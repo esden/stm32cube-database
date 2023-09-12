@@ -1,15 +1,28 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 <IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" DBVersion="V4.0" Name="SMARTCARD" Version="STM32Cube_FW_H7_V0.4.0" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
-    <RefConfig Name="SmartCard_Init">
+        <RefConfig Name="SmartCard_Init">
         <CallLibMethod Name="HAL_SMARTCARD_Init">
+	<MethodArg Name="NACKEnable" ParameterName="NACKState"/>
         <MethodArg Name="StopBits" ParameterName="SmartCardStopBits"/>
         <MethodArg Name="Mode" ParameterName="SmartCardMode"/>
         <MethodArg Name="Parity" ParameterName="SmartCardParity"/>
-        <MethodArg Name="NACKEnable" ParameterName="NACKState"/>
 	<MethodArg Name="WordLength" ParameterName="SmartCardWordLength"/>
-        <MethodArg Name="FIFOMode" ParameterName="SmartCardFIFOMode"/>
-        <MethodArg Name="TXFIFOThreshold" ParameterName="SmartCardTXFIFOThreshold"/>
-        <MethodArg Name="RXFIFOThreshold" ParameterName="SmartCardRXFIFOThreshold"/>
+        <MethodArg Name="ClockPrescaler" ParameterName="SmartCardPrescaler"/>
+        </CallLibMethod>
+        <IFCondition Expression="(SmartCardFIFOMode=SMARTCARD_FIFOMODE_ENABLE)">
+        <CallLibMethod Name="HAL_SMARTCARDEx_EnableFifoMode">
+        </CallLibMethod>
+        </IFCondition>
+        
+        <IFCondition Expression="(SmartCardFIFOMode=SMARTCARD_FIFOMODE_DISABLE)">
+        <CallLibMethod Name="HAL_SMARTCARDEx_DisableFifoMode">
+        </CallLibMethod>
+        </IFCondition>
+        <CallLibMethod Name="HAL_SMARTCARDEx_SetTxFifoThreshold">
+            <MethodArg Name="Threshold" ParameterName="SmartCardTXFIFOThreshold"/>
+        </CallLibMethod>
+        <CallLibMethod Name="HAL_SMARTCARDEx_SetRxFifoThreshold">
+            <MethodArg Name="Threshold" ParameterName="SmartCardRXFIFOThreshold"/>
         </CallLibMethod>
         <ImplementCallBack Name="HAL_SMARTCARD_MspInit"/>
         <ImplementCallBack Name="HAL_SMARTCARD_MspDeInit"/>
@@ -34,12 +47,10 @@
                 <Argument AddressOf="false" GenericType="simple" Name="GuardTime" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="NACKEnable" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="TimeOutEnable" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal" />
-                <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal" />
+                <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="AutoRetryCount" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="FIFOMode" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TXFIFOThreshold" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="RXFIFOThreshold" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
             </Argument>
             <Argument AddressOf="false" GenericType="struct" Name="AdvancedInit" TypeName="SMARTCARD_AdvFeatureInitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="AdvFeatureInit" OptimizationCondition="equal"/>
@@ -58,6 +69,11 @@
             <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
@@ -65,7 +81,7 @@
             <Argument AddressOf="false" GenericType="simple" Name="RxState" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
         </Argument>
-        <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal" />
+        <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
     </LibMethod>
     <LibMethod Comment="" Name="HAL_SMARTCARDEx_TimeOut_Config">
         <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsmartcard" TypeName="SMARTCARD_HandleTypeDef">
@@ -84,12 +100,10 @@
                 <Argument AddressOf="false" GenericType="simple" Name="GuardTime" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="NACKEnable" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="TimeOutEnable" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal" />
-                <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal" />
+                <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="AutoRetryCount" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="FIFOMode" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TXFIFOThreshold" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="RXFIFOThreshold" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
             </Argument>
             <Argument AddressOf="false" GenericType="struct" Name="AdvancedInit" TypeName="SMARTCARD_AdvFeatureInitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="AdvFeatureInit" OptimizationCondition="equal"/>
@@ -108,6 +122,11 @@
             <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
@@ -115,7 +134,7 @@
             <Argument AddressOf="false" GenericType="simple" Name="RxState" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
         </Argument>
-        <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal" />
+        <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
     </LibMethod>
     <LibMethod Comment="" Name="HAL_SMARTCARDEx_EnableReceiverTimeOut">
         <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsmartcard" TypeName="SMARTCARD_HandleTypeDef">
@@ -137,9 +156,7 @@
                 <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="AutoRetryCount" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="FIFOMode" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TXFIFOThreshold" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="RXFIFOThreshold" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
             </Argument>
             <Argument AddressOf="false" GenericType="struct" Name="AdvancedInit" TypeName="SMARTCARD_AdvFeatureInitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="AdvFeatureInit" OptimizationCondition="equal"/>
@@ -158,6 +175,11 @@
             <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
@@ -186,9 +208,7 @@
                 <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="AutoRetryCount" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="FIFOMode" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TXFIFOThreshold" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="RXFIFOThreshold" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
             </Argument>
             <Argument AddressOf="false" GenericType="struct" Name="AdvancedInit" TypeName="SMARTCARD_AdvFeatureInitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="AdvFeatureInit" OptimizationCondition="equal"/>
@@ -207,6 +227,11 @@
             <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
@@ -214,6 +239,320 @@
             <Argument AddressOf="false" GenericType="simple" Name="RxState" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
         </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SMARTCARDEx_RxFifoFullCallback">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsmartcard" TypeName="SMARTCARD_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SMARTCARD_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OneBitSampling" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Prescaler" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GuardTime" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NACKEnable" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TimeOutEnable" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AutoRetryCount" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="struct" Name="AdvancedInit" TypeName="SMARTCARD_AdvFeatureInitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="AdvFeatureInit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TxPinLevelInvert" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="RxPinLevelInvert" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DataInvert" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Swap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OverrunDisable" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DMADisableonRxError" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MSBFirst" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TxCompletionIndication" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="gState" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxState" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SMARTCARDEx_TxFifoEmptyCallback">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsmartcard" TypeName="SMARTCARD_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SMARTCARD_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OneBitSampling" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Prescaler" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GuardTime" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NACKEnable" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TimeOutEnable" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AutoRetryCount" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="struct" Name="AdvancedInit" TypeName="SMARTCARD_AdvFeatureInitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="AdvFeatureInit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TxPinLevelInvert" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="RxPinLevelInvert" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DataInvert" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Swap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OverrunDisable" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DMADisableonRxError" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MSBFirst" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TxCompletionIndication" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="gState" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxState" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SMARTCARDEx_EnableFifoMode">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsmartcard" TypeName="SMARTCARD_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SMARTCARD_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OneBitSampling" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Prescaler" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GuardTime" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NACKEnable" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TimeOutEnable" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AutoRetryCount" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="struct" Name="AdvancedInit" TypeName="SMARTCARD_AdvFeatureInitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="AdvFeatureInit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TxPinLevelInvert" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="RxPinLevelInvert" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DataInvert" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Swap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OverrunDisable" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DMADisableonRxError" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MSBFirst" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TxCompletionIndication" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="gState" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxState" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SMARTCARDEx_DisableFifoMode">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsmartcard" TypeName="SMARTCARD_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SMARTCARD_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OneBitSampling" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Prescaler" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GuardTime" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NACKEnable" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TimeOutEnable" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AutoRetryCount" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="struct" Name="AdvancedInit" TypeName="SMARTCARD_AdvFeatureInitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="AdvFeatureInit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TxPinLevelInvert" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="RxPinLevelInvert" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DataInvert" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Swap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OverrunDisable" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DMADisableonRxError" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MSBFirst" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TxCompletionIndication" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="gState" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxState" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SMARTCARDEx_SetTxFifoThreshold">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsmartcard" TypeName="SMARTCARD_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SMARTCARD_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OneBitSampling" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Prescaler" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GuardTime" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NACKEnable" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TimeOutEnable" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AutoRetryCount" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="struct" Name="AdvancedInit" TypeName="SMARTCARD_AdvFeatureInitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="AdvFeatureInit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TxPinLevelInvert" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="RxPinLevelInvert" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DataInvert" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Swap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OverrunDisable" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DMADisableonRxError" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MSBFirst" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TxCompletionIndication" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="gState" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxState" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="Threshold" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_SMARTCARDEx_SetRxFifoThreshold">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsmartcard" TypeName="SMARTCARD_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SMARTCARD_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OneBitSampling" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Prescaler" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GuardTime" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NACKEnable" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TimeOutEnable" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AutoRetryCount" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="false" GenericType="struct" Name="AdvancedInit" TypeName="SMARTCARD_AdvFeatureInitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="AdvFeatureInit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TxPinLevelInvert" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="RxPinLevelInvert" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DataInvert" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Swap" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OverrunDisable" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DMADisableonRxError" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MSBFirst" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TxCompletionIndication" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="gState" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxState" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="Threshold" OptimizationCondition="equal"/>
     </LibMethod>
     <LibMethod Comment="" Name="HAL_SMARTCARD_Init">
         <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsmartcard" TypeName="SMARTCARD_HandleTypeDef">
@@ -235,9 +574,7 @@
                 <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="AutoRetryCount" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="FIFOMode" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TXFIFOThreshold" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="RXFIFOThreshold" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
             </Argument>
             <Argument AddressOf="false" GenericType="struct" Name="AdvancedInit" TypeName="SMARTCARD_AdvFeatureInitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="AdvFeatureInit" OptimizationCondition="equal"/>
@@ -256,6 +593,11 @@
             <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
@@ -284,9 +626,7 @@
                 <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="AutoRetryCount" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="FIFOMode" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TXFIFOThreshold" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="RXFIFOThreshold" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
             </Argument>
             <Argument AddressOf="false" GenericType="struct" Name="AdvancedInit" TypeName="SMARTCARD_AdvFeatureInitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="AdvFeatureInit" OptimizationCondition="equal"/>
@@ -305,6 +645,11 @@
             <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
@@ -331,11 +676,9 @@
                 <Argument AddressOf="false" GenericType="simple" Name="NACKEnable" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="TimeOutEnable" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal" />
+                <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="AutoRetryCount" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="FIFOMode" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TXFIFOThreshold" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="RXFIFOThreshold" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
             </Argument>
             <Argument AddressOf="false" GenericType="struct" Name="AdvancedInit" TypeName="SMARTCARD_AdvFeatureInitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="AdvFeatureInit" OptimizationCondition="equal"/>
@@ -354,6 +697,11 @@
             <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
@@ -382,9 +730,7 @@
                 <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="AutoRetryCount" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="FIFOMode" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TXFIFOThreshold" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="RXFIFOThreshold" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
             </Argument>
             <Argument AddressOf="false" GenericType="struct" Name="AdvancedInit" TypeName="SMARTCARD_AdvFeatureInitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="AdvFeatureInit" OptimizationCondition="equal"/>
@@ -403,6 +749,11 @@
             <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
@@ -431,9 +782,7 @@
                 <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="AutoRetryCount" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="FIFOMode" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TXFIFOThreshold" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="RXFIFOThreshold" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
             </Argument>
             <Argument AddressOf="false" GenericType="struct" Name="AdvancedInit" TypeName="SMARTCARD_AdvFeatureInitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="AdvFeatureInit" OptimizationCondition="equal"/>
@@ -452,6 +801,11 @@
             <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
@@ -480,12 +834,10 @@
                 <Argument AddressOf="false" GenericType="simple" Name="GuardTime" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="NACKEnable" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="TimeOutEnable" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal" />
-                <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal" />
+                <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="AutoRetryCount" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="FIFOMode" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TXFIFOThreshold" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="RXFIFOThreshold" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
             </Argument>
             <Argument AddressOf="false" GenericType="struct" Name="AdvancedInit" TypeName="SMARTCARD_AdvFeatureInitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="AdvFeatureInit" OptimizationCondition="equal"/>
@@ -504,6 +856,11 @@
             <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
@@ -532,12 +889,10 @@
                 <Argument AddressOf="false" GenericType="simple" Name="GuardTime" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="NACKEnable" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="TimeOutEnable" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal" />
-                <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal" />
+                <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="AutoRetryCount" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="FIFOMode" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TXFIFOThreshold" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="RXFIFOThreshold" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
             </Argument>
             <Argument AddressOf="false" GenericType="struct" Name="AdvancedInit" TypeName="SMARTCARD_AdvFeatureInitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="AdvFeatureInit" OptimizationCondition="equal"/>
@@ -556,6 +911,11 @@
             <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
@@ -583,12 +943,10 @@
                 <Argument AddressOf="false" GenericType="simple" Name="GuardTime" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="NACKEnable" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="TimeOutEnable" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal" />
-                <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal" />
+                <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="AutoRetryCount" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="FIFOMode" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TXFIFOThreshold" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="RXFIFOThreshold" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
             </Argument>
             <Argument AddressOf="false" GenericType="struct" Name="AdvancedInit" TypeName="SMARTCARD_AdvFeatureInitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="AdvFeatureInit" OptimizationCondition="equal"/>
@@ -607,6 +965,11 @@
             <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
@@ -637,9 +1000,7 @@
                 <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="AutoRetryCount" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="FIFOMode" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TXFIFOThreshold" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="RXFIFOThreshold" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
             </Argument>
             <Argument AddressOf="false" GenericType="struct" Name="AdvancedInit" TypeName="SMARTCARD_AdvFeatureInitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="AdvFeatureInit" OptimizationCondition="equal"/>
@@ -658,6 +1019,11 @@
             <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
@@ -688,9 +1054,7 @@
                 <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="AutoRetryCount" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="FIFOMode" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TXFIFOThreshold" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="RXFIFOThreshold" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
             </Argument>
             <Argument AddressOf="false" GenericType="struct" Name="AdvancedInit" TypeName="SMARTCARD_AdvFeatureInitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="AdvFeatureInit" OptimizationCondition="equal"/>
@@ -709,6 +1073,11 @@
             <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
@@ -739,9 +1108,7 @@
                 <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="AutoRetryCount" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="FIFOMode" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TXFIFOThreshold" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="RXFIFOThreshold" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
             </Argument>
             <Argument AddressOf="false" GenericType="struct" Name="AdvancedInit" TypeName="SMARTCARD_AdvFeatureInitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="AdvFeatureInit" OptimizationCondition="equal"/>
@@ -760,6 +1127,11 @@
             <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
@@ -788,9 +1160,7 @@
                 <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="AutoRetryCount" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="FIFOMode" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TXFIFOThreshold" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="RXFIFOThreshold" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
             </Argument>
             <Argument AddressOf="false" GenericType="struct" Name="AdvancedInit" TypeName="SMARTCARD_AdvFeatureInitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="AdvFeatureInit" OptimizationCondition="equal"/>
@@ -809,6 +1179,11 @@
             <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
@@ -837,9 +1212,7 @@
                 <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="AutoRetryCount" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="FIFOMode" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TXFIFOThreshold" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="RXFIFOThreshold" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
             </Argument>
             <Argument AddressOf="false" GenericType="struct" Name="AdvancedInit" TypeName="SMARTCARD_AdvFeatureInitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="AdvFeatureInit" OptimizationCondition="equal"/>
@@ -858,6 +1231,11 @@
             <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
@@ -886,9 +1264,7 @@
                 <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="AutoRetryCount" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="FIFOMode" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TXFIFOThreshold" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="RXFIFOThreshold" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
             </Argument>
             <Argument AddressOf="false" GenericType="struct" Name="AdvancedInit" TypeName="SMARTCARD_AdvFeatureInitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="AdvFeatureInit" OptimizationCondition="equal"/>
@@ -907,6 +1283,11 @@
             <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
@@ -935,9 +1316,7 @@
                 <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="AutoRetryCount" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="FIFOMode" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TXFIFOThreshold" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="RXFIFOThreshold" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
             </Argument>
             <Argument AddressOf="false" GenericType="struct" Name="AdvancedInit" TypeName="SMARTCARD_AdvFeatureInitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="AdvFeatureInit" OptimizationCondition="equal"/>
@@ -956,6 +1335,11 @@
             <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
@@ -984,9 +1368,7 @@
                 <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="AutoRetryCount" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="FIFOMode" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TXFIFOThreshold" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="RXFIFOThreshold" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
             </Argument>
             <Argument AddressOf="false" GenericType="struct" Name="AdvancedInit" TypeName="SMARTCARD_AdvFeatureInitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="AdvFeatureInit" OptimizationCondition="equal"/>
@@ -1005,6 +1387,11 @@
             <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
@@ -1033,9 +1420,7 @@
                 <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="AutoRetryCount" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="FIFOMode" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TXFIFOThreshold" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="RXFIFOThreshold" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
             </Argument>
             <Argument AddressOf="false" GenericType="struct" Name="AdvancedInit" TypeName="SMARTCARD_AdvFeatureInitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="AdvFeatureInit" OptimizationCondition="equal"/>
@@ -1054,6 +1439,11 @@
             <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
@@ -1082,9 +1472,7 @@
                 <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="AutoRetryCount" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="FIFOMode" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TXFIFOThreshold" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="RXFIFOThreshold" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
             </Argument>
             <Argument AddressOf="false" GenericType="struct" Name="AdvancedInit" TypeName="SMARTCARD_AdvFeatureInitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="AdvFeatureInit" OptimizationCondition="equal"/>
@@ -1103,6 +1491,11 @@
             <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
@@ -1131,9 +1524,7 @@
                 <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="AutoRetryCount" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="FIFOMode" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TXFIFOThreshold" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="RXFIFOThreshold" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
             </Argument>
             <Argument AddressOf="false" GenericType="struct" Name="AdvancedInit" TypeName="SMARTCARD_AdvFeatureInitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="AdvFeatureInit" OptimizationCondition="equal"/>
@@ -1152,6 +1543,11 @@
             <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
@@ -1180,9 +1576,7 @@
                 <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="AutoRetryCount" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="FIFOMode" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TXFIFOThreshold" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="RXFIFOThreshold" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
             </Argument>
             <Argument AddressOf="false" GenericType="struct" Name="AdvancedInit" TypeName="SMARTCARD_AdvFeatureInitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="AdvFeatureInit" OptimizationCondition="equal"/>
@@ -1201,6 +1595,11 @@
             <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
@@ -1229,9 +1628,7 @@
                 <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="AutoRetryCount" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="FIFOMode" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TXFIFOThreshold" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="RXFIFOThreshold" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
             </Argument>
             <Argument AddressOf="false" GenericType="struct" Name="AdvancedInit" TypeName="SMARTCARD_AdvFeatureInitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="AdvFeatureInit" OptimizationCondition="equal"/>
@@ -1250,6 +1647,11 @@
             <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
@@ -1278,9 +1680,7 @@
                 <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="AutoRetryCount" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="FIFOMode" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TXFIFOThreshold" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="RXFIFOThreshold" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
             </Argument>
             <Argument AddressOf="false" GenericType="struct" Name="AdvancedInit" TypeName="SMARTCARD_AdvFeatureInitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="AdvFeatureInit" OptimizationCondition="equal"/>
@@ -1299,6 +1699,11 @@
             <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
@@ -1327,9 +1732,7 @@
                 <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="AutoRetryCount" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="FIFOMode" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TXFIFOThreshold" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="RXFIFOThreshold" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
             </Argument>
             <Argument AddressOf="false" GenericType="struct" Name="AdvancedInit" TypeName="SMARTCARD_AdvFeatureInitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="AdvFeatureInit" OptimizationCondition="equal"/>
@@ -1348,6 +1751,11 @@
             <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
@@ -1376,9 +1784,7 @@
                 <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="AutoRetryCount" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="FIFOMode" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TXFIFOThreshold" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="RXFIFOThreshold" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
             </Argument>
             <Argument AddressOf="false" GenericType="struct" Name="AdvancedInit" TypeName="SMARTCARD_AdvFeatureInitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="AdvFeatureInit" OptimizationCondition="equal"/>
@@ -1397,6 +1803,11 @@
             <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
@@ -1425,9 +1836,7 @@
                 <Argument AddressOf="false" GenericType="simple" Name="TimeOutValue" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="BlockLength" OptimizationCondition="equal"/>
                 <Argument AddressOf="false" GenericType="simple" Name="AutoRetryCount" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="FIFOMode" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="TXFIFOThreshold" OptimizationCondition="equal"/>
-                <Argument AddressOf="false" GenericType="simple" Name="RXFIFOThreshold" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
             </Argument>
             <Argument AddressOf="false" GenericType="struct" Name="AdvancedInit" TypeName="SMARTCARD_AdvFeatureInitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="AdvFeatureInit" OptimizationCondition="equal"/>
@@ -1446,6 +1855,11 @@
             <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>

@@ -76,7 +76,7 @@
             [/#list]
             [#if !exist]  [#-- if exist --]
               [#if argument.status!="NULL"]
-                    #t${argument.typeName} ${argument.name};
+                    #t${argument.typeName} ${argument.name} = {0};
                 [#if myListOfLocalVariables != ""]
                   [#assign myListOfLocalVariables = myListOfLocalVariables + " " + argument.name]
                 [#else]
@@ -89,7 +89,7 @@
           [/#if][#-- if global --]
         [#else][#-- if context?? --]
           [#if argument.status!="NULL"]
-                #t${argument.typeName} ${argument.name};
+                #t${argument.typeName} ${argument.name} = {0};
           [/#if]
         [/#if][#-- if argument.context?? --]
 
@@ -544,6 +544,10 @@ static void MX_${instName}_Init(void)
   [/#if]
 {
 [/#if]
+#n#t/* USER CODE BEGIN ${instName}_Init 0 */
+#n
+#t/* USER CODE END ${instName}_Init 0 */
+#n
   [#assign args = ""]
   [#assign listOfLocalVariables=""]
   [#assign resultList=""]
@@ -551,10 +555,16 @@ static void MX_${instName}_Init(void)
     [@getLocalVariable configModel1=config listOfLocalVariables=listOfLocalVariables resultList=resultList/]
     [#assign listOfLocalVariables=resultList]
   [/#list]
+#n#t/* USER CODE BEGIN ${instName}_Init 1 */
+#n
+#t/* USER CODE END ${instName}_Init 1 */
   [#if listOfLocalVariables!=""]#n[/#if]
   [#list instanceData.configs as config]
     [@generateConfigModelCode configModel=config inst=instName nTab=1/]
   [/#list]
+#t/* USER CODE BEGIN ${instName}_Init 2 */
+#n
+#t/* USER CODE END ${instName}_Init 2 */
 [#if instanceData.isMWUsed=="false"]  
 }
 [/#if]

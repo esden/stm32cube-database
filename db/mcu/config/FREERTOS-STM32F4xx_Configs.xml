@@ -10,11 +10,39 @@
         <ConfigFile Name="INC"/>
         <ConfigFile Name="VARS"/>
         <ConfigFile Name="PFP"/>
-        <ConfigFile Name="THREADS_CODE"/>
+        <ConfigFile Name="DEFAULT_THREAD"/>
         <ConfigFile Name="USER_THREADS"/>
         <ConfigFile Name="RTOS_START"/>
     </RefConfig>
-
+    
+    <RefConfig Comment="" Name="FREERTOS_CMSIS_V2_ENABLE_Init">  
+        <CallLibMethod Name="osKernelStart" ReturnHAL="false"/>                 
+        <Component Name="Middleware:FREERTOS:HEAP:$HEAP_NUMBER"/>
+        <ConfigFile Name="CONFIG_V2"/>
+        <ConfigFile Name="HOOKS_V2"/>
+        <ConfigFile Name="CREATION_V2"/>
+        <ConfigFile Name="INC"/>
+        <ConfigFile Name="VARS_V2"/>
+        <ConfigFile Name="PFP_V2"/>
+        <ConfigFile Name="DEFAULT_THREAD_V2"/>
+        <ConfigFile Name="USER_THREADS_V2"/>
+        <ConfigFile Name="RTOS_START"/>
+    </RefConfig>
+    
+    <RefConfig Comment="" Name="FREERTOS_NATIVE_ENABLE_Init">       
+        <CallLibMethod Name="osKernelStart" ReturnHAL="false"/>                 
+        <Component Name="Middleware:FREERTOS:HEAP:$HEAP_NUMBER"/>
+        <ConfigFile Name="CONFIG"/>
+        <ConfigFile Name="HOOKS"/>
+        <ConfigFile Name="CREATION_NATIVE"/>
+        <ConfigFile Name="INC_NATIVE"/>
+        <ConfigFile Name="VARS_NATIVE"/>
+        <ConfigFile Name="PFP_NATIVE"/>
+        <ConfigFile Name="DEFAULT_THREAD_NATIVE"/>
+        <ConfigFile Name="USER_THREADS_NATIVE"/>
+        <ConfigFile Name="RTOS_START_NATIVE"/>
+    </RefConfig>
+       
     <LibMethod Comment="Start scheduler" Name="osKernelStart">
         <Argument Context="local" GenericType="baseaddress" Name="thread_def" TypeName="osThreadDef_t *"/>
         <Argument Context="local" GenericType="baseaddress" Name="argument" TypeName="void *"/>
@@ -49,10 +77,13 @@
         <File Category="source" Name="Source/tasks.c"/>
         <File Category="source" Name="Source/timers.c"/>
         
-        <!-- <File Category="source" Name="Source/CMSIS_RTOS/*.c"/> -->
-        <!-- <File Category="header" Name="Source/CMSIS_RTOS/*.h"/> -->
-        <File Category="source" Name="Source/CMSIS_RTOS/cmsis_os.c"/>
-        <File Category="header" Name="Source/CMSIS_RTOS/cmsis_os.h"/>
+        <!-- Section for copying the right files according to the chosen API -->
+        <File Category="source" Name="Source/CMSIS_RTOS/cmsis_os.c" Condition="S_CMSIS_RTOS_V1"/>
+        <File Category="header" Name="Source/CMSIS_RTOS/cmsis_os.h" Condition="S_CMSIS_RTOS_V1"/>
+        <File Category="source" Name="Source/CMSIS_RTOS_V2/cmsis_os2.c" Condition="S_CMSIS_RTOS_V2"/>
+        <File Category="header" Name="Source/CMSIS_RTOS_V2/cmsis_os2.h" Condition="S_CMSIS_RTOS_V2"/>
+        <File Category="header" Name="Source/CMSIS_RTOS_V2/cmsis_os.h" Condition="S_CMSIS_RTOS_V2"/>
+        <File Category="source" Name="Source/portable/Common/mpu_wrappers.c" Condition="S_FREERTOS_WITH_MPU"/>     
         
         <SubComponent Csub="HEAP" Cvariant="1">
             <File Category="source" Name="Source/portable/MemMang/heap_1.c"/>
@@ -72,21 +103,30 @@
    
         <!-- F4 is based on Cortex-M4 -->
         <SubComponent Csub="IAR">
-            <File Category="source" Name="Source/portable/IAR/ARM_CM4F/port.c"/>
-            <File Category="source" Name="Source/portable/IAR/ARM_CM4F/portasm.s"/>
-            <File Category="header" Name="Source/portable/IAR/ARM_CM4F/portmacro.h"/>
-        </SubComponent>                  
+            <File Category="source" Name="Source/portable/IAR/ARM_CM4F/port.c" Condition="!S_FREERTOS_WITH_MPU"/>
+            <File Category="source" Name="Source/portable/IAR/ARM_CM4F/portasm.s" Condition="!S_FREERTOS_WITH_MPU"/>
+            <File Category="header" Name="Source/portable/IAR/ARM_CM4F/portmacro.h" Condition="!S_FREERTOS_WITH_MPU"/>
+            <File Category="source" Name="Source/portable/IAR/ARM_CM4_MPU/port.c" Condition="S_FREERTOS_WITH_MPU"/>
+            <File Category="source" Name="Source/portable/IAR/ARM_CM4_MPU/portasm.s" Condition="S_FREERTOS_WITH_MPU"/>
+            <File Category="header" Name="Source/portable/IAR/ARM_CM4_MPU/portmacro.h" Condition="S_FREERTOS_WITH_MPU"/>
+        </SubComponent>
         <SubComponent Csub="Keil">    <!-- Keil refers to RVDS files -->
-            <File Category="source" Name="Source/portable/RVDS/ARM_CM4F/port.c"/>
-            <File Category="header" Name="Source/portable/RVDS/ARM_CM4F/portmacro.h"/>
+            <File Category="source" Name="Source/portable/RVDS/ARM_CM4F/port.c" Condition="!S_FREERTOS_WITH_MPU"/>
+            <File Category="header" Name="Source/portable/RVDS/ARM_CM4F/portmacro.h" Condition="!S_FREERTOS_WITH_MPU"/>
+            <File Category="source" Name="Source/portable/RVDS/ARM_CM4_MPU/port.c" Condition="S_FREERTOS_WITH_MPU"/>
+            <File Category="header" Name="Source/portable/RVDS/ARM_CM4_MPU/portmacro.h" Condition="S_FREERTOS_WITH_MPU"/>
         </SubComponent> 
         <SubComponent Csub="RVDS">
-            <File Category="source" Name="Source/portable/RVDS/ARM_CM4F/port.c"/>
-            <File Category="header" Name="Source/portable/RVDS/ARM_CM4F/portmacro.h"/>
+            <File Category="source" Name="Source/portable/RVDS/ARM_CM4F/port.c" Condition="!S_FREERTOS_WITH_MPU"/>
+            <File Category="header" Name="Source/portable/RVDS/ARM_CM4F/portmacro.h" Condition="!S_FREERTOS_WITH_MPU"/>
+            <File Category="source" Name="Source/portable/RVDS/ARM_CM4_MPU/port.c" Condition="S_FREERTOS_WITH_MPU"/>
+            <File Category="header" Name="Source/portable/RVDS/ARM_CM4_MPU/portmacro.h" Condition="S_FREERTOS_WITH_MPU"/>
         </SubComponent> 
         <SubComponent Csub="GCC">
-            <File Category="source" Name="Source/portable/GCC/ARM_CM4F/port.c"/>
-            <File Category="header" Name="Source/portable/GCC/ARM_CM4F/portmacro.h"/>
+            <File Category="source" Name="Source/portable/GCC/ARM_CM4F/port.c" Condition="!S_FREERTOS_WITH_MPU"/>
+            <File Category="header" Name="Source/portable/GCC/ARM_CM4F/portmacro.h" Condition="!S_FREERTOS_WITH_MPU"/>
+            <File Category="source" Name="Source/portable/GCC/ARM_CM4_MPU/port.c" Condition="S_FREERTOS_WITH_MPU"/>
+            <File Category="header" Name="Source/portable/GCC/ARM_CM4_MPU/portmacro.h" Condition="S_FREERTOS_WITH_MPU"/>
         </SubComponent> 
         <!--
         <SubComponent Csub="Tasking" >
@@ -133,7 +173,7 @@
         <File Category="source" Condition="all" Name="rtos_start.tmp" Version="10.0.1"/>
     </RefConfigFile>
 
-    <RefConfigFile Description="FreeRTOS default thread" Name="THREADS_CODE" Template="freertos_threads.ftl">
+    <RefConfigFile Description="FreeRTOS default thread" Name="DEFAULT_THREAD" Template="freertos_threads.ftl">
         <File Category="source" Condition="all" Name="rtos_threads.tmp" Version="10.0.1"/>
         <Argument Comment="User threads" GenericType="rtos_list" Name="Threads"/>
     </RefConfigFile>
@@ -250,6 +290,215 @@
         <Argument Comment="Set to 1 if you wish to use a hook, or 0 to omit it" GenericType="simple" Name="configUSE_DAEMON_TASK_STARTUP_HOOK"/>
         <Argument Comment="Static allocation" GenericType="simple" Name="MEMORY_ALLOCATION"/>
         <Argument Comment="Set to 1 to include software timer functionality, or 0 to omit it" GenericType="simple" Name="configUSE_TIMERS"/>
+    </RefConfigFile>
+
+    <!-- Specific for CMSIS V2 -->
+
+    <RefConfigFile Description="Variable declarations for FreeRTOS" Name="VARS_V2" Template="freertos_vars_v10_0_cmsis_v2.ftl">  
+        <File Category="source" Condition="all" Name="rtos_vars.tmp" Version="10.0.1"/>
+        <Argument Comment="User threads" GenericType="rtos_list" Name="Threads"/>
+        <Argument Comment="User queues" GenericType="rtos_list" Name="Queues"/>
+        <Argument Comment="User timers" GenericType="rtos_list" Name="Timers"/>     
+        <Argument Comment="User mutexes" GenericType="rtos_list" Name="Mutexes"/>  
+        <Argument Comment="User recursive mutexes" GenericType="rtos_list" Name="RecursiveMutexes"/>
+        <Argument Comment="User binary semaphores" GenericType="rtos_list" Name="BinarySemaphores"/>  
+        <Argument Comment="User counting semaphores" GenericType="rtos_list" Name="Semaphores"/>  
+    </RefConfigFile>
+    
+    <RefConfigFile Description="Private Functions Prototypes for FreeRTOS" Name="PFP_V2" Template="freertos_pfp_cmsis_v2.ftl">
+        <File Category="source" Condition="all" Name="rtos_pfp.tmp" Version="10.0.1"/>
+        <Argument Comment="User threads" GenericType="rtos_list" Name="Threads"/>
+        <Argument Comment="User timers" GenericType="rtos_list" Name="Timers"/>
+    </RefConfigFile>
+    
+    <RefConfigFile Description="Variable creation then launch the RTOS" Name="CREATION_V2" Template="freertos_init_c_v10_0_cmsis_v2.ftl">
+        <File Category="source" Condition="all" Name="rtos_HalInit.tmp" Version="10.0.1"/>
+        <Argument Comment="User threads" GenericType="rtos_list" Name="Threads"/>
+        <Argument Comment="User queues" GenericType="rtos_list" Name="Queues"/>
+        <Argument Comment="User timers" GenericType="rtos_list" Name="Timers"/>     
+        <Argument Comment="User mutexes" GenericType="rtos_list" Name="Mutexes"/>
+        <Argument Comment="User recursive mutexes" GenericType="rtos_list" Name="RecursiveMutexes"/>
+        <Argument Comment="User binary semaphores" GenericType="rtos_list" Name="BinarySemaphores"/>  
+        <Argument Comment="User counting semaphores" GenericType="rtos_list" Name="Semaphores"/> 
+        <Argument Comment="API in use" GenericType="simple" Name="FreeRTOS_API"/>   <!--  need to distinguish CMSIS v1 and v2 -->
+    </RefConfigFile>
+
+    <RefConfigFile Description="FreeRTOS default thread" Name="DEFAULT_THREAD_V2" Template="freertos_body_default_thread_cmsis_v2.ftl">
+        <File Category="source" Condition="all" Name="rtos_threads.tmp" Version="10.0.1"/>
+        <Argument Comment="User threads" GenericType="rtos_list" Name="Threads"/>
+        <Argument Comment="" GenericType="simple" Name="FreeRTOS_API"/>   <!--  need to distinguish CMSIS v1 and v2 -->
+    </RefConfigFile>
+
+    <RefConfigFile Description="FreeRTOS user threads" Name="USER_THREADS_V2" Template="freertos_body_user_threads_cmsis_v2.ftl">
+        <File Category="source" Condition="all" Name="rtos_user_threads.tmp" Version="10.0.1"/>
+        <Argument Comment="User threads" GenericType="rtos_list" Name="Threads"/>
+        <Argument Comment="User timers" GenericType="rtos_list" Name="Timers"/>
+    </RefConfigFile>
+
+    <!-- use specific template file to generate header file containing #define -->
+    <RefConfigFile Description="Header file for #define" Name="CONFIG_V2" Template="freertos_conf_v10_0_cmsis_v2.ftl">
+        <File Category="header" Condition="all" Name="FreeRTOSConfig.h" Version="10.0.1"/>
+        <!-- Parameters for FReeRTOS -->
+        <Argument Comment="Set to 1 to use the preemptive RTOS scheduler, or 0 to use the cooperative RTOS scheduler. " GenericType="simple" Name="configUSE_PREEMPTION"/>
+        <Argument Comment="Frequency in Hz of the internal CPU clock" GenericType="simple" Name="configCPU_CLOCK_HZ"/>
+        <Argument Comment="The frequency of the RTOS tick interrupt" GenericType="simple" Name="configTICK_RATE_HZ"/>
+        <Argument Comment="The number of priorities available to the application tasks" GenericType="simple" Name="configMAX_PRIORITIES"/>
+        <Argument Comment="The size of the stack used by the idle task" GenericType="simple" Name="configMINIMAL_STACK_SIZE"/>
+        <Argument Comment="The total amount of RAM available to the RTOS kernel" GenericType="simple" Name="configTOTAL_HEAP_SIZE"/>
+        <Argument Comment="The maximum permissible length of the descriptive name given to a task when the task is created" GenericType="simple" Name="configMAX_TASK_NAME_LEN"/>
+        <Argument Comment="" GenericType="simple" Name="configUSE_16_BIT_TICKS"/>
+        <Argument Comment="This parameter controls the behaviour of tasks at the idle priority" GenericType="simple" Name="configIDLE_SHOULD_YIELD"/>
+        <Argument Comment="Set to 1 to include mutex functionality, or 0 to omit it" GenericType="simple" Name="configUSE_MUTEXES"/>
+        <Argument Comment="Set to 1 to include recursive mutex functionality, or 0 to omit it" GenericType="simple" Name="configUSE_RECURSIVE_MUTEXES"/>  
+        <Argument Comment="Set to 1 to include counting semaphore functionality, or 0 to omit it" GenericType="simple" Name="configUSE_COUNTING_SEMAPHORES"/>  
+        <Argument Comment="Defines the maximum number of queues and semaphores that can be registered." GenericType="simple" Name="configQUEUE_REGISTRY_SIZE"/>
+        <Argument Comment="" GenericType="simple" Name="configUSE_APPLICATION_TASK_TAG"/>
+        
+        <Argument Comment="Set to 1 if you wish to use an idle hook, or 0 to omit it" GenericType="simple" Name="configUSE_IDLE_HOOK"/>
+        <Argument Comment="Set to 1 if you wish to use a tick hook, or 0 to omit it" GenericType="simple" Name="configUSE_TICK_HOOK"/>
+        <Argument Comment="Set to 1 if you wish to use a malloc failed hook, or 0 to omit it" GenericType="simple" Name="configUSE_MALLOC_FAILED_HOOK"/>
+        
+        <!--  <Argument Name="configUSE_TICK_HOOK" GenericType="simple" Comment=
+            "&#xD;Tick hook: when set to 1, the application must provide the hook function (a callback) with the following prototype: &#xD;    void vApplicationTickHook( void );&#xD;"/> -->
+        <Argument Comment="" GenericType="simple" Name="configCHECK_FOR_STACK_OVERFLOW"/>
+        
+        <Argument Comment="Set to 1 to include additional structure members and functions to assist with execution visualisation and tracing" GenericType="simple" Name="configUSE_TRACE_FACILITY"/>    
+        <Argument Comment="When set to 1, a collection of run time statistics is enabled" GenericType="simple" Name="configGENERATE_RUN_TIME_STATS"/>
+        <Argument Comment="When USE_TRACE_FACILITY and USE_STATS_FORMATTING_FUNCTIONS set to 1, the vTaskList() and vTaskGetRunTimeStats() functions are included in the build." GenericType="simple" Name="configUSE_STATS_FORMATTING_FUNCTIONS"/>
+
+        <Argument Comment="Set to 1 to include co-routine functionality, or 0 to omit it" GenericType="simple" Name="configUSE_CO_ROUTINES"/>
+        <Argument Comment="The number of priorities available to the application co-routines." GenericType="simple" Name="configMAX_CO_ROUTINE_PRIORITIES"/>
+              
+        <Argument Comment="Set to 1 to include software timer functionality, or 0 to omit it" GenericType="simple" Name="configUSE_TIMERS"/>
+        <Argument Comment="Sets the priority of the software timer service/daemon task" GenericType="simple" Name="configTIMER_TASK_PRIORITY"/>
+        <Argument Comment="Sets the length of the software timer command queue" GenericType="simple" Name="configTIMER_QUEUE_LENGTH"/>
+        <Argument Comment="Sets the size of the stack (in words, not bytes) allocated to the timer service task." GenericType="simple" Name="configTIMER_TASK_STACK_DEPTH"/>
+        
+        <!-- <Argument Name="configKERNEL_INTERRUPT_PRIORITY" GenericType="simple" Comment=""/>  -->
+        <Argument Comment="" GenericType="simple" Name="configLIBRARY_LOWEST_INTERRUPT_PRIORITY"/>
+        <!-- <Argument Name="configKERNEL_INTERRUPT_PRIORITY" GenericType="simple" Comment=""/>  -->
+        <Argument Comment="" GenericType="simple" Name="configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY"/>
+        
+        <Argument Comment="" GenericType="simple" Name="configPRIO_BITS"/>
+        
+        <Argument Comment="" GenericType="simple" Name="INCLUDE_vTaskPrioritySet"/>
+        <Argument Comment="" GenericType="simple" Name="INCLUDE_uxTaskPriorityGet"/>
+        <Argument Comment="" GenericType="simple" Name="INCLUDE_vTaskDelete"/>
+        <Argument Comment="" GenericType="simple" Name="INCLUDE_vTaskCleanUpResources"/>
+        <Argument Comment="" GenericType="simple" Name="INCLUDE_vTaskSuspend"/>
+        <Argument Comment="" GenericType="simple" Name="INCLUDE_vTaskDelayUntil"/>
+        <Argument Comment="" GenericType="simple" Name="INCLUDE_vTaskDelay"/>  
+        <Argument Comment="" GenericType="simple" Name="INCLUDE_xTaskGetSchedulerState"/> 
+        
+        <Argument Comment="" GenericType="simple" Name="configASSERT( x )"/>
+
+        <!-- New for all families -->   
+        <Argument Comment="" GenericType="simple" Name="configUSE_ALTERNATIVE_API"/> 
+        <Argument Comment="" GenericType="simple" Name="INCLUDE_xTaskResumeFromISR"/>         
+        <Argument Comment="" GenericType="simple" Name="INCLUDE_xQueueGetMutexHolder"/>
+        <Argument Comment="" GenericType="simple" Name="INCLUDE_xSemaphoreGetMutexHolder"/>
+        <Argument Comment="" GenericType="simple" Name="INCLUDE_pcTaskGetTaskName"/>
+        <Argument Comment="" GenericType="simple" Name="INCLUDE_uxTaskGetStackHighWaterMark"/>
+        <Argument Comment="" GenericType="simple" Name="INCLUDE_xTaskGetCurrentTaskHandle"/>
+        <Argument Comment="" GenericType="simple" Name="INCLUDE_eTaskGetState"/>
+        
+        <Argument Comment="" GenericType="simple" Name="CMSIS_version"/>
+
+        <!--  New for FreeRTOS 8.1.2 -->
+        <Argument Comment="" GenericType="simple" Name="INCLUDE_xEventGroupSetBitFromISR"/>
+        <Argument Comment="" GenericType="simple" Name="INCLUDE_xTimerPendFunctionCall"/>
+        <Argument Comment="" GenericType="simple" Name="configENABLE_BACKWARD_COMPATIBILITY"/>
+        <Argument Comment="" GenericType="simple" Name="configUSE_PORT_OPTIMISED_TASK_SELECTION"/>
+        
+        <!--  New for FreeRTOS 8.2.1 -->
+        <Argument Comment="" GenericType="simple" Name="configUSE_TICKLESS_IDLE"/>
+        <Argument Comment="" GenericType="simple" Name="configUSE_TASK_NOTIFICATIONS"/>
+        
+        <!--  New for FreeRTOS 9.0.0 -->
+        <Argument Comment="Default value is 0" GenericType="simple" Name="MEMORY_ALLOCATION"/>
+        <Argument Comment="Set to 1 if you wish to use a hook, or 0 to omit it" GenericType="simple" Name="configUSE_DAEMON_TASK_STARTUP_HOOK"/>
+        <Argument Comment="" GenericType="simple" Name="INCLUDE_xTaskAbortDelay"/>
+        <Argument Comment="" GenericType="simple" Name="INCLUDE_xTaskGetHandle"/>
+        
+         <!--  New for FreeRTOS 10.0.0 -->
+         <Argument Comment="" GenericType="simple" Name="configRECORD_STACK_HIGH_ADDRESS"/>
+         
+         <!--  For CMSIS V2 -->
+         <Argument Comment="" GenericType="simple" Name="HEAP_NUMBER"/>
+
+    </RefConfigFile>
+
+    <!-- Putting it at the end of the file (as the last one to deal with) allows to include all tmp files previously generated in freertos.c -->
+    <RefConfigFile Description="Optional hook functions" Name="HOOKS_V2" Template="freertos_c_v10_0_0_cmsis_v2.ftl">
+        <File Category="source" Condition="all" Name="freertos.c" Version="10.0.1"/>
+        <Argument Comment="When set to 1, a collection of run time statistics is enabled" GenericType="simple" Name="configGENERATE_RUN_TIME_STATS"/>
+        <Argument Comment="Set to 1 if you wish to use an idle hook, or 0 to omit it" GenericType="simple" Name="configUSE_IDLE_HOOK"/>
+        <Argument Comment="Set to 1 if you wish to use a tick hook, or 0 to omit it" GenericType="simple" Name="configUSE_TICK_HOOK"/>
+        <Argument Comment="" GenericType="simple" Name="configCHECK_FOR_STACK_OVERFLOW"/>
+        <Argument Comment="Set to 1 if you wish to use a malloc failed hook, or 0 to omit it" GenericType="simple" Name="configUSE_MALLOC_FAILED_HOOK"/>
+        <!--  New for FreeRTOS 8.1.2 -->
+        <Argument Comment="" GenericType="simple" Name="configENABLE_BACKWARD_COMPATIBILITY"/> 
+        <!--  New for FreeRTOS 8.2.1 -->
+        <Argument Comment="" GenericType="simple" Name="configUSE_TICKLESS_IDLE"/>
+        <!--  New for FreeRTOS 9.0.0 -->
+        <Argument Comment="Set to 1 if you wish to use a hook, or 0 to omit it" GenericType="simple" Name="configUSE_DAEMON_TASK_STARTUP_HOOK"/>
+        <Argument Comment="Static allocation" GenericType="simple" Name="MEMORY_ALLOCATION"/>
+        <Argument Comment="Set to 1 to include software timer functionality, or 0 to omit it" GenericType="simple" Name="configUSE_TIMERS"/>
+        <!-- CMSIS v2 -->
+        <Argument Comment="" GenericType="simple" Name="FreeRTOS_API"/>   <!--  need to distinguish CMSIS v1 and v2 -->
+    </RefConfigFile>
+    
+    <!-- Specific for Native API -->
+    
+    <RefConfigFile Description="Header file for #include" Name="INC_NATIVE" Template="freertos_inc_native.ftl">
+        <File Category="source" Condition="all" Name="rtos_inc.tmp" Version="10.0.1"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="Variable declarations for FreeRTOS" Name="VARS_NATIVE" Template="freertos_vars_native.ftl">
+        <File Category="source" Condition="all" Name="rtos_vars.tmp" Version="10.0.1"/>
+        <Argument Comment="User threads" GenericType="rtos_list" Name="Threads"/>
+        <Argument Comment="User queues" GenericType="rtos_list" Name="Queues"/>
+        <Argument Comment="User timers" GenericType="rtos_list" Name="Timers"/>     
+        <Argument Comment="User mutexes" GenericType="rtos_list" Name="Mutexes"/>  
+        <Argument Comment="User recursive mutexes" GenericType="rtos_list" Name="RecursiveMutexes"/>
+        <Argument Comment="User binary semaphores" GenericType="rtos_list" Name="BinarySemaphores"/>  
+        <Argument Comment="User counting semaphores" GenericType="rtos_list" Name="Semaphores"/>  
+        <Argument Comment="" GenericType="simple" Name="USE_MPU"/> <!-- Do not generate default task if native + mpu -->
+    </RefConfigFile>
+
+    <RefConfigFile Description="Private Functions Prototypes for FreeRTOS" Name="PFP_NATIVE" Template="freertos_pfp_native.ftl">
+        <File Category="source" Condition="all" Name="rtos_pfp.tmp" Version="10.0.1"/>
+        <Argument Comment="User threads" GenericType="rtos_list" Name="Threads"/>
+        <Argument Comment="User timers" GenericType="rtos_list" Name="Timers"/>
+        <Argument Comment="" GenericType="simple" Name="USE_MPU"/> <!-- Do not generate default task if native + mpu -->
+    </RefConfigFile>
+
+    <RefConfigFile Description="Variable creation then launch the RTOS" Name="CREATION_NATIVE" Template="freertos_init_c_native.ftl">
+        <File Category="source" Condition="all" Name="rtos_HalInit.tmp" Version="10.0.1"/>
+        <Argument Comment="User threads" GenericType="rtos_list" Name="Threads"/>
+        <Argument Comment="User queues" GenericType="rtos_list" Name="Queues"/>
+        <Argument Comment="User timers" GenericType="rtos_list" Name="Timers"/>     
+        <Argument Comment="User mutexes" GenericType="rtos_list" Name="Mutexes"/>
+        <Argument Comment="User recursive mutexes" GenericType="rtos_list" Name="RecursiveMutexes"/>
+        <Argument Comment="User binary semaphores" GenericType="rtos_list" Name="BinarySemaphores"/>  
+        <Argument Comment="User counting semaphores" GenericType="rtos_list" Name="Semaphores"/>
+        <Argument Comment="" GenericType="simple" Name="USE_MPU"/> <!-- Do not generate default task if native + mpu --> 
+    </RefConfigFile>
+
+    <RefConfigFile Description="Code to start the kernel" Name="RTOS_START_NATIVE" Template="freertos_start_native.ftl">
+        <File Category="source" Condition="all" Name="rtos_start.tmp" Version="10.0.1"/>
+    </RefConfigFile>
+
+    <!-- 16/07/2018: Temporary fix for Dory and MPU: do not generate default task -->
+    <RefConfigFile Description="FreeRTOS default thread" Name="DEFAULT_THREAD_NATIVE" Template="freertos_threads_native.ftl">
+        <File Category="source" Condition="!S_FREERTOS_WITH_MPU" Name="rtos_threads.tmp" Version="10.0.1"/>
+        <Argument Comment="User threads" GenericType="rtos_list" Name="Threads"/>
+    </RefConfigFile>
+    
+    <RefConfigFile Description="FreeRTOS user threads" Name="USER_THREADS_NATIVE" Template="freertos_user_threads_native.ftl">
+        <File Category="source" Condition="all" Name="rtos_user_threads.tmp" Version="10.0.1"/>
+        <Argument Comment="User threads" GenericType="rtos_list" Name="Threads"/>
+        <Argument Comment="User timers" GenericType="rtos_list" Name="Timers"/>
     </RefConfigFile>
 
 </IP>

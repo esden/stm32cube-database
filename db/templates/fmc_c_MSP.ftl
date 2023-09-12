@@ -541,7 +541,7 @@
   [#list service.variables as variable] [#-- variables declaration --]
     [#if v?contains(variable.name)]
     [#else]
-#t${variable.value} ${variable.name};
+#t${variable.value} ${variable.name} ={0};
       [#assign v = v + " " + variable.name]
     [/#if]
   [/#list]

@@ -25,11 +25,11 @@
 #include "cmsis_os.h"
 #include "usbpd_pwr_user.h"
 
-/** @addtogroup STM32_USBPD_LIBRARY
+/** @addtogroup STM32_USBPD_APPLICATION
   * @{
   */
 
-/** @addtogroup USBPD_USER
+/** @addtogroup STM32_USBPD_APPLICATION_DPM_USER
   * @{
   */
 
@@ -126,7 +126,7 @@ void USBPD_DPM_WaitForTime(uint32_t Time)
 
 /**
   * @brief  User processing time, it is recommended to avoid blocking task for long time
-  * @param  None
+  * @param  argument  DPM User event
   * @retval None
   */
 void USBPD_DPM_UserExecute(void const *argument)
@@ -210,7 +210,6 @@ USBPD_StatusTypeDef USBPD_DPM_EvaluatePowerRoleSwap(uint8_t PortNum)
 /**
   * @brief  Callback function called by PE to inform DPM about PE event.
   * @param  PortNum The current port number
-  * @param  EventType @ref USBPD_NotifyEvent_TypeDef
   * @param  EventVal @ref USBPD_NotifyEventValue_TypeDef
   * @retval None
   */
@@ -222,22 +221,10 @@ void USBPD_DPM_Notification(uint8_t PortNum, USBPD_NotifyEventValue_TypeDef Even
 }
 
 /**
-  * @brief  Request DPM to confirm if current contract is still valid.
-  * @param  PortNum Port number
-  * @retval USBPD_OK, USBPD_ERROR
-*/
-USBPD_StatusTypeDef USBPD_DPM_IsContractStillValid(uint8_t PortNum)
-{
-/* USER CODE BEGIN USBPD_DPM_IsContractStillValid */
-  return USBPD_OK;
-/* USER CODE END USBPD_DPM_IsContractStillValid */
-}
-
-/**
   * @brief  DPM callback to allow PE to retrieve information from DPM/PWR_IF.
   * @param  PortNum Port number
   * @param  DataId  Type of data to be updated in DPM based on @ref USBPD_CORE_DataInfoType_TypeDef
-  * @param  Ptr     Pointer on address where DPM data should be written (u32 pointer)
+  * @param  Ptr     Pointer on address where DPM data should be written (u8 pointer)
   * @param  Size    Pointer on nb of u8 written by DPM
   * @retval None
   */
@@ -252,6 +239,7 @@ void USBPD_DPM_GetDataInfo(uint8_t PortNum, USBPD_CORE_DataInfoType_TypeDef Data
   * @brief  DPM callback to allow PE to update information in DPM/PWR_IF.
   * @param  PortNum Port number
   * @param  DataId  Type of data to be updated in DPM based on @ref USBPD_CORE_DataInfoType_TypeDef
+  * @param  Ptr     Pointer on the data
   * @param  Size    Nb of bytes to be updated in DPM
   * @retval None
   */
@@ -264,7 +252,7 @@ void USBPD_DPM_SetDataInfo(uint8_t PortNum, USBPD_CORE_DataInfoType_TypeDef Data
 
 /**
   * @brief  Evaluate received Request Message from Sink port
-  * @param  pdhandle Pointer to USB PD handle
+  * @param  PortNum Port number
   * @param  PtrPowerObject  Pointer on the power data object
   * @retval USBPD status : USBPD_ACCEPT, USBPD_REJECT, USBPD_WAIT, USBPD_GOTOMIN
   */
@@ -279,10 +267,10 @@ USBPD_StatusTypeDef USBPD_DPM_EvaluateRequest(uint8_t PortNum, USBPD_CORE_PDO_Ty
   * @brief  Evaluate received Capabilities Message from Source port and prepare the request message
   * @param  PortNum         Port number
   * @param  PtrRequestData  Pointer on selected request data object
-  * @param  PtrPowerObject  Pointer on the power data object
+  * @param  PtrPowerObjectType  Pointer on the power data object
   * @retval None
   */
-void USBPD_DPM_SNK_EvaluateCapabilities(uint8_t PortNum, uint32_t *PtrRequestData, USBPD_CORE_PDO_Type_TypeDef *PtrPowerObject)
+void USBPD_DPM_SNK_EvaluateCapabilities(uint8_t PortNum, uint32_t *PtrRequestData, USBPD_CORE_PDO_Type_TypeDef *PtrPowerObjectType)
 {
 /* USER CODE BEGIN USBPD_DPM_SNK_EvaluateCapabilities */
 
@@ -334,8 +322,8 @@ USBPD_StatusTypeDef USBPD_DPM_PE_VconnPwr(uint8_t PortNum, USBPD_FunctionalState
   *         This parameter can be one of the following values:
   *           @arg @ref USBPD_EXT_SECURITY_REQUEST Security Request extended message
   *           @arg @ref USBPD_EXT_SECURITY_RESPONSE Security Response extended message
-  * @param  Ptr Pointer on address Extended Message data could be read (u8 pointer)
-  * @param  Size Nb of u8 that compose Extended message
+  * @param  ptrData   Pointer on address Extended Message data could be read (u8 pointer)
+  * @param  DataSize  Nb of u8 that compose Extended message
   * @retval None
   */
 void USBPD_DPM_ExtendedMessageReceived(uint8_t PortNum, USBPD_ExtendedMsg_TypeDef MsgType, uint8_t *ptrData, uint16_t DataSize)
@@ -369,6 +357,7 @@ USBPD_FunctionalState USBPD_DPM_IsPowerReady(uint8_t PortNum, USBPD_VSAFE_Status
   return ((USBPD_OK == USBPD_PWR_IF_SupplyReady(PortNum, Vsafe)) ? USBPD_ENABLE : USBPD_DISABLE);
 /* USER CODE END USBPD_DPM_IsPowerReady */
 }
+
 /**
   * @}
   */

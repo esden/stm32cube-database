@@ -60,7 +60,7 @@
 				[#case "USART"]
 					[#if UsartIpInstanceList == ""]
 						[#assign UsartIpInstance = bsp.solution]	
-						[#assign UsartIpInstanceList = bsp.solution]
+						[#assign UsartIpInstanceList = bsp.solution]						
 [#-- extern UART_HandleTypeDef h${UsartIpInstance?lower_case};	--]										
 					[#elseif !UsartIpInstanceList?contains(bsp.solution)]
 						[#assign UsartIpInstance = bsp.solution]
@@ -156,12 +156,12 @@ __weak HAL_StatusTypeDef MX_${I2CIpInstance}_Init(I2C_HandleTypeDef* hi2c);
 						[#assign UsartIpInstance = bsp.solution]
 						[#assign UsartIpInstanceList = bsp.solution]
 [#-- A.T MX_PPPx_Init prototype updated after reveiw with Maher --]
-__weak HAL_StatusTypeDef MX_${UsartIpInstance}_Init(UART_HandleTypeDef* huart);								
+__weak HAL_StatusTypeDef MX_${UsartIpInstance}_UART_Init(UART_HandleTypeDef* huart);								
 					[#elseif !UsartIpInstanceList?contains(bsp.solution)]
 						[#assign UsartIpInstance = bsp.solution]
 						[#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
 [#-- A.T MX_PPPx_Init prototype updated after reveiw with Maher --]
-__weak HAL_StatusTypeDef MX_${UsartIpInstance}_Init(UART_HandleTypeDef* huart);
+__weak HAL_StatusTypeDef MX_${UsartIpInstance}_UART_Init(UART_HandleTypeDef* huart);
 					[/#if]
 				[#break] 
 				[#case "UART"]
@@ -170,12 +170,12 @@ __weak HAL_StatusTypeDef MX_${UsartIpInstance}_Init(UART_HandleTypeDef* huart);
 						[#assign UsartIpInstance = bsp.solution]
 						[#assign UsartIpInstanceList = bsp.solution]
 [#-- A.T MX_PPPx_Init prototype updated after reveiw with Maher --]
-__weak HAL_StatusTypeDef MX_${UsartIpInstance}_Init(UART_HandleTypeDef* huart);								
+__weak HAL_StatusTypeDef MX_${UsartIpInstance}_UART_Init(UART_HandleTypeDef* huart);								
 					[#elseif !UsartIpInstanceList?contains(bsp.solution)]
 						[#assign UsartIpInstance = bsp.solution]
 						[#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
 [#-- A.T MX_PPPx_Init prototype updated after reveiw with Maher --]
-__weak HAL_StatusTypeDef MX_${UsartIpInstance}_Init(UART_HandleTypeDef* huart);
+__weak HAL_StatusTypeDef MX_${UsartIpInstance}_UART_Init(UART_HandleTypeDef* huart);
 					[/#if]
 				[#break] 
 				[#case "LPUART"]
@@ -212,150 +212,129 @@ __weak HAL_StatusTypeDef MX_${UsartIpInstance}_Init(UART_HandleTypeDef* huart);
   
 [#if I2CisTrue]
 [#if FamilyName?starts_with("STM32L4")]
-#define DIV_ROUND_CLOSEST(x, d)  (((x) + ((d) / 2)) / (d))
+#define DIV_ROUND_CLOSEST(x, d)  (((x) + ((d) / 2U)) / (d))
 
-#define I2C_ANALOG_FILTER_ENABLE	1
-#define I2C_ANALOG_FILTER_DELAY_MIN	50	/* ns */
-#define I2C_ANALOG_FILTER_DELAY_MAX	260	/* ns */
-#define I2C_ANALOG_FILTER_DELAY_DEFAULT	2	/* ns */
+#define I2C_ANALOG_FILTER_DELAY_MIN            50U     /* ns */
+#define I2C_ANALOG_FILTER_DELAY_MAX            260U    /* ns */
+#define I2C_ANALOG_FILTER_DELAY_DEFAULT        2U      /* ns */
 
-#define VALID_PRESC_NBR     100
-#define PRESC_MAX			16
-#define SCLDEL_MAX			16
-#define SDADEL_MAX			16
-#define SCLH_MAX			256
-#define SCLL_MAX			256
-#define I2C_DNF_MAX			16
+#ifndef I2C_VALID_TIMING_NBR
+  #define I2C_VALID_TIMING_NBR                 128U
+#endif
 
-#define NSEC_PER_SEC	                1000000000L
+#define I2C_SPEED_STANDARD                     0U    /* 100 kHz */
+#define I2C_SPEED_FAST                         1U    /* 400 kHz */
+#define I2C_SPEED_FAST_PLUS                    2U    /* 1 MHz */
+
+#define I2C_PRESC_MAX                          16U
+#define I2C_SCLDEL_MAX                         16U
+#define I2C_SDADEL_MAX                         16U
+#define I2C_SCLH_MAX                           256U
+#define I2C_SCLL_MAX                           256U
+#define SEC2NSEC                               1000000000UL
+
+
+#if (USE_CUBEMX_BSP_V2 == 1)
+/**
+  * @brief I2C_charac
+  *  freq: I2C bus speed (Hz)
+  *  freq_min: 80% of I2C bus speed (Hz)
+  *  freq_max: 100% of I2C bus speed (Hz)
+  *  fall_max: Max fall time of both SDA and SCL signals (ns)
+  *  rise_max: Max rise time of both SDA and SCL signals (ns)
+  *  hddat_min: Min data hold time (ns)
+  *  vddat_max: Max data valid time (ns)
+  *  sudat_min: Min data setup time (ns)
+  *  lscl_min: Min low period of the SCL clock (ns)
+  *  hscl_min: Min high period of the SCL clock (ns)
+  *  trise: Rise time (ns)
+  *  tfall: Fall time (ns)
+  *  dnf: Digital filter coefficient (0-16)
+  */
+typedef struct
+{
+  uint32_t freq;
+  uint32_t freq_min;
+  uint32_t freq_max;
+  uint32_t hddat_min;
+  uint32_t vddat_max;
+  uint32_t sudat_min;
+  uint32_t lscl_min;
+  uint32_t hscl_min;
+  uint32_t trise;
+  uint32_t tfall;
+  uint32_t dnf;
+}I2C_Charac_t;
 
 /**
- * struct i2c_charac - private i2c specification timing
- * @rate: I2C bus speed (Hz)
- * @rate_min: 80% of I2C bus speed (Hz)
- * @rate_max: 100% of I2C bus speed (Hz)
- * @fall_max: Max fall time of both SDA and SCL signals (ns)
- * @rise_max: Max rise time of both SDA and SCL signals (ns)
- * @hddat_min: Min data hold time (ns)
- * @vddat_max: Max data valid time (ns)
- * @sudat_min: Min data setup time (ns)
- * @l_min: Min low period of the SCL clock (ns)
- * @h_min: Min high period of the SCL clock (ns)
- */
-struct i2c_specs {
-	uint32_t rate;
-	uint32_t rate_min;
-	uint32_t rate_max;
-	uint32_t fall_max;
-	uint32_t rise_max;
-	uint32_t hddat_min;
-	uint32_t vddat_max;
-	uint32_t sudat_min;
-	uint32_t l_min;
-	uint32_t h_min;
-};
+  * @brief I2C timings parameters
+  *  presc: Prescaler value
+  *  tscldel: Data setup time
+  *  tsdadel: Data hold time
+  *  sclh: SCL high period (master mode)
+  *  scll: SCL low period (master mode)
+  */
+typedef struct
+{
+  uint32_t presc;
+  uint32_t tscldel;
+  uint32_t tsdadel;
+  uint32_t sclh;
+  uint32_t scll;
+}I2C_Timings_t;
 
-enum i2c_speed {
-	I2C_SPEED_STANDARD, /* 100 kHz */
-	I2C_SPEED_FAST, /* 400 kHz */
-	I2C_SPEED_FAST_PLUS, /* 1 MHz */
+static const I2C_Charac_t I2C_Charac[] =
+{
+  [I2C_SPEED_STANDARD] =
+  {
+    .freq = 100000,
+    .freq_min = 80000,
+    .freq_max = 120000,
+    .hddat_min = 0,
+    .vddat_max = 3450,
+    .sudat_min = 250,
+    .lscl_min = 4700,
+    .hscl_min = 4000,
+    .trise = 400,
+    .tfall = 100,
+    .dnf = I2C_ANALOG_FILTER_DELAY_DEFAULT,
+  },
+  [I2C_SPEED_FAST] =
+  {
+    .freq = 400000,
+    .freq_min = 320000,
+    .freq_max = 480000,
+    .hddat_min = 0,
+    .vddat_max = 900,
+    .sudat_min = 100,
+    .lscl_min = 1300,
+    .hscl_min = 600,
+    .trise = 250,
+    .tfall = 100,
+    .dnf = I2C_ANALOG_FILTER_DELAY_DEFAULT,
+  },
+  [I2C_SPEED_FAST_PLUS] =
+  {
+    .freq = 1000000,
+    .freq_min = 800000,
+    .freq_max = 1200000,
+    .hddat_min = 0,
+    .vddat_max = 450,
+    .sudat_min = 50,
+    .lscl_min = 500,
+    .hscl_min = 260,
+    .trise = 60,
+    .tfall = 100,
+    .dnf = I2C_ANALOG_FILTER_DELAY_DEFAULT,
+  },
 };
-
-/**
- * struct i2c_setup - private I2C timing setup parameters
- * @rise_time: Rise time (ns)
- * @fall_time: Fall time (ns)
- * @dnf: Digital filter coefficient (0-16)
- * @analog_filter: Analog filter delay (On/Off)
- */
-struct i2c_setup {
-	uint32_t rise_time;
-	uint32_t fall_time;
-	uint8_t dnf;
-	uint8_t analog_filter;
-};
-
-
-/**
- * struct i2c_timings - private I2C output parameters
- * @node: List entry
- * @presc: Prescaler value
- * @scldel: Data setup time
- * @sdadel: Data hold time
- * @sclh: SCL high period (master mode)
- * @scll: SCL low period (master mode)
- */
-struct i2c_timings {
-	uint8_t presc;
-	uint8_t scldel;
-	uint8_t sdadel;
-	uint8_t sclh;
-	uint8_t scll;
-};
-
-const struct i2c_specs i2c_specs[] = {
-	[I2C_SPEED_STANDARD] = {
-		.rate = 100000,
-		.rate_min = 100000,
-		.rate_max = 120000,
-		.fall_max = 300,
-		.rise_max = 1000,
-		.hddat_min = 0,
-		.vddat_max = 3450,
-		.sudat_min = 250,
-		.l_min = 4700,
-		.h_min = 4000,
-	},
-	[I2C_SPEED_FAST] = {
-		.rate = 400000,
-		.rate_min = 320000,
-		.rate_max = 400000,
-		.fall_max = 300,
-		.rise_max = 300,
-		.hddat_min = 0,
-		.vddat_max = 900,
-		.sudat_min = 100,
-		.l_min = 1300,
-		.h_min = 600,
-	},
-	[I2C_SPEED_FAST_PLUS] = {
-		.rate = 1000000,
-		.rate_min = 800000,
-		.rate_max = 1000000,
-		.fall_max = 120,
-		.rise_max = 120,
-		.hddat_min = 0,
-		.vddat_max = 450,
-		.sudat_min = 50,
-		.l_min = 500,
-		.h_min = 260,
-	},
-};
-
-const struct i2c_setup i2c_user_setup[] = {
-  [I2C_SPEED_STANDARD] = {
-	.rise_time = 400,
-	.fall_time = 100,
-	.dnf = I2C_ANALOG_FILTER_DELAY_DEFAULT,
-	.analog_filter = 1,
- },
- [I2C_SPEED_FAST] = {
-	.rise_time = 250,
-	.fall_time = 100,
-	.dnf = I2C_ANALOG_FILTER_DELAY_DEFAULT,
-	.analog_filter = 1,
- },
- [I2C_SPEED_FAST_PLUS] = { 
-	.rise_time = 60,
-	.fall_time = 100,
-	.dnf = I2C_ANALOG_FILTER_DELAY_DEFAULT,
-	.analog_filter = 1,
- }
-};
+static I2C_Timings_t valid_timing[I2C_VALID_TIMING_NBR];
+static uint32_t valid_timing_nbr = 0;
+#endif
 [/#if]  
 [/#if]
 
-/** @defgroup ${BoardName?upper_case}_Private_Variables BUS Private Variables
+/** @defgroup ${BoardName?upper_case}_BUS_Exported_Variables BUS Exported Variables
   * @{
   */
 [#assign IpName = ""]
@@ -414,7 +393,7 @@ I2C_HandleTypeDef h${I2CIpInstance?lower_case};
 						[#assign UsartIpInstance = bsp.solution]	
 						[#assign UsartIpInstanceList = bsp.solution]
 [#-- extern : A.T removed after reveiw with Maher --]
-UART_HandleTypeDef h${UsartIpInstance?lower_case};
+UART_HandleTypeDef h${UsartIpInstance?lower_case?replace("s","")};
 					[#elseif !UsartIpInstanceList?contains(bsp.solution)]
 						[#assign UsartIpInstance = bsp.solution]
 						[#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
@@ -453,6 +432,13 @@ UART_HandleTypeDef h${UsartIpInstance?lower_case};
 		[/#list]
 	[/#if]
 [/#list]
+/**
+  * @}
+  */
+
+/** @defgroup ${BoardName?upper_case}_BUS_Private_Variables BUS Private Variables
+  * @{
+  */
 [#assign IpName = ""]
 
 [#assign UsartIpInstance = ""]
@@ -465,10 +451,12 @@ UART_HandleTypeDef h${UsartIpInstance?lower_case};
 [#assign SpiIpInstanceList = ""]
 [#assign SPI = ""]
 [#assign SPIInstance = ""]
+[#assign SPIisTrue = false]
 [#assign SPIDone = ""]
 
 [#assign I2CIpInstance = ""]
 [#assign I2CIpInstanceList = ""]
+[#assign I2CisTrue = false]
 [#assign I2C = ""]
 [#assign I2CInstance = ""]
 
@@ -478,7 +466,8 @@ UART_HandleTypeDef h${UsartIpInstance?lower_case};
 			[#assign IpName = bsp.bspIpName]			
 			[#if IpName??]
 				[#switch IpName]
-					[#case "SPI"]					
+					[#case "SPI"]		
+					[#assign SPIisTrue = true]			
 					[#if SpiIpInstanceList == ""]
 						[#assign SpiIpInstance = bsp.solution]
                         [#assign SpiIpInstanceList = bsp.solution]
@@ -494,6 +483,7 @@ static uint32_t Is${SpiIpInstance}MspCbValid = 0;
 					[/#if]
 				[#break]
 				[#case "I2C"]
+				[#assign I2CisTrue = true]		
 					[#if I2CIpInstanceList == ""]
 						[#assign I2CIpInstance = bsp.solution]
 						[#assign I2CIpInstanceList = bsp.solution]
@@ -504,11 +494,12 @@ static uint32_t Is${I2CIpInstance}MspCbValid = 0;
 						[#assign I2CIpInstance = bsp.solution]
 						[#assign I2CIpInstanceList = I2CIpInstanceList + "," + bsp.solution]
 #if (USE_HAL_I2C_REGISTER_CALLBACKS == 1)
-static uint32_t Is${I2CIpInstance}MspCbValid = 0;											
+static uint32_t Is${I2CIpInstance}MspCbValid = 0;										
 #endif /* USE_HAL_I2C_REGISTER_CALLBACKS */
 					[/#if]
 				[#break]  
 				[#case "UART"]
+				[#assign USARTisTrue = true]		
 					[#if UsartIpInstanceList == ""]
 						[#assign UsartIpInstance = bsp.solution]
 						[#assign UsartIpInstanceList = bsp.solution]
@@ -524,11 +515,12 @@ static uint32_t Is${UsartIpInstance}MspCbValid = 0;
 					[/#if]
 				[#break] 
 				[#case "USART"]
+				[#assign USARTisTrue = true]	
 					[#if UsartIpInstanceList == ""]
 						[#assign UsartIpInstance = bsp.solution]
 						[#assign UsartIpInstanceList = bsp.solution]
 #if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
-static uint32_t Is${UsartIpInstance}MspCbValid = 0;										
+static uint32_t Is${UsartIpInstance}MspCbValid = 0;									
 #endif /* USE_HAL_UART_REGISTER_CALLBACKS */				
 					[#elseif !UsartIpInstanceList?contains(bsp.solution)]
 						[#assign UsartIpInstance = bsp.solution]
@@ -539,6 +531,7 @@ static uint32_t Is${UsartIpInstance}MspCbValid = 0;
 					[/#if]
 				[#break] 				
 				[#case "LPUART"]
+				[#assign USARTisTrue = true]	
 					[#if UsartIpInstanceList == ""]
 						[#assign UsartIpInstance = bsp.solution]
 						[#assign UsartIpInstanceList = bsp.solution]
@@ -558,12 +551,22 @@ static uint32_t Is${UsartIpInstance}MspCbValid = 0;
 		[/#list]
 	[/#if]
 [/#list]  
+
+[#if SPIisTrue]
+static uint32_t ${SpiIpInstance}InitCounter = 0;
+[/#if]
+[#if I2CisTrue]
+static uint32_t ${I2CIpInstance}InitCounter = 0;
+[/#if]
+[#if USARTisTrue]
+static uint32_t ${UsartIpInstance}InitCounter = 0;
+[/#if]
 /**
   * @}
   */
 
 
-/** @defgroup ${BoardName?upper_case}_Private_FunctionPrototypes  Private Function Prototypes
+/** @defgroup ${BoardName?upper_case}_BUS_Private_FunctionPrototypes  BUS Private Function
   * @{
   */  
 
@@ -620,6 +623,8 @@ static void ${I2CIpInstance}_MspInit(I2C_HandleTypeDef* hI2c);
 static void ${I2CIpInstance}_MspDeInit(I2C_HandleTypeDef* hI2c);
 #if (USE_CUBEMX_BSP_V2 == 1)
 static uint32_t I2C_GetTiming(uint32_t clock_src_hz, uint32_t i2cfreq_hz);
+static void Compute_PRESC_SCLDEL_SDADEL(uint32_t clock_src_freq, uint32_t I2C_Speed);
+static uint32_t Compute_SCLL_SCLH (uint32_t clock_src_freq, uint32_t I2C_speed);
 #endif
 					[#elseif !I2CIpInstanceList?contains(bsp.solution)]
 						[#assign I2CIpInstance = bsp.solution]
@@ -629,6 +634,8 @@ static void ${I2CIpInstance}_MspDeInit(I2C_HandleTypeDef* hI2c);
 [#if FamilyName?starts_with("STM32L4")]
 #if (USE_CUBEMX_BSP_V2 == 1)
 static uint32_t I2C_GetTiming(uint32_t clock_src_hz, uint32_t i2cfreq_hz);
+static void Compute_PRESC_SCLDEL_SDADEL(uint32_t clock_src_freq, uint32_t I2C_Speed);
+static uint32_t Compute_SCLL_SCLH (uint32_t clock_src_freq, uint32_t I2C_speed);
 #endif
 [/#if]
 					[/#if]
@@ -861,8 +868,7 @@ static void ${UsartIpInstance}_MspDeInit(UART_HandleTypeDef* huart);
                             BUS OPERATIONS OVER I2C
 *******************************************************************************/
 /**
-  * @brief  Initialize a bus
-  * @param None
+  * @brief  Initialize I2C HAL
   * @retval BSP status
   */
 int32_t BSP_${IpInstance}_Init(void) 
@@ -872,8 +878,10 @@ int32_t BSP_${IpInstance}_Init(void)
   
   h${IpInstance?lower_case}.Instance  = ${IpInstance?upper_case};
 
-  if (HAL_I2C_GetState(&h${IpInstance?lower_case}) == HAL_I2C_STATE_RESET)
-  {  
+  if(${I2CIpInstance}InitCounter++ == 0)
+  {     
+    if (HAL_I2C_GetState(&h${IpInstance?lower_case}) == HAL_I2C_STATE_RESET)
+    {  
     #if (USE_HAL_I2C_REGISTER_CALLBACKS == 0)
       /* Init the I2C Msp */
       ${IpInstance?upper_case}_MspInit(&h${IpInstance?lower_case});
@@ -886,66 +894,72 @@ int32_t BSP_${IpInstance}_Init(void)
         }
       }
     #endif
-
-    /* Init the I2C */
-    if(MX_${IpInstance}_Init(&h${IpInstance?lower_case}) != HAL_OK)
-    {
-      ret = BSP_ERROR_BUS_FAILURE;
-    }
+      if(ret == BSP_ERROR_NONE)
+	  {
+    	/* Init the I2C */
+    	if(MX_${IpInstance}_Init(&h${IpInstance?lower_case}) != HAL_OK)
+    	{
+      		ret = BSP_ERROR_BUS_FAILURE;
+    	}
 	[#if FamilyName.contains("STM32L1") || FamilyName.contains("STM32F1") || FamilyName.contains("STM32F2")]
 	[#else]
-    else if(HAL_I2CEx_ConfigAnalogFilter(&h${IpInstance?lower_case}, I2C_ANALOGFILTER_ENABLE) != HAL_OK) 
-    {
-      ret = BSP_ERROR_BUS_FAILURE;
-    }
+    	else if(HAL_I2CEx_ConfigAnalogFilter(&h${IpInstance?lower_case}, I2C_ANALOGFILTER_ENABLE) != HAL_OK) 
+    	{
+      	  ret = BSP_ERROR_BUS_FAILURE;    		
+    	}
 	[/#if]
-    else
-    {
-      ret = BSP_ERROR_NONE;
-    }	
+    	else
+    	{
+      		ret = BSP_ERROR_NONE;
+    	}
+	  }	
+    }
   }
-
   return ret;
 }
 
 
 /**
-  * @brief  DeInitialize a bus
-  * @param None
+  * @brief  DeInitialize I2C HAL.
   * @retval BSP status
   */
 int32_t BSP_${IpInstance}_DeInit(void) 
 {
   int32_t ret = BSP_ERROR_NONE;
   
+  if (${I2CIpInstance}InitCounter > 0)
+  {       
+    if (--${I2CIpInstance}InitCounter == 0)
+    {    
   #if (USE_HAL_I2C_REGISTER_CALLBACKS == 0)
-    /* DeInit the I2C */ 
-    ${IpInstance?upper_case}_MspDeInit(&h${IpInstance?lower_case});
+    	/* DeInit the I2C */ 
+    	${IpInstance?upper_case}_MspDeInit(&h${IpInstance?lower_case});
   #endif  
-  /* DeInit the I2C */ 
-  if (HAL_I2C_DeInit(&h${IpInstance?lower_case}) != HAL_OK) 
-  {
-    ret = BSP_ERROR_BUS_FAILURE;
+  		/* DeInit the I2C */ 
+  		if (HAL_I2C_DeInit(&h${IpInstance?lower_case}) != HAL_OK) 
+  		{
+    		ret = BSP_ERROR_BUS_FAILURE;
+  		}
+    }
   }
-  
   return ret;
 }
 
 /**
-  * @brief Return the status of the Bus
-  *	@retval bool
+  * @brief  Check whether the I2C bus is ready.
+  * @param DevAddr : I2C device address
+  * @param Trials : Check trials number
+  *	@retval BSP status
   */
 int32_t BSP_${IpInstance}_IsReady(uint16_t DevAddr, uint32_t Trials) 
 {
-  int32_t ret;
-  if (HAL_I2C_IsDeviceReady(&h${IpInstance?lower_case}, DevAddr, Trials, BUS_I2C1_POLL_TIMEOUT) != HAL_OK)
+  int32_t ret = BSP_ERROR_NONE;
+  
+  if (HAL_I2C_IsDeviceReady(&h${IpInstance?lower_case}, DevAddr, Trials, BUS_${I2CIpInstance}_POLL_TIMEOUT) != HAL_OK)
   {
     ret = BSP_ERROR_BUSY;
   } 
-  else
-  { 
-    ret = BSP_ERROR_NONE; 
-  } 
+  
   return ret;
 }
 
@@ -961,21 +975,13 @@ int32_t BSP_${IpInstance}_IsReady(uint16_t DevAddr, uint32_t Trials)
 
 int32_t BSP_${IpInstance}_WriteReg(uint16_t DevAddr, uint16_t Reg, uint8_t *pData, uint16_t Length)
 {
-  int32_t ret = BSP_ERROR_BUS_FAILURE;
-  uint32_t hal_error = HAL_OK;
+  int32_t ret = BSP_ERROR_NONE;  
   
-  if (HAL_I2C_Mem_Write(&h${IpInstance?lower_case}, (uint8_t)DevAddr,
-                       (uint16_t)Reg, I2C_MEMADD_SIZE_8BIT,
-                       (uint8_t *)pData, Length, BUS_I2C1_POLL_TIMEOUT) == HAL_OK)
-  {
-    ret = BSP_ERROR_NONE;
-  }
-  else
-  {
-    hal_error = HAL_I2C_GetError(&h${IpInstance?lower_case});
-    if( hal_error == HAL_I2C_ERROR_AF)
+  if (HAL_I2C_Mem_Write(&h${IpInstance?lower_case}, DevAddr,Reg, I2C_MEMADD_SIZE_8BIT,pData, Length, BUS_${I2CIpInstance}_POLL_TIMEOUT) != HAL_OK)
+  {    
+    if (HAL_I2C_GetError(&h${IpInstance?lower_case}) == HAL_I2C_ERROR_AF)
     {
-      return BSP_ERROR_BUS_ACKNOWLEDGE_FAILURE;
+      ret = BSP_ERROR_BUS_ACKNOWLEDGE_FAILURE;
     }
     else
     {
@@ -996,25 +1002,17 @@ int32_t BSP_${IpInstance}_WriteReg(uint16_t DevAddr, uint16_t Reg, uint8_t *pDat
   */
 int32_t  BSP_${IpInstance}_ReadReg(uint16_t DevAddr, uint16_t Reg, uint8_t *pData, uint16_t Length) 
 {
-  int32_t ret = BSP_ERROR_BUS_FAILURE;
-  uint32_t hal_error = HAL_OK;
+  int32_t ret = BSP_ERROR_NONE;
   
-  if (HAL_I2C_Mem_Read(&h${IpInstance?lower_case}, DevAddr, (uint16_t)Reg,
-                       I2C_MEMADD_SIZE_8BIT, pData,
-                       Length, 0x1000) == HAL_OK)
-  {
-    ret = BSP_ERROR_NONE;
-  }
-  else
-  {
-    hal_error = HAL_I2C_GetError(&h${IpInstance?lower_case});
-    if( hal_error == HAL_I2C_ERROR_AF)
+  if (HAL_I2C_Mem_Read(&h${IpInstance?lower_case}, DevAddr, Reg, I2C_MEMADD_SIZE_8BIT, pData, Length, BUS_${I2CIpInstance}_POLL_TIMEOUT) != HAL_OK)
+  { 
+    if (HAL_I2C_GetError(&h${IpInstance?lower_case}) == HAL_I2C_ERROR_AF)
     {
-      return BSP_ERROR_BUS_ACKNOWLEDGE_FAILURE;
+      ret = BSP_ERROR_BUS_ACKNOWLEDGE_FAILURE;
     }
     else
     {
-      ret =  BSP_ERROR_PERIPH_FAILURE;
+      ret = BSP_ERROR_PERIPH_FAILURE;
     }
   }
   return ret;
@@ -1033,21 +1031,14 @@ int32_t  BSP_${IpInstance}_ReadReg(uint16_t DevAddr, uint16_t Reg, uint8_t *pDat
   */
 int32_t BSP_${IpInstance}_WriteReg16(uint16_t DevAddr, uint16_t Reg, uint8_t *pData, uint16_t Length) 
 {
-  int32_t ret = BSP_ERROR_BUS_FAILURE;
-  uint32_t hal_error = HAL_OK;
+  int32_t ret = BSP_ERROR_NONE;
   
-  if (HAL_I2C_Mem_Write(&h${IpInstance?lower_case}, (uint8_t)DevAddr,
-                       (uint16_t)Reg, I2C_MEMADD_SIZE_16BIT,
-                       (uint8_t *)pData, Length, 0x1000) == HAL_OK)
+  
+  if (HAL_I2C_Mem_Write(&h${IpInstance?lower_case}, DevAddr, Reg, I2C_MEMADD_SIZE_16BIT, pData, Length, BUS_${I2CIpInstance}_POLL_TIMEOUT) != HAL_OK)
   {
-    ret = BSP_ERROR_NONE;
-  }
-  else
-  {
-    hal_error = HAL_I2C_GetError(&h${IpInstance?lower_case});
-    if ( hal_error == HAL_I2C_ERROR_AF)
+    if (HAL_I2C_GetError(&h${IpInstance?lower_case}) == HAL_I2C_ERROR_AF)    
     {
-      return BSP_ERROR_BUS_ACKNOWLEDGE_FAILURE;
+      ret = BSP_ERROR_BUS_ACKNOWLEDGE_FAILURE;
     }
     else
     {
@@ -1067,21 +1058,13 @@ int32_t BSP_${IpInstance}_WriteReg16(uint16_t DevAddr, uint16_t Reg, uint8_t *pD
   */
 int32_t  BSP_${IpInstance}_ReadReg16(uint16_t DevAddr, uint16_t Reg, uint8_t *pData, uint16_t Length) 
 {
-  int32_t ret = BSP_ERROR_BUS_FAILURE;
-  uint32_t hal_error = HAL_OK;
+  int32_t ret = BSP_ERROR_NONE;  
  
-  if (HAL_I2C_Mem_Read(&h${IpInstance?lower_case}, DevAddr, (uint16_t)Reg,
-                       I2C_MEMADD_SIZE_16BIT, pData,
-                       Length, 0x1000) == HAL_OK)
+  if (HAL_I2C_Mem_Read(&h${IpInstance?lower_case}, DevAddr, Reg, I2C_MEMADD_SIZE_16BIT, pData, Length, BUS_${I2CIpInstance}_POLL_TIMEOUT) != HAL_OK)
   {
-    ret = BSP_ERROR_NONE;
-  }
-  else
-  {
-    hal_error = HAL_I2C_GetError(&h${IpInstance?lower_case});
-    if( hal_error == HAL_I2C_ERROR_AF)
+    if (HAL_I2C_GetError(&h${IpInstance?lower_case}) != HAL_I2C_ERROR_AF)
     {
-      return BSP_ERROR_BUS_ACKNOWLEDGE_FAILURE;
+      ret =  BSP_ERROR_BUS_ACKNOWLEDGE_FAILURE;
     }
     else
     {
@@ -1091,7 +1074,6 @@ int32_t  BSP_${IpInstance}_ReadReg16(uint16_t DevAddr, uint16_t Reg, uint8_t *pD
   return ret;
 }
 
-[#--
 /**
   * @brief  Send an amount width data through bus (Simplex)
   * @param  DevAddr: Device address on Bus.
@@ -1100,23 +1082,13 @@ int32_t  BSP_${IpInstance}_ReadReg16(uint16_t DevAddr, uint16_t Reg, uint8_t *pD
   * @retval BSP status
   */
 int32_t BSP_${IpInstance}_Send(uint16_t DevAddr, uint8_t *pData, uint16_t Length) {
-  int32_t ret = BSP_ERROR_BUS_FAILURE;	
-  uint32_t hal_error = HAL_OK;
+  int32_t ret = BSP_ERROR_NONE;	  
   
-  if (HAL_I2C_Master_Transmit(&h${IpInstance?lower_case}, 
-                              DevAddr, 
-                              pData, 
-                              Length, 
-                              BUS_I2C1_POLL_TIMEOUT) == HAL_OK)
+  if (HAL_I2C_Master_Transmit(&h${IpInstance?lower_case}, DevAddr, pData, Length, BUS_${I2CIpInstance}_POLL_TIMEOUT) != HAL_OK)
   {
-    ret = BSP_ERROR_NONE;
-  }
-  else
-  {
-    hal_error = HAL_I2C_GetError(&h${IpInstance?lower_case});
-    if( hal_error == HAL_I2C_ERROR_AF)
+    if (HAL_I2C_GetError(&h${IpInstance?lower_case}) != HAL_I2C_ERROR_AF)
     {
-      return BSP_ERROR_BUS_ACKNOWLEDGE_FAILURE;
+      ret = BSP_ERROR_BUS_ACKNOWLEDGE_FAILURE;
     }
     else
     {
@@ -1136,23 +1108,13 @@ int32_t BSP_${IpInstance}_Send(uint16_t DevAddr, uint8_t *pData, uint16_t Length
   * @retval BSP status
   */
 int32_t BSP_${IpInstance}_Recv(uint16_t DevAddr, uint8_t *pData, uint16_t Length) {	
-  int32_t ret = BSP_ERROR_BUS_FAILURE;
-  uint32_t hal_error = HAL_OK;
+  int32_t ret = BSP_ERROR_NONE;
   
-  if (HAL_I2C_Master_Receive(&h${IpInstance?lower_case}, 
-                              DevAddr, 
-                              pData, 
-                              Length, 
-                              BUS_I2C1_POLL_TIMEOUT) == HAL_OK)
+  if (HAL_I2C_Master_Receive(&h${IpInstance?lower_case}, DevAddr, pData, Length, BUS_${I2CIpInstance}_POLL_TIMEOUT) != HAL_OK)
   {
-    ret = BSP_ERROR_NONE;
-  }
-  else
-  {
-    hal_error = HAL_I2C_GetError(&h${IpInstance?lower_case});
-    if( hal_error == HAL_I2C_ERROR_AF)
+    if (HAL_I2C_GetError(&h${IpInstance?lower_case}) != HAL_I2C_ERROR_AF)
     {
-      return BSP_ERROR_BUS_ACKNOWLEDGE_FAILURE;
+      ret = BSP_ERROR_BUS_ACKNOWLEDGE_FAILURE;
     }
     else
     {
@@ -1160,11 +1122,9 @@ int32_t BSP_${IpInstance}_Recv(uint16_t DevAddr, uint8_t *pData, uint16_t Length
     }
   }
   return ret;
-
-	return ret;
 }
 
-[!--
+[#--
 /**
   * @brief  Send and receive an amount of data through bus (Full duplex)
   * @param  DevAddr: Device address on Bus.
@@ -1206,27 +1166,33 @@ int32_t BSP_${IpInstance}_Init(void)
   int32_t ret = BSP_ERROR_NONE;
   
   h${IpInstance?lower_case}.Instance  = ${IpInstance?upper_case};
-  if (HAL_SPI_GetState(&h${IpInstance?lower_case}) == HAL_SPI_STATE_RESET) 
-  { 
+  
+  if(${SpiIpInstance}InitCounter++ == 0)
+  {    
+	if (HAL_SPI_GetState(&h${IpInstance?lower_case}) == HAL_SPI_STATE_RESET) 
+	{ 
 #if (USE_HAL_SPI_REGISTER_CALLBACKS == 0)
-    /* Init the SPI Msp */
-    ${IpInstance?upper_case}_MspInit(&h${IpInstance?lower_case});
+		/* Init the SPI Msp */
+		${IpInstance?upper_case}_MspInit(&h${IpInstance?lower_case});
 #else
-    if(Is${SpiIpInstance}MspCbValid == 0U)
-    {
-      if(BSP_${IpInstance?upper_case}_RegisterDefaultMspCallbacks() != BSP_ERROR_NONE)
-      {
-        return BSP_ERROR_MSP_FAILURE;
-      }
-    }
+		if(Is${SpiIpInstance}MspCbValid == 0U)
+		{
+			if(BSP_${IpInstance?upper_case}_RegisterDefaultMspCallbacks() != BSP_ERROR_NONE)
+			{
+				return BSP_ERROR_MSP_FAILURE;
+			}
+		}	
 #endif   
-    
-    /* Init the SPI */
-    if (MX_${IpInstance}_Init(&h${IpInstance?lower_case}) != HAL_OK)
-    {
-      ret = BSP_ERROR_BUS_FAILURE;
-    }
-  } 
+		if(ret == BSP_ERROR_NONE)
+		{
+			/* Init the SPI */
+			if (MX_${IpInstance}_Init(&h${IpInstance?lower_case}) != HAL_OK)
+			{
+				ret = BSP_ERROR_BUS_FAILURE;
+			}
+		}
+	}
+  }	
 
   return ret;
 }
@@ -1240,15 +1206,20 @@ int32_t BSP_${IpInstance}_Init(void)
 int32_t BSP_${IpInstance}_DeInit(void) 
 {
   int32_t ret = BSP_ERROR_BUS_FAILURE;
-
+  if (${SpiIpInstance}InitCounter > 0)
+  {    
+    if (--${SpiIpInstance}InitCounter == 0)
+    {   
 #if (USE_HAL_SPI_REGISTER_CALLBACKS == 0)
-  ${IpInstance?upper_case}_MspDeInit(&h${IpInstance?lower_case});
+	  ${IpInstance?upper_case}_MspDeInit(&h${IpInstance?lower_case});
 #endif  
-  /* DeInit the SPI*/
-  if (HAL_SPI_DeInit(&h${IpInstance?lower_case}) == HAL_OK) {
-    ret = BSP_ERROR_NONE;
+	  /* DeInit the SPI*/
+	  if (HAL_SPI_DeInit(&h${IpInstance?lower_case}) == HAL_OK) 
+	  {
+		ret = BSP_ERROR_NONE;		
+	  }
+	}
   }
-  
   return ret;
 }
 
@@ -1261,11 +1232,11 @@ int32_t BSP_${IpInstance}_DeInit(void)
   */
 int32_t BSP_${IpInstance}_Send(uint8_t *pData, uint16_t Length)
 {
-  int32_t ret = BSP_ERROR_UNKNOWN_FAILURE;
+  int32_t ret = BSP_ERROR_NONE;
   
-  if(HAL_SPI_Transmit(&h${IpInstance?lower_case}, pData, Length, BUS_SPI1_POLL_TIMEOUT) == HAL_OK)
+  if(HAL_SPI_Transmit(&h${IpInstance?lower_case}, pData, Length, BUS_${SpiIpInstance}_POLL_TIMEOUT) != HAL_OK)
   {
-      ret = BSP_ERROR_NONE;
+      ret = BSP_ERROR_UNKNOWN_FAILURE;
   }
   return ret;
 }
@@ -1279,11 +1250,11 @@ int32_t BSP_${IpInstance}_Send(uint8_t *pData, uint16_t Length)
   */
 int32_t  BSP_${IpInstance}_Recv(uint8_t *pData, uint16_t Length)
 {
-  int32_t ret = BSP_ERROR_UNKNOWN_FAILURE;
+  int32_t ret = BSP_ERROR_NONE;
   
-  if(HAL_SPI_Receive(&h${IpInstance?lower_case}, pData, Length, BUS_SPI1_POLL_TIMEOUT) == HAL_OK)
+  if(HAL_SPI_Receive(&h${IpInstance?lower_case}, pData, Length, BUS_${SpiIpInstance}_POLL_TIMEOUT) != HAL_OK)
   {
-      ret = BSP_ERROR_NONE;
+      ret = BSP_ERROR_UNKNOWN_FAILURE;
   }
   return ret;
 }
@@ -1297,11 +1268,11 @@ int32_t  BSP_${IpInstance}_Recv(uint8_t *pData, uint16_t Length)
   */
 int32_t BSP_${IpInstance}_SendRecv(uint8_t *pTxData, uint8_t *pRxData, uint16_t Length)
 {
-  int32_t ret = BSP_ERROR_UNKNOWN_FAILURE;
+  int32_t ret = BSP_ERROR_NONE;
   
-  if(HAL_SPI_TransmitReceive(&h${IpInstance?lower_case}, pTxData, pRxData, Length, BUS_SPI1_POLL_TIMEOUT) == HAL_OK)
+  if(HAL_SPI_TransmitReceive(&h${IpInstance?lower_case}, pTxData, pRxData, Length, BUS_${SpiIpInstance}_POLL_TIMEOUT) != HAL_OK)
   {
-      ret = BSP_ERROR_NONE;
+      ret = BSP_ERROR_UNKNOWN_FAILURE;
   }
   return ret;
 }
@@ -1315,35 +1286,41 @@ int32_t BSP_${IpInstance}_SendRecv(uint8_t *pTxData, uint8_t *pRxData, uint16_t 
 *******************************************************************************/
 /**
   * @brief  Initializes USART HAL. 
+  * @param  Init : UART initialization parameters
   * @retval BSP status
   */
-int32_t BSP_${IpInstance}_Init(BUS_UART_InitTypeDef *Init) 
+int32_t BSP_${IpInstance}_Init(void) 
 {
   int32_t ret = BSP_ERROR_NONE;
   
-  h${IpInstance?lower_case}.Instance  = ${IpInstance?upper_case};
-  if (HAL_UART_GetState(&h${IpInstance?lower_case}) == HAL_UART_STATE_RESET) 
+  h${IpInstance?lower_case?replace("s","")}.Instance  = ${IpInstance?upper_case};
+  
+  if(${UsartIpInstance}InitCounter++ == 0)
   { 
+    if (HAL_UART_GetState(&h${IpInstance?lower_case?replace("s","")}) == HAL_UART_STATE_RESET) 
+    { 
 #if (USE_HAL_UART_REGISTER_CALLBACKS == 0)
-    /* Init the UART Msp */
-    ${IpInstance?upper_case}_MspInit(&h${IpInstance?lower_case});
+      /* Init the UART Msp */
+      ${IpInstance?upper_case}_MspInit(&h${IpInstance?lower_case?replace("s","")});
 #else
-    if(Is${UsartIpInstance}MspCbValid == 0U)
-    {
-      if(BSP_${IpInstance?upper_case}_RegisterDefaultMspCallbacks() != BSP_ERROR_NONE)
+      if(Is${UsartIpInstance}MspCbValid == 0U)
       {
-        return BSP_ERROR_MSP_FAILURE;
+        if(BSP_${IpInstance?upper_case?replace("s","")}_RegisterDefaultMspCallbacks() != BSP_ERROR_NONE)
+        {
+          return BSP_ERROR_MSP_FAILURE;
+        }
       }
-    }
 #endif   
-    
-    /* Init the UART */
-    if (MX_${IpInstance}_Init(&h${IpInstance?lower_case}) != HAL_OK)
-    {
-      ret = BSP_ERROR_BUS_FAILURE;
-    }
-  } 
-
+      if(ret == BSP_ERROR_NONE)
+      {
+        /* Init the UART */
+        if (MX_${IpInstance}_UART_Init(&h${IpInstance?lower_case?replace("s","")}) != HAL_OK)
+        {
+          ret = BSP_ERROR_BUS_FAILURE;
+        }
+      }
+    } 
+  }
   return ret;
 }
 
@@ -1356,15 +1333,21 @@ int32_t BSP_${IpInstance}_Init(BUS_UART_InitTypeDef *Init)
 int32_t BSP_${IpInstance}_DeInit(void) 
 {
   int32_t ret = BSP_ERROR_BUS_FAILURE;
-
-#if (USE_HAL_UART_REGISTER_CALLBACKS == 0)
-  ${IpInstance?upper_case}_MspDeInit(&h${IpInstance?lower_case});
-#endif  
-  /* DeInit the UART*/
-  if (HAL_UART_DeInit(&h${IpInstance?lower_case}) == HAL_OK) {
-    ret = BSP_ERROR_NONE;
-  }
   
+  if (${UsartIpInstance}InitCounter > 0)
+  {       
+    if (--${UsartIpInstance}InitCounter == 0)
+    { 
+#if (USE_HAL_UART_REGISTER_CALLBACKS == 0)
+      ${IpInstance?upper_case}_MspDeInit(&h${IpInstance?lower_case?replace("s","")});
+#endif  
+      /* DeInit the UART*/
+      if (HAL_UART_DeInit(&h${IpInstance?lower_case?replace("s","")}) == HAL_OK) 
+      {
+        ret = BSP_ERROR_NONE;
+      }
+    }
+  }
   return ret;
 }
 
@@ -1379,7 +1362,7 @@ int32_t BSP_${IpInstance}_Send(uint8_t *pData, uint16_t Length)
 {
   int32_t ret = BSP_ERROR_UNKNOWN_FAILURE;
   
-  if(HAL_UART_Transmit(&h${IpInstance?lower_case}, pData, Length, BUS_UART1_POLL_TIMEOUT) == HAL_OK)
+  if(HAL_UART_Transmit(&h${IpInstance?lower_case?replace("s","")}, pData, Length, BUS_${UsartIpInstance}_POLL_TIMEOUT) == HAL_OK)
   {
       ret = BSP_ERROR_NONE;
   }
@@ -1397,7 +1380,7 @@ int32_t  BSP_${IpInstance}_Recv(uint8_t *pData, uint16_t Length)
 {
   int32_t ret = BSP_ERROR_UNKNOWN_FAILURE;
   
-  if(HAL_UART_Receive(&h${IpInstance?lower_case}, pData, Length, BUS_UART1_POLL_TIMEOUT) == HAL_OK)
+  if(HAL_UART_Receive(&h${IpInstance?lower_case?replace("s","")}, pData, Length, BUS_${UsartIpInstance}_POLL_TIMEOUT) == HAL_OK)
   {
       ret = BSP_ERROR_NONE;
   }
@@ -1541,16 +1524,16 @@ int32_t BSP_${IpInstance}_RegisterMspCallbacks (BSP_${IpName}_Cb_t *Callbacks)
 int32_t BSP_${IpInstance}_RegisterDefaultMspCallbacks (void)
 {
 
-  __HAL_${IpName}_RESET_HANDLE_STATE(&h${IpHandle?lower_case});
+  __HAL_${IpName?replace("S","")}_RESET_HANDLE_STATE(&h${IpHandle?lower_case?replace("s","")});
   
   /* Register MspInit Callback */
-  if (HAL_${IpName}_RegisterCallback(&h${IpHandle?lower_case}, HAL_${IpName}_MSPINIT_CB_ID, ${IpInstance}_MspInit)  != HAL_OK)
+  if (HAL_${IpName?replace("S","")}_RegisterCallback(&h${IpHandle?lower_case?replace("s","")}, HAL_${IpName?replace("S","")}_MSPINIT_CB_ID, ${IpInstance}_MspInit)  != HAL_OK)
   {
     return BSP_ERROR_PERIPH_FAILURE;
   }
   
   /* Register MspDeInit Callback */
-  if (HAL_${IpName}_RegisterCallback(&h${IpHandle?lower_case}, HAL_${IpName}_MSPDEINIT_CB_ID, ${IpInstance}_MspDeInit) != HAL_OK)
+  if (HAL_${IpName?replace("S","")}_RegisterCallback(&h${IpHandle?lower_case?replace("s","")}, HAL_${IpName?replace("S","")}_MSPDEINIT_CB_ID, ${IpInstance}_MspDeInit) != HAL_OK)
   {
     return BSP_ERROR_PERIPH_FAILURE;
   }
@@ -1564,19 +1547,19 @@ int32_t BSP_${IpInstance}_RegisterDefaultMspCallbacks (void)
   * @param Callbacks     pointer to ${IpInstance} MspInit/MspDeInit callback functions
   * @retval BSP status
   */
-int32_t BSP_${IpInstance}_RegisterMspCallbacks (BSP_${IpName}_Cb_t *Callbacks)
+int32_t BSP_${IpInstance}_RegisterMspCallbacks (BSP_${IpName?replace("S","")}_Cb_t *Callbacks)
 {
   /* Prevent unused argument(s) compilation warning */
-  __HAL_${IpName}_RESET_HANDLE_STATE(&h${IpHandle?lower_case});  
+  __HAL_${IpName?replace("S","")}_RESET_HANDLE_STATE(&h${IpHandle?lower_case?replace("s","")});  
  
    /* Register MspInit Callback */
-  if (HAL_${IpName}_RegisterCallback(&h${IpHandle?lower_case}, HAL_${IpName}_MSPINIT_CB_ID, Callbacks->pMspInitCb)  != HAL_OK)
+  if (HAL_${IpName?replace("S","")}_RegisterCallback(&h${IpHandle?lower_case?replace("s","")}, HAL_${IpName?replace("S","")}_MSPINIT_CB_ID, Callbacks->pMspInitCb)  != HAL_OK)
   {
     return BSP_ERROR_PERIPH_FAILURE;
   }
   
   /* Register MspDeInit Callback */
-  if (HAL_${IpName}_RegisterCallback(&h${IpHandle?lower_case}, HAL_${IpName}_MSPDEINIT_CB_ID, Callbacks->pMspDeInitCb) != HAL_OK)
+  if (HAL_${IpName?replace("S","")}_RegisterCallback(&h${IpHandle?lower_case?replace("s","")}, HAL_${IpName?replace("S","")}_MSPDEINIT_CB_ID, Callbacks->pMspDeInitCb) != HAL_OK)
   {
     return BSP_ERROR_PERIPH_FAILURE;
   }
@@ -1624,160 +1607,196 @@ int32_t BSP_${IpInstance}_RegisterMspCallbacks (BSP_${IpName}_Cb_t *Callbacks)
 #if (USE_CUBEMX_BSP_V2 == 1)
 /**
   * @brief  Convert the I2C Frequency into I2C timing.
-  * @param  clock_src_hz : I2C source clock in HZ.
-  * @param  i2cfreq_hz : I2C frequency in Hz.
-  * @retval Prescaler dividor
-  */        
-static uint32_t I2C_GetTiming(uint32_t clock_src_hz, uint32_t i2cfreq_hz)
+  * @note   The algorithm to compute the different fields of the Timings register
+  *         is described in the AN4235 and the charac timings are inline with
+  *         the product RM.
+  * @param  clock_src_freq : I2C source clock in HZ.
+  * @param  i2c_freq : I2C frequency in Hz.
+  * @retval I2C timing value
+  */
+static uint32_t I2C_GetTiming(uint32_t clock_src_freq, uint32_t i2c_freq)
 {
   uint32_t ret = 0;
-  uint32_t speed = 0;
-  uint32_t is_valid_speed = 0; 
-  uint32_t p_prev = PRESC_MAX;
-  uint32_t i2cclk;
-  uint32_t i2cspeed;
-  uint32_t clk_error_prev;
-  uint32_t tsync;
-  uint32_t af_delay_min, af_delay_max;
+  uint32_t speed;
+  uint32_t idx;
+
+  if((clock_src_freq != 0U) && (i2c_freq != 0U))
+  {
+    for ( speed = 0 ; speed <=  (uint32_t)I2C_SPEED_FAST_PLUS ; speed++)
+    {
+      if ((i2c_freq >= I2C_Charac[speed].freq_min) &&
+          (i2c_freq <= I2C_Charac[speed].freq_max))
+      {
+        Compute_PRESC_SCLDEL_SDADEL(clock_src_freq, speed);
+        idx = Compute_SCLL_SCLH(clock_src_freq, speed);
+
+        if (idx < I2C_VALID_TIMING_NBR)
+        {
+          ret = ((valid_timing[idx].presc  & 0x0FU) << 28) |\
+                ((valid_timing[idx].tscldel & 0x0FU) << 20) |\
+                ((valid_timing[idx].tsdadel & 0x0FU) << 16) |\
+                ((valid_timing[idx].sclh & 0xFFU) << 8) |\
+                ((valid_timing[idx].scll & 0xFFU) << 0);
+        }
+        break;
+      }
+    }
+  }
+
+  return ret;
+}
+
+
+/**
+  * @brief  Compute PRESC, SCLDEL and SDADEL.
+  * @param  clock_src_freq : I2C source clock in HZ.
+  * @param  I2C_Speed : I2C frequency (index).
+  * @retval None
+  */
+static void Compute_PRESC_SCLDEL_SDADEL(uint32_t clock_src_freq, uint32_t I2C_Speed)
+{
+  uint32_t prev_presc = I2C_PRESC_MAX;
+  uint32_t ti2cclk;
+  int32_t  tsdadel_min, tsdadel_max;
+  int32_t  tscldel_min;
+  uint32_t presc, scldel, sdadel;
+
+  ti2cclk   = (SEC2NSEC + (clock_src_freq / 2U))/ clock_src_freq;
+
+  /* tDNF = DNF x tI2CCLK
+     tPRESC = (PRESC+1) x tI2CCLK
+     SDADEL >= {tf +tHD;DAT(min) - tAF(min) - tDNF - [3 x tI2CCLK]} / {tPRESC}
+     SDADEL <= {tVD;DAT(max) - tr - tAF(max) - tDNF- [4 x tI2CCLK]} / {tPRESC} */
+
+  tsdadel_min = (int32_t)I2C_Charac[I2C_Speed].tfall + (int32_t)I2C_Charac[I2C_Speed].hddat_min -
+    (int32_t)I2C_ANALOG_FILTER_DELAY_MIN - (int32_t)(((int32_t)I2C_Charac[I2C_Speed].dnf + 3) * (int32_t)ti2cclk);
+
+  tsdadel_max = (int32_t)I2C_Charac[I2C_Speed].vddat_max - (int32_t)I2C_Charac[I2C_Speed].trise -
+    (int32_t)I2C_ANALOG_FILTER_DELAY_MAX - (int32_t)(((int32_t)I2C_Charac[I2C_Speed].dnf + 4) * (int32_t)ti2cclk);
+
+
+  /* {[tr+ tSU;DAT(min)] / [tPRESC]} - 1 <= SCLDEL */
+  tscldel_min = (int32_t)I2C_Charac[I2C_Speed].trise + (int32_t)I2C_Charac[I2C_Speed].sudat_min;
+
+  if (tsdadel_min <= 0)
+  {
+    tsdadel_min = 0;
+  }
+
+  if (tsdadel_max <= 0)
+  {
+    tsdadel_max = 0;
+  }
+
+  for (presc = 0; presc < I2C_PRESC_MAX; presc++)
+  {
+    for (scldel = 0; scldel < I2C_SCLDEL_MAX; scldel++)
+    {
+      /* TSCLDEL = (SCLDEL+1) * (PRESC+1) * TI2CCLK */
+      uint32_t tscldel = (scldel + 1U) * (presc + 1U) * ti2cclk;
+
+      if (tscldel >= (uint32_t)tscldel_min)
+      {
+        for (sdadel = 0; sdadel < I2C_SDADEL_MAX; sdadel++)
+        {
+          /* TSDADEL = SDADEL * (PRESC+1) * TI2CCLK */
+          uint32_t tsdadel = (sdadel * (presc + 1U)) * ti2cclk;
+
+          if ((tsdadel >= (uint32_t)tsdadel_min) && (tsdadel <= (uint32_t)tsdadel_max))
+          {
+            if(presc != prev_presc)
+            {
+              valid_timing[valid_timing_nbr].presc = presc;
+              valid_timing[valid_timing_nbr].tscldel = scldel;
+              valid_timing[valid_timing_nbr].tsdadel = sdadel;
+              prev_presc = presc;
+              valid_timing_nbr ++;
+
+              if(valid_timing_nbr >= I2C_VALID_TIMING_NBR)
+              {
+                return;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+  * @brief  Calculate SCLL and SCLH and find best configuration.
+  * @param  clock_src_freq : I2C source clock in HZ.
+  * @param  I2C_Speed : I2C frequency (index).
+  * @retval config index (0 to I2C_VALID_TIMING_NBR], 0xFFFFFFFF : no valid config
+  */
+static uint32_t Compute_SCLL_SCLH (uint32_t clock_src_freq, uint32_t I2C_speed)
+{
+  uint32_t ret = 0xFFFFFFFFU;
+  uint32_t ti2cclk;
+  uint32_t ti2cspeed;
+  uint32_t prev_error;
   uint32_t dnf_delay;
   uint32_t clk_min, clk_max;
-  int32_t sdadel_min, sdadel_max;
-  int32_t scldel_min;
-  struct i2c_timings *s = 0;
-  struct i2c_timings valid_timing[VALID_PRESC_NBR];
-  uint16_t p, l, a, h;
-  uint32_t valid_timing_nbr = 0;  
-  
-  for (speed =0 ; speed<=  I2C_SPEED_FAST_PLUS ; speed++)
+  uint32_t scll, sclh;
+
+  ti2cclk   = (SEC2NSEC + (clock_src_freq / 2U))/ clock_src_freq;
+  ti2cspeed   = (SEC2NSEC + (I2C_Charac[I2C_speed].freq / 2U))/ I2C_Charac[I2C_speed].freq;
+
+  /* tDNF = DNF x tI2CCLK */
+  dnf_delay = I2C_Charac[I2C_speed].dnf * ti2cclk;
+
+  clk_max = SEC2NSEC / I2C_Charac[I2C_speed].freq_min;
+  clk_min = SEC2NSEC / I2C_Charac[I2C_speed].freq_max;
+
+  prev_error = ti2cspeed;
+
+  for (uint32_t count = 0; count < valid_timing_nbr; count++)
   {
-    if ((i2cfreq_hz >= i2c_specs[speed].rate_min) &&
-        (i2cfreq_hz <= i2c_specs[speed].rate_max))
+    /* tPRESC = (PRESC+1) x tI2CCLK*/
+    uint32_t tpresc = (valid_timing[count].presc + 1U) * ti2cclk;
+
+    for (scll = 0; scll < I2C_SCLL_MAX; scll++)
     {
-      is_valid_speed = 1;
-      break;
-    }
-  }
-  
-  if(is_valid_speed)
-  {
-    i2cclk = DIV_ROUND_CLOSEST(NSEC_PER_SEC, clock_src_hz);
-    i2cspeed = DIV_ROUND_CLOSEST(NSEC_PER_SEC, i2cfreq_hz);
-    clk_error_prev = i2cspeed;
-    
-    /*  Analog and Digital Filters */
-    af_delay_min =(i2c_user_setup[speed].analog_filter ? I2C_ANALOG_FILTER_DELAY_MIN : 0);
-    af_delay_max =(i2c_user_setup[speed].analog_filter ? I2C_ANALOG_FILTER_DELAY_MAX : 0);
-    
-    dnf_delay = i2c_user_setup[speed].dnf * i2cclk;
-    
-    sdadel_min = i2c_user_setup[speed].fall_time - i2c_specs[speed].hddat_min -
-      af_delay_min - (i2c_user_setup[speed].dnf + 3) * i2cclk;
-    
-    sdadel_max = i2c_specs[speed].vddat_max - i2c_user_setup[speed].rise_time -
-      af_delay_max - (i2c_user_setup[speed].dnf + 4) * i2cclk;
-    
-    scldel_min = i2c_user_setup[speed].rise_time + i2c_specs[speed].sudat_min;
-    
-    if (sdadel_min < 0)
-      sdadel_min = 0;
-    if (sdadel_max < 0)
-      sdadel_max = 0;
-    
-    /* Compute possible values for PRESC, SCLDEL and SDADEL */
-    for (p = 0; p < PRESC_MAX; p++) {
-      for (l = 0; l < SCLDEL_MAX; l++) {
-        uint32_t scldel = (l + 1) * (p + 1) * i2cclk;
-        
-        if (scldel < scldel_min)
-          continue;
-        
-        for (a = 0; a < SDADEL_MAX; a++) {
-          uint32_t sdadel = (a * (p + 1) + 1) * i2cclk;
-          
-          if (((sdadel >= sdadel_min) &&
-               (sdadel <= sdadel_max))&&
-              (p != p_prev)) {
-                valid_timing[valid_timing_nbr].presc = p;
-                valid_timing[valid_timing_nbr].scldel = l;
-                valid_timing[valid_timing_nbr].sdadel = a;
-                p_prev = p;
-                valid_timing_nbr ++;
-                
-                if(valid_timing_nbr >= VALID_PRESC_NBR)
-                {
-                  /* max valid timing buffer is full, use only these values*/
-                  goto  Compute_scll_sclh;
-                }
-              }
-        }
-      }
-    }
-    
-    if (!valid_timing_nbr) {
-      return 0;
-    }
-	
-Compute_scll_sclh:    
-    tsync = af_delay_min + dnf_delay + (2 * i2cclk);
-    s = NULL;
-    clk_max = NSEC_PER_SEC / i2c_specs[speed].rate_min;
-    clk_min = NSEC_PER_SEC / i2c_specs[speed].rate_max;
-    
-    /*
-    * Among Prescaler possibilities discovered above figures out SCL Low
-    * and High Period. Provided:
-    * - SCL Low Period has to be higher than Low Period of tehs SCL Clock
-    *   defined by I2C Specification. I2C Clock has to be lower than
-    *   (SCL Low Period - Analog/Digital filters) / 4.
-    * - SCL High Period has to be lower than High Period of the SCL Clock
-    *   defined by I2C Specification
-    * - I2C Clock has to be lower than SCL High Period
-    */
-    for (int32_t count = 0; count < valid_timing_nbr; count++) {          
-      uint32_t prescaler = (valid_timing[count].presc + 1) * i2cclk;
-      
-      for (l = 0; l < SCLL_MAX; l++) {
-        uint32_t tscl_l = (l + 1) * prescaler + tsync;
-        
-        if ((tscl_l < i2c_specs[speed].l_min) ||
-            (i2cclk >= ((tscl_l - af_delay_min - dnf_delay) / 4))) {
-              continue;
+      /* tLOW(min) <= tAF(min) + tDNF + 2 x tI2CCLK + [(SCLL+1) x tPRESC ] */
+      uint32_t tscl_l = I2C_ANALOG_FILTER_DELAY_MIN + dnf_delay + (2U * ti2cclk) + (scll + 1U) * tpresc;
+
+
+      /* The I2CCLK period tI2CCLK must respect the following conditions:
+      tI2CCLK < (tLOW - tfilters) / 4 and tI2CCLK < tHIGH */
+      if ((tscl_l > I2C_Charac[I2C_speed].lscl_min) && (ti2cclk < ((tscl_l - I2C_ANALOG_FILTER_DELAY_MIN - dnf_delay) / 4U)))
+      {
+        for (sclh = 0; sclh < I2C_SCLH_MAX; sclh++)
+        {
+          /* tHIGH(min) <= tAF(min) + tDNF + 2 x tI2CCLK + [(SCLH+1) x tPRESC] */
+          uint32_t tscl_h = I2C_ANALOG_FILTER_DELAY_MIN + dnf_delay + (2U * ti2cclk) + (sclh + 1U) * tpresc;
+
+          /* tSCL = tf + tLOW + tr + tHIGH */
+          uint32_t tscl = tscl_l + tscl_h + I2C_Charac[I2C_speed].trise + I2C_Charac[I2C_speed].tfall;
+
+          if ((tscl >= clk_min) && (tscl <= clk_max) && (tscl_h >= I2C_Charac[I2C_speed].hscl_min) && (ti2cclk < tscl_h))
+          {
+            int32_t error = (int32_t)tscl - (int32_t)ti2cspeed;
+
+            if (error < 0)
+            {
+              error = -error;
             }
-        
-        for (h = 0; h < SCLH_MAX; h++) {
-          uint32_t tscl_h = (h + 1) * prescaler + tsync;
-          uint32_t tscl = tscl_l + tscl_h + i2c_user_setup[speed].rise_time + i2c_user_setup[speed].fall_time;
-          
-          if ((tscl >= clk_min) && (tscl <= clk_max) &&
-              (tscl_h >= i2c_specs[speed].h_min) &&
-                (i2cclk < tscl_h)) {
-                  int clk_error = tscl - i2cspeed;
-                  
-                  if (clk_error < 0)
-                    clk_error = -clk_error;
-                  
-                  /* save the solution with the lowest clock error */
-                  if (clk_error < clk_error_prev) {
-                    clk_error_prev = clk_error;
-                    valid_timing[count].scll = l;
-                    valid_timing[count].sclh = h;
-                    s = &valid_timing[count];
-                  }
-                }
+
+            /* look for the timings with the lowest clock error */
+            if ((uint32_t)error < prev_error)
+            {
+              prev_error = (uint32_t)error;
+              valid_timing[count].scll = scll;
+              valid_timing[count].sclh = sclh;
+              ret = count;
+            }
+          }
         }
       }
     }
-    
-    if (!s) {
-      return 0;
-    }
-    
-    ret = ((s->presc  & 0xF) << 28) |
-      ((s->scldel & 0xF) << 20) |
-        ((s->sdadel & 0xF) << 16) |
-          ((s->sclh & 0xFF) << 8) |
-            ((s->scll & 0xFF) << 0);
   }
+
   return ret;
 }
 #endif

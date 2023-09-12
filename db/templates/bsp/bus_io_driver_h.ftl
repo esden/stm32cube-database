@@ -84,7 +84,7 @@
 						[#assign I2CIpInstanceList = I2CIpInstanceList + "," + bsp.solution]
 					[/#if]
 				[#break] 
-                [#case "UART"]
+                [#case "UART"]                
 				[#assign USARTisTrue = true]
 					[#if UsartIpInstanceList == ""]
 						[#assign UsartIpInstance = bsp.solution]
@@ -121,18 +121,18 @@
 [/#list]
   
 [#if  I2CisTrue]
-#ifndef BUS_I2C1_POLL_TIMEOUT
-   #define BUS_I2C1_POLL_TIMEOUT                0x1000U   
+#ifndef BUS_${I2CIpInstance}_POLL_TIMEOUT
+   #define BUS_${I2CIpInstance}_POLL_TIMEOUT                0x1000U   
 #endif
-/* ${I2CInstance} Frequeny in Hz  */
-#ifndef BUS_${I2CInstance}_FREQUENCY  
-   #define BUS_${I2CInstance}_FREQUENCY  1000000U /* Frequency of I2Cn = 100 KHz*/
+/* ${I2CIpInstance} Frequeny in Hz  */
+#ifndef BUS_${I2CIpInstance}_FREQUENCY  
+   #define BUS_${I2CIpInstance}_FREQUENCY  1000000U /* Frequency of I2Cn = 100 KHz*/
 #endif
 [/#if] 
 
 [#if  SPIisTrue]
-#ifndef BUS_SPI1_POLL_TIMEOUT
-  #define BUS_SPI1_POLL_TIMEOUT                   0x1000
+#ifndef BUS_${SpiIpInstance}_POLL_TIMEOUT
+  #define BUS_${SpiIpInstance}_POLL_TIMEOUT                   0x1000U
 #endif
 /* ${SpiIpInstance} Baud rate in bps  */
 #ifndef BUS_${SpiIpInstance}_BAUDRATE   
@@ -141,11 +141,11 @@
 [/#if] 
 
 [#if  USARTisTrue]
-#ifndef BUS_UART1_BAUDRATE 
-   #define BUS_UART1_BAUDRATE  9600U /* baud rate of UARTn = 9600 baud*/
+#ifndef BUS_${UsartIpInstance}_BAUDRATE 
+   #define BUS_${UsartIpInstance}_BAUDRATE  9600U /* baud rate of UARTn = 9600 baud*/
 #endif  
-#ifndef BUS_UART1_POLL_TIMEOUT
-   #define BUS_UART1_POLL_TIMEOUT                9600U   
+#ifndef BUS_${UsartIpInstance}_POLL_TIMEOUT
+   #define BUS_${UsartIpInstance}_POLL_TIMEOUT                9600U   
 #endif  
 [/#if] 
 
@@ -162,7 +162,7 @@ typedef struct
 {
   pI2C_CallbackTypeDef  pMspInitCb;
   pI2C_CallbackTypeDef  pMspDeInitCb;
-}BSP_${IpInstance}_Cb_t;
+}BSP_I2C_Cb_t;
 #endif /* (USE_HAL_I2C_REGISTER_CALLBACKS == 1) */
 [/#if]
 [#if SPIisTrue]
@@ -171,7 +171,7 @@ typedef struct
 {
   pSPI_CallbackTypeDef  pMspInitCb;
   pSPI_CallbackTypeDef  pMspDeInitCb;
-}BSP_${IpInstance}_Cb_t;
+}BSP_SPI_Cb_t;
 #endif /* (USE_HAL_SPI_REGISTER_CALLBACKS == 1) */
 [/#if] 
 [#if USARTisTrue]
@@ -198,7 +198,7 @@ extern I2C_HandleTypeDef h${I2CIpInstance?lower_case};
 extern SPI_HandleTypeDef h${SpiIpInstance?lower_case};	
 [/#if]
 [#if USARTisTrue]
-extern UART_HandleTypeDef h${UsartIpInstance?lower_case};	
+extern UART_HandleTypeDef h${UsartIpInstance?lower_case?replace("s","")};	
 [/#if]
 /**
   * @}
@@ -332,7 +332,7 @@ int32_t BSP_${IpInstance}_SendRecv(uint8_t *pTxData, uint8_t *pRxData, uint16_t 
 [#-- macro generateBspUSART_Driver --]
 [#macro generateBspUSART_Driver IpInstance]
 HAL_StatusTypeDef MX_${IpInstance}_Init(UART_HandleTypeDef* huart);
-int32_t BSP_${IpInstance}_Init(BUS_UART_InitTypeDef *Init);
+int32_t BSP_${IpInstance}_Init(void);
 int32_t BSP_${IpInstance}_DeInit(void);
 int32_t BSP_${IpInstance}_Send(uint8_t *pData, uint16_t Length);
 int32_t BSP_${IpInstance}_Recv(uint8_t *pData, uint16_t Length);
@@ -346,21 +346,21 @@ int32_t BSP_GetTick(void);
 [#if I2CisTrue]
 #if (USE_HAL_I2C_REGISTER_CALLBACKS == 1)
 int32_t BSP_${IpInstance}_RegisterDefaultMspCallbacks (void);
-int32_t BSP_${IpInstance}_RegisterMspCallbacks (BSP_${IpInstance}_Cb_t *Callbacks);
+int32_t BSP_${IpInstance}_RegisterMspCallbacks (BSP_I2C_Cb_t *Callbacks);
 #endif /* (USE_HAL_I2C_REGISTER_CALLBACKS == 1) */
 [/#if]
 
 [#if SPIisTrue]
 #if (USE_HAL_SPI_REGISTER_CALLBACKS == 1)
 int32_t BSP_${IpInstance}_RegisterDefaultMspCallbacks (void);
-int32_t BSP_${IpInstance}_RegisterMspCallbacks (BSP_${IpInstance}_Cb_t *Callbacks);
+int32_t BSP_${IpInstance}_RegisterMspCallbacks (BSP_SPI_Cb_t *Callbacks);
 #endif /* (USE_HAL_SPI_REGISTER_CALLBACKS == 1) */
 [/#if]
 
-[#if SPIisTrue]
+[#if USARTisTrue]
 #if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
 int32_t BSP_${IpInstance}_RegisterDefaultMspCallbacks (void);
-int32_t BSP_${IpInstance}_RegisterMspCallbacks (BSP_${IpInstance}_Cb_t *Callbacks);
+int32_t BSP_${IpInstance}_RegisterMspCallbacks (BSP_UART_Cb_t *Callbacks);
 #endif /* (USE_HAL_UART_REGISTER_CALLBACKS == 1)  */
 [/#if]
 

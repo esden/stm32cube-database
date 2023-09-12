@@ -90,13 +90,13 @@
                         [/#if]
                     [/#list]
                     [#if !exist]  [#-- if exist --]                  
-                    #t${argument.typeName} ${argument.name};                        
+                    #t${argument.typeName} ${argument.name} = {0};                        
                       [#assign myListOfLocalVariables = myListOfLocalVariables + " "+ argument.name]
                       [#assign resultList = myListOfLocalVariables]
                     [/#if][#-- if exist --]
                     [/#if][#-- if global --]
                 [#else][#-- if context?? --]
-                #t${argument.typeName} ${argument.name};
+                #t${argument.typeName} ${argument.name} = {0};
             [/#if][#-- if argument.context?? --]
 
             [#-- Array type --]
@@ -692,7 +692,7 @@
 [#-- #nvoid HAL_${mode}_MspInit(${mode}_HandleTypeDef* h${mode?lower_case}){--] 
 [#compress]
 [#if name !="TIM"]
-    [#if (name=="USB" && FamilyName=="STM32WB")]
+    [#if (name=="USB" && (FamilyName=="STM32WB"| FamilyName=="STM32G4"))]
 #if (USE_HAL_${mode}_REGISTER_CALLBACK == 1U)
 static void ${entry.key}(${mode}_HandleTypeDef* ${mode?lower_case}Handle)
 #else
@@ -757,7 +757,7 @@ void ${entry.key}(${mode}_HandleTypeDef* ${mode?lower_case}Handle)
             [#if v?contains(variable.name)]
             [#-- no matches--]
             [#else]
-#t${variable.value} ${variable.name};
+#t${variable.value} ${variable.name} = {0};
                 [#assign v = v + " "+ variable.name/] 
             [/#if]  
         [/#list]  
@@ -934,7 +934,7 @@ uint32_t DFSDM_Init = 0;
 [#assign mode=entry.key?replace("_MspDeInit","")?replace("MspDeInit","")?replace("_BspDeInit","")?replace("HAL_","")]
 [#assign ipHandler = mode?lower_case+ "Handle"]
 [#if name !="TIM"]
-    [#if (name=="USB" && FamilyName=="STM32WB")]
+    [#if (name=="USB" && (FamilyName=="STM32WB" | FamilyName=="STM32G4"))]
 #if (USE_HAL_${mode}_REGISTER_CALLBACK == 1U)
 static void ${entry.key}(${mode}_HandleTypeDef* ${mode?lower_case}Handle)
 #else

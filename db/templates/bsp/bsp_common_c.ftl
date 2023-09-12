@@ -22,6 +22,14 @@
 [#assign BUTTON_IRQn = ""]
 [#assign BUTTON_EXTI = ""]
 
+[#assign useDefine = false]
+
+[#if HalExtiUseDefine??]
+[#if HalExtiUseDefine == "true"]
+[#assign useDefine = true]
+[/#if]
+[/#if]
+
 [#list BspIpDatas as SWIP] 
 	[#if SWIP.variables??]
 		[#list SWIP.variables as variables]
@@ -56,8 +64,8 @@
 [/#list]
 
 /* Includes ------------------------------------------------------------------*/ 
-#include "${FamilyName?lower_case}_${BoardName}.h"
-
+[#--#include "${FamilyName?lower_case}${BoardName}.h"--]
+#include "${BoardName}.h"
 [#if useBUTTON]
 #include "${FamilyName?lower_case}xx_hal_exti.h"
 [/#if] 
@@ -84,20 +92,6 @@
  * @{
  */ 
 
-/**
- * @brief ${FamilyName?upper_case}XX NUCLEO BSP Driver version number V1.2.6
- */  
-#define __${BoardName?upper_case}_BSP_VERSION_MAIN   (0x01) /*!< [31:24] main version */
-#define __${BoardName?upper_case}_BSP_VERSION_SUB1   (0x02) /*!< [23:16] sub1 version */
-#define __${BoardName?upper_case}_BSP_VERSION_SUB2   (0x06) /*!< [15:8]  sub2 version */
-#define __${BoardName?upper_case}_BSP_VERSION_RC     (0x00) /*!< [7:0]  release candidate */ 
-#define __${BoardName?upper_case}_BSP_VERSION        ((__${BoardName?upper_case}_BSP_VERSION_MAIN << 24)\
-                                                    |(__${BoardName?upper_case}_BSP_VERSION_SUB1 << 16)\
-                                                    |(__${BoardName?upper_case}_BSP_VERSION_SUB2 << 8 )\
-                                                    |(__${BoardName?upper_case}_BSP_VERSION_RC))
-/**
- * @}
- */ 
 
 /** @defgroup ${BoardName?upper_case}_LOW_LEVEL_FunctionPrototypes ${BoardName?upper_case} LOW LEVEL Private Function Prototypes
  * @{
@@ -118,10 +112,14 @@ static GPIO_TypeDef*  LED_PORT[LEDn] = {LED2_GPIO_PORT};
 static const uint16_t LED_PIN[LEDn]  = {LED2_PIN};
 [/#if]
 [#if useBUTTON]
-static GPIO_TypeDef*   BUTTON_PORT[BUTTONn] = {KEY_BUTTON_GPIO_PORT}; 
-static const uint16_t  BUTTON_PIN[BUTTONn]  = {KEY_BUTTON_PIN}; 
-static const IRQn_Type BUTTON_IRQn[BUTTONn] = {KEY_BUTTON_EXTI_IRQn};
-EXTI_HandleTypeDef* hExtiButtonHandle[BUTTONn];
+static GPIO_TypeDef*   BUTTON_PORT[BUTTONn] = {USER_BUTTON_GPIO_PORT}; 
+static const uint16_t  BUTTON_PIN[BUTTONn]  = {USER_BUTTON_PIN}; 
+static const IRQn_Type BUTTON_IRQn[BUTTONn] = {USER_BUTTON_EXTI_IRQn};
+[#if useDefine]
+EXTI_HandleTypeDef hpb_exti[BUTTONn] = {{.Line = EXTI_LINE_${BUTTON_EXTI}}};
+[#else]
+EXTI_HandleTypeDef* hpb_exti[BUTTONn];
+[/#if]
 [/#if]
 [#if useUSART]
 USART_TypeDef* COM_USART[COMn] = {COM1_UART};
@@ -138,7 +136,12 @@ __weak HAL_StatusTypeDef MX_${UsartInstance}_UART_Init(UART_HandleTypeDef* huart
 [/#if]
 [#if useBUTTON]
 [#-- Bug 60723 --]
+[#-- Bug 50684 --]
+[#if useDefine]
+[#-- here we must intialize the handle with the correct exti line number --]
+[#else]
 EXTI_HandleTypeDef hexti${BUTTON_EXTI} = {.Line = EXTI_LINE_${BUTTON_EXTI}};
+[/#if]
 [/#if]
 /**
  * @}
@@ -148,7 +151,7 @@ EXTI_HandleTypeDef hexti${BUTTON_EXTI} = {.Line = EXTI_LINE_${BUTTON_EXTI}};
  * @{
  */ 
 [#if useBUTTON]
-static void BUTTON_KEY_EXTI_Callback(void);
+static void BUTTON_USER_EXTI_Callback(void);
 [/#if]
 [#if useUSART]
 #if (USE_BSP_COM_FEATURE > 0)
@@ -208,15 +211,14 @@ int32_t BSP_LED_Init(Led_TypeDef Led)
  */
 int32_t BSP_LED_DeInit(Led_TypeDef Led)
 {
-  GPIO_InitTypeDef GPIO_InitStruct;
-  
-  /* Turn off LED */ 
-  HAL_GPIO_WritePin(LED_PORT [Led], (uint16_t)LED_PIN[Led], GPIO_PIN_RESET);
-  
-  /* DeInit the GPIO_LED pin */ 
-  GPIO_InitStruct.Pin = LED_PIN [Led];    
-  HAL_GPIO_DeInit(LED_PORT [Led], GPIO_InitStruct.Pin);
-  
+  GPIO_InitTypeDef  gpio_init_structure;
+
+  /* Turn off LED */
+  HAL_GPIO_WritePin(LED_PORT[Led], LED_PIN[Led], GPIO_PIN_RESET);
+  /* DeInit the GPIO_LED pin */
+  gpio_init_structure.Pin = LED_PIN[Led];
+  HAL_GPIO_DeInit(LED_PORT[Led], gpio_init_structure.Pin);
+
   return BSP_ERROR_NONE;
 }
 
@@ -266,8 +268,8 @@ int32_t BSP_LED_Off(Led_TypeDef Led)
  */
 int32_t BSP_LED_Toggle(Led_TypeDef Led)
 {
-  HAL_GPIO_TogglePin(LED_PORT[Led], (uint16_t)LED_PIN[Led]);
-  
+  HAL_GPIO_TogglePin(LED_PORT[Led], LED_PIN[Led]);
+
   return BSP_ERROR_NONE;
 }
 
@@ -283,7 +285,7 @@ int32_t BSP_LED_Toggle(Led_TypeDef Led)
  */
 int32_t BSP_LED_GetState(Led_TypeDef Led) 
 { 
-  return (int32_t)HAL_GPIO_ReadPin(LED_PORT [Led], LED_PIN [Led]); 
+  return (int32_t)(HAL_GPIO_ReadPin (LED_PORT [Led], LED_PIN [Led]) == GPIO_PIN_RESET);
 }
 [/#if]
 [#if useBUTTON]
@@ -291,7 +293,7 @@ int32_t BSP_LED_GetState(Led_TypeDef Led)
   * @brief  Configures button GPIO and EXTI Line.
   * @param  Button: Button to be configured
   *                 This parameter can be one of the following values: 
-  *                 @arg  BUTTON_KEY: Key Push Button
+  *                 @arg  BUTTON_USER: User Push Button
   * @param  ButtonMode Button mode
   *                    This parameter can be one of the following values:
   *                    @arg  BUTTON_MODE_GPIO: Button will be used as simple IO
@@ -301,81 +303,107 @@ int32_t BSP_LED_GetState(Led_TypeDef Led)
   */
 int32_t BSP_PB_Init(Button_TypeDef Button, ButtonMode_TypeDef ButtonMode)
 {
-  GPIO_InitTypeDef GPIO_InitStruct;
-  hExtiButtonHandle[Button] = &hexti${BUTTON_EXTI};
+  int32_t ret = BSP_ERROR_NONE;
+  GPIO_InitTypeDef gpio_init_structure;
+[#if useDefine == false]  
+  hpb_exti[Button] = &hexti${BUTTON_EXTI};
+[/#if]
   
-  static BSP_EXTI_LineCallback ButtonCallback[BUTTONn] ={BUTTON_KEY_EXTI_Callback};                                                
-  static uint32_t  BSP_BUTTON_PRIO [BUTTONn] ={BSP_BUTTON_KEY_IT_PRIORITY};  											     
-  static const uint32_t BUTTON_EXTI_LINE[BUTTONn] ={KEY_BUTTON_EXTI_LINE};
+  static const BSP_EXTI_LineCallback ButtonCallback[BUTTONn] ={BUTTON_USER_EXTI_Callback};                                                
+  static const uint32_t  BSP_BUTTON_PRIO [BUTTONn] ={BSP_BUTTON_USER_IT_PRIORITY};  											     
+  static const uint32_t BUTTON_EXTI_LINE[BUTTONn] ={USER_BUTTON_EXTI_LINE};
   
   /* Enable the BUTTON clock*/ 
-  KEY_BUTTON_GPIO_CLK_ENABLE();
-  GPIO_InitStruct.Pin = BUTTON_PIN [Button];
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  USER_BUTTON_GPIO_CLK_ENABLE();
+  gpio_init_structure.Pin = BUTTON_PIN [Button];
+  gpio_init_structure.Pull = GPIO_PULLDOWN;
+  gpio_init_structure.Speed = GPIO_SPEED_FREQ_HIGH;
   
   if(ButtonMode == BUTTON_MODE_GPIO)
   {
     /* Configure Button pin as input */
-    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;    
-    HAL_GPIO_Init(BUTTON_PORT [Button], &GPIO_InitStruct);
+    gpio_init_structure.Mode = GPIO_MODE_INPUT;
+    HAL_GPIO_Init(BUTTON_PORT [Button], &gpio_init_structure);
   }
   else /* (ButtonMode == BUTTON_MODE_EXTI) */
   {      
     /* Configure Button pin as input with External interrupt */    
-    GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING; 
+    gpio_init_structure.Mode = GPIO_MODE_IT_RISING;
     
-    HAL_GPIO_Init(BUTTON_PORT[Button], &GPIO_InitStruct);
+    HAL_GPIO_Init(BUTTON_PORT[Button], &gpio_init_structure);
     
-    (void)HAL_EXTI_GetHandle(hExtiButtonHandle[Button], BUTTON_EXTI_LINE[Button]);  
-    (void)HAL_EXTI_RegisterCallback(hExtiButtonHandle[Button],  HAL_EXTI_COMMON_CB_ID, ButtonCallback[Button]);
-      
-    /* Enable and set Button EXTI Interrupt to the lowest priority */
-    HAL_NVIC_SetPriority((BUTTON_IRQn[Button]), BSP_BUTTON_PRIO[Button], 0x00);
-    HAL_NVIC_EnableIRQ((BUTTON_IRQn[Button]));
+    [#if useDefine]
+    if(HAL_EXTI_GetHandle(&hpb_exti[Button], BUTTON_EXTI_LINE[Button]) != HAL_OK)
+	{
+      ret = BSP_ERROR_PERIPH_FAILURE;
+    }
+    else if (HAL_EXTI_RegisterCallback(&hpb_exti[Button],  HAL_EXTI_COMMON_CB_ID, ButtonCallback[Button]) != HAL_OK)
+    {
+      ret = BSP_ERROR_PERIPH_FAILURE;
+    }
+    [#else]
+    if(HAL_EXTI_GetHandle(hpb_exti[Button], BUTTON_EXTI_LINE[Button]) != HAL_OK)
+	{
+	  ret = BSP_ERROR_PERIPH_FAILURE;
+	}
+    else if(HAL_EXTI_RegisterCallback(hpb_exti[Button],  HAL_EXTI_COMMON_CB_ID, ButtonCallback[Button]) != HAL_OK)
+	{
+      ret = BSP_ERROR_PERIPH_FAILURE;
+    }
+    [/#if]  
+	else
+	{
+      /* Enable and set Button EXTI Interrupt to the lowest priority */
+      HAL_NVIC_SetPriority((BUTTON_IRQn[Button]), BSP_BUTTON_PRIO[Button], 0x00);
+      HAL_NVIC_EnableIRQ((BUTTON_IRQn[Button]));
+	}
   }
   
-  return BSP_ERROR_NONE;
+  return ret;
 }
 
 /**
  * @brief  Push Button DeInit.
  * @param  Button Button to be configured
  *                This parameter can be one of the following values:
- *                @arg  BUTTON_KEY: Key Push Button
+ *                @arg  BUTTON_USER: Wakeup Push Button
  * @note PB DeInit does not disable the GPIO clock
  * @retval BSP status
  */
 int32_t BSP_PB_DeInit(Button_TypeDef Button)
 {
-  GPIO_InitTypeDef GPIO_InitStruct;
-  
-  GPIO_InitStruct.Pin = BUTTON_PIN[Button];
+  GPIO_InitTypeDef gpio_init_structure;
+
+  gpio_init_structure.Pin = BUTTON_PIN[Button];
   HAL_NVIC_DisableIRQ((IRQn_Type)(BUTTON_IRQn[Button]));
-  HAL_GPIO_DeInit(BUTTON_PORT[Button], GPIO_InitStruct.Pin);
-  
+  HAL_GPIO_DeInit(BUTTON_PORT[Button], gpio_init_structure.Pin);
+
   return BSP_ERROR_NONE;
 }
 
 /**
  * @brief  Returns the selected button state.
- * @param  Button Button to be checked
+ * @param  Button Button to be adressed
  *                This parameter can be one of the following values:
- *                @arg  BUTTON_KEY: Key Push Button
- * @retval The Button GPIO pin value
+ *                @arg  BUTTON_USER
+ * @retval The Button GPIO pin value (GPIO_PIN_RESET = button pressed)
  */
 int32_t BSP_PB_GetState(Button_TypeDef Button)
 {
-  return (int32_t)(HAL_GPIO_ReadPin(BUTTON_PORT[Button], BUTTON_PIN[Button]));
+  return (int32_t)(HAL_GPIO_ReadPin(BUTTON_PORT[Button], BUTTON_PIN[Button]) == GPIO_PIN_RESET);
 }
 
 /**
- * @brief  Key EXTI line detection callbacks.
+ * @brief  User EXTI line detection callbacks.
  * @retval None
  */
 void BSP_PB_IRQHandler (Button_TypeDef Button)
 {
-  HAL_EXTI_IRQHandler( hExtiButtonHandle[Button] );   
+[#if useDefine]
+  HAL_EXTI_IRQHandler( &hpb_exti[Button] );
+[#else]
+  HAL_EXTI_IRQHandler( hpb_exti[Button] );
+[/#if]     
 }
 
 /**
@@ -393,16 +421,17 @@ __weak void BSP_PB_Callback(Button_TypeDef Button)
 }
 
 /**
-  * @brief  Key EXTI line detection callbacks.
+  * @brief  User EXTI line detection callbacks.
   * @retval None
   */
-static void BUTTON_KEY_EXTI_Callback(void)
+static void BUTTON_USER_EXTI_Callback(void)
 {   
-  BSP_PB_Callback(BUTTON_KEY);
+  BSP_PB_Callback(BUTTON_USER);
 }
 
 
 [/#if]
+
 [#if useUSART]
 #if (USE_BSP_COM_FEATURE > 0)
 /**
@@ -423,13 +452,14 @@ int32_t BSP_COM_Init(COM_TypeDef COM)
   }
   else
   {  
+     hcom_uart[COM].Instance = COM_USART[COM];
 #if (USE_HAL_UART_REGISTER_CALLBACKS == 0)
     /* Init the UART Msp */
     ${UsartInstance}_MspInit(&hcom_uart[COM]);
 #else
     if(Is${UsartInstance?lower_case?replace("u","U")}MspCbValid == 0U)
     {
-      if(BSP_COM_RegisterDefaultMspCallbacks() != BSP_ERROR_NONE)
+      if(BSP_COM_RegisterDefaultMspCallbacks(COM) != BSP_ERROR_NONE)
       {
         return BSP_ERROR_MSP_FAILURE;
       }
@@ -504,14 +534,14 @@ int32_t BSP_COM_RegisterDefaultMspCallbacks(COM_TypeDef COM)
   else
   {  
     
-    __HAL_UART_RESET_HANDLE_STATE(&hcom_uart[COM1]);
+    __HAL_UART_RESET_HANDLE_STATE(&hcom_uart[COM]);
   
     /* Register default MspInit/MspDeInit Callback */
-    if(HAL_UART_RegisterCallback(&hcom_uart[COM1], HAL_UART_MSPINIT_CB_ID, ${UsartInstance}_MspInit) != HAL_OK)
+    if(HAL_UART_RegisterCallback(&hcom_uart[COM], HAL_UART_MSPINIT_CB_ID, ${UsartInstance?replace("s","")}_MspInit) != HAL_OK)
     {
       ret = BSP_ERROR_PERIPH_FAILURE;
     }
-    else if(HAL_UART_RegisterCallback(&hcom_uart[COM1], HAL_UART_MSPDEINIT_CB_ID, ${UsartInstance}_MspDeInit) != HAL_OK)
+    else if(HAL_UART_RegisterCallback(&hcom_uart[COM], HAL_UART_MSPDEINIT_CB_ID, ${UsartInstance?replace("s","")}_MspDeInit) != HAL_OK)
     {
       ret = BSP_ERROR_PERIPH_FAILURE;
     }
@@ -540,14 +570,14 @@ int32_t BSP_COM_RegisterMspCallbacks (COM_TypeDef COM , BSP_COM_Cb_t *Callback)
   }
   else
   {
-    __HAL_UART_RESET_HANDLE_STATE(&hcom_uart[COM1]);
+    __HAL_UART_RESET_HANDLE_STATE(&hcom_uart[COM]);
   
     /* Register MspInit/MspDeInit Callbacks */
-    if(HAL_UART_RegisterCallback(&hcom_uart[COM1], HAL_UART_MSPINIT_CB_ID, Callback->pMspUsartInitCb) != HAL_OK)
+    if(HAL_UART_RegisterCallback(&hcom_uart[COM], HAL_UART_MSPINIT_CB_ID, Callback->pMspInitCb) != HAL_OK)
     {
       ret = BSP_ERROR_PERIPH_FAILURE;
     }
-    else if(HAL_UART_RegisterCallback(&hcom_uart[COM1], HAL_UART_MSPDEINIT_CB_ID, Callback->pMspUsartDeInitCb) != HAL_OK)
+    else if(HAL_UART_RegisterCallback(&hcom_uart[COM], HAL_UART_MSPDEINIT_CB_ID, Callback->pMspDeInitCb) != HAL_OK)
     {
       ret = BSP_ERROR_PERIPH_FAILURE;
     }
@@ -584,7 +614,7 @@ int32_t BSP_COM_SelectLogPort(COM_TypeDef COM)
  int fputc (int ch, FILE *f) 
 #endif /* __GNUC__ */ 
 { 
-  HAL_UART_Transmit(&hcom_uart[COM_ActiveLogPort], (uint8_t *)&ch, 1, COM_POLL_TIMEOUT); 
+  (void)HAL_UART_Transmit(&hcom_uart[COM_ActiveLogPort], (uint8_t *)&ch, 1, COM_POLL_TIMEOUT); 
   return ch;
 }
 #endif /* USE_COM_LOG */ 

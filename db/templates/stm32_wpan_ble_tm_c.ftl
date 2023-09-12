@@ -76,8 +76,8 @@ typedef enum
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-PLACE_IN_SECTION("MB_MEM2") static TL_CmdPacket_t BleCmdBuffer;
-PLACE_IN_SECTION("MB_MEM2") static uint8_t HciAclDataBuffer[sizeof(TL_PacketHeader_t) + 5 + 251];
+PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static TL_CmdPacket_t BleCmdBuffer;
+PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static uint8_t HciAclDataBuffer[sizeof(TL_PacketHeader_t) + 5 + 251];
 
 static uint8_t RxHostData[5];
 static HciReceiveStatus_t HciReceiveStatus;
@@ -138,7 +138,7 @@ void TM_Init( void  )
     CFG_BLE_HSE_STARTUP_TIME,
     CFG_BLE_VITERBI_MODE,
     CFG_BLE_LL_ONLY,
-    0}                                  /** TODO Should be read from HW */
+    0}
   };
 
 
@@ -297,8 +297,8 @@ static void TM_SysLocalCmd ( void )
 
 static void RxCpltCallback( void )
 {
-  uint16_t nb_bytes_to_receive;
-  uint16_t buffer_index;
+  uint16_t nb_bytes_to_receive=0;
+  uint16_t buffer_index=0;
   uint8_t packet_indicator;
 
   switch (HciReceiveStatus)
@@ -480,21 +480,33 @@ static void TM_AclDataAck( void )
  * WRAP FUNCTIONS
  *
  *************************************************************/
-void shci_send( TL_CmdPacket_t * p_cmd, TL_EvtPacket_t * p_rsp )
+void shci_send( uint16_t cmd_code, uint8_t len_cmd_payload, uint8_t * p_cmd_payload, TL_EvtPacket_t * p_rsp_status )
 {
   TL_CmdPacket_t *p_cmd_buffer;
+  uint32_t ipccdba;
+  MB_RefTable_t * p_ref_table;
+
+  ipccdba = READ_BIT( FLASH->IPCCBR, FLASH_IPCCBR_IPCCDBA );
+  p_ref_table = (MB_RefTable_t*)((ipccdba<<2) + SRAM2A_BASE);
 
   SysLocalCmdStatus = 1;
 
-  p_cmd_buffer = (TL_CmdPacket_t *)(p_RefTable->p_sys_table->pcmd_buffer);
+  p_cmd_buffer = (TL_CmdPacket_t *)(p_ref_table->p_sys_table->pcmd_buffer);
 
-  memcpy( p_cmd_buffer, p_cmd, p_cmd->cmdserial.cmd.plen + sizeof( TL_PacketHeader_t ) + TL_CMD_HDR_SIZE );
+  p_cmd_buffer->cmdserial.cmd.cmdcode = cmd_code;
+  p_cmd_buffer->cmdserial.cmd.plen = len_cmd_payload;
+
+  memcpy(p_cmd_buffer->cmdserial.cmd.payload, p_cmd_payload, len_cmd_payload );
 
   TL_SYS_SendCmd( 0, 0 );
 
   SCH_WaitEvt( 1<< CFG_IDLEEVT_SYSTEM_HCI_CMD_EVT_RSP_ID );
 
-  memcpy( &(p_rsp->evtserial), &(p_cmd_buffer->cmdserial), ((TL_EvtPacket_t*)p_cmd_buffer)->evtserial.evt.plen + TL_BLEEVT_CS_PACKET_SIZE );
+  /**
+   * The command complete of a system command does not have the header
+   * It starts immediately with the evtserial field
+   */
+  memcpy( &(p_rsp_status->evtserial), p_cmd_buffer, ((TL_EvtSerial_t*)p_cmd_buffer)->evt.plen + TL_EVT_HDR_SIZE );
 
   return;
 }

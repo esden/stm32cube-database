@@ -890,17 +890,6 @@ typedef enum
     [/#if]
 [/#list]
 
-
-#if   defined ( __CC_ARM )     /* Keil */
-#undef CFG_DEBUG_BLE_TRACE
-#undef CFG_DEBUG_APP_TRACE
-#undef CFG_LPM_SUPPORTED
-#define CFG_DEBUG_BLE_TRACE     0
-#define CFG_DEBUG_APP_TRACE     0
-#define CFG_LPM_SUPPORTED   0
-#endif
-
-
 #if (CFG_DEBUG_APP_TRACE != 0)
 #define APP_DBG_MSG                 PRINT_MESG_DBG
 #else
@@ -988,9 +977,6 @@ typedef enum
 #define CFG_DEBUG_TRACE      0
 #endif
 
-#if   defined ( __CC_ARM )     /* Keil */
-#undef CFG_DEBUG_TRACE
-#endif
 [/#if]
 
 /* USER CODE BEGIN Defines */

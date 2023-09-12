@@ -19,6 +19,14 @@
 #endif
 
 /* Includes ------------------------------------------------------------------*/
+/** @addtogroup STM32_USBPD_APPLICATION
+  * @{
+  */
+
+/** @addtogroup STM32_USBPD_APPLICATION_VDM_USER
+  * @{
+  */
+
 /* Exported typedef ----------------------------------------------------------*/
 /* Exported define -----------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
@@ -27,6 +35,14 @@
 /* Exported functions --------------------------------------------------------*/
 USBPD_StatusTypeDef USBPD_VDM_UserInit(uint8_t PortNum);
 void                USBPD_VDM_UserReset(uint8_t PortNum);
+
+/**
+  * @}
+  */
+
+/**
+  * @}
+  */
 
 #ifdef __cplusplus
 }

@@ -1,4 +1,8 @@
 [#ftl]
+[#assign contextFolder=""]
+[#if cpucore!=""]    
+[#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")+"/"]
+[/#if]
 /**
   ******************************************************************************
   * @file   fatfs.c
@@ -10,7 +14,7 @@
 
 #include "fatfs.h"
 
-[@common.optinclude name=mxTmpFolder+"/fatfs_vars.tmp"/]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/fatfs_vars.tmp"/]
 
 [#list SWIPdatas as SWIP]  
 	[#if SWIP.defines??]
@@ -35,7 +39,7 @@ PARTITION VolToPart[];
 
 void MX_FATFS_Init(void) 
 {
-[@common.optinclude name=mxTmpFolder+"/fatfs_HalInit.tmp"/]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/fatfs_HalInit.tmp"/]
 
 #t/* USER CODE BEGIN Init */
 #t/* additional user code for init */     

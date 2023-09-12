@@ -21,9 +21,7 @@
 [#assign ipvar = IP]
 /* Includes ------------------------------------------------------------------*/
 #include "${name?lower_case}.h"
-[#if RESMGR_UTILITY??]
-#include "resmgr_utility.h"
-[/#if]
+
 [#assign useGpio = false]
 [#assign useBdma = false]
 [#assign useDma = false]
@@ -1014,7 +1012,7 @@ ${variable.value} ${variable.name};
 #n      
 
 [#if RESMGR_UTILITY??]
-    [@common.optinclude name=mxTmpFolder+"/resmgrutility_"+instName+".tmp"/][#-- ADD RESMGR_UTILITY Code--]
+    [@common.optinclude name="Src/resmgrutility_"+instName+".tmp"/][#-- ADD RESMGR_UTILITY Code--]
 [/#if]
 
 [#-- if used Driver is LL --]

@@ -23,11 +23,11 @@
 
 /* USER CODE END Include */
 
-/** @addtogroup STM32_USBPD_LIBRARY
+/** @addtogroup STM32_USBPD_APPLICATION
   * @{
   */
 
-/** @addtogroup USBPD_USER
+/** @addtogroup STM32_USBPD_APPLICATION_DPM_USER
   * @{
   */
 

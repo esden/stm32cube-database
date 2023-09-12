@@ -46,19 +46,19 @@
             [#if definition.name == "FWUPDATE_RESPONDER"]
                 [#assign FWUPDATE_RESPONDER = true]
             [/#if]
-            [#if definition.name == "TRACE"]
+            [#if definition.name == "TRACE" && definition.value == "true"]
                 [#assign TRACE = true]
             [/#if]
-            [#if definition.name == "USBPD_REV30_SUPPORT"]
+            [#if definition.name == "USBPD_REV30_SUPPORT" && definition.value == "true"]
                 [#assign USBPD_REV30_SUPPORT = true]
             [/#if]
-            [#if definition.name == "SRC"]
+            [#if definition.name == "SRC" && definition.value == "true"]
                 [#assign SRC = true]
             [/#if]
-            [#if definition.name == "SNK"]
+            [#if definition.name == "SNK" && definition.value == "true"]
                 [#assign SNK = true]
             [/#if]
-            [#if definition.name == "DRP"]
+            [#if definition.name == "DRP" && definition.value == "true"]
                 [#assign DRP = true]
             [/#if]
             [#if definition.name == "VCONN_SUPPORT"]
@@ -106,7 +106,8 @@
 [/#if]
 
 /* Private enum */
-enum {
+enum
+{
   USBPD_THREAD_PORT_0 = USBPD_PORT_0,
 #if USBPD_PORT_COUNT == 2
   USBPD_THREAD_PORT_1 = USBPD_PORT_1,
@@ -157,6 +158,12 @@ osThreadDef(PE_1, USBPD_PE_Task, osPriorityHigh, 0, 200);
 #define CHECK_PE_FUNCTION_CALL(_function_)  if(USBPD_OK != _function_) {return USBPD_ERROR;}
 #define CHECK_CAD_FUNCTION_CALL(_function_) if(USBPD_CAD_OK != _function_) {return USBPD_ERROR;}
 
+#if defined(_DEBUG_TRACE)
+#define DPM_CORE_DEBUG_TRACE(_PORTNUM_, __MESSAGE__)  USBPD_TRACE_Add(USBPD_TRACE_DEBUG, _PORTNUM_, 0u, (uint8_t *)(__MESSAGE__), sizeof(__MESSAGE__) - 1u);
+#else
+#define DPM_CORE_DEBUG_TRACE(_PORTNUM_, __MESSAGE__)
+#endif /* _DEBUG_TRACE */
+
 /* Private variables ---------------------------------------------------------*/
 static uint32_t DPM_Sleep_time[MAX_TREAD_POWER];
 [#if RTOS]
@@ -167,6 +174,10 @@ osMessageQId  AlarmMsgBox;
 osMessageQDef(queuePE, 2, uint16_t);
 osMessageQDef(queueCAD, 1, uint16_t);
 static osMessageQId PEQueueId[USBPD_PORT_COUNT], CADQueueId;
+[#if TRACE]
+osMessageQDef(queueTRACE, 1, uint16_t);
+static osMessageQId TraceQueueId;
+[/#if]
 [#else]
 static uint32_t DPM_Sleep_start[MAX_TREAD_POWER];
 [/#if]
@@ -174,6 +185,9 @@ static uint32_t DPM_Sleep_start[MAX_TREAD_POWER];
 USBPD_ParamsTypeDef   DPM_Params[USBPD_PORT_COUNT];
 
 /* Private functions ---------------------------------------------------------*/
+[#if TRACE]
+void USBPD_DPM_TraceWakeUp(void);
+[/#if]
 static void DPM_ManageAttachedState(uint8_t PortNum, USBPD_CAD_EVENT State, CCxPin_TypeDef Cc);
 
 /**
@@ -211,12 +225,12 @@ static const USBPD_PE_Callbacks dpmCallbacks =
 [#if SNK || DRP]
   USBPD_DPM_SNK_EvaluateCapabilities,
 [#else]
-    NULL,
+  NULL,
 [/#if]
 [#if DRP]
   USBPD_DPM_PowerRoleSwap,
 [#else]
-    NULL,
+  NULL,
 [/#if]
   USBPD_PE_TaskWakeUp,
 [#if VCONN_SUPPORT]
@@ -330,7 +344,6 @@ static const USBPD_PE_Callbacks dpmCallbacks =
   return USBPD_OK;
 }
 
-
 /**
   * @brief  Initialize the OS parts (task, queue,... )
   * @retval USBPD status
@@ -388,7 +401,6 @@ USBPD_StatusTypeDef USBPD_DPM_InitOS(void)
 
   return USBPD_OK;
 }
-
 
 /**
   * @brief  Initialize the OS parts (port power role, PWR_IF, CAD and PE Init procedures)
@@ -585,6 +597,20 @@ void USBPD_TRACE_TX_Task(void const *argument)
 [/#if]
 [/#if]
 
+[#if TRACE]
+/**
+  * @brief  WakeUp TRACE task
+  * @retval None
+  */
+void USBPD_DPM_TraceWakeUp(void)
+{
+[#if RTOS]
+  osMessagePut(TraceQueueId, 0xFFFF, 0);
+[#else]
+  /* Wake up the non RTOS application to evacuate the trace */
+[/#if]
+}
+[/#if]
 
 /**
   * @brief  CallBack reporting events on a specified port from CAD layer.

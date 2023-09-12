@@ -309,7 +309,7 @@
 			[/#if]
 		    [/#list]
                     [#-- add Register Callbacks for USB STM32WB Start --]
-                    [#if FamilyName=="STM32WB" && inst == "USB" && handler!=""]                    
+                    [#if (FamilyName=="STM32WB" | FamilyName=="STM32G4" ) && inst == "USB" && handler!=""]                    
                     [#if handler?contains("pcd")]
                     [#assign USBmodule = "PCD"]
                     [#else]

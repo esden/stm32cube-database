@@ -46,53 +46,61 @@ value will be applied.
 
 
 [#macro bind_etzpc	pDtLevel]
-[#compress]
 [#local TABres = dts_get_tabs(pDtLevel)]
 [#local TABetzpc = TABres.TABN]
-
+[#t]
 	[#local showDecprot = false]
 	[#if !showDecprot]
 		[#local showDecprot = true]
 ${TABetzpc}st,decprot = <
 	[/#if]
-
+[#t]
 	[#local runtimeContextNamesList = srvcmx_getRuntimeCtxtNamesList()]
 	[#local isPeriphFound = false]
 	[#list runtimeContextNamesList as runtimeContextName]
 		[#local isCtxtSecure = srvcmx_isContextSecure(runtimeContextName)]
 		[#local ctxtCoreName = srvcmx_getContextCoreName(runtimeContextName)]
-
+[#t]
 		[#--Get IP devices--]
 		[#local deviceNamesList = srvcmx_getRuntimeCtxtEnableIPDeviceNamesList(runtimeContextName)]
-
+[#t]
 		[#local isPeriphFoundInCtxt = false]
 		[#list deviceNamesList as deviceName]
+[#t]
 			[#local res = srvc_map_getValueIfMatchWithStatus(etzpc_map_periphIds, deviceName)]
 			[#if res.errors?has_content]
 /*ERR : bind_etzpc() returns errors. The DTS may be incomplete. Reason:
 ${res.errors} - deviceName=${deviceName}*/
 			[/#if]
-
+[#t]
 			[#if res.isMatching]
 				[#local isPeriphFound = true]
-
+[#t]
 				[#if res.res?has_content]
 					[#local periphIdsList = [res.res?upper_case]]
 				[#else]
 					[#local periphIdsList = [deviceName?upper_case]]
 				[/#if]
-
+[#t]
+				[#--Special configurations--]
+				[#if (deviceName=="quadspi")]
+					[#local periphIdsList = periphIdsList + ["DLYBQ"]]
+				[/#if]
+				[#if (deviceName=="sdmmc3")]
+					[#local periphIdsList = periphIdsList + ["DLYBSD3"]]
+				[/#if]
+[#t]
 				[#--keep in case of--]
 				[#if !showDecprot]
 					[#local showDecprot = true]
 ${TABetzpc}st,decprot = <
 				[/#if]
-
+[#t]
 				[#if !isPeriphFoundInCtxt]
 					[#local isPeriphFoundInCtxt = true]
 ${TABetzpc}/*"${srvcmx_getContextLongName(runtimeContextName)}" context*/
 				[/#if]
-
+[#t]
 				[#list periphIdsList as periphId]
 					[#if isCtxtSecure && !srvcmx_isEnabledDeviceNonSecure(deviceName)][#--if NS => shared => DECPROT_NS_RW--]
 						[#if !(deviceName=="tim15")][#--HW restriction (Wildcat specific): TIM15 cannot be declared secured--]
@@ -106,20 +114,12 @@ ${TABetzpc}DECPROT(${mx_family?upper_case}_ETZPC_${periphId}_ID, DECPROT_NS_RW, 
 						[/#if]
 					[/#if]
 				[/#list]
-
-				[#--warn message--]
-				[#if (deviceName=="quadspi")]
-${TABetzpc}/*Restriction: STM32MP1_ETZPC_DLYBQ_ID is not managed - please to use User-Section if needed*/
-				[/#if]
-				[#if (deviceName=="sdmmc3")]
-${TABetzpc}/*Restriction: STM32MP1_ETZPC_DLYBSD3_ID is not managed - please to use User-Section if needed*/
-				[/#if]
-
+[#t]
 			[#--else: no match, skip peripheral--]
 			[/#if]
 		[/#list]
 	[/#list]
-
+[#t]
 	[#if !isPeriphFound]
 #n
 ${TABetzpc}/*No peripherals found*/#n
@@ -134,12 +134,10 @@ ${TABetzpc}	/*STM32CubeMX generates a basic and standard configuration for ETZPC
 ${TABetzpc}	Additional device configurations can be added here if needed.
 ${TABetzpc}	"etzpc" node could be also overloaded in "addons" User-Section.*/
 ${TABetzpc}/* USER CODE END etzpc_decprot */
-
+[#t]
 	[#if showDecprot]
 ${TABetzpc}>;#n
 	[#else]
 #n
 	[/#if]
-
-[/#compress]
 [/#macro]

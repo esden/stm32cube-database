@@ -10,14 +10,16 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            [#if definition.name=="RESMGR_UTILITY_DynamicSystemResourcesUpdate" && definition.value??]
-                [#assign valueDynamicSystemResourcesUpdate = definition.value]
-            [/#if]
+[#list IPdatas as IP]
+    [#list IP.configModelList as configModelList]
+        [#list configModelList.refConfigFiles as refConfigFiles]
+            [#list refConfigFiles.arguments as argument]
+                [#if argument.name=="RESMGR_UTILITY_DynamicSystemResourcesUpdate" && argument.value??]
+                    [#assign valueDynamicSystemResourcesUpdate = argument.value]
+                [/#if]
+            [/#list]
         [/#list]
-    [/#if]
+    [/#list]
 [/#list]
 
 /* Define to prevent recursive inclusion -------------------------------------*/

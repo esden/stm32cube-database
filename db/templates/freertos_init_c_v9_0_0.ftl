@@ -1,6 +1,6 @@
 [#ftl]
 [#compress]
-
+[#assign threadControlBlock = "NULL"]
 [#assign nbThreads = 0]
 [#assign nbM = 0]
 [#assign nbRM = 0]

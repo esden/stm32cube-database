@@ -1,4 +1,8 @@
 [#ftl]
+[#assign contextFolder=""]
+[#if cpucore!=""]    
+[#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")+"/"]
+[/#if]
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
@@ -38,6 +42,43 @@
     [/#if]
 [/#list]
 [/#list]
+
+[#-- Add UCPD mgmt : remove internal Pull-Up Dead Battery when UCPD not used & not requested by user --]
+[#assign disableUCPDDeadBattery = false]
+[#assign disableDeadBatteryConfig = ""]
+[#assign orCondition = false]
+[#list IPdatas as IP]
+    [#if FamilyName == "STM32G0" || FamilyName == "STM32G4"]
+        [#if IP.ipName == "UCPD"]
+            [#list IP.configModelList as configModel]
+                [#if configModel.configs??]
+                    [#list configModel.configs as config]
+                        [#if config.parser??]
+                            [#assign sem = config.parser.getSemaphore("EnabledDeadBattery" + configModel.instanceName) ]
+                            [#if sem.getValue() == 0]
+                                [#assign disableUCPDDeadBattery = true]
+                                [#if FamilyName == "STM32G0"]
+                                    [#if orCondition]
+                                        [#assign disableDeadBatteryConfig = disableDeadBatteryConfig + "|"]
+                                    [/#if]
+                                    [#assign disableDeadBatteryConfig = disableDeadBatteryConfig + "LL_SYSCFG_" + configModel.instanceName + "_STROBE"]
+                                    [#assign orCondition = true]
+                                [/#if]
+                            [/#if]
+                        [/#if]
+                    [/#list]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#if]
+[/#list]
+[#if disableUCPDDeadBattery = true]
+    [#if FamilyName=="STM32G0"]
+        [#t]#include "stm32g0xx_ll_system.h"
+    [#elseif FamilyName=="STM32G4"]
+        [#t]#include "stm32g4xx_ll_pwr.h"
+    [/#if]
+[/#if]
 
 [/#compress]
 #n
@@ -161,6 +202,15 @@ void HAL_MspInit(void)
 [#list pwrConfig as config]
 [@common.generateConfigModelListCode configModel=config inst="PWR"  nTab=1 index=""/]
 [/#list]
+[/#if]
+#n
+[#-- Add UCPD mgmt : remove internal Pull-Up Dead Battery when UCPD not used & not requested by user --]
+[#if disableUCPDDeadBattery]
+    [#if FamilyName=="STM32G0"]
+        [#t]#tLL_SYSCFG_DisableDBATT(${disableDeadBatteryConfig});
+    [#elseif FamilyName=="STM32G4"]
+        [#t]#tLL_PWR_DisableDeadBatteryPD();
+    [/#if]
 [/#if]
 #n
 #t/* USER CODE BEGIN MspInit 1 */#n
@@ -929,7 +979,7 @@ void HAL_MspInit(void)
                         #t#t#t/* Enable EXTI Line 18 for USB wakeup */
                         [/#if]
                     [#else]
-                        [#if FamilyName=="STM32L0" || FamilyName=="STM32F0"]
+                        [#if FamilyName=="STM32L0" || FamilyName=="STM32F0"|| FamilyName=="STM32G4"]
                             #t#t#t/* Enable EXTI Line 18 for USB wakeup */
                         [#elseif FamilyName=="STM32WB"]
                             #t#t#t/* Enable EXTI Line 28 for USB wakeup */
@@ -1633,13 +1683,13 @@ uint32_t DFSDM_Init = 0;
 [/#list]
 #n
 [#-- FMC MSP --]
-[@common.optinclude name=mxTmpFolder+"/mx_fmc_MSP.tmp"/]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/mx_fmc_MSP.tmp"/]
 
 [#-- FSMC MSP --]
-[@common.optinclude name=mxTmpFolder+"/mx_fsmc_MSP.tmp"/]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/mx_fsmc_MSP.tmp"/]
 
 [#-- SAI MSP --]
-[@common.optinclude name=mxTmpFolder+"/sai_msp.tmp"/]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/sai_msp.tmp"/]
 
 /* USER CODE BEGIN 1 */
 

@@ -27,13 +27,21 @@
 
 /* USER CODE END Include */
 
+/** @addtogroup STM32_USBPD_APPLICATION
+  * @{
+  */
+
+/** @addtogroup STM32_USBPD_APPLICATION_POWER_IF
+  * @{
+  */
+
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN Private_Typedef */
 
 /* USER CODE END Private_Typedef */
 
 /* Private define ------------------------------------------------------------*/
-/** @defgroup USBPD_USER_PRIVATE_DEFINES USBPD USER Private Defines
+/** @addtogroup STM32_USBPD_APPLICATION_POWER_IF_Private_Defines
   * @{
   */
 /* USER CODE BEGIN Private_Define */
@@ -43,8 +51,8 @@
   * @}
   */
 
-/* Private macro -------------------------------------------------------------*/
-/** @defgroup USBPD_USER_PRIVATE_MACROS USBPD USER Private Macros
+/* Private macros ------------------------------------------------------------*/
+/** @addtogroup STM32_USBPD_APPLICATION_POWER_IF_Private_Macros
   * @{
   */
 /* USER CODE BEGIN Private_Macro */
@@ -55,7 +63,7 @@
   */
 
 /* Private variables ---------------------------------------------------------*/
-/** @defgroup USBPD_USER_PRIVATE_VARIABLES USBPD USER Private Variables
+/** @addtogroup STM32_USBPD_APPLICATION_POWER_IF_Private_Variables
   * @{
   */
 /* USER CODE BEGIN Private_Variables */
@@ -67,7 +75,7 @@
   */
 
 /* Private function prototypes -----------------------------------------------*/
-/** @defgroup USBPD_USER_PRIVATE_FUNCTIONS USBPD USER Private Functions
+/** @addtogroup STM32_USBPD_APPLICATION_POWER_IF_Private_Functions
   * @{
   */
 
@@ -104,7 +112,9 @@ uint32_t _PWR_SNKBatteryPDO(float _MAXV_,float _MINV_,float _PWR_);
   * @}
   */
 
-/* Private functions ---------------------------------------------------------*/
+/** @addtogroup STM32_USBPD_APPLICATION_POWER_IF_Exported_Functions
+  * @{
+  */
 
 /**
   * @brief  Initialize structures and variables related to power board profiles
@@ -121,8 +131,6 @@ USBPD_StatusTypeDef USBPD_PWR_IF_Init(void)
 /**
   * @brief  Sets the required power profile, now it works only with Fixed ones
   * @param  PortNum Port number
-  * @param  PowerProfile          Number of the required Power Data Objects
-  * @param  PreviousPowerProfile  Number of the previous required Power Data Objects
   * @retval USBPD status
 */
 USBPD_StatusTypeDef USBPD_PWR_IF_SetProfile(uint8_t PortNum)
@@ -158,6 +166,7 @@ USBPD_StatusTypeDef USBPD_PWR_IF_PowerReset(uint8_t PortNum)
 /**
   * @brief  Checks if the power on a specified port is ready
   * @param  PortNum Port number
+  * @param  Vsafe   Vsafe status based on @ref USBPD_VSAFE_StatusTypeDef
   * @retval USBPD status
 */
 USBPD_StatusTypeDef USBPD_PWR_IF_SupplyReady(uint8_t PortNum, USBPD_VSAFE_StatusTypeDef Vsafe)
@@ -168,9 +177,8 @@ USBPD_StatusTypeDef USBPD_PWR_IF_SupplyReady(uint8_t PortNum, USBPD_VSAFE_Status
 }
 
 /**
-  * @brief  Enables VBUS/VCONN the power on a specified port
+  * @brief  Enables VBUS power on a specified port
   * @param  PortNum Port number
-  * @param  VconnState enable or disable VCONN according VCONN status on power side
   * @retval USBPD status
 */
 USBPD_StatusTypeDef USBPD_PWR_IF_VBUSEnable(uint8_t PortNum)
@@ -272,7 +280,7 @@ USBPD_StatusTypeDef USBPD_PWR_IF_Disable_VConn(uint8_t PortNum, CCxPin_TypeDef C
   *         This parameter can be one of the following values:
   *           @arg @ref USBPD_CORE_DATATYPE_SRC_PDO Source PDO reading requested
   *           @arg @ref USBPD_CORE_DATATYPE_SNK_PDO Sink PDO reading requested
-  * @param  Ptr Pointer on address where PDO values should be written (u32 pointer)
+  * @param  Ptr Pointer on address where PDO values should be written (u8 pointer)
   * @param  Size Pointer on nb of u32 written by PWR_IF (nb of PDOs)
   * @retval None
   */
@@ -301,7 +309,6 @@ USBPD_StatusTypeDef USBPD_PWR_IF_SearchRequestedPDO(uint8_t PortNum, uint32_t Rd
 
 /**
   * @brief  the function is called in case of critical issue is detected to switch in safety mode.
-  * @param  None
   * @retval None
   */
 void USBPD_PWR_IF_Alarm()
@@ -310,4 +317,17 @@ void USBPD_PWR_IF_Alarm()
 
 /* USER CODE END USBPD_PWR_IF_Alarm */
 }
+
+/**
+  * @}
+  */
+
+/**
+  * @}
+  */
+
+/**
+  * @}
+  */
+
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

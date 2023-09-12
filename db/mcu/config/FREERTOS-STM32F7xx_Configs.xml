@@ -10,11 +10,11 @@
         <ConfigFile Name="INC"/>
         <ConfigFile Name="VARS"/>
         <ConfigFile Name="PFP"/>
-        <ConfigFile Name="THREADS_CODE"/>
+        <ConfigFile Name="DEFAULT_THREAD"/>
         <ConfigFile Name="USER_THREADS"/>
         <ConfigFile Name="RTOS_START"/>
     </RefConfig>
-
+ 
     <LibMethod Comment="Start scheduler" Name="osKernelStart">
         <Argument Context="local" GenericType="baseaddress" Name="thread_def" TypeName="osThreadDef_t *"/>
         <Argument Context="local" GenericType="baseaddress" Name="argument" TypeName="void *"/>
@@ -49,10 +49,13 @@
         <File Category="source" Name="Source/tasks.c"/>
         <File Category="source" Name="Source/timers.c"/>
         
-        <!-- <File Category="source" Name="Source/CMSIS_RTOS/*.c"/> -->
-        <!-- <File Category="header" Name="Source/CMSIS_RTOS/*.h"/> -->
-        <File Category="source" Name="Source/CMSIS_RTOS/cmsis_os.c"/>
-        <File Category="header" Name="Source/CMSIS_RTOS/cmsis_os.h"/>
+        <!-- Section for copying the right files according to the chosen API -->
+        <File Category="source" Name="Source/CMSIS_RTOS/cmsis_os.c" Condition="S_CMSIS_RTOS_V1"/>
+        <File Category="header" Name="Source/CMSIS_RTOS/cmsis_os.h" Condition="S_CMSIS_RTOS_V1"/>
+        <File Category="source" Name="Source/CMSIS_RTOS_V2/cmsis_os2.c" Condition="S_CMSIS_RTOS_V2"/>
+        <File Category="header" Name="Source/CMSIS_RTOS_V2/cmsis_os2.h" Condition="S_CMSIS_RTOS_V2"/>
+        <File Category="header" Name="Source/CMSIS_RTOS_V2/cmsis_os.h" Condition="S_CMSIS_RTOS_V2"/>
+        <File Category="source" Name="Source/portable/Common/mpu_wrappers.c" Condition="S_FREERTOS_WITH_MPU"/>     
         
         <SubComponent Csub="HEAP" Cvariant="1">
             <File Category="source" Name="Source/portable/MemMang/heap_1.c"/>
@@ -72,21 +75,30 @@
 
         <!-- F7 is based on Cortex-M7 -->
         <SubComponent Csub="IAR">
-            <File Category="source" Name="Source/portable/IAR/ARM_CM7/r0p1/port.c"/>
-            <File Category="source" Name="Source/portable/IAR/ARM_CM7/r0p1/portasm.s"/>
-            <File Category="header" Name="Source/portable/IAR/ARM_CM7/r0p1/portmacro.h"/>
+            <File Category="source" Name="Source/portable/IAR/ARM_CM7/r0p1/port.c" Condition="!S_FREERTOS_WITH_MPU"/>
+            <File Category="source" Name="Source/portable/IAR/ARM_CM7/r0p1/portasm.s" Condition="!S_FREERTOS_WITH_MPU"/>
+            <File Category="header" Name="Source/portable/IAR/ARM_CM7/r0p1/portmacro.h" Condition="!S_FREERTOS_WITH_MPU"/>
+            <File Category="source" Name="Source/portable/IAR/ARM_CM7_MPU/r0p1/port.c" Condition="S_FREERTOS_WITH_MPU"/>
+            <File Category="source" Name="Source/portable/IAR/ARM_CM7_MPU/r0p1/portasm.s" Condition="S_FREERTOS_WITH_MPU"/>
+            <File Category="header" Name="Source/portable/IAR/ARM_CM7_MPU/r0p1/portmacro.h" Condition="S_FREERTOS_WITH_MPU"/>
         </SubComponent>
         <SubComponent Csub="Keil">    <!-- Keil refers to RVDS files -->
-            <File Category="source" Name="Source/portable/RVDS/ARM_CM7/r0p1/port.c"/>
-            <File Category="header" Name="Source/portable/RVDS/ARM_CM7/r0p1/portmacro.h"/>
+            <File Category="source" Name="Source/portable/RVDS/ARM_CM7/r0p1/port.c" Condition="!S_FREERTOS_WITH_MPU"/>
+            <File Category="header" Name="Source/portable/RVDS/ARM_CM7/r0p1/portmacro.h" Condition="!S_FREERTOS_WITH_MPU"/>
+            <File Category="source" Name="Source/portable/RVDS/ARM_CM7_MPU/r0p1/port.c" Condition="S_FREERTOS_WITH_MPU"/>
+            <File Category="header" Name="Source/portable/RVDS/ARM_CM7_MPU/r0p1/portmacro.h" Condition="S_FREERTOS_WITH_MPU"/>
         </SubComponent> 
         <SubComponent Csub="RVDS">
-            <File Category="source" Name="Source/portable/RVDS/ARM_CM7/r0p1/port.c"/>
-            <File Category="header" Name="Source/portable/RVDS/ARM_CM7/r0p1/portmacro.h"/>
+            <File Category="source" Name="Source/portable/RVDS/ARM_CM7/r0p1/port.c" Condition="!S_FREERTOS_WITH_MPU"/>
+            <File Category="header" Name="Source/portable/RVDS/ARM_CM7/r0p1/portmacro.h" Condition="!S_FREERTOS_WITH_MPU"/>
+            <File Category="source" Name="Source/portable/RVDS/ARM_CM7_MPU/r0p1/port.c" Condition="S_FREERTOS_WITH_MPU"/>
+            <File Category="header" Name="Source/portable/RVDS/ARM_CM7_MPU/r0p1/portmacro.h" Condition="S_FREERTOS_WITH_MPU"/>
         </SubComponent> 
         <SubComponent Csub="GCC">
-            <File Category="source" Name="Source/portable/GCC/ARM_CM7/r0p1/port.c"/>
-            <File Category="header" Name="Source/portable/GCC/ARM_CM7/r0p1/portmacro.h"/>
+            <File Category="source" Name="Source/portable/GCC/ARM_CM7/r0p1/port.c" Condition="!S_FREERTOS_WITH_MPU"/>
+            <File Category="header" Name="Source/portable/GCC/ARM_CM7/r0p1/portmacro.h" Condition="!S_FREERTOS_WITH_MPU"/>
+            <File Category="source" Name="Source/portable/GCC/ARM_CM7_MPU/r0p1/port.c" Condition="S_FREERTOS_WITH_MPU"/>
+            <File Category="header" Name="Source/portable/GCC/ARM_CM7_MPU/r0p1/portmacro.h" Condition="S_FREERTOS_WITH_MPU"/>
         </SubComponent>
         <!--
         <SubComponent Csub="Tasking" >
@@ -133,7 +145,7 @@
         <File Category="source" Condition="all" Name="rtos_start.tmp" Version="10.0.1"/>
     </RefConfigFile>
 
-    <RefConfigFile Description="FreeRTOS default thread" Name="THREADS_CODE" Template="freertos_threads.ftl">
+    <RefConfigFile Description="FreeRTOS default thread" Name="DEFAULT_THREAD" Template="freertos_threads.ftl">
         <File Category="source" Condition="all" Name="rtos_threads.tmp" Version="10.0.1"/>
         <Argument Comment="User threads" GenericType="rtos_list" Name="Threads"/>
     </RefConfigFile>

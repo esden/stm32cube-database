@@ -47,7 +47,6 @@
 #define RTT_COLOR_CODE_CYAN    ""
 #endif /* LOG_RTT_COLOR_ENABLE == 1 */
 
-
 #if (CFG_DEBUG_TRACE != 0)
 /**
  * Function for outputting code region string.

@@ -491,6 +491,12 @@ standard names. */
 /* #define xPortSysTickHandler SysTick_Handler */
 [/#if]
 
+[#if USE_Touch_GFX_STACK??]
+/* To measure mcu load by measure time used in the dummy idle task */
+#define traceTASK_SWITCHED_OUT() xTaskCallApplicationTaskHook( pxCurrentTCB, (void*)1 )
+#define traceTASK_SWITCHED_IN() xTaskCallApplicationTaskHook( pxCurrentTCB, (void*)0 )
+[/#if]
+
 [#if configGENERATE_RUN_TIME_STATS=="1"]
 /* USER CODE BEGIN 2 */    
 /* Definitions needed when configGENERATE_RUN_TIME_STATS is on */

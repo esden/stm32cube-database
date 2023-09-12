@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<IP DBVersion="V4.0" Name="FATFS" Version="STM32Cube_FW_G0_V0.7.0" RootFolder="Middlewares/Third_Party/FatFs/" CodeTemplate="fatfs_HalInit.tmp.ftl;fatfs_h.ftl"
+    IncludeFile="ff.h;ff_gen_drv.h"
+    xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+    ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd"
+    xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+
+    <!-- May need to remove some modes useless for G4 -->
+
+    <RefConfig Name="FATFS_SDIO_Init" Comment="SD">   <!-- Not valid on G4 -->
+        <Component Name="Middleware:FATFS:SDIO"/>
+        <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
+        <ConfigFile Name="FF_CONF"/>  
+        <ConfigFile Name="FATFS_INIT"/>
+        <ConfigFile Name="FATFS_HEADER"/>
+    </RefConfig>
+    
+    <RefConfig Name="FATFS_USB_Init" Comment="USBH">   <!-- Not valid on G4 -->
+        <Component Name="Middleware:FATFS:USBH"/>
+        <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
+        <ConfigFile Name="FF_CONF"/>
+        <ConfigFile Name="FATFS_INIT"/>
+        <ConfigFile Name="FATFS_HEADER"/>
+    </RefConfig>
+    
+    <RefConfig Name="FATFS_FSMC_NAND16_Init" Comment="NAND">   <!-- Not valid on G4 -->
+        <Component Name="Middleware:FATFS:NAND"/>
+        <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
+        <ConfigFile Name="FF_CONF"/>
+        <ConfigFile Name="FATFS_INIT"/>
+        <ConfigFile Name="FATFS_HEADER"/>
+    </RefConfig>
+    
+    <RefConfig Name="FATFS_FMC_SDRAM_Init" Comment="SDRAMDISK">   <!-- Not valid on G4 -->
+        <Component Name="Middleware:FATFS:SDRAM"/>
+        <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
+        <ConfigFile Name="FF_CONF"/>
+        <ConfigFile Name="FATFS_INIT"/>
+        <ConfigFile Name="FATFS_HEADER"/>
+    </RefConfig>
+    
+    <RefConfig Name="FATFS_SRAM_Init" Comment="SRAMDISK">    <!-- Valid on G4 -->
+        <Component Name="Middleware:FATFS:SRAM"/>
+        <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
+        <ConfigFile Name="FF_CONF"/>
+        <ConfigFile Name="G4XX_SRAM_C"/> 
+        <ConfigFile Name="G4XX_SRAM_H"/> 
+        <ConfigFile Name="FATFS_INIT"/> 
+        <ConfigFile Name="FATFS_HEADER"/>
+        <ConfigFile Name="SRAM_DISKIO_TEMPLATE_H"/>
+        <ConfigFile Name="SRAM_DISKIO_TEMPLATE_C"/>
+        <!--  <ConfigFile Name="EVAL_BOARD_CONF_FILE"/> -->
+    </RefConfig>
+    
+    <RefConfig Name="FATFS_USER_DEFINED_Init" Comment="USER">  <!-- Valid on G4 -->
+        <Component Name="Middleware:FATFS:GENERIC"/>
+        <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
+        <ConfigFile Name="FF_CONF"/>
+        <ConfigFile Name="USER_DISKIO_C"/>
+        <ConfigFile Name="USER_DISKIO_H"/>
+        <ConfigFile Name="FATFS_INIT"/>
+        <ConfigFile Name="FATFS_HEADER"/>
+        <!--  <ConfigFile Name="EVAL_BOARD_CONF_FILE"/> -->
+        <!--  <ConfigFile Name="NUCLEO_BOARD_CONF_FILE"/> --> 
+        <!--  <ConfigFile Name="NUCLEO_BOARD_C_BUS_FILE"/> -->
+        <!--  <ConfigFile Name="NUCLEO_BOARD_H_BUS_FILE"/> --> 
+        <!--  <ConfigFile Name="ADAFRUIT_802_CONF"/> -->
+    </RefConfig>
+    
+    <RefComponent Cclass="Middleware" Cgroup="FATFS" Cversion="0.1.0">
+        <!-- <File Name="src/*.h" Category="header"/>  -->
+        <File Name="src/diskio.h" Category="header"/>
+        <File Name="src/ff.h" Category="header"/>
+        <File Name="src/ff_gen_drv.h" Category="header"/>
+        <File Name="src/integer.h" Category="header"/>
+        
+        <!--  <File Name="src/*.c" Category="source"/> -->
+        <File Name="src/diskio.c" Category="source"/>
+        <File Name="src/ff.c" Category="source"/>
+        <File Name="src/ff_gen_drv.c" Category="source"/>
+
+        <File Name="src/option/syscall.c" Category="source"/>
+
+        <SubComponent Csub="CODE_PAGE" Cvariant="932" >
+            <File Name="src/option/cc932.c" Category="source"/>
+        </SubComponent>
+        <SubComponent Csub="CODE_PAGE" Cvariant="936" >
+            <File Name="src/option/cc936.c" Category="source"/>
+        </SubComponent>
+        <SubComponent Csub="CODE_PAGE" Cvariant="949" >
+            <File Name="src/option/cc949.c" Category="source"/>
+        </SubComponent>
+        <SubComponent Csub="CODE_PAGE" Cvariant="950" >
+            <File Name="src/option/cc950.c" Category="source"/>
+        </SubComponent>
+        <SubComponent Csub="CODE_PAGE" Cvariant="850" >
+            <File Name="src/option/ccsbcs.c" Category="source"/>
+        </SubComponent>
+    </RefComponent>
+
+    <!-- use specific template file "fatfs_conf_R12c.ftl" to generate header file containing #define -->
+    <RefConfigFile Name="FF_CONF" Description="Header file for #define" Template="fatfs_conf_R12c.ftl">      
+        <File Name="Target/ffconf.h" Category="header" Version="R0.12" Condition="all"/>
+        <!-- Parameters for Function and Buffer Configurations -->
+        <Argument Name="_FS_TINY" GenericType="simple" Comment="0:Normal or 1:Tiny"/>
+        <Argument Name="_FS_READONLY" GenericType="simple" Comment="0:Read/Write or 1:Read only"/>
+        <Argument Name="_FS_MINIMIZE" GenericType="simple" Comment="0 to 3"/>
+        <Argument Name="_USE_STRFUNC" GenericType="simple" Comment="0:Disable or 1-2:Enable"/>
+        <Argument Name="_USE_FIND" GenericType="simple" Comment="0:Disable or 1:Enable"/>                  <!-- New in R0.11 --> 
+        <Argument Name="_USE_MKFS" GenericType="simple" Comment="0:Disable or 1:Enable"/>
+        <Argument Name="_USE_FORWARD" GenericType="simple" Comment="0:Disable or 1:Enable"/>
+        <Argument Name="_USE_LABEL" GenericType="simple" Comment="0:Disable or 1:Enable"/>
+        <Argument Name="_USE_FASTSEEK" GenericType="simple" Comment="0:Disable or 1:Enable"/>
+        <!-- Parameters for Locale and Namespace Configurations -->
+        <Argument Name="_CODE_PAGE" GenericType="simple" Comment="The _CODE_PAGE specifies the OEM code page to be used on the target system"/>
+        <Argument Name="_USE_LFN" GenericType="simple" Comment="0 to 3"/>
+        <Argument Name="_MAX_LFN" GenericType="simple" Comment="Maximum LFN length to handle (12 to 255)"/>
+        <Argument Name="_LFN_UNICODE" GenericType="simple" Comment="0:ANSI/OEM or 1:Unicode"/>
+        <Argument Name="_STRF_ENCODE" GenericType="simple" Comment="0:ANSI/OEM, 1:UTF-16LE, 2:UTF-16BE, 3:UTF-8"/>
+        <Argument Name="_FS_RPATH" GenericType="simple" Comment="0 to 2"/>	
+        <!-- Parameters for Physical Drive Configurations  -->
+        <Argument Name="_VOLUMES" GenericType="simple" Comment="Number of volumes (logical drives) to be used"/>
+        <Argument Name="_MAX_SS" GenericType="simple" Comment="512, 1024, 2048 or 4096"/>
+        <Argument Name="_MIN_SS" GenericType="simple" Comment="512, 1024, 2048 or 4096"/>
+        <Argument Name="_MULTI_PARTITION" GenericType="simple" Comment="0:Single partition, 1:Enable multiple partition"/>
+        <Argument Name="_USE_TRIM" GenericType="simple" Comment="0:Disable or 1:Enable"/>                  <!-- Renamed in R0.11 --> 
+        <Argument Name="_FS_NOFSINFO" GenericType="simple" Comment="0: Load all informations in the FSINFO if available, 1: Do not trust free cluster count in the FSINFO"/>
+        <!-- Parameters for System Configurations   -->
+        <Argument Name="_FS_NORTC" GenericType="simple" Comment="0 or 1"/>                                 <!-- New in R0.11 -->  
+        <Argument Name="_NORTC_YEAR" GenericType="simple" Comment="1980..2107"/>                           <!-- New in R0.11 -->  
+        <Argument Name="_NORTC_MON" GenericType="simple" Comment="1..12"/>                                 <!-- New in R0.11 -->  
+        <Argument Name="_NORTC_MDAY" GenericType="simple" Comment="1..31"/>                                <!-- New in R0.11 -->  
+        <Argument Name="_WORD_ACCESS" GenericType="simple" Comment="0 or 1"/>
+        <Argument Name="_FS_REENTRANT" GenericType="simple" Comment="0:Disable or 1:Enable"/>
+        <Argument Name="_FS_TIMEOUT" GenericType="simple" Comment="Timeout period in unit of time ticks"/>
+        <Argument Name="_SYNC_t" GenericType="simple" Comment="O/S dependent type of sync object. e.g. HANDLE, OS_EVENT*, ID and etc.."/>		
+        <Argument Name="_FS_LOCK" GenericType="simple" Comment="0:Disable or >=1:Enable"/>        
+        <!-- Internal: for detecting enabled modes and include the right files -->
+        <Argument Name="_FS_FATFS_SDIO" GenericType="simple" Comment="0:Disable or >=1:Enable"/> 
+        <Argument Name="_FS_FATFS_SDRAM" GenericType="simple" Comment="0:Disable or >=1:Enable"/> 
+        <Argument Name="_FS_FATFS_SRAM" GenericType="simple" Comment="0:Disable or >=1:Enable"/> 
+        <Argument Name="_FS_FATFS_USB" GenericType="simple" Comment="0:Disable or >=1:Enable"/> 
+        <!-- To get the right handle for USBH (FS or HS) -->
+        <Argument Name="_HUSBH" GenericType="simple" Comment=""/>
+        <!-- R0.12 -->
+        <Argument Name="_USE_EXPAND" GenericType="simple" Comment=""/>
+        <Argument Name="_USE_CHMOD" GenericType="simple" Comment=""/>
+        <Argument Name="_FS_EXFAT" GenericType="simple" Comment=""/>
+        <!-- Specific to SRAM on G4 -->  
+        <Argument Name="SRAM_BSP_CODE" GenericType="simple" Comment=""/>
+    </RefConfigFile> 
+
+    <!-- Generate a conf file for the EVAL BOARD STM32G474E -->
+    <RefConfigFile Name="EVAL_BOARD_CONF_FILE" Description="Conf file for STM32G474E_EVAL_BOARD" Template="fatfs_stm32g474e_eval_conf.h.ftl">       
+        <File Name="Target/stm32g474e_eval_conf.h" Category="header" Version="R0.12" Condition="S_STM32G474E_EVAL_BOARD"/>    
+    </RefConfigFile>
+    
+    <RefConfigFile Name="NUCLEO_BOARD_CONF_FILE" Description="Conf file for a NUCLEO BOARD" Template="fatfs_stm32g4xx_nucleo_conf.h.ftl">       
+        <File Name="Target/stm32g4xx_nucleo_conf.h" Category="header" Version="R0.12" Condition="S_STM32G474RE_NUCLEO_BOARD | S_STM32G431RB_NUCLEO_BOARD"/>    
+    </RefConfigFile>
+    
+    <RefConfigFile Name="NUCLEO_BOARD_C_BUS_FILE" Description="C Bus file for a NUCLEO BOARD" Template="fatfs_stm32g4xx_nucleo_bus.c.ftl">       
+        <File Name="Target/stm32g4xx_nucleo_bus.c" Category="header" Version="R0.12" Condition="S_STM32G474RE_NUCLEO_BOARD | S_STM32G431RB_NUCLEO_BOARD"/>    
+    </RefConfigFile> 
+    
+    <RefConfigFile Name="NUCLEO_BOARD_H_BUS_FILE" Description="H Bus file for a NUCLEO BOARD" Template="fatfs_stm32g4xx_nucleo_bus.h.ftl">       
+        <File Name="Target/stm32g4xx_nucleo_bus.h" Category="header" Version="R0.12" Condition="S_STM32G474RE_NUCLEO_BOARD | S_STM32G431RB_NUCLEO_BOARD"/>    
+    </RefConfigFile> 
+
+    <!-- Generate a driver file for SRAM that uses the right IP handle -->
+    <RefConfigFile Name="G4XX_SRAM_C" Description="C driver file for SRAM" Template="fatfs_bsp_sram_c_g4.ftl">  
+        <File Name="Target/bsp_driver_sram.c" Category="source" Version="R0.12" Condition="!S_CUSTOM_BSP"/>  <!--  not generated if custom bsp in use -->
+        <Argument Name="_HSRAM" GenericType="simple" Comment=""/>     
+    </RefConfigFile>
+    
+    <!-- Generate a driver file for SRAM that uses the right IP handle -->
+    <RefConfigFile Name="G4XX_SRAM_H" Description="H driver file for SRAM" Template="fatfs_bsp_sram_h_g4.ftl">       
+        <File Name="Target/bsp_driver_sram.h" Category="header" Version="R0.12" Condition="!S_CUSTOM_BSP"/>  <!--  not generated if custom bsp in use -->                 
+    </RefConfigFile>
+    
+    <!-- NEW FILES FOR R12 -->
+    <!-- GENERIC DISKIO files (when GENERIC code is used) -->
+    <RefConfigFile Name="SRAM_DISKIO_TEMPLATE_H" Description="TEMPLATE for SRAM_DISKIO_H" Template="fatfs_sram_diskio_template_h.ftl">       
+        <File Name="Target/sram_diskio.h" Category="header" Version="R0.12" Condition="!S_CUSTOM_BSP"/>  
+        <Argument Name="_HSRAM" GenericType="simple" Comment=""/> 
+    </RefConfigFile>
+    
+    <RefConfigFile Name="SRAM_DISKIO_TEMPLATE_C" Description="TEMPLATE for SRAM_DISKIO_C" Template="fatfs_sram_diskio_template_c_g4.ftl">       
+        <File Name="Target/sram_diskio.c" Category="source" Version="R0.12" Condition="!S_CUSTOM_BSP"/>  
+        <Argument Name="_HSRAM" GenericType="simple" Comment=""/>
+    </RefConfigFile>
+    
+    <!-- CUSTOM DISKIO files (when CUSTOM code is used) -->
+    <RefConfigFile Name="SRAM_DISKIO_TEMPLATE_H" Description="TEMPLATE for SRAM_DISKIO_H" Template="fatfs_sram_diskio_template_h_g4.ftl">       
+        <File Name="Target/sram_diskio.h" Category="header" Version="R0.12" Condition="S_CUSTOM_BSP"/>  
+        <Argument Name="_HSRAM" GenericType="simple" Comment=""/>
+        <Argument Name="BOARD_NAME" GenericType="simple" Comment=""/>  
+    </RefConfigFile>
+    
+    <RefConfigFile Name="SRAM_DISKIO_TEMPLATE_C" Description="TEMPLATE for SRAM_DISKIO_C" Template="fatfs_sram_diskio_template_c_g4.ftl">       
+        <File Name="Target/sram_diskio.c" Category="source" Version="R0.12" Condition="S_CUSTOM_BSP"/>  
+        <Argument Name="_HSRAM" GenericType="simple" Comment=""/>
+    </RefConfigFile>
+    <!-- NEW FILES FOR R12 -->
+    
+    <!--  GENERIC DISKIO C files -->
+    <!-- Generate a generic diskio C driver file (user_diskio.c file)  -->
+    <RefConfigFile Name="USER_DISKIO_C" Description="GENERIC C diskio driver file" Template="fatfs_user_diskio_c.ftl">       
+        <File Name="Target/user_diskio.c" Category="source" Version="R0.12" Condition="!USER_SD_DISKIO"/>    
+        <Argument Name="NEW_DISKIO_API" GenericType="simple" Comment=""/>
+    </RefConfigFile>
+    
+    <!-- Generate a generic diskio H driver file (user_diskio.h file -->
+    <RefConfigFile Name="USER_DISKIO_H" Description="GENERIC H driver file" Template="fatfs_user_diskio_h.ftl">       
+        <File Name="Target/user_diskio.h" Category="header" Version="R0.12" Condition="!USER_SD_DISKIO"/>                    
+    </RefConfigFile>
+    <!--  GENERIC DISKIO C files -->
+    
+    <!-- CUSTOM DISKIO C files for EVAL -->
+    <!-- Generate the sd.diskio.c driver file (if user selects in advanced tab the "SD" choice) -->
+    <RefConfigFile Name="USER_DISKIO_C" Description="SD C diskio driver file" Template="fatfs_user_sd_diskio_c_g4.ftl">       
+        <File Name="Target/sd_diskio.c" Category="source" Version="R0.12" Condition="USER_SD_DISKIO &amp; S_STM32G474E_EVAL_BOARD"/>    
+    </RefConfigFile>
+    
+    <!-- Generate the sd_diskio.h driver file (if user selects in advanced tab the "SD" choice) -->
+    <RefConfigFile Name="USER_DISKIO_H" Description="SD H driver file" Template="fatfs_user_sd_diskio_h_g4.ftl">       
+        <File Name="Target/sd_diskio.h" Category="header" Version="R0.12" Condition="USER_SD_DISKIO &amp; S_STM32G474E_EVAL_BOARD"/>   
+        <Argument Name="BOARD_NAME" GenericType="simple" Comment=""/>                 
+    </RefConfigFile>
+    <!-- CUSTOM DISKIO C files for EVAL -->   
+
+    <!-- CUSTOM DISKIO C files for NUCLEO -->
+    <!-- Generate the sd.diskio.c driver file (if user selects in advanced tab the "SD" choice) -->
+    <RefConfigFile Name="USER_DISKIO_C" Description="SD C diskio driver file for Nucleo" Template="fatfs_user_sd_diskio_c_g4_nucleo.ftl">       
+        <File Name="Target/sd_diskio.c" Category="source" Version="R0.12" Condition="USER_SD_DISKIO &amp; (S_STM32G474RE_NUCLEO_BOARD | S_STM32G431RB_NUCLEO_BOARD)"/>    
+    </RefConfigFile>
+    
+    <!-- Generate the sd_diskio.h driver file (if user selects in advanced tab the "SD" choice) -->
+    <RefConfigFile Name="USER_DISKIO_H" Description="SD H driver file for Nucleo" Template="fatfs_user_sd_diskio_h_g4.ftl">       
+        <File Name="Target/sd_diskio.h" Category="header" Version="R0.12" Condition="USER_SD_DISKIO &amp; (S_STM32G474RE_NUCLEO_BOARD | S_STM32G431RB_NUCLEO_BOARD)"/>   
+        <Argument Name="BOARD_NAME" GenericType="simple" Comment=""/>                 
+    </RefConfigFile>
+    <!-- CUSTOM DISKIO C files for NUCLEO -->  
+    
+    <!-- ADA FRUIT FILE FOR NUCLEOS --> 
+    <RefConfigFile Name="ADAFRUIT_802_CONF" Description="CONF FILE FOR ADAFRUIT 802" Template="fatfs_adafruit_802_conf.h.ftl">       
+        <File Name="Target/adafruit_802_conf.h" Category="header" Version="R0.12" Condition="USER_SD_DISKIO &amp; (S_STM32G474RE_NUCLEO_BOARD | S_STM32G431RB_NUCLEO_BOARD)"/>   
+        <Argument Name="BOARD_NAME" GenericType="simple" Comment=""/>                 
+    </RefConfigFile>
+    <!-- ADA FRUIT FILE FOR NUCLEOS --> 
+
+    <!-- Generate a init code file (app_fatfs.c) -->
+    <RefConfigFile Name="FATFS_INIT" Description="FATFS Init code file" Template="fatfs_init_g4.ftl">       
+        <File Name="App/app_fatfs.c" Category="source" Version="R0.12" Condition="S_FATFS_Generic"/>        
+        <Argument Name="_FS_NORTC" GenericType="simple" Comment="0 or 1"/>                 
+        <Argument Name="_MULTI_PARTITION" GenericType="simple" Comment="0 or 1"/>
+        <Argument Name="DISKIO_CODE" GenericType="simple" Comment=""/>
+        <Argument Name="_FS_FATFS_SRAM" GenericType="simple" Comment=""/>
+    </RefConfigFile>
+    <RefConfigFile Name="FATFS_INIT" Description="FATFS Init code file" Template="fatfs_init_g4.ftl">       
+        <File Name="App/app_fatfs.c" Category="source" Version="R0.12" Condition="!S_FATFS_Generic"/>        
+        <Argument Name="_FS_NORTC" GenericType="simple" Comment="0 or 1"/>                                 
+        <Argument Name="_MULTI_PARTITION" GenericType="simple" Comment="0 or 1"/>
+        <Argument Name="_FS_FATFS_SRAM" GenericType="simple" Comment=""/>
+    </RefConfigFile>    
+
+    <!-- Generate header for the init code file (app_fatfs.h) -->
+    <RefConfigFile Name="FATFS_HEADER" Description="FATFS header file" Template="fatfs_header_g4.ftl">       
+        <File Name="App/app_fatfs.h" Category="source" Version="R0.12" Condition="S_FATFS_Generic"/>
+        <Argument Name="DISKIO_CODE" GenericType="simple" Comment=""/>
+        <Argument Name="_FS_FATFS_SRAM" GenericType="simple" Comment=""/>
+    </RefConfigFile>
+    <RefConfigFile Name="FATFS_HEADER" Description="FATFS header file" Template="fatfs_header_g4.ftl">       
+        <File Name="App/app_fatfs.h" Category="source" Version="R0.12" Condition="!S_FATFS_Generic"/>
+        <Argument Name="_FS_FATFS_SRAM" GenericType="simple" Comment=""/>
+    </RefConfigFile>
+
+    <!-- Code for BSP (SDIO mode) -->
+    <!--  
+    <RefBspComponent Name="Detect_SDIO" BspIpName="GPIO" BspModeName="Input">       
+        <File Category="template" Name="fatfs_platform_h.ftl"/>
+        <File Category="template" Name="fatfs_platform_c.ftl"/>
+    </RefBspComponent>
+    -->
+
+</IP>

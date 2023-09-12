@@ -155,7 +155,7 @@
         <Description>Rx Buffer Address.</Description>
     </RefParameter>
     <RefParameter Name="NO_SYS" Comment="NO_SYS (OS Awarness)" Type="list" Group="Infrastructure - OS Awarness Option" DefaultValue="0" TabName="Key Options" Mode="Basic" Visible="true">
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Forced to Enabled (set to 0) by activating FREERTOS middleware. To set NO_SYS to 1 (Disabled), unset FREERTOS middleware." Expression="S_NO_SYS &amp; S_FREERTOS"/>
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Forced to Enabled (set to 0) by activating FREERTOS middleware. To set NO_SYS to 1 (Disabled), unset FREERTOS middleware." Expression="S_NO_SYS &amp; S_FREERTOS$context"/>
         <PossibleValue Comment="OS Used" Value="0"/>
         <Description>When NO_SYS=0, lwIP is used with selected Operating System (FreeRTOS) and its related thread, semaphores, mutexes or mboxes. This means threaded APIs are used (socket, netconn, i.e. everything in the 'api' folder).&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: Take care about NO_SYS value: NO_SYS(OS Used)=0.</Description>
     </RefParameter>
@@ -817,14 +817,14 @@
     <RefParameter Name="TCPIP_THREAD_NAME" Comment="TCPIP_THREAD_NAME (TCPIP Thread Name)" Type="StringRW" Group="Infrastructure - Threading Options" DefaultValue="&quot;tcpip_thread&quot;" TabName="Key Options" Mode="Basic" Visible="false">
         <Description>Name assigned to the main tcpip thread.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: TCPIP_THREAD_NAME is used only if NO_SYS=0.</Description>
     </RefParameter>
-    <RefParameter Name="TCPIP_THREAD_STACKSIZE" Comment="TCPIP_THREAD_STACKSIZE (TCPIP Thread Stack Size)" Type="Integer" Unit="Word(s)" Group="Infrastructure - Threading Options" DefaultValue="1024" TabName="Key Options" Mode="Basic" Min="=FREERTOS:configMINIMAL_STACK_SIZE" Max="=FREERTOS:MAX_SIZE_IN_USE" >
+    <RefParameter Name="TCPIP_THREAD_STACKSIZE" Comment="TCPIP_THREAD_STACKSIZE (TCPIP Thread Stack Size)" Type="Integer" Unit="Word(s)" Group="Infrastructure - Threading Options" DefaultValue="1024" TabName="Key Options" Mode="Basic" Min="=FREERTOS$context:configMINIMAL_STACK_SIZE" Max="=FREERTOS$context:MAX_SIZE_IN_USE" >
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: TCPIP_THREAD_STACKSIZE is used only if NO_SYS=0.&lt;br&gt;&lt;b&gt;Default Preset:&lt;/b&gt; This parameter has been set with a non zero value to avoid functional issue with FREERTOS.&lt;br&gt;Up to user to fine tune this parameter value considering all dependencies.&lt;br&gt;&lt;b&gt;Min value:&lt;/b&gt; The Min TCPIP Thread Stack Size value is the Min Stack Size of FREERTOS.&lt;br&gt;&lt;b&gt;Max value:&lt;/b&gt; The Max TCPIP Thread Stack Size value is the Total Heap Size of FREERTOS divided by 4." Expression="!NO_SYS"/>
         <Description>Stack size used by the main tcpip thread (Word 32 bits). The stack size value itself is platform-dependent, but is passed to sys_thread_new() when the thread is created.</Description>
     </RefParameter>
     <RefParameter Name="TCPIP_THREAD_STACKSIZE" Comment="TCPIP_THREAD_STACKSIZE (TCPIP Thread Stack Size)" Type="Integer" Unit="Byte(s)" Group="Infrastructure - Threading Options" DefaultValue="0" TabName="Key Options" Mode="Basic" Min="0" Max="2147483647" Visible="false">
         <Description>Stack size used by the main tcpip thread. The stack size value itself is platform-dependent, but is passed to sys_thread_new() when the thread is created.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: TCPIP_THREAD_STACKSIZE is used only if NO_SYS=0.</Description>
     </RefParameter>
-    <RefParameter Name="TCPIP_THREAD_PRIO" Comment="TCPIP_THREAD_PRIO (TCPIP Thread Priority Level)" Type="Integer" Group="Infrastructure - Threading Options" DefaultValue="3" TabName="Key Options" Mode="Basic" Min="0" Max="=FREERTOS:configMAX_PRIORITIES-1" >
+    <RefParameter Name="TCPIP_THREAD_PRIO" Comment="TCPIP_THREAD_PRIO (TCPIP Thread Priority Level)" Type="Integer" Group="Infrastructure - Threading Options" DefaultValue="3" TabName="Key Options" Mode="Basic" Min="0" Max="=FREERTOS$context:configMAX_PRIORITIES-1" >
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: TCPIP_THREAD_PRIO is used only if NO_SYS=0.&lt;br&gt;&lt;b&gt;Default Preset:&lt;/b&gt; The default value is aligned on FreeRTOS default Task Priority.&lt;br&gt;&lt;b&gt;Max value:&lt;/b&gt; The Max of TCPIP Thread Priority strictly less than the current FREERTOS MAX_PRIORITIES parameter." Expression="!NO_SYS"/>
         <Description>Priority assigned to the main tcpip thread. The priority value itself is platform-dependent, but is passed to sys_thread_new() when the thread is created.</Description>
     </RefParameter>
@@ -845,14 +845,14 @@
     <RefParameter Name="SLIPIF_THREAD_NAME" Comment="SLIPIF_THREAD_NAME (TCPIP SLIPIF Loop Thread Name)" Type="StringRW" Group="Infrastructure - Threading Options" DefaultValue="&quot;slipif_loop&quot;" TabName="Key Options" Mode="Advanced" Visible="false">
         <Description>Name assigned to the slipif_loop thread.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: SLIPIF_THREAD_NAME is used only if NO_SYS=0.</Description>
     </RefParameter>
-    <RefParameter Name="SLIPIF_THREAD_STACKSIZE" Comment="SLIPIF_THREAD_STACKSIZE (SLIPIF Thread Stack Size)" Type="Integer" Unit="Word(s)" Group="Infrastructure - Threading Options" DefaultValue="1024" TabName="Key Options" Mode="Advanced" Min="=FREERTOS:configMINIMAL_STACK_SIZE" Max="=FREERTOS:MAX_SIZE_IN_USE" >
+    <RefParameter Name="SLIPIF_THREAD_STACKSIZE" Comment="SLIPIF_THREAD_STACKSIZE (SLIPIF Thread Stack Size)" Type="Integer" Unit="Word(s)" Group="Infrastructure - Threading Options" DefaultValue="1024" TabName="Key Options" Mode="Advanced" Min="=FREERTOS$context:configMINIMAL_STACK_SIZE" Max="=FREERTOS$context:MAX_SIZE_IN_USE" >
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: SLIPIF_THREAD_STACKSIZE is used only if NO_SYS=0.&lt;br&gt;&lt;b&gt;Default Preset:&lt;/b&gt; This parameter has been set with a non zero value to avoid functional issue with FREERTOS.&lt;br&gt;Up to user to fine tune this parameter value considering all dependencies.&lt;br&gt;&lt;b&gt;Min value:&lt;/b&gt;The Min SLIPIF Thread Stack Size value is the Min Stack Size of FREERTOS.&lt;br&gt;&lt;b&gt;Max value:&lt;/b&gt;The Max SLIPIF Thread Stack Size value is the Total Heap Size of FREERTOS divided by 4." Expression="!NO_SYS"/>
         <Description>Stack size used by the slipif_loop thread. The stack size value itself is platform-dependent, but is passed to sys_thread_new() when the thread is created.</Description>
     </RefParameter>
     <RefParameter Name="SLIPIF_THREAD_STACKSIZE" Comment="SLIPIF_THREAD_STACKSIZE (SLIPIF Thread Stack Size)" Type="Integer" Group="Infrastructure - Threading Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" Min="0" Max="2147483647" Visible="false">
         <Description>Stack size used by the slipif_loop thread. The stack size value itself is platform-dependent, but is passed to sys_thread_new() when the thread is created.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: SLIPIF_THREAD_STACKSIZE is used only if NO_SYS=0.</Description>
     </RefParameter>
-    <RefParameter Name="SLIPIF_THREAD_PRIO" Comment="SLIPIF_THREAD_PRIO (SLIPIF Thread Priority Level)" Type="Integer" Group="Infrastructure - Threading Options" DefaultValue="3" TabName="Key Options" Mode="Advanced" Min="0" Max="=FREERTOS:configMAX_PRIORITIES-1" >
+    <RefParameter Name="SLIPIF_THREAD_PRIO" Comment="SLIPIF_THREAD_PRIO (SLIPIF Thread Priority Level)" Type="Integer" Group="Infrastructure - Threading Options" DefaultValue="3" TabName="Key Options" Mode="Advanced" Min="0" Max="=FREERTOS$context:configMAX_PRIORITIES-1" >
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: SLIPIF_THREAD_PRIO is used only if NO_SYS=0.&lt;br&gt;&lt;b&gt;Default Preset:&lt;/b&gt; The default value is aligned on FreeRTOS default Task Priority.&lt;br&gt;&lt;b&gt;Max value:&lt;/b&gt;The Max of SLIPIF Thread Priority strictly less than the current FREERTOS MAX_PRIORITIES parameter." Expression="!NO_SYS"/>
         <Description>Priority assigned to the slipif_loop thread. The priority value itself is platform-dependent, but is passed to sys_thread_new() when the thread is created.</Description>
     </RefParameter>
@@ -866,14 +866,14 @@
     <RefParameter Name="DEFAULT_THREAD_NAME" Comment="DEFAULT_THREAD_NAME (Default LwIP Thread Name)" Type="StringRW" Group="Infrastructure - Threading Options" DefaultValue="&quot;lwIP&quot;" TabName="Key Options" Mode="Basic" Visible="false">
         <Description>Name assigned to any other lwIP thread.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: DEFAULT_THREAD_NAME is used only if NO_SYS=0.</Description>
     </RefParameter>
-    <RefParameter Name="DEFAULT_THREAD_STACKSIZE" Comment="DEFAULT_THREAD_STACKSIZE (Default LwIP Thread Stack Size)" Type="Integer" Unit="Word(s)" Group="Infrastructure - Threading Options" DefaultValue="1024" TabName="Key Options" Mode="Basic" Min="=FREERTOS:configMINIMAL_STACK_SIZE" Max="=FREERTOS:MAX_SIZE_IN_USE" >
+    <RefParameter Name="DEFAULT_THREAD_STACKSIZE" Comment="DEFAULT_THREAD_STACKSIZE (Default LwIP Thread Stack Size)" Type="Integer" Unit="Word(s)" Group="Infrastructure - Threading Options" DefaultValue="1024" TabName="Key Options" Mode="Basic" Min="=FREERTOS$context:configMINIMAL_STACK_SIZE" Max="=FREERTOS$context:MAX_SIZE_IN_USE" >
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: DEFAULT_THREAD_STACKSIZE is used only if NO_SYS=0.&lt;br&gt;&lt;b&gt;Default Preset:&lt;/b&gt; This parameter has been set with a non zero value to avoid functional issue with FREERTOS.&lt;br&gt;Up to user to fine tune this parameter value considering all dependencies.&lt;br&gt;&lt;b&gt;Min value:&lt;/b&gt; The Min Default Thread Stack Size value is the Min Stack Size of FREERTOS.&lt;br&gt;&lt;b&gt;Max value:&lt;/b&gt; The Max Default Thread Stack Size value is the Total Heap Size of FREERTOS divided by 4." Expression="!NO_SYS"/>
         <Description>Stack size used by any other lwIP thread.&lt;br&gt;The stack size value itself is platform-dependent, but is passed to sys_thread_new() when the thread is created.</Description>
     </RefParameter>
     <RefParameter Name="DEFAULT_THREAD_STACKSIZE" Comment="DEFAULT_THREAD_STACKSIZE (Default LwIP Thread Stack Size)" Type="Integer" Group="Infrastructure - Threading Options" DefaultValue="0" TabName="Key Options" Mode="Basic" Min="0" Max="2147483647" Visible="false">
         <Description>Stack size used by any other lwIP thread.&lt;br&gt;The stack size value itself is platform-dependent, but is passed to sys_thread_new() when the thread is created.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: DEFAULT_THREAD_STACKSIZE is used only if NO_SYS=0.</Description>
     </RefParameter>
-    <RefParameter Name="DEFAULT_THREAD_PRIO" Comment="DEFAULT_THREAD_PRIO (Default LwIP Thread Priority Level)" Type="Integer" Group="Infrastructure - Threading Options" DefaultValue="3" TabName="Key Options" Mode="Basic" Min="0" Max="=FREERTOS:configMAX_PRIORITIES-1" >
+    <RefParameter Name="DEFAULT_THREAD_PRIO" Comment="DEFAULT_THREAD_PRIO (Default LwIP Thread Priority Level)" Type="Integer" Group="Infrastructure - Threading Options" DefaultValue="3" TabName="Key Options" Mode="Basic" Min="0" Max="=FREERTOS$context:configMAX_PRIORITIES-1" >
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: DEFAULT_THREAD_PRIO is used only if NO_SYS=0.&lt;br&gt;&lt;b&gt;Default Preset:&lt;/b&gt; The default value is aligned on FreeRTOS default Task Priority.&lt;br&gt;&lt;b&gt;Max value:&lt;/b&gt; The Max of Default Thread Priority strictly less than the current FREERTOS MAX_PRIORITIES parameter." Expression="!NO_SYS"/>
         <Description>Priority assigned to any other lwIP thread.&lt;br&gt;The priority value itself is platform-dependent, but is passed to sys_thread_new() when the thread is created.</Description>
     </RefParameter>
@@ -1927,14 +1927,14 @@
         <PossibleValue Comment="Enabled" Value="1" Semaphore="S_SNMP_USE_NETCONN"/>
         <Description>Use raw API.&lt;br&gt;SNMP agent does not run in a worker thread, so blocking operations should not be done in MIB calls.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="SNMP_STACK_SIZE" Comment="SNMP_STACK_SIZE (Stack Size of SNMP Worker Thread)" Type="Integer" Unit="Word(s)" Group="SNMP Options" DefaultValue="=DEFAULT_THREAD_STACKSIZE" TabName="SNMP" Mode="Advanced" Min="=FREERTOS:configMINIMAL_STACK_SIZE" Max="=FREERTOS:MAX_SIZE_IN_USE" >
+    <RefParameter Name="SNMP_STACK_SIZE" Comment="SNMP_STACK_SIZE (Stack Size of SNMP Worker Thread)" Type="Integer" Unit="Word(s)" Group="SNMP Options" DefaultValue="=DEFAULT_THREAD_STACKSIZE" TabName="SNMP" Mode="Advanced" Min="=FREERTOS$context:configMINIMAL_STACK_SIZE" Max="=FREERTOS$context:MAX_SIZE_IN_USE" >
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: SNMP_STACK_SIZE requires LWIP_SNMP and SNMP_USE_NETCONN enabled." Expression="LWIP_SNMP &amp; SNMP_USE_NETCONN"/>
         <Description>Stack size of SNMP netconn worker thread.</Description>
     </RefParameter>
     <RefParameter Name="SNMP_STACK_SIZE" Comment="SNMP_STACK_SIZE (Stack Size of SNMP Worker Thread)" Type="Integer" Group="SNMP Options" DefaultValue="null" TabName="SNMP" Mode="Advanced" Visible="false">
         <Description>Stack size of SNMP netconn worker thread.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: SNMP_STACK_SIZE requires LWIP_SNMP and SNMP_USE_NETCONN enabled.</Description>
     </RefParameter>
-    <RefParameter Name="SNMP_THREAD_PRIO" Comment="SNMP_THREAD_PRIO (SNMP Worker Thread Priority)" Type="Integer" Group="SNMP Options" DefaultValue="=DEFAULT_THREAD_PRIO" TabName="SNMP" Mode="Advanced" Min="0" Max="=FREERTOS:configMAX_PRIORITIES-1" >
+    <RefParameter Name="SNMP_THREAD_PRIO" Comment="SNMP_THREAD_PRIO (SNMP Worker Thread Priority)" Type="Integer" Group="SNMP Options" DefaultValue="=DEFAULT_THREAD_PRIO" TabName="SNMP" Mode="Advanced" Min="0" Max="=FREERTOS$context:configMAX_PRIORITIES-1" >
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: SNMP_THREAD_PRIO requires LWIP_SNMP and SNMP_USE_NETCONN enabled." Expression="LWIP_SNMP &amp; SNMP_USE_NETCONN"/>
         <Description>SNMP netconn worker thread priority.</Description>
     </RefParameter>
@@ -2510,7 +2510,7 @@
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Generate checksums in software for outgoing ICMP packets.</Description>
     </RefParameter>
-    <RefParameter Name="CHECKSUM_GEN_ICMP" Comment="CHECKSUM_GEN_ICMP (Generate Software Checksum for Outgoing ICMP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="=IF(CHECKSUM_BY_HARDWARE,0,IF(LWIP_CHECKSUM_CTRL_PER_NETIF,1,0))" TabName="Checksum" Mode="Basic" >
+    <RefParameter Name="CHECKSUM_GEN_ICMP" Comment="CHECKSUM_GEN_ICMP (Generate Software Checksum for Outgoing ICMP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="=IF(STM32H7 &amp; CHECKSUM_BY_HARDWARE,1,IF(CHECKSUM_BY_HARDWARE,0,IF(LWIP_CHECKSUM_CTRL_PER_NETIF,1,0)))" TabName="Checksum" Mode="Basic" >
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Generate checksums in software for outgoing ICMP packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_GEN_ICMP requires CHECKSUM_BY_HARDWARE disabled. CHECKSUM_GEN_ICMP is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled.</Description>
@@ -2560,7 +2560,7 @@
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Check checksums in software for Incoming ICMP packets.</Description>
     </RefParameter>
-    <RefParameter Name="CHECKSUM_CHECK_ICMP" Comment="CHECKSUM_CHECK_ICMP (Generate Software Checksum for Incoming ICMP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="=IF(CHECKSUM_BY_HARDWARE,0,IF(LWIP_CHECKSUM_CTRL_PER_NETIF,1,0))" TabName="Checksum" Mode="Basic" >
+    <RefParameter Name="CHECKSUM_CHECK_ICMP" Comment="CHECKSUM_CHECK_ICMP (Generate Software Checksum for Incoming ICMP Packets)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="=IF(STM32H7 &amp; CHECKSUM_BY_HARDWARE,1,IF(CHECKSUM_BY_HARDWARE,0,IF(LWIP_CHECKSUM_CTRL_PER_NETIF,1,0)))" TabName="Checksum" Mode="Basic" >
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Check checksums in software for Incoming ICMP packets.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Set CHECKSUM_CHECK_ICMP requires CHECKSUM_BY_HARDWARE disabled. CHECKSUM_CHECK_ICMP is enabled if LWIP_CHECKSUM_CTRL_PER_NETIF is enabled.</Description>
@@ -3267,9 +3267,9 @@
                     <Semaphore>S_LWIP</Semaphore>
                 </Mode>
             </ModeLogicOperator>
-            <Condition Expression="IF(MW_ETH_MW, IF(!S_MBEDTLS | (S_MBEDTLS &amp; S_FREERTOS),1,0),0)" Diagnostic="Active only if: ETH IP configured / FREERTOS is enabled when MBEDTLS is enabled."/>
+            <Condition Expression="IF(MW_ETH_MW, IF((!S_MBEDTLS &amp; !S_CMSIS_RTOS_V2) | (S_MBEDTLS &amp; S_FREERTOS &amp; !S_CMSIS_RTOS_V2),1,0),0)" Diagnostic="Active only if: ETH IP configured / FREERTOS V2 Not enabled / FREERTOS V1 is enabled when MBEDTLS is enabled."/>
         </Mode>
-        <Mode Name="Enabled" RemoveCondition="!STM32H7">
+        <Mode Name="Enabled" RemoveCondition="!(STM32H7 &amp; (STM32H745_755|STM32H747_757))">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="Enabled">
                     <SignalLogicalOp Name="AND">
@@ -3278,7 +3278,18 @@
                     <Semaphore>S_LWIP</Semaphore>
                 </Mode>
             </ModeLogicOperator>
-            <Condition Expression="IF(MW_ETH_MW &amp; S_M7_DCACHE_ENABLED, IF(!S_MBEDTLS | (S_MBEDTLS &amp; S_FREERTOS),1,0),0)" Diagnostic="Active only if: ETH IP configured / FREERTOS is enabled when MBEDTLS is enabled.&lt;br&gt;&lt;font color=&quot;red&quot;&gt;For STM32H7, CORTEX_M7 CPU DCache parameter must be Enabled (Configuration tab) to allow LwIP activation."/>
+            <Condition Expression="IF(MW_ETH_MW &amp; ((S_M7_DCACHE_ENABLED &amp; $IpInstance_Cortex_M7) | $IpInstance_Cortex_M4), IF((!S_MBEDTLS &amp; !S_CMSIS_RTOS_V2) | (S_MBEDTLS &amp; S_FREERTOS$context &amp; !S_CMSIS_RTOS_V2),1,0),0)" Diagnostic="Active only if: ETH IP configured / FREERTOS V2 Not enabled / FREERTOS V1 is enabled when MBEDTLS is enabled.&lt;br&gt;&lt;font color=&quot;red&quot;&gt;For STM32H7 using Cortex M7, CORTEX_M7 CPU DCache parameter must be Enabled (Configuration tab) to allow LwIP activation."/>
+        </Mode>
+        <Mode Name="Enabled" RemoveCondition="!(STM32H7 &amp; !(STM32H745_755|STM32H747_757))">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="Enabled">
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="" Name="VS_Enabled"/>
+                    </SignalLogicalOp>
+                    <Semaphore>S_LWIP</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+            <Condition Expression="IF(MW_ETH_MW &amp; S_M7_DCACHE_ENABLED, IF((!S_MBEDTLS &amp; !S_CMSIS_RTOS_V2) | (S_MBEDTLS &amp; S_FREERTOS$context &amp; !S_CMSIS_RTOS_V2),1,0),0)" Diagnostic="Active only if: ETH IP configured / FREERTOS V2 Not enabled / FREERTOS V1 is enabled when MBEDTLS is enabled.&lt;br&gt;&lt;font color=&quot;red&quot;&gt;For STM32H7, CORTEX_M7 CPU DCache parameter must be Enabled (Configuration tab) to allow LwIP activation."/>
         </Mode>
     </ModeLogicOperator>
 <RefSignal Name="VS_Enabled" Virtual="true"/>

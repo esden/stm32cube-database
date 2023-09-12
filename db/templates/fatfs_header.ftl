@@ -1,4 +1,8 @@
 [#ftl]
+[#assign contextFolder=""]
+[#if cpucore!=""]    
+[#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")+"/"]
+[/#if]
 /**
   ******************************************************************************
   * @file   fatfs.h
@@ -16,14 +20,14 @@
 #endif
 
 [#compress]
-[@common.optinclude name=mxTmpFolder+"/fatfs_inc.tmp"/][#--include fatfs includes --]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/fatfs_inc.tmp"/][#--include fatfs includes --]
 
 #n/* USER CODE BEGIN Includes */     
 #n
 #n/* USER CODE END Includes */
 #n
 
-[@common.optinclude name=mxTmpFolder+"/fatfs_ext_vars.tmp"/]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/fatfs_ext_vars.tmp"/]
 
 #nvoid MX_FATFS_Init(void);
 

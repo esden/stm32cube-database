@@ -19,40 +19,72 @@
 / Additional user header to be used  
 /-----------------------------------------------------------------------------*/
 [#assign usbhInUse = 0]
+[#assign includeGenericBspForSD = 0]
+[#assign includeGenericBspForSDRAM = 0]
+[#assign includeGenericBspForSRAM = 0]
+[#assign includeBspForUSBH = 0]
+[#assign customBSPSRAM = 0]    [#-- on G4, not need to include bsp_driver_sram.h when custom BSP is chosen --]
+[#assign cmsisrtosInUse = 0]
+
 #include "main.h"
 #include "${FamilyName?lower_case}xx_hal.h"
+[#compress]
 [#list SWIPdatas as SWIP]
 [#if SWIP.defines??]
 [#list SWIP.defines as definition]
-[#if definition.name="_FS_FATFS_SDIO"]
+[#if definition.name="_FS_FATFS_SDIO"]   [#-- SD Card mode is selected --]
 [#if definition.value="1"]
-#include "bsp_driver_sd.h"
+[#assign includeGenericBspForSD = 1]
 [/#if]
 [/#if]
-[#if definition.name="_FS_FATFS_SDRAM"]
+[#if definition.name="_FS_FATFS_SDRAM"]  [#-- SDRAM mode is selected --]
 [#if definition.value="1"]
-#include "bsp_driver_sdram.h"
+[#assign includeGenericBspForSDRAM = 1]
 [/#if]
 [/#if]
-[#if definition.name="_FS_FATFS_SRAM"]
+[#if definition.name="_FS_FATFS_SRAM"]   [#-- SRAM mode is selected --]
 [#if definition.value="1"]
-#include "bsp_driver_sram.h"
+[#assign includeGenericBspForSRAM = 1]
 [/#if]
 [/#if]
-[#if definition.name="_FS_FATFS_USB"]
+[#if definition.name="_FS_FATFS_USB"]    [#-- USB Disk mode is selected --]
 [#if definition.value="1"]
-#include "usbh_core.h"
-#include "usbh_msc.h"
 [#assign usbhInUse = 1]
+[#assign includeBspForUSBH = 1]
+[/#if]
+[/#if]
+[#if definition.name="SRAM_BSP_CODE"]
+[#if definition.value="1"]                [#-- can occur on G4 --] 
+[#assign customBSPSRAM = 1]
 [/#if]
 [/#if]
 [#if definition.name="_FS_REENTRANT"]
 [#if definition.value="1"]
-#include "cmsis_os.h"    /* _FS_REENTRANT set to 1 */
+[#assign cmsisrtosInUse = 1]    [#-- Should change with FreeRTOS Native mode when it comes --] 
 [/#if] 
 [/#if]
 [/#list]
 [/#if]
+
+[#if includeGenericBspForSD == 1]
+#include "bsp_driver_sd.h"
+[/#if]
+[#if includeGenericBspForSDRAM == 1]
+#include "bsp_driver_sdram.h"
+[/#if]
+[#if includeGenericBspForSRAM == 1]
+[#if customBSPSRAM == 0]
+#include "bsp_driver_sram.h"       [#-- on G4, not needed when CUSTOM BSP is chosen --]  
+[/#if]       
+[/#if]
+[#if includeBspForUSBH == 1]
+#include "usbh_core.h"
+#include "usbh_msc.h"
+[/#if]
+[#if cmsisrtosInUse == 1]
+#include "cmsis_os.h"    /* _FS_REENTRANT set to 1 and CMSIS API chosen */
+[/#if]
+
 
 [#if includes??]
 [#list includes as include]
@@ -178,6 +210,8 @@ extern ${variable.value} ${variable.name};
 [/#if]
 
 [/#list]
+[/#compress]
+
 
 /*-----------------------------------------------------------------------------/
 / Function Configurations

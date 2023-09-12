@@ -26,6 +26,13 @@
 [#assign UsartInstance = ""]
 [#assign UART_PORT = ""]
 [#assign UART_PIN = ""]
+[#assign useDefine = false]
+
+[#if HalExtiUseDefine??]
+[#if HalExtiUseDefine == "true"]
+[#assign useDefine = true]
+[/#if]
+[/#if]
  
 [#list BspIpDatas as SWIP] 
     [#if SWIP.variables??]
@@ -89,14 +96,29 @@
  * @{
  */
 
-/** @addtogroup ${BoardName?upper_case}
+/** @defgroup ${BoardName?upper_case}
  * @{
  */
 
-/** @addtogroup ${BoardName?upper_case}_LOW_LEVEL
+/** @defgroup ${BoardName?upper_case}_LOW_LEVEL
  * @{
  */ 
 
+/** @defgroup STM32L4XX_NUCLEO_LOW_LEVEL_Exported_Constants LOW LEVEL Exported Constants
+  * @{
+  */
+/**
+ * @brief ${FamilyName?upper_case}XX NUCLEO BSP Driver version number V1.0.0
+ */  
+#define __${BoardName?upper_case}_BSP_VERSION_MAIN   (0x01) /*!< [31:24] main version */
+#define __${BoardName?upper_case}_BSP_VERSION_SUB1   (0x00) /*!< [23:16] sub1 version */
+#define __${BoardName?upper_case}_BSP_VERSION_SUB2   (0x00) /*!< [15:8]  sub2 version */
+#define __${BoardName?upper_case}_BSP_VERSION_RC     (0x00) /*!< [7:0]  release candidate */ 
+#define __${BoardName?upper_case}_BSP_VERSION        ((__${BoardName?upper_case}_BSP_VERSION_MAIN << 24)\
+                                                    |(__${BoardName?upper_case}_BSP_VERSION_SUB1 << 16)\
+                                                    |(__${BoardName?upper_case}_BSP_VERSION_SUB2 << 8 )\
+                                                    |(__${BoardName?upper_case}_BSP_VERSION_RC))											
+													
 /** @defgroup ${BoardName?upper_case}_LOW_LEVEL_Exported_Types ${BoardName?upper_case} LOW LEVEL Exported Types
  * @{
  */
@@ -111,27 +133,79 @@
    #define USE_BSP_COM_FEATURE                  0U
 #endif
 
+[#if useLED]
+/** @defgroup ${BoardName?upper_case}_LOW_LEVEL_LED ${BoardName?upper_case} LOW LEVEL LED
+ * @{
+ */  
+#define LEDn                              1U
+
+#define LED2_GPIO_PORT                    ${LED2_PORT}
+#define LED2_GPIO_CLK_ENABLE()            __HAL_RCC_${LED2_PORT}_CLK_ENABLE()
+#define LED2_GPIO_CLK_DISABLE()           __HAL_RCC_${LED2_PORT}_CLK_DISABLE()  
+#define LED2_PIN                     ${LED2_PIN}
+[/#if]
+/**
+ * @}
+ */ 
+ 
+[#if useBUTTON] 
+/** @defgroup ${BoardName?upper_case}_LOW_LEVEL_BUTTON ${BoardName?upper_case} LOW LEVEL BUTTON
+ * @{
+ */ 
+/* Button state */
+[#-- Bug 60928 Nucleo 144 pin and Nucleo L4 SMPS --]
+[#if Board_RPN?upper_case?contains("Z") || Board_RPN?upper_case?contains("-P")]
+#define BUTTON_RELEASED                   1U
+#define BUTTON_PRESSED                    0U
+[#else]
+#define BUTTON_RELEASED                   0U
+#define BUTTON_PRESSED                    1U
+[/#if] 
+
+#define BUTTONn                           1U
+
+/**
+ * @brief User push-button
+ */
+#define USER_BUTTON_PIN	                  ${BUTTON_PIN}
+#define USER_BUTTON_GPIO_PORT              ${BUTTON_PORT}
+#define USER_BUTTON_GPIO_CLK_ENABLE()      __HAL_RCC_${BUTTON_PORT}_CLK_ENABLE()   
+#define USER_BUTTON_GPIO_CLK_DISABLE()     __HAL_RCC_${BUTTON_PORT}_CLK_DISABLE()  
+#define USER_BUTTON_EXTI_IRQn              ${BUTTON_IRQn}
+#define USER_BUTTON_EXTI_LINE              EXTI_LINE_${BUTTON_EXTI} 
+[#if useDefine]
+#define H_EXTI_${BUTTON_EXTI}			  hpb_exti[BUTTON_USER]
+[/#if]
+/**
+ * @}
+ */ 
+[/#if]
 #ifndef USE_BSP_COM
   #define USE_BSP_COM                           0U
 #endif
+
  
 #ifndef USE_COM_LOG
   #define USE_COM_LOG                           1U
 #endif
   
-#ifndef BSP_BUTTON_KEY_IT_PRIORITY
-  #define BSP_BUTTON_KEY_IT_PRIORITY            15U
+#ifndef BSP_BUTTON_USER_IT_PRIORITY
+  #define BSP_BUTTON_USER_IT_PRIORITY            15U
 #endif 
   
 typedef enum 
 {
-  LED2 = 0
-} Led_TypeDef;
+  LED2 = 0,
+  LED_GREEN = LED2,
+}Led_TypeDef;
 
 typedef enum 
 {
-  BUTTON_KEY = 0U
-} Button_TypeDef;
+  BUTTON_USER = 0U,
+}Button_TypeDef;
+
+/* Keep compatibility with CMSIS Pack already delivered */
+#define BUTTON_KEY BUTTON_USER
 
 typedef enum 
 {  
@@ -143,7 +217,14 @@ typedef enum
 typedef enum 
 {
   COM1 = 0U,
+  COMn
 }COM_TypeDef;
+
+typedef enum
+{                                          
+ COM_WORDLENGTH_8B     =   UART_WORDLENGTH_8B,
+ COM_WORDLENGTH_9B     =   UART_WORDLENGTH_9B, 
+}COM_WordLengthTypeDef;
 
 typedef enum
 {          
@@ -169,7 +250,7 @@ typedef enum
 typedef struct
 {
   uint32_t             BaudRate;      
-  uint32_t             WordLength;    
+  COM_WordLengthTypeDef  WordLength;
   COM_StopBitsTypeDef  StopBits;      
   COM_ParityTypeDef    Parity;               
   COM_HwFlowCtlTypeDef HwFlowCtl;                           
@@ -193,46 +274,6 @@ typedef struct
 /**
  * @}
  */ 
-
-[#if useLED]
-/** @defgroup ${BoardName?upper_case}_LOW_LEVEL_LED ${BoardName?upper_case} LOW LEVEL LED
- * @{
- */  
-#define LEDn                              1U
-
-#define LED2_GPIO_PORT                    ${LED2_PORT}
-#define LED2_GPIO_CLK_ENABLE()            __HAL_RCC_${LED2_PORT}_CLK_ENABLE()
-#define LED2_GPIO_CLK_DISABLE()           __HAL_RCC_${LED2_PORT}_CLK_DISABLE()  
-#define LED2_PIN                     ${LED2_PIN}
-[/#if]
-/**
- * @}
- */ 
-
-[#if useBUTTON] 
-/** @defgroup ${BoardName?upper_case}_LOW_LEVEL_BUTTON ${BoardName?upper_case} LOW LEVEL BUTTON
- * @{
- */ 
-/* Button state */
-#define BUTTON_RELEASED                   0U
-#define BUTTON_PRESSED                    1U 
-
-#define BUTTONn                           1U
-
-/**
- * @brief Key push-button
- */
-#define KEY_BUTTON_PIN	                  ${BUTTON_PIN}
-#define KEY_BUTTON_GPIO_PORT              ${BUTTON_PORT}
-#define KEY_BUTTON_GPIO_CLK_ENABLE()      __HAL_RCC_${BUTTON_PORT}_CLK_ENABLE()   
-#define KEY_BUTTON_GPIO_CLK_DISABLE()     __HAL_RCC_${BUTTON_PORT}_CLK_DISABLE()  
-#define KEY_BUTTON_EXTI_IRQn              ${BUTTON_IRQn}
-#define KEY_BUTTON_EXTI_LINE              EXTI_LINE_${BUTTON_EXTI} 
-
-/**
- * @}
- */ 
-[/#if]
 
 /** @defgroup ${BoardName?upper_case}_LOW_LEVEL_COM ${BoardName?upper_case} LOW LEVEL COM
  * @{
@@ -270,7 +311,11 @@ extern UART_HandleTypeDef hcom_uart[COMn];
   * @{
   */   
 [#if useBUTTON]
-extern EXTI_HandleTypeDef* hExtiButtonHandle[BUTTONn];
+[#if useDefine]
+extern EXTI_HandleTypeDef hpb_exti[BUTTONn];
+[#else]
+extern EXTI_HandleTypeDef* hpb_exti[BUTTONn];
+[/#if]
 [/#if]
 /**
   * @}

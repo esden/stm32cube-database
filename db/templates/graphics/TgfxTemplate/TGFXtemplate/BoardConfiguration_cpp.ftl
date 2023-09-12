@@ -61,7 +61,7 @@
 [/#if]
 [#if FamilyName=="STM32F7"]
 #include <STM32F7DMA.hpp> /* generated for F7 DMA2D acceleration */
-#include <STM32F7HAL_DSI.hpp> /* generated when a DSI display is selected on F4 */
+#include <STM32F7HAL_DSI.hpp> /* generated when a DSI display is selected on F7 */
 [/#if]
 [#if FamilyName=="STM32F4"]
 #include <STM32F4Instrumentation.hpp>
@@ -69,6 +69,14 @@
 [#if FamilyName=="STM32F7"]
 #include <STM32F7Instrumentation.hpp>
 [/#if]
+[#if FamilyName=="STM32H7"]
+#include <STM32H7DMA.hpp> /* generated for H7 DMA2D acceleration */
+#include <STM32H7HAL_DSI.hpp> /* generated when a DSI display is selected on H7 */
+[/#if]
+[#if FamilyName=="STM32H7"]
+#include <STM32H7Instrumentation.hpp>
+[/#if]
+
 
 
 
@@ -84,6 +92,9 @@
     [#if FamilyName=="STM32F7"]
 #include <STM32F7TouchController.hpp>
     [/#if]
+    [#if FamilyName=="STM32H7"]
+#include <STM32H7TouchController.hpp>
+ [/#if]
 [/#if]
 #n
 /* USER CODE BEGIN user includes */
@@ -124,6 +135,10 @@ extern "C"
 [#if FamilyName=="STM32F7"]
 #include "stm32f7xx_hal.h"
 #include "stm32f7xx_hal_dsi.h"
+[/#if]
+[#if FamilyName=="STM32H7"]
+#include "stm32h7xx_hal.h"
+#include "stm32h7xx_hal_dsi.h"
 [/#if]
 
 extern DSI_HandleTypeDef    hdsi;
@@ -349,6 +364,7 @@ void GRAPHICS_HW_Init()
     //Deactivate speculative/cache access to first FMC Bank to save FMC bandwidth
     FMC_Bank1->BTCR[0] = 0x000030D2;
 	[/#if]
+       
 }
 
 [#if OTM8009A_PixelFormat != "0" ]
@@ -366,6 +382,9 @@ STM32F4DMA dma; /* generated DMA2D acceleration module declaration for F4 device
 [#if FamilyName=="STM32F7"]
 STM32F7DMA dma; /* generated DMA2D acceleration module declaration for F7 devices */
 [/#if]
+[#if FamilyName=="STM32H7"]
+STM32H7DMA dma; /* generated DMA2D acceleration module declaration for H7 devices */
+[/#if]
 [#if OTM8009A_PixelFormat != "0" ]
 OTM8009TouchController tc;
 [/#if]
@@ -375,11 +394,17 @@ STM32F4TouchController tc;
 [#if OTM8009A_PixelFormat == "0" && FamilyName=="STM32F7" ]
 STM32F7TouchController tc;
 [/#if]
+[#if OTM8009A_PixelFormat == "0" && FamilyName=="STM32H7" ]
+STM32H7TouchController tc;
+[/#if]
 [#if FamilyName=="STM32F4"]
 STM32F4Instrumentation mcuInstr;
 [/#if]
 [#if FamilyName=="STM32F7"]
 STM32F7Instrumentation mcuInstr;
+[/#if]
+[#if FamilyName=="STM32H7"]
+STM32H7Instrumentation mcuInstr;
 [/#if]
 
 [#if TGFX_depth=="16" || TGFX_depth=="0" ]
@@ -402,6 +427,10 @@ void touchgfx_init()
 [/#if]
 [#if FamilyName=="STM32F7"]
   HAL& hal = touchgfx_generic_init<STM32F7HAL_DSI>(dma, display, tc, dispWidth, dispHeight, (uint16_t*) ${CACHE_ADDR}, 
+                                               ${CACHE_SIZE}, ${Cache_Count}); 
+[/#if]
+[#if FamilyName=="STM32H7"]
+  HAL& hal = touchgfx_generic_init<STM32H7HAL_DSI>(dma, display, tc, dispWidth, dispHeight, (uint16_t*) ${CACHE_ADDR}, 
                                                ${CACHE_SIZE}, ${Cache_Count}); 
 [/#if]
 

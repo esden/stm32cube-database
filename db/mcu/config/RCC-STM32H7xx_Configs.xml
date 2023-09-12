@@ -37,8 +37,8 @@
     </RefConfig>
 
 	<RefConfig Comment="Supply configuration update enable" Name="RCC_MODIFY_REG">
-        <CallLibMethod Name="MODIFY_REG" ReturnHAL="false">
-            <!--MethodArg Name="MODIFY_REG_Arg" ParameterName="MODIFY_REG1"/-->
+        <CallLibMethod Name="HAL_PWREx_ConfigSupply" ReturnHAL="false">
+            <MethodArg Name="SupplySource" ParameterName="SupplySource"/>
         </CallLibMethod>
     </RefConfig>
 	
@@ -59,7 +59,7 @@
             <MethodArg Name="REGULATOR" ParameterName="PWR_Regulator_Voltage_Scale"/>
         </CallLibMethod>
 		<CallLibMethod Name="" Type="HardCode">
-                <HardCode Text="#n#twhile ((PWR->D3CR &amp; (PWR_D3CR_VOSRDY)) != PWR_D3CR_VOSRDY) #n#t{#n#t#t#n#t}"/>
+                <HardCode Text="#n#twhile(!__HAL_PWR_GET_FLAG(PWR_FLAG_VOSRDY)) {}"/>
             </CallLibMethod>
     </RefConfig>
     <RefConfig Name="RCC_MCO1Config">
@@ -171,6 +171,12 @@
    
         </CallLibMethod>
     </RefConfig>
+    
+    <RefConfig Comment=" Enable USB Voltage detector" Name="PWREx_EnableUSBVoltageDetector">
+        <IFCondition Expression="USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC">
+        <CallLibMethod Name="HAL_PWREx_EnableUSBVoltageDetector" ReturnHAL="false"/>
+        </IFCondition>
+    </RefConfig>
 	    <LibMethod Comment="Enable the CRS" Name="__HAL_RCC_CRS_CLK_ENABLE">  
 		</LibMethod>
 
@@ -187,7 +193,7 @@
     <LibMethod Comment="" Name="HAL_RCC_EnableCSS">
     </LibMethod>
     <LibMethod Comment="" Name="HAL_RCCEx_EnableLSECSS"/>
-  
+    <LibMethod Comment="" Name="HAL_PWREx_EnableUSBVoltageDetector"/>  
     <LibMethod Comment="" Name="__HAL_RCC_PWR_CLK_ENABLE">
     </LibMethod>
 	
@@ -197,9 +203,11 @@
     <LibMethod Comment="" Name="__HAL_PWR_VOLTAGESCALING_CONFIG">
         <Argument AddressOf="false" GenericType="simple" Name="REGULATOR" OptimizationCondition="equal"/>
     </LibMethod>
-    <LibMethod Comment="" Name="MODIFY_REG">
-        <Argument AddressOf="false" GenericType="simple" Name="MODIFY_REG1" OptimizationCondition="equal"/>
+
+    <LibMethod Comment="" Name="HAL_PWREx_ConfigSupply">
+        <Argument AddressOf="false" GenericType="simple" Name="SupplySource" OptimizationCondition="equal"/>
     </LibMethod>
+    
 	    <LibMethod Comment="" Name="HAL_SYSTICK_Config">
         <Argument AddressOf="false" GenericType="simple" Name="TicksNumb" OptimizationCondition="equal"/>
     </LibMethod>

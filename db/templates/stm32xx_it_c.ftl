@@ -1,4 +1,8 @@
 [#ftl]
+[#assign contextFolder=""]
+[#if cpucore!=""]    
+[#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")+"/"]
+[/#if]
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
@@ -16,7 +20,7 @@
 #include "${FamilyName?lower_case}xx_it.h"
 [#if FREERTOS??] [#-- If FreeRtos is used --]
 [#-- #include "cmsis_os.h" --]
-[@common.optinclude name=mxTmpFolder+"/rtos_inc.tmp"/][#--include freertos includes --]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_inc.tmp"/][#--include freertos includes --]
 [/#if]
 [#if TOUCHSENSING??] [#-- If TouchSensing is used --]
 #include "tsl_time.h"
@@ -92,7 +96,7 @@ void SystemClock_Config(void);
 [#list handlers as handler] [#-- handlers is a list of ipHandlers (hashmap)  --]
   [#list handler.entrySet() as entry]  [#-- handler is a set of handles --]
     [#list entry.value as ipHandler]  [#-- entry.value is a list of IpHandler --]
-        [#if ipHandler.useNvic && !(handleList?contains("(" + ipHandler.handler + ")")) && ipHandler.handlerType!="DFSDM_Channel_HandleTypeDef"]
+        [#if ipHandler.useNvic && ipHandler.declareExtenalVariable && !(handleList?contains("(" + ipHandler.handler + ")")) && ipHandler.handlerType!="DFSDM_Channel_HandleTypeDef"]
 extern ${ipHandler.handlerType} ${ipHandler.handler};
         [/#if]
         [#assign handleList = handleList + "(" + ipHandler.handler + ")"]

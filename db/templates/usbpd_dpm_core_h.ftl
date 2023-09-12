@@ -79,7 +79,6 @@ void                USBPD_DPM_TimerCounter(void);
 
 /* USER CODE END functions */
 
-
 #ifdef __cplusplus
 }
 #endif

@@ -122,6 +122,9 @@
 [/#if]
 #include "lpm.h"
 #include "dbg_trace.h"
+[#if THREAD = 1 ]
+#include "shci.h"
+[/#if]
 
 /* Private includes -----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -179,7 +182,7 @@ static tListNode  SysEvtQueue;
 /* USER CODE END PV */
 [#if (THREAD = 1)]
 /* Global function prototypes -----------------------------------------------*/
-size_t __write(int handle, const unsigned char * buf,size_t bufSize);
+size_t DbgTraceWrite(int handle, const unsigned char * buf, size_t bufSize);
 
 /* USER CODE BEGIN GFP */
 
@@ -204,7 +207,10 @@ static void APPE_SysUserEvtRx( void * pPayload );
 [#if (THREAD = 1)]
 static void APPE_SysStatusNot( SHCI_TL_CmdStatus_t status );
 static void APPE_SysUserEvtRx( void * pPayload );
+static void APPE_SysEvtReadyProcessing( void );
+static void APPE_SysEvtError( SCHI_SystemErrCode_t ErrorCode);
 [/#if]
+
 #if (CFG_HW_LPUART1_ENABLED == 1)
 extern void MX_LPUART1_UART_Init(void);
 #endif
@@ -230,7 +236,7 @@ void APPE_Init( void )
 
   /**
    * From now, the application is waiting for the ready event ( VS_HCI_C2_Ready )
-   * received on the system channel before starting the BLE Stack
+   * received on the system channel before starting the Stack
    * This system event is received with APPE_SysUserEvtRx()
    */
 /* USER CODE BEGIN APPE_Init_2 */
@@ -416,9 +422,64 @@ static void APPE_SysStatusNot( SHCI_TL_CmdStatus_t status )
   return;
 }
 
+[#if (THREAD = 1)]
+/**
+ * @brief Trap a notification coming from the M0 firmware
+ * @param  pPayload  : payload associated to the notification
+ *
+ * @retval None
+ */
+
+ [/#if]
 static void APPE_SysUserEvtRx( void * pPayload )
 {
+[#if (BLE = 1)]
   UNUSED(pPayload);
+[/#if]
+[#if (THREAD = 1)]
+  TL_AsynchEvt_t *p_sys_event;
+  p_sys_event = (TL_AsynchEvt_t*)(((tSHCI_UserEvtRxParam*)pPayload)->pckt->evtserial.evt.payload);
+
+  switch(p_sys_event->subevtcode)
+  {
+     case SHCI_SUB_EVT_CODE_READY:
+         APPE_SysEvtReadyProcessing();
+         break;
+     case SHCI_SUB_EVT_ERROR_NOTIF:
+         APPE_SysEvtError((SCHI_SystemErrCode_t) (p_sys_event->payload[0]));
+         break;
+     default:
+         break;
+  }
+  return;
+}
+
+/**
+ * @brief Notify a system error coming from the M0 firmware
+ * @param  ErrorCode  : errorCode detected by the M0 firmware
+ *
+ * @retval None
+ */
+static void APPE_SysEvtError( SCHI_SystemErrCode_t ErrorCode)
+{
+  switch(ErrorCode)
+  {
+  case ERR_THREAD_LLD_FATAL_ERROR:
+       APP_DBG("** ERR_THREAD : LLD_FATAL_ERROR \n");
+       break;
+  case ERR_THREAD_UNKNOWN_CMD:
+       APP_DBG("** ERR_THREAD : UNKNOWN_CMD \n");
+       break;
+  default:
+       APP_DBG("** ERR_THREAD : ErroCode=%d \n",ErrorCode);
+       break;
+  }
+  return;
+}
+
+static void APPE_SysEvtReadyProcessing( void )
+{
+[/#if]
   /* Traces channel initialization */
   TL_TRACES_Init( );
 
@@ -597,7 +658,7 @@ void TL_TRACES_EvtReceived( TL_EvtPacket_t * hcievt )
   /* Call write/print function using DMA from dbg_trace */
   /* - Cast to TL_AsynchEvt_t* to get "real" payload (without Sub Evt code 2bytes),
      - (-2) to size to remove Sub Evt Code */
-  __write(1U, (const unsigned char *) ((TL_AsynchEvt_t *)(hcievt->evtserial.evt.payload))->payload, hcievt->evtserial.evt.plen - 2U);
+  DbgTraceWrite(1U, (const unsigned char *) ((TL_AsynchEvt_t *)(hcievt->evtserial.evt.payload))->payload, hcievt->evtserial.evt.plen - 2U);
 #endif /* CFG_DEBUG_TRACE */
   /* Release buffer */
   TL_MM_EvtDone( hcievt );

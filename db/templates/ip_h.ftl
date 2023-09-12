@@ -22,6 +22,11 @@
 [#if H7_ETH_NoLWIP?? &&HALCompliant??]
 #include "string.h"
 [/#if]
+
+[#if RESMGR_UTILITY??]
+#include "res_mgr_conf.h"
+#include "res_mgr.h"
+[/#if]
 [/#compress]
 
 #n

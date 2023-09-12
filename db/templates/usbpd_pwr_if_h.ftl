@@ -21,15 +21,11 @@
 /* Includes ------------------------------------------------------------------*/
 #include "usbpd_def.h"
 
-/** @addtogroup STM32_USBPD_USER
+/** @addtogroup STM32_USBPD_APPLICATION
   * @{
   */
 
-/** @addtogroup USBPD_USER
-  * @{
-  */
-
-/** @addtogroup USBPD_USER_PWR_IF
+/** @addtogroup STM32_USBPD_APPLICATION_POWER_IF
   * @{
   */
 
@@ -64,7 +60,7 @@
 
 /* Exported variables --------------------------------------------------------*/
 /* Exported functions --------------------------------------------------------*/
-/** @defgroup USBPD_USER_PWR_IF_Exported_Functions USBPD PWR IF Exported Functions
+/** @defgroup STM32_USBPD_APPLICATION_POWER_IF_Exported_Functions USBPD PWR IF Exported Functions
   * @{
   */
 
@@ -189,7 +185,6 @@ USBPD_StatusTypeDef USBPD_PWR_IF_SearchRequestedPDO(uint8_t PortNum, uint32_t Rd
 
 /**
   * @brief  the function is called in case of critical issue is detected to switch in safety mode.
-  * @param  None
   * @retval None
   */
 void USBPD_PWR_IF_Alarm(void);

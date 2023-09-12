@@ -324,7 +324,7 @@
       [#if  family?upper_case == "STM32F2" || family?upper_case ==  "STM32L1" || family?upper_case ==  "STM32L1"]
         <file category="header" name="${sourceRepository}Drivers\CMSIS\Include\core_cm3.h"/>
       [/#if]
-      [#if  family?upper_case == "STM32F4" || family?upper_case ==  "STM32L4" || family?upper_case ==  "STM32F3"]
+      [#if  family?upper_case == "STM32F4" || family?upper_case ==  "STM32L4" || family?upper_case ==  "STM32F3" || family?upper_case ==  "STM32G4"]
         <file category="header" name="${sourceRepository}Drivers\CMSIS\Include\core_cm4.h"/>
       [/#if]
       [#if  family?upper_case == "STM32F7"]

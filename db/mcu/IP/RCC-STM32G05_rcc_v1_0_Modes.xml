@@ -52,13 +52,13 @@
     </RefParameter>
     <!--PLLR-->
     <RefParameter Visible="false" Comment="PLLR" DefaultValue="RCC_PLLR_DIV2" Name="PLLR" Type="list">
-        <PossibleValue Comment="2" Value="RCC_PLLR_DIV2"/>
-        <PossibleValue Comment="3" Value="RCC_PLLR_DIV3"/>
-        <PossibleValue Comment="4" Value="RCC_PLLR_DIV4"/>
-        <PossibleValue Comment="5" Value="RCC_PLLR_DIV5"/>
-        <PossibleValue Comment="6" Value="RCC_PLLR_DIV6"/>
-        <PossibleValue Comment="7" Value="RCC_PLLR_DIV7"/>
-        <PossibleValue Comment="8" Value="RCC_PLLR_DIV8"/>
+        <PossibleValue Comment="2" Value="RCC_PLLR_DIV2" Semaphore="PLLR2"/>
+        <PossibleValue Comment="3" Value="RCC_PLLR_DIV3" Semaphore="PLLR3"/>
+        <PossibleValue Comment="4" Value="RCC_PLLR_DIV4" Semaphore="PLLR4"/>
+        <PossibleValue Comment="5" Value="RCC_PLLR_DIV5" Semaphore="PLLR5"/>
+        <PossibleValue Comment="6" Value="RCC_PLLR_DIV6" Semaphore="PLLR6"/>
+        <PossibleValue Comment="7" Value="RCC_PLLR_DIV7" Semaphore="PLLR7"/>
+        <PossibleValue Comment="8" Value="RCC_PLLR_DIV8" Semaphore="PLLR8"/>
     </RefParameter>
     <!--PLLP-->
     <RefParameter Visible="false" Comment="PLLP" DefaultValue="RCC_PLLP_DIV2" Name="PLLP" Type="list">
@@ -97,13 +97,13 @@
     <!--PLLQ-->
 
     <RefParameter Visible="false" Comment="PLLQ" DefaultValue="RCC_PLLQ_DIV2" Name="PLLQ" Type="list">
-        <PossibleValue Comment="2" Value="RCC_PLLQ_DIV2"/>
-        <PossibleValue Comment="3" Value="RCC_PLLQ_DIV3"/>
-        <PossibleValue Comment="4" Value="RCC_PLLQ_DIV4"/>
-        <PossibleValue Comment="5" Value="RCC_PLLQ_DIV5"/>
-        <PossibleValue Comment="6" Value="RCC_PLLQ_DIV6"/>
-        <PossibleValue Comment="7" Value="RCC_PLLQ_DIV7"/>
-        <PossibleValue Comment="8" Value="RCC_PLLQ_DIV8"/>
+        <PossibleValue Comment="2" Value="RCC_PLLQ_DIV2" Semaphore="PLLQ2"/>
+        <PossibleValue Comment="3" Value="RCC_PLLQ_DIV3" Semaphore="PLLQ3"/>
+        <PossibleValue Comment="4" Value="RCC_PLLQ_DIV4" Semaphore="PLLQ4"/>
+        <PossibleValue Comment="5" Value="RCC_PLLQ_DIV5" Semaphore="PLLQ5"/>
+        <PossibleValue Comment="6" Value="RCC_PLLQ_DIV6" Semaphore="PLLQ6"/>
+        <PossibleValue Comment="7" Value="RCC_PLLQ_DIV7" Semaphore="PLLQ7"/>
+        <PossibleValue Comment="8" Value="RCC_PLLQ_DIV8" Semaphore="PLLQ8"/>
     </RefParameter>
 
 
@@ -166,9 +166,7 @@
         <PossibleValue Comment="Pllsource Hsi" Value="RCC_PLLSOURCE_HSI"/>
         <PossibleValue Comment="Pllsource Hse" Value="RCC_PLLSOURCE_HSE"/>
     </RefParameter>
-
-	    <RefParameter Visible="false" Comment="PLL Source" DefaultValue="+PLLSourceVirtual" Name="PLLSourceVirtualString" Type="string"/>
-
+    <RefParameter Visible="false" Comment="PLL Source" DefaultValue="+PLLSourceVirtual" Name="PLLSourceVirtualString" Type="string"/>
 	
     <RefParameter Visible="false" Comment="PLL Source" DefaultValue="+PLLSourceVirtualString" Name="PLLSource" Type="list">
 	<PossibleValue Comment="Pllsource Hsi" Value="RCC_PLLSOURCE_HSI" Semaphore="PLLSourceHSI" />
@@ -180,8 +178,7 @@
         <PossibleValue Comment="Sysclksource Hsi"    Value="RCC_SYSCLKSOURCE_HSI"    Semaphore="SysSourceHSI"/>
         <PossibleValue Comment="Sysclksource Hse"    Value="RCC_SYSCLKSOURCE_HSE"    Semaphore="SysSourceHSE"/>
         <PossibleValue Comment="Sysclksource Pllclk" Value="RCC_SYSCLKSOURCE_PLLCLK" Semaphore="SysSourcePLL"/>
-        <PossibleValue Comment="Sysclksource Lsi"    Value="RCC_SYSCLKSOURCE_LSI"    Semaphore="SysSourceLsi"/>
-        
+        <PossibleValue Comment="Sysclksource Lsi"    Value="RCC_SYSCLKSOURCE_LSI"    Semaphore="SysSourceLsi"/>        
     </RefParameter>
     <!--RCC_MCO1Source-->
     <RefParameter Visible="false" Comment="MCO Clock Source" DefaultValue="RCC_MCO1SOURCE_SYSCLK" Name="RCC_MCO1Source" Type="list">
@@ -263,7 +260,17 @@
         <PossibleValue Comment="LPTIM2 Clksource Lse"  Value="RCC_LPTIM2CLKSOURCE_LSE" Semaphore="LPTIM2SOURCELSE"/>
     </RefParameter>
     <!--TIM1CLockSelection-->
-    <RefParameter Visible="false"  Comment="TIM1 Clock Selection" DefaultValue="RCC_TIM1CLKSOURCE_PCLK1" Name="TIM1CLockSelection" Type="list" IP="TIMER1">
+    <RefParameter Visible="false"  Comment="TIM1 Clock Selection" DefaultValue="RCC_TIM1CLKSOURCE_PCLK1" Name="TIM1CLockSelectionVirtual" Type="list" IP="TIMER1">
+        <Condition Diagnostic="When TIM1/TIM15 derives from PLLQ, they can be only an integer multiple of PCLK and must be aligned with it." Expression="!(((PLLR2 &amp; PLLQ2) |(PLLR3 &amp; PLLQ3) | (PLLR4 &amp; (PLLQ4 | PLLQ2)) | (PLLR5 &amp; PLLQ5) | (PLLR6 &amp; (PLLQ3 | PLLQ2 | PLLQ6)) | (PLLR7 &amp; PLLQ7) | (PLLR8 &amp; (PLLQ8 | PLLQ4 | PLLQ2))) &amp; (SYSCLKFreq_VALUE1=SYSCLKFreq_VALUE2) &amp; SysSourcePLL) &amp; !STM32G0x0_Value_line"/>
+        <PossibleValue Comment="tim1 Clksource Pclk" Value="RCC_TIM1CLKSOURCE_PCLK1" Semaphore="TIM1SOURCEPclk"/>
+    </RefParameter>
+    <RefParameter Visible="false"  Comment="TIM1 Clock Selection" DefaultValue="RCC_TIM1CLKSOURCE_PCLK1" Name="TIM1CLockSelectionVirtual" Type="list" IP="TIMER1">
+        <Condition Diagnostic="" Expression="!STM32G0x0_Value_line"/>
+        <PossibleValue Comment="tim1 Clksource Pclk" Value="RCC_TIM1CLKSOURCE_PCLK1" Semaphore="TIM1SOURCEPclk"/>
+        <PossibleValue Comment="tim1 Clksource Lsi"  Value="RCC_TIM1CLKSOURCE_PLL"   Semaphore="TIM1SOURCEPll"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="PLL Source" DefaultValue="+TIM1CLockSelectionVirtual" Name="TIM1CLockSelectionVirtualString" Type="string"/>
+    <RefParameter Visible="false"  Comment="TIM1 Clock Selection" DefaultValue="+TIM1CLockSelectionVirtualString" Name="TIM1CLockSelection" Type="list" IP="TIMER1">
         <Condition Diagnostic="" Expression="!STM32G0x0_Value_line"/>
         <PossibleValue Comment="tim1 Clksource Pclk" Value="RCC_TIM1CLKSOURCE_PCLK1" Semaphore="TIM1SOURCEPclk"/>
         <PossibleValue Comment="tim1 Clksource Lsi"  Value="RCC_TIM1CLKSOURCE_PLL"   Semaphore="TIM1SOURCEPll"/>
@@ -274,10 +281,20 @@
         <PossibleValue Comment="CEC Clksource LSE"      Value="RCC_CECCLKSOURCE_LSE"          Semaphore="CECSOURCELSE"/>        
     </RefParameter>
     <!--TIM15CLockSelection-->
-    <RefParameter Visible="false"  Comment="TIM15 Clock Selection" DefaultValue="RCC_TIM15CLKSOURCE_PCLK1" Name="TIM15CLockSelection" Type="list" IP="TIMER15">
+    <RefParameter Visible="false"  Comment="TIM1 Clock Selection" DefaultValue="RCC_TIM15CLKSOURCE_PCLK1" Name="TIM15CLockSelectionVirtual" Type="list" IP="TIMER15">
+        <Condition Diagnostic="When TIM1/TIM15 derives from PLLQ, they can be only an integer multiple of PCLK and must be aligned with it." Expression="!(((PLLR2 &amp; PLLQ2) |(PLLR3 &amp; PLLQ3) | (PLLR4 &amp; (PLLQ4 | PLLQ2)) | (PLLR5 &amp; PLLQ5) | (PLLR6 &amp; (PLLQ3 | PLLQ2 | PLLQ6)) | (PLLR7 &amp; PLLQ7) | (PLLR8 &amp; (PLLQ8 | PLLQ4 | PLLQ2))) &amp; (SYSCLKFreq_VALUE1=SYSCLKFreq_VALUE2) &amp; SysSourcePLL) &amp; !STM32G0x0_Value_line"/>
+        <PossibleValue Comment="tim1 Clksource Pclk" Value="RCC_TIM15CLKSOURCE_PCLK1" Semaphore="TIM15SOURCEPclk"/>
+    </RefParameter>
+    <RefParameter Visible="false"  Comment="TIM15 Clock Selection" DefaultValue="RCC_TIM15CLKSOURCE_PCLK1" Name="TIM15CLockSelectionVirtual" Type="list" IP="TIMER15">
         <Condition Diagnostic="" Expression="!STM32G0x0_Value_line"/>
         <PossibleValue Comment="tim15 Clksource Pclk" Value="RCC_TIM15CLKSOURCE_PCLK1" Semaphore="TIM15SOURCEPclk"/>
         <PossibleValue Comment="tim15 Clksource Lsi"  Value="RCC_TIM15CLKSOURCE_PLL"   Semaphore="TIM15SOURCEPll"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="PLL Source" DefaultValue="+TIM15CLockSelectionVirtual" Name="TIM15CLockSelectionVirtualString" Type="string"/>
+    <RefParameter Visible="false"  Comment="TIM15 Clock Selection" DefaultValue="+TIM15CLockSelectionVirtualString" Name="TIM15CLockSelection" Type="list" IP="TIMER15">
+        <Condition Diagnostic="" Expression="!STM32G0x0_Value_line"/>
+        <PossibleValue Comment="tim1 Clksource Pclk" Value="RCC_TIM15CLKSOURCE_PCLK1" Semaphore="TIM15SOURCEPclk"/>
+        <PossibleValue Comment="tim1 Clksource Lsi"  Value="RCC_TIM15CLKSOURCE_PLL"   Semaphore="TIM15SOURCEPll"/>
     </RefParameter>
     <!--ADCCLockSelection-->
     <RefParameter Visible="false"  Comment="ADC CLock Selection" DefaultValue="RCC_ADCCLKSOURCE_SYSCLK"    Name="ADCCLockSelection" Type="list" IP="ADC1">
@@ -350,6 +367,9 @@
     <RefParameter Visible="false" Comment="Cortex System Timer"   Name="CortexFreq_Value"     DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz"/>
 	
 	<!--main sysclock Freq value-->
+        <RefParameter Visible="false" Comment="System Clock"   Name="SYSCLKFreq_VALUE1" DefaultValue="=SYSCLKFreq_VALUE/1000000" Type="double"/>
+        <RefParameter Visible="false" Comment="System Clock"   Name="SYSCLKFreq_VALUE2" DefaultValue="=SYSCLKFreq_VALUE/1000000" Type="integer"/>
+
 	<RefParameter Visible="false" Comment="System Clock"   Name="SYSCLKFreq_VALUE" DefaultValue="4000000" Max="64000000" Type="double" Display="value/1000000" Unit="MHz">
         <Condition Diagnostic="overDrive activated" Expression="(VDD_VALUE&lt; 1.8)|(VDD_VALUE&gt; 2.1)"/>
     </RefParameter>
@@ -373,7 +393,7 @@
     <RefParameter Visible="false" Comment="LPTIM1 clock Source"  Name="LPTIM1Freq_Value"  DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="LPTIM1"/>
     <RefParameter Visible="false" Comment="LPTIM2 clock Source"  Name="LPTIM2Freq_Value"  DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="LPTIM2"/>
 
-    <RefParameter Visible="false" Comment="TIM1 clock Source"   Name="TIM1Freq_Value"  DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="TIMER1">
+    <RefParameter Visible="false" Comment="TIM1 clock Source"   Name="TIM1Freq_Value"  DefaultValue="4000000" Max="128000000" Type="double" Display="value/1000000" Unit="MHz" IP="TIMER1">
         <Condition Diagnostic="" Expression="!STM32G0x0_Value_line"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="TIM1 clock Source"   Name="TIM1Freq_Value"  DefaultValue="=APBTimFreq_Value"  Type="double" Display="value/1000000" Unit="MHz" IP="TIMER1"/>
@@ -385,8 +405,6 @@
     
     <RefParameter Visible="false" Comment="CEC clock Source"   Name="CECFreq_Value"  DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="HDMI_CEC"/>
 
-
-	
     <RefParameter Visible="false" Comment="CK48 clock Source"   Name="USBFreq_Value"   DefaultValue="16000000" Min="47880000" Max="48120000"  Type="double" Display="value/1000000" Unit="MHz" IP="USB_OTG_FS">
     <Condition Diagnostic="HSE in bypass Mode" Expression="USB_OTG_FSUsed_ForRCC"/>
     </RefParameter> 
@@ -1173,7 +1191,7 @@
 
     
     <RefParameter Visible="false" Name="Tim1ClockSelectionARG" Comment="Tim1ClockSelectionARG" Type="list" DefaultValue="+TIM1CLockSelection">
-        <Condition Expression="(TIM1 &amp; STM32G0x0_Value_line) &amp; CodegenConfigPeriph=true" Diagnostic="TIM1 Activated"/>
+        <Condition Expression="(TIM1 &amp; !STM32G0x0_Value_line) &amp; CodegenConfigPeriph=true" Diagnostic="TIM1 Activated"/>
     </RefParameter>
     <RefParameter Visible="false" Name="Tim1ClockSelectionARG" Comment="Tim1ClockSelectionARG" Type="list" DefaultValue="null"/>
     
@@ -1543,8 +1561,6 @@
         <Parameter Name="LPTIM1CLockSelection"/>
         <Parameter Name="LPTIM2CLockSelection"/>
         <Parameter Name="CECCLockSelection"/>
-
-
         <Parameter Name="ADCCLockSelection"/>
         <Parameter Name="EnbaleCSS"/>
         <Parameter Name="EnableCSSLSE"/>
@@ -1553,8 +1569,9 @@
         <Parameter Name="LSE_VALUE"/>
         <Parameter Name="LSI_VALUE"/>
         <Parameter Name="SYSCLKFreq_VALUE"/>
+        <Parameter Name="SYSCLKFreq_VALUE1"/>
+        <Parameter Name="SYSCLKFreq_VALUE2"/>
         <Parameter Name="MCO1PinFreq_Value"/>
-
         <Parameter Name="HCLKFreq_Value"/>
         <Parameter Name="USBFreq_Value"/>
         <Parameter Name="ADCFreq_Value"/>

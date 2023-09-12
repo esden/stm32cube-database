@@ -303,11 +303,11 @@
         <Condition Diagnostic="The slave must have the same value of the master" Expression="($IpNumber=2) &amp; USE_ADC2 &amp; USE_ADC1 &amp; (ADC1:BoostMode=DISABLE) &amp; !(Mode=ADC_MODE_INDEPENDENT)"/>
         <PossibleValue    Comment="Disabled" Value="DISABLE" />
     </RefParameter-->
-         
-    <RefParameter Comment="Boost Mode" DefaultValue="DISABLE" Group="ADCgroup" Name="BoostMode" Type="list">
-         <Condition Diagnostic="" Expression="(RCC:ADCFreq_Value&gt;20000000)" /> 
+<!--       boost mode not used   -->
+<!--    <RefParameter Comment="Boost Mode" DefaultValue="DISABLE" Group="ADCgroup" Name="BoostMode" Type="list">
+        <Condition Diagnostic="" Expression="(RCC:ADCFreq_Value&gt;20000000)" /> 
                                                                                                                                   
-        <!--Condition Diagnostic="" Expression="BoostMode_isNotAllowed"/-->
+        Condition Diagnostic="" Expression="BoostMode_isNotAllowed"/
         <PossibleValue    Comment="Disabled" Value="DISABLE"/>
         <Description>The Boost Mode is disable because the  ADC clock is less than 20 MHz to save power at lower clock frequency.</Description> 
     </RefParameter> 
@@ -315,7 +315,7 @@
         
         <PossibleValue    Comment="Enabled" Value="ENABLE" />
         <Description>The Boost Mode is enable when ADC clock is more than 20 MHz.</Description> 
-    </RefParameter>
+    </RefParameter>-->
         
     <!-- Possible values of ConversionDataManagement parameters -->
          
@@ -513,8 +513,8 @@
     </RefParameter>
 	
     <!-- Possible Value of OffsetNumber parameters  -->
-     <RefParameter Comment="Offset Number" DefaultValue="ADC_OFFSET_NONE" Group="ADCgroup" Name="OffsetNumber" Type="list">
-         <Condition Diagnostic="" Expression="Regular_OversamplingMode_Enabled_$IpInstance | Injected_OversamplingMode_Enabled_$IpInstance"/>
+    <RefParameter Comment="Offset Number" DefaultValue="ADC_OFFSET_NONE" Group="ADCgroup" Name="OffsetNumber" Type="list">
+        <Condition Diagnostic="" Expression="Regular_OversamplingMode_Enabled_$IpInstance | Injected_OversamplingMode_Enabled_$IpInstance"/>
         <PossibleValue Comment="No offset" Value="ADC_OFFSET_NONE"/>
      
         <Description>Regular Channel x offset number selection</Description>
@@ -813,11 +813,11 @@
     </RefParameter>
 
 
-    <RefParameter Comment="Injected Queue" DefaultValue="null" Group="ADCgroup" Name="InjectedQueue" Type="list" Visible="false">
+    <RefParameter Comment="Injected Queue" DefaultValue="null" Group="ADCgroup" Name="injectedQueueMode" Type="list" Visible="false">
         <Condition Diagnostic="In case of usage of channels on injected group, ADC frequency should be low than AHB clock frequency /4 for resolution 12 or 10 bits, AHB clock frequency /3 for resolution 8 bits, AHB clock frequency /2 for resolution 6 bits." Expression="EnableInjectedConversion=DISABLE | InjNumberOfConversion=0 "/>
         <Description>Enable/Disable Injected Queue</Description>
     </RefParameter>
-    <RefParameter Comment="Injected Queue" DefaultValue="DISABLE" Group="ADCgroup" Name="InjectedQueue" Type="list">
+    <RefParameter Comment="Injected Queue" DefaultValue="DISABLE" Group="ADCgroup" Name="injectedQueueMode" Type="list">
         <PossibleValue Comment="Injected Queue Disable" Semaphore="QueueDisable$IpInstance" Value="DISABLE"/>
         <PossibleValue Comment="Injected Queue Enabled" Semaphore="QueueEnable$IpInstance" Value="ENABLE"/>
         <Description>Enable/Disable Injected Queue</Description>
@@ -827,7 +827,8 @@
         <Condition Diagnostic="In case of usage of channels on injected group, ADC frequency should be low than AHB clock frequency /4 for resolution 12 or 10 bits, AHB clock frequency /3 for resolution 8 bits, AHB clock frequency /2 for resolution 6 bits." Expression="EnableInjectedConversion=DISABLE | InjNumberOfConversion=0 "/>
     </RefParameter>
     <RefParameter Comment="Queue Injected Context Mode" DefaultValue="DISABLE" Group="ADCgroup" Name="QueueInjectedContext" Type="list" Visible="false">
-        <Condition Diagnostic="Injected Queue Should be anabled to configure Mode" Expression="InjectedQueue=DISABLE"/>
+        <Condition Diagnostic="Injected Queue Should be anabled to configure Mode" Expression="QueueDisable$IpInstance"/>
+        <PossibleValue Comment="Injected Queue context should be disabled while the queue mode disabled " Value="DISABLE"/>
     </RefParameter>
     
     <RefParameter Comment="Queue Injected Context Mode" DefaultValue="DISABLE" Group="ADCgroup" Name="QueueInjectedContext" Type="list">
@@ -884,7 +885,7 @@
     <RefParameter Comment="Offset Number" DefaultValue="ADC_OFFSET_NONE" Group="ADCgroup" Name="InjectedOffsetNumber" Type="list" Visible="false">
         <Condition Diagnostic="" Expression="EnableInjectedConversion=DISABLE"/>
     </RefParameter>
-      <RefParameter Comment="Offset Number" DefaultValue="ADC_OFFSET_NONE" Group="ADCgroup" Name="InjectedOffsetNumber" Type="list" >
+    <RefParameter Comment="Offset Number" DefaultValue="ADC_OFFSET_NONE" Group="ADCgroup" Name="InjectedOffsetNumber" Type="list" >
         <Condition Diagnostic="Offset is not supported with oversampling mode" Expression="Injected_OversamplingMode_Enabled_$IpInstance | Regular_OversamplingMode_Enabled_$IpInstance"/>
         <PossibleValue Comment="No offset" Value="ADC_OFFSET_NONE"/>
     </RefParameter>
@@ -950,10 +951,10 @@
         <PossibleValue Comment="9 bit shift"   Value="ADC_RIGHTBITSHIFT_9"/>
         <PossibleValue Comment="10 bit shift"  Value="ADC_RIGHTBITSHIFT_10"/>
         <PossibleValue Comment="11 bit shift"  Value="ADC_RIGHTBITSHIFT_11"/>  
-         <Description>Right Offset Shift for injected channel</Description>        
+        <Description>Right Offset Shift for injected channel</Description>        
     </RefParameter>            
                         
-         <RefParameter Comment="Offset right shift" DefaultValue="__NULL" Group="ADCgroup" Name="InjectedOffsetRightShift" Type="list">
+    <RefParameter Comment="Offset right shift" DefaultValue="__NULL" Group="ADCgroup" Name="InjectedOffsetRightShift" Type="list">
         <!-- <PossibleValue Comment="Disable" Value="ADCEx_RightOffsetShift_DISABLE"/> -->
         <!-- <Condition Diagnostic="Supported only for 8-bit and 16-bit data format" Expression="!(ADC_RESOLUTION8b_$IpInstance)|!(ADC_RESOLUTION16b_$IpInstance)"/> -->
         <PossibleValue Comment="Disable" Value="__NULL" Diagnostic="Supported only for 8-bit and 16-bit data format"/> 
@@ -1286,7 +1287,7 @@
         <PossibleValue Comment="Channel 16" Value="ADC_CHANNEL_16"/>
         <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT_DIV4"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
-         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT"/>
+        <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT"/>
         <Description>ADC channel for the analog watchdog</Description>     
     </RefParameter>
 	  
@@ -1370,7 +1371,7 @@
         <PossibleValue Comment="Channel 16" Value="ADC_CHANNEL_16"/>
         <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT_DIV4"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
-         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT"/>
+        <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT"/>
         <Description>ADC channel for the analog watchdog</Description>        
     </RefParameter>
 	
@@ -1446,7 +1447,7 @@
         <PossibleValue Comment="Channel 16" Value="ADC_CHANNEL_16"/>
         <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT_DIV4"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
-         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT"/>
+        <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT"/>
         <Description>ADC channel for the analog watchdog</Description>     
     </RefParameter>
 	
@@ -1879,7 +1880,7 @@
         <Parameter Name="DMAContinuousRequests"/>
         <Parameter Name="EOCSelection"/>
         <Parameter Name="Overrun"/>
-        <Parameter Name="BoostMode"/>
+<!--        <Parameter Name="BoostMode"/>-->
         <Parameter Name="ConversionDataManagement"/>
         <Parameter Name="LowPowerAutoWait"/>
     </RefMode>
@@ -1919,7 +1920,7 @@
         <Parameter Name="ExternalTrigInjecConv"/>
         <Parameter Name="ExternalTrigInjecConvEdge"/>
         <Parameter Name="InjectedConvMode"/>
-        <Parameter Name="InjectedQueue"/>
+        <Parameter Name="injectedQueueMode"/>
         <Parameter Name="QueueInjectedContext"/>
         <Parameter Name="AutoInjectedConv"/>
         <Parameter Name="InjectedDiscontinuousConvMode"/>

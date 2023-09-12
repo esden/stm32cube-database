@@ -1,8 +1,8 @@
-[#ftl]
+[#ftl]            
 #include "ff.h"
 #include "ff_gen_drv.h"
 
-[#list IPdatas as IP]  
+[#list IPdatas as IP]    [#-- no more used on new series (G0,WB,G4) --]
 [#assign ipvar = IP]
 [#list IP.configModelList as instanceData]
         [#assign instName = instanceData.instanceName]

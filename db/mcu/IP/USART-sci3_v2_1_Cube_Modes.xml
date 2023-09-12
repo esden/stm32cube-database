@@ -29,7 +29,7 @@
     
 	
     <RefParameter Comment="Auto Baudrate" DefaultValue="UART_ADVFEATURE_AUTOBAUDRATE_DISABLE" Group="Advanced Features" Name="AutoBaudRateEnableParam" Type="list">
-        <Condition Diagnostic="" Expression="!(DIE460 &amp; (($IpNumber=4)|($IpNumber=3)))"/>
+        <Condition Diagnostic="" Expression="!(DIE460 &amp; (($IpNumber=4)|($IpNumber=3))) &amp; !(DIE466 &amp; ($IpNumber=2))"/>
         <PossibleValue Comment="Disable" Value="UART_ADVFEATURE_AUTOBAUDRATE_DISABLE"/>
         <PossibleValue Comment="Enable" Semaphore="$IpInstance_UART_AutoBaudRate_Enable" Value="UART_ADVFEATURE_AUTOBAUDRATE_ENABLE"/>
     </RefParameter>
@@ -633,7 +633,7 @@
     </RefParameter>
 	
     <!-- Calculate Speed, based on ClockPrescaler Value on SmartCard Mode -->
-    <RefParameter Comment="SmartCard Clock Frequency" DefaultValue="4000000" Group="Clock Parameters" Name="CalculateSpeed" Type="string"/>
+    <RefParameter Comment="SmartCard Clock Frequency" DefaultValue="5000000" Group="Clock Parameters" Name="CalculateSpeed" Type="string"/>
 	
     <!-- Specifics RefParameters for SmartCard Mode Only -->
     <RefParameter Comment="NACK If Parity Error" DefaultValue="SMARTCARD_NACK_DISABLE" Group="Advanced Parameters" Name="NACKState" Type="list">
@@ -1162,6 +1162,7 @@
 
            
     <RefParameter Comment="Fifo Mode" DefaultValue="FIFOMODE_DISABLE" Group="Advanced Parameters" Name="FIFOMode" Type="list">
+        <Condition Diagnostic="" Expression="!(DIE460 &amp; (($IpNumber=4)|($IpNumber=3))) &amp; !(DIE466 &amp; ($IpNumber=2))"/>
         <PossibleValue Comment="Disable " Value="FIFOMODE_DISABLE"/>
         <PossibleValue Comment="Enable " Value="FIFOMODE_ENABLE"/>
     </RefParameter>
@@ -1193,6 +1194,7 @@
     </RefParameter>
 
     <RefParameter Comment="Txfifo Threshold" DefaultValue="TXFIFO_THRESHOLD_1EIGHTHFULL" Group="Advanced Parameters" Name="TXFIFOThreshold" Type="list">
+        <Condition Diagnostic="" Expression="!(DIE460 &amp; (($IpNumber=4)|($IpNumber=3))) &amp; !(DIE466 &amp; ($IpNumber=2))"/>
         <PossibleValue Comment="1 eighth full configuration " Value="TXFIFO_THRESHOLD_1EIGHTHFULL"/>
         <PossibleValue Comment="1 quart full configuration "  Value="TXFIFO_THRESHOLD_1QUARTERFULL"/>
         <PossibleValue Comment="half full configuration "     Value="TXFIFO_THRESHOLD_HALFFULL"/>
@@ -1276,6 +1278,7 @@
     </RefParameter>
 
     <RefParameter Comment="Rxfifo Threshold" DefaultValue="RXFIFO_THRESHOLD_1EIGHTHFULL" Group="Advanced Parameters" Name="RXFIFOThreshold" Type="list">
+        <Condition Diagnostic="" Expression="!(DIE460 &amp; (($IpNumber=4)|($IpNumber=3))) &amp; !(DIE466 &amp; ($IpNumber=2))"/>
         <PossibleValue Comment="1 eighth full configuration " Value="RXFIFO_THRESHOLD_1EIGHTHFULL"/>
         <PossibleValue Comment="1 quart full configuration " Value="RXFIFO_THRESHOLD_1QUARTERFULL"/>
         <PossibleValue Comment="half full configuration " Value="RXFIFO_THRESHOLD_HALFFULL"/>
@@ -1708,8 +1711,8 @@
             <ModeLogicOperator Name="XOR">
                 <Mode Name="Asynchronous">
                     <SignalLogicalOp Name="AND">
-                        <Signal IOMode="AlternateFunctionPushPullPULLUP" Name="RX"/>
-                        <Signal IOMode="AlternateFunctionPushPullPULLUP" Name="TX"/>
+                        <Signal Name="RX"/>
+                        <Signal Name="TX"/>
                     </SignalLogicalOp>
                     <Semaphore>$IpInstance_Asynchronous</Semaphore>
                     <Semaphore>Asynchronous</Semaphore>
@@ -1732,39 +1735,39 @@
                 </Mode>
                 <Mode Name="Half_duplex(single_wire_mode)" UserName="Single Wire (Half-Duplex)">
                     <SignalLogicalOp Name="AND">
-                        <Signal IOMode="AlternateFunctionOpenDrain" Name="TX"/>
+                        <Signal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultOD" Name="TX"/>
                     </SignalLogicalOp>
                 </Mode>
                 <Mode Name="Multiprocessor_communication" UserName="Multiprocessor Communication">
                     <SignalLogicalOp Name="AND">
-                        <Signal Name="RX"/>
-                        <Signal Name="TX"/>
+                        <Signal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultOD" Name="RX"/>
+                        <Signal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultOD" Name="TX"/>
                     </SignalLogicalOp>
                 </Mode>
-                <Mode Name="IrDA" RemoveCondition="DIE460 &amp; (($IpNumber=4)|($IpNumber=3))">
+                <Mode Name="IrDA" RemoveCondition="DIE460 &amp; (($IpNumber=4)|($IpNumber=3))| DIE466 &amp; ($IpNumber=2)">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="RX"/>
                         <Signal Name="TX"/>
                     </SignalLogicalOp>
                 </Mode>
-                <Mode Name="LIN" RemoveCondition="DIE460 &amp; (($IpNumber=4)|($IpNumber=3))">
+                <Mode Name="LIN" RemoveCondition="DIE460 &amp; (($IpNumber=4)|($IpNumber=3)) | DIE466 &amp; ($IpNumber=2)">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="RX"/>
                         <Signal Name="TX"/>
                     </SignalLogicalOp>
                 </Mode>
-                <Mode Name="SmartCard" RemoveCondition="DIE460 &amp; (($IpNumber=4)|($IpNumber=3))">
+                <Mode Name="SmartCard" RemoveCondition="DIE460 &amp; (($IpNumber=4)|($IpNumber=3)) | DIE466 &amp; ($IpNumber=2)">
                     <SignalLogicalOp Name="AND">
-                        <Signal IOMode="AlternateFunctionOpenDrain" Name="TX"/>
+                        <Signal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultOD" Name="TX"/>
                     </SignalLogicalOp>
                 </Mode>
-                <Mode Name="SmartCard_With_Clock" UserName="SmartCard with Card Clock" RemoveCondition="DIE460 &amp; (($IpNumber=4)|($IpNumber=3))">
+                <Mode Name="SmartCard_With_Clock" UserName="SmartCard with Card Clock" RemoveCondition="DIE460 &amp; (($IpNumber=4)|($IpNumber=3))| DIE466 &amp; ($IpNumber=2)">
                     <SignalLogicalOp Name="AND">
-                        <Signal IOMode="AlternateFunctionOpenDrain" Name="TX"/>
+                        <Signal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultOD" Name="TX"/>
                         <Signal Name="CK"/>
                     </SignalLogicalOp>
                 </Mode>
-                <Mode Name="ModbusCommunication" UserName="Modbus Communication" RemoveCondition="DIE460 &amp; (($IpNumber=4)|($IpNumber=3))">
+                <Mode Name="ModbusCommunication" UserName="Modbus Communication" RemoveCondition="DIE460 &amp; (($IpNumber=4)|($IpNumber=3))| DIE466 &amp; ($IpNumber=2)">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="TX"/>
                     </SignalLogicalOp>

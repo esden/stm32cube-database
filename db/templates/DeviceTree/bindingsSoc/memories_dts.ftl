@@ -10,6 +10,7 @@
 [#local TABnode = TABres.TABN]
 [#local TABprop = TABres.TABP]
 
+[/#compress]
 	[#--Std memory--]
 	[#if mx_ddrConfigs["general"]?? && mx_ddrConfigs["general"]["ddrBaseAddress"]?? && mx_ddrConfigs["general"]["ddrSize"]??]
 ${TABnode}memory@${mx_ddrConfigs["general"]["ddrBaseAddress"]?replace("0x", "")} {
@@ -22,7 +23,7 @@ ${TABnode}};
 ${TABnode}[@mlog  logMod=module logType="WARN" logMsg="no DDR config found: 'memory' node not generated" varsMap={} /]
 ${TABnode}/*
 ${TABnode}memory@??? {
-${TABprop}	reg = < ??? >;
+${TABprop}reg = < ??? >;
 ${TABnode}};
 ${TABnode}*/
 	[/#if]
@@ -37,6 +38,7 @@ ${TABprop}ranges;
 ${TABprop}/* USER CODE BEGIN reserved-memory */
 ${TABprop}/* USER CODE END reserved-memory */
 #n
+[#compress]
 
 	[#--GPU memory binding--]
 	[#local errorLog = ""]
@@ -56,6 +58,7 @@ ${TABprop}/* USER CODE END reserved-memory */
 		[#local errorLog = "no DDR config found"]
 	[/#if]
 
+[/#compress]
 [#local TABres = dts_get_tabs(pDtLevel+1)]
 [#local TABsubnode = TABres.TABN]
 [#local TABsubprop = TABres.TABP]
@@ -73,8 +76,6 @@ ${TABsubprop}no-map;
 ${TABsubnode}};
 ${TABsubnode}*/
 	[/#if]
-
 ${TABnode}};
 
-[/#compress]
 [/#macro]

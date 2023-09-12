@@ -2,9 +2,9 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file    usbpd_dpm_core.h
+  * @file    usbpd_dpm_conf.h
   * @author  MCD Application Team
-  * @brief   Header file for usbpd_dpm_core.c file
+  * @brief   Header file for stack/application settings file
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
@@ -17,11 +17,23 @@
 #ifdef __cplusplus
  extern "C" {
 #endif 
-
+[#assign nbPorts = "1"]
+[#assign SRC = false]
+[#assign SNK = false]
+[#assign DRP = false]
 [#-- SWIPdatas is a list of SWIPconfigModel --]  
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
     	[#list SWIP.defines as definition]
+            [#if definition.name == "SRC" && definition.value == "true"]
+                [#assign SRC = true]
+            [/#if]
+            [#if definition.name == "SNK" && definition.value == "true"]
+                [#assign SNK = true]
+            [/#if]
+            [#if definition.name == "DRP" && definition.value == "true"]
+                [#assign DRP = true]
+            [/#if]
             [#if definition.name=="USBPD_NbPorts"]
                 [#assign nbPorts = definition.value]
             [/#if]
@@ -60,9 +72,6 @@
             [/#if]
             [#if definition.name=="PE_RoleSwap_P0"]
                 [#assign valuePE_RoleSwap_P0 = definition.value]
-            [/#if]
-            [#if definition.name=="PE_DataSwap_P0"]
-                [#assign valuePE_DataSwap_P0 = definition.value]
             [/#if]
             [#if definition.name=="PE_VDMSupport_P0"]
                 [#assign valuePE_VDMSupport_P0 = definition.value]
@@ -109,9 +118,6 @@
             [#if definition.name=="Is_GetStatus_Supported_P0"]
                 [#assign valueIs_GetStatus_Supported_P0 = definition.value]
             [/#if]
-            [#if definition.name=="Is_GetBattery_Supported_P0"]
-                [#assign valueIs_GetBattery_Supported_P0 = definition.value]
-            [/#if]
             [#if definition.name=="PE_BatteryCapaSupport_P0"]
                 [#assign valuePE_BatteryCapaSupport_P0 = definition.value]
             [/#if]
@@ -132,30 +138,6 @@
             [/#if]
             [#if definition.name=="Is_SnkCapaExt_Supported_P0"]
                 [#assign valueIs_SnkCapaExt_Supported_P0 = definition.value]
-            [/#if]
-            [#if definition.name=="VDM_XID_SOP_P0"]
-                [#assign valueVDM_XID_SOP_P0 = definition.value]
-            [/#if]
-            [#if definition.name=="VDM_PID_SOP_P0"]
-                [#assign valueVDM_PID_SOP_P0 = definition.value]
-            [/#if]
-            [#if definition.name=="VDM_ModalOperation_P0"]
-                [#assign valueVDM_ModalOperation_P0 = definition.value]
-            [/#if]
-            [#if definition.name=="VDM_bcdDevice_SOP_P0"]
-                [#assign valueVDM_bcdDevice_SOP_P0 = definition.value]
-            [/#if]
-            [#if definition.name=="VDM_USBHostSupport_P0"]
-                [#assign valueVDM_USBHostSupport_P0 = definition.value]
-            [/#if]
-            [#if definition.name=="VDM_USBDeviceSupport_P0"]
-                [#assign valueVDM_USBDeviceSupport_P0 = definition.value]
-            [/#if]
-            [#if definition.name=="VDM_ProductTypeUFPorCP_P0"]
-                [#assign valueVDM_ProductTypeUFPorCP_P0 = definition.value]
-            [/#if]
-            [#if definition.name=="VDM_ProductTypeDFP_P0"]
-                [#assign valueVDM_ProductTypeDFP_P0 = definition.value]
             [/#if]
             [#if definition.name=="CAD_SRCToggleTime_P0"]
                 [#assign valueCAD_SRCToggleTime_P0 = definition.value]
@@ -190,9 +172,6 @@
                 [/#if]
                 [#if definition.name=="PE_RoleSwap_P1"]
                     [#assign valuePE_RoleSwap_P1 = definition.value]
-                [/#if]
-                [#if definition.name=="PE_DataSwap_P1"]
-                    [#assign valuePE_DataSwap_P1 = definition.value]
                 [/#if]
                 [#if definition.name=="PE_VDMSupport_P1"]
                     [#assign valuePE_VDMSupport_P1 = definition.value]
@@ -239,9 +218,6 @@
                 [#if definition.name=="Is_GetStatus_Supported_P1"]
                     [#assign valueIs_GetStatus_Supported_P1 = definition.value]
                 [/#if]
-                [#if definition.name=="Is_GetBattery_Supported_P1"]
-                    [#assign valueIs_GetBattery_Supported_P1 = definition.value]
-                [/#if]
                 [#if definition.name=="PE_BatteryCapaSupport_P1"]
                     [#assign valuePE_BatteryCapaSupport_P1 = definition.value]
                 [/#if]
@@ -262,30 +238,6 @@
                 [/#if]
                 [#if definition.name=="Is_SnkCapaExt_Supported_P1"]
                     [#assign valueIs_SnkCapaExt_Supported_P1 = definition.value]
-                [/#if]
-                [#if definition.name=="VDM_XID_SOP_P1"]
-                    [#assign valueVDM_XID_SOP_P1 = definition.value]
-                [/#if]
-                [#if definition.name=="VDM_PID_SOP_P1"]
-                    [#assign valueVDM_PID_SOP_P1 = definition.value]
-                [/#if]
-                [#if definition.name=="VDM_ModalOperation_P1"]
-                    [#assign valueVDM_ModalOperation_P1 = definition.value]
-                [/#if]
-                [#if definition.name=="VDM_bcdDevice_SOP_P1"]
-                    [#assign valueVDM_bcdDevice_SOP_P1 = definition.value]
-                [/#if]
-                [#if definition.name=="VDM_USBHostSupport_P1"]
-                    [#assign valueVDM_USBHostSupport_P1 = definition.value]
-                [/#if]
-                [#if definition.name=="VDM_USBDeviceSupport_P1"]
-                    [#assign valueVDM_USBDeviceSupport_P1 = definition.value]
-                [/#if]
-                [#if definition.name=="VDM_ProductTypeUFPorCP_P1"]
-                    [#assign valueVDM_ProductTypeUFPorCP_P1 = definition.value]
-                [/#if]
-                [#if definition.name=="VDM_ProductTypeDFP_P1"]
-                    [#assign valueVDM_ProductTypeDFP_P1 = definition.value]
                 [/#if]
                 [#if definition.name=="CAD_SRCToggleTime_P1"]
                     [#assign valueCAD_SRCToggleTime_P1 = definition.value]
@@ -333,7 +285,7 @@
 /* Private variables ---------------------------------------------------------*/
 #ifndef __USBPD_DPM_CORE_C
 extern USBPD_SettingsTypeDef            DPM_Settings[USBPD_PORT_COUNT];
-#else
+#else /* __USBPD_DPM_CORE_C */
 USBPD_SettingsTypeDef       DPM_Settings[USBPD_PORT_COUNT] =
 {
   {
@@ -348,12 +300,14 @@ USBPD_SettingsTypeDef       DPM_Settings[USBPD_PORT_COUNT] =
     .PE_VDMSupport = ${valuePE_VDMSupport_P0},
     .PE_RespondsToDiscovSOP = ${valuePE_RespondsToDiscovSOP_P0},      /*!< Can respond successfully to a Discover Identity */
     .PE_AttemptsDiscovSOP = ${valuePE_AttemptsDiscovSOP_P0},        /*!< Can send a Discover Identity */
-    .PE_PingSupport = ${valuePE_PingSupport_P0},              /* support ping                                            */
+    .PE_PingSupport = ${valuePE_PingSupport_P0},              /* support Ping (only for PD3.0)                                            */
     .PE_CapscounterSupport = ${valuePE_CapscounterSupport_P0},       /* support caps counter                                    */
-    .CAD_RoleToggle = ${valueCAD_RoleToggle_P0},               /* cad role toggle                                         */
+    .CAD_RoleToggle = ${valueCAD_RoleToggle_P0},               /* CAD role toggle                                         */
+[#if SRC || DRP]
     .CAD_DefaultResistor = ${valueCAD_DefaultResistor_P0},
-    .CAD_TryFeature = ${valueCAD_TryFeature_P0},              /* cad try feature                                         */
-    .CAD_AccesorySupport = ${valueCAD_AccesorySupport_P0},         /* cas accessory support                                   */
+[/#if]
+    .CAD_TryFeature = ${valueCAD_TryFeature_P0},              /* CAD try feature                                         */
+    .CAD_AccesorySupport = ${valueCAD_AccesorySupport_P0},         /* CAD accessory support                                   */
     .PE_PD3_Support.d =                           /*!< PD3 SUPPORT FEATURE                                              */
     {
       .PE_UnchunkSupport                = ${valuePE_UnchunkSupport_P0},  /* support Unchunked mode (valid only spec revision 3.0)   */
@@ -387,12 +341,14 @@ USBPD_SettingsTypeDef       DPM_Settings[USBPD_PORT_COUNT] =
     .PE_VDMSupport = ${valuePE_VDMSupport_P1},
     .PE_RespondsToDiscovSOP = ${valuePE_RespondsToDiscovSOP_P1},      /*!< Can respond successfully to a Discover Identity */
     .PE_AttemptsDiscovSOP = ${valuePE_AttemptsDiscovSOP_P1},        /*!< Can send a Discover Identity */
-    .PE_PingSupport = ${valuePE_PingSupport_P1},              /* support ping                                            */
+    .PE_PingSupport = ${valuePE_PingSupport_P1},              /* support Ping (only for PD3.0)                                     */
     .PE_CapscounterSupport = ${valuePE_CapscounterSupport_P1},       /* support caps counter                                    */
-    .CAD_RoleToggle = ${valueCAD_RoleToggle_P1},              /* cad role toggle                                         */
+    .CAD_RoleToggle = ${valueCAD_RoleToggle_P1},              /* CAD role toggle                                         */
+[#if SRC || DRP]
     .CAD_DefaultResistor = ${valueCAD_DefaultResistor_P1},
-    .CAD_TryFeature = ${valueCAD_TryFeature_P1},              /* cad try feature                                         */
-    .CAD_AccesorySupport = ${valueCAD_AccesorySupport_P1},         /* cas accessory support                                   */
+[/#if]
+    .CAD_TryFeature = ${valueCAD_TryFeature_P1},              /* CAD try feature                                         */
+    .CAD_AccesorySupport = ${valueCAD_AccesorySupport_P1},         /* CAD accessory support                                   */
     .PE_PD3_Support.d =                         /*!< PD3 SUPPORT FEATURE                                              */
     {
       .PE_UnchunkSupport                = ${valuePE_UnchunkSupport_P1},  /* support Unchunked mode (valid only spec revision 3.0)   */

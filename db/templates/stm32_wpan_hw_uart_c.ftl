@@ -132,6 +132,7 @@ extern UART_HandleTypeDef huart1;
 [\#--]
         /* Variables ------------------------------------------------------------------*/
 #if (CFG_HW_USART1_ENABLED == 1)
+
 #if (CFG_HW_USART1_DMA_TX_SUPPORTED == 1)
     DMA_HandleTypeDef HW_hdma_huart1_tx ={0};
 #endif
@@ -140,6 +141,7 @@ extern UART_HandleTypeDef huart1;
 #endif
 
 #if (CFG_HW_LPUART1_ENABLED == 1)
+
 #if (CFG_HW_LPUART1_DMA_TX_SUPPORTED == 1)
     DMA_HandleTypeDef HW_hdma_hlpuart1_tx ={0};
 #endif

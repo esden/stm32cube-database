@@ -96,11 +96,6 @@
  *         This parameter can be take one of the following values:
  *         @arg TYPE_C_PORT_1
  *         @arg TYPE_C_PORT_2
- * @param  Role Type-C port power role
- *         This parameter can be take one of the following values:
- *         @arg POWER_ROLE_SOURCE
- *         @arg POWER_ROLE_SINK
- *         @arg POWER_ROLE_DUAL
  * @retval PD controller status
  */
 PWR_StatusTypeDef BSP_PWR_VBUSInit(uint32_t               PortId)

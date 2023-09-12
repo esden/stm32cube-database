@@ -374,7 +374,7 @@ void APP_BLE_Init( void )
     CFG_BLE_HSE_STARTUP_TIME,
     CFG_BLE_VITERBI_MODE,
     CFG_BLE_LL_ONLY,
-    0}                                  /** TODO Should be read from HW */
+    0}
   };
 
   /**
@@ -425,6 +425,7 @@ void APP_BLE_Init( void )
   BleApplicationContext.SmartPhone_Connection_Status = APP_BLE_IDLE;
   BleApplicationContext.EndDevice_Connection_Status[0] = APP_BLE_IDLE;
   BleApplicationContext.EndDevice1Found = 0x00;
+
 #if (CFG_P2P_DEMO_MULTI != 0)
 /* USER CODE BEGIN Connection_Status_Multi */
 
@@ -459,6 +460,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *pckt)
   uint8_t result;
   uint8_t role, event_type, event_data_size;
   int k = 0;
+  uint8_t *adv_report_data;
   uint8_t adtype, adlength;
   hci_disconnection_complete_event_rp0 *cc = (void *) event_pckt->data;
 
@@ -574,6 +576,16 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *pckt)
             handleNotification.ConnectionHandle = connection_handle;
             Evt_Notification(&handleNotification);
           }
+
+  if (cc->Connection_Handle == BleApplicationContext.connectionHandleCentral)
+  {
+    APP_DBG_MSG("\r\n\r** DISCONNECTION EVENT OF SMART PHONE \n");
+    BleApplicationContext.connectionHandleCentral = APP_BLE_IDLE;
+    handleNotification.P2P_Evt_Opcode = SMART_PHONE1_DISCON_HANDLE_EVT;
+    handleNotification.ConnectionHandle = 0xFFFF;
+    Evt_Notification(&handleNotification);
+  }
+
 #if (CFG_P2P_DEMO_MULTI != 0)
           /* USER CODE BEGIN EVT_DISCONN_COMPLETE_Multi */
 
@@ -690,6 +702,9 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *pckt)
 
           event_data_size = le_advertising_event->Advertising_Report[0].Length_Data;
 
+          adv_report_data = (uint8_t*)(&le_advertising_event->Advertising_Report[0].Length_Data) + 1;
+          k = 0;
+
           /* search AD TYPE 0x09 (Complete Local Name) */
           /* search AD Type 0x02 (16 bits UUIDS) */
           if (event_type == ADV_IND)
@@ -699,8 +714,8 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *pckt)
 
             while(k < event_data_size)
             {
-              adlength = le_advertising_event->Advertising_Report[0].Data[k];
-              adtype = le_advertising_event->Advertising_Report[0].Data[k + 1];
+              adlength = adv_report_data[k];
+              adtype = adv_report_data[k + 1];
               switch (adtype)
               {
                 case 0x01: /* now get flags */
@@ -727,12 +742,12 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *pckt)
                 /* USER CODE BEGIN Manufactureur_Specific */
 
                 /* USER CODE END Manufactureur_Specific */
-                  if (adlength >= 7 && le_advertising_event->Advertising_Report[0].Data[k + 2] == 0x01)
+                  if (adlength >= 7 && adv_report_data[k + 2] == 0x01)
                   { /* ST VERSION ID 01 */
 #if(CFG_DEBUG_APP_TRACE != 0) 
                     APP_DBG_MSG("--- ST MANUFACTURER ID --- \n");
 #endif
-                    switch (le_advertising_event->Advertising_Report[0].Data[k + 3])
+                    switch (adv_report_data[k + 3])
                     {
                       case CFG_DEV_ID_P2P_SERVER1:
 #if(CFG_DEBUG_APP_TRACE != 0) 

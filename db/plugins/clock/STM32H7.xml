@@ -3,6 +3,9 @@
     <Background  imageName="STM32H7DSI" name="STM32H7DSI"  x="151" y="1735">
         <Condition Diagnostic="" Expression="(DSIHOST_Exist)"/>
     </Background>
+    <Background  imageName="STM32H7-dualcore" name="STM32H7-dualcore"  x="1037" y="22">
+        <Condition Expression="STM32H745_755|STM32H747_757|STM32H7x5" Diagnostic="Dual Core"/>
+    </Background>
  
     <Tree id="ClockTree">
         <!--Divers source-->
@@ -252,15 +255,28 @@
             <Input signalId="D1CPRECLK" from="D1CPRE"/>
         </Element>
 		
+        <Element id="CpuClockOutput" type="activeOutput" isKey="true" refParameter="CpuClockFreq_Value" x="1400" y="145">
+            <Condition Expression="STM32H745_755|STM32H747_757|STM32H7x5" Diagnostic="Dual Core"/>
+            <Input signalId="D1CPRECLK" from="D1CPRE"/>
+        </Element>
         <Element id="CpuClockOutput" type="activeOutput" isKey="true" refParameter="CpuClockFreq_Value" x="1400" y="205">
             <Input signalId="D1CPRECLK" from="D1CPRE"/>
         </Element>
 		 
+        <Element id="CortexPrescaler" type="devisor" refParameter="Cortex_Div" x="1200" y="175">
+            <Condition Expression="STM32H745_755|STM32H747_757|STM32H7x5" Diagnostic="Dual Core"/>
+            <Input signalId="D1CPRECLK" from="D1CPRE"/>
+            <Output signalId="CortexCLK" to="CortexSysOutput" />
+        </Element>
         <Element id="CortexPrescaler" type="devisor" refParameter="Cortex_Div" x="1200" y="235">
             <Input signalId="D1CPRECLK" from="D1CPRE"/>
             <Output signalId="CortexCLK" to="CortexSysOutput" />
         </Element>
 		
+        <Element id="CortexSysOutput" type="activeOutput" refParameter="CortexFreq_Value" x="1400" y="175">
+            <Condition Expression="STM32H745_755|STM32H747_757|STM32H7x5" Diagnostic="Dual Core"/>
+            <Input signalId="CortexCLK" from="CortexPrescaler"/>
+        </Element>
         <Element id="CortexSysOutput" type="activeOutput" refParameter="CortexFreq_Value" x="1400" y="235">
             <Input signalId="CortexCLK" from="CortexPrescaler"/>
         </Element>
@@ -272,9 +288,9 @@
         </Element>
 		
        <Element id="AHBOutput" type="activeOutput" isKey="true" refParameter="HCLKFreq_Value" x="1080" y="443">
-
+           <Condition Expression="STM32H745_755|STM32H747_757|STM32H7x5" Diagnostic="Dual Core"/>
             <Input signalId="HPREDivCLK" from="HPRE"/>
-			<Output signalId="HPRECLK" to="D1PPRE" />
+	    <Output signalId="HPRECLK" to="D1PPRE" />
             <Output signalId="HPRECLK" to="D2PPRE1" />
             <Output signalId="HPRECLK" to="D2PPRE2" />
             <Output signalId="HPRECLK" to="AXIClockOutput" />
@@ -282,6 +298,35 @@
              <Output signalId="HPRECLK" to="AHB4Output" />
             <Output signalId="HPRECLK" to="AHB12Output" />
             <Output signalId="HPRECLK" to="D3PPRE" />
+            <Output signalId="HPRECLK" to="Cortex2Prescaler" />
+            <Output signalId="HPRECLK" to="CPU2ClockOutput" />
+        </Element>
+        <Element id="AHBOutput" type="activeOutput" isKey="true" refParameter="HCLKFreq_Value" x="1080" y="443">
+            <Condition Expression="!STM32H745_755 &amp; !STM32H747_757 &amp; !STM32H7x5" Diagnostic="Mono Core"/>
+            <Input signalId="HPREDivCLK" from="HPRE"/>
+	    <Output signalId="HPRECLK" to="D1PPRE" />
+            <Output signalId="HPRECLK" to="D2PPRE1" />
+            <Output signalId="HPRECLK" to="D2PPRE2" />
+            <Output signalId="HPRECLK" to="AXIClockOutput" />
+            <Output signalId="HPRECLK" to="HCLK3Output" />
+             <Output signalId="HPRECLK" to="AHB4Output" />
+            <Output signalId="HPRECLK" to="AHB12Output" />
+            <Output signalId="HPRECLK" to="D3PPRE" />
+        </Element>
+
+        <Element id="Cortex2Prescaler" type="devisor" refParameter="Cortex2_Div" x="1200" y="235">
+            <Condition Expression="STM32H745_755|STM32H747_757|STM32H7x5" Diagnostic="Dual Core"/>
+            <Input signalId="HPRECLK" from="AHBOutput"/>
+            <Output signalId="Cortex2CLK" to="CPU2SystikOutput" />
+        </Element>
+
+        <Element id="CPU2ClockOutput" type="activeOutput" refParameter="CPU2Freq_Value" x="1400" y="205">
+            <Condition Expression="STM32H745_755|STM32H747_757|STM32H7x5" Diagnostic="Dual Core"/>
+            <Input signalId="HPRECLK" from="AHBOutput"/>
+        </Element>
+        <Element id="CPU2SystikOutput" type="activeOutput" refParameter="CPU2SystikFreq_Value" x="1400" y="235">
+            <Condition Expression="STM32H745_755|STM32H747_757|STM32H7x5" Diagnostic="Dual Core"/>
+            <Input signalId="Cortex2CLK" from="Cortex2Prescaler"/>
         </Element>
 
         <Element id="AXIClockOutput" type="activeOutput" refParameter="AXIClockFreq_Value" x="1400" y="265">
@@ -1077,6 +1122,7 @@
         <Signal id="SYSCLK"/>
         <Signal id="D1CPRECLK"/>
         <Signal id="CortexCLK"/>
+        <Signal id="Cortex2CLK"/>
         <Signal id="HPREDivCLK"/>
         <Signal id="HCLK3"/>
         <Signal id="D1PPRECLK"/>
@@ -1271,16 +1317,32 @@
    
     <Label id="AHBPrescalerLabel" type="info" posX="810" posY="420" text="D1CPRE Prescaler"/>
 	
-    <Label id="AHBMaxLimitConstraint"  type="dynamiConstraint" posX="900"  posY="470" text="400 MHz max"/>
-    <Label id="AHBMaxLimitConstraint"  type="dynamiConstraint" posX="1080"  posY="470" text="200 MHz max"/>
+    <Label id="AHBMaxLimitConstraint"  type="dynamiConstraint" posX="900"  posY="470" text="480 MHz max"/>
+    <Label id="AHBMaxLimitConstraint"  type="dynamiConstraint" posX="1080"  posY="470" text="240 MHz max"/>
 	
-    <Label id="AHBMaxLimitConstraint"  type="dynamiConstraint" posX="1270"  posY="320" text="100 MHz max"/>
-    <Label id="AHBMaxLimitConstraint"  type="dynamiConstraint" posX="1270"  posY="380" text="100 MHz max"/>
-    <Label id="AHBMaxLimitConstraint"  type="dynamiConstraint" posX="1270"  posY="440" text="100 MHz max"/>
-    <Label id="AHBMaxLimitConstraint"  type="dynamiConstraint" posX="1270"  posY="530" text="100 MHz max"/>
+    <Label id="AHBMaxLimitConstraint"  type="dynamiConstraint" posX="1270"  posY="320" text="120 MHz max"/>
+    <Label id="AHBMaxLimitConstraint"  type="dynamiConstraint" posX="1270"  posY="380" text="120 MHz max"/>
+    <Label id="AHBMaxLimitConstraint"  type="dynamiConstraint" posX="1270"  posY="440" text="120 MHz max"/>
+    <Label id="AHBMaxLimitConstraint"  type="dynamiConstraint" posX="1270"  posY="530" text="120 MHz max"/>
 	
-    <Label id="Power" type="SpecialInfo" posX="1460" posY="210" text="To CPU Clocks (MHz)"/>
-    <Label id="Power" type="SpecialInfo" posX="1460" posY="240" text="To CPU Systick Clock (MHz)"/>
+    <Label id="Power" type="SpecialInfo" posX="1460" posY="152" text="To CPU1 Clocks (MHz)">
+        <Condition Expression="STM32H745_755|STM32H747_757|STM32H7x5" Diagnostic="Dual Core"/>
+    </Label>
+    <Label id="Power" type="SpecialInfo" posX="1460" posY="210" text="To CPU Clocks (MHz)">
+        <Condition Expression="!STM32H745_755 &amp; !STM32H747_757 &amp; !STM32H7x5" Diagnostic="Mono Core"/>
+    </Label>
+    <Label id="Power" type="SpecialInfo" posX="1460" posY="180" text="To CPU1 Systick Clock (MHz)">
+        <Condition Expression="STM32H745_755|STM32H747_757|STM32H7x5" Diagnostic="Dual Core"/>
+    </Label>
+    <Label id="Power" type="SpecialInfo" posX="1460" posY="240" text="To CPU Systick Clock (MHz)">
+        <Condition Expression="!STM32H745_755 &amp; !STM32H747_757 &amp; !STM32H7x5" Diagnostic="Mono Core"/>
+    </Label>
+    <Label id="Power" type="SpecialInfo" posX="1460" posY="210" text="To CPU2 Clocks (MHz)">
+        <Condition Expression="STM32H745_755|STM32H747_757|STM32H7x5" Diagnostic="Dual Core"/>
+    </Label>
+    <Label id="Power" type="SpecialInfo" posX="1460" posY="240" text="To CPU2 Systick Clock (MHz)">
+        <Condition Expression="STM32H745_755|STM32H747_757|STM32H7x5" Diagnostic="Dual Core"/>
+    </Label>
     <Label id="Power" type="SpecialInfo" posX="1460" posY="270" text="To AXI Peripheral Clocks (MHz)"/>
     <Label id="Power" type="SpecialInfo" posX="1460" posY="300" text="To HCLK3 (MHz)"/>
     <Label id="Power" type="SpecialInfo" posX="1460" posY="330" text="To APB3 Peripheral Clocks (MHz)"/>
@@ -1352,7 +1414,12 @@
     <Label id="HRTIMEnableMUXLabel"    type="muxLabel"    text="HRTIM Clock Mux" posX="1320" posY="1665" refEnable="HRTIMEnable"/>
     <Label id="HRTIMEnableOutput"      type="SpecialInfo" text="To HRTIM (MHz)"  posX="1460" posY="1710" refEnable="HRTIMEnable"/> 	
     <Label id="HRTIMnableSYSCLKLabel" type="signal"       text="Tim2_Ck"            posX="1300" posY="1685" refEnable="HRTIMEnable"/>
-    <Label id="HRTIMEnableHSILabel"    type="signal"      text="Cpu_Ck"           posX="1300" posY="1725" refEnable="HRTIMEnable"/>
+    <Label id="HRTIMEnableHSILabel"    type="signal"      text="Cpu1_Ck"           posX="1300" posY="1725" refEnable="HRTIMEnable">
+        <Condition Expression="STM32H745_755|STM32H747_757|STM32H7x5" Diagnostic="Dual Core"/>
+    </Label>
+    <Label id="HRTIMEnableHSILabel"    type="signal"      text="Cpu_Ck"           posX="1300" posY="1725" refEnable="HRTIMEnable">
+        <Condition Expression="!STM32H745_755 &amp; !STM32H747_757 &amp; !STM32H7x5" Diagnostic="Mono Core"/>
+    </Label>
 	
     <!--USART234578 mux-->
     <Label id="USART234578MUXLabel"    type="muxLabel"    text="USART2,3,4,5,7,8 Clock Mux" posX="1150" posY="640" refEnable="USART234578Enable"/>

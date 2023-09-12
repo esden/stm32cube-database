@@ -42,11 +42,11 @@
 [#function dts_get_tabs   pDtLevel ]
 
 	[#local TABN = ""]
-	[#local TABP = "#t#t"]
+	[#local TABP = "\t"]
 	[#if pDtLevel > 0]
 		[#list 1..pDtLevel as idx ]
-			[#local TABN = TABN + "#t#t"]
-			[#local TABP = TABP + "#t#t"]
+			[#local TABN = TABN + "\t"]
+			[#local TABP = TABP + "\t"]
 		[/#list]
 	[/#if]
 
@@ -161,12 +161,12 @@ ${systemPropertiesElmtsListRes.errors}*/
 		[/#if]
 
 		[#--Print elmts--]
+[/#compress]
 		[#local elmtIdx = 0]
 		[#list outElmtsList as elmt]
 			[@DTBindedDtsElmtDM_print pElmt=elmt pDtLevel=pDtLevel pElmtIdx=elmtIdx/]
 			[#local elmtIdx = elmtIdx+1]
 		[/#list]
-[/#compress]
 [/#macro]
 
 
@@ -393,7 +393,7 @@ ${dtsTAB}/*ERR : Can not generate User-Section.*/
 				[#break]
 [#t]
 				[#case "Node"]
-#n${dtsTAB}};
+${dtsTAB}};
 				[#break]
 [#t]
 				[#case "Property"]
@@ -405,7 +405,7 @@ ${propValueItemEnd}[#t]
 				[#break]
 [#t]
 				[#case "ArrayItem"]
-[#nt] [#t]
+[#nt][#t]
 				[#break]
 [#t]
 				[#case "PossibleValue"]

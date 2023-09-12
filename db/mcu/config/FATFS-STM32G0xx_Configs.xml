@@ -6,19 +6,7 @@
     xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
 
     <!-- May need to remove some modes useless (for G0, keep only FATFS_USER_DEFINED_Init?)-->
-
-    <RefConfig Name="FATFS_SDSPI_Init" Comment="SD">          
-        <Component Name="Middleware:FATFS:SDIO"/>
-        <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
-        <ConfigFile Name="FF_CONF"/>  
-        <ConfigFile Name="BSP_SD_SPI_C"/> 
-        <ConfigFile Name="BSP_SD_SPI_H"/> 
-        <ConfigFile Name="FATFS_INIT"/>
-        <ConfigFile Name="FATFS_HEADER"/>
-        <ConfigFile Name="SD_DISKIO_TEMPLATE_H"/>
-        <ConfigFile Name="SD_DISKIO_TEMPLATE_C"/>
-    </RefConfig>
-    
+   
     <RefConfig Name="FATFS_USB_Init" Comment="USBH">
         <Component Name="Middleware:FATFS:USBH"/>
         <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
@@ -142,55 +130,30 @@
         <Argument Name="_FS_EXFAT" GenericType="simple" Comment=""/>
     </RefConfigFile> 
 
-
-    <!-- Generate a driver file for SD that uses the right IP handle -->
-    <RefConfigFile Name="BSP_SD_SPI_C" Description="C driver file for SD" Template="fatfs_bsp_sd_c_G0.ftl">       
-        <File Name="Target/bsp_driver_sd.c" Category="source" Version="R0.12" Condition="all"/>   
-        <Argument Name="_SPI" GenericType="simple" Comment=""/>                    
-    </RefConfigFile>
-
-    <!-- Generate a driver file for SD that uses the right IP handle -->
-    <RefConfigFile Name="BSP_SD_SPI_H" Description="H driver file for SD" Template="fatfs_g0xxsd_h.ftl">       
-        <File Name="Target/bsp_driver_sd.h" Category="header" Version="R0.12" Condition="all"/>       
-    </RefConfigFile>
-
-    <!-- NEW FILE FOR R12 -->
-    <RefConfigFile Name="SD_DISKIO_TEMPLATE_H" Description="TEMPLATE for SD_DISKIO_H" Template="fatfs_sd_diskio_template_h_for_spi.ftl">       
-        <File Name="Target/sd_diskio.h" Category="header" Version="R0.12" Condition="all"/>  
-        <Argument Name="_SPI" GenericType="simple" Comment=""/>         
-    </RefConfigFile>
-    
-    <!-- NEW FILE FOR R12 -->
-    <RefConfigFile Name="SD_DISKIO_TEMPLATE_C" Description="TEMPLATE for SD_DISKIO_C" Template="fatfs_sd_diskio_template_c_for_spi.ftl">
-        <File Name="Target/sd_diskio.c" Category="source" Version="R0.12" Condition="all"/>  
-        <Argument Name="_SPI" GenericType="simple" Comment=""/>
-    </RefConfigFile>
-
-
     <!-- Generate a generic diskio C driver file (user_diskio.c file)  -->
-    <RefConfigFile Name="USER_DISKIO_C" Description="GENERIC C diskio driver file" Template="fatfs_generic_diskio_c.ftl">       
+    <RefConfigFile Name="USER_DISKIO_C" Description="GENERIC C diskio driver file" Template="fatfs_user_diskio_c.ftl">       
         <File Name="Target/user_diskio.c" Category="source" Version="R0.12" Condition="!USER_SD_DISKIO"/>    
         <Argument Name="NEW_DISKIO_API" GenericType="simple" Comment=""/>
     </RefConfigFile>
     
     <!-- Generate a generic diskio H driver file (user_diskio.h file -->
-    <RefConfigFile Name="USER_DISKIO_H" Description="GENERIC H driver file" Template="generic_diskio_h.ftl">       
+    <RefConfigFile Name="USER_DISKIO_H" Description="GENERIC H driver file" Template="fatfs_user_diskio_h.ftl">       
         <File Name="Target/user_diskio.h" Category="header" Version="R0.12" Condition="!USER_SD_DISKIO"/>                    
     </RefConfigFile>
     
     <!-- Generate the sd.diskio.c driver file (if user selects in advanced tab the "SD" choice) -->
-    <RefConfigFile Name="USER_DISKIO_C" Description="SD C diskio driver file" Template="fatfs_user_sd_diskio_c.ftl">       
+    <RefConfigFile Name="USER_DISKIO_C" Description="SD C diskio driver file" Template="fatfs_user_sd_diskio_c_g0.ftl">       
         <File Name="Target/sd_diskio.c" Category="source" Version="R0.12" Condition="USER_SD_DISKIO"/>    
     </RefConfigFile>
     
     <!-- Generate the sd_diskio.h driver file (if user selects in advanced tab the "SD" choice) -->
-    <RefConfigFile Name="USER_DISKIO_H" Description="SD H driver file" Template="fatfs_g0_user_sd_diskio_h.ftl">       
+    <RefConfigFile Name="USER_DISKIO_H" Description="SD H driver file" Template="fatfs_user_sd_diskio_h_g0.ftl">       
         <File Name="Target/sd_diskio.h" Category="header" Version="R0.12" Condition="USER_SD_DISKIO"/>   
         <Argument Name="BOARD_NAME" GenericType="simple" Comment=""/>                 
     </RefConfigFile>    
 
     <!-- Generate a init code file (app_fatfs.c) -->
-    <RefConfigFile Name="FATFS_INIT" Description="FATFS Init code file" Template="fatfs_init_extended.ftl">       
+    <RefConfigFile Name="FATFS_INIT" Description="FATFS Init code file" Template="fatfs_init_g0_wb.ftl">       
         <File Name="App/app_fatfs.c" Category="source" Version="R0.12" Condition="all"/>        
         <Argument Name="_FS_NORTC" GenericType="simple" Comment="0 or 1"/>                           <!-- New in R0.11 -->                  
         <Argument Name="_MULTI_PARTITION" GenericType="simple" Comment="0 or 1"/>
@@ -198,7 +161,7 @@
     </RefConfigFile>
     
     <!-- Generate header for the init code file (app_fatfs.h) -->
-    <RefConfigFile Name="FATFS_HEADER" Description="FATFS header file" Template="fatfs_header_extended.ftl">       
+    <RefConfigFile Name="FATFS_HEADER" Description="FATFS header file" Template="fatfs_header_g0_wb.ftl">       
         <File Name="App/app_fatfs.h" Category="source" Version="R0.12" Condition="all"/>
         <Argument Name="DISKIO_CODE" GenericType="simple" Comment=""/>
     </RefConfigFile>

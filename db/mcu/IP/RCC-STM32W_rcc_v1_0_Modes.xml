@@ -75,7 +75,15 @@
         <PossibleValue Comment="8"  Value="RCC_PLLM_DIV8"/>
     </RefParameter>
     
-    <RefParameter Visible="false" Comment="SMPSDivider" DefaultValue="1" Name="SMPSDivider" Type="list">
+    <RefParameter Visible="false" Comment="SMPSDivider" DefaultValue="3" Name="SMPSDivider" Type="list">
+        <Condition Expression="SMPSCLockSelectionVirtual=RCC_SMPSCLKSOURCE_MSI &amp; (MSIRANGE_9 | MSIRANGE_11)" Diagnostic=""/>
+        <PossibleValue Comment="1" Value="1"/>
+        <PossibleValue Comment="2" Value="2"/>
+        <PossibleValue Comment="3" Value="3"/>
+        <PossibleValue Comment="4" Value="4"/>
+        <PossibleValue Comment="6" Value="6"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="SMPSDivider" DefaultValue="2" Name="SMPSDivider" Type="list">
         <PossibleValue Comment="1" Value="1"/>
         <PossibleValue Comment="2" Value="2"/>
         <PossibleValue Comment="3" Value="3"/>
@@ -101,31 +109,31 @@
         <PossibleValue Comment="4" Value="RCC_SMPSCLKDIV_RANGE1"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="SMPSDiv" DefaultValue="RCC_SMPSCLKDIV_RANGE0" Name="SMPSDiv" Type="list">
-        <Condition Expression="(MSIClockRange=RCC_MSIRANGE_8) &amp; (SMPSCLockSelectionVirtual=RCC_SMPSCLKSOURCE_MSI) &amp; SMPSDivider=1" Diagnostic=""/>
+        <Condition Expression="(MSIRANGE_8) &amp; (SMPSCLockSelectionVirtual=RCC_SMPSCLKSOURCE_MSI) &amp; SMPSDivider=1" Diagnostic=""/>
         <PossibleValue Comment="1" Value="RCC_SMPSCLKDIV_RANGE0"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="SMPSDiv" DefaultValue="RCC_SMPSCLKDIV_RANGE1" Name="SMPSDiv" Type="list">
-        <Condition Expression="(MSIClockRange=RCC_MSIRANGE_8) &amp; (SMPSCLockSelectionVirtual=RCC_SMPSCLKSOURCE_MSI)  &amp; SMPSDivider=2" Diagnostic=""/>
+        <Condition Expression="(MSIRANGE_8) &amp; (SMPSCLockSelectionVirtual=RCC_SMPSCLKSOURCE_MSI)  &amp; SMPSDivider=2" Diagnostic=""/>
         <PossibleValue Comment="2" Value="RCC_SMPSCLKDIV_RANGE1"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="SMPSDiv" DefaultValue="RCC_SMPSCLKDIV_RANGE1" Name="SMPSDiv" Type="list">
-        <Condition Expression="(MSIClockRange=RCC_MSIRANGE_9) &amp; (SMPSCLockSelectionVirtual=RCC_SMPSCLKSOURCE_MSI) &amp; SMPSDivider=3" Diagnostic=""/>
+        <Condition Expression="(MSIRANGE_9) &amp; (SMPSCLockSelectionVirtual=RCC_SMPSCLKSOURCE_MSI) &amp; SMPSDivider=3" Diagnostic=""/>
         <PossibleValue Comment="3" Value="RCC_SMPSCLKDIV_RANGE1"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="SMPSDiv" DefaultValue="RCC_SMPSCLKDIV_RANGE0" Name="SMPSDiv" Type="list">
-        <Condition Expression="(MSIClockRange=RCC_MSIRANGE_10) &amp; (SMPSCLockSelectionVirtual=RCC_SMPSCLKSOURCE_MSI) &amp; SMPSDivider=2" Diagnostic=""/>
+        <Condition Expression="(MSIRANGE_10) &amp; (SMPSCLockSelectionVirtual=RCC_SMPSCLKSOURCE_MSI) &amp; SMPSDivider=2" Diagnostic=""/>
         <PossibleValue Comment="2" Value="RCC_SMPSCLKDIV_RANGE0"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="SMPSDiv" DefaultValue="RCC_SMPSCLKDIV_RANGE1" Name="SMPSDiv" Type="list">
-        <Condition Expression="(MSIClockRange=RCC_MSIRANGE_10) &amp; (SMPSCLockSelectionVirtual=RCC_SMPSCLKSOURCE_MSI) &amp; SMPSDivider=4" Diagnostic=""/>
+        <Condition Expression="(MSIRANGE_10) &amp; (SMPSCLockSelectionVirtual=RCC_SMPSCLKSOURCE_MSI) &amp; SMPSDivider=4" Diagnostic=""/>
         <PossibleValue Comment="4" Value="RCC_SMPSCLKDIV_RANGE1"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="SMPSDiv" DefaultValue="RCC_SMPSCLKDIV_RANGE0" Name="SMPSDiv" Type="list">
-        <Condition Expression="(MSIClockRange=RCC_MSIRANGE_11) &amp; (SMPSCLockSelectionVirtual=RCC_SMPSCLKSOURCE_MSI) &amp; SMPSDivider=3" Diagnostic=""/>
+        <Condition Expression="(MSIRANGE_11) &amp; (SMPSCLockSelectionVirtual=RCC_SMPSCLKSOURCE_MSI) &amp; SMPSDivider=3" Diagnostic=""/>
         <PossibleValue Comment="3" Value="RCC_SMPSCLKDIV_RANGE0"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="SMPSDiv" DefaultValue="RCC_SMPSCLKDIV_RANGE1" Name="SMPSDiv" Type="list">
-        <Condition Expression="(MSIClockRange=RCC_MSIRANGE_11) &amp; (SMPSCLockSelectionVirtual=RCC_SMPSCLKSOURCE_MSI) &amp; SMPSDivider=6" Diagnostic=""/>
+        <Condition Expression="(MSIRANGE_11) &amp; (SMPSCLockSelectionVirtual=RCC_SMPSCLKSOURCE_MSI) &amp; SMPSDivider=6" Diagnostic=""/>
         <PossibleValue Comment="6" Value="RCC_SMPSCLKDIV_RANGE1"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="SMPSDiv" DefaultValue="null" Name="SMPSDiv" Type="list" />
@@ -414,48 +422,42 @@
     </RefParameter>   
     <!--SMPSCLockSelection-->
     <RefParameter Visible="false"  Comment="SMPS Clock Selection" DefaultValue="RCC_SMPSCLKSOURCE_HSE" Name="SMPSCLockSelectionVirtual" Type="list" IP="SMPS">
-        <Condition Diagnostic="SMPS should use HSE with 32 Mhz as clock source (RF is enabled)" Expression="(RFUsed_ForRCC)"/>
+        <Condition Diagnostic="SMPS should use HSE with 32 Mhz as clock source (RF is enabled)" Expression="RFUsed_ForRCC"/>
         <PossibleValue Comment="SMPS Clksource Sysclk" Value="RCC_SMPSCLKSOURCE_HSE"  Semaphore="SMPSSourceHSE"/>
     </RefParameter>
+    <!--RefParameter Visible="false"  Comment="SMPS Clock Selection" DefaultValue="" Name="SMPSCLockSelectionVirtual" Type="list" IP="SMPS">
+        <Condition Diagnostic="SMPS should use HSE with 32 Mhz as clock source (RF is enabled)" Expression="RFUsed_ForRCC"/>
+    </RefParameter-->
     
     <RefParameter Visible="false"  Comment="SMPS Clock Selection" DefaultValue="RCC_SMPSCLKSOURCE_HSI" Name="SMPSCLockSelectionVirtual" Type="list" IP="SMPS">
-        <Condition Diagnostic="SMPS CLock could have MSI as clock source" Expression="HSE_VALUE=32000000 &amp; (MSIClockRange=RCC_MSIRANGE_8 | MSIClockRange=RCC_MSIRANGE_9 | MSIClockRange=RCC_MSIRANGE_10 | MSIClockRange=RCC_MSIRANGE_11)"/>
-        <PossibleValue Comment="SMPS Clksource Pclk2"  Value="RCC_SMPSCLKSOURCE_MSI"  Semaphore="SMPSSourceMSI"/>
-        <PossibleValue Comment="SMPS Clksource Sysclk" Value="RCC_SMPSCLKSOURCE_HSE"  Semaphore="SMPSSourceHSE"/>
-        <PossibleValue Comment="SMPS Clksource Hsi"    Value="RCC_SMPSCLKSOURCE_HSI"    Semaphore="SMPSSourceHSI"/>
+        <Condition Diagnostic="SMPS CLock could have any clock source" Expression="HSE_VALUE=32000000 &amp; (MSIRANGE_8 | MSIRANGE_9 | MSIRANGE_10 | MSIRANGE_11)"/>
+        <PossibleValue Comment="SMPS Clksource MSI"  Value="RCC_SMPSCLKSOURCE_MSI"  Semaphore="SMPSSourceMSI"/>
+        <PossibleValue Comment="SMPS Clksource HSE" Value="RCC_SMPSCLKSOURCE_HSE"  Semaphore="SMPSSourceHSE"/>
+        <PossibleValue Comment="SMPS Clksource HSI"    Value="RCC_SMPSCLKSOURCE_HSI"    Semaphore="SMPSSourceHSI"/>
     </RefParameter>
     
     <RefParameter Visible="false"  Comment="SMPS Clock Selection" DefaultValue="RCC_SMPSCLKSOURCE_HSI" Name="SMPSCLockSelectionVirtual" Type="list" IP="SMPS">
-        <Condition Diagnostic="SMPS CLock could not have MSI as clock source" Expression="HSE_VALUE=32000000"/>
-        <PossibleValue Comment="SMPS Clksource Sysclk" Value="RCC_SMPSCLKSOURCE_HSE"  Semaphore="SMPSSourceHSE"/>
-        <PossibleValue Comment="SMPS Clksource Hsi"    Value="RCC_SMPSCLKSOURCE_HSI"    Semaphore="SMPSSourceHSI"/>
+        <Condition Diagnostic="SMPS CLock could not use MSI as clock source" Expression="HSE_VALUE=32000000"/>
+        <PossibleValue Comment="SMPS Clksource HSE" Value="RCC_SMPSCLKSOURCE_HSE"  Semaphore="SMPSSourceHSE"/>
+        <PossibleValue Comment="SMPS Clksource HSI"    Value="RCC_SMPSCLKSOURCE_HSI"    Semaphore="SMPSSourceHSI"/>
     </RefParameter>
     
     <RefParameter Visible="false"  Comment="SMPS Clock Selection" DefaultValue="RCC_SMPSCLKSOURCE_HSI" Name="SMPSCLockSelectionVirtual" Type="list" IP="SMPS">
-        <Condition Diagnostic="SMPS could use HSE with 32 Mhz as clock source" Expression="(HSEOscillator | HSEByPass) &amp; (MSIClockRange=RCC_MSIRANGE_8 | MSIClockRange=RCC_MSIRANGE_9 | MSIClockRange=RCC_MSIRANGE_10 | MSIClockRange=RCC_MSIRANGE_11)"/>
-        <PossibleValue Comment="SMPS Clksource Pclk2"  Value="RCC_SMPSCLKSOURCE_MSI"  Semaphore="SMPSSourceMSI"/>
-        <PossibleValue Comment="SMPS Clksource Hsi"    Value="RCC_SMPSCLKSOURCE_HSI"    Semaphore="SMPSSourceHSI"/>
+        <Condition Diagnostic="SMPS could not use  HSE as a clock source" Expression="(MSIRANGE_8 | MSIRANGE_9 | MSIRANGE_10 | MSIRANGE_11)"/>
+        <PossibleValue Comment="SMPS Clksource MSI"  Value="RCC_SMPSCLKSOURCE_MSI"  Semaphore="SMPSSourceMSI"/>
+        <PossibleValue Comment="SMPS Clksource HSI"    Value="RCC_SMPSCLKSOURCE_HSI"    Semaphore="SMPSSourceHSI"/>
     </RefParameter>
-    
+        
     <RefParameter Visible="false"  Comment="SMPS Clock Selection" DefaultValue="RCC_SMPSCLKSOURCE_HSI" Name="SMPSCLockSelectionVirtual" Type="list" IP="SMPS">
-        <Condition Diagnostic="SMPS could not use HSE as clock source" Expression="(MSIClockRange=RCC_MSIRANGE_8 | MSIClockRange=RCC_MSIRANGE_9 | MSIClockRange=RCC_MSIRANGE_10 | MSIClockRange=RCC_MSIRANGE_11)"/>
-        <PossibleValue Comment="SMPS Clksource Pclk2"  Value="RCC_SMPSCLKSOURCE_MSI"  Semaphore="SMPSSourceMSI"/>
-        <PossibleValue Comment="SMPS Clksource Hsi"    Value="RCC_SMPSCLKSOURCE_HSI"    Semaphore="SMPSSourceHSI"/>
-    </RefParameter>
-    <RefParameter Visible="false"  Comment="SMPS Clock Selection" DefaultValue="RCC_SMPSCLKSOURCE_HSI" Name="SMPSCLockSelectionVirtual" Type="list" IP="SMPS">
-        <Condition Diagnostic="could use HSE with 32 Mhz or MSI with right range as clock source" Expression="(HSEOscillator | HSEByPass) &amp; !(MSIClockRange=RCC_MSIRANGE_8 | MSIClockRange=RCC_MSIRANGE_9 | MSIClockRange=RCC_MSIRANGE_10 | MSIClockRange=RCC_MSIRANGE_11)"/>
-        <PossibleValue Comment="SMPS Clksource Hsi"    Value="RCC_SMPSCLKSOURCE_HSI"    Semaphore="SMPSSourceHSI"/>
-    </RefParameter>
-    
-    <RefParameter Visible="false"  Comment="SMPS Clock Selection" DefaultValue="RCC_SMPSCLKSOURCE_HSI" Name="SMPSCLockSelectionVirtual" Type="list" IP="SMPS">
-        <Condition Diagnostic="MSI should be greather than 16 Mhz" Expression="!(HSEOscillator | HSEByPass) &amp; !(MSIClockRange=RCC_MSIRANGE_8 | MSIClockRange=RCC_MSIRANGE_9 | MSIClockRange=RCC_MSIRANGE_10 | MSIClockRange=RCC_MSIRANGE_11)"/>
+        <Condition Diagnostic="MSI should be greather than 16 Mhz OR HSE with 32 Mhz" Expression="!(HSE_VALUE=32000000) &amp; !(MSIRANGE_8 | MSIRANGE_9 | MSIRANGE_10 | MSIRANGE_11)"/>
         <PossibleValue Comment="SMPS Clksource Hsi"    Value="RCC_SMPSCLKSOURCE_HSI"    Semaphore="SMPSSourceHSI"/>
     </RefParameter>    
-    <RefParameter Visible="false"  Comment="SMPS Clock Selection" DefaultValue="" Name="SMPSCLockSelectionVirtual" Type="list" IP="SMPS">
+    <!--RefParameter Visible="false"  Comment="SMPS Clock Selection" DefaultValue="" Name="SMPSCLockSelectionVirtual" Type="list" IP="SMPS">
         <PossibleValue Comment="SMPS Clksource Hsi"    Value="RCC_SMPSCLKSOURCE_HSI"    Semaphore="SMPSSourceHSI"/>
-    </RefParameter>
+    </RefParameter-->
+    <RefParameter Comment="PLL Source" DefaultValue="+SMPSCLockSelectionVirtual" Name="SMPSCLockSelectionVirtualString" Type="string" Visible="false"/>
     
-    <RefParameter Visible="false"  Comment="SMPS Clock Selection" DefaultValue="+SMPSCLockSelectionVirtual" Name="SMPSCLockSelection" Type="list" IP="SMPS">
+    <RefParameter Visible="false"  Comment="SMPS Clock Selection" DefaultValue="+SMPSCLockSelectionVirtualString" Name="SMPSCLockSelection" Type="list" IP="SMPS">
         <PossibleValue Comment="SMPS Clksource Pclk2"  Value="RCC_SMPSCLKSOURCE_MSI"  Semaphore="SMPSSourceMSI"/>
         <PossibleValue Comment="SMPS Clksource Sysclk" Value="RCC_SMPSCLKSOURCE_HSE"  Semaphore="SMPSSourceHSE"/>
         <PossibleValue Comment="SMPS Clksource Hsi"    Value="RCC_SMPSCLKSOURCE_HSI"    Semaphore="SMPSSourceHSI"/>
@@ -533,18 +535,18 @@
     <!-- MSI clock range-->	
 
     <RefParameter Visible="false" Comment="MSI Clock Range" DefaultValue="RCC_MSIRANGE_6" Name="MSIClockRange" Display="value/1000" Unit="KHz" Type="list">
-        <PossibleValue Comment="100"    Value="RCC_MSIRANGE_0"/>
-        <PossibleValue Comment="200"    Value="RCC_MSIRANGE_1"/>
-        <PossibleValue Comment="400"    Value="RCC_MSIRANGE_2"/>
-        <PossibleValue Comment="800"    Value="RCC_MSIRANGE_3"/>
-        <PossibleValue Comment="1000"   Value="RCC_MSIRANGE_4"/>
-        <PossibleValue Comment="2000"   Value="RCC_MSIRANGE_5"/>
-        <PossibleValue Comment="4000"   Value="RCC_MSIRANGE_6"/>
-        <PossibleValue Comment="8000"   Value="RCC_MSIRANGE_7"/>
-        <PossibleValue Comment="16000"  Value="RCC_MSIRANGE_8"/>
-        <PossibleValue Comment="24000"  Value="RCC_MSIRANGE_9"/>
-        <PossibleValue Comment="32000"  Value="RCC_MSIRANGE_10"/>
-        <PossibleValue Comment="48000"  Value="RCC_MSIRANGE_11"/>
+        <PossibleValue Comment="100"    Value="RCC_MSIRANGE_0" Semaphore="MSIRANGE_0"/>
+        <PossibleValue Comment="200"    Value="RCC_MSIRANGE_1" Semaphore="MSIRANGE_1"/>
+        <PossibleValue Comment="400"    Value="RCC_MSIRANGE_2" Semaphore="MSIRANGE_2"/>
+        <PossibleValue Comment="800"    Value="RCC_MSIRANGE_3" Semaphore="MSIRANGE_3"/>
+        <PossibleValue Comment="1000"   Value="RCC_MSIRANGE_4" Semaphore="MSIRANGE_4"/>
+        <PossibleValue Comment="2000"   Value="RCC_MSIRANGE_5" Semaphore="MSIRANGE_5"/>
+        <PossibleValue Comment="4000"   Value="RCC_MSIRANGE_6" Semaphore="MSIRANGE_6"/>
+        <PossibleValue Comment="8000"   Value="RCC_MSIRANGE_7" Semaphore="MSIRANGE_7"/>
+        <PossibleValue Comment="16000"  Value="RCC_MSIRANGE_8" Semaphore="MSIRANGE_8"/>
+        <PossibleValue Comment="24000"  Value="RCC_MSIRANGE_9" Semaphore="MSIRANGE_9"/>
+        <PossibleValue Comment="32000"  Value="RCC_MSIRANGE_10" Semaphore="MSIRANGE_10"/>
+        <PossibleValue Comment="48000"  Value="RCC_MSIRANGE_11" Semaphore="MSIRANGE_11"/>
     </RefParameter>
 	
 	
@@ -611,7 +613,7 @@
         <Condition Expression="RFUsed_ForRCC|S_BLE_HOST|S_THREAD" Diagnostic=""/>
     </RefParameter>
     <RefParameter Visible="false" Comment="FCLK2 Cortex"          Name="FCLK2Freq_Value"      DefaultValue="4000000"  Max="32000000" Type="double" Display="value/1000000" Unit="MHz"/>
-    <RefParameter Visible="false" Comment="PWR clock"             Name="PWRFreq_Value"        DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz"/>
+    <RefParameter Visible="false" Comment="PWR clock"             Name="PWRFreq_Value"        DefaultValue="4000000"  Max="64000000" Type="double" Display="value/1000000" Unit="MHz"/>
     <RefParameter Visible="false" Comment="AHB clock"             Name="AHBFreq_Value"        DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz"/>
     <RefParameter Visible="false" Comment="AHB2 clock"            Name="AHB2Freq_Value"       DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz"/>
     <RefParameter Visible="false" Comment="IWDG clock"            Name="WatchDogFreq_Value"   DefaultValue="32000"    Type="double" Display="value/1000"    Unit="KHz" IP="IWATCHDOG" />
@@ -625,7 +627,7 @@
 
     <!--main sysclock Freq value-->
  
-    <RefParameter Visible="false" Comment="System clock"   Name="SYSCLKFreq_VALUE"  DefaultValue="4000000"   Type="double"  Display="value/1000000" Unit="MHz"/>
+    <RefParameter Visible="false" Comment="System clock"   Name="SYSCLKFreq_VALUE"  DefaultValue="4000000"  Max="64000000" Type="double"  Display="value/1000000" Unit="MHz"/>
     <RefParameter Visible="false" Comment="MCO Output"     Name="MCO1PinFreq_Value" DefaultValue="4000000"   Type="double"  Display="value/1000000" Unit="MHz"/>
 	
 
@@ -652,13 +654,27 @@
     <RefParameter Visible="false" Comment="USART1 clock Source"  Name="USART1Freq_Value"  DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="USART1"/>
     <RefParameter Visible="false" Comment="LPUART1 clock Source" Name="LPUART1Freq_Value" DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="LPUART1"/>
     
+    <RefParameter Visible="false" Comment="SMPS clock Source" Name="SMPSFreq_Value" DefaultValue="4000000"  Type="list" Display="value/1000000" Unit="MHz" IP="SMPS">
+        <Condition Diagnostic="" Expression="(MSIRANGE_9) &amp; (SMPSCLockSelectionVirtual=RCC_SMPSCLKSOURCE_MSI)"/>
+        <PossibleValue Value="4000000" Comment="4000000"   />
+    </RefParameter>
     <RefParameter Visible="false" Comment="SMPS clock Source" Name="SMPSFreq_Value" DefaultValue="8000000"  Type="list" Display="value/1000000" Unit="MHz" IP="SMPS">
         <PossibleValue Value="4000000" Comment="4000000"   />
         <PossibleValue Value="8000000" Comment="8000000"   />
     </RefParameter>
 
-
-    <RefParameter Visible="false" Comment="SMPS output clock Source" Name="SMPS1Freq_Value" DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz" IP="SMPS"/>
+    <RefParameter Visible="false" Comment="SMPS output clock Source" Name="SMPS1Freq_Value" DefaultValue="8000000"  Type="list" Display="value/1000000" Unit="MHz" IP="SMPS">
+        <Condition Diagnostic="" Expression="(MSIRANGE_9) &amp; (SMPSCLockSelectionVirtual=RCC_SMPSCLKSOURCE_MSI)"/>
+        <PossibleValue Value="8000000" Comment="8000000"   />
+    </RefParameter>
+    <RefParameter Visible="false" Comment="SMPS output clock Source" Name="SMPS1Freq_Value" DefaultValue="16000000"  Type="list" Display="value/1000000" Unit="MHz" IP="SMPS">
+        <PossibleValue Value="8000000" Comment="8000000"   />
+        <PossibleValue Value="16000000" Comment="16000000"   />
+    </RefParameter> 
+    <RefParameter Visible="false" Comment="SMPS output clock Source" Name="SMPS1Freq_ValueConstraintsText" DefaultValue="Only 8 MHz could be used"  Type="list" Display="value/1000000" Unit="MHz" IP="SMPS">
+        <Condition Diagnostic="" Expression="(MSIRANGE_9) &amp; (SMPSCLockSelectionVirtual=RCC_SMPSCLKSOURCE_MSI)"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="SMPS output clock Source" Name="SMPS1Freq_ValueConstraintsText" DefaultValue="Only 8 MHz and 16 MHz could be used"  Type="list" Display="value/1000000" Unit="MHz" IP="SMPS"/>
    
     <RefParameter Visible="false" Comment="LPTIM1 clock Source"  Name="LPTIM1Freq_Value"  DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="LPTIM1"/>
     <RefParameter Visible="false" Comment="LPTIM2 clock Source"  Name="LPTIM2Freq_Value"  DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="LPTIM2"/>
@@ -700,7 +716,7 @@
 	
 	
     <!--PLLSAI1R output-->
-    <RefParameter Visible="false" Comment="PLLSAI1R" Name="PLLSAI1RoutputFreq_Value" DefaultValue="16000000" Min="12000000" Max="80000000"   Type="double" Display="value/1000000" Unit="MHz">
+    <RefParameter Visible="false" Comment="PLLSAI1R" Name="PLLSAI1RoutputFreq_Value" DefaultValue="16000000" Min="12000000" Max="64000000"   Type="double" Display="value/1000000" Unit="MHz">
         <Condition Expression="(ADCSourcePLLSAI1R &amp; (USE_ADC1|USE_ADC2|USE_ADC3))&amp; scale1 " Diagnostic=" "/>
     </RefParameter>
     <RefParameter Visible="false" Comment="PLLSAI1R" Name="PLLSAI1RoutputFreq_Value" DefaultValue="16000000"  Min="12000000" Max="26000000"  Type="double" Display="value/1000000" Unit="MHz">
@@ -710,7 +726,7 @@
     <RefParameter Visible="false" Comment="PLLSAI1R" Name="PLLSAI1RoutputFreq_Value" DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz"/>
 	
     <!--PLLSAI1Q output-->
-    <RefParameter Visible="false" Comment="PLLSAI1Q" Name="PLLSAI1QoutputFreq_Value"  Min="12000000" Max="80000000"  DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz">
+    <RefParameter Visible="false" Comment="PLLSAI1Q" Name="PLLSAI1QoutputFreq_Value"  Min="12000000" Max="64000000"  DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz">
         <Condition Expression="((USBUsed_ForRCC|(RNGUsed_ForRCC &amp; RNGCLKSOURCE_CLK48))&amp; CK48SourcePLLSAI1)&amp; scale1 " Diagnostic=" "/>
     </RefParameter>
     <RefParameter Visible="false" Comment="PLLSAI1Q" Name="PLLSAI1QoutputFreq_Value"  Min="12000000" Max="26000000"  DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz">
@@ -720,7 +736,7 @@
     <RefParameter Visible="false" Comment="PLLSAI1Q" Name="PLLSAI1QoutputFreq_Value" DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz"/>
 	
     <!--PLLSAI1P output-->
-    <RefParameter Visible="false" Comment="PLLSAI1P" Name="PLLSAI1PoutputFreq_Value"  Min="3000000" Max="80000000" DefaultValue="4571429"    Type="double" Display="value/1000000" Unit="MHz">
+    <RefParameter Visible="false" Comment="PLLSAI1P" Name="PLLSAI1PoutputFreq_Value"  Min="3000000" Max="64000000" DefaultValue="4571429"    Type="double" Display="value/1000000" Unit="MHz">
         <Condition Expression="((SAI1SourcePLLSAI1P&amp;(SAI1Used_ForRCC)))&amp; scale1 " Diagnostic=" "/>
     </RefParameter>
 
@@ -742,7 +758,7 @@
 
 	
     <!--PLLQ output-->
-    <RefParameter Visible="false" Comment="PLLQ"     Name="PLLQoutputFreq_Value"  Min="12000000" Max="80000000"     DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz">
+    <RefParameter Visible="false" Comment="PLLQ"     Name="PLLQoutputFreq_Value"  Min="12000000" Max="64000000"     DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz">
         <Condition Expression="((USBUsed_ForRCC|SDMMC1Used_ForRCC|(RNGUsed_ForRCC &amp; RNGCLKSOURCE_CLK48))&amp; CK48SourcePLLCLK)&amp; scale1 " Diagnostic=" "/>
     </RefParameter>
 
@@ -753,7 +769,7 @@
     <RefParameter Visible="false" Comment="PLLQ"     Name="PLLQoutputFreq_Value"     DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz"/>
 	
     <!--PLLP output-->
-    <RefParameter Visible="false" Comment="PLLP"     Name="PLLPoutputFreq_Value"  Min="3000000" Max="80000000"    DefaultValue="4571429"   Type="double" Display="value/1000000" Unit="MHz">
+    <RefParameter Visible="false" Comment="PLLP"     Name="PLLPoutputFreq_Value"  Min="3000000" Max="64000000"    DefaultValue="4571429"   Type="double" Display="value/1000000" Unit="MHz">
         <Condition Expression="((SAI1SourcePLLP&amp;(SAI1Used_ForRCC))) |(ADCSourcePLL &amp; (USE_ADC1|USE_ADC2|USE_ADC3))&amp; scale1 " Diagnostic=" "/>
     </RefParameter>
 
@@ -783,7 +799,7 @@
     <RefParameter Visible="false" Comment="VCOOutput"     Name="VCOOutputFreq_Value"     DefaultValue="32000000"   Type="double" Display="value/1000000" Unit="MHz"/>
 		 
     <!--PLLRCLK output ==> PLLCLK -->
-    <RefParameter Visible="false" Comment="PLLCLK"     Name="PLLRCLKFreq_Value"   Min="12000000" Max="80000000"    DefaultValue="16000000"   Type="double" Display="value/1000000" Unit="MHz">
+    <RefParameter Visible="false" Comment="PLLCLK"     Name="PLLRCLKFreq_Value"   Min="12000000" Max="64000000"    DefaultValue="16000000"   Type="double" Display="value/1000000" Unit="MHz">
         <Condition Expression="PLLUsed=1&amp; scale1" Diagnostic="PLLUsed=1"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="PLLCLK"     Name="PLLRCLKFreq_Value"   Min="12000000" Max="26000000"    DefaultValue="16000000"   Type="double" Display="value/1000000" Unit="MHz">
@@ -1090,7 +1106,7 @@
     </RefParameter>
     <!--SAI1 Enable-->
     <RefParameter Visible="false" Name="RFEnable" Comment="SAI1" Type="list" DefaultValue="true">
-        <Condition Expression="(RFUsed_ForRCC) &amp; CodegenConfigPeriph=true" Diagnostic="SAI1 is activated"/>
+        <Condition Expression="RFUsed_ForRCC &amp; CodegenConfigPeriph=true" Diagnostic="SAI1 is activated"/>
         <PossibleValue Value="true" Comment="true"/>
     </RefParameter>
 	
@@ -1554,7 +1570,7 @@
         <Condition Expression="CodegenConfigPeriph=false" Diagnostic=" "/>
     </RefParameter>
 
-    <RefParameter Visible="false" Name="SMPSClockSelectionARG" Comment="SMPSClockSelectionARG" Type="list" DefaultValue="+SMPSCLockSelectionVirtual"/>
+    <RefParameter Visible="false" Name="SMPSClockSelectionARG" Comment="SMPSClockSelectionARG" Type="list" DefaultValue="+SMPSCLockSelection"/>
 	
 	
     <RefParameter Visible="false" Name="RTCClockSelectionARG" Comment="RTCClockSelectionARG" Type="list" DefaultValue="+RTCClockSelection">
@@ -1948,21 +1964,21 @@
     -->
   
     <RefParameter Name="FLatency" Comment="Flash Latency(WS)" Type="uniqueElementList" DefaultValue="FLASH_LATENCY_0" Group="System Parameters">
-        <Condition Diagnostic="" Expression="(scale1 &amp; ((HCLKFreq_Value &lt; 18000000)|(HCLKFreq_Value= 18000000 )))|(scale2 &amp; ((HCLKFreq_Value &lt; 6000000)|(HCLKFreq_Value= 6000000 )))" />
+        <Condition Diagnostic="" Expression="(scale1 &amp; ((HCLK3Freq_Value &lt; 18000000)|(HCLK3Freq_Value= 18000000 )))|(scale2 &amp; ((HCLK3Freq_Value &lt; 6000000)|(HCLK3Freq_Value= 6000000 )))" />
         <PossibleValue Value="FLASH_LATENCY_0" Comment="0 WS (1 CPU cycle)"/>
     </RefParameter>
 	
     <RefParameter Name="FLatency" Comment="Flash Latency(WS)" Type="uniqueElementList" DefaultValue="FLASH_LATENCY_1" Group="System Parameters">
-        <Condition Diagnostic="" Expression="(scale1 &amp; ((HCLKFreq_Value &lt; 36000000)|(HCLKFreq_Value= 36000000 )))|(scale2 &amp; ((HCLKFreq_Value &lt; 12000000)|(HCLKFreq_Value= 12000000 )))" />
+        <Condition Diagnostic="" Expression="(scale1 &amp; ((HCLK3Freq_Value &lt; 36000000)|(HCLK3Freq_Value= 36000000 )))|(scale2 &amp; ((HCLK3Freq_Value &lt; 12000000)|(HCLK3Freq_Value= 12000000 )))" />
         <PossibleValue Value="FLASH_LATENCY_1" Comment="1 WS (2 CPU cycle)"/>
     </RefParameter>
     <RefParameter Name="FLatency" Comment="Flash Latency(WS)" Type="uniqueElementList" DefaultValue="FLASH_LATENCY_2" Group="System Parameters">
-        <Condition Diagnostic="" Expression="(scale1 &amp; ((HCLKFreq_Value &lt; 54000000)|(HCLKFreq_Value= 54000000 ))) |(scale2 &amp; ((HCLKFreq_Value &lt; 16000000)|(HCLKFreq_Value= 16000000 )))" />
+        <Condition Diagnostic="" Expression="(scale1 &amp; ((HCLK3Freq_Value &lt; 54000000)|(HCLK3Freq_Value= 54000000 ))) |(scale2 &amp; ((HCLK3Freq_Value &lt; 16000000)|(HCLK3Freq_Value= 16000000 )))" />
         <PossibleValue Value="FLASH_LATENCY_2" Comment="2 WS (3 CPU cycle)"/>
     </RefParameter>
 
     <RefParameter Name="FLatency" Comment="Flash Latency(WS)" Type="uniqueElementList" DefaultValue="FLASH_LATENCY_3" Group="System Parameters">
-        <Condition Diagnostic="" Expression="(scale1 &amp; ((HCLKFreq_Value &lt; 64000000)|(HCLKFreq_Value= 64000000 )))" />
+        <Condition Diagnostic="" Expression="(scale1 &amp; ((HCLK3Freq_Value &lt; 64000000)|(HCLK3Freq_Value= 64000000 )))" />
         <PossibleValue Value="FLASH_LATENCY_3" Comment="3 WS (4 CPU cycle)"/>
     </RefParameter>
 	

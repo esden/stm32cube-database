@@ -96,6 +96,40 @@
 	[/#if]
 [/#list]
 
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_NO_64BIT_MULTIPLICATION"]
+/**
+ * \def MBEDTLS_NO_64BIT_MULTIPLICATION
+ *
+ * The platform lacks support for 32x32 -> 64-bit multiplication.
+ *
+ * Used in:
+ *      library/poly1305.c
+ *
+ * Some parts of the library may use multiplication of two unsigned 32-bit
+ * operands with a 64-bit result in order to speed up computations. On some
+ * platforms, this is not available in hardware and has to be implemented in
+ * software, usually in a library provided by the toolchain.
+ *
+ * Sometimes it is not desirable to have to link to that library. This option
+ * removes the dependency of that library on platforms that lack a hardware
+ * 64-bit multiplier by embedding a software implementation in Mbed TLS.
+ *
+ * Note that depending on the compiler, this may decrease performance compared
+ * to using the library function provided by the toolchain.
+ */
+            [#if definition.value="0"]
+					[#lt]//#define MBEDTLS_NO_64BIT_MULTIPLICATION
+				[#else]
+					[#lt]#define MBEDTLS_NO_64BIT_MULTIPLICATION
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+
 /**
  * \def MBEDTLS_HAVE_SSE2
  *
@@ -147,12 +181,21 @@
 /**
  * \def MBEDTLS_HAVE_TIME_DATE
  *
- * System has time.h and time(), gmtime() and the clock is correct.
+ * System has time.h, time(), and an implementation for
+ * mbedtls_platform_gmtime_r() (see below).
  * The time needs to be correct (not necesarily very accurate, but at least
  * the date should be correct). This is used to verify the validity period of
  * X.509 certificates.
  *
  * Comment if your system does not have a correct clock.
+ *
+ * \note mbedtls_platform_gmtime_r() is an abstraction in platform_util.h that
+ * behaves similarly to the gmtime_r() function from the C standard. Refer to
+ * the documentation for mbedtls_platform_gmtime_r() for more information.
+ *
+ * \note It is possible to configure an implementation for
+ * mbedtls_platform_gmtime_r() at compile-time by using the macro
+ * MBEDTLS_PLATFORM_GMTIME_R_ALT.
  */
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
@@ -542,6 +585,32 @@
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
 		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_CHACHA20_ALT"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_CHACHA20_ALT
+				[#else]
+					[#lt]#define MBEDTLS_CHACHA20_ALT
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_CHACHAPOLY_ALT"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_CHACHAPOLY_ALT
+				[#else]
+					[#lt]#define MBEDTLS_CHACHAPOLY_ALT
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
 			[#if definition.name="MBEDTLS_CMAC_ALT"]
 				[#if definition.value="0"]
 					[#lt]//#define MBEDTLS_CMAC_ALT
@@ -607,6 +676,19 @@
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
 		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_NIST_KW_ALT"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_NIST_KW_ALT
+				[#else]
+					[#lt]#define MBEDTLS_NIST_KW_ALT
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
 			[#if definition.name="MBEDTLS_MD2_ALT"]
 				[#if definition.value="0"]
 					[#lt]//#define MBEDTLS_MD2_ALT
@@ -638,6 +720,19 @@
 					[#lt]//#define MBEDTLS_MD5_ALT
 				[#else]
 					[#lt]#define MBEDTLS_MD5_ALT
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_POLY1305_ALT"]
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_POLY1305_ALT
+				[#else]
+					[#lt]#define MBEDTLS_POLY1305_ALT
 				[/#if]
 			[/#if]
 		[/#list]
@@ -721,6 +816,7 @@
 		[/#list]
 	[/#if]
 [/#list]
+
 /*
  * When replacing the elliptic curve module, pleace consider, that it is
  * implemented with two .c files:
@@ -1789,6 +1885,42 @@
 	[/#if]
 [/#list]
 
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_ECP_RESTARTABLE"]
+/**
+ * \def MBEDTLS_ECP_RESTARTABLE
+ *
+ * Enable "non-blocking" ECC operations that can return early and be resumed.
+ *
+ * This allows various functions to pause by returning
+ * #MBEDTLS_ERR_ECP_IN_PROGRESS (or, for functions in the SSL module,
+ * #MBEDTLS_ERR_SSL_CRYPTO_IN_PROGRESS) and then be called later again in
+ * order to further progress and eventually complete their operation. This is
+ * controlled through mbedtls_ecp_set_max_ops() which limits the maximum
+ * number of ECC operations a function may perform before pausing; see
+ * mbedtls_ecp_set_max_ops() for more information.
+ *
+ * This is useful in non-threaded environments if you want to avoid blocking
+ * for too long on ECC (and, hence, X.509 or SSL/TLS) operations.
+ *
+ * Uncomment this macro to enable restartable ECC computations.
+ *
+ * \note  This option only works with the default software implementation of
+ *        elliptic curve functionality. It is incompatible with
+ *        MBEDTLS_ECP_ALT, MBEDTLS_ECDH_XXX_ALT and MBEDTLS_ECDSA_XXX_ALT.
+ */
+                [#if definition.value="0"]
+					[#lt]//#define MBEDTLS_ECP_RESTARTABLE
+				[#else]
+					[#lt]#define MBEDTLS_ECP_RESTARTABLE
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list] 
+ 
 /**
  * \def MBEDTLS_ECDSA_DETERMINISTIC
  *
@@ -2832,7 +2964,7 @@
 /**
  * \def MBEDTLS_SSL_RENEGOTIATION
  *
- * Disable support for TLS renegotiation.
+ * Enable support for TLS renegotiation.
  *
  * The two main uses of renegotiation are (1) refresh keys on long-lived
  * connections and (2) client authentication after the initial handshake.
@@ -4003,6 +4135,50 @@
 	[/#if]
 [/#list]
 
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+            [#if definition.name="MBEDTLS_CHACHA20_C"]
+/**
+ * \def MBEDTLS_CHACHA20_C
+ *
+ * Enable the ChaCha20 stream cipher.
+ *
+ * Module:  library/chacha20.c
+ */
+                [#if definition.value="0"]
+					[#lt]//#define MBEDTLS_CHACHA20_C
+				[#else]
+					[#lt]#define MBEDTLS_CHACHA20_C
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+            [#if definition.name="MBEDTLS_CHACHAPOLY_C"]
+/**
+ * \def MBEDTLS_CHACHAPOLY_C
+ *
+ * Enable the ChaCha20-Poly1305 AEAD algorithm.
+ *
+ * Module:  library/chachapoly.c
+ *
+ * This module requires: MBEDTLS_CHACHA20_C, MBEDTLS_POLY1305_C
+ */
+                [#if definition.value="0"]
+					[#lt]//#define MBEDTLS_CHACHAPOLY_C
+				[#else]
+					[#lt]#define MBEDTLS_CHACHAPOLY_C
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+
 /**
  * \def MBEDTLS_CIPHER_C
  *
@@ -4055,14 +4231,16 @@
 /**
  * \def MBEDTLS_CTR_DRBG_C
  *
- * Enable the CTR_DRBG AES-256-based random generator.
+ * Enable the CTR_DRBG AES-based random generator.
+ * The CTR_DRBG generator uses AES-256 by default.
+ * To use AES-128 instead, enable MBEDTLS_CTR_DRBG_USE_128_BIT_KEY below.
  *
  * Module:  library/ctr_drbg.c
  * Caller:
  *
  * Requires: MBEDTLS_AES_C
  *
- * This module provides the CTR_DRBG AES-256 random number generator.
+ * This module provides the CTR_DRBG AES random number generator.
  */
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
@@ -4448,6 +4626,31 @@
 					[#lt]//#define MBEDTLS_HMAC_DRBG_C
 				[#else]
 					[#lt]#define MBEDTLS_HMAC_DRBG_C
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_NIST_KW_C"]
+/**
+ * \def MBEDTLS_NIST_KW_C
+ *
+ * Enable the Key Wrapping mode for 128-bit block ciphers,
+ * as defined in NIST SP 800-38F. Only KW and KWP modes
+ * are supported. At the moment, only AES is approved by NIST.
+ *
+ * Module:  library/nist_kw.c
+ *
+ * Requires: MBEDTLS_AES_C and MBEDTLS_CIPHER_C
+ */
+                [#if definition.value="0"]
+					[#lt]//#define MBEDTLS_NIST_KW_C
+				[#else]
+					[#lt]#define MBEDTLS_NIST_KW_C
 				[/#if]
 			[/#if]
 		[/#list]
@@ -4935,6 +5138,28 @@
 					[#lt]//#define MBEDTLS_PLATFORM_C
 				[#else]
 					[#lt]#define MBEDTLS_PLATFORM_C
+				[/#if]
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="MBEDTLS_POLY1305_C"]
+/**
+ * \def MBEDTLS_POLY1305_C
+ *
+ * Enable the Poly1305 MAC algorithm.
+ *
+ * Module:  library/poly1305.c
+ * Caller:  library/chachapoly.c
+ */
+				[#if definition.value="0"]
+					[#lt]//#define MBEDTLS_POLY1305_C
+				[#else]
+					[#lt]#define MBEDTLS_POLY1305_C
 				[/#if]
 			[/#if]
 		[/#list]
@@ -5672,7 +5897,23 @@
 		[/#list]
 	[/#if]
 [/#list]
-
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as enableFlag]
+			[#if enableFlag.name="MBEDTLS_CTR_DRBG_USE_128_BIT_KEY_ENABLE"]
+				[#list SWIP.defines as definition]
+					[#if definition.name="MBEDTLS_CTR_DRBG_USE_128_BIT_KEY"]
+						[#if enableFlag.value="0"]
+							[#lt]//#define MBEDTLS_CTR_DRBG_USE_128_BIT_KEY           /**< Use 128-bit key for CTR_DRBG - may reduce security (see ctr_drbg.h)  */
+						[#else]
+							[#lt]#define MBEDTLS_CTR_DRBG_USE_128_BIT_KEY           ${definition.value} /**< Use 128-bit key for CTR_DRBG - may reduce security (see ctr_drbg.h)  */
+						[/#if]
+					[/#if]
+				[/#list]			
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
 /* HMAC_DRBG options */
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
@@ -6309,10 +6550,21 @@
 			[#if enableFlag.name="MBEDTLS_SSL_MAX_CONTENT_LEN_ENABLE"]
 				[#list SWIP.defines as definition]
 					[#if definition.name="MBEDTLS_SSL_MAX_CONTENT_LEN"]
-						[#if enableFlag.value="0"]
-							[#lt]//#define MBEDTLS_SSL_MAX_CONTENT_LEN             16384 /**< Maxium fragment length in bytes, determines the size of each of the two internal I/O buffers */
+
+/** \def MBEDTLS_SSL_MAX_CONTENT_LEN
+ *
+ * Maximum fragment length in bytes.
+ *
+ * Determines the size of both the incoming and outgoing TLS I/O buffers.
+ *
+ * Uncommenting MBEDTLS_SSL_IN_CONTENT_LEN and/or MBEDTLS_SSL_OUT_CONTENT_LEN
+ * will override this length by setting maximum incoming and/or outgoing
+ * fragment length, respectively.
+ */
+                        [#if enableFlag.value="0"]
+							[#lt]//#define MBEDTLS_SSL_MAX_CONTENT_LEN             16384
 						[#else]
-							[#lt]#define MBEDTLS_SSL_MAX_CONTENT_LEN             ${definition.value} /**< Maxium fragment length in bytes, determines the size of each of the two internal I/O buffers */
+							[#lt]#define MBEDTLS_SSL_MAX_CONTENT_LEN             ${definition.value}
 						[/#if]
 					[/#if]
 				[/#list]			
@@ -6320,6 +6572,104 @@
 		[/#list]
 	[/#if]
 [/#list]
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as enableFlag]
+			[#if enableFlag.name="MBEDTLS_SSL_IN_CONTENT_LEN_ENABLE"]
+				[#list SWIP.defines as definition]
+					[#if definition.name="MBEDTLS_SSL_IN_CONTENT_LEN"]
+
+/** \def MBEDTLS_SSL_IN_CONTENT_LEN
+ *
+ * Maximum incoming fragment length in bytes.
+ *
+ * Uncomment to set the size of the inward TLS buffer independently of the
+ * outward buffer.
+ */
+                        [#if enableFlag.value="0"]
+							[#lt]//#define MBEDTLS_SSL_IN_CONTENT_LEN             16384
+						[#else]
+							[#lt]#define MBEDTLS_SSL_IN_CONTENT_LEN             ${definition.value}
+						[/#if]
+					[/#if]
+				[/#list]			
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as enableFlag]
+			[#if enableFlag.name="MBEDTLS_SSL_OUT_CONTENT_LEN_ENABLE"]
+				[#list SWIP.defines as definition]
+					[#if definition.name="MBEDTLS_SSL_OUT_CONTENT_LEN"]
+
+/** \def MBEDTLS_SSL_OUT_CONTENT_LEN
+ *
+ * Maximum outgoing fragment length in bytes.
+ *
+ * Uncomment to set the size of the outward TLS buffer independently of the
+ * inward buffer.
+ *
+ * It is possible to save RAM by setting a smaller outward buffer, while keeping
+ * the default inward 16384 byte buffer to conform to the TLS specification.
+ *
+ * The minimum required outward buffer size is determined by the handshake
+ * protocol's usage. Handshaking will fail if the outward buffer is too small.
+ * The specific size requirement depends on the configured ciphers and any
+ * certificate data which is sent during the handshake.
+ *
+ * For absolute minimum RAM usage, it's best to enable
+ * MBEDTLS_SSL_MAX_FRAGMENT_LENGTH and reduce MBEDTLS_SSL_MAX_CONTENT_LEN. This
+ * reduces both incoming and outgoing buffer sizes. However this is only
+ * guaranteed if the other end of the connection also supports the TLS
+ * max_fragment_len extension. Otherwise the connection may fail.
+ */
+                        [#if enableFlag.value="0"]
+							[#lt]//#define MBEDTLS_SSL_OUT_CONTENT_LEN             16384
+						[#else]
+							[#lt]#define MBEDTLS_SSL_OUT_CONTENT_LEN             ${definition.value}
+						[/#if]
+					[/#if]
+				[/#list]			
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+		[#list SWIP.defines as enableFlag]
+			[#if enableFlag.name="MBEDTLS_SSL_DTLS_MAX_BUFFERING_ENABLE"]
+				[#list SWIP.defines as definition]
+					[#if definition.name="MBEDTLS_SSL_DTLS_MAX_BUFFERING"]
+
+/** \def MBEDTLS_SSL_DTLS_MAX_BUFFERING
+ *
+ * Maximum number of heap-allocated bytes for the purpose of
+ * DTLS handshake message reassembly and future message buffering.
+ *
+ * This should be at least 9/8 * MBEDTLSSL_IN_CONTENT_LEN
+ * to account for a reassembled handshake message of maximum size,
+ * together with its reassembly bitmap.
+ *
+ * A value of 2 * MBEDTLS_SSL_IN_CONTENT_LEN (32768 by default)
+ * should be sufficient for all practical situations as it allows
+ * to reassembly a large handshake message (such as a certificate)
+ * while buffering multiple smaller handshake messages.
+ *
+ */
+                        [#if enableFlag.value="0"]
+							[#lt]//#define MBEDTLS_SSL_DTLS_MAX_BUFFERING             32768
+						[#else]
+							[#lt]#define MBEDTLS_SSL_DTLS_MAX_BUFFERING             ${definition.value}
+						[/#if]
+					[/#if]
+				[/#list]			
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
 		[#list SWIP.defines as enableFlag]
@@ -6519,6 +6869,37 @@
                     [#lt]//#define MBEDTLS_PLATFORM_ZEROIZE_ALT
                 [#else]
                     [#lt]#define MBEDTLS_PLATFORM_ZEROIZE_ALT
+                [/#if]
+            [/#if]
+        [/#list]
+	[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+	[#if SWIP.defines??]
+        [#list SWIP.defines as definition]
+            [#if definition.name="MBEDTLS_PLATFORM_GMTIME_R_ALT"]
+
+            /**
+ * Uncomment the macro to let Mbed TLS use your alternate implementation of
+ * mbedtls_platform_gmtime_r(). This replaces the default implementation in
+ * platform_util.c.
+ *
+ * gmtime() is not a thread-safe function as defined in the C standard. The
+ * library will try to use safer implementations of this function, such as
+ * gmtime_r() when available. However, if Mbed TLS cannot identify the target
+ * system, the implementation of mbedtls_platform_gmtime_r() will default to
+ * using the standard gmtime(). In this case, calls from the library to
+ * gmtime() will be guarded by the global mutex mbedtls_threading_gmtime_mutex
+ * if MBEDTLS_THREADING_C is enabled. We recommend that calls from outside the
+ * library are also guarded with this mutex to avoid race conditions. However,
+ * if the macro MBEDTLS_PLATFORM_GMTIME_R_ALT is defined, Mbed TLS will
+ * unconditionally use the implementation for mbedtls_platform_gmtime_r()
+ * supplied at compile time.
+ */
+                [#if definition.value="0"]
+                    [#lt]//#define MBEDTLS_PLATFORM_GMTIME_R_ALT
+                [#else]
+                    [#lt]#define MBEDTLS_PLATFORM_GMTIME_R_ALT
                 [/#if]
             [/#if]
         [/#list]

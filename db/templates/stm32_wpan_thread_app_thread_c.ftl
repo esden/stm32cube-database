@@ -68,6 +68,7 @@
 /* USER CODE END PM */
 
 /* Private function prototypes -----------------------------------------------*/
+static void APP_THREAD_CheckWirelessFirmwareInfo(void);
 static void APP_THREAD_DeviceConfig(void);
 static void APP_THREAD_StateNotif(uint32_t NotifFlags, void *pContext);
 static void APP_THREAD_TraceError(const char * pMess, uint32_t ErrCode);
@@ -156,6 +157,9 @@ void APP_THREAD_Init( void )
   /* USER CODE END APP_THREAD_INIT_1 */
 
   SHCI_CmdStatus_t ThreadInitStatus;
+  
+  /* Check the compatibility with the Coprocessor Wireless Firmware loaded */
+  APP_THREAD_CheckWirelessFirmwareInfo();
 
 #if (CFG_USB_INTERFACE_ENABLE != 0)
   VCP_Init(&VcpTxBuffer[0], &VcpRxBuffer[0]);
@@ -254,6 +258,9 @@ void APP_THREAD_Error(uint32_t ErrId, uint32_t ErrCode)
     APP_THREAD_TraceError("ERROR : ERR_THREAD_MSG_COMPARE_FAILED ",ErrCode);
     break;
 [/#if]
+  case ERR_THREAD_CHECK_WIRELESS :
+    APP_THREAD_TraceError("ERROR : ERR_THREAD_CHECK_WIRELESS ",ErrCode);
+    break;
   default :
     APP_THREAD_TraceError("ERROR Unknown ", 0);
     break;
@@ -596,6 +603,48 @@ static void APP_THREAD_TraceError(const char * pMess, uint32_t ErrCode)
   /* USER CODE BEGIN TRACE_ERROR */
 
   /* USER CODE END TRACE_ERROR */
+}
+
+/**
+ * @brief Check if the Coprocessor Wireless Firmware loaded supports Thread
+ *        and display associated informations
+ * @param  None
+ * @retval None
+ */
+static void APP_THREAD_CheckWirelessFirmwareInfo(void)
+{
+  WirelessFwInfo_t wireless_info_instance;
+  WirelessFwInfo_t* p_wireless_info = &wireless_info_instance;
+
+  if (SHCI_GetWirelessFwInfo(p_wireless_info) != SHCI_Success)
+  {
+    APP_THREAD_Error((uint32_t)ERR_THREAD_CHECK_WIRELESS, (uint32_t)ERR_INTERFACE_FATAL);
+  }
+  else
+  {
+    APP_DBG("**********************************************************");
+    APP_DBG("WIRELESS COPROCESSOR FW:");
+    /* Print version */
+    APP_DBG("VERSION ID = %d.%d.%d", p_wireless_info->VersionMajor, p_wireless_info->VersionMinor, p_wireless_info->VersionSub);
+
+    switch(p_wireless_info->StackType)
+    {
+    case INFO_STACK_TYPE_THREAD_FTD :
+      APP_DBG("FW Type : Thread FTD");
+      break;
+    case INFO_STACK_TYPE_THREAD_MTD :
+      APP_DBG("FW Type : Thread MTD");
+      break;
+    case INFO_STACK_TYPE_BLE_THREAD_FTD_STATIC :
+      APP_DBG("FW Type : Static concurent mode BLE/Thread");
+      break;
+    default :
+      /* No Thread device supported ! */
+      APP_THREAD_Error((uint32_t)ERR_THREAD_CHECK_WIRELESS, (uint32_t)ERR_INTERFACE_FATAL);
+      break;
+    }
+    APP_DBG("**********************************************************");
+  }
 }
 
 /* USER CODE BEGIN FD_LOCAL_FUNCTIONS */

@@ -94,7 +94,7 @@ __weak void ${defaultTaskFunction}(void const * argument)
           [/#if]
           [#assign index = index + 1]
         [/#list]
-            [#if mw!="USBPD" && mw!="TRACER_EMB"]
+            [#if mw!="USBPD" && mw!="TRACER_EMB" && mw!="OPENAMP" && mw!="RESMGR_UTILITY"]
               [#if mw!="GRAPHICS"]
                 [#if !((mw == "LWIP") && (USE_MBEDTLS == true))]
                   [#if (mw == "MBEDTLS")]

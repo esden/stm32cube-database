@@ -289,7 +289,7 @@ void APP_BLE_Init( void )
     CFG_BLE_HSE_STARTUP_TIME,
     CFG_BLE_VITERBI_MODE,
     CFG_BLE_LL_ONLY,
-    0}                                  /** TODO Should be read from HW */
+    0}
   };
 
   /**
@@ -536,6 +536,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
 
         case EVT_LE_ADVERTISING_REPORT:
         {
+          uint8_t *adv_report_data;
           /* USER CODE BEGIN EVT_LE_ADVERTISING_REPORT */
 
           /* USER CODE END EVT_LE_ADVERTISING_REPORT */
@@ -544,6 +545,9 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
           event_type = le_advertising_event->Advertising_Report[0].Event_Type;
 
           event_data_size = le_advertising_event->Advertising_Report[0].Length_Data;
+
+          adv_report_data = (uint8_t*)(&le_advertising_event->Advertising_Report[0].Length_Data) + 1;
+          k = 0;
 
           /* search AD TYPE 0x09 (Complete Local Name) */
           /* search AD Type 0x02 (16 bits UUIDS) */
@@ -554,8 +558,8 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
 
             while(k < event_data_size)
             {
-              adlength = le_advertising_event->Advertising_Report[0].Data[k];
-              adtype = le_advertising_event->Advertising_Report[0].Data[k + 1];
+              adlength = adv_report_data[k];
+              adtype = adv_report_data[k + 1];
               switch (adtype)
               {
                 case AD_TYPE_FLAGS: /* now get flags */
@@ -573,12 +577,12 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
                 /* USER CODE BEGIN AD_TYPE_MANUFACTURER_SPECIFIC_DATA */
 
                 /* USER CODE END AD_TYPE_MANUFACTURER_SPECIFIC_DATA */
-                  if (adlength >= 7 && le_advertising_event->Advertising_Report[0].Data[k + 2] == 0x01)
+                  if (adlength >= 7 && adv_report_data[k + 2] == 0x01)
                   { /* ST VERSION ID 01 */
 #if(CFG_DEBUG_APP_TRACE != 0)
                     APP_DBG_MSG("--- ST MANUFACTURER ID --- \n");
 #endif
-                    switch (le_advertising_event->Advertising_Report[0].Data[k + 3])
+                    switch (adv_report_data[k + 3])
                     {   /* Demo ID */
                     case CFG_DEV_ID_P2P_SERVER1: /* End Device 1 */
 #if(CFG_DEBUG_APP_TRACE != 0)

@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V4.0" IPType="peripheral" IpGroup="Control" Name="FMAC" Version="matrix1_v1_0_Cube"
+    xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+    ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
+    xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+    <About>FMAC: Filter Math Accelerator</About>
+
+    <!-- Generic RefParameters for FMAC --> 
+    <RefParameter Name="Instance" DefaultValue="FMAC" Comment="Instance" Type="" Visible="false"/>
+    <RefParameter Name="InputAccess_Init" DefaultValue="null" Comment="InputAccess_Init" Type="list"/>
+    <RefParameter Name="OutputAccess_Init" DefaultValue="null" Comment="OutputAccess_Init" Type="list"/>
+    <!-- X1 buffer base address: InputBaseAddress = 0 --> 
+    <RefParameter Comment="Input Base Address" DefaultValue="0" Max="0" Min="0" Name="InputBaseAddress" Type="string" Group="Input Buffer">
+        <Description>Base address of the input buffer (X1) within the internal memory (0x00 to 0xFF).</Description>
+    </RefParameter>
+    <!-- X1 buffer size: InputBufferSize_FIR = N+1 + d // N+1 is P_FIR, d is user input -->
+    <RefParameter Comment="Input Buffer Size" DefaultValue="=P_FIR + d_input" Max="255" Min="0" Name="InputBufferSize_FIR" Type="string" Group="Input Buffer">
+        <Description>Number of 16-bit addresses allocated to the input buffer (including the optional "headroom").</Description>
+    </RefParameter>
+    <!-- X1 buffer size: InputBufferSize_IIR = N+1 + d // N+1 is P_IIR, d is user input -->
+    <RefParameter Comment="Input Buffer Size" DefaultValue="=P_IIR + d_input" Max="255" Min="0" Name="InputBufferSize_IIR" Type="string" Group="Input Buffer">
+        <Description>Number of 16-bit addresses allocated to the input buffer (including the optional "headroom").</Description>
+    </RefParameter>
+    <!-- InputThreshol is purely user input -->
+    <RefParameter Comment="Input Threshold" DefaultValue="FMAC_THRESHOLD_1" Name="InputThreshold" Type="list" Group="Input Buffer">
+        <Description>Input threshold: the buffer full flag will be set if the number of free spaces in the buffer is inferior to this threshold.</Description>
+        <PossibleValue Comment="Input: Buffer full flag set if the number of free spaces in the buffer is less than 1. Output: Buffer empty flag set if the number of unread values in the buffer is less than 1. " Value="FMAC_THRESHOLD_1" Semaphore = "Semaphore_input_threshold_1"/>
+        <PossibleValue Comment="Input: Buffer full flag set if the number of free spaces in the buffer is less than 2. Output: Buffer empty flag set if the number of unread values in the buffer is less than 2. " Value="FMAC_THRESHOLD_2" Semaphore = "Semaphore_input_threshold_2"/>
+        <PossibleValue Comment="Input: Buffer full flag set if the number of free spaces in the buffer is less than 4. Output: Buffer empty flag set if the number of unread values in the buffer is less than 4. " Value="FMAC_THRESHOLD_4" Semaphore = "Semaphore_input_threshold_4"/>
+        <PossibleValue Comment="Input: Buffer full flag set if the number of free spaces in the buffer is less than 8. Output: Buffer empty flag set if the number of unread values in the buffer is less than 8. " Value="FMAC_THRESHOLD_8" Semaphore = "Semaphore_input_threshold_8"/>
+    </RefParameter>
+    <!-- input_d_min is the value of InputThreshold and is used to calculate d_input -->
+    <RefParameter Comment="" DefaultValue="1" Max="1" Min="1" Name="input_d_min" Type="integer">
+        <Condition Diagnostic="" Expression="Semaphore_input_threshold_1"/>
+    </RefParameter>
+    <RefParameter Comment="" DefaultValue="2" Max="2" Min="2" Name="input_d_min" Type="integer">
+        <Condition Diagnostic="" Expression="Semaphore_input_threshold_2"/>
+    </RefParameter>
+    <RefParameter Comment="" DefaultValue="4" Max="4" Min="4" Name="input_d_min" Type="integer">
+        <Condition Diagnostic="" Expression="Semaphore_input_threshold_4"/>
+    </RefParameter>
+    <RefParameter Comment="" DefaultValue="8" Max="8" Min="8" Name="input_d_min" Type="integer">
+        <Condition Diagnostic="" Expression="Semaphore_input_threshold_8"/>
+    </RefParameter>
+    <!-- d of the input buffer is the headroom used to calculate the input buffer size -->
+    <RefParameter Comment="Input Buffer HeadRoom Size" DefaultValue="=input_d_min" Max="255" Min="=input_d_min" Name="d_input" Type="integer" Group="Input Buffer">
+        <Description>HeadRoom value of Input Buffer.</Description>
+    </RefParameter>
+    <!-- X2 buffer base address: CoeffBaseAddress_FIR = InputBaseAddress + InputBufferSize_FIR -->
+    <RefParameter Comment="Coeff Base Address" DefaultValue="= InputBaseAddress + InputBufferSize_FIR" Max="255" Min="0" Name="CoeffBaseAddress_FIR" Type="string" Group="Coeff Buffer">
+        <Description>Base address of the coefficient buffer (X2) within the internal memory (0x00 to 0xFF).</Description>
+    </RefParameter>
+    <!-- X2 buffer base address: CoeffBaseAddress_IIR = InputBaseAddress + InputBufferSize_IIR -->
+    <RefParameter Comment="Coeff Base Address" DefaultValue="= InputBaseAddress + InputBufferSize_FIR" Max="255" Min="0" Name="CoeffBaseAddress_IIR" Type="string" Group="Coeff Buffer">
+        <Description>Base address of the coefficient buffer (X2) within the internal memory (0x00 to 0xFF).</Description>
+    </RefParameter>
+    <!-- X2 buffer size: CoeffBufferSize_FIR = N+1 i.e. P_FIR -->
+    <RefParameter Comment="Coeff Buffer Size" DefaultValue="=P_FIR" Max="255" Min="0" Name="CoeffBufferSize_FIR" Type="string" Group="Coeff Buffer">
+        <Description>Number of 16-bit addresses allocated to the coefficient buffer.</Description>
+    </RefParameter>
+    <!-- X2 buffer size: CoeffBufferSize_IIR = M+N+1 i.e. Q + P_IIR -->
+    <RefParameter Comment="Coeff Buffer Size" DefaultValue="=Q+ P_IIR" Max="255" Min="0" Name="CoeffBufferSize_IIR" Type="string" Group="Coeff Buffer">
+        <Description>Number of 16-bit addresses allocated to the coefficient buffer.</Description>
+    </RefParameter>
+    <!-- Y buffer base address: OutputBaseAddress_FIR = CoeffBaseAddress_FIR + CoeffBufferSize_FIR  -->
+    <RefParameter Comment="Output Base Address" DefaultValue="=CoeffBaseAddress_FIR + CoeffBufferSize_FIR" Max="255" Min="0" Name="OutputBaseAddress_FIR" Type="string" Group="Output Buffer">
+        <Description>Base address of the output buffer (Y) within the internal memory (0x00 to 0xFF).</Description>
+    </RefParameter>
+    <!-- Y buffer base address: OutputBaseAddress_IIR = CoeffBaseAddress_IIR + CoeffBufferSize_IIR  -->
+    <RefParameter Comment="Output Base Address" DefaultValue="=CoeffBaseAddress_IIR + CoeffBufferSize_IIR" Max="255" Min="0" Name="OutputBaseAddress_IIR" Type="string" Group="Output Buffer">
+        <Description>Base address of the output buffer (Y) within the internal memory (0x00 to 0xFF).</Description>
+    </RefParameter>
+    <!-- Y buffer size: OutputBufferSize_FIR = d (i.e. headroom) -->
+    <RefParameter Comment="Output Buffer Size" DefaultValue="=d_output" Max="255" Min="0" Name="OutputBufferSize_FIR" Type="string" Group="Output Buffer">
+        <Description>Number of 16-bit addresses allocated to the output buffer (including the optional "headroom").</Description>
+    </RefParameter>
+    <!-- Y buffer size: OutputBufferSize_IIR = d (i.e. headroom) + M (i.e. Q) -->
+    <RefParameter Comment="Output Buffer Size" DefaultValue="=d_output + Q" Max="255" Min="0" Name="OutputBufferSize_IIR" Type="string" Group="Output Buffer">
+        <Description>Number of 16-bit addresses allocated to the output buffer (including the optional "headroom").</Description>
+    </RefParameter>
+    <!-- OutputThreashold is purely user input -->
+    <RefParameter Comment="Output Threshold" DefaultValue="FMAC_THRESHOLD_1" Name="OutputThreshold" Type="list" Group="Output Buffer">
+        <Description>Output threshold: the buffer empty flag will be set if the number of unread values in the buffer is inferior to this threshold.</Description>
+        <PossibleValue Comment="Input: Buffer full flag set if the number of free spaces in the buffer is less than 1. Output: Buffer empty flag set if the number of unread values in the buffer is less than 1. " Value="FMAC_THRESHOLD_1" Semaphore = "Semaphore_output_threshold_1"/>
+        <PossibleValue Comment="Input: Buffer full flag set if the number of free spaces in the buffer is less than 2. Output: Buffer empty flag set if the number of unread values in the buffer is less than 2. " Value="FMAC_THRESHOLD_2" Semaphore = "Semaphore_output_threshold_2"/>
+        <PossibleValue Comment="Input: Buffer full flag set if the number of free spaces in the buffer is less than 4. Output: Buffer empty flag set if the number of unread values in the buffer is less than 4. " Value="FMAC_THRESHOLD_4" Semaphore = "Semaphore_output_threshold_4"/>
+        <PossibleValue Comment="Input: Buffer full flag set if the number of free spaces in the buffer is less than 8. Output: Buffer empty flag set if the number of unread values in the buffer is less than 8. " Value="FMAC_THRESHOLD_8" Semaphore = "Semaphore_output_threshold_8"/>
+    </RefParameter>
+    <!-- output_d_min is the value of OutputThreshold and is used to calculate d_output -->
+    <RefParameter Comment="" DefaultValue="1" Max="1" Min="1" Name="output_d_min" Type="integer">
+        <Condition Diagnostic="" Expression="Semaphore_output_threshold_1"/>
+    </RefParameter>
+    <RefParameter Comment="" DefaultValue="2" Max="2" Min="2" Name="output_d_min" Type="integer">
+        <Condition Diagnostic="" Expression="Semaphore_output_threshold_2"/>
+    </RefParameter>
+    <RefParameter Comment="" DefaultValue="4" Max="4" Min="4" Name="output_d_min" Type="integer">
+        <Condition Diagnostic="" Expression="Semaphore_output_threshold_4"/>
+    </RefParameter>
+    <RefParameter Comment="" DefaultValue="8" Max="8" Min="8" Name="output_d_min" Type="integer">
+        <Condition Diagnostic="" Expression="Semaphore_output_threshold_8"/>
+    </RefParameter>
+    <!-- d of the output buffer is the headroom used to calculate the output buffer size -->
+    <RefParameter Comment="Output buffer HeadRoom Size" DefaultValue="=output_d_min" Max="255" Min="=output_d_min" Name="d_output" Type="integer" Group="Output Buffer">
+        <Description>HeadRoom value of output buffer.</Description>
+    </RefParameter>
+    <!-- -->
+    <RefParameter Comment="Coeff A" ArraySize="63" ArrayTypeElement="uint16_t;16" Name="pCoeffA_IIR" Type="Array" Separator=" " Group="Coeff Buffer" DefaultValue="0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000">
+        <!--<RefParameter  Comment="Coeff A buffer address" Name="pCoeffA_IIR" Type="StringRW" DefaultValue="pCoeffA" Group="Coeff Buffer">-->
+        <Description>[IIR only] Coefficient vector A.</Description>
+    </RefParameter>
+    <RefParameter Comment="Coeff B" ArraySize="127" ArrayTypeElement="uint16_t;16" Name="pCoeffB_FIR" Type="Array" Separator=" " Group="Coeff Buffer" DefaultValue="0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000">
+        <!--        <RefParameter  Comment="Coeff B buffer address" Name="pCoeffB_FIR" Type="StringRW" DefaultValue="pCoeffB" Group="Coeff Buffer">-->
+        <Description>Coefficient vector B.</Description>
+    </RefParameter>
+    <RefParameter Comment="Coeff B" ArraySize="64" ArrayTypeElement="uint16_t;16" Name="pCoeffB_IIR" Type="Array" Separator=" " Group="Coeff Buffer" DefaultValue="0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000">
+        <!--    <RefParameter  Comment="Coeff B buffer address" Name="pCoeffB_IIR" Type="StringRW" DefaultValue="pCoeffB" Group="Coeff Buffer">-->
+        <Description>Coefficient vector B.</Description>
+    </RefParameter>
+    <!--<RefParameter  Comment="Coeff B buffer address" Name="pCoeffB_FIR" Type="StringRW" DefaultValue="FIR_coeff_B_vector" Group="Coeff Buffer"/>
+    <RefParameter  Comment="Coeff B buffer address" Name="pCoeffB_IIR" Type="StringRW" DefaultValue="IIR_coeff_B_vector" Group="Coeff Buffer"/>
+    <RefParameter  Comment="Coeff A buffer address" Name="pCoeffA" Type="StringRW" DefaultValue="IIR_coeff_A_vector" Group="Coeff Buffer"/>-->
+    <!-- CoeffASize is the M (i.e. Q)-->
+    <RefParameter Comment="Coeff A Size" DefaultValue="=Q" Max="255" Min="0" Name="CoeffASize" Type="string" Group="Coeff Buffer">
+        <Description>Size of the coefficient vector A.</Description>
+    </RefParameter>
+    <!-- <RefParameter Comment="P Coeffb" DefaultValue="0" Max="0" Min="0" Name="pCoeffB" Type="integer" Group="Coeff Buffer">
+        <Description>Initialization of the coefficient vector B.</Description>
+    </RefParameter> -->
+    <!-- CoeffBSize for FIR is the N+1 (i.e. P_FIR)-->
+    <RefParameter Comment="Coeff B Size" DefaultValue="=P_FIR" Max="255" Min="0" Name="CoeffBSize_FIR" Type="string" Group="Coeff Buffer">
+        <Description>Size of the coefficient vector B.</Description>
+    </RefParameter>
+    <!-- CoeffBSize for IIR is the N+1 (i.e. P_IIR)-->
+    <RefParameter Comment="Coeff B Size" DefaultValue="=P_IIR" Max="255" Min="0" Name="CoeffBSize_IIR" Type="string" Group="Coeff Buffer">
+        <Description>Size of the coefficient vector B.</Description>
+    </RefParameter>
+    <RefParameter Comment="Input Access" DefaultValue="FMAC_BUFFER_ACCESS_NONE" Name="InputAccess" Type="list" Group="Input Buffer">
+        <Description>Access to the input buffer (internal memory area): DMT, IT, Polling, None.</Description>
+        <PossibleValue Comment="Buffer handled by an external IP (ADC for instance) " Value="FMAC_BUFFER_ACCESS_NONE"/>
+        <PossibleValue Comment="Buffer accessed through the FMAC DMA " Value="FMAC_BUFFER_ACCESS_DMA"/>
+        <PossibleValue Comment="Buffer accessed through polling " Value="FMAC_BUFFER_ACCESS_POLLING"/>
+        <PossibleValue Comment="Buffer accessed through interruptions " Value="FMAC_BUFFER_ACCESS_IT"/>
+    </RefParameter>
+    <RefParameter Comment="Output Access" DefaultValue="FMAC_BUFFER_ACCESS_NONE" Name="OutputAccess" Type="list" Group="Output Buffer">
+        <Description>Access to the output buffer (internal memory area): DMA, IT, Polling, None.</Description>
+        <PossibleValue Comment="Buffer handled by an external IP (ADC for instance) " Value="FMAC_BUFFER_ACCESS_NONE"/>
+        <PossibleValue Comment="Buffer accessed through the FMAC DMA " Value="FMAC_BUFFER_ACCESS_DMA"/>
+        <PossibleValue Comment="Buffer accessed through polling " Value="FMAC_BUFFER_ACCESS_POLLING"/>
+        <PossibleValue Comment="Buffer accessed through interruptions " Value="FMAC_BUFFER_ACCESS_IT"/>
+    </RefParameter>
+    <RefParameter Comment="Clip" DefaultValue="FMAC_CLIP_DISABLED" Name="Clip" Type="list" Group="General">
+        <Description>Enable or disable the clipping feature (wrapping when the q1.</Description>
+        <PossibleValue Comment="Clipping disabled " Value="FMAC_CLIP_DISABLED"/>
+        <PossibleValue Comment="Clipping enabled " Value="FMAC_CLIP_ENABLED"/>
+    </RefParameter>
+    <RefParameter Comment="Filter" DefaultValue="FMAC_FUNC_CONVO_FIR" Name="Filter" Type="list">
+        <Condition Diagnostic="" Expression="Semaphore_FIR"/>
+        <Description>Filter type.</Description>
+        <PossibleValue Comment="Convolution (FIR filter) " Value="FMAC_FUNC_CONVO_FIR"/>
+    </RefParameter>
+    <RefParameter Comment="Filter" DefaultValue="FMAC_FUNC_IIR_DIRECT_FORM_1" Name="Filter" Type="list">
+        <Condition Diagnostic="" Expression="Semaphore_IIR"/>
+        <Description>Filter type.</Description>
+        <PossibleValue Comment="IIR filter (direct form 1) " Value="FMAC_FUNC_IIR_DIRECT_FORM_1"/>
+    </RefParameter>
+    <RefParameter Comment="Coeff B Length" DefaultValue="2" Max="127" Min="2" Name="P_FIR" Type="integer" Group="Coeff Buffer">
+        <Description>Length of the coefficient vector B.</Description>
+    </RefParameter>
+    <RefParameter Comment="Coeff A Length" DefaultValue="1" Max="63" Min="1" Name="Q" Type="integer" Group="Coeff Buffer">
+        <Description>Length of the coefficient vector A.</Description>
+    </RefParameter>
+    <RefParameter Comment="Gain" DefaultValue="0" Max="7" Min="0" Name="R" Type="integer" Group="General">
+        <Description>The gain to be applied to the accumulator output. The value output to the Y buffer is multiplied by 2^R</Description>
+    </RefParameter>
+    <RefParameter Comment="Coeff B Length" DefaultValue="2" Max="64" Min="2" Name="P_IIR" Type="integer" Group="Coeff Buffer">
+        <Description>Length of the coefficient vector B.</Description>
+    </RefParameter>
+
+	<!-- RefModes for FMAC -->
+	<RefMode Name="FIR" >
+		<ConfigForMode>Fmac_Init</ConfigForMode>
+        <ConfigForMode>FIR_Configuration</ConfigForMode>
+        <Parameter Name="InputBaseAddress"/>
+        <Parameter Name="InputBufferSize_FIR"/>
+        <Parameter Name="InputThreshold"/>
+        <Parameter Name="d_input"/>
+        <Parameter Name="InputAccess"/>
+        <Parameter Name="CoeffBaseAddress_FIR"/>
+        <Parameter Name="CoeffBufferSize_FIR"/>
+        <Parameter Name="CoeffBSize_FIR"/>
+        <Parameter Name="OutputBaseAddress_FIR"/>
+        <Parameter Name="OutputBufferSize_FIR"/>
+        <Parameter Name="OutputThreshold"/>
+        <Parameter Name="d_output"/>
+        <Parameter Name="OutputAccess"/>
+        <Parameter Name="pCoeffB_FIR"/>
+        <Parameter Name="P_FIR"/>
+        <Parameter Name="Clip"/>
+        <Parameter Name="R"/>
+	</RefMode>
+	<RefMode Name="IIR" >
+		<ConfigForMode>Fmac_Init</ConfigForMode>
+        <ConfigForMode>IIR_Configuration</ConfigForMode>
+        <Parameter Name="InputBaseAddress"/>
+        <Parameter Name="InputBufferSize_IIR"/>
+        <Parameter Name="InputThreshold"/>
+        <Parameter Name="d_input"/>
+        <Parameter Name="InputAccess"/>
+        <Parameter Name="CoeffBaseAddress_IIR"/>
+        <Parameter Name="CoeffBufferSize_IIR"/>
+        <Parameter Name="CoeffASize"/>
+        <Parameter Name="CoeffBSize_IIR"/>
+        <Parameter Name="OutputBaseAddress_IIR"/>
+        <Parameter Name="OutputBufferSize_IIR"/>
+        <Parameter Name="OutputThreshold"/>
+        <Parameter Name="d_output"/>
+        <Parameter Name="OutputAccess"/>
+        <Parameter Name="pCoeffA_IIR"/>
+        <Parameter Name="Q"/>
+        <Parameter Name="pCoeffB_IIR"/>
+        <Parameter Name="P_IIR"/>
+        <Parameter Name="Clip"/>
+        <Parameter Name="R"/>
+	</RefMode>
+	<RefMode Name="FMAC_Activate">
+		<ConfigForMode>Fmac_Init</ConfigForMode>
+	</RefMode>
+
+
+    <!-- ModeLogicOperator for FMAC -->
+       <ModeLogicOperator Name="OR">
+           <Mode Name="Filter" UserName="Mode" >
+			<ModeLogicOperator Name="XOR">
+                <Mode Name="FMAC_Activate" UserName="Activated">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_FMAC" />
+                    </SignalLogicalOp>
+                </Mode>
+                <Mode Name="FIR" UserName="FIR" RemoveCondition="true">
+                    <Semaphore>Semaphore_FIR</Semaphore>
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VS_FMAC" />
+					</SignalLogicalOp>
+				</Mode>
+				<Mode Name="IIR" UserName="IIR" RemoveCondition="true">
+                    <Semaphore>Semaphore_IIR</Semaphore>
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VS_FMAC" />
+					</SignalLogicalOp>
+				</Mode>
+            </ModeLogicOperator>
+        </Mode>
+	</ModeLogicOperator>
+
+    <!-- RefSignal for FMAC -->
+	<RefSignal Name="VS_FMAC" Virtual="true"/>
+</IP>

@@ -107,7 +107,7 @@
             [/#list]
             [#if !exist]  [#-- if exist --]
               [#if argument.status!="NULL"]
-                    #t${argument.typeName} ${argument.name};
+                    #t${argument.typeName} ${argument.name} = {0};
                 [#if myListOfLocalVariables != ""]
                   [#assign myListOfLocalVariables = myListOfLocalVariables + " " + argument.name]
                 [#else]
@@ -120,7 +120,7 @@
           [/#if][#-- if global --]
         [#else][#-- if context?? --]
           [#if argument.status!="NULL"]
-                #t${argument.typeName} ${argument.name};
+                #t${argument.typeName} ${argument.name} = {0};
           [/#if]
         [/#if][#-- if argument.context?? --]
 
@@ -618,7 +618,7 @@ void MX_${instName}_Init(void)
   [#list service.variables as variable] [#-- variables declaration --]
     [#if v?contains(variable.name)]
     [#else]
-#t${variable.value} ${variable.name};
+#t${variable.value} ${variable.name} = {0};
       [#assign v = v + " " + variable.name]
     [/#if]
   [/#list]

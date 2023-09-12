@@ -1,6 +1,6 @@
 [#ftl]
 [#-- IPdatas is a list of IPconfigModel --] 
-[#--  Default template in Config file of new series --]
+[#--  Default template in Config file of new series (G0, WB) --]
 [#list IPdatas as IP]  
 	[#assign ipvar = IP] 
 	[#assign initCondition = ""]

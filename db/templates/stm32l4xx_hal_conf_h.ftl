@@ -51,7 +51,7 @@
   */
 
 #define HAL_MODULE_ENABLED  
-[#assign allModules = ["ADC", "AES", "CAN", "COMP", "CRC", "CRYP", "DAC", "DCMI", "DMA2D", "DFSDM", "DSI", "FIREWALL", "GFXMMU", "HCD", "HASH", "I2S", "IRDA", "IWDG", "LTDC","LCD", "LPTIM", "NAND", "NOR", "OPAMP", "OSPI", "OCTOSPI", "PCD", "QSPI", "QUADSPI", "RNG", "RTC", "SAI", "SD", "SMBUS", "SMARTCARD", "SPI", "SRAM", "SWPMI", "TIM", "TSC", "UART", "USART", "WWDG","EXTI" ]]
+[#assign allModules = ["ADC", "AES", "CAN", "COMP", "CRC", "CRYP", "DAC", "DCMI", "DMA2D", "DFSDM", "DSI", "FIREWALL", "GFXMMU", "HCD", "HASH", "I2S", "IRDA", "IWDG", "LTDC","LCD", "LPTIM", "MMC", "NAND", "NOR", "OPAMP", "OSPI", "OCTOSPI", "PCD", "QSPI", "QUADSPI", "RNG", "RTC", "SAI", "SD", "SMBUS", "SMARTCARD", "SPI", "SRAM", "SWPMI", "TIM", "TSC", "UART", "USART", "WWDG","EXTI" ]]
   [#list allModules as module]
 	[#if isModuleUsed(module)]
 [#compress]#define HAL_${module?replace("QUADSPI","QSPI")?replace("AES","CRYP")?replace("OCTOSPI","OSPI")}_MODULE_ENABLED[/#compress]
@@ -274,6 +274,10 @@
 #ifdef HAL_SRAM_MODULE_ENABLED
   #include "stm32l4xx_hal_sram.h"
 #endif /* HAL_SRAM_MODULE_ENABLED */
+
+#ifdef HAL_MMC_MODULE_ENABLED
+  #include "stm32l4xx_hal_mmc.h"
+#endif /* HAL_MMC_MODULE_ENABLED */
 
 #ifdef HAL_NOR_MODULE_ENABLED
   #include "stm32l4xx_hal_nor.h"

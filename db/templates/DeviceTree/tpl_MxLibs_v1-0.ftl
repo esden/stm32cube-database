@@ -111,7 +111,6 @@
 [#-- Extracting info from DT --]
 [#--------------------------------------------------------------------------------------------------------------------------------]
 
-
 [#--returns the list of devices assigned to "BootLoader" context and enabled--]
 [#function srvcmx_getBootloadersEnabledDevicesList]
 
@@ -191,6 +190,18 @@ NB: it is supposed that device checked is enabled as "dt_enabledDevicesMap" is u
 [#return false]
 [/#function]
 
+
+[#--return the nber of runtime ctxts the device is assigned to.
+NB: independently to its state--]
+[#function srvcmx_getDeviceRtCtxtNber		pDeviceName]
+
+	[#local device = srvc_map_getValue(mxDtDM.dt_enabledDevicesMap, pDeviceName)]
+	[#if  device??]
+		[#return device.rtCtxtAssignmentNber]
+	[/#if]
+
+[#return 0]
+[/#function]
 
 
 [#--------------------------------------------------------------------------------------------------------------------------------]

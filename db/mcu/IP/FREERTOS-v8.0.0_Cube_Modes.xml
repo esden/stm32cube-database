@@ -27,14 +27,14 @@
     
     <!-- For future use of MPU mode (support started with Dory/WB series) -->
     <RefParameter Name="USE_MPU" Comment="Use MPU" DefaultValue="0" Type="list" Group="MPU" TabName="Config parameters">
-        <Condition Diagnostic="Available for Dory" Expression="S_FREERTOS_NATIVE &amp; STM32WB"/>
+        <Condition Diagnostic="Available for Dory" Expression="S_FREERTOS_NATIVE &amp; STM32WBxx"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1" Semaphore="S_FREERTOS_WITH_MPU"/>
         <Description>Use or not Memory Protection Unit with FreeRTOS. Very first step of implementation on Dory for Examples Migration. To be consolidated.</Description>
     </RefParameter>
     <RefParameter Name="USE_MPU" Comment="Use MPU" DefaultValue="0" Type="list" Group="MPU" TabName="Config parameters" Visible="false">
         <PossibleValue Comment="Disabled" Value="0"/>
-        <Description>Use or not Memory Protection Unit with FreeRTOS (not available).</Description>
+        <Description>Use of Memory Protection Unit with FreeRTOS (not yet available).</Description>
     </RefParameter>
 
     <!-- In config files, does not do the job correctly with conditions and semaphores -->
@@ -56,9 +56,18 @@
     
     <!-- Semaphore of CMSIS_version TO BE UPDATED when FW packages come and support new FreeRTOS and CMSI versions -->
     <!-- Note: also used in NvicVector.java (be careful when renaming!!!) -->
+    <!--  TO BE REWORKED with CMSIS V2 coming -->
     <RefParameter Name="CMSIS_version" Comment="CMSIS-RTOS version" DefaultValue="1.02" Type="String" Group="Versions" TabName="Config parameters">
+        <Condition Diagnostic="When CMSIS V1 API is selected" Expression="FreeRTOS_API=0"/>
         <PossibleValue Comment="Version version of CMSIS" Value="1.02"/>
     </RefParameter>
+    <RefParameter Name="CMSIS_version" Comment="CMSIS-RTOS version" DefaultValue="2.00" Type="String" Group="Versions" TabName="Config parameters">
+        <Condition Diagnostic="When CMSIS V2 API is selected" Expression="FreeRTOS_API=1"/>
+        <PossibleValue Comment="Version version of CMSIS" Value="2.00"/>
+    </RefParameter>
+    <RefParameter Name="CMSIS_version" Comment="CMSIS-RTOS version" DefaultValue="undefined" Type="String" Group="Versions" TabName="Config parameters">
+        <PossibleValue Comment="Version version of CMSIS" Value="undefined"/>
+    </RefParameter> 
 
     <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="9.0.0" Type="String" Group="Versions" TabName="Config parameters">
         <PossibleValue Comment="Version of FreeRTOS" Value="9.0.0" Semaphore="S_VERSION_9_0_0"/>
@@ -88,17 +97,17 @@
         <PossibleValue Comment="Version of FreeRTOS" Value="10.0.1" Semaphore="S_VERSION_10_0_0"/>
         <Condition Diagnostic="New version available for G0" Expression="STM32G0"/>
     </RefParameter>
-    <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="9.0.0" Type="String" Group="Versions" TabName="Config parameters">
-        <PossibleValue Comment="Version of FreeRTOS" Value="9.0.0" Semaphore="S_VERSION_9_0_0"/>
-        <Condition Diagnostic="Version available for H7" Expression="STM32H7"/>
+    <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="10.0.1" Type="String" Group="Versions" TabName="Config parameters">
+        <PossibleValue Comment="Version of FreeRTOS" Value="10.0.1" Semaphore="S_VERSION_10_0_0"/>
+        <Condition Diagnostic="New version available for H7" Expression="STM32H7"/>
     </RefParameter>
     <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="10.0.1" Type="String" Group="Versions" TabName="Config parameters">
         <PossibleValue Comment="Version of FreeRTOS" Value="10.0.1" Semaphore="S_VERSION_10_0_0"/>
         <Condition Diagnostic="New version available for L0" Expression="STM32L0"/>  <!-- Note: check on configUSE_PORT_OPTIMISED_TASK_SELECTION when v10 comes -->
     </RefParameter>
-    <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="9.0.0" Type="String" Group="Versions" TabName="Config parameters">
-        <PossibleValue Comment="Version of FreeRTOS" Value="9.0.0" Semaphore="S_VERSION_9_0_0"/>
-        <Condition Diagnostic="Version available for L1" Expression="STM32L1"/>
+    <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="10.0.1" Type="String" Group="Versions" TabName="Config parameters">
+        <PossibleValue Comment="Version of FreeRTOS" Value="10.0.1" Semaphore="S_VERSION_10_0_0"/>
+        <Condition Diagnostic="New version available for L1" Expression="STM32L1"/>
     </RefParameter>
     <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="10.0.1" Type="String" Group="Versions" TabName="Config parameters">
         <PossibleValue Comment="Version of FreeRTOS" Value="10.0.1" Semaphore="S_VERSION_10_0_0"/>
@@ -112,8 +121,12 @@
         <PossibleValue Comment="Version of FreeRTOS" Value="10.0.1" Semaphore="S_VERSION_10_0_0"/>
         <Condition Diagnostic="New version available for MP1" Expression="STM32MP1"/>
     </RefParameter>
-    <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="9.0.0" Type="String" Group="Versions" TabName="Config parameters">
-        <PossibleValue Comment="Default version of FreeRTOS" Value="9.0.0" Semaphore="S_VERSION_9_0_0"/>
+    <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="10.0.1" Type="String" Group="Versions" TabName="Config parameters">
+        <PossibleValue Comment="Version of FreeRTOS" Value="10.0.1" Semaphore="S_VERSION_10_0_0"/>
+        <Condition Diagnostic="New version available for G4" Expression="STM32G4"/>
+    </RefParameter>
+    <RefParameter Name="FREERTOS_version" Comment="FreeRTOS version" DefaultValue="10.0.1" Type="String" Group="Versions" TabName="Config parameters">
+        <PossibleValue Comment="Default version of FreeRTOS" Value="10.0.1" Semaphore="S_VERSION_10_0_0"/>
     </RefParameter>
 
     <RefParameter Name="RAM_SIZE" Comment="RAM_SIZE" DefaultValue="=$RamSize" Type="integer" Visible="false"/>
@@ -153,6 +166,14 @@
                      The max value is 1000, as higher values generate compilation errors (division by zero)</Description>
     </RefParameter>
 
+    <RefParameter Name="configMAX_PRIORITIES" Comment="MAX_PRIORITIES" DefaultValue="56" Type="uniqueElementList" Group="Kernel settings" TabName="Config parameters" NoCheckOpt="false">
+        <Condition Diagnostic="Default set to 56 when CMSIS RTOS V2 is Enabled" Expression="S_CMSIS_RTOS_V2"/>
+        <Description>Sets the maximum priority that can be assigned to a task. &lt;br&gt;
+                     Tasks can be assigned a priority from zero, which is the lowest priority, to (MAX_PRIORITIES-1), which is the highest priority.
+                     &lt;b&gt;Warning: &lt;/b&gt; &lt;br&gt;
+                     Set to 56 when CMSIS-RTOS v2 is in use.</Description>
+    </RefParameter>
+    
     <RefParameter Name="configMAX_PRIORITIES" Comment="MAX_PRIORITIES" DefaultValue="7" Max="32" Min="4"  Type="integer" Group="Kernel settings" TabName="Config parameters" NoCheckOpt="false">
         <Condition Diagnostic="Limited to 32 when configUSE_PORT_OPTIMISED_TASK_SELECTION is Enabled" Expression="configUSE_PORT_OPTIMISED_TASK_SELECTION=1"/>
         <Description>Sets the maximum priority that can be assigned to a task. &lt;br&gt;
@@ -217,20 +238,31 @@
 	<!-- 2016-02-16 Default value back to 1, so that LwIP projects with FreeRTOS work fine. To investigate a better way (with semaphores) -->
 	<!-- Temporary patch (to avoid useless trackers) -->
 	<RefParameter Name="configUSE_MUTEXES" Comment="USE_MUTEXES" DefaultValue="1" Type="list" Group="Kernel settings" TabName="Config parameters">
+		<Condition Diagnostic="Both values allowed when CMSIS_RTOS V2 is not used" Expression="!S_CMSIS_RTOS_V2"/>
 		<PossibleValue Comment="Disabled" Value="0"/>
 		<PossibleValue Comment="Enabled" Value="1"/>
 		<Description>Set to 1 to include mutex functionality in the build, or 0 to omit mutex functionality from the build.</Description>
 	</RefParameter>
+	<RefParameter Name="configUSE_MUTEXES" Comment="USE_MUTEXES" DefaultValue="1" Type="list" Group="Kernel settings" TabName="Config parameters">
+		<PossibleValue Comment="Enabled" Value="1"/>
+		<Description>Forced to 1 when CMSIS_RTOS_V2 is used (constraint due to current cmsis_os2.c file in FW packs).</Description>
+	</RefParameter>	
 	
 	<!-- Default value was changed to 1 to hide the trouble with Keil (error in cmsis_os.c, issue from the forum) -->
 	<!-- Issue still exists with Keil when the value is set to 0... But not with IAR..  -->
 	<!-- Was aligned on appli examples which all use a value set to 1 -->
 	<!-- 2016-02-13 - Back to 0 as default value to reduce heap consumption when no mutexes used -->
+	
 	<RefParameter Name="configUSE_RECURSIVE_MUTEXES" Comment="USE_RECURSIVE_MUTEXES" DefaultValue="0" Type="list" Group="Kernel settings" TabName="Config parameters">
-	    <Condition Diagnostic="Both values allowed when configUSE_MUTEXES equals to 1" Expression="configUSE_MUTEXES=1"/>
+	    <Condition Diagnostic="Both values allowed when configUSE_MUTEXES equals to 1" Expression="!S_CMSIS_RTOS_V2 &amp; configUSE_MUTEXES=1"/>
 		<PossibleValue Comment="Disabled" Value="0"/>
 		<PossibleValue Comment="Enabled" Value="1"/>
 		<Description>Set to 1 to include recursive mutex functionality in the build, or 0 to omit recursive mutex functionality from the build.</Description>
+	</RefParameter>
+    <RefParameter Name="configUSE_RECURSIVE_MUTEXES" Comment="USE_RECURSIVE_MUTEXES" DefaultValue="1" Type="list" Group="Kernel settings" TabName="Config parameters">
+	    <Condition Diagnostic="Forced to 1 when CMSIS RTOS v2 is used" Expression="S_CMSIS_RTOS_V2"/>
+		<PossibleValue Comment="Enabled" Value="1"/>
+		<Description>Forced to 1 when CMSIS_RTOS_V2 is used (constraint due to current cmsis_os2.c file in FW packs).</Description>
 	</RefParameter>
 	<RefParameter Name="configUSE_RECURSIVE_MUTEXES" Comment="USE_RECURSIVE_MUTEXES" DefaultValue="0" Type="list" Group="Kernel settings" TabName="Config parameters">
 		<PossibleValue Comment="Disabled" Value="0"/>
@@ -238,6 +270,12 @@
 		             Forced to 0 (Disabled) when configUSE_MUTEXES equals to 0 (Disabled).</Description>
 	</RefParameter>
 	
+	<RefParameter Name="configUSE_COUNTING_SEMAPHORES" Comment="USE_COUNTING_SEMAPHORES" DefaultValue="1" Type="list" Group="Kernel settings" TabName="Config parameters">
+	    <Condition Diagnostic="Forced to 1 when CMSIS RTOS v2 is in use." Expression="S_CMSIS_RTOS_V2"/>
+		<PossibleValue Comment="Enabled" Value="1"/>
+		<Description>Set to 1 to include counting semaphore functionality in the build, or 0 to omit counting semaphore functionality from the build.&lt;br&gt;
+		             Forced to 1 when CMSIS_RTOS_V2 is used (constraint due to current cmsis_os2.c file in FW packs).</Description>
+	</RefParameter>
 	<RefParameter Name="configUSE_COUNTING_SEMAPHORES" Comment="USE_COUNTING_SEMAPHORES" DefaultValue="0" Type="list" Group="Kernel settings" TabName="Config parameters">
 		<PossibleValue Comment="Disabled" Value="0"/>
 		<PossibleValue Comment="Enabled" Value="1"/>
@@ -251,13 +289,23 @@
 	                 The queue registry has no purpose unless you are using a RTOS kernel aware debugger. </Description>
 	</RefParameter>
 	
+	<!-- cf BZL 55923 -->
 	<RefParameter Name="configUSE_APPLICATION_TASK_TAG" Comment="USE_APPLICATION_TASK_TAG" DefaultValue="0" Type="list" Group="Kernel settings" TabName="Config parameters">
+	    <Condition Diagnostic="Both values allowed when TouchGFX not in use." Expression="!USE_Touch_GFX_STACK"/>
 		<PossibleValue Comment="Disabled" Value="0"/>
 		<PossibleValue Comment="Enabled" Value="1"/>
 		<Description>USE_APPLICATION_TASK_TAG must be defined as 1 for the vTaskSetApplicationTaskTag function to be available.&lt;br&gt;
 		             This function is intended for advanced users only. &lt;br&gt; 
 		             A 'tag' value can be assigned to each task. This value is for the use of the application only - the RTOS kernel itself does not make use of it in any way. &lt;br&gt;
 		             The FreeRTOS trace macros documentation page provides a good example of how an application might make use of this feature.</Description>
+	</RefParameter>
+	<RefParameter Name="configUSE_APPLICATION_TASK_TAG" Comment="USE_APPLICATION_TASK_TAG" DefaultValue="1" Type="list" Group="Kernel settings" TabName="Config parameters">
+		<PossibleValue Comment="Enabled" Value="1"/>
+		<Description>USE_APPLICATION_TASK_TAG must be defined as 1 for the vTaskSetApplicationTaskTag function to be available.&lt;br&gt;
+		             This function is intended for advanced users only. &lt;br&gt; 
+		             A 'tag' value can be assigned to each task. This value is for the use of the application only - the RTOS kernel itself does not make use of it in any way. &lt;br&gt;
+		             The FreeRTOS trace macros documentation page provides a good example of how an application might make use of this feature. &lt;br&gt;
+		             Forced to 1 (Enabled) when TouchGFX is in use. </Description>
 	</RefParameter>
 
 	<!--<RefParameter Name="configTOTAL_HEAP_SIZE" Comment="TOTAL_HEAP_SIZE" DefaultValue="15" Unit="KByte(s)" Type="integer" Max="$RamSize" Min="1" Group="Kernel settings" TabName="Config parameters">    -->
@@ -361,16 +409,6 @@
 		             The schemes defined by heap_1.c, heap_2.c, heap_4.c and heap_5.c allocate memory from a statically allocated array, known as the FreeRTOS heap.&lt;br&gt;
 		             TOTAL_HEAP_SIZE sets the size of this array. The size is specified in bytes.&lt;br&gt;</Description>
 	</RefParameter>
-
-	<!--   uniqueElementList
-    <RefParameter Name="HEAP_NUMBER" Comment="Memory Management scheme" DefaultValue="4" Type="list" Group="Kernel settings" TabName="Config parameters">
-		<PossibleValue Comment="heap_1" Value="1"/>
-		<PossibleValue Comment="heap_2" Value="2"/>
-		<PossibleValue Comment="heap_3" Value="3"/>
-		<PossibleValue Comment="heap_4" Value="4"/>
-		<Description>The RTOS kernel v7 allocates RAM each time a task, queue, mutex, software timer or semaphore is created.&lt;br&gt; To replace and improve the use of C standard libray malloc() and free() functions, the FreeRTOS download includes four sample memory allocation implementations.&lt;br&gt; The schemes are implemented in the heap_1.c, heap_2.c, heap_3.c and heap_4.c sources files respectively. &lt;br&gt;  The schemes defined by heap_1.c, heap_2.c and heap_4.c allocate memory from a statically allocated array, known as the FreeRTOS heap.&lt;br&gt; TOTAL_HEAP_SIZE sets the size of this array. The size is specified in bytes.&lt;br&gt;</Description>
-	</RefParameter>
-	-->
     
     <RefParameter Name="configGENERATE_RUN_TIME_STATS" Comment="GENERATE_RUN_TIME_STATS" DefaultValue="0" Type="list" Group="Run time and task stats gathering related definitions" TabName="Config parameters">
         <PossibleValue Comment="Disabled" Value="0"/>
@@ -447,7 +485,7 @@
     </RefParameter>
 
     <RefParameter Name="configUSE_TIMERS" Comment="USE_TIMERS" DefaultValue="0" Type="list" Group="Software timer definitions" TabName="Config parameters">
-        <Condition Diagnostic="Both values allowed" Expression="INCLUDE_xTaskGetSchedulerState=1 &amp; INCLUDE_xTimerPendFunctionCall=0 &amp; INCLUDE_xEventGroupSetBitFromISR=0"/>
+        <Condition Diagnostic="Both values allowed" Expression="!S_CMSIS_RTOS_V2 &amp; INCLUDE_xTaskGetSchedulerState=1 &amp; INCLUDE_xTimerPendFunctionCall=0 &amp; INCLUDE_xEventGroupSetBitFromISR=0"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Set to 1 (Enabled) to include software timer functionality, or 0 (Disabled) to omit software timer functionality. &lt;br&gt;
@@ -459,6 +497,7 @@
         <Description>Set to 1 (Enabled) to include software timer functionality. &lt;br&gt;
                      &lt;b&gt;Dependency:&lt;/b&gt;&lt;br&gt;
                      Forced to 1 (Enabled) when &lt;br&gt;
+                     - CMSIS_RTOS_V2 is used (constraint due to current cmsis_os2.c file in FW packs) &lt;br&gt;
                      - xTaskGetSchedulerState equals to 0 (Disabled) &lt;br&gt;
                      - xTimerPendFunctionCall equals to 1 (Enabled) &lt;br&gt;
                      - or xEventGroupSetBitFromISR equals to 1 (Enabled).</Description>
@@ -498,7 +537,7 @@
 	
 	
 	<RefParameter Name="configLIBRARY_LOWEST_INTERRUPT_PRIORITY" Comment="LIBRARY_LOWEST_INTERRUPT_PRIORITY" DefaultValue="15" Max="15" Min="1"  Type="integer" Group="Interrupt nesting behaviour configuration" TabName="Config parameters" NoCheckOpt="false">
-	    <Condition Diagnostic="Values for F1/F2/F3/F4/L1/L4/F7/H7/WB/MP1" Expression="STM32F4 | STM32F2 | STM32F3 | STM32L1 | STM32F1 | STM32F7 | STM32H7 | STM32L4 | STM32WB | STM32MP1"/>
+	    <Condition Diagnostic="Values for F1/F2/F3/F4/L1/L4/F7/H7/WB/MP1/G4" Expression="STM32F4 | STM32F2 | STM32F3 | STM32L1 | STM32F1 | STM32F7 | STM32H7 | STM32L4 | STM32WB | STM32MP1 | STM32G4"/>
 	    <Description>The lowest interrupt priority that can be used in a call to a "set priority" function.</Description>
 	</RefParameter>
 	<RefParameter Name="configLIBRARY_LOWEST_INTERRUPT_PRIORITY" Comment="LIBRARY_LOWEST_INTERRUPT_PRIORITY" DefaultValue="3" Max="3" Min="1"  Type="integer" Group="Interrupt nesting behaviour configuration" TabName="Config parameters" NoCheckOpt="false">
@@ -507,7 +546,7 @@
 	
     <!-- <RefParameter Name="configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY" Comment="LIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY" DefaultValue="5" Max="15" Min="1"  Type="integer" Group="Interrupt nesting behaviour configuration" TabName="Config parameters">  -->
 	<RefParameter Name="configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY" Comment="LIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY" DefaultValue="5" Max="=configLIBRARY_LOWEST_INTERRUPT_PRIORITY" Min="1" Type="integer" Group="Interrupt nesting behaviour configuration" TabName="Config parameters" NoCheckOpt="false">
-	    <Condition Diagnostic="Values for F1/F2/F3/F4/L1/L4/F7/H7/WB/MP1" Expression="STM32F4 | STM32F2 | STM32F3 | STM32L1 | STM32F1 | STM32F7 | STM32H7 | STM32L4 | STM32WB | STM32MP1"/>
+	    <Condition Diagnostic="Values for F1/F2/F3/F4/L1/L4/F7/H7/WB/MP1/G4" Expression="STM32F4 | STM32F2 | STM32F3 | STM32L1 | STM32F1 | STM32F7 | STM32H7 | STM32L4 | STM32WB | STM32MP1 | STM32G4"/>
 	    <Description>The highest interrupt priority that can be used by any interrupt service routine that makes calls to interrupt safe FreeRTOS API functions. &lt;br&gt; 
                      DO NOT CALL INTERRUPT SAFE FREERTOS API FUNCTIONS FROM ANY INTERRUPT THAT HAS A HIGHER PRIORITY THAN THIS! (higher priorities are lower numeric values).</Description>
     </RefParameter>
@@ -716,7 +755,7 @@
 
     <!--  New for CMSIS v1.02 / FreeRTOS 8.1.2 -->
     <RefParameter Name="INCLUDE_xEventGroupSetBitFromISR" Comment="xEventGroupSetBitFromISR" DefaultValue="0" Type="list" Group="Include definitions" TabName="Include parameters" Visible="true">
-	    <Condition Diagnostic="Available since support of FreeRTOS v8" Expression="CMSIS_version=1.02 &amp; INCLUDE_xTimerPendFunctionCall=1"/>
+	    <Condition Diagnostic="Available since support of FreeRTOS v8" Expression="INCLUDE_xTimerPendFunctionCall=1"/>
 	    <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
 	    <Description>Set bits (flags) within an RTOS event group. A version of xEventGroupSetBits() that can be called from an interrupt service routine (ISR). &lt;br&gt;
@@ -724,7 +763,6 @@
                      INCLUDE_xTimerPendFunctionCall must be set to 1 to make the xEventGroupSetBitFromISR() function available.</Description>
     </RefParameter>
 	<RefParameter Name="INCLUDE_xEventGroupSetBitFromISR" Comment="xEventGroupSetBitFromISR" DefaultValue="0" Type="list" Group="Include definitions" TabName="Include parameters" Visible="true">
-	    <Condition Diagnostic="Available since support of FreeRTOS v8" Expression="CMSIS_version=1.02 &amp; INCLUDE_xTimerPendFunctionCall=0"/>
 	    <PossibleValue Comment="Disabled" Value="0"/>
 	    <Description>Set bits (flags) within an RTOS event group. A version of xEventGroupSetBits() that can be called from an interrupt service routine (ISR). &lt;br&gt;
                      &lt;b&gt;Note:&lt;/b&gt;&lt;br&gt;
@@ -732,12 +770,9 @@
                      &lt;b&gt;Dependency:&lt;/b&gt;&lt;br&gt; 
                      Must be set to 0 (Disabled) when xTimerPendFunctionCall = 0 (Disabled).</Description>
 	</RefParameter>
-	<RefParameter Name="INCLUDE_xEventGroupSetBitFromISR" Comment="xEventGroupSetBitFromISR" DefaultValue="0" Type="integer" Group="Include definitions" TabName="Include parameters" Visible="false">
-	    <Description>Set bits (flags) within an RTOS event group. A version of xEventGroupSetBits() that can be called from an interrupt service routine (ISR)</Description>
-	</RefParameter>
 
     <RefParameter Name="INCLUDE_xTimerPendFunctionCall" Comment="xTimerPendFunctionCall" DefaultValue="0" Type="list" Group="Include definitions" TabName="Include parameters" Visible="true">
-	    <Condition Diagnostic="Available since support of FreeRTOS v8" Expression="CMSIS_version=1.02 &amp; configUSE_TIMERS=1"/>
+	    <Condition Diagnostic="Available since support of FreeRTOS v8" Expression="configUSE_TIMERS=1"/>
 	    <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
 	    <Description>Used to pend the execution of a function to the RTOS daemon task (the timer service task, hence this function is pre-fixed with 'Timer'). &lt;br&gt;
@@ -745,7 +780,6 @@
                      configUSE_TIMERS must be set to 1 to make the xTimerPendFunctionCall() function available</Description>
 	</RefParameter>
 	<RefParameter Name="INCLUDE_xTimerPendFunctionCall" Comment="xTimerPendFunctionCall" DefaultValue="0" Type="uniqueElementList" Group="Include definitions" TabName="Include parameters" Visible="true">
-	    <Condition Diagnostic="Available since support of FreeRTOS v8" Expression="CMSIS_version=1.02 &amp; configUSE_TIMERS=0"/>
 	    <PossibleValue Comment="Disabled" Value="0"/>
 	    <Description>Used to pend the execution of a function to the RTOS daemon task (the timer service task, hence this function is pre-fixed with 'Timer'). &lt;br&gt;
                      &lt;b&gt;Note:&lt;/b&gt;&lt;br&gt;
@@ -753,29 +787,20 @@
                      &lt;b&gt;Dependency:&lt;/b&gt;&lt;br&gt;
                      Forced to 0 (Disabled) as configUSE_TIMERS is Disabled.</Description>
 	</RefParameter>
-	<RefParameter Name="INCLUDE_xTimerPendFunctionCall" Comment="xTimerPendFunctionCall" DefaultValue="0" Type="integer" Group="Include definitions" TabName="Include parameters" Visible="false">
-	    <Description>Used to pend the execution of a function to the RTOS daemon task (the timer service task, hence this function is pre-fixed with 'Timer').</Description>
-	</RefParameter>
 
     <RefParameter Name="configENABLE_BACKWARD_COMPATIBILITY" Comment="ENABLE_BACKWARD_COMPATIBILITY" DefaultValue="1" Type="list" Group="Kernel settings" TabName="Config parameters" Visible="true">
-	    <Condition Diagnostic="Available since support of FreeRTOS v8" Expression="CMSIS_version=1.02"/>
-	    <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
 	    <Description>The FreeRTOS.h header file includes a set of #define macros that map the names of data types used in versions of FreeRTOS prior to version 8.0.0 to the names used in FreeRTOS version 8.0.0. &lt;br&gt;
                      The macros allow application code to update the version of FreeRTOS they are built against from a pre 8.0.0 version to a post 8.0.0 version without modification. &lt;br&gt;
                      Setting configENABLE_BACKWARD_COMPATIBILITY to 0 in FreeRTOSConfig.h excludes the macros from the build, and in so doing allowing validation that no pre version 8.0.0 names are being used. </Description>
 	</RefParameter>
-    <RefParameter Name="configENABLE_BACKWARD_COMPATIBILITY" Comment="ENABLE_BACKWARD_COMPATIBILITY" DefaultValue="null" Type="integer" Group="Kernel settings" TabName="Config parameters" Visible="false">
-        <Description>The FreeRTOS.h header file includes a set of #define macros that map the names of data types used in versions of FreeRTOS prior to version 8.0.0 to the names used in FreeRTOS version 8.0.0. &lt;br&gt;
-                     The macros allow application code to update the version of FreeRTOS they are built against from a pre 8.0.0 version to a post 8.0.0 version without modification. &lt;br&gt;
-                     Setting configENABLE_BACKWARD_COMPATIBILITY to 0 in FreeRTOSConfig.h excludes the macros from the build, and in so doing allowing validation that no pre version 8.0.0 names are being used. </Description>
-    </RefParameter>
 
     <!--  configUSE_PORT_OPTIMISED_TASK_SELECTION to study in the future; current link with configMAX_PRIORITIES (max is now fixed to 32, with CMSIS V1) -->
 
     <!-- Ticket 33822 (see also 25890) (kept otherwise compilation fails on tasks.c: for example, Error[Pe223]: function "portRECORD_READY_PRIORITY" declared implicitly ... -->
     <RefParameter Name="configUSE_PORT_OPTIMISED_TASK_SELECTION" Comment="USE_PORT_OPTIMISED_TASK_SELECTION" DefaultValue="0" Type="uniqueElementList" Group="Kernel settings" TabName="Config parameters" Visible="true">
-        <Condition Diagnostic="configUSE_PORT_OPTIMISED_TASK_SELECTION must always be disabled with M0 cortex" Expression="(STM32F0 | STM32L0 | STM32G0)"/>
+        <Condition Diagnostic="configUSE_PORT_OPTIMISED_TASK_SELECTION must always be disabled with M0 cortex or when CMSIS RTOS V2 is selected" Expression="(STM32F0 | STM32L0 | STM32G0 | S_CMSIS_RTOS_V2)"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <Description>Some FreeRTOS ports have two methods of selecting the next task to execute - a generic method, and a method that is specific to that port.&lt;br&gt;
                      The Generic method:&lt;br&gt;
@@ -808,22 +833,6 @@
                      &lt;b&gt;Warning: &lt;/b&gt; &lt;br&gt;
                      Forced to 1 (Enabled) since FreeRTOS v9 support.</Description>                    
     </RefParameter>
-    <!--
-    <RefParameter Name="configUSE_PORT_OPTIMISED_TASK_SELECTION" Comment="USE_PORT_OPTIMISED_TASK_SELECTION" DefaultValue="null" Type="integer" Group="Kernel settings" TabName="Config parameters" Visible="false">
-        <Description>Some FreeRTOS ports have two methods of selecting the next task to execute - a generic method, and a method that is specific to that port.&lt;br&gt;
-                     The Generic method:&lt;br&gt;
-                     - Is used when configUSE_PORT_OPTIMISED_TASK_SELECTION is set to 0, or when a port specific method is not implemented.&lt;br&gt;
-                     - Can be used with all FreeRTOS ports.&lt;br&gt;
-                     - Is completely written in C, making it less efficient than a port specific method.&lt;br&gt;
-                     - Does not impose a limit on the maximum number of available priorities.&lt;br&gt;
-                     A port specific method:&lt;br&gt;
-                     - Is not available for all ports.&lt;br&gt;
-                     - Is used when configUSE_PORT_OPTIMISED_TASK_SELECTION is set to 1.&lt;br&gt;
-                     - Relies on one or more architecture specific assembly instructions (typically a Count Leading Zeros [CLZ] of equivalent instruction) so can only be used with the architecture for which it was specifically written.&lt;br&gt;
-                     - Is more efficient than the generic method.&lt;br&gt;
-                     - Typically imposes a limit of 32 on the maximum number of available priorities.</Description>
-	</RefParameter>    
-	-->
 
     <!--  New for FreeRTOS 8.2.1 -->  
     <RefParameter Name="configUSE_TICKLESS_IDLE" Comment="USE_TICKLESS_IDLE" DefaultValue="0" Type="list" Group="Kernel settings" TabName="Config parameters" Visible="true">
@@ -851,6 +860,40 @@
     </RefParameter>
 
     <!--  New for FreeRTOS 9.0.0 -->  
+    <RefParameter Name="MEMORY_ALLOCATION" Comment="Memory Allocation" DefaultValue="2" Type="uniqueElementList" Group="Memory management settings" TabName="Config parameters" Visible="true">
+        <Condition Diagnostic="Both allocations required with current CMSIS-RTOS V2 files" Expression="S_CMSIS_RTOS_V2"/>
+        <PossibleValue Comment="Dynamic / Static" Value="2"/>
+        <Description>FreeRTOS versions prior to V9.0.0 allocate the memory used by the RTOS objects listed below from the special FreeRTOS heap.&lt;br&gt;
+                     FreeRTOS V9.0.0 and onwards gives the application writer the ability to instead provide the memory themselves, 
+                     allowing the following objects to optionally be created without any memory being allocated dynamically: Tasks, Software Timers, Queues, Event Groups, Semaphores and Mutexes.&lt;br&gt;
+                     For that purpose, two new parameters are available: configSUPPORT_DYNAMIC_ALLOCATION and configSUPPORT_STATIC_ALLOCATION.&lt;br&gt;
+                     (see http://www.freertos.org/Static_Vs_Dynamic_Memory_Allocation.html for more information).&lt;br&gt;&lt;br&gt;
+                     In CubeMx, setting MEMORY_ALLOCATION allows to configure configSUPPORT_STATIC_ALLOCATION and configSUPPORT_DYNAMIC_ALLOCATION parameters at the same time:&lt;br&gt;
+                     - when equals to "Dynamic", sets configSUPPORT_DYNAMIC_ALLOCATION to 1 and configSUPPORT_STATIC_ALLOCATION to 0 &lt;br&gt;
+                     - when equals to "Static", sets configSUPPORT_DYNAMIC_ALLOCATION to 0 and configSUPPORT_STATIC_ALLOCATION to 1 &lt;br&gt;
+                     - when equals to "Dynamic / Static", sets both configSUPPORT_DYNAMIC_ALLOCATION and configSUPPORT_STATIC_ALLOCATION to 1 &lt;br&gt;
+                     &lt;b&gt;Note:&lt;/b&gt; 
+                     Forced to 2 (Dynamic / Static), constraint due to the current CMSIS-RTOS V2 files (mainly cmsis_os2.c).
+        </Description>
+    </RefParameter>
+ 
+    <RefParameter Name="MEMORY_ALLOCATION" Comment="Memory Allocation" DefaultValue="2" Type="list" Group="Memory management settings" TabName="Config parameters" Visible="true">
+        <Condition Diagnostic="Both allocations are now the default value for F4." Expression="STM32F4"/>
+        <PossibleValue Comment="Dynamic" Value="0"/>
+        <PossibleValue Comment="Static" Value="1"/>
+        <PossibleValue Comment="Dynamic / Static" Value="2"/>
+        <Description>FreeRTOS versions prior to V9.0.0 allocate the memory used by the RTOS objects listed below from the special FreeRTOS heap.&lt;br&gt;
+                     FreeRTOS V9.0.0 and onwards gives the application writer the ability to instead provide the memory themselves, 
+                     allowing the following objects to optionally be created without any memory being allocated dynamically: Tasks, Software Timers, Queues, Event Groups, Semaphores and Mutexes.&lt;br&gt;
+                     For that purpose, two new parameters are available: configSUPPORT_DYNAMIC_ALLOCATION and configSUPPORT_STATIC_ALLOCATION.&lt;br&gt;
+                     (see http://www.freertos.org/Static_Vs_Dynamic_Memory_Allocation.html for more information).&lt;br&gt;&lt;br&gt;
+                     In CubeMx, setting MEMORY_ALLOCATION allows to configure configSUPPORT_STATIC_ALLOCATION and configSUPPORT_DYNAMIC_ALLOCATION parameters at the same time:&lt;br&gt;
+                     - when equals to "Dynamic", sets configSUPPORT_DYNAMIC_ALLOCATION to 1 and configSUPPORT_STATIC_ALLOCATION to 0 &lt;br&gt;
+                     - when equals to "Static", sets configSUPPORT_DYNAMIC_ALLOCATION to 0 and configSUPPORT_STATIC_ALLOCATION to 1 &lt;br&gt;
+                     - when equals to "Dynamic / Static", sets both configSUPPORT_DYNAMIC_ALLOCATION and configSUPPORT_STATIC_ALLOCATION to 1 &lt;br&gt;
+        </Description>
+    </RefParameter>
+    
     <RefParameter Name="MEMORY_ALLOCATION" Comment="Memory Allocation" DefaultValue="0" Type="list" Group="Memory management settings" TabName="Config parameters" Visible="true">
         <PossibleValue Comment="Dynamic" Value="0"/>
         <PossibleValue Comment="Static" Value="1"/>
@@ -902,7 +945,8 @@
     
     <!--  New for FreeRTOS v10.0.0 -->
     <RefParameter Name="configRECORD_STACK_HIGH_ADDRESS" Comment="RECORD_STACK_HIGH_ADDRESS" DefaultValue="0" Type="list" Group="Kernel settings" TabName="Config parameters">
-        <Condition Diagnostic="Added since support of FreeRTOS v10" Expression="S_VERSION_10_0_0"/>
+        <!--  <Condition Diagnostic="Added since support of FreeRTOS v10" Expression="S_VERSION_10_0_0"/> -->
+        <Condition Diagnostic="Added since support of FreeRTOS v10" Expression="!(STM32F0|STM32F1|STM32F2|STM32F3)"/> <!-- fix for 64092 -->
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>When set to 1 (Enabled) the stack start address is saved into each task's TCB (assuming stack grows down).</Description>
@@ -1046,33 +1090,7 @@
         <Parameter Name="BinarySemaphores01"/>
         <Parameter Name="CountingSemaphores01"/>
     </RefMode>
-    
-    <!-- RefMode for Old-fashioned Enabled 
-    <RefMode Name="Enabled" BaseMode="FreeRTOS_Basemode" Abstract="false">
-        <ConfigForMode>FREERTOS_ENABLE_Init</ConfigForMode>
-        <Parameter Name="CMSIS_version"/>
-    </RefMode>
-    -->
-	
-	<!-- ModeLogicOperator for FREERTOS
-    <ModeLogicOperator Name="OR">
-		<Mode Name="Enabled">
-			<ModeLogicOperator Name="XOR">
-				<Mode Name="Enabled">
-					<SignalLogicalOp Name="AND">
-						<Signal IOMode="" Name="VS_ENABLE"/>
-					</SignalLogicalOp>
-					<Semaphore>S_FREERTOS</Semaphore>
-				</Mode>
-			</ModeLogicOperator>
-		</Mode>
-    </ModeLogicOperator>
-    -->
-	
-	<!-- RefSignal for FREERTOS 
-	<RefSignal Name="VS_ENABLE" Virtual="true"/>
-	-->
-	
+
 	<!-- RefMode for CMSIS -->
 	<RefMode Name="CMSIS_V1" BaseMode="FreeRTOS_Basemode" Abstract="false">
 		<ConfigForMode>FREERTOS_ENABLE_Init</ConfigForMode>
@@ -1089,7 +1107,6 @@
 		<ConfigForMode>FREERTOS_NATIVE_ENABLE_Init</ConfigForMode>
 	</RefMode>
 	
-    <!-- Part to uncomment when trying "native" mode -->
     <ModeLogicOperator Name="OR">
       <Mode Name="Interface">
         <Condition Expression="!(S_BLE_HOST | S_THREAD)" Diagnostic="Not possible to activate FREERTOS when ST32_WPAN is activated"/>
@@ -1099,7 +1116,7 @@
             <SignalLogicalOp Name="AND">
               <Signal IOMode="" Name="VS_CMSIS_V1"/>
             </SignalLogicalOp>
-            <Semaphore>S_FREERTOS</Semaphore>
+            <Semaphore>S_FREERTOS$context</Semaphore>
             <Semaphore>S_CMSIS_RTOS_V1</Semaphore>    <!-- Note: also used in NvicVector.java (be careful when renaming!!!) -->
           </Mode>
           
@@ -1110,11 +1127,12 @@
             </SignalLogicalOp>
             <Semaphore>S_FREERTOS</Semaphore> 
             <Semaphore>S_CMSIS_RTOS_V2</Semaphore>   <!-- Note: not forget to add it in NvicVector.java (be careful when renaming as well!!!) -->
-            <Condition Expression="STM32xxx" Diagnostic="Not yet available for that series"/>
+            <Condition Expression="STM32F4" Diagnostic="Only available for F4 series"/>
+            <!-- <Condition Expression="STM32xxx" Diagnostic="Not yet available for that series"/> -->
           </Mode>
           
           <!-- "Native" to be delivered in the future -->
-          <!--
+          <!--  
           <Mode Name="Native">
             <SignalLogicalOp Name="AND">
               <Signal IOMode="" Name="VS_NATIVE"/>
@@ -1130,6 +1148,6 @@
     
     <RefSignal Name="VS_CMSIS_V1" Virtual="true"/>
     <RefSignal Name="VS_CMSIS_V2" Virtual="true"/>
-    <!--  <RefSignal Name="VS_NATIVE" Virtual="true"/> -->
+    <RefSignal Name="VS_NATIVE" Virtual="true"/>
 
 </IP>

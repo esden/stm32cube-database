@@ -19,6 +19,9 @@
 [#assign EA_PATH = params.EA_PATH ]
 [#assign underRoot = params.underRoot ]
 [#assign ToolChainLocation = params.ToolChainLocation]
+[#if params.dualCore??]
+[#assign dualCore = params.dualCore]
+[/#if]
 
 [#--assign version = params.EA_3_in_file1_param8 --]
 [/#list]
@@ -41,7 +44,7 @@
     "SelectedColorDepth": ${Depth},    
     "SelectedStartupLanguage": "GB",
     "Skin": "Blue",
-    "TouchGfxPath": "../Middlewares/ST/TouchGFX/touchgfx/",
+    "TouchGfxPath": "[#if dualCore??]../[/#if]../Middlewares/ST/TouchGFX/touchgfx/",
     "UIPath": ".",
     "ApplicationTemplate": {
       "Name": "Simulator",
@@ -63,10 +66,10 @@
       "AvailableResolutions": [],
       "PhysicalButtons": [],
       "GenerateAssetsCommand": "make -f simulator/gcc/Makefile assets -j10",
-      [#if IDE == "SW4STM32"]
-      "PostGenerateCommand": [#if underRoot?? && underRoot=="true"]"touchgfx update_project --project-file=../.project "[#else]"touchgfx update_project --project-file=${ideProjectFile?replace(MXPRojectRootPath,"..")}  --gui-group-name=Application/User/TouchGFX/gui --generated-group-name=Application/User/TouchGFX/generated"[/#if],      
+      [#if IDE == "SW4STM32" || IDE == "STM32CubeIDE"]
+      "PostGenerateCommand": [#if underRoot?? && underRoot=="true"]"touchgfx update_project --project-file=[#if dualCore??]../[/#if]../.project "[#else]"touchgfx update_project --project-file=${ideProjectFile?replace(MXPRojectRootPath,"..")}  --gui-group-name=Application/User/TouchGFX/gui --generated-group-name=Application/User/TouchGFX/generated"[/#if],      
       [#else]
-      "PostGenerateCommand":[#if IDE?contains("EWARM")]"touchgfx update_project --project-file=${ideProjectFile?replace(MXPRojectRootPath,"..")}   --gui-group-name=Application/User/TouchGFX/gui --generated-group-name=Application/User/TouchGFX/generated"[#else]"touchgfx update_project --project-file=${ideProjectFile?replace(MXPRojectRootPath,"..")} --gui-group-name=Application/User/TouchGFX/gui --generated-group-name=Application/User/TouchGFX/generated"[/#if],
+      "PostGenerateCommand":[#if IDE?contains("EWARM")]"touchgfx update_project --project-file=[#if dualCore??]..\\[/#if]${ideProjectFile?replace(MXPRojectRootPath,"..")}"[#else]"touchgfx update_project --project-file=${ideProjectFile?replace(MXPRojectRootPath,"..")} --gui-group-name=Application/User/TouchGFX/gui --generated-group-name=Application/User/TouchGFX/generated"[/#if],
       [/#if]
       "CompileSimulatorCommand": "make -f simulator/gcc/Makefile -j10",
       "RunSimulatorCommand": "build\\bin\\simulator.exe",

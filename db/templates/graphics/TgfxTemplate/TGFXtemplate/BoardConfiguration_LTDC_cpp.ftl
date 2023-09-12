@@ -62,6 +62,10 @@
 #include <STM32F7HAL.hpp>
 #include <STM32F7DMA.hpp>
 [/#if]
+[#if FamilyName=="STM32H7"]
+#include <STM32H7HAL.hpp>
+#include <STM32H7DMA.hpp>
+[/#if]
 
 [#if FamilyName=="STM32F4"]
 #include <STM32F4Instrumentation.hpp>
@@ -70,6 +74,10 @@
 [#if FamilyName=="STM32F7"]
 #include <STM32F7TouchController.hpp>
 #include <STM32F7Instrumentation.hpp>
+[/#if]
+[#if FamilyName=="STM32H7"]
+#include <STM32H7Instrumentation.hpp>
+#include <STM32H7TouchController.hpp>
 [/#if]
 #n
 /* USER CODE BEGIN user includes */
@@ -130,6 +138,15 @@ extern "C"
 #include "stm32f4xx_hal_rcc_ex.h"
 #include "stm32f4xx_hal_tim.h"
 
+}
+[/#if]
+[#if FamilyName=="STM32H7"]
+extern "C"
+{
+#include "stm32h7xx.h"
+#include "stm32h7xx_hal_dma.h"
+#include "stm32h7xx_hal_rcc_ex.h"
+#include "stm32h7xx_hal_tim.h"
 }
 [/#if]
 
@@ -249,6 +266,11 @@ STM32F4DMA dma;
 STM32F4TouchController tc;
 STM32F4Instrumentation mcuInstr;
 [/#if]
+[#if FamilyName=="STM32H7"]
+STM32H7DMA dma;
+STM32H7TouchController tc;
+STM32H7Instrumentation mcuInstr;
+[/#if]
 
 [#if TGFX_depth=="16" || TGFX_depth=="0" ]
 static LCD16bpp display;
@@ -273,6 +295,10 @@ void touchgfx_init()
 [/#if]
 [#if FamilyName=="STM32F7"]
     HAL& hal = touchgfx_generic_init<STM32F7HAL>(dma, display, tc, dispWidth, dispHeight,(uint16_t*) ${CACHE_ADDR}, 
+                                               ${CACHE_SIZE}, ${Cache_Count});
+[/#if]
+[#if FamilyName=="STM32H7"]
+    HAL& hal = touchgfx_generic_init<STM32H7HAL>(dma, display, tc, dispWidth, dispHeight,(uint16_t*) ${CACHE_ADDR}, 
                                                ${CACHE_SIZE}, ${Cache_Count});
 
 [/#if]

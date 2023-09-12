@@ -940,7 +940,7 @@
             [#if tabN==2]#t#t[#else]#t#t#t[/#if]/* Enable EXTI Line 18 for USB wakeup */
         [/#if]
     [#else]
-        [#if FamilyName=="STM32L0" || FamilyName=="STM32F0"]
+        [#if FamilyName=="STM32L0" || FamilyName=="STM32F0" || FamilyName=="STM32G4"]
             [#if tabN==2]#t#t[#else]#t#t#t[/#if]/* Enable EXTI Line 18 for USB wakeup */
         [#elseif FamilyName=="STM32WB"]
             [#if tabN==2]#t#t[#else]#t#t#t[/#if]/* Enable EXTI Line 28 for USB wakeup */

@@ -389,7 +389,7 @@ uint32_t DHCPcoarseTimer = 0;
 osSemaphoreId Netif_LinkSemaphore = NULL;
 /* Ethernet link thread Argument */
 struct link_str link_arg;
-  [/#if][#-- endif netif_callback && with_rtos --]
+[/#if][#-- endif netif_callback && with_rtos --]
 [#else][#-- else series --]
 [#if (netif_callback == 1) && (with_rtos == 0)]
 uint32_t EthernetLinkTimer;

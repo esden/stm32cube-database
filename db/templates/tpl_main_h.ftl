@@ -156,6 +156,18 @@ extern "C" {
 
 [/#compress]
 
+[#-- MZA add the list of files (board_conf.h,..) to be include into the main.h for Tikcet 50684 --]
+[#compress]
+[#assign bspConfIncludesList = ""]
+[#if BspConfIncludes??] [#-- Include Bsp Configuration file --]
+    [#list BspConfIncludes as inc]
+        [#if !bspConfIncludesList?contains(inc)]
+#include "${inc}"
+            [#assign bspConfIncludesList = bspConfIncludesList+" "+inc]
+        [/#if]
+    [/#list]
+[/#if]
+[/#compress]
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -239,6 +251,7 @@ void Error_Handler(void);
 [/#if]
 [#if isHALUsed??]
 [#else]
+[#if FamilyName!="STM32G0"]
 #ifndef NVIC_PRIORITYGROUP_0
 #define NVIC_PRIORITYGROUP_0         ((uint32_t)0x00000007) /*!< 0 bit  for pre-emption priority,
                                                                  4 bits for subpriority */
@@ -251,6 +264,7 @@ void Error_Handler(void);
 #define NVIC_PRIORITYGROUP_4         ((uint32_t)0x00000003) /*!< 4 bits for pre-emption priority,
                                                                  0 bit  for subpriority */
 #endif
+[/#if]
 [/#if]
 [#list voids as void]
   [#if void.bspUsed?? && void.bspUsed]

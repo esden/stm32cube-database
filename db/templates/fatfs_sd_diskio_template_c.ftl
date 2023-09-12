@@ -1,5 +1,4 @@
 [#ftl]
-/* USER CODE BEGIN Header */
 [#assign familyName=FamilyName?lower_case]
 [#assign use_dma=0]
 [#assign use_rtos=0]
@@ -21,23 +20,27 @@
 [/#if]
 [/#list]
 [/#if]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-[#if use_dma = 1]
- [#if use_rtos = 1]
-  * @file    sd_diskio.c (based on sd_diskio_dma_rtos_template.c v2.0.2 as FreeRTOS is enabled)
- [#else]
-  * @file    sd_diskio.c (based on sd_diskio_dma_template.c v2.0.2 as "Use dma template" is enabled)
- [/#if]
-[#else]
-  * @file    sd_diskio.c (based on sd_diskio_template.c v2.0.2 as "Use dma template" is disabled)
-[/#if]
+  * @file    sd_diskio.c
   * @brief   SD Disk I/O driver
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 /* USER CODE END Header */
+
+[#-- Moved here (as the user section prevents from refreshing the comments). --]
+[#if use_dma = 1]
+ [#if use_rtos = 1]
+/* Note: code generation based on sd_diskio_dma_rtos_template.c v2.0.2 as FreeRTOS is enabled. */
+ [#else]
+/* Note: code generation based on sd_diskio_dma_template.c v2.0.2 as "Use dma template" is enabled. */
+ [/#if]
+[#else]
+/* Note: code generation based on sd_diskio_template.c v2.0.2 as "Use dma template" is disabled. */
+[/#if]
 
 /* USER CODE BEGIN firstSection */
 /* can be used to modify / undefine following code or add new definitions */

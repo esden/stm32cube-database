@@ -20,7 +20,7 @@
         <PossibleValue Comment="FD mode with BitRate Switshing " Value="FDCAN_FRAME_FD_BRS"/>
     </RefParameter>
 
-    <RefParameter Comment="Mode" DefaultValue="FDCAN_MODE_NORMAL" Name="Mode" Type="list" Group="Basic Parameters">
+    <RefParameter Comment="Mode" DefaultValue="lol" Name="Mode" Type="list" Group="Basic Parameters">
         <Description>Specifies the FDCAN operating mode.</Description>
         <PossibleValue Comment="Normal mode " Value="FDCAN_MODE_NORMAL"/>
         <PossibleValue Comment="Restricted operation" Value="FDCAN_MODE_RESTRICTED_OPERATION"/>
@@ -85,10 +85,21 @@
     </RefParameter>
     <RefParameter Comment="Std Filters Nbr" DefaultValue="0" Max="128" Min="0" Name="StdFiltersNbr" Type="integer" Group="Basic Parameters">
         <Description>Specifies the number of standard Message ID filter.</Description>
+        <Condition Diagnostic="" Expression="STM32H7" />
+    </RefParameter>
+    <RefParameter Comment="Std Filters Nbr" DefaultValue="0" Max="28" Min="0" Name="StdFiltersNbr" Type="integer" Group="Basic Parameters">
+        <Description>Specifies the number of standard Message ID filter.</Description>
+        <Condition Diagnostic="" Expression="STM32G4" />
     </RefParameter>
     <RefParameter Comment="Ext Filters Nbr" DefaultValue="0" Max="64" Min="0" Name="ExtFiltersNbr" Type="integer" Group="Basic Parameters">
         <Description>Specifies the number of extended Message ID filters.</Description>
+        <Condition Diagnostic="" Expression="STM32H7" />
     </RefParameter>
+    <RefParameter Comment="Ext Filters Nbr" DefaultValue="0" Max="8" Min="0" Name="ExtFiltersNbr" Type="integer" Group="Basic Parameters">
+        <Description>Specifies the number of extended Message ID filters.</Description>
+        <Condition Diagnostic="" Expression="STM32G4" />
+    </RefParameter>
+    
     <RefParameter Comment="Rx Fifo0 Elmts Nbr" DefaultValue="0" Max="64" Min="0" Name="RxFifo0ElmtsNbr" Type="integer" Group="Basic Parameters">
         <Condition Diagnostic="" Expression="STM32H7"/>
         <Description>Specifies the number of Rx FIFO0 Elements.</Description>
@@ -145,7 +156,7 @@
         <Condition Diagnostic="" Expression="STM32H7"/>
         <Description>Specifies the number of Dedicated Tx Buffers.</Description>
     </RefParameter>
-    <RefParameter Comment="Tx Fifo Queue Elmts Nbr" DefaultValue="0" Max="4294967295" Min="0" Name="TxFifoQueueElmtsNbr" Type="integer" Group="Basic Parameters">
+    <RefParameter Comment="Tx Fifo Queue Elmts Nbr" DefaultValue="0" Max="32" Min="0" Name="TxFifoQueueElmtsNbr" Type="integer" Group="Basic Parameters">
         <Condition Diagnostic="" Expression="STM32H7"/>
         <Description>Specifies the number of Tx Buffers used for Tx FIFO/Queue.</Description>
     </RefParameter>
@@ -724,7 +735,6 @@
         <Parameter Name="FrameFormat"/>
         <Parameter Name="Mode"/>
         <Parameter Name="AutoRetransmission"/>
-
        
         <Parameter Name="TransmitPause"/>
         <Parameter Name="ProtocolException"/>
@@ -773,7 +783,6 @@
         <Parameter Name="FrameFormat"/>
         <Parameter Name="Mode"/>
         <Parameter Name="AutoRetransmission"/>
-
         
         <Parameter Name="TransmitPause"/>
         <Parameter Name="ProtocolException"/>
@@ -823,7 +832,6 @@
         <Parameter Name="FrameFormat"/>
         <Parameter Name="Mode"/>
         <Parameter Name="AutoRetransmission"/>
-
        
         <Parameter Name="TransmitPause"/>
         <Parameter Name="ProtocolException"/>
@@ -863,12 +871,14 @@
         <Parameter Name="ErrorCode"/>
         <Parameter Name="EndAddress"/>-->
     </RefMode>
-
+   
+   
     <!-- Modes for CAN. Suppose Silent and/or Loopback Modes are Debug, and need Tx/Rx on Board -->
     <ModeLogicOperator Name="OR">
         <Mode Name="Mode" UserName="Mode">
             <ModeLogicOperator Name="XOR">
-                <Mode Name="FDCANMaster" UserName="Classic" ShrinkName="Master Mode" RemoveCondition="$IpNumber=2" >
+                         
+                <Mode Name="FDCANMaster" UserName="Classic Master" ShrinkName="Master Mode" RemoveCondition="$IpNumber=2" >
                     <SignalLogicalOp Name="AND">
                         <Signal Name="RX"/>
                         <Signal Name="TX"/>
@@ -876,14 +886,16 @@
                     <Condition Expression="$IpNumber=1" Diagnostic="Master active only on CAN1"/>
                     <Semaphore>FDCAN_Master_$IpInstance</Semaphore>
                 </Mode>
-                <Mode Name="FDCANSlave" UserName="Classic" ShrinkName="Slave Mode" RemoveCondition="$IpNumber=1" >
+            
+                <Mode Name="FDCANSlave" UserName="Classic Slave" ShrinkName="Slave Mode" RemoveCondition="$IpNumber=1" >
                     <SignalLogicalOp Name="AND">
                         <Signal Name="RX"/>
                         <Signal Name="TX"/>
                     </SignalLogicalOp>
-                    <Condition Expression="$IpNumber=2" Diagnostic="Slave active only on CAN2"/>
+                    <Condition Expression="" Diagnostic="Slave active only on CAN2"/>
                     <Semaphore>FDCAN_Slave_$IpInstance</Semaphore>
                 </Mode>
+                
                 <Mode Name="FDCANFD" UserName="FD">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="RX"/>
@@ -916,6 +928,7 @@
         </Mode>-->
     </ModeLogicOperator>
 		
+                
     <!-- RefSignal for CAN -->
     <RefSignal IOMode="AlternateFunctionPushPull" Name="RX"/>
     <RefSignal IOMode="AlternateFunctionPushPull" Name="TX"/>

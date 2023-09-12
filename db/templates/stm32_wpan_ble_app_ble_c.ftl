@@ -98,7 +98,7 @@
 #include "eddystone_uid_service.h"
 #include "eddystone_url_service.h"
 #include "eddystone_tlm_service.h"
-#include "IBeacon_service.h"
+#include "ibeacon_service.h"
 #include "ibeacon.h"
 [/#if]
 [#if  (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)]
@@ -548,7 +548,7 @@ void APP_BLE_Init( void )
     CFG_BLE_HSE_STARTUP_TIME,
     CFG_BLE_VITERBI_MODE,
     CFG_BLE_LL_ONLY,
-    0}                                  /** TODO Should be read from HW */
+    0}
   };
 
   /**
@@ -1233,7 +1233,7 @@ static void Adv_Request(APP_BLE_ConnStatus_t New_Status)
       if (ret == BLE_STATUS_SUCCESS)
       {
 #if(CFG_DEBUG_APP_TRACE != 0)
-        APP_DBG_MSG("Successfully Stopped Advertising");
+        APP_DBG_MSG("Successfully Stopped Advertising \n");
 #endif
         }
       else
@@ -1267,14 +1267,14 @@ static void Adv_Request(APP_BLE_ConnStatus_t New_Status)
     {
       if (New_Status == APP_BLE_FAST_ADV)
       {
-        APP_DBG_MSG("Successfully Start Fast Advertising " );
+        APP_DBG_MSG("Successfully Start Fast Advertising \n" );
         /* Start Timer to STOP ADV - TIMEOUT */
         HW_TS_Start(BleApplicationContext.Advertising_mgr_timer_Id, INITIAL_ADV_TIMEOUT);
       }
       else
       {
 #if(CFG_DEBUG_APP_TRACE != 0)
-        APP_DBG_MSG("Successfully Start Low Power Advertising ");
+        APP_DBG_MSG("Successfully Start Low Power Advertising \n");
 #endif
         }
     }
