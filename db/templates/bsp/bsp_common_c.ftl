@@ -129,7 +129,7 @@ UART_HandleTypeDef hcom_uart[COMn];
 #if (USE_COM_LOG > 0)
 static COM_TypeDef COM_ActiveLogPort;
 #endif
-#if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
+#if (USE_HAL_UART_REGISTER_CALLBACKS == 1U)
 static uint32_t Is${UsartInstance?lower_case?replace("u","U")}MspCbValid = 0;
 #endif
 __weak HAL_StatusTypeDef MX_${UsartInstance}_UART_Init(UART_HandleTypeDef* huart);
@@ -453,7 +453,7 @@ int32_t BSP_COM_Init(COM_TypeDef COM)
   else
   {  
      hcom_uart[COM].Instance = COM_USART[COM];
-#if (USE_HAL_UART_REGISTER_CALLBACKS == 0)
+#if (USE_HAL_UART_REGISTER_CALLBACKS == 0U)
     /* Init the UART Msp */
     ${UsartInstance}_MspInit(&hcom_uart[COM]);
 #else
@@ -494,9 +494,9 @@ int32_t BSP_COM_DeInit(COM_TypeDef COM)
     /* USART configuration */
     hcom_uart[COM].Instance = COM_USART[COM];
   
-    #if (USE_HAL_UART_REGISTER_CALLBACKS == 0)  
+    #if (USE_HAL_UART_REGISTER_CALLBACKS == 0U)  
       ${UsartInstance}_MspDeInit(&hcom_uart[COM]);  
-    #endif /* (USE_HAL_UART_REGISTER_CALLBACKS == 0) */
+    #endif /* (USE_HAL_UART_REGISTER_CALLBACKS == 0U) */
   
     if(HAL_UART_DeInit(&hcom_uart[COM]) != HAL_OK)
     {
@@ -518,7 +518,7 @@ int32_t BSP_COM_DeInit(COM_TypeDef COM)
 [@common.optinclude name=mxTmpFolder+"/${UsartInstance?lower_case}_CommonD_HalInit.tmp"/]
 
 #endif 
-#if (USE_HAL_UART_REGISTER_CALLBACKS == 1) 
+#if (USE_HAL_UART_REGISTER_CALLBACKS == 1U) 
 /**
  * @brief Register Default ${UsartInstance} Bus Msp Callbacks
  * @retval BSP status

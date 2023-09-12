@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
-<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" DBVersion="V4.0" Name="RCC" Version="STM32Cube_FW_L4_V1.5.0" IncludeFile="stm32l5xx_ll_crs.h;stm32l5xx_ll_rcc.h;stm32l5xx_ll_bus.h;stm32l5xx_ll_system.h;stm32l5xx_ll_exti.h;stm32l5xx_ll_cortex.h;stm32l5xx_ll_utils.h;stm32l5xx_ll_pwr.h;stm32l5xx_ll_dma.h" 
+<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" DBVersion="V4.0" Name="RCC" Version="STM32Cube_FW_L5_V1.0.0RC1" IncludeFile="stm32l5xx_ll_crs.h;stm32l5xx_ll_rcc.h;stm32l5xx_ll_bus.h;stm32l5xx_ll_system.h;stm32l5xx_ll_exti.h;stm32l5xx_ll_cortex.h;stm32l5xx_ll_utils.h;stm32l5xx_ll_pwr.h;stm32l5xx_ll_dma.h" 
     xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
 
     <RefConfig Name="RCC_OSCConfig">
@@ -139,10 +139,10 @@
             </CallLibMethod>
         </IFCondition>
  
-        <IFCondition Expression ="LSEUsed=1 &amp; LSEByPass">
+        <IFCondition Expression ="LSEUsed=1 &amp; (LSEByPass | LSEByPassRTC)">
             <CallLibMethod Name="LL_RCC_LSE_EnableBypass"/>
         </IFCondition>
-        <IFCondition Expression ="LSEOscillator &amp;(LSEUsed=1)">
+        <IFCondition Expression ="(LSEOscillator | LSEOscillatorRTC) &amp;(LSEUsed=1)">
             <CallLibMethod Name="LL_RCC_LSE_SetDriveCapability">
                 <MethodArg Name="LSEDrive" ParameterName="LSE_Drive_Capability"/>
             </CallLibMethod>
@@ -275,7 +275,7 @@
 
         <!--system core frequency set,systick init,systick priority configuration-->
         <IFCondition Expression ="USE_FULL_LL_DRIVER">
-             <CallLibMethod Name="" Type="HardCode">
+            <CallLibMethod Name="" Type="HardCode">
                 <HardCode Text="#n"/>
             </CallLibMethod>
             <CallLibMethod Name="LL_Init1msTick">
@@ -294,6 +294,14 @@
         <IFCondition Expression ="1=1">
             <CallLibMethod Name="LL_SetSystemCoreClock">
                 <MethodArg Name="HCLKFrequency" ParameterName="HCLKFreq_Value"/>            
+            </CallLibMethod>
+        </IFCondition>
+        <IFCondition Expression ="!USE_FULL_LL_DRIVER">
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#n#t /* Update the time base */"/>
+            </CallLibMethod>
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#tif (HAL_InitTick (TICK_INT_PRIORITY) != HAL_OK)#n#t{#n#t#tError_Handler();#t#n#t};"/>
             </CallLibMethod>
         </IFCondition>
         <IFCondition Expression ="RCC_TZ_PRIV">

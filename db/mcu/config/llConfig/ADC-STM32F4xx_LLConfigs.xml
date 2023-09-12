@@ -63,6 +63,60 @@
         <CallLibMethod Name="LL_ADC_DisableIT_EOCS">
             <MethodArg Name="ADCx" ParameterName="Instance" />
         </CallLibMethod>
+        
+        <IFCondition Expression="Injected_Mode_Enabled" >
+             
+            <CallLibMethod Name="LL_ADC_INJ_Init">
+                <MethodArg Name="ADCx" ParameterName="Instance" />
+                <MethodArg Name="TriggerSource" ParameterName="ExternalTrigInjecConv" />
+                <MethodArg Name="SequencerLength" ParameterName="InjNumberOfConversion" />
+                <MethodArg Name="SequencerDiscont" ParameterName="InjectedDiscontinuousConvMode" />
+                <MethodArg Name="TrigAuto" ParameterName="AutoInjectedConv" />
+            </CallLibMethod>
+             
+             
+            <IFCondition Expression="!(ExternalTrigInjecConvEdge = ADC_EXTERNALTRIGINJECCONV_EDGE_NONE)">
+                <CallLibMethod Name="LL_ADC_INJ_SetTriggerEdge">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                    <MethodArg Name="ExternalTriggerEdge" ParameterName="ExternalTrigInjecConvEdge" />
+                </CallLibMethod>
+            </IFCondition>
+            <CallLibMethod Name="LL_ADC_INJ_SetQueueMode">
+                <MethodArg Name="ADCx" ParameterName="Instance" />
+                <MethodArg Name="QueueMode" ParameterName="injectedQueueMode,QueueInjectedContext" />
+            </CallLibMethod>
+            
+            <CallLibMethod Name="LL_ADC_SetOverSamplingScope">
+                <MethodArg Name="ADCx" ParameterName="Instance" />
+                <MethodArg Name="OvsScope"
+                           ParameterName="OversamplingMode,EnableInjectedOversampling,OversamplingStopReset" />
+            </CallLibMethod>
+
+            <CallLibMethod Name="LL_ADC_ConfigOverSamplingRatioShift">
+                <MethodArg Name="ADCx" ParameterName="Instance" />
+                <MethodArg Name="Ratio" ParameterName="InjOversamplingRatio" />
+                <MethodArg Name="Shift" ParameterName="InjOversamplingRightShift" />
+            </CallLibMethod>
+
+            <!-- parameter EOCSelection -->
+            <IFCondition Expression="(EOCSelection = ADC_EOC_SINGLE_CONV)">
+                <CallLibMethod Name="LL_ADC_DisableIT_JEOC">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                </CallLibMethod>
+                <CallLibMethod Name="LL_ADC_DisableIT_JEOS">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                </CallLibMethod>
+            </IFCondition>
+
+            <IFCondition Expression="(EOCSelection = ADC_EOC_SINGLE_SEQ_CONV)">
+                <CallLibMethod Name="LL_ADC_DisableIT_JEOS">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                </CallLibMethod>
+                <CallLibMethod Name="LL_ADC_DisableIT_JEOC">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                </CallLibMethod>
+            </IFCondition>  
+        </IFCondition>
     </RefConfig>
 
     <RefConfig Name="ADC_RegularChannelConfig" Comment="Configure Regular Channel">
@@ -93,26 +147,26 @@
     </RefConfig>
 
     <RefConfig Name="ADC_InjectedChannelConfig" Comment="Configure Injected Channel">
-        <CallLibMethod Name="LL_ADC_INJ_Init">
+<!--        <CallLibMethod Name="LL_ADC_INJ_Init">
             <MethodArg Name="ADCx" ParameterName="Instance" />
             <MethodArg Name="TriggerSource" ParameterName="ExternalTrigInjecConv" />
             <MethodArg Name="SequencerLength" ParameterName="InjNumberOfConversion" />
             <MethodArg Name="SequencerDiscont" ParameterName="InjectedDiscontinuousConvMode" />
             <MethodArg Name="TrigAuto" ParameterName="AutoInjectedConv" />
-        </CallLibMethod>
+        </CallLibMethod>-->
         <!-- à verifier -->
-        <IFCondition Expression="!(ExternalTrigInjecConvEdge = ADC_EXTERNALTRIGINJECCONV_EDGE_NONE)">
+<!--        <IFCondition Expression="!(ExternalTrigInjecConvEdge = ADC_EXTERNALTRIGINJECCONV_EDGE_NONE)">
             <CallLibMethod Name="LL_ADC_INJ_StartConversionExtTrig">
                 <MethodArg Name="ADCx" ParameterName="Instance" />
                 <MethodArg Name="ExternalTriggerEdge" ParameterName="ExternalTrigInjecConvEdge" />
             </CallLibMethod>
-        </IFCondition>
+        </IFCondition>-->
         <!-- à verifier -->
         <!-- parameter EOCSelection -->
         <!--IFCondition Expression="(EOCSelection = ADC_EOC_SINGLE_CONV)"-->
-            <CallLibMethod Name="LL_ADC_DisableIT_JEOS">
+<!--            <CallLibMethod Name="LL_ADC_DisableIT_JEOS">
                 <MethodArg Name="ADCx" ParameterName="Instance" />
-            </CallLibMethod>
+            </CallLibMethod>-->
         <!--/IFCondition-->
 
         <!--IFCondition Expression="(EOCSelection = ADC_EOC_SINGLE_SEQ_CONV)">
@@ -218,6 +272,32 @@
         <Argument AddressOf="false" GenericType="simple" Name="PathInternal"
                           OptimizationCondition="equal" />
     </LibMethod>
+    <LibMethod Comment="" Name="LL_ADC_ConfigOverSamplingRatioShift">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="ADCx"
+                          TypeName="ADC_TypeDef" />
+        <Argument AddressOf="false" GenericType="simple" Name="Ratio"
+                          OptimizationCondition="equal" />
+        <Argument AddressOf="false" GenericType="simple" Name="Shift"
+                          OptimizationCondition="equal" />
+    </LibMethod>
+     <LibMethod Comment="" Name="LL_ADC_INJ_SetTriggerEdge">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="ADCx"
+                  TypeName="ADC_TypeDef" />
+        <Argument AddressOf="false" GenericType="simple" Name="ExternalTriggerEdge"
+                  OptimizationCondition="equal" />
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_ADC_INJ_SetQueueMode">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="ADCx"
+                  TypeName="ADC_TypeDef" />
+        <Argument AddressOf="false" GenericType="simple" Name="QueueMode"
+                  OptimizationCondition="equal" />
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_ADC_SetOverSamplingScope">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="ADCx"
+                  TypeName="ADC_TypeDef" />
+        <Argument AddressOf="false" GenericType="simple" Name="OvsScope"
+                  OptimizationCondition="equal" />
+    </LibMethod>
 	
 	 
     <LibMethod Comment="" Name="LL_ADC_REG_StartConversionExtTrig">
@@ -239,6 +319,10 @@
                           OptimizationCondition="equal" />
         <Argument AddressOf="false" GenericType="simple" Name="Channel"
                           OptimizationCondition="equal" />
+    </LibMethod>
+     <LibMethod Comment="" Name="LL_ADC_DisableIT_JEOC">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="ADCx"
+                  TypeName="ADC_TypeDef" />
     </LibMethod>
        
 	

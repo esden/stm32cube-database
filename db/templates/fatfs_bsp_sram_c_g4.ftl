@@ -2,9 +2,13 @@
 /* USER CODE BEGIN Header */
 /**
  ******************************************************************************
- [#assign familyName=FamilyName?lower_case]
- * @file    bsp_driver_sram.c for G4 (based on stm32l476g_eval_sram.c)
-   @brief   This file includes a generic SRAM driver.
+ * @file    bsp_driver_sram.c for G4 (based on stm32g474e_eval_sram.c)
+ * @brief   This file includes a generic SRAM driver.
+ *          To be updated by the user according to the board used for the project.
+ * @note    Functions generated as weak: they can be overriden by 
+ *          - code in user files 
+ *          - or BSP code from the FW pack files 
+ *          if such files are added to the generated project (by the user).
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
@@ -31,9 +35,10 @@ extern SRAM_HandleTypeDef ${sramHandle};
 /* USER CODE BEGIN Init */
 /**
   * @brief  Initializes the SRAM device.
-  * @retval SRAM status
+  * @param  Instance SRAM instance
+  * @retval BSP status
   */
-int32_t BSP_SRAM_Init(uint32_t Instance)
+__weak int32_t BSP_SRAM_Init(uint32_t Instance)
 { 
   int32_t ret = BSP_ERROR_NONE;
   
@@ -48,7 +53,7 @@ int32_t BSP_SRAM_Init(uint32_t Instance)
   * @brief  This function handles SRAM DMA interrupt request.
   * @retval None
   */
-void BSP_SRAM_DMA_IRQHandler(void)
+__weak void BSP_SRAM_DMA_IRQHandler(void)
 {
   HAL_DMA_IRQHandler(${sramHandle}.hdma);
 }

@@ -26,7 +26,7 @@
  *
  * 1 tab == 4 spaces!
  */
- /* USER CODE END Header */
+/* USER CODE END Header */
 
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
@@ -319,7 +319,9 @@
 /* Ensure definitions are only used by the compiler, and not by the assembler. */
 #if defined(__ICCARM__) || defined(__CC_ARM) || defined(__GNUC__)
 #t#include <stdint.h>
-#textern uint32_t SystemCoreClock;
+[#-- BZ 74309 --]
+#textern uint32_t ${valueCpuClock};
+[#-- BZ 74309 --]
 [#if prototypeNeeded == "true"] [#-- generated when timebase=systick --]
 #tvoid xPortSysTickHandler(void);
 [/#if]

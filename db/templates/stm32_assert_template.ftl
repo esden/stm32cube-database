@@ -1,10 +1,20 @@
 [#ftl]
+[#assign familyName=FamilyName?lower_case]
 /**
   ******************************************************************************
   * @file    stm32_assert.h
   * @brief   STM32 assert file.
   ******************************************************************************
- [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
+  * @attention
+  *
+  * <h2><center>&copy; Copyright (c) [#if familyName="stm32g4" || familyName="stm32l5" ||familyName="stm32wb"]2019[#else]2018[/#if] STMicroelectronics. 
+  * All rights reserved.</center></h2>
+  *
+  * This software component is licensed by ST under BSD 3-Clause license,
+  * the "License"; You may not use this file except in compliance with the
+  * License. You may obtain a copy of the License at:
+  *                        opensource.org/licenses/BSD-3-Clause
+  *
   ******************************************************************************
   */
 
@@ -29,16 +39,9 @@
   *         If expr is true, it returns no value.
   * @retval None
   */
-[#assign familyName=FamilyName?lower_case]
-[#if familyName="stm32f0" || familyName="stm32f3" ||familyName="stm32l4"]
- #define assert_param(expr) ((expr) ? (void)0U : assert_failed((char *)__FILE__, __LINE__))
-/* Exported functions ------------------------------------------------------- */
-  void assert_failed(char* file, uint32_t line);
-[#else]
  #define assert_param(expr) ((expr) ? (void)0U : assert_failed((uint8_t *)__FILE__, __LINE__))
 /* Exported functions ------------------------------------------------------- */
   void assert_failed(uint8_t* file, uint32_t line);
-[/#if]
 #else
   #define assert_param(expr) ((void)0U)
 #endif /* USE_FULL_ASSERT */

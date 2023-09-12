@@ -407,10 +407,11 @@ void MX_FREERTOS_Init(void) {
 #t/* USER CODE BEGIN Init */
 #t     
 #t/* USER CODE END Init */
-[@common.optinclude name=mxTmpFolder+"/rtos_HalInit.tmp"/]
+[@common.optinclude name=mxTmpFolder+"/rtos_obj_creat.tmp"/]
 }
+[@common.optinclude name=mxTmpFolder+"/rtos_default_thread.tmp"/]
 [@common.optinclude name=mxTmpFolder+"/rtos_threads.tmp"/]
-[@common.optinclude name=mxTmpFolder+"/rtos_user_threads.tmp"/] 
+[@common.optinclude name=mxTmpFolder+"/rtos_callbacks.tmp"/]
 [/#if]  
 
 /* Private application code --------------------------------------------------*/

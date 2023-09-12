@@ -77,6 +77,7 @@
 [#compress]
 [#if with_rtos == 1]
 #include "cmsis_os.h"
+#include "lwip/tcpip.h"
 [/#if][#-- endif with_rtos --][/#compress]
 
 /* Within 'USER CODE' section, code will be kept by default at each generation */
@@ -407,11 +408,12 @@ static struct pbuf * low_level_input(struct netif *netif)
   
 
   /* get received frame */
-[#if with_rtos == 1]  
+[#if with_rtos == 1]
   if (HAL_ETH_GetReceivedFrame_IT(&heth) != HAL_OK)
 [#else]
   if (HAL_ETH_GetReceivedFrame(&heth) != HAL_OK)
-[/#if]  
+[/#if] 
+  
     return NULL;
   
   /* Obtain the size of the packet and put it into the "len" variable. */
@@ -489,10 +491,10 @@ static struct pbuf * low_level_input(struct netif *netif)
 [#if with_rtos == 1]
 [#if cmsis_version = "v1"]
 void ethernetif_input(void const * argument)
-[#else]
+[#else][#-- endif cmsis_version --]
 void ethernetif_input(void* argument)
 [/#if][#-- endif cmsis_version --]
-[#else]
+[#else][#-- endif with_rtos --]
 void ethernetif_input(struct netif *netif)
 [/#if][#-- endif with_rtos --]
 {
@@ -507,12 +509,13 @@ void ethernetif_input(struct netif *netif)
   {
 [#if cmsis_version = "v2"]
     if (osSemaphoreAcquire(s_xSemaphore, TIME_WAITING_FOR_INPUT) == osOK)
-[#else]
+[#else][#-- endif cmsis_version --]
     if (osSemaphoreWait(s_xSemaphore, TIME_WAITING_FOR_INPUT) == osOK)
 [/#if][#-- endif cmsis_version --]
     {
       do
       {   
+        LOCK_TCPIP_CORE();
         p = low_level_input( netif );
         if   (p != NULL)
         {
@@ -521,9 +524,10 @@ void ethernetif_input(struct netif *netif)
             pbuf_free(p);
           }
         }
+        UNLOCK_TCPIP_CORE();
       } while(p!=NULL);
     }
-[#else]
+[#else][#-- endif with_rtos --]
 
   /* move received packet into a new pbuf */
   p = low_level_input(netif);

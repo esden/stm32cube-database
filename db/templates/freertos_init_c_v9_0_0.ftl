@@ -36,7 +36,7 @@
         [#if mutexName != "0"]
           [#assign nbM = nbM + 1]
           [#if nbM == 1]
-            #n#t/* Create the mutex(es) */
+            #t/* Create the mutex(es) */
           [/#if]
             #t/* definition and creation of ${mutexName} */
           [#if mutexAllocation == "Dynamic"]

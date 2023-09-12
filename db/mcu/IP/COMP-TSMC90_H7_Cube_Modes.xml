@@ -84,6 +84,24 @@
 <!-- if input neg is disabled then generate the code with a quarter of Vref that is reset value --> 
                 <PossibleValue Comment="parameter not set in CubeMx interface" Value="COMP_INPUT_MINUS_1_4VREFINT"/>
 	</RefParameter>
+	<RefParameter Comment="Inverting Input" DefaultValue="COMP_INPUT_MINUS_VBAT_VDDAP" Group="Pinout Parameters" Name="InvertingInput" Type="list" Visible="false">
+		<Condition Diagnostic="" Expression="$IpInstance_Vbat_vddap"/>
+                <PossibleValue Comment="VDDAP" Value="COMP_INPUT_MINUS_VBAT_VDDAP"/>
+	</RefParameter>
+	<RefParameter Comment="Inverting Input" DefaultValue="COMP_INPUT_MINUS_VBAT_VDDAP" Group="Pinout Parameters" Name="InvertingInput" Type="list" Visible="false">
+		<Condition Diagnostic="" Expression="$IpInstance_Vbat_vddap"/>
+                <PossibleValue Comment="1/4 VBAT" Value="COMP_INPUT_MINUS_VBAT_VDDAP"/>
+	</RefParameter>
+	<RefParameter Comment="Inverting Input" DefaultValue="COMP_INPUT_MINUS_TPSENS_DAC2CH1" Group="Pinout Parameters" Name="InvertingInput" Type="list" Visible="false">
+		<Condition Diagnostic="" Expression="$IpInstance_tpsens_dac2ch1"/>
+                <PossibleValue Comment="Temperature Sensor" Value="COMP_INPUT_MINUS_TPSENS_DAC2CH1"/>
+	</RefParameter>
+	<RefParameter Comment="Inverting Input" DefaultValue="COMP_INPUT_MINUS_TPSENS_DAC2CH1" Group="Pinout Parameters" Name="InvertingInput" Type="list" Visible="false">
+		<Condition Diagnostic="" Expression="$IpInstance_tpsens_dac2ch1"/>
+                <PossibleValue Comment="DAC2_CH1" Value="COMP_INPUT_MINUS_TPSENS_DAC2CH1"/>
+	</RefParameter>
+
+
 
 
 	<RefParameter Comment="Non Inverting Input" DefaultValue="COMP_INPUT_PLUS_IO1" Group="Pinout Parameters" Name="NonInvertingInput" Type="list" Visible="false">
@@ -93,6 +111,10 @@
 	<RefParameter Comment="Non Inverting Input" DefaultValue="COMP_INPUT_PLUS_IO2" Group="Pinout Parameters" Name="NonInvertingInput" Type="list" Visible="false">
 		<Condition Diagnostic="" Expression="((PB2_COMP1_INP  &amp; ($IpNumber=1))|(PE11_COMP2_INP  &amp; ($IpNumber=2)))"/>
 		<PossibleValue Comment="" Value="COMP_INPUT_PLUS_IO2"/>
+	</RefParameter>
+	<RefParameter Comment="Non Inverting Input" DefaultValue="COMP_INPUT_PLUS_DAC2_CH1" Group="Pinout Parameters" Name="NonInvertingInput" Type="list" Visible="false">
+		<Condition Diagnostic="" Expression="$IpInstance_DAC2Channel1_inputplus &amp; ($IpNumber=1)"/>
+		<PossibleValue Comment="DAC2 Channel1" Value="COMP_INPUT_PLUS_DAC2_CH1"/>
 	</RefParameter>
 	<RefParameter Comment="Window Mode" DefaultValue="COMP_WINDOWMODE_DISABLE" Group="Pinout Parameters" Name="WindowMode" Type="list" Visible="false">
             <PossibleValue Comment="Window mode disabled (Plus input of comparator 1 connected to PC5/PB2) " Value="COMP_WINDOWMODE_DISABLE"/>
@@ -160,7 +182,11 @@
 	<RefMode BaseMode="InputPlus_BaseMode" Name="INP">
 		<Parameter Name="NonInvertingInput"/>
 	</RefMode>
-	
+	<RefMode BaseMode="InputPlus_BaseMode" Name="INP_DAC2CH1">
+		<Parameter Name="NonInvertingInput">
+			<PossibleValue>COMP_INPUT_PLUS_DAC2_CH1</PossibleValue>
+		</Parameter>	
+	</RefMode>
 
 	<!-- 'Window Mode' RefMode-->
 	<RefMode BaseMode="InputPlus_BaseMode" Name="WindowMode">
@@ -204,6 +230,27 @@
 			<PossibleValue>COMP_INPUT_MINUS_DAC1_CH2</PossibleValue>
 		</Parameter>	
 	</RefMode>
+	<RefMode Name="14VBAT">
+		<Parameter Name="InvertingInput">
+			<PossibleValue>COMP_INPUT_MINUS_VBAT_VDDAP</PossibleValue>
+		</Parameter>	
+	</RefMode>
+	<RefMode Name="VDDAP">
+		<Parameter Name="InvertingInput">
+			<PossibleValue>COMP_INPUT_MINUS_VBAT_VDDAP</PossibleValue>
+		</Parameter>	
+	</RefMode>
+	<RefMode Name="TPSENS">
+		<Parameter Name="InvertingInput">
+			<PossibleValue>COMP_INPUT_MINUS_TPSENS_DAC2CH1</PossibleValue>
+		</Parameter>	
+	</RefMode>
+	<RefMode Name="DAC2CH1">
+		<Parameter Name="InvertingInput">
+			<PossibleValue>COMP_INPUT_MINUS_TPSENS_DAC2CH1</PossibleValue>
+		</Parameter>	
+	</RefMode>
+
 
 	
 	
@@ -218,6 +265,14 @@
 					<Semaphore>$IpInstance_ExternalInputPlus</Semaphore>
 	                                <Semaphore>Semaphore_$IpInstance_Enable</Semaphore>
 				</Mode>
+				<Mode Name="INP_DAC2CH1" RemoveCondition="($IpNumber=2) | !(DIE480)" UserName="DAC2 OUT1">
+                                       <Semaphore>$IpInstance_DAC2Channel1_inputplus</Semaphore>
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VS_DAC2CH1INP"/>
+					</SignalLogicalOp>
+					<Condition Diagnostic="need to have DAC2 OUT1 activated with internal connection" Expression="(DAC2_OUT1_ExtAndInt | DAC2_OUT1_Int)"/>
+					
+				</Mode>
 			
 				<Mode Name="WindowMode" RemoveCondition="($IpNumber=1)" UserName="Window Mode">
 					<SignalLogicalOp Name="AND">
@@ -225,7 +280,7 @@
 					</SignalLogicalOp>
 	                                <Semaphore>Semaphore_$IpInstance_Enable</Semaphore>
 	                                <Semaphore>Semaphore_WindowMode_$IpInstance_Enable</Semaphore>
-					<Condition Diagnostic="Need to have an INP (External Input [+]) on previous Comparator" Expression="(($IpNumber=2) &amp; COMP1_ExternalInputPlus)"/>
+					<Condition Diagnostic="Need to have an INP (External Input [+]) on previous Comparator" Expression="COMP1_ExternalInputPlus"/>
 				</Mode>
 			</ModeLogicOperator>
 			<Semaphore>$IpInstance_InputPlus</Semaphore>
@@ -240,19 +295,19 @@
 					</SignalLogicalOp>
 				</Mode>
 				<!-- Used if only one DAC -->
-				<Mode Name="INM_DACOUT1" UserName="DAC OUT1">
+				<Mode Name="INM_DACOUT1" UserName="DAC1 OUT1">
                                        <Semaphore>$IpInstance_DACChannel1</Semaphore>
 					<SignalLogicalOp Name="AND">
 						<Signal Name="VS_DACOUT1"/>
 					</SignalLogicalOp>
-					<Condition Diagnostic="Need to have an 'DAC Out 1' activated with  internal connection" Expression="(DAC1_OUT1_ExtAndInt | DAC1_OUT1_Int)"/>
+					<Condition Diagnostic="Need to have DAC1 Out 1 activated with internal connection" Expression="(DAC1_OUT1_ExtAndInt | DAC1_OUT1_Int)"/>
 				</Mode>
-				<Mode Name="INM_DACOUT2" UserName="DAC OUT2">
+				<Mode Name="INM_DACOUT2" UserName="DAC1 OUT2">
                                        <Semaphore>$IpInstance_DACChannel2</Semaphore>
 					<SignalLogicalOp Name="AND">
 						<Signal Name="VS_DACOUT2"/>
 					</SignalLogicalOp>
-					<Condition Diagnostic="Need to have an 'DAC Out 2' activated with internal connection" Expression="(DAC1_OUT2_ExtAndInt | DAC1_OUT2_Int)"/>
+					<Condition Diagnostic="Need to have DAC1 Out 2 activated with internal connection" Expression="(DAC1_OUT2_ExtAndInt | DAC1_OUT2_Int)"/>
 				</Mode>
 			
 				<Mode Name="VREFINT" UserName="Internal VRef">
@@ -279,6 +334,34 @@
 						<Signal Name="VS_VREFINT14"/>
 					</SignalLogicalOp>
 				</Mode>
+				<Mode Name="14VBAT" RemoveCondition="($IpNumber=2) | !(DIE480)" UserName="1/4 VBAT">
+                                       <Semaphore>$IpInstance_Vbat_vddap</Semaphore>
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VS_VBAT"/>
+					</SignalLogicalOp>
+				</Mode>
+				<Mode Name="VDDAP" RemoveCondition="($IpNumber=1) | !(DIE480)" UserName="VDDAP">
+                                       <Semaphore>$IpInstance_Vbat_vddap</Semaphore>
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VS_VDDAP"/>
+					</SignalLogicalOp>
+				</Mode>
+				
+				<Mode Name="TPSENS" RemoveCondition="($IpNumber=2) | !(DIE480)" UserName="Temperature Sensor">
+                                       <Semaphore>$IpInstance_tpsens_dac2ch1</Semaphore>
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VS_TPSENS"/>
+					</SignalLogicalOp>
+				</Mode>
+				<Mode Name="DAC2CH1" RemoveCondition="($IpNumber=1) | !(DIE480)" UserName="DAC2 OUT1">
+                                       <Semaphore>$IpInstance_tpsens_dac2ch1</Semaphore>
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VS_DAC2CH1"/>
+					</SignalLogicalOp>
+					<Condition Diagnostic="need to have DAC2 OUT1 activated with internal connection" Expression="(DAC2_OUT1_ExtAndInt | DAC2_OUT1_Int)"/>
+					
+				</Mode>
+
 			</ModeLogicOperator>
 			<Condition Diagnostic="Need to have an INP (External Input [+]) activated" Expression="$IpInstance_InputPlus"/>
 		</Mode>
@@ -356,6 +439,12 @@
 	<RefSignal Name="VS_VREFINT14" Virtual="true"/>
 	<RefSignal Name="VS_DACOUT1" Virtual="true"/>
 	<RefSignal Name="VS_DACOUT2" Virtual="true"/>
+	<RefSignal Name="VS_VBAT" Virtual="true"/>
+	<RefSignal Name="VS_VDDAP" Virtual="true"/>
+	<RefSignal Name="VS_TPSENS" Virtual="true"/>
+	<RefSignal Name="VS_DAC2CH1" Virtual="true"/>
+	<RefSignal Name="VS_DAC2CH1INP" Virtual="true"/>
+
 
 	
 	<!-- Semaphore for COMP -->

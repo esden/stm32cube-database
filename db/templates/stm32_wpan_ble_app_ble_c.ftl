@@ -25,6 +25,7 @@
 [#assign FREERTOS_STATUS = 0]
 [#assign BLE_APPLICATION_TYPE = "This text shouldn't appear"]
 [#assign LOCAL_NAME_FORMATTED = "This text shouldn't appear"]
+[#assign LOCAL_NAME = "STM32WB"]
 [#assign P2P_SERVER_NUMBER = ""]
 
 [#list SWIPdatas as SWIP]
@@ -71,6 +72,9 @@
             [/#if]
             [#if definition.name == "LOCAL_NAME_FORMATTED"]
                 [#assign LOCAL_NAME_FORMATTED = definition.value]
+            [/#if]
+            [#if definition.name == "LOCAL_NAME"]
+                [#assign LOCAL_NAME = definition.value]
             [/#if]
             [#if definition.name == "P2P_SERVER_NUMBER"]
                 [#assign P2P_SERVER_NUMBER = definition.value]
@@ -554,6 +558,7 @@ static void Adv_Cancel_Req( void );
 static void Switch_OFF_GPIO( void );
 #if(L2CAP_REQUEST_NEW_CONN_PARAM != 0)  
 static void BLE_SVC_L2CAP_Conn_Update(uint16_t Connection_Handle);
+static void Connection_Interval_Update_Req( void );
 #endif
 [/#if]
 
@@ -647,20 +652,24 @@ void APP_BLE_Init( void )
 [/#if]
 [/#if]
 [#if  (CUSTOM_P2P_SERVER = 1)]
-    UTIL_SEQ_RegTask( 1<<CFG_TASK_ADV_CANCEL_ID, UTIL_SEQ_RFU, Adv_Cancel);
+  UTIL_SEQ_RegTask( 1<<CFG_TASK_ADV_CANCEL_ID, UTIL_SEQ_RFU, Adv_Cancel);
+#if (L2CAP_REQUEST_NEW_CONN_PARAM != 0 )
+  UTIL_SEQ_RegTask( 1<<CFG_TASK_CONN_UPDATE_REG_ID, UTIL_SEQ_RFU, Connection_Interval_Update_Req);
+#endif
 [/#if]
 [#if  (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1)]
+
   /**
    * Initialization of ADV - Ad Manufacturer Element - Support OTA Bit Mask
    */
-#if(BLE_CFG_OTA_REBOOT_CHAR != 0)  
-    manuf_data[sizeof(manuf_data)-8] = CFG_FEATURE_OTA_REBOOT;
+#if(BLE_CFG_OTA_REBOOT_CHAR != 0)
+  manuf_data[sizeof(manuf_data)-8] = CFG_FEATURE_OTA_REBOOT;
 #endif
 [/#if]
 [#if  (CUSTOM_P2P_SERVER = 1)]
 #if(RADIO_ACTIVITY_EVENT != 0)  
   aci_hal_set_radio_activity_mask(0x0006);
-#endif  
+#endif
   
 #if (L2CAP_REQUEST_NEW_CONN_PARAM != 0 )
   index_con_int = 0; 
@@ -821,6 +830,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
       {
         BleApplicationContext.BleApplicationContext_legacy.connectionHandle = 0;
         BleApplicationContext.Device_Connection_Status = APP_BLE_IDLE;
+
         APP_DBG_MSG("\r\n\r** DISCONNECTION EVENT WITH CLIENT \n");
       }
 
@@ -830,9 +840,9 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
  /*
 * SPECIFIC to P2P Server APP
 */     
-        handleNotification.P2P_Evt_Opcode = PEER_DISCON_HANDLE_EVT;
-        handleNotification.ConnectionHandle = BleApplicationContext.BleApplicationContext_legacy.connectionHandle;
-        P2PS_APP_Notification(&handleNotification);
+      handleNotification.P2P_Evt_Opcode = PEER_DISCON_HANDLE_EVT;
+      handleNotification.ConnectionHandle = BleApplicationContext.BleApplicationContext_legacy.connectionHandle;
+      P2PS_APP_Notification(&handleNotification);
 
 [/#if]
       /* USER CODE BEGIN EVT_DISCONN_COMPLETE */
@@ -856,6 +866,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
 [#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1)]
         case EVT_LE_CONN_UPDATE_COMPLETE: 
           APP_DBG_MSG("\r\n\r** CONNECTION UPDATE EVENT WITH CLIENT \n");
+
           /* USER CODE BEGIN EVT_LE_CONN_UPDATE_COMPLETE */
 
           /* USER CODE END EVT_LE_CONN_UPDATE_COMPLETE */
@@ -873,11 +884,12 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
           {
             APP_DBG_MSG("EVT_UPDATE_PHY_COMPLETE, status nok \n");
           }
+
           ret = hci_le_read_phy(BleApplicationContext.BleApplicationContext_legacy.connectionHandle,&TX_PHY,&RX_PHY);
           if (ret == BLE_STATUS_SUCCESS)
           {
             APP_DBG_MSG("Read_PHY success \n");
-           
+
             if ((TX_PHY == TX_2M) && (RX_PHY == RX_2M))
             {
               APP_DBG_MSG("PHY Param  TX= %d, RX= %d \n", TX_PHY, RX_PHY);
@@ -898,30 +910,28 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
 [/#if]
         case EVT_LE_CONN_COMPLETE:
 [#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1)]
-          {
+        {
           hci_le_connection_complete_event_rp0 *connection_complete_event;
 
           /**
            * The connection is done, there is no need anymore to schedule the LP ADV
            */
           connection_complete_event = (hci_le_connection_complete_event_rp0 *) meta_evt->data;
-          
+
           HW_TS_Stop(BleApplicationContext.Advertising_mgr_timer_Id);
 
-          APP_DBG_MSG("EVT_LE_CONN_COMPLETE for connection handle 0x%x\n",
-          connection_complete_event->Connection_Handle);
-            if (BleApplicationContext.Device_Connection_Status == APP_BLE_LP_CONNECTING)
-            {
-              /* Connection as client */
-              BleApplicationContext.Device_Connection_Status = APP_BLE_CONNECTED_CLIENT;
-            }
-            else
-            {
-              /* Connection as server */
-              BleApplicationContext.Device_Connection_Status = APP_BLE_CONNECTED_SERVER;
-            }
-            BleApplicationContext.BleApplicationContext_legacy.connectionHandle =
-                connection_complete_event->Connection_Handle;
+          APP_DBG_MSG("EVT_LE_CONN_COMPLETE for connection handle 0x%x\n", connection_complete_event->Connection_Handle);
+          if (BleApplicationContext.Device_Connection_Status == APP_BLE_LP_CONNECTING)
+          {
+            /* Connection as client */
+            BleApplicationContext.Device_Connection_Status = APP_BLE_CONNECTED_CLIENT;
+          }
+          else
+          {
+            /* Connection as server */
+            BleApplicationContext.Device_Connection_Status = APP_BLE_CONNECTED_SERVER;
+          }
+          BleApplicationContext.BleApplicationContext_legacy.connectionHandle = connection_complete_event->Connection_Handle;
 [#if  (CUSTOM_P2P_SERVER = 1)] 
  /*
 * SPECIFIC to P2P Server APP
@@ -933,7 +943,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
           /* USER CODE BEGIN HCI_EVT_LE_CONN_COMPLETE */
 
           /* USER CODE END HCI_EVT_LE_CONN_COMPLETE */
-          }
+        }
 [/#if]
         break; /* HCI_EVT_LE_CONN_COMPLETE */
 
@@ -978,24 +988,24 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
         /* USER CODE BEGIN EVT_BLUE_GAP_PROCEDURE_COMPLETE */
 
         /* USER CODE END EVT_BLUE_GAP_PROCEDURE_COMPLETE */
-        break; /* EVT_BLUE_GAP_PROCEDURE_COMPLETE */
+          break; /* EVT_BLUE_GAP_PROCEDURE_COMPLETE */
 [#if (CUSTOM_P2P_SERVER = 1)]
 #if(RADIO_ACTIVITY_EVENT != 0)
-        case 0x0004:
+        case ACI_HAL_END_OF_RADIO_ACTIVITY_VSEVT_CODE:
         /* USER CODE BEGIN RADIO_ACTIVITY_EVENT*/
 
         /* USER CODE END RADIO_ACTIVITY_EVENT*/
-        break; /* RADIO_ACTIVITY_EVENT */
+          break; /* RADIO_ACTIVITY_EVENT */
 #endif
 [/#if]
       }
       break; /* EVT_VENDOR */
 
-        default:
-        /* USER CODE BEGIN ECODE_DEFAULT*/
+      default:
+      /* USER CODE BEGIN ECODE_DEFAULT*/
 
-        /* USER CODE END ECODE_DEFAULT*/
-          break;
+      /* USER CODE END ECODE_DEFAULT*/
+        break;
   }
 
   return (SVCCTL_UserEvtFlowEnable);
@@ -1032,7 +1042,7 @@ static void Ble_Tl_Init( void )
   return;
 }
 
- static void Ble_Hci_Gap_Gatt_Init(void){
+static void Ble_Hci_Gap_Gatt_Init(void){
 
   uint8_t role;
 [#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1)]
@@ -1150,10 +1160,10 @@ static void Ble_Tl_Init( void )
 
   if (role > 0)
   {
-[#if (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1)]
-    const char *name = "STM32WB";
+[#if  (BT_SIG_BEACON = 1)]
+    const char *name = "BEACON";
 [#else]
-    const char *name = "BLEcore";
+    const char *name = "${LOCAL_NAME}";
 [/#if]
     aci_gap_init(role, 0,
                  APPBLE_GAP_DEVICE_NAME_LENGTH,
@@ -1268,7 +1278,7 @@ static void Adv_Request(APP_BLE_ConnStatus_t New_Status)
 {
   tBleStatus ret = BLE_STATUS_INVALID_PARAMS;
   uint16_t Min_Inter, Max_Inter;
- 
+
   if (New_Status == APP_BLE_FAST_ADV)
   {
     Min_Inter = AdvIntervalMin;
@@ -1288,6 +1298,7 @@ static void Adv_Request(APP_BLE_ConnStatus_t New_Status)
     HW_TS_Stop(BleApplicationContext.Advertising_mgr_timer_Id);
 
     APP_DBG_MSG("First index in %d state \n", BleApplicationContext.Device_Connection_Status);
+
     if ((New_Status == APP_BLE_LP_ADV)
         && ((BleApplicationContext.Device_Connection_Status == APP_BLE_FAST_ADV)
             || (BleApplicationContext.Device_Connection_Status == APP_BLE_LP_ADV)))
@@ -1323,7 +1334,7 @@ static void Adv_Request(APP_BLE_ConnStatus_t New_Status)
     ret = aci_gap_update_adv_data(sizeof(manuf_data), (uint8_t*) manuf_data);
 
 [/#if]
-     if (ret == BLE_STATUS_SUCCESS)
+    if (ret == BLE_STATUS_SUCCESS)
     {
       if (New_Status == APP_BLE_FAST_ADV)
       {
@@ -1431,7 +1442,7 @@ static void Adv_Mgr( void )
 [#if (FREERTOS_STATUS = 1)]
   osThreadFlagsSet( AdvUpdateProcessId, 1 );
 [#else]
-   UTIL_SEQ_SetTask(1 << CFG_TASK_ADV_UPDATE_ID, CFG_SCH_PRIO_0);
+  UTIL_SEQ_SetTask(1 << CFG_TASK_ADV_UPDATE_ID, CFG_SCH_PRIO_0);
 [/#if]
 
   return;
@@ -1561,6 +1572,19 @@ void BLE_SVC_L2CAP_Conn_Update(uint16_t Connection_Handle)
   return;
 }
 #endif
+
+#if (L2CAP_REQUEST_NEW_CONN_PARAM != 0 )
+static void Connection_Interval_Update_Req( void )
+{
+  if (BleApplicationContext.Device_Connection_Status != APP_BLE_FAST_ADV && BleApplicationContext.Device_Connection_Status != APP_BLE_IDLE)
+  {
+    BLE_SVC_L2CAP_Conn_Update(BleApplicationContext.BleApplicationContext_legacy.connectionHandle);
+  }
+  return;
+}
+#endif
+
+
 [/#if]
 
 /* USER CODE BEGIN FD_SPECIFIC_FUNCTIONS */

@@ -1,7 +1,7 @@
 [#ftl]
 /**
   ******************************************************************************
-  * @file    Templates/TrustZone/Secure_nsclib/secure_nsc.h
+  * @file    Secure_nsclib/secure_nsc.h
   * @author  MCD Application Team
   * @brief   Header for secure non-secure callable APIs list
   ******************************************************************************

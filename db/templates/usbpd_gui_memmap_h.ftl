@@ -1,3 +1,5 @@
+[#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    usbpd_gui_memmap.h
@@ -5,18 +7,10 @@
   * @brief   This file contains memory mapping configuration to be able to run
   *          Cube-Monitor-UCPD on embedded side.
   ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) $COPYRIGHT_YEAR$ STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under Ultimate Liberty license
-  * SLA0044, the "License"; You may not use this file except in compliance with
-  * the License. You may obtain a copy of the License at:
-  *                             www.st.com/SLA0044
-  *
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 #ifndef __USBPD_GUI_MEMMAP_H_
 #define __USBPD_GUI_MEMMAP_H_
@@ -41,9 +35,22 @@
 
 /* Exported define -----------------------------------------------------------*/
 
-/* Start of the FLASH base address used to save the USBPD parameters */
-#define INDEX_PAGE              (FLASH_PAGE_NB - 1)          /* Index of latest page                      */
-#define ADDR_FLASH_LAST_PAGE    (FLASH_BASE + (INDEX_PAGE * FLASH_PAGE_SIZE))  /* Base @ of latest pages  */
+/* Following definitions should be adapted to used Flash configuration :
+   INDEX_PAGE : represents the number of the page used for storing USBPD settings (usually the last page)
+   ADDR_FLASH_LAST_PAGE : Flash address value of begining of USBPD settings page
+   ADDR_FLASH_PAGE_END : Flash address value of end of USBPD settings page
+*/
+
+[#if FamilyName?lower_case=="stm32l5"]
+#define FLASH_PAGE_NB           128u
+[/#if]
+
+#if defined (FLASH_OPTR_DBANK)
+#define INDEX_PAGE              ((FLASH_PAGE_NB * 2u) - 1u)          /* Index of latest page    */
+#else
+#define INDEX_PAGE              (FLASH_PAGE_NB - 1u)                 /* Index of latest page    */
+#endif /* FLASH_OPTR_DBANK */
+#define ADDR_FLASH_LAST_PAGE    (FLASH_BASE + (INDEX_PAGE * FLASH_PAGE_SIZE))  /* Base @ of latest page */
 #define ADDR_FLASH_PAGE_END     (ADDR_FLASH_LAST_PAGE + FLASH_PAGE_SIZE - 1)
 
 #define GUI_FLASH_ADDR_NB_PDO_SNK_P0  (ADDR_FLASH_LAST_PAGE)

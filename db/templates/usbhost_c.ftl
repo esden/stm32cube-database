@@ -187,6 +187,7 @@
 [#local myInst=inst]
 
         [#list methodList as method]
+            [#-- #if !FREERTOS?? || method.osCall=="PRE_OS" --]
                 [#assign args = ""]
                 [#if method.callBackMethod=="false"]
                 [#if method.status=="OK"]
@@ -378,8 +379,9 @@
             [#else]
             [#if nTab==2]#t#t[#else]#t[/#if]${method.name}()#n;
                         [/#if]
-        [/#if]
+        [#-- /#if --]
 [/#if]
+	[/#if]
     [/#list]
 
 [#assign instanceIndex = ""]

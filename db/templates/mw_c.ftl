@@ -124,7 +124,7 @@
         [#--[#if halMode!=instName]void ${halMode}_${instName}_Init(void)[#else]void MX_${instName}_Init(void)[/#if] --]
 void MX_${ipName}${instName}_Init(void)
 {
-
+    /***************************************/
 	[#-- MZA je dois remplir la liste des configs, pour l'instant j'utilise la liste des methods --]
 	[#-- assign ipInstanceIndex = instName?replace(name,"")--]
 	[#assign args = ""]

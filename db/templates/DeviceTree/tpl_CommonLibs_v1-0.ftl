@@ -1,6 +1,12 @@
 [#ftl]
 
-[#--Common services--]
+[#----------------------------------------------------]
+[#--Common services
+
+Global variables Api:
+    -cfg_traceEnable: enable the trace feature when true
+--]
+[#----------------------------------------------------]
 
 
 [#--------------------------------------------------------------------------------------------------------------------------------]
@@ -204,7 +210,7 @@ ${flog("", "", logType, logMsg, varsMap)}
 
 [#-- trace from function --]
 [#function ftrace  traces message]
-	[#if cfg_traceEnable]
+	[#if cfg_traceEnable?? && cfg_traceEnable]
 		[#return traces + message]
 	[/#if]
 [#return traces]
@@ -213,7 +219,7 @@ ${flog("", "", logType, logMsg, varsMap)}
 
 [#-- trace from macro --]
 [#macro mtrace  traces]
-	[#if cfg_traceEnable]
+	[#if cfg_traceEnable?? && cfg_traceEnable]
 #n
 /*Trace>>>
   ---

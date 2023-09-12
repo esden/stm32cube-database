@@ -46,7 +46,9 @@
 #include "usbpd_dpm_conf.h"
 #include "usbpd_pdo_defs.h"
 #include "usbpd_core.h"
+#if defined(_TRACE)
 #include "usbpd_trace.h"
+#endif /* _TRACE */
 #include "string.h"
 [#if GUI_INTERFACE??]
 #include "gui_api.h"
@@ -64,53 +66,64 @@
   */
 
 /* Private typedef -----------------------------------------------------------*/
+/** @addtogroup STM32_USBPD_APPLICATION_POWER_IF_Private_TypeDef
+  * @{
+  */
 /* USER CODE BEGIN Private_Typedef */
 
 /* USER CODE END Private_Typedef */
+/**
+  * @}
+  */
 
 /* Private define ------------------------------------------------------------*/
-/* USER CODE BEGIN Private_Define */
 /** @addtogroup STM32_USBPD_APPLICATION_POWER_IF_Private_Defines
   * @{
   */
+/* USER CODE BEGIN Private_Define */
 
+/* USER CODE END Private_Define */
 /**
   * @}
   */
-/* USER CODE END Private_Define */
 
 /* Private macros ------------------------------------------------------------*/
-/* USER CODE BEGIN Private_Macro */
 /** @addtogroup STM32_USBPD_APPLICATION_POWER_IF_Private_Macros
   * @{
   */
+#if defined(_TRACE)
+#define PWR_IF_DEBUG_TRACE(_PORT_, __MESSAGE__)  USBPD_TRACE_Add(USBPD_TRACE_DEBUG,    (_PORT_), 0u,(__MESSAGE__), sizeof(__MESSAGE__) - 1u)
+#else
+#define PWR_IF_DEBUG_TRACE(_PORT_, __MESSAGE__)
+#endif /* _TRACE */
+/* USER CODE BEGIN Private_Macro */
 
+/* USER CODE END Private_Macro */
 /**
   * @}
   */
-/* USER CODE END Private_Macro */
 
 /* Private variables ---------------------------------------------------------*/
-/* USER CODE BEGIN Private_Variables */
 /** @addtogroup STM32_USBPD_APPLICATION_POWER_IF_Private_Variables
   * @{
   */
+/* USER CODE BEGIN Private_Variables */
 
+/* USER CODE END Private_Variables */
 /**
   * @}
   */
-/* USER CODE END Private_Variables */
 
 /* Private function prototypes -----------------------------------------------*/
-/* USER CODE BEGIN USBPD_USER_PRIVATE_FUNCTIONS_Prototypes */
 /** @addtogroup STM32_USBPD_APPLICATION_POWER_IF_Private_Functions
   * @{
   */
+/* USER CODE BEGIN USBPD_USER_PRIVATE_FUNCTIONS_Prototypes */
 
+/* USER CODE END USBPD_USER_PRIVATE_FUNCTIONS_Prototypes */
 /**
   * @}
   */
-/* USER CODE END USBPD_USER_PRIVATE_FUNCTIONS_Prototypes */
 
 /** @addtogroup STM32_USBPD_APPLICATION_POWER_IF_Exported_Functions
   * @{
@@ -136,7 +149,16 @@ USBPD_StatusTypeDef USBPD_PWR_IF_Init(void)
 USBPD_StatusTypeDef USBPD_PWR_IF_SetProfile(uint8_t PortNum)
 {
 /* USER CODE BEGIN USBPD_PWR_IF_SetProfile */
-  return USBPD_ERROR;
+  USBPD_StatusTypeDef      _status = USBPD_ERROR;
+[#if SRC || DRP]
+  PWR_IF_DEBUG_TRACE(PortNum, "HELP: update USBPD_PWR_IF_SetProfile");
+/*   if (BSP_ERROR_NONE == BSP_USBPD_PWR_VBUSSetVoltage_Fixed(PortNum, 5000, 3000, 3000))
+  {
+     _status = USBPD_OK;
+  }
+ */
+[/#if]
+  return _status;
 /* USER CODE END USBPD_PWR_IF_SetProfile */
 }
 
@@ -161,7 +183,12 @@ USBPD_StatusTypeDef USBPD_PWR_IF_SupplyReady(uint8_t PortNum, USBPD_VSAFE_Status
 USBPD_StatusTypeDef USBPD_PWR_IF_VBUSEnable(uint8_t PortNum)
 {
 /* USER CODE BEGIN USBPD_PWR_IF_VBUSEnable */
+[#if SRC || DRP]
+  USBPD_StatusTypeDef _status = (USBPD_StatusTypeDef)HW_IF_PWR_Enable(PortNum, USBPD_ENABLE, CCNONE, USBPD_FALSE, USBPD_PORTPOWERROLE_SRC);
+  return _status;
+[#else]
   return USBPD_ERROR;
+[/#if]
 /* USER CODE END USBPD_PWR_IF_VBUSEnable */
 }
 
@@ -173,7 +200,12 @@ USBPD_StatusTypeDef USBPD_PWR_IF_VBUSEnable(uint8_t PortNum)
 USBPD_StatusTypeDef USBPD_PWR_IF_VBUSDisable(uint8_t PortNum)
 {
 /* USER CODE BEGIN USBPD_PWR_IF_VBUSDisable */
+[#if SRC || DRP]
+  USBPD_StatusTypeDef _status = (USBPD_StatusTypeDef)HW_IF_PWR_Enable(PortNum, USBPD_DISABLE, CCNONE, USBPD_FALSE, USBPD_PORTPOWERROLE_SRC);
+  return _status;
+[#else]
   return USBPD_ERROR;
+[/#if]
 /* USER CODE END USBPD_PWR_IF_VBUSDisable */
 }
 
@@ -249,8 +281,8 @@ void USBPD_PWR_IF_GetPortPDOs(uint8_t PortNum, USBPD_CORE_DataInfoType_TypeDef D
     if (DataId == USBPD_CORE_DATATYPE_SRC_PDO)
     {
 [#if GUI_INTERFACE??]
-      *Size = GUI_NbPDO[1];
-      memcpy(Ptr,PORT0_PDO_ListSRC, sizeof(uint32_t) * GUI_NbPDO[1]);
+      *Size = USBPD_NbPDO[1];
+      memcpy(Ptr,PORT0_PDO_ListSRC, sizeof(uint32_t) * USBPD_NbPDO[1]);
 [#else]
       *Size = PORT0_NB_SOURCEPDO;
       memcpy(Ptr,PORT0_PDO_ListSRC, sizeof(uint32_t) * PORT0_NB_SOURCEPDO);
@@ -263,8 +295,8 @@ void USBPD_PWR_IF_GetPortPDOs(uint8_t PortNum, USBPD_CORE_DataInfoType_TypeDef D
 [#if SNK || DRP]
     {
 [#if GUI_INTERFACE??]
-      *Size = GUI_NbPDO[0];
-      memcpy(Ptr,PORT0_PDO_ListSNK, sizeof(uint32_t) * GUI_NbPDO[0]);
+      *Size = USBPD_NbPDO[0];
+      memcpy(Ptr,PORT0_PDO_ListSNK, sizeof(uint32_t) * USBPD_NbPDO[0]);
 [#else]
       *Size = PORT0_NB_SINKPDO;
       memcpy(Ptr,PORT0_PDO_ListSNK, sizeof(uint32_t) * PORT0_NB_SINKPDO);
@@ -279,8 +311,8 @@ void USBPD_PWR_IF_GetPortPDOs(uint8_t PortNum, USBPD_CORE_DataInfoType_TypeDef D
     if (DataId == USBPD_CORE_DATATYPE_SRC_PDO)
     {
 [#if GUI_INTERFACE??]
-      *Size = GUI_NbPDO[3];
-      memcpy(Ptr,PORT1_PDO_ListSRC, sizeof(uint32_t) * GUI_NbPDO[3]);
+      *Size = USBPD_NbPDO[3];
+      memcpy(Ptr,PORT1_PDO_ListSRC, sizeof(uint32_t) * USBPD_NbPDO[3]);
 [#else]
       *Size = PORT1_NB_SOURCEPDO;
       memcpy(Ptr,PORT1_PDO_ListSRC, sizeof(uint32_t) * PORT1_NB_SOURCEPDO);
@@ -293,8 +325,8 @@ void USBPD_PWR_IF_GetPortPDOs(uint8_t PortNum, USBPD_CORE_DataInfoType_TypeDef D
 [#if SNK || DRP]
     {
 [#if GUI_INTERFACE??]
-      *Size = GUI_NbPDO[2];
-      memcpy(Ptr,PORT1_PDO_ListSNK, sizeof(uint32_t) * GUI_NbPDO[2]);
+      *Size = USBPD_NbPDO[2];
+      memcpy(Ptr,PORT1_PDO_ListSNK, sizeof(uint32_t) * USBPD_NbPDO[2]);
 [#else]
       *Size = PORT1_NB_SINKPDO;
       memcpy(Ptr,PORT1_PDO_ListSNK, sizeof(uint32_t) * PORT1_NB_SINKPDO);
@@ -345,6 +377,22 @@ uint8_t USBPD_PWR_IF_GetVBUSStatus(uint8_t PortNum, USBPD_VBUSPOWER_STATUS Power
 {
 /* USER CODE BEGIN USBPD_PWR_IF_GetVBUSStatus */
   uint8_t _status = USBPD_FALSE;
+  uint32_t _vbus = HW_IF_PWR_GetVoltage(PortNum);
+
+  switch(PowerTypeStatus)
+  {
+  case USBPD_PWR_BELOWVSAFE0V :
+    if (_vbus < USBPD_PWR_LOW_VBUS_THRESHOLD) _status = USBPD_TRUE;
+    break;
+  case USBPD_PWR_VSAFE5V :
+    if (_vbus >= USBPD_PWR_HIGH_VBUS_THRESHOLD) _status = USBPD_TRUE;
+    break;
+  case USBPD_PWR_SNKDETACH:
+    if (_vbus < USBPD_PWR_HIGH_VBUS_THRESHOLD) _status = USBPD_TRUE;
+    break;
+  default :
+    break;
+  }
   return _status;
 /* USER CODE END USBPD_PWR_IF_GetVBUSStatus */
 }

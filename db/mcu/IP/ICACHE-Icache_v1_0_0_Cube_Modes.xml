@@ -7,13 +7,18 @@
 
 <!-- Generic RefParameters for CRC --> 
 	<RefParameter Name="Instance" DefaultValue="ICACHE" Comment="Instance" Type="" Visible="false"/>
-        
-        <RefMode BaseMode="icacheBasic" Name="ICACHE_Activate">
+         <RefParameter Comment="ICACHE 1WAY" DefaultValue="ICACHE_1WAY" Name="ICACHE_1WAY" Type="list" Visible="false"/>
+        <RefMode BaseMode="icacheBasic" Name="DefaultMode">
         <ConfigForMode>ICACHE_Init</ConfigForMode>		
     </RefMode>
-    <!-- ModeLogicOperator for VREFBUF -->
+     <RefMode BaseMode="icache1way" Name="DirectMappedCache">
+        <ConfigForMode>ICACHE_Config</ConfigForMode> 
+        <!--ConfigForMode>ICACHE_Init</ConfigForMode-->		
+    </RefMode>
+    
+    <!-- ModeLogicOperator for Icache -->
     <ModeLogicOperator Name="OR">
-      <Mode Name="ICACHE_State" UserName="Activated">
+      <!--Mode Name="ICACHE_State" UserName="Activated">
         <ModeLogicOperator Name="XOR">
           <Mode Name="ICACHE_Activate" UserName="Activated">
             <SignalLogicalOp Name="AND">
@@ -22,11 +27,28 @@
           </Mode>
         </ModeLogicOperator>
 
-      </Mode>
+      </Mode-->
+       <Mode Name="Mode" UserName="Mode">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="DefaultMode"
+					UserName="2-ways set associative cache">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VS_ICACHE" />
+					</SignalLogicalOp>
+					
+				</Mode>
+				<Mode Name="DirectMappedCache"
+					UserName="1-way (direct mapped cache)">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VS_ICACHE" />
+					</SignalLogicalOp>
+				</Mode>
+                                </ModeLogicOperator>
+		</Mode>
        
     </ModeLogicOperator>
 
-    <!-- RefSignal for VREFBUF -->
+    <!-- RefSignal for ICACHE -->
     <RefSignal Name="VS_ICACHE" Virtual="true"/>
 
 </IP>

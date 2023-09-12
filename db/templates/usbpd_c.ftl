@@ -45,16 +45,16 @@ void MX_USBPD_Init(void)
   /* Global Init of USBPD HW */
   USBPD_HW_IF_GlobalHwInit();
 
-[#if GUI_INTERFACE??]
-  /* Initialize GUI before retrieving PDO from RAM */
-  GUI_Init(GetHWBoardVersionName, GetPDTypeName, HW_IF_PWR_GetVoltage, HW_IF_PWR_GetCurrent);
-[/#if]
-
   /* Initialize the Device Policy Manager */
   if(USBPD_OK != USBPD_DPM_InitCore())
   {
     while(1);
   }
+
+[#if GUI_INTERFACE??]
+  /* Initialize GUI before retrieving PDO from RAM */
+  GUI_Init(GetHWBoardVersionName, GetPDTypeName, HW_IF_PWR_GetVoltage, HW_IF_PWR_GetCurrent);
+[/#if]
 
   /* Initialise the DPM application */
   if (USBPD_OK != USBPD_DPM_UserInit())

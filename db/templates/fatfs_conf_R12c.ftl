@@ -454,11 +454,19 @@ extern ${variable.value} ${variable.name};
 /  SemaphoreHandle_t and etc.. A header file for O/S definitions needs to be
 /  included somewhere in the scope of ff.h. */
 
+[#-- In R0.12c, definitions that depend on FreeRTOS state (enabled/disabled) --]
+[#if cmsisrtosInUse == 1]
+/* define the ff_malloc ff_free macros as FreeRTOS pvPortMalloc and vportFree macros */
+#if !defined(ff_malloc) && !defined(ff_free)
+#define ff_malloc  pvPortMalloc
+#define ff_free  vportFree
+[#else]
 /* define the ff_malloc ff_free macros as standard malloc free */
 #if !defined(ff_malloc) && !defined(ff_free)
 #include <stdlib.h>
 #define ff_malloc  malloc
 #define ff_free  free
+[/#if]
 #endif
 
 #endif /* _FFCONF */

@@ -24,7 +24,12 @@
  [#if familyName="stm32l4"]
  * @file    bsp_driver_sram.c for L4 (based on stm32l476g_eval_sram.c)
  [/#if]
-  * @brief   This file includes a generic SRAM driver.
+ * @brief   This file includes a generic SRAM driver.
+ *          To be updated by the user according to the board used for the project.
+ * @note    Functions generated as weak: they can be overriden by 
+ *          - code in user files 
+ *          - or BSP code from the FW pack files 
+ *          if such files are added to the generated project (by the user).
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
@@ -60,7 +65,7 @@ extern SRAM_HandleTypeDef ${sramHandle};
   * @brief  Initializes the SRAM device.
   * @retval SRAM status
   */
-uint8_t BSP_SRAM_Init(void)
+__weak uint8_t BSP_SRAM_Init(void)
 { 
   uint8_t sramstatus = SRAM_OK;
   
@@ -79,9 +84,9 @@ uint8_t BSP_SRAM_Init(void)
   * @param  uwStartAddress: Read start address
   * @param  pData: Pointer to data to be read
   * @param  uwDataSize: Size of read data from the memory
-  * @retval SRAM status
+  * @retval SRAM status : SRAM_OK or SRAM_ERROR.
   */
-uint8_t BSP_SRAM_ReadData(uint32_t uwStartAddress, uint16_t *pData, uint32_t uwDataSize)
+__weak uint8_t BSP_SRAM_ReadData(uint32_t uwStartAddress, uint16_t *pData, uint32_t uwDataSize)
 { 
   uint8_t sramstatus = SRAM_OK;
 
@@ -98,9 +103,9 @@ uint8_t BSP_SRAM_ReadData(uint32_t uwStartAddress, uint16_t *pData, uint32_t uwD
   * @param  uwStartAddress: Read start address
   * @param  pData: Pointer to data to be read
   * @param  uwDataSize: Size of read data from the memory
-  * @retval SRAM status
+  * @retval SRAM status : SRAM_OK or SRAM_ERROR.
   */
-uint8_t BSP_SRAM_ReadData_DMA(uint32_t uwStartAddress, uint16_t *pData, uint32_t uwDataSize)
+__weak uint8_t BSP_SRAM_ReadData_DMA(uint32_t uwStartAddress, uint16_t *pData, uint32_t uwDataSize)
 {
   uint8_t sramstatus = SRAM_OK;
   
@@ -120,10 +125,10 @@ uint8_t BSP_SRAM_ReadData_DMA(uint32_t uwStartAddress, uint16_t *pData, uint32_t
   * @brief  Writes an amount of data from the SRAM device in polling mode.
   * @param  uwStartAddress: Write start address
   * @param  pData: Pointer to data to be written
-  * @param  uwDataSize: Size of written data from the memory   
-  * @retval SRAM status
+  * @param  uwDataSize: Size of written data from the memory
+  * @retval SRAM status : SRAM_OK or SRAM_ERROR.
   */
-uint8_t BSP_SRAM_WriteData(uint32_t uwStartAddress, uint16_t *pData, uint32_t uwDataSize) 
+__weak uint8_t BSP_SRAM_WriteData(uint32_t uwStartAddress, uint16_t *pData, uint32_t uwDataSize) 
 {
   uint8_t sramstatus = SRAM_OK;
   
@@ -140,9 +145,9 @@ uint8_t BSP_SRAM_WriteData(uint32_t uwStartAddress, uint16_t *pData, uint32_t uw
   * @param  uwStartAddress: Write start address
   * @param  pData: Pointer to data to be written
   * @param  uwDataSize: Size of written data from the memory
-  * @retval SRAM status
+  * @retval SRAM status : SRAM_OK or SRAM_ERROR.
   */
-uint8_t BSP_SRAM_WriteData_DMA(uint32_t uwStartAddress, uint16_t *pData, uint32_t uwDataSize)
+__weak uint8_t BSP_SRAM_WriteData_DMA(uint32_t uwStartAddress, uint16_t *pData, uint32_t uwDataSize)
 {
   uint8_t sramstatus = SRAM_OK;
   
@@ -154,11 +159,12 @@ uint8_t BSP_SRAM_WriteData_DMA(uint32_t uwStartAddress, uint16_t *pData, uint32_
   return sramstatus;
 }
 
-[#if familyName!="stm32f7" && familyName!="stm32h7"] [#-- 2018-07-31 : aligned on bsp drivers files in FW pack --]
+[#if familyName!="stm32f7"] [#-- 2018-07-31 : aligned on bsp drivers files in FW pack --]
 /**
   * @brief  Handles SRAM DMA transfer interrupt request.
+  * @retval None
   */
-void BSP_SRAM_DMA_IRQHandler(void)
+__weak void BSP_SRAM_DMA_IRQHandler(void)
 {
   HAL_DMA_IRQHandler(${sramHandle}.hdma);
 }

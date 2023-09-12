@@ -16,7 +16,7 @@
 /* Start scheduler */
 #tosKernelStart(NULL, NULL);
 [#else]
-/* Start scheduler */
+#t/* Start scheduler */
 #tosKernelStart();
 [/#if]
 

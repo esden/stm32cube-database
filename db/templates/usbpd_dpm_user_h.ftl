@@ -13,6 +13,7 @@
 
 [#assign SNK = false]
 [#assign DRP = false]
+[#assign DR_SWAP_TO_XFP_FEATURE = false]
 
 [#-- SWIPdatas is a list of SWIPconfigModel --]
 [#list SWIPdatas as SWIP]
@@ -23,6 +24,9 @@
             [/#if]
             [#if definition.name == "DRP" && definition.value == "true"]
                 [#assign DRP = true]
+            [/#if]
+            [#if definition.name=="PE_DR_Swap_To_DFP_P0"]
+                [#assign DR_SWAP_TO_XFP_FEATURE = true]
             [/#if]
         [/#list]
     [/#if]
@@ -52,9 +56,15 @@
 [#else]
 typedef struct
 {
-  uint32_t PE_DataSwap                                    : 1;  /*!< support data swap                                     */
-  uint32_t PE_VconnSwap                                   : 1;  /*!< support VCONN swap                                    */
-  uint32_t Reserved1                                      :30;  /*!< Reserved bits */
+  uint32_t PE_DataSwap                                    : 1U;  /*!< support data swap                                     */
+  uint32_t PE_VconnSwap                                   : 1U;  /*!< support VCONN swap                                    */
+[#if DR_SWAP_TO_XFP_FEATURE]
+  uint32_t PE_DR_Swap_To_DFP                              : 1U;  /*!< If supported, DR Swap to DFP can be accepted or not by the user else directly rejected */
+  uint32_t PE_DR_Swap_To_UFP                              : 1U;  /*!< If supported, DR Swap to UFP can be accepted or not by the user else directly rejected */
+  uint32_t Reserved1                                      :28U;  /*!< Reserved bits */
+[#else]
+  uint32_t Reserved1                                      :30U;  /*!< Reserved bits */
+[/#if]
 [#if SNK || DRP]
   USBPD_SNKPowerRequest_TypeDef DPM_SNKRequestedPower;          /*!< Requested Power by the sink board                     */
 [#else]
@@ -79,7 +89,6 @@ typedef struct
 typedef void     (*GUI_NOTIFICATION_POST)(uint8_t PortNum, uint16_t EventVal);
 typedef uint32_t (*GUI_NOTIFICATION_FORMAT_SEND)(uint32_t PortNum, uint32_t TypeNotification, uint32_t Value);
 typedef void     (*GUI_SAVE_INFO)(uint8_t PortNum, uint8_t DataId, uint8_t *Ptr, uint32_t Size);
-
 [/#if]
 /* Exported define -----------------------------------------------------------*/
 /* USER CODE BEGIN Define */
@@ -112,7 +121,7 @@ USBPD_StatusTypeDef USBPD_DPM_UserInit(void);
 [#if GUI_INTERFACE??]
 void                USBPD_DPM_SetNotification_GUI(GUI_NOTIFICATION_FORMAT_SEND PtrFormatSend, GUI_NOTIFICATION_POST PtrPost, GUI_SAVE_INFO PtrSaveInfo);
 [/#if]
-[#if FREERTOS??]
+[#if FREERTOS?? && Secure!="true"]
 [#else]
 void                USBPD_DPM_UserExecute(void const *argument);
 [/#if]

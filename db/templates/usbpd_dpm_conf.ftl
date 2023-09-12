@@ -22,6 +22,8 @@
 [#assign SNK = false]
 [#assign DRP = false]
 [#assign BATT_FEATURE = false]
+[#assign DR_SWAP_TO_XFP_FEATURE = false]
+[#assign GUI_V1_8_0_OR_NEWER = false]
 [#-- SWIPdatas is a list of SWIPconfigModel --]  
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
@@ -40,6 +42,9 @@
             [/#if]
             [#if definition.name=="USBPD_PortConfig"]
                 [#assign valueUSBPD_PortConfig = definition.value]
+            [/#if]
+            [#if definition.name=="GUI_V1_8_0_OR_NEWER" && definition.value == "true"]
+                [#assign GUI_V1_8_0_OR_NEWER = true]
             [/#if]
             [#if definition.name=="USBPD_VID"]
                 [#assign valueUSBPD_VID = definition.value]
@@ -79,6 +84,13 @@
             [/#if]
             [#if definition.name=="PE_DataSwap_P0"]
                 [#assign valuePE_DataSwap_P0 = definition.value]
+            [/#if]
+            [#if definition.name=="PE_DR_Swap_To_DFP_P0"]
+                [#assign valuePE_DR_Swap_To_DFP_P0 = definition.value]
+                [#assign DR_SWAP_TO_XFP_FEATURE = true]
+            [/#if]
+            [#if definition.name=="PE_DR_Swap_To_UFP_P0"]
+                [#assign valuePE_DR_Swap_To_UFP_P0 = definition.value]
             [/#if]
             [#if definition.name=="PE_VDMSupport_P0"]
                 [#assign valuePE_VDMSupport_P0 = definition.value]
@@ -190,6 +202,12 @@
                 [#if definition.name=="PE_DataSwap_P1"]
                     [#assign valuePE_DataSwap_P1 = definition.value]
                 [/#if]
+                [#if definition.name=="PE_DR_Swap_To_DFP_P1"]
+                    [#assign valuePE_DR_Swap_To_DFP_P1 = definition.value]
+                [/#if]
+                [#if definition.name=="PE_DR_Swap_To_UFP_P1"]
+                    [#assign valuePE_DR_Swap_To_UFP_P1 = definition.value]
+                [/#if]
                 [#if definition.name=="PE_VDMSupport_P1"]
                     [#assign valuePE_VDMSupport_P1 = definition.value]
                 [/#if]
@@ -280,6 +298,12 @@
 #include "usbpd_vdm_user.h"
 #include "usbpd_dpm_user.h"
 
+[#if GUI_INTERFACE??]
+/* Section where include file can be added */
+#include "gui_api.h"
+#include "usbpd_gui_memmap.h"
+[/#if]
+
 /* USER CODE BEGIN Includes */
 /* Section where include file can be added */
 
@@ -305,8 +329,7 @@
 /* Private variables ---------------------------------------------------------*/
 #ifndef __USBPD_DPM_CORE_C
 extern USBPD_SettingsTypeDef            DPM_Settings[USBPD_PORT_COUNT];
-[#if GUI_INTERFACE??]
-[#else]
+[#if !GUI_INTERFACE?? || GUI_V1_8_0_OR_NEWER]
 extern USBPD_IdSettingsTypeDef          DPM_ID_Settings[USBPD_PORT_COUNT];
 extern USBPD_USER_SettingsTypeDef       DPM_USER_Settings[USBPD_PORT_COUNT];
 [/#if]
@@ -346,7 +369,6 @@ USBPD_SettingsTypeDef       DPM_Settings[USBPD_PORT_COUNT] =
       .Is_GetCountryInfo_Supported      = ${valueIs_GetCountryInfo_Supported_P0},  /*!< Country_Info message supported or not by DPM */
       .Is_SecurityRequest_Supported     = ${valueIs_SecurityRequest_Supported_P0},  /*!< Security_Response message supported or not by DPM */
       .Is_FirmUpdateRequest_Supported   = ${valueIs_FirmUpdateRequest_Supported_P0},  /*!< Firmware update response message supported by PE */
-      .Is_SnkCapaExt_Supported          = ${valueIs_SnkCapaExt_Supported_P0},  /*!< Sink_Capabilities_Extended message supported by PE */
 [#if BATT_FEATURE]
       .Is_GetBattery_Supported          = ${valueIs_GetBattery_Supported_P0},  /*!< Get Battery Capabitity and Status messages supported by PE */
 [/#if]
@@ -390,7 +412,6 @@ USBPD_SettingsTypeDef       DPM_Settings[USBPD_PORT_COUNT] =
       .Is_GetCountryInfo_Supported      = ${valueIs_GetCountryInfo_Supported_P1},  /*!< Country_Info message supported or not by DPM */
       .Is_SecurityRequest_Supported     = ${valueIs_SecurityRequest_Supported_P1},  /*!< Security_Response message supported or not by DPM */
       .Is_FirmUpdateRequest_Supported   = ${valueIs_FirmUpdateRequest_Supported_P1},  /*!< Firmware update response message supported by PE */
-      .Is_SnkCapaExt_Supported          = ${valueIs_SnkCapaExt_Supported_P1},  /*!< Sink_Capabilities_Extended message supported by PE */
 [#if BATT_FEATURE]
       .Is_GetBattery_Supported          = ${valueIs_GetBattery_Supported_P1},  /*!< Get Battery Capabitity and Status messages supported by PE */
 [/#if]
@@ -403,8 +424,7 @@ USBPD_SettingsTypeDef       DPM_Settings[USBPD_PORT_COUNT] =
   }
 };
 
-[#if GUI_INTERFACE??]
-[#else]
+[#if !GUI_INTERFACE?? || GUI_V1_8_0_OR_NEWER]
 USBPD_IdSettingsTypeDef          DPM_ID_Settings[USBPD_PORT_COUNT] =
 {
   {
@@ -428,31 +448,47 @@ USBPD_USER_SettingsTypeDef       DPM_USER_Settings[USBPD_PORT_COUNT] =
   {
     .PE_DataSwap = ${valuePE_DataSwap_P0},                  /* support data swap                                       */
     .PE_VconnSwap = ${valuePE_VconnSwap_P0},                 /* support VCONN swap                                  */
+[#if DR_SWAP_TO_XFP_FEATURE]
+    .PE_DR_Swap_To_DFP = ${valuePE_DR_Swap_To_DFP_P0},                  /*  Support of DR Swap to DFP                                  */
+    .PE_DR_Swap_To_UFP = ${valuePE_DR_Swap_To_UFP_P0},                  /*  Support of DR Swap to UFP                                  */
+[/#if]
+#if defined(USBPD_REV30_SUPPORT)
+#if _MANU_INFO
     .DPM_ManuInfoPort =                      /*!< Manufacturer information used for the port            */
     {
       .VID = USBPD_VID,                      /*!< Vendor ID (assigned by the USB-IF)        */
       .PID = USBPD_PID,                      /*!< Product ID (assigned by the manufacturer) */
       .ManuString = "STMicroelectronics",    /*!< Vendor defined byte array                 */
     },
+#endif /* _MANU_INFO */
+#endif /* USBPD_REV30_SUPPORT */
   },
 [#if nbPorts=="2"]
 #if USBPD_PORT_COUNT >= 2
   {
     .PE_DataSwap = ${valuePE_DataSwap_P1},                  /* support data swap                                       */
     .PE_VconnSwap = ${valuePE_VconnSwap_P0},                /* support VCONN swap                                  */
+[#if DR_SWAP_TO_XFP_FEATURE]
+    .PE_DR_Swap_To_DFP = ${valuePE_DR_Swap_To_DFP_P1},                  /*  Support of DR Swap to DFP                                  */
+    .PE_DR_Swap_To_UFP = ${valuePE_DR_Swap_To_UFP_P1},                  /*  Support of DR Swap to UFP                                  */
+[/#if]
+#if defined(USBPD_REV30_SUPPORT)
+#if _MANU_INFO
     .DPM_ManuInfoPort =                      /*!< Manufacturer information used for the port            */
     {
       .VID = USBPD_VID,                      /*!< Vendor ID (assigned by the USB-IF)        */
       .PID = USBPD_PID,                      /*!< Product ID (assigned by the manufacturer) */
       .ManuString = "STMicroelectronics",    /*!< Vendor defined byte array                 */
     },
+#endif /* _MANU_INFO */
+#endif /* USBPD_REV30_SUPPORT */
   }
 #endif /* USBPD_PORT_COUNT >= 2 */
 [/#if]
 };
 [/#if]
 
-#endif
+#endif /* !__USBPD_DPM_CORE_C */
 
 /* USER CODE BEGIN Variable */
 /* Section where Variable can be added */

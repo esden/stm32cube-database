@@ -45,7 +45,7 @@
 /*
 //-------- <<< Use Configuration Wizard in Context Menu >>> -----------------
 */
-
+/* USER CODE BEGIN 0 */
 /*
 // <e>Initialize Security Attribution Unit (SAU) CTRL register
 */
@@ -325,7 +325,7 @@
 //   <i> Value for SCB->AIRCR register bit SYSRESETREQS
 */
 #define SCB_AIRCR_SYSRESETREQS_VAL  0
-
+/* USER CODE END 0 */
 /*
 //   <o>Priority of Non-Secure exceptions is
 //     <0=> Not altered
@@ -345,7 +345,7 @@
 /*
 // </e>
 */
-
+/* USER CODE BEGIN 1 */
 /*
 // <e>Setup behaviour of Floating Point Unit
 */
@@ -386,7 +386,7 @@
 /*
 // </e>
 */
-
+/* USER CODE END 1 */
 /*
 // <h>Setup Interrupt Target
 */
@@ -613,7 +613,7 @@
 // </h>
 */
 
-
+/* USER CODE BEGIN 2 */
 
 /*
     max 8 SAU regions.
@@ -693,7 +693,7 @@ __STATIC_INLINE void TZ_SAU_Setup (void)
   #if defined (__FPU_USED) && (__FPU_USED == 1U) && \
       defined (TZ_FPU_NS_USAGE) && (TZ_FPU_NS_USAGE == 1U)
 
-    SCB->NSACR = (SCB->NSACR & ~(SCB_NSACR_CP10_Msk | SCB_NSACR_CP10_Msk)) |
+    SCB->NSACR = (SCB->NSACR & ~(SCB_NSACR_CP10_Msk | SCB_NSACR_CP11_Msk)) |
                    ((SCB_NSACR_CP10_11_VAL << SCB_NSACR_CP10_Pos) & (SCB_NSACR_CP10_Msk | SCB_NSACR_CP11_Msk));
 
     FPU->FPCCR = (FPU->FPCCR & ~(FPU_FPCCR_TS_Msk | FPU_FPCCR_CLRONRETS_Msk | FPU_FPCCR_CLRONRET_Msk)) |
@@ -719,6 +719,7 @@ __STATIC_INLINE void TZ_SAU_Setup (void)
   #endif
 
 }
+/* USER CODE END 2 */
 [#if McuName?starts_with("STM32L562")]
 #endif  /* PARTITION_STM32L562XX_H */
 [#else]

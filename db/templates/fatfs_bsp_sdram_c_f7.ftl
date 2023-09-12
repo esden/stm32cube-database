@@ -4,6 +4,11 @@
  ******************************************************************************
   * @file    bsp_driver_sdram.c (based on stm32756g_eval_sdram.c)
   * @brief   This file includes a generic SDRAM driver.
+  *          To be updated by the user according to the board used for the project.
+  * @note    Functions generated as weak: they can be overwritten by 
+  *          - code in user files 
+  *          - or BSP code from the FW pack files 
+  *          if such files are added to the generated project (by the user).
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
@@ -38,8 +43,9 @@ extern SDRAM_HandleTypeDef ${sdramHandle};
 /**
   * @brief  Initializes the SDRAM device 
   * @retval SDRAM status
+  * @note   Called in sdram_diskio.c
   */
-uint8_t BSP_SDRAM_Init(void)
+__weak uint8_t BSP_SDRAM_Init(void)
 {
   uint8_t sdramstatus = SDRAM_OK;
   
@@ -60,7 +66,7 @@ uint8_t BSP_SDRAM_Init(void)
   * @param  uwDataSize: Size of read data from the memory
   * @retval SDRAM status : SDRAM_OK or SDRAM_ERROR.
   */
-uint8_t BSP_SDRAM_ReadData(uint32_t uwStartAddress, uint32_t *pData, uint32_t uwDataSize)
+__weak uint8_t BSP_SDRAM_ReadData(uint32_t uwStartAddress, uint32_t *pData, uint32_t uwDataSize)
 { 
   uint8_t sdramstatus = SDRAM_OK;
   
@@ -79,7 +85,7 @@ uint8_t BSP_SDRAM_ReadData(uint32_t uwStartAddress, uint32_t *pData, uint32_t uw
   * @param  uwDataSize: Size of read data from the memory
   * @retval SDRAM status : SDRAM_OK or SDRAM_ERROR.
   */
-uint8_t BSP_SDRAM_ReadData_DMA(uint32_t uwStartAddress, uint32_t *pData, uint32_t uwDataSize)
+__weak uint8_t BSP_SDRAM_ReadData_DMA(uint32_t uwStartAddress, uint32_t *pData, uint32_t uwDataSize)
 { 
   uint8_t sdramstatus = SDRAM_OK;
   
@@ -102,7 +108,7 @@ uint8_t BSP_SDRAM_ReadData_DMA(uint32_t uwStartAddress, uint32_t *pData, uint32_
   * @param  uwDataSize: Size of written data from the memory
   * @retval SDRAM status : SDRAM_OK or SDRAM_ERROR.
   */
-uint8_t BSP_SDRAM_WriteData(uint32_t uwStartAddress, uint32_t *pData, uint32_t uwDataSize)
+__weak uint8_t BSP_SDRAM_WriteData(uint32_t uwStartAddress, uint32_t *pData, uint32_t uwDataSize)
 { 
   uint8_t sdramstatus = SDRAM_OK;
   
@@ -121,7 +127,7 @@ uint8_t BSP_SDRAM_WriteData(uint32_t uwStartAddress, uint32_t *pData, uint32_t u
   * @param  uwDataSize: Size of written data from the memory
   * @retval SDRAM status : SDRAM_OK or SDRAM_ERROR.
   */
-uint8_t BSP_SDRAM_WriteData_DMA(uint32_t uwStartAddress, uint32_t *pData, uint32_t uwDataSize)
+__weak uint8_t BSP_SDRAM_WriteData_DMA(uint32_t uwStartAddress, uint32_t *pData, uint32_t uwDataSize)
 { 
   uint8_t sdramstatus = SDRAM_OK;
   
@@ -138,7 +144,7 @@ uint8_t BSP_SDRAM_WriteData_DMA(uint32_t uwStartAddress, uint32_t *pData, uint32
   * @param  SdramCmd: Pointer to SDRAM command structure
   * @retval SDRAM status : SDRAM_OK or SDRAM_ERROR.
   */
-uint8_t BSP_SDRAM_Sendcmd(FMC_SDRAM_CommandTypeDef *SdramCmd)
+__weak uint8_t BSP_SDRAM_Sendcmd(FMC_SDRAM_CommandTypeDef *SdramCmd)
 { 
   uint8_t sdramstatus = SDRAM_OK;
   

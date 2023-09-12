@@ -305,7 +305,13 @@
             [/#if] 
             [#if dataKey=="atLeastOneBspComponentIsUsed"]
                [#assign atLeastOneBspComponentIsUsed =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="deviceDriverGroups"]
+               [#assign deviceDriverGroups =  elem[dataKey]]
             [/#if] 
+             [#if dataKey=="atLeastDeviceDriverIsUsed"]
+               [#assign atLeastDeviceDriverIsUsed =  elem[dataKey]]
+            [/#if]              
             [#--if dataKey=="atLeastOneMiddlewareIsUsed"]
                [#assign atLeastOneMiddlewareIsUsed =  elem[dataKey]]
             [/#if--] 
@@ -377,6 +383,9 @@
 [#if underRoot == "true"]
 <sourceEntriesToRemove>
     <sourceEntry>
+[#if ide=="SW4STM32" &&  family=="STM32MP1xx"]
+<name>Src</name>
+[/#if]
 [#-- [#list SourceEntryToRemove as SourceEntry]--]
         [#-- [#if SourceEntry!="null"]--]
  [#-- [/#if]--]
@@ -502,7 +511,7 @@
             <name>Packs</name>
             </sourceEntry>
 	[/#if--]
-        [#if ResMgr_Utility??]
+        [#if ResMgr_Utility?? || UtilitiesGroup??]
             <sourceEntry>
                 <name>Utilities</name>
             </sourceEntry>
@@ -510,9 +519,11 @@
 
         [#if ThirdPartyPackList??]
             [#list  ThirdPartyPackList as pack]
+[#if pack !=  ""]
         <sourceEntry>
             <name>${pack}</name>
             </sourceEntry>
+[/#if]
             [/#list]
         [/#if]
                 </sourceEntries>
@@ -592,6 +603,24 @@
         [/#list]
     <group>
         <name>Drivers</name> 
+         
+        [#if atLeastDeviceDriverIsUsed]
+        <group>					
+            [#if deviceDriverGroups??]	
+            	[#list deviceDriverGroups as grp]
+            		<name>${grp.name!''}</name>
+            		[#if grp.sourceFilesNameList??]
+        				[#list grp.sourceFilesNameList as filesName]	
+        				<file>
+        					<name>${filesName!''}</name>
+        				</file>        					
+        				[/#list]				
+            	[/#if]
+            	[/#list]
+            [/#if]     					
+            </group>
+        [/#if]
+        
         [#if atLeastOneBspComponentIsUsed]
         <group>					
             [#if bspComponentGroups??]						
@@ -841,9 +870,11 @@
 	[/#if]
         [#if ThirdPartyPackList??]
             [#list ThirdPartyPackList as pack]
+     [#if pack !=  ""]
         <sourceEntry>
             <name>${pack}</name>
             </sourceEntry>
+[/#if]
             [/#list]
         [/#if]
 	[#-- MZA Bug41441 --]			
@@ -1121,7 +1152,24 @@
         [@getGroups groupArg=grp/]
     [/#list]
     <group>
-        <name>Drivers</name> 
+        <name>Drivers</name>         
+        [#if atLeastDeviceDriverIsUsed]
+        <group>					
+            [#if deviceDriverGroups??]	
+            	[#list deviceDriverGroups as grp]
+            	 <name>${grp.name!''}</name>
+            		[#if grp.sourceFilesNameList??]
+        				[#list grp.sourceFilesNameList as filesName]
+        				<file>	
+        					 <name>${filesName!''}</name>
+        				</file>        				
+        				[/#list]				
+            	[/#if]
+            	[/#list]
+            [/#if]     					
+            </group>
+        [/#if]
+        
     [#if atLeastOneBspComponentIsUsed]
         <group>					
         [#if bspComponentGroups??]						

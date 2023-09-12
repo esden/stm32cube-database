@@ -59,6 +59,11 @@
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
+[#-- in main template, contextFolder is used...  --]
+[#-- [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_typedefs.tmp"/]  --]
+[#if inMain == 0]
+[@common.optinclude name=mxTmpFolder+"/rtos_typedefs.tmp"/]
+[/#if]
 /* USER CODE BEGIN PTD */
 
 /* USER CODE END PTD */
@@ -82,9 +87,6 @@
 [/#if]
 
 /* Private function prototypes -----------------------------------------------*/
-[#if timeBaseSource?? && timeBaseSource=="SysTick"]  [#-- generated when CMSIS RTOS v2 and timebase=systick --]
-void xPortSysTickHandler( void );
-[/#if]
 /* USER CODE BEGIN FunctionPrototypes */
    
 /* USER CODE END FunctionPrototypes */
@@ -369,32 +371,14 @@ void MX_FREERTOS_Init(void) {
 #t/* USER CODE BEGIN Init */
 #t     
 #t/* USER CODE END Init */
-[@common.optinclude name=mxTmpFolder+"/rtos_HalInit.tmp"/]
+[@common.optinclude name=mxTmpFolder+"/rtos_obj_creat.tmp"/]
 }
+[@common.optinclude name=mxTmpFolder+"/rtos_default_thread.tmp"/]
 [@common.optinclude name=mxTmpFolder+"/rtos_threads.tmp"/]
-[@common.optinclude name=mxTmpFolder+"/rtos_user_threads.tmp"/] 
+[@common.optinclude name=mxTmpFolder+"/rtos_callbacks.tmp"/]
 [/#if]  
 
 /* Private application code --------------------------------------------------*/
-[#if timeBaseSource?? && timeBaseSource=="SysTick"]  [#-- generated when CMSIS RTOS v2 and timebase=systick --]
-/**
-* @brief  Handles the tick increment
-* @param  none.
-* @retval none.
-*/
-void systickHandler(void) // replaces osSystickHandler (available in V1 but not in V2)
-{
-
-#if (INCLUDE_xTaskGetSchedulerState  == 1 )
-  if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
-  {
-#endif  /* INCLUDE_xTaskGetSchedulerState */  
-    xPortSysTickHandler();
-#if (INCLUDE_xTaskGetSchedulerState  == 1 )
-  }
-#endif  /* INCLUDE_xTaskGetSchedulerState */  
-}
-[/#if]
 /* USER CODE BEGIN Application */
      
 /* USER CODE END Application */

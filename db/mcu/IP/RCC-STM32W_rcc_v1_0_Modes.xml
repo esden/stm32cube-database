@@ -454,8 +454,8 @@
         <Condition Diagnostic="MSI should be greather than 16 Mhz OR HSE with 32 Mhz" Expression="!(HSE_VALUE=32000000) &amp; !(MSIRANGE_8 | MSIRANGE_9 | MSIRANGE_10 | MSIRANGE_11)"/>
         <PossibleValue Comment="SMPS Clksource Hsi"    Value="RCC_SMPSCLKSOURCE_HSI"    Semaphore="SMPSSourceHSI"/>
     </RefParameter>    
-    <!--RefParameter Visible="false"  Comment="SMPS Clock Selection" DefaultValue="" Name="SMPSCLockSelectionVirtual" Type="list" IP="SMPS">
-        <PossibleValue Comment="SMPS Clksource Hsi"    Value="RCC_SMPSCLKSOURCE_HSI"    Semaphore="SMPSSourceHSI"/>
+    <!--RefParameter Visible="false"  Comment="SMPS Clock Selection" DefaultValue="RCC_SMPSCLKSOURCE_HSI" Name="SMPSCLockSelectionVirtual" Type="list" IP="SMPS">
+        <PossibleValue Comment="SMPS Clksource MSI"  Value="RCC_SMPSCLKSOURCE_MSI"  Semaphore="SMPSSourceMSI"/>
     </RefParameter-->
     <RefParameter Comment="PLL Source" DefaultValue="+SMPSCLockSelectionVirtual" Name="SMPSCLockSelectionVirtualString" Type="string" Visible="false"/>
     
@@ -2211,19 +2211,24 @@
     </RefParameter>  
     <RefParameter Name="ReloadValueARG" Visible="false" Comment="CRS Synchro Reload Value" Type="list" DefaultValue="null" Group="CRS Parameters"/>
     
+    <RefParameter Name="ReloadValueLL" Visible="false" Comment="CRS Synchro Reload Value" Type="list" DefaultValue="null" Group="CRS Parameters">
+        <Condition Expression="!CRSActivatedSourceGPIO &amp; !CRSActivatedSourceLSE &amp; !CRSActivatedSourceUSB" Diagnostic=""/>   
+    </RefParameter>
+      
+        <RefParameter Name="ReloadValueLL" Visible="false" Comment="CRS Synchro Reload Value" Type="list" DefaultValue="__LL_CRS_CALC_CALCULATE_RELOADVALUE(48000000," Group="CRS Parameters">
+        <Condition Expression="AutomaticRelaod" Diagnostic=""/>   
+        <PossibleValue Value="__LL_CRS_CALC_CALCULATE_RELOADVALUE(48000000," Comment="__LL_CRS_CALC_CALCULATE_RELOADVALUE(48000000,"/>
+    </RefParameter>
+
+    <RefParameter Name="ReloadValueLL"  Comment="CRS Synchro Reload Value" Type="integer" DefaultValue="null" Min="0" Max="65535" Group="CRS Parameters"/>
+    
     <RefParameter Name="ReloadValueARGLL" Visible="false" Comment="CRS Synchro Reload Value" Type="list" DefaultValue="null" Group="CRS Parameters">
         <Condition Expression="!CRSActivatedSourceGPIO &amp; !CRSActivatedSourceLSE &amp; !CRSActivatedSourceUSB" Diagnostic=""/>   
 
     </RefParameter>
     
-    <RefParameter Name="ReloadValueARGLL" Visible="false" Comment="CRS Synchro Reload Value" Type="list" DefaultValue="+ReloadValueLL+GPIOFsync+)" Group="CRS Parameters">
-        <Condition Expression="AutomaticRelaod &amp; (CRSActivatedSourceGPIO)" Diagnostic=""/>   
-    </RefParameter>
-    <RefParameter Name="ReloadValueARGLL" Visible="false" Comment="CRS Synchro Reload Value" Type="list" DefaultValue="+ReloadValueLL+LSEFsync+)" Group="CRS Parameters">
-        <Condition Expression="AutomaticRelaod &amp; (CRSActivatedSourceLSE)" Diagnostic=""/>   
-    </RefParameter>
-    <RefParameter Name="ReloadValueARGLL" Visible="false" Comment="CRS Synchro Reload Value" Type="list" DefaultValue="+ReloadValueLL+USBFsync+)" Group="CRS Parameters">
-        <Condition Expression="AutomaticRelaod &amp; (CRSActivatedSourceUSB)" Diagnostic=""/>   
+    <RefParameter Name="ReloadValueARGLL" Visible="false" Comment="CRS Synchro Reload Value" Type="list" DefaultValue="+ReloadValueLL+Fsync+)" Group="CRS Parameters">
+        <Condition Expression="AutomaticRelaod &amp; (CRSActivatedSourceGPIO|!CRSActivatedSourceLSE | !CRSActivatedSourceUSB)" Diagnostic=""/>   
     </RefParameter>
 	    <RefParameter Name="ReloadValueARGLL" Visible="false" Comment="CRS Synchro Reload Value" Type="list" DefaultValue="+ReloadValue" Group="CRS Parameters">
         <Condition Expression="DefaultReload|UserDefinedReload" Diagnostic=""/>   
@@ -2420,6 +2425,7 @@
         <Parameter Name="ClockTypeHCLK"/>
         <Parameter Name="ClockTypePCLK1"/>
         <Parameter Name="ClockTypePCLK2"/>
+        <Parameter Name="SMPSDiv"/>
 	
     </RefMode>
 	

@@ -211,31 +211,31 @@
   * @{
   */
 [#if I2CisTrue]
-#if (USE_HAL_I2C_REGISTER_CALLBACKS == 1)
+#if (USE_HAL_I2C_REGISTER_CALLBACKS == 1U)
 typedef struct
 {
   pI2C_CallbackTypeDef  pMspInitCb;
   pI2C_CallbackTypeDef  pMspDeInitCb;
 }BSP_I2C_Cb_t;
-#endif /* (USE_HAL_I2C_REGISTER_CALLBACKS == 1) */
+#endif /* (USE_HAL_I2C_REGISTER_CALLBACKS == 1U) */
 [/#if]
 [#if SPIisTrue]
-#if (USE_HAL_SPI_REGISTER_CALLBACKS == 1) 
+#if (USE_HAL_SPI_REGISTER_CALLBACKS == 1U) 
 typedef struct
 {
   pSPI_CallbackTypeDef  pMspInitCb;
   pSPI_CallbackTypeDef  pMspDeInitCb;
 }BSP_SPI_Cb_t;
-#endif /* (USE_HAL_SPI_REGISTER_CALLBACKS == 1) */
+#endif /* (USE_HAL_SPI_REGISTER_CALLBACKS == 1U) */
 [/#if] 
 [#if USARTisTrue]
-#if (USE_HAL_UART_REGISTER_CALLBACKS  == 1) 
+#if (USE_HAL_UART_REGISTER_CALLBACKS  == 1U) 
 typedef struct
 {
   pUART_CallbackTypeDef  pMspInitCb;
   pUART_CallbackTypeDef  pMspDeInitCb;
 }BSP_UART_Cb_t;
-#endif /* (USE_HAL_UART_REGISTER_CALLBACKS == 1) */
+#endif /* (USE_HAL_UART_REGISTER_CALLBACKS == 1U) */
 
 [/#if]
 /**
@@ -454,10 +454,10 @@ int32_t BSP_${IpInstance}_ReadReg16(uint16_t Addr, uint16_t Reg, uint8_t *pData,
 int32_t BSP_${IpInstance}_Send(uint16_t DevAddr, uint8_t *pData, uint16_t Length);
 int32_t BSP_${IpInstance}_Recv(uint16_t DevAddr, uint8_t *pData, uint16_t Length);
 int32_t BSP_${IpInstance}_SendRecv(uint16_t DevAddr, uint8_t *pTxdata, uint8_t *pRxdata, uint16_t Length);
-#if (USE_HAL_I2C_REGISTER_CALLBACKS == 1)
+#if (USE_HAL_I2C_REGISTER_CALLBACKS == 1U)
 int32_t BSP_${IpInstance}_RegisterDefaultMspCallbacks (void);
 int32_t BSP_${IpInstance}_RegisterMspCallbacks (BSP_I2C_Cb_t *Callbacks);
-#endif /* (USE_HAL_I2C_REGISTER_CALLBACKS == 1) */
+#endif /* (USE_HAL_I2C_REGISTER_CALLBACKS == 1U) */
 
 [/#macro]
 [#-- End macro generateBspI2C_Driver --]
@@ -470,10 +470,10 @@ int32_t BSP_${IpInstance}_DeInit(void);
 int32_t BSP_${IpInstance}_Send(uint8_t *pData, uint16_t Length);
 int32_t BSP_${IpInstance}_Recv(uint8_t *pData, uint16_t Length);
 int32_t BSP_${IpInstance}_SendRecv(uint8_t *pTxData, uint8_t *pRxData, uint16_t Length);
-#if (USE_HAL_SPI_REGISTER_CALLBACKS == 1)
+#if (USE_HAL_SPI_REGISTER_CALLBACKS == 1U)
 int32_t BSP_${IpInstance}_RegisterDefaultMspCallbacks (void);
 int32_t BSP_${IpInstance}_RegisterMspCallbacks (BSP_SPI_Cb_t *Callbacks);
-#endif /* (USE_HAL_SPI_REGISTER_CALLBACKS == 1) */
+#endif /* (USE_HAL_SPI_REGISTER_CALLBACKS == 1U) */
 
 [/#macro]
 [#-- End macro generateBspSPI_Driver --]
@@ -485,10 +485,10 @@ int32_t BSP_${IpInstance}_Init(void);
 int32_t BSP_${IpInstance}_DeInit(void);
 int32_t BSP_${IpInstance}_Send(uint8_t *pData, uint16_t Length);
 int32_t BSP_${IpInstance}_Recv(uint8_t *pData, uint16_t Length);
-#if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
+#if (USE_HAL_UART_REGISTER_CALLBACKS == 1U)
 int32_t BSP_${IpInstance}_RegisterDefaultMspCallbacks (void);
 int32_t BSP_${IpInstance}_RegisterMspCallbacks (BSP_UART_Cb_t *Callbacks);
-#endif /* (USE_HAL_UART_REGISTER_CALLBACKS == 1)  */
+#endif /* (USE_HAL_UART_REGISTER_CALLBACKS == 1U)  */
 
 [/#macro]
 [#-- End macro generateBspUSART_Driver --]

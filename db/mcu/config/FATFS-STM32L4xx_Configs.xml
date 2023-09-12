@@ -16,7 +16,7 @@
         <ConfigFile Name="SD_DISKIO_TEMPLATE_H"/>
         <ConfigFile Name="SD_DISKIO_TEMPLATE_C"/>
     </RefConfig>
-    
+
     <RefConfig Name="FATFS_USB_Init" Comment="USBH">
         <Component Name="Middleware:FATFS:USBH"/>
         <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
@@ -26,7 +26,7 @@
         <ConfigFile Name="USBH_DISKIO_TEMPLATE_H"/>
         <ConfigFile Name="USBH_DISKIO_TEMPLATE_C"/>
     </RefConfig>
-    
+
     <RefConfig Name="FATFS_FSMC_NAND16_Init" Comment="NAND">
         <Component Name="Middleware:FATFS:NAND"/>
         <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
@@ -34,7 +34,7 @@
         <ConfigFile Name="FATFS_INIT"/>
         <ConfigFile Name="FATFS_HEADER"/>
     </RefConfig>
-    
+
     <RefConfig Name="FATFS_FMC_SDRAM_Init" Comment="SDRAMDISK">
         <Component Name="Middleware:FATFS:SDRAM"/>
         <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
@@ -42,19 +42,19 @@
         <ConfigFile Name="FATFS_INIT"/>
         <ConfigFile Name="FATFS_HEADER"/>
     </RefConfig>
-    
+
     <RefConfig Name="FATFS_SRAM_Init" Comment="SRAMDISK">
         <Component Name="Middleware:FATFS:SRAM"/>
         <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
         <ConfigFile Name="FF_CONF"/>
-        <ConfigFile Name="L4XX_SRAM_C"/> 
-        <ConfigFile Name="L4XX_SRAM_H"/> 
+        <ConfigFile Name="BSP_SRAM_C"/> 
+        <ConfigFile Name="BSP_SRAM_H"/> 
         <ConfigFile Name="FATFS_INIT"/> 
         <ConfigFile Name="FATFS_HEADER"/>
         <ConfigFile Name="SRAM_DISKIO_TEMPLATE_H"/>
         <ConfigFile Name="SRAM_DISKIO_TEMPLATE_C"/>
     </RefConfig>
-    
+
     <RefConfig Name="FATFS_USER_DEFINED_Init" Comment="USER">
         <Component Name="Middleware:FATFS:GENERIC"/>
         <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
@@ -64,7 +64,7 @@
         <ConfigFile Name="FATFS_INIT"/>
         <ConfigFile Name="FATFS_HEADER"/>
     </RefConfig>
-       
+
     <RefComponent Cclass="Middleware" Cgroup="FATFS" Cversion="0.1.0">
         <!-- <File Name="src/*.h" Category="header"/>  -->
         <File Name="src/diskio.h" Category="header"/>
@@ -97,7 +97,7 @@
     </RefComponent>
 
     <!-- use specific template file "fatfs_conf_R12c.ftl" to generate header file containing #define -->
-    <RefConfigFile Name="FF_CONF" Description="Header file for #define" Template="fatfs_conf_R12c.ftl">      
+    <RefConfigFile Name="FF_CONF" Description="Header file for #define" Template="fatfs_conf_R12c - new tag.ftl">    <!-- BZ 72761 -->  
         <File Name="Target/ffconf.h" Category="header" Version="R0.12" Condition="all"/>
         <!-- Parameters for Function and Buffer Configurations -->
         <Argument Name="_FS_TINY" GenericType="simple" Comment="0:Normal or 1:Tiny"/>
@@ -143,68 +143,70 @@
         <Argument Name="_USE_EXPAND" GenericType="simple" Comment=""/>
         <Argument Name="_USE_CHMOD" GenericType="simple" Comment=""/>
         <Argument Name="_FS_EXFAT" GenericType="simple" Comment=""/>
+        <!-- To better support CMSIS-RTOS v2 with updated FatFS syscall.c -->
+        <Argument Name="_USE_MUTEX" GenericType="simple" Comment="FatFS synchronization object"/>    <!-- BZ 72761 -->  		
     </RefConfigFile> 
        
     <!-- Generate a driver file for SD that uses the right IP handle -->
-    <RefConfigFile Name="BSP_SD_C" Description="C driver file for SD" Template="fatfs_bsp_sdio_c_l4.ftl">       
+    <RefConfigFile Name="BSP_SD_C" Description="C driver file for SD" Template="fatfs_bsp_sdio_c_l4.ftl">
         <File Name="Target/bsp_driver_sd.c" Category="source" Version="R0.12" Condition="all"/>   
         <Argument Name="_HSD" GenericType="simple" Comment=""/>                 
         <Argument Name="SDMMC1_MODE" GenericType="simple" Comment="SD mode value"/>                     
     </RefConfigFile>
     
     <!-- Generate a driver file for SD that uses the right IP handle -->
-    <RefConfigFile Name="BSP_SD_H" Description="H driver file for SD" Template="fatfs_bsp_sdio_h_l4.ftl">       
-        <File Name="Target/bsp_driver_sd.h" Category="header" Version="R0.12" Condition="all"/>  
+    <RefConfigFile Name="BSP_SD_H" Description="H driver file for SD" Template="fatfs_bsp_sdio_h_l4.ftl">
+        <File Name="Target/bsp_driver_sd.h" Category="header" Version="R0.12" Condition="all"/>
     </RefConfigFile>
 
     <!-- NEW FILE FOR R12 -->
-    <RefConfigFile Name="SD_DISKIO_TEMPLATE_H" Description="TEMPLATE for SD_DISKIO_H" Template="fatfs_sd_diskio_template_h.ftl">       
+    <RefConfigFile Name="SD_DISKIO_TEMPLATE_H" Description="TEMPLATE for SD_DISKIO_H" Template="fatfs_sd_diskio_template_h.ftl">
         <File Name="Target/sd_diskio.h" Category="header" Version="R0.12" Condition="all"/>  
         <Argument Name="_HSD" GenericType="simple" Comment=""/>
         <Argument Name="USE_DMA_CODE_SD" GenericType="simple" Comment=""/> 
-        <Argument Name="_FS_REENTRANT" GenericType="simple" Comment=""/>          
+        <Argument Name="_FS_REENTRANT" GenericType="simple" Comment=""/>
     </RefConfigFile>
     
     <!-- NEW FILE FOR R12 -->
-    <RefConfigFile Name="SD_DISKIO_TEMPLATE_C" Description="TEMPLATE for SD_DISKIO_C" Template="fatfs_sd_diskio_template_c.ftl">
+    <RefConfigFile Name="SD_DISKIO_TEMPLATE_C" Description="TEMPLATE for SD_DISKIO_C" Template="fatfs_sd_diskio_template_c_2.1.3.ftl">
         <File Name="Target/sd_diskio.c" Category="source" Version="R0.12" Condition="all"/>  
         <Argument Name="_HSD" GenericType="simple" Comment=""/>
         <Argument Name="USE_DMA_CODE_SD" GenericType="simple" Comment=""/>
         <Argument Name="_FS_REENTRANT" GenericType="simple" Comment=""/>
     </RefConfigFile>
 
-    <!-- Generate a driver file for SD that uses the right IP handle -->
-    <RefConfigFile Name="L4XX_SRAM_C" Description="C driver file for SRAM" Template="fatfs_bsp_sram_c.ftl">
+    <!-- Generate a driver file for SRAM that uses the right IP handle (BSP code) -->
+    <RefConfigFile Name="BSP_SRAM_C" Description="C driver file for SRAM" Template="fatfs_bsp_sram_c.ftl">
         <File Name="Target/bsp_driver_sram.c" Category="source" Version="R0.12" Condition="all"/>
         <Argument Name="_HSRAM" GenericType="simple" Comment=""/>
     </RefConfigFile>
     
-    <!-- Generate a driver file for SD that uses the right IP handle -->
-    <RefConfigFile Name="L4XX_SRAM_H" Description="H driver file for SRAM" Template="fatfs_bsp_sram_h_l4.ftl">
+    <!-- Generate a driver file for SRAM that uses the right IP handle (BSP code) -->
+    <RefConfigFile Name="BSP_SRAM_H" Description="H driver file for SRAM" Template="fatfs_bsp_sram_h_l4.ftl">
         <File Name="Target/bsp_driver_sram.h" Category="header" Version="R0.12" Condition="all"/>                  
     </RefConfigFile>
     
     <!-- NEW FILE FOR R12 -->
-    <RefConfigFile Name="SRAM_DISKIO_TEMPLATE_H" Description="TEMPLATE for SRAM_DISKIO_H" Template="fatfs_sram_diskio_template_h.ftl">       
+    <RefConfigFile Name="SRAM_DISKIO_TEMPLATE_H" Description="TEMPLATE for SRAM_DISKIO_H" Template="fatfs_sram_diskio_template_h.ftl">
         <File Name="Target/sram_diskio.h" Category="header" Version="R0.12" Condition="all"/>  
         <Argument Name="_HSRAM" GenericType="simple" Comment=""/>
     </RefConfigFile>
     
     <!-- NEW FILE FOR R12 -->
-    <RefConfigFile Name="SRAM_DISKIO_TEMPLATE_C" Description="TEMPLATE for SRAM_DISKIO_C" Template="fatfs_sram_diskio_template_c.ftl">       
+    <RefConfigFile Name="SRAM_DISKIO_TEMPLATE_C" Description="TEMPLATE for SRAM_DISKIO_C" Template="fatfs_sram_diskio_template_c.ftl">
         <File Name="Target/sram_diskio.c" Category="source" Version="R0.12" Condition="all"/>  
         <Argument Name="_HSRAM" GenericType="simple" Comment=""/>
     </RefConfigFile>
     
     
     <!-- Generate a generic diskio C driver file  -->
-    <RefConfigFile Name="USER_DISKIO_C" Description="GENERIC C diskio driver file" Template="fatfs_user_diskio_c.ftl">       
+    <RefConfigFile Name="USER_DISKIO_C" Description="GENERIC C diskio driver file" Template="fatfs_user_diskio_c.ftl">
         <File Name="Target/user_diskio.c" Category="source" Version="R0.12" Condition="all"/>    
         <Argument Name="NEW_DISKIO_API" GenericType="simple" Comment=""/>
     </RefConfigFile>
     
     <!-- Generate a generic diskio H driver file -->
-    <RefConfigFile Name="USER_DISKIO_H" Description="GENERIC H driver file" Template="fatfs_user_diskio_h.ftl">       
+    <RefConfigFile Name="USER_DISKIO_H" Description="GENERIC H driver file" Template="fatfs_user_diskio_h.ftl">
         <File Name="Target/user_diskio.h" Category="header" Version="R0.12" Condition="all"/>                    
     </RefConfigFile>
     
@@ -225,19 +227,19 @@
     
 
     <!-- Generate a init code file (fatfs.c) -->
-    <RefConfigFile Name="FATFS_INIT" Description="FATFS Init code file" Template="fatfs_init.ftl">       
+    <RefConfigFile Name="FATFS_INIT" Description="FATFS Init code file" Template="fatfs_init.ftl">
         <File Name="App/fatfs.c" Category="source" Version="R0.12" Condition="all"/>        
         <Argument Name="_FS_NORTC" GenericType="simple" Comment="0 or 1"/>                           <!-- New in R0.11 -->                  
         <Argument Name="_MULTI_PARTITION" GenericType="simple" Comment="0 or 1"/>
     </RefConfigFile>
     
     <!-- Generate header for the init code file (fatfs.h) -->
-    <RefConfigFile Name="FATFS_HEADER" Description="FATFS header file" Template="fatfs_header.ftl">       
+    <RefConfigFile Name="FATFS_HEADER" Description="FATFS header file" Template="fatfs_header.ftl">
         <File Name="App/fatfs.h" Category="source" Version="R0.12" Condition="all"/>
     </RefConfigFile>
     
-        <!-- Code for BSP (SDMMC mode) -->
-    <RefBspComponent Name="Detect_SDIO" BspIpName="GPIO" BspModeName="Input">       
+    <!-- Code for BSP (SDMMC mode) -->
+    <RefBspComponent Name="Detect_SDIO" BspIpName="GPIO" BspModeName="Input">
         <File Category="template" Name="fatfs_platform_h.ftl"/>
         <File Category="template" Name="fatfs_platform_c.ftl"/>
     </RefBspComponent>

@@ -232,6 +232,7 @@
 [/#list]
 [/#if]
 
+[#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_P2P_SERVER = 1)]
 /**
  * Define PHY
  */
@@ -242,6 +243,7 @@
 #define TX_2M                                           0x02
 #define RX_1M                                           0x01
 #define RX_2M                                           0x02 
+[/#if]
 
 [#if (BT_SIG_BEACON = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_P2P_CLIENT = 1)|| (CUSTOM_P2P_ROUTER = 1)|| ( BLE_TRANSPARENT_MODE_UART = 1)|| ( BLE_TRANSPARENT_MODE_VCP = 1)]
 /**
@@ -261,8 +263,8 @@
 
 /**< specific parameters */
 /*****************************************************/
+
 [#if (CUSTOM_P2P_CLIENT = 1)]
-#define PUSH_BUTTON_SW1_EXTI_IRQHandler         EXTI4_IRQHandler
 #define CFG_MAX_CONNECTION                      1
 #define UUID_128BIT_FORMAT                      1
 #define CFG_DEV_ID_P2P_SERVER1                  (0x83)
@@ -277,15 +279,13 @@
 #define CONN_L2   (CONN_L(10))
 #define OOB_DEMO                                1   /* Out Of Box Demo */  
 [/#if]
-[#if (BT_SIG_BEACON = 1) || (CUSTOM_P2P_SERVER = 1) || ( BLE_TRANSPARENT_MODE_UART = 1) || (CUSTOM_P2P_ROUTER = 1)]
+[#if (CUSTOM_P2P_SERVER = 1) || ( BLE_TRANSPARENT_MODE_UART = 1)]
 #define PUSH_BUTTON_SW1_EXTI_IRQHandler                         EXTI4_IRQHandler
 [/#if]
-[#if (BT_SIG_BEACON = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1)]
+[#if (CUSTOM_P2P_SERVER = 1)]
 #define PUSH_BUTTON_SW2_EXTI_IRQHandler                         EXTI0_IRQHandler
 [/#if]
-[#if (BT_SIG_BEACON = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)]
-#define PUSH_BUTTON_SW3_EXTI_IRQHandler                         EXTI1_IRQHandler
-[/#if]
+
 [#if (BT_SIG_BEACON = 1)]
 /**
  * Beacon selection
@@ -309,7 +309,6 @@
 /* LSB - Second Byte */
 #define CFG_FEATURE_OTA_REBOOT                  (0x20)
 [/#if]
-
 [#if (CUSTOM_P2P_SERVER = 1)]
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
@@ -453,7 +452,6 @@
 
 [/#if]
 [#if (CUSTOM_P2P_ROUTER = 1)]
-#define BLE_CLI_LED_BUTTON                1 /**< LED BUTTON CLIENT */
 #define CFG_MAX_CONNECTION                8
 #define UUID_128BIT_FORMAT                1    
 
@@ -726,7 +724,7 @@
  [#else]
 /******************************************************************************
  * Low Power
-******************************************************************************/
+ ******************************************************************************/
 /**
  *  When set to 1, the low power mode is enable
  *  When set to 0, the device stays in RUN mode
@@ -845,7 +843,7 @@
 
 typedef enum
 {
-    CFG_TIM_PROC_ID_ISR,
+  CFG_TIM_PROC_ID_ISR,
 } CFG_TimProcID_t;
 
 /******************************************************************************
@@ -1097,6 +1095,9 @@ typedef enum
 [#if CUSTOM_P2P_SERVER = 1]
     CFG_TASK_ADV_CANCEL_ID,
     CFG_TASK_SW1_BUTTON_PUSHED_ID,
+#if (L2CAP_REQUEST_NEW_CONN_PARAM != 0 )
+    CFG_TASK_CONN_UPDATE_REG_ID,
+#endif
 [/#if]
 [#if CUSTOM_P2P_CLIENT = 1]
     CFG_TASK_START_SCAN_ID,
@@ -1272,7 +1273,7 @@ typedef enum
 #define CFG_HCI_USER_EVT_PROCESS_CB_SIZE      (0)
 #define CFG_HCI_USER_EVT_PROCESS_STACK_MEM    (0)
 #define CFG_HCI_USER_EVT_PROCESS_PRIORITY     osPriorityNone
-#define CFG_HCI_USER_EVT_PROCESS_STACk_SIZE   (128 * 2)
+#define CFG_HCI_USER_EVT_PROCESS_STACk_SIZE   (128 * 8)
 
 #define CFG_ADV_UPDATE_PROCESS_NAME           "ADV_UPDATE_PROCESS"
 #define CFG_ADV_UPDATE_PROCESS_ATTR_BITS      (0)
@@ -1289,11 +1290,13 @@ typedef enum
 #define CFG_HRS_PROCESS_STACK_MEM             (0)
 #define CFG_HRS_PROCESS_PRIORITY              osPriorityNone
 #define CFG_HRS_PROCESS_STACk_SIZE            (128 * 5)
+
 [/#if]
 /* USER CODE BEGIN FreeRTOS_Defines */
 
 /* USER CODE END FreeRTOS_Defines */
 [/#if]
+
 /******************************************************************************
  * LOW POWER
  ******************************************************************************/

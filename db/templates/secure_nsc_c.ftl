@@ -1,7 +1,7 @@
 [#ftl]
 /**
   ******************************************************************************
-  * @file    Templates_TZ/Secure/Src/secure_nsc.h
+  * @file    Secure/Src/secure_nsc.c
   * @author  MCD Application Team
   * @brief   This file contains the non-secure callable APIs (secure world)
   ******************************************************************************
@@ -21,7 +21,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "secure_nsc.h"
-#include <stdio.h>
 
 /** @addtogroup STM32L5xx_HAL_Examples
   * @{

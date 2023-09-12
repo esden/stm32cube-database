@@ -471,14 +471,14 @@ UART_HandleTypeDef h${UsartIpInstance?lower_case};
 					[#if SpiIpInstanceList == ""]
 						[#assign SpiIpInstance = bsp.solution]
                         [#assign SpiIpInstanceList = bsp.solution]
-#if (USE_HAL_SPI_REGISTER_CALLBACKS == 1)						
+#if (USE_HAL_SPI_REGISTER_CALLBACKS == 1U)						
 static uint32_t Is${SpiIpInstance}MspCbValid = 0;	
 #endif /* USE_HAL_SPI_REGISTER_CALLBACKS */
 static uint32_t ${SpiIpInstance}InitCounter = 0;	
 					[#elseif !SpiIpInstanceList?contains(bsp.solution)]
 						[#assign SpiIpInstance = bsp.solution]
 						[#assign SpiIpInstanceList = SpiIpInstanceList + "," + bsp.solution]
-#if (USE_HAL_SPI_REGISTER_CALLBACKS == 1)
+#if (USE_HAL_SPI_REGISTER_CALLBACKS == 1U)
 static uint32_t Is${SpiIpInstance}MspCbValid = 0;	
 #endif /* USE_HAL_SPI_REGISTER_CALLBACKS */
 static uint32_t ${SpiIpInstance}InitCounter = 0;
@@ -489,14 +489,14 @@ static uint32_t ${SpiIpInstance}InitCounter = 0;
 					[#if I2CIpInstanceList == ""]
 						[#assign I2CIpInstance = bsp.solution]
 						[#assign I2CIpInstanceList = bsp.solution]
-#if (USE_HAL_I2C_REGISTER_CALLBACKS == 1)
+#if (USE_HAL_I2C_REGISTER_CALLBACKS == 1U)
 static uint32_t Is${I2CIpInstance}MspCbValid = 0;										
 #endif /* USE_HAL_I2C_REGISTER_CALLBACKS */
 static uint32_t ${I2CIpInstance}InitCounter = 0;	
 					[#elseif !I2CIpInstanceList?contains(bsp.solution)]
 						[#assign I2CIpInstance = bsp.solution]
 						[#assign I2CIpInstanceList = I2CIpInstanceList + "," + bsp.solution]
-#if (USE_HAL_I2C_REGISTER_CALLBACKS == 1)
+#if (USE_HAL_I2C_REGISTER_CALLBACKS == 1U)
 static uint32_t Is${I2CIpInstance}MspCbValid = 0;										
 #endif /* USE_HAL_I2C_REGISTER_CALLBACKS */
 static uint32_t ${I2CIpInstance}InitCounter = 0;
@@ -507,14 +507,14 @@ static uint32_t ${I2CIpInstance}InitCounter = 0;
 					[#if UsartIpInstanceList == ""]
 						[#assign UsartIpInstance = bsp.solution]
 						[#assign UsartIpInstanceList = bsp.solution]
-#if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
+#if (USE_HAL_UART_REGISTER_CALLBACKS == 1U)
 static uint32_t Is${UsartIpInstance}MspCbValid = 0;										
 #endif /* USE_HAL_UART_REGISTER_CALLBACKS */
 static uint32_t ${UsartIpInstance}InitCounter = 0;		
 					[#elseif !UsartIpInstanceList?contains(bsp.solution)]
 						[#assign UsartIpInstance = bsp.solution]
 						[#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
-#if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
+#if (USE_HAL_UART_REGISTER_CALLBACKS == 1U)
 static uint32_t Is${UsartIpInstance}MspCbValid = 0;											
 #endif /* USE_HAL_UART_REGISTER_CALLBACKS */
 static uint32_t ${UsartIpInstance}InitCounter = 0;
@@ -525,14 +525,14 @@ static uint32_t ${UsartIpInstance}InitCounter = 0;
 					[#if UsartIpInstanceList == ""]
 						[#assign UsartIpInstance = bsp.solution]
 						[#assign UsartIpInstanceList = bsp.solution]
-#if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
+#if (USE_HAL_UART_REGISTER_CALLBACKS == 1U)
 static uint32_t Is${UsartIpInstance}MspCbValid = 0;									
 #endif /* USE_HAL_UART_REGISTER_CALLBACKS */
 static uint32_t ${UsartIpInstance}InitCounter = 0;		
 					[#elseif !UsartIpInstanceList?contains(bsp.solution)]
 						[#assign UsartIpInstance = bsp.solution]
 						[#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
-#if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
+#if (USE_HAL_UART_REGISTER_CALLBACKS == 1U)
 static uint32_t Is${UsartIpInstance}MspCbValid = 0;											
 #endif /* USE_HAL_UART_REGISTER_CALLBACKS */
 static uint32_t ${UsartIpInstance}InitCounter = 0;
@@ -543,14 +543,14 @@ static uint32_t ${UsartIpInstance}InitCounter = 0;
 					[#if UsartIpInstanceList == ""]
 						[#assign UsartIpInstance = bsp.solution]
 						[#assign UsartIpInstanceList = bsp.solution]
-#if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
+#if (USE_HAL_UART_REGISTER_CALLBACKS == 1U)
 static uint32_t Is${UsartIpInstance}MspCbValid = 0;										
 #endif /* USE_HAL_UART_REGISTER_CALLBACKS */
 static uint32_t ${UsartIpInstance}InitCounter = 0;
 					[#elseif !UsartIpInstanceList?contains(bsp.solution)]
 						[#assign UsartIpInstance = bsp.solution]
 						[#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
-#if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
+#if (USE_HAL_UART_REGISTER_CALLBACKS == 1U)
 static uint32_t Is${UsartIpInstance}MspCbValid = 0;											
 #endif /* USE_HAL_UART_REGISTER_CALLBACKS */
 static uint32_t ${UsartIpInstance}InitCounter = 0;
@@ -894,7 +894,7 @@ int32_t BSP_${IpInstance}_Init(void)
   {     
     if (HAL_I2C_GetState(&h${IpInstance?lower_case}) == HAL_I2C_STATE_RESET)
     {  
-    #if (USE_HAL_I2C_REGISTER_CALLBACKS == 0)
+    #if (USE_HAL_I2C_REGISTER_CALLBACKS == 0U)
       /* Init the I2C Msp */
       ${IpInstance?upper_case}_MspInit(&h${IpInstance?lower_case});
     #else
@@ -943,7 +943,7 @@ int32_t BSP_${IpInstance}_DeInit(void)
   {       
     if (--${I2CIpInstance}InitCounter == 0)
     {    
-  #if (USE_HAL_I2C_REGISTER_CALLBACKS == 0)
+  #if (USE_HAL_I2C_REGISTER_CALLBACKS == 0U)
     	/* DeInit the I2C */ 
     	${IpInstance?upper_case}_MspDeInit(&h${IpInstance?lower_case});
   #endif  
@@ -1183,7 +1183,7 @@ int32_t BSP_${IpInstance}_Init(void)
   {    
 	if (HAL_SPI_GetState(&h${IpInstance?lower_case}) == HAL_SPI_STATE_RESET) 
 	{ 
-#if (USE_HAL_SPI_REGISTER_CALLBACKS == 0)
+#if (USE_HAL_SPI_REGISTER_CALLBACKS == 0U)
 		/* Init the SPI Msp */
 		${IpInstance?upper_case}_MspInit(&h${IpInstance?lower_case});
 #else
@@ -1222,7 +1222,7 @@ int32_t BSP_${IpInstance}_DeInit(void)
   {    
     if (--${SpiIpInstance}InitCounter == 0)
     {   
-#if (USE_HAL_SPI_REGISTER_CALLBACKS == 0)
+#if (USE_HAL_SPI_REGISTER_CALLBACKS == 0U)
 	  ${IpInstance?upper_case}_MspDeInit(&h${IpInstance?lower_case});
 #endif  
 	  /* DeInit the SPI*/
@@ -1311,7 +1311,7 @@ int32_t BSP_${IpInstance}_Init(void)
   { 
     if (HAL_UART_GetState(&h${IpInstance?lower_case?replace("s","")}) == HAL_UART_STATE_RESET) 
     { 
-#if (USE_HAL_UART_REGISTER_CALLBACKS == 0)
+#if (USE_HAL_UART_REGISTER_CALLBACKS == 0U)
       /* Init the UART Msp */
       ${IpInstance?upper_case}_MspInit(&h${IpInstance?lower_case?replace("s","")});
 #else
@@ -1350,7 +1350,7 @@ int32_t BSP_${IpInstance}_DeInit(void)
   {       
     if (--${UsartIpInstance}InitCounter == 0)
     { 
-#if (USE_HAL_UART_REGISTER_CALLBACKS == 0)
+#if (USE_HAL_UART_REGISTER_CALLBACKS == 0U)
       ${IpInstance?upper_case}_MspDeInit(&h${IpInstance?lower_case?replace("s","")});
 #endif  
       /* DeInit the UART*/
@@ -1412,7 +1412,7 @@ int32_t BSP_GetTick(void) {
 
 [#-- macro registerMspSpiCallBack --]
 [#macro registerMspSpiCallBack IpName IpInstance IpHandle]
-#if (USE_HAL_SPI_REGISTER_CALLBACKS == 1)  
+#if (USE_HAL_SPI_REGISTER_CALLBACKS == 1U)  
 /**
   * @brief Register Default BSP ${IpInstance} Bus Msp Callbacks
   * @retval BSP status
@@ -1470,7 +1470,7 @@ int32_t BSP_${IpInstance}_RegisterMspCallbacks (BSP_${IpName}_Cb_t *Callbacks)
 
 [#-- macro registerMspI2CCallBack --]
 [#macro registerMspI2CCallBack IpName IpInstance IpHandle]
-#if (USE_HAL_I2C_REGISTER_CALLBACKS == 1)  
+#if (USE_HAL_I2C_REGISTER_CALLBACKS == 1U)  
 /**
   * @brief Register Default BSP ${IpInstance} Bus Msp Callbacks
   * @retval BSP status
@@ -1528,7 +1528,7 @@ int32_t BSP_${IpInstance}_RegisterMspCallbacks (BSP_${IpName}_Cb_t *Callbacks)
 
 [#-- macro registerMspUSARTCallBack --]
 [#macro registerMspUSARTCallBack IpName IpInstance IpHandle]
-#if (USE_HAL_UART_REGISTER_CALLBACKS == 1)  
+#if (USE_HAL_UART_REGISTER_CALLBACKS == 1U)  
 /**
   * @brief Register Default BSP ${IpInstance} Bus Msp Callbacks
   * @retval BSP status

@@ -581,6 +581,7 @@ static SVCCTL_EvtAckStatus_t Client_Event_Handler(void *Event)
 
                     /* USER CODE END EVT_BLUE_ATT_READ_BY_TYPE_RESP */
                     aci_att_read_by_type_resp_event_rp0 *pr = (void*)blue_evt->data;
+
                     uint8_t idx;
                     uint16_t uuid, handle;
 

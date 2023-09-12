@@ -102,11 +102,11 @@
         <PossibleValue Comment="Software Trigger" Value="LPTIM_TRIGSOURCE_SOFTWARE" Semaphore="Semaphore_SWTrigger_$IpInstance"/>
         <PossibleValue Comment="LPTIM2_OUT" Value="LPTIM_TRIGSOURCE_0"/>
     <!--<PossibleValue Comment="reserved" Value="LPTIM_TRIGSOURCE_1"/>-->
-        <PossibleValue Comment="LPTIM4_OUT" Value="LPTIM_TRIGSOURCE_2"/>
-        <PossibleValue Comment="LPTIM5_OUT" Value="LPTIM_TRIGSOURCE_3"/>
+        <PossibleValue Comment="LPTIM4_OUT" Value="LPTIM_TRIGSOURCE_2" Condition="!LPTIM4_Exist" Action="remove"/>
+        <PossibleValue Comment="LPTIM5_OUT" Value="LPTIM_TRIGSOURCE_3" Condition="!LPTIM5_Exist" Action="remove"/>
         <PossibleValue Comment="SAI1 FS_A" Value="LPTIM_TRIGSOURCE_4"/>
         <PossibleValue Comment="SAI1 FS_B" Value="LPTIM_TRIGSOURCE_5"/>
-    <!--<PossibleValue Comment="reserved" Value="LPTIM_TRIGSOURCE_6"/>-->
+        <PossibleValue Comment="DFSDM2_BRK" Value="LPTIM_TRIGSOURCE_6" Condition="!DFSDM2_Exist" Action="remove"/>
     <!--<PossibleValue Comment="reserved" Value="LPTIM_TRIGSOURCE_7"/>-->
     </RefParameter>
  <RefParameter Comment="Trigger Source" DefaultValue="LPTIM_TRIGSOURCE_SOFTWARE" Name="TriggerSource" Type="list" Group="Trigger">
@@ -200,13 +200,13 @@
         <Condition Diagnostic="external or standalone" Expression="Semaphore_Input1_comp1comp2$IpInstance &amp;($IpNumber=2)"/>
         <PossibleValue Comment="COMP1 OR COMP2 " Value="LPTIM_INPUT1SOURCE_COMP1_COMP2"/>
     </RefParameter>
- <RefParameter Comment="Input1 Source" DefaultValue="LPTIM_INPUT1SOURCE_SAI1_FSA" Name="Input1Source" Type="list" Visible="false">
-        <Condition Diagnostic="external or standalone" Expression="Semaphore_Input1_SAI1_FSA$IpInstance &amp;($IpNumber=3)"/>
-        <PossibleValue Comment="SAI1_FSA" Value="LPTIM_INPUT1SOURCE_SAI1_FSA"/>
+ <RefParameter Comment="Input1 Source" DefaultValue="LPTIM_INPUT1SOURCE_SAI4_FSA" Name="Input1Source" Type="list" Visible="false">
+        <Condition Diagnostic="external or standalone" Expression="Semaphore_Input1_SAI4_FSA$IpInstance &amp;($IpNumber=3)"/>
+        <PossibleValue Comment="SAI4_FSA" Value="LPTIM_INPUT1SOURCE_SAI4_FSA"/>
     </RefParameter>
- <RefParameter Comment="Input1 Source" DefaultValue="LPTIM_INPUT1SOURCE_SAI1_FSB" Name="Input1Source" Type="list" Visible="false">
-        <Condition Diagnostic="external or standalone" Expression="Semaphore_Input1_SAI1_FSB$IpInstance &amp;($IpNumber=3)"/>
-        <PossibleValue Comment="SAI1_FSB" Value="LPTIM_INPUT1SOURCE_SAI1_FSB"/>
+ <RefParameter Comment="Input1 Source" DefaultValue="LPTIM_INPUT1SOURCE_SAI4_FSB" Name="Input1Source" Type="list" Visible="false">
+        <Condition Diagnostic="external or standalone" Expression="Semaphore_Input1_SAI4_FSB$IpInstance &amp;($IpNumber=3)"/>
+        <PossibleValue Comment="SAI4_FSB" Value="LPTIM_INPUT1SOURCE_SAI4_FSB"/>
     </RefParameter>
  <RefParameter Comment="Input1 Source" DefaultValue="__NULL" Name="Input1Source" Type="list" Visible="false">
         <PossibleValue Comment="No connection" Value="__NULL"/>
@@ -408,20 +408,20 @@
                                                 <Signal Name="VS_COMP12_LPTIM"/>
                                         </SignalLogicalOp>
                                 </Mode>
-        <Mode Name="Counts_external_clock_standalone_1X_occur5" UserName="Standalone : counts external Clock events from SAI1_FS_A" RemoveCondition="!($IpNumber=3)">
+        <Mode Name="Counts_external_clock_standalone_1X_occur5" UserName="Standalone : counts external Clock events from SAI4_FS_A" RemoveCondition="!($IpNumber=3)| !(SAI4_Exist)">
                                         <!--<Condition Diagnostic="SAI1_FSA link to LPTIM must be enabled in SAI1 settings" Expression="Semaphore_SAI1_FSA_LPTIM_enabled"/>-->
                                         <Semaphore>Semaphore_CounterExternalClk_standalone$IpInstance</Semaphore>
-                                        <Semaphore>Semaphore_Input1_SAI1_FSA$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_Input1_SAI4_FSA$IpInstance</Semaphore>
                                         <SignalLogicalOp Name="AND">
-                                                <Signal Name="VS_SAI1_LPTIM"/>
+                                                <Signal Name="VS_SAI4_LPTIM"/>
                                         </SignalLogicalOp>
                                 </Mode>
-        <Mode Name="Counts_external_clock_standalone_1X_occur6" UserName="Standalone : counts external Clock events from SAI1_FS_B" RemoveCondition="!($IpNumber=3)">
-                                       <!-- <Condition Diagnostic="SAI4_FSB link to LPTIM must be enabled in SAI1 settings" Expression="Semaphore_SAI1_FSB_LPTIM_enabled"/>-->
+        <Mode Name="Counts_external_clock_standalone_1X_occur6" UserName="Standalone : counts external Clock events from SAI4_FS_B" RemoveCondition="!($IpNumber=3)|!(SAI4_Exist)">
+                                       <!-- <Condition Diagnostic="SAI4_FSB link to LPTIM must be enabled in SAI1 settings" Expression="Semaphore_SAI4_FSB_LPTIM_enabled"/>-->
                                         <Semaphore>Semaphore_CounterExternalClk_standalone$IpInstance</Semaphore>
-                                        <Semaphore>Semaphore_Input1_SAI1_FSB$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_Input1_SAI4_FSB$IpInstance</Semaphore>
                                         <SignalLogicalOp Name="AND">
-                                                <Signal Name="VS_SAI1_LPTIM"/>
+                                                <Signal Name="VS_SAI4_LPTIM"/>
                                         </SignalLogicalOp>
                                 </Mode>
                                 <Mode Name="Encoder_mode_occur1" UserName="Encoder mode from IN1 IN2">
@@ -492,5 +492,5 @@
  <RefSignal Name="VS_COMP1_LPTIM" Virtual="true"/>
         <RefSignal Name="VS_COMP2_LPTIM" Virtual="true"/>
         <RefSignal Name="VS_COMP12_LPTIM" Virtual="true"/>
- <RefSignal Name="VS_SAI1_LPTIM" Virtual="true"/>
+ <RefSignal Name="VS_SAI4_LPTIM" Virtual="true"/>
 </IP>

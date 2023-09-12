@@ -401,9 +401,9 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
           if (gap_evt_proc_complete->Procedure_Code == GAP_GENERAL_DISCOVERY_PROC
               && gap_evt_proc_complete->Status == 0x00)
           {
-              /* USER CODE BEGIN GAP_GENERAL_DISCOVERY_PROC */
+            /* USER CODE BEGIN GAP_GENERAL_DISCOVERY_PROC */
 
-              /* USER CODE END GAP_GENERAL_DISCOVERY_PROC */
+            /* USER CODE END GAP_GENERAL_DISCOVERY_PROC */
             APP_DBG_MSG("-- GAP GENERAL DISCOVERY PROCEDURE_COMPLETED\n");
             /*if a device found, connect to it, device 1 being chosen first if both found*/
             if (BleApplicationContext.DeviceServerFound == 0x01 && BleApplicationContext.Device_Connection_Status != APP_BLE_CONNECTED_CLIENT)
@@ -537,6 +537,11 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
 
           event_data_size = le_advertising_event->Advertising_Report[0].Length_Data;
 
+          /* WARNING: be careful when decoding advertising report as its raw format cannot be mapped on a C structure. 
+          The data and RSSI values could not be directly decoded from the RAM using the data and RSSI field from hci_le_advertising_report_event_rp0 structure.
+          Instead they must be read by using offsets (please refer to BLE specification).
+          RSSI = *(uint8_t*) (adv_report_data + le_advertising_event->Advertising_Report[0].Length_Data);
+          */
           adv_report_data = (uint8_t*)(&le_advertising_event->Advertising_Report[0].Length_Data) + 1;
           k = 0;
 
@@ -573,7 +578,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
                     APP_DBG_MSG("--- ST MANUFACTURER ID --- \n");
                     switch (adv_report_data[k + 3])
                     {   /* Demo ID */
-                    case CFG_DEV_ID_P2P_SERVER1: /* End Device 1 */
+                      case CFG_DEV_ID_P2P_SERVER1: /* End Device 1 */
                         APP_DBG_MSG("-- SERVER DETECTED -- VIA MAN ID\n");
                         BleApplicationContext.DeviceServerFound = 0x01;
                         SERVER_REMOTE_BDADDR[0] = le_advertising_event->Advertising_Report[0].Address[0];
@@ -614,17 +619,18 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
 
           /* USER CODE END subevent_default */
           break;
-          }
+
       }
-          
-      break; /* HCI_EVT_LE_META_EVENT */
+    }
+    break; /* HCI_EVT_LE_META_EVENT */
 
-      default:
-        /* USER CODE BEGIN evt_default */
+    default:
+      /* USER CODE BEGIN evt_default */
 
-        /* USER CODE END evt_default */
-        break;
-   }
+      /* USER CODE END evt_default */
+      break;
+  }
+
   return (SVCCTL_UserEvtFlowEnable);
 }
 
@@ -827,12 +833,13 @@ static void Connect_Request( void )
 
   /* USER CODE END Connect_Request_1 */
   tBleStatus result;
+
   APP_DBG_MSG("\r\n\r** CREATE CONNECTION TO SERVER **  \r\n\r");
 
   if (BleApplicationContext.Device_Connection_Status != APP_BLE_CONNECTED_CLIENT)
   {
     result = aci_gap_create_connection(SCAN_P,
-    SCAN_L,
+                                       SCAN_L,
                                        PUBLIC_ADDR, SERVER_REMOTE_BDADDR,
                                        PUBLIC_ADDR,
                                        CONN_P1,

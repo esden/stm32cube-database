@@ -70,7 +70,8 @@ PLACE_IN_SECTION("BLE_APP_CONTEXT") static HRSAPP_Context_t HRSAPP_Context;
 /**
  * END of Section BLE_APP_CONTEXT
  */
- [#if FREERTOS_STATUS = 1]
+
+[#if FREERTOS_STATUS = 1]
 osThreadId_t HrsProcessId;
 
 const osThreadAttr_t HrsProcess_attr = {
@@ -83,6 +84,7 @@ const osThreadAttr_t HrsProcess_attr = {
     .stack_size = CFG_HRS_PROCESS_STACk_SIZE
 };
 [/#if]
+
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -174,6 +176,7 @@ static void HrsProcess(void *argument)
   }
 }
 [/#if]
+
 static void HRSAPP_Measurement(void)
 {
 /* USER CODE BEGIN HRSAPP_Measurement */

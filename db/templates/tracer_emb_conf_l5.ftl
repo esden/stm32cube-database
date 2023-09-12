@@ -126,7 +126,7 @@ extern "C" {
 [#if UARTinstance??]
     [#if UARTinstance?starts_with("LPUART")][#t]
         [#t]#include "${FamilyName?lower_case}xx_ll_lpuart.h"
-    [/#if][#t]
+    [/#if]
 [/#if]
 /* Private typedef -----------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
@@ -187,6 +187,8 @@ extern "C" {
                                                        }while(0)
 #define TRACER_EMB_TX_DMA_REQUEST                    LL_DMAMUX_REQ_${UART_TX_DMA_REQUEST}
 #define TRACER_EMB_TX_DMA_CHANNEL                    LL_DMA_${UART_TX_DMA_LL_CHANNEL}
+#define TRACER_EMB_ENABLECHANNEL                     LL_DMA_EnableChannel
+#define TRACER_EMB_DISABLECHANNEL                    LL_DMA_DisableChannel
 #define TRACER_EMB_TX_DMA_IRQ                        ${UART_TX_DMA_interrupt}
 #define TRACER_EMB_TX_DMA_IRQHANDLER                 ${UART_TX_DMA_interrupt.replace("IRQn", "IRQHandler")}
 #define TRACER_EMB_TX_DMA_ACTIVE_FLAG                LL_DMA_IsActiveFlag_TC${UART_TX_DMA_CHANNEL_ID}

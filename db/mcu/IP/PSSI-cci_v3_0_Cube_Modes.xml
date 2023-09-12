@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V4.0" IPType="peripheral" Name="PSSI" Version="cci_v3_0_Cube" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd" xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+    <About>PSSI: Parallel Synchronous Slave Interface</About>
+
+    <!-- Generic RefParameters for PSSI --> 
+    <!-- Si on a besoin de gérer plusieurs instances de PSSI : 
+    <RefParameter Name="Instance" DefaultValue="PSSI$Instance" Comment="Instance" Type="" Visible="false"/> --> 
+
+    <RefParameter Name="DataWidth" Comment="Data Width" DefaultValue="HAL_PSSI_8BITS" Type="list" Group="Mode Config"  Visible="true">
+        <Condition Name="8 data lines" Expression="PSSI_8_BusWidth" Diagnostic=""/>
+        <PossibleValue Value="HAL_PSSI_8BITS" Comment="8 Bits"/>
+        <PossibleValue Value="HAL_PSSI_16BITS" Comment="16 Bits"/>
+        <PossibleValue Value="HAL_PSSI_32BITS" Comment="32 Bits"/>
+    </RefParameter>
+    <RefParameter Name="DataWidth" Comment="Data Width" DefaultValue="HAL_PSSI_16BITS" Type="list" Group="Mode Config"  Visible="true">
+        <Condition Name="16 data lines" Expression="PSSI_16_BusWidth" Diagnostic=""/>       
+        <PossibleValue Value="HAL_PSSI_16BITS" Comment="16 Bits"/>
+        <PossibleValue Value="HAL_PSSI_32BITS" Comment="32 Bits"/>
+    </RefParameter>
+  
+    <RefParameter Name="BusWidth" Comment="Bus Width" DefaultValue="HAL_PSSI_8LINES" Type="uniqueElementList" Group="Mode Config"  Visible="true">
+        <Condition Name="8 data lines" Expression="PSSI_8_BusWidth" Diagnostic=""/>
+        <PossibleValue Value="HAL_PSSI_8LINES" Comment="8 Bits"/>
+    </RefParameter>
+    <RefParameter Name="BusWidth" Comment="Bus Width" DefaultValue="HAL_PSSI_16LINES" Type="uniqueElementList" Group="Mode Config"  Visible="true">
+        <Condition Name="16 data lines" Expression="PSSI_16_BusWidth" Diagnostic=""/>
+        <PossibleValue Value="HAL_PSSI_16LINES" Comment="16 Bits"/>
+    </RefParameter>
+    
+    
+    <RefParameter Name="ControlSignal" Comment="Control Signal" DefaultValue="HAL_PSSI_DE_RDY_DISABLE" Type="list" Group="Mode Config"  Visible="true">
+        <PossibleValue Value="HAL_PSSI_DE_RDY_DISABLE"       Comment="Neither DE nor RDY are enabled"/>
+        <PossibleValue Value="HAL_PSSI_RDY_ENABLE"           Comment="Only RDY enabled"/>
+        <PossibleValue Value="HAL_PSSI_DE_ENABLE"            Comment="Only DE enabled"/>
+        <PossibleValue Value="HAL_PSSI_DE_RDY_ALT_ENABLE"    Comment="Both RDY and DE alternate functions enabled"/>
+        <PossibleValue Value="HAL_PSSI_MAP_RDY_BIDIR_ENABLE" Comment="Bi-directional on RDY pin" />
+        <PossibleValue Value="HAL_PSSI_RDY_MAP_ENABLE"       Comment="Only RDY enabled, mapped to DE pin"/>
+        <PossibleValue Value="HAL_PSSI_DE_MAP_ENABLE"        Comment="Only DE enabled, mapped to RDY pin"/>
+        <PossibleValue Value="HAL_PSSI_MAP_DE_BIDIR_ENABLE"  Comment="Bi-directional on DE pin"/>
+    </RefParameter>
+
+    <RefParameter Name="ClockPolarity" Comment="Clock Polarity" DefaultValue="HAL_PSSI_FALLING_EDGE" Type="list" Group="Mode Config"  Visible="true">
+        <PossibleValue Value="HAL_PSSI_FALLING_EDGE" Comment="Falling Edge"/>
+        <PossibleValue Value="HAL_PSSI_RISING_EDGE" Comment="Rising Edge"/>
+    </RefParameter>
+
+    <RefParameter Name="DataEnablePolarity" Comment="Data Enable Polarity" DefaultValue="HAL_PSSI_DEPOL_ACTIVE_LOW" Type="list" Group="Mode Config"  Visible="true">
+        <PossibleValue Value="HAL_PSSI_DEPOL_ACTIVE_LOW" Comment="Active Low"/>
+        <PossibleValue Value="HAL_PSSI_DEPOL_ACTIVE_HIGH" Comment="Active High"/>
+    </RefParameter>
+
+    <RefParameter Name="ReadyPolarity" Comment="Ready Polarity" DefaultValue="HAL_PSSI_RDYPOL_ACTIVE_LOW" Type="list" Group="Mode Config"  Visible="true">
+        <PossibleValue Value="HAL_PSSI_RDYPOL_ACTIVE_LOW" Comment="Active Low"/>
+        <PossibleValue Value="HAL_PSSI_RDYPOL_ACTIVE_HIGH" Comment="Active High"/>
+    </RefParameter>
+
+    <!--RefParameter Name="" Comment="" DefaultValue="" Type="list" Group="Mode Config"  Visible="true">
+        <PossibleValue Value="" Comment=""/>
+        <PossibleValue Value="" Comment=""/>
+    </RefParameter-->
+  
+    <RefMode Name="PSSI_8" Comment="PSSI initialization" HalMode="PSSI" BaseMode="PSSI" />
+    <RefMode Name="PSSI_16" Comment="PSSI initialization" HalMode="PSSI" BaseMode="PSSI" />
+    <RefMode Name="PSSI" Comment="PSSI initialization" HalMode="PSSI" Abstract="true">
+        <ConfigForMode>PSSI_Init</ConfigForMode>
+        <Parameter Name="DataWidth"/>
+        <Parameter Name="BusWidth"/>
+        <Parameter Name="ControlSignal"/>
+        <Parameter Name="ClockPolarity"/>
+        <Parameter Name="DataEnablePolarity"/>
+        <Parameter Name="ReadyPolarity"/>    
+    </RefMode>
+ 
+    <ModeLogicOperator Name="OR">
+        <Mode Name="PSSI">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="PSSI_8" UserName="PSSI with 8 bits bus width">
+                    <Semaphore>PSSI_8_BusWidth</Semaphore>
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="D0"/>
+                        <Signal Name="D1"/>
+                        <Signal Name="D2"/>
+                        <Signal Name="D3"/>
+                        <Signal Name="D4"/>
+                        <Signal Name="D5"/>
+                        <Signal Name="D6"/>
+                        <Signal Name="D7"/>
+                        <Signal Name="DE"/>
+                        <Signal Name="PDCK"/>
+                        <Signal Name="RDY"/>
+                    </SignalLogicalOp>
+                </Mode>
+                <Mode Name="PSSI_16" UserName="PSSI with 16 bits bus width">
+                    <Semaphore>PSSI_16_BusWidth</Semaphore>
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="D0"/>
+                        <Signal Name="D1"/>
+                        <Signal Name="D2"/>
+                        <Signal Name="D3"/>
+                        <Signal Name="D4"/>
+                        <Signal Name="D5"/>
+                        <Signal Name="D6"/>
+                        <Signal Name="D7"/>
+                        <Signal Name="D8"/>
+                        <Signal Name="D9"/>
+                        <Signal Name="D10"/>
+                        <Signal Name="D11"/>
+                        <Signal Name="D12"/>
+                        <Signal Name="D13"/>
+                        <Signal Name="D14"/>
+                        <Signal Name="D15"/>
+                        <Signal Name="DE"/>
+                        <Signal Name="PDCK"/>
+                        <Signal Name="RDY"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
+    </ModeLogicOperator>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="D0"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="D1"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="D2"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="D3"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="D4"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="D5"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="D6"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="D7"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="D8"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="D9"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="D10"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="D11"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="D12"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="D13"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="D14"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="D15"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="DE"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="PDCK"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="RDY"/>
+</IP>

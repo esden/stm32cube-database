@@ -278,13 +278,8 @@
     <RefParameter Name="Is_FirmUpdateRequest_Supported_P0" Comment="Firmware update Response message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
     </RefParameter>
-    <RefParameter Name="Is_SnkCapaExt_Supported_P0" Comment="Sink Capabilities Extended message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
-        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
-        <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
-        <Condition Diagnostic="Only available if the specification revision value is set to 3.0" Expression="PE_SpecRevision_P0=USBPD_SPECIFICATION_REV3"/>
-    </RefParameter>
-    <RefParameter Name="Is_SnkCapaExt_Supported_P0" Comment="Sink Capabilities Extended message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
-        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+    <RefParameter Name="Is_SnkCapaExt_Supported_P0" Comment="Sink Capabilities Extended message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_TRUE" Visible="false">
+        <PossibleValue Value="USBPD_TRUE" Comment="IOCCompatibility"/>
     </RefParameter>
     <!--<RefParameter Name="Is_GetBattery_Supported_P0" Comment="Get Battery Capabitity and Status messages" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 0 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
@@ -553,13 +548,8 @@
     <RefParameter Name="Is_FirmUpdateRequest_Supported_P1" Comment="Firmware update Response message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
     </RefParameter>
-    <RefParameter Name="Is_SnkCapaExt_Supported_P1" Comment="Sink Capabilities Extended message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE">
-        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
-        <PossibleValue Value="USBPD_TRUE" Comment="Supported"/>
-        <Condition Diagnostic="Only available if the specification revision value is set to 3.0" Expression="PE_SpecRevision_P1=USBPD_SPECIFICATION_REV3"/>
-    </RefParameter>
-    <RefParameter Name="Is_SnkCapaExt_Supported_P1" Comment="Sink Capabilities Extended message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE" Visible="false">
-        <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
+    <RefParameter Name="Is_SnkCapaExt_Supported_P1" Comment="Sink Capabilities Extended message" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_TRUE" Visible="false">
+        <PossibleValue Value="USBPD_TRUE" Comment="IOCCompatibility"/>
     </RefParameter>
     <!--<RefParameter Name="Is_GetBattery_Supported_P1" Comment="Get Battery Capabitity and Status messages" Type="list" Group="PD Revision 3.0 specific parameters" TabName="Stack Port 1 Parameters" DefaultValue="USBPD_FALSE">
         <PossibleValue Value="USBPD_FALSE" Comment="Not supported"/>
@@ -810,6 +800,7 @@
     <RefParameter Name="USBPD_PORT0" Comment="UCPD Instance" Type="string" Group="Port Configuration" TabName="Stack Port 0 Parameters" DefaultValue="UCPD2">
         <Condition Diagnostic="UCPD2 used for USBPD port 0" Expression="USBPD_P0U2"/>
     </RefParameter>
+    <RefParameter Name="USBPD_PORT0" Comment="UCPD Instance" Type="string" Group="Port Configuration" TabName="Stack Port 0 Parameters" DefaultValue="" Visible="false"/>
     <RefParameter Name="USBPD_PORT1" Comment="UCPD Instance" Type="string" Group="Port Configuration" TabName="Stack Port 1 Parameters" DefaultValue="UCPD1">
         <Condition Diagnostic="UCPD1 used for USBPD port 1" Expression="USBPD_P1U1"/>
     </RefParameter>
@@ -1183,7 +1174,6 @@
         <Parameter Name="Is_GetCountryInfo_Supported_P0"/>
         <Parameter Name="Is_SecurityRequest_Supported_P0"/>
         <Parameter Name="Is_FirmUpdateRequest_Supported_P0"/>
-        <Parameter Name="Is_SnkCapaExt_Supported_P0"/>
         <!--<Parameter Name="Is_GetBattery_Supported_P0"/>-->
         <Parameter Name="VDM_ModalOperation_P0"/>
         <Parameter Name="VDM_bcdDevice_SOP_P0"/>
@@ -1227,7 +1217,6 @@
         <Parameter Name="Is_GetCountryInfo_Supported_P1"/>
         <Parameter Name="Is_SecurityRequest_Supported_P1"/>
         <Parameter Name="Is_FirmUpdateRequest_Supported_P1"/>
-        <Parameter Name="Is_SnkCapaExt_Supported_P1"/>
         <!--<Parameter Name="Is_GetBattery_Supported_P1"/>-->
         <Parameter Name="VDM_ModalOperation_P1"/>
         <Parameter Name="VDM_bcdDevice_SOP_P1"/>
@@ -1399,7 +1388,7 @@
                     </SignalLogicalOp>
                     <Semaphore>USBPD_TIM15</Semaphore>
                 </Mode>
-                <Mode Name="TIM16" RemoveCondition="!TIM16$modeexist_Channel4" >
+                <Mode Name="TIM16" RemoveCondition="!TIM16:$modeexist_Channel4" >
                     <Condition Expression="!(TIM16 | SYS_TIM16)" Diagnostic="TIM16 already used."/>
                     <Condition Expression="Semaphore_Channel4TIM16" Diagnostic="you have to configure TIM16_CH4 to enable this mode."/>
                     <SignalLogicalOp Name="AND">
@@ -1481,7 +1470,7 @@
         </Mode>
 
     </ModeLogicOperator>
-    <Condition Expression="(UCPD_Used &amp; S_FREERTOS &amp; !S_CMSIS_RTOS_V2)" Diagnostic="FREERTOS and at least one instance of UCPD must be activated"/>
+    <Condition Expression="UCPD_Used" Diagnostic="instance of UCPD must be activated"/>
 
     <!-- RefSignal for USBPD -->
     <RefSignal Name="VS_USBPD1" Virtual="true"/>

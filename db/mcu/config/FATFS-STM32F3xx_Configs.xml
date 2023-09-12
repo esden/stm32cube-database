@@ -36,15 +36,15 @@
         <ConfigFile Name="FATFS_INIT"/>
         <ConfigFile Name="FATFS_HEADER"/>
     </RefConfig>
-    
+
     <!-- Added for F303E (Sunfish) -->
     <RefConfig Name="FATFS_SRAM_Init" Comment="SRAMDISK">      
         <Component Name="Middleware:FATFS:SRAM"/>
         <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
         <ConfigFile Name="FF_CONF"/>
-        <ConfigFile Name="F3XX_SRAM_C"/> 
-        <ConfigFile Name="F3XX_SRAM_H"/> 
-        <ConfigFile Name="FATFS_INIT"/> 
+        <ConfigFile Name="BSP_SRAM_C"/>
+        <ConfigFile Name="BSP_SRAM_H"/>
+        <ConfigFile Name="FATFS_INIT"/>
         <ConfigFile Name="FATFS_HEADER"/>
     </RefConfig>
     
@@ -87,7 +87,7 @@
         <SubComponent Csub="CODE_PAGE" Cvariant="850" >
             <File Name="src/option/ccsbcs.c" Category="source"/>
         </SubComponent>
-        
+
         <SubComponent Csub="SDIO">
             <File Name="src/drivers/sd_diskio.c" Category="source"/>
             <File Name="src/drivers/sd_diskio.h" Category="header"/>
@@ -148,42 +148,41 @@
         <Argument Name="_FS_LOCK" GenericType="simple" Comment="0:Disable or >=1:Enable"/>        
         <!-- Internal: for detecting enabled modes and include the right files - ADDED for F303E having FMC (then access to SRAM) -->
         <Argument Name="_FS_FATFS_SRAM" GenericType="simple" Comment="0:Disable or >=1:Enable"/> 
-    </RefConfigFile> 
-   
-     <!-- Added for F303E that allows SRAM use (via FSMC) -->
-    <!-- Generate a driver file for SD that uses the right IP handle -->
-    <RefConfigFile Name="F3XX_SRAM_C" Description="C driver file for SRAM" Template="fatfs_bsp_sram_c.ftl">       
+    </RefConfigFile>
+
+    <!-- Added for F303E that allows SRAM use (via FSMC) -->
+    <!-- Generate a driver file for SRAM that uses the right IP handle (BSP code) -->
+    <RefConfigFile Name="BSP_SRAM_C" Description="C driver file for SRAM" Template="fatfs_bsp_sram_c.ftl">
         <File Name="Target/bsp_driver_sram.c" Category="source" Version="R0.11" Condition="all"/>
-        <Argument Name="_HSRAM" GenericType="simple" Comment=""/>                    
+        <Argument Name="_HSRAM" GenericType="simple" Comment=""/>
     </RefConfigFile>
-    
-    <!-- Generate a driver file for SD that uses the right IP handle -->
-    <RefConfigFile Name="F3XX_SRAM_H" Description="H driver file for SRAM" Template="fatfs_bsp_sram_h_f3.ftl">       
-        <File Name="Target/bsp_driver_sram.h" Category="header" Version="R0.11" Condition="all"/>                          
+
+    <!-- Generate a driver file for SRAM that uses the right IP handle (BSP code) -->
+    <RefConfigFile Name="BSP_SRAM_H" Description="H driver file for SRAM" Template="fatfs_bsp_sram_h_f3.ftl">
+        <File Name="Target/bsp_driver_sram.h" Category="header" Version="R0.11" Condition="all"/>
     </RefConfigFile>
-    
+
     <!-- Generate a generic diskio C driver file  -->
     <RefConfigFile Name="USER_DISKIO_C" Description="GENERIC C diskio driver file" Template="fatfs_user_diskio_c.ftl">       
-        <File Name="Target/user_diskio.c" Category="source" Version="R0.11" Condition="all"/>                      
-        <Argument Name="NEW_DISKIO_API" GenericType="simple" Comment=""/>                                            
+        <File Name="Target/user_diskio.c" Category="source" Version="R0.11" Condition="all"/>
+        <Argument Name="NEW_DISKIO_API" GenericType="simple" Comment=""/>
     </RefConfigFile>
-    
+
     <!-- Generate a generic diskio H driver file -->
     <RefConfigFile Name="USER_DISKIO_H" Description="GENERIC H driver file" Template="fatfs_user_diskio_h.ftl">       
-        <File Name="Target/user_diskio.h" Category="header" Version="R0.11" Condition="all"/>                    
+        <File Name="Target/user_diskio.h" Category="header" Version="R0.11" Condition="all"/>
     </RefConfigFile>
-    
+
     <!-- Generate a init code file (fatfs.c) -->
     <RefConfigFile Name="FATFS_INIT" Description="FATFS Init code file" Template="fatfs_init.ftl">       
         <File Name="App/fatfs.c" Category="source" Version="R0.11" Condition="all"/>                    
         <Argument Name="_FS_NORTC" GenericType="simple" Comment="0 or 1"/>                           <!-- New in R0.11 -->                  
         <Argument Name="_MULTI_PARTITION" GenericType="simple" Comment="0 or 1"/>
     </RefConfigFile>
-    
-        <!-- Generate header for the init code file (fatfs.h) -->
+
+    <!-- Generate header for the init code file (fatfs.h) -->
     <RefConfigFile Name="FATFS_HEADER" Description="FATFS header file" Template="fatfs_header.ftl">       
-        <File Name="App/fatfs.h" Category="source" Version="R0.11" Condition="all"/>                    
+        <File Name="App/fatfs.h" Category="source" Version="R0.11" Condition="all"/>
     </RefConfigFile>
-    
-    
+
 </IP>

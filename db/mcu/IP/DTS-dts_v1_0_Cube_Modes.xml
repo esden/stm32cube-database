@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V4.0" 
+    IPType="service" 
+    Name="DTS" 
+    Version="dts_v1_0_Cube" 
+    xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" 
+    ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd" 
+    xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+    <About>DTS : Digital Temperature Sensor</About>
+
+    <!-- Generic RefParameters for DTS --> 
+    <!--RefParameter Name="" Comment="" DefaultValue="" Type="list" Group="Mode Config"  Visible="true">
+        <PossibleValue Value="" Comment=""/>
+        <PossibleValue Value="" Comment=""/>
+    </RefParameter-->
+  
+    <RefParameter Name="QuickMeasure" Comment="Quick Measure" DefaultValue="DTS_QUICKMEAS_DISABLE" Type="list" Group="Mode Config"  Visible="true">
+        <PossibleValue Value="DTS_QUICKMEAS_ENABLE" Comment="Enable the Quick Measure (Measure without calibration)"/>
+        <PossibleValue Value="DTS_QUICKMEAS_DISABLE" Comment="Disable the Quick Measure (Measure with calibration)"/>
+    </RefParameter>
+    
+    <RefParameter Name="RefClock" Comment="Ref Clock" DefaultValue="DTS_REFCLKSEL_PCLK" Type="list" Group="Mode Config"  Visible="true">
+        <PossibleValue Value="DTS_REFCLKSEL_LSE" Comment="Low speed REF clock (LSE)"/>
+        <PossibleValue Value="DTS_REFCLKSEL_PCLK" Comment="High speed REF clock (PCLK)"/>
+    </RefParameter>
+    
+    <RefParameter Name="TriggerInput" Comment="Trigger Input" DefaultValue="DTS_TRIGGER_HW_NONE" Type="list" Group="Mode Config"  Visible="true">
+        <PossibleValue Value="DTS_TRIGGER_HW_NONE" Comment="No Hardware trigger detection"/>
+        <PossibleValue Condition="!Semaphore_ETRLPTIM1" Value="DTS_TRIGGER_LPTIMER1" Comment="External Interrupt Mode with LPTIMER1 trigger detection"/>
+        <PossibleValue Condition="!Semaphore_ETRLPTIM2" Value="DTS_TRIGGER_LPTIMER2" Comment="External Interrupt Mode with LPTIMER2 trigger detection"/>
+        <PossibleValue Condition="!Semaphore_ETRLPTIM3" Value="DTS_TRIGGER_LPTIMER3" Comment="External Interrupt Mode with LPTIMER3 trigger detection"/>
+        <PossibleValue Condition="!GPIO_EXTI13_SEM" Value="DTS_TRIGGER_EXTI13" Comment="External Interrupt Mode with EXTI13 trigger detection"/>
+    </RefParameter>
+    
+    <RefParameter Name="SamplingTime" Comment="Sampling Time" DefaultValue="DTS_SMP_TIME_1_CYCLE" Type="list" Group="Mode Config"  Visible="true">
+        <PossibleValue Value="DTS_SMP_TIME_1_CYCLE" Comment="1 clock cycle for the sampling time"/>
+        <PossibleValue Value="DTS_SMP_TIME_2_CYCLE" Comment="2 clock cycle for the sampling time"/>
+        <PossibleValue Value="DTS_SMP_TIME_3_CYCLE" Comment="3 clock cycle for the sampling time"/>
+        <PossibleValue Value="DTS_SMP_TIME_4_CYCLE" Comment="4 clock cycle for the sampling time"/>
+        <PossibleValue Value="DTS_SMP_TIME_5_CYCLE" Comment="5 clock cycle for the sampling time"/>
+        <PossibleValue Value="DTS_SMP_TIME_6_CYCLE" Comment="6 clock cycle for the sampling time"/>
+        <PossibleValue Value="DTS_SMP_TIME_7_CYCLE" Comment="7 clock cycle for the sampling time"/>
+        <PossibleValue Value="DTS_SMP_TIME_8_CYCLE" Comment="8 clock cycle for the sampling time"/>
+        <PossibleValue Value="DTS_SMP_TIME_9_CYCLE" Comment="9 clock cycle for the sampling time"/>
+        <PossibleValue Value="DTS_SMP_TIME_10_CYCLE" Comment="10 clock cycle for the sampling time"/>
+        <PossibleValue Value="DTS_SMP_TIME_11_CYCLE" Comment="11 clock cycle for the sampling time"/>
+        <PossibleValue Value="DTS_SMP_TIME_12_CYCLE" Comment="12 clock cycle for the sampling time"/>
+        <PossibleValue Value="DTS_SMP_TIME_13_CYCLE" Comment="13 clock cycle for the sampling time"/>
+        <PossibleValue Value="DTS_SMP_TIME_14_CYCLE" Comment="14 clock cycle for the sampling time"/>
+        <PossibleValue Value="DTS_SMP_TIME_15_CYCLE" Comment="15 clock cycle for the sampling time"/>
+    </RefParameter>
+    
+    <RefParameter Name="Divider" Comment="Divider" DefaultValue="0" Type="integer" Group="Mode Config"  Visible="true" Min="0" Max="127"/>
+
+    <RefParameter Name="HighThreshold" Comment="High Threshold" DefaultValue="0x0" Type="hex" Group="Mode Config"  Visible="true" Min="0x0" Max="0xFFFF"/>
+    
+    <RefParameter Name="LowThreshold" Comment="Low Threshold" DefaultValue="0x0" Type="Hex" Group="Mode Config"  Visible="true" Min="0x0" Max="0xFFFF"/>
+    
+    <RefMode Name="DTS" Comment="DTS initialization" HalMode="DTS" Abstract="true">
+        <ConfigForMode>DTS_Init</ConfigForMode>
+        <Parameter Name="QuickMeasure"/>
+        <Parameter Name="RefClock"/>
+        <Parameter Name="TriggerInput"/>
+        <Parameter Name="SamplingTime"/>
+        <Parameter Name="Divider"/>
+        <Parameter Name="HighThreshold"/>    
+        <Parameter Name="LowThreshold"/>
+    </RefMode>
+ 
+    <ModeLogicOperator Name="OR">
+        <Mode Name="DTS">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="DTS" UserName="DTS">
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="" Name="VS-DTS"/>
+                    </SignalLogicalOp>		
+                    <Semaphore>DTS</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
+    </ModeLogicOperator>
+    <RefSignal Name="VS-DTS" Virtual="true"/>	
+</IP>

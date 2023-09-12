@@ -79,9 +79,6 @@
 [#-- /#if --]
 [/#compress]
 
-[#if USE_Touch_GFX_STACK??]
-       [#--include "BoardConfiguration.hpp"--]
-[/#if]
 #n
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -89,6 +86,9 @@
 /* USER CODE END Includes */
 #n
 /* Private typedef -----------------------------------------------------------*/
+[#if HALCompliant??]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_typedefs.tmp"/]
+[/#if]
 /* USER CODE BEGIN PTD */
 
 /* USER CODE END PTD */
@@ -194,6 +194,14 @@ ${dHandle};
     [#-- ADD BDMA Code Begin--]
     [@common.optinclude name=contextFolder+mxTmpFolder+"/bdma_GV.tmp"/]
     [#-- ADD BDMA Code End--]
+[#-- BDMA1 global variables --]
+    [#-- ADD BDMA1 Code Begin--]
+    [@common.optinclude name=contextFolder+mxTmpFolder+"/bdma1_GV.tmp"/]
+    [#-- ADD BDMA1 Code End--]
+[#-- BDMA2 global variables --]
+    [#-- ADD BDMA2 Code Begin--]
+    [@common.optinclude name=contextFolder+mxTmpFolder+"/bdma2_GV.tmp"/]
+    [#-- ADD BDMA2 Code End--]
     [#-- DMA global variables --]
     [#-- ADD DMA Code Begin--]
     [@common.optinclude name=contextFolder+mxTmpFolder+"/dma_GV.tmp"/]
@@ -245,16 +253,9 @@ ${dHandle};
 static void NonSecure_Init(void);
 [/#if]
 [#if rccFctName?? && ((!McuDualCore?? && TZEN=="0") || ((TZEN=="1" && Secure=="true") && rccIsSecure??) || ((TZEN=="1" && Secure=="false") && !rccIsSecure??)|| (bootMode?? && bootMode=="boot0" && cpucore=="ARM_CORTEX_M7" && McuDualCore??))]
-[#if USE_Touch_GFX_STACK??]
-extern "C" void SystemClock_Config(void); [#-- remove static --]
-[#if commonClockConfig??]
-extern "C" void PeriphCommonClock_Config(void);
-[/#if]
-[#else]
 void SystemClock_Config(void); [#-- remove static --]
 [#if commonClockConfig??]
 void PeriphCommonClock_Config(void);
-[/#if]
 [/#if]
 [/#if]
 [/#if]
@@ -272,7 +273,7 @@ static void MPU_Config(void);
 [/#if]
 [#if HALCompliant??]
     [#list voids as void]
-        [#if !void.ipType?contains("thirdparty")&&!void.functionName?contains("FREERTOS")&&!void.functionName?contains("VREFBUF")&&void.functionName!="Init"&&!void.functionName?contains("FATFS")&& !void.functionName?contains("LWIP")&& !void.functionName?contains("MBEDTLS")&& !void.functionName?contains("USB_DEVICE") && !void.functionName?contains("USB_Device") && !void.functionName?contains("USB_HOST")&& !void.functionName?contains("CORTEX")&& !void.functionName?contains("SystemClock_Config")&& !void.functionName?contains("LIBJPEG")&& !void.functionName?contains("PDM2PCM")&& !void.functionName?contains("TOUCHSENSING")&& !void.functionName?contains("MotorControl")&& !void.functionName?contains("RESMGR_UTILITY") && !void.functionName?contains("OPENAMP") && !void.functionName?contains("TRACER_EMB") && !void.functionName?contains("APPE_Init") && !void.functionName?contains("ETZPC") && !void.functionName?contains("GUI_INTERFACE")]
+        [#if !void.ipType?contains("thirdparty")&&!void.functionName?contains("FREERTOS")&&!void.functionName?contains("VREFBUF")&&void.functionName!="Init"&&!void.functionName?contains("FATFS")&& !void.functionName?contains("LWIP")&& !void.functionName?contains("MBEDTLS")&& !void.functionName?contains("USB_DEVICE") && !void.functionName?contains("USB_Device") && !void.functionName?contains("USB_HOST")&& !void.functionName?contains("CORTEX")&& !void.functionName?contains("PWR")&& !void.functionName?contains("SystemClock_Config")&& !void.functionName?contains("LIBJPEG")&& !void.functionName?contains("PDM2PCM")&& !void.functionName?contains("TOUCHSENSING")&& !void.functionName?contains("MotorControl")&& !void.functionName?contains("RESMGR_UTILITY") && !void.functionName?contains("OPENAMP") && !void.functionName?contains("TRACER_EMB") && !void.functionName?contains("APPE_Init") && !void.functionName?contains("ETZPC") && !void.functionName?contains("GUI_INTERFACE")]
             [#if !void.functionName?contains("GRAPHICS") && !void.functionName?contains("USBPD")]
                 [#if void.isStatic]
                     static void ${""?right_pad(2)}${void.functionName}(void);
@@ -325,6 +326,10 @@ static void MX_NVIC_Init(void);
 [#if noMain?? && noMain=="false"]
 int main(void)
 {
+[#if TZEN=="1" && Secure=="true"]
+  /* SAU/IDAU, FPU and interrupts secure/non-secure allocation setup done */
+  /* in SystemInit() based on partition_[#if McuName?starts_with("STM32L562")]stm32l562xx.h[#else]stm32l552xx.h[/#if] file's definitions. */
+[/#if]
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
@@ -334,7 +339,10 @@ int main(void)
   /* USER CODE END Boot_Mode_Sequence_0 */
   [/#if]
 
+
 [#compress]
+
+
 [#if !McuDualCore?? || (cpucore=="ARM_CORTEX_M7" && McuDualCore??)]
 [#if mpuControl??] [#-- if MPU config is enabled --]
 
@@ -343,6 +351,7 @@ int main(void)
     #tMPU_Config();
     
 [/#if]
+
 [#if ICache??] [#-- if CPU ICache is enabled --]
 #n#t/* Enable I-Cache---------------------------------------------------------*/
 
@@ -398,6 +407,31 @@ int main(void)
 #t[@common.optinclude name=contextFolder+mxTmpFolder+"/system.tmp"/] [#-- if LL include system.tmp --]
 [/#if]
 [/#if]
+
+#n
+[#if pwrConfig??]
+[#list pwrConfig as config]
+ [#assign listOfLocalVariables =""]
+        [#assign resultList =""] 	
+            [@common.getLocalVariableList instanceData=config/] 
+[/#list]
+[/#if]
+#n
+[#-- PWR configuration --]
+[#if pwrConfig??]
+[#list pwrConfig as config]
+
+[@common.generateConfigModelListCode configModel=config inst="PWR"  nTab=1 index=""/]
+[/#list]
+[/#if]
+#n
+
+[#-- vrefbuf configuration --]
+[#if vrefbufConfig??]
+[#list vrefbufConfig as config]
+[@common.generateConfigModelListCode configModel=config inst="VREFBUF"  nTab=1 index=""/]
+[/#list]
+[/#if]
 #n
 #t/* USER CODE BEGIN Init */
 
@@ -419,6 +453,9 @@ int main(void)
     [/#if]
 [/#list]
 [/#if]
+
+
+
 [#if bootMode?? && cpucore=="ARM_CORTEX_M7" && McuDualCore??] [#-- M7 boot0 sequence --]
 /* USER CODE BEGIN Boot_Mode_Sequence_2 */
  /* When system initialization is finished, Cortex-M7 will release Cortex-M4  by means of 
@@ -463,18 +500,50 @@ int main(void)
 #t/* Resource Manager Utility initialisation ---------------------------------*/
     #tMX_RESMGR_UTILITY_Init();
 [/#if]
+
+
 #n
 #t/* USER CODE BEGIN SysInit */
 
 #n#t/* USER CODE END SysInit */
 #n
+
 #n#t/* Initialize all configured peripherals */
+[#-- FCR: init of middleware to always be done in the main (USBD and USBH, and GRAPHICS partly, kept in default task (temporary ) --]
+[#assign USE_MBEDTLS = false]
 [#list voids as void]
-[#if void.functionName?? && !void.functionName?contains("FREERTOS")&&!void.functionName?contains("VREFBUF")&&!void.functionName?contains("CORTEX")&& !void.functionName?contains("SystemClock_Config")&&void.functionName!="Init" && !void.functionName?contains("Process") && !void.functionName?contains("RESMGR_UTILITY")  && !void.functionName?contains("OPENAMP") && !void.functionName?contains("IPCC") && !void.functionName?contains("GTZC") && !void.functionName?contains("ETZPC") && !void.functionName?contains("TRACER_EMB") && !void.functionName?contains("GUI_INTERFACE")]
+ [#if void.functionName?? && void.functionName?contains("MBEDTLS")]
+ [#assign USE_MBEDTLS = true]
+ [/#if]
+[/#list]
+[#list voids as void]
+[#if void.functionName?? && !void.functionName?contains("FREERTOS")&&!void.functionName?contains("VREFBUF")&&!void.functionName?contains("CORTEX")&&!void.functionName?contains("PWR")&& !void.functionName?contains("SystemClock_Config")&&void.functionName!="Init" && !void.functionName?contains("Process") && !void.functionName?contains("RESMGR_UTILITY")  && !void.functionName?contains("OPENAMP") && !void.functionName?contains("IPCC") && !void.functionName?contains("GTZC") && !void.functionName?contains("ETZPC") && !void.functionName?contains("TRACER_EMB") && !void.functionName?contains("GUI_INTERFACE")]
 [#if !void.isNotGenerated]
+[#-- FCR: Replaces previous loop kept in comments below (could be removed in case no regression found) --]
+[#if void.functionName!="GRAPHICS_Init" && void.functionName!="APPE_Init"]
+ [#if FREERTOS?? && ((void.functionName?contains("LWIP") && USE_MBEDTLS) || void.functionName?contains("MBEDTLS") || void.functionName?contains("MX_USB_DEVICE_Init") || void.functionName==("MX_USB_HOST_Init"))]
+ [#-- Nothing generated for 
+  - MBEDTLS with FreeRTOS
+  - Lwip with FreeRTOS + MBEDTLS
+  - USBD and USBH when FreeRTOS (still generated in default task as temporary patch) 
+ --]
+  [#if void.functionName?contains("MBEDTLS")][#-- special comment generated here --]
+    #t/* Up to user define the empty MX_MBEDTLS_Init() function located in mbedtls.c file */#n
+  [/#if]
+ [#else] [#-- must generate a call in all other cases --]
+   [#if void.functionName?contains("FATFS") && (familyName="stm32g0" || familyName="stm32wb" || familyName="stm32l5" || familyName="stm32g4")]
+  #tif (MX_FATFS_Init() != APP_OK) {
+  #t#tError_Handler();
+  #t}
+   [#else]
+  #t${void.functionName}();
+   [/#if]
+ [/#if]
+
+[#-- FCR: Previous loop kept in comments --]
+[#-- 
 [#if ((FREERTOS?? && void.ipType=="peripheral") || !FREERTOS?? || void.functionName?contains("MotorControl") ) && void.functionName!="GRAPHICS_Init"]
 [#if void.functionName?contains("FATFS") && (familyName="stm32g0" || familyName="stm32wb" || familyName="stm32l5" || familyName="stm32g4")]
- [#-- Required by the examples migration (due to the fact that the function signature has changed and returns a value now. --]
  #tif (MX_FATFS_Init() != APP_OK) {
  #t#tError_Handler();
  #t}
@@ -485,6 +554,10 @@ int main(void)
 [/#if]
 [/#if]
 [/#if]
+ --]
+ 
+[/#if]
+
 [/#if]
 [/#if]
 [/#list]
@@ -498,13 +571,16 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
+[@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_kernelInit.tmp"/][#-- any RTOS can include here --]
 [#list voids as void]
   [#if USBPD?? && void.functionName?? && void.functionName?contains("USBPD")]
     [#lt]#t/* USBPD initialisation ---------------------------------*/
     [#lt]#tMX_USBPD_Init();
   [/#if]
 [/#list]
-
+[#if HALCompliant??][#-- Put after UBSPD init to keep examples generated unchanged --]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_obj_creat.tmp"/][#-- any RTOS can include here --]
+[/#if]
 [#if FREERTOS??] [#-- If FreeRtos is used --]
     [#if GRAPHICS??]
 /* Initialise the graphical hardware */
@@ -512,9 +588,10 @@ int main(void)
 #n
 #t/* Initialise the graphical stack engine */
 #tGRAPHICS_Init();#n      
-      [/#if]
+    [/#if]
+  [#-- include of "rtos_kernelInit.tmp" moved above --]
   [#if HALCompliant??]
-  [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_HalInit.tmp"/] [#-- include generated tmp file22 Augst 2014 --]
+  [#-- include of "rtos_obj_creat.tmp" moved above --]
 [#list voids as void]
 [#if void.functionName?? && void.functionName?contains("APPE_Init")]
 #t/* Init code for STM32_WPAN */
@@ -525,18 +602,20 @@ int main(void)
   /* Call init function for freertos objects (in freertos.c) */
   MX_FREERTOS_Init(); 
   [/#if]
-
-  [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_start.tmp"/] [#-- include generated tmp file 13 Nov 2014 --] 
-  /* We should never get here as control is now taken by the scheduler */
-[#else]
+  [#-- include of "rtos_kernelStart.tmp" moved below --]
+[#else] [#-- If FreeRtos is not used --]
 [#list voids as void]
 [#if void.functionName?? && void.functionName?contains("APPE_Init")]
 #t/* Init code for STM32_WPAN */  
 #tAPPE_Init();
 [/#if]
 [/#list]
+[/#if] [#-- If FreeRtos is used --]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_kernelStart.tmp"/]
+[#if FREERTOS??] [#-- If FreeRtos is used (should become more generic: if RTOS??) --]
+  /* We should never get here as control is now taken by the scheduler */
 [/#if]
-[#if TZEN=="1" && Secure=="true"]
+[#if TZEN=="1" && Secure=="true"][#-- FreeRTOS is not enabled in that case --]
 #n
 #t/*************** Setup and jump to non-secure *******************************/
 #n
@@ -679,6 +758,7 @@ void PeriphCommonClock_Config(void)
 }[/#if]
 [/#compress]
 [/#if]
+
 [/#compress]
 
 [#compress]
@@ -818,7 +898,7 @@ static void MX_NVIC_Init(void)
 [#compress]
 [#list IP.configModelList as instanceData]
 [#assign ipName = instanceData.ipName]
-[#if instanceData.isMWUsed=="false" && instanceData.isBusDriverUSed=="false" && !ipName?contains("CORTEX") && !ipName?contains("RESMGR_UTILITY") && !ipName?contains("TRACER_EMB") && !ipName?contains("GUI_INTERFACE")]
+[#if instanceData.isMWUsed=="false" && instanceData.isBusDriverUSed=="false" && !ipName?contains("CORTEX") && !ipName?contains("PWR")&& !ipName?contains("VREFBUF")&& !ipName?contains("RESMGR_UTILITY") && !ipName?contains("TRACER_EMB") && !ipName?contains("GUI_INTERFACE")]
      [#assign instName = instanceData.instanceName]
 
         [#assign halMode= instanceData.halMode]
@@ -955,12 +1035,16 @@ static void MX_NVIC_Init(void)
 [/#list]
 
 [@common.optinclude name=contextFolder+mxTmpFolder+"/bdma.tmp"/][#-- ADD BDMA Code--]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/bdma1.tmp"/][#-- ADD BDMA1 Code--]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/bdma2.tmp"/][#-- ADD BDMA2 Code--]
+
 [@common.optinclude name=contextFolder+mxTmpFolder+"/dma.tmp"/][#-- ADD DMA Code--]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/mdma.tmp"/][#-- ADD MDMA Code--]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/mx_fmc_HC.tmp"/][#-- FMC Init --]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/gpio.tmp"/][#-- ADD GPIO Code--] 
 [/#if] [#-- if HALCompliant End --]
 #n
+
 [#-- FSMC Init --]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/mx_fsmc_HC.tmp"/]
 #n
@@ -970,10 +1054,11 @@ static void MX_NVIC_Init(void)
 /* USER CODE END 4 */
 #n
 
-[#if HALCompliant??] [#-- If FreeRtos is used --]
+[#if HALCompliant??] [#-- If FreeRtos is used (and tmp files included in the main) --]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_default_thread.tmp"/]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_threads.tmp"/]
-[@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_user_threads.tmp"/] 
-[/#if] [#-- If FreeRtos is used --]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_callbacks.tmp"/]
+[/#if] [#-- If FreeRtos is used (and tmp files included in the main) --]
 [#if !McuDualCore?? || (cpucore=="ARM_CORTEX_M7" && McuDualCore??)]
 [#if mpuControl??] [#-- if MPU config is enabled --]
 /* MPU Configuration */

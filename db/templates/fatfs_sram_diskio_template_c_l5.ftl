@@ -38,7 +38,8 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
-
+/* Disk status */
+static volatile DSTATUS Stat = STA_NOINIT;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -69,6 +70,7 @@ const Diskio_drvTypeDef SRAMDISK_Driver =
 #endif /* _USE_IOCTL == 1 */
 };
 
+/* Private functions ---------------------------------------------------------*/
 
 /**
   * @brief  Initializes a Drive
@@ -78,10 +80,12 @@ const Diskio_drvTypeDef SRAMDISK_Driver =
 DSTATUS SRAMDISK_initialize(BYTE lun)
 {
   /* USER CODE BEGIN SRAMDISK_initialize */
+  Stat = STA_NOINIT;
   
-  /* Place for user code */
-  return STA_NOINIT;
-  
+  /* Configure the SRAM device */
+  /* Place for user code (may require BSP functions/defines to be added to the project) */
+
+  return Stat;
   /* USER CODE END SRAMDISK_initialize */
 }
 
@@ -94,8 +98,7 @@ DSTATUS SRAMDISK_status(BYTE lun)
 {
   /* USER CODE BEGIN SRAMDISK_status */
   
-  /* Place for user code */
-  return STA_NOINIT;
+  return Stat;
   
   /* USER CODE END SRAMDISK_status */
 }
@@ -112,9 +115,10 @@ DRESULT SRAMDISK_read(BYTE lun, BYTE *buff, DWORD sector, UINT count)
 {
   /* USER CODE BEGIN SRAMDISK_read */
 
-  /* Place for user code */
-  return RES_ERROR;
-  
+  /* Place for user code (may require BSP functions/defines to be added to the project) */
+
+  return RES_OK;
+
   /* USER CODE END SRAMDISK_read */
 }
 
@@ -131,9 +135,10 @@ DRESULT SRAMDISK_write(BYTE lun, const BYTE *buff, DWORD sector, UINT count)
 {
   /* USER CODE BEGIN SRAMDISK_write */
 
-  /* Place for user code */
-  return RES_ERROR;
-  
+  /* Place for user code (may require BSP functions/defines to be added to the project) */
+
+  return RES_OK;
+
   /* USER CODE END SRAMDISK_write */
 }
 #endif /* _USE_WRITE == 1 */
@@ -149,9 +154,12 @@ DRESULT SRAMDISK_write(BYTE lun, const BYTE *buff, DWORD sector, UINT count)
 DRESULT SRAMDISK_ioctl(BYTE lun, BYTE cmd, void *buff)
 {
   /* USER CODE BEGIN SRAMDISK_ioctl */
-  
-  /* Place for user code */
-  return RES_ERROR;
+
+  DRESULT res = RES_ERROR;
+
+  /* Place for user code (may require BSP functions/defines to be added to the project) */
+
+  return res;
   
   /* USER CODE END SRAMDISK_ioctl */
 }

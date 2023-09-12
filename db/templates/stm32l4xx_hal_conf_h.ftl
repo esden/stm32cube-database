@@ -51,7 +51,7 @@
   */
 
 #define HAL_MODULE_ENABLED  
-[#assign allModules = ["ADC", "AES", "CAN", "COMP", "CRC", "CRYP", "DAC", "DCMI", "DMA2D", "DFSDM", "DSI", "FIREWALL", "GFXMMU", "HCD", "HASH", "I2S", "IRDA", "IWDG", "LTDC","LCD", "LPTIM", "MMC", "NAND", "NOR", "OPAMP", "OSPI", "OCTOSPI", "PCD", "QSPI", "QUADSPI", "RNG", "RTC", "SAI", "SD", "SMBUS", "SMARTCARD", "SPI", "SRAM", "SWPMI", "TIM", "TSC", "UART", "USART", "WWDG","EXTI" ]]
+[#assign allModules = ["ADC", "AES", "CAN", "COMP", "CRC", "CRYP", "DAC", "DCMI", "DMA2D", "DFSDM", "DSI", "FIREWALL", "GFXMMU", "HCD", "HASH", "I2S", "IRDA", "IWDG", "LTDC","LCD", "LPTIM", "MMC", "NAND", "NOR", "OPAMP", "OSPI", "OCTOSPI", "PCD", "PKA", "QSPI", "QUADSPI", "RNG", "RTC", "SAI", "SD", "SMBUS", "SMARTCARD", "SPI", "SRAM", "SWPMI", "TIM", "TSC", "UART", "USART", "WWDG","EXTI","PSSI" ]]
   [#list allModules as module]
 	[#if isModuleUsed(module)]
 [#compress]#define HAL_${module?replace("QUADSPI","QSPI")?replace("AES","CRYP")?replace("OCTOSPI","OSPI")}_MODULE_ENABLED[/#compress]
@@ -315,6 +315,10 @@
   #include "stm32l4xx_hal_ospi.h"
 #endif /* HAL_OSPI_MODULE_ENABLED */
 
+#ifdef HAL_PKA_MODULE_ENABLED
+  #include "stm32l4xx_hal_pka.h"
+#endif /* HAL_PWR_MODULE_ENABLED */
+
 #ifdef HAL_PWR_MODULE_ENABLED
   #include "stm32l4xx_hal_pwr.h"
 #endif /* HAL_PWR_MODULE_ENABLED */
@@ -391,6 +395,10 @@
   #include "stm32l4xx_hal_gfxmmu.h"
 #endif /* HAL_GFXMMU_MODULE_ENABLED */
 
+#ifdef HAL_PSSI_MODULE_ENABLED
+  #include "stm32l4xx_hal_pssi.h"
+#endif /* HAL_PSSI_MODULE_ENABLED */
+
 
 /* Exported macro ------------------------------------------------------------*/
 #ifdef  USE_FULL_ASSERT
@@ -402,7 +410,7 @@
   *         If expr is true, it returns no value.
   * @retval None
   */
-  #define assert_param(expr) ((expr) ? (void)0U : assert_failed((char *)__FILE__, __LINE__))
+  #define assert_param(expr) ((expr) ? (void)0U : assert_failed((uint8_t *)__FILE__, __LINE__))
 /* Exported functions ------------------------------------------------------- */
   void assert_failed(char *file, uint32_t line);
 #else

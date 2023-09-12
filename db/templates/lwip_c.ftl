@@ -20,6 +20,7 @@
 	[#assign lwip_ipv4 = 0]
 	[#assign lwip_ipv6 = 0]
 	[#assign lwip_ipv6_autoconfig = 0]
+	[#assign cmsis_version = "n/a"]
 	[#assign methodList = configModel.libMethod]
 	[#list methodList as method]
 		[#list method.arguments as argument]
@@ -44,6 +45,14 @@
             [#if (argument.name == "LWIP_IPV6_AUTOCONFIG") && (argument.value == "1")]
                 [#assign lwip_ipv6_autoconfig = 1]
             [/#if]
+            [#if (argument.name == "CMSIS_VERSION") && (with_rtos == 1)]
+                [#if argument.value == "0"]
+                    [#assign cmsis_version = "v1"]
+                [/#if]
+                [#if argument.value == "1"]
+                    [#assign cmsis_version = "v2"]
+                [/#if]
+            [/#if][#-- CMSIS_VERSION --]
 		[/#list]
 	[/#list]
 [/#macro]
@@ -76,6 +85,11 @@
 [#if netif_callback == 1] 
 #include "ethernetif.h"
 [/#if][#-- endif netif_callback --]
+[#if with_rtos == 1]
+[#if cmsis_version = "v2"]
+#include <string.h>
+[/#if][#-- endif cmsis_version --]
+[/#if][#-- endif with_rtos --]
 
 /* USER CODE BEGIN 0 */
 
@@ -471,7 +485,11 @@ void MX_LWIP_Init(void)
 [/#if][#-- endif with_rtos --]
 [#if with_rtos == 1]
 #t/* Initilialize the LwIP stack with RTOS */
-#ttcpip_init( NULL, NULL );	
+#ttcpip_init( NULL, NULL );
+[#if cmsis_version = "v2"]
+#t#define INTERFACE_THREAD_STACK_SIZE            ( 350 )
+#tosThreadAttr_t attributes;
+[/#if][#-- endif cmsis_version --]
 [/#if][#-- endif with_rtos --]
 #n
 [/#compress]
@@ -547,19 +565,39 @@ void MX_LWIP_Init(void)
 #n 
 [#if (series != "stm32h7") && (with_rtos == 1)]
 #t/* create a binary semaphore used for informing ethernetif of frame reception */
+[#if cmsis_version = "v2"]
+#tNetif_LinkSemaphore = osSemaphoreNew(1, 1, NULL);
+[#else][#-- else cmsis_version --]
 #tosSemaphoreDef(Netif_SEM);
 #tNetif_LinkSemaphore = osSemaphoreCreate(osSemaphore(Netif_SEM) , 1 );
+[/#if][#-- endif cmsis_version --]
 #n  
 #tlink_arg.netif = &gnetif;
 #tlink_arg.semaphore = Netif_LinkSemaphore;
 #t/* Create the Ethernet link handler thread */
+[#if cmsis_version = "v2"]
+#tmemset(&attributes, 0x0, sizeof(osThreadAttr_t));
+#tattributes.name = "LinkThr";
+#tattributes.stack_size = INTERFACE_THREAD_STACK_SIZE;
+#tattributes.priority = osPriorityRealtime;
+#tosThreadNew(ethernetif_input, &link_arg, &attributes);
+[#else][#-- else cmsis_version --]
 #tosThreadDef(LinkThr, ethernetif_set_link, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 2);
 #tosThreadCreate (osThread(LinkThr), &link_arg);
-[#else][#-- case series == "stm32h7" --] 
+[/#if][#-- endif cmsis_version --]
+[#else][#-- case series == "stm32h7" --]
 #t/* Create the Ethernet link handler thread */
 [#if with_rtos == 1]
+[#if cmsis_version = "v2"]
+#tmemset(&attributes, 0x0, sizeof(osThreadAttr_t));
+#tattributes.name = "EthLink";
+#tattributes.stack_size = INTERFACE_THREAD_STACK_SIZE;
+#tattributes.priority = osPriorityRealtime;
+#tosThreadNew(ethernetif_input, &gnetif, &attributes);
+[#else][#-- else cmsis_version --]
 #tosThreadDef(EthLink, ethernet_link_thread, osPriorityNormal, 0, configMINIMAL_STACK_SIZE *2); 
 #tosThreadCreate (osThread(EthLink), &gnetif);
+[/#if][#-- endif cmsis_version --]
 [/#if][#-- endif with_rtos --]
 [/#if][#-- endif series --]
 [/#if][#-- endif netif_callback --]

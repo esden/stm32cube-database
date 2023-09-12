@@ -1,8 +1,11 @@
 [#ftl]
 
-[#--MX Data models access services
+[#--------------------------------------------------------------------]
+[#--MX Device Tree Generator Data models access services
+
 NB: all the string lists should be re-ordered to insure DTS ordering.
 --]
+[#--------------------------------------------------------------------]
 
 [#--------------------------------------------------------------------------------------------------------------------------------]
 [#-- Extract DT DM info --]
@@ -51,7 +54,7 @@ NB: all the string lists should be re-ordered to insure DTS ordering.
 	 ------------------------]
 	[#--Specify templates path --]
 	[#assign mx_dtBindingsBoardPath = "bindingsBoard" + mx_osPathDelimiter] [#--used from included ftl--]
-	[#assign mx_dtBindingsSocPath = "bindingsSoc" + mx_osPathDelimiter] [#--used from included ftl--]
+	[#assign mx_dtBindingsSocPath = "bindingsSoc" + mx_osPathDelimiter] [#--soc ftl--]
 
 
 	[#--get runtime context names list--]
@@ -447,60 +450,3 @@ Returns the 1st found "bindedHwName" as a "String".
 	[#return {"pinctrlElmtType":pPinctrlElmtType, "pinCtrlConfigName":pPinCtrlConfigName, "pinCtrlConfigNodesList":pPinCtrlConfigNodesList}]
 [/#function]
 
-
-[#--------------------------------------------------------------------------------------------------------------------------------]
-[#-- Misc DTS services --]
-[#--------------------------------------------------------------------------------------------------------------------------------]
-
-[#--UserSection name generation: DO NOT CHANGE !!!--]
-
-[#--Generate a US name: "pParentElmt" is the elmt (typically a Node) where the US stands--]
-[#function srvcmx_generate_UserSectionName  pParentElmt pLevel]
-[#local module = "srvcmx_generate_UserSectionName"]
-[#local traces =  ftrace("", "module="+module+"\n") ]
-[#local errors = ""]
-
-	[#if pLevel < 20]
-		[#if pParentElmt?has_content]
-			[#--Mandatory attributes--]
-			[#local isNodeOverloading = pParentElmt.isNodeOverloading]
-			[#local name = pParentElmt.name]
-			[#--Optional attributes--]
-			[#local label = pParentElmt.nodeLabel!]
-			[#local unitAddress = pParentElmt.nodeUnitAddress!]
-
-			[#if label?has_content]
-				[#--use label (preferred)--]
-				[#local usName = label]
-			[#elseif isNodeOverloading]
-				[#--if no label, use parent elmt ref if it is an overload--]
-				[#local usName = name]
-			[#else]
-				[#--name = parentUSName_name-unitAddress--]
-				[#local usName = name]
-				[#if unitAddress?has_content]
-					[#local usName = usName + "-" + unitAddress]
-				[/#if]
-
-				[#if pParentElmt.parent??]
-					[#local usNameRes = srvcmx_generate_UserSectionName(pParentElmt.parent, (pLevel+1))]
-					[#local errors = usNameRes.errors]
-					[#if !usNameRes.errors?has_content]
-						[#local usName = usNameRes.name + "_" + usName]
-					[/#if]
-				[#else]
-					[#local errors = "no parent"]
-				[/#if]
-			[/#if]
-		[#else]
-			[#local errors = "empty parent"]
-		[/#if]
-	[#else]
-		[#--control recursivity--]
-		[#local errors = "too high level"]
-	[/#if]
-
-	[#return {"errors":errors!, "name":usName!, "traces":traces!} ]
-[/#function]
-
-[#--UserSection name generation--]

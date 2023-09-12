@@ -198,7 +198,8 @@
 [#local myInst=inst]
 
         [#list methodList as method]
-                [#assign args = ""]                
+            [#if !FREERTOS?? || method.osCall=="PRE_OS"]
+                [#assign args = ""]
                 [#if method.callBackMethod=="false"]
                 [#if method.status=="OK"]
                 
@@ -404,6 +405,7 @@
                         [/#if]
         [/#if]
 [/#if]
+	[/#if]
     [/#list]
 
 [#assign instanceIndex = ""]

@@ -10,6 +10,31 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
+[#assign SNK = false]
+[#assign SRC = false]
+[#assign DRP = false]
+[#-- SWIPdatas is a list of SWIPconfigModel --]
+[#list SWIPdatas as SWIP]
+    [#if SWIP.defines??]
+        [#list SWIP.defines as definition]
+            [#if definition.name=="USBPD_NbPorts"]
+                [#assign nbPorts = definition.value]
+            [/#if]
+            [#if definition.name == "SNK" && definition.value == "true"]
+                [#assign SNK = true]
+            [/#if]
+            [#if definition.name == "SRC" && definition.value == "true"]
+                [#assign SRC = true]
+            [/#if]
+            [#if definition.name == "DRP" && definition.value == "true"]
+                [#assign DRP = true]
+            [/#if]
+        [/#list]
+    [/#if]
+    [#assign instName = SWIP.ipName]
+    [#assign fileName = SWIP.fileName]
+    [#assign version = SWIP.version]
+[/#list]
 
 #define USBPD_DPM_USER_C
 /* Includes ------------------------------------------------------------------*/
@@ -19,10 +44,13 @@
 #include "usbpd_dpm_conf.h"
 #include "usbpd_dpm_user.h"
 #include "usbpd_vdm_user.h"
+#if defined(_TRACE)
 #include "usbpd_trace.h"
+#include "stdio.h"
+#endif /* _TRACE */
 #include "usbpd_pwr_if.h"
 #include "string.h"
-[#if FREERTOS??]
+[#if FREERTOS?? && Secure!="true"]
 #include "cmsis_os.h"
 [/#if]
 #include "usbpd_pwr_user.h"
@@ -48,7 +76,7 @@
 #define DPM_GUI_NOTIF_ISCONNECTED       (1 << 5)
 #define DPM_GUI_NOTIF_POWER_EVENT       (1 << 15)
 [/#if]
-[#if FREERTOS??]
+[#if FREERTOS?? && Secure!="true"]
 #if (osCMSIS < 0x20000U)
 void                USBPD_DPM_UserExecute(void const *argument);
 #else
@@ -67,6 +95,19 @@ void                USBPD_DPM_UserExecute(void *argument);
 /** @defgroup USBPD_USER_PRIVATE_MACROS USBPD USER Private Macros
   * @{
   */
+#if defined(_TRACE)
+#define DPM_USER_DEBUG_TRACE_SIZE       40u
+#define DPM_USER_DEBUG_TRACE(_PORT_, ...)  do {                                          \
+      char _str[DPM_USER_DEBUG_TRACE_SIZE];                                                                    \
+      uint8_t _size = snprintf(_str, DPM_USER_DEBUG_TRACE_SIZE, __VA_ARGS__);                                  \
+      if (_size < DPM_USER_DEBUG_TRACE_SIZE)                                                                   \
+        USBPD_TRACE_Add(USBPD_TRACE_DEBUG, (uint8_t)(_PORT_), 0, (uint8_t*)_str, strlen(_str));  \
+      else                                                                              \
+        USBPD_TRACE_Add(USBPD_TRACE_DEBUG, (uint8_t)(_PORT_), 0, (uint8_t*)_str, DPM_USER_DEBUG_TRACE_SIZE);   \
+ } while(0)
+#else
+#define DPM_USER_DEBUG_TRACE(_PORT_, ...)
+#endif /* _TRACE */
 /* USER CODE BEGIN Private_Macro */
 
 /* USER CODE END Private_Macro */
@@ -151,11 +192,11 @@ void USBPD_DPM_SetNotification_GUI(GUI_NOTIFICATION_FORMAT_SEND PtrFormatSend, G
 void USBPD_DPM_WaitForTime(uint32_t Time)
 {
 /* USER CODE BEGIN USBPD_DPM_WaitForTime */
-#ifdef _RTOS
+[#if FREERTOS?? && Secure!="true"]
   osDelay(Time);
-#else
+[#else]
   HAL_Delay(Time);
-#endif
+[/#if]
 /* USER CODE END USBPD_DPM_WaitForTime */
 }
 
@@ -164,15 +205,25 @@ void USBPD_DPM_WaitForTime(uint32_t Time)
   * @param  argument  DPM User event
   * @retval None
   */
+[#if FREERTOS?? && Secure!="true"]
 #if (osCMSIS < 0x20000U)
 void USBPD_DPM_UserExecute(void const *argument)
 #else
 void USBPD_DPM_UserExecute(void *argument)
 #endif /* osCMSIS < 0x20000U */
+[#else]
+void USBPD_DPM_UserExecute(void const *argument)
+[/#if]
 {
 /* USER CODE BEGIN USBPD_DPM_UserExecute */
 
 /* USER CODE END USBPD_DPM_UserExecute */
+[#if FREERTOS?? && Secure!="true"]
+[#else]
+[#if GUI_INTERFACE??]
+  GUI_Execute();
+[/#if]
+[/#if]
 }
 
 /**
@@ -202,7 +253,34 @@ void USBPD_DPM_UserCableDetection(uint8_t PortNum, USBPD_CAD_EVENT State)
   }
 [/#if]
 /* USER CODE BEGIN USBPD_DPM_UserCableDetection */
-
+[#if SRC || DRP]
+  DPM_USER_DEBUG_TRACE(PortNum, "HELP: update USBPD_DPM_UserCableDetection");
+  // switch(State)
+  // {
+  // case USBPD_CAD_EVENT_ATTACHED:
+  // case USBPD_CAD_EVENT_ATTEMC:
+    // {
+      // if (USBPD_OK != USBPD_PWR_IF_VBUSEnable(PortNum))
+      // {
+        // /* Should not occurr */
+        // HAL_Delay(6000);
+        // NVIC_SystemReset();
+      // }
+      // break;
+    // }
+  // case USBPD_CAD_EVENT_DETACHED :
+  // case USBPD_CAD_EVENT_EMC :
+  // default :
+    // {
+      // if (USBPD_OK != USBPD_PWR_IF_VBUSDisable(PortNum))
+      // {
+        // /* Should not occurr */
+        // while(1);
+      // }
+      // break;
+    // }
+  // }
+  [/#if]
 /* USER CODE END USBPD_DPM_UserCableDetection */
 }
 
@@ -236,7 +314,7 @@ void USBPD_DPM_UserTimerCounter(uint8_t PortNum)
 void USBPD_DPM_HardReset(uint8_t PortNum, USBPD_PortPowerRole_TypeDef CurrentRole, USBPD_HR_Status_TypeDef Status)
 {
 /* USER CODE BEGIN USBPD_DPM_HardReset */
-
+  DPM_USER_DEBUG_TRACE(PortNum, "HELP: update USBPD_DPM_HardReset");
 /* USER CODE END USBPD_DPM_HardReset */
 }
 
@@ -295,7 +373,37 @@ void USBPD_DPM_Notification(uint8_t PortNum, USBPD_NotifyEventValue_TypeDef Even
 void USBPD_DPM_GetDataInfo(uint8_t PortNum, USBPD_CORE_DataInfoType_TypeDef DataId, uint8_t *Ptr, uint32_t *Size)
 {
 /* USER CODE BEGIN USBPD_DPM_GetDataInfo */
-
+  /* Check type of information targeted by request */
+  switch(DataId)
+  {
+[#if SNK || DRP]
+//  case USBPD_CORE_DATATYPE_SNK_PDO:           /*!< Handling of port Sink PDO, requested by get sink capa*/
+    // break;
+//  case USBPD_CORE_EXTENDED_CAPA:              /*!< Source Extended capability message content          */
+    // break;
+[/#if]
+//  case USBPD_CORE_DATATYPE_REQ_VOLTAGE:       /*!< Get voltage value requested for BIST tests, expect 5V*/
+    // break;
+[#if SRC || DRP]
+//  case USBPD_CORE_DATATYPE_SRC_PDO:           /*!< Handling of port Source PDO                         */
+    // break;
+//  case USBPD_CORE_PPS_STATUS:                 /*!< PPS Status message content                          */
+    // break;
+//  case USBPD_CORE_SNK_EXTENDED_CAPA:          /*!< Retrieve of Sink Extended capability message content*/
+    // break;
+  [/#if]
+//  case USBPD_CORE_INFO_STATUS:                /*!< Information status message content                  */
+    // break;
+//  case USBPD_CORE_MANUFACTURER_INFO:          /*!< Retrieve of Manufacturer info message content       */
+    // break;
+//  case USBPD_CORE_BATTERY_STATUS:             /*!< Retrieve of Battery status message content          */
+    // break;
+//  case USBPD_CORE_BATTERY_CAPABILITY:         /*!< Retrieve of Battery capability message content      */
+    // break;
+  default:
+    DPM_USER_DEBUG_TRACE(PortNum, "HELP: update USBPD_DPM_GetDataInfo:%d", DataId);
+    break;
+  }
 /* USER CODE END USBPD_DPM_GetDataInfo */
 }
 
@@ -310,8 +418,54 @@ void USBPD_DPM_GetDataInfo(uint8_t PortNum, USBPD_CORE_DataInfoType_TypeDef Data
 void USBPD_DPM_SetDataInfo(uint8_t PortNum, USBPD_CORE_DataInfoType_TypeDef DataId, uint8_t *Ptr, uint32_t Size)
 {
 /* USER CODE BEGIN USBPD_DPM_SetDataInfo */
-
+  /* Check type of information targeted by request */
+  switch(DataId)
+  {
+//  case USBPD_CORE_DATATYPE_RDO_POSITION:      /*!< Reset the PDO position selected by the sink only */
+    // break;
+//  case USBPD_CORE_DATATYPE_RCV_SRC_PDO:       /*!< Storage of Received Source PDO values        */
+    // break;
+//  case USBPD_CORE_DATATYPE_RCV_SNK_PDO:       /*!< Storage of Received Sink PDO values          */
+    // break;
+[#if SRC || DRP]
+  // case USBPD_CORE_DATATYPE_RCV_REQ_PDO :     /*!< Storage of Received Sink Request PDO value   */
+    // if (Size == 4)
+    // {
+      // memcpy((uint8_t *)&DPM_Ports[PortNum].DPM_RcvRequestDOMsg,  Ptr, 4);
+    // }
+    // break;
+[/#if]
+[#if SNK || DRP]
+//  case USBPD_CORE_EXTENDED_CAPA:              /*!< Source Extended capability message content   */
+    // break;
+//  case USBPD_CORE_PPS_STATUS:                 /*!< PPS Status message content                   */
+    // break;
+[/#if]
+//  case USBPD_CORE_INFO_STATUS:                /*!< Information status message content           */
+    // break;
+//  case USBPD_CORE_ALERT:                      /*!< Storing of received Alert message content    */
+    // break;
+//  case USBPD_CORE_GET_MANUFACTURER_INFO:      /*!< Storing of received Get Manufacturer info message content */
+    // break;
+//  case USBPD_CORE_GET_BATTERY_STATUS:         /*!< Storing of received Get Battery status message content    */
+    // break;
+//  case USBPD_CORE_GET_BATTERY_CAPABILITY:     /*!< Storing of received Get Battery capability message content*/
+    // break;
+//  case USBPD_CORE_SNK_EXTENDED_CAPA:          /*!< Storing of Sink Extended capability message content       */
+    // break;
+  default:
+    DPM_USER_DEBUG_TRACE(PortNum, "HELP: update USBPD_DPM_SetDataInfo:%d", DataId);
+    break;
+  }
 /* USER CODE END USBPD_DPM_SetDataInfo */
+
+[#if GUI_INTERFACE??]
+  /* Forward info to GUI if enabled */
+  if (NULL != DPM_GUI_SaveInfo)
+  {
+    DPM_GUI_SaveInfo(PortNum, DataId, Ptr, Size);
+  }
+[/#if]
 }
 
 /**
@@ -323,6 +477,7 @@ void USBPD_DPM_SetDataInfo(uint8_t PortNum, USBPD_CORE_DataInfoType_TypeDef Data
 USBPD_StatusTypeDef USBPD_DPM_EvaluateRequest(uint8_t PortNum, USBPD_CORE_PDO_Type_TypeDef *PtrPowerObject)
 {
 /* USER CODE BEGIN USBPD_DPM_EvaluateRequest */
+  DPM_USER_DEBUG_TRACE(PortNum, "HELP: update USBPD_DPM_EvaluateRequest");
   return USBPD_REJECT;
 /* USER CODE END USBPD_DPM_EvaluateRequest */
 }
@@ -337,7 +492,7 @@ USBPD_StatusTypeDef USBPD_DPM_EvaluateRequest(uint8_t PortNum, USBPD_CORE_PDO_Ty
 void USBPD_DPM_SNK_EvaluateCapabilities(uint8_t PortNum, uint32_t *PtrRequestData, USBPD_CORE_PDO_Type_TypeDef *PtrPowerObjectType)
 {
 /* USER CODE BEGIN USBPD_DPM_SNK_EvaluateCapabilities */
-
+  DPM_USER_DEBUG_TRACE(PortNum, "HELP: update USBPD_DPM_SNK_EvaluateCapabilities");
 /* USER CODE END USBPD_DPM_SNK_EvaluateCapabilities */
 }
 
@@ -350,7 +505,7 @@ void USBPD_DPM_SNK_EvaluateCapabilities(uint8_t PortNum, uint32_t *PtrRequestDat
 void USBPD_DPM_PowerRoleSwap(uint8_t PortNum, USBPD_PortPowerRole_TypeDef CurrentRole, USBPD_PRS_Status_TypeDef Status)
 {
 /* USER CODE BEGIN USBPD_DPM_PowerRoleSwap */
-
+  DPM_USER_DEBUG_TRACE(PortNum, "HELP: update USBPD_DPM_PowerRoleSwap");
 /* USER CODE END USBPD_DPM_PowerRoleSwap */
 }
 
@@ -487,6 +642,7 @@ USBPD_StatusTypeDef USBPD_DPM_RequestMessageRequest(uint8_t PortNum, uint8_t Ind
 /* USER CODE BEGIN USBPD_DPM_RequestMessageRequest */
   /* To be adapted to call the PE function */
   /*       _status = USBPD_PE_Send_Request(PortNum, rdo.d32, pdo_object);*/
+  DPM_USER_DEBUG_TRACE(PortNum, "HELP: update USBPD_DPM_RequestMessageRequest");
 /* USER CODE END USBPD_DPM_RequestMessageRequest */
   return _status;
 }

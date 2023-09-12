@@ -41,7 +41,7 @@ extern "C" {
 /* USER CODE END typedef */
 
 /* Exported define -----------------------------------------------------------*/
-[#if FREERTOS??]
+[#if FREERTOS?? && Secure!="true"]
 [#if USBPD_TCPM_MODULE_ENABLED]
 #define TCPM_ALARMBOX_MESSAGES_MAX      (2U * USBPD_PORT_COUNT)
 [/#if]
@@ -79,6 +79,6 @@ void                USBPD_DPM_TimerCounter(void);
 }
 #endif
 
-#endif /* __USBPD_DPM_H_ */
+#endif /* __USBPD_DPM_CORE_H_ */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

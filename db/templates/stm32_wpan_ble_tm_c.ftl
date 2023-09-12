@@ -152,8 +152,8 @@ void TM_Init( void  )
   tl_ble_init_conf.IoBusAclDataTxAck = TM_AclDataAck;
   TL_BLE_Init( (void*) &tl_ble_init_conf );
 
-  UTIL_LPM_SetOffMode(1 << CFG_LPM_APP, UTIL_LPM_DISABLE);
-  UTIL_LPM_SetStopMode( 1<<CFG_LPM_APP, UTIL_LPM_DISABLE);
+  UTIL_LPM_SetOffMode(1 << CFG_LPM_APP_BLE, UTIL_LPM_DISABLE);
+  UTIL_LPM_SetStopMode( 1<<CFG_LPM_APP_BLE, UTIL_LPM_DISABLE);
   LowPowerModeStatus = LOW_POWER_MODE_DISABLE;
 
   SysLocalCmdStatus = 0;
@@ -282,7 +282,7 @@ static void TM_SysLocalCmd ( void )
       ((TL_CcEvt_t *)(((TL_EvtPacket_t*)&SysLocalCmd)->evtserial.evt.payload))->cmdcode = SysLocalCmd.cmdserial.cmd.cmdcode;
       ((TL_CcEvt_t *)(((TL_EvtPacket_t*)&SysLocalCmd)->evtserial.evt.payload))->payload[0] = 0x01;
       ((TL_CcEvt_t *)(((TL_EvtPacket_t*)&SysLocalCmd)->evtserial.evt.payload))->numcmd = 1;
-      ((TL_EvtPacket_t*)&SysLocalCmd)->evtserial.type = TL_BLEEVT_PKT_TYPE;
+      ((TL_EvtPacket_t*)&SysLocalCmd)->evtserial.type = TL_LOCRSP_PKT_TYPE;
       ((TL_EvtPacket_t*)&SysLocalCmd)->evtserial.evt.evtcode = TL_BLEEVT_CC_OPCODE;
       ((TL_EvtPacket_t*)&SysLocalCmd)->evtserial.evt.plen = TL_EVT_CS_PAYLOAD_SIZE;
 
@@ -291,7 +291,7 @@ static void TM_SysLocalCmd ( void )
 
   LST_insert_tail (&HostTxQueue, (tListNode *)&SysLocalCmd);
   UTIL_SEQ_SetTask( 1<<CFG_TASK_TX_TO_HOST_ID,CFG_SCH_PRIO_0);
-  
+
   return;
 }
 

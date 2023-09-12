@@ -14,9 +14,12 @@
 /* Includes ------------------------------------------------------------------*/
 #include "usbpd_pwr_user.h"
 #include "${FamilyName?lower_case}xx_hal.h"
+#if defined(_TRACE)
+#include "usbpd_core.h"
+#include "usbpd_trace.h"
+#endif /* _TRACE */
 
 /* USER CODE BEGIN include */
-
 /* USER CODE END include */
 
 /** @addtogroup BSP
@@ -49,6 +52,11 @@
 /** @defgroup POWER_Private_Macros Private Macros
   * @{
   */
+#if defined(_TRACE)
+#define PWR_DEBUG_TRACE(_PORT_, __MESSAGE__)  USBPD_TRACE_Add(USBPD_TRACE_DEBUG,    (_PORT_), 0u, (uint8_t*)(__MESSAGE__), sizeof(__MESSAGE__) - 1u)
+#else
+#define PWR_DEBUG_TRACE(_PORT_, __MESSAGE__)
+#endif /* _TRACE */
 /* USER CODE BEGIN POWER_Private_Macros */
 
 /* USER CODE END POWER_Private_Macros */
@@ -101,6 +109,7 @@
 PWR_StatusTypeDef BSP_PWR_VBUSInit(uint32_t               PortId)
 {
 /* USER CODE BEGIN BSP_PWR_VBUSInit */
+  PWR_DEBUG_TRACE(PortId, "HELP: Update BSP_PWR_VBUSInit");
   return PWR_ERROR;
 /* USER CODE END BSP_PWR_VBUSInit */
 }
@@ -131,6 +140,7 @@ PWR_StatusTypeDef BSP_PWR_VBUSDeInit(uint32_t PortId)
 PWR_StatusTypeDef BSP_PWR_VBUSOn(uint32_t PortId)
 {
 /* USER CODE BEGIN BSP_PWR_VBUSOn */
+  PWR_DEBUG_TRACE(PortId, "HELP: Update BSP_PWR_VBUSOn");
   return PWR_ERROR;
 /* USER CODE END BSP_PWR_VBUSOn */
 }
@@ -145,6 +155,7 @@ PWR_StatusTypeDef BSP_PWR_VBUSOn(uint32_t PortId)
 PWR_StatusTypeDef BSP_PWR_VBUSOff(uint32_t PortId)
 {
 /* USER CODE BEGIN BSP_PWR_VBUSOff */
+  PWR_DEBUG_TRACE(PortId, "HELP: Update BSP_PWR_VBUSOff");
   return PWR_ERROR;
 /* USER CODE END BSP_PWR_VBUSOff */
 }
@@ -165,7 +176,7 @@ PWR_StatusTypeDef BSP_PWR_VBUSSetVoltage_Fixed(uint32_t PortId,
                                                uint32_t MaxOperatingCurrent)
 {
 /* USER CODE BEGIN BSP_PWR_VBUSSetVoltage_Fixed */
-  return PWR_ERROR;
+  return PWR_OK;
 /* USER CODE END BSP_PWR_VBUSSetVoltage_Fixed */
 }
 
@@ -244,6 +255,7 @@ PWR_StatusTypeDef BSP_PWR_VBUSSetVoltage_APDO(uint32_t PortId,
 uint32_t  BSP_PWR_VBUSGetVoltage(uint32_t PortId)
 {
 /* USER CODE BEGIN BSP_PWR_VBUSGetVoltage */
+  PWR_DEBUG_TRACE(PortId, "HELP: Update BSP_PWR_VBUSGetVoltage");
   return 0;
 /* USER CODE END BSP_PWR_VBUSGetVoltage */
 }
@@ -394,6 +406,7 @@ PWR_StatusTypeDef BSP_PWR_RegisterVBUSDetectCallback(uint32_t                   
 uint8_t BSP_PWR_VBUSIsOn(uint32_t PortId)
 {
 /* USER CODE BEGIN BSP_PWR_VBUSIsOn */
+  PWR_DEBUG_TRACE(PortId, "HELP: Update BSP_PWR_VBUSIsOn");
   return 0;
 /* USER CODE END BSP_PWR_VBUSIsOn */
 }

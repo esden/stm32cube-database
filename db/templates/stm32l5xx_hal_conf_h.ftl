@@ -36,7 +36,7 @@
   * @brief This is the list of modules to be used in the HAL driver
   */
 #define HAL_MODULE_ENABLED  
-[#assign allModules = ["ADC", "COMP", "CRC", "AES", "DAC", "DFSDM", "FDCAN", "GTZC", "HASH", "I2C", "IRDA", "IWDG", "LPTIM", "MMC", "NAND", "NOR", "OPAMP", "OCTOSPI", "OTFDEC", "PCD", "PKA", "RCC", "RNG", "RTC", "SAI", "SD", "SMARTCARD", "SMBUS", "SPI", "SRAM", "TIM", "TSC", "UART", "USART", "WWDG" ]]
+[#assign allModules = ["ADC", "COMP", "CRC", "AES", "DAC", "DFSDM", "FDCAN", "GTZC", "HASH", "I2C", "IRDA", "IWDG", "LPTIM", "MMC", "NAND", "NOR", "OPAMP", "OCTOSPI", "OTFDEC", "PCD", "PKA", "RCC", "RNG", "RTC", "SAI", "SD", "SMARTCARD", "SMBUS", "SPI", "SRAM", "TIM", "TSC", "UART", "USART", "WWDG"]]
   [#list allModules as module]
 	[#if isModuleUsed(module)]
 [#compress]#define HAL_${module?replace("QUADSPI","QSPI")?replace("AES","CRYP")?replace("OCTOSPI","OSPI")}_MODULE_ENABLED[/#compress]
@@ -62,7 +62,7 @@
 #define HAL_FLASH_MODULE_ENABLED
 #define HAL_PWR_MODULE_ENABLED
 #define HAL_CORTEX_MODULE_ENABLED
-#define HAL_GTZC_MODULE_ENABLED
+
 #define HAL_ICACHE_MODULE_ENABLED
 
 /* ########################## Oscillator Values adaptation ####################*/
@@ -224,7 +224,7 @@
 
 /* ################## SDMMC peripheral configuration ######################### */
 
-#define USE_SD_TRANSCEIVER            0U
+#define USE_SD_TRANSCEIVER            [#if USE_SD_TRANSCEIVER??]${USE_SD_TRANSCEIVER}[#else]0U[/#if]
  
  
 /* Includes ------------------------------------------------------------------*/

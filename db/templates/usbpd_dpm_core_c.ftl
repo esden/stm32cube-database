@@ -80,7 +80,7 @@
 #include "usbpd_dpm_core.h"
 #include "usbpd_dpm_user.h"
 #include "usbpd_dpm_conf.h"
-[#if FREERTOS??]
+[#if FREERTOS?? && Secure!="true"]
 #include "cmsis_os.h"
 #if (osCMSIS >= 0x20000U)
 #include "task.h"
@@ -141,7 +141,7 @@ void USBPD_TRACE_TX_Task(void *argument);
 #endif /* osCMSIS < 0x20000U */
 
 /* Private typedef -----------------------------------------------------------*/
-[#if FREERTOS??]
+[#if FREERTOS?? && Secure!="true"]
 #if (osCMSIS < 0x20000U)
 #define DPM_STACK_SIZE_ADDON_FOR_CMSIS              1
 #else
@@ -223,7 +223,7 @@ osThreadAttr_t TRA_Thread_Atrr = {
 /* Private define ------------------------------------------------------------*/
 #define MAX_THREAD_NB   (USBPD_PORT_COUNT + 1)          /* 1 entry per port + 1 for CAD */
 
-[#if FREERTOS??]
+[#if FREERTOS?? && Secure!="true"]
 #if (osCMSIS < 0x20000U)
 #define OSTHREAD_PE(__PORT__)       (((__PORT__) == USBPD_PORT_0) ? osThread(PE_0) : osThread(PE_1))
 #else
@@ -244,7 +244,7 @@ osThreadAttr_t TRA_Thread_Atrr = {
 #endif /* _DEBUG_TRACE */
 
 /* Private variables ---------------------------------------------------------*/
-[#if FREERTOS??]
+[#if FREERTOS?? && Secure!="true"]
 static osThreadId DPM_Thread_Table[MAX_THREAD_NB];
 [#if USBPD_TCPM_MODULE_ENABLED]
 osMessageQId  AlarmMsgBox;
@@ -426,7 +426,7 @@ USBPD_StatusTypeDef USBPD_DPM_InitCore(void)
   */
 USBPD_StatusTypeDef USBPD_DPM_InitOS(void)
 {
-[#if FREERTOS??]
+[#if FREERTOS?? && Secure!="true"]
 [#if USBPD_TCPM_MODULE_ENABLED]
 #if (osCMSIS < 0x20000U)
   osMessageQDef(MsgBox, TCPM_ALARMBOX_MESSAGES_MAX, uint16_t);
@@ -498,7 +498,7 @@ USBPD_StatusTypeDef USBPD_DPM_InitOS(void)
   */
 void USBPD_DPM_Run(void)
 {
-[#if FREERTOS??]
+[#if FREERTOS?? && Secure!="true"]
 #if (osCMSIS >= 0x20000U)
   osKernelInitialize();
 #endif /* osCMSIS >= 0x20000U */
@@ -582,7 +582,7 @@ void USBPD_DPM_TimerCounter(void)
 
 [#if !CUBEMX_GENERATED]
 [#-- does not provide this piece of code because already done by CubeMX in main.c --]
-[#if FREERTOS??]
+[#if FREERTOS?? && Secure!="true"]
   /* check to avoid count before OSKernel Start */
   if (uxTaskGetNumberOfTasks() != 0)
   {
@@ -604,7 +604,7 @@ extern void xPortSysTickHandler(void);
   */
 static void USBPD_PE_TaskWakeUp(uint8_t PortNum)
 {
-[#if FREERTOS??]
+[#if FREERTOS?? && Secure!="true"]
 #if (osCMSIS < 0x20000U)
   (void)osMessagePut(PEQueueId[PortNum], 0xFFFF, 0);
 #else
@@ -623,7 +623,7 @@ static void USBPD_PE_TaskWakeUp(uint8_t PortNum)
   */
 static void USBPD_DPM_CADTaskWakeUp(void)
 {
-[#if FREERTOS??]
+[#if FREERTOS?? && Secure!="true"]
 #if (osCMSIS < 0x20000U)
   (void)osMessagePut(CADQueueId, 0xFFFF, 0);
 #else
@@ -633,7 +633,7 @@ static void USBPD_DPM_CADTaskWakeUp(void)
 [/#if]
 }
 
-[#if FREERTOS??]
+[#if FREERTOS?? && Secure!="true"]
 #if (osCMSIS < 0x20000U)
 /**
   * @brief  Main task for PE layer
@@ -795,7 +795,7 @@ void USBPD_TRACE_TX_Task(void *argument)
   */
 void USBPD_DPM_TraceWakeUp(void)
 {
-[#if FREERTOS??]
+[#if FREERTOS?? && Secure!="true"]
   if (NULL != TraceQueueId)
   {
 #if (osCMSIS < 0x20000U)
@@ -849,7 +849,7 @@ void USBPD_DPM_CADCallback(uint8_t PortNum, USBPD_CAD_EVENT State, CCxPin_TypeDe
       /* The ufp is detached */
       (void)USBPD_PE_IsCableConnected(PortNum, 0);
       /* Terminate PE task */
-[#if FREERTOS??]
+[#if FREERTOS?? && Secure!="true"]
       if (DPM_Thread_Table[PortNum] != NULL)
       {
         osThreadTerminate(DPM_Thread_Table[PortNum]);
@@ -894,7 +894,7 @@ static void DPM_ManageAttachedState(uint8_t PortNum, USBPD_CAD_EVENT State, CCxP
   USBPD_DPM_WaitForTime(6);
 [/#if]
 
-[#if FREERTOS??]
+[#if FREERTOS?? && Secure!="true"]
   /* Create PE task */
   if (DPM_Thread_Table[PortNum] == NULL)
   {

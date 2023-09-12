@@ -23,10 +23,12 @@
         <ConfigFile Name="HOOKS_V2"/>
         <ConfigFile Name="CREATION_V2"/>
         <ConfigFile Name="INC"/>
+        <ConfigFile Name="TYPEDEFS_V2"/>
         <ConfigFile Name="VARS_V2"/>
         <ConfigFile Name="PFP_V2"/>
         <ConfigFile Name="DEFAULT_THREAD_V2"/>
         <ConfigFile Name="USER_THREADS_V2"/>
+        <ConfigFile Name="RTOS_INIT"/>  <!-- new tmp generated now for CMSIS-RTOS v2 case -->
         <ConfigFile Name="RTOS_START"/>
         <ConfigFile Name="HEAP_USER"/>	
     </RefConfig>
@@ -159,7 +161,7 @@
     </RefConfigFile>
 
     <RefConfigFile Description="Variable creation then launch the RTOS" Name="CREATION" Template="freertos_init_c_v10_0_0.ftl">
-        <File Category="source" Condition="all" Name="rtos_HalInit.tmp" Version="10.0.1"/>
+        <File Category="source" Condition="all" Name="rtos_obj_creat.tmp" Version="10.0.1"/>
         <Argument Comment="User threads" GenericType="rtos_list" Name="Threads"/>
         <Argument Comment="User queues" GenericType="rtos_list" Name="Queues"/>
         <Argument Comment="User timers" GenericType="rtos_list" Name="Timers"/>     
@@ -169,17 +171,22 @@
         <Argument Comment="User counting semaphores" GenericType="rtos_list" Name="Semaphores"/>  
     </RefConfigFile>
     
+    <!-- NEW template for kernel init code -->
+    <RefConfigFile Description="Code to init the kernel" Name="RTOS_INIT" Template="freertos_init_kernel.ftl">
+        <File Category="source" Condition="all" Name="rtos_kernelInit.tmp" Version="10.0.1"/>
+    </RefConfigFile>
+    
     <RefConfigFile Description="Code to start the kernel" Name="RTOS_START" Template="freertos_start.ftl">
-        <File Category="source" Condition="all" Name="rtos_start.tmp" Version="10.0.1"/>
+        <File Category="source" Condition="all" Name="rtos_kernelStart.tmp" Version="10.0.1"/>
     </RefConfigFile>
 
-    <RefConfigFile Description="FreeRTOS default thread" Name="DEFAULT_THREAD" Template="freertos_threads.ftl">
-        <File Category="source" Condition="all" Name="rtos_threads.tmp" Version="10.0.1"/>
+    <RefConfigFile Description="FreeRTOS default thread" Name="DEFAULT_THREAD" Template="freertos_body_default_thread_cmsis_v1.ftl">
+        <File Category="source" Condition="all" Name="rtos_default_thread.tmp" Version="10.0.1"/>
         <Argument Comment="User threads" GenericType="rtos_list" Name="Threads"/>
     </RefConfigFile>
 
-    <RefConfigFile Description="FreeRTOS user threads" Name="USER_THREADS" Template="freertos_user_threads.ftl">
-        <File Category="source" Condition="all" Name="rtos_user_threads.tmp" Version="10.0.1"/>
+    <RefConfigFile Description="FreeRTOS user threads" Name="USER_THREADS" Template="freertos_body_user_threads_cmsis_v1.ftl">
+        <File Category="source" Condition="all" Name="rtos_threads.tmp" Version="10.0.1"/>
         <Argument Comment="User threads" GenericType="rtos_list" Name="Threads"/>
         <Argument Comment="User timers" GenericType="rtos_list" Name="Timers"/>
     </RefConfigFile>
@@ -297,6 +304,17 @@
 
     <!-- Specific for CMSIS V2 -->
 
+    <RefConfigFile Description="Variable declarations for FreeRTOS" Name="TYPEDEFS_V2" Template="freertos_typedefs_v10_0_cmsis_v2.ftl">  
+        <File Category="source" Condition="all" Name="rtos_typedefs.tmp" Version="10.0.1"/>
+        <Argument Comment="User threads" GenericType="rtos_list" Name="Threads"/>
+        <Argument Comment="User queues" GenericType="rtos_list" Name="Queues"/>
+        <Argument Comment="User timers" GenericType="rtos_list" Name="Timers"/>     
+        <Argument Comment="User mutexes" GenericType="rtos_list" Name="Mutexes"/>  
+        <Argument Comment="User recursive mutexes" GenericType="rtos_list" Name="RecursiveMutexes"/>
+        <Argument Comment="User binary semaphores" GenericType="rtos_list" Name="BinarySemaphores"/>  
+        <Argument Comment="User counting semaphores" GenericType="rtos_list" Name="Semaphores"/>  
+    </RefConfigFile>
+
     <RefConfigFile Description="Variable declarations for FreeRTOS" Name="VARS_V2" Template="freertos_vars_v10_0_cmsis_v2.ftl">  
         <File Category="source" Condition="all" Name="rtos_vars.tmp" Version="10.0.1"/>
         <Argument Comment="User threads" GenericType="rtos_list" Name="Threads"/>
@@ -315,7 +333,7 @@
     </RefConfigFile>
     
     <RefConfigFile Description="Variable creation then launch the RTOS" Name="CREATION_V2" Template="freertos_init_c_v10_0_cmsis_v2.ftl">
-        <File Category="source" Condition="all" Name="rtos_HalInit.tmp" Version="10.0.1"/>
+        <File Category="source" Condition="all" Name="rtos_obj_creat.tmp" Version="10.0.1"/>
         <Argument Comment="User threads" GenericType="rtos_list" Name="Threads"/>
         <Argument Comment="User queues" GenericType="rtos_list" Name="Queues"/>
         <Argument Comment="User timers" GenericType="rtos_list" Name="Timers"/>     
@@ -327,13 +345,13 @@
     </RefConfigFile>
 
     <RefConfigFile Description="FreeRTOS default thread" Name="DEFAULT_THREAD_V2" Template="freertos_body_default_thread_cmsis_v2.ftl">
-        <File Category="source" Condition="all" Name="rtos_threads.tmp" Version="10.0.1"/>
+        <File Category="source" Condition="all" Name="rtos_default_thread.tmp" Version="10.0.1"/>
         <Argument Comment="User threads" GenericType="rtos_list" Name="Threads"/>
         <Argument Comment="" GenericType="simple" Name="FreeRTOS_API"/>   <!--  need to distinguish CMSIS v1 and v2 -->
     </RefConfigFile>
 
     <RefConfigFile Description="FreeRTOS user threads" Name="USER_THREADS_V2" Template="freertos_body_user_threads_cmsis_v2.ftl">
-        <File Category="source" Condition="all" Name="rtos_user_threads.tmp" Version="10.0.1"/>
+        <File Category="source" Condition="all" Name="rtos_threads.tmp" Version="10.0.1"/>
         <Argument Comment="User threads" GenericType="rtos_list" Name="Threads"/>
         <Argument Comment="User timers" GenericType="rtos_list" Name="Timers"/>
     </RefConfigFile>
@@ -480,7 +498,7 @@
     </RefConfigFile>
 
     <RefConfigFile Description="Variable creation then launch the RTOS" Name="CREATION_NATIVE" Template="freertos_init_c_native.ftl">
-        <File Category="source" Condition="all" Name="rtos_HalInit.tmp" Version="10.0.1"/>
+        <File Category="source" Condition="all" Name="rtos_obj_creat.tmp" Version="10.0.1"/>
         <Argument Comment="User threads" GenericType="rtos_list" Name="Threads"/>
         <Argument Comment="User queues" GenericType="rtos_list" Name="Queues"/>
         <Argument Comment="User timers" GenericType="rtos_list" Name="Timers"/>     
@@ -492,17 +510,17 @@
     </RefConfigFile>
 
     <RefConfigFile Description="Code to start the kernel" Name="RTOS_START_NATIVE" Template="freertos_start_native.ftl">
-        <File Category="source" Condition="all" Name="rtos_start.tmp" Version="10.0.1"/>
+        <File Category="source" Condition="all" Name="rtos_kernelStart.tmp" Version="10.0.1"/>
     </RefConfigFile>
 
     <!-- 16/07/2018: Temporary fix for WB and MPU: do not generate default task (removed for F4) -->
-    <RefConfigFile Description="FreeRTOS default thread" Name="DEFAULT_THREAD_NATIVE" Template="freertos_threads_native.ftl">
-        <File Category="source" Condition="all" Name="rtos_threads.tmp" Version="10.0.1"/>
+    <RefConfigFile Description="FreeRTOS default thread" Name="DEFAULT_THREAD_NATIVE" Template="freertos_body_default_thread_native.ftl">
+        <File Category="source" Condition="all" Name="rtos_default_thread.tmp" Version="10.0.1"/>
         <Argument Comment="User threads" GenericType="rtos_list" Name="Threads"/>
     </RefConfigFile>
     
-    <RefConfigFile Description="FreeRTOS user threads" Name="USER_THREADS_NATIVE" Template="freertos_user_threads_native.ftl">
-        <File Category="source" Condition="all" Name="rtos_user_threads.tmp" Version="10.0.1"/>
+    <RefConfigFile Description="FreeRTOS user threads" Name="USER_THREADS_NATIVE" Template="freertos_body_user_threads_native.ftl">
+        <File Category="source" Condition="all" Name="rtos_threads.tmp" Version="10.0.1"/>
         <Argument Comment="User threads" GenericType="rtos_list" Name="Threads"/>
         <Argument Comment="User timers" GenericType="rtos_list" Name="Timers"/>
     </RefConfigFile>

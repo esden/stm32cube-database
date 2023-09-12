@@ -491,9 +491,9 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *pckt)
           if (gap_evt_proc_complete->Procedure_Code == GAP_GENERAL_DISCOVERY_PROC
               && gap_evt_proc_complete->Status == 0x00)
           {
-              /* USER CODE BEGIN GAP_GENERAL_DISCOVERY_PROC */
+            /* USER CODE BEGIN GAP_GENERAL_DISCOVERY_PROC */
 
-              /* USER CODE END GAP_GENERAL_DISCOVERY_PROC */
+            /* USER CODE END GAP_GENERAL_DISCOVERY_PROC */
 
             APP_DBG_MSG("-- GAP GENERAL DISCOVERY PROCEDURE_COMPLETED\n");
             /*if a device found, connect to it, device 1 being chosen first if both found*/
@@ -561,29 +561,29 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *pckt)
       /* USER CODE BEGIN EVT_DISCONN_COMPLETE */
 
       /* USER CODE END EVT_DISCONN_COMPLETE */
-          if (cc->Connection_Handle == BleApplicationContext.connectionHandleEndDevice1)
-          {
-            APP_DBG_MSG("\r\n\r** DISCONNECTION EVENT OF END DEVICE 1 \n");
-            BleApplicationContext.EndDevice_Connection_Status[0] = APP_BLE_IDLE;
-            BleApplicationContext.connectionHandleEndDevice1 = 0xFFFF;
-            handleNotification.P2P_Evt_Opcode = P2P_SERVER1_DISCON_HANDLE_EVT;
-            handleNotification.ConnectionHandle = connection_handle;
-            Evt_Notification(&handleNotification);
-          }
+      if (cc->Connection_Handle == BleApplicationContext.connectionHandleEndDevice1)
+      {
+        APP_DBG_MSG("\r\n\r** DISCONNECTION EVENT OF END DEVICE 1 \n");
+        BleApplicationContext.EndDevice_Connection_Status[0] = APP_BLE_IDLE;
+        BleApplicationContext.connectionHandleEndDevice1 = 0xFFFF;
+        handleNotification.P2P_Evt_Opcode = P2P_SERVER1_DISCON_HANDLE_EVT;
+        handleNotification.ConnectionHandle = connection_handle;
+        Evt_Notification(&handleNotification);
+      }
 
-  if (cc->Connection_Handle == BleApplicationContext.connectionHandleCentral)
-  {
-    APP_DBG_MSG("\r\n\r** DISCONNECTION EVENT OF SMART PHONE \n");
-    BleApplicationContext.connectionHandleCentral = APP_BLE_IDLE;
-    handleNotification.P2P_Evt_Opcode = SMART_PHONE1_DISCON_HANDLE_EVT;
-    handleNotification.ConnectionHandle = 0xFFFF;
-    Evt_Notification(&handleNotification);
-  }
+      if (cc->Connection_Handle == BleApplicationContext.connectionHandleCentral)
+      {
+        APP_DBG_MSG("\r\n\r** DISCONNECTION EVENT OF SMART PHONE \n");
+        BleApplicationContext.connectionHandleCentral = APP_BLE_IDLE;
+        handleNotification.P2P_Evt_Opcode = SMART_PHONE1_DISCON_HANDLE_EVT;
+        handleNotification.ConnectionHandle = 0xFFFF;
+        Evt_Notification(&handleNotification);
+      }
 
 #if (CFG_P2P_DEMO_MULTI != 0)
-          /* USER CODE BEGIN EVT_DISCONN_COMPLETE_Multi */
+      /* USER CODE BEGIN EVT_DISCONN_COMPLETE_Multi */
 
-          /* USER CODE END EVT_DISCONN_COMPLETE_Multi */
+      /* USER CODE END EVT_DISCONN_COMPLETE_Multi */
 #endif           
 
       break; /* EVT_DISCONN_COMPLETE */
@@ -650,7 +650,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *pckt)
               }
               else
               {
-              APP_DBG_MSG("BLE_CTRL_App_Notification(), All services discovery Failed \r\n\r");
+                APP_DBG_MSG("BLE_CTRL_App_Notification(), All services discovery Failed \r\n\r");
               }
 #if (CFG_P2P_DEMO_MULTI != 0)                            
           /* USER CODE BEGIN EVT_LE_CONN_COMPLETE_Multi_3 */
@@ -688,6 +688,11 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *pckt)
 
           event_data_size = le_advertising_event->Advertising_Report[0].Length_Data;
 
+          /* WARNING: be careful when decoding advertising report as its raw format cannot be mapped on a C structure. 
+          The data and RSSI values could not be directly decoded from the RAM using the data and RSSI field from hci_le_advertising_report_event_rp0 structure.
+          Instead they must be read by using offsets (please refer to BLE specification).
+          RSSI = *(uint8_t*) (adv_report_data + le_advertising_event->Advertising_Report[0].Length_Data);
+          */
           adv_report_data = (uint8_t*)(&le_advertising_event->Advertising_Report[0].Length_Data) + 1;
           k = 0;
 

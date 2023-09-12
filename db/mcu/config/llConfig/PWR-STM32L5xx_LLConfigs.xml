@@ -8,10 +8,11 @@
 
 <!-- PVD Configuration -->
   <RefConfig Comment="PVD Configuration" Name="PVDConfig">
+      <IFCondition Expression ="(S_SECURE  &amp; SEM_M33S &amp; (pwrSecureFull=PWR_SECURE_FULL_YES)) | (S_SECURE  &amp; SEM_M33NS &amp; (pwrSecureFull=PWR_SECURE_FULL_NO))|( !S_SECURE)" >
     <CallLibMethod Name="LL_PWR_SetPVDLevel"  ReturnHAL="false">
       <MethodArg Name="PVDLevel" ParameterName="PVDLevel" />
     </CallLibMethod>
-      
+     </IFCondition>    
     <IFCondition Expression="!(Mode = PWR_PVD_MODE_NORMAL)">
       <CallLibMethod Name="INITSTRUCT" Type="HardCode">
          <HardCode Text="#n#t/* Configure EXTI line 16 */#n#tLL_EXTI_InitTypeDef exti_initstruct;#n#texti_initstruct.Line_0_31 = LL_EXTI_LINE_16;#n#texti_initstruct.Line_32_63 = LL_EXTI_LINE_NONE;#n#texti_initstruct.LineCommand = ENABLE;"/>
@@ -57,7 +58,9 @@
   </RefConfig>
   
   <RefConfig Comment="Enable the PVD Output" Name="PVDEnable">
+       <IFCondition Expression ="(S_SECURE  &amp; SEM_M33S &amp; (pwrSecureFull=PWR_SECURE_FULL_YES)) | (S_SECURE  &amp; SEM_M33NS &amp; (pwrSecureFull=PWR_SECURE_FULL_NO))|( !S_SECURE)" >
 		<CallLibMethod Name="LL_PWR_EnablePVD" ReturnHAL="false"/>
+                </IFCondition>
   </RefConfig>
 
 	
@@ -68,10 +71,15 @@
 	<LibMethod Comment="Configure the voltage threshold detected by the Power Voltage Detector" Name="LL_PWR_SetPVDLevel">
 		<Argument AddressOf="false" GenericType="simple" Name="PVDLevel" OptimizationCondition="equal" />
 	</LibMethod>
-	
 
-	
-	
+	<RefConfig Comment="Disable the internal Pull-Up in Dead Battery pins of UCPD peripheral" Name="DisableDeadBatterySignals">
+		<IFCondition Expression="DisableDeadBatterySignalsConfig=Disable">
+			<CallLibMethod Name="LL_PWR_DisableUCPDDeadBattery" ReturnHAL="false"/>
+		</IFCondition>
+	</RefConfig>
+
+	<LibMethod Comment="" Name="LL_PWR_DisableUCPDDeadBattery"/>
+
 <RefComponent Cclass="LL" Cgroup="DAC" Cversion="1.5.0">
         
        

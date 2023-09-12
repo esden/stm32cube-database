@@ -241,7 +241,7 @@ void ${vector.irqHandler}(void)
 
 [#list nvic as vector]
 
-[#if !vector.systemHandler && vector.irqHandlerGenerated]
+[#if vector?? && !vector.systemHandler && vector.irqHandlerGenerated]
 /**
 #t* @brief  This function handles ${vector.comment}.  
 #t*/
@@ -251,13 +251,13 @@ void ${vector.irqHandler}(void)
 
 #n#t/* USER CODE END ${vector.name} 0 */
 
-[#if vector.halHandler == "NONE" || !vector.halHandlerNeeded]
+[#if vector.halHandler?? && (vector.halHandler == "NONE" || !vector.halHandlerNeeded)]
 [#elseif vector.ipName=="" || vector.irregular=="true"]
   #t${vector.halHandler}
 [#elseif vector.name=="FMC_IRQn" || vector.name=="FSMC_IRQn" || vector.name=="HASH_RNG_IRQn" || vector.name=="TIM6_DAC_IRQn"]
   #t${vector.halHandler}
 [#elseif vector.ipHandle != "" && vector.halUsed]
-  #t${vector.halHandler}(&${vector.ipHandle});
+  #t${vector.halHandler}[#if timeBaseSource==vector.ipName && FamilyName=="STM32MP1"][#else](&${vector.ipHandle});[/#if]
 [#elseif vector.halUsed]
   #t${vector.halHandler}();
 [/#if]

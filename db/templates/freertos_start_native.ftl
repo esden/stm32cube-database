@@ -1,7 +1,7 @@
 [#ftl]
 [#compress]
 
-/* Start scheduler */
+#t/* Start scheduler */
 #tvTaskStartScheduler();
 
 [/#compress]

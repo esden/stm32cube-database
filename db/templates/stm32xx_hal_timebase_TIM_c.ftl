@@ -56,6 +56,10 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
   
   /* Enable ${instance} clock */
   __HAL_RCC_${instance}_CLK_ENABLE();
+[#if FamilyName=="STM32MP1"]
+  __HAL_RCC_${instance}_FORCE_RESET();
+  __HAL_RCC_${instance}_RELEASE_RESET();
+[/#if]
   
   /* Get clock configuration */
   HAL_RCC_GetClockConfig(&clkconfig, &pFLatency);

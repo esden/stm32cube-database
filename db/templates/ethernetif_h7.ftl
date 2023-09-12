@@ -392,24 +392,26 @@ static void low_level_init(struct netif *netif)
     MACConf.Speed = speed;
     HAL_ETH_SetMACConfig(&heth, &MACConf);
     
+    HAL_ETH_Start_IT(&heth);
+    netif_set_up(netif);
+    netif_set_link_up(netif);
+    
 /* USER CODE BEGIN PHY_POST_CONFIG */ 
     
 /* USER CODE END PHY_POST_CONFIG */
-  }
-[#else]
+    }
+[#else][#-- endif bsp --]
 /* USER CODE BEGIN low_level_init Code 2 for User BSP */ 
     
 /* USER CODE END low_level_init Code 2 for User BSP */
-[/#if][#-- endif bsp --]
-  HAL_ETH_Start_IT(&heth);
-  netif_set_up(netif);
-  netif_set_link_up(netif);
-[#else][#-- else with_rtos --]
+[/#if][#-- endelse bsp --]
+
+[#else][#-- endif with_rtos --]
   /* Get link state */
   ethernet_link_check_state(netif);
-[/#if][#-- endif with_rtos --]
+[/#if][#-- endelse with_rtos --]
   }
-  else 
+  else
   {
     Error_Handler();
   }
@@ -581,7 +583,6 @@ void ethernetif_input(struct netif *netif)
       do
       {
         LOCK_TCPIP_CORE();
-        
         p = low_level_input( netif );
         if (p != NULL)
         {
@@ -590,9 +591,7 @@ void ethernetif_input(struct netif *netif)
             pbuf_free(p);           
           }
         }
-        
         UNLOCK_TCPIP_CORE();
-        
       } while(p!=NULL);
     }
   }
@@ -822,12 +821,12 @@ int32_t ETH_PHY_IO_GetTick(void)
 [#if with_rtos == 1]
 [#if cmsis_version = "v2"]
 void ethernet_link_thread(void* argument)
-[#else]
+[#else] [#-- endif cmsis_version --]
 void ethernet_link_thread(void const * argument)
-[/#if][#-- endif cmsis_version --]
+[/#if][#-- endelse cmsis_version --]
 [#else][#-- else with_rtos --]  
 void ethernet_link_check_state(struct netif *netif)
-[/#if][#-- endif with_rtos --]
+[/#if][#-- endelse with_rtos --]
 {
 [#if bsp == 1]
   ETH_MACConfigTypeDef MACConf;
@@ -837,6 +836,10 @@ void ethernet_link_check_state(struct netif *netif)
   
 [#if with_rtos == 1]
   struct netif *netif = (struct netif *) argument;
+  
+/* USER CODE BEGIN ETH link init */
+
+/* USER CODE END ETH link init */
   
   for(;;)
   {
@@ -850,7 +853,7 @@ void ethernet_link_check_state(struct netif *netif)
     HAL_ETH_Stop_IT(&heth);
 [#else][#-- else with_rtos --]
     HAL_ETH_Stop(&heth);
-[/#if][#-- endif with_rtos --]  
+[/#if][#-- endif with_rtos --]
     netif_set_down(netif);
     netif_set_link_down(netif);
   }
@@ -889,33 +892,28 @@ void ethernet_link_check_state(struct netif *netif)
       MACConf.DuplexMode = duplex;
       MACConf.Speed = speed;
       HAL_ETH_SetMACConfig(&heth, &MACConf);
+      
+[#if with_rtos == 1]
+      HAL_ETH_Start_IT(&heth);
+[#else][#-- else with_rtos --]
+      HAL_ETH_Start(&heth);
+[/#if][#-- endif with_rtos --]
+      netif_set_up(netif);
+      netif_set_link_up(netif);
     }
   }
-[/#if][#-- bsp == 0 --]
-[#if with_rtos == 1]
-  HAL_ETH_Start_IT(&heth);
-[#else][#-- else with_rtos --]
-  HAL_ETH_Start(&heth);
-[/#if][#-- endif with_rtos --]
-  netif_set_up(netif);
-  netif_set_link_up(netif);
-[#if with_rtos == 1]
-  osDelay(100);
-  }
-[/#if][#-- endif with_rtos --]  
+[/#if][#-- endif bsp --]
 
-/* USER CODE BEGIN ETH link code for User BSP */ 
+[#if with_rtos == 1]
+/* USER CODE BEGIN ETH link Thread core code for User BSP */
     
-/* USER CODE END ETH link code for User BSP */
+/* USER CODE END ETH link Thread core code for User BSP */
+[/#if][#-- endif with_rtos --]
 
-[#if (with_rtos == 1) && (bsp == 0)]
-/* USER CODE BEGIN 7 */
-
-  while(1) {
+[#if with_rtos == 1]
     osDelay(100);
   }
-/* USER CODE END 7 */
-[/#if][#-- endif with_rtos and bsp --]    
+[/#if][#-- endif with_rtos --]   
 }
 /* USER CODE BEGIN 8 */
 

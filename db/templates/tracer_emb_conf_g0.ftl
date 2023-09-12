@@ -193,6 +193,8 @@ extern "C" {
 #define TRACER_EMB_ENABLE_CLK_DMA()                  ${UART_TX_DMA_enableClock}
 #define TRACER_EMB_TX_DMA_REQUEST                    LL_DMAMUX_REQ_${UART_TX_DMA_REQUEST}
 #define TRACER_EMB_TX_DMA_CHANNEL                    LL_DMA_${UART_TX_DMA_LL_CHANNEL}
+#define TRACER_EMB_ENABLECHANNEL                     LL_DMA_EnableChannel
+#define TRACER_EMB_DISABLECHANNEL                    LL_DMA_DisableChannel
 #define TRACER_EMB_TX_DMA_IRQ                        ${UART_TX_DMA_interrupt}
 #define TRACER_EMB_TX_DMA_IRQHANDLER                 ${UART_TX_DMA_interrupt.replace("IRQn", "IRQHandler")}
 #define TRACER_EMB_TX_DMA_ACTIVE_FLAG                LL_DMA_IsActiveFlag_TC${UART_TX_DMA_CHANNEL_ID}

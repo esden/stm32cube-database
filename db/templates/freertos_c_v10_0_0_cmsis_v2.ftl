@@ -11,6 +11,9 @@
 /* USER CODE END Header */
 
 [#compress]
+[#if cpucore!="" && (contextFolder=="" || contextFolder=="/")]
+[#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")+"/"]
+[/#if]
 [#assign inMain = 0]
 [#assign useNewHandle = 0]
 [#assign useTimers = 0]
@@ -50,7 +53,7 @@
 [/#compress]
 
 [#if inMain == 0]
-[@common.optinclude name=mxTmpFolder+"/rtos_inc.tmp"/][#--include freertos includes --]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_inc.tmp"/][#--include freertos includes --]
 [/#if]
 
 /* Private includes ----------------------------------------------------------*/
@@ -59,6 +62,9 @@
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
+[#if inMain == 0]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_typedefs.tmp"/]
+[/#if]
 /* USER CODE BEGIN PTD */
 
 /* USER CODE END PTD */
@@ -78,7 +84,7 @@
 
 /* USER CODE END Variables */
 [#if inMain == 0]
-[@common.optinclude name=mxTmpFolder+"/rtos_vars.tmp"/]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_vars.tmp"/]
 [/#if]
 
 /* Private function prototypes -----------------------------------------------*/
@@ -88,7 +94,7 @@
 [#compress]
 #n
 [#if inMain == 0]
-[@common.optinclude name=mxTmpFolder+"/rtos_pfp.tmp"/]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_pfp.tmp"/]
 #n
   [#list SWIPdatas as SWIP]
     [#if SWIP.variables??]
@@ -366,10 +372,11 @@ void MX_FREERTOS_Init(void) {
 #t/* USER CODE BEGIN Init */
 #t     
 #t/* USER CODE END Init */
-[@common.optinclude name=mxTmpFolder+"/rtos_HalInit.tmp"/]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_obj_creat.tmp"/]
 }
-[@common.optinclude name=mxTmpFolder+"/rtos_threads.tmp"/]
-[@common.optinclude name=mxTmpFolder+"/rtos_user_threads.tmp"/] 
+[@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_default_thread.tmp"/]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_threads.tmp"/]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_callbacks.tmp"/]
 [/#if]  
 
 /* Private application code --------------------------------------------------*/

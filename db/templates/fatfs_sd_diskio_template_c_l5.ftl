@@ -38,7 +38,8 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
-
+/* Disk status */
+static volatile DSTATUS Stat = STA_NOINIT;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -79,10 +80,11 @@ const Diskio_drvTypeDef  SD_Driver =
 DSTATUS SD_initialize(BYTE lun)
 {
   /* USER CODE BEGIN SD_initialize */
+  Stat = STA_NOINIT;
   
-  /* Place for user code */
-  return STA_NOINIT;
+  /* Place for user code (may require BSP functions/defines to be added to the project) */
   
+  return Stat;
   /* USER CODE END SD_initialize */
 }
 
@@ -94,10 +96,11 @@ DSTATUS SD_initialize(BYTE lun)
 DSTATUS SD_status(BYTE lun)
 {
   /* USER CODE BEGIN SD_status */
+  Stat = STA_NOINIT;
   
-  /* Place for user code */
-  return STA_NOINIT;
-  
+  /* Place for user code (may require BSP functions/defines to be added to the project) */
+
+  return Stat;
   /* USER CODE END SD_status */
 }
 
@@ -112,10 +115,11 @@ DSTATUS SD_status(BYTE lun)
 DRESULT SD_read(BYTE lun, BYTE *buff, DWORD sector, UINT count)
 {
   /* USER CODE BEGIN SD_read */
-
-  /* Place for user code */
-  return RES_ERROR;
+  DRESULT res = RES_ERROR;
   
+  /* Place for user code (may require BSP functions/defines to be added to the project) */
+  
+  return res;
   /* USER CODE END SD_read */
 }
 
@@ -131,9 +135,11 @@ DRESULT SD_read(BYTE lun, BYTE *buff, DWORD sector, UINT count)
 DRESULT SD_write(BYTE lun, const BYTE *buff, DWORD sector, UINT count)
 {
   /* USER CODE BEGIN SD_write */
-
-  /* Place for user code */
-  return RES_ERROR;
+  DRESULT res = RES_ERROR;
+  
+  /* Place for user code (may require BSP functions/defines to be added to the project) */
+  
+  return res;
   
   /* USER CODE END SD_write */
 }
@@ -150,9 +156,10 @@ DRESULT SD_write(BYTE lun, const BYTE *buff, DWORD sector, UINT count)
 DRESULT SD_ioctl(BYTE lun, BYTE cmd, void *buff)
 {
   /* USER CODE BEGIN SD_ioctl */
+  DRESULT res = RES_ERROR;
   
-  /* Place for user code */
-  return RES_ERROR;
+  /* Place for user code (may require BSP functions/defines to be added to the project) */
+  return res;
   
   /* USER CODE END SD_ioctl */
 }

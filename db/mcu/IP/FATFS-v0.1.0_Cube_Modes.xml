@@ -966,17 +966,17 @@
         <Condition Diagnostic="Available in CubeMx since R0.11 version" Expression="(_FS_NORTC = 1)"/>
         <Description>As FS_NORTC is enabled, it is the year part of the timestamps used by Fatfs. </Description>
     </RefParameter>
-    <RefParameter Name="_NORTC_YEAR" Comment="      NORTC_YEAR (Year for timestamp)" DefaultValue="2015" Type="uniqueElementList" Group="System Parameters" TabName="Set Defines">
+    <RefParameter Name="_NORTC_YEAR" Comment="      NORTC_YEAR (Year for timestamp)" DefaultValue="2015" Max="2107" Min="1980" Type="integer" Group="System Parameters" TabName="Set Defines" Visible="false">
         <Description>Useless as FS_NORTC is disabled (otherwise, it is the year part of the timestamps used by Fatfs). </Description>
-    </RefParameter>
+    </RefParameter><!-- uniqueElementList removed in 5.5.0 -->
 
     <RefParameter Name="_NORTC_MON" Comment="      NORTC_MON (Month for timestamp)" DefaultValue="6" Max="12" Min="1" Type="integer" Group="System Parameters" TabName="Set Defines">
         <Condition Diagnostic="Available in CubeMx since R0.11 version" Expression="(_FS_NORTC = 1)"/>
         <Description>As FS_NORTC is enabled, it is the month part of the timestamps used by Fatfs.</Description>
     </RefParameter>
-    <RefParameter Name="_NORTC_MON" Comment="      NORTC_MON (Month for timestamp)" DefaultValue="6" Type="uniqueElementList" Group="System Parameters" TabName="Set Defines">
+    <RefParameter Name="_NORTC_MON" Comment="      NORTC_MON (Month for timestamp)" DefaultValue="6" Max="12" Min="1" Type="integer" Group="System Parameters" TabName="Set Defines" Visible="false">
         <Description>Useless as FS_NORTC is disabled (otherwise, it is the month part of the timestamps used by Fatfs). </Description>
-    </RefParameter>
+    </RefParameter><!-- uniqueElementList removed in 5.5.0 -->
 
     <RefParameter Name="_NORTC_MDAY" Comment="      NORTC_MDAY (Day for timestamp)" DefaultValue="4" Max="30" Min="1" Type="integer" Group="System Parameters" TabName="Set Defines">
         <Condition Diagnostic="Available in CubeMx since R0.11 version" Expression="(_FS_NORTC = 1) &amp; (_NORTC_MON = 4 | _NORTC_MON = 6 | _NORTC_MON = 9 | _NORTC_MON = 11)"/>
@@ -990,9 +990,9 @@
         <Condition Diagnostic="Available in CubeMx since R0.11 version" Expression="(_FS_NORTC = 1)"/>
         <Description>As FS_NORTC is enabled, it is the day part of the timestamps used by Fatfs. </Description>
     </RefParameter>
-    <RefParameter Name="_NORTC_MDAY" Comment="      NORTC_MDAY (Day for timestamp)" DefaultValue="4" Type="uniqueElementList" Group="System Parameters" TabName="Set Defines">
+    <RefParameter Name="_NORTC_MDAY" Comment="      NORTC_MDAY (Day for timestamp)" DefaultValue="4" Max="31" Min="1" Type="integer" Group="System Parameters" TabName="Set Defines" Visible="false">
         <Description>Useless as FS_NORTC is disabled (otherwise, it is the day part of the timestamps used by Fatfs). </Description>
-    </RefParameter>
+    </RefParameter><!-- uniqueElementList removed in 5.5.0 -->
     <!--  New in Fatfs R0.11 -->
 
     <!-- _WORD_ACCESS removed in R0.12 -->
@@ -1025,12 +1025,46 @@
         <Description>Timeout period in unit of time ticks</Description>
     </RefParameter>
 
-    <RefParameter Name="_SYNC_t" Comment="SYNC_t (O/S sync object)" DefaultValue="osSemaphoreId" Type="uniqueElementList" Group="System Parameters" TabName="Set Defines">
-        <PossibleValue Comment="osSemaphoreId" Value="osSemaphoreId"/>
-        <!--  <PossibleValue Comment="FreeRTOS (xSemaphoreHandle)" Value="xSemaphoreHandle"/> -->
-        <!--  <PossibleValue Comment="Win32 (HANDLE)" Value="HANDLE"/> -->
+
+    <!-- ADDED/REWORKED FOR BETTER SUPPORT OF  CMSIS_RTOS V2 (cf syscall.c file) -->
+    <RefParameter Name="_USE_MUTEX" Comment="USE_MUTEX" DefaultValue="0" Type="list" Group="System Parameters" TabName="Set Defines">
+        <Condition Diagnostic="Useful when rtos is enabled" Expression="_FS_REENTRANT=1 &amp; (STM32H7 | STM32L4)"/> <!-- H7 & L4 to come in 6.0 -->
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>New param for better support of CMSIS-RTOS v2</Description>
+    </RefParameter>
+    <RefParameter Name="_USE_MUTEX" Comment="USE_MUTEX" DefaultValue="0" Type="list" Group="System Parameters" TabName="Set Defines" Visible="false">
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>New param for better support of CMSIS-RTOS v2</Description>
+    </RefParameter>
+
+    <RefParameter Name="_SYNC_t" Comment="SYNC_t (O/S sync object)" DefaultValue="osMutexId_t" Type="uniqueElementList" Group="System Parameters" TabName="Set Defines">
+        <Condition Diagnostic="Useful when rtos is enabled" Expression="_FS_REENTRANT=1 &amp; _USE_MUTEX=1 &amp; S_CMSIS_RTOS_V2$context"/>
+        <PossibleValue Comment="osMutexId_t" Value="osMutexId_t"/>
         <Description>O/S dependent type of sync object. e.g. HANDLE, OS_EVENT*, ID and etc..</Description>
     </RefParameter>
+    <RefParameter Name="_SYNC_t" Comment="SYNC_t (O/S sync object)" DefaultValue="osMutexId" Type="uniqueElementList" Group="System Parameters" TabName="Set Defines">
+        <Condition Diagnostic="Useful when rtos is enabled" Expression="_FS_REENTRANT=1 &amp; _USE_MUTEX=1 &amp; S_CMSIS_RTOS_V1$context"/>
+        <PossibleValue Comment="osMutexId" Value="osMutexId"/>
+        <Description>O/S dependent type of sync object. e.g. HANDLE, OS_EVENT*, ID and etc..</Description>
+    </RefParameter>
+    <RefParameter Name="_SYNC_t" Comment="SYNC_t (O/S sync object)" DefaultValue="osSemaphoreId_t" Type="uniqueElementList" Group="System Parameters" TabName="Set Defines">
+        <Condition Diagnostic="Useful when rtos is enabled" Expression="_FS_REENTRANT=1 &amp; _USE_MUTEX=0 &amp; S_CMSIS_RTOS_V2$context"/>
+        <PossibleValue Comment="osSemaphoreId_t" Value="osSemaphoreId_t"/>
+        <Description>O/S dependent type of sync object. e.g. HANDLE, OS_EVENT*, ID and etc..</Description>
+    </RefParameter>
+    <RefParameter Name="_SYNC_t" Comment="SYNC_t (O/S sync object)" DefaultValue="osSemaphoreId" Type="uniqueElementList" Group="System Parameters" TabName="Set Defines">
+        <Condition Diagnostic="Useful when rtos is enabled" Expression="_FS_REENTRANT=1 &amp; _USE_MUTEX=0 &amp; S_CMSIS_RTOS_V1$context"/>
+        <PossibleValue Comment="osSemaphoreId" Value="osSemaphoreId"/>
+        <Description>O/S dependent type of sync object. e.g. HANDLE, OS_EVENT*, ID and etc..</Description>
+    </RefParameter>
+    <RefParameter Name="_SYNC_t" Comment="SYNC_t (O/S sync object)" DefaultValue="NULL" Type="uniqueElementList" Group="System Parameters" TabName="Set Defines" Visible="false">
+        <PossibleValue Comment="No sync" Value="NULL"/>
+        <Description>Not needed when there is no Os in use.</Description>
+    </RefParameter>
+
+    <!-- ADDED/REWORKED FOR BETTER SUPPORT OF CMSIS_RTOS V2 -->
 
     <RefParameter Name="_FS_LOCK" Comment="FS_LOCK (Number of files opened simultaneously)" DefaultValue="2" Max="255" Min="0"  Type="integer" Group="System Parameters" TabName="Set Defines">
         <Description>To enable file lock control feature, set FS_LOCK to 1 or greater. The value defines how many files can be opened simultaneously. </Description>
@@ -1173,6 +1207,7 @@
         <Parameter Name="_WORD_ACCESS"/>   <!-- Removed in R12 --> 
         <Parameter Name="_FS_REENTRANT"/>
         <Parameter Name="_FS_TIMEOUT"/>
+        <Parameter Name="_USE_MUTEX"/>
         <Parameter Name="_SYNC_t"/>
         <Parameter Name="_FS_LOCK"/>
         <!-- R12 + FW pack update (possible use of DMA templates)-->

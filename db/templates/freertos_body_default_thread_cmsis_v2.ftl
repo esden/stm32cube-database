@@ -59,8 +59,7 @@ __weak void ${defaultTaskFunction}(void *argument)
 {
 [#compress] [#-- To avoid blank lines at the beginning --]
 [#-- Start Detection of middlewares used --]
-[#assign USE_LWIP = false]
-[#assign USE_MBEDTLS = false] 
+[#assign USE_GRAPHICS = false]
 [#list SWIPdatas as SWIP]
   [#if SWIP.variables??]
     [#list SWIP.variables as variable]
@@ -73,16 +72,15 @@ __weak void ${defaultTaskFunction}(void *argument)
           [/#if]
           [#assign index = index + 1]
         [/#list]
-        [#if mw == "MBEDTLS"]
-          [#assign USE_MBEDTLS = true]
-        [/#if]
+        [#if mw == "GRAPHICS"]
+          [#assign USE_GRAPHICS = true]
+        [/#if]        
 	  [/#if]
     [/#list]
   [/#if]
 [/#list]
 [#-- End of middlewares used detection --]
 
-[#assign USE_GRAPHICS = false] 
 [#list SWIPdatas as SWIP]
   [#if SWIP.variables??]
     [#list SWIP.variables as variable]
@@ -95,14 +93,23 @@ __weak void ${defaultTaskFunction}(void *argument)
           [/#if]
           [#assign index = index + 1]
         [/#list]
-        [#-- specific cases to be handled (no Init generation) --]  
-        [#if mw!="USBPD" && mw!="TRACER_EMB" && mw!="OPENAMP" && mw!="RESMGR_UTILITY" && mw!="MotorControl"] [#--last added, cf BZ 53327 --]
+        [#-- specific cases to be handled --]  
+        [#if mw == "USB_HOST" || mw == "USB_DEVICE"]
+#t/* init code for ${mw} */
+#tMX_${mw}_Init();#n[#--  could be replaced by the call to the start function here! --]
+        [#else]
+          [#-- nothing generated in the default task --]  
+        [/#if]
+
+        [#-- specific cases to be handled (no Init generation): MOVED TO main function--]
+        [#-- 
+        [#if mw!="USBPD" && mw!="TRACER_EMB" && mw!="OPENAMP" && mw!="RESMGR_UTILITY" && mw!="MotorControl"]
           [#if mw!="GRAPHICS"]
             [#if !((mw == "LWIP") && (USE_MBEDTLS == true))]
               [#if (mw == "MBEDTLS")]
 #t/* Up to user define the empty MX_MBEDTLS_Init() function located in mbedtls.c file */#n
               [#else]
-                [#if !mw?contains("WPAN")] [#-- cf BZ 68409 --]
+                [#if !mw?contains("WPAN")]
 #t/* init code for ${mw?replace("MX_","")?replace("_Init","")} */
 #tMX_${mw}_Init();#n
                 [/#if]
@@ -114,7 +121,9 @@ __weak void ${defaultTaskFunction}(void *argument)
           [#else]
             [#assign USE_GRAPHICS = true]
           [/#if]
-        [/#if] [#-- end if specific cases --]  
+        [/#if] 
+        --]  
+
       [/#if]  [#-- end if variable.name=="MiddlewareInUse"--]  
     [/#list]
   [/#if]
@@ -125,6 +134,8 @@ __weak void ${defaultTaskFunction}(void *argument)
 #tGRAPHICS_MainTask();#n
 [/#if]
 
+[#-- No more in default task --]
+[#--
 [#list SWIPdatas as SWIP]
   [#if SWIP.variables??]
     [#list SWIP.variables as variable]
@@ -145,6 +156,8 @@ __weak void ${defaultTaskFunction}(void *argument)
     [/#list]
   [/#if]
 [/#list]
+--]
+
 [/#compress]
 [#if inMain == 1]
 #t/* USER CODE BEGIN 5 */

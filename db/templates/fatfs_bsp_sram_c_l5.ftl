@@ -4,11 +4,15 @@
  ******************************************************************************
  * @file    bsp_driver_sram.c for L5 (based on stm32l5_eval_sram.c)
  * @brief   This file includes a generic SRAM driver 
-   @note    To be completed by the user according to the project board in use.
-  ******************************************************************************
+ *          To be updated by the user according to the board used for the project.
+ * @note    Functions generated as weak: they can be overriden by 
+ *          - code in user files 
+ *          - or BSP code from the FW pack files 
+ *          if such files are added to the generated project (by the user).
+ ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
-  ******************************************************************************
-  */
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 [#-- SWIPdatas is a list of SWIPconfigModel --]  
@@ -38,7 +42,7 @@ extern SRAM_HandleTypeDef ${sramHandle};
   * @brief  Initializes the SRAM device.
   * @retval SRAM status
   */
-int32_t BSP_SRAM_Init(uint32_t Instance)
+__weak int32_t BSP_SRAM_Init(uint32_t Instance)
 { 
   int32_t ret = BSP_ERROR_NONE;
   

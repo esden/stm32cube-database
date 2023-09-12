@@ -5,15 +5,49 @@
 
     
     <RefConfig Comment="PVD Configuration" Name="PVDConfig">
+         <IFCondition Expression ="(S_SECURE  &amp; SEM_M33S &amp; (pwrSecureFull=PWR_SECURE_FULL_YES)) | (S_SECURE  &amp; SEM_M33NS &amp; (pwrSecureFull=PWR_SECURE_FULL_NO))|( !S_SECURE)" >
 		<CallLibMethod Name="HAL_PWR_ConfigPVD"  ReturnHAL="false">
 			<MethodArg Name="sConfigPVD.PVDLevel" ParameterName="PVDLevel"/>
 			<MethodArg Name="sConfigPVD.Mode" ParameterName="Mode"/>
 		</CallLibMethod>
+         </IFCondition>
 	</RefConfig>
 	<RefConfig Comment="Enable the PVD Output" Name="PVDEnable">
+            <IFCondition Expression ="(S_SECURE  &amp; SEM_M33S &amp; (pwrSecureFull=PWR_SECURE_FULL_YES)) | (S_SECURE  &amp; SEM_M33NS &amp; (pwrSecureFull=PWR_SECURE_FULL_NO))|( !S_SECURE)" >
 		<CallLibMethod Name="HAL_PWR_EnablePVD" ReturnHAL="false"/>
+            </IFCondition>
 	</RefConfig>
+        
+      <RefConfig Name="ConfigAttributesSECPRIV">
+          <IFCondition Expression ="S_SECURE  &amp; SEM_M33S &amp; (pwrSecureFull=PWR_SECURE_FULL_YES) &amp; (pwrPrivilegeFull=PWR_PRIVILEGE_FULL_YES) " >
+        <CallLibMethod Name="HAL_PWR_ConfigAttributes" ReturnHAL="false">
+            <MethodArg Name="Item" ParameterName="ItemSECPRIV"/>
+            <MethodArg Name="Attributes" ParameterName="AttributesSECPRIV"/>            
+        </CallLibMethod>
+         </IFCondition>
+    </RefConfig>
+    
+     
+    <RefConfig Name="ConfigAttributesSEC">
+         <IFCondition Expression ="S_SECURE  &amp; SEM_M33S &amp;(pwrSecureFull=PWR_SECURE_FULL_YES)&amp; (pwrPrivilegeFull=PWR_PRIVILEGE_FULL_NO)" >
+        <CallLibMethod Name="HAL_PWR_ConfigAttributes" ReturnHAL="false">
+            <MethodArg Name="Item" ParameterName="ItemSECPRIV"/>
+            <MethodArg Name="Attributes" ParameterName="AttributesSEC"/>            
+        </CallLibMethod>
+        </IFCondition>
+    </RefConfig>
+    
+    
 
+    <RefConfig Name="ConfigAttributesPRIV">
+        <IFCondition Expression ="(S_SECURE  &amp; SEM_M33NS &amp;(pwrPrivilegeFull=PWR_PRIVILEGE_FULL_YES) &amp; (pwrSecureFull=PWR_SECURE_FULL_NO))|( !S_SECURE &amp;(pwrPrivilegeFull=PWR_PRIVILEGE_FULL_YES))" >
+        <CallLibMethod Name="HAL_PWR_ConfigAttributes" ReturnHAL="false">
+            <MethodArg Name="Item" ParameterName="ItemSECPRIV"/>
+            <MethodArg Name="Attributes" ParameterName="AttributesPRIV"/>            
+        </CallLibMethod>
+         </IFCondition>
+    </RefConfig>   
+   
 	<LibMethod Comment="" Name="HAL_PWR_ConfigPVD">
 		<Argument AddressOf="true" GenericType="struct" Name="sConfigPVD" TypeName="PWR_PVDTypeDef">
 			<Argument AddressOf="false" GenericType="simple" Name="PVDLevel"/>
@@ -21,12 +55,26 @@
 		</Argument>
 	</LibMethod>
 
-
+        <LibMethod Comment="" Name="HAL_PWR_ConfigAttributes">
+	 <Argument AddressOf="false" GenericType="simple" Name="Item" OptimizationCondition="equal"/>
+         <Argument AddressOf="false" GenericType="simple" Name="Attributes" OptimizationCondition="equal"/>
+    </LibMethod>
 	<LibMethod Comment="" Name="HAL_PWR_EnablePVD"/>
-	
-	
 
-	<LibMethod Comment="" Name="LL_PWR_DisableUCPDDeadBattery"/>
+	<RefConfig Comment="Disable the internal Pull-Up in Dead Battery pins of UCPD peripheral" Name="DisableDeadBatterySignals">
+		<IFCondition Expression="DisableDeadBatterySignalsConfig=Disable &amp; !SEM_M33NS">
+			<CallLibMethod Name="HAL_PWREx_DisableUCPDDeadBattery" ReturnHAL="false"/>
+		</IFCondition>
+		<Component Name="HAL:UCPD"/>
+	</RefConfig>
 
-  
+	<LibMethod Comment="" Name="HAL_PWREx_DisableUCPDDeadBattery"/>
+
+    <RefComponent Cclass="HAL" Cgroup="UCPD" Cversion="">
+        <File Category="header" Name="Drivers/STM32L5xx_HAL_Driver/Inc/stm32l5xx_hal_pwr.h"/>
+        <File Category="source" Name="Drivers/STM32L5xx_HAL_Driver/Src/stm32l5xx_hal_pwr.c"/>
+        <File Category="header" Name="Drivers/STM32L5xx_HAL_Driver/Inc/stm32l5xx_hal_pwr_ex.h"/>
+        <File Category="source" Name="Drivers/STM32L5xx_HAL_Driver/Src/stm32l5xx_hal_pwr_ex.c"/>
+    </RefComponent>
+
 </IP>

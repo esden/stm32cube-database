@@ -134,54 +134,6 @@ extern "C" {
 [/#compress]
 #n
 
-[#compress]
-[#if GRAPHICS?? ]
-    [#if USE_OTM?? && FamilyName!="STM32L4"]
-
-
-        #include "otm8009a.h"
-    [/#if]
-    [#if USE_MFX?? && FamilyName=="STM32L4"]
-        #include "mfxstm32l152.h"
-    [/#if]
-
-    [#if USE_STemWin_STACK??]
-        #include "GUI.h"        
-        [#if USE_ILI??]
-            #include "ili9341.h"
-        [/#if]
-        #include "HW_Init.h"
-        [#if Display_Interface_FMC??]
-            #include "WM.h"
-        [/#if]
-        #include "GUI_App.h"
-        #include "STemwin_wrapper.h"
-    [/#if]
-    [#if USE_Embedded_Wizard_STACK??]
-        #include "xprintf.h"
-        #include "tlsf.h"
-        #include "ewrte.h"
-        #include "ewgfx.h"
-        #include "ewextgfx.h"
-        #include "ewgfxdefs.h"
-        #include "Core.h"
-        #include "Graphics.h"
-        #include "tara_wrapper.h"
-        [#-- #include "ew_bsp_system.h"
-        #include "ew_bsp_clock.h"
-        #include "ew_bsp_event.h"
-        #include "ew_bsp_display.h"
-        #include "ew_bsp_touch.h"
-        #include "ew_bsp_serial.h" --]
-    [/#if]
-    [#if USE_Touch_GFX_STACK??]
-       [#--include "HW_Init.hpp"--]
-    [/#if]
-   
-[/#if]
-
-[/#compress]
-
 [#-- MZA add the list of files (board_conf.h,..) to be include into the main.h for Tikcet 50684 --]
 [#compress]
 [#assign bspConfIncludesList = ""]
@@ -289,7 +241,7 @@ void Error_Handler(void);
 [/#if]
 [#if isHALUsed??]
 [#else]
-[#if FamilyName!="STM32G0"]
+[#if FamilyName!="STM32G0" && FamilyName!="STM32L5"]
 #ifndef NVIC_PRIORITYGROUP_0
 #define NVIC_PRIORITYGROUP_0         ((uint32_t)0x00000007) /*!< 0 bit  for pre-emption priority,
                                                                  4 bits for subpriority */
@@ -300,6 +252,18 @@ void Error_Handler(void);
 #define NVIC_PRIORITYGROUP_3         ((uint32_t)0x00000004) /*!< 3 bits for pre-emption priority,
                                                                  1 bit  for subpriority */
 #define NVIC_PRIORITYGROUP_4         ((uint32_t)0x00000003) /*!< 4 bits for pre-emption priority,
+                                                                 0 bit  for subpriority */
+#endif
+[/#if]
+[#if FamilyName=="STM32L5"]
+#ifndef NVIC_PRIORITYGROUP_0
+#define NVIC_PRIORITYGROUP_0         ((uint32_t)0x00000007) /*!< 0 bit  for pre-emption priority,
+                                                                 3 bits for subpriority */
+#define NVIC_PRIORITYGROUP_1         ((uint32_t)0x00000006) /*!< 1 bit  for pre-emption priority,
+                                                                 2 bits for subpriority */
+#define NVIC_PRIORITYGROUP_2         ((uint32_t)0x00000005) /*!< 2 bits for pre-emption priority,
+                                                                 1 bits for subpriority */
+#define NVIC_PRIORITYGROUP_3         ((uint32_t)0x00000004) /*!< 3 bits for pre-emption priority,
                                                                  0 bit  for subpriority */
 #endif
 [/#if]

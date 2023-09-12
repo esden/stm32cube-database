@@ -26,7 +26,7 @@
 [#assign customBSPSRAM = 0]    [#-- on G4, not need to include bsp_driver_sram.h when custom BSP is chosen --]
 [#assign customBSPSD = 0]  [#-- on L5, not need to include bsp_driver_sd.h when a board is chosen 9will use the BSP of the board --]
 [#assign cmsisrtosInUse = 0]
-
+[#assign useMutex = 0]
 #include "main.h"
 #include "${FamilyName?lower_case}xx_hal.h"
 [#compress]
@@ -196,6 +196,9 @@ extern ${variable.value} ${variable.name};
       [/#if]
       [#if definition.name=="_FS_EXFAT"]         [#-- New in R0.12 --]
           [#assign valueExFat = definition.value]
+      [/#if]
+      [#if definition.name=="_USE_MUTEX"]
+          [#assign useMutex = definition.value]
       [/#if]
     [/#list]
 [/#if]
@@ -418,8 +421,11 @@ extern ${variable.value} ${variable.name};
 /      lock control is independent of re-entrancy. */
 
 #define _FS_REENTRANT    ${valueReentrant}  /* 0:Disable or 1:Enable */
+[#if cmsisrtosInUse == 1] [#-- Generated only if freertos activated --]
+#define _USE_MUTEX       ${useMutex} /* 0:Disable or 1:Enable */
 #define _FS_TIMEOUT      ${valueTimeout} /* Timeout period in unit of time ticks */
-#define _SYNC_t          ${valueSynct} 
+#define _SYNC_t          ${valueSynct}
+[/#if]
 /* The option _FS_REENTRANT switches the re-entrancy (thread safe) of the FatFs
 /  module itself. Note that regardless of this option, file access to different
 /  volume is always re-entrant and volume control functions, f_mount(), f_mkfs()
@@ -437,11 +443,19 @@ extern ${variable.value} ${variable.name};
 /  SemaphoreHandle_t and etc.. A header file for O/S definitions needs to be
 /  included somewhere in the scope of ff.h. */
 
+[#-- In R0.12c, definitions that depend on FreeRTOS state (enabled/disabled) --]
+[#if cmsisrtosInUse == 1]
+/* define the ff_malloc ff_free macros as FreeRTOS pvPortMalloc and vportFree macros */
+#if !defined(ff_malloc) && !defined(ff_free)
+#define ff_malloc  pvPortMalloc
+#define ff_free  vportFree
+[#else]
 /* define the ff_malloc ff_free macros as standard malloc free */
 #if !defined(ff_malloc) && !defined(ff_free)
 #include <stdlib.h>
 #define ff_malloc  malloc
 #define ff_free  free
+[/#if]
 #endif
 
 #endif /* _FFCONF */

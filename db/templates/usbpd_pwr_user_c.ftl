@@ -14,6 +14,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "usbpd_pwr_user.h"
 #include "${FamilyName?lower_case}xx_hal.h"
+#if defined(_TRACE)
+#include "usbpd_core.h"
+#include "usbpd_trace.h"
+#endif /* _TRACE */
 
 /* USER CODE BEGIN include */
 /* USER CODE END include */
@@ -48,6 +52,11 @@
 /** @defgroup POWER_Private_Macros Private Macros
   * @{
   */
+#if defined(_TRACE)
+#define PWR_DEBUG_TRACE(_PORT_, __MESSAGE__)  USBPD_TRACE_Add(USBPD_TRACE_DEBUG,    (_PORT_), 0u, (uint8_t*)(__MESSAGE__), sizeof(__MESSAGE__) - 1u)
+#else
+#define PWR_DEBUG_TRACE(_PORT_, __MESSAGE__)
+#endif /* _TRACE */
 /* USER CODE BEGIN POWER_Private_Macros */
 
 /* USER CODE END POWER_Private_Macros */
@@ -93,7 +102,6 @@
   * @param  Instance Type-C port identifier
   *         This parameter can be take one of the following values:
   *         @arg @ref USBPD_PWR_TYPE_C_PORT_1
-  *         @arg @ref USBPD_PWR_TYPE_C_PORT_2
   * @retval BSP status
   */
 int32_t BSP_USBPD_PWR_Init(uint32_t Instance)
@@ -115,7 +123,6 @@ int32_t BSP_USBPD_PWR_Init(uint32_t Instance)
   * @param  Instance Type-C port identifier
   *         This parameter can be take one of the following values:
   *         @arg @ref USBPD_PWR_TYPE_C_PORT_1
-  *         @arg @ref USBPD_PWR_TYPE_C_PORT_2
   * @retval BSP status
   */
 int32_t BSP_USBPD_PWR_Deinit(uint32_t Instance)
@@ -138,7 +145,6 @@ int32_t BSP_USBPD_PWR_Deinit(uint32_t Instance)
   * @param  Instance Type-C port identifier
   *         This parameter can be take one of the following values:
   *         @arg @ref USBPD_PWR_TYPE_C_PORT_1
-  *         @arg @ref USBPD_PWR_TYPE_C_PORT_2
   * @retval BSP status
   */
 int32_t BSP_USBPD_PWR_VBUSInit(uint32_t Instance)
@@ -151,6 +157,11 @@ int32_t BSP_USBPD_PWR_VBUSInit(uint32_t Instance)
   {
     ret = BSP_ERROR_WRONG_PARAM;
   }
+  else
+  {
+    PWR_DEBUG_TRACE(Instance, "HELP: Update BSP_USBPD_PWR_VBUSInit");
+  }
+
   return ret;
   /* USER CODE END BSP_USBPD_PWR_VBUSInit */
 }
@@ -161,7 +172,6 @@ int32_t BSP_USBPD_PWR_VBUSInit(uint32_t Instance)
   * @param  Instance Type-C port identifier
   *         This parameter can be take one of the following values:
   *         @arg @ref USBPD_PWR_TYPE_C_PORT_1
-  *         @arg @ref USBPD_PWR_TYPE_C_PORT_2
   * @retval BSP status
   */
 int32_t BSP_USBPD_PWR_VBUSDeInit(uint32_t Instance)
@@ -189,11 +199,16 @@ int32_t BSP_USBPD_PWR_VBUSOn(uint32_t Instance)
 {
   /* USER CODE BEGIN BSP_USBPD_PWR_VBUSOn */
   /* Check if instance is valid       */
-  int32_t ret = BSP_ERROR_FEATURE_NOT_SUPPORTED;
+  int32_t ret;
 
   if (Instance >= USBPD_PWR_INSTANCES_NBR)
   {
     ret = BSP_ERROR_WRONG_PARAM;
+  }
+  else
+  {
+    ret = BSP_ERROR_FEATURE_NOT_SUPPORTED;
+    PWR_DEBUG_TRACE(Instance, "HELP: Update BSP_USBPD_PWR_VBUSOn");
   }
   return ret;
   /* USER CODE END BSP_USBPD_PWR_VBUSOn */
@@ -210,11 +225,16 @@ int32_t BSP_USBPD_PWR_VBUSOff(uint32_t Instance)
 {
   /* USER CODE BEGIN BSP_USBPD_PWR_VBUSOff */
   /* Check if instance is valid       */
-  int32_t ret = BSP_ERROR_FEATURE_NOT_SUPPORTED;
+  int32_t ret;
 
   if (Instance >= USBPD_PWR_INSTANCES_NBR)
   {
     ret = BSP_ERROR_WRONG_PARAM;
+  }
+  else
+  {
+    ret = BSP_ERROR_FEATURE_NOT_SUPPORTED;
+    PWR_DEBUG_TRACE(Instance, "HELP: Update BSP_USBPD_PWR_VBUSOff");
   }
   return ret;
   /* USER CODE END BSP_USBPD_PWR_VBUSOff */
@@ -337,7 +357,6 @@ int32_t BSP_USBPD_PWR_VBUSSetVoltage_APDO(uint32_t Instance,
   * @param  Instance Type-C port identifier
   *         This parameter can be take one of the following values:
   *         @arg @ref USBPD_PWR_TYPE_C_PORT_1
-  *         @arg @ref USBPD_PWR_TYPE_C_PORT_2
   * @param  pVoltage Pointer on measured voltage level (in mV)
   * @retval BSP status
   */
@@ -353,6 +372,7 @@ int32_t BSP_USBPD_PWR_VBUSGetVoltage(uint32_t Instance, uint32_t *pVoltage)
     ret = BSP_ERROR_WRONG_PARAM;
   }
   *pVoltage = 0u;
+  PWR_DEBUG_TRACE(Instance, "HELP: Update BSP_USBPD_PWR_VBUSGetVoltage");
   return ret;
   /* USER CODE END BSP_USBPD_PWR_VBUSGetVoltage */
 }
@@ -362,7 +382,6 @@ int32_t BSP_USBPD_PWR_VBUSGetVoltage(uint32_t Instance, uint32_t *pVoltage)
   * @param  Instance Type-C port identifier
   *         This parameter can be take one of the following values:
   *         @arg @ref USBPD_PWR_TYPE_C_PORT_1
-  *         @arg @ref USBPD_PWR_TYPE_C_PORT_2
   * @param  pCurrent Pointer on measured current level (in mA)
   * @retval BSP status
   */
@@ -390,7 +409,6 @@ int32_t BSP_USBPD_PWR_VBUSGetCurrent(uint32_t Instance, int32_t *pCurrent)
   * @param  Instance Type-C port identifier
   *         This parameter can be take one of the following values:
   *         @arg @ref USBPD_PWR_TYPE_C_PORT_1
-  *         @arg @ref USBPD_PWR_TYPE_C_PORT_2
   * @param  CCPinId Type-C CC pin identifier
   *         This parameter can be take one of the following values:
   *         @arg @ref USBPD_PWR_TYPE_C_CC1
@@ -417,7 +435,6 @@ int32_t BSP_USBPD_PWR_VCONNInit(uint32_t Instance,
   * @param  Instance Type-C port identifier
   *         This parameter can be take one of the following values:
   *         @arg @ref USBPD_PWR_TYPE_C_PORT_1
-  *         @arg @ref USBPD_PWR_TYPE_C_PORT_2
   * @param  CCPinId Type-C CC pin identifier
   *         This parameter can be take one of the following values:
   *         @arg @ref USBPD_PWR_TYPE_C_CC1
@@ -444,7 +461,6 @@ int32_t BSP_USBPD_PWR_VCONNDeInit(uint32_t Instance,
   * @param  Instance Type-C port identifier
   *         This parameter can be take one of the following values:
   *         @arg @ref USBPD_PWR_TYPE_C_PORT_1
-  *         @arg @ref USBPD_PWR_TYPE_C_PORT_2
   * @param  CCPinId Type-C CC pin identifier
   *         This parameter can be take one of the following values:
   *         @arg @ref USBPD_PWR_TYPE_C_CC1
@@ -471,7 +487,6 @@ int32_t BSP_USBPD_PWR_VCONNOn(uint32_t Instance,
   * @param  Instance Type-C port identifier
   *         This parameter can be take one of the following values:
   *         @arg @ref USBPD_PWR_TYPE_C_PORT_1
-  *         @arg @ref USBPD_PWR_TYPE_C_PORT_2
   * @param  CCPinId CC pin identifier
   *         This parameter can be take one of the following values:
   *         @arg @ref USBPD_PWR_TYPE_C_CC1
@@ -529,7 +544,6 @@ int32_t BSP_USBPD_PWR_VCONNIsOn(uint32_t Instance,
   * @param  Instance Type-C port identifier
   *         This parameter can be take one of the following values:
   *         @arg @ref USBPD_PWR_TYPE_C_PORT_1
-  *         @arg @ref USBPD_PWR_TYPE_C_PORT_2
   * @param  VoltageThreshold VBUS disconnection voltage threshold (in mV)
   * @retval BSP status
   */
@@ -557,7 +571,6 @@ int32_t BSP_USBPD_PWR_SetVBUSDisconnectionThreshold(uint32_t Instance,
   * @param  Instance Type-C port identifier
   *         This parameter can be take one of the following values:
   *         @arg @ref USBPD_PWR_TYPE_C_PORT_1
-  *         @arg @ref USBPD_PWR_TYPE_C_PORT_2
   * @param  pfnVBUSDetectCallback callback function pointer
   * @retval BSP status
   */
@@ -588,11 +601,16 @@ int32_t BSP_USBPD_PWR_VBUSIsOn(uint32_t Instance, uint8_t *pState)
 {
   /* USER CODE BEGIN BSP_USBPD_PWR_VBUSIsOn */
   /* Check if instance is valid       */
-  int32_t ret = BSP_ERROR_FEATURE_NOT_SUPPORTED;
+  int32_t ret;
 
   if (Instance >= USBPD_PWR_INSTANCES_NBR)
   {
     ret = BSP_ERROR_WRONG_PARAM;
+  }
+  else
+  {
+    ret = BSP_ERROR_FEATURE_NOT_SUPPORTED;
+    PWR_DEBUG_TRACE(Instance, "HELP: Update BSP_USBPD_PWR_VBUSIsOn");
   }
   *pState = 0u;
   return ret;

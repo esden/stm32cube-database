@@ -27,7 +27,7 @@
  *
  * 1 tab == 4 spaces!
  */
- /* USER CODE END Header */
+/* USER CODE END Header */
 
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
@@ -87,12 +87,15 @@
 [#assign heapNUMBER = "4"]
 [#-- For BLE --] 
 [#assign configOVERRIDE_DEFAULT_TICK_CONFIGURATION = "0"]
-[#-- For 10.2.1 (starting on L5)--]
+[#-- For 10.2.1 --]
 [#assign configENABLE_TRUSTZONE = "0"]
 [#assign configRUN_FREERTOS_SECURE_ONLY = "0"]
 [#assign configMINIMAL_SECURE_STACK_SIZE = "0"]
 [#assign configENABLE_MPU = "0"]
 [#assign configENABLE_FPU = "0"]
+[#assign configUSE_POSIX_ERRNO = "0"]                 [#-- NEW In 10.2.1, has a default value, 0 (in FreeRTOS.h) --]
+[#assign INCLUDE_uxTaskGetStackHighWaterMark2 = "0"]  [#-- NEW In 10.2.1, has a default value, 0 (in FreeRTOS.h) --]
+
 [#-- For NEWLIB --]
 [#assign configUSE_NEWLIB_REENTRANT = "0"]
 
@@ -288,7 +291,7 @@
       [#if definition.name=="configOVERRIDE_DEFAULT_TICK_CONFIGURATION"]
           [#assign configOVERRIDE_DEFAULT_TICK_CONFIGURATION = definition.value]
       [/#if]
-      [#-- New ones for 10.2.1 (starting with L5 support) --]
+      [#-- New ones for 10.2.1 --]
       [#if definition.name=="configENABLE_TRUSTZONE"]
           [#assign configENABLE_TRUSTZONE = definition.value]
       [/#if]
@@ -304,10 +307,16 @@
       [#if definition.name=="configENABLE_FPU"]
           [#assign configENABLE_FPU = definition.value]
       [/#if]
+      [#if definition.name=="configUSE_POSIX_ERRNO"]
+          [#assign configUSE_POSIX_ERRNO = definition.value]
+      [/#if]
+      [#if definition.name=="INCLUDE_uxTaskGetStackHighWaterMark2"]
+          [#assign INCLUDE_uxTaskGetStackHighWaterMark2 = definition.value]
+      [/#if]            
       [#-- NEWLIB --]
       [#if definition.name=="configUSE_NEWLIB_REENTRANT"]
           [#assign configUSE_NEWLIB_REENTRANT = definition.value]
-      [/#if] 
+      [/#if]
     [/#list]
   [/#if]
 
@@ -342,26 +351,29 @@
 /* Ensure definitions are only used by the compiler, and not by the assembler. */
 #if defined(__ICCARM__) || defined(__CC_ARM) || defined(__GNUC__)
 #t#include <stdint.h>
-#textern uint32_t SystemCoreClock;
+[#-- BZ 74309 --]
+#textern uint32_t ${valueCpuClock};
+[#-- BZ 74309 --]
 [#if prototypeNeeded == "true"] [#-- generated when timebase=systick --]
 #tvoid xPortSysTickHandler(void);
 [/#if]
 [#if configGENERATE_RUN_TIME_STATS=="1"]
-/* USER CODE BEGIN 0 */   	      
+/* USER CODE BEGIN 0 */
 #textern void configureTimerForRunTimeStats(void);
 #textern unsigned long getRunTimeCounterValue(void);  
-/* USER CODE END 0 */       
+/* USER CODE END 0 */
 [/#if]
 #endif
 [/#compress]
 
+[#-- Added for 10.2.1 support --]
 [#if (familyName=="stm32l5") ]
 /*-------------------- STM32L5 specific defines -------------------*/
-#define configENABLE_TRUSTZONE                  ${configENABLE_TRUSTZONE}
-#define configRUN_FREERTOS_SECURE_ONLY          ${configRUN_FREERTOS_SECURE_ONLY}
-#define configENABLE_FPU                        ${configENABLE_FPU}
-#define configENABLE_MPU                        ${configENABLE_MPU}
+#define configENABLE_TRUSTZONE                   ${configENABLE_TRUSTZONE}
+#define configRUN_FREERTOS_SECURE_ONLY           ${configRUN_FREERTOS_SECURE_ONLY}
 [/#if]
+#define configENABLE_FPU                         ${configENABLE_FPU}
+#define configENABLE_MPU                         ${configENABLE_MPU}
 
 #define configUSE_PREEMPTION                     ${valueUsePreemption}
 [#if valueMemoryAllocation == "0"]
@@ -401,8 +413,8 @@
 [#if configUSE_TRACE_FACILITY=="1"]
 #define configUSE_TRACE_FACILITY                 1
 [/#if]
-[#if configUSE_STATS_FORMATTING_FUNCTIONS=="1"]
-#define configUSE_STATS_FORMATTING_FUNCTIONS     1
+[#if configUSE_STATS_FORMATTING_FUNCTIONS != "0"]
+#define configUSE_STATS_FORMATTING_FUNCTIONS     ${configUSE_STATS_FORMATTING_FUNCTIONS}
 [/#if]
 #define configUSE_16_BIT_TICKS                   ${valueUse16BitTicks}
 [#if configIDLE_SHOULD_YIELD=="0"]
@@ -452,6 +464,16 @@
 [#if configOVERRIDE_DEFAULT_TICK_CONFIGURATION=="1"]
 #define configOVERRIDE_DEFAULT_TICK_CONFIGURATION          1
 [/#if]
+[#-- for 10.2.1 support --]
+[#if configUSE_POSIX_ERRNO=="1"]
+#define configUSE_POSIX_ERRNO                    1
+[/#if]
+/* USER CODE BEGIN MESSAGE_BUFFER_LENGTH_TYPE */
+/* Defaults to size_t for backward compatibility, but can be changed
+   if lengths will always be less than the number of bytes in a size_t. */
+#define configMESSAGE_BUFFER_LENGTH_TYPE         size_t
+/* USER CODE END MESSAGE_BUFFER_LENGTH_TYPE */ 
+[#-- for 10.2.1 support --]
 
 /* Co-routine definitions. */
 #define configUSE_CO_ROUTINES                    ${valueUseCoRoutines}
@@ -466,51 +488,54 @@
 [/#if]
 
 [#if configUSE_NEWLIB_REENTRANT=="1"]
-#define configUSE_NEWLIB_REENTRANT          1
+#define configUSE_NEWLIB_REENTRANT               1
 [/#if]
 
 /* Set the following definitions to 1 to include the API function, or zero
 to exclude the API function. */
-#define INCLUDE_vTaskPrioritySet            ${valueTaskPrioritySet}
-#define INCLUDE_uxTaskPriorityGet           ${valueTaskPriorityGet}
-#define INCLUDE_vTaskDelete                 ${valueTaskDelete}
-#define INCLUDE_vTaskCleanUpResources       ${valueTaskCleanUpResources}
-#define INCLUDE_vTaskSuspend                ${valueTaskSuspend}
-#define INCLUDE_vTaskDelayUntil             ${valueTaskDelayUntil}
-#define INCLUDE_vTaskDelay                  ${valueTaskDelay}
-#define INCLUDE_xTaskGetSchedulerState      ${valueGetSchedulerState}
+#define INCLUDE_vTaskPrioritySet             ${valueTaskPrioritySet}
+#define INCLUDE_uxTaskPriorityGet            ${valueTaskPriorityGet}
+#define INCLUDE_vTaskDelete                  ${valueTaskDelete}
+#define INCLUDE_vTaskCleanUpResources        ${valueTaskCleanUpResources}
+#define INCLUDE_vTaskSuspend                 ${valueTaskSuspend}
+#define INCLUDE_vTaskDelayUntil              ${valueTaskDelayUntil}
+#define INCLUDE_vTaskDelay                   ${valueTaskDelay}
+#define INCLUDE_xTaskGetSchedulerState       ${valueGetSchedulerState}
 [#if xTaskResumeFromISR=="0"]
-#define INCLUDE_xTaskResumeFromISR          0
+#define INCLUDE_xTaskResumeFromISR           0
 [/#if]
 [#if xEventGroupSetBitFromISR=="1"]
-#define INCLUDE_xEventGroupSetBitFromISR    1
+#define INCLUDE_xEventGroupSetBitFromISR     1
 [/#if]
 [#if xTimerPendFunctionCall=="1"]
-#define INCLUDE_xTimerPendFunctionCall      1
+#define INCLUDE_xTimerPendFunctionCall       1
 [/#if]
 [#if xQueueGetMutexHolder=="1"]
-#define INCLUDE_xQueueGetMutexHolder        1
+#define INCLUDE_xQueueGetMutexHolder         1
 [/#if]
 [#if xSemaphoreGetMutexHolder=="1"]
-#define INCLUDE_xSemaphoreGetMutexHolder    1
+#define INCLUDE_xSemaphoreGetMutexHolder     1
 [/#if]
 [#if pcTaskGetTaskName=="1"]
-#define INCLUDE_pcTaskGetTaskName           1
+#define INCLUDE_pcTaskGetTaskName            1
 [/#if]
 [#if uxTaskGetStackHighWaterMark=="1"]
-#define INCLUDE_uxTaskGetStackHighWaterMark 1
+#define INCLUDE_uxTaskGetStackHighWaterMark  1
+[/#if]
+[#if INCLUDE_uxTaskGetStackHighWaterMark2=="1"][#-- Added for 10.2.1 --]
+#define INCLUDE_uxTaskGetStackHighWaterMark2 1
 [/#if]
 [#if xTaskGetCurrentTaskHandle=="1"]
-#define INCLUDE_xTaskGetCurrentTaskHandle   1
+#define INCLUDE_xTaskGetCurrentTaskHandle    1
 [/#if]
 [#if eTaskGetState=="1"]
-#define INCLUDE_eTaskGetState               1
+#define INCLUDE_eTaskGetState                1
 [/#if]
 [#if xTaskAbortDelay=="1"]
-#define INCLUDE_xTaskAbortDelay             1
+#define INCLUDE_xTaskAbortDelay              1
 [/#if]
 [#if xTaskGetHandle=="1"]
-#define INCLUDE_xTaskGetHandle              1
+#define INCLUDE_xTaskGetHandle               1
 [/#if]
 
 /* 

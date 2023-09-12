@@ -193,9 +193,9 @@
         [#t]#include "${FamilyName?lower_case}xx_ll_tim.h"
     [/#if]
 [/#if]
+#include "usbpd_pwr_user.h"
 
 /* USER CODE BEGIN Includes */
-#include "usbpd_pwr_user.h"
 
 /* USER CODE END Includes */
 

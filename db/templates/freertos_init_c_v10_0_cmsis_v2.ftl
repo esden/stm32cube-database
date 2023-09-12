@@ -7,7 +7,7 @@
 [#assign nbTimers = 0]
 [#assign nbQueues = 0]
 [#assign nbSemaphores = 0]
-[#assign mutexControl = "NULL"] 
+[#assign mutexControl = "NULL"]
 [#assign threadAllocation = "Dynamic"]
 [#assign mutexAllocation = "Dynamic"]
 [#assign semaphoreAllocation = "Dynamic"]
@@ -15,7 +15,7 @@
 [#assign timerAllocation = "Dynamic"]
 [#assign queueThreadId = "NULL"]
 
-osKernelInitialize();
+[#-- osKernelInitialize(); /* commented and replaced by the include of the new tmp file (always done in the main) */  --]
 
 [#list SWIPdatas as SWIP]
   [#if SWIP.variables??]
@@ -38,9 +38,11 @@ osKernelInitialize();
         [#if mutexName != "0"]
           [#assign nbM = nbM + 1]
           [#if nbM == 1]
-            #n#t/* Create the mutex(es) */
+            #t/* Create the mutex(es) */
           [/#if]
-            #t/* definition and creation of ${mutexName} */
+            #t/* creation of ${mutexName} */
+          [#-- removed here, cf BZ 74919 --]
+          [#--
           [#if mutexAllocation == "Dynamic"]
             #tconst osMutexAttr_t ${mutexName}_attributes = {
             #t#t.name = "${mutexName}"
@@ -52,6 +54,7 @@ osKernelInitialize();
             #t#t.cb_size = sizeof(${mutexControl}),
             #t};
           [/#if]
+          --]
             #t${mutexName}Handle = osMutexNew(&${mutexName}_attributes);
             #n
         [/#if]
@@ -83,7 +86,9 @@ osKernelInitialize();
           [#if nbRM == 1]
             #n#t/* Create the recursive mutex(es) */
           [/#if]
-            #t/* definition and creation of ${mutexName} */
+            #t/* creation of ${mutexName} */
+          [#-- removed here, cf BZ 74919 --]
+          [#--
           [#if mutexAllocation == "Dynamic"]
             #tconst osMutexAttr_t ${mutexName}_attributes = {
             #t#t.name = "${mutexName}",
@@ -97,6 +102,7 @@ osKernelInitialize();
             #t#t.cb_size = sizeof(${mutexControl}),
             #t};
           [/#if]
+          --]
             #t${mutexName}Handle = osMutexNew(&${mutexName}_attributes);
             #n
         [/#if]
@@ -133,7 +139,9 @@ osKernelInitialize();
           [#if nbSemaphores == 1]
             #n#t/* Create the semaphores(s) */
           [/#if]
-            #t/* definition and creation of ${semaphoreName} */
+            #t/* creation of ${semaphoreName} */
+          [#-- removed here, cf BZ 74919 --]
+          [#--
           [#if semaphoreAllocation == "Dynamic"]
             #tconst osSemaphoreAttr_t ${semaphoreName}_attributes = {
             #t#t.name = "${semaphoreName}"
@@ -145,6 +153,7 @@ osKernelInitialize();
             #t#t.cb_size = sizeof(${semaphoreControl}),            
             #t};
           [/#if]
+          --]
           #t${semaphoreName}Handle = osSemaphoreNew(1, 1, &${semaphoreName}_attributes);
           #n
         [/#if]
@@ -179,7 +188,9 @@ osKernelInitialize();
           [#if nbSemaphores == 1]
             #n#t/* Create the semaphores(s) */
           [/#if]
-          #t/* definition and creation of ${semaphoreName} */
+          #t/* creation of ${semaphoreName} */
+          [#-- removed here, cf BZ 74919 --]
+          [#--  
           [#if semaphoreAllocation == "Dynamic"]
             #tconst osSemaphoreAttr_t ${semaphoreName}_attributes = {
             #t#t.name = "${semaphoreName}"
@@ -191,6 +202,7 @@ osKernelInitialize();
             #t#t.cb_size = sizeof(${semaphoreControl}),            
             #t};
           [/#if]
+          --]
           #t${semaphoreName}Handle = osSemaphoreNew(${semaphoreCount}, ${semaphoreCount}, &${semaphoreName}_attributes);
           #n
         [/#if]
@@ -242,7 +254,9 @@ osKernelInitialize();
           [#if nbTimers == 1]
             #n#t/* Create the timer(s) */
           [/#if]
-          #t/* definition and creation of ${timerName} */   
+          #t/* creation of ${timerName} */
+          [#-- removed here, cf BZ 74919 --]
+          [#--  
           [#if timerAllocation == "Dynamic"]
           #tconst osTimerAttr_t ${timerName}_attributes = {
           #t#t.name = "${timerName}"
@@ -254,6 +268,7 @@ osKernelInitialize();
           #t#t.cb_size = sizeof(${timerControlBlock}), 
           #t};
           [/#if]
+          --]
           #t${timerName}Handle = osTimerNew(${timerCallback}, ${timerType}, ${timerParameters}, &${timerName}_attributes);
           #n
         [/#if]
@@ -302,7 +317,9 @@ osKernelInitialize();
           [#if nbQueues == 1]
             #n#t/* Create the queue(s) */
           [/#if]
-          #t/* definition and creation of ${queueName} */
+          #t/* creation of ${queueName} */
+          [#-- removed here, cf BZ 74919 --]
+          [#--  
           [#if queueAllocation == "Dynamic"]
             #tconst osMessageQueueAttr_t ${queueName}_attributes = {
             #t#t.name = "${queueName}"
@@ -316,6 +333,7 @@ osKernelInitialize();
             #t#t.mq_size = sizeof(${queueBuffer})         
             #t};
           [/#if]
+          --]
           [#-- what about the sizeof here??? cd native code  --]
           [#if queueIsIntegerType = "0"]
           #t${queueName}Handle = osMessageQueueNew (${queueSize}, sizeof(${queueElementType}), &${queueName}_attributes);
@@ -377,7 +395,9 @@ osKernelInitialize();
         [#if nbThreads == 1]
           #n#t/* Create the thread(s) */
         [/#if]
-        #t/* definition and creation of ${threadName} */
+        #t/* creation of ${threadName} */
+        [#-- removed here, cf BZ 74919 --]
+        [#--  
         [#if threadAllocation == "Dynamic"]
          #tconst osThreadAttr_t ${threadName}_attributes = {
          #t#t.name = "${threadName}",
@@ -394,7 +414,9 @@ osKernelInitialize();
          #t#t.priority = (osPriority_t) ${threadPriority},
          #t};
         [/#if]
-         #t${threadName}Handle = osThreadNew(${threadFunction}, NULL, &${threadName}_attributes);
+        --]
+         [#-- #t${threadName}Handle = osThreadNew(${threadFunction}, NULL, &${threadName}_attributes); --] [#-- BZ 74920 --]
+         #t${threadName}Handle = osThreadNew(${threadFunction}, ${threadArguments}, &${threadName}_attributes); 
          #n
       [/#if]
 	[/#list]

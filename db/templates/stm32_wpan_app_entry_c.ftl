@@ -184,6 +184,7 @@ static tListNode  SysEvtQueue;
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
+
 [#if FREERTOS_STATUS = 1]
 /* Global variables ----------------------------------------------------------*/
 osMutexId_t MtxShciId;
@@ -363,7 +364,7 @@ static void appe_Tl_Init( void )
   SemShciId = osSemaphoreNew( 1, 0, NULL ); /*< Create the semaphore and make it busy at initialization */
 
   /** FreeRTOS system task creation */
-  ShciUserEvtProcessId = osThreadNew(ShciUserEvtProcess, NULL,&ShciUserEvtProcess_attr);
+  ShciUserEvtProcessId = osThreadNew(ShciUserEvtProcess, NULL, &ShciUserEvtProcess_attr);
 [/#if]
 
   /**< System channel initialization */
@@ -460,15 +461,15 @@ static void APPE_SysStatusNot( SHCI_TL_CmdStatus_t status )
   return;
 }
 
-[#if (THREAD = 1)]
 /**
- * @brief Trap a notification coming from the M0 firmware
- * @param  pPayload  : payload associated to the notification
- *
- * @retval None
+ * The type of the payload for a system user event is tSHCI_UserEvtRxParam
+ * When the system event is both :
+ *    - a ready event (subevtcode = SHCI_SUB_EVT_CODE_READY)
+ *    - reported by the FUS (sysevt_ready_rsp == RSS_FW_RUNNING)
+ * The buffer shall not be released
+ * ( eg ((tSHCI_UserEvtRxParam*)pPayload)->status shall be set to SHCI_TL_UserEventFlow_Disable )
+ * When the status is not filled, the buffer is released by default
  */
-
- [/#if]
 static void APPE_SysUserEvtRx( void * pPayload )
 {
 [#if (BLE = 1)]

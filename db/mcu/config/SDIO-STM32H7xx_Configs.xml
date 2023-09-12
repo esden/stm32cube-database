@@ -2,23 +2,19 @@
 <IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" DBVersion="V4.0" IncludeFile="stm32h7xx_hal.h" Name="SDIO" Version="STM32Cube_FW_H7_V1.1.0" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
     <!-- Config for SD and MMC -->
     <RefConfig Name="SD_Init">
-        <CallLibMethod Name="HAL_SD_Init"  ReturnHAL="HAL_OK"/>
+        <CallLibMethod Name="HAL_SD_Init"  ReturnHAL="HAL_OK">
+            <MethodArg Name="TranceiverPresent" ParameterName="TransceiverPresent"/>
+        </CallLibMethod>
         <ImplementCallBack Name="HAL_SD_MspInit"/>
         <ImplementCallBack Name="HAL_SD_MspDeInit"/>
         <Component Name="HAL:SDIO:SD"/>
     </RefConfig>
     <RefConfig Name="MMC_Init">
         <CallLibMethod Name="HAL_MMC_Init"  ReturnHAL="HAL_OK">
-            <MethodArg Name="BusWide" FValue="SDMMC_BUS_WIDE_1B"/>
+            <MethodArg Name="TranceiverPresent" ParameterName="TransceiverPresent"/>
         </CallLibMethod>
         <ImplementCallBack Name="HAL_MMC_MspInit"/>
         <ImplementCallBack Name="HAL_MMC_MspDeInit"/>
-        <Component Name="HAL:SDIO:MMC"/>
-    </RefConfig>
-    <RefConfig Name="MMC_WideBus_Config">
-        <CallLibMethod Name="HAL_MMC_ConfigWideBusOperation" ReturnHAL="HAL_OK">
-          <MethodArg Name="WideMode" ParameterName="BusWide"/>
-        </CallLibMethod>
         <Component Name="HAL:SDIO:MMC"/>
     </RefConfig>
 
@@ -50,6 +46,7 @@
                 <Argument AddressOf="false" GenericType="simple" Name="BusWide"/>
                 <Argument AddressOf="false" GenericType="simple" Name="HardwareFlowControl"/>
                 <Argument AddressOf="false" GenericType="simple" Name="ClockDiv"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TranceiverPresent"/>
             </Argument>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" TypeName="HAL_LockTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="pTxBuffPtr"/>
@@ -68,12 +65,13 @@
     <LibMethod Comment="" Name="HAL_SD_DeInit">
         <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsd" TypeName="SD_HandleTypeDef">
             <Argument AddressOf="false" GenericType="enum" Name="Instance" TypeName="SD_TypeDef"/>
-            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDIO_InitTypeDef">
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SD_InitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="ClockEdge"/>
                 <Argument AddressOf="false" GenericType="simple" Name="ClockPowerSave"/>
                 <Argument AddressOf="false" GenericType="simple" Name="BusWide"/>
                 <Argument AddressOf="false" GenericType="simple" Name="HardwareFlowControl"/>
                 <Argument AddressOf="false" GenericType="simple" Name="ClockDiv"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TranceiverPresent"/>
             </Argument>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" TypeName="HAL_LockTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="pTxBuffPtr"/>
@@ -92,12 +90,13 @@
     <LibMethod Comment="" Name="HAL_SD_MspInit">
         <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsd" TypeName="SD_HandleTypeDef">
             <Argument AddressOf="false" GenericType="enum" Name="Instance" TypeName="SD_TypeDef"/>
-            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDIO_InitTypeDef">
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SD_InitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="ClockEdge"/>
                 <Argument AddressOf="false" GenericType="simple" Name="ClockPowerSave"/>
                 <Argument AddressOf="false" GenericType="simple" Name="BusWide"/>
                 <Argument AddressOf="false" GenericType="simple" Name="HardwareFlowControl"/>
                 <Argument AddressOf="false" GenericType="simple" Name="ClockDiv"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TranceiverPresent"/>
             </Argument>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" TypeName="HAL_LockTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="pTxBuffPtr"/>
@@ -116,12 +115,13 @@
     <LibMethod Comment="" Name="HAL_SD_MspDeInit">
         <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsd" TypeName="SD_HandleTypeDef">
             <Argument AddressOf="false" GenericType="enum" Name="Instance" TypeName="SD_TypeDef"/>
-            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDIO_InitTypeDef">
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SD_InitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="ClockEdge"/>
                 <Argument AddressOf="false" GenericType="simple" Name="ClockPowerSave"/>
                 <Argument AddressOf="false" GenericType="simple" Name="BusWide"/>
                 <Argument AddressOf="false" GenericType="simple" Name="HardwareFlowControl"/>
                 <Argument AddressOf="false" GenericType="simple" Name="ClockDiv"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TranceiverPresent"/>
             </Argument>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" TypeName="HAL_LockTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="pTxBuffPtr"/>
@@ -140,12 +140,13 @@
     <LibMethod Comment="" Name="HAL_SD_ConfigWideBusOperation">
         <Argument AddressOf="true" Context="global" GenericType="struct" Name="hsd" TypeName="SD_HandleTypeDef">
             <Argument AddressOf="false" GenericType="simple" Name="Instance" TypeName="SD_TypeDef"/>
-            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SDIO_InitTypeDef">
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="SD_InitTypeDef">
                 <Argument AddressOf="false" GenericType="simple" Name="ClockEdge"/>
                 <Argument AddressOf="false" GenericType="simple" Name="ClockPowerSave"/>
                 <Argument AddressOf="false" GenericType="simple" Name="BusWide"/>
                 <Argument AddressOf="false" GenericType="simple" Name="HardwareFlowControl"/>
                 <Argument AddressOf="false" GenericType="simple" Name="ClockDiv"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TranceiverPresent"/>
             </Argument>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" TypeName="HAL_LockTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="pTxBuffPtr"/>
@@ -171,6 +172,7 @@
                 <Argument AddressOf="false" GenericType="simple" Name="BusWide"/>
                 <Argument AddressOf="false" GenericType="simple" Name="HardwareFlowControl"/>
                 <Argument AddressOf="false" GenericType="simple" Name="ClockDiv"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TranceiverPresent"/>
             </Argument>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" TypeName="HAL_LockTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="pTxBuffPtr"/>
@@ -195,6 +197,7 @@
                 <Argument AddressOf="false" GenericType="simple" Name="BusWide"/>
                 <Argument AddressOf="false" GenericType="simple" Name="HardwareFlowControl"/>
                 <Argument AddressOf="false" GenericType="simple" Name="ClockDiv"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TranceiverPresent"/>
             </Argument>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" TypeName="HAL_LockTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="pTxBuffPtr"/>
@@ -219,6 +222,7 @@
                 <Argument AddressOf="false" GenericType="simple" Name="BusWide"/>
                 <Argument AddressOf="false" GenericType="simple" Name="HardwareFlowControl"/>
                 <Argument AddressOf="false" GenericType="simple" Name="ClockDiv"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TranceiverPresent"/>
             </Argument>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" TypeName="HAL_LockTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="pTxBuffPtr"/>
@@ -243,6 +247,7 @@
                 <Argument AddressOf="false" GenericType="simple" Name="BusWide"/>
                 <Argument AddressOf="false" GenericType="simple" Name="HardwareFlowControl"/>
                 <Argument AddressOf="false" GenericType="simple" Name="ClockDiv"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TranceiverPresent"/>
             </Argument>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" TypeName="HAL_LockTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="pTxBuffPtr"/>
@@ -267,6 +272,7 @@
                 <Argument AddressOf="false" GenericType="simple" Name="BusWide"/>
                 <Argument AddressOf="false" GenericType="simple" Name="HardwareFlowControl"/>
                 <Argument AddressOf="false" GenericType="simple" Name="ClockDiv"/>
+                <Argument AddressOf="false" GenericType="simple" Name="TranceiverPresent"/>
             </Argument>
             <Argument AddressOf="false" GenericType="simple" Name="Lock" TypeName="HAL_LockTypeDef"/>
             <Argument AddressOf="false" GenericType="simple" Name="pTxBuffPtr"/>

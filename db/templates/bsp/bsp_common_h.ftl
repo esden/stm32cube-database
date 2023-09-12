@@ -262,13 +262,13 @@ typedef struct
 #define MX_UART_ParityTypeDef        COM_ParityTypeDef
 #define MX_UART_HwFlowCtlTypeDef     COM_HwFlowCtlTypeDef
 [#if useUSART]
-#if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
+#if (USE_HAL_UART_REGISTER_CALLBACKS == 1U)
 typedef struct
 {
   void (* pMspInitCb)(UART_HandleTypeDef *);
   void (* pMspDeInitCb)(UART_HandleTypeDef *);
 } BSP_COM_Cb_t;
-#endif /* (USE_HAL_UART_REGISTER_CALLBACKS == 1) */
+#endif /* (USE_HAL_UART_REGISTER_CALLBACKS == 1U) */
 [/#if]
 
 /**
@@ -351,7 +351,7 @@ int32_t  BSP_COM_DeInit(COM_TypeDef COM);
 int32_t  BSP_COM_SelectLogPort(COM_TypeDef COM);
 #endif
 
-#if (USE_HAL_UART_REGISTER_CALLBACKS == 1) 
+#if (USE_HAL_UART_REGISTER_CALLBACKS == 1U) 
 int32_t BSP_COM_RegisterDefaultMspCallbacks(COM_TypeDef COM);
 int32_t BSP_COM_RegisterMspCallbacks(COM_TypeDef COM , BSP_COM_Cb_t *Callback);
 #endif /* USE_HAL_UART_REGISTER_CALLBACKS */
