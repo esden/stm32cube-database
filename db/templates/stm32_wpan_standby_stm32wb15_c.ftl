@@ -8,6 +8,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+[#assign Line = Line]
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
@@ -38,7 +39,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 uint32_t backup_MSP;
-uint32_t backup_IPCC_C1MR;  
+uint32_t backup_IPCC_C1MR;
 uint32_t boot_after_standby;
 extern RTC_HandleTypeDef hrtc;
 /* USER CODE BEGIN PV */
@@ -46,11 +47,11 @@ extern RTC_HandleTypeDef hrtc;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
-uint32_t standby_boot_mng(void);   
+uint32_t standby_boot_mng(void);
 void standby_hw_save(void);
 void standby_hw_restore(void);
 /* USER CODE BEGIN PFP */
-void SystemClock_Config(void);
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -58,8 +59,6 @@ void SystemClock_Config(void);
 
 /* USER CODE END 0 */
 
-
-  
 /*******************************************************************************
  * This part may be updated by the user
  ******************************************************************************/
@@ -72,9 +71,9 @@ void SystemClock_Config(void);
 void standby_hw_save(void)
 {
   backup_IPCC_C1MR = READ_REG(IPCC->C1MR);
-  
+
   /* USER CODE BEGIN standby_hw_save */
-  
+
   /* USER CODE END standby_hw_save */
   return;
 }
@@ -91,24 +90,32 @@ void standby_hw_restore(void)
   /* USER CODE END standby_hw_restore_1 */
 
   APPD_Init();
-
-  SystemClock_Config();
-
+  Init_Exti();
+[#if Line != "STM32WBx0 Value Line" ]
+  Init_Smps();
+[/#if]
   HAL_Init();
+
+  HW_IPCC_Init();
+  HW_IPCC_Enable();
+  WRITE_REG(IPCC->C1MR, backup_IPCC_C1MR);
+
+  if( !LL_HSEM_1StepLock( HSEM, CFG_HW_RCC_SEMID ) )
+  {
+    LL_RCC_SetClkAfterWakeFromStop(LL_RCC_STOP_WAKEUPCLOCK_HSI);
+    LL_HSEM_ReleaseLock( HSEM, CFG_HW_RCC_SEMID, 0 );
+  }
+  LL_HSEM_ReleaseLock( HSEM, CFG_HW_PWR_STANDBY_SEMID, 0 );
 
   /* In this user section add MX init functions present in main.c , except MX_RTC_Init() */
   /* USER CODE BEGIN standby_hw_restore_2 */
 
   /* USER CODE END standby_hw_restore_2 */
 
-  HW_IPCC_Init();
-  HW_IPCC_Enable();
-  WRITE_REG(IPCC->C1MR, backup_IPCC_C1MR);
-  
   HW_TS_Init(hw_ts_InitMode_Limited, &hrtc);
-  
+
   LL_PWR_EnableSRAM2Retention();
-  
+
   /* USER CODE BEGIN standby_hw_restore_3 */
 
   /* USER CODE END standby_hw_restore_3 */
@@ -128,20 +135,24 @@ void standby_hw_restore(void)
 uint32_t standby_boot_mng(void)
 {
 #if ( CFG_LPM_STANDBY_SUPPORTED != 0 )
+  __HAL_RCC_HSEM_CLK_ENABLE();
+  while( LL_HSEM_1StepLock( HSEM, CFG_HW_PWR_STANDBY_SEMID ) );
+
   if( __HAL_PWR_GET_FLAG(PWR_FLAG_SB) != RESET )
-  {    
-    __disable_irq( );  
-    
-    boot_after_standby = 1;    
-    __HAL_PWR_CLEAR_FLAG(PWR_FLAG_SB);
+  {
+    __disable_irq( );
+
+    boot_after_standby = 1;
   }else{
     boot_after_standby = 0;
+
+    LL_HSEM_ReleaseLock( HSEM, CFG_HW_PWR_STANDBY_SEMID, 0 );
   }
 #else
   boot_after_standby = 0;
 #endif
-  
-  return boot_after_standby;  
+
+  return boot_after_standby;
 }
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

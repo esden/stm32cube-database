@@ -1,0 +1,689 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu"
+    xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+    ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
+    DBVersion="V4.0"
+    IPType="middleware"
+    IpGroup="Middleware"
+    Name="SubGHz_Phy"
+    Version="v1.1.0_Cube">
+    <About>Middleware enabling LoRa, (G)FSK, (G)MSK and BPSK modulations.</About>
+
+
+<!--
+    <RefParameter Name="SUBGHZ_APPLICATION" Comment="Skeleton mode" DefaultValue="SUBGHZ_USER_APPLICATION" Type="list" Group="Application selection" TabName="SubGHz_Phy application">
+        <PossibleValue Value="SUBGHZ_PINGPONG" Comment="PingPong skeleton" Semaphore="SEM_SUBGHZ_PINGPONG"/>
+        <PossibleValue Value="SUBGHZ_PER" Comment="PacketErrorRate skeleton" Semaphore="SEM_SUBGHZ_PER"/>
+        <PossibleValue Value="SUBGHZ_USER_APPLICATION" Comment="User defined skeleton" Semaphore="SEM_SUBGHZ_USER_APPLICATION"/>
+        <Description>List of available applications</Description>
+    </RefParameter>
+-->
+    <RefParameter Name="SUBGHZ_APPLICATION" Comment="Application" DefaultValue="SUBGHZ_USER_APPLICATION" Type="list" Group="Application selection" TabName="SubGHz_Phy application">
+        <PossibleValue Value="SUBGHZ_ADV_APPLICATION" Comment="Advanced template" Semaphore="SEM_SUBGHZ_ADV_APPLICATION"/>
+        <PossibleValue Value="SUBGHZ_USER_APPLICATION" Comment="User defined template" Semaphore="SEM_SUBGHZ_USER_APPLICATION"/>
+        <Description>List of available applications</Description>
+    </RefParameter>
+
+<!--
+    <RefParameter Name="DISPLAY_APPLICATION" Comment="Application" DefaultValue="SUBGHZ_USER_APPLICATION" Type="list" Group="Application selection" TabName="SubGHz_Phy application" Visible="false">
+        <PossibleValue Value="SUBGHZ_PINGPONG" Condition="!SEM_SUBGHZ_PINGPONG" Comment="PingPong (accessible from EXAMPLE selector)"/>
+        <PossibleValue Value="SUBGHZ_PER" Condition="!SEM_SUBGHZ_PER" Comment="PacketErrorRate (accessible from EXAMPLE selector)"/>
+        <PossibleValue Value="SUBGHZ_USER_APPLICATION" Condition="!SEM_SUBGHZ_USER_APPLICATION" Comment="User defined (accessible from WL MCU selector)"/>
+        <Description>List of available applications, some available starting the new project from EXAMPLE SELECTOR other from MCU or BOARD SELECTOR</Description>
+    </RefParameter>
+-->
+
+    <RefParameter Name="FILL_UCS" Comment="Fill User Code Sections" DefaultValue="false" Type="boolean" Group="Application selection" TabName="SubGHz_Phy application" Visible="false">
+        <PossibleValue Value="true" Comment="true"/>
+        <PossibleValue Value="false" Comment="false"/>
+        <Description> </Description>
+    </RefParameter>
+
+    <RefParameter Name="USER_SUBGHZ_APP" Comment="PingPong vs PER" DefaultValue="SUBGHZ_PINGPONG" Type="list" Group="Application selection" TabName="SubGHz_Phy application" Visible="false">
+        <PossibleValue Value="SUBGHZ_PINGPONG" Comment="PingPong" Semaphore="SEM_SUBGHZ_PINGPONG"/>
+        <PossibleValue Value="SUBGHZ_PER" Comment="PacketErrorRate"/>
+        <Description> </Description>
+    </RefParameter>
+
+    <RefParameter Name="USE_LPM" Comment="Configure Low Power Mode" DefaultValue="false" Type="boolean" Group="Application selection" TabName="SubGHz_Phy application" Visible="true">
+        <Condition Diagnostic="" Expression="SEM_SUBGHZ_USER_APPLICATION"/>
+        <PossibleValue Value="true" Comment="true" Semaphore="SEM_SUBGHZ_USE_LPM"/>
+        <PossibleValue Value="false" Comment="false"/>
+        <Description>
+        Allow pre-fill of stm32_lpm_if.c file.
+        </Description>
+    </RefParameter>
+    <RefParameter Name="USE_LPM" Comment="Use LPM" DefaultValue="true" Type="String" Group="Application selection" TabName="SubGHz_Phy application" Visible="false">
+    </RefParameter>
+
+    <RefParameter Name="USE_RTC" Comment="Use RTC for Timer" DefaultValue="false" Type="boolean" Group="Application selection" TabName="SubGHz_Phy application" Visible="true">
+        <Condition Diagnostic="" Expression="SEM_SUBGHZ_USER_APPLICATION"/>
+        <PossibleValue Value="true" Comment="true" Semaphore="SEM_SUBGHZ_USE_RTC"/>
+        <PossibleValue Value="false" Comment="false"/>
+        <Description>
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;RTC:&lt;/b&gt; Proposed solution to manage timer in Low Power mode.&lt;/font&gt;&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; For Dual Core operation Runtime Contexts are both Cortex-M4 and Cortex-M0+ and initializer is Cortex-M0+&lt;br/&gt;
+        &lt;b&gt;Modes:&lt;/b&gt; Activate Clock Source, Activate Calendar and activate Alarm A (and B for Dual Core) (Internal Alarm A (and B for Dual Core))&lt;br/&gt;
+        &lt;b&gt;User Constants:&lt;/b&gt; Add the following Constants&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Constant Name: &lt;b&gt;RTC_N_PREDIV_S&lt;/b&gt; Value: 10&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Constant Name: &lt;b&gt;RTC_PREDIV_S&lt;/b&gt; Value: ((1 &amp;lt;&amp;lt; RTC_N_PREDIV_S)-1)&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Constant Name: &lt;b&gt;RTC_PREDIV_A&lt;/b&gt; Value: ((1 &amp;lt;&amp;lt; (15-RTC_N_PREDIV_S))-1)&lt;br/&gt;
+        &lt;b&gt;Configuration&lt;/b&gt; - Parameters Settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Asynchronous Predivider value: Set value to RTC_PREDIV_A&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Bin Mode: Free running Binary mode&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Alarm A Binary AutoControl: RTC_ALARMSUBSECONDBIN_AUTOCLR_NO&lt;br/&gt;
+        &lt;b&gt;Configuration&lt;/b&gt; - NVIC settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Enable both Interrupts&lt;br/&gt;
+        &lt;br/&gt;
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;SubGHz_Phy - Platform Settings panel:&lt;/b&gt; Platform proposals&lt;/font&gt;&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Ensure that RTC is selected in Found Solutions&lt;br/&gt;
+        </Description>
+    </RefParameter>
+    <RefParameter Name="USE_RTC" Comment="Use RTC" DefaultValue="true" Type="String" Group="Application selection" TabName="SubGHz_Phy application" Visible="false">
+    </RefParameter>
+
+    <RefParameter Name="USE_UART" Comment="Use UART for Trace" DefaultValue="false" Type="boolean" Group="Application selection" TabName="SubGHz_Phy application" Visible="true">
+        <Condition Diagnostic="" Expression="SEM_SUBGHZ_USER_APPLICATION"/>
+        <PossibleValue Value="true" Comment="true" Semaphore="SEM_SUBGHZ_USE_UART"/>
+        <PossibleValue Value="false" Comment="false"/>
+        <Description>
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;USART/LPUART:&lt;/b&gt; Proposed solution to manage trace.&lt;/font&gt;&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; For Dual Core operation Runtime Context is Cortex-M4&lt;br/&gt;
+        &lt;b&gt;Modes:&lt;/b&gt; Asynchronous&lt;br/&gt;
+        &lt;b&gt;Configuration&lt;/b&gt; - Parameters Settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; If LPUART is selected then set Baud Rate: 9600 Bits/s&lt;br/&gt;
+        &lt;b&gt;Configuration&lt;/b&gt; - DMA Settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Add USARTx_TX DMA Request with Channel configured with DMA1 Channel 5&lt;br/&gt;
+        &lt;b&gt;Configuration&lt;/b&gt; - NVIC settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Enable both Interrupts&lt;br/&gt;
+        &lt;b&gt;Clock Configuration panel&lt;/b&gt;&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; If LPUART is selected then set Clock Mux to LSE&lt;br/&gt;
+        &lt;b&gt;NVIC Mode and Configuration panel&lt;/b&gt; - Preemption priority management&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Set preemption Priority for DMA and UART Interrupt to 2&lt;br/&gt;
+        &lt;br/&gt;
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;SubGHz_Phy - Platform Settings panel:&lt;/b&gt; Platform proposals&lt;/font&gt;&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Ensure that chosen UART is selected in Found Solutions&lt;br/&gt;
+        </Description>
+    </RefParameter>
+    <RefParameter Name="USE_UART" Comment="Use UART" DefaultValue="true" Type="String" Group="Application selection" TabName="SubGHz_Phy application" Visible="false">
+    </RefParameter>
+
+    <RefParameter Name="USER_GUIDANCE" Comment="Application configuration recommendations " DefaultValue="!! Please read carefully Information panel below!!" Type="String" Group="Application selection" TabName="SubGHz_Phy application">
+        <Condition Diagnostic="" Expression="SEM_SUBGHZ_USER_APPLICATION"/>
+        <Description>
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;RCC:&lt;/b&gt; Proposed solution to manage RCC.&lt;/font&gt;&lt;br/&gt;
+        &lt;b&gt;Modes:&lt;/b&gt; Low Speed Clock (LSE): Set value to Crystal Ceramic Resonator&lt;br/&gt;
+        &lt;b&gt;Configuration&lt;/b&gt; - Parameters Settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Flash Latency(WS): 2 WS (3 CPU cycle)&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Power Regulator Voltage Scale: Scale 1&lt;br/&gt;
+        &lt;b&gt;Clock Configuration panel&lt;/b&gt;&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Set MSI RC to 32MHz&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Set RTC Clock Mux to LSE&lt;br/&gt;
+        &lt;br/&gt;
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;Project Manager- Advanced Settings panel:&lt;/b&gt; Generated Function Calls management&lt;/font&gt;&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Untick "Generate Code" for RTC on CortexM4 and DMA on CortexM0PLUS for Dual Core&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Tick "Do Not Generate Function Call" for DMA, RTC, SUBGHZ, UART and IPCC(for Dual Core)&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Untick Visibility for all Function Calls on both cores
+        </Description>
+    </RefParameter>
+
+    <RefParameter Name="USER_GUIDANCE" Comment="Application configuration recommendations " DefaultValue="!! Please read carefully Information panel below!!" Type="String" Group="Application selection" TabName="SubGHz_Phy application">
+        <Description>
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;RCC:&lt;/b&gt; Proposed solution to manage RCC.&lt;/font&gt;&lt;br/&gt;
+        &lt;b&gt;Modes:&lt;/b&gt; Low Speed Clock (LSE): Set value to Crystal Ceramic Resonator&lt;br/&gt;
+        &lt;b&gt;Configuration&lt;/b&gt; - Parameters Settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Flash Latency(WS): 2 WS (3 CPU cycle)&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Power Regulator Voltage Scale: Scale 1&lt;br/&gt;
+        &lt;b&gt;Clock Configuration panel&lt;/b&gt;&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Set MSI RC to 32MHz&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Set RTC Clock Mux to LSE&lt;br/&gt;
+        &lt;br/&gt;
+        &lt;br/&gt;
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;RTC:&lt;/b&gt; Proposed solution to manage timer in Low Power mode.&lt;/font&gt;&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; For Dual Core operation Runtime Contexts are both Cortex-M4 and Cortex-M0+ and initializer is Cortex-M0+&lt;br/&gt;
+        &lt;b&gt;Modes:&lt;/b&gt; Activate Clock Source, Activate Calendar and activate Alarm A (and B for Dual Core) (Internal Alarm A (and B for Dual Core))&lt;br/&gt;
+        &lt;b&gt;User Constants:&lt;/b&gt; Add the following Constants&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Constant Name: &lt;b&gt;RTC_N_PREDIV_S&lt;/b&gt; Value: 10&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Constant Name: &lt;b&gt;RTC_PREDIV_S&lt;/b&gt; Value: ((1 &amp;lt;&amp;lt; RTC_N_PREDIV_S)-1)&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Constant Name: &lt;b&gt;RTC_PREDIV_A&lt;/b&gt; Value: ((1 &amp;lt;&amp;lt; (15-RTC_N_PREDIV_S))-1)&lt;br/&gt;
+        &lt;b&gt;Configuration&lt;/b&gt; - Parameters Settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Asynchronous Predivider value: Set value to RTC_PREDIV_A&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Bin Mode: Free running Binary mode&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Alarm A Binary AutoControl: RTC_ALARMSUBSECONDBIN_AUTOCLR_NO&lt;br/&gt;
+        &lt;b&gt;Configuration&lt;/b&gt; - NVIC settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Enable both Interrupts&lt;br/&gt;
+        &lt;br/&gt;
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;USART/LPUART:&lt;/b&gt; Proposed solution to manage trace.&lt;/font&gt;&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; For Dual Core operation: Runtime Contexts is Cortex-M4&lt;br/&gt;
+        &lt;b&gt;Modes:&lt;/b&gt; Asynchronous&lt;br/&gt;
+        &lt;b&gt;Configuration&lt;/b&gt; - Parameters Settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; If LPUART is selected then set Baud Rate: 9600 Bits/s&lt;br/&gt;
+        &lt;b&gt;Configuration&lt;/b&gt; - DMA Settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Add USARTx_TX DMA Request with Channel configured with DMA1 Channel 5&lt;br/&gt;
+        &lt;b&gt;Configuration&lt;/b&gt; - NVIC settings:&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Enable both Interrupts&lt;br/&gt;
+        &lt;b&gt;Clock Configuration panel&lt;/b&gt;&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; If LPUART is selected then set Clock Mux to LSE&lt;br/&gt;
+        &lt;b&gt;NVIC Mode and Configuration panel&lt;/b&gt; - Preemption priority management&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Set preemption Priority for DMA and UART Interrupt to 2&lt;br/&gt;
+        &lt;br/&gt;
+        &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;Project Manager- Advanced Settings panel:&lt;/b&gt; Generated Function Calls management&lt;/font&gt;&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Untick "Generate Code" for RTC on CortexM4 for Dual Core if you decide to use RTC for Timer and DMA on CortexM0PLUS for Dual Core&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Tick "Do Not Generate Function Call" for DMA, RTC, SUBGHZ, UART and IPCC(for Dual Core)&lt;br/&gt;
+        &#160;&#160;&#160;&#8226; Untick Visibility for all Function Calls on both cores
+        </Description>
+    </RefParameter>
+
+    <!-- SUBGHZ_PHY sys_conf.h RefParameters - Begin -->
+    <RefParameter Name="VERBOSE_LEVEL" Comment="Trace verbose level" DefaultValue="VLEVEL_M" Type="list" Group="sys_conf" TabName="SubGHz_Phy application" Visible="true">
+        <Condition Diagnostic="" Expression="!(STM32WL55UCYx | STM32WL55CCUx | STM32WL55JCIx | STM32WL54CCUx | STM32WL54JCIx) &amp; !SEM_SUBGHZ_USER_APPLICATION"/>
+        <PossibleValue Value="VLEVEL_H" Comment="VLEVEL_H"/>
+        <PossibleValue Value="VLEVEL_M" Comment="VLEVEL_M"/>
+        <PossibleValue Value="VLEVEL_L" Comment="VLEVEL_L"/>
+        <Description> </Description>
+    </RefParameter>
+    <RefParameter Name="VERBOSE_LEVEL" Comment="Trace verbose level" DefaultValue="" Type="list" Group="sys_conf" TabName="SubGHz_Phy application" Visible="false">
+        <Description> </Description>
+    </RefParameter>
+
+    <RefParameter Name="VERBOSE_LEVEL_CM4" Comment="Trace verbose level" DefaultValue="VLEVEL_M" Type="list" Group="sys_conf CM4" TabName="SubGHz_Phy application" Visible="true">
+        <Condition Diagnostic="" Expression="(STM32WL55UCYx | STM32WL55CCUx | STM32WL55JCIx | STM32WL54CCUx | STM32WL54JCIx) &amp; !SEM_SUBGHZ_USER_APPLICATION"/>
+        <PossibleValue Value="VLEVEL_H" Comment="VLEVEL_H"/>
+        <PossibleValue Value="VLEVEL_M" Comment="VLEVEL_M"/>
+        <PossibleValue Value="VLEVEL_L" Comment="VLEVEL_L"/>
+        <Description> </Description>
+    </RefParameter>
+    <RefParameter Name="VERBOSE_LEVEL_CM4" Comment="Trace verbose level" DefaultValue="" Type="list" Group="sys_conf CM0PLUS" TabName="SubGHz_Phy application" Visible="false">
+        <Description> </Description>
+    </RefParameter>
+
+    <RefParameter Name="VERBOSE_LEVEL_CM0PLUS" Comment="Trace verbose level" DefaultValue="VLEVEL_M" Type="list" Group="sys_conf CM0PLUS" TabName="SubGHz_Phy application" Visible="true">
+        <Condition Diagnostic="" Expression="(STM32WL55UCYx | STM32WL55CCUx | STM32WL55JCIx | STM32WL54CCUx | STM32WL54JCIx) &amp; !S_SINGLE_CORE &amp; !SEM_SUBGHZ_USER_APPLICATION"/>
+        <PossibleValue Value="VLEVEL_H" Comment="VLEVEL_H"/>
+        <PossibleValue Value="VLEVEL_M" Comment="VLEVEL_M"/>
+        <PossibleValue Value="VLEVEL_L" Comment="VLEVEL_L"/>
+        <Description> </Description>
+    </RefParameter>
+    <RefParameter Name="VERBOSE_LEVEL_CM0PLUS" Comment="Trace verbose level" DefaultValue="" Type="list" Group="sys_conf CM0PLUS" TabName="SubGHz_Phy application" Visible="false">
+        <Description> </Description>
+    </RefParameter>
+
+    <RefParameter Name="APP_LOG_ENABLED" Comment="Enable Application Logging" DefaultValue="true" Type="boolean" Group="sys_conf" TabName="SubGHz_Phy application" Visible="true">
+        <Condition Diagnostic="" Expression="!(STM32WL55UCYx | STM32WL55CCUx | STM32WL55JCIx | STM32WL54CCUx | STM32WL54JCIx) &amp; !SEM_SUBGHZ_USER_APPLICATION"/>
+        <PossibleValue Value="true" Comment="true"/>
+        <PossibleValue Value="false" Comment="false"/>
+        <Description> </Description>
+    </RefParameter>
+    <RefParameter Name="APP_LOG_ENABLED" Comment="Enable Application Logging" DefaultValue="true" Type="boolean" Group="sys_conf" TabName="SubGHz_Phy application" Visible="false">
+        <Description> </Description>
+    </RefParameter>
+
+    <RefParameter Name="APP_LOG_ENABLED_CM4" Comment="Enable Application Logging" DefaultValue="true" Type="boolean" Group="sys_conf CM4" TabName="SubGHz_Phy application" Visible="true">
+        <Condition Diagnostic="" Expression="(STM32WL55UCYx | STM32WL55CCUx | STM32WL55JCIx | STM32WL54CCUx | STM32WL54JCIx) &amp; !SEM_SUBGHZ_USER_APPLICATION"/>
+        <PossibleValue Value="true" Comment="true"/>
+        <PossibleValue Value="false" Comment="false"/>
+        <Description> </Description>
+    </RefParameter>
+    <RefParameter Name="APP_LOG_ENABLED_CM4" Comment="Enable Application Logging" DefaultValue="true" Type="boolean" Group="sys_conf CM4" TabName="SubGHz_Phy application" Visible="false">
+        <Description> </Description>
+    </RefParameter>
+
+    <RefParameter Name="APP_LOG_ENABLED_CM0PLUS" Comment="Enable Application Logging" DefaultValue="true" Type="boolean" Group="sys_conf CM0PLUS" TabName="SubGHz_Phy application" Visible="true">
+        <Condition Diagnostic="" Expression="(STM32WL55UCYx | STM32WL55CCUx | STM32WL55JCIx | STM32WL54CCUx | STM32WL54JCIx) &amp; !S_SINGLE_CORE &amp; !SEM_SUBGHZ_USER_APPLICATION"/>
+        <PossibleValue Value="true" Comment="true"/>
+        <PossibleValue Value="false" Comment="false"/>
+        <Description> </Description>
+    </RefParameter>
+    <RefParameter Name="APP_LOG_ENABLED_CM0PLUS" Comment="Enable Application Logging" DefaultValue="true" Type="boolean" Group="sys_conf CM0PLUS" TabName="SubGHz_Phy application" Visible="false">
+        <Description> </Description>
+    </RefParameter>
+
+    <RefParameter Name="DEBUGGER_ON" Comment="Activate Debugger" DefaultValue="false" Type="boolean" Group="sys_conf" TabName="SubGHz_Phy application" Visible="true">
+        <Condition Diagnostic="" Expression="!(STM32WL55UCYx | STM32WL55CCUx | STM32WL55JCIx | STM32WL54CCUx | STM32WL54JCIx) &amp; !SEM_SUBGHZ_USER_APPLICATION"/>
+        <PossibleValue Value="true" Comment="true"/>
+        <PossibleValue Value="false" Comment="false"/>
+        <Description></Description>
+    </RefParameter>
+    <RefParameter Name="DEBUGGER_ON" Comment="Activate Debugger" DefaultValue="false" Type="boolean" Group="sys_conf" TabName="SubGHz_Phy application" Visible="false">
+        <Description></Description>
+    </RefParameter>
+
+    <RefParameter Name="DEBUGGER_ON_CM4" Comment="Activate Debugger" DefaultValue="false" Type="boolean" Group="sys_conf CM4" TabName="SubGHz_Phy application" Visible="true">
+        <Condition Diagnostic="" Expression="(STM32WL55UCYx | STM32WL55CCUx | STM32WL55JCIx | STM32WL54CCUx | STM32WL54JCIx) &amp; !SEM_SUBGHZ_USER_APPLICATION"/>
+        <PossibleValue Value="true" Comment="true"/>
+        <PossibleValue Value="false" Comment="false"/>
+        <Description></Description>
+    </RefParameter>
+    <RefParameter Name="DEBUGGER_ON_CM4" Comment="Activate Debugger" DefaultValue="false" Type="boolean" Group="sys_conf CM4" TabName="SubGHz_Phy application" Visible="false">
+        <Description></Description>
+    </RefParameter>
+
+    <RefParameter Name="DEBUGGER_ON_CM0PLUS" Comment="Activate Debugger" DefaultValue="false" Type="boolean" Group="sys_conf CM0PLUS" TabName="SubGHz_Phy application" Visible="true">
+        <Condition Diagnostic="" Expression="(STM32WL55UCYx | STM32WL55CCUx | STM32WL55JCIx | STM32WL54CCUx | STM32WL54JCIx) &amp; !S_SINGLE_CORE &amp; !SEM_SUBGHZ_USER_APPLICATION"/>
+        <PossibleValue Value="true" Comment="true"/>
+        <PossibleValue Value="false" Comment="false"/>
+        <Description></Description>
+    </RefParameter>
+    <RefParameter Name="DEBUGGER_ON_CM0PLUS" Comment="Activate Debugger" DefaultValue="false" Type="boolean" Group="sys_conf CM0PLUS" TabName="SubGHz_Phy application" Visible="false">
+        <Description></Description>
+    </RefParameter>
+
+    <RefParameter Name="LOW_POWER_DISABLE" Comment="Disable Low Power Mode" DefaultValue="false" Type="boolean" Group="sys_conf" TabName="SubGHz_Phy application" Visible="true">
+        <Condition Diagnostic="" Expression="!(STM32WL55UCYx | STM32WL55CCUx | STM32WL55JCIx | STM32WL54CCUx | STM32WL54JCIx) &amp; !SEM_SUBGHZ_USER_APPLICATION"/>
+        <PossibleValue Value="true" Comment="true"/>
+        <PossibleValue Value="false" Comment="false"/>
+        <Description>It goes only to SLEEP but not to STOP mode </Description>
+    </RefParameter>
+    <RefParameter Name="LOW_POWER_DISABLE" Comment="Disable Low Power Mode" DefaultValue="false" Type="boolean" Group="sys_conf" TabName="SubGHz_Phy application" Visible="false">
+        <Description>It goes only to SLEEP but not to STOP mode </Description>
+    </RefParameter>
+
+    <RefParameter Name="LOW_POWER_DISABLE_CM4" Comment="Disable Low Power Mode CM4" DefaultValue="false" Type="boolean" Group="sys_conf CM4" TabName="SubGHz_Phy application" Visible="true">
+        <Condition Diagnostic="" Expression="(STM32WL55UCYx | STM32WL55CCUx | STM32WL55JCIx | STM32WL54CCUx | STM32WL54JCIx) &amp; !S_SINGLE_CORE &amp; !SEM_SUBGHZ_USER_APPLICATION"/>
+        <PossibleValue Value="true" Comment="true"/>
+        <PossibleValue Value="false" Comment="false"/>
+        <Description>It goes only to SLEEP but not to STOP mode </Description>
+    </RefParameter>
+    <RefParameter Name="LOW_POWER_DISABLE_CM4" Comment="Disable Low Power Mode CM4" DefaultValue="false" Type="boolean" Group="sys_conf CM4" TabName="SubGHz_Phy application" Visible="false">
+        <Description>It goes only to SLEEP but not to STOP mode </Description>
+    </RefParameter>
+
+    <RefParameter Name="LOW_POWER_DISABLE_CM0PLUS" Comment="Disable Low Power Mode CM0PLUS" DefaultValue="false" Type="boolean" Group="sys_conf CM0PLUS" TabName="SubGHz_Phy application" Visible="true">
+        <Condition Diagnostic="" Expression="(STM32WL55UCYx | STM32WL55CCUx | STM32WL55JCIx | STM32WL54CCUx | STM32WL54JCIx) &amp; !S_SINGLE_CORE &amp; !SEM_SUBGHZ_USER_APPLICATION"/>
+        <PossibleValue Value="true" Comment="true"/>
+        <PossibleValue Value="false" Comment="false"/>
+        <Description>It goes only to SLEEP but not to STOP mode </Description>
+    </RefParameter>
+    <RefParameter Name="LOW_POWER_DISABLE_CM0PLUS" Comment="Disable Low Power Mode CM0PLUS" DefaultValue="false" Type="boolean" Group="sys_conf CM0PLUS" TabName="SubGHz_Phy application" Visible="false">
+        <Description>It goes only to SLEEP but not to STOP mode </Description>
+    </RefParameter>
+
+    <!-- SUBGHZ_PHY sys_conf.h RefParameters - End -->
+
+    <!-- SUBGHZ_PHY app_subghz_phy.h RefParameters - Begin -->
+    <RefParameter Name="MODEM_USED" Comment="Modem used" DefaultValue="7" Type="list" Group="app_subghz_phy" TabName="SubGHz_Phy application" Visible="true">
+        <Condition Diagnostic="" Expression="!SEM_SUBGHZ_USER_APPLICATION"/>
+        <PossibleValue Value="USE_MODEM_LORA" Comment="LoRa" Semaphore="Semaphore_USE_MODEM_LORA"/>
+        <PossibleValue Value="USE_MODEM_FSK" Comment="FSK" Semaphore="Semaphore_USE_MODEM_FSK"/>
+        <Description> </Description>
+    </RefParameter>
+    <RefParameter Name="MODEM_USED" Comment="Modem used" DefaultValue="" Type="UniqueElementList" Group="app_subghz_phy" TabName="SubGHz_Phy application" Visible="false">
+        <Description> </Description>
+    </RefParameter>
+
+    <RefParameter Name="REGION" Comment="Region" DefaultValue="REGION_EU868" Type="list" Group="app_subghz_phy" TabName="SubGHz_Phy application" Visible="true">
+        <Condition Diagnostic="" Expression="!SEM_SUBGHZ_USER_APPLICATION"/>
+        <PossibleValue Value="REGION_AS923" Comment="Region Asia freq: 923"/>
+        <PossibleValue Value="REGION_AU915" Comment="Region Australia freq: 915"/>
+        <PossibleValue Value="REGION_CN470" Comment="Region China freq: 470"/>
+        <PossibleValue Value="REGION_CN779" Comment="Region China freq: 779"/>
+        <PossibleValue Value="REGION_EU433" Comment="Region Europe freq: 433"/>
+        <PossibleValue Value="REGION_EU868" Comment="Region Europe freq: 868"/>
+        <PossibleValue Value="REGION_KR920" Comment="Region Korea freq: 920"/>
+        <PossibleValue Value="REGION_IN865" Comment="Region India freq: 865"/>
+        <PossibleValue Value="REGION_US915" Comment="Region USA freq: 915"/>
+        <PossibleValue Value="REGION_RU864" Comment="Region Russia freq: 864"/>
+        <Description> </Description>
+    </RefParameter>
+    <RefParameter Name="REGION" Comment="Region" DefaultValue="" Type="UniqueElementList" Group="app_subghz_phy" TabName="SubGHz_Phy application" Visible="false">
+        <Description> </Description>
+    </RefParameter>
+
+    <RefParameter Name="TX_OUTPUT_POWER" Comment="Transmit power level" DefaultValue="14" Type="double" Min="-17" Max="22" Group="app_subghz_phy" TabName="SubGHz_Phy application" Visible="true">
+        <Condition Diagnostic="" Expression="!SEM_SUBGHZ_USER_APPLICATION"/>
+        <Description> </Description>
+    </RefParameter>
+
+    <RefParameter Name="LORA_BANDWIDTH" Comment="LoRa bandwidth" DefaultValue="0" Type="list" Group="app_subghz_phy" TabName="SubGHz_Phy application" Visible="true">
+        <Condition Diagnostic="" Expression="!SEM_SUBGHZ_USER_APPLICATION &amp; Semaphore_USE_MODEM_LORA"/>
+        <PossibleValue Value="0" Comment="0: 125 kHz"/>
+        <PossibleValue Value="1" Comment="1: 250 kHz"/>
+        <PossibleValue Value="2" Comment="2: 500 kHz"/>
+        <Description> </Description>
+    </RefParameter>
+    <RefParameter Name="LORA_BANDWIDTH" Comment="LoRa bandwidth" DefaultValue="0" Type="list" Group="app_subghz_phy" TabName="SubGHz_Phy application" Visible="false">
+        <Description> </Description>
+    </RefParameter>
+
+    <RefParameter Name="LORA_SPREADING_FACTOR" Comment="LoRa spreading factor" DefaultValue="7" Type="list" Group="app_subghz_phy" TabName="SubGHz_Phy application" Visible="true">
+        <Condition Diagnostic="" Expression="!SEM_SUBGHZ_USER_APPLICATION &amp; Semaphore_USE_MODEM_LORA"/>
+        <PossibleValue Value="7" Comment="SF7"/>
+        <PossibleValue Value="8" Comment="SF8"/>
+        <PossibleValue Value="9" Comment="SF9"/>
+        <PossibleValue Value="10" Comment="SF10"/>
+        <PossibleValue Value="11" Comment="SF11"/>
+        <PossibleValue Value="12" Comment="SF12"/>
+        <Description> </Description>
+    </RefParameter>
+    <RefParameter Name="LORA_SPREADING_FACTOR" Comment="LoRa spreading factor" DefaultValue="7" Type="list" Group="app_subghz_phy" TabName="SubGHz_Phy application" Visible="false">
+        <Description> </Description>
+    </RefParameter>
+
+    <RefParameter Name="LORA_CODINGRATE" Comment="LoRa coding rate" DefaultValue="1" Type="list" Group="app_subghz_phy" TabName="SubGHz_Phy application" Visible="true">
+        <Condition Diagnostic="" Expression="!SEM_SUBGHZ_USER_APPLICATION &amp; Semaphore_USE_MODEM_LORA"/>
+        <PossibleValue Value="1" Comment="1: 4/5"/>
+        <PossibleValue Value="2" Comment="2: 4/6"/>
+        <PossibleValue Value="3" Comment="3: 4/7"/>
+        <PossibleValue Value="4" Comment="4: 4/8"/>
+        <Description> </Description>
+    </RefParameter>
+    <RefParameter Name="LORA_CODINGRATE" Comment="LoRa coding rate" DefaultValue="1" Type="list" Group="app_subghz_phy" TabName="SubGHz_Phy application" Visible="false">
+        <Description> </Description>
+    </RefParameter>
+
+    <RefParameter Name="LORA_PREAMBLE_LENGTH" Comment="LoRa preamble length" DefaultValue="8" Min="1" Max="65535" Type="integer" Group="app_subghz_phy" TabName="SubGHz_Phy application" Visible="true">
+        <Condition Diagnostic="" Expression="Semaphore_USE_MODEM_LORA &amp; !SEM_SUBGHZ_USER_APPLICATION"/>
+        <Description> </Description>
+    </RefParameter>
+    <RefParameter Name="LORA_PREAMBLE_LENGTH" Comment="LoRa preamble length" DefaultValue="8" Min="1" Max="65535" Type="integer" Group="app_subghz_phy" TabName="SubGHz_Phy application" Visible="false">
+        <Description> </Description>
+    </RefParameter>
+
+    <RefParameter Name="LORA_SYMBOL_TIMEOUT" Comment="LoRa symbol timeout" DefaultValue="5" Min="1" Max="255" Type="integer" Group="app_subghz_phy" TabName="SubGHz_Phy application" Visible="true">
+        <Condition Diagnostic="" Expression="Semaphore_USE_MODEM_LORA &amp; !SEM_SUBGHZ_USER_APPLICATION"/>
+        <Description> </Description>
+    </RefParameter>
+    <RefParameter Name="LORA_SYMBOL_TIMEOUT" Comment="LoRa symbol timeout" DefaultValue="5" Min="1" Max="255" Type="integer" Group="app_subghz_phy" TabName="SubGHz_Phy application" Visible="false">
+        <Description> </Description>
+    </RefParameter>
+
+    <RefParameter Name="LORA_FIX_LENGTH_PAYLOAD_ON" Comment="LoRa fix length payload on" DefaultValue="false" Type="boolean" Group="app_subghz_phy" TabName="SubGHz_Phy application" Visible="true">
+        <Condition Diagnostic="" Expression="Semaphore_USE_MODEM_LORA &amp; !SEM_SUBGHZ_USER_APPLICATION"/>
+        <PossibleValue Value="true" Comment="true"/>
+        <PossibleValue Value="false" Comment="false"/>
+        <Description> </Description>
+    </RefParameter>
+    <RefParameter Name="LORA_FIX_LENGTH_PAYLOAD_ON" Comment="LoRa fix length payload on" DefaultValue="false" Type="boolean" Group="app_subghz_phy" TabName="SubGHz_Phy application" Visible="false">
+        <Description> </Description>
+    </RefParameter>
+
+    <RefParameter Name="LORA_IQ_INVERSION_ON" Comment="LoRa IQ inversion" DefaultValue="false" Type="boolean" Group="app_subghz_phy" TabName="SubGHz_Phy application" Visible="true">
+        <PossibleValue Value="true" Comment="true"/>
+        <PossibleValue Value="false" Comment="false"/>
+        <Condition Diagnostic="" Expression="Semaphore_USE_MODEM_LORA &amp; !SEM_SUBGHZ_USER_APPLICATION"/>
+        <Description> </Description>
+    </RefParameter>
+    <RefParameter Name="LORA_IQ_INVERSION_ON" Comment="LoRa IQ inversion" DefaultValue="false" Type="boolean" Group="app_subghz_phy" TabName="SubGHz_Phy application" Visible="false">
+        <Description> </Description>
+    </RefParameter>
+
+    <RefParameter Name="FSK_FDEV" Comment="FSK frequency deviation" DefaultValue="25000" Type="integer" Group="app_subghz_phy" TabName="SubGHz_Phy application" Visible="true">
+        <Condition Diagnostic="" Expression="!Semaphore_USE_MODEM_LORA &amp; !SEM_SUBGHZ_USER_APPLICATION"/>
+        <Description> </Description>
+    </RefParameter>
+    <RefParameter Name="FSK_FDEV" Comment="FSK frequency deviation" DefaultValue="25000" Type="integer" Group="app_subghz_phy" TabName="SubGHz_Phy application" Visible="false">
+        <Description> </Description>
+    </RefParameter>
+
+    <RefParameter Name="FSK_DATARATE" Comment="FSK data rate" DefaultValue="50000" Type="integer" Group="app_subghz_phy" TabName="SubGHz_Phy application" Visible="true">
+        <Condition Diagnostic="" Expression="!Semaphore_USE_MODEM_LORA &amp; !SEM_SUBGHZ_USER_APPLICATION"/>
+        <Description> </Description>
+    </RefParameter>
+    <RefParameter Name="FSK_DATARATE" Comment="FSK data rate" DefaultValue="50000" Type="integer" Group="app_subghz_phy" TabName="SubGHz_Phy application" Visible="false">
+        <Description> </Description>
+    </RefParameter>
+
+    <RefParameter Name="FSK_BANDWIDTH" Comment="FSK bandwidth" DefaultValue="50000" Type="integer" Group="app_subghz_phy" TabName="SubGHz_Phy application" Visible="true">
+        <Condition Diagnostic="" Expression="!Semaphore_USE_MODEM_LORA &amp; !SEM_SUBGHZ_USER_APPLICATION"/>
+        <Description> </Description>
+    </RefParameter>
+    <RefParameter Name="FSK_BANDWIDTH" Comment="FSK bandwidth" DefaultValue="50000" Type="integer" Group="app_subghz_phy" TabName="SubGHz_Phy application" Visible="false">
+        <Description> </Description>
+    </RefParameter>
+
+    <RefParameter Name="FSK_PREAMBLE_LENGTH" Comment="FSK preamble length" DefaultValue="5" Type="integer" Group="app_subghz_phy" TabName="SubGHz_Phy application" Visible="true">
+        <Condition Diagnostic="" Expression="!Semaphore_USE_MODEM_LORA &amp; !SEM_SUBGHZ_USER_APPLICATION"/>
+        <Description> </Description>
+    </RefParameter>
+    <RefParameter Name="FSK_PREAMBLE_LENGTH" Comment="FSK preamble length" DefaultValue="5" Type="integer" Group="app_subghz_phy" TabName="SubGHz_Phy application" Visible="false">
+        <Description> </Description>
+    </RefParameter>
+
+    <RefParameter Name="FSK_FIX_LENGTH_PAYLOAD_ON" Comment="FSK fix lenght payload on" DefaultValue="false" Type="list" Group="app_subghz_phy" TabName="SubGHz_Phy application" Visible="true">
+        <PossibleValue Value="true" Comment="Yes"/>
+        <PossibleValue Value="false" Comment="No"/>
+        <Condition Diagnostic="" Expression="!Semaphore_USE_MODEM_LORA &amp; !SEM_SUBGHZ_USER_APPLICATION"/>
+        <Description> </Description>
+    </RefParameter>
+    <RefParameter Name="FSK_FIX_LENGTH_PAYLOAD_ON" Comment="FSK fix lenght payload on" DefaultValue="false" Type="list" Group="app_subghz_phy" TabName="SubGHz_Phy application" Visible="false">
+        <Description> </Description>
+    </RefParameter>
+
+    <RefParameter Name="PAYLOAD_LEN" Comment="Payload length" DefaultValue="64" Type="integer" Group="app_subghz_phy" TabName="SubGHz_Phy application" Visible="true">
+        <Condition Diagnostic="" Expression="!SEM_SUBGHZ_USER_APPLICATION"/>
+        <Description> </Description>
+    </RefParameter>
+    <RefParameter Name="PAYLOAD_LEN" Comment="Payload length" DefaultValue="64" Type="integer" Group="app_subghz_phy" TabName="SubGHz_Phy application" Visible="false">
+        <Description> </Description>
+    </RefParameter>
+
+    <!-- SubGHz_Phy app_subghz_phy.c RefParameters - End -->
+
+    <!-- SubGHz_Phy mw_log_conf.h RefParameters - Begin -->
+    <RefParameter Name="MW_LOG_ENABLED" Comment="Enable Middleware log" DefaultValue="true" Type="boolean" Group="mw_log_conf" TabName="SubGHz_Phy middleware" Visible="true">
+        <Condition Diagnostic="" Expression="!SEM_SUBGHZ_USER_APPLICATION"/>
+        <PossibleValue Value="false" Comment="false"/>
+        <PossibleValue Value="true" Comment="true"/>
+        <Description> </Description>
+    </RefParameter>
+    <RefParameter Name="MW_LOG_ENABLED" Comment="Enable Middleware log" DefaultValue="true" Type="UniqueElementList" Group="mw_log_conf" TabName="SubGHz_Phy middleware" Visible="false">
+        <Description> </Description>
+    </RefParameter>
+    <!-- SubGHz_Phy mw_log_conf.h RefParameters - End -->
+
+    <!-- SubGHz_Phy radio_conf.h RefParameters - Begin -->
+    <RefParameter Name="Activate_DEBUG_LINE" Comment="Probe Lines in Platform Settings" DefaultValue="false" Type="boolean" Group="radio_conf" TabName="SubGHz_Phy middleware" Added="true">
+        <Condition Diagnostic="" Expression="!SEM_SUBGHZ_USER_APPLICATION"/>
+        <PossibleValue Comment="false" Value="false"/>
+        <PossibleValue Comment="true" Value="true" Semaphore="SEM_PROBE_LINE_FOR_SUBGHZ_PHY"/>
+        <Description>Enable Probe Line using GPIO under Plaform Settings panel</Description>
+    </RefParameter>
+    <RefParameter Name="Activate_DEBUG_LINE" Comment="Probes Lines in Platform Settings" DefaultValue="false" Type="UniqueElementList" Group="radio_conf" TabName="SubGHz_Phy middleware" Added="true" Visible="false">
+        <PossibleValue Comment="false" Value="false"/>
+        <Description>Enable Probes Line using GPIO under Plaform Settings panel</Description>
+    </RefParameter>
+
+    <RefParameter Name="RF_WAKEUP_TIME" Comment="Radio maximum wakeup time (in ms)" DefaultValue="1" Type="integer" Group="radio_conf" TabName="SubGHz_Phy middleware" Added="true">
+        <Description>Radio maximum wakeup time (in ms)</Description>
+    </RefParameter>
+    <!-- SubGHz_Phy radio_conf.h RefParameters - End -->
+
+    <!-- SubGHz_Phy radio_board_if.c/h RefParameters - Begin -->
+    <RefParameter Name="Activate_RADIO_BOARD_INTERFACE" Comment="Select radio Driver" DefaultValue="UserBoard" Type="list" Group="radio_board_if" TabName="SubGHz_Phy middleware" Added="true" Visible="true">
+        <PossibleValue Value="UserBoard" Comment="User Board" Semaphore="SEM_USER_BOARD_FOR_SUBGHZ_PHY"/>
+        <PossibleValue Value="Bsp" Comment="Bsp via extSettings" />
+        <!--
+        <PossibleValue Value="NucleoPseudo" Comment="Nucleo Pseudo Driver" />
+        <Description>UserBoard: user to complete; Bsp: need to be included in the IDE; NucleoPseudo: just x backward compatibility.</Description>
+        -->
+        <Description>UserBoard: user to complete; Bsp: need to be included in the IDE.</Description>
+    </RefParameter>
+
+    <RefParameter Name="IS_TCXO_SUPPORTED" Comment="TCXO support" DefaultValue="true" Type="boolean" Group="radio_board_if" TabName="SubGHz_Phy middleware" Added="true">
+        <Condition Diagnostic="" Expression="HSEByPassPwr &amp; SEM_USER_BOARD_FOR_SUBGHZ_PHY"/>
+        <Description>Indicates whether or not TCXO is supported by the board. TCXO needs to be selected in RCC panel (HSE clock)</Description>
+    </RefParameter>
+    <RefParameter Name="IS_TCXO_SUPPORTED" Comment="TCXO support" DefaultValue="false" Type="list" Group="radio_board_if" TabName="SubGHz_Phy middleware" Added="true">
+        <Condition Expression="SEM_USER_BOARD_FOR_SUBGHZ_PHY"  Diagnostic=""/> 
+        <PossibleValue Value="false" Comment="TCXO not available!"/>
+        <Description>You need to activate TCXO in RCC configuration panel</Description>
+    </RefParameter>
+
+    <RefParameter Name="IS_DCDC_SUPPORTED" Comment="DCDC support" DefaultValue="true" Type="boolean" Group="radio_board_if" TabName="SubGHz_Phy middleware" Added="true">
+        <Condition Expression="SEM_USER_BOARD_FOR_SUBGHZ_PHY"  Diagnostic=""/> 
+        <PossibleValue Value="false" Comment="false"/>
+        <PossibleValue Value="true" Comment="true"/>
+        <Description>Indicates whether or not DCDC is supported by the board</Description>
+    </RefParameter>
+
+    <RefParameter Name="TX_RFO_CONFIG" Comment="Tx Rfo Config" DefaultValue="RBI_CONF_RFO_LP_HP" Type="list" Group="radio_board_if" TabName="SubGHz_Phy middleware" Added="true">
+        <Condition Expression="SEM_USER_BOARD_FOR_SUBGHZ_PHY"  Diagnostic=""/> 
+        <PossibleValue Value="RBI_CONF_RFO_LP_HP" Comment="CONF_RFO_LP_HP"/>
+        <PossibleValue Value="RBI_CONF_RFO_LP" Comment="CONF_RFO_LP"/>
+        <PossibleValue Value="RBI_CONF_RFO_HP" Comment="CONF_RFO_HP"/>
+        <Description>Indicates the config</Description>
+    </RefParameter>
+    <!-- SubGHz_Phy radio_board_if.h RefParameters - End -->
+
+    <!-- SubGHz_Phy board_resources.h/c RefParameters - Begin -->
+    <RefParameter Name="Activate_BOARD_RESOURCES" Comment="Board Resources" DefaultValue="none" Type="list" Group="board settings" TabName="SubGHz_Phy application" Added="true">
+        <Condition Diagnostic="" Expression="(STM32WL55UCYx | STM32WL55CCUx | STM32WL55JCIx | STM32WL54CCUx | STM32WL54JCIx) &amp; !S_SINGLE_CORE"/>
+        <PossibleValue Comment="Cortex-M0+ via Platform Settings" Value="M0PLUS" Semaphore="SEM_BOARD_RESOURCES_M0PLUS_FOR_SUBGHZ_PHY"/>
+        <PossibleValue Comment="Cortex-M4 via Platform Settings" Value="M4" Semaphore="SEM_BOARD_RESOURCES_M4_FOR_SUBGHZ_PHY"/>
+        <PossibleValue Comment="Both cores via Platform Settings" Value="both" Semaphore="SEM_BOARD_RESOURCES_BOTH_FOR_SUBGHZ_PHY"/>
+        <PossibleValue Comment="None" Value="none"/>
+        <Description>Enable LEDs and BUTTONs settings using GPIO under Plaform Settings panel</Description>
+    </RefParameter>
+
+    <RefParameter Name="Activate_BOARD_RESOURCES" Comment="Board Resources" DefaultValue="none" Type="list" Group="board settings" TabName="SubGHz_Phy application" Added="true">
+        <PossibleValue Comment="Set pins via Platform Settings" Value="M4" Semaphore="SEM_BOARD_RESOURCES_M4_FOR_SUBGHZ_PHY"/>
+        <PossibleValue Comment="None" Value="none"/>
+        <Description>Enable LEDs and BUTTONs settings using GPIO under Plaform Settings panel or via .extSettings file</Description>
+    </RefParameter>
+    <!-- SubGHz_Phy board_resources.h/c RefParameters - End -->
+
+
+    <!-- RefMode for subGHzRF -->
+    <RefMode Name="SubGhzPhy_Enabled">
+        <ConfigForMode>SubGhz_Phy_Init</ConfigForMode>
+        <!-- app_conf.h -->
+        <Parameter Name="SUBGHZ_APPLICATION"/>
+        <Parameter Name="USER_SUBGHZ_APP"/>
+        <Parameter Name="USER_GUIDANCE"/>
+        <Parameter Name="FILL_UCS"/>
+        <Parameter Name="USE_RTC"/>
+        <Parameter Name="USE_UART"/>
+        <Parameter Name="USE_LPM"/>
+
+        <!-- board_resources -->
+        <Parameter Name="Activate_BOARD_RESOURCES" Added="true"/>
+
+        <!-- sys_conf.h -->
+        <Parameter Name="VERBOSE_LEVEL"/>
+        <Parameter Name="VERBOSE_LEVEL_CM4"/>
+        <Parameter Name="VERBOSE_LEVEL_CM0PLUS"/>
+        <Parameter Name="APP_LOG_ENABLED"/>
+        <Parameter Name="APP_LOG_ENABLED_CM4"/>
+        <Parameter Name="APP_LOG_ENABLED_CM0PLUS"/>
+        <Parameter Name="DEBUGGER_ON"/>
+        <Parameter Name="DEBUGGER_ON_CM4"/>
+        <Parameter Name="DEBUGGER_ON_CM0PLUS"/>
+        <Parameter Name="LOW_POWER_DISABLE"/>
+        <Parameter Name="LOW_POWER_DISABLE_CM4"/>
+        <Parameter Name="LOW_POWER_DISABLE_CM0PLUS"/>
+        <!-- sys_conf.h -->
+
+        <!-- subghz_phy_app.h -->
+        <Parameter Name="MODEM_USED"/>
+        <Parameter Name="REGION"/>
+        <Parameter Name="LORA_BANDWIDTH"/>
+        <Parameter Name="LORA_SPREADING_FACTOR"/>
+        <Parameter Name="LORA_CODINGRATE"/>
+        <Parameter Name="LORA_PREAMBLE_LENGTH"/>
+        <Parameter Name="LORA_SYMBOL_TIMEOUT"/>
+        <Parameter Name="LORA_FIX_LENGTH_PAYLOAD_ON"/>
+        <Parameter Name="LORA_IQ_INVERSION_ON"/>
+        <Parameter Name="FSK_FDEV"/>
+        <Parameter Name="FSK_DATARATE"/>
+        <Parameter Name="FSK_BANDWIDTH"/>
+        <Parameter Name="FSK_PREAMBLE_LENGTH"/>
+        <Parameter Name="FSK_FIX_LENGTH_PAYLOAD_ON"/>
+        <Parameter Name="PAYLOAD_LEN"/>
+
+        <!-- subghz_phy_app.h -->
+
+        <!-- radio_conf -->
+        <Parameter Name="RF_WAKEUP_TIME" Added="true"/>
+        <Parameter Name="Activate_DEBUG_LINE" Added="true"/>
+        <!-- radio_conf -->
+
+        <!-- radio_board interface -->
+        <Parameter Name="Activate_RADIO_BOARD_INTERFACE" Added="true"/>
+        <Parameter Name="IS_TCXO_SUPPORTED" Added="true"/>
+        <Parameter Name="IS_DCDC_SUPPORTED" Added="true"/>
+        <Parameter Name="TX_RFO_CONFIG" Added="true"/>
+        <!-- radio_board interface -->
+
+        <!-- mw_log_conf.h -->
+        <Parameter Name="MW_LOG_ENABLED"/>
+        <!-- mw_log_conf.h -->
+
+        <!-- BSP Board resources Driver Begin -->
+        <BspDependency Name="LED 1" Comment="Use the User Led for this application" BspIpName="GPIO" BspModeName="Output" GroupName="Board resources">
+            <Condition Expression="SEM_BOARD_RESOURCES_M0PLUS_FOR_SUBGHZ_PHY | SEM_BOARD_RESOURCES_M4_FOR_SUBGHZ_PHY | SEM_BOARD_RESOURCES_BOTH_FOR_SUBGHZ_PHY"  Diagnostic=""/>
+        </BspDependency>
+        <BspDependency Name="LED 2" Comment="Use the User Led for this application" BspIpName="GPIO" BspModeName="Output" GroupName="Board resources">
+            <Condition Expression="SEM_BOARD_RESOURCES_M0PLUS_FOR_SUBGHZ_PHY | SEM_BOARD_RESOURCES_M4_FOR_SUBGHZ_PHY | SEM_BOARD_RESOURCES_BOTH_FOR_SUBGHZ_PHY"  Diagnostic=""/>
+        </BspDependency>
+        <BspDependency Name="LED 3" Comment="Use the User Led for this application" BspIpName="GPIO" BspModeName="Output" GroupName="Board resources">
+            <Condition Expression="SEM_BOARD_RESOURCES_M0PLUS_FOR_SUBGHZ_PHY | SEM_BOARD_RESOURCES_M4_FOR_SUBGHZ_PHY | SEM_BOARD_RESOURCES_BOTH_FOR_SUBGHZ_PHY"  Diagnostic=""/>
+        </BspDependency>
+        <BspDependency Name="BUTTON 1" Comment="Use the User Button for this application" BspIpName="GPIO" BspModeName="EXTI" Api="HAL_EXTI_DRIVER" GroupName="Board resources">
+            <Condition Expression="SEM_BOARD_RESOURCES_M0PLUS_FOR_SUBGHZ_PHY | SEM_BOARD_RESOURCES_M4_FOR_SUBGHZ_PHY | SEM_BOARD_RESOURCES_BOTH_FOR_SUBGHZ_PHY"  Diagnostic=""/>
+        </BspDependency>
+        <BspDependency Name="BUTTON 1" Comment="Use the User Button for this application" BspIpName="GPIO" BspModeName="Input" GroupName="Board resources">
+            <Condition Expression="SEM_BOARD_RESOURCES_M0PLUS_FOR_SUBGHZ_PHY | SEM_BOARD_RESOURCES_M4_FOR_SUBGHZ_PHY | SEM_BOARD_RESOURCES_BOTH_FOR_SUBGHZ_PHY"  Diagnostic=""/>
+        </BspDependency>
+        <BspDependency Name="BUTTON 2" Comment="Use the User Button for this application" BspIpName="GPIO" BspModeName="EXTI" Api="HAL_EXTI_DRIVER" GroupName="Board resources">
+            <Condition Expression="SEM_BOARD_RESOURCES_M0PLUS_FOR_SUBGHZ_PHY | SEM_BOARD_RESOURCES_M4_FOR_SUBGHZ_PHY | SEM_BOARD_RESOURCES_BOTH_FOR_SUBGHZ_PHY"  Diagnostic=""/>
+        </BspDependency>
+        <BspDependency Name="BUTTON 2" Comment="Use the User Button for this application" BspIpName="GPIO" BspModeName="Input" GroupName="Board resources">
+            <Condition Expression="SEM_BOARD_RESOURCES_M0PLUS_FOR_SUBGHZ_PHY | SEM_BOARD_RESOURCES_M4_FOR_SUBGHZ_PHY | SEM_BOARD_RESOURCES_BOTH_FOR_SUBGHZ_PHY"  Diagnostic=""/>
+        </BspDependency>
+        <BspDependency Name="BUTTON 3" Comment="Use the User Button for this application" BspIpName="GPIO" BspModeName="EXTI" Api="HAL_EXTI_DRIVER" GroupName="Board resources">
+            <Condition Expression="SEM_BOARD_RESOURCES_M0PLUS_FOR_SUBGHZ_PHY | SEM_BOARD_RESOURCES_M4_FOR_SUBGHZ_PHY | SEM_BOARD_RESOURCES_BOTH_FOR_SUBGHZ_PHY"  Diagnostic=""/>
+        </BspDependency>
+        <BspDependency Name="BUTTON 3" Comment="Use the User Button for this application" BspIpName="GPIO" BspModeName="Input" GroupName="Board resources">
+            <Condition Expression="SEM_BOARD_RESOURCES_M0PLUS_FOR_SUBGHZ_PHY | SEM_BOARD_RESOURCES_M4_FOR_SUBGHZ_PHY | SEM_BOARD_RESOURCES_BOTH_FOR_SUBGHZ_PHY"  Diagnostic=""/>
+        </BspDependency>
+        <!-- BSP Board resources Driver End -->
+
+        <!-- BSP Virtual PortCom Begin -->
+        <BspDependency Name="USART" Comment="Use an USART or LPUART for this application" BspIpName="(LPU|US)ART" BspModeName="Asynchronous" GroupName="VCOM">
+            <Condition Expression="!SEM_SUBGHZ_USER_APPLICATION | SEM_SUBGHZ_USE_UART" Diagnostic=""/>
+        </BspDependency>
+        <!-- BSP Virtual PortCom End -->
+
+        <!-- BSP RTC Begin -->
+        <BspDependency Name="RTC" Comment="Use RTC for timeServer" BspIpName="RTC" BspModeName="RTC Enabled" GroupName="TimeServer">
+            <Condition Expression="!SEM_SUBGHZ_USER_APPLICATION | SEM_SUBGHZ_USE_RTC" Diagnostic=""/>
+        </BspDependency>
+        <!-- BSP RTC End -->
+
+        <!-- BSP Probe Begin -->
+        <BspDependency Name="Debug Line 1" Comment="Probe Line 1" BspIpName="GPIO" BspModeName="Output" GroupName="Probe Lines">
+            <Condition Expression="SEM_PROBE_LINE_FOR_SUBGHZ_PHY"  Diagnostic=""/>
+        </BspDependency>
+        <BspDependency Name="Debug Line 2" Comment="Probe Line 2" BspIpName="GPIO" BspModeName="Output" GroupName="Probe Lines">
+            <Condition Expression="SEM_PROBE_LINE_FOR_SUBGHZ_PHY"  Diagnostic=""/>
+        </BspDependency>
+        <BspDependency Name="Debug Line 3" Comment="Probe Line 3" BspIpName="GPIO" BspModeName="Output" GroupName="Probe Lines">
+            <Condition Expression="SEM_PROBE_LINE_FOR_SUBGHZ_PHY"  Diagnostic=""/>
+        </BspDependency>
+        <BspDependency Name="Debug Line 4" Comment="Probe Line 4" BspIpName="GPIO" BspModeName="Output" GroupName="Probe Lines">
+            <Condition Expression="SEM_PROBE_LINE_FOR_SUBGHZ_PHY"  Diagnostic=""/>
+        </BspDependency>
+        <!-- BSP Probe End -->
+    </RefMode>
+
+    <!-- ModeLogicOperator for subGHzRF -->
+    <ModeLogicOperator Name="OR">
+        <Mode Name="Enabled">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="SubGhzPhy_Enabled">
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="Basic" Name="VS_SubGhzPhy"/>
+                    </SignalLogicalOp>
+                    <Semaphore>S_SubGhzPhy</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+            <Condition Expression="((STM32WL55UCYx | STM32WL55CCUx | STM32WL55JCIx | STM32WL54CCUx | STM32WL54JCIx) &amp; !S_LoRaWAN &amp; !S_Sigfox &amp; S_SUBGHZ &amp; S_IPCC_Enabled &amp; !S_SINGLE_CORE)
+									| ((STM32WL55UCYx | STM32WL55CCUx | STM32WL55JCIx | STM32WL54CCUx | STM32WL54JCIx) &amp; !S_LoRaWAN &amp; !S_Sigfox &amp; S_SUBGHZ &amp; S_SINGLE_CORE)
+									| ((!STM32WL55UCYx &amp; !STM32WL55CCUx &amp; !STM32WL55JCIx &amp; !STM32WL54CCUx &amp; !STM32WL54JCIx) &amp; !S_LoRaWAN &amp; !S_Sigfox &amp; S_SUBGHZ)"
+									Diagnostic="You can enable this middleware only if only if SubGHz IP is enabled and LoRaWAN and Sigfox middlewares are not enabled. For Dual Core product you need also to activate IPCC"/>
+        </Mode>
+    </ModeLogicOperator>
+
+    <!-- RefSignal for subGHzRF -->
+    <RefSignal Name="VS_SubGhzPhy" Virtual="true"/>
+</IP>

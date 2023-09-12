@@ -43,7 +43,7 @@ struct shared_resource_table {
 	struct fw_rsc_vdev vdev;
 	struct fw_rsc_vdev_vring vring0;
 	struct fw_rsc_vdev_vring vring1;
-		struct fw_rsc_trace cm_trace;
+	struct fw_rsc_trace cm_trace;
 };
 
 /* USER CODE END ET */

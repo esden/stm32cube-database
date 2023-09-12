@@ -101,6 +101,12 @@
 [#assign SERVICE4_UUID_TYPE = 0]
 [#assign SERVICE5_UUID_TYPE = 0]
 
+[#assign SERVICE1_UUID_128_INPUT_TYPE = 0]
+[#assign SERVICE2_UUID_128_INPUT_TYPE = 0]
+[#assign SERVICE3_UUID_128_INPUT_TYPE = 0]
+[#assign SERVICE4_UUID_128_INPUT_TYPE = 0]
+[#assign SERVICE5_UUID_128_INPUT_TYPE = 0]
+
 [#assign SERVICE1_MAX_ATTRIBUTES_RECORDS = 0]
 [#assign SERVICE2_MAX_ATTRIBUTES_RECORDS = 0]
 [#assign SERVICE3_MAX_ATTRIBUTES_RECORDS = 0]
@@ -158,6 +164,32 @@
 [#assign SERVICE5_CHAR3_UUID_TYPE = 0]
 [#assign SERVICE5_CHAR4_UUID_TYPE = 0]
 [#assign SERVICE5_CHAR5_UUID_TYPE = 0]
+
+[#assign SERVICE1_CHAR1_UUID_128_INPUT_TYPE = 0]
+[#assign SERVICE1_CHAR2_UUID_128_INPUT_TYPE = 0]
+[#assign SERVICE1_CHAR3_UUID_128_INPUT_TYPE = 0]
+[#assign SERVICE1_CHAR4_UUID_128_INPUT_TYPE = 0]
+[#assign SERVICE1_CHAR5_UUID_128_INPUT_TYPE = 0]
+[#assign SERVICE2_CHAR1_UUID_128_INPUT_TYPE = 0]
+[#assign SERVICE2_CHAR2_UUID_128_INPUT_TYPE = 0]
+[#assign SERVICE2_CHAR3_UUID_128_INPUT_TYPE = 0]
+[#assign SERVICE2_CHAR4_UUID_128_INPUT_TYPE = 0]
+[#assign SERVICE2_CHAR5_UUID_128_INPUT_TYPE = 0]
+[#assign SERVICE3_CHAR1_UUID_128_INPUT_TYPE = 0]
+[#assign SERVICE3_CHAR2_UUID_128_INPUT_TYPE = 0]
+[#assign SERVICE3_CHAR3_UUID_128_INPUT_TYPE = 0]
+[#assign SERVICE3_CHAR4_UUID_128_INPUT_TYPE = 0]
+[#assign SERVICE3_CHAR5_UUID_128_INPUT_TYPE = 0]
+[#assign SERVICE4_CHAR1_UUID_128_INPUT_TYPE = 0]
+[#assign SERVICE4_CHAR2_UUID_128_INPUT_TYPE = 0]
+[#assign SERVICE4_CHAR3_UUID_128_INPUT_TYPE = 0]
+[#assign SERVICE4_CHAR4_UUID_128_INPUT_TYPE = 0]
+[#assign SERVICE4_CHAR5_UUID_128_INPUT_TYPE = 0]
+[#assign SERVICE5_CHAR1_UUID_128_INPUT_TYPE = 0]
+[#assign SERVICE5_CHAR2_UUID_128_INPUT_TYPE = 0]
+[#assign SERVICE5_CHAR3_UUID_128_INPUT_TYPE = 0]
+[#assign SERVICE5_CHAR4_UUID_128_INPUT_TYPE = 0]
+[#assign SERVICE5_CHAR5_UUID_128_INPUT_TYPE = 0]
 
 [#assign SERVICE1_CHAR1_VALUE_OFFSET = 0]
 [#assign SERVICE1_CHAR2_VALUE_OFFSET = 0]
@@ -915,6 +947,22 @@
                 [#assign SERVICE5_UUID_TYPE = definition.value]
             [/#if]
 
+            [#if (definition.name == "SERVICE1_UUID_128_INPUT_TYPE")]
+                [#assign SERVICE1_UUID_128_INPUT_TYPE = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE2_UUID_128_INPUT_TYPE")]
+                [#assign SERVICE2_UUID_128_INPUT_TYPE = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE3_UUID_128_INPUT_TYPE")]
+                [#assign SERVICE3_UUID_128_INPUT_TYPE = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE4_UUID_128_INPUT_TYPE")]
+                [#assign SERVICE4_UUID_128_INPUT_TYPE = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE5_UUID_128_INPUT_TYPE")]
+                [#assign SERVICE5_UUID_128_INPUT_TYPE = definition.value]
+            [/#if]
+
             [#if (definition.name == "SERVICE1_MAX_ATTRIBUTES_RECORDS")]
                 [#assign SERVICE1_MAX_ATTRIBUTES_RECORDS = definition.value]
             [/#if]
@@ -1082,6 +1130,96 @@
             [#if (definition.name == "SERVICE5_CHAR5_UUID_TYPE")]
                 [#assign SERVICE5_CHAR5_UUID_TYPE = definition.value]
             [/#if]
+
+
+
+
+
+            [#if (definition.name == "SERVICE1_CHAR1_UUID_128_INPUT_TYPE")]
+                [#assign SERVICE1_CHAR1_UUID_128_INPUT_TYPE = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE1_CHAR2_UUID_128_INPUT_TYPE")]
+                [#assign SERVICE1_CHAR2_UUID_128_INPUT_TYPE = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE1_CHAR3_UUID_128_INPUT_TYPE")]
+                [#assign SERVICE1_CHAR3_UUID_128_INPUT_TYPE = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE1_CHAR4_UUID_128_INPUT_TYPE")]
+                [#assign SERVICE1_CHAR4_UUID_128_INPUT_TYPE = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE1_CHAR5_UUID_128_INPUT_TYPE")]
+                [#assign SERVICE1_CHAR5_UUID_128_INPUT_TYPE = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE2_CHAR1_UUID_128_INPUT_TYPE")]
+                [#assign SERVICE2_CHAR1_UUID_128_INPUT_TYPE = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE2_CHAR2_UUID_128_INPUT_TYPE")]
+                [#assign SERVICE2_CHAR2_UUID_128_INPUT_TYPE = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE2_CHAR3_UUID_128_INPUT_TYPE")]
+                [#assign SERVICE2_CHAR3_UUID_128_INPUT_TYPE = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE2_CHAR4_UUID_128_INPUT_TYPE")]
+                [#assign SERVICE2_CHAR4_UUID_128_INPUT_TYPE = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE2_CHAR5_UUID_128_INPUT_TYPE")]
+                [#assign SERVICE2_CHAR5_UUID_128_INPUT_TYPE = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE3_CHAR1_UUID_128_INPUT_TYPE")]
+                [#assign SERVICE3_CHAR1_UUID_128_INPUT_TYPE = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE3_CHAR2_UUID_128_INPUT_TYPE")]
+                [#assign SERVICE3_CHAR2_UUID_128_INPUT_TYPE = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE3_CHAR3_UUID_128_INPUT_TYPE")]
+                [#assign SERVICE3_CHAR3_UUID_128_INPUT_TYPE = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE3_CHAR4_UUID_128_INPUT_TYPE")]
+                [#assign SERVICE3_CHAR4_UUID_128_INPUT_TYPE = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE3_CHAR5_UUID_128_INPUT_TYPE")]
+                [#assign SERVICE3_CHAR5_UUID_128_INPUT_TYPE = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE4_CHAR1_UUID_128_INPUT_TYPE")]
+                [#assign SERVICE4_CHAR1_UUID_128_INPUT_TYPE = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE4_CHAR2_UUID_128_INPUT_TYPE")]
+                [#assign SERVICE4_CHAR2_UUID_128_INPUT_TYPE = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE4_CHAR3_UUID_128_INPUT_TYPE")]
+                [#assign SERVICE4_CHAR3_UUID_128_INPUT_TYPE = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE4_CHAR4_UUID_128_INPUT_TYPE")]
+                [#assign SERVICE4_CHAR4_UUID_128_INPUT_TYPE = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE4_CHAR5_UUID_128_INPUT_TYPE")]
+                [#assign SERVICE4_CHAR5_UUID_128_INPUT_TYPE = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE5_CHAR1_UUID_128_INPUT_TYPE")]
+                [#assign SERVICE5_CHAR1_UUID_128_INPUT_TYPE = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE5_CHAR2_UUID_128_INPUT_TYPE")]
+                [#assign SERVICE5_CHAR2_UUID_128_INPUT_TYPE = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE5_CHAR3_UUID_128_INPUT_TYPE")]
+                [#assign SERVICE5_CHAR3_UUID_128_INPUT_TYPE = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE5_CHAR4_UUID_128_INPUT_TYPE")]
+                [#assign SERVICE5_CHAR4_UUID_128_INPUT_TYPE = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE5_CHAR5_UUID_128_INPUT_TYPE")]
+                [#assign SERVICE5_CHAR5_UUID_128_INPUT_TYPE = definition.value]
+            [/#if]
+
+
+
+
+
+
+
+
+
+
 
             [#if (definition.name == "SERVICE1_CHAR1_VALUE_OFFSET")]
                 [#assign SERVICE1_CHAR1_VALUE_OFFSET = definition.value]
@@ -2464,7 +2602,6 @@
                 [#if (definition.name == "SERVICE5_CHAR5_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP")]
                     [#assign SERVICE5_CHAR5_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP = definition.value]
                 [/#if]
-
                 [#if (definition.name == "SERVICE1_CHAR1_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP")]
                     [#assign SERVICE1_CHAR1_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP = definition.value]
                 [/#if]
@@ -2601,43 +2738,44 @@
 [#assign item = 0]
 [#assign item_UUID_TYPE = item][#assign item = item + 1]
 [#assign item_UUID = item][#assign item = item + 1]
+[#assign item_UUID_128_INPUT_TYPE = item][#assign item = item + 1]
 [#assign item_TYPE = item][#assign item = item + 1]
 [#assign item_MAX_ATTRIBUTES_RECORDS = item]
 
 [#assign SERVICES_INFO = {
-  "1":[SERVICE1_UUID_TYPE, SERVICE1_UUID, SERVICE1_TYPE, SERVICE1_MAX_ATTRIBUTES_RECORDS],
-  "2":[SERVICE2_UUID_TYPE, SERVICE2_UUID, SERVICE2_TYPE, SERVICE2_MAX_ATTRIBUTES_RECORDS],
-  "3":[SERVICE3_UUID_TYPE, SERVICE3_UUID, SERVICE3_TYPE, SERVICE3_MAX_ATTRIBUTES_RECORDS],
-  "4":[SERVICE4_UUID_TYPE, SERVICE4_UUID, SERVICE4_TYPE, SERVICE4_MAX_ATTRIBUTES_RECORDS],
-  "5":[SERVICE5_UUID_TYPE, SERVICE5_UUID, SERVICE5_TYPE, SERVICE5_MAX_ATTRIBUTES_RECORDS]
+  "1":[SERVICE1_UUID_TYPE, SERVICE1_UUID, SERVICE1_UUID_128_INPUT_TYPE, SERVICE1_TYPE, SERVICE1_MAX_ATTRIBUTES_RECORDS],
+  "2":[SERVICE2_UUID_TYPE, SERVICE2_UUID, SERVICE2_UUID_128_INPUT_TYPE, SERVICE2_TYPE, SERVICE2_MAX_ATTRIBUTES_RECORDS],
+  "3":[SERVICE3_UUID_TYPE, SERVICE3_UUID, SERVICE3_UUID_128_INPUT_TYPE, SERVICE3_TYPE, SERVICE3_MAX_ATTRIBUTES_RECORDS],
+  "4":[SERVICE4_UUID_TYPE, SERVICE4_UUID, SERVICE4_UUID_128_INPUT_TYPE, SERVICE4_TYPE, SERVICE4_MAX_ATTRIBUTES_RECORDS],
+  "5":[SERVICE5_UUID_TYPE, SERVICE5_UUID, SERVICE5_UUID_128_INPUT_TYPE, SERVICE5_TYPE, SERVICE5_MAX_ATTRIBUTES_RECORDS]
 }]
 
 [#assign SERVICES_CHARS_INFO = {
-  "1":{"1":[SERVICE1_CHAR1_UUID_TYPE, SERVICE1_CHAR1_UUID],
-       "2":[SERVICE1_CHAR2_UUID_TYPE, SERVICE1_CHAR2_UUID],
-       "3":[SERVICE1_CHAR3_UUID_TYPE, SERVICE1_CHAR3_UUID],
-       "4":[SERVICE1_CHAR4_UUID_TYPE, SERVICE1_CHAR4_UUID],
-       "5":[SERVICE1_CHAR5_UUID_TYPE, SERVICE1_CHAR5_UUID]},
-  "2":{"1":[SERVICE2_CHAR1_UUID_TYPE, SERVICE2_CHAR1_UUID],
-       "2":[SERVICE2_CHAR2_UUID_TYPE, SERVICE2_CHAR2_UUID],
-       "3":[SERVICE2_CHAR3_UUID_TYPE, SERVICE2_CHAR3_UUID],
-       "4":[SERVICE2_CHAR4_UUID_TYPE, SERVICE2_CHAR4_UUID],
-       "5":[SERVICE2_CHAR5_UUID_TYPE, SERVICE2_CHAR5_UUID]},
-  "3":{"1":[SERVICE3_CHAR1_UUID_TYPE, SERVICE3_CHAR1_UUID],
-       "2":[SERVICE3_CHAR2_UUID_TYPE, SERVICE3_CHAR2_UUID],
-       "3":[SERVICE3_CHAR3_UUID_TYPE, SERVICE3_CHAR3_UUID],
-       "4":[SERVICE3_CHAR4_UUID_TYPE, SERVICE3_CHAR4_UUID],
-       "5":[SERVICE3_CHAR5_UUID_TYPE, SERVICE3_CHAR5_UUID]},
-  "4":{"1":[SERVICE4_CHAR1_UUID_TYPE, SERVICE4_CHAR1_UUID],
-       "2":[SERVICE4_CHAR2_UUID_TYPE, SERVICE4_CHAR2_UUID],
-       "3":[SERVICE4_CHAR3_UUID_TYPE, SERVICE4_CHAR3_UUID],
-       "4":[SERVICE4_CHAR4_UUID_TYPE, SERVICE4_CHAR4_UUID],
-       "5":[SERVICE4_CHAR5_UUID_TYPE, SERVICE4_CHAR5_UUID]},
-  "5":{"1":[SERVICE5_CHAR1_UUID_TYPE, SERVICE5_CHAR1_UUID],
-       "2":[SERVICE5_CHAR2_UUID_TYPE, SERVICE5_CHAR2_UUID],
-       "3":[SERVICE5_CHAR3_UUID_TYPE, SERVICE5_CHAR3_UUID],
-       "4":[SERVICE5_CHAR4_UUID_TYPE, SERVICE5_CHAR4_UUID],
-       "5":[SERVICE5_CHAR5_UUID_TYPE, SERVICE5_CHAR5_UUID]}
+  "1":{"1":[SERVICE1_CHAR1_UUID_TYPE, SERVICE1_CHAR1_UUID,SERVICE1_CHAR1_UUID_128_INPUT_TYPE],
+       "2":[SERVICE1_CHAR2_UUID_TYPE, SERVICE1_CHAR2_UUID,SERVICE1_CHAR2_UUID_128_INPUT_TYPE],
+       "3":[SERVICE1_CHAR3_UUID_TYPE, SERVICE1_CHAR3_UUID,SERVICE1_CHAR3_UUID_128_INPUT_TYPE],
+       "4":[SERVICE1_CHAR4_UUID_TYPE, SERVICE1_CHAR4_UUID,SERVICE1_CHAR4_UUID_128_INPUT_TYPE],
+       "5":[SERVICE1_CHAR5_UUID_TYPE, SERVICE1_CHAR5_UUID,SERVICE1_CHAR5_UUID_128_INPUT_TYPE]},
+  "2":{"1":[SERVICE2_CHAR1_UUID_TYPE, SERVICE2_CHAR1_UUID,SERVICE2_CHAR1_UUID_128_INPUT_TYPE],
+       "2":[SERVICE2_CHAR2_UUID_TYPE, SERVICE2_CHAR2_UUID,SERVICE2_CHAR2_UUID_128_INPUT_TYPE],
+       "3":[SERVICE2_CHAR3_UUID_TYPE, SERVICE2_CHAR3_UUID,SERVICE2_CHAR3_UUID_128_INPUT_TYPE],
+       "4":[SERVICE2_CHAR4_UUID_TYPE, SERVICE2_CHAR4_UUID,SERVICE2_CHAR4_UUID_128_INPUT_TYPE],
+       "5":[SERVICE2_CHAR5_UUID_TYPE, SERVICE2_CHAR5_UUID,SERVICE2_CHAR5_UUID_128_INPUT_TYPE]},
+  "3":{"1":[SERVICE3_CHAR1_UUID_TYPE, SERVICE3_CHAR1_UUID,SERVICE3_CHAR1_UUID_128_INPUT_TYPE],
+       "2":[SERVICE3_CHAR2_UUID_TYPE, SERVICE3_CHAR2_UUID,SERVICE3_CHAR2_UUID_128_INPUT_TYPE],
+       "3":[SERVICE3_CHAR3_UUID_TYPE, SERVICE3_CHAR3_UUID,SERVICE3_CHAR3_UUID_128_INPUT_TYPE],
+       "4":[SERVICE3_CHAR4_UUID_TYPE, SERVICE3_CHAR4_UUID,SERVICE3_CHAR4_UUID_128_INPUT_TYPE],
+       "5":[SERVICE3_CHAR5_UUID_TYPE, SERVICE3_CHAR5_UUID,SERVICE3_CHAR5_UUID_128_INPUT_TYPE]},
+  "4":{"1":[SERVICE4_CHAR1_UUID_TYPE, SERVICE4_CHAR1_UUID,SERVICE4_CHAR1_UUID_128_INPUT_TYPE],
+       "2":[SERVICE4_CHAR2_UUID_TYPE, SERVICE4_CHAR2_UUID,SERVICE4_CHAR2_UUID_128_INPUT_TYPE],
+       "3":[SERVICE4_CHAR3_UUID_TYPE, SERVICE4_CHAR3_UUID,SERVICE4_CHAR3_UUID_128_INPUT_TYPE],
+       "4":[SERVICE4_CHAR4_UUID_TYPE, SERVICE4_CHAR4_UUID,SERVICE4_CHAR4_UUID_128_INPUT_TYPE],
+       "5":[SERVICE4_CHAR5_UUID_TYPE, SERVICE4_CHAR5_UUID,SERVICE4_CHAR5_UUID_128_INPUT_TYPE]},
+  "5":{"1":[SERVICE5_CHAR1_UUID_TYPE, SERVICE5_CHAR1_UUID,SERVICE5_CHAR1_UUID_128_INPUT_TYPE],
+       "2":[SERVICE5_CHAR2_UUID_TYPE, SERVICE5_CHAR2_UUID,SERVICE5_CHAR2_UUID_128_INPUT_TYPE],
+       "3":[SERVICE5_CHAR3_UUID_TYPE, SERVICE5_CHAR3_UUID,SERVICE5_CHAR3_UUID_128_INPUT_TYPE],
+       "4":[SERVICE5_CHAR4_UUID_TYPE, SERVICE5_CHAR4_UUID,SERVICE5_CHAR4_UUID_128_INPUT_TYPE],
+       "5":[SERVICE5_CHAR5_UUID_TYPE, SERVICE5_CHAR5_UUID,SERVICE5_CHAR5_UUID_128_INPUT_TYPE]}
 }]
 
 [#assign SERVICES_CHARS_VALUE_OFFSET = {
@@ -2868,8 +3006,63 @@
        "5":[SERVICE5_CHAR5_GATT_NOTIFY_ATTRIBUTE_WRITE, SERVICE5_CHAR5_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP, SERVICE5_CHAR5_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP]}
 }]
 
+[#assign IS_ATTRIBUTE = 0]
+[#if NUMBER_OF_SERVICES != "0"]
+    [#list 1..NUMBER_OF_SERVICES?number as service]
+        [#list 1..SERVICES_NUMBER_OF_CHARACTERISTICS[service?string]?number as characteristic]
+            [#if (((SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_WRITE_WITHOUT_RESP]??  &&
+                SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_WRITE_WITHOUT_RESP] != "") ||
+                (SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_WRITE]??  &&
+                SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_WRITE] != "")) &&
+                SERVICES_CHARS_GATT_NOTIFY[service?string][characteristic?string][item_GATT_NOTIFY_ATTR_WRITE]??  &&
+                SERVICES_CHARS_GATT_NOTIFY[service?string][characteristic?string][item_GATT_NOTIFY_ATTR_WRITE] != "")
+                ||
+                ((SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_NOTIFY]??  &&
+                SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_NOTIFY] != "") ||
+                (SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE]??  &&
+                SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE] != ""))]
+[#assign IS_ATTRIBUTE = 1]
+            [/#if]
+        [/#list]
+    [/#list]
+[/#if]
+
+[#assign IS_WRITE = 0]
+[#if NUMBER_OF_SERVICES != "0"]
+    [#list 1..NUMBER_OF_SERVICES?number as service]
+        [#list 1..SERVICES_NUMBER_OF_CHARACTERISTICS[service?string]?number as characteristic]
+            [#if (((SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_WRITE_WITHOUT_RESP]??  &&
+                SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_WRITE_WITHOUT_RESP] != "") ||
+                (SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_WRITE]??  &&
+                SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_WRITE] != "")) &&
+                SERVICES_CHARS_GATT_NOTIFY[service?string][characteristic?string][item_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP]??  &&
+                SERVICES_CHARS_GATT_NOTIFY[service?string][characteristic?string][item_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP] != "")]
+[#assign IS_WRITE = 1]
+            [/#if]
+        [/#list]
+    [/#list]
+[/#if]
+
+[#assign IS_READ = 0]
+[#if NUMBER_OF_SERVICES != "0"]
+    [#list 1..NUMBER_OF_SERVICES?number as service]
+        [#list 1..SERVICES_NUMBER_OF_CHARACTERISTICS[service?string]?number as characteristic]
+            [#if (SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_READ]??  &&
+                SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_READ] != "" &&
+                SERVICES_CHARS_GATT_NOTIFY[service?string][characteristic?string][item_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP]??  &&
+                SERVICES_CHARS_GATT_NOTIFY[service?string][characteristic?string][item_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP] != "")]
+[#assign IS_READ = 1]
+            [/#if]
+        [/#list]
+    [/#list]
+[/#if]
+
 [#macro serviceLongName service]
     ${SERVICES_NAMES[service?string][item_LONG_NAME]}[#t]
+[/#macro]
+
+[#macro characteristicShortName service characteristic]
+    ${SERVICES_CHARS_NAMES[service?string][characteristic?string][item_SHORT_NAME]?upper_case}[#t]
 [/#macro]
 
 [#macro characteristicLongName service characteristic]
@@ -2914,9 +3107,9 @@
 typedef struct{
 [#if NUMBER_OF_SERVICES != "0"]
     [#list 1..NUMBER_OF_SERVICES?number as service]
-  uint16_t  Custom[@serviceShortNameCapitalized service/]Hdle;                   /**< [@serviceLongName service/] handle */
+  uint16_t  Custom[@serviceShortNameCapitalized service/]Hdle;                    /**< [@serviceLongName service/] handle */
         [#list 1..SERVICES_NUMBER_OF_CHARACTERISTICS[service?string]?number as characteristic]
-  uint16_t  Custom[@characteristicShortNameCapitalized service characteristic/]Hdle;                   /**< [@characteristicLongName service characteristic/] handle */
+  uint16_t  Custom[@characteristicShortNameCapitalized service characteristic/]Hdle;                  /**< [@characteristicLongName service characteristic/] handle */
         [/#list]
     [/#list]
 [/#if]
@@ -2942,6 +3135,8 @@ typedef struct{
 /* USER CODE END PD */
 
 /* Private macros ------------------------------------------------------------*/
+#define CHARACTERISTIC_DESCRIPTOR_ATTRIBUTE_OFFSET         2
+#define CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET              1
 /* USER CODE BEGIN PM */
 
 /* USER CODE END PM */
@@ -3000,11 +3195,19 @@ do {\
 [#if NUMBER_OF_SERVICES != "0"]
     [#list 1..NUMBER_OF_SERVICES?number as service]
         [#if SERVICES_INFO[service?string][item_UUID_TYPE] == "0x02"]
+            [#if SERVICES_INFO[service?string][item_UUID_128_INPUT_TYPE] == "0"]
 #define [@copyServ service/]_UUID(uuid_struct)          COPY_UUID_128(uuid_struct,0x00,0x00,0x${SERVICES_INFO[service?string][item_UUID]?lower_case?replace(" ",",0x")},0xcc,0x7a,0x48,0x2a,0x98,0x4a,0x7f,0x2e,0xd5,0xb3,0xe5,0x8f)
+            [#else]
+#define [@copyServ service/]_UUID(uuid_struct)          COPY_UUID_128(uuid_struct,0x${SERVICES_INFO[service?string][item_UUID]?lower_case?replace(" ",",0x")})
+            [/#if]
         [/#if]
         [#list 1..SERVICES_NUMBER_OF_CHARACTERISTICS[service?string]?number as characteristic]
             [#if SERVICES_CHARS_INFO[service?string][characteristic?string][item_UUID_TYPE] == "0x02"]
+                [#if SERVICES_CHARS_INFO[service?string][characteristic?string][item_UUID_128_INPUT_TYPE] == "0"]
 #define [@copyServChar service characteristic/]_UUID(uuid_struct)    COPY_UUID_128(uuid_struct,0x00,0x00,0x${SERVICES_CHARS_INFO[service?string][characteristic?string][item_UUID]?lower_case?replace(" ",",0x")},0x8e,0x22,0x45,0x41,0x9d,0x4c,0x21,0xed,0xae,0x82,0xed,0x19)
+                [#else]
+#define [@copyServChar service characteristic/]_UUID(uuid_struct)    COPY_UUID_128(uuid_struct,0x${SERVICES_CHARS_INFO[service?string][characteristic?string][item_UUID]?lower_case?replace(" ",",0x")})
+                [/#if]
             [/#if]
         [/#list]
     [/#list]
@@ -3024,9 +3227,19 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *Event)
   SVCCTL_EvtAckStatus_t return_value;
   hci_event_pckt *event_pckt;
   evt_blecore_aci *blecore_evt;
-/* USER CODE BEGIN Custom_STM_Event_Handler_1 */
+[#if IS_ATTRIBUTE =1]
+  aci_gatt_attribute_modified_event_rp0 *attribute_modified;
+[/#if]
+[#if IS_WRITE =1]
+  aci_gatt_write_permit_req_event_rp0   *write_perm_req;
+[/#if]
+[#if IS_READ =1]
+  aci_gatt_read_permit_req_event_rp0    *read_req;
+[/#if]
+  Custom_STM_App_Notification_evt_t     Notification;
+  /* USER CODE BEGIN Custom_STM_Event_Handler_1 */
 
-/* USER CODE END Custom_STM_Event_Handler_1 */
+  /* USER CODE END Custom_STM_Event_Handler_1 */
 
   return_value = SVCCTL_EvtNotAck;
   event_pckt = (hci_event_pckt *)(((hci_uart_pckt*)Event)->data);
@@ -3037,68 +3250,310 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *Event)
       blecore_evt = (evt_blecore_aci*)event_pckt->data;
       switch(blecore_evt->ecode)
       {
-[#assign gatt_notify_attribute_write = 0]
-[#assign gatt_notify_write_req_and_wait_for_appl_resp = 0]
-[#assign gatt_notify_read_req_and_wait_for_appl_resp = 0]
+        case ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE:
+          /* USER CODE BEGIN EVT_BLUE_GATT_ATTRIBUTE_MODIFIED_BEGIN */
 
+          /* USER CODE END EVT_BLUE_GATT_ATTRIBUTE_MODIFIED_BEGIN */
+[#if IS_ATTRIBUTE =1]
+          attribute_modified = (aci_gatt_attribute_modified_event_rp0*)blecore_evt->data;
+[/#if]
+[#assign INDEX = 0]
 [#if NUMBER_OF_SERVICES != "0"]
     [#list 1..NUMBER_OF_SERVICES?number as service]
         [#list 1..SERVICES_NUMBER_OF_CHARACTERISTICS[service?string]?number as characteristic]
-            [#if SERVICES_CHARS_GATT_NOTIFY[service?string][characteristic?string][item_GATT_NOTIFY_ATTR_WRITE]??]
-                [#if SERVICES_CHARS_GATT_NOTIFY[service?string][characteristic?string][item_GATT_NOTIFY_ATTR_WRITE] != ""]
-                    [#assign gatt_notify_attribute_write = gatt_notify_attribute_write + 1]
-                [/#if]
+            [#if (SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_NOTIFY]??  &&
+                SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_NOTIFY] != "") &&
+                (SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE]?? &&
+                SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE] != "")]
+              [#if INDEX = 0]
+          if(attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_DESCRIPTOR_ATTRIBUTE_OFFSET))
+                [#assign INDEX = INDEX + 1]
+              [#else]
+          else if(attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_DESCRIPTOR_ATTRIBUTE_OFFSET))              
+              [/#if]
+          {
+            return_value = SVCCTL_EvtAckFlowEnable;
+            /* USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string} */
+
+            /* USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string} */
+
+            switch(attribute_modified->Attr_Data[0])
+            {
+              /* USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_attribute_modified  */
+
+              /* USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_attribute_modified  */
+
+              /* Disabled Notification and Indication management */
+              case (!(COMSVC_Notification) | !(COMSVC_Indication)):
+                /* USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_Disabled_BEGIN  */
+
+                /* USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_Disabled_BEGIN  */
+                Notification.Custom_Evt_Opcode = CUSTOM_STM_[@characteristicShortName service characteristic/]_NOTIFY_DISABLED_EVT;
+                Custom_STM_App_Notification(&Notification);
+                Notification.Custom_Evt_Opcode = CUSTOM_STM_[@characteristicShortName service characteristic/]_INDICATE_DISABLED_EVT;
+                Custom_STM_App_Notification(&Notification);
+                /* USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_Disabled_END */
+
+                /* USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_Disabled_END */
+                break;
+
+              /* Enabled Notification management */
+              case COMSVC_Notification:
+                /* USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_COMSVC_Notification_BEGIN */
+
+                /* USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_COMSVC_Notification_BEGIN */
+                Notification.Custom_Evt_Opcode = CUSTOM_STM_[@characteristicShortName service characteristic/]_NOTIFY_ENABLED_EVT;
+                Custom_STM_App_Notification(&Notification);
+                /* USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_COMSVC_Notification_END */
+             
+                /* USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_COMSVC_Notification_END */
+                break;
+
+              /* Enabled Indication management */
+              case COMSVC_Indication:
+                /* USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_COMSVC_Indication_BEGIN */
+
+                /* USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_COMSVC_Indication_BEGIN */
+                Notification.Custom_Evt_Opcode = CUSTOM_STM_[@characteristicShortName service characteristic/]_INDICATE_ENABLED_EVT;
+                Custom_STM_App_Notification(&Notification);
+                /* USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_COMSVC_Indication_END */
+
+                /* USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_COMSVC_Indication_END */
+                break;
+
+              default:
+                /* USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_default */
+
+                /* USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_default */
+                break;
+            }
+          }  /* if(attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_DESCRIPTOR_ATTRIBUTE_OFFSET))*/
+
             [/#if]
-            [#if SERVICES_CHARS_GATT_NOTIFY[service?string][characteristic?string][item_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP]??]
-                [#if SERVICES_CHARS_GATT_NOTIFY[service?string][characteristic?string][item_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP] != ""]
-                    [#assign gatt_notify_write_req_and_wait_for_appl_resp = gatt_notify_write_req_and_wait_for_appl_resp + 1]
-                [/#if]
+            [#if (SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_NOTIFY]??  &&
+                SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_NOTIFY] != "") &&
+                (SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE]?? &&
+                SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE] == "")]
+              [#if INDEX = 0]
+          if(attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_DESCRIPTOR_ATTRIBUTE_OFFSET))
+                [#assign INDEX = INDEX + 1]
+              [#else]
+          else if(attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_DESCRIPTOR_ATTRIBUTE_OFFSET))              
+              [/#if]
+          {
+            return_value = SVCCTL_EvtAckFlowEnable;
+            /* USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string} */
+            
+            /* USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string} */            
+            switch(attribute_modified->Attr_Data[0])
+            {
+              /* USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_attribute_modified */
+
+              /* USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_attribute_modified */
+
+              /* Disabled Notification management */
+              case (!(COMSVC_Notification)):
+                /* USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_Disabled_BEGIN */
+
+                /* USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_Disabled_BEGIN */
+                Notification.Custom_Evt_Opcode = CUSTOM_STM_[@characteristicShortName service characteristic/]_NOTIFY_DISABLED_EVT;
+                Custom_STM_App_Notification(&Notification);
+                /* USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_Disabled_END */
+
+                /* USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_Disabled_END */
+                break;
+
+              /* Enabled Notification management */
+              case COMSVC_Notification:
+                /* USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_COMSVC_Notification_BEGIN */
+
+                /* USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_COMSVC_Notification_BEGIN */
+                Notification.Custom_Evt_Opcode = CUSTOM_STM_[@characteristicShortName service characteristic/]_NOTIFY_ENABLED_EVT;
+                Custom_STM_App_Notification(&Notification);
+                /* USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_COMSVC_Notification_END */
+
+                /* USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_COMSVC_Notification_END */
+                break;
+
+              default:
+                /* USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_default */
+
+                /* USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_default */
+              break;
+            }
+          }  /* if(attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_DESCRIPTOR_ATTRIBUTE_OFFSET))*/
+  
             [/#if]
-            [#if SERVICES_CHARS_GATT_NOTIFY[service?string][characteristic?string][item_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP]??]
-                [#if SERVICES_CHARS_GATT_NOTIFY[service?string][characteristic?string][item_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP] != ""]
-                    [#assign gatt_notify_read_req_and_wait_for_appl_resp = gatt_notify_read_req_and_wait_for_appl_resp + 1]
-                [/#if]
+            [#if (SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_NOTIFY]??  &&
+                SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_NOTIFY] == "") &&
+                (SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE]?? &&
+                SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE] != "")]
+              [#if INDEX = 0]
+          if(attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_DESCRIPTOR_ATTRIBUTE_OFFSET))
+                [#assign INDEX = INDEX + 1]
+              [#else]
+          else if(attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_DESCRIPTOR_ATTRIBUTE_OFFSET))
+              [/#if]
+          {
+            return_value = SVCCTL_EvtAckFlowEnable;
+            /* USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string} */
+
+            /* USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string} */
+
+            switch(attribute_modified->Attr_Data[0])
+            {
+              /* USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_attribute_modified */
+
+              /* USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_attribute_modified */
+
+              /* Disabled Indication management */
+              case (!(COMSVC_Indication)):
+                /* USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_Disabled_BEGIN */
+
+                /* USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_attribute_modified */
+                Notification.Custom_Evt_Opcode = CUSTOM_STM_[@characteristicShortName service characteristic/]_INDICATE_DISABLED_EVT;
+                Custom_STM_App_Notification(&Notification);
+                /* USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_Disabled_END */
+
+                /* USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_Disabled_END */
+                break;
+
+                /* Enabled Indication management */
+              case COMSVC_Indication:
+              /* USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_COMSVC_Indication_BEGIN */
+
+              /* USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_COMSVC_Indication_BEGIN */
+              Notification.Custom_Evt_Opcode = CUSTOM_STM_[@characteristicShortName service characteristic/]_INDICATE_ENABLED_EVT;
+              Custom_STM_App_Notification(&Notification);
+              /* USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_COMSVC_Indication_END */
+                      
+              /* USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_COMSVC_Indication_END */
+              break;
+  
+              default:
+              /* USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_default */
+                    
+              /* USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_default */
+              break;
+            }
+          }  /* if(attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicLongName service characteristic/]Hdle + CHARACTERISTIC_DESCRIPTOR_ATTRIBUTE_OFFSET))*/
+
             [/#if]
         [/#list]
     [/#list]
 [/#if]
+[#if NUMBER_OF_SERVICES != "0"]
+    [#list 1..NUMBER_OF_SERVICES?number as service]
+        [#list 1..SERVICES_NUMBER_OF_CHARACTERISTICS[service?string]?number as characteristic]
+            [#if (((SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_WRITE_WITHOUT_RESP]??  &&
+                SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_WRITE_WITHOUT_RESP] != "") ||
+                (SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_WRITE]??  &&
+                SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_WRITE] != "")) &&
+                SERVICES_CHARS_GATT_NOTIFY[service?string][characteristic?string][item_GATT_NOTIFY_ATTR_WRITE]??  &&
+                SERVICES_CHARS_GATT_NOTIFY[service?string][characteristic?string][item_GATT_NOTIFY_ATTR_WRITE] != "")]
+              [#if INDEX = 0]
+          if(attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))
+                [#assign INDEX = INDEX + 1]
+              [#else]
+          else if(attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))              
+              [/#if]
+          {
+            return_value = SVCCTL_EvtAckFlowEnable;
+            /* USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE */
 
-[#--
-[#if gatt_notify_attribute_write > 0]
---]
-        case ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE:
-          /* USER CODE BEGIN EVT_BLUE_GATT_ATTRIBUTE_MODIFIED */
-
-          /* USER CODE END EVT_BLUE_GATT_ATTRIBUTE_MODIFIED */
-          break;
-[#--
+            /* USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE */
+          } /* if(attribute_modified->Attr_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))*/
+            [/#if]
+        [/#list]
+    [/#list]
 [/#if]
---]
+          /* USER CODE BEGIN EVT_BLUE_GATT_ATTRIBUTE_MODIFIED_END */
 
-[#--
-[#if gatt_notify_write_req_and_wait_for_appl_resp > 0]
---]
+          /* USER CODE END EVT_BLUE_GATT_ATTRIBUTE_MODIFIED_END */
+          break;
+
         case ACI_GATT_READ_PERMIT_REQ_VSEVT_CODE :
-          /* USER CODE BEGIN EVT_BLUE_GATT_READ_PERMIT_REQ */
+          /* USER CODE BEGIN EVT_BLUE_GATT_READ_PERMIT_REQ_BEGIN */
 
-          /* USER CODE END EVT_BLUE_GATT_READ_PERMIT_REQ */
-          break;
-[#--
+          /* USER CODE END EVT_BLUE_GATT_READ_PERMIT_REQ_BEGIN */
+[#if IS_READ =1]
+          read_req = (aci_gatt_read_permit_req_event_rp0*)blecore_evt->data; 
 [/#if]
---]
+[#assign INDEX = 0]
+[#if NUMBER_OF_SERVICES != "0"]
+    [#list 1..NUMBER_OF_SERVICES?number as service]
+        [#list 1..SERVICES_NUMBER_OF_CHARACTERISTICS[service?string]?number as characteristic]
+            [#if (SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_READ]??  &&
+                SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_READ] != "" &&
+                SERVICES_CHARS_GATT_NOTIFY[service?string][characteristic?string][item_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP]??  &&
+                SERVICES_CHARS_GATT_NOTIFY[service?string][characteristic?string][item_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP] != "")]
+              [#if INDEX = 0]
+          if(read_req->Attribute_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))
+                [#assign INDEX = INDEX + 1]
+              [#else]
+          else if(read_req->Attribute_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))
+              [/#if]
+          {
+            return_value = SVCCTL_EvtAckFlowEnable;
+            /*USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_ACI_GATT_READ_PERMIT_REQ_VSEVT_CODE_1 */
 
-[#--
-[#if gatt_notify_read_req_and_wait_for_appl_resp > 0]
---]
+            /*USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_ACI_GATT_READ_PERMIT_REQ_VSEVT_CODE_1*/
+            aci_gatt_allow_read(read_req->Connection_Handle);
+            /*USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_ACI_GATT_READ_PERMIT_REQ_VSEVT_CODE_2 */
+
+            /*USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_ACI_GATT_READ_PERMIT_REQ_VSEVT_CODE_2*/
+          } /* if(read_req->Attribute_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))*/
+            [/#if]
+        [/#list]
+    [/#list]
+[/#if]
+          /* USER CODE BEGIN EVT_BLUE_GATT_READ_PERMIT_REQ_END */
+
+          /* USER CODE END EVT_BLUE_GATT_READ_PERMIT_REQ_END */
+          break;
+
         case ACI_GATT_WRITE_PERMIT_REQ_VSEVT_CODE:
-          /* USER CODE BEGIN EVT_BLUE_GATT_WRITE_PERMIT_REQ */
+          /* USER CODE BEGIN EVT_BLUE_GATT_WRITE_PERMIT_REQ_BEGIN */
 
-          /* USER CODE END EVT_BLUE_GATT_WRITE_PERMIT_REQ */
-          break;
-[#--
+          /* USER CODE END EVT_BLUE_GATT_WRITE_PERMIT_REQ_BEGIN */
+[#if IS_WRITE =1]
+          write_perm_req = (aci_gatt_write_permit_req_event_rp0*)blecore_evt->data;
 [/#if]
---]
+[#assign INDEX = 0]
+[#if NUMBER_OF_SERVICES != "0"]
+    [#list 1..NUMBER_OF_SERVICES?number as service]
+        [#list 1..SERVICES_NUMBER_OF_CHARACTERISTICS[service?string]?number as characteristic]
+            [#if (((SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_WRITE_WITHOUT_RESP]??  &&
+                SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_WRITE_WITHOUT_RESP] != "") ||
+                (SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_WRITE]??  &&
+                SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_WRITE] != "")) &&
+                SERVICES_CHARS_GATT_NOTIFY[service?string][characteristic?string][item_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP]??  &&
+                SERVICES_CHARS_GATT_NOTIFY[service?string][characteristic?string][item_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP] != "")]
+              [#if INDEX = 0]
+          if(write_perm_req->Attribute_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))
+                [#assign INDEX = INDEX + 1]
+              [#else]
+          else if(write_perm_req->Attribute_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))
+              [/#if]
+          {
+            return_value = SVCCTL_EvtAckFlowEnable;
+            /* Allow or reject a write request from a client using aci_gatt_write_resp(...) function */
+            /*USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_ACI_GATT_WRITE_PERMIT_REQ_VSEVT_CODE */
 
+            /*USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}_ACI_GATT_WRITE_PERMIT_REQ_VSEVT_CODE*/
+          } /*if(write_perm_req->Attribute_Handle == (CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))*/
+
+            [/#if]
+        [/#list]
+    [/#list]
+[/#if]
+          /* USER CODE BEGIN EVT_BLUE_GATT_WRITE_PERMIT_REQ_END */
+
+          /* USER CODE END EVT_BLUE_GATT_WRITE_PERMIT_REQ_END */
+          break;
+        /* USER CODE BEGIN BLECORE_EVT */
+
+        /* USER CODE END BLECORE_EVT */
         default:
           /* USER CODE BEGIN EVT_DEFAULT */
 
@@ -3110,17 +3565,20 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *Event)
       /* USER CODE END EVT_VENDOR*/
       break; /* HCI_VENDOR_SPECIFIC_DEBUG_EVT_CODE */
 
-    /* USER CODE BEGIN EVENT_PCKT_CASES*/
+      /* USER CODE BEGIN EVENT_PCKT_CASES*/
 
-    /* USER CODE END EVENT_PCKT_CASES*/
+      /* USER CODE END EVENT_PCKT_CASES*/
 
     default:
+      /* USER CODE BEGIN EVENT_PCKT*/
+
+      /* USER CODE END EVENT_PCKT*/      
       break;
   }
 
-/* USER CODE BEGIN Custom_STM_Event_Handler_2 */
+  /* USER CODE BEGIN Custom_STM_Event_Handler_2 */
 
-/* USER CODE END Custom_STM_Event_Handler_2 */
+  /* USER CODE END Custom_STM_Event_Handler_2 */
 
   return(return_value);
 }/* end Custom_STM_Event_Handler */
@@ -3137,12 +3595,12 @@ void SVCCTL_InitCustomSvc(void)
 {
  
   Char_UUID_t  uuid;
-/* USER CODE BEGIN SVCCTL_InitCustomSvc_1 */
+  /* USER CODE BEGIN SVCCTL_InitCustomSvc_1 */
 
-/* USER CODE END SVCCTL_InitCustomSvc_1 */
+  /* USER CODE END SVCCTL_InitCustomSvc_1 */
 
   /**
-   *	Register the event handler to the BLE controller
+   *  Register the event handler to the BLE controller
    */
   SVCCTL_RegisterSvcHandler(Custom_STM_Event_Handler);
 
@@ -3151,113 +3609,113 @@ void SVCCTL_InitCustomSvc(void)
 [#if NUMBER_OF_SERVICES != "0"]
     [#list 1..NUMBER_OF_SERVICES?number as service]
 
-    /*
-     *          [@serviceLongName service/]
-     *
-     * Max_Attribute_Records = 1 + 2*${SERVICES_NUMBER_OF_CHARACTERISTICS[service?string]} + 1*no_of_char_with_notify_or_indicate_property + 1*no_of_char_with_broadcast_property
-     * service_max_attribute_record = 1 for [@serviceLongName service/] +
-        [#list 1..SERVICES_NUMBER_OF_CHARACTERISTICS[service?string]?number as characteristic]
-     *                                2 for [@characteristicLongName service characteristic/] +
-        [/#list]
-        [#list 1..SERVICES_NUMBER_OF_CHARACTERISTICS[service?string]?number as characteristic]
-            [#if (SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_NOTIFY]??  &&
-                SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_NOTIFY] != "") ||
-                (SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE]?? &&
-                SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE] != "")]
-     *                                1 for [@characteristicLongName service characteristic/] configuration descriptor +
-            [/#if]
-        [/#list]
-        [#list 1..SERVICES_NUMBER_OF_CHARACTERISTICS[service?string]?number as characteristic]
-            [#if (SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_BROADCAST]??  &&
-                SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_BROADCAST] != "")]
-     *                                1 for [@characteristicLongName service characteristic/] broadcast property +
-            [/#if]
-        [/#list]
-     *                              = ${SERVICES_INFO[service?string][item_MAX_ATTRIBUTES_RECORDS]}
-     */
+  /*
+   *          [@serviceLongName service/]
+   *
+   * Max_Attribute_Records = 1 + 2*${SERVICES_NUMBER_OF_CHARACTERISTICS[service?string]} + 1*no_of_char_with_notify_or_indicate_property + 1*no_of_char_with_broadcast_property
+   * service_max_attribute_record = 1 for [@serviceLongName service/] +
+      [#list 1..SERVICES_NUMBER_OF_CHARACTERISTICS[service?string]?number as characteristic]
+   *                                2 for [@characteristicLongName service characteristic/] +
+      [/#list]
+      [#list 1..SERVICES_NUMBER_OF_CHARACTERISTICS[service?string]?number as characteristic]
+          [#if (SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_NOTIFY]??  &&
+              SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_NOTIFY] != "") ||
+              (SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE]?? &&
+              SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE] != "")]
+   *                                1 for [@characteristicLongName service characteristic/] configuration descriptor +
+          [/#if]
+      [/#list]
+      [#list 1..SERVICES_NUMBER_OF_CHARACTERISTICS[service?string]?number as characteristic]
+          [#if (SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_BROADCAST]??  &&
+              SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_BROADCAST] != "")]
+   *                                1 for [@characteristicLongName service characteristic/] broadcast property +
+          [/#if]
+      [/#list]
+   *                              = ${SERVICES_INFO[service?string][item_MAX_ATTRIBUTES_RECORDS]}
+   */
 
-        [#if SERVICES_INFO[service?string][item_UUID_TYPE] == "0x01"]
-            [#assign UUID_TYPE = "UUID_TYPE_16"]
-    uuid.Char_UUID_16 = 0x${SERVICES_INFO[service?string][item_UUID]?lower_case?replace(" ","")};
-        [/#if]
-        [#if SERVICES_INFO[service?string][item_UUID_TYPE] == "0x02"]
-            [#assign UUID_TYPE = "UUID_TYPE_128"]
-    [@copyServ service/]_UUID(uuid.Char_UUID_128);
-        [/#if]
-    aci_gatt_add_service(${UUID_TYPE},
-                      (Service_UUID_t *) &uuid,
-                      ${SERVICES_INFO[service?string][item_TYPE]},
-                      ${SERVICES_INFO[service?string][item_MAX_ATTRIBUTES_RECORDS]},
-                      &(CustomContext.Custom[@serviceShortNameCapitalized service/]Hdle));
+      [#if SERVICES_INFO[service?string][item_UUID_TYPE] == "0x01"]
+          [#assign UUID_TYPE = "UUID_TYPE_16"]
+  uuid.Char_UUID_16 = 0x${SERVICES_INFO[service?string][item_UUID]?lower_case?replace(" ","")};
+      [/#if]
+      [#if SERVICES_INFO[service?string][item_UUID_TYPE] == "0x02"]
+          [#assign UUID_TYPE = "UUID_TYPE_128"]
+  [@copyServ service/]_UUID(uuid.Char_UUID_128);
+      [/#if]
+  aci_gatt_add_service(${UUID_TYPE},
+                       (Service_UUID_t *) &uuid,
+                       ${SERVICES_INFO[service?string][item_TYPE]},
+                       ${SERVICES_INFO[service?string][item_MAX_ATTRIBUTES_RECORDS]},
+                       &(CustomContext.Custom[@serviceShortNameCapitalized service/]Hdle));
 
-        [#list 1..SERVICES_NUMBER_OF_CHARACTERISTICS[service?string]?number as characteristic]
-            [#-- prop_list definition --]
-            [#assign prop_list = ""]
-            [#list item_PROP_START..item_PROP_END as item]
-                [#if SERVICES_CHARS_PROP[service?string][characteristic?string][item]??]
-                    [#if SERVICES_CHARS_PROP[service?string][characteristic?string][item] != "" && prop_list != ""]
-                        [#assign prop_list = prop_list + " | "]
-                    [/#if]
-                    [#assign prop_list = prop_list + SERVICES_CHARS_PROP[service?string][characteristic?string][item]]
-                [/#if]
-            [/#list]
-            [#if prop_list == ""]
-                [#assign prop_list = SERVICE_CHAR_PROP_NONE]
-            [/#if]
-            [#-- attr_perm_list definition --]
-            [#assign attr_perm_list = ""]
-            [#list item_ATTR_PERM_START..item_ATTR_PERM_END as item]
-                [#if SERVICES_CHARS_ATTR_PERM[service?string][characteristic?string][item]??]
-                    [#if SERVICES_CHARS_ATTR_PERM[service?string][characteristic?string][item] != "" && attr_perm_list != ""]
-                        [#assign attr_perm_list = attr_perm_list + " | "]
-                    [/#if]
-                    [#assign attr_perm_list = attr_perm_list + SERVICES_CHARS_ATTR_PERM[service?string][characteristic?string][item]]
-                [/#if]
-            [/#list]
-            [#if attr_perm_list == ""]
-                [#assign attr_perm_list = SERVICE_CHAR_ATTR_PERMISSION_NONE]
-            [/#if]
-            [#-- gatt_notify_list definition --]
-            [#assign gatt_notify_list = ""]
-            [#list item_GATT_NOTIFY_START..item_GATT_NOTIFY_END as item]
-                [#if SERVICES_CHARS_GATT_NOTIFY[service?string][characteristic?string][item]??]
-                    [#if SERVICES_CHARS_GATT_NOTIFY[service?string][characteristic?string][item] != "" && gatt_notify_list != ""]
-                        [#assign gatt_notify_list = gatt_notify_list + " | "]
-                    [/#if]
-                    [#assign gatt_notify_list = gatt_notify_list + SERVICES_CHARS_GATT_NOTIFY[service?string][characteristic?string][item]]
-                [/#if]
-            [/#list]
-            [#if gatt_notify_list == ""]
-                [#assign gatt_notify_list = SERVICE_CHAR_GATT_DONT_NOTIFY_EVENTS]
-            [/#if]
-    /**
-     *  [@characteristicLongName service characteristic/]
-     */
-            [#if SERVICES_CHARS_INFO[service?string][characteristic?string][item_UUID_TYPE] == "0x01"]
-                [#assign UUID_TYPE = "UUID_TYPE_16"]
-    uuid.Char_UUID_16 = 0x${SERVICES_CHARS_INFO[service?string][characteristic?string][item_UUID]?lower_case?replace(" ","")};
-            [/#if]
-            [#if SERVICES_CHARS_INFO[service?string][characteristic?string][item_UUID_TYPE] == "0x02"]
-                [#assign UUID_TYPE = "UUID_TYPE_128"]
-    [@copyServChar service characteristic/]_UUID(uuid.Char_UUID_128);
-            [/#if]
-    aci_gatt_add_char(CustomContext.Custom[@serviceShortNameCapitalized service/]Hdle,
-                      ${UUID_TYPE}, &uuid,
-                      Size[@characteristicShortNameCapitalized service characteristic/],
-                      ${prop_list},
-                      ${attr_perm_list},
-                      ${gatt_notify_list},
-                      ${SERVICES_CHARS_ENC_KEY_SIZE[service?string][characteristic?string]},
-                      ${SERVICES_CHARS_LENGTH_CHARACTERISTIC[service?string][characteristic?string]},
-                      &(CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle));
-        [/#list]
+      [#list 1..SERVICES_NUMBER_OF_CHARACTERISTICS[service?string]?number as characteristic]
+          [#-- prop_list definition --]
+          [#assign prop_list = ""]
+          [#list item_PROP_START..item_PROP_END as item]
+              [#if SERVICES_CHARS_PROP[service?string][characteristic?string][item]??]
+                  [#if SERVICES_CHARS_PROP[service?string][characteristic?string][item] != "" && prop_list != ""]
+                      [#assign prop_list = prop_list + " | "]
+                  [/#if]
+                  [#assign prop_list = prop_list + SERVICES_CHARS_PROP[service?string][characteristic?string][item]]
+              [/#if]
+          [/#list]
+          [#if prop_list == ""]
+              [#assign prop_list = SERVICE_CHAR_PROP_NONE]
+          [/#if]
+          [#-- attr_perm_list definition --]
+          [#assign attr_perm_list = ""]
+          [#list item_ATTR_PERM_START..item_ATTR_PERM_END as item]
+              [#if SERVICES_CHARS_ATTR_PERM[service?string][characteristic?string][item]??]
+                  [#if SERVICES_CHARS_ATTR_PERM[service?string][characteristic?string][item] != "" && attr_perm_list != ""]
+                      [#assign attr_perm_list = attr_perm_list + " | "]
+                  [/#if]
+                  [#assign attr_perm_list = attr_perm_list + SERVICES_CHARS_ATTR_PERM[service?string][characteristic?string][item]]
+              [/#if]
+          [/#list]
+          [#if attr_perm_list == ""]
+              [#assign attr_perm_list = SERVICE_CHAR_ATTR_PERMISSION_NONE]
+          [/#if]
+          [#-- gatt_notify_list definition --]
+          [#assign gatt_notify_list = ""]
+          [#list item_GATT_NOTIFY_START..item_GATT_NOTIFY_END as item]
+              [#if SERVICES_CHARS_GATT_NOTIFY[service?string][characteristic?string][item]??]
+                  [#if SERVICES_CHARS_GATT_NOTIFY[service?string][characteristic?string][item] != "" && gatt_notify_list != ""]
+                      [#assign gatt_notify_list = gatt_notify_list + " | "]
+                  [/#if]
+                  [#assign gatt_notify_list = gatt_notify_list + SERVICES_CHARS_GATT_NOTIFY[service?string][characteristic?string][item]]
+              [/#if]
+          [/#list]
+          [#if gatt_notify_list == ""]
+              [#assign gatt_notify_list = SERVICE_CHAR_GATT_DONT_NOTIFY_EVENTS]
+          [/#if]
+  /**
+   *  [@characteristicLongName service characteristic/]
+   */
+          [#if SERVICES_CHARS_INFO[service?string][characteristic?string][item_UUID_TYPE] == "0x01"]
+              [#assign UUID_TYPE = "UUID_TYPE_16"]
+  uuid.Char_UUID_16 = 0x${SERVICES_CHARS_INFO[service?string][characteristic?string][item_UUID]?lower_case?replace(" ","")};
+          [/#if]
+          [#if SERVICES_CHARS_INFO[service?string][characteristic?string][item_UUID_TYPE] == "0x02"]
+              [#assign UUID_TYPE = "UUID_TYPE_128"]
+  [@copyServChar service characteristic/]_UUID(uuid.Char_UUID_128);
+          [/#if]
+  aci_gatt_add_char(CustomContext.Custom[@serviceShortNameCapitalized service/]Hdle,
+                    ${UUID_TYPE}, &uuid,
+                    Size[@characteristicShortNameCapitalized service characteristic/],
+                    ${prop_list},
+                    ${attr_perm_list},
+                    ${gatt_notify_list},
+                    ${SERVICES_CHARS_ENC_KEY_SIZE[service?string][characteristic?string]},
+                    ${SERVICES_CHARS_LENGTH_CHARACTERISTIC[service?string][characteristic?string]},
+                    &(CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle));
+      [/#list]
 
     [/#list]
 [/#if]
 
-/* USER CODE BEGIN SVCCTL_InitCustomSvc_2 */
+  /* USER CODE BEGIN SVCCTL_InitCustomSvc_2 */
 
-/* USER CODE END SVCCTL_InitCustomSvc_2 */
+  /* USER CODE END SVCCTL_InitCustomSvc_2 */
 
   return;
 }
@@ -3271,9 +3729,9 @@ void SVCCTL_InitCustomSvc(void)
 tBleStatus Custom_STM_App_Update_Char(Custom_STM_Char_Opcode_t CharOpcode, uint8_t *pPayload) 
 {
   tBleStatus result = BLE_STATUS_INVALID_PARAMS;
-/* USER CODE BEGIN Custom_STM_App_Update_Char_1 */
+  /* USER CODE BEGIN Custom_STM_App_Update_Char_1 */
 
-/* USER CODE END Custom_STM_App_Update_Char_1 */
+  /* USER CODE END Custom_STM_App_Update_Char_1 */
 
   switch(CharOpcode)
   {
@@ -3283,13 +3741,13 @@ tBleStatus Custom_STM_App_Update_Char(Custom_STM_Char_Opcode_t CharOpcode, uint8
         [#list 1..SERVICES_NUMBER_OF_CHARACTERISTICS[service?string]?number as characteristic]
     case [@customServChar service characteristic/]:
       result = aci_gatt_update_char_value(CustomContext.Custom[@serviceShortNameCapitalized service/]Hdle,
-                            CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle,
-                            ${SERVICES_CHARS_VALUE_OFFSET[service?string][characteristic?string]}, /* charValOffset */
-                            Size[@characteristicShortNameCapitalized service characteristic/], /* charValueLen */
-                            (uint8_t *)  pPayload);
-    /* USER CODE BEGIN [@customServChar service characteristic/]*/
+                                          CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle,
+                                          ${SERVICES_CHARS_VALUE_OFFSET[service?string][characteristic?string]}, /* charValOffset */
+                                          Size[@characteristicShortNameCapitalized service characteristic/], /* charValueLen */
+                                          (uint8_t *)  pPayload);
+      /* USER CODE BEGIN CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}*/
 
-    /* USER CODE END [@customServChar service characteristic/]*/
+      /* USER CODE END CUSTOM_STM_Service_${service?string}_Char_${characteristic?string}*/
       break;
 
         [/#list]
@@ -3300,9 +3758,9 @@ tBleStatus Custom_STM_App_Update_Char(Custom_STM_Char_Opcode_t CharOpcode, uint8
       break;
   }
 
-/* USER CODE BEGIN Custom_STM_App_Update_Char_2 */
+  /* USER CODE BEGIN Custom_STM_App_Update_Char_2 */
 
-/* USER CODE END Custom_STM_App_Update_Char_2 */
+  /* USER CODE END Custom_STM_App_Update_Char_2 */
 
   return result;
 }

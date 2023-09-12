@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    msg_id.h
@@ -8,32 +9,30 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 [#--
-********************************
-SWIP Data:
-
 [#if SWIPdatas??]
-  [#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-Defines:
-      [#list SWIP.defines as definition]
-        ${definition.name}: ${definition.value}
-      [/#list]
-    [/#if]
-  [/#list]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                ${definition.name}: ${definition.value}
+            [/#list]
+        [/#if]
+    [/#list]
 [/#if]
-********************************
 --]
 [#assign SUBGHZ_APPLICATION = ""]
-[#list SWIPdatas as SWIP]
-  [#if SWIP.defines??]
-    [#list SWIP.defines as definition]
-            [#if definition.name == "SUBGHZ_APPLICATION"]
-                [#assign SUBGHZ_APPLICATION = definition.value]
-            [/#if]
-        [/#list]
-  [/#if]
-[/#list]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "SUBGHZ_APPLICATION"]
+                    [#assign SUBGHZ_APPLICATION = definition.value]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __MSG_ID_H__
@@ -85,6 +84,14 @@ typedef enum
   LMHANDLER_SET_DEVEUI_ID,
   LMHANDLER_GET_APPEUI_ID,
   LMHANDLER_SET_APPEUI_ID,
+  LMHANDLER_GET_NWKKEY_ID,
+  LMHANDLER_SET_NWKKEY_ID,
+  LMHANDLER_GET_APPKEY_ID,
+  LMHANDLER_SET_APPKEY_ID,
+  LMHANDLER_GET_NWKSKEY_ID,
+  LMHANDLER_SET_NWKSKEY_ID,
+  LMHANDLER_GET_APPSKEY_ID,
+  LMHANDLER_SET_APPSKEY_ID,
   LMHANDLER_GET_NWKID_ID,
   LMHANDLER_SET_NWKID_ID,
   LMHANDLER_GET_DEVADDR_ID,
@@ -112,14 +119,21 @@ typedef enum
   LMHANDLER_GET_PING_PERIODICITY_ID,
   LMHANDLER_SET_PING_PERIODICITY_ID,
   LMHANDLER_GET_BEACON_STATE_ID,
+  LMHANDLER_LINK_CHECK_REQ_ID,
+  LMHANDLER_DEVICE_TIME_REQ_ID,
 
   LMHANDLER_INFO_INIT_ID,
   /* NotifAck */
   LMHANDLER_GET_BATTERY_LEVEL_CB_ID,
   LMHANDLER_GET_TEMPERATURE_CB_ID,
+  LMHANDLER_ON_NVM_DATA_CHANGE_CB_ID,
+  LMHANDLER_ON_NETWORK_PARAMS_CHANGE_CB_ID,
   LMHANDLER_ON_JOIN_REQ_CB_ID,
   LMHANDLER_ON_TX_DATA_CB_ID,
   LMHANDLER_ON_RX_DATA_CB_ID,
+  LMHANDLER_ON_CLASS_CHANGE_CB_ID,
+  LMHANDLER_ON_BEACON_STATUS_CHANGE_CB_ID,
+  LMHANDLER_ON_ON_SYS_TIME_UPDATE_CB_ID,
   LMHANDLER_ON_MAC_PROCESS_CB_ID,
   /* USER CODE BEGIN LORA_MsgIdTypeDef */
 
@@ -179,7 +193,7 @@ typedef enum
   RADIO_STANDBY_ID,
   RADIO_RX_ID,
   RADIO_START_CAD_ID,
-  RADIO_SET_TX_CONTINOUS_WAVE_ID,
+  RADIO_SET_TX_CONTINUOUS_WAVE_ID,
   RADIO_RSSI_ID,
   RADIO_WRITE_ID,
   RADIO_READ_ID,
@@ -273,3 +287,5 @@ typedef enum
 #endif
 
 #endif /* __MSG_ID_H__ */
+
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

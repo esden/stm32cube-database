@@ -1,13 +1,15 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    mbmuxif_sigfox.c
   * @author  MCD Application Team
-  * @brief   allows CM0PLUS applic to register and handle Sigfox to MBMUX
+  * @brief   allows CM0PLUS application to register and handle Sigfox to MBMUX
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
 #include "platform.h"
@@ -49,8 +51,21 @@ static MBMUX_ComParam_t *SigfoxComObj;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
+/**
+  * @brief  Sigfox acknowledge callbacks: set event to release waiting task
+  * @param  ComObj pointer to the Sigfox com param buffer
+  */
 static void MBMUXIF_IsrSigfoxAckRcvCb(void *ComObj);
+
+/**
+  * @brief  Sigfox command callbacks: schedules a task in order to quit the ISR
+  * @param  ComObj pointer to the Sigfox com param buffer
+  */
 static void MBMUXIF_IsrSigfoxCmdRcvCb(void *ComObj);
+
+/**
+  * @brief  Sigfox task to process the command
+  */
 static void MBMUXIF_TaskSigfoxCmdRcv(void);
 
 /* USER CODE BEGIN PFP */
@@ -58,13 +73,6 @@ static void MBMUXIF_TaskSigfoxCmdRcv(void);
 /* USER CODE END PFP */
 
 /* Exported functions --------------------------------------------------------*/
-
-/**
-  * @brief   Registers Sigfox feature to the mailbox and to the sequencer
-  * @param   none
-  * @retval  0: OK; -1: if ch hasn't been registered by CM4
-  * @note    this function is supposed to be called by the System on request (Cmd) of CM4
-  */
 int8_t MBMUXIF_SigfoxInit(void)
 {
   int8_t ret;
@@ -91,11 +99,6 @@ int8_t MBMUXIF_SigfoxInit(void)
   return ret;
 }
 
-/**
-  * @brief gives back the pointer to the com buffer associated to Sigfox feature Notif
-  * @param none
-  * @retval  return pointer to the com param buffer
-  */
 MBMUX_ComParam_t *MBMUXIF_GetSigfoxFeatureNotifComPtr(void)
 {
   /* USER CODE BEGIN MBMUXIF_GetSigfoxFeatureNotifComPtr_1 */
@@ -104,7 +107,7 @@ MBMUX_ComParam_t *MBMUXIF_GetSigfoxFeatureNotifComPtr(void)
   MBMUX_ComParam_t *com_param_ptr = MBMUX_GetFeatureComPtr(FEAT_INFO_SIGFOX_ID, MBMUX_NOTIF_ACK);
   if (com_param_ptr == NULL)
   {
-    while (1) {} /* ErrorHandler() : feature isn't registered */
+    Error_Handler(); /* feature isn't registered */
   }
   return com_param_ptr;
   /* USER CODE BEGIN MBMUXIF_GetSigfoxFeatureNotifComPtr_Last */
@@ -112,11 +115,6 @@ MBMUX_ComParam_t *MBMUXIF_GetSigfoxFeatureNotifComPtr(void)
   /* USER CODE END MBMUXIF_GetSigfoxFeatureNotifComPtr_Last */
 }
 
-/**
-  * @brief  Set a Task to prevent being blocked on ISR
-  * @param  none
-  * @retval none
-  */
 void MBMUXIF_SigfoxSendNotif(void)
 {
   /* USER CODE BEGIN MBMUXIF_SigfoxSendNotif_1 */
@@ -128,11 +126,6 @@ void MBMUXIF_SigfoxSendNotif(void)
   /* USER CODE END MBMUXIF_SigfoxSendNotif_Last */
 }
 
-/**
-  * @brief  Sends a Sigfox-Notif via Ipcc and Wait for the Ack
-  * @param  none
-  * @retval none
-  */
 void MBMUXIF_SigfoxSendNotifTask(void)
 {
   /* USER CODE BEGIN MBMUXIF_SigfoxSendNotifTask_1 */
@@ -144,18 +137,13 @@ void MBMUXIF_SigfoxSendNotifTask(void)
   }
   else
   {
-    while (1) {} /* ErrorHandler(); */
+    Error_Handler();
   }
   /* USER CODE BEGIN MBMUXIF_SigfoxSendNotifTask_Last */
 
   /* USER CODE END MBMUXIF_SigfoxSendNotifTask_Last */
 }
 
-/**
-  * @brief Sends a Sigfox-Resp  via Ipcc without waiting for the response
-  * @param none
-  * @retval   none
-  */
 void MBMUXIF_SigfoxSendResp(void)
 {
   /* USER CODE BEGIN MBMUXIF_SigfoxSendResp_1 */
@@ -163,7 +151,7 @@ void MBMUXIF_SigfoxSendResp(void)
   /* USER CODE END MBMUXIF_SigfoxSendResp_1 */
   if (MBMUX_ResponseSnd(FEAT_INFO_SIGFOX_ID) != 0)
   {
-    while (1) {} /* ErrorHandler(); */
+    Error_Handler();
   }
   /* USER CODE BEGIN MBMUXIF_SigfoxSendResp_Last */
 
@@ -175,11 +163,7 @@ void MBMUXIF_SigfoxSendResp(void)
 /* USER CODE END EFD */
 
 /* Private functions ---------------------------------------------------------*/
-/**
-  * @brief  Sigfox acknowledge callbacks: set event to release waiting task
-  * @param  pointer to the Sigfox com param buffer
-  * @retval  none
-  */
+
 static void MBMUXIF_IsrSigfoxAckRcvCb(void *ComObj)
 {
   /* USER CODE BEGIN MBMUXIF_IsrSigfoxAckRcvCb_1 */
@@ -191,11 +175,6 @@ static void MBMUXIF_IsrSigfoxAckRcvCb(void *ComObj)
   /* USER CODE END MBMUXIF_IsrSigfoxAckRcvCb_Last */
 }
 
-/**
-  * @brief  Sigfox command callbacks: schedules a task in order to quit the ISR
-  * @param  pointer to the Sigfox com param buffer
-  * @retval  none
-  */
 static void MBMUXIF_IsrSigfoxCmdRcvCb(void *ComObj)
 {
   /* USER CODE BEGIN MBMUXIF_IsrSigfoxCmdRcvCb_1 */
@@ -208,11 +187,6 @@ static void MBMUXIF_IsrSigfoxCmdRcvCb(void *ComObj)
   /* USER CODE END MBMUXIF_IsrSigfoxCmdRcvCb_Last */
 }
 
-/**
-  * @brief  Sigfox task to process the command
-  * @param  pointer to the Sigfox com param buffer
-  * @retval  none
-  */
 static void MBMUXIF_TaskSigfoxCmdRcv(void)
 {
   /* USER CODE BEGIN MBMUXIF_TaskSigfoxCmdRcv_1 */

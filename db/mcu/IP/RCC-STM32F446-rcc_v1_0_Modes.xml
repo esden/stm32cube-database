@@ -396,7 +396,7 @@
     </RefParameter>
 	
     <!-- USB Clock Selection-->
-    <RefParameter Visible="false" Comment="USB Clock Selection" DefaultValue="RCC_CLK48CLKSOURCE_PLLQ" Name="USBCLockSelection" Type="list" IP="USB,SDIO">
+    <RefParameter Visible="false" Comment="USB Clock Selection" DefaultValue="RCC_CLK48CLKSOURCE_PLLQ" Name="USBCLockSelection" Type="list" IP="USB,SDIO,USB_OTG_HS,USB_OTG_FS">
         <PossibleValue Comment="USB PLLSAIP Devisor" Value="RCC_CLK48CLKSOURCE_PLLSAIP" Semaphore="USBSourceisPLLSAIP"/>
         <PossibleValue Comment="USB PLLQ Devisor"    Value="RCC_CLK48CLKSOURCE_PLLQ"    Semaphore="USBSourceisPLLQ"/>
     </RefParameter>
@@ -414,7 +414,7 @@
     </RefParameter>
 	
     <!-- SAIA Clock Selection-->
-    <RefParameter Visible="false" Comment="SAIA CLock Selection" DefaultValue="RCC_SAI1CLKSOURCE_PLLSAI" Name="SAIACLockSelection" Type="list" IP="SAI1">
+    <RefParameter Visible="false" Comment="SAIA CLock Selection" DefaultValue="RCC_SAI1CLKSOURCE_PLLSAI" Name="SAIACLockSelection" Type="list" IP="SAI1,SAI1_SAIA,SAI1_SAIB">
         <PossibleValue Comment="SAIA PLLSAI"       Value="RCC_SAI1CLKSOURCE_EXT"       Semaphore="SAIASourceIsIsExt"/>
         <PossibleValue Comment="SAIA PLLR devisor" Value="RCC_SAI1CLKSOURCE_PLLR"      Semaphore="SAIASourceIsPLLR"/>
         <PossibleValue Comment="SAIA PLLI2S" 	   Value="RCC_SAI1CLKSOURCE_PLLI2S"    Semaphore="SAIASourceIsPLLI2SQ"/>
@@ -422,7 +422,7 @@
     </RefParameter>
 	
     <!-- SAIB Clock Selection-->
-    <RefParameter Visible="false" Comment="SAIB CLock Selection" DefaultValue="RCC_SAI2CLKSOURCE_PLLSAI" Name="SAIBCLockSelection" Type="list" IP="SAI2">
+    <RefParameter Visible="false" Comment="SAIB CLock Selection" DefaultValue="RCC_SAI2CLKSOURCE_PLLSAI" Name="SAIBCLockSelection" Type="list" IP="SAI2,SAI2_SAIA,SAI2_SAIB">
         <PossibleValue Comment="SAIB Extern"       Value="RCC_SAI2CLKSOURCE_PLLSRC" Semaphore="SAIBSourceIsPllSRC"/>
         <PossibleValue Comment="SAIB PLLR devisor" Value="RCC_SAI2CLKSOURCE_PLLR"   Semaphore="SAIBSourceIsPLLR"/>
         <PossibleValue Comment="SAIB PLLI2S"       Value="RCC_SAI2CLKSOURCE_PLLI2S" Semaphore="SAIBSourceIsPLLI2SQ"/>
@@ -640,13 +640,13 @@
     <RefParameter Visible="false" Comment="RTC Clock HSE_Div"    Name="RTCHSEDivFreq_Value" DefaultValue="12500000" IP="RTC"       Type="double" Display="value/1000000" Unit="MHz"/>
     <RefParameter Visible="false" Comment="CEC Clock Source"     Name="CECFreq_Value"       DefaultValue="32768"    IP="HDMI_CEC"  Type="double" Display="value/1000"    Unit="KHz" />
     <RefParameter Visible="false" Comment="FMPI2C1 Clock Source" Name="FMPI2C1Freq_Value"   DefaultValue="16000000" IP="FMPI2C1"   Type="double" Display="value/1000000" Unit="MHz"/>
-    <RefParameter Visible="false" Comment="48MHz Clocks"         Name="USBFreq_Value"       DefaultValue="48000000"                Type="double" Display="value/1000000" Unit="MHz" Min="47880000" Max="48120000">
+    <RefParameter Visible="false" Comment="48MHz Clocks"         Name="USBFreq_Value"       DefaultValue="48000000" IP="USB_OTG_HS,USB_OTG_FS"  Type="double" Display="value/1000000" Unit="MHz" Min="47880000" Max="48120000">
         <Condition Diagnostic="USB activated" Expression="USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="USB Clock Source"     Name="USBFreq_Value"       DefaultValue="48000000"                Type="double" Display="value/1000000" Unit="MHz" Min="48000000" Max="48000000"/>
     <RefParameter Visible="false" Comment="SDIO Clock Source"    Name="SDIOFreq_Value"      DefaultValue="48000000" IP="SDIO"      Type="double" Display="value/1000000" Unit="MHz"  Max="48000000"/>
-    <RefParameter Visible="false" Comment="SAIA Clock Source"    Name="SAIAFreq_Value"      DefaultValue="16000000" IP="SAI1"      Type="double" Display="value/1000000" Unit="MHz"/>
-    <RefParameter Visible="false" Comment="SAIB Clock Source"    Name="SAIBFreq_Value"      DefaultValue="16000000" IP="SAI2"      Type="double" Display="value/1000000" Unit="MHz"/>
+    <RefParameter Visible="false" Comment="SAIA Clock Source"    Name="SAIAFreq_Value"      DefaultValue="16000000" IP="SAI1,SAI1_SAIA,SAI1_SAIB"      Type="double" Display="value/1000000" Unit="MHz"/>
+    <RefParameter Visible="false" Comment="SAIB Clock Source"    Name="SAIBFreq_Value"      DefaultValue="16000000" IP="SAI2,SAI2_SAIA,SAI2_SAIB"      Type="double" Display="value/1000000" Unit="MHz"/>
     <RefParameter Visible="false" Comment="I2S1 Clock Source"    Name="I2S1Freq_Value"      DefaultValue="96000000" IP="I2S2,I2S3"      Type="double" Display="value/1000000" Unit="MHz" Max="192000000"/>
     <RefParameter Visible="false" Comment="I2S2 Clock Source"    Name="I2S2Freq_Value"      DefaultValue="96000000" IP="I2S1"      Type="double" Display="value/1000000" Unit="MHz" Max="192000000"/>
     <RefParameter Visible="false" Comment="SPDIF Clock Source"   Name="SPDIFRXFreq_Value"   DefaultValue="96000000" IP="SPDIFRX"   Type="double" Display="value/1000000" Unit="MHz" Min="5632000"/>
@@ -1110,232 +1110,649 @@
         </RefParameter>
 	
         <RefParameter Visible="false" Comment="PLLI2SUsedForSPDIFRX" DefaultValue="0" Name="PLLI2SUsedForSPDIFRX" Min="0" Max="0" Type="integer"/>
-    <!--prama for periph cod gen-->
-    <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" DefaultValue="+PeriphClockSelection" Type="list">
-        <Condition Expression="(MCO2Config &amp; MCOSourceIsPLLI2SP)|FMPI2C1Used_ForRCC|((HSEByPass|HSEOscillator)&amp;(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11))|CECUsed_ForRCC|RTCUsed_ForRCC|TimPrescalerEnabled|SDIOUsed_ForRCC|SPDIFRXUsed_ForRCC|SAI1Used_ForRCC|SAI2Used_ForRCC|(I2S2Used_ForRCC|I2S3Used_ForRCC)|I2S1Used_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|USB_OTG_FSUsed_ForRCC" Diagnostic="clock used by RCC"/>
+        
+        
+                    <!-- ****************** Clock Update Ticket 90818 CubeAzure _____Begin **************** --> 
+    
+    <!-- pllsaiusage -->
+    <RefParameter Visible="false" Comment="PLLSAI is Used" DefaultValue="=pllsaiForUSB1+pllsaiForUSB2+pllsaiForSAI1A+pllsaiForSAI1B+pllsaiForSAI2A+pllsaiForSAI2B+pllsaiForSDIO" Name="pllsaiusage" Min="0" Type="integer"/>
+    
+    <RefParameter Visible="false" Comment="PLLSAI is Used for USB1" DefaultValue="1" Name="pllsaiForUSB1" Min="0" Type="integer">
+        <Condition Expression="(USB_OTG_FSUsed_ForRCC &amp; USBSourceisPLLSAIP)" Diagnostic=""/>
     </RefParameter>
+    <RefParameter Visible="false" Comment="PLLSAI not Used for USB1" DefaultValue="0" Name="pllsaiForUSB1" Min="0" Type="integer"/>
+    
+    <RefParameter Visible="false" Comment="PLLSAI is Used for USB2" DefaultValue="1" Name="pllsaiForUSB2" Min="0" Type="integer">
+        <Condition Expression="(USB_OTG_HSEmbeddedPHYUsed_ForRCC &amp; USBSourceisPLLSAIP)" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="PLLSAI not Used for USB2" DefaultValue="0" Name="pllsaiForUSB2" Min="0" Type="integer"/>
+    
+    <RefParameter Visible="false" Comment="PLLSAI is Used for SAI1A" DefaultValue="1" Name="pllsaiForSAI1A" Min="0" Type="integer">
+        <Condition Expression="(SAI1_SAIA_Mode &amp; SAIASourceIsPLLSAI)" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="PLLSAI not Used for SAI1A" DefaultValue="0" Name="pllsaiForSAI1A" Min="0" Type="integer"/>
+    
+    <RefParameter Visible="false" Comment="PLLSAI is Used for SAI1B" DefaultValue="1" Name="pllsaiForSAI1B" Min="0" Type="integer">
+        <Condition Expression="(SAI1_SAIB_Mode &amp; SAIASourceIsPLLSAI)" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="PLLSAI not Used for SAI1B" DefaultValue="0" Name="pllsaiForSAI1B" Min="0" Type="integer"/>
+
+    <RefParameter Visible="false" Comment="PLLSAI is Used for SAI2A" DefaultValue="1" Name="pllsaiForSAI2A" Min="0" Type="integer">
+        <Condition Expression="(SAI2_SAIA_Mode &amp; SAIBSourceIsPLLSAI)" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="PLLSAI not Used for SAI2A" DefaultValue="0" Name="pllsaiForSAI2A" Min="0" Type="integer"/>
+    
+    <RefParameter Visible="false" Comment="PLLSAI is Used for SAI2B" DefaultValue="1" Name="pllsaiForSAI2B" Min="0" Type="integer">
+        <Condition Expression="(SAI2_SAIB_Mode &amp; SAIBSourceIsPLLSAI)" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="PLLSAI not Used for SAI2B" DefaultValue="0" Name="pllsaiForSAI2B" Min="0" Type="integer"/>
+
+    <RefParameter Visible="false" Comment="PLLSAI is Used for SDIO" DefaultValue="1" Name="pllsaiForSDIO" Min="0" Type="integer">
+        <Condition Expression="(SDIOUsed_ForRCC &amp; SDIOSourceIsClock48 &amp; USBSourceisPLLSAIP)" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="PLLSAI not Used for SDIO" DefaultValue="0" Name="pllsaiForSDIO" Min="0" Type="integer"/>
+    
+    <!-- plli2susage -->
+    <RefParameter Visible="false" Comment="PLLI2S is Used" DefaultValue="=plli2sForSAI1A+plli2sForSAI1B+plli2sForSAI2A+plli2sForSAI2B+plli2sForI2S1+plli2sForI2S2+plli2sForI2S3+plli2sForMCO2+plli2sForSPIDIFRX" Name="plli2susage" Min="0" Type="integer"/>
+    
+    <RefParameter Visible="false" Comment="PLLI2S is Used for SAI1A" DefaultValue="1" Name="plli2sForSAI1A" Min="0" Type="integer">
+        <Condition Expression="(SAI1_SAIA_Mode &amp; SAIASourceIsPLLI2SQ)" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="PLLI2S not Used for SAI1A" DefaultValue="0" Name="plli2sForSAI1A" Min="0" Type="integer"/>
+    
+    <RefParameter Visible="false" Comment="PLLI2S is Used for SAI1B" DefaultValue="1" Name="plli2sForSAI1B" Min="0" Type="integer">
+        <Condition Expression="(SAI1_SAIB_Mode &amp; SAIASourceIsPLLI2SQ)" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="PLLI2S not Used for SAI1B" DefaultValue="0" Name="plli2sForSAI1B" Min="0" Type="integer"/>
+    
+    <RefParameter Visible="false" Comment="PLLI2S is Used for SAI2A" DefaultValue="1" Name="plli2sForSAI2A" Min="0" Type="integer">
+        <Condition Expression="(SAI2_SAIA_Mode &amp; SAIBSourceIsPLLI2SQ)" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="PLLI2S not Used for SAI2A" DefaultValue="0" Name="plli2sForSAI2A" Min="0" Type="integer"/>
+    
+    <RefParameter Visible="false" Comment="PLLI2S is Used for SAI2B" DefaultValue="1" Name="plli2sForSAI2B" Min="0" Type="integer">
+        <Condition Expression="(SAI2_SAIB_Mode &amp; SAIBSourceIsPLLI2SQ)" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="PLLI2S not Used for SAI2B" DefaultValue="0" Name="plli2sForSAI2B" Min="0" Type="integer"/>
+    
+    <RefParameter Visible="false" Comment="PLLI2S is Used for I2S1" DefaultValue="1" Name="plli2sForI2S1" Min="0" Type="integer">
+        <Condition Expression="(I2S1Used_ForRCC &amp; I2S2SourceIsPLLI2SR)" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="PLLI2S not Used for I2S1" DefaultValue="0" Name="plli2sForI2S1" Min="0" Type="integer"/>
+    
+    <RefParameter Visible="false" Comment="PLLI2S is Used for I2S2" DefaultValue="1" Name="plli2sForI2S2" Min="0" Type="integer">
+        <Condition Expression="(I2S2Used_ForRCC &amp; I2S1SourceIsPLLI2SR)" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="PLLI2S not Used for I2S2" DefaultValue="0" Name="plli2sForI2S2" Min="0" Type="integer"/>
+    
+    <RefParameter Visible="false" Comment="PLLI2S is Used for I2S3" DefaultValue="1" Name="plli2sForI2S3" Min="0" Type="integer">
+        <Condition Expression="(I2S3Used_ForRCC &amp; I2S1SourceIsPLLI2SR)" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="PLLI2S not Used for I2S3" DefaultValue="0" Name="plli2sForI2S3" Min="0" Type="integer"/>
+    
+    <RefParameter Visible="false" Comment="PLLI2S is Used for MCO2" DefaultValue="1" Name="plli2sForMCO2" Min="0" Type="integer">
+        <Condition Expression="MCOSourceIsPLLI2SP &amp;(MCO2Config)" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="PLLI2S not Used for MCO2" DefaultValue="0" Name="plli2sForMCO2" Min="0" Type="integer"/>
+    
+    <RefParameter Visible="false" Comment="PLLI2S is Used for SPIDIFRX" DefaultValue="1" Name="plli2sForSPIDIFRX" Min="0" Type="integer">
+        <Condition Expression="(SPDIFSourceisPLLI2SP &amp; SPDIFRXUsed_ForRCC)" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="PLLI2S not Used for SPIDIFRX" DefaultValue="0" Name="plli2sForSPIDIFRX" Min="0" Type="integer"/>
+    
+    <!-- Old PeriphClockSelectionARG -->
+    <!--RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" DefaultValue="+PeriphClockSelection" Type="list">
+        <Condition Expression="(MCO2Config &amp; MCOSourceIsPLLI2SP)|FMPI2C1Used_ForRCC|((HSEByPass|HSEOscillator)&amp;(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11))|CECUsed_ForRCC|RTCUsed_ForRCC|TimPrescalerEnabled|SDIOUsed_ForRCC|SPDIFRXUsed_ForRCC|SAI1Used_ForRCC|SAI2Used_ForRCC|(I2S2Used_ForRCC|I2S3Used_ForRCC)|I2S1Used_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|USB_OTG_FSUsed_ForRCC" Diagnostic="clock used by RCC"/>
+    </RefParameter-->
+    
+    <!-- FMPI2C1 -->
+    <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" IP="FMPI2C1" DefaultValue="RCC_PERIPHCLK_FMPI2C1" Type="list">
+        <Condition Expression="FMPI2C1Used_ForRCC" Diagnostic=""/>
+    </RefParameter>
+    
+    <!-- RTC -->
+    <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" IP="RTC" DefaultValue="RCC_PERIPHCLK_RTC" Type="list">
+        <Condition Expression="RTCUsed_ForRCC" Diagnostic=""/>
+    </RefParameter>
+    
+    <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" IP="TIM11" DefaultValue="RCC_PERIPHCLK_RTC" Type="list">
+        <Condition Expression="((HSEByPass|HSEOscillator)&amp;(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11))" Diagnostic=""/>
+    </RefParameter>
+
+    <!-- CEC -->
+    <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" IP="HDMI_CEC" DefaultValue="RCC_PERIPHCLK_CEC" Type="list">
+        <Condition Expression="CECUsed_ForRCC" Diagnostic=""/>
+    </RefParameter>
+    
+    <!-- USB -->
+    <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" IP="USB_OTG_HS" DefaultValue="RCC_PERIPHCLK_CLK48" Type="list">
+        <Condition Expression="USB_OTG_HSEmbeddedPHYUsed_ForRCC &amp; !USBSourceisPLLSAIP" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" IP="USB_OTG_HS" DefaultValue="RCC_PERIPHCLK_CLK48" Type="list">
+        <Condition Expression="USB_OTG_HSEmbeddedPHYUsed_ForRCC &amp; USBSourceisPLLSAIP &amp; (pllsaiusage &lt; 2)" Diagnostic=""/>
+    </RefParameter>
+    
+    <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" IP="USB_OTG_FS" DefaultValue="RCC_PERIPHCLK_CLK48" Type="list">
+        <Condition Expression="USB_OTG_FSUsed_ForRCC &amp; !USBSourceisPLLSAIP" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" IP="USB_OTG_FS" DefaultValue="RCC_PERIPHCLK_CLK48" Type="list">
+        <Condition Expression="USB_OTG_FSUsed_ForRCC &amp; USBSourceisPLLSAIP &amp; (pllsaiusage &lt; 2)" Diagnostic=""/>
+    </RefParameter>
+    
+    <!-- SDIO -->
+    <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" IP="SDIO" DefaultValue="RCC_PERIPHCLK_SDIO" Type="list">
+        <Condition Expression="SDIOUsed_ForRCC &amp; !SDIOSourceIsClock48" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" IP="SDIO" DefaultValue="RCC_PERIPHCLK_SDIO|RCC_PERIPHCLK_CLK48" Type="list">
+        <Condition Expression="SDIOUsed_ForRCC &amp; SDIOSourceIsClock48 &amp; !USBSourceisPLLSAIP" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" IP="SDIO" DefaultValue="RCC_PERIPHCLK_SDIO|RCC_PERIPHCLK_CLK48" Type="list">
+        <Condition Expression="SDIOUsed_ForRCC &amp; SDIOSourceIsClock48 &amp; USBSourceisPLLSAIP &amp; (pllsaiusage &lt; 2)" Diagnostic=""/>
+    </RefParameter>
+    
+    <!-- SAI1 -->
+    <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" IP="SAI1_SAIA,SAI1_SAIB" DefaultValue="RCC_PERIPHCLK_SAI1" Type="list">
+        <Condition Expression="(SAI1Used_ForRCC &amp; !SAIASourceIsPLLSAI &amp; !SAIASourceIsPLLI2SQ)" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" IP="SAI1_SAIA,SAI1_SAIB" DefaultValue="RCC_PERIPHCLK_SAI1" Type="list">
+        <Condition Expression="(SAI1Used_ForRCC &amp; SAIASourceIsPLLSAI &amp; (pllsaiusage &lt; 2))" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" IP="SAI1_SAIA,SAI1_SAIB" DefaultValue="RCC_PERIPHCLK_SAI1" Type="list">
+        <Condition Expression="(SAI1Used_ForRCC &amp; SAIASourceIsPLLI2SQ &amp; (plli2susage &lt; 2))" Diagnostic=""/>
+    </RefParameter>
+    
+    <!-- SAI2 -->
+    <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" IP="SAI2_SAIA,SAI2_SAIB" DefaultValue="RCC_PERIPHCLK_SAI2" Type="list">
+        <Condition Expression="(SAI2Used_ForRCC &amp; !SAIBSourceIsPLLSAI &amp; !SAIBSourceIsPLLI2SQ)" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" IP="SAI2_SAIA,SAI2_SAIB" DefaultValue="RCC_PERIPHCLK_SAI2" Type="list">
+        <Condition Expression="(SAI2Used_ForRCC &amp; SAIBSourceIsPLLSAI &amp; (pllsaiusage &lt; 2))" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" IP="SAI2_SAIA,SAI2_SAIB" DefaultValue="RCC_PERIPHCLK_SAI2" Type="list">
+        <Condition Expression="(SAI2Used_ForRCC &amp; SAIBSourceIsPLLI2SQ &amp; (plli2susage &lt; 2))" Diagnostic=""/>
+    </RefParameter>
+    
+    <!-- SPDIFRX -->
+    <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" IP="SPDIFRX" DefaultValue="RCC_PERIPHCLK_SPDIFRX" Type="list">
+        <Condition Expression="SPDIFRXUsed_ForRCC &amp; !SPDIFSourceisPLLI2SP" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" IP="SPDIFRX" DefaultValue="RCC_PERIPHCLK_SPDIFRX" Type="list">
+        <Condition Expression="SPDIFRXUsed_ForRCC &amp; SPDIFSourceisPLLI2SP &amp; (plli2susage &lt; 2)" Diagnostic=""/>
+    </RefParameter>
+    
+    <!-- I2S_APB1 -->
+    <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" IP="I2S2" DefaultValue="RCC_PERIPHCLK_I2S_APB1" Type="list">
+        <Condition Expression="I2S2Used_ForRCC &amp; !I2S1SourceIsPLLI2SR" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" IP="I2S2" DefaultValue="RCC_PERIPHCLK_I2S_APB1" Type="list">
+        <Condition Expression="I2S2Used_ForRCC &amp; I2S1SourceIsPLLI2SR &amp; (plli2susage &lt; 2)" Diagnostic=""/>
+    </RefParameter>
+    
+    <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" IP="I2S3" DefaultValue="RCC_PERIPHCLK_I2S_APB1" Type="list">
+        <Condition Expression="I2S3Used_ForRCC &amp; !I2S1SourceIsPLLI2SR" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" IP="I2S3" DefaultValue="RCC_PERIPHCLK_I2S_APB1" Type="list">
+        <Condition Expression="I2S3Used_ForRCC &amp; I2S1SourceIsPLLI2SR &amp; (plli2susage &lt; 2)" Diagnostic=""/>
+    </RefParameter>
+    
+    <!-- I2S_APB2 -->
+    <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" IP="I2S1" DefaultValue="RCC_PERIPHCLK_I2S_APB2" Type="list">
+        <Condition Expression="I2S1Used_ForRCC  &amp; !I2S2SourceIsPLLI2SR" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" IP="I2S1" DefaultValue="RCC_PERIPHCLK_I2S_APB2" Type="list">
+        <Condition Expression="I2S1Used_ForRCC  &amp; I2S2SourceIsPLLI2SR &amp; (plli2susage &lt; 2)" Diagnostic=""/>
+    </RefParameter>
+    
     <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" DefaultValue="null" Type="list"/>
 	
-    <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelection" DefaultValue="+RCC_PERIPHCLK_PLLI2SVar+|RCC_PERIPHCLK_I2S1Var+|RCC_PERIPHCLK_I2S2Var+|RCC_PERIPHCLK_SAIAVar+|RCC_PERIPHCLK_SAIBVar+|RCC_PERIPHCLK_TIMVar+|RCC_PERIPHCLK_RTCVar+|RCC_PERIPHCLK_SDIOVar+|RCC_PERIPHCLK_SPDIFVar+|RCC_PERIPHCLK_CK48Var+|RCC_PERIPHCLK_CECVar+|RCC_PERIPHCLK_FMPI2C1Var" Type="list"/>
+    <!-- Old PeriphClockSelection -->
+    <!--RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelection" DefaultValue="+RCC_PERIPHCLK_PLLI2SVar+|RCC_PERIPHCLK_I2S1Var+|RCC_PERIPHCLK_I2S2Var+|RCC_PERIPHCLK_SAIAVar+|RCC_PERIPHCLK_SAIBVar+|RCC_PERIPHCLK_TIMVar+|RCC_PERIPHCLK_RTCVar+|RCC_PERIPHCLK_SDIOVar+|RCC_PERIPHCLK_SPDIFVar+|RCC_PERIPHCLK_CK48Var+|RCC_PERIPHCLK_CECVar+|RCC_PERIPHCLK_FMPI2C1Var" Type="list"/-->
 
-	
-	
+    <RefParameter Visible="false" Comment="Periph Clock Selection" Name="C_PeriphClockSelectionARG" DefaultValue="+RCC_PERIPHCLK_PLLI2SVar+|RCC_PERIPHCLK_I2S1Var+|RCC_PERIPHCLK_I2S2Var+|RCC_PERIPHCLK_SAIAVar+|RCC_PERIPHCLK_SAIBVar+|RCC_PERIPHCLK_TIMVar+|RCC_PERIPHCLK_SDIOVar+|RCC_PERIPHCLK_SPDIFVar+|RCC_PERIPHCLK_CK48Var" Type="list">
+    </RefParameter>
+    
     <RefParameter Visible="false" Name="RCC_PERIPHCLK_PLLI2SVar" Comment="RCC_PERIPHCLK_PLLI2SVar" Type="list" DefaultValue="RCC_PERIPHCLK_PLLI2S">
-        <Condition Expression="(MCO2Config &amp; MCOSourceIsPLLI2SP)" Diagnostic="I2S Activated and source is PLLI2S"/>
+        <Condition Expression="(MCO2Config &amp; MCOSourceIsPLLI2SP)" Diagnostic=""/>
         <PossibleValue Value="RCC_PERIPHCLK_PLLI2S" Comment="RCC_PERIPHCLK_PLLI2S"/>
     </RefParameter>
     <RefParameter Visible="false" Name="RCC_PERIPHCLK_PLLI2SVar" Comment="RCC_PERIPHCLK_PLLI2SVar" Type="list" DefaultValue=""/>
-	
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_FMPI2C1Var" Comment="RCC_PERIPHCLK_FMPI2C1Var" Type="list" DefaultValue="RCC_PERIPHCLK_FMPI2C1">
-        <Condition Expression="FMPI2C1Used_ForRCC" Diagnostic="I2S Activated and source is PLLI2S"/>
-        <PossibleValue Value="RCC_PERIPHCLK_FMPI2C1" Comment="RCC_PERIPHCLK_FMPI2C1"/>
-    </RefParameter>
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_FMPI2C1Var" Comment="RCC_PERIPHCLK_FMPI2C1Var" Type="list" DefaultValue=""/>
-	
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_SPDIFVar" Comment="RCC_PERIPHCLK_SPDIFVar" Type="list" DefaultValue="RCC_PERIPHCLK_SPDIFRX">
-        <Condition Expression="SPDIFRXUsed_ForRCC" Diagnostic="I2S Activated and source is PLLI2S"/>
-        <PossibleValue Value="RCC_PERIPHCLK_SPDIFRX" Comment="RCC_PERIPHCLK_SPDIFRX"/>
-    </RefParameter>
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_SPDIFVar" Comment="RCC_PERIPHCLK_SPDIFVar" Type="list" DefaultValue=""/>
-	
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_CECVar" Comment="RCC_PERIPHCLK_CECVar" Type="list" DefaultValue="RCC_PERIPHCLK_CEC">
-        <Condition Expression="CECUsed_ForRCC" Diagnostic="I2S Activated and source is PLLI2S"/>
-        <PossibleValue Value="RCC_PERIPHCLK_CEC" Comment="RCC_PERIPHCLK_CEC"/>
-    </RefParameter>
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_CECVar" Comment="RCC_PERIPHCLK_CECVar" Type="list" DefaultValue=""/>
-	
-	
-	
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_SDIOVar" Comment="RCC_PERIPHCLK_SDIOVar" Type="list" DefaultValue="RCC_PERIPHCLK_SDIO">
-        <Condition Expression="SDIOUsed_ForRCC" Diagnostic="I2S Activated and source is PLLI2S"/>
-        <PossibleValue Value="RCC_PERIPHCLK_SDIO" Comment="RCC_PERIPHCLK_SDIO"/>
-    </RefParameter>
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_SDIOVar" Comment="RCC_PERIPHCLK_SDIOVar" Type="list" DefaultValue=""/>
-	
-	
-	
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_I2S1Var" Comment="RCC_PERIPHCLK_I2S1Var" Type="list" DefaultValue="RCC_PERIPHCLK_I2S_APB1">
-        <Condition Expression="(I2S2Used_ForRCC|I2S3Used_ForRCC)" Diagnostic="I2S Activated and source is PLLI2S"/>
-        <PossibleValue Value="RCC_PERIPHCLK_I2S_APB1" Comment="RCC_PERIPHCLK_I2S_APB1"/>
-    </RefParameter>
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_I2S1Var" Comment="RCC_PERIPHCLK_I2S1Var" Type="list" DefaultValue=""/>
-	
-	
-	
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_I2S2Var" Comment="RCC_PERIPHCLK_I2S2Var" Type="list" DefaultValue="RCC_PERIPHCLK_I2S_APB2">
-        <Condition Expression="I2S1Used_ForRCC" Diagnostic="I2S Activated and source is PLLI2S"/>
-        <PossibleValue Value="RCC_PERIPHCLK_I2S_APB2" Comment="RCC_PERIPHCLK_I2S_APB2"/>
-    </RefParameter>
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_I2S2Var" Comment="RCC_PERIPHCLK_I2S2Var" Type="list" DefaultValue=""/>
-	
-	
-	
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_SAIAVar" Comment="RCC_PERIPHCLK_SAIAVar" Type="list" DefaultValue="RCC_PERIPHCLK_SAI1">
-        <Condition Expression="SAI1Used_ForRCC" Diagnostic="I2S Activated and source is PLLI2S"/>
-        <PossibleValue Value="RCC_PERIPHCLK_SAI1" Comment="RCC_PERIPHCLK_SAI1"/>
-    </RefParameter>
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_SAIAVar" Comment="RCC_PERIPHCLK_SAIAVar" Type="list" DefaultValue=""/>
-	
-	
-	
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_SAIBVar" Comment="RCC_PERIPHCLK_SAIBVar" Type="list" DefaultValue="RCC_PERIPHCLK_SAI2">
-        <Condition Expression="SAI2Used_ForRCC" Diagnostic="I2S Activated and source is PLLI2S"/>
-        <PossibleValue Value="RCC_PERIPHCLK_SAI2" Comment="RCC_PERIPHCLK_SAI2"/>
-    </RefParameter>
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_SAIBVar" Comment="RCC_PERIPHCLK_SAIBVar" Type="list" DefaultValue=""/>
-	
-	
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_RTCVar" Comment="RCC_PERIPHCLK_RTCVar" Type="list" DefaultValue="RCC_PERIPHCLK_RTC">
-        <Condition Expression="RTCUsed_ForRCC|((HSEByPass|HSEOscillator)&amp;(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11))" Diagnostic="I2S Activated and source is PLLI2S"/>
-        <PossibleValue Value="RCC_PERIPHCLK_RTC" Comment="RCC_PERIPHCLK_RTC"/>
-    </RefParameter>
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_RTCVar" Comment="RCC_PERIPHCLK_RTCVar" Type="list" DefaultValue=""/>
-	
+    
     <RefParameter Visible="false" Name="RCC_PERIPHCLK_TIMVar" Comment="RCC_PERIPHCLK_TIMVar" Type="list" DefaultValue="RCC_PERIPHCLK_TIM">
         <Condition Expression="TimPrescalerEnabled" Diagnostic="Timer Prescaler Activated"/>
         <PossibleValue Value="RCC_PERIPHCLK_TIM" Comment="RCC_PERIPHCLK_TIM"/>
     </RefParameter>
     <RefParameter Visible="false" Name="RCC_PERIPHCLK_TIMVar" Comment="RCC_PERIPHCLK_TIMVar" Type="list" DefaultValue=""/>
-	
+    
     <RefParameter Visible="false" Name="RCC_PERIPHCLK_CK48Var" Comment="RCC_PERIPHCLK_CK48Var" Type="list" DefaultValue="RCC_PERIPHCLK_CLK48">
-        <Condition Expression="USB_OTG_HSEmbeddedPHYUsed_ForRCC|USB_OTG_FSUsed_ForRCC|(SDIOUsed_ForRCC &amp; SDIOSourceIsClock48)" Diagnostic="Timer Prescaler Activated"/>
-        <PossibleValue Value="RCC_PERIPHCLK_CLK48" Comment="RCC_PERIPHCLK_CLK48"/>
+        <Condition Expression="(USB_OTG_HSEmbeddedPHYUsed_ForRCC|USB_OTG_FSUsed_ForRCC|(SDIOUsed_ForRCC &amp; SDIOSourceIsClock48)) &amp; USBSourceisPLLSAIP &amp; (pllsaiusage &gt; 1)" Diagnostic=""/>
     </RefParameter>
     <RefParameter Visible="false" Name="RCC_PERIPHCLK_CK48Var" Comment="RCC_PERIPHCLK_CK48Var" Type="list" DefaultValue=""/>
+    
+    <RefParameter Visible="false" Name="RCC_PERIPHCLK_SDIOVar" Comment="RCC_PERIPHCLK_SDIOVar" Type="list" DefaultValue="RCC_PERIPHCLK_SDIO">
+        <Condition Expression="SDIOUsed_ForRCC &amp; SDIOSourceIsClock48 &amp; USBSourceisPLLSAIP &amp; (pllsaiusage &gt; 1)" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="RCC_PERIPHCLK_SDIOVar" Comment="RCC_PERIPHCLK_SDIOVar" Type="list" DefaultValue=""/>
 	
+    <RefParameter Visible="false" Name="RCC_PERIPHCLK_SPDIFVar" Comment="RCC_PERIPHCLK_SPDIFVar" Type="list" DefaultValue="RCC_PERIPHCLK_SPDIFRX">
+        <Condition Expression="SPDIFRXUsed_ForRCC &amp; SPDIFSourceisPLLI2SP &amp; (plli2susage &gt; 1)" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="RCC_PERIPHCLK_SPDIFVar" Comment="RCC_PERIPHCLK_SPDIFVar" Type="list" DefaultValue=""/>
+    
+    <RefParameter Visible="false" Name="RCC_PERIPHCLK_SAIAVar" Comment="RCC_PERIPHCLK_SAIAVar" Type="list" DefaultValue="RCC_PERIPHCLK_SAI1">
+        <Condition Expression="(SAI1Used_ForRCC &amp; SAIASourceIsPLLSAI &amp; (pllsaiusage &gt; 1))|(SAI1Used_ForRCC &amp; SAIASourceIsPLLI2SQ &amp; (plli2susage &gt; 1))" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="RCC_PERIPHCLK_SAIAVar" Comment="RCC_PERIPHCLK_SAIAVar" Type="list" DefaultValue=""/>
 	
-    <RefParameter Visible="false" Name="FMPI2C1ClockSelectionARG" Comment="FMPI2C1ClockSelectionARG" Type="list" DefaultValue="+FMPI2C1Selection">
-        <Condition Expression="FMPI2C1Used_ForRCC" Diagnostic="I2S Activated and source is PLLI2S"/>
+    <RefParameter Visible="false" Name="RCC_PERIPHCLK_SAIBVar" Comment="RCC_PERIPHCLK_SAIBVar" Type="list" DefaultValue="RCC_PERIPHCLK_SAI2">
+        <Condition Expression="(SAI2Used_ForRCC &amp; SAIBSourceIsPLLSAI &amp; (pllsaiusage &gt; 1))|(SAI2Used_ForRCC &amp; SAIBSourceIsPLLI2SQ &amp; (plli2susage &gt; 1))" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="RCC_PERIPHCLK_SAIBVar" Comment="RCC_PERIPHCLK_SAIBVar" Type="list" DefaultValue=""/>
+	
+    <RefParameter Visible="false" Name="RCC_PERIPHCLK_I2S1Var" Comment="RCC_PERIPHCLK_I2S1Var" Type="list" DefaultValue="RCC_PERIPHCLK_I2S_APB1">
+        <Condition Expression="(I2S2Used_ForRCC|I2S3Used_ForRCC) &amp; I2S1SourceIsPLLI2SR &amp; (plli2susage &gt; 1)" Diagnostic=""/>
+        <PossibleValue Value="RCC_PERIPHCLK_I2S_APB1" Comment="RCC_PERIPHCLK_I2S_APB1"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="RCC_PERIPHCLK_I2S1Var" Comment="RCC_PERIPHCLK_I2S1Var" Type="list" DefaultValue=""/>
+	
+    <RefParameter Visible="false" Name="RCC_PERIPHCLK_I2S2Var" Comment="RCC_PERIPHCLK_I2S2Var" Type="list" DefaultValue="RCC_PERIPHCLK_I2S_APB2">
+        <Condition Expression="I2S1Used_ForRCC &amp; I2S2SourceIsPLLI2SR &amp; (plli2susage &gt; 1)" Diagnostic="I2S Activated and source is PLLI2S"/>
+        <PossibleValue Value="RCC_PERIPHCLK_I2S_APB2" Comment="RCC_PERIPHCLK_I2S_APB2"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="RCC_PERIPHCLK_I2S2Var" Comment="RCC_PERIPHCLK_I2S2Var" Type="list" DefaultValue=""/>
+	
+    <!-- FMPI2C1ClockSelectionARG -->
+    <RefParameter Visible="false" Name="FMPI2C1ClockSelectionARG" Comment="FMPI2C1ClockSelectionARG" Type="list" IP="FMPI2C1" DefaultValue="+FMPI2C1Selection">
+        <Condition Expression="FMPI2C1Used_ForRCC" Diagnostic=""/>
     </RefParameter>
     <RefParameter Visible="false" Name="FMPI2C1ClockSelectionARG" Comment="FMPI2C1ClockSelectionARG" Type="list" DefaultValue="null"/>
-	
-	
-    <RefParameter Visible="false" Name="SPDIFClockSelectionARG" Comment="SPDIFClockSelectionARG" Type="list" DefaultValue="+SPDIFCLockSelection">
-        <Condition Expression="SPDIFRXUsed_ForRCC" Diagnostic="I2S Activated and source is PLLI2S"/>
-    </RefParameter>
-    <RefParameter Visible="false" Name="SPDIFClockSelectionARG" Comment="SPDIFClockSelectionARG" Type="list" DefaultValue="null"/>
-	
-	
-    <RefParameter Visible="false" Name="CECClockSelectionARG" Comment="CECClockSelectionARG" Type="list" DefaultValue="+CECClockSelection">
-        <Condition Expression="CECUsed_ForRCC" Diagnostic="I2S Activated and source is PLLI2S"/>
+    
+    <!-- CECClockSelectionARG -->
+    <RefParameter Visible="false" Name="CECClockSelectionARG" Comment="CECClockSelectionARG" Type="list" IP="HDMI_CEC" DefaultValue="+CECClockSelection">
+        <Condition Expression="CECUsed_ForRCC" Diagnostic=""/>
     </RefParameter>
     <RefParameter Visible="false" Name="CECClockSelectionARG" Comment="CECClockSelectionARG" Type="list" DefaultValue="null"/>
-	
-	
-    <RefParameter Visible="false" Name="SDIOClockSelectionARG" Comment="SDIOClockSelectionARG" Type="list" DefaultValue="+SDIOCLockSelection">
-        <Condition Expression="SDIOUsed_ForRCC" Diagnostic="I2S Activated and source is PLLI2S"/>
+    
+    <!-- RTCClockSelectionARG -->
+    <RefParameter Visible="false" Name="RTCClockSelectionARG" Comment="RTCClockSelectionARG" Type="list" IP="RTC" DefaultValue="+RCC_RTC_Clock_Source">
+        <Condition Expression="RTCUsed_ForRCC" Diagnostic=""/>
     </RefParameter>
-    <RefParameter Visible="false" Name="SDIOClockSelectionARG" Comment="SDIOClockSelectionARG" Type="list" DefaultValue="null"/>
-	
-	
-    <RefParameter Visible="false" Name="I2S1ClockSelectionARG" Comment="I2S1ClockSelectionARG" Type="list" DefaultValue="+I2S1CLockSelection">
-        <Condition Expression="(I2S2Used_ForRCC|I2S3Used_ForRCC)" Diagnostic="I2S Activated and source is PLLI2S"/>
-    </RefParameter>
-    <RefParameter Visible="false" Name="I2S1ClockSelectionARG" Comment="I2S1ClockSelectionARG" Type="list" DefaultValue="null"/>
-	
-	
-	
-    <RefParameter Visible="false" Name="I2S2ClockSelectionARG" Comment="I2S2ClockSelectionARG" Type="list" DefaultValue="+I2S2CLockSelection">
-        <Condition Expression="I2S1Used_ForRCC" Diagnostic="I2S Activated and source is PLLI2S"/>
-    </RefParameter>
-    <RefParameter Visible="false" Name="I2S2ClockSelectionARG" Comment="I2S2ClockSelectionARG" Type="list" DefaultValue="null"/>
-	
-    <RefParameter Visible="false" Name="SAI1ClockSelectionARG" Comment="SAI1ClockSelectionARG" Type="list" DefaultValue="+SAIACLockSelection">
-        <Condition Expression="SAI1Used_ForRCC" Diagnostic="I2S Activated and source is PLLI2S"/>
-    </RefParameter>
-    <RefParameter Visible="false" Name="SAI1ClockSelectionARG" Comment="SAI1ClockSelectionARG" Type="list" DefaultValue="null"/>
-	
-	
-    <RefParameter Visible="false" Name="SAI2ClockSelectionARG" Comment="SAI2ClockSelectionARG" Type="list" DefaultValue="+SAIBCLockSelection">
-        <Condition Expression="SAI2Used_ForRCC" Diagnostic="I2S Activated and source is PLLI2S"/>
-    </RefParameter>
-    <RefParameter Visible="false" Name="SAI2ClockSelectionARG" Comment="SAI2ClockSelectionARG" Type="list" DefaultValue="null"/>
-	
-    <RefParameter Visible="false" Name="CK48ClockSelectionARG" Comment="CK48ClockSelectionARG" Type="list" DefaultValue="+USBCLockSelection">
-        <Condition Expression="(USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|(SDIOSourceIsClock48&amp;SDIOUsed_ForRCC))" Diagnostic="PLLSAI is used for SAI"/>
-    </RefParameter>
-    <RefParameter Visible="false" Name="CK48ClockSelectionARG" Comment="CK48ClockSelectionARG" Type="list" DefaultValue="null"/>
-	
-	
-    <RefParameter Visible="false" Name="RTCClockSelectionARG" Comment="RTCClockSelectionARG" Type="list" DefaultValue="+RCC_RTC_Clock_Source">
-        <Condition Expression="((HSEByPass|HSEOscillator)&amp;(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11))|RTCUsed_ForRCC" Diagnostic="PLLSAI is used for SAI"/>
+    <RefParameter Visible="false" Name="RTCClockSelectionARG" Comment="RTCClockSelectionARG" Type="list" IP="TIM11" DefaultValue="+RCC_RTC_Clock_Source">
+        <Condition Expression="((HSEByPass|HSEOscillator)&amp;(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11))" Diagnostic=""/>
     </RefParameter>
     <RefParameter Visible="false" Name="RTCClockSelectionARG" Comment="RTCClockSelectionARG" Type="list" DefaultValue="null"/>
 	
+    <!-- TIMPresSelectionARG -->
     <RefParameter Visible="false" Name="TIMPresSelectionARG" Comment="TIMPresSelectionARG" Type="list" DefaultValue="+RCC_TIM_PRescaler_Selection">
-        <Condition Expression="TimPrescalerEnabled" Diagnostic="PLLSAI is used for SAI"/>
+        <Condition Expression="TimPrescalerEnabled" Diagnostic=""/>
     </RefParameter>
     <RefParameter Visible="false" Name="TIMPresSelectionARG" Comment="TIMPresSelectionARG" Type="list" DefaultValue="null"/>
 	
+    <!-- SPDIFClockSelectionARG -->
+    <RefParameter Visible="false" Name="SPDIFClockSelectionARG" Comment="SPDIFClockSelectionARG" Type="list" IP="SPDIFRX" DefaultValue="+SPDIFCLockSelection">
+        <Condition Expression="SPDIFRXUsed_ForRCC &amp; !SPDIFSourceisPLLI2SP" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="SPDIFClockSelectionARG" Comment="SPDIFClockSelectionARG" Type="list" IP="SPDIFRX" DefaultValue="+SPDIFCLockSelection">
+        <Condition Expression="SPDIFRXUsed_ForRCC &amp; SPDIFSourceisPLLI2SP &amp; (plli2susage &lt; 2)" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="SPDIFClockSelectionARG" Comment="SPDIFClockSelectionARG" Type="list" DefaultValue="null"/>
+    
+    <RefParameter Visible="false" Name="C_SPDIFClockSelectionARG" Comment="C_SPDIFClockSelectionARG" Type="list" DefaultValue="+SPDIFCLockSelection">
+        <Condition Expression="SPDIFRXUsed_ForRCC &amp; SPDIFSourceisPLLI2SP &amp; (plli2susage &gt; 1)" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="C_SPDIFClockSelectionARG" Comment="C_SPDIFClockSelectionARG" Type="list" DefaultValue="null"/>
+
+    <!-- SDIOClockSelectionARG -->
+    <RefParameter Visible="false" Name="SDIOClockSelectionARG" Comment="SDIOClockSelectionARG" Type="list" IP="SDIO" DefaultValue="+SDIOCLockSelection">
+        <Condition Expression="SDIOUsed_ForRCC &amp; !SDIOSourceIsClock48" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="SDIOClockSelectionARG" Comment="SDIOClockSelectionARG" Type="list" IP="SDIO" DefaultValue="+SDIOCLockSelection">
+        <Condition Expression="SDIOUsed_ForRCC &amp; SDIOSourceIsClock48 &amp; !USBSourceisPLLSAIP" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="SDIOClockSelectionARG" Comment="SDIOClockSelectionARG" Type="list" IP="SDIO" DefaultValue="+SDIOCLockSelection">
+        <Condition Expression="SDIOUsed_ForRCC &amp; SDIOSourceIsClock48 &amp; USBSourceisPLLSAIP &amp; (pllsaiusage &lt; 2)" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="SDIOClockSelectionARG" Comment="SDIOClockSelectionARG" Type="list" DefaultValue="null"/>
+    
+    <RefParameter Visible="false" Name="C_SDIOClockSelectionARG" Comment="C_SDIOClockSelectionARG" Type="list" DefaultValue="+SDIOCLockSelection">
+        <Condition Expression="SDIOUsed_ForRCC &amp; SDIOSourceIsClock48 &amp; USBSourceisPLLSAIP &amp; (pllsaiusage &gt; 1)" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="C_SDIOClockSelectionARG" Comment="C_SDIOClockSelectionARG" Type="list" DefaultValue="null"/>
+    
+    <!-- CK48ClockSelectionARG -->
+    <RefParameter Visible="false" Name="CK48ClockSelectionARG" Comment="CK48ClockSelectionARG" Type="list" IP="USB_OTG_FS,USB_OTG_HS" DefaultValue="+USBCLockSelection">
+        <Condition Expression="(USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC) &amp; !USBSourceisPLLSAIP" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="CK48ClockSelectionARG" Comment="CK48ClockSelectionARG" Type="list" IP="USB_OTG_FS,USB_OTG_HS" DefaultValue="+USBCLockSelection">
+        <Condition Expression="(USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC) &amp; USBSourceisPLLSAIP &amp; (pllsaiusage &lt; 2)" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="CK48ClockSelectionARG" Comment="CK48ClockSelectionARG" Type="list" IP="SDIO" DefaultValue="+USBCLockSelection">
+        <Condition Expression="(SDIOUsed_ForRCC &amp; SDIOSourceIsClock48 &amp; !USBSourceisPLLSAIP)" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="CK48ClockSelectionARG" Comment="CK48ClockSelectionARG" Type="list" IP="SDIO" DefaultValue="+USBCLockSelection">
+        <Condition Expression="(SDIOUsed_ForRCC &amp; SDIOSourceIsClock48 &amp; USBSourceisPLLSAIP &amp; (pllsaiusage &lt; 2))" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="CK48ClockSelectionARG" Comment="CK48ClockSelectionARG" Type="list" DefaultValue="null"/>
+    
+    <RefParameter Visible="false" Name="C_CK48ClockSelectionARG" Comment="C_CK48ClockSelectionARG" Type="list" DefaultValue="+USBCLockSelection">
+        <Condition Expression="((SDIOUsed_ForRCC &amp; SDIOSourceIsClock48)|USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC) &amp; USBSourceisPLLSAIP &amp; (pllsaiusage &gt; 1)" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="C_CK48ClockSelectionARG" Comment="C_CK48ClockSelectionARG" Type="list" DefaultValue="null"/>
+    
+    <!-- SAI1ClockSelectionARG -->
+    <RefParameter Visible="false" Name="SAI1ClockSelectionARG" Comment="SAI1ClockSelectionARG" Type="list" IP="SAI1_SAIA,SAI1_SAIB" DefaultValue="+SAIACLockSelection">
+        <Condition Expression="(SAI1Used_ForRCC &amp; !SAIASourceIsPLLSAI &amp; !SAIASourceIsPLLI2SQ)" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="SAI1ClockSelectionARG" Comment="SAI1ClockSelectionARG" Type="list" IP="SAI1_SAIA,SAI1_SAIB" DefaultValue="+SAIACLockSelection">
+        <Condition Expression="(SAI1Used_ForRCC &amp; SAIASourceIsPLLSAI &amp; (pllsaiusage &lt; 2))" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="SAI1ClockSelectionARG" Comment="SAI1ClockSelectionARG" Type="list" IP="SAI1_SAIA,SAI1_SAIB" DefaultValue="+SAIACLockSelection">
+        <Condition Expression="(SAI1Used_ForRCC &amp; SAIASourceIsPLLI2SQ &amp; (plli2susage &lt; 2))" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="SAI1ClockSelectionARG" Comment="SAI1ClockSelectionARG" Type="list" DefaultValue="null"/>
+
+    <RefParameter Visible="false" Name="C_SAI1ClockSelectionARG" Comment="C_SAI1ClockSelectionARG" Type="list" DefaultValue="+SAIACLockSelection">
+        <Condition Expression="(SAI1Used_ForRCC &amp; SAIASourceIsPLLSAI &amp; (pllsaiusage &gt; 1))|(SAI1Used_ForRCC &amp; SAIASourceIsPLLI2SQ &amp; (plli2susage &gt; 1))" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="C_SAI1ClockSelectionARG" Comment="C_SAI1ClockSelectionARG" Type="list" DefaultValue="null"/>
+
+    <!-- SAI2ClockSelectionARG -->
+    <RefParameter Visible="false" Name="SAI2ClockSelectionARG" Comment="SAI2ClockSelectionARG" Type="list" IP="SAI2_SAIA,SAI2_SAIB" DefaultValue="+SAIBCLockSelection">
+        <Condition Expression="(SAI2Used_ForRCC &amp; !SAIBSourceIsPLLSAI &amp; !SAIBSourceIsPLLI2SQ)" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="SAI2ClockSelectionARG" Comment="SAI2ClockSelectionARG" Type="list" IP="SAI2_SAIA,SAI2_SAIB" DefaultValue="+SAIBCLockSelection">
+        <Condition Expression="(SAI2Used_ForRCC &amp; SAIBSourceIsPLLSAI &amp; (pllsaiusage &lt; 2))" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="SAI2ClockSelectionARG" Comment="SAI2ClockSelectionARG" Type="list" IP="SAI2_SAIA,SAI2_SAIB" DefaultValue="+SAIBCLockSelection">
+        <Condition Expression="(SAI2Used_ForRCC &amp; SAIBSourceIsPLLI2SQ &amp; (plli2susage &lt; 2))" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="SAI2ClockSelectionARG" Comment="SAI2ClockSelectionARG" Type="list" DefaultValue="null"/>
+    
+    <RefParameter Visible="false" Name="C_SAI2ClockSelectionARG" Comment="C_SAI2ClockSelectionARG" Type="list" DefaultValue="+SAIBCLockSelection">
+        <Condition Expression="(SAI2Used_ForRCC &amp; SAIBSourceIsPLLSAI &amp; (pllsaiusage &gt; 1))|(SAI2Used_ForRCC &amp; SAIBSourceIsPLLI2SQ &amp; (plli2susage &gt; 1))" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="C_SAI2ClockSelectionARG" Comment="C_SAI2ClockSelectionARG" Type="list" DefaultValue="null"/>
+
+    <!-- I2S1ClockSelectionARG -->
+    <RefParameter Visible="false" Name="I2S1ClockSelectionARG" Comment="I2S1ClockSelectionARG" Type="list" IP="I2S2,I2S3" DefaultValue="+I2S1CLockSelection">
+        <Condition Expression="(I2S2Used_ForRCC|I2S3Used_ForRCC) &amp; !I2S1SourceIsPLLI2SR" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="I2S1ClockSelectionARG" Comment="I2S1ClockSelectionARG" Type="list" IP="I2S2,I2S3" DefaultValue="+I2S1CLockSelection">
+        <Condition Expression="(I2S2Used_ForRCC|I2S3Used_ForRCC) &amp; I2S1SourceIsPLLI2SR &amp; (plli2susage &lt; 2)" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="I2S1ClockSelectionARG" Comment="I2S1ClockSelectionARG" Type="list" DefaultValue="null"/>
+    
+    <RefParameter Visible="false" Name="C_I2S1ClockSelectionARG" Comment="C_I2S1ClockSelectionARG" Type="list" DefaultValue="+I2S1CLockSelection">
+        <Condition Expression="(I2S2Used_ForRCC|I2S3Used_ForRCC) &amp; I2S1SourceIsPLLI2SR &amp; (plli2susage &gt; 1)" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="C_I2S1ClockSelectionARG" Comment="C_I2S1ClockSelectionARG" Type="list" DefaultValue="null"/>
 	
-	<RefParameter Visible="false" Comment="MainPLL Is Used" DefaultValue="1" Name="PLLI2SUsed" Min="1" Type="integer">
+    <!-- I2S2ClockSelectionARG -->
+    <RefParameter Visible="false" Name="I2S2ClockSelectionARG" Comment="I2S2ClockSelectionARG" Type="list" IP="I2S1" DefaultValue="+I2S2CLockSelection">
+        <Condition Expression="I2S1Used_ForRCC &amp; I2S2SourceIsPLLI2SR &amp; (plli2susage &lt; 2)" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="I2S2ClockSelectionARG" Comment="I2S2ClockSelectionARG" Type="list" IP="I2S1" DefaultValue="+I2S2CLockSelection">
+        <Condition Expression="I2S1Used_ForRCC &amp; !I2S2SourceIsPLLI2SR" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="I2S2ClockSelectionARG" Comment="I2S2ClockSelectionARG" Type="list" DefaultValue="null"/>
+    
+    <RefParameter Visible="false" Name="C_I2S2ClockSelectionARG" Comment="C_I2S2ClockSelectionARG" Type="list" DefaultValue="+I2S2CLockSelection">
+        <Condition Expression="I2S1Used_ForRCC &amp; I2S2SourceIsPLLI2SR &amp; (plli2susage &gt; 1)" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="C_I2S2ClockSelectionARG" Comment="C_I2S2ClockSelectionARG" Type="list" DefaultValue="null"/>
+	
+    <RefParameter Visible="false" Comment="MainPLL Is Used" DefaultValue="1" Name="PLLI2SUsed" Min="1" Type="integer">
         <Condition Expression="(MCO2Config &amp; MCOSourceIsPLLI2SP)|(SPDIFSourceisPLLI2SP&amp;SPDIFRXUsed_ForRCC)|(I2S1SourceIsPLLI2SR&amp; (I2S2Used_ForRCC|I2S3Used_ForRCC))|(I2S2SourceIsPLLI2SR&amp; I2S1Used_ForRCC)|(SAIASourceIsPLLI2SQ&amp; SAI1Used_ForRCC)|(SAIBSourceIsPLLI2SQ&amp; SAI2Used_ForRCC)" Diagnostic="LSE is used if "/>
     </RefParameter>
     <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="PLLI2SUsed" Min="0" Type="integer"/>
-	
-    <RefParameter Visible="false" Name="PLLI2SMARG" Comment="PLLI2SMARG" Type="list" DefaultValue="+PLLI2SM">
+    
+    <!-- PLLI2SMARG -->
+    <!--RefParameter Visible="false" Name="PLLI2SMARG" Comment="PLLI2SMARG" Type="list" IP="" DefaultValue="+PLLI2SM">
         <Condition Diagnostic="PLLI2SM  used" Expression="(MCO2Config &amp; MCOSourceIsPLLI2SP)|(SPDIFSourceisPLLI2SP&amp;SPDIFRXUsed_ForRCC)|(I2S1SourceIsPLLI2SR&amp; (I2S2Used_ForRCC|I2S3Used_ForRCC))|(I2S2SourceIsPLLI2SR&amp; I2S1Used_ForRCC)|(SAIASourceIsPLLI2SQ&amp; SAI1Used_ForRCC)|(SAIBSourceIsPLLI2SQ&amp; SAI2Used_ForRCC)"/>
+    </RefParameter-->
+    <RefParameter Visible="false" Name="PLLI2SMARG" Comment="PLLI2SMARG" Type="list" IP="SAI1_SAIA,SAI1_SAIB" DefaultValue="+PLLI2SM">
+        <Condition Diagnostic="PLLI2SM  used" Expression="(SAI1Used_ForRCC &amp; SAIASourceIsPLLI2SQ &amp; (plli2susage &lt; 2))"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLI2SMARG" Comment="PLLI2SMARG" Type="list" IP="SAI2_SAIA,SAI2_SAIB" DefaultValue="+PLLI2SM">
+        <Condition Diagnostic="PLLI2SM  used" Expression="(SAI2Used_ForRCC &amp; SAIBSourceIsPLLI2SQ &amp; (plli2susage &lt; 2))"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLI2SMARG" Comment="PLLI2SMARG" Type="list" IP="SPDIFRX" DefaultValue="+PLLI2SM">
+        <Condition Diagnostic="PLLI2SM  used" Expression="(SPDIFRXUsed_ForRCC &amp; SPDIFSourceisPLLI2SP &amp; (plli2susage &lt; 2))"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLI2SMARG" Comment="PLLI2SMARG" Type="list" IP="I2S2,I2S3" DefaultValue="+PLLI2SM">
+        <Condition Diagnostic="PLLI2SM  used" Expression="(I2S2Used_ForRCC|I2S3Used_ForRCC) &amp; I2S1SourceIsPLLI2SR &amp; (plli2susage &lt; 2)"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLI2SMARG" Comment="PLLI2SMARG" Type="list" IP="I2S1" DefaultValue="+PLLI2SM">
+        <Condition Diagnostic="PLLI2SM  used" Expression="(I2S1Used_ForRCC &amp; I2S2SourceIsPLLI2SR &amp; (plli2susage &lt; 2))"/>
     </RefParameter>
     <RefParameter Visible="false" Name="PLLI2SMARG" Comment="PLLI2SMARG" Type="list" DefaultValue="null"/>
+    
+    <RefParameter Visible="false" Name="C_PLLI2SMARG" Comment="C_PLLI2SMARG" Type="list" DefaultValue="+PLLI2SM">
+        <Condition Diagnostic="PLLI2SM  used" Expression="(MCO2Config &amp; MCOSourceIsPLLI2SP)|(((SPDIFSourceisPLLI2SP&amp;SPDIFRXUsed_ForRCC)|(I2S1SourceIsPLLI2SR&amp; (I2S2Used_ForRCC|I2S3Used_ForRCC))|(I2S2SourceIsPLLI2SR&amp; I2S1Used_ForRCC)|(SAIASourceIsPLLI2SQ&amp; SAI1Used_ForRCC)|(SAIBSourceIsPLLI2SQ&amp; SAI2Used_ForRCC)) &amp; (plli2susage &gt; 1))"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="C_PLLI2SMARG" Comment="C_PLLI2SMARG" Type="list" DefaultValue="null"/>
 	
-    <RefParameter Visible="false" Name="PLLI2SNARG" Comment="PLLI2SNARG" Type="list" DefaultValue="+PLLI2SN">
-        <Condition Diagnostic="PLLI2SM  used" Expression="(MCO2Config &amp; MCOSourceIsPLLI2SP)|(SPDIFSourceisPLLI2SP&amp;SPDIFRXUsed_ForRCC)|(I2S1SourceIsPLLI2SR&amp; (I2S2Used_ForRCC|I2S3Used_ForRCC))|(I2S2SourceIsPLLI2SR&amp; I2S1Used_ForRCC)|(SAIASourceIsPLLI2SQ&amp; SAI1Used_ForRCC)|(SAIBSourceIsPLLI2SQ&amp; SAI2Used_ForRCC)"/>
+    <!-- PLLI2SNARG -->
+    <RefParameter Visible="false" Name="PLLI2SNARG" Comment="PLLI2SNARG" Type="list" IP="SAI1_SAIA,SAI1_SAIB" DefaultValue="+PLLI2SN">
+        <Condition Diagnostic="PLLI2SM  used" Expression="(SAI1Used_ForRCC &amp; SAIASourceIsPLLI2SQ &amp; (plli2susage &lt; 2))"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLI2SNARG" Comment="PLLI2SNARG" Type="list" IP="SAI2_SAIA,SAI2_SAIB" DefaultValue="+PLLI2SN">
+        <Condition Diagnostic="PLLI2SM  used" Expression="(SAI2Used_ForRCC &amp; SAIBSourceIsPLLI2SQ &amp; (plli2susage &lt; 2))"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLI2SNARG" Comment="PLLI2SNARG" Type="list" IP="SPDIFRX" DefaultValue="+PLLI2SN">
+        <Condition Diagnostic="PLLI2SM  used" Expression="(SPDIFRXUsed_ForRCC &amp; SPDIFSourceisPLLI2SP &amp; (plli2susage &lt; 2))"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLI2SNARG" Comment="PLLI2SNARG" Type="list" IP="I2S2,I2S3" DefaultValue="+PLLI2SN">
+        <Condition Diagnostic="PLLI2SM  used" Expression="(I2S2Used_ForRCC|I2S3Used_ForRCC) &amp; I2S1SourceIsPLLI2SR &amp; (plli2susage &lt; 2)"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLI2SNARG" Comment="PLLI2SNARG" Type="list" IP="I2S1" DefaultValue="+PLLI2SN">
+        <Condition Diagnostic="PLLI2SM  used" Expression="(I2S1Used_ForRCC &amp; I2S2SourceIsPLLI2SR &amp; (plli2susage &lt; 2))"/>
     </RefParameter>
     <RefParameter Visible="false" Name="PLLI2SNARG" Comment="PLLI2SNARG" Type="list" DefaultValue="null"/>
+    
+    <RefParameter Visible="false" Name="C_PLLI2SNARG" Comment="C_PLLI2SNARG" Type="list" DefaultValue="+PLLI2SN">
+        <Condition Diagnostic="PLLI2SM  used" Expression="(MCO2Config &amp; MCOSourceIsPLLI2SP)|(((SPDIFSourceisPLLI2SP&amp;SPDIFRXUsed_ForRCC)|(I2S1SourceIsPLLI2SR&amp; (I2S2Used_ForRCC|I2S3Used_ForRCC))|(I2S2SourceIsPLLI2SR&amp; I2S1Used_ForRCC)|(SAIASourceIsPLLI2SQ&amp; SAI1Used_ForRCC)|(SAIBSourceIsPLLI2SQ&amp; SAI2Used_ForRCC)) &amp; (plli2susage &gt; 1))"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="C_PLLI2SNARG" Comment="C_PLLI2SNARG" Type="list" DefaultValue="null"/>
 	
-    <RefParameter Visible="false" Name="PLLI2SPARG" Comment="PLLI2SPARG" Type="list" DefaultValue="+PLLI2SP">
-        <Condition Diagnostic="PLLI2SP not used" Expression="PLLI2SUsed=1"/>
+    <!-- PLLI2SPARG -->
+    <RefParameter Visible="false" Name="PLLI2SPARG" Comment="PLLI2SPARG" Type="list" IP="SAI1_SAIA,SAI1_SAIB" DefaultValue="+PLLI2SP">
+        <Condition Diagnostic="PLLI2SP not used" Expression="(SAI1Used_ForRCC &amp; SAIASourceIsPLLI2SQ &amp; (plli2susage &lt; 2))"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLI2SPARG" Comment="PLLI2SPARG" Type="list" IP="SAI2_SAIA,SAI2_SAIB" DefaultValue="+PLLI2SP">
+        <Condition Diagnostic="PLLI2SP not used" Expression="(SAI2Used_ForRCC &amp; SAIBSourceIsPLLI2SQ &amp; (plli2susage &lt; 2))"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLI2SPARG" Comment="PLLI2SPARG" Type="list" IP="SPDIFRX" DefaultValue="+PLLI2SP">
+        <Condition Diagnostic="PLLI2SP not used" Expression="(SPDIFRXUsed_ForRCC &amp; SPDIFSourceisPLLI2SP &amp; (plli2susage &lt; 2))"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLI2SPARG" Comment="PLLI2SPARG" Type="list" IP="I2S2,I2S3" DefaultValue="+PLLI2SP">
+        <Condition Diagnostic="PLLI2SP not used" Expression="(I2S2Used_ForRCC|I2S3Used_ForRCC) &amp; I2S1SourceIsPLLI2SR &amp; (plli2susage &lt; 2)"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLI2SPARG" Comment="PLLI2SPARG" Type="list" IP="I2S1" DefaultValue="+PLLI2SP">
+        <Condition Diagnostic="PLLI2SP not used" Expression="(I2S1Used_ForRCC &amp; I2S2SourceIsPLLI2SR &amp; (plli2susage &lt; 2))"/>
     </RefParameter>
     <RefParameter Visible="false" Name="PLLI2SPARG" Comment="PLLI2SPARG" Type="list" DefaultValue="null"/>
+    
+    <RefParameter Visible="false" Name="C_PLLI2SPARG" Comment="C_PLLI2SPARG" Type="list" DefaultValue="+PLLI2SP">
+        <Condition Diagnostic="PLLI2SP not used" Expression="(MCO2Config &amp; MCOSourceIsPLLI2SP)|(((SPDIFSourceisPLLI2SP&amp;SPDIFRXUsed_ForRCC)|(I2S1SourceIsPLLI2SR&amp; (I2S2Used_ForRCC|I2S3Used_ForRCC))|(I2S2SourceIsPLLI2SR&amp; I2S1Used_ForRCC)|(SAIASourceIsPLLI2SQ&amp; SAI1Used_ForRCC)|(SAIBSourceIsPLLI2SQ&amp; SAI2Used_ForRCC)) &amp; (plli2susage &gt; 1))"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="C_PLLI2SPARG" Comment="C_PLLI2SPARG" Type="list" DefaultValue="null"/>
 	
-    <RefParameter Visible="false" Name="PLLI2SRARG" Comment="PLLI2SRARG" Type="list" DefaultValue="+PLLI2SR">
-        <Condition Diagnostic="PLL not used" Expression="PLLI2SUsed=1"/>
+    <!-- PLLI2SRARG -->
+    <RefParameter Visible="false" Name="PLLI2SRARG" Comment="PLLI2SRARG" Type="list" IP="SAI1_SAIA,SAI1_SAIB" DefaultValue="+PLLI2SR">
+        <Condition Diagnostic="PLL not used" Expression="(SAI1Used_ForRCC &amp; SAIASourceIsPLLI2SQ &amp; (plli2susage &lt; 2))"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLI2SRARG" Comment="PLLI2SRARG" Type="list" IP="SAI2_SAIA,SAI2_SAIB" DefaultValue="+PLLI2SR">
+        <Condition Diagnostic="PLL not used" Expression="(SAI2Used_ForRCC &amp; SAIBSourceIsPLLI2SQ &amp; (plli2susage &lt; 2))"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLI2SRARG" Comment="PLLI2SRARG" Type="list" IP="SPDIFRX" DefaultValue="+PLLI2SR">
+        <Condition Diagnostic="PLL not used" Expression="(SPDIFRXUsed_ForRCC &amp; SPDIFSourceisPLLI2SP &amp; (plli2susage &lt; 2))"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLI2SRARG" Comment="PLLI2SRARG" Type="list" IP="I2S2,I2S3" DefaultValue="+PLLI2SR">
+        <Condition Diagnostic="PLL not used" Expression="(I2S2Used_ForRCC|I2S3Used_ForRCC) &amp; I2S1SourceIsPLLI2SR &amp; (plli2susage &lt; 2)"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLI2SRARG" Comment="PLLI2SRARG" Type="list" IP="I2S1" DefaultValue="+PLLI2SR">
+        <Condition Diagnostic="PLL not used" Expression="(I2S1Used_ForRCC &amp; I2S2SourceIsPLLI2SR &amp; (plli2susage &lt; 2))"/>
     </RefParameter>
     <RefParameter Visible="false" Name="PLLI2SRARG" Comment="PLLI2SRARG" Type="list" DefaultValue="null"/>
+    
+    <RefParameter Visible="false" Name="C_PLLI2SRARG" Comment="C_PLLI2SRARG" Type="list" DefaultValue="+PLLI2SR">
+        <Condition Diagnostic="PLL not used" Expression="(MCO2Config &amp; MCOSourceIsPLLI2SP)|(((SPDIFSourceisPLLI2SP&amp;SPDIFRXUsed_ForRCC)|(I2S1SourceIsPLLI2SR&amp; (I2S2Used_ForRCC|I2S3Used_ForRCC))|(I2S2SourceIsPLLI2SR&amp; I2S1Used_ForRCC)|(SAIASourceIsPLLI2SQ&amp; SAI1Used_ForRCC)|(SAIBSourceIsPLLI2SQ&amp; SAI2Used_ForRCC)) &amp; (plli2susage &gt; 1))"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="C_PLLI2SRARG" Comment="C_PLLI2SRARG" Type="list" DefaultValue="null"/>
 
-    <RefParameter Visible="false" Name="PLLI2SQARG" Comment="PLLI2SQARG" Type="list" DefaultValue="+PLLI2SQ">
-        <Condition Diagnostic="PLL not used" Expression="PLLI2SUsed=1"/>
+    <!-- PLLI2SQARG -->
+    <RefParameter Visible="false" Name="PLLI2SQARG" Comment="PLLI2SQARG" Type="list" IP="SAI1_SAIA,SAI1_SAIB" DefaultValue="+PLLI2SQ">
+        <Condition Diagnostic="PLL not used" Expression="(SAI1Used_ForRCC &amp; SAIASourceIsPLLI2SQ &amp; (plli2susage &lt; 2))"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLI2SQARG" Comment="PLLI2SQARG" Type="list" IP="SAI2_SAIA,SAI2_SAIB" DefaultValue="+PLLI2SQ">
+        <Condition Diagnostic="PLL not used" Expression="(SAI2Used_ForRCC &amp; SAIBSourceIsPLLI2SQ &amp; (plli2susage &lt; 2))"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLI2SQARG" Comment="PLLI2SQARG" Type="list" IP="SPDIFRX" DefaultValue="+PLLI2SQ">
+        <Condition Diagnostic="PLL not used" Expression="(SPDIFRXUsed_ForRCC &amp; SPDIFSourceisPLLI2SP &amp; (plli2susage &lt; 2))"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLI2SQARG" Comment="PLLI2SQARG" Type="list" IP="I2S2,I2S3" DefaultValue="+PLLI2SQ">
+        <Condition Diagnostic="PLL not used" Expression="(I2S2Used_ForRCC|I2S3Used_ForRCC) &amp; I2S1SourceIsPLLI2SR &amp; (plli2susage &lt; 2)"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLI2SQARG" Comment="PLLI2SQARG" Type="list" IP="I2S1" DefaultValue="+PLLI2SQ">
+        <Condition Diagnostic="PLL not used" Expression="(I2S1Used_ForRCC &amp; I2S2SourceIsPLLI2SR &amp; (plli2susage &lt; 2))"/>
     </RefParameter>
     <RefParameter Visible="false" Name="PLLI2SQARG" Comment="PLLI2SQARG" Type="list" DefaultValue="null"/>
+    
+    <RefParameter Visible="false" Name="C_PLLI2SQARG" Comment="C_PLLI2SQARG" Type="list" DefaultValue="+PLLI2SQ">
+        <Condition Diagnostic="PLL not used" Expression="(MCO2Config &amp; MCOSourceIsPLLI2SP)|(((SPDIFSourceisPLLI2SP&amp;SPDIFRXUsed_ForRCC)|(I2S1SourceIsPLLI2SR&amp; (I2S2Used_ForRCC|I2S3Used_ForRCC))|(I2S2SourceIsPLLI2SR&amp; I2S1Used_ForRCC)|(SAIASourceIsPLLI2SQ&amp; SAI1Used_ForRCC)|(SAIBSourceIsPLLI2SQ&amp; SAI2Used_ForRCC)) &amp; (plli2susage &gt; 1))"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="C_PLLI2SQARG" Comment="C_PLLI2SQARG" Type="list" DefaultValue="null"/>
 	
-    <RefParameter Visible="false" Name="PLLI2SDivQARG" Comment="PLLI2SDivQARG" Type="list" DefaultValue="+PLLI2SQDiv">
-        <Condition Diagnostic="PLL not used" Expression="PLLI2SUsed=1"/>
+    <!-- PLLI2SDivQARG -->
+    <RefParameter Visible="false" Name="PLLI2SDivQARG" Comment="PLLI2SDivQARG" Type="list" IP="SAI1_SAIA,SAI1_SAIB" DefaultValue="+PLLI2SQDiv">
+        <Condition Diagnostic="PLL not used" Expression="(SAI1Used_ForRCC &amp; SAIASourceIsPLLI2SQ &amp; (plli2susage &lt; 2))"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLI2SDivQARG" Comment="PLLI2SDivQARG" Type="list" IP="SAI2_SAIA,SAI2_SAIB" DefaultValue="+PLLI2SQDiv">
+        <Condition Diagnostic="PLL not used" Expression="(SAI2Used_ForRCC &amp; SAIBSourceIsPLLI2SQ &amp; (plli2susage &lt; 2))"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLI2SDivQARG" Comment="PLLI2SDivQARG" Type="list" IP="SPDIFRX" DefaultValue="+PLLI2SQDiv">
+        <Condition Diagnostic="PLL not used" Expression="(SPDIFRXUsed_ForRCC &amp; SPDIFSourceisPLLI2SP &amp; (plli2susage &lt; 2))"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLI2SDivQARG" Comment="PLLI2SDivQARG" Type="list" IP="I2S2,I2S3" DefaultValue="+PLLI2SQDiv">
+        <Condition Diagnostic="PLL not used" Expression="(I2S2Used_ForRCC|I2S3Used_ForRCC) &amp; I2S1SourceIsPLLI2SR &amp; (plli2susage &lt; 2)"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLI2SDivQARG" Comment="PLLI2SDivQARG" Type="list" IP="I2S1" DefaultValue="+PLLI2SQDiv">
+        <Condition Diagnostic="PLL not used" Expression="(I2S1Used_ForRCC &amp; I2S2SourceIsPLLI2SR &amp; (plli2susage &lt; 2))"/>
     </RefParameter>
     <RefParameter Visible="false" Name="PLLI2SDivQARG" Comment="PLLI2SDivQARG" Type="list" DefaultValue="null"/>
-	
-	
-	<RefParameter Visible="false" Comment="MainPLL Is Used" DefaultValue="1" Name="PLLSAIUsed" Min="1" Type="integer">
-        <Condition Expression="(USBSourceisPLLSAIP &amp; (USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|(SDIOSourceIsClock48 &amp; SDIOUsed_ForRCC))) |(SAIASourceIsPLLSAI &amp; SAI1Used_ForRCC)|(SAIBSourceIsPLLSAI&amp;SAI2Used_ForRCC)" Diagnostic="LSE is used if "/>
+    
+    <RefParameter Visible="false" Name="C_PLLI2SDivQARG" Comment="C_PLLI2SDivQARG" Type="list" DefaultValue="+PLLI2SQDiv">
+        <Condition Diagnostic="PLL not used" Expression="(MCO2Config &amp; MCOSourceIsPLLI2SP)|(((SPDIFSourceisPLLI2SP&amp;SPDIFRXUsed_ForRCC)|(I2S1SourceIsPLLI2SR&amp; (I2S2Used_ForRCC|I2S3Used_ForRCC))|(I2S2SourceIsPLLI2SR&amp; I2S1Used_ForRCC)|(SAIASourceIsPLLI2SQ&amp; SAI1Used_ForRCC)|(SAIBSourceIsPLLI2SQ&amp; SAI2Used_ForRCC)) &amp; (plli2susage &gt; 1))"/>
     </RefParameter>
+    <RefParameter Visible="false" Name="C_PLLI2SDivQARG" Comment="C_PLLI2SDivQARG" Type="list" DefaultValue="null"/>
+	
+	
+    <RefParameter Visible="false" Comment="MainPLL Is Used" DefaultValue="1" Name="PLLSAIUsed" Min="1" Type="integer">
+        <Condition Expression="(USBSourceisPLLSAIP &amp; (USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|(SDIOSourceIsClock48 &amp; SDIOUsed_ForRCC))) |(SAIASourceIsPLLSAI &amp; SAI1Used_ForRCC)|(SAIBSourceIsPLLSAI&amp;SAI2Used_ForRCC)" Diagnostic="LSE is used if "/>
+    </RefParameter>             
     <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="PLLSAIUsed" Min="0" Type="integer"/>
 	
-	
-    <RefParameter Visible="false" Name="PLLSAIMARG" Comment="PLLSAIMARG" Type="list" DefaultValue="+PLLSAIM">
-        <Condition Diagnostic="PLLSAIM  used" Expression="(USBSourceisPLLSAIP &amp; (USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|(SDIOSourceIsClock48 &amp; SDIOUsed_ForRCC))) |(SAIASourceIsPLLSAI &amp; SAI1Used_ForRCC)|(SAIBSourceIsPLLSAI&amp;SAI2Used_ForRCC)"/>
+    <!-- PLLSAIMARG -->
+    <RefParameter Visible="false" Name="PLLSAIMARG" Comment="PLLSAIMARG" Type="list" IP="USB_OTG_FS,USB_OTG_HS" DefaultValue="+PLLSAIM">
+        <Condition Diagnostic="PLLSAIM  used" Expression="(USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC) &amp; USBSourceisPLLSAIP &amp; (pllsaiusage &lt; 2)"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLSAIMARG" Comment="PLLSAIMARG" Type="list" IP="SDIO" DefaultValue="+PLLSAIM">
+        <Condition Diagnostic="PLLSAIM  used" Expression="(SDIOUsed_ForRCC &amp; SDIOSourceIsClock48 &amp; USBSourceisPLLSAIP &amp; (pllsaiusage &lt; 2))"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLSAIMARG" Comment="PLLSAIMARG" Type="list" IP="SAI1_SAIA,SAI1_SAIB" DefaultValue="+PLLSAIM">
+        <Condition Diagnostic="PLLSAIM  used" Expression="(SAI1Used_ForRCC &amp; SAIASourceIsPLLSAI &amp; (pllsaiusage &lt; 2))"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLSAIMARG" Comment="PLLSAIMARG" Type="list" IP="SAI2_SAIA,SAI2_SAIB" DefaultValue="+PLLSAIM">
+        <Condition Diagnostic="PLLSAIM  used" Expression="(SAI2Used_ForRCC &amp; SAIBSourceIsPLLSAI &amp; (pllsaiusage &lt; 2))"/>
     </RefParameter>
     <RefParameter Visible="false" Name="PLLSAIMARG" Comment="PLLSAIMARG" Type="list" DefaultValue="null"/>
-	
-    <RefParameter Visible="false" Name="PLLSAINARG" Comment="PLLSAINARG" Type="list" DefaultValue="+PLLSAIN">
-        <Condition Diagnostic="PLLSAIM  used" Expression="(USBSourceisPLLSAIP &amp; (USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|(SDIOSourceIsClock48 &amp; SDIOUsed_ForRCC))) |(SAIASourceIsPLLSAI &amp; SAI1Used_ForRCC)|(SAIBSourceIsPLLSAI&amp;SAI2Used_ForRCC)"/>
+    
+    <RefParameter Visible="false" Name="C_PLLSAIMARG" Comment="C_PLLSAIMARG" Type="list" DefaultValue="+PLLSAIM">
+        <Condition Diagnostic="PLLSAIM  used" Expression="((USBSourceisPLLSAIP &amp; (USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|(SDIOSourceIsClock48 &amp; SDIOUsed_ForRCC))) |(SAIASourceIsPLLSAI &amp; SAI1Used_ForRCC)|(SAIBSourceIsPLLSAI&amp;SAI2Used_ForRCC)) &amp; (pllsaiusage &gt; 1)"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="C_PLLSAIMARG" Comment="C_PLLSAIMARG" Type="list" DefaultValue="null"/>
+    
+    <!-- PLLSAINARG -->
+    <RefParameter Visible="false" Name="PLLSAINARG" Comment="PLLSAINARG" Type="list" IP="USB_OTG_FS,USB_OTG_HS" DefaultValue="+PLLSAIN">
+        <Condition Diagnostic="PLLSAIN  used" Expression="(USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC) &amp; USBSourceisPLLSAIP &amp; (pllsaiusage &lt; 2)"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLSAINARG" Comment="PLLSAINARG" Type="list" IP="SDIO" DefaultValue="+PLLSAIN">
+        <Condition Diagnostic="PLLSAIN  used" Expression="(SDIOUsed_ForRCC &amp; SDIOSourceIsClock48 &amp; USBSourceisPLLSAIP &amp; (pllsaiusage &lt; 2))"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLSAINARG" Comment="PLLSAINARG" Type="list" IP="SAI1_SAIA,SAI1_SAIB" DefaultValue="+PLLSAIN">
+        <Condition Diagnostic="PLLSAIN  used" Expression="(SAI1Used_ForRCC &amp; SAIASourceIsPLLSAI &amp; (pllsaiusage &lt; 2))"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLSAINARG" Comment="PLLSAINARG" Type="list" IP="SAI2_SAIA,SAI2_SAIB" DefaultValue="+PLLSAIN">
+        <Condition Diagnostic="PLLSAIN  used" Expression="(SAI2Used_ForRCC &amp; SAIBSourceIsPLLSAI &amp; (pllsaiusage &lt; 2))"/>
     </RefParameter>
     <RefParameter Visible="false" Name="PLLSAINARG" Comment="PLLSAINARG" Type="list" DefaultValue="null"/>
+    
+    <RefParameter Visible="false" Name="C_PLLSAINARG" Comment="C_PLLSAINARG" Type="list" DefaultValue="+PLLSAIN">
+        <Condition Diagnostic="PLLSAIN  used" Expression="((USBSourceisPLLSAIP &amp; (USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|(SDIOSourceIsClock48 &amp; SDIOUsed_ForRCC))) |(SAIASourceIsPLLSAI &amp; SAI1Used_ForRCC)|(SAIBSourceIsPLLSAI&amp;SAI2Used_ForRCC)) &amp; (pllsaiusage &gt; 1)"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="C_PLLSAINARG" Comment="C_PLLSAINARG" Type="list" DefaultValue="null"/>
 	
-    <RefParameter Visible="false" Name="PLLSAIPARG" Comment="PLLSAIPARG" Type="list" DefaultValue="+PLLSAIP">
-        <Condition Diagnostic="PLLSAIP not used" Expression=" PLLSAIUsed=1"/>
+    <!-- PLLSAIPARG -->
+    <RefParameter Visible="false" Name="PLLSAIPARG" Comment="PLLSAIPARG" Type="list" IP="USB_OTG_FS,USB_OTG_HS" DefaultValue="+PLLSAIP">
+        <Condition Diagnostic="PLLSAIP not used" Expression="(USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC) &amp; USBSourceisPLLSAIP &amp; (pllsaiusage &lt; 2)"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLSAIPARG" Comment="PLLSAIPARG" Type="list" IP="SDIO" DefaultValue="+PLLSAIP">
+        <Condition Diagnostic="PLLSAIP not used" Expression="(SDIOUsed_ForRCC &amp; SDIOSourceIsClock48 &amp; USBSourceisPLLSAIP &amp; (pllsaiusage &lt; 2))"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLSAIPARG" Comment="PLLSAIPARG" Type="list" IP="SAI1_SAIA,SAI1_SAIB" DefaultValue="+PLLSAIP">
+        <Condition Diagnostic="PLLSAIP not used" Expression="(SAI1Used_ForRCC &amp; SAIASourceIsPLLSAI &amp; (pllsaiusage &lt; 2))"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLSAIPARG" Comment="PLLSAIPARG" Type="list" IP="SAI2_SAIA,SAI2_SAIB" DefaultValue="+PLLSAIP">
+        <Condition Diagnostic="PLLSAIP not used" Expression="(SAI2Used_ForRCC &amp; SAIBSourceIsPLLSAI &amp; (pllsaiusage &lt; 2))"/>
     </RefParameter>
     <RefParameter Visible="false" Name="PLLSAIPARG" Comment="PLLSAIPARG" Type="list" DefaultValue="null"/>
+    
+    <RefParameter Visible="false" Name="C_PLLSAIPARG" Comment="C_PLLSAIPARG" Type="list" DefaultValue="+PLLSAIP">
+        <Condition Diagnostic="PLLSAIP not used" Expression="((USBSourceisPLLSAIP &amp; (USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|(SDIOSourceIsClock48 &amp; SDIOUsed_ForRCC))) |(SAIASourceIsPLLSAI &amp; SAI1Used_ForRCC)|(SAIBSourceIsPLLSAI&amp;SAI2Used_ForRCC)) &amp; (pllsaiusage &gt; 1)"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="C_PLLSAIPARG" Comment="C_PLLSAIPARG" Type="list" DefaultValue="null"/>
 	
-    <RefParameter Visible="false" Name="PLLSAIQARG" Comment="PLLSAIQARG" Type="list" DefaultValue="+PLLSAIQ">
-        <Condition Diagnostic="PLL not used" Expression="PLLSAIUsed=1"/>
+    <!-- PLLSAIQARG -->
+    <RefParameter Visible="false" Name="PLLSAIQARG" Comment="PLLSAIQARG" Type="list" IP="USB_OTG_FS,USB_OTG_HS" DefaultValue="+PLLSAIQ">
+        <Condition Diagnostic="PLL not used" Expression="(USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC) &amp; USBSourceisPLLSAIP &amp; (pllsaiusage &lt; 2)"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLSAIQARG" Comment="PLLSAIQARG" Type="list" IP="SDIO" DefaultValue="+PLLSAIQ">
+        <Condition Diagnostic="PLL not used" Expression="(SDIOUsed_ForRCC &amp; SDIOSourceIsClock48 &amp; USBSourceisPLLSAIP &amp; (pllsaiusage &lt; 2))"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLSAIQARG" Comment="PLLSAIQARG" Type="list" IP="SAI1_SAIA,SAI1_SAIB" DefaultValue="+PLLSAIQ">
+        <Condition Diagnostic="PLL not used" Expression="(SAI1Used_ForRCC &amp; SAIASourceIsPLLSAI &amp; (pllsaiusage &lt; 2))"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLSAIQARG" Comment="PLLSAIQARG" Type="list" IP="SAI2_SAIA,SAI2_SAIB" DefaultValue="+PLLSAIQ">
+        <Condition Diagnostic="PLL not used" Expression="(SAI2Used_ForRCC &amp; SAIBSourceIsPLLSAI &amp; (pllsaiusage &lt; 2))"/>
     </RefParameter>
     <RefParameter Visible="false" Name="PLLSAIQARG" Comment="PLLSAIQARG" Type="list" DefaultValue="null"/>
+    
+    <RefParameter Visible="false" Name="C_PLLSAIQARG" Comment="C_PLLSAIQARG" Type="list" DefaultValue="+PLLSAIQ">
+        <Condition Diagnostic="PLL not used" Expression="((USBSourceisPLLSAIP &amp; (USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|(SDIOSourceIsClock48 &amp; SDIOUsed_ForRCC))) |(SAIASourceIsPLLSAI &amp; SAI1Used_ForRCC)|(SAIBSourceIsPLLSAI&amp;SAI2Used_ForRCC)) &amp; (pllsaiusage &gt; 1)"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="C_PLLSAIQARG" Comment="C_PLLSAIQARG" Type="list" DefaultValue="null"/>
 	
-	
-    <RefParameter Visible="false" Name="PLLSAIDivQARG" Comment="PLLSAIDivQARG" Type="list" DefaultValue="+PLLSAIQDiv">
-        <Condition Diagnostic="PLL not used" Expression="PLLSAIUsed=1"/>
+    <!-- PLLSAIDivQARG -->
+    <RefParameter Visible="false" Name="PLLSAIDivQARG" Comment="PLLSAIDivQARG" Type="list" IP="USB_OTG_FS,USB_OTG_HS" DefaultValue="+PLLSAIQDiv">
+        <Condition Diagnostic="PLL not used" Expression="(USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC) &amp; USBSourceisPLLSAIP &amp; (pllsaiusage &lt; 2)"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLSAIDivQARG" Comment="PLLSAIDivQARG" Type="list" IP="SDIO" DefaultValue="+PLLSAIQDiv">
+        <Condition Diagnostic="PLL not used" Expression="(SDIOUsed_ForRCC &amp; SDIOSourceIsClock48 &amp; USBSourceisPLLSAIP &amp; (pllsaiusage &lt; 2))"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLSAIDivQARG" Comment="PLLSAIDivQARG" Type="list" IP="SAI1_SAIA,SAI1_SAIB" DefaultValue="+PLLSAIQDiv">
+        <Condition Diagnostic="PLL not used" Expression="(SAI1Used_ForRCC &amp; SAIASourceIsPLLSAI &amp; (pllsaiusage &lt; 2))"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PLLSAIDivQARG" Comment="PLLSAIDivQARG" Type="list" IP="SAI2_SAIA,SAI2_SAIB" DefaultValue="+PLLSAIQDiv">
+        <Condition Diagnostic="PLL not used" Expression="(SAI2Used_ForRCC &amp; SAIBSourceIsPLLSAI &amp; (pllsaiusage &lt; 2))"/>
     </RefParameter>
     <RefParameter Visible="false" Name="PLLSAIDivQARG" Comment="PLLSAIDivQARG" Type="list" DefaultValue="null"/>
-	
+    
+    <RefParameter Visible="false" Name="C_PLLSAIDivQARG" Comment="C_PLLSAIDivQARG" Type="list" DefaultValue="+PLLSAIQDiv">
+        <Condition Diagnostic="PLL not used" Expression="((USBSourceisPLLSAIP &amp; (USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|(SDIOSourceIsClock48 &amp; SDIOUsed_ForRCC))) |(SAIASourceIsPLLSAI &amp; SAI1Used_ForRCC)|(SAIBSourceIsPLLSAI&amp;SAI2Used_ForRCC)) &amp; (pllsaiusage &gt; 1)"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="C_PLLSAIDivQARG" Comment="C_PLLSAIDivQARG" Type="list" DefaultValue="null"/>
+                                
+                                                <!-- ****************** Clock Update Ticket 90818 CubeAzure _____End. **************** -->
 	
     <RefParameter Visible="false" Comment="Hse StateARG" DefaultValue="+HSEState" Name="HSEStateARG" Type="list">
         <Condition Diagnostic="HSE used" Expression="HSEUsed=1"/>
@@ -1763,16 +2180,16 @@
         <Parameter Name="PLLUsed"/>
         <Parameter Name="PLLState"/>
         <Parameter Name="PeriphClockSelectionARG"/>
-        <Parameter Name="PeriphClockSelection"/>
-        <Parameter Name="RCC_PERIPHCLK_FMPI2C1Var"/>
+        <!--Parameter Name="PeriphClockSelection"/-->
+        <!--Parameter Name="RCC_PERIPHCLK_FMPI2C1Var"/-->
         <Parameter Name="RCC_PERIPHCLK_SPDIFVar"/>
-        <Parameter Name="RCC_PERIPHCLK_CECVar"/>
+        <!--Parameter Name="RCC_PERIPHCLK_CECVar"/-->
         <Parameter Name="RCC_PERIPHCLK_SDIOVar"/>
         <Parameter Name="RCC_PERIPHCLK_I2S1Var"/>
         <Parameter Name="RCC_PERIPHCLK_I2S2Var"/>
         <Parameter Name="RCC_PERIPHCLK_SAIAVar"/>
         <Parameter Name="RCC_PERIPHCLK_SAIBVar"/>
-        <Parameter Name="RCC_PERIPHCLK_RTCVar"/>
+        <!--Parameter Name="RCC_PERIPHCLK_RTCVar"/-->
         <Parameter Name="RCC_PERIPHCLK_TIMVar"/>
         <Parameter Name="RCC_PERIPHCLK_CK48Var"/>
         <Parameter Name="FMPI2C1ClockSelectionARG"/>
@@ -1824,8 +2241,16 @@
         <Parameter Name="AHBMaxLimitConstraint"/>
         <Parameter Name="EnbaleCSS"/>
     </RefMode>
+    
+    <RefMode Name="PClockTree">
+        <ConfigForMode>RCC_PeriphClockConfig</ConfigForMode>
+    </RefMode>
+
+    <RefMode Name="CommonPClockTree">
+        <ConfigForMode>PLL2P_FOR_MCO</ConfigForMode>
+        <ConfigForMode>RCC_CommonPeriphClockConfig</ConfigForMode>
+    </RefMode>
    
-  
 	
     <RefMode Name="AdvancedSettings">
         <Parameter Name="VDD_VALUE"/>

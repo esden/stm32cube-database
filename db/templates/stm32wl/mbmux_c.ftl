@@ -1,5 +1,6 @@
 [#ftl]
 [#assign CPUCORE = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    mbmux.c
@@ -13,11 +14,14 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
+[#assign SECURE_PROJECTS = "0"]
 
 /* Includes ------------------------------------------------------------------*/
 #include "stdint.h"
 #include "assert.h"
 #include "stddef.h"
+#include "stm32_mem.h"
 #include "ipcc_if.h"
 #include "mbmux.h"
 /* USER CODE BEGIN Includes */
@@ -50,6 +54,11 @@
 static MBMUX_ComTable_t *p_MBMUX_ComTable;
 [#if CPUCORE == "CM4"]
 static FEAT_INFO_List_t *p_MBMUX_Cm0plusFeatureList = NULL;
+[#else]
+static MBMUX_MsgCbPointersTab_t MBMUX_MsgCbPointersTabCm0 UTIL_MEM_ALIGN(4) ;
+static FLASH_OBProgramInitTypeDef OptionsBytesStruct;
+static uint32_t unsecure_sram1_end;
+static uint32_t unsecure_sram2_end;
 [/#if]
 
 /* USER CODE BEGIN PV */
@@ -58,15 +67,70 @@ static FEAT_INFO_List_t *p_MBMUX_Cm0plusFeatureList = NULL;
 
 /* Private function prototypes -----------------------------------------------*/
 [#if CPUCORE == "CM4"]
+/**
+  * @brief   Check if the FEATURE is in the CM0 table and return it's position
+  * @param   e_featID  identifier of the feature
+  * @retval  0 not present, 1 present
+  */
 static uint8_t MBMUX_CheckIfFeatureSupportedByCm0plus(FEAT_INFO_IdTypeDef e_featID);
+
+/**
+  * @brief   Isr executed when Ipcc receive IRQ notification: forwards to upper layer
+  * @param   channelIdx ipcc channel number
+  */
 static void MBMUX_IsrResponseRcvCb(uint32_t channelIdx);
+
+/**
+  * @brief   Isr executed when Ipcc receive IRQ notification: forwards to upper layer
+  * @param   channelIdx  ipcc channel number
+  */
 static void MBMUX_IsrNotificationRcvCb(uint32_t channelIdx);
+
+/**
+  * @brief   Find the first channel not yet associated to a feature (available)
+  * @param   ComType  0 for CMd/Resp (TX), 1 for Notif/Ack (RX)
+  * @retval  ipcc channel number: if 0xFF means no channel available
+  */
 static uint8_t MBMUX_FindChStillUnregistered(MBMUX_ComType_t ComType);
 [#else]
+/**
+  * @brief   Isr executed when Ipcc receive IRQ notification: forwards to upper layer
+  * @param   channelIdx  ipcc channel number
+  */
 static void MBMUX_IsrCommandRcvCb(uint32_t channelIdx);
+
+/**
+  * @brief   Isr executed when Ipcc receive IRQ notification: forwards to upper layer
+  * @param   channelIdx  ipcc channel number
+  */
 static void MBMUX_IsrAcknowledgeRcvCb(uint32_t channelIdx);
+
+/**
+  * @brief   Retrieve Sram Security Configuration from AB and store in static global var
+  */
+static void MBMUX_RetrieveSecureSramConfig(void);
+
+/**
+  * @brief   verify if buffer is in the allowed SRAM range otherwise ErrorHandler
+  * @param   pBufferAddress buffer start address
+  * @param   bufferSize  buffer size
+  * @retval  pointer to validated address
+  */
+static uint32_t *MBMUX_SEC_VerifySramBuffer(uint32_t *pBufferAddress, uint32_t bufferSize);
 [/#if]
+
+/**
+  * @brief   gives back channel associated to the feature
+  * @param   e_featID  identifier of the feature (Lora, Sigfox, etc).
+  * @param   ComType  0 for CMd/Resp (TX), 1 for Notif/Ack (RX)
+  * @retval  ipcc channel number: if 0xFF means the feature isn't registered
+  */
 static uint8_t MBMUX_GetFeatureChIdx(FEAT_INFO_IdTypeDef e_featID, MBMUX_ComType_t ComType);
+
+/**
+  * @brief   To facilitate the debug in case a function is not registered
+  * @param   ComObj Dummy
+  */
 static void MBMUX_IsrNotRegistered(void *ComObj);
 
 /* USER CODE BEGIN PFP */
@@ -74,11 +138,6 @@ static void MBMUX_IsrNotRegistered(void *ComObj);
 /* USER CODE END PFP */
 
 /* Exported functions --------------------------------------------------------*/
-/**
-  * @brief Init the mailbox feature table and init the ipcc
-  * @param MBMUX_ComTable_t  Mailbox intra-MCUs communication table
-  * @retval  none
-  */
 void MBMUX_Init(MBMUX_ComTable_t *const pMBMUX_ComTable)
 {
   /* USER CODE BEGIN MBMUX_Init_1 */
@@ -87,11 +146,16 @@ void MBMUX_Init(MBMUX_ComTable_t *const pMBMUX_ComTable)
   uint8_t i;
 [#if CPUCORE == "CM4"]
   IPCC_IF_Init(MBMUX_IsrResponseRcvCb, MBMUX_IsrNotificationRcvCb);
-[#else]
-  IPCC_IF_Init(MBMUX_IsrCommandRcvCb, MBMUX_IsrAcknowledgeRcvCb);
-[/#if]
 
   p_MBMUX_ComTable = pMBMUX_ComTable;
+[#else]
+  IPCC_IF_Init(MBMUX_IsrCommandRcvCb, MBMUX_IsrAcknowledgeRcvCb);
+
+  /* Retrieve SRAM  Security Config from Option Bytes */
+  MBMUX_RetrieveSecureSramConfig();
+  /* Validate pMBMUX_ComTable address range */
+  p_MBMUX_ComTable = (MBMUX_ComTable_t *) MBMUX_SEC_VerifySramBufferPtr((uint32_t *) pMBMUX_ComTable, sizeof(MBMUX_ComTable_t));
+[/#if]
 
 [#if CPUCORE == "CM4"]
   for (i = 0; i < FEAT_INFO_CNT; i++)
@@ -114,8 +178,10 @@ void MBMUX_Init(MBMUX_ComTable_t *const pMBMUX_ComTable)
 [#else]
   for (i = 0; i < MBMUX_CHANNEL_NUMBER; i++)
   {
-    p_MBMUX_ComTable->MBCmdRespParam[i].MsgCm0plusCb = MBMUX_IsrNotRegistered;
-    p_MBMUX_ComTable->MBNotifAckParam[i].MsgCm0plusCb = MBMUX_IsrNotRegistered;
+    MBMUX_MsgCbPointersTabCm0.MBCmdRespCb[i].MsgCm0plusCb = MBMUX_IsrNotRegistered;
+    MBMUX_MsgCbPointersTabCm0.MBNotifAckCb[i].MsgCm0plusCb = MBMUX_IsrNotRegistered;
+    p_MBMUX_ComTable->MBCmdRespParam[i].MsgCm0plusCb = MBMUX_IsrNotRegistered; /* not used anymore */
+    p_MBMUX_ComTable->MBNotifAckParam[i].MsgCm0plusCb = MBMUX_IsrNotRegistered; /* not used anymore */
   }
 [/#if]
   /* USER CODE BEGIN MBMUX_Init_Last */
@@ -124,11 +190,6 @@ void MBMUX_Init(MBMUX_ComTable_t *const pMBMUX_ComTable)
 }
 
 [#if CPUCORE == "CM4"]
-/**
-  * @brief The application informs MBMUX about the CM0PLUS supported feature list
-  * @param p_CM0PLUS_FeatureList  pointer to the list of CM0PLUS features
-  * @retval  none
-  */
 void MBMUX_SetCm0plusFeatureListPtr(FEAT_INFO_List_t *pCM0PLUS_FeatureList)
 {
   /* USER CODE BEGIN MBMUX_SetCm0plusFeatureListPtr_1 */
@@ -140,21 +201,6 @@ void MBMUX_SetCm0plusFeatureListPtr(FEAT_INFO_List_t *pCM0PLUS_FeatureList)
   /* USER CODE END MBMUX_SetCm0plusFeatureListPtr_Last */
 }
 
-[/#if]
-/**
-  * @brief Assigns an ipcc channel to a feature (for a requested direction) and registers associated applic cb and buffer
-  * @param e_featID  identifier of the feature (Lora, Sigfox, etc).
-  * @param ComType  0 for CMd/Resp, 1 for Notif/Ack
-  * @param MsgCb   applic callback for notification processing
-  * @param ComBuffer   applic buffer where Msg values (params) are stored
-  * @param ComBufSize  max size allocated by the applic for the buffer
-[#if CPUCORE == "CM4"]
-  * @retval   channel index or -1: (no more ipcc channel available) or -2: feature not provided by CM0PLUS
-[#else]
-  * @retval  return -1 if ch hasn't been registered by CM4, otherwise the nr of the assigned ch
-[/#if]
-  */
-[#if CPUCORE == "CM4"]
 int8_t MBMUX_RegisterFeature(FEAT_INFO_IdTypeDef e_featID, MBMUX_ComType_t ComType, void (*MsgCb)(void *ComObj), uint32_t *const ComBuffer, uint16_t ComBufSize)
 [#else]
 int8_t MBMUX_RegisterFeatureCallback(FEAT_INFO_IdTypeDef e_featID, MBMUX_ComType_t ComType, void (*MsgCb)(void *ComObj))
@@ -236,15 +282,19 @@ int8_t MBMUX_RegisterFeatureCallback(FEAT_INFO_IdTypeDef e_featID, MBMUX_ComType
   {
     /* channel has been registered by CM4 registered */
     channel_idx = check_existing_feature_registration;
-    if (ComType == MBMUX_CMD_RESP)
+
+    if (channel_idx != MB_CHANNEL_NOT_REGISTERED)
     {
-      p_MBMUX_ComTable->MBCmdRespParam[channel_idx].MsgCm0plusCb = MsgCb;
+      if (ComType == MBMUX_CMD_RESP)
+      {
+        MBMUX_MsgCbPointersTabCm0.MBCmdRespCb[channel_idx].MsgCm0plusCb = MsgCb;
+      }
+      else
+      {
+        MBMUX_MsgCbPointersTabCm0.MBNotifAckCb[channel_idx].MsgCm0plusCb = MsgCb;
+      }
+      ret = channel_idx;
     }
-    else
-    {
-      p_MBMUX_ComTable->MBNotifAckParam[channel_idx].MsgCm0plusCb = MsgCb;
-    }
-    ret = channel_idx;
   }
 [/#if]
   /* USER CODE BEGIN MBMUX_RegisterFeatureC_Last */
@@ -253,13 +303,6 @@ int8_t MBMUX_RegisterFeatureCallback(FEAT_INFO_IdTypeDef e_featID, MBMUX_ComType
   return ret;
 }
 
-/**
-  * @brief Release an ipcc channel from the given feature and direction
-  * @param e_featID  identifier of the feature (Lora, Sigfox, etc).
-  * @param ComType  0 for CMd/Resp (TX), 1 for Notif/Ack (RX)
-  * @retval  none
-  * @note  this function has not been fully tested, because never required by our applic
-  */
 void MBMUX_UnregisterFeature(FEAT_INFO_IdTypeDef e_featID, MBMUX_ComType_t ComType)
 {
   /* USER CODE BEGIN MBMUX_UnregisterFeature_1 */
@@ -286,9 +329,9 @@ void MBMUX_UnregisterFeature(FEAT_INFO_IdTypeDef e_featID, MBMUX_ComType_t ComTy
     }
     else
     {
-      /* Make sure to clear pending IRQ Notification before unregistering the callback */
+      /* Make sure to clear pending IRQ Notification before un-registering the callback */
       /* necessary because the HAL_cb only mask the register, the SR is cleaned by the task */
-      /* if the mask is removed by anyone, the unwhished IRQ is generated if SR isn't cleaned */
+      /* if the mask is removed by anyone, the unwished IRQ is generated if SR isn't cleaned */
       IPCC_IF_AcknowledgeSnd(mb_ch);
 
       p_MBMUX_ComTable->MBNotifAckParam[mb_ch].MsgCm4Cb = MBMUX_IsrNotRegistered;
@@ -308,11 +351,11 @@ void MBMUX_UnregisterFeature(FEAT_INFO_IdTypeDef e_featID, MBMUX_ComType_t ComTy
       /* Make sure to clear pending IRQ from Cmd before unregistering the callback */
       IPCC_IF_ResponseSnd(mb_ch);
 
-      p_MBMUX_ComTable->MBCmdRespParam[mb_ch].MsgCm0plusCb = MBMUX_IsrNotRegistered;
+      MBMUX_MsgCbPointersTabCm0.MBCmdRespCb[mb_ch].MsgCm0plusCb = MBMUX_IsrNotRegistered;
     }
     else
     {
-      p_MBMUX_ComTable->MBNotifAckParam[mb_ch].MsgCm0plusCb = MBMUX_IsrNotRegistered;
+      MBMUX_MsgCbPointersTabCm0.MBNotifAckCb[mb_ch].MsgCm0plusCb = MBMUX_IsrNotRegistered;
     }
   }
 [/#if]
@@ -321,16 +364,6 @@ void MBMUX_UnregisterFeature(FEAT_INFO_IdTypeDef e_featID, MBMUX_ComType_t ComTy
   /* USER CODE END MBMUX_UnregisterFeature_Last */
 }
 
-/**
-[#if CPUCORE == "CM4"]
-  * @brief gives back the pointer to the MailBox com buffer associated to the feature
-[#else]
-  * @brief gives back the pointer to the com buffer associated to the feature
-[/#if]
-  * @param e_featID  identifier of the feature (Lora, Sigfox, etc).
-  * @param ComType  0 for CMd/Resp (TX), 1 for Notif/Ack (RX)
-  * @retval  return pointer to the com param buffer
-  */
 MBMUX_ComParam_t *MBMUX_GetFeatureComPtr(FEAT_INFO_IdTypeDef e_featID, MBMUX_ComType_t ComType)
 {
   /* USER CODE BEGIN MBMUX_GetFeatureComPtr_1 */
@@ -358,11 +391,6 @@ MBMUX_ComParam_t *MBMUX_GetFeatureComPtr(FEAT_INFO_IdTypeDef e_featID, MBMUX_Com
 }
 
 [#if CPUCORE == "CM4"]
-/**
-  * @brief Send Cmd to remote MCU for a requested feature by abstracting the channel idx
-  * @param e_featID  identifier of the feature
-  * @retval OK: 0 , fail: -1
-  */
 int32_t MBMUX_CommandSnd(FEAT_INFO_IdTypeDef e_featID)
 {
   /* USER CODE BEGIN MBMUX_CommandSnd_1 */
@@ -381,11 +409,6 @@ int32_t MBMUX_CommandSnd(FEAT_INFO_IdTypeDef e_featID)
   /* USER CODE END MBMUX_CommandSnd_Last */
 }
 
-/**
-  * @brief Send ack to remote MCU for a requested feature by abstracting the channel idx
-  * @param e_featID  identifier of the feature
-  * @retval OK: 0 , fail: -1
-  */
 uint32_t MBMUX_AcknowledgeSnd(FEAT_INFO_IdTypeDef e_featID)
 {
   /* USER CODE BEGIN MBMUX_AcknowledgeSnd_1 */
@@ -401,11 +424,6 @@ uint32_t MBMUX_AcknowledgeSnd(FEAT_INFO_IdTypeDef e_featID)
 }
 
 [#else]
-/**
-  * @brief Send Notif to remote MCU for a requested feature by abstracting the channel idx
-  * @param e_featID  identifier of the feature (Lora, Sigfox, etc).
-  * @retval OK: 0 , fail: -1
-  */
 int32_t MBMUX_NotificationSnd(FEAT_INFO_IdTypeDef e_featID)
 {
   /* USER CODE BEGIN MBMUX_NotificationSnd_1 */
@@ -416,7 +434,7 @@ int32_t MBMUX_NotificationSnd(FEAT_INFO_IdTypeDef e_featID)
   mb_ch = MBMUX_GetFeatureChIdx(e_featID, MBMUX_NOTIF_ACK);
   if (p_MBMUX_ComTable->MBNotifAckParam[mb_ch].ParamCnt > p_MBMUX_ComTable->MBNotifAckParam[mb_ch].BufSize)
   {
-    while (1) {}
+    Error_Handler();
   }
   return IPCC_IF_NotificationSnd(mb_ch);
   /* USER CODE BEGIN MBMUX_NotificationSnd_Last */
@@ -424,11 +442,6 @@ int32_t MBMUX_NotificationSnd(FEAT_INFO_IdTypeDef e_featID)
   /* USER CODE END MBMUX_NotificationSnd_Last */
 }
 
-/**
-  * @brief Send response to remote MCU for a requested feature by abstracting the channel idx
-  * @param e_featID  identifier of the feature (Lora, Sigfox, etc).
-  * @retval OK: 0 , fail: -1
-  */
 uint32_t MBMUX_ResponseSnd(FEAT_INFO_IdTypeDef e_featID)
 {
   /* USER CODE BEGIN MBMUX_ResponseSnd_1 */
@@ -443,6 +456,40 @@ uint32_t MBMUX_ResponseSnd(FEAT_INFO_IdTypeDef e_featID)
   /* USER CODE END MBMUX_ResponseSnd_Last */
 }
 
+uint32_t *MBMUX_SEC_VerifySramBufferPtr(uint32_t *pBufferAddress, uint32_t bufferSize)
+{
+  uint32_t *pbuf_validated = NULL;
+
+  /* USER CODE BEGIN MBMUX_SEC_VerifySramBufferPtr_1 */
+
+  /* USER CODE END MBMUX_SEC_VerifySramBufferPtr_1 */
+
+[#if (SECURE_PROJECTS == "1")]
+  /* First check is only sufficient to avoid SW attacks (pBufferAddress out of range) */
+  pbuf_validated = MBMUX_SEC_VerifySramBuffer(pBufferAddress, bufferSize);
+
+  /* USER CODE BEGIN MBMUX_SEC_VerifySramBufferPtr_2 */
+
+  /* USER CODE END MBMUX_SEC_VerifySramBufferPtr_2 */
+
+  /* Double Check to avoid basic fault injection by "HW" (e.g. power glitched) */
+  /* fault injection might lead to "jump" the check inside the MBMUX_SEC_VerifySramBuffer function */
+  /* which would validate an out-of-range buffer pointer */
+  /* note: below "if statement" is dummy: it is used to avoid the compiler to remove the second call*/
+  if ((pbuf_validated == pBufferAddress) || (pbuf_validated == NULL))
+  {
+    /* Calling twice the function reduce exponentially the HW fault injection attacks */
+    pbuf_validated = MBMUX_SEC_VerifySramBuffer(pBufferAddress, bufferSize);
+  }
+[#else]
+  pbuf_validated = MBMUX_SEC_VerifySramBuffer(pBufferAddress, bufferSize);
+[/#if]
+
+  /* USER CODE BEGIN MBMUX_SEC_VerifySramBufferPtr_Last */
+
+  /* USER CODE END MBMUX_SEC_VerifySramBufferPtr_Last */
+  return (pbuf_validated);
+}
 [/#if]
 
 /* USER CODE BEGIN EFD */
@@ -450,13 +497,7 @@ uint32_t MBMUX_ResponseSnd(FEAT_INFO_IdTypeDef e_featID)
 /* USER CODE END EFD */
 
 /* Private functions ---------------------------------------------------------*/
-
 [#if CPUCORE == "CM4"]
-/**
-  * @brief Check if the FEATURE is in the CM0 table and return it's position
-  * @param e_featID  identifier of the feature
-  * @retval 0 not present, 1 present
-  */
 static uint8_t MBMUX_CheckIfFeatureSupportedByCm0plus(FEAT_INFO_IdTypeDef e_featID)
 {
   int8_t ret = 0;
@@ -488,11 +529,6 @@ static uint8_t MBMUX_CheckIfFeatureSupportedByCm0plus(FEAT_INFO_IdTypeDef e_feat
   return ret;
 }
 
-/**
-  * @brief Isr executed when Ipcc receive IRQ notification: forwards to upper layer
-  * @param channelIdx  ipcc channel number
-  * @retval none
-  */
 static void MBMUX_IsrResponseRcvCb(uint32_t channelIdx)
 {
   /* USER CODE BEGIN MBMUX_IsrResponseRcvCb_1 */
@@ -509,11 +545,97 @@ static void MBMUX_IsrResponseRcvCb(uint32_t channelIdx)
 }
 
 [#else]
-/**
-  * @brief Isr executed when Ipcc receive IRQ notification: forwards to upper layer
-  * @param channelIdx  ipcc channel number
-  * @retval none
-  */
+static uint32_t *MBMUX_SEC_VerifySramBuffer(uint32_t *pBufferAddress, uint32_t bufferSize)
+{
+  uint32_t *p_validated_address = NULL;
+  /* USER CODE BEGIN MBMUX_SEC_VerifySramBuffer_1 */
+
+  /* USER CODE END MBMUX_SEC_VerifySramBuffer_1 */
+
+  /* Check the global security is enabled */
+  if ((OptionsBytesStruct.SecureMode & OB_SECURE_SYSTEM_AND_FLASH_ENABLE) != 0)
+  {
+    /** The security is enabled */
+
+    if (((((uint32_t)(pBufferAddress)) >= SRAM1_BASE)
+         && ((((uint32_t)(pBufferAddress)) + bufferSize) <= unsecure_sram1_end)) ||
+        ((((uint32_t)(pBufferAddress)) >= SRAM2_BASE) && ((((uint32_t)(pBufferAddress)) + bufferSize) <= unsecure_sram2_end))
+       )
+    {
+      /* check against (pBufferAddress + bufferSize) overflow */
+      if (((uint32_t)pBufferAddress <= unsecure_sram2_end) && (bufferSize < (SRAM1_SIZE + SRAM2_SIZE)))
+      {
+        /** The address is validated because part of the unsecure SRAM  */
+        p_validated_address = pBufferAddress;
+      }
+      else
+      {
+        /**
+          * The address is outside the unsecure SRAM
+          * This is considered as a security attack
+          * Hold everything to avoid any security issue
+          */
+        Error_Handler();
+      }
+    }
+    else
+    {
+      /**
+        * The address is outside the unsecure SRAM
+        * This is considered as a security attack
+        * Hold everything to avoid any security issue
+        */
+      Error_Handler();
+    }
+  }
+  else
+  {
+    /** The security is disabled */
+    p_validated_address = pBufferAddress;
+  }
+
+  /* USER CODE BEGIN MBMUX_SEC_VerifySramBuffer_Last */
+
+  /* USER CODE END MBMUX_SEC_VerifySramBuffer_Last */
+  return (p_validated_address);
+}
+
+static void MBMUX_RetrieveSecureSramConfig(void)
+{
+  /* USER CODE BEGIN MBMUX_RetrieveSecureSramConfig_1 */
+
+  /* USER CODE END MBMUX_RetrieveSecureSramConfig_1 */
+  /* Get the Dual boot configuration status */
+  HAL_FLASHEx_OBGetConfig(&OptionsBytesStruct);
+
+  /* Check the SRAM1 security */
+  if ((OptionsBytesStruct.SecureMode & OB_SECURE_SRAM1_DISABLE) != 0)
+  {
+    /** SRAM1 is not secure */
+    unsecure_sram1_end = SRAM1_BASE + SRAM1_SIZE;
+  }
+  else
+  {
+    /** part of SRAM1 is secure */
+    unsecure_sram1_end = OptionsBytesStruct.SecureSRAM1StartAddr;
+  }
+
+  /** Check the SRAM2 security */
+  if ((OptionsBytesStruct.SecureMode & OB_SECURE_SRAM2_DISABLE) != 0)
+  {
+    /** SRAM2 is not secure */
+    unsecure_sram2_end = SRAM2_BASE + SRAM2_SIZE;
+  }
+  else
+  {
+    /** part of SRAM2 is secure */
+    unsecure_sram2_end = OptionsBytesStruct.SecureSRAM2StartAddr;
+  }
+  /* USER CODE BEGIN MBMUX_RetrieveSecureSramConfig_Last */
+
+  /* USER CODE END MBMUX_RetrieveSecureSramConfig_Last */
+}
+
 static void MBMUX_IsrCommandRcvCb(uint32_t channelIdx)
 {
   /* USER CODE BEGIN MBMUX_IsrCommandRcvCb_1 */
@@ -522,18 +644,13 @@ static void MBMUX_IsrCommandRcvCb(uint32_t channelIdx)
   /* retrieve pointer to com params */
   void *com_obj = (void *) &p_MBMUX_ComTable->MBCmdRespParam[channelIdx];
   /* call registered callback */
-  p_MBMUX_ComTable->MBCmdRespParam[channelIdx].MsgCm0plusCb(com_obj);
+  MBMUX_MsgCbPointersTabCm0.MBCmdRespCb[channelIdx].MsgCm0plusCb(com_obj);
   /* USER CODE BEGIN MBMUX_IsrCommandRcvCb_Last */
 
   /* USER CODE END MBMUX_IsrCommandRcvCb_Last */
   return;
 }
 
-/**
-  * @brief Isr executed when Ipcc receive IRQ notification: forwards to upper layer
-  * @param channelIdx  ipcc channel number
-  * @retval none
-  */
 static void MBMUX_IsrAcknowledgeRcvCb(uint32_t channelIdx)
 {
   /* USER CODE BEGIN MBMUX_IsrAcknowledgeRcvCb_1 */
@@ -542,7 +659,7 @@ static void MBMUX_IsrAcknowledgeRcvCb(uint32_t channelIdx)
   /* retrieve pointer to com params */
   void *com_obj = (void *) &p_MBMUX_ComTable->MBNotifAckParam[channelIdx];
   /* call registered callback */
-  p_MBMUX_ComTable->MBNotifAckParam[channelIdx].MsgCm0plusCb(com_obj);
+  MBMUX_MsgCbPointersTabCm0.MBNotifAckCb[channelIdx].MsgCm0plusCb(com_obj);
   /* USER CODE BEGIN MBMUX_IsrAcknowledgeRcvCb_Last */
 
   /* USER CODE END MBMUX_IsrAcknowledgeRcvCb_Last */
@@ -551,11 +668,6 @@ static void MBMUX_IsrAcknowledgeRcvCb(uint32_t channelIdx)
 
 [/#if]
 [#if CPUCORE == "CM4"]
-/**
-  * @brief Isr executed when Ipcc receive IRQ notification: forwards to upper layer
-  * @param channelIdx  ipcc channel number
-  * @retval none
-  */
 static void MBMUX_IsrNotificationRcvCb(uint32_t channelIdx)
 {
   /* USER CODE BEGIN MBMUX_IsrNotificationRcvCb_1 */
@@ -571,11 +683,6 @@ static void MBMUX_IsrNotificationRcvCb(uint32_t channelIdx)
   return;
 }
 
-/**
-  * @brief Find the first channel not yet associated to a feature (available)
-  * @param ComType  0 for CMd/Resp (TX), 1 for Notif/Ack (RX)
-  * @retval ipcc channel number: if 0xFF means no channel available
-  */
 static uint8_t MBMUX_FindChStillUnregistered(MBMUX_ComType_t ComType)
 {
   /* USER CODE BEGIN MBMUX_FindChStillUnregistered_1 */
@@ -637,12 +744,6 @@ static uint8_t MBMUX_FindChStillUnregistered(MBMUX_ComType_t ComType)
 }
 
 [/#if]
-/**
-  * @brief gives back channel associated to the feature
-  * @param e_featID  identifier of the feature (Lora, Sigfox, etc).
-  * @param ComType  0 for CMd/Resp (TX), 1 for Notif/Ack (RX)
-  * @retval ipcc channel number: if 0xFF means the feature isn't registered
-  */
 static uint8_t MBMUX_GetFeatureChIdx(FEAT_INFO_IdTypeDef e_featID, MBMUX_ComType_t ComType)
 {
   /* USER CODE BEGIN MBMUX_GetFeatureChIdx_1 */
@@ -654,17 +755,12 @@ static uint8_t MBMUX_GetFeatureChIdx(FEAT_INFO_IdTypeDef e_featID, MBMUX_ComType
   /* USER CODE END MBMUX_GetFeatureChIdx_Last */
 }
 
-/**
-  * @brief To facilitate the debug in case a function is not registered
-  * @param ComType  Dummy
-  * @retval None
-  */
 static void MBMUX_IsrNotRegistered(void *ComObj)
 {
   /* USER CODE BEGIN MBMUX_IsrNotRegistered_1 */
 
   /* USER CODE END MBMUX_IsrNotRegistered_1 */
-  while(1);
+  Error_Handler();
   /* USER CODE BEGIN MBMUX_IsrNotRegistered_Last */
 
   /* USER CODE END MBMUX_IsrNotRegistered_Last */

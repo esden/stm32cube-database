@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    kms_if.h
@@ -8,6 +9,9 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
+[#assign SECURE_PROJECTS = "0"]
+[#assign LORAWAN_FUOTA = "0"]
 [#assign ipNameList = configs[0].peripheralParams?keys]
 [#assign useKMS = ipNameList?seq_contains("KMS")]
 
@@ -24,7 +28,11 @@ extern "C" {
 
 #include "kms.h"
 #include "tkms.h"
+[#if (SECURE_PROJECTS == "1") || (LORAWAN_FUOTA == "1")]
+#include "se_interface_kms.h"
+[#else]
 #include "kms_interface.h"
+[/#if]
 
 [/#if]
 /* USER CODE BEGIN Includes */
@@ -63,4 +71,3 @@ extern "C" {
 #endif /* KMS_IF_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
-

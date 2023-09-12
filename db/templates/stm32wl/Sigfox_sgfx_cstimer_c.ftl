@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    sgfx_cstimer.c
@@ -8,6 +9,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
 #include "sgfx_cstimer.h"
@@ -54,7 +56,7 @@ void RxCarrierSenseInitStatus(void)
   /* USER CODE BEGIN RxCarrierSenseInitStatus_1 */
 
   /* USER CODE END RxCarrierSenseInitStatus_1 */
-  /*Initialises the Flag*/
+  /*Initialize the Flag*/
   rxCarrierSenseFlag = 0;
   /* USER CODE BEGIN RxCarrierSenseInitStatus_2 */
 

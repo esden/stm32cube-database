@@ -372,6 +372,7 @@ DSTATUS SD_status(BYTE lun)
  [#if use_rtos = 1]  [#--Part from sd_diskio_dma_rtos_template.c --]
 DRESULT SD_read(BYTE lun, BYTE *buff, DWORD sector, UINT count)
 {
+  uint8_t ret;   [#--Missing in FW pack reference template --]
   DRESULT res = RES_ERROR;
   uint32_t timer;
 #if (osCMSIS < 0x20000U)
@@ -397,7 +398,7 @@ DRESULT SD_read(BYTE lun, BYTE *buff, DWORD sector, UINT count)
   {
 #endif
     /* Fast path cause destination buffer is correctly aligned */
-    uint8_t ret = BSP_SD_ReadBlocks_DMA((uint32_t*)buff, (uint32_t)(sector), count);
+    ret = BSP_SD_ReadBlocks_DMA((uint32_t*)buff, (uint32_t)(sector), count);
 
     if (ret == MSD_OK) {
 #if (osCMSIS < 0x20000U)
@@ -451,7 +452,7 @@ DRESULT SD_read(BYTE lun, BYTE *buff, DWORD sector, UINT count)
 
       for (i = 0; i < count; i++)
       {
-        ret = BSP_SD_ReadBlocks_DMA((uint32_t*)scratch, (uint32_t)sector++, 1);
+        ret = BSP_SD_ReadBlocks_DMA((uint32_t*)scratch, (uint32_t)sector++, 1); [#--Fails without ret definition when ENABLE_SCRATCH_BUFFER defined --]
         if (ret == MSD_OK )
         {
           /* wait until the read is successful or a timeout occurs */

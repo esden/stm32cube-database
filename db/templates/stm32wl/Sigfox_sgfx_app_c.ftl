@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    sgfx_app.c
@@ -8,28 +9,39 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
-
+/* USER CODE END Header */
 [#--
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
                 ${definition.name}: ${definition.value}
-        [/#list]
-    [/#if]
-[/#list]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 --]
 [#assign CPUCORE = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")]
 [#assign SUBGHZ_APPLICATION = ""]
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            [#if definition.name == "SUBGHZ_APPLICATION"]
-                [#assign SUBGHZ_APPLICATION = definition.value]
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
+[#assign SECURE_PROJECTS = "0"]
+[#assign FILL_UCS = ""]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "SUBGHZ_APPLICATION"]
+                    [#assign SUBGHZ_APPLICATION = definition.value]
+                [/#if]
+                [#if definition.name == "FILL_UCS"]
+                    [#assign FILL_UCS = definition.value]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
+
 /* Includes ------------------------------------------------------------------*/
+
 #include "st_sigfox_api.h"
 #include "sgfx_app.h"
 #include "sgfx_app_version.h"
@@ -51,9 +63,6 @@
 [#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") ]
 #include "sgfx_command.h"
 [/#if]
-[#if (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON") ]
-#include "sys_sensors.h"
-[/#if]
 [#if ((SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") || (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON")) && (CPUCORE == "CM4") ]
 #include "sigfox_mbwrapper.h"
 #include "sigfox_info.h"
@@ -62,12 +71,23 @@
 [/#if]
 
 /* USER CODE BEGIN Includes */
+[#if (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON") && (FILL_UCS == "true")]
+#include "sys_sensors.h"
+[/#if]
 
 /* USER CODE END Includes */
 
 /* External variables ---------------------------------------------------------*/
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
 extern RadioEvents_t RfApiRadioEvents;
+[/#if]
+[#if (SECURE_PROJECTS == "1") && (CPUCORE == "CM4") ]
+#if defined (DEBUGGER_ENABLED) && ( DEBUGGER_ENABLED == 1 )
+extern __IO uint32_t lets_go_on;
+#elif !defined (DEBUGGER_ENABLED)
+#error "DEBUGGER_ENABLED not defined or out of range <0,1>"
+#endif /* DEBUGGER_ENABLED */
+
 [/#if]
 /* USER CODE BEGIN EV */
 
@@ -91,27 +111,25 @@ extern RadioEvents_t RfApiRadioEvents;
 /* Private variables ---------------------------------------------------------*/
 [#if ((SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") || (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON")) && (CPUCORE == "CM4")]
 static SigfoxCallback_t SigfoxCallbacks = { SYS_GetBatteryLevel,
-                                            SYS_GetTemperatureLevel};
-[/#if]
+                                            SYS_GetTemperatureLevel
+                                          };
 
+[/#if]
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
-[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
 static sfx_error_t st_sigfox_open(sfx_rc_enum_t sfx_rc);
 
-[/#if]
 [#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") ]
 static void CmdProcessNotify(void);
 
 [/#if]
-[#if (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON") ]
-static void SendSigfox(void);
-
-[/#if]
 /* USER CODE BEGIN PFP */
+[#if (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON") && (FILL_UCS == "true")]
+static void SendSigfox(void);
+[/#if]
 
 /* USER CODE END PFP */
 
@@ -119,11 +137,14 @@ static void SendSigfox(void);
 
 void Sigfox_Init(void)
 {
-  /* USER CODE BEGIN Sigfox_Init_1 */
+  sfx_rc_enum_t sfx_rc = SFX_RC1;
+  sfx_error_t error = 0;
+[#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") ]
+  /* USER CODE BEGIN Sigfox_Init_0 */
 
-  /* USER CODE END Sigfox_Init_1 */
+  /* USER CODE END Sigfox_Init_0 */
+[/#if]
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
-  sfx_u8 error = 0;
 [#if (CPUCORE == "CM4")]
   SigfoxInfo_t *SigfoxRegionInfo;
   FEAT_INFO_Param_t *p_cm0plus_specific_features_info;
@@ -134,7 +155,15 @@ void Sigfox_Init(void)
 
   CMD_Init(CmdProcessNotify);
 
-  APP_PPRINTF("ATtention command interface\n\r");
+[/#if]
+[/#if]
+  /* USER CODE BEGIN Sigfox_Init_1 */
+[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION") && (FILL_UCS == "true")]
+  BSP_LED_Init(LED_BLUE);
+  BSP_LED_Init(LED_GREEN);
+[#if (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON")]
+  /* Initialize button here*/
+  BSP_PB_Init(BUTTON_SW1, BUTTON_MODE_EXTI);
 [/#if]
 
 [#if CPUCORE == "CM4"]
@@ -186,32 +215,33 @@ void Sigfox_Init(void)
           (uint8_t)(__SUBGHZ_PHY_VERSION >> __APP_VERSION_SUB1_SHIFT),
           (uint8_t)(__SUBGHZ_PHY_VERSION >> __APP_VERSION_SUB2_SHIFT));
 [/#if]
+[#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") ]
+  APP_PPRINTF("ATtention command interface\n\r");
+[/#if]
+[/#if]   [#-- (FILL_UCS == "true") --]
 
-#if defined(USE_BSP_DRIVER)
-  BSP_LED_Init(LED_BLUE);
-  BSP_LED_Init(LED_GREEN);
-#elif defined(MX_BOARD_PSEUDODRIVER)
-  SYS_LED_Init(SYS_LED_BLUE);
-  SYS_LED_Init(SYS_LED_GREEN);
-#endif /* defined(USE_BSP_DRIVER) */
+  /* USER CODE END Sigfox_Init_1 */
+[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
 
+[#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") ]
+  sfx_rc = E2P_Read_Rc();
+
+[/#if]
 [#if (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON") ]
-#if defined(USE_BSP_DRIVER)
-  BSP_PB_Init(BUTTON_SW1, BUTTON_MODE_EXTI);
-#elif defined(MX_BOARD_PSEUDODRIVER)
-  SYS_PB_Init(SYS_BUTTON1, SYS_BUTTON_MODE_EXTI);
-#endif /* defined(USE_BSP_DRIVER) */
-
   E2P_Write_Rc(DEFAULT_RC);
+  sfx_rc = E2P_Read_Rc();
 [/#if]
 
-  /*OPen Sifox Lib*/
-  error = st_sigfox_open(E2P_Read_Rc());
+[/#if]
+  /*Open Sigfox library */
+  error = st_sigfox_open(sfx_rc);
+
+[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
 
 [#if (CPUCORE == "CM0PLUS") || (CPUCORE == "")]
   Radio.Init(&RfApiRadioEvents);
 [#elseif (CPUCORE == "CM4")]
-  /* Init SigfoxInfo capabilities table (redondant: Cm0 is supposed to have done it already) */
+  /* Init SigfoxInfo capabilities table (redundant: Cm0 is supposed to have done it already) */
   SigfoxInfo_Init();
 
   SigfoxRegionInfo = SigfoxInfo_GetPtr();
@@ -221,10 +251,11 @@ void Sigfox_Init(void)
     while (1) {} /* At least one region shall be defined */
   }
 
-  /* Register get Battery and Get temp functions */
+  /* Register GetBatteryLevel and GetTemperatureLevel functions */
   Sigfox_Register(&SigfoxCallbacks);
 [/#if]
-
+  /* USER CODE BEGIN Sigfox_Init_ErrorCheck */
+[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION") && (FILL_UCS == "true")]
   if (1U == E2P_Read_AtEcho())
   {
     if (error == SFX_ERR_NONE)
@@ -233,103 +264,33 @@ void Sigfox_Init(void)
     }
     else
     {
-      APP_PPRINTF("\r\n\n\rSIGFOX APPLICATION ERROR: %d\n\r\n\r", error);
+      APP_PPRINTF("\r\n\n\rSIGFOX APPLICATION ERROR: 0x%04X\n\r\n\r", error);
     }
   }
+[#else]
 
-  /* Put radio in Sleep waiting next cmd */
+[/#if]
+  /* USER CODE END Sigfox_Init_ErrorCheck */
 [#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") ]
+  /* Put radio in Sleep waiting next cmd */
   UTIL_SEQ_RegTask(1 << CFG_SEQ_Task_Vcom, UTIL_SEQ_RFU, CMD_Process);
 [/#if]
-[#if (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON") ]
-  UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_Pb), UTIL_SEQ_RFU, SendSigfox);
-[/#if]
 [#else]
-  /*open sigfox lybrary*/
-  /*sfx_rc_t SgfxRc = RC7;*/
-  /*error = SIGFOX_API_open(&SgfxRc);*/
-  /* */
-  /*start a timer timer to periodically send data*/
+
+  /*initialize an event to send data periodically*/
 [/#if]
   /* USER CODE BEGIN Sigfox_Init_2 */
+[#if (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON")  && (FILL_UCS == "true")]
+  UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_Pb), UTIL_SEQ_RFU, SendSigfox);
+[/#if]
 
   /* USER CODE END Sigfox_Init_2 */
 }
-
-[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
-[#if (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON") ]
-#if defined(USE_BSP_DRIVER)
-void BSP_PB_Callback(Button_TypeDef Button)
-{
-  /* USER CODE BEGIN BSP_PB_Callback_1 */
-
-  /* USER CODE END BSP_PB_Callback_1 */
-#warning: adapt stm32wlxx_it.c to call BSP_PB_IRQHandler if you want to use BSP
-  switch (Button)
-  {
-    case  BUTTON_SW1:
-      UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_Pb), CFG_SEQ_Prio_0);
-      break;
-    default:
-      break;
-  }
-  /* USER CODE BEGIN BSP_PB_Callback_1 */
-
-  /* USER CODE END BSP_PB_Callback_1 */
-}
-#elif defined(MX_BOARD_PSEUDODRIVER)
-/* Note: Current MX does not support EXTI IP neither BSP. */
-/* In order to get a push button IRS by code automatically generated */
-/* this function is today the only available possibility. */
-/* Calling BSP_PB_Callback() from here it shortcuts the BSP. */
-/* If users wants to go through the BSP, it can remove BSP_PB_Callback() from here */
-/* and add a call to BSP_PB_IRQHandler() in the USER CODE SESSION of the */
-/* correspondent EXTIn_IRQHandler() in the stm32wlxx_it.c */
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-  /* USER CODE BEGIN HAL_GPIO_EXTI_Callback_1 */
-
-  /* USER CODE END HAL_GPIO_EXTI_Callback_1 */
-  switch (GPIO_Pin)
-  {
-    case  SYS_BUTTON1_PIN:
-      /* Note: when "EventType == TX_ON_TIMER" this GPIO is not initialised */
-      UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_Pb), CFG_SEQ_Prio_0);
-      /* USER CODE BEGIN EXTI_Callback_2 */
-
-      /* USER CODE END EXTI_Callback_2 */
-      break;
-    case  SYS_BUTTON2_PIN:
-      /* USER CODE BEGIN EXTI_Callback_3 */
-
-      /* USER CODE END EXTI_Callback_3 */
-      break;
-    /* USER CODE BEGIN EXTI_Callback_4 */
-
-    /* USER CODE END EXTI_Callback_4 */
-    default:
-      /* USER CODE BEGIN EXTI_Callback_5 */
-
-      /* USER CODE END EXTI_Callback_5 */
-
-      break;
-  }
-  /* USER CODE BEGIN EXTI_Callback_6 */
-
-  /* USER CODE END EXTI_Callback_6 */
-}
-#else
-#error user to provide its board code or to call his board driver functions
-#endif /* defined(USE_BSP_DRIVER) */
-
-[/#if]
-[/#if]
 /* USER CODE BEGIN EF */
 
 /* USER CODE END EF */
 
 /* Private Functions Definition -----------------------------------------------*/
-[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
 static sfx_error_t st_sigfox_open(sfx_rc_enum_t sfx_rc)
 {
   /* USER CODE BEGIN st_sigfox_open_1 */
@@ -337,7 +298,13 @@ static sfx_error_t st_sigfox_open(sfx_rc_enum_t sfx_rc)
   /* USER CODE END st_sigfox_open_1 */
   sfx_u32 config_words[3] = {0};
 
+[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
   E2P_Read_ConfigWords(sfx_rc, config_words);
+[#else]
+  /* USER CODE BEGIN st_sigfox_open_read_config_words */
+  /* read config words from memory */
+  /* USER CODE END st_sigfox_open_read_config_words */
+[/#if]
 
   sfx_error_t error = SFX_ERR_NONE;
 
@@ -424,6 +391,9 @@ static sfx_error_t st_sigfox_open(sfx_rc_enum_t sfx_rc)
       error = SIGFOX_API_open(&SgfxRc);
       break;
     }
+    /* USER CODE BEGIN st_sigfox_open_case */
+
+    /* USER CODE END st_sigfox_open_case */
     default:
     {
       error = SFX_ERR_API_OPEN;
@@ -449,12 +419,43 @@ static void CmdProcessNotify(void)
   /* USER CODE END CmdProcessNotify_2 */
 }
 [/#if]
-[#if (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON") ]
+
+
+/* USER CODE BEGIN PrFD */
+[#if (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON")  && (FILL_UCS == "true")]
+/* Note: Current the stm32wlxx_it.c generated by STM32CubeMX does not support BSP for PB in EXTI mode. */
+/* In order to get a push button IRS by code automatically generated */
+/* HAL_GPIO_EXTI_Callback is today the only available possibility. */
+/* Using HAL_GPIO_EXTI_Callback() shortcuts the BSP. */
+/* If users wants to really go through the BSP, stm32wlxx_it.c should be updated  */
+/* in the USER CODE SESSION of the correspondent EXTIn_IRQHandler() */
+/* to call the BSP_PB_IRQHandler() or the HAL_EXTI_IRQHandler(&H_EXTI_n);. */
+/* Then the below HAL_GPIO_EXTI_Callback() can be replaced by BSP callback */
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  switch (GPIO_Pin)
+  {
+    case  BUTTON_SW1_PIN:
+      UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_Pb), CFG_SEQ_Prio_0);
+      break;
+    case  BUTTON_SW2_PIN:
+[#if (SECURE_PROJECTS == "1") && (CPUCORE == "CM4") ]
+#if defined (DEBUGGER_ENABLED) && ( DEBUGGER_ENABLED == 1 )
+      lets_go_on = 1;
+#elif !defined (DEBUGGER_ENABLED)
+#error "DEBUGGER_ENABLED not defined or out of range <0,1>"
+#endif /* DEBUGGER_ENABLED */
+[/#if]
+      break;
+    case  BUTTON_SW3_PIN:
+      break;
+    default:
+      break;
+  }
+}
+
 static void SendSigfox(void)
 {
-  /* USER CODE BEGIN SendSigfox_1 */
-
-  /* USER CODE END SendSigfox_1 */
   uint8_t ul_msg[12] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x10, 0x11};
   uint8_t dl_msg[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
   uint32_t  ul_size = 0;
@@ -479,29 +480,19 @@ static void SendSigfox(void)
   ul_msg[ul_size++] = (humidity >> 8) & 0xFF;
   ul_msg[ul_size++] = humidity & 0xFF;
 
-#if defined(USE_BSP_DRIVER)
+[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION") && (FILL_UCS == "true")]
   BSP_LED_On(LED_BLUE);
-#elif defined(MX_BOARD_PSEUDODRIVER)
-  SYS_LED_On(SYS_LED_BLUE);
-#endif /* defined(USE_BSP_DRIVER) */
 
+[/#if]
   SIGFOX_API_send_frame(ul_msg, ul_size, dl_msg, nbTxRepeatFlag, SFX_FALSE);
 
-#if defined(USE_BSP_DRIVER)
+[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION") && (FILL_UCS == "true")]
   BSP_LED_Off(LED_BLUE);
-#elif defined(MX_BOARD_PSEUDODRIVER)
-  SYS_LED_Off(SYS_LED_BLUE);
-#endif /* defined(USE_BSP_DRIVER) */
 
+[/#if]
   APP_LOG(TS_OFF, VLEVEL_L, " done\n\r");
-  /* USER CODE BEGIN SendSigfox_2 */
-
-  /* USER CODE END SendSigfox_2 */
 }
 [/#if]
-[/#if]
-
-/* USER CODE BEGIN PrFD */
 
 /* USER CODE END PrFD */
 

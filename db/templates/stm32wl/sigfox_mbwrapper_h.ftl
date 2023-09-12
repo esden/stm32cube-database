@@ -1,5 +1,6 @@
 [#ftl]
 [#assign CPUCORE = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    sigfox_mbwrapper.h
@@ -10,6 +11,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __SIGFOX_MBWRAPPER_${CPUCORE}_H__
@@ -72,14 +74,33 @@ typedef struct sSigfoxCallback
 
 /* Exported functions prototypes ---------------------------------------------*/
 [#if CPUCORE == "CM4"]
+/**
+  * @brief This function processes the callbacks and primitives from Cm0
+  * @param ComObj exchange buffer parameter
+  */
 void Process_Sigfox_Notif(MBMUX_ComParam_t *ComObj);
 
+/**
+ * @brief Register the callbacks structure for the process notification
+ * @param SigfoxCallback struct of callbacks
+ */
 void Sigfox_Register(SigfoxCallback_t *SigfoxCallback);
 [#elseif CPUCORE == "CM0PLUS"]
 void Process_Sigfox_Cmd(MBMUX_ComParam_t *ComObj);
 
+/*!
+  * @brief   Measures the battery level
+  * @return  Battery level [0: node is connected to an external
+  *          power source, 1..254: battery level, where 1 is the minimum
+  *          and 254 is the maximum value, 255: the node was not able
+  *          to measure the battery level]
+  */
 uint16_t GetBatteryLevel_mbwrapper(void);
 
+/*!
+  * @brief   Measures the temperature level
+  * @return  Temperature level
+  */
 int16_t GetTemperatureLevel_mbwrapper(void);
 [/#if]
 

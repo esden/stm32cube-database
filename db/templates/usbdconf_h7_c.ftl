@@ -382,9 +382,11 @@ USBD_StatusTypeDef USBD_LL_Init(USBD_HandleTypeDef *pdev)
   HAL_PCD_RegisterIsoOutIncpltCallback(&hpcd_USB_OTG_FS, PCD_ISOOUTIncompleteCallback);
   HAL_PCD_RegisterIsoInIncpltCallback(&hpcd_USB_OTG_FS, PCD_ISOINIncompleteCallback);
 #endif /* USE_HAL_PCD_REGISTER_CALLBACKS */
+#t/* USER CODE BEGIN TxRx_Configuration */
 #tHAL_PCDEx_SetRxFiFo(&hpcd_USB_OTG_FS, 0x80);
 #tHAL_PCDEx_SetTxFiFo(&hpcd_USB_OTG_FS, 0, 0x40);
 #tHAL_PCDEx_SetTxFiFo(&hpcd_USB_OTG_FS, 1, 0x80);
+#t/* USER CODE END TxRx_Configuration */
 #t}
 [/#if]
 [#if handleNameHS == "HS"]
@@ -408,9 +410,11 @@ USBD_StatusTypeDef USBD_LL_Init(USBD_HandleTypeDef *pdev)
   HAL_PCD_RegisterIsoOutIncpltCallback(&hpcd_USB_OTG_HS, PCD_ISOOUTIncompleteCallback);
   HAL_PCD_RegisterIsoInIncpltCallback(&hpcd_USB_OTG_HS, PCD_ISOINIncompleteCallback);
 #endif /* USE_HAL_PCD_REGISTER_CALLBACKS */
+#t/* USER CODE BEGIN TxRx_Configuration */
 #tHAL_PCDEx_SetRxFiFo(&hpcd_USB_OTG_HS, 0x200);
 #tHAL_PCDEx_SetTxFiFo(&hpcd_USB_OTG_HS, 0, 0x80);
 #tHAL_PCDEx_SetTxFiFo(&hpcd_USB_OTG_HS, 1, 0x174);
+#t/* USER CODE END TxRx_Configuration */
 #t}
 [/#if]
 [#if handleNameUSB_FS == "FS"]
@@ -664,10 +668,10 @@ USBD_StatusTypeDef USBD_LL_PrepareReceive(USBD_HandleTypeDef *pdev, uint8_t ep_a
 }
 
 /**
-  * @brief  Returns the last transfered packet size.
+  * @brief  Returns the last transferred packet size.
   * @param  pdev: Device handle
   * @param  ep_addr: Endpoint number
-  * @retval Recived Data Size
+  * @retval Received Data Size
   */
 uint32_t USBD_LL_GetRxDataSize(USBD_HandleTypeDef *pdev, uint8_t ep_addr)
 {
@@ -783,7 +787,7 @@ static void SystemClockConfig_Resume(void)
 [/#if]
 [/#if]
 /**
-  * @brief  Retuns the USB status depending on the HAL status:
+  * @brief  Returns the USB status depending on the HAL status:
   * @param  hal_status: HAL status
   * @retval USB status
   */

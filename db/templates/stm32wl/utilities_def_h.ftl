@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    utilities_def.h
@@ -8,27 +9,33 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
-
+/* USER CODE END Header */
 [#--
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            ${definition.name}: ${definition.value}
-        [/#list]
-    [/#if]
-[/#list]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                ${definition.name}: ${definition.value}
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 --]
 [#assign CPUCORE = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")]
 [#assign SUBGHZ_APPLICATION = ""]
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            [#if definition.name == "SUBGHZ_APPLICATION"]
-                [#assign SUBGHZ_APPLICATION = definition.value]
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
+[#assign SECURE_PROJECTS = "0"]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "SUBGHZ_APPLICATION"]
+                    [#assign SUBGHZ_APPLICATION = definition.value]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
+
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __UTILITIES_DEF_H__
 #define __UTILITIES_DEF_H__
@@ -52,11 +59,15 @@ extern "C" {
   */
 typedef enum
 {
-[#if ((SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")) ]
+  /* USER CODE BEGIN CFG_LPM_Id_t_0 */
+
+  /* USER CODE END CFG_LPM_Id_t_0 */
+[#if ((SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")) ]
   CFG_LPM_APPLI_Id,
   CFG_LPM_UART_TX_Id,
+[#else]
+  CFG_LPM_DUMMY_Id,
 [/#if]
-  CFG_LPM_TCXO_WA_Id,
 [#if ((SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") || (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON")) ]
   CFG_LPM_SGFX_MN_Id,
 [/#if]
@@ -97,31 +108,40 @@ typedef enum
 [#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE") || (SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION")]
   CFG_SEQ_Task_MbLoRaCmdRcv,
 [/#if]
-[#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE")||(SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON")||(SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION") ]
+[#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") || (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON") || (SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION") ]
   CFG_SEQ_Task_MbSigfoxCmdRcv,
 [/#if]
   CFG_SEQ_Task_MbRadioCmdRcv,
   CFG_SEQ_Task_MbRadioNotifSnd,
-[#if (SUBGHZ_APPLICATION != "SUBGHZ_PINGPONG")]
+[#if ((SUBGHZ_APPLICATION != "SUBGHZ_ADV_APPLICATION")) ]
   CFG_SEQ_Task_MbKmsCmdRcv,
 [/#if]
 [#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE") || (SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION")]
   CFG_SEQ_Task_MbLmHandlerProcess,
 [/#if]
-[#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE")||(SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON")||(SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION") ]
+[#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") || (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON") || (SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION") ]
   CFG_SEQ_Task_MbSigfoxNotifRcv,
   CFG_SEQ_Task_Monarch,
 [/#if]
+[#if (SECURE_PROJECTS == "1")]
+  CFG_SEQ_Task_RadioIrq_Process,
+  CFG_SEQ_Task_RadioRxTimeout_Process,
+  CFG_SEQ_Task_RadioTxTimeout_Process,
+  CFG_SEQ_Task_UtilTimer_Process,
+[/#if]
 [#elseif (CPUCORE == "CM4")]
   /* CM4 */
-[#if (SUBGHZ_APPLICATION == "SUBGHZ_PINGPONG")]
-  CFG_SEQ_Task_PingPong_Process,
+  /* USER CODE BEGIN CFG_SEQ_Task_Id_t_0 */
+
+  /* USER CODE END CFG_SEQ_Task_Id_t_0 */
+[#if (SUBGHZ_APPLICATION == "SUBGHZ_ADV_APPLICATION")]
+  CFG_SEQ_Task_SubGHz_Phy_App_Process,
 [/#if]
   CFG_SEQ_Task_MbSystemNotifRcv,
 [#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE") || (SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION")]
   CFG_SEQ_Task_MbLoRaNotifRcv,
 [/#if]
-[#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE")||(SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON")||(SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION") ]
+[#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") || (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON") || (SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION") ]
   CFG_SEQ_Task_MbSigfoxNotifRcv,
 [/#if]
   CFG_SEQ_Task_MbRadioNotifRcv,
@@ -154,8 +174,8 @@ typedef enum
 [#elseif (SUBGHZ_APPLICATION == "LORA_END_NODE")]
   CFG_SEQ_Task_LmHandlerProcess,
   CFG_SEQ_Task_LoRaSendOnTxTimerOrButtonEvent,
-[#elseif (SUBGHZ_APPLICATION == "SUBGHZ_PINGPONG")]
-  CFG_SEQ_Task_PingPong_Process,
+[#elseif (SUBGHZ_APPLICATION == "SUBGHZ_ADV_APPLICATION")]
+  CFG_SEQ_Task_SubGHz_Phy_App_Process,
 [#elseif (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") ]
   CFG_SEQ_Task_Vcom,
   CFG_SEQ_Task_Monarch,
@@ -185,6 +205,7 @@ typedef enum
 [/#if]
 [#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") || (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON") || (SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION")]
   CFG_SEQ_Evt_MbSigfoxAckRcv,
+  CFG_SEQ_Evt_Monarch,
 [/#if]
   CFG_SEQ_Evt_MbRadioAckRcv,
 [#if (SUBGHZ_APPLICATION == "SIGFOX_AT_SLAVE") || (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON")]
@@ -195,7 +216,7 @@ typedef enum
 [#elseif (CPUCORE == "CM4")]
   /* CM4 */
   CFG_SEQ_Evt_MbSystemRespRcv,
-[#if (SUBGHZ_APPLICATION != "SUBGHZ_PINGPONG")]
+[#if ((SUBGHZ_APPLICATION != "SUBGHZ_ADV_APPLICATION"))]
   CFG_SEQ_Evt_MbKmsRespRcv,
 [/#if]
 [#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE") || (SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION")]

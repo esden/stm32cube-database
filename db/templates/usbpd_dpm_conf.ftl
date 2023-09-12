@@ -16,7 +16,7 @@
 
 #ifdef __cplusplus
  extern "C" {
-#endif 
+#endif
 [#assign nbPorts = "1"]
 [#assign USBPD_CoreLib = ""]
 [#assign SRC = false]
@@ -26,7 +26,7 @@
 [#assign DR_SWAP_TO_XFP_FEATURE = false]
 [#assign GUI_V1_8_0_OR_NEWER = false]
 
-[#-- SWIPdatas is a list of SWIPconfigModel --]  
+[#-- SWIPdatas is a list of SWIPconfigModel --]
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
         [#list SWIP.defines as definition]
@@ -302,8 +302,8 @@
 /* Includes ------------------------------------------------------------------*/
 [#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
 #include "usbpd_pdo_defs.h"
-#include "usbpd_dpm_user.h"
 [/#if]
+#include "usbpd_dpm_user.h"
 [#if USBPD_CoreLib == "USBPDCORE_LIB_PD3_FULL" | USBPD_CoreLib == "USBPDCORE_LIB_PD3_CONFIG_1"]
 #include "usbpd_vdm_user.h"
 [/#if]

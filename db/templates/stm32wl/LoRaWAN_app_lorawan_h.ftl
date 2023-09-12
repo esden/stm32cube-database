@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    app_lorawan.h
@@ -8,6 +9,8 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
+
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __APP_LORAWAN_H__
 #define __APP_LORAWAN_H__
@@ -44,17 +47,15 @@ extern "C" {
 /* Exported Functions Prototypes------------------------------------------------------- */
 /**
   * @brief  Init Lora Application
-  * @param None
-  * @retval None
   */
 void MX_LoRaWAN_Init(void);
 
+[#if !FREERTOS??][#-- If FreeRtos, only available in CM4 is not used --]
 /**
   * @brief  Entry Lora Process or scheduling
-  * @param None
-  * @retval None
   */
 void MX_LoRaWAN_Process(void);
+[/#if]
 
 /* USER CODE BEGIN EFP */
 

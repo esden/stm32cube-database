@@ -1,5 +1,6 @@
 [#ftl]
 [#assign CPUCORE = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    radio_conf.h
@@ -9,36 +10,68 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
-
+/* USER CODE END Header */
 [#--
-********************************
-SWIP Data:
 [#if SWIPdatas??]
-  [#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-Defines:
-      [#list SWIP.defines as definition]
-        ${definition.name}: ${definition.value}
-      [/#list]
-    [/#if]
-  [/#list]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                ${definition.name}: ${definition.value}
+            [/#list]
+        [/#if]
+    [/#list]
 [/#if]
-********************************
 --]
 [#assign SUBGHZ_APPLICATION = ""]
+[#assign USER_SUBGHZ_APP = ""]
+[#assign FILL_UCS = ""]
 [#assign Activate_DEBUG_LINE = ""]
-[#list SWIPdatas as SWIP]
-  [#if SWIP.defines??]
-    [#list SWIP.defines as definition]
-            [#if definition.name == "SUBGHZ_APPLICATION"]
-                [#assign SUBGHZ_APPLICATION = definition.value]
-            [/#if]
-            [#if definition.name == "Activate_DEBUG_LINE"]
-                [#assign Activate_DEBUG_LINE = definition.value]
-            [/#if]
+[#assign RF_WAKEUP_TIME=""]
+[#assign SECURE_PROJECTS = "0"]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "SUBGHZ_APPLICATION"]
+                    [#assign SUBGHZ_APPLICATION = definition.value]
+                [/#if]
+                [#if definition.name == "USER_SUBGHZ_APP"]
+                    [#assign USER_SUBGHZ_APP = definition.value]
+                [/#if]
+                [#if definition.name == "FILL_UCS"]
+                    [#assign FILL_UCS = definition.value]
+                [/#if]
+                [#if definition.name == "Activate_DEBUG_LINE"]
+                    [#assign Activate_DEBUG_LINE = definition.value]
+                [/#if]
+                [#if definition.name == "RF_WAKEUP_TIME"]
+                    [#assign RF_WAKEUP_TIME = definition.value]
+                [/#if]
+            [/#list]
+        [/#if]
     [/#list]
-  [/#if]
-[/#list]
+[/#if]
+[#assign PROBE_LINE = {"1": "0", "2": "0", "3": "0", "4": "0"}]
+[#if BspIpDatas??]
+    [#list BspIpDatas as SWIP]
+        [#if SWIP.variables??]
+            [#list SWIP.variables as variables]
+                [#if variables.name?contains("IpInstance")]
+                    [#assign IpInstance = variables.value]
+                [/#if]
+                [#if variables.name?contains("IpName")]
+                    [#assign IpName = variables.value]
+                [/#if]
+                [#-- User BSP Debug --]
+                [#if variables.value?contains("Debug ") ]
+                    [#assign i = (variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
+                    [#assign PROBE_LINE = PROBE_LINE + {i: "1"}]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
+
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __RADIO_CONF_H__
 #define __RADIO_CONF_H__
@@ -54,8 +87,9 @@ extern "C" {
 [#else]
 #include "subghz.h"
 [/#if]
-[#if (CPUCORE != "CM0PLUS") || (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION") || (SUBGHZ_APPLICATION == "SUBGHZ_USER_APPLICATION") || (SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION")]
-#include "stm32_mem.h"
+#include "stm32_mem.h"       /* RADIO_MEMSET8 def in this file */
+[#if (SECURE_PROJECTS == "1")]
+#include "stm32_seq.h"
 [/#if]
 #include "mw_log_conf.h"     /* mw trace conf */
 #include "radio_board_if.h"  /* low layer api (bsp) */
@@ -79,37 +113,47 @@ extern SUBGHZ_HandleTypeDef hsubghz;
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
-[#if ((SUBGHZ_APPLICATION == "LORA_USER_APPLICATION") || (SUBGHZ_APPLICATION == "SUBGHZ_USER_APPLICATION") || (SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION") || (Activate_DEBUG_LINE == "false"))]
+[#if ((Activate_DEBUG_LINE == "false") || (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION") || (SUBGHZ_APPLICATION == "SUBGHZ_USER_APPLICATION") || (SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION"))]
 /* USER CODE BEGIN DBG_GPIO_RADIO */
-#define DBG_GPIO_RADIO_RX(set_rst) /*DBG_GPIO_##set_rst##_LINE(DGB_LINE1_PORT, DGB_LINE1_PIN);*/
-#define DBG_GPIO_RADIO_TX(set_rst) /*DBG_GPIO_##set_rst##_LINE(DGB_LINE2_PORT, DGB_LINE2_PIN);*/
+#define DBG_GPIO_RADIO_RX(set_rst) /*PROBE_GPIO_##set_rst##_LINE(PROBE_LINE1_PORT, PROBE_LINE1_PIN);*/
+#define DBG_GPIO_RADIO_TX(set_rst) /*PROBE_GPIO_##set_rst##_LINE(PROBE_LINE2_PORT, PROBE_LINE2_PIN);*/
 /* USER CODE END DBG_GPIO_RADIO */
 [#else]
 /**
   * @brief Set RX pin to high or low level
   */
-#define DBG_GPIO_RADIO_RX(set_rst) DBG_GPIO_##set_rst##_LINE(DGB_LINE1_PORT, DGB_LINE1_PIN);
+[#if PROBE_LINE["1"] == "1"]
+#define DBG_GPIO_RADIO_RX(set_rst) PROBE_GPIO_##set_rst##_LINE(PROBE_LINE1_PORT, PROBE_LINE1_PIN);
+[#else]
+#define DBG_GPIO_RADIO_RX(set_rst) /*PROBE_GPIO_##set_rst##_LINE(PROBE_LINE1_PORT, PROBE_LINE1_PIN);*/
+[/#if]
 
 /**
   * @brief Set TX pin to high or low level
   */
-#define DBG_GPIO_RADIO_TX(set_rst) DBG_GPIO_##set_rst##_LINE(DGB_LINE2_PORT, DGB_LINE2_PIN);
+[#if PROBE_LINE["2"] == "1"]
+#define DBG_GPIO_RADIO_TX(set_rst) PROBE_GPIO_##set_rst##_LINE(PROBE_LINE2_PORT, PROBE_LINE2_PIN);
+[#else]
+#define DBG_GPIO_RADIO_TX(set_rst) /*PROBE_GPIO_##set_rst##_LINE(PROBE_LINE2_PORT, PROBE_LINE2_PIN);*/
+[/#if]
 [/#if]
 
+[#if CPUCORE == "CM0PLUS"]
 /**
   * @brief Max payload buffer size
   */
 #define RADIO_RX_BUF_SIZE          255
 
-[#if CPUCORE == "CM0PLUS"]
 /**
   * @brief Get the chip revision ID from Mbmux table
   */
 #define LL_DBGMCU_GetRevisionID() MBMUXIF_ChipRevId()
 
 [/#if]
+
 /**
   * @brief drive value used anytime radio is NOT in TX low power mode
+  * @note override the default configuration of radio_driver.c
   */
 #define SMPS_DRIVE_SETTING_DEFAULT  SMPS_DRV_40
 
@@ -117,26 +161,75 @@ extern SUBGHZ_HandleTypeDef hsubghz;
   * @brief drive value used anytime radio is in TX low power mode
   *        TX low power mode is the worst case because the PA sinks from SMPS
   *        while in high power mode, current is sunk directly from the battery
+  * @note override the default configuration of radio_driver.c
   */
 #define SMPS_DRIVE_SETTING_MAX      SMPS_DRV_60
 
 /**
-  * @brief in XO mode, set internal capacitor (from 0x00 to 0x2F starting 11.2pF with 0.47pF steps)
+  * @brief Provides the frequency of the chip running on the radio and the frequency step
+  * @remark These defines are used for computing the frequency divider to set the RF frequency
+  * @note override the default configuration of radio_driver.c
   */
-#define XTAL_DEFAULT_CAP_VALUE      0x20
+#define XTAL_FREQ                   ( 32000000UL )
 
 /**
-  * @brief Frequency error (in Hz) can be compensated here.
-  *        warning XO frequency error generates (de)modulator sampling time error which can not be compensated
+  * @brief in XO mode, set internal capacitor (from 0x00 to 0x2F starting 11.2pF with 0.47pF steps)
+  * @note override the default configuration of radio_driver.c
   */
-#define RF_FREQUENCY_ERROR          ((int32_t) 0)
+#define XTAL_DEFAULT_CAP_VALUE      ( 0x20UL )
 
 /**
   * @brief voltage of vdd tcxo.
+  * @note override the default configuration of radio_driver.c
   */
 #define TCXO_CTRL_VOLTAGE           TCXO_CTRL_1_7V
 
+/**
+  * @brief Radio maximum wakeup time (in ms)
+  * @note override the default configuration of radio_driver.c
+  */
+#define RF_WAKEUP_TIME              ( ${RF_WAKEUP_TIME}UL )
+
+/**
+  * @brief DCDC is enabled
+  * @remark this define is only used if the DCDC is present on the board
+  * @note override the default configuration of radio_driver.c
+  */
+#define DCDC_ENABLE                 ( 1UL )
+
+[#if (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (USER_SUBGHZ_APP == "SUBGHZ_PER")]
+
+/**
+  * @brief enables the RFW module
+  * @note disabled by default
+  */
+#define RFW_ENABLE 1
+
+/**
+  * @brief enables the RFW long packet feature
+  * @note disabled by default
+  */
+#define RFW_LONGPACKET_ENABLE 1
+
+[/#if]
+[#if (SECURE_PROJECTS == "1")]
+#define RADIO_IRQ_PROCESS_INIT()   do{ UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_RadioIrq_Process), UTIL_SEQ_RFU, RadioIrqProcess); \
+                                       UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_RadioRxTimeout_Process), UTIL_SEQ_RFU, RadioOnRxTimeoutProcess);\
+                                       UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_RadioTxTimeout_Process), UTIL_SEQ_RFU, RadioOnTxTimeoutProcess);} while(0)
+
+#define RADIO_IRQ_PROCESS()        do{ UTIL_SEQ_SetTask(1 << CFG_SEQ_Task_RadioIrq_Process, CFG_SEQ_Prio_0); } while(0)
+#define RADIO_RX_TIMEOUT_PROCESS() do{ UTIL_SEQ_SetTask(1 << CFG_SEQ_Task_RadioRxTimeout_Process, CFG_SEQ_Prio_0); } while(0)
+#define RADIO_TX_TIMEOUT_PROCESS() do{ UTIL_SEQ_SetTask(1 << CFG_SEQ_Task_RadioTxTimeout_Process, CFG_SEQ_Prio_0); } while(0)
+
+[/#if]
 /* USER CODE BEGIN EC */
+[#if (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (USER_SUBGHZ_APP == "SUBGHZ_PER") && (FILL_UCS == "true")]
+/**
+  * @brief enables the RFW module log
+  * @note disabled by default
+  */
+#define RWF_MW_LOG_ENABLE
+[/#if]
 
 /* USER CODE END EC */
 
@@ -174,6 +267,11 @@ extern SUBGHZ_HandleTypeDef hsubghz;
   * @brief Memset utilities interface to radio Middleware
   */
 #define RADIO_MEMSET8( dest, value, size )      UTIL_MEM_set_8( dest, value, size )
+
+/**
+  * @brief Memcpy utilities interface to radio Middleware
+  */
+#define RADIO_MEMCPY8( dest, src, size )        UTIL_MEM_cpy_8( dest, src, size )
 
 /* USER CODE BEGIN EM */
 

@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    mw_log_conf.h
@@ -8,32 +9,36 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
-
+/* USER CODE END Header */
 [#--
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
                 ${definition.name}: ${definition.value}
-        [/#list]
-    [/#if]
-[/#list]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 --]
 [#assign MW_LOG_ENABLED = "0"]
 [#assign SUBGHZ_APPLICATION = ""]
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            [#if definition.name == "MW_LOG_ENABLED"]
-                [#if definition.value == "true"]
-          [#assign MW_LOG_ENABLED = "1"]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "MW_LOG_ENABLED"]
+                    [#if definition.value == "true"]
+                        [#assign MW_LOG_ENABLED = "1"]
+                    [/#if]
+                [/#if]
+                [#if definition.name == "SUBGHZ_APPLICATION"]
+                    [#assign SUBGHZ_APPLICATION = definition.value]
+                [/#if]
+            [/#list]
         [/#if]
-            [/#if]
-            [#if definition.name == "SUBGHZ_APPLICATION"]
-                [#assign SUBGHZ_APPLICATION = definition.value]
-            [/#if]
     [/#list]
-    [/#if]
-[/#list]
+[/#if]
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __MW_LOG_CONF_H__
@@ -46,10 +51,8 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 [#if ((SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION"))]
 #include "stm32_adv_trace.h"
-[#else]
-#include "sys_app.h"   /* temporary w.a waiting Ticket 92161 resolution */
-[/#if]
 
+[/#if]
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */

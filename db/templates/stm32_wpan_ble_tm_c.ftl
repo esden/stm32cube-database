@@ -149,11 +149,7 @@ void TM_Init( void  )
 
 
   ipccdba = READ_BIT( FLASH->IPCCBR, FLASH_IPCCBR_IPCCDBA );
-[#if DIE == "DIE494"]
-  p_RefTable = (MB_RefTable_t*)((ipccdba<<2) + (SRAM_BASE + 0x00030000));
-[#else]
   p_RefTable = (MB_RefTable_t*)((ipccdba<<2) + SRAM2A_BASE);
-[/#if]
 
   tl_ble_init_conf.p_cmdbuffer = (uint8_t*)&BleCmdBuffer;
   tl_ble_init_conf.p_AclDataBuffer = HciAclDataBuffer;
@@ -497,11 +493,7 @@ void shci_send( uint16_t cmd_code, uint8_t len_cmd_payload, uint8_t * p_cmd_payl
   MB_RefTable_t * p_ref_table;
 
   ipccdba = READ_BIT( FLASH->IPCCBR, FLASH_IPCCBR_IPCCDBA );
-[#if DIE == "DIE494"]
-  p_ref_table = (MB_RefTable_t*)((ipccdba<<2) + (SRAM_BASE + 0x00030000));
-[#else]
   p_ref_table = (MB_RefTable_t*)((ipccdba<<2) + SRAM2A_BASE);
-[/#if]
 
   SysLocalCmdStatus = 1;
 

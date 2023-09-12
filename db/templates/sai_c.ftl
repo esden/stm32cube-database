@@ -50,12 +50,6 @@
   [/#if]
 [/#list]
 
-[#if useGpio]
-#include "gpio.h"
-[/#if]
-[#if useDma]
-#include "dma.h"
-[/#if]
 [#-- End Define includes --]
 
 [#-- Function getInitServiceMode --]
@@ -120,46 +114,51 @@
 [/#if]
 [#if serviceName=="dmaA" && dmaServiceA??]
  [#assign instanceIndex =""]
-    [#list dmaServiceA as dmaconfig] 
-     [@common.generateConfigModelCode configModel=dmaconfig inst=ipName  nTab=tabN index="" mode="type"/]
+    [#list dmaServiceA as dmaconfig]        
+        [@common.generateConfigModelCode configModel=dmaconfig inst=ipName  nTab=tabN index="" mode="type"/]
         [#assign dmaCurrentRequest = dmaconfig.dmaRequestName?lower_case]
         [#assign prefixList = dmaCurrentRequest?split("_")]
-        [#list prefixList as p][#assign prefix= p][/#list]        
-      [#if dmaconfig.dmaHandel?size > 1] [#-- if more than one dma handler--]
-        [#assign channel="channel"]
-        [#if (FamilyName=="STM32F2" || FamilyName=="STM32F4" || FamilyName=="STM32F7")]
-          [#assign channel="stream"]
+        [#list prefixList as p][#assign prefix= p][/#list]   
+        [#if dmaconfig.dmaVersion?? && dmaconfig.dmaVersion!="DMA3"]
+            [#if dmaconfig.dmaHandel?size > 1] [#-- if more than one dma handler--]
+                [#assign channel="channel"]
+                [#if (FamilyName=="STM32F2" || FamilyName=="STM32F4" || FamilyName=="STM32F7")]
+                  [#assign channel="stream"]
+                [/#if]
+                #t#t/* Several peripheral DMA handle pointers point to the same DMA handle.
+                #t#t   Be aware that there is only one ${channel} to perform all the requested DMAs. */
+                [#list dmaconfig.dmaHandel as dmaH]
+                    #t#t__HAL_LINKDMA(${instHandler},${dmaH},hdma_${dmaconfig.dmaRequestName?lower_case});
+                [/#list]
+            [#else] [#-- if one dma handler--]
+                #t#t__HAL_LINKDMA(${instHandler},[#if dmaconfig.dmaHandel??]${dmaconfig.dmaHandel}[#else]hdma${prefix}[/#if],hdma_${dmaconfig.dmaRequestName?lower_case});#n
+            [/#if]   [#-- if more than one dma handler--]  
         [/#if]
-#t#t/* Several peripheral DMA handle pointers point to the same DMA handle.
-#t#t   Be aware that there is only one ${channel} to perform all the requested DMAs. */
-                            [#list dmaconfig.dmaHandel as dmaH]
-#t#t__HAL_LINKDMA(${instHandler},${dmaH},hdma_${dmaconfig.dmaRequestName?lower_case});
-                            [/#list]
-                        [#else] [#-- if one dma handler--]
-#t#t__HAL_LINKDMA(${instHandler},[#if dmaconfig.dmaHandel??]${dmaconfig.dmaHandel}[#else]hdma${prefix}[/#if],hdma_${dmaconfig.dmaRequestName?lower_case});#n
-                        [/#if]   [#-- if more than one dma handler--]        [/#list] [#-- list dmaService as dmaconfig --]
+    [/#list] [#-- list dmaService as dmaconfig --]
 [/#if]
 [#if serviceName=="dmaB" && dmaServiceB??]
  [#assign instanceIndex =""]
-    [#list dmaServiceB as dmaconfig] 
-     [@common.generateConfigModelCode configModel=dmaconfig inst=ipName  nTab=tabN index="" mode="type"/]
+    [#list dmaServiceB as dmaconfig]        
+        [@common.generateConfigModelCode configModel=dmaconfig inst=ipName  nTab=tabN index="" mode="type"/]
         [#assign dmaCurrentRequest = dmaconfig.dmaRequestName?lower_case]
         [#assign prefixList = dmaCurrentRequest?split("_")]
         [#list prefixList as p][#assign prefix= p][/#list]
-        
-       [#if dmaconfig.dmaHandel?size > 1] [#-- if more than one dma handler--]
-        [#assign channel="channel"]
-        [#if (FamilyName=="STM32F2" || FamilyName=="STM32F4" || FamilyName=="STM32F7")]
-          [#assign channel="stream"]
+        [#if dmaconfig.dmaVersion?? && dmaconfig.dmaVersion!="DMA3"]
+            [#if dmaconfig.dmaHandel?size > 1] [#-- if more than one dma handler--]
+                [#assign channel="channel"]
+                [#if (FamilyName=="STM32F2" || FamilyName=="STM32F4" || FamilyName=="STM32F7")]
+                  [#assign channel="stream"]
+                [/#if]
+                #t#t/* Several peripheral DMA handle pointers point to the same DMA handle.
+                #t#t   Be aware that there is only one ${channel} to perform all the requested DMAs. */
+                [#list dmaconfig.dmaHandel as dmaH]
+                    #t#t__HAL_LINKDMA(${instHandler},${dmaH},hdma_${dmaconfig.dmaRequestName?lower_case});
+                [/#list]
+            [#else] [#-- if one dma handler--]
+                #t#t__HAL_LINKDMA(${instHandler},[#if dmaconfig.dmaHandel??]${dmaconfig.dmaHandel}[#else]hdma${prefix}[/#if],hdma_${dmaconfig.dmaRequestName?lower_case});#n
+            [/#if]   [#-- if more than one dma handler--]  
         [/#if]
-#t#t/* Several peripheral DMA handle pointers point to the same DMA handle.
-#t#t   Be aware that there is only one ${channel} to perform all the requested DMAs. */
-                            [#list dmaconfig.dmaHandel as dmaH]
-#t#t__HAL_LINKDMA(${instHandler},${dmaH},hdma_${dmaconfig.dmaRequestName?lower_case});
-                            [/#list]
-                        [#else] [#-- if one dma handler--]
-#t#t__HAL_LINKDMA(${instHandler},[#if dmaconfig.dmaHandel??]${dmaconfig.dmaHandel}[#else]hdma${prefix}[/#if],hdma_${dmaconfig.dmaRequestName?lower_case});#n
-                        [/#if]   [#-- if more than one dma handler--]           [/#list] [#-- list dmaService as dmaconfig --]
+    [/#list] [#-- list dmaService as dmaconfig --]
 [/#if]
 [/#macro]
 [#-- End macro generateConfigCode --]
@@ -237,7 +236,7 @@
         [/#list]
         [/#if] 
 [#if gpioExistA]
- #t#tif(hsai->Instance==${ipName}_Block_A)  
+ #t#tif(saiHandle->Instance==${ipName}_Block_A)  
 #t#t{    
     [#if serviceType=="Init"]  #t#t/* ${ipName} clock enable */
 
@@ -329,7 +328,7 @@
 [/#if]
 
 [#if gpioExistB]
-#t#tif(hsai->Instance==${ipName}_Block_B)
+#t#tif(saiHandle->Instance==${ipName}_Block_B)
 #t#t{
     [#if serviceType=="Init"]  #t#t#t/* ${ipName} clock enable */
 
@@ -499,11 +498,11 @@ static uint32_t ${saiInst}_client =0;
 [/#list]
 [#assign mode=entry.key?replace("_MspInit","")?replace("_BspInit","")?replace("HAL_","")]
 
-[#assign ipHandler = "h" + mode?lower_case]
+[#assign ipHandler = mode?lower_case+"Handle"]
 
 
 [#-- #nvoid HAL_${mode}_MspInit(${mode}_HandleTypeDef* h${mode?lower_case}){--] 
-#nvoid ${entry.key}(${mode}_HandleTypeDef* h${mode?lower_case})
+#nvoid ${entry.key}(${mode}_HandleTypeDef* ${mode?lower_case}Handle)
 {
 #n
 [#-- Search for static variables Start--]
@@ -699,9 +698,9 @@ static uint32_t ${saiInst}_client =0;
 [#list ipvar.deInitCallBacks.entrySet() as entry]
 [#assign instanceList = entry.value]
 [#assign mode=entry.key?replace("_MspDeInit","")?replace("_BspDeInit","")?replace("HAL_","")]
-[#assign ipHandler = "h" + mode?lower_case]
+[#assign ipHandler = mode?lower_case+"Handle"]
 
-#nvoid ${entry.key}(${mode}_HandleTypeDef* h${mode?lower_case})
+#nvoid ${entry.key}(${mode}_HandleTypeDef* ${mode?lower_case}Handle)
 [#assign words = instanceList]
 {
 #n

@@ -1,24 +1,29 @@
 [#ftl]
 [#--
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
                 ${definition.name}: ${definition.value}
-        [/#list]
-    [/#if]
-[/#list]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 --]
 [#assign CPUCORE = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")]
 [#assign SUBGHZ_APPLICATION = ""]
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            [#if definition.name == "SUBGHZ_APPLICATION"]
-                [#assign SUBGHZ_APPLICATION = definition.value]
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "SUBGHZ_APPLICATION"]
+                    [#assign SUBGHZ_APPLICATION = definition.value]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
 [#if ((SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE") || (SUBGHZ_APPLICATION == "LORA_USER_APPLICATION"))]
@@ -38,6 +43,8 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
+
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __APP_VERSION_H__
 #define __APP_VERSION_H__
@@ -59,7 +66,7 @@ extern "C" {
 
 /* Exported constants --------------------------------------------------------*/
 #define __APP_VERSION_MAIN   (0x01U) /*!< [31:24] main version */
-#define __APP_VERSION_SUB1   (0x00U) /*!< [23:16] sub1 version */
+#define __APP_VERSION_SUB1   (0x01U) /*!< [23:16] sub1 version */
 #define __APP_VERSION_SUB2   (0x00U) /*!< [15:8]  sub2 version */
 #define __APP_VERSION_RC     (0x00U) /*!< [7:0]  release candidate */
 
@@ -130,7 +137,7 @@ extern "C" {
   */
 #define __CM0_APP_VERSION             __APP_VERSION
     [/#if]
-[#elseif (SUBGHZ_APPLICATION == "SUBGHZ_PINGPONG") || (SUBGHZ_APPLICATION == "SUBGHZ_USER_APPLICATION")]
+[#elseif (SUBGHZ_APPLICATION == "SUBGHZ_ADV_APPLICATION") || (SUBGHZ_APPLICATION == "SUBGHZ_USER_APPLICATION")]
     [#if (CPUCORE == "CM4")]
 /**
   * @brief Subghz_Phy CM4 application version

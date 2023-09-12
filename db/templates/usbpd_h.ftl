@@ -32,8 +32,14 @@
 /* USER CODE BEGIN 1 */
 /* USER CODE END 1 */
 
+unsigned int USBPD_PreInitOs(void);
+
 /* USBPD init function */
+[#if THREADX??]
+unsigned int    MX_USBPD_Init(void *memory_ptr);
+[#else]
 void            MX_USBPD_Init(void);
+[/#if]
 [#if GUI_INTERFACE??]
 const uint8_t*  BSP_GetBoardName(void);
 const uint8_t*  BSP_GetBoardID(void);

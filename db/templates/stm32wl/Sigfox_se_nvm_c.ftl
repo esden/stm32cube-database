@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    se_nvm.c
@@ -8,31 +9,30 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 [#--
-********************************
-SWIP Data:
 [#if SWIPdatas??]
-  [#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-Defines:
-      [#list SWIP.defines as definition]
-        ${definition.name}: ${definition.value}
-      [/#list]
-    [/#if]
-  [/#list]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                ${definition.name}: ${definition.value}
+            [/#list]
+        [/#if]
+    [/#list]
 [/#if]
-********************************
 --]
 [#assign SUBGHZ_APPLICATION = ""]
-[#list SWIPdatas as SWIP]
-  [#if SWIP.defines??]
-    [#list SWIP.defines as definition]
-            [#if definition.name == "SUBGHZ_APPLICATION"]
-                [#assign SUBGHZ_APPLICATION = definition.value]
-            [/#if]
-        [/#list]
-  [/#if]
-[/#list]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "SUBGHZ_APPLICATION"]
+                    [#assign SUBGHZ_APPLICATION = definition.value]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 
 /* Includes ------------------------------------------------------------------*/
 #include <stdint.h>

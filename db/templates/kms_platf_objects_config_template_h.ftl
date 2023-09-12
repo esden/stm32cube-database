@@ -57,6 +57,9 @@ extern "C" {
 #define KMS_INDEX_MIN_NVM_DYNAMIC_OBJECTS            50UL   /*!< NVM dynamic objects min ID */
 #define KMS_INDEX_MAX_NVM_DYNAMIC_OBJECTS            69UL   /*!< NVM dynamic objects max ID */
 
+#define KMS_INDEX_MIN_VM_DYNAMIC_OBJECTS             50UL   /*!< VM dynamic objects min ID */
+#define KMS_INDEX_MAX_VM_DYNAMIC_OBJECTS             69UL   /*!< VM dynamic objects max ID */
+
 /* When EXTERNAL TOKEN is not supported the below values can be commented */
 #define KMS_INDEX_MIN_EXT_TOKEN_STATIC_OBJECTS        70UL  /*!< External token static objects min ID */
 #define KMS_INDEX_MAX_EXT_TOKEN_STATIC_OBJECTS        89UL  /*!< External token static objects max ID */

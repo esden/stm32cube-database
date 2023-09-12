@@ -108,14 +108,10 @@ void USBPD_TaskUser(void);
 #else
 #define DPM_STACK_SIZE_ADDON_FOR_CMSIS              4
 #endif /* osCMSIS < 0x20000U */
-[#if !USBPDCORE_LIB_NO_PD]
+
 #define FREERTOS_PE_PRIORITY                    osPriorityAboveNormal
-[#if USBPDCORE_LIB_NO_PD]
 #define FREERTOS_PE_STACK_SIZE                  (350 * DPM_STACK_SIZE_ADDON_FOR_CMSIS)
-[#else]
-#define FREERTOS_PE_STACK_SIZE                  (200 * DPM_STACK_SIZE_ADDON_FOR_CMSIS)
-[/#if]
-[/#if]
+
 #define FREERTOS_CAD_PRIORITY                   osPriorityRealtime
 #define FREERTOS_CAD_STACK_SIZE                 (300 * DPM_STACK_SIZE_ADDON_FOR_CMSIS)
 
@@ -538,7 +534,7 @@ void USBPD_DPM_Run(void)
   UTIL_SEQ_SetTask(TASK_CAD,  0);
   UTIL_TIMER_Create(&TimerCAD, 10, UTIL_TIMER_ONESHOT, TimerCADfunction, NULL);
 
-#if !defined(USBPDCORE_LIB_NO_PD)
+[#if !USBPDCORE_LIB_NO_PD]
   UTIL_SEQ_RegTask(TASK_PE_0, 0,  USBPD_PE_Task_P0);
   UTIL_SEQ_PauseTask(TASK_PE_0);
   UTIL_TIMER_Create(&TimerPE0, 10, UTIL_TIMER_ONESHOT, TimerPE0function, NULL);
@@ -547,7 +543,7 @@ void USBPD_DPM_Run(void)
   UTIL_SEQ_PauseTask(TASK_PE_1);
   UTIL_TIMER_Create(&TimerPE1, 10, UTIL_TIMER_ONESHOT, TimerPE1function, NULL);
 #endif /* USBPD_PORT_COUNT == 2 */
-#endif /* !USBPDCORE_LIB_NO_PD */
+[/#if] /* !USBPDCORE_LIB_NO_PD */
 
   UTIL_SEQ_RegTask(TASK_USER, 0, USBPD_TaskUser);
   UTIL_SEQ_SetTask(TASK_USER,  0);

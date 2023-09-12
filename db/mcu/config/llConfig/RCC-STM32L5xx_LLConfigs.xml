@@ -295,13 +295,13 @@
             <CallLibMethod Name="LL_RCC_ConfigSecure">
                 <MethodArg Name="Configuration" ParameterName="ItemSECPRIV"/>
             </CallLibMethod>
-        <Else>
-            <IFCondition Expression ="S_SECURE">
-                <CallLibMethod Name="LL_RCC_ConfigSecure">
-                    <MethodArg Name="Configuration" ParameterName="ItemSEC"/>
-                </CallLibMethod>
-            </IFCondition>
-        </Else>                  
+            <Else>
+                <IFCondition Expression ="S_SECURE">
+                    <CallLibMethod Name="LL_RCC_ConfigSecure">
+                        <MethodArg Name="Configuration" ParameterName="ItemSEC"/>
+                    </CallLibMethod>
+                </IFCondition>
+            </Else>                  
         </IFCondition>
     </RefConfig>
 
@@ -321,33 +321,116 @@
             <CallLibMethod Name="HardCode:RTC" Type="HardCode">
                 <HardCode Text="#tif(LL_RCC_GetRTCClockSource() != LL_RCC_RTC_CLKSOURCE_LSI)#n#t{"/>
             </CallLibMethod>
-        <Else>
-            <IFCondition Expression ="RTCUsed_ForRCC &amp; RTCSourceLSE">
-                <CallLibMethod Name="HardCode:RTC" Type="HardCode">
-                    <HardCode Text="#tif(LL_RCC_GetRTCClockSource() != LL_RCC_RTC_CLKSOURCE_LSE)#n#t{"/>
-                </CallLibMethod>
-                <Else>
-                    <IFCondition Expression ="RTCUsed_ForRCC &amp; RTCSourceHSE">
-                        <CallLibMethod Name="HardCode:RTC" Type="HardCode">
-                            <HardCode Text="#tif(LL_RCC_GetRTCClockSource() != LL_RCC_RTC_CLKSOURCE_HSE_DIV32)#n#t{"/>
+            <Else>
+                <IFCondition Expression ="RTCUsed_ForRCC &amp; RTCSourceLSE">                    
+                    <CallLibMethod Name="HardCode:RTC" Type="HardCode">
+                        <HardCode Text="#tif(LL_RCC_GetRTCClockSource() != LL_RCC_RTC_CLKSOURCE_LSE)#n#t{"/>
+                    </CallLibMethod>
+                    <CallLibMethod Name="HardCode:RTC" Type="HardCode">
+                        <HardCode Text="#t#tFlagStatus       pwrclkchanged = RESET;"/>
+                    </CallLibMethod>
+                    <CallLibMethod Name="HardCode:RTC" Type="HardCode">
+                        <HardCode Text="#t#t/* Update LSE configuration in Backup Domain control register    */"/>
+                    </CallLibMethod>
+                    <CallLibMethod Name="HardCode:RTC" Type="HardCode">
+                        <HardCode Text="#t#t/* Requires to enable write access to Backup Domain if necessary */"/>
+                    </CallLibMethod>
+                
+                    <CallLibMethod Name="HardCode:RTC" Type="HardCode">
+                        <HardCode Text="#t#tif (LL_APB1_GRP1_IsEnabledClock (LL_APB1_GRP1_PERIPH_PWR) != 1U)#n#t#t{"/>
+                    </CallLibMethod>
+                    <CallLibMethod Name="HardCode:RTC" Type="HardCode">
+                        <HardCode Text="#t#t#t/* Enables the PWR Clock and Enables access to the backup domain */"/>
+                    </CallLibMethod>
+                    <CallLibMethod Name="HardCode:RTC" Type="HardCode">
+                        <HardCode Text="#t#t#tLL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_PWR);"/>
+                    </CallLibMethod>
+                    <CallLibMethod Name="HardCode:RTC" Type="HardCode">
+                        <HardCode Text="#t#t#tpwrclkchanged = SET;#n#t#t}"/>
+                    </CallLibMethod>
+                    <CallLibMethod Name="HardCode:RTC" Type="HardCode">
+                        <HardCode Text="#t#tif (LL_PWR_IsEnabledBkUpAccess () != 1U)#n#t#t{"/>
+                    </CallLibMethod>
+                    <CallLibMethod Name="HardCode:RTC" Type="HardCode">
+                        <HardCode Text="#t#t#t/* Enable write access to Backup domain */"/>
+                    </CallLibMethod>
+                    <CallLibMethod Name="HardCode:RTC" Type="HardCode">
+                        <HardCode Text="#t#t#tLL_PWR_EnableBkUpAccess();"/>
+                    </CallLibMethod>
+                    <CallLibMethod Name="HardCode:RTC" Type="HardCode">
+                        <HardCode Text="#t#t#twhile (LL_PWR_IsEnabledBkUpAccess () == 0U)#n#t#t#t{#n#t#t#t}#n#t#t}"/>
+                    </CallLibMethod>
+                    <Else>
+                        <IFCondition Expression ="RTCUsed_ForRCC &amp; RTCSourceHSE">
+                            <CallLibMethod Name="HardCode:RTC" Type="HardCode">
+                                <HardCode Text="#tif(LL_RCC_GetRTCClockSource() != LL_RCC_RTC_CLKSOURCE_HSE_DIV32)#n#t{"/>
                             </CallLibMethod>
-                    </IFCondition>
-                </Else>
-            </IFCondition>
-        </Else>
+                        </IFCondition>
+                    </Else>
+                </IFCondition>
+            </Else>
         </IFCondition>
 
         <IFCondition Expression ="RTCUsed_ForRCC">
-            <CallLibMethod Name="#tLL_RCC_ForceBackupDomainReset">
+            <CallLibMethod Name="HardCode:RTC" Type="HardCode">
+                <HardCode Text="#t#tLL_RCC_ForceBackupDomainReset();"/>
             </CallLibMethod>
 
-            <CallLibMethod Name="#tLL_RCC_ReleaseBackupDomainReset">
+            <CallLibMethod Name="HardCode:RTC" Type="HardCode">
+                <HardCode Text="#t#tLL_RCC_ReleaseBackupDomainReset();"/>
             </CallLibMethod>
         </IFCondition>
+        
+        <IFCondition Expression ="RTCUsed_ForRCC &amp; LSEByPass &amp; RTCSourceLSE">
+            <CallLibMethod Name="HardCode:RTC" Type="HardCode">
+                <HardCode Text="#t#tLL_RCC_LSE_EnableBypass();"/>
+            </CallLibMethod>
+        </IFCondition>
+        
+        <IFCondition Expression ="RTCUsed_ForRCC &amp; (LSEOscillator | LSEOscillatorRTC) &amp; RTCSourceLSE">
+            <CallLibMethod Name="LL_RCC_LSE_SetDriveCapability">
+                <MethodArg Name="LSEDrive" ParameterName="LSE_Drive_Capability"/>
+            </CallLibMethod>
+        
+        </IFCondition>
 
-        <IFCondition Expression ="RTCUsed_ForRCC|LCDUsed_ForRCC">
-            <CallLibMethod Name="#tLL_RCC_SetRTCClockSource">
-                <MethodArg Name="Source" ParameterName="RTCClockSelection"/>
+        <IFCondition Expression ="RTCUsed_ForRCC &amp; RTCSourceLSE">
+            <CallLibMethod Name="HardCode:RTC" Type="HardCode">
+                <HardCode Text="#t#tLL_RCC_LSE_Enable();"/>
+            </CallLibMethod>
+
+            <CallLibMethod Name="HardCode:RTC" Type="HardCode">
+                <HardCode Text="#n#t /* Wait till LSE is ready */#n#t#twhile(LL_RCC_LSE_IsReady() != 1)#n#t#t{#n#t#t}"/>
+            </CallLibMethod>
+        </IFCondition>
+       
+        <IFCondition Expression ="RTCUsed_ForRCC &amp; RTCSourceLSI">
+            <CallLibMethod Name="HardCode:RTC" Type="HardCode">
+                <HardCode Text="#t#tLL_RCC_SetRTCClockSource(LL_RCC_RTC_CLKSOURCE_LSI);"/>
+            </CallLibMethod>
+            <Else>
+                <IFCondition Expression ="RTCUsed_ForRCC &amp; RTCSourceLSE">                
+                    <CallLibMethod Name="HardCode:RTC" Type="HardCode">
+                        <HardCode Text="#t#tLL_RCC_SetRTCClockSource(LL_RCC_RTC_CLKSOURCE_LSE);"/>
+                    </CallLibMethod>
+                <Else>
+                    <IFCondition Expression ="RTCUsed_ForRCC &amp; RTCSourceHSE">
+                        <CallLibMethod Name="HardCode:RTC" Type="HardCode">
+                            <HardCode Text="#t#tLL_RCC_SetRTCClockSource(LL_RCC_RTC_CLKSOURCE_HSE_DIV32);"/>
+                        </CallLibMethod>
+                    </IFCondition>
+                </Else>
+                </IFCondition>
+            </Else>
+        </IFCondition>
+        
+        
+         <IFCondition Expression ="RTCUsed_ForRCC &amp; RTCSourceLSE  ">
+            <CallLibMethod Name="HardCode:RTC" Type="HardCode">
+                <HardCode Text="#t#t/* Restore clock configuration if changed */"/>
+            </CallLibMethod>
+            <CallLibMethod Name="HardCode:RTC" Type="HardCode">
+                <HardCode Text="#t#tif (pwrclkchanged == SET)#n#t#t{#n#t#t#tLL_APB1_GRP1_DisableClock(LL_APB1_GRP1_PERIPH_PWR);#n#t#t}"/>
             </CallLibMethod>
         </IFCondition>
         <IFCondition Expression ="RTCUsed_ForRCC">
@@ -370,7 +453,7 @@
 
         <IFCondition Expression ="USART2Used_ForRCC">
             <CallLibMethod Name="LL_RCC_SetUSARTClockSource">
-                <MethodArg Name="USARTxSource" ParameterName="USART2CLockSelection"/>
+                <MethodArg Name="USARTxSource" ParameterName="USART2CL qockSelection"/>
             </CallLibMethod>
         </IFCondition>
 
@@ -780,7 +863,7 @@
         <Argument AddressOf="false" GenericType="simple" Name="DFSDMxSource"/>
     </LibMethod>
 	
-    <LibMethod Comment="" Name="#tLL_RCC_SetRTCClockSource">
+    <LibMethod Comment="" Name="LL_RCC_SetRTCClockSource">
         <Argument AddressOf="false" GenericType="simple" Name="Source"/>
     </LibMethod>
 	

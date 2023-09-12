@@ -28,43 +28,45 @@
   ******************************************************************************
  */
 [#--
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
                 ${definition.name}: ${definition.value}
-        [/#list]
-    [/#if]
-[/#list]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 --]
 [#assign LORAWAN_PUBLIC_NETWORK = ""]
 [#assign LORAWAN_NETWORK_ID = ""]
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            [#if definition.name == "LORAWAN_PUBLIC_NETWORK"]
-                [#assign LORAWAN_PUBLIC_NETWORK = definition.value]
-            [/#if]
-            [#if definition.name == "LORAWAN_NETWORK_ID"]
-                [#assign LORAWAN_NETWORK_ID = definition.value]
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "LORAWAN_PUBLIC_NETWORK"]
+                    [#assign LORAWAN_PUBLIC_NETWORK = definition.value]
+                [/#if]
+                [#if definition.name == "LORAWAN_NETWORK_ID"]
+                    [#assign LORAWAN_NETWORK_ID = definition.value]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
+
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __COMMISSIONING_H__
 #define __COMMISSIONING_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 /*!
  ******************************************************************************
  ********************************** WARNING ***********************************
  ******************************************************************************
 
- The LoRaWAN AES128 keys are stored and provisionned on secure-elements.
+ The LoRaWAN AES128 keys are stored and provisioned on secure-elements.
 
- This project providdes a software emulated secure-element.
+ This project provides a software emulated secure-element.
  The LoRaWAN AES128 keys SHALL be updated under
  src/peripherals/<secure-element name>-se\se-identity.h file.
 
@@ -104,9 +106,5 @@ extern "C" {
 /* USER CODE BEGIN EC2 */
 
 /* USER CODE END EC2 */
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* __COMMISSIONING_H__ */

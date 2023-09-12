@@ -1,5 +1,6 @@
 [#ftl]
 [#assign CPUCORE = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    mbmuxif_kms.h
@@ -9,6 +10,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __MBMUXIF_KMS_${CPUCORE}_H__

@@ -238,7 +238,7 @@
                                                 [/#if]
                                                 [#-- [#assign arg = "" + adr + fargument.name] --]
                                                 [#--if (!method.name?contains("Init")&&fargument.context=="global")--]
-                                                [#if (fargument.init=="false")] [#-- MZA add the field init for Argument object, if init is false the intialization of this argument is not done --]
+                                                [#if (fargument.init=="false")] [#-- MZA add the field init for Argument object, if init is false the initialization of this argument is not done --]
                                                         [#-- do Nothing --]
                                                 [#else]
                                                         [#list fargument.argument as argument]

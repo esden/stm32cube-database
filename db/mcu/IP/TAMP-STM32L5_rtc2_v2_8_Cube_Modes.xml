@@ -19,6 +19,16 @@
         <PossibleValue Comment="Tamper activated after 4 consecutive samples" Value="RTC_TAMPERFILTER_4SAMPLE"/>
         <PossibleValue Comment="Tamper activated after 8 consecutive samples" Value="RTC_TAMPERFILTER_8SAMPLE"/>
     </RefParameter>
+    <RefParameter Comment="Tamper state" DefaultValue="TAMP_PRIVILEGE_FULL_YES"  Group="Privilege Tamper" TabName="TZSC Privilegeable TAMP"  Name="tampPrivilegeFull" Type="list" >
+        <PossibleValue Comment=" Fully privilege" Value="TAMP_PRIVILEGE_FULL_YES" />
+        <PossibleValue Comment=" Non-privilege" Value="TAMP_PRIVILEGE_FULL_NO" />  
+    </RefParameter>
+    <RefParameter Comment="Monotonic Counter Privilege" DefaultValue="TAMP_MONOTONIC_CNT_PRIVILEGE_NO"  Group="Privilege Tamper" TabName="TZSC Privilegeable TAMP"  Name="MonotonicCounterPrivilege" Type="list" >
+         <Condition Diagnostic="" Expression="STM32U5"/>
+        <PossibleValue Comment=" Privileged " Value="TAMP_MONOTONIC_CNT_PRIVILEGE_YES" />
+        <PossibleValue Comment=" Not privileged" Value="TAMP_MONOTONIC_CNT_PRIVILEGE_NO" />
+
+    </RefParameter>
     
     <RefParameter Comment="Tamper1" DefaultValue="RTC_ATAMP_ENABLE" Group="Tamper1" Name="Enable1" Type="String" >
         <Condition Diagnostic="" Expression="Semaphore_ActiveTamper1"/>
@@ -105,18 +115,24 @@
         <PossibleValue Comment="Mask Flag Disabled" Value="RTC_TAMPERMASK_FLAG_DISABLE"/>
     </RefParameter-->
 	
-    <RefParameter Comment="Tamper1_Mask_Flag" DefaultValue="RTC_TAMPERMASK_FLAG_DISABLE" Group="Tamper1" Name="MaskFlag_1" Type="list">
-        <Condition Diagnostic="" Expression="Tamper1_ON &amp;(RTC_IRQn | TAMP_STAMP_IRQn |TAMP_IRQn)"/>
+   <RefParameter Comment="Tamper1_Mask_Flag" DefaultValue="RTC_TAMPERMASK_FLAG_DISABLE" Group="Tamper1" Name="MaskFlag_1" Type="list">
+        <Condition Diagnostic="" Expression="Tamper1_ON &amp;(RTC_IRQn | TAMP_STAMP_IRQn | (TAMP_IRQn))"/>
         <PossibleValue Comment="Mask Flag Disabled" Value="RTC_TAMPERMASK_FLAG_DISABLE"/>
     </RefParameter>
-   
     <RefParameter Comment="Tamper1_Mask_Flag" DefaultValue="RTC_TAMPERMASK_FLAG_DISABLE" Group="Tamper1" Name="MaskFlag_10" Type="list">
         <Condition Diagnostic="" Expression="Semaphore_ActiveTamper1"/>
         <PossibleValue Comment="Mask Flag Disabled" Value="RTC_TAMPERMASK_FLAG_DISABLE"/>
         <PossibleValue Comment="Mask Flag Enabled" Value="RTC_TAMPERMASK_FLAG_ENABLE"/>
     </RefParameter>
+	
+    <RefParameter Comment="Tamper1_Mask_Flag" DefaultValue="RTC_TAMPERMASK_FLAG_DISABLE" Group="Tamper1" Name="MaskFlag_1" Type="list">
+        <Condition Diagnostic="" Expression="Tamper1_ON"/>
+        <PossibleValue Comment="Mask Flag Disabled" Value="RTC_TAMPERMASK_FLAG_DISABLE"/>
+        <PossibleValue Comment="Mask Flag Enabled" Value="RTC_TAMPERMASK_FLAG_ENABLE"/>
+    </RefParameter>
     <RefParameter Comment="Tamper1_Mask_Flag" DefaultValue="null" Group="Tamper1" Name="MaskFlag_1" Type="list" Visible="false">
-        <Condition Diagnostic="" Expression="Tamper1_ON "/>
+                <Condition Diagnostic="" Expression="Tamper1_ON "/>
+
     </RefParameter>
     <RefParameter Comment="Active AsyncPrescaler" DefaultValue="RTC_ATAMP_ASYNCPRES_RTCCLK" Group="Active tamper signals" Name="ActiveAsyncPrescaler" Type="list">
         <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
@@ -171,6 +187,13 @@
         <PossibleValue Comment="Secure  " Value="TAMP_SECURE_FULL_YES"  /> 
         <PossibleValue Comment="Non-secure  " Value="TAMP_SECURE_FULL_NO" />
     </RefParameter>
+     <RefParameter Comment="Monotonic Counter Secure" DefaultValue="TAMP_MONOTONIC_CNT_SECURE_NO"  Group="Tamper TZEN=1  " TabName="TZSC Securable TAMP"  Name="MonotonicCounterSecure" Type="list" >
+         <Condition Diagnostic="" Expression="S_SECURE &amp; STM32U5"/>
+        <PossibleValue Comment="Non-secure " Value="TAMP_MONOTONIC_CNT_SECURE_NO" />
+        <PossibleValue Comment="Secure" Value="TAMP_MONOTONIC_CNT_SECURE_YES" />
+    </RefParameter>
+    <RefParameter Comment="Monotonic Counter Secure" DefaultValue="null"  Group="Tamper TZEN=1  " TabName="TZSC Securable TAMP"  Name="MonotonicCounterSecure" Type="list"  Visible="false">     
+    </RefParameter>
     <RefParameter Comment="Tamper1_Interrupt_mode" DefaultValue="RTC_ATAMP_INTERRUPT_DISABLE" Group="Tamper1" Name="Interrupt1" Type="list">
         <Condition Expression="Tamper1_ON &amp; Semaphore_ActiveTamper1" Diagnostic="" />
         <PossibleValue Comment="Enable" Value="RTC_ATAMP_INTERRUPT_ENABLE"/>
@@ -182,6 +205,10 @@
         <PossibleValue Value="__NULL" Comment="__NULL"/>
     </RefParameter>
    
+    <RefParameter Comment="Tamper1_Active_Input_Output" DefaultValue="__NULL" Group="Tamper1" Name="Output1" Type="list" Visible="false">
+        <PossibleValue Value="__NULL" Comment="__NULL"/>
+        <Condition Expression="!Tamper1_ON |!Semaphore_ActiveTamper1" Diagnostic="" />
+    </RefParameter>
   
     <RefParameter Comment="Tamper1_Active_Input_Output" DefaultValue="RTC_ATAMP_1" Group="Tamper1" Name="Output1" Type="list">
         <Condition Expression="Semaphore_ActiveTamper1 &amp; (LQFP48|LQFP64|UFQFPN48|WLCSP81|UFB)"   Diagnostic="" /> 
@@ -212,6 +239,30 @@
         <PossibleValue Comment="Tamper 6" Value="RTC_ATAMP_6" Condition="!Tamper6_OUTPUT" Diagnostic="Available when Active Output6 is enabled"/> 
     </RefParameter>
     <RefParameter Comment="Tamper1_Active_Input_Output" DefaultValue="RTC_ATAMP_1" Group="Tamper1" Name="Output1" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper1 &amp; UFBGA132|WLCSP90 &amp; STM32U5" Diagnostic="" />
+        <PossibleValue Comment="Tamper 1" Value="RTC_ATAMP_1" Condition="!Tamper1_OUTPUT" Diagnostic="Available when Active Output1 is enabled" />  
+        <PossibleValue Comment="Tamper 2" Value="RTC_ATAMP_2" Condition="!Tamper2_OUTPUT" Diagnostic="Available when Active Output2 is enabled"/> 
+        <PossibleValue Comment="Tamper 3" Value="RTC_ATAMP_3" Condition="!Tamper3_OUTPUT"  Diagnostic="Available when Active Output3 is enabled"/>  
+        <PossibleValue Comment="Tamper 4" Value="RTC_ATAMP_4" Condition="!Tamper4_OUTPUT" Diagnostic="Available when Active Output4 is enabled"/> 
+        <PossibleValue Comment="Tamper 5" Value="RTC_ATAMP_5" Condition="!Tamper5_OUTPUT"  Diagnostic="Available when Active Output5 is enabled"/>  
+        <PossibleValue Comment="Tamper 6" Value="RTC_ATAMP_6" Condition="!Tamper6_OUTPUT" Diagnostic="Available when Active Output6 is enabled"/> 
+        <PossibleValue Comment="Tamper 7" Value="RTC_ATAMP_7" Condition="!Tamper7_OUTPUT"  Diagnostic="Available when Active Output7 is enabled"/>  
+        <PossibleValue Comment="Tamper 8" Value="RTC_ATAMP_8" Condition="!Tamper8_OUTPUT" Diagnostic="Available when Active Output8 is enabled"/> 
+        
+    </RefParameter>
+    <RefParameter Comment="Tamper1_Active_Input_Output" DefaultValue="RTC_ATAMP_1" Group="Tamper1" Name="Output1" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper1 &amp; UFBGA169 &amp; STM32U5" Diagnostic="" />
+        <PossibleValue Comment="Tamper 1" Value="RTC_ATAMP_1" Condition="!Tamper1_OUTPUT" Diagnostic="Available when Active Output1 is enabled" />  
+        <PossibleValue Comment="Tamper 2" Value="RTC_ATAMP_2" Condition="!Tamper2_OUTPUT" Diagnostic="Available when Active Output2 is enabled"/> 
+        <PossibleValue Comment="Tamper 3" Value="RTC_ATAMP_3" Condition="!Tamper3_OUTPUT"  Diagnostic="Available when Active Output3 is enabled"/>  
+        <PossibleValue Comment="Tamper 4" Value="RTC_ATAMP_4" Condition="!Tamper4_OUTPUT" Diagnostic="Available when Active Output4 is enabled"/> 
+        <PossibleValue Comment="Tamper 5" Value="RTC_ATAMP_5" Condition="!Tamper5_OUTPUT"  Diagnostic="Available when Active Output5 is enabled"/>  
+        <PossibleValue Comment="Tamper 6" Value="RTC_ATAMP_6" Condition="!Tamper6_OUTPUT" Diagnostic="Available when Active Output6 is enabled"/> 
+        <PossibleValue Comment="Tamper 7" Value="RTC_ATAMP_7" Condition="!Tamper7_OUTPUT"  Diagnostic="Available when Active Output7 is enabled"/>  
+        <PossibleValue Comment="Tamper 8" Value="RTC_ATAMP_8" Condition="!Tamper8_OUTPUT" Diagnostic="Available when Active Output8 is enabled"/> 
+        
+    </RefParameter>
+    <RefParameter Comment="Tamper1_Active_Input_Output" DefaultValue="RTC_ATAMP_1" Group="Tamper1" Name="Output1" Type="list">
         <Condition Expression="Semaphore_ActiveTamper1 &amp; UFBGA132" Diagnostic="" />
         <PossibleValue Comment="Tamper 1" Value="RTC_ATAMP_1" Condition="!Tamper1_OUTPUT" Diagnostic="Available when Active Output1 is enabled" />  
         <PossibleValue Comment="Tamper 2" Value="RTC_ATAMP_2" Condition="!Tamper2_OUTPUT" Diagnostic="Available when Active Output2 is enabled"/> 
@@ -225,11 +276,6 @@
     <RefParameter Comment="Tamper1_Active_Input_Output" DefaultValue="null" Group="Tamper1" Name="Output1" Type="list" Visible="false"/>
     <!-- ################################## Tamper 2 ##################################################-->
    
-    <RefParameter Comment="State" DefaultValue="TAMP_SECURE_FULL_NO" Group="Tamper TZEN=1  "  Name="tampSecureFull" TabName="TZSC Securable RTC" Type="list">
-        <Condition Expression="S_SECURE"   Diagnostic=" Specifies If the TAMP is fully secured or not" />
-        <PossibleValue Comment="Secure  " Value="TAMP_SECURE_FULL_YES"  /> 
-        <PossibleValue Comment="Non-secure  " Value="TAMP_SECURE_FULL_NO" />
-    </RefParameter>
     <RefParameter Comment="Tamper" DefaultValue="RTC_TAMPER_2" Group="Tamper2" Name="Tamper_2" Type="list" Visible="false">
         <PossibleValue Comment="Tamper 2" Value="RTC_TAMPER_2"/>
     </RefParameter>
@@ -377,7 +423,34 @@
 
         <PossibleValue Value="__NULL" Comment="__NULL"/>
     </RefParameter>
-       
+    <RefParameter Comment="Tamper2_Active_Input_Output" DefaultValue="__NULL" Group="Tamper2" Name="Output2" Type="list" Visible="false">
+        <PossibleValue Value="__NULL" Comment="__NULL"/>
+        <Condition Expression="!Tamper2_ON|!Semaphore_ActiveTamper2" Diagnostic="" />
+    </RefParameter>
+    <RefParameter Comment="Tamper2_Active_Input_Output" DefaultValue="RTC_ATAMP_1" Group="Tamper2" Name="Output2" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper2 &amp; UFBGA169|WLCSP90 &amp; STM32U5" Diagnostic="" />
+        <PossibleValue Comment="Tamper 1" Value="RTC_ATAMP_1" Condition="!Tamper1_OUTPUT" Diagnostic="Available when Active Output1 is enabled" />  
+        <PossibleValue Comment="Tamper 2" Value="RTC_ATAMP_2" Condition="!Tamper2_OUTPUT" Diagnostic="Available when Active Output2 is enabled"/> 
+        <PossibleValue Comment="Tamper 3" Value="RTC_ATAMP_3" Condition="!Tamper3_OUTPUT"  Diagnostic="Available when Active Output3 is enabled"/>  
+        <PossibleValue Comment="Tamper 4" Value="RTC_ATAMP_4" Condition="!Tamper4_OUTPUT" Diagnostic="Available when Active Output4 is enabled"/> 
+        <PossibleValue Comment="Tamper 5" Value="RTC_ATAMP_5" Condition="!Tamper5_OUTPUT"  Diagnostic="Available when Active Output5 is enabled"/>  
+        <PossibleValue Comment="Tamper 6" Value="RTC_ATAMP_6" Condition="!Tamper6_OUTPUT" Diagnostic="Available when Active Output6 is enabled"/> 
+        <PossibleValue Comment="Tamper 7" Value="RTC_ATAMP_7" Condition="!Tamper7_OUTPUT"  Diagnostic="Available when Active Output7 is enabled"/>  
+        <PossibleValue Comment="Tamper 8" Value="RTC_ATAMP_8" Condition="!Tamper8_OUTPUT" Diagnostic="Available when Active Output8 is enabled"/> 
+        
+    </RefParameter>
+       <RefParameter Comment="Tamper2_Active_Input_Output" DefaultValue="RTC_ATAMP_1" Group="Tamper2" Name="Output2" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper2 &amp; UFBGA132 &amp; STM32U5" Diagnostic="" />
+        <PossibleValue Comment="Tamper 1" Value="RTC_ATAMP_1" Condition="!Tamper1_OUTPUT" Diagnostic="Available when Active Output1 is enabled" />  
+        <PossibleValue Comment="Tamper 2" Value="RTC_ATAMP_2" Condition="!Tamper2_OUTPUT" Diagnostic="Available when Active Output2 is enabled"/> 
+        <PossibleValue Comment="Tamper 3" Value="RTC_ATAMP_3" Condition="!Tamper3_OUTPUT"  Diagnostic="Available when Active Output3 is enabled"/>  
+        <PossibleValue Comment="Tamper 4" Value="RTC_ATAMP_4" Condition="!Tamper4_OUTPUT" Diagnostic="Available when Active Output4 is enabled"/> 
+        <PossibleValue Comment="Tamper 5" Value="RTC_ATAMP_5" Condition="!Tamper5_OUTPUT"  Diagnostic="Available when Active Output5 is enabled"/>  
+        <PossibleValue Comment="Tamper 6" Value="RTC_ATAMP_6" Condition="!Tamper6_OUTPUT" Diagnostic="Available when Active Output6 is enabled"/> 
+        <PossibleValue Comment="Tamper 7" Value="RTC_ATAMP_7" Condition="!Tamper7_OUTPUT"  Diagnostic="Available when Active Output7 is enabled"/>  
+        <PossibleValue Comment="Tamper 8" Value="RTC_ATAMP_8" Condition="!Tamper8_OUTPUT" Diagnostic="Available when Active Output8 is enabled"/> 
+        
+    </RefParameter>
    
     <RefParameter Comment="Tamper2_Active_Input_Output" DefaultValue="RTC_ATAMP_2" Group="Tamper2" Name="Output2" Type="list">
         <Condition Expression="Semaphore_ActiveTamper2 &amp; (LQFP48|LQFP64|UFQFPN48|WLCSP81)" Diagnostic="" />
@@ -420,11 +493,6 @@
     </RefParameter>
     <!-- ################################## Tamper 3 ##################################################-->
   
-    <RefParameter Comment="State" DefaultValue="TAMP_SECURE_FULL_NO" Group="Tamper TZEN=1  "  Name="tampSecureFull" TabName="TZSC Securable RTC" Type="list">
-        <Condition Expression="S_SECURE"   Diagnostic=" Specifies If the TAMP is fully secured or not" />
-        <PossibleValue Comment="Secure  " Value="TAMP_SECURE_FULL_YES"  /> 
-        <PossibleValue Comment="Non-secure  " Value="TAMP_SECURE_FULL_NO" />
-    </RefParameter>
     <RefParameter Comment="Tamper" DefaultValue="RTC_TAMPER_3" Group="Tamper3" Name="Tamper_3" Type="list" Visible="false">
         <PossibleValue Comment="Tamper 3" Value="RTC_TAMPER_3"/>
     </RefParameter>
@@ -572,7 +640,22 @@
         <Condition Expression="Semaphore_ActiveTamper3" Diagnostic="" />
         <PossibleValue Value="__NULL" Comment="__NULL"/>
     </RefParameter>
-    
+      <RefParameter Comment="Tamper3_Active_Input_Output" DefaultValue="__NULL" Group="Tamper3" Name="Output3" Type="list" Visible="false">
+        <PossibleValue Value="__NULL" Comment="__NULL"/>
+        <Condition Expression="!Tamper3_ON|!Semaphore_ActiveTamper3" Diagnostic="" />
+    </RefParameter>
+    <RefParameter Comment="Tamper3_Active_Input_Output" DefaultValue="RTC_ATAMP_1" Group="Tamper3" Name="Output3" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper3 &amp; UFBGA132|UFBGA169|WLCSP90 &amp; STM32U5" Diagnostic="" />
+        <PossibleValue Comment="Tamper 1" Value="RTC_ATAMP_1" Condition="!Tamper1_OUTPUT" Diagnostic="Available when Active Output1 is enabled" />  
+        <PossibleValue Comment="Tamper 2" Value="RTC_ATAMP_2" Condition="!Tamper2_OUTPUT" Diagnostic="Available when Active Output2 is enabled"/> 
+        <PossibleValue Comment="Tamper 3" Value="RTC_ATAMP_3" Condition="!Tamper3_OUTPUT"  Diagnostic="Available when Active Output3 is enabled"/>  
+        <PossibleValue Comment="Tamper 4" Value="RTC_ATAMP_4" Condition="!Tamper4_OUTPUT" Diagnostic="Available when Active Output4 is enabled"/> 
+        <PossibleValue Comment="Tamper 5" Value="RTC_ATAMP_5" Condition="!Tamper5_OUTPUT"  Diagnostic="Available when Active Output5 is enabled"/>  
+        <PossibleValue Comment="Tamper 6" Value="RTC_ATAMP_6" Condition="!Tamper6_OUTPUT" Diagnostic="Available when Active Output6 is enabled"/> 
+        <PossibleValue Comment="Tamper 7" Value="RTC_ATAMP_7" Condition="!Tamper7_OUTPUT"  Diagnostic="Available when Active Output7 is enabled"/>  
+        <PossibleValue Comment="Tamper 8" Value="RTC_ATAMP_8" Condition="!Tamper8_OUTPUT" Diagnostic="Available when Active Output8 is enabled"/> 
+        
+    </RefParameter>
      <RefParameter Comment="Tamper3_Active_Input_Output" DefaultValue="RTC_ATAMP_1" Group="Tamper3" Name="Output3" Type="list">
         <Condition Expression="Semaphore_ActiveTamper3 &amp;  (LQFP48|LQFP64|UFQFPN48|WLCSP81)" Diagnostic="" />
 
@@ -615,11 +698,7 @@
     
     <!-- ################################## Tamper 4 ##################################################-->
     
-    <RefParameter Comment="State" DefaultValue="TAMP_SECURE_FULL_NO" Group="Tamper TZEN=1  "  Name="tampSecureFull" TabName="TZSC Securable RTC" Type="list">
-        <Condition Expression="S_SECURE"   Diagnostic=" Specifies If the TAMP is fully secured or not" />
-        <PossibleValue Comment="Secure  " Value="TAMP_SECURE_FULL_YES"  /> 
-        <PossibleValue Comment="Non-secure  " Value="TAMP_SECURE_FULL_NO" />
-    </RefParameter>
+  
     <RefParameter Comment="Tamper" DefaultValue="RTC_TAMPER_4" Group="Tamper4" Name="Tamper_4" Type="list" Visible="false">
         <PossibleValue Comment="Tamper 4" Value="RTC_TAMPER_4"/>
     </RefParameter>
@@ -682,10 +761,10 @@
         <Condition Expression="Semaphore_PassiveTamper4" Diagnostic="" />
         <PossibleValue Comment="Passive Input" Value="RTC_ATAMP_DISABLE"/>    
     </RefParameter>
- <RefParameter Comment="Tamper4" DefaultValue="RTC_ATAMP_ENABLE" Group="Tamper4" Name="Enable40" Type="list">
-        <Condition Expression="Tamper4_ON &amp; Semaphore_PassiveTamper4" Diagnostic="" />
+  <RefParameter Comment="Tamper4" DefaultValue="RTC_ATAMP_ENABLE" Group="Tamper4" Name="Enable40" Type="list">
+        <Condition Expression="Tamper4_ON &amp; Semaphore_ActiveTamper4" Diagnostic="" />
         <PossibleValue Comment="Active Input" Value="RTC_ATAMP_ENABLE"  />
-    </RefParameter>    
+    </RefParameter>  
    <RefParameter Comment="Tamper4_NoErase" DefaultValue="RTC_TAMPER_ERASE_BACKUP_ENABLE" Group="Tamper4" Name="NoErase_4" Type="list">
         <Condition Expression="Tamper4_ON" Diagnostic="" />
         <PossibleValue Comment="Erase Enabled" Value="RTC_TAMPER_ERASE_BACKUP_ENABLE"/>
@@ -752,9 +831,21 @@
         <PossibleValue Value="__NULL" Comment="__NULL"/>
     </RefParameter>
     
-    <RefParameter Comment="Tamper4_Active_Input_Output" DefaultValue="__NULL" Group="Tamper4" Name="Output4" Type="list">
+    <RefParameter Comment="Tamper4_Active_Input_Output" DefaultValue="__NULL" Group="Tamper4" Name="Output4" Type="list" Visible="false">
         <PossibleValue Value="__NULL" Comment="__NULL"/>
-        <Condition Expression="!Tamper4_ON &amp; Semaphore_ActiveTamper4" Diagnostic="" />
+        <Condition Expression="!Tamper4_ON|!Semaphore_ActiveTamper4" Diagnostic="" />
+    </RefParameter>
+    <RefParameter Comment="Tamper4_Active_Input_Output" DefaultValue="RTC_ATAMP_4" Group="Tamper4" Name="Output4" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper4 &amp; UFBGA132|UFBGA169|WLCSP90 &amp; STM32U5" Diagnostic="" />
+        <PossibleValue Comment="Tamper 1" Value="RTC_ATAMP_1" Condition="!Tamper1_OUTPUT" Diagnostic="Available when Active Output1 is enabled" />  
+        <PossibleValue Comment="Tamper 2" Value="RTC_ATAMP_2" Condition="!Tamper2_OUTPUT" Diagnostic="Available when Active Output2 is enabled"/> 
+        <PossibleValue Comment="Tamper 3" Value="RTC_ATAMP_3" Condition="!Tamper3_OUTPUT"  Diagnostic="Available when Active Output3 is enabled"/>  
+        <PossibleValue Comment="Tamper 4" Value="RTC_ATAMP_4" Condition="!Tamper4_OUTPUT" Diagnostic="Available when Active Output4 is enabled"/> 
+        <PossibleValue Comment="Tamper 5" Value="RTC_ATAMP_5" Condition="!Tamper5_OUTPUT"  Diagnostic="Available when Active Output5 is enabled"/>  
+        <PossibleValue Comment="Tamper 6" Value="RTC_ATAMP_6" Condition="!Tamper6_OUTPUT" Diagnostic="Available when Active Output6 is enabled"/> 
+        <PossibleValue Comment="Tamper 7" Value="RTC_ATAMP_7" Condition="!Tamper7_OUTPUT"  Diagnostic="Available when Active Output7 is enabled"/>  
+        <PossibleValue Comment="Tamper 8" Value="RTC_ATAMP_8" Condition="!Tamper8_OUTPUT" Diagnostic="Available when Active Output8 is enabled"/> 
+        
     </RefParameter>
     <RefParameter Comment="Tamper4_Active_Input_Output" DefaultValue="RTC_ATAMP_4" Group="Tamper4" Name="Output4" Type="list">
         <Condition Expression="Semaphore_ActiveTamper4 &amp;  (LQFP48|LQFP64|UFQFPN48|WLCSP81)" Diagnostic="" />
@@ -798,11 +889,6 @@
    
     <!-- ################################## Tamper 5 ##################################################-->
  
-    <RefParameter Comment="State" DefaultValue="TAMP_SECURE_FULL_NO" Group="Tamper TZEN=1  "  Name="tampSecureFull" TabName="TZSC Securable RTC" Type="list">
-        <Condition Expression="S_SECURE"   Diagnostic=" Specifies If the TAMP is fully secured or not" />
-        <PossibleValue Comment="Secure  " Value="TAMP_SECURE_FULL_YES"  /> 
-        <PossibleValue Comment="Non-secure  " Value="TAMP_SECURE_FULL_NO" />
-    </RefParameter>
     <RefParameter Comment="Tamper" DefaultValue="RTC_TAMPER_5" Group="Tamper5" Name="Tamper_5" Type="list" Visible="false">
         <PossibleValue Comment="Tamper 5" Value="RTC_TAMPER_5"/>
     </RefParameter>
@@ -931,13 +1017,28 @@
 
         <PossibleValue Value="__NULL" Comment="__NULL"/>
     </RefParameter>
-   
+   <RefParameter Comment="Tamper5_Active_Input_Output" DefaultValue="__NULL" Group="Tamper5" Name="Output5" Type="list" Visible="false">
+        <PossibleValue Value="__NULL" Comment="__NULL"/>
+        <Condition Expression="!Tamper5_ON|!Semaphore_ActiveTamper5" Diagnostic="" />
+    </RefParameter>
      <RefParameter Comment="Tamper5_Active_Input_Output" DefaultValue="RTC_ATAMP_1" Group="Tamper5" Name="Output5" Type="list">
         <Condition Expression="Semaphore_ActiveTamper5 &amp;  (LQFP48|LQFP64|UFQFPN48|WLCSP81)" Diagnostic="" />
 
        <PossibleValue Comment="Tamper 1" Value="RTC_ATAMP_1" Condition="!Tamper1_OUTPUT" Diagnostic="Available when Active Output1 is enabled" />  
         <PossibleValue Comment="Tamper 2" Value="RTC_ATAMP_2" Condition="!Tamper2_OUTPUT" Diagnostic="Available when Active Output2 is enabled"/> 
         <PossibleValue Comment="Tamper 4" Value="RTC_ATAMP_4" Condition="!Tamper4_OUTPUT" Diagnostic="Available when Active Output4 is enabled"/> 
+        
+    </RefParameter>
+     <RefParameter Comment="Tamper5_Active_Input_Output" DefaultValue="RTC_ATAMP_1" Group="Tamper5" Name="Output5" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper5 &amp; UFBGA132|UFBGA169|WLCSP90 &amp; STM32U5" Diagnostic="" />
+        <PossibleValue Comment="Tamper 1" Value="RTC_ATAMP_1" Condition="!Tamper1_OUTPUT" Diagnostic="Available when Active Output1 is enabled" />  
+        <PossibleValue Comment="Tamper 2" Value="RTC_ATAMP_2" Condition="!Tamper2_OUTPUT" Diagnostic="Available when Active Output2 is enabled"/> 
+        <PossibleValue Comment="Tamper 3" Value="RTC_ATAMP_3" Condition="!Tamper3_OUTPUT"  Diagnostic="Available when Active Output3 is enabled"/>  
+        <PossibleValue Comment="Tamper 4" Value="RTC_ATAMP_4" Condition="!Tamper4_OUTPUT" Diagnostic="Available when Active Output4 is enabled"/> 
+        <PossibleValue Comment="Tamper 5" Value="RTC_ATAMP_5" Condition="!Tamper5_OUTPUT"  Diagnostic="Available when Active Output5 is enabled"/>  
+        <PossibleValue Comment="Tamper 6" Value="RTC_ATAMP_6" Condition="!Tamper6_OUTPUT" Diagnostic="Available when Active Output6 is enabled"/> 
+        <PossibleValue Comment="Tamper 7" Value="RTC_ATAMP_7" Condition="!Tamper7_OUTPUT"  Diagnostic="Available when Active Output7 is enabled"/>  
+        <PossibleValue Comment="Tamper 8" Value="RTC_ATAMP_8" Condition="!Tamper8_OUTPUT" Diagnostic="Available when Active Output8 is enabled"/> 
         
     </RefParameter>
      <RefParameter Comment="Tamper5_Active_Input_Output" DefaultValue="RTC_ATAMP_5" Group="Tamper5" Name="Output5" Type="list">
@@ -973,11 +1074,6 @@
     </RefParameter>
     <!-- ################################## Tamper 6 ##################################################-->
  
-    <RefParameter Comment="State" DefaultValue="TAMP_SECURE_FULL_NO" Group="Tamper TZEN=1  "  Name="tampSecureFull" TabName="TZSC Securable RTC" Type="list">
-        <Condition Expression="S_SECURE"   Diagnostic=" Specifies If the TAMP is fully secured or not" />
-        <PossibleValue Comment="Secure  " Value="TAMP_SECURE_FULL_YES"  /> 
-        <PossibleValue Comment="Non-secure  " Value="TAMP_SECURE_FULL_NO" />
-    </RefParameter>
     <RefParameter Comment="Tamper" DefaultValue="RTC_TAMPER_6" Group="Tamper6" Name="Tamper_6" Type="list" Visible="false">
         <PossibleValue Comment="Tamper 6" Value="RTC_TAMPER_6"/>
     </RefParameter>
@@ -1104,6 +1200,10 @@
         <PossibleValue Value="__NULL" Comment="__NULL"/>
     </RefParameter>
    
+    <RefParameter Comment="Tamper6_Active_Input_Output" DefaultValue="__NULL" Group="Tamper6" Name="Output6" Type="list" Visible="false">
+        <PossibleValue Value="__NULL" Comment="__NULL"/>
+        <Condition Expression="!Tamper6_ON|!Semaphore_ActiveTamper6" Diagnostic="" />
+    </RefParameter>
    
     <RefParameter Comment="Tamper6_Active_Input_Output" DefaultValue="RTC_ATAMP_6" Group="Tamper6" Name="Output6" Type="list">
         <Condition Expression="Semaphore_ActiveTamper6 &amp;  (LQFP48|LQFP64|UFQFPN48|WLCSP81)" Diagnostic="" />
@@ -1111,6 +1211,18 @@
           <PossibleValue Comment="Tamper 1" Value="RTC_ATAMP_1" Condition="!Tamper1_OUTPUT" Diagnostic="Available when Active Output1 is enabled" />  
         <PossibleValue Comment="Tamper 2" Value="RTC_ATAMP_2" Condition="!Tamper2_OUTPUT" Diagnostic="Available when Active Output2 is enabled"/> 
         <PossibleValue Comment="Tamper 4" Value="RTC_ATAMP_4" Condition="!Tamper4_OUTPUT" Diagnostic="Available when Active Output4 is enabled"/>
+        
+    </RefParameter>
+    <RefParameter Comment="Tamper6_Active_Input_Output" DefaultValue="RTC_ATAMP_1" Group="Tamper6" Name="Output6" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper6 &amp; UFBGA132|UFBGA169|WLCSP90 &amp; STM32U5" Diagnostic="" />
+        <PossibleValue Comment="Tamper 1" Value="RTC_ATAMP_1" Condition="!Tamper1_OUTPUT" Diagnostic="Available when Active Output1 is enabled" />  
+        <PossibleValue Comment="Tamper 2" Value="RTC_ATAMP_2" Condition="!Tamper2_OUTPUT" Diagnostic="Available when Active Output2 is enabled"/> 
+        <PossibleValue Comment="Tamper 3" Value="RTC_ATAMP_3" Condition="!Tamper3_OUTPUT"  Diagnostic="Available when Active Output3 is enabled"/>  
+        <PossibleValue Comment="Tamper 4" Value="RTC_ATAMP_4" Condition="!Tamper4_OUTPUT" Diagnostic="Available when Active Output4 is enabled"/> 
+        <PossibleValue Comment="Tamper 5" Value="RTC_ATAMP_5" Condition="!Tamper5_OUTPUT"  Diagnostic="Available when Active Output5 is enabled"/>  
+        <PossibleValue Comment="Tamper 6" Value="RTC_ATAMP_6" Condition="!Tamper6_OUTPUT" Diagnostic="Available when Active Output6 is enabled"/> 
+        <PossibleValue Comment="Tamper 7" Value="RTC_ATAMP_7" Condition="!Tamper7_OUTPUT"  Diagnostic="Available when Active Output7 is enabled"/>  
+        <PossibleValue Comment="Tamper 8" Value="RTC_ATAMP_8" Condition="!Tamper8_OUTPUT" Diagnostic="Available when Active Output8 is enabled"/> 
         
     </RefParameter>
     <RefParameter Comment="Tamper6_Active_Input_Output" DefaultValue="RTC_ATAMP_6" Group="Tamper6" Name="Output6" Type="list">
@@ -1145,12 +1257,7 @@
         
     </RefParameter>
     <!-- ################################## Tamper 7 ##################################################-->
-   
-    <RefParameter Comment="State" DefaultValue="TAMP_SECURE_FULL_NO" Group="Tamper TZEN=1  "  Name="tampSecureFull" TabName="TZSC Securable RTC" Type="list">
-        <Condition Expression="S_SECURE"   Diagnostic=" Specifies If the TAMP is fully secured or not" />
-        <PossibleValue Comment="Secure  " Value="TAMP_SECURE_FULL_YES"  /> 
-        <PossibleValue Comment="Non-secure  " Value="TAMP_SECURE_FULL_NO" />
-    </RefParameter>
+  
     <RefParameter Comment="Tamper" DefaultValue="RTC_TAMPER_7" Group="Tamper7" Name="Tamper_7" Type="list" Visible="false">
         <PossibleValue Comment="Tamper 7" Value="RTC_TAMPER_7"/>
     </RefParameter>
@@ -1253,7 +1360,7 @@
     </RefParameter>
     
     <RefParameter Comment="Tamper7" DefaultValue="RTC_ATAMP_ENABLE" Group="Tamper7" Name="Enable70" Type="list">
-        <Condition Expression="Tamper7_ON &amp; Semaphore_PassiveTamper7" Diagnostic="" />
+        <Condition Expression="Tamper7_ON &amp; Semaphore_ActiveTamper7" Diagnostic="" />
         <PossibleValue Comment="Active Input" Value="RTC_ATAMP_ENABLE"  />
     </RefParameter>
     <RefParameter Name="Seed_Size0" Comment="Seed[0]" DefaultValue="0x00000000" Min="0x00000000" Max="0xFFFFFFFF"  Type="hex"  Group="Active tamper signals"   >
@@ -1279,6 +1386,10 @@
 
         <PossibleValue Value="__NULL" Comment="__NULL"/>
     </RefParameter>
+    <RefParameter Comment="Tamper7_Active_Input_Output" DefaultValue="__NULL" Group="Tamper7" Name="Output7" Type="list" Visible="false">
+        <PossibleValue Value="__NULL" Comment="__NULL"/>
+        <Condition Expression="!Tamper7_ON|!Semaphore_ActiveTamper7" Diagnostic="" />
+    </RefParameter>
     <RefParameter Comment="Tamper7_Active_Input_Output" DefaultValue="RTC_ATAMP_7" Group="Tamper7" Name="Output7" Type="list">
         <Condition Expression="Semaphore_ActiveTamper7 &amp;  (LQFP48|LQFP64|UFQFPN48|WLCSP81)" Diagnostic="" />
 
@@ -1287,6 +1398,18 @@
         <PossibleValue Comment="Tamper 4" Value="RTC_ATAMP_4" Condition="!Tamper4_OUTPUT" Diagnostic="Available when Active Output4 is enabled"/> 
         <PossibleValue Comment="Tamper 6" Value="RTC_ATAMP_6" Condition="!Tamper6_OUTPUT" Diagnostic="Available when Active Output6 is enabled"/> 
        
+    </RefParameter>
+    <RefParameter Comment="Tamper7_Active_Input_Output" DefaultValue="RTC_ATAMP_1" Group="Tamper7" Name="Output7" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper7 &amp; UFBGA132|UFBGA169|WLCSP90 &amp; STM32U5" Diagnostic="" />
+        <PossibleValue Comment="Tamper 1" Value="RTC_ATAMP_1" Condition="!Tamper1_OUTPUT" Diagnostic="Available when Active Output1 is enabled" />  
+        <PossibleValue Comment="Tamper 2" Value="RTC_ATAMP_2" Condition="!Tamper2_OUTPUT" Diagnostic="Available when Active Output2 is enabled"/> 
+        <PossibleValue Comment="Tamper 3" Value="RTC_ATAMP_3" Condition="!Tamper3_OUTPUT"  Diagnostic="Available when Active Output3 is enabled"/>  
+        <PossibleValue Comment="Tamper 4" Value="RTC_ATAMP_4" Condition="!Tamper4_OUTPUT" Diagnostic="Available when Active Output4 is enabled"/> 
+        <PossibleValue Comment="Tamper 5" Value="RTC_ATAMP_5" Condition="!Tamper5_OUTPUT"  Diagnostic="Available when Active Output5 is enabled"/>  
+        <PossibleValue Comment="Tamper 6" Value="RTC_ATAMP_6" Condition="!Tamper6_OUTPUT" Diagnostic="Available when Active Output6 is enabled"/> 
+        <PossibleValue Comment="Tamper 7" Value="RTC_ATAMP_7" Condition="!Tamper7_OUTPUT"  Diagnostic="Available when Active Output7 is enabled"/>  
+        <PossibleValue Comment="Tamper 8" Value="RTC_ATAMP_8" Condition="!Tamper8_OUTPUT" Diagnostic="Available when Active Output8 is enabled"/> 
+        
     </RefParameter>
     <RefParameter Comment="Tamper7_Active_Input_Output" DefaultValue="RTC_ATAMP_7" Group="Tamper7" Name="Output7" Type="list">
         <Condition Expression="Semaphore_ActiveTamper7 &amp; LQFP144" Diagnostic="" />
@@ -1321,11 +1444,6 @@
     </RefParameter>
     <!-- ################################## Tamper 8 ##################################################-->
  
-    <RefParameter Comment="State" DefaultValue="TAMP_SECURE_FULL_NO" Group="Tamper TZEN=1  "  Name="tampSecureFull" TabName="TZSC Securable RTC" Type="list">
-        <Condition Expression="S_SECURE"   Diagnostic=" Specifies If the TAMP is fully secured or not" />
-        <PossibleValue Comment="Secure  " Value="TAMP_SECURE_FULL_YES"  /> 
-        <PossibleValue Comment="Non-secure  " Value="TAMP_SECURE_FULL_NO" />
-    </RefParameter>
     <RefParameter Comment="Tamper" DefaultValue="RTC_TAMPER_8" Group="Tamper8" Name="Tamper_8" Type="list" Visible="false">
         <PossibleValue Comment="Tamper 8" Value="RTC_TAMPER_8"/>
     </RefParameter>
@@ -1348,16 +1466,16 @@
     </RefParameter>
     
     <RefParameter Comment="Tamper8" DefaultValue="RTC_ATAMP_ENABLE" Group="Tamper8" Name="Enable80" Type="list">
-        <Condition Expression="Tamper8_ON &amp; Semaphore_PassiveTamper8" Diagnostic="" />
+        <Condition Expression="Tamper8_ON &amp; Semaphore_ActiveTamper8" Diagnostic="" />
         <PossibleValue Comment="Active Input" Value="RTC_ATAMP_ENABLE"  />
     </RefParameter>    
      <RefParameter Comment="Tamper8_Interrupt_mode" DefaultValue="RTC_ATAMP_INTERRUPT_DISABLE" Group="Tamper8" Name="Interrupt8" Type="list">
-        <Condition Expression="Semaphore_PassiTamper8" Diagnostic="" />
+        <Condition Expression="Tamper8_ON &amp;  Semaphore_ActiveTamper8" Diagnostic="" />
         <PossibleValue Comment="Enable" Value="RTC_ATAMP_INTERRUPT_ENABLE"/>
         <PossibleValue Comment="Disable" Value="RTC_ATAMP_INTERRUPT_DISABLE"/>
     </RefParameter>
     <RefParameter Comment="Interrupt8" DefaultValue="__NULL" Group="Tamper8" Name="Interrupt8" Type="list">
-        <Condition Expression="Semaphore_PassiTamper8" Diagnostic="" />
+        <Condition Expression="Semaphore_ActiveTamper8" Diagnostic="" />
         <PossibleValue Value="__NULL" Comment="__NULL"/>
     </RefParameter>
     
@@ -1452,7 +1570,10 @@
     <RefParameter Name="Seed_Size3" Comment="Seed[3]" DefaultValue="0x00000000" Min="0x00000000" Max="0xFFFFFFFF"  Type="hex" Group="Active tamper signals"   >
         <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
     </RefParameter>
-    
+    <RefParameter Comment="Tamper8_Active_Input_Output" DefaultValue="RTC_ATAMP_8" Group="Tamper8" Name="Output8" Type="list" Visible="false">
+        <PossibleValue Value="__NULL" Comment="__NULL"/>
+        <Condition Expression="!Tamper8_ON|!Semaphore_ActiveTamper8" Diagnostic="" />
+    </RefParameter>
     <RefParameter Comment="Tamper8_Active_Input_Output" DefaultValue="RTC_ATAMP_8" Group="Tamper8" Name="Output8" Type="list">
         <Condition Expression="Semaphore_ActiveTamper8 &amp; (LQFP48|LQFP64|UFQFPN48|WLCSP81)" Diagnostic="" />
 
@@ -1462,7 +1583,18 @@
       
        
     </RefParameter>
-    
+    <RefParameter Comment="Tamper8_Active_Input_Output" DefaultValue="RTC_ATAMP_1" Group="Tamper8" Name="Output8" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper8 &amp; UFBGA132|UFBGA169|WLCSP90 &amp; STM32U5" Diagnostic="" />
+        <PossibleValue Comment="Tamper 1" Value="RTC_ATAMP_1" Condition="!Tamper1_OUTPUT" Diagnostic="Available when Active Output1 is enabled" />  
+        <PossibleValue Comment="Tamper 2" Value="RTC_ATAMP_2" Condition="!Tamper2_OUTPUT" Diagnostic="Available when Active Output2 is enabled"/> 
+        <PossibleValue Comment="Tamper 3" Value="RTC_ATAMP_3" Condition="!Tamper3_OUTPUT"  Diagnostic="Available when Active Output3 is enabled"/>  
+        <PossibleValue Comment="Tamper 4" Value="RTC_ATAMP_4" Condition="!Tamper4_OUTPUT" Diagnostic="Available when Active Output4 is enabled"/> 
+        <PossibleValue Comment="Tamper 5" Value="RTC_ATAMP_5" Condition="!Tamper5_OUTPUT"  Diagnostic="Available when Active Output5 is enabled"/>  
+        <PossibleValue Comment="Tamper 6" Value="RTC_ATAMP_6" Condition="!Tamper6_OUTPUT" Diagnostic="Available when Active Output6 is enabled"/> 
+        <PossibleValue Comment="Tamper 7" Value="RTC_ATAMP_7" Condition="!Tamper7_OUTPUT"  Diagnostic="Available when Active Output7 is enabled"/>  
+        <PossibleValue Comment="Tamper 8" Value="RTC_ATAMP_8" Condition="!Tamper8_OUTPUT" Diagnostic="Available when Active Output8 is enabled"/> 
+        
+    </RefParameter>
     <RefParameter Comment="Tamper8_Active_Input_Output" DefaultValue="RTC_ATAMP_8" Group="Tamper8" Name="Output8" Type="list">
         <Condition Expression="Semaphore_ActiveTamper8 &amp; LQFP144" Diagnostic="" />
 
@@ -1495,10 +1627,7 @@
         
     </RefParameter>
     
-    <RefParameter Comment="Tamper state" DefaultValue="RTC_PRIVILEGE_FULL_NO" Group="Privilege Tamper" TabName="TZSC Privilegeable TAMP"  Name="tampPrivilegeFull" Type="list">
-        <PossibleValue Comment=" Fully privilege " Value="TAMP_PRIVILEGE_FULL_YES" />
-        <PossibleValue Comment=" Non-privilege " Value="TAMP_PRIVILEGE_FULL_NO" />  
-    </RefParameter>
+      
     
     <!-- ################################## Tamper REF MODE ##################################################-->
     <RefMode Abstract="true" HalMode="RTC" Name="Tamper">
@@ -1516,8 +1645,14 @@
         <Parameter Name="Seed_Size1"/>
         <Parameter Name="Seed_Size2"/>
         <Parameter Name="Seed_Size3"/>
-        <Parameter Name="tampSecureFull"/>       
-        <Parameter Name="tampPrivilegeFull"/>  
+        <Parameter Name="tampSecureFull"/>  
+        <Parameter Name="MonotonicCounterSecure"/>  
+        <Parameter Name="tampPrivilegeFull"/>      
+        <Parameter Name="MonotonicCounterPrivilege"/>
+
+       
+
+         
  
     </RefMode>
     <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_1_enabled">
@@ -1531,7 +1666,9 @@
         <Parameter Name="Trigger_1"/>
         <Parameter Name="NoErase_1"/>
         <Parameter Name="MaskFlag_1"/>
-        <Parameter Name="Interrupt1"/>               
+        <Parameter Name="Interrupt1"/>  
+        <Parameter Name="tampSecureFull"/>  
+             
     </RefMode>
     <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_1_enabled0">
         <Condition Diagnostic="" Expression="(TAMP_STAMP_IRQn| (TAMP_IRQn) | (TAMP_S_IRQn))"/>
@@ -1544,7 +1681,9 @@
         <Parameter Name="Trigger_1"/>
         <Parameter Name="NoErase_1"/>
         <Parameter Name="MaskFlag_1"/>
-        <Parameter Name="Interrupt1"/>
+        <Parameter Name="Interrupt1"/>    
+                <Parameter Name="tampSecureFull"/>  
+           
     </RefMode>
     
     <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_1_enabled">
@@ -1558,6 +1697,8 @@
         <Parameter Name="NoErase_1"/>
         <Parameter Name="MaskFlag_1"/>
         <Parameter Name="Interrupt1"/>
+                <Parameter Name="tampSecureFull"/>  
+
     </RefMode>
     <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_1_enabled0">
         <ConfigForMode>RTC_SetTamper_1</ConfigForMode>
@@ -1570,6 +1711,8 @@
         <Parameter Name="NoErase_1"/>
         <Parameter Name="MaskFlag_1"/>
         <Parameter Name="Interrupt1"/>
+                <Parameter Name="tampSecureFull"/>  
+
     </RefMode>
 	
     <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_2_enabled">
@@ -1584,6 +1727,8 @@
         <Parameter Name="NoErase_2"/>
         <Parameter Name="MaskFlag_2"/>
         <Parameter Name="Interrupt2"/>
+                <Parameter Name="tampSecureFull"/>  
+
     </RefMode>
     
     <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_2_enabled">
@@ -1597,6 +1742,8 @@
         <Parameter Name="NoErase_2"/>
         <Parameter Name="MaskFlag_2"/>
         <Parameter Name="Interrupt2"/>
+                <Parameter Name="tampSecureFull"/>  
+
     </RefMode>
     <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_2_enabled0">
         <Condition Diagnostic="" Expression="(TAMP_STAMP_IRQn| (TAMP_IRQn) | (TAMP_S_IRQn))"/>
@@ -1610,6 +1757,8 @@
         <Parameter Name="NoErase_2"/>
         <Parameter Name="MaskFlag_2"/>
         <Parameter Name="Interrupt2"/>
+                <Parameter Name="tampSecureFull"/>  
+
     </RefMode>
     
     <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_2_enabled0">
@@ -1623,6 +1772,8 @@
         <Parameter Name="NoErase_2"/>
         <Parameter Name="MaskFlag_2"/>
         <Parameter Name="Interrupt2"/>
+                <Parameter Name="tampSecureFull"/>  
+
     </RefMode>
     
     <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_3_enabled">
@@ -1638,6 +1789,8 @@
         <Parameter Name="NoErase_3"/>
         <Parameter Name="MaskFlag_3"/>
         <Parameter Name="Interrupt3"/>
+                <Parameter Name="tampSecureFull"/>  
+
     </RefMode>
     
     <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_3_enabled">
@@ -1651,6 +1804,8 @@
         <Parameter Name="NoErase_3"/>
         <Parameter Name="MaskFlag_3"/>
         <Parameter Name="Interrupt3"/>
+                <Parameter Name="tampSecureFull"/>  
+
     </RefMode>
      <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_3_enabled0">
         <Condition Diagnostic="" Expression="(TAMP_STAMP_IRQn| (TAMP_IRQn) | (TAMP_S_IRQn))"/>
@@ -1665,6 +1820,8 @@
         <Parameter Name="NoErase_3"/>
         <Parameter Name="MaskFlag_3"/>
         <Parameter Name="Interrupt3"/>
+                <Parameter Name="tampSecureFull"/>  
+
     </RefMode>
     
     <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_3_enabled0">
@@ -1678,6 +1835,8 @@
         <Parameter Name="NoErase_3"/>
         <Parameter Name="MaskFlag_3"/>
         <Parameter Name="Interrupt3"/>
+                <Parameter Name="tampSecureFull"/>  
+
     </RefMode>
     
     <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_4_enabled">
@@ -1691,6 +1850,8 @@
         <Parameter Name="Trigger_4"/>
         <Parameter Name="NoErase_4"/>
         <Parameter Name="Interrupt4"/>
+                <Parameter Name="tampSecureFull"/>  
+
     </RefMode>
     
     <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_4_enabled">
@@ -1704,6 +1865,8 @@
         <Parameter Name="NoErase_4"/>
         <Parameter Name="Enable4"/>
         <Parameter Name="Interrupt4"/>
+                <Parameter Name="tampSecureFull"/>  
+
     </RefMode>
     <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_4_enabled0">
         <Condition Diagnostic="" Expression="(TAMP_STAMP_IRQn| (TAMP_IRQn) | (TAMP_S_IRQn))"/>
@@ -1716,6 +1879,8 @@
         <Parameter Name="Trigger_4"/>
         <Parameter Name="NoErase_4"/>
         <Parameter Name="Interrupt4"/>
+                <Parameter Name="tampSecureFull"/>  
+
     </RefMode>
     
     <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_4_enabled0">
@@ -1729,8 +1894,23 @@
         <Parameter Name="NoErase_4"/>
         <Parameter Name="Enable4"/>
         <Parameter Name="Interrupt4"/>
+                <Parameter Name="tampSecureFull"/>  
+
     </RefMode>
-    
+    <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_5_enabled">
+        <ConfigForMode>RTC_SetTamper_5</ConfigForMode>
+        <Parameter Name="Tamper_5">
+            <PossibleValue>RTC_TAMPER_5</PossibleValue>
+        </Parameter>
+          <Parameter Name="Enable5"/>
+        <Parameter Name="Output5"/>        
+        <Parameter Name="Trigger_5"/>
+        <Parameter Name="NoErase_5"/>
+        <Parameter Name="Enable5"/>
+        <Parameter Name="Interrupt5"/>
+         <Parameter Name="tampSecureFull"/>  
+
+    </RefMode>
     <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_5_enabled">
         <Condition Diagnostic="" Expression="(TAMP_STAMP_IRQn| (TAMP_IRQn) | (TAMP_S_IRQn))"/>
         <ConfigForMode>RTC_SetTamper_5_IT</ConfigForMode>
@@ -1741,7 +1921,9 @@
         <Parameter Name="Output5"/>
         <Parameter Name="Trigger_5"/>
         <Parameter Name="NoErase_5"/>
-        <Parameter Name="Interrupt5"/>    
+        <Parameter Name="Interrupt5"/>  
+                <Parameter Name="tampSecureFull"/>  
+  
     </RefMode>
      <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_4_enabled0">
         <ConfigForMode>RTC_SetTamper_4</ConfigForMode>
@@ -1754,6 +1936,8 @@
         <Parameter Name="NoErase_4"/>
         <Parameter Name="Enable4"/>
         <Parameter Name="Interrupt4"/>
+                <Parameter Name="tampSecureFull"/>  
+
     </RefMode>
     
     <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_5_enabled0">
@@ -1766,7 +1950,9 @@
         <Parameter Name="Output5"/>
         <Parameter Name="Trigger_5"/>
         <Parameter Name="NoErase_5"/>
-        <Parameter Name="Interrupt5"/>    
+        <Parameter Name="Interrupt5"/>   
+                <Parameter Name="tampSecureFull"/>  
+ 
     </RefMode>
     
     <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_5_enabled0">
@@ -1779,6 +1965,8 @@
         <Parameter Name="Trigger_5"/>
         <Parameter Name="NoErase_5"/>
         <Parameter Name="Interrupt5"/>  
+                <Parameter Name="tampSecureFull"/>  
+
     </RefMode>
     
     <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_6_enabled">
@@ -1792,7 +1980,9 @@
         <Parameter Name="Trigger_6"/>
         <Parameter Name="NoErase_6"/>
         <Parameter Name="Trigger_6"/>
-        <Parameter Name="Interrupt6"/>    
+        <Parameter Name="Interrupt6"/>  
+                <Parameter Name="tampSecureFull"/>  
+  
     </RefMode>
     
     <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_6_enabled">
@@ -1818,7 +2008,9 @@
         <Parameter Name="Trigger_6"/>
         <Parameter Name="NoErase_6"/>
         <Parameter Name="Trigger_6"/>
-        <Parameter Name="Interrupt6"/>    
+        <Parameter Name="Interrupt6"/>   
+                <Parameter Name="tampSecureFull"/>  
+ 
     </RefMode>
     
     <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_6_enabled0">
@@ -1845,6 +2037,8 @@
         <Parameter Name="Trigger_7"/>
         <Parameter Name="NoErase_7"/>
         <Parameter Name="Interrupt7"/>
+                <Parameter Name="tampSecureFull"/>  
+
     </RefMode>
     
     <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_7_enabled">
@@ -1858,6 +2052,8 @@
         <Parameter Name="NoErase_7"/>
         <Parameter Name="tampSecureFull"/>  
         <Parameter Name="Interrupt7"/>
+                <Parameter Name="tampSecureFull"/>  
+
     </RefMode>
     <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_7_enabled0">
         <Condition Diagnostic="" Expression="TAMP_STAMP_IRQn | TAMP_IRQn | TAMP_S_IRQn"/>
@@ -1870,6 +2066,8 @@
         <Parameter Name="Trigger_7"/>
         <Parameter Name="NoErase_7"/>
         <Parameter Name="Interrupt7"/>
+                <Parameter Name="tampSecureFull"/>  
+
     </RefMode>
     
     <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_7_enabled0">
@@ -1897,6 +2095,8 @@
         <Parameter Name="NoErase_8"/>
         <Parameter Name="Trigger_8"/>
         <Parameter Name="Interrupt8"/>
+                <Parameter Name="tampSecureFull"/>  
+
     </RefMode>
     
     <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_8_enabled">
@@ -1910,6 +2110,8 @@
         <Parameter Name="NoErase_8"/>
         <Parameter Name="Trigger_8"/>
         <Parameter Name="Interrupt8"/>
+                <Parameter Name="tampSecureFull"/>  
+
     </RefMode>
     <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_8_enabled0">
         <Condition Diagnostic="" Expression="(TAMP_STAMP_IRQn| (TAMP_IRQn) | (TAMP_S_IRQn))"/>
@@ -1923,6 +2125,8 @@
         <Parameter Name="NoErase_8"/>
         <Parameter Name="Trigger_8"/>
         <Parameter Name="Interrupt8"/>
+                <Parameter Name="tampSecureFull"/>  
+
     </RefMode>
     
     <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_8_enabled0">
@@ -1936,6 +2140,8 @@
         <Parameter Name="NoErase_8"/>
         <Parameter Name="Trigger_8"/>
         <Parameter Name="Interrupt8"/>
+                <Parameter Name="tampSecureFull"/>  
+
     </RefMode>
     
     
@@ -1988,7 +2194,7 @@
             <Semaphore>Tamper2_ON</Semaphore>
             <Semaphore>RTC_TAMPER_INTERRUPT</Semaphore>
         </Mode>
-        <Mode Name="Tamper_3" UserName="Tamper 3">
+         <Mode Name="Tamper_3" UserName="Tamper 3">
             <Condition Diagnostic="Tamper 3 is available when RTC is activated" Expression="RTC_ENABLED"/>
                     
             <ModeLogicOperator Name="XOR">

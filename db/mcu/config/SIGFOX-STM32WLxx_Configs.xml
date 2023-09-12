@@ -7,7 +7,7 @@
     IncludeFile=""
     Name="Sigfox"
     RootFolder="Middlewares/Third_Party/"
-    Version="STM32Cube_FW_WL_V0.7.0">
+    Version="STM32Cube_FW_WL_V1.1.0">
 
     <RefConfig Comment="" Name="Sigfox_Init">
         <CallLibMethod Name="Sigfox_Init"/>
@@ -27,14 +27,12 @@
         <!-- Core/Inc -->
         <ConfigFile Name="IPCC_IF_H"/>
         <ConfigFile Name="FLASH_IF_H"/>
-        <ConfigFile Name="LPTIM_H"/>
         <ConfigFile Name="NUCLEO_CONF_H"/>
         <ConfigFile Name="PLATFORM_H"/>
         <ConfigFile Name="STM32_LPM_IF_H"/>
         <ConfigFile Name="SYS_APP_H"/>
-        <ConfigFile Name="SYS_APP_M4_H"/>
-        <ConfigFile Name="SYS_APP_M0PLUS_H"/>
         <ConfigFile Name="SYS_CONF_H"/>
+        <ConfigFile Name="SYS_DEBUG_H"/>
         <ConfigFile Name="SYS_SENSORS_H"/>
         <ConfigFile Name="STM32_TIMER_IF_H"/>
         <ConfigFile Name="UTILITIES_CONF_H"/>
@@ -47,8 +45,7 @@
         <ConfigFile Name="FLASH_IF_C"/>
         <ConfigFile Name="STM32_LPM_IF_C"/>
         <ConfigFile Name="SYS_APP_C"/>
-        <ConfigFile Name="SYS_APP_M4_C"/>
-        <ConfigFile Name="SYS_APP_M0PLUS_C"/>
+        <ConfigFile Name="SYS_DEBUG_C"/>
         <ConfigFile Name="SYS_SENSORS_C"/>
         <ConfigFile Name="STM32_ADV_TRACE_IF_C"/>
         <ConfigFile Name="STM32_ADV_TRACE_IF_H"/>
@@ -97,8 +94,10 @@
         <ConfigFile Name="MBMUX_MBMUX_H"/>
         <ConfigFile Name="MBMUX_MBMUX_C"/>
 
+        <!--
         <ConfigFile Name="MBMUX_MBMUXIF_KMS_H"/>
         <ConfigFile Name="MBMUX_MBMUXIF_KMS_C"/>
+        -->
 
         <ConfigFile Name="MBMUX_MBMUXIF_SIGFOX_H"/>
         <ConfigFile Name="MBMUX_MBMUXIF_SIGFOX_M4_C"/>
@@ -204,45 +203,42 @@
         <File Category="header" Name="SubGHz_Phy/radio_ex.h" Condition="!SEM_M4"/>
         <File Category="header" Name="SubGHz_Phy/stm32_radio_driver/radio_driver.h" Condition="all"/>
         <File Category="source" Name="SubGHz_Phy/stm32_radio_driver/radio_driver.c" Condition="!SEM_M4"/>
+        <File Category="header" Name="SubGHz_Phy/stm32_radio_driver/radio_fw.h" Condition="all"/>
+        <File Category="source" Name="SubGHz_Phy/stm32_radio_driver/radio_fw.c" Condition="!SEM_M4"/>
         <File Category="source" Name="SubGHz_Phy/stm32_radio_driver/radio.c" Condition="!SEM_M4"/>
         <File Category="header" Name="SubGHz_Phy/stm32_radio_driver/subghz_phy_version.h" Condition="all"/>
     </RefComponent>
 
 <!-- Core/Inc begin -->
 
-    <RefConfigFile Description="" Name="FLASH_IF_H" Template="stm32wl/Sigfox_flash_if_h.ftl" destinationFolder="Core/Inc/">
-        <File Category="header" Name="flash_if.h" Version="1.0" Condition="!SEM_M4 &amp; !SEM_SIGFOX_USER_APPLICATION"/>
-    </RefConfigFile>
-
-    <RefConfigFile Description="" Name="LPTIM_H" Template="stm32wl/Sigfox_lptim_h.ftl" destinationFolder="Core/Inc/">
-        <File Category="header" Name="lptim.h" Version="1.0" Condition="SEM_M0PLUS"/>
+    <RefConfigFile Description="" Name="FLASH_IF_H" Template="stm32wl/flash_if_h.ftl" destinationFolder="Core/Inc/">
+        <File Category="header" Name="flash_if.h" Version="1.0" Condition="!SEM_M4 &amp; !SEM_SGX_USER_APPLICATION"/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="PLATFORM_H" Template="stm32wl/platform_h.ftl" destinationFolder="Core/Inc/">
         <File Category="header" Name="platform.h" Version="1.0" Condition="all"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
+        <Argument Name="FILL_UCS" GenericType="Simple" Comment=""/>
+        <Argument Name="Activate_RADIO_BOARD_INTERFACE" GenericType="Simple" Comment=""/>
+        <Argument Name="Activate_BOARD_RESOURCES" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="STM32_LPM_IF_H" Template="stm32wl/stm32_lpm_if_h.ftl" destinationFolder="Core/Inc/">
         <File Category="header" Name="stm32_lpm_if.h" Version="1.0" Condition="all"/>
+        <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
+        <Argument Name="USE_UART" GenericType="Simple" Comment=""/>
+        <Argument Name="USE_LPM" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="SYS_APP_H" Template="stm32wl/sys_app_h.ftl" destinationFolder="Core/Inc/">
-        <File Category="header" Name="sys_app.h" Version="1.0" Condition="!SEM_M0PLUS &amp; !SEM_M4"/>
-        <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
-    </RefConfigFile>
-    <RefConfigFile Description="" Name="SYS_APP_M4_H" Template="stm32wl/sys_app_M4_h.ftl" destinationFolder="Core/Inc/">
-        <File Category="header" Name="sys_app.h" Version="1.0" Condition="SEM_M4"/>
-        <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
-    </RefConfigFile>
-    <RefConfigFile Description="" Name="SYS_APP_M0PLUS_H" Template="stm32wl/sys_app_M0PLUS_h.ftl" destinationFolder="Core/Inc/">
-        <File Category="header" Name="sys_app.h" Version="1.0" Condition="SEM_M0PLUS"/>
+        <File Category="header" Name="sys_app.h" Version="1.0" Condition="all"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="SYS_CONF_H" Template="stm32wl/sys_conf_h.ftl" destinationFolder="Core/Inc/">
-        <File Category="header" Name="sys_conf.h" Version="1.0" Condition="!SEM_SIGFOX_USER_APPLICATION"/>
+        <File Category="header" Name="sys_conf.h" Version="1.0" Condition="!SEM_SGX_USER_APPLICATION"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
+        <Argument Name="Activate_DEBUG_LINE" GenericType="Simple" Comment=""/>
         <Argument Name="VERBOSE_LEVEL" GenericType="Simple" Comment=""/>
         <Argument Name="APP_LOG_ENABLED" GenericType="Simple" Comment=""/>
         <Argument Name="DEBUGGER_ON" GenericType="Simple" Comment=""/>
@@ -261,6 +257,10 @@
         <File Category="header" Name="sys_sensors.h" Version="1.0" Condition="SEM_SGX_PUSHBUTTON &amp; !SEM_M0PLUS"/>
     </RefConfigFile>
 
+    <RefConfigFile Description="" Name="SYS_DEBUG_H" Template="stm32wl/sys_debug_h.ftl" destinationFolder="Core/Inc/">
+        <File Category="header" Name="sys_debug.h" Version="1.0" Condition="!SEM_M0PLUS &amp; !SEM_M4 &amp; !SEM_SGX_USER_APPLICATION"/>
+    </RefConfigFile>
+
     <RefConfigFile Description="" Name="UTILITIES_CONF_H" Template="stm32wl/utilities_conf_h.ftl" destinationFolder="Core/Inc/">
         <File Category="header" Name="utilities_conf.h" Version="1.0" Condition="all"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
@@ -272,11 +272,8 @@
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="NUCLEO_CONF_H" Template="stm32wl/stm32wlxx_nucleo_conf_h.ftl" destinationFolder="Core/Inc/">
-        <File Category="header" Name="stm32wlxx_nucleo_conf.h" Version="1.0" Condition="!SEM_M0PLUS &amp; !SEM_M4"/>
+        <File Category="header" Name="stm32wlxx_nucleo_conf.h" Version="1.0" Condition="!SEM_M0PLUS &amp; !SEM_M4 &amp; !SEM_SGX_USER_APPLICATION"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
-        <Argument Name="RF_WAKEUP_TIME" GenericType="Simple" Comment=""/>
-        <Argument Name="IS_TCXO_SUPPORTED" GenericType="Simple" Comment=""/>
-        <Argument Name="IS_DCDC_SUPPORTED" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="IPCC_IF_H" Template="stm32wl/ipcc_if_h.ftl" destinationFolder="Core/Inc/">
@@ -291,8 +288,8 @@
 
 <!-- Core/Src begin-->
 
-    <RefConfigFile Description="" Name="FLASH_IF_C" Template="stm32wl/Sigfox_flash_if_c.ftl" destinationFolder="Core/Src/">
-        <File Category="source" Name="flash_if.c" Version="1.0" Condition="!SEM_M4 &amp; !SEM_SIGFOX_USER_APPLICATION"/>
+    <RefConfigFile Description="" Name="FLASH_IF_C" Template="stm32wl/flash_if_c.ftl" destinationFolder="Core/Src/">
+        <File Category="source" Name="flash_if.c" Version="1.0" Condition="!SEM_M4 &amp; !SEM_SGX_USER_APPLICATION"/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="IPCC_IF_M4_C" Template="stm32wl/ipcc_if_M4_c.ftl" destinationFolder="Core/Src/">
@@ -308,18 +305,12 @@
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="SYS_APP_C" Template="stm32wl/sys_app_c.ftl" destinationFolder="Core/Src/">
-        <File Category="source" Name="sys_app.c" Version="1.0" Condition="!SEM_M0PLUS &amp; !SEM_M4"/>
+        <File Category="source" Name="sys_app.c" Version="1.0" Condition="all"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
-    <RefConfigFile Description="" Name="SYS_APP_M4_C" Template="stm32wl/sys_app_M4_c.ftl" destinationFolder="Core/Src/">
-        <File Category="source" Name="sys_app.c" Version="1.0" Condition="SEM_M4"/>
-        <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
-    </RefConfigFile>
-
-    <RefConfigFile Description="" Name="SYS_APP_M0PLUS_C" Template="stm32wl/sys_app_M0PLUS_c.ftl" destinationFolder="Core/Src/">
-        <File Category="source" Name="sys_app.c" Version="1.0" Condition="SEM_M0PLUS"/>
-        <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
+    <RefConfigFile Description="" Name="SYS_DEBUG_C" Template="stm32wl/sys_debug_c.ftl" destinationFolder="Core/Src/">
+        <File Category="source" Name="sys_debug.c" Version="1.0" Condition="!SEM_M0PLUS &amp; !SEM_M4 &amp; !SEM_SGX_USER_APPLICATION"/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="SYS_SENSORS_C" Template="stm32wl/sys_sensors_c.ftl" destinationFolder="Core/Src/">
@@ -341,11 +332,11 @@
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="APP_EE_C" Template="stm32wl/Sigfox_ee_c.ftl">
-        <File Category="source" Name="App/ee.c" Version="1.0" Condition="!SEM_M4  &amp; !SEM_SIGFOX_USER_APPLICATION"/>
+        <File Category="source" Name="App/ee.c" Version="1.0" Condition="!SEM_M4  &amp; !SEM_SGX_USER_APPLICATION"/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="APP_EE_H" Template="stm32wl/Sigfox_ee_h.ftl">
-        <File Category="header" Name="App/ee.h" Version="1.0" Condition="!SEM_M4 &amp; !SEM_SIGFOX_USER_APPLICATION"/>
+        <File Category="header" Name="App/ee.h" Version="1.0" Condition="!SEM_M4 &amp; !SEM_SGX_USER_APPLICATION"/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="APP_SIGFOX_APP_C" Template="stm32wl/Sigfox_sgfx_app_c.ftl" >
@@ -382,20 +373,20 @@
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="APP_CSTIMER_C" Template="stm32wl/Sigfox_sgfx_cstimer_c.ftl">
-        <File Category="source" Name="App/sgfx_cstimer.c" Version="1.0" Condition="!SEM_M4 &amp; !SEM_SIGFOX_USER_APPLICATION"/>
+        <File Category="source" Name="App/sgfx_cstimer.c" Version="1.0" Condition="!SEM_M4 &amp; !SEM_SGX_USER_APPLICATION"/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="APP_CSTIMER_H" Template="stm32wl/Sigfox_sgfx_cstimer_h.ftl">
-        <File Category="header" Name="App/sgfx_cstimer.h" Version="1.0" Condition="!SEM_M4 &amp; !SEM_SIGFOX_USER_APPLICATION"/>
+        <File Category="header" Name="App/sgfx_cstimer.h" Version="1.0" Condition="!SEM_M4 &amp; !SEM_SGX_USER_APPLICATION"/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="APP_EEPROM_IF_C" Template="stm32wl/Sigfox_sgfx_eeprom_if_c.ftl">
-        <File Category="source" Name="App/sgfx_eeprom_if.c" Version="1.0" Condition="!SEM_SIGFOX_USER_APPLICATION"/>
+        <File Category="source" Name="App/sgfx_eeprom_if.c" Version="1.0" Condition="!SEM_SGX_USER_APPLICATION"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="APP_EEPROM_IF_H" Template="stm32wl/Sigfox_sgfx_eeprom_if_h.ftl">
-        <File Category="header" Name="App/sgfx_eeprom_if.h" Version="1.0" Condition="!SEM_SIGFOX_USER_APPLICATION"/>
+        <File Category="header" Name="App/sgfx_eeprom_if.h" Version="1.0" Condition="!SEM_SGX_USER_APPLICATION"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
@@ -420,6 +411,7 @@
     <RefConfigFile Description="" Name="TARGET_MCU_API_C" Template="stm32wl/Sigfox_mcu_api_c.ftl" >
         <File Category="source" Condition="!SEM_M4" Name="Target/mcu_api.c" Version="1.0"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
+        <Argument Name="FILL_UCS" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="TARGET_MCU_API_H" Template="stm32wl/Sigfox_mcu_api_h.ftl" >
@@ -449,16 +441,16 @@
     <RefConfigFile Description="" Name="TARGET_RADIO_BOARD_H" Template="stm32wl/radio_board_if_h.ftl">
         <File Category="header" Name="Target/radio_board_if.h" Version="1.0" Condition="!SEM_M4"/>
         <Argument Name="Activate_RADIO_BOARD_INTERFACE" GenericType="Simple" Comment=""/>
-        <Argument Name="RF_WAKEUP_TIME" GenericType="Simple" Comment=""/>
+        <Argument Name="TX_RFO_CONFIG" GenericType="Simple" Comment=""/>
         <Argument Name="IS_TCXO_SUPPORTED" GenericType="Simple" Comment=""/>
         <Argument Name="IS_DCDC_SUPPORTED" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="TARGET_RADIO_CONF_H" Template="stm32wl/radio_conf_h.ftl">
         <File Category="header" Name="Target/radio_conf.h" Version="1.0" Condition="!SEM_M4"/>
-        <Argument Name="Activate_RADIO_BOARD_INTERFACE" GenericType="Simple" Comment=""/>
         <Argument Name="Activate_DEBUG_LINE" GenericType="Simple" Comment=""/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
+        <Argument Name="RF_WAKEUP_TIME" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="TARGET_RF_API_C" Template="stm32wl/Sigfox_rf_api_c.ftl">
@@ -484,20 +476,23 @@
         <File Category="header" Name="Target/timer.h" Version="1.0" Condition="!SEM_M4"/>
     </RefConfigFile>
 
-    <RefConfigFile Description="" Name="STM32_TIMER_IF_H" Template="stm32wl/stm32_timer_if_h.ftl" destinationFolder="Core/Inc/">
-        <File Category="header" Name="timer_if.h" Version="1.0" Condition="SEM_SIGFOX_USER_APPLICATION"/>
+    <RefConfigFile Description="" Name="STM32_TIMER_IF_H" Template="stm32wl/timer_if_h.ftl" destinationFolder="Core/Inc/">
+        <File Category="header" Name="timer_if.h" Version="1.0"  Condition="all"/>
+        <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
-    <RefConfigFile Description="" Name="STM32_TIMER_IF_C" Template="stm32wl/stm32_timer_if_c.ftl" destinationFolder="Core/Src/">
-        <File Category="source" Name="timer_if.c" Version="1.0" Condition="SEM_SIGFOX_USER_APPLICATION"/>
+    <RefConfigFile Description="" Name="STM32_TIMER_IF_C" Template="stm32wl/timer_if_c.ftl" destinationFolder="Core/Src/">
+        <File Category="source" Name="timer_if.c" Version="1.0"  Condition="all"/>
+        <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
+        <Argument Name="USE_RTC" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="STM32_ADV_TRACE_IF_C" Template="stm32wl/stm32_adv_trace_if_c.ftl" destinationFolder="Core/Src/">
-        <File Category="source" Name="stm32_adv_trace_if.c" Version="1.0" Condition="((!SEM_M0PLUS &amp; !SEM_M4) | SEM_M4) &amp; SEM_SIGFOX_USER_APPLICATION"/>
+        <File Category="source" Name="stm32_adv_trace_if.c" Version="1.0" Condition="((!SEM_M0PLUS &amp; !SEM_M4) | SEM_M4) &amp; SEM_SGX_USER_APPLICATION&amp; !SEM_SGX_USE_UART"/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="STM32_ADV_TRACE_IF_H" Template="stm32wl/stm32_adv_trace_if_h.ftl" destinationFolder="Core/Inc/">
-        <File Category="source" Name="stm32_adv_trace_if.h" Version="1.0" Condition="((!SEM_M0PLUS &amp; !SEM_M4) | SEM_M4) &amp; SEM_SIGFOX_USER_APPLICATION"/>
+        <File Category="source" Name="stm32_adv_trace_if.h" Version="1.0" Condition="((!SEM_M0PLUS &amp; !SEM_M4) | SEM_M4) &amp; SEM_SGX_USER_APPLICATION &amp; !SEM_SGX_USE_UART"/>
     </RefConfigFile>
 
 <!-- Sigfox/Target end-->
@@ -521,6 +516,7 @@
         <File Category="header" Condition="SEM_M4 | SEM_M0PLUS" Name="mbmux.h" Version="1.0"/>
     </RefConfigFile>
 
+    <!--
     <RefConfigFile Description="" Name="MBMUX_MBMUXIF_KMS_C" Template="stm32wl/mbmuxif_kms_c.ftl" destinationFolder="MbMux">
         <File Category="source" Condition="SEM_M4 | SEM_M0PLUS" Name="mbmuxif_kms.c" Version="1.0"/>
     </RefConfigFile>
@@ -528,6 +524,7 @@
     <RefConfigFile Description="" Name="MBMUX_MBMUXIF_KMS_H" Template="stm32wl/mbmuxif_kms_h.ftl" destinationFolder="MbMux">
         <File Category="header" Condition="SEM_M4 | SEM_M0PLUS" Name="mbmuxif_kms.h" Version="1.0"/>
     </RefConfigFile>
+    -->
 
     <RefConfigFile Description="" Name="MBMUX_MBMUXIF_SIGFOX_M4_C" Template="stm32wl/mbmuxif_sigfox_M4_c.ftl" destinationFolder="MbMux">
         <File Category="source" Condition="SEM_M4" Name="mbmuxif_sigfox.c" Version="1.0"/>
@@ -566,7 +563,7 @@
     <RefConfigFile Description="" Name="MBMUX_MBMUXIF_SYS_H" Template="stm32wl/mbmuxif_sys_h.ftl" destinationFolder="MbMux">
         <File Category="header" Condition="SEM_M4 | SEM_M0PLUS" Name="mbmuxif_sys.h" Version="1.0"/>
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
-	</RefConfigFile>
+    </RefConfigFile>
 
     <RefConfigFile Description="" Name="MBMUX_MBMUXIF_TRACE_M4_C" Template="stm32wl/mbmuxif_trace_M4_c.ftl" destinationFolder="MbMux">
         <File Category="source" Condition="SEM_M4" Name="mbmuxif_trace.c" Version="1.0"/>
@@ -583,12 +580,10 @@
 
     <RefConfigFile Description="" Name="MBMUX_RADIO_MBWRAPPER_M4_C" Template="stm32wl/radio_mbwrapper_M4_c.ftl" destinationFolder="MbMux">
         <File Category="source" Condition="SEM_M4" Name="radio_mbwrapper.c" Version="1.0"/>
-        <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="MBMUX_RADIO_MBWRAPPER_M0PLUS_C" Template="stm32wl/radio_mbwrapper_M0PLUS_c.ftl" destinationFolder="MbMux">
         <File Category="source" Condition="SEM_M0PLUS" Name="radio_mbwrapper.c" Version="1.0"/>
-        <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="MBMUX_RADIO_MBWRAPPER_H" Template="stm32wl/radio_mbwrapper_h.ftl" destinationFolder="MbMux">
@@ -610,24 +605,31 @@
     </RefConfigFile>
 
    <RefConfigFile Description="" Name="MBMUX_SYSTEM_MBWRAPPER_M4_C" Template="stm32wl/system_mbwrapper_M4_c.ftl" destinationFolder="MbMux">
-        <File Category="source" Condition="SEM_M4 &amp; !SEM_SIGFOX_USER_APPLICATION" Name="system_mbwrapper.c" Version="1.0"/>
+        <File Category="source" Condition="SEM_M4 &amp; !SEM_SGX_USER_APPLICATION" Name="system_mbwrapper.c" Version="1.0"/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="MBMUX_SYSTEM_MBWRAPPER_M4_H" Template="stm32wl/system_mbwrapper_M4_h.ftl" destinationFolder="MbMux">
-        <File Category="header" Condition="SEM_M4 &amp; !SEM_SIGFOX_USER_APPLICATION" Name="system_mbwrapper.h" Version="1.0"/>
+        <File Category="header" Condition="SEM_M4 &amp; !SEM_SGX_USER_APPLICATION" Name="system_mbwrapper.h" Version="1.0"/>
     </RefConfigFile>
 
 <!-- MbMux end-->
 
 <!-- COMMON/Board Begin-->
     <RefConfigFile Description="" Name="NUCLEO_CONF_H" Template="stm32wl/stm32wlxx_nucleo_conf_h.ftl" destinationFolder="../Common/Board/">
-        <File Category="header" Name="stm32wlxx_nucleo_conf.h" Version="1.0" Condition="SEM_M0PLUS | SEM_M4" />
+        <File Category="header" Name="stm32wlxx_nucleo_conf.h" Version="1.0" Condition="(SEM_M0PLUS | SEM_M4) &amp; !SEM_SGX_USER_APPLICATION" />
         <Argument Name="SUBGHZ_APPLICATION" GenericType="Simple" Comment=""/>
-        <Argument Name="RF_WAKEUP_TIME" GenericType="Simple" Comment=""/>
-        <Argument Name="IS_TCXO_SUPPORTED" GenericType="Simple" Comment=""/>
-        <Argument Name="IS_DCDC_SUPPORTED" GenericType="Simple" Comment=""/>
     </RefConfigFile>
 <!-- COMMON/Board end-->
+
+<!-- COMMON/System Begin-->
+    <RefConfigFile Description="" Name="SYS_DEBUG_H" Template="stm32wl/sys_debug_h.ftl" destinationFolder="../Common/System/">
+        <File Category="header" Name="sys_debug.h" Version="1.0" Condition="(SEM_M0PLUS | SEM_M4) &amp; !SEM_SGX_USER_APPLICATION"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="SYS_DEBUG_C" Template="stm32wl/sys_debug_c.ftl" destinationFolder="../Common/System/">
+        <File Category="source" Name="sys_debug.c" Version="1.0" Condition="(SEM_M0PLUS | SEM_M4) &amp; !SEM_SGX_USER_APPLICATION"/>
+    </RefConfigFile>
+<!-- COMMON/System end-->
 
 <!-- COMMON/MbMux Begin-->
 
@@ -652,25 +654,6 @@
 <!-- COMMON/MbMux end-->
 
 <!-- Platform Setting Begin -->
-    <!-- BSP Radio Driver Begin -->
-    <RefBspComponent Name="RF SW CTRL 1" BspIpName="GPIO" BspModeName="Output">
-        <File Category="template" Name="stm32wl/radio_board_if_h.ftl" Condition="!SEM_M4"/>
-        <File Category="template" Name="stm32wl/radio_board_if_c.ftl" Condition="!SEM_M4"/>
-        <File Category="template" Name="stm32wl/radio_conf_h.ftl" Condition="!SEM_M4"/>
-    </RefBspComponent>
-    <RefBspComponent Name="RF SW CTRL 2" BspIpName="GPIO" BspModeName="Output">
-        <File Category="template" Name="stm32wl/radio_board_if_h.ftl" Condition="!SEM_M4"/>
-        <File Category="template" Name="stm32wl/radio_board_if_c.ftl" Condition="!SEM_M4"/>
-        <File Category="template" Name="stm32wl/radio_conf_h.ftl" Condition="!SEM_M4"/>
-    </RefBspComponent>
-    <RefBspComponent Name="RF SW CTRL 3" BspIpName="GPIO" BspModeName="Output">
-        <File Category="template" Name="stm32wl/radio_board_if_h.ftl" Condition="!SEM_M4"/>
-        <File Category="template" Name="stm32wl/radio_board_if_c.ftl" Condition="!SEM_M4"/>
-        <File Category="template" Name="stm32wl/radio_conf_h.ftl" Condition="!SEM_M4"/>
-    </RefBspComponent>
-    <!--<RefBspComponent Name="RF TCXO VCC" BspIpName="GPIO" BspModeName="VDDTXCO"/> -->
-    <!-- BSP Radio Driver End -->
-
     <!-- BSP HMI Begin -->
     <RefBspComponent Name="LED 1" BspIpName="GPIO" BspModeName="Output">
         <File attr="config" Category="template" Name="stm32wl/board_resources_h.ftl" Condition="!SEM_M0PLUS &amp; !SEM_M4" src="Core/Inc/"/>
@@ -766,12 +749,12 @@
 
     <!-- BSP Virtual PortCom Begin -->
     <RefBspComponent Name="USART" BspIpName="LPUART" BspModeName="Asynchronous">
-        <File Category="template" Name="stm32wl/usart_if_h.ftl" Condition="SEM_SGX_AT_SLAVE &amp; !SEM_M0PLUS" src="Core/Inc/"/>
-        <File Category="template" Name="stm32wl/usart_if_c.ftl" Condition="SEM_SGX_AT_SLAVE &amp; !SEM_M0PLUS" src="Core/Src/"/>
+        <File Category="template" Name="stm32wl/usart_if_h.ftl" Condition="(SEM_SGX_AT_SLAVE | SEM_SGX_USE_UART)&amp; !SEM_M0PLUS" src="Core/Inc/"/>
+        <File Category="template" Name="stm32wl/usart_if_c.ftl" Condition="(SEM_SGX_AT_SLAVE | SEM_SGX_USE_UART) &amp; !SEM_M0PLUS" src="Core/Src/"/>
     </RefBspComponent>
     <RefBspComponent Name="USART" BspIpName="(LPU|US)ART" BspModeName="Asynchronous">
-        <File Category="template" Name="stm32wl/usart_if_h.ftl" Condition="SEM_SGX_PUSHBUTTON &amp; !SEM_M0PLUS" src="Core/Inc/"/>
-        <File Category="template" Name="stm32wl/usart_if_c.ftl" Condition="SEM_SGX_PUSHBUTTON &amp; !SEM_M0PLUS" src="Core/Src/"/>
+        <File Category="template" Name="stm32wl/usart_if_h.ftl" Condition="(SEM_SGX_PUSHBUTTON | SEM_SGX_USE_UART) &amp; !SEM_M0PLUS" src="Core/Inc/"/>
+        <File Category="template" Name="stm32wl/usart_if_c.ftl" Condition="(SEM_SGX_PUSHBUTTON | SEM_SGX_USE_UART) &amp; !SEM_M0PLUS" src="Core/Src/"/>
     </RefBspComponent>
     <!-- BSP Virtual PortCom End -->
 
@@ -796,31 +779,35 @@
     </RefBspComponent>
     <!-- BSP LPTIM End -->
 
-    <!-- BSP Debug Begin -->
+    <!-- BSP Probe Begin -->
     <RefBspComponent Name="Debug Line 1" BspIpName="GPIO" BspModeName="Output">
-        <File Category="template" Name="stm32wl/sys_debug_h.ftl" Condition="(!SEM_M0PLUS &amp; !SEM_M4) &amp; !SEM_SIGFOX_USER_APPLICATION" src="Core/Inc/"/>
-        <File Category="template" Name="stm32wl/sys_debug_h.ftl" Condition="(SEM_M0PLUS | SEM_M4) &amp; !SEM_SIGFOX_USER_APPLICATION" src="../Common/System/"/>
-        <File Category="template" Name="stm32wl/sys_debug_c.ftl" Condition="(!SEM_M0PLUS &amp; !SEM_M4) &amp; !SEM_SIGFOX_USER_APPLICATION" src="Core/Src/"/>
-        <File Category="template" Name="stm32wl/sys_debug_c.ftl" Condition="(SEM_M0PLUS | SEM_M4) &amp; !SEM_SIGFOX_USER_APPLICATION" src="../Common/System/"/>
+        <File Category="template" Name="stm32wl/sys_debug_h.ftl" Condition="(!SEM_M0PLUS &amp; !SEM_M4) &amp; !SEM_SGX_USER_APPLICATION" src="Core/Inc/"/>
+        <File Category="template" Name="stm32wl/sys_debug_h.ftl" Condition="(SEM_M0PLUS | SEM_M4) &amp; !SEM_SGX_USER_APPLICATION" src="../Common/System/"/>
+        <File Category="template" Name="stm32wl/sys_debug_c.ftl" Condition="(!SEM_M0PLUS &amp; !SEM_M4) &amp; !SEM_SGX_USER_APPLICATION" src="Core/Src/"/>
+        <File Category="template" Name="stm32wl/sys_debug_c.ftl" Condition="(SEM_M0PLUS | SEM_M4) &amp; !SEM_SGX_USER_APPLICATION" src="../Common/System/"/>
+        <File Category="template" Name="stm32wl/radio_conf_h.ftl" Condition="!SEM_M4 &amp; !SEM_SGX_USER_APPLICATION" src="Sigfox/Target"/>
     </RefBspComponent>
     <RefBspComponent Name="Debug Line 2" BspIpName="GPIO" BspModeName="Output">
-        <File Category="template" Name="stm32wl/sys_debug_h.ftl" Condition="(!SEM_M0PLUS &amp; !SEM_M4) &amp; !SEM_SIGFOX_USER_APPLICATION" src="Core/Inc/"/>
-        <File Category="template" Name="stm32wl/sys_debug_h.ftl" Condition="(SEM_M0PLUS | SEM_M4) &amp; !SEM_SIGFOX_USER_APPLICATION" src="../Common/System/"/>
-        <File Category="template" Name="stm32wl/sys_debug_c.ftl" Condition="(!SEM_M0PLUS &amp; !SEM_M4) &amp; !SEM_SIGFOX_USER_APPLICATION" src="Core/Src/"/>
-        <File Category="template" Name="stm32wl/sys_debug_c.ftl" Condition="(SEM_M0PLUS | SEM_M4) &amp; !SEM_SIGFOX_USER_APPLICATION" src="../Common/System/"/>
+        <File Category="template" Name="stm32wl/sys_debug_h.ftl" Condition="(!SEM_M0PLUS &amp; !SEM_M4) &amp; !SEM_SGX_USER_APPLICATION" src="Core/Inc/"/>
+        <File Category="template" Name="stm32wl/sys_debug_h.ftl" Condition="(SEM_M0PLUS | SEM_M4) &amp; !SEM_SGX_USER_APPLICATION" src="../Common/System/"/>
+        <File Category="template" Name="stm32wl/sys_debug_c.ftl" Condition="(!SEM_M0PLUS &amp; !SEM_M4) &amp; !SEM_SGX_USER_APPLICATION" src="Core/Src/"/>
+        <File Category="template" Name="stm32wl/sys_debug_c.ftl" Condition="(SEM_M0PLUS | SEM_M4) &amp; !SEM_SGX_USER_APPLICATION" src="../Common/System/"/>
+        <File Category="template" Name="stm32wl/radio_conf_h.ftl" Condition="!SEM_M4 &amp; !SEM_SGX_USER_APPLICATION" src="Sigfox/Target"/>
     </RefBspComponent>
     <RefBspComponent Name="Debug Line 3" BspIpName="GPIO" BspModeName="Output">
-        <File Category="template" Name="stm32wl/sys_debug_h.ftl" Condition="(!SEM_M0PLUS &amp; !SEM_M4) &amp; !SEM_SIGFOX_USER_APPLICATION" src="Core/Inc/"/>
-        <File Category="template" Name="stm32wl/sys_debug_h.ftl" Condition="(SEM_M0PLUS | SEM_M4) &amp; !SEM_SIGFOX_USER_APPLICATION" src="../Common/System/"/>
-        <File Category="template" Name="stm32wl/sys_debug_c.ftl" Condition="(!SEM_M0PLUS &amp; !SEM_M4) &amp; !SEM_SIGFOX_USER_APPLICATION" src="Core/Src/"/>
-        <File Category="template" Name="stm32wl/sys_debug_c.ftl" Condition="(SEM_M0PLUS | SEM_M4) &amp; !SEM_SIGFOX_USER_APPLICATION" src="../Common/System/"/>
+        <File Category="template" Name="stm32wl/sys_debug_h.ftl" Condition="(!SEM_M0PLUS &amp; !SEM_M4) &amp; !SEM_SGX_USER_APPLICATION" src="Core/Inc/"/>
+        <File Category="template" Name="stm32wl/sys_debug_h.ftl" Condition="(SEM_M0PLUS | SEM_M4) &amp; !SEM_SGX_USER_APPLICATION" src="../Common/System/"/>
+        <File Category="template" Name="stm32wl/sys_debug_c.ftl" Condition="(!SEM_M0PLUS &amp; !SEM_M4) &amp; !SEM_SGX_USER_APPLICATION" src="Core/Src/"/>
+        <File Category="template" Name="stm32wl/sys_debug_c.ftl" Condition="(SEM_M0PLUS | SEM_M4) &amp; !SEM_SGX_USER_APPLICATION" src="../Common/System/"/>
+        <File Category="template" Name="stm32wl/radio_conf_h.ftl" Condition="!SEM_M4 &amp; !SEM_SGX_USER_APPLICATION" src="Sigfox/Target"/>
     </RefBspComponent>
     <RefBspComponent Name="Debug Line 4" BspIpName="GPIO" BspModeName="Output">
-        <File Category="template" Name="stm32wl/sys_debug_h.ftl" Condition="(!SEM_M0PLUS &amp; !SEM_M4) &amp; !SEM_SIGFOX_USER_APPLICATION" src="Core/Inc/"/>
-        <File Category="template" Name="stm32wl/sys_debug_h.ftl" Condition="(SEM_M0PLUS | SEM_M4) &amp; !SEM_SIGFOX_USER_APPLICATION" src="../Common/System/"/>
-        <File Category="template" Name="stm32wl/sys_debug_c.ftl" Condition="(!SEM_M0PLUS &amp; !SEM_M4) &amp; !SEM_SIGFOX_USER_APPLICATION" src="Core/Src/"/>
-        <File Category="template" Name="stm32wl/sys_debug_c.ftl" Condition="(SEM_M0PLUS | SEM_M4) &amp; !SEM_SIGFOX_USER_APPLICATION" src="../Common/System/"/>
+        <File Category="template" Name="stm32wl/sys_debug_h.ftl" Condition="(!SEM_M0PLUS &amp; !SEM_M4) &amp; !SEM_SGX_USER_APPLICATION" src="Core/Inc/"/>
+        <File Category="template" Name="stm32wl/sys_debug_h.ftl" Condition="(SEM_M0PLUS | SEM_M4) &amp; !SEM_SGX_USER_APPLICATION" src="../Common/System/"/>
+        <File Category="template" Name="stm32wl/sys_debug_c.ftl" Condition="(!SEM_M0PLUS &amp; !SEM_M4) &amp; !SEM_SGX_USER_APPLICATION" src="Core/Src/"/>
+        <File Category="template" Name="stm32wl/sys_debug_c.ftl" Condition="(SEM_M0PLUS | SEM_M4) &amp; !SEM_SGX_USER_APPLICATION" src="../Common/System/"/>
+        <File Category="template" Name="stm32wl/radio_conf_h.ftl" Condition="!SEM_M4 &amp; !SEM_SGX_USER_APPLICATION" src="Sigfox/Target"/>
     </RefBspComponent>
-    <!-- BSP Debug End -->
+    <!-- BSP Probe End -->
 <!-- Platform Setting End -->
 </IP>

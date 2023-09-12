@@ -274,6 +274,70 @@
             <PossibleValue Comment="7 eighth full configuration " Value="UART_RXFIFO_THRESHOLD_7_8"/>
             <PossibleValue Comment="Full " Value="UART_RXFIFO_THRESHOLD_8_8"/>
         </RefParameter>
+        
+        <!-- Autonomous Mode with Parameters __begin -->
+        <RefParameter Comment="Autonomous Mode" DefaultValue="AUTONOMOUS_MODE_DISABLE" Group="Advanced Parameters" Name="AutonomousMode" Type="list">
+            <Condition Diagnostic="" Expression="STM32U5 &amp; $IpInstance_Asynchronous &amp; !$IpInstance_FlowControl"/>
+            <PossibleValue Comment="Disable " Value="AUTONOMOUS_MODE_DISABLE"/>
+            <PossibleValue Comment="Enable " Value="AUTONOMOUS_MODE_ENABLE"/>
+        </RefParameter>
+        <RefParameter Comment="Autonomous Mode" DefaultValue="null" Group="Advanced Parameters" Name="AutonomousMode" Type="list" Visible="false">
+            <Condition Diagnostic="" Expression="!STM32U5"/>
+        </RefParameter>
+        
+        <RefParameter Comment="Autonomous Mode" DefaultValue="AUTONOMOUS_MODE_DISABLE" Group="Advanced Parameters" Name="AutonomousModeState" Type="list">
+            <Condition Diagnostic="" Expression="AutonomousMode = AUTONOMOUS_MODE_ENABLE"/>
+            <PossibleValue Comment="Enable " Value="UART_AUTONOMOUS_MODE_ENABLE"/>
+        </RefParameter>        
+        <RefParameter Comment="Autonomous Mode" DefaultValue="AUTONOMOUS_MODE_DISABLE" Name="AutonomousModeState" Type="list" Visible="false">
+            <Condition Diagnostic="" Expression="AutonomousMode = AUTONOMOUS_MODE_DISABLE"/>
+            <PossibleValue Comment="Disable " Value="UART_AUTONOMOUS_MODE_DISABLE"/>
+        </RefParameter>
+
+        <RefParameter Comment="     Trigger Polarity" DefaultValue="null" Group="Advanced Parameters" Name="TriggerPolarity" Type="list" Visible="false">
+            <Condition Diagnostic="" Expression="!STM32U5 | (AutonomousMode = AUTONOMOUS_MODE_DISABLE)"/>
+        </RefParameter>
+        <RefParameter Comment="     Trigger Polarity" DefaultValue="UART_TRIG_POLARITY_RISING" Group="Advanced Parameters" Name="TriggerPolarity" Type="list">
+            <Condition Diagnostic="" Expression="AutonomousMode = AUTONOMOUS_MODE_ENABLE"/>
+            <PossibleValue Comment="RISING" Value="UART_TRIG_POLARITY_RISING"/>
+            <PossibleValue Comment="FALLING" Value="UART_TRIG_POLARITY_FALLING"/>
+        </RefParameter>
+        
+        <RefParameter Comment="     Trigger Selection" DefaultValue="null" Group="Advanced Parameters" Name="TriggerSelection" Type="list" Visible="false">
+            <Condition Diagnostic="" Expression="!STM32U5 | (AutonomousMode = AUTONOMOUS_MODE_DISABLE)"/>
+        </RefParameter>
+        <RefParameter Comment="     Trigger Selection" DefaultValue="UART_GPDMA1_CH0_TCF_TRG" Group="Advanced Parameters" Name="TriggerSelection" Type="list">
+            <Condition Diagnostic="" Expression="AutonomousMode = AUTONOMOUS_MODE_ENABLE"/>
+            <PossibleValue Comment="LPUART LPDMA1 channel0" Value="LPUART_LPDMA1_CH0_TCF_TRG"/>
+            <PossibleValue Comment="LPUART LPDMA1 channel1" Value="LPUART_LPDMA1_CH1_TCF_TRG"/>
+            <PossibleValue Comment="LPUART LPDMA1 channel2" Value="LPUART_LPDMA1_CH2_TCF_TRG"/>
+            <PossibleValue Comment="LPUART LPDMA1 channel3" Value="LPUART_LPDMA1_CH3_TCF_TRG"/>
+            <PossibleValue Comment="LPUART EXTI line 6" Value="LPUART_EXTI_LINE6_TRG"/>
+            <PossibleValue Comment="LPUART EXTI line 8" Value="LPUART_EXTI_LINE8_TRG"/>
+            <PossibleValue Comment="LPUART LPTIM1 out" Value="LPUART_LPTIM1_OUT_TRG"/>
+            <PossibleValue Comment="LPUART LPTIM3 out" Value="LPUART_LPTIM3_OUT_TRG"/>
+            <PossibleValue Comment="LPUART COMP1 out" Value="LPUART_COMP1_OUT_TRG"/>
+            <PossibleValue Comment="LPUART COMP2 out" Value="LPUART_COMP2_OUT_TRG"/>
+            <PossibleValue Comment="LPUART RTC alarm" Value="LPUART_RTC_ALRA_TRG"/>
+            <PossibleValue Comment="LPUART RTC wakeup" Value="LPUART_RTC_WUT_TRG"/>
+        </RefParameter>
+        
+        <RefParameter Comment="     Data Size" DefaultValue="null" Group="Advanced Parameters" Name="DataSize" Type="integer" Visible="false">
+            <Condition Diagnostic="" Expression="!STM32U5 | (AutonomousMode = AUTONOMOUS_MODE_DISABLE)"/>
+        </RefParameter>
+        <RefParameter Comment="     Data Size" DefaultValue="0" Group="Advanced Parameters" Name="DataSize" Min="0" Type="integer">
+            <Condition Diagnostic="" Expression="AutonomousMode = AUTONOMOUS_MODE_ENABLE"/>
+        </RefParameter>
+        
+        <RefParameter Comment="     Idle Frame" DefaultValue="null" Group="Advanced Parameters" Name="IdleFrame" Type="list" Visible="false">
+            <Condition Diagnostic="" Expression="!STM32U5 | (AutonomousMode = AUTONOMOUS_MODE_DISABLE)"/>
+        </RefParameter>
+        <RefParameter Comment="     Idle Frame" DefaultValue="UART_IDLE_FRAME_DISABLE" Group="Advanced Parameters" Name="IdleFrame" Type="list">
+            <Condition Diagnostic="" Expression="AutonomousMode = AUTONOMOUS_MODE_ENABLE"/>
+            <PossibleValue Comment="Enable" Value="UART_IDLE_FRAME_ENABLE"/>
+            <PossibleValue Comment="Disable" Value="UART_IDLE_FRAME_DISABLE"/>
+        </RefParameter>
+        <!-- Autonomous Mode  __end. -->
 
 	<!-- RefMode for Asynchronous UART -->
 	<RefMode HalMode="UART" Name="Asynchronous">
@@ -320,6 +384,13 @@
                 <Parameter Name="FIFOMode"/>
                 <Parameter Name="TXFIFOThreshold"/>
                 <Parameter Name="RXFIFOThreshold"/>
+                <!--Autonomous Mode-->
+                <Parameter Name="AutonomousMode"/>
+                <Parameter Name="TriggerPolarity"/>
+                <Parameter Name="TriggerSelection"/>
+                <Parameter Name="DataSize"/>
+                <Parameter Name="IdleFrame"/>
+
 		<!-- Advanced Features -->
 		<Parameter Name="TxPinLevelInvertParam"/>
 		<Parameter Name="RxPinLevelInvertParam"/>

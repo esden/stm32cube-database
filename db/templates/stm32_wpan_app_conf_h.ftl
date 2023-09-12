@@ -35,6 +35,8 @@
 [#assign CFG_CLI_UART = "0"]
 [#assign CFG_DEBUGGER_SUPPORTED = 0]
 [#assign CFG_ADV_BD_ADDRESS = 0]
+[#assign CFG_STATIC_RANDOM_ADDRESS = 0]
+[#assign STATIC_RANDOM_ADDRESS = 0]
 [#assign CFG_FAST_CONN_ADV_INTERVAL_MAX_HEXA = 0]
 [#assign CFG_FAST_CONN_ADV_INTERVAL_MIN_HEXA = 0]
 [#assign CFG_LP_CONN_ADV_INTERVAL_MAX_HEXA = 0]
@@ -91,6 +93,7 @@
 [#assign CFG_RTC_SYNCH_PRESCALER = "0x7FFF"]
 [#assign CFG_LPM_STANDBY_SUPPORTED = 0]
 [#assign DIE = DIE]
+[#assign Line = Line]
 [#--
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
@@ -193,6 +196,12 @@
             [/#if]
             [#if (definition.name == "CFG_ADV_BD_ADDRESS")]
                 [#assign CFG_ADV_BD_ADDRESS = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_STATIC_RANDOM_ADDRESS")]
+                [#assign CFG_STATIC_RANDOM_ADDRESS = definition.value]
+            [/#if]
+            [#if (definition.name == "STATIC_RANDOM_ADDRESS")]
+                [#assign STATIC_RANDOM_ADDRESS = definition.value]
             [/#if]
             [#if (definition.name == "CFG_FAST_CONN_ADV_INTERVAL_MIN_HEXA")]
                 [#assign CFG_FAST_CONN_ADV_INTERVAL_MIN_HEXA = definition.value]
@@ -392,6 +401,13 @@
  */
 #define CFG_ADV_BD_ADDRESS                (${CFG_ADV_BD_ADDRESS})
 [/#if]
+[#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_P2P_ROUTER = 1) || (CUSTOM_TEMPLATE = 1)]
+#define CFG_BLE_ADDRESS_TYPE              ${BLE_ADDR_TYPE} /**< Bluetooth address types defined in ble_legacy.h */
+[#if ((CFG_STATIC_RANDOM_ADDRESS = "1") && (BLE_ADDR_TYPE = "RANDOM_ADDR"))]
+#define CFG_STATIC_RANDOM_ADDRESS         (${STATIC_RANDOM_ADDRESS}) /**< Static Random Address fixed for lifetime of the device */
+[/#if]
+[/#if]
+
 [#if (BT_SIG_BEACON != "0") || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_TEMPLATE = 1)]
 #define CFG_FAST_CONN_ADV_INTERVAL_MIN    (${CFG_FAST_CONN_ADV_INTERVAL_MIN_HEXA})   /**< 80ms */
 #define CFG_FAST_CONN_ADV_INTERVAL_MAX    (${CFG_FAST_CONN_ADV_INTERVAL_MAX_HEXA})  /**< 100ms */
@@ -399,13 +415,13 @@
 #define CFG_LP_CONN_ADV_INTERVAL_MAX      (${CFG_LP_CONN_ADV_INTERVAL_MAX_HEXA}) /**< 2.5s */
 [/#if]
 [#if (CUSTOM_TEMPLATE = 1)]
-#define ADV_TYPE                           ${ADV_TYPE}
-#define BLE_ADDR_TYPE                      ${BLE_ADDR_TYPE}
-#define ADV_FILTER                         ${ADV_FILTER}
+#define ADV_TYPE                          ${ADV_TYPE}
+#define BLE_ADDR_TYPE                     ${BLE_ADDR_TYPE}
+#define ADV_FILTER                        ${ADV_FILTER}
 [/#if]
 [#if (CUSTOM_P2P_ROUTER = 1)]
-#define LEDBUTTON_CONN_ADV_INTERVAL_MIN  (0x1FA)
-#define LEDBUTTON_CONN_ADV_INTERVAL_MAX  (0x3E8)
+#define LEDBUTTON_CONN_ADV_INTERVAL_MIN   (0x1FA)
+#define LEDBUTTON_CONN_ADV_INTERVAL_MAX   (0x3E8)
 
 [/#if]
 [#if (BT_SIG_BEACON != "0") || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_P2P_CLIENT = 1)|| (CUSTOM_P2P_ROUTER = 1)|| (CUSTOM_TEMPLATE = 1)]
@@ -502,6 +518,7 @@
 #define CFG_BLE_ERK     {${CFG_BLE_ERK_HEX}}
 
 [/#if]
+[#if Line != "STM32WBx0 Value Line" ]
 /**
  * SMPS supply
  * SMPS not used when Set to 0
@@ -509,6 +526,7 @@
  */
 #define CFG_USE_SMPS    ${CFG_USE_SMPS}
 
+[/#if]
 /* USER CODE BEGIN Generic_Parameters */
 
 /* USER CODE END Generic_Parameters */
@@ -913,7 +931,9 @@
  * allocated in the queue of received events and can be used to optimize the amount of RAM allocated by the Memory Manager.
  * It should not exceed 255 which is the maximum HCI packet payload size (a greater value is a lost of memory as it will
  * never be used)
- * With the current wireless firmware implementation, this parameter shall be kept to 255
+ * It shall be at least 4 to receive the command status event in one frame.
+ * The default value is set to 27 to allow receiving an event of MTU size in a single buffer. This value maybe reduced
+ * further depending on the application.
  */
 [#if (BLE = 1)]
 #define CFG_TLBLE_MOST_EVENT_PAYLOAD_SIZE ${CFG_TLBLE_MOST_EVENT_PAYLOAD_SIZE}   /**< Set to 255 with the memory manager and the mailbox */
@@ -1029,6 +1049,11 @@
 #define CFG_LPM_STANDBY_SUPPORTED    ${CFG_LPM_STANDBY_SUPPORTED}
 
 [/#if]
+/******************************************************************************
+ * RTC interface
+ ******************************************************************************/
+#define HAL_RTCEx_WakeUpTimerIRQHandler(...)  HW_TS_RTC_Wakeup_Handler( )
+
 /******************************************************************************
  * Timer Server
  ******************************************************************************/
@@ -1377,7 +1402,6 @@ typedef enum
 [/#if]
 [#if (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
     CFG_TASK_ADV_CANCEL_ID,
-    CFG_TASK_SW1_BUTTON_PUSHED_ID,
 #if (L2CAP_REQUEST_NEW_CONN_PARAM != 0 )
     CFG_TASK_CONN_UPDATE_REG_ID,
 #endif
@@ -1386,7 +1410,6 @@ typedef enum
     CFG_TASK_START_SCAN_ID,
     CFG_TASK_CONN_DEV_1_ID,
     CFG_TASK_SEARCH_SERVICE_ID,
-    CFG_TASK_SW1_BUTTON_PUSHED_ID,
     CFG_TASK_CONN_UPDATE_ID,
 [/#if]
 [#if CUSTOM_P2P_ROUTER = 1]
@@ -1543,7 +1566,7 @@ typedef enum
 #define CFG_SHCI_USER_EVT_PROCESS_CB_SIZE     (0)
 #define CFG_SHCI_USER_EVT_PROCESS_STACK_MEM   (0)
 #define CFG_SHCI_USER_EVT_PROCESS_PRIORITY    osPriorityNone
-#define CFG_SHCI_USER_EVT_PROCESS_STACK_SIZE  (128 * 7)
+#define CFG_SHCI_USER_EVT_PROCESS_STACK_SIZE  (128 * 20)
 
 [#if (THREAD = 1)]
 #define CFG_THREAD_MSG_M0_TO_M4_PROCESS_NAME        "THREAD_MSG_M0_TO_M4_PROCESS"
@@ -1570,7 +1593,7 @@ typedef enum
 #define CFG_HCI_USER_EVT_PROCESS_CB_SIZE      (0)
 #define CFG_HCI_USER_EVT_PROCESS_STACK_MEM    (0)
 #define CFG_HCI_USER_EVT_PROCESS_PRIORITY     osPriorityNone
-#define CFG_HCI_USER_EVT_PROCESS_STACK_SIZE   (128 * 8)
+#define CFG_HCI_USER_EVT_PROCESS_STACK_SIZE   (128 * 40)
 
 #define CFG_ADV_UPDATE_PROCESS_NAME           "ADV_UPDATE_PROCESS"
 #define CFG_ADV_UPDATE_PROCESS_ATTR_BITS      (0)
@@ -1578,7 +1601,7 @@ typedef enum
 #define CFG_ADV_UPDATE_PROCESS_CB_SIZE        (0)
 #define CFG_ADV_UPDATE_PROCESS_STACK_MEM      (0)
 #define CFG_ADV_UPDATE_PROCESS_PRIORITY       osPriorityNone
-#define CFG_ADV_UPDATE_PROCESS_STACK_SIZE     (128 * 6)
+#define CFG_ADV_UPDATE_PROCESS_STACK_SIZE     (128 * 20)
 
 #define CFG_HRS_PROCESS_NAME                  "HRS_PROCESS"
 #define CFG_HRS_PROCESS_ATTR_BITS             (0)
@@ -1586,7 +1609,7 @@ typedef enum
 #define CFG_HRS_PROCESS_CB_SIZE               (0)
 #define CFG_HRS_PROCESS_STACK_MEM             (0)
 #define CFG_HRS_PROCESS_PRIORITY              osPriorityNone
-#define CFG_HRS_PROCESS_STACK_SIZE            (128 * 5)
+#define CFG_HRS_PROCESS_STACK_SIZE            (128 * 20)
 
 [/#if]
 /* USER CODE BEGIN FreeRTOS_Defines */

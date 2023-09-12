@@ -55,7 +55,13 @@ pElmt is viewed as of DTDtsElmtDM type.--]
 	[#local internalConfigsList = pConfigsList]
 
 	[#--get tabulations level--]
-	[#local dtsTAB = dts_get_tabs(pDtLevel).TABN]
+	[#local printerTAG = ""]
+	[#if pElmt.txtPrinterTag?? && pElmt.txtPrinterTag?has_content]
+		[#local printerTAG = pElmt.txtPrinterTag]
+		[#local dtsTAB =  printerTAG + dts_get_tabs(pDtLevel).TABN]
+	[#else]
+		[#local dtsTAB =  dts_get_tabs(pDtLevel).TABN]
+	[/#if]
 
 	[#--Check DTBindingElmt level --]
 	[#------------------------------]
@@ -238,7 +244,7 @@ ${propArrayItemSeparator}${possibleValueStart}${value}[#t]
 						[#local formatOff = ">"]
 					[/#if]
 					[#if (formatOn?has_content) && (formatOff?has_content)]
-#include ${formatOn}${name}${formatOff}
+${printerTAG}#include ${formatOn}${name}${formatOff}
 					[#else]
 						[@mlog  logMod=module logType="ERR" logMsg="Unknown dts-v1 include format" varsMap={"format":format!, "name":name!} /]
 					[/#if]
@@ -317,9 +323,9 @@ ${dtsTAB}/${name}/[#t]
 						[#local dtsTABCpp = dtsTABCpp?substring(1)][#--cf inclusion into container--]
 					[/#if]
 					[#if value?has_content]
-#${name} ${value}
+${printerTAG}#${name} ${value}
 					[#else]
-#${name}
+${printerTAG}#${name}
 					[/#if]
 					[#--Print--]
 					[#local inspectAndPrint = true]

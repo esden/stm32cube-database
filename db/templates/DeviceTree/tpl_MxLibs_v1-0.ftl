@@ -140,6 +140,18 @@ NB: all the string lists should be re-ordered to insure DTS ordering.
 [/#function]
 
 
+[#--get manifest version.
+	Empty string if no version.--]
+[#function srvcmx_getManifestVersion]
+
+	[#if !mxDtDM.dt_ManifestVersion??]
+		[#return ""]
+	[/#if]
+
+[#return mxDtDM.dt_ManifestVersion]
+[/#function]
+
+
 [#--returns the list of devices assigned to "BootLoader" context and enabled--]
 [#function srvcmx_getBootloadersEnabledDevicesList]
 

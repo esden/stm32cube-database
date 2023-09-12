@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    app_sigfox.c
@@ -8,33 +9,38 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
-
+/* USER CODE END Header */
 [#--
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            ${definition.name}: ${definition.value}
-        [/#list]
-    [/#if]
-[/#list]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                ${definition.name}: ${definition.value}
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 --]
 [#assign CPUCORE = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")]
 [#assign SUBGHZ_APPLICATION = ""]
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            [#if definition.name == "SUBGHZ_APPLICATION"]
-                [#assign SUBGHZ_APPLICATION = definition.value]
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "SUBGHZ_APPLICATION"]
+                    [#assign SUBGHZ_APPLICATION = definition.value]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
+
 /* Includes ------------------------------------------------------------------*/
 #include "app_sigfox.h"
-[#if (CPUCORE == "CM4") || (CPUCORE == "")]
-#include "sgfx_app.h"
-[#elseif (CPUCORE == "CM0PLUS")]
+[#if (CPUCORE == "CM0PLUS")]
 #include "radio.h"
+[#else]
+#include "sgfx_app.h"
 [/#if]
 #include "sys_app.h"
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION") ]

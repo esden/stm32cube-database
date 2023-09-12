@@ -46,7 +46,16 @@ extern "C" {
 /* USER CODE END EM */
 
 /* Exported functions ---------------------------------------------*/
-  void APPE_Init( void );
+  void MX_APPE_Config( void );
+  void MX_APPE_Init( void );
+[#if !FREERTOS??]
+  void MX_APPE_Process( void );
+[/#if]
+  void Init_Exti( void );
+[#if Line != "STM32WBx0 Value Line" ]
+  void Init_Smps( void );
+[/#if]
+
 /* USER CODE BEGIN EF */
 
 /* USER CODE END EF */

@@ -15,7 +15,6 @@
         </excluded>
         [#assign excludeFromConfig = "1"]
     [/#if]
-
     [#if groupArg.sourceFilesNameList??]
         [#list groupArg.sourceFilesNameList as filesName]
             [#if filesName?ends_with(".a")||filesName?ends_with(".lib")]
@@ -27,7 +26,7 @@
             <name>${filesName!''}</name>
             [#if  isApplicationGroup=="0" && excludeFromConfig=="0" && prtGrpexcluded =="0" && multiConfigurationProject?? && ConfigsAndFiles??]
                 [#list ConfigsAndFiles?keys as configKey]
-                    [#if !ConfigsAndFiles[configKey]?seq_contains(filesName) && TrustZone=="0"]
+                    [#if !ConfigsAndFiles[configKey]?seq_contains(filesName) && !ConfigsAndFiles[configKey]?seq_contains(filesName?replace("/","\\")) && TrustZone=="0"]
                             <excluded>
                                 <configuration>${Configuration}_${configKey?replace("CortexM", "CM")}</configuration>
                                 </excluded>
@@ -122,6 +121,13 @@
             [#if dataKey=="CdefinesList"]
                [#assign CdefinesList =  elem[dataKey]]
             [/#if]
+            [#if dataKey=="AdefinesList"]
+               [#assign AdefinesList =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="aDefineToRemove"]
+               [#assign aDefineToRemove =  elem[dataKey]]
+            [/#if]
+
             [#if dataKey=="linkerExtraLibList"]
                [#assign linkerExtraLibList =  elem[dataKey]]
             [/#if]
@@ -142,6 +148,15 @@
             [/#if]
             [#if dataKey=="LinkerFile"]
                [#assign LinkerFile =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="HeapSize"]
+               [#assign HeapSize =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="StackSize"]
+               [#assign StackSize =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="threadsafeCore"]
+               [#assign threadsafeCore =  elem[dataKey]]
             [/#if]
         [/#list]   
     [/#if]
@@ -305,6 +320,33 @@
         [/#list] 
         </LinkAdditionalLibs>
     [/#if]
+
+
+[#if ThreadSafeSupport?? && ThreadSafeStrategy[threadsafeCore]??]
+    <ThreadSafeSupport>
+        <ThreadSafeStrategy>${ThreadSafeStrategy[threadsafeCore].getStrategyValue()}</ThreadSafeStrategy>
+			[#if FilesFromFW??]
+            <IDELockFiles>
+                [#list cFileIDEList as cFileIDE]
+                    <cFile>${cFileIDE}</cFile>
+                [/#list]
+                [#list hFileIDEList as hFileIDE]
+                    <hFile>${hFileIDE}</hFile>
+                [/#list]
+            </IDELockFiles>
+
+            <UserLockFiles>
+                <Inc>
+                    [#list hFileUserList as hFileUser]
+                        <hFile>${hFileUser}</hFile>
+                    [/#list]
+                </Inc>
+            </UserLockFiles>
+			[/#if]
+
+    </ThreadSafeSupport>
+[/#if]
+
     </config>
 [/#macro]
 
@@ -392,6 +434,12 @@
 [#if dataKey=="prj_ctx"]
                [#assign prj_ctx =  elem[dataKey]]
             [/#if]
+            [#if dataKey=="HeapSize"]
+               [#assign HeapSize =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="StackSize"]
+               [#assign StackSize =  elem[dataKey]]
+            [/#if]
         [/#list]
         [#break]
     [/#if]
@@ -402,6 +450,9 @@
 [#-- <ProjectPath>${ProjectPath}</ProjectPath>  --][#-- added to give project path --]
     <ProjectName>${projectName}[#if TrustZone=="1"][#if prjSecure=="1"]_S[#else]_NS[/#if][/#if]</ProjectName> [#-- modified to give only the project name without path --]
     <ProjectNature>${ProjectNature}</ProjectNature> [#-- Cpp --]
+    [#if CompilerVersionCte??]
+    <CompilerVersion>${CompilerVersionCte}</CompilerVersion>
+    [/#if]
  [#if TrustZone == "1"]     
 <Secure>${prjSecure}</Secure>
 [#else]
@@ -527,7 +578,7 @@
                     </sourceEntry>
         [#if sourceStructure == "Advanced"]
             [#list MiddlewareList as Middleware] 
-                [#if Middleware != "FREERTOS"]                    
+                [#if Middleware != "FREERTOS" && Middleware != "ThreadX"]                    
                         [#if TrustZone == "0"]
                     <sourceEntry>
                     <name>${Middleware}</name>
@@ -797,7 +848,7 @@
             <name>${src}</name>
             </sourceEntry>
             [#list AppSourceEntries as SrcEntry] [#-- add application Groups --]
-                    [#if !SrcEntry?ends_with("FREERTOS")]
+                    [#if !SrcEntry?ends_with("FREERTOS") && !SrcEntry?ends_with("ThreadX")]
             <sourceEntry>
             <name>${SrcEntry}</name>
             </sourceEntry>
@@ -921,7 +972,7 @@
         
     [#if sourceStructure == "Advanced"]
         [#list MiddlewareList as Middleware] 
-            [#if Middleware != "FREERTOS" && !AppSourceEntries?seq_contains(Middleware?replace("/","\\")?replace("CM0Plus","CM0PLUS"))]             
+            [#if Middleware != "FREERTOS" && Middleware != "ThreadX" && !AppSourceEntries?seq_contains(Middleware?replace("/","\\")?replace("CM0Plus","CM0PLUS"))]             
             [#if TrustZone == "0"]
                     <sourceEntry>
                     <name>${Middleware}</name>

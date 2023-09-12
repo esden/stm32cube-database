@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    subghz_phy_app.h
@@ -8,16 +9,18 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 [#--
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
                 ${definition.name}: ${definition.value}
-        [/#list]
-    [/#if]
-[/#list]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 --]
-
 [#assign SUBGHZ_APPLICATION = ""]
 [#assign MODEM_USED = ""]
 [#assign REGION = ""]
@@ -33,57 +36,64 @@
 [#assign FSK_BANDWIDTH = ""]
 [#assign FSK_PREAMBLE_LENGTH = ""]
 [#assign FSK_FIX_LENGTH_PAYLOAD_ON = ""]
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            [#if definition.name == "SUBGHZ_APPLICATION"]
-                [#assign SUBGHZ_APPLICATION = definition.value]
-            [/#if]
-            [#if definition.name == "MODEM_USED"]
-                [#assign MODEM_USED = definition.value]
-            [/#if]
-            [#if definition.name == "REGION"]
-                [#assign REGION = definition.value]
-            [/#if]
-            [#if definition.name == "LORA_BANDWIDTH"]
-                [#assign LORA_BANDWIDTH = definition.value]
-            [/#if]
-            [#if definition.name == "LORA_SPREADING_FACTOR"]
-                [#assign LORA_SPREADING_FACTOR = definition.value]
-            [/#if]
-            [#if definition.name == "LORA_CODINGRATE"]
-                [#assign LORA_CODINGRATE = definition.value]
-            [/#if]
-            [#if definition.name == "LORA_PREAMBLE_LENGTH"]
-                [#assign LORA_PREAMBLE_LENGTH = definition.value]
-            [/#if]
-            [#if definition.name == "LORA_SYMBOL_TIMEOUT"]
-                [#assign LORA_SYMBOL_TIMEOUT = definition.value]
-            [/#if]
-            [#if definition.name == "LORA_FIX_LENGTH_PAYLOAD_ON"]
-                [#assign LORA_FIX_LENGTH_PAYLOAD_ON = definition.value]
-            [/#if]
-            [#if definition.name == "LORA_IQ_INVERSION_ON"]
-                [#assign LORA_IQ_INVERSION_ON = definition.value]
-            [/#if]
-            [#if definition.name == "FSK_FDEV"]
-                [#assign FSK_FDEV = definition.value]
-            [/#if]
-            [#if definition.name == "FSK_DATARATE"]
-                [#assign FSK_DATARATE = definition.value]
-            [/#if]
-            [#if definition.name == "FSK_BANDWIDTH"]
-                [#assign FSK_BANDWIDTH = definition.value]
-            [/#if]
-            [#if definition.name == "FSK_PREAMBLE_LENGTH"]
-                [#assign FSK_PREAMBLE_LENGTH = definition.value]
-            [/#if]
-            [#if definition.name == "FSK_FIX_LENGTH_PAYLOAD_ON"]
-                [#assign FSK_FIX_LENGTH_PAYLOAD_ON = definition.value]
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
+[#assign PAYLOAD_LEN = ""]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "SUBGHZ_APPLICATION"]
+                    [#assign SUBGHZ_APPLICATION = definition.value]
+                [/#if]
+                [#if definition.name == "MODEM_USED"]
+                    [#assign MODEM_USED = definition.value]
+                [/#if]
+                [#if definition.name == "REGION"]
+                    [#assign REGION = definition.value]
+                [/#if]
+                [#if definition.name == "LORA_BANDWIDTH"]
+                    [#assign LORA_BANDWIDTH = definition.value]
+                [/#if]
+                [#if definition.name == "LORA_SPREADING_FACTOR"]
+                    [#assign LORA_SPREADING_FACTOR = definition.value]
+                [/#if]
+                [#if definition.name == "LORA_CODINGRATE"]
+                    [#assign LORA_CODINGRATE = definition.value]
+                [/#if]
+                [#if definition.name == "LORA_PREAMBLE_LENGTH"]
+                    [#assign LORA_PREAMBLE_LENGTH = definition.value]
+                [/#if]
+                [#if definition.name == "LORA_SYMBOL_TIMEOUT"]
+                    [#assign LORA_SYMBOL_TIMEOUT = definition.value]
+                [/#if]
+                [#if definition.name == "LORA_FIX_LENGTH_PAYLOAD_ON"]
+                    [#assign LORA_FIX_LENGTH_PAYLOAD_ON = definition.value]
+                [/#if]
+                [#if definition.name == "LORA_IQ_INVERSION_ON"]
+                    [#assign LORA_IQ_INVERSION_ON = definition.value]
+                [/#if]
+                [#if definition.name == "FSK_FDEV"]
+                    [#assign FSK_FDEV = definition.value]
+                [/#if]
+                [#if definition.name == "FSK_DATARATE"]
+                    [#assign FSK_DATARATE = definition.value]
+                [/#if]
+                [#if definition.name == "FSK_BANDWIDTH"]
+                    [#assign FSK_BANDWIDTH = definition.value]
+                [/#if]
+                [#if definition.name == "FSK_PREAMBLE_LENGTH"]
+                    [#assign FSK_PREAMBLE_LENGTH = definition.value]
+                [/#if]
+                [#if definition.name == "FSK_FIX_LENGTH_PAYLOAD_ON"]
+                    [#assign FSK_FIX_LENGTH_PAYLOAD_ON = definition.value]
+                [/#if]
+                [#if definition.name == "PAYLOAD_LEN"]
+                    [#assign PAYLOAD_LEN = definition.value]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
+
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __SUBGHZ_PHY_APP_H__
 #define __SUBGHZ_PHY_APP_H__
@@ -103,8 +113,8 @@ extern "C" {
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
-/* MODEM type: one shall be 1 the other shall be 0 */
 [#if (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION")]
+/* MODEM type: one shall be 1 the other shall be 0 */
 [#if (MODEM_USED == "USE_MODEM_FSK")]
 #define USE_MODEM_LORA  0
 #define USE_MODEM_FSK   1
@@ -174,7 +184,6 @@ extern "C" {
 #define FSK_FDEV                                    ${FSK_FDEV}     /* Hz */
 #define FSK_DATARATE                                ${FSK_DATARATE}     /* bps */
 #define FSK_BANDWIDTH                               ${FSK_BANDWIDTH}     /* Hz */
-#define FSK_AFC_BANDWIDTH                           83333     /* Hz */
 #define FSK_PREAMBLE_LENGTH                         ${FSK_PREAMBLE_LENGTH}         /* Same for Tx and Rx */
 #define FSK_FIX_LENGTH_PAYLOAD_ON                   ${FSK_FIX_LENGTH_PAYLOAD_ON}
 
@@ -182,14 +191,9 @@ extern "C" {
 #error "Please define a modem in the compiler subghz_phy_app.h."
 #endif /* USE_MODEM_LORA | USE_MODEM_FSK */
 
-#define RX_TIMEOUT_VALUE                            2000
-#define TX_TIMEOUT_VALUE                            3000
-#define BUFFER_SIZE                                 64  /* Define the payload size here */
-#define LED_PERIOD_MS                               200
-
-#define TCXO_WORKAROUND_TIME_MARGIN                 50  /* 50ms margin */
-
+#define PAYLOAD_LEN                                 ${PAYLOAD_LEN}
 [/#if]
+
 /* USER CODE BEGIN EC */
 
 /* USER CODE END EC */
@@ -205,16 +209,8 @@ extern "C" {
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
-/* USER CODE BEGIN EFP */
-
-/* USER CODE END EFP */
-
-
-/* Exported functions prototypes ---------------------------------------------*/
 /**
   * @brief  Init Subghz Application
-  * @param None
-  * @retval None
   */
 void SubghzApp_Init(void);
 

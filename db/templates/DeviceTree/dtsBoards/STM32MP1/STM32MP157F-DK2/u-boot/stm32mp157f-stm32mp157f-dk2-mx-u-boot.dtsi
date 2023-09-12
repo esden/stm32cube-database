@@ -19,20 +19,16 @@
 	config{
 		u-boot,boot-led = "heartbeat";
 		u-boot,error-led = "error";
-		u-boot,mmc-env-partition = "ssbl";
+		u-boot,mmc-env-partition = "fip";
 		st,adc_usb_pd = <&adc1 18>, <&adc1 19>;
 		st,fastboot-gpios = <&gpioa 13 GPIO_ACTIVE_LOW>;
 		st,stm32prog-gpios = <&gpioa 14 GPIO_ACTIVE_LOW>;
 	};
 
-	led{
+#ifdef CONFIG_STM32MP15x_STM32IMAGE
 
-		red{
-			label = "error";
-			gpios = <&gpioa 13 GPIO_ACTIVE_LOW>;
-			default-state = "off";
-			status = "okay";
-		};
+	config{
+		u-boot,mmc-env-partition = "ssbl";
 	};
 
 	firmware{
@@ -50,11 +46,22 @@
 			no-map;
 		};
 	};
+#endif
+
+	led{
+
+		led-red{
+			label = "error";
+			gpios = <&gpioa 13 GPIO_ACTIVE_LOW>;
+			default-state = "off";
+			status = "okay";
+		};
+	};
 	/* USER CODE END root */
 
 	clocks{
 
-#ifndef CONFIG_STM32MP1_TRUSTED
+#ifndef CONFIG_TFABOOT
 
 		clk_lsi:clk-lsi{
 		};
@@ -77,7 +84,7 @@
 	};
 };
 
-#ifndef CONFIG_STM32MP1_TRUSTED
+#ifndef CONFIG_TFABOOT
 
 &rcc{
 	u-boot,dm-pre-reloc;
@@ -189,7 +196,6 @@
 
 	/* USER CODE BEGIN usbotg_hs */
 	u-boot,force-b-session-valid;
-	hnp-srp-disable;
 	dr_mode = "peripheral";
 	/* USER CODE END usbotg_hs */
 };
@@ -211,4 +217,5 @@
 &adc{
 	status = "okay";
 };
+
 /* USER CODE END addons */

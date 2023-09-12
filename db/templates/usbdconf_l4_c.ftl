@@ -854,10 +854,10 @@ USBD_StatusTypeDef USBD_LL_PrepareReceive(USBD_HandleTypeDef *pdev, uint8_t ep_a
 }
 
 /**
-  * @brief  Returns the last transfered packet size.
+  * @brief  Returns the last transferred packet size.
   * @param  pdev: Device handle
   * @param  ep_addr: Endpoint number
-  * @retval Recived Data Size
+  * @retval Received Data Size
   */
 uint32_t USBD_LL_GetRxDataSize(USBD_HandleTypeDef *pdev, uint8_t ep_addr)
 {
@@ -877,7 +877,10 @@ uint32_t USBD_LL_GetRxDataSize(USBD_HandleTypeDef *pdev, uint8_t ep_addr)
    */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
+  if (GPIO_Pin == GPIO_PIN_9)
+  {
      HAL_PCDEx_BCD_VBUSDetect(&hpcd_USB_OTG_FS);
+  }
 }
                 [/#if]
             [/#if]

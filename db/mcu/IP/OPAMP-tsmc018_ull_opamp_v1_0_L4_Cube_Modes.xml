@@ -8,11 +8,21 @@
 	<RefParameter Name="Instance" DefaultValue="OPAMP$Index" Comment="Instance" Type="" Visible="false"/>
 	
 	<RefParameter Comment="Power Supply Range" DefaultValue="OPAMP_POWERSUPPLY_LOW" Name="PowerSupplyRange" Type="list"  Group="Basic Parameters">
-		<PossibleValue Comment="Power Supply Range Low" Value="OPAMP_POWERSUPPLY_LOW"/>
-		<PossibleValue Comment="Power Supply Range High" Value="OPAMP_POWERSUPPLY_HIGH"/>
+	<Condition Diagnostic="" Expression="STM32L4|STM32L5"/>
+ 		<PossibleValue Comment="Power Supply Range Low" Value="OPAMP_POWERSUPPLY_LOW"/>
+ 		<PossibleValue Comment="Power Supply Range High" Value="OPAMP_POWERSUPPLY_HIGH"/>
+ 	</RefParameter>
+ 	
+	<RefParameter Comment="Power Mode" DefaultValue="OPAMP_POWERMODE_NORMALPOWER_NORMALSPEED" Name="PowerMode" Type="list"  Group="Basic Parameters">
+	<Condition Diagnostic="" Expression="STM32U5"/>
+		<PossibleValue Comment="Normal and Normal Speed" Value="OPAMP_POWERMODE_NORMALPOWER_NORMALSPEED"/>
+		<PossibleValue Comment="Normal and High Speed" Value="OPAMP_POWERMODE_NORMALPOWER_HIGHSPEED"/>
+		<PossibleValue Comment="Low and Normal Speed" Value="OPAMP_POWERMODE_LOWPOWER_NORMALSPEED"/>
+		<PossibleValue Comment="Low and High Speed" Value="OPAMP_POWERMODE_LOWPOWER_HIGHSPEED"/>
 	</RefParameter>
 	
 	<RefParameter Comment="Power Mode" DefaultValue="OPAMP_POWERMODE_NORMALPOWER" Name="PowerMode" Type="list"  Group="Basic Parameters">
+			<Condition Diagnostic="" Expression="STM32L4|STM32L5"/>
 		<PossibleValue Comment="Normal" Value="OPAMP_POWERMODE_NORMALPOWER"/>
 		<PossibleValue Comment="Low Power" Value="OPAMP_POWERMODE_LOWPOWER"/>
 	</RefParameter>
@@ -50,14 +60,20 @@
 	</RefParameter>
 	
 	<RefParameter Comment="Inverting Input" DefaultValue="null" Name="InvertingInput" Type="list" Visible="false" Group="Basic Parameters"/>
-		
-	
-
-	
-	
-	
-	
-	  
+        
+	<!--internal Output -->
+    <RefParameter Comment="Internal Output" DefaultValue="ENABLE" Group="Basic Parameters" Name="InternalOutput" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="(STM32U5 &amp;(OPAMP1channelSelected_ADC1) &amp;$IpNumber=1)"/>
+        <PossibleValue Comment="Enable" Value="ENABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Internal Output" DefaultValue="ENABLE" Group="Basic Parameters" Name="InternalOutput" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="(STM32U5 &amp;(OPAMP2channelSelected_ADC2) &amp;($Index=2))"/>
+        <PossibleValue Comment="Enable" Value="ENABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Internal Output" DefaultValue="DISABLE" Group="Basic Parameters" Name="InternalOutput" Type="list" Visible="false">
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+    </RefParameter>	
+	 
 	   <!-- PgaGain  -->
 	
     <RefParameter Comment="PGA Gain" DefaultValue="OPAMP_PGA_GAIN_2" Name="PgaGain" Type="list" Group="Basic Parameters">
@@ -77,49 +93,99 @@
 	    <Condition Expression="$IpInstance_User_Trimming" Diagnostic=""/>
 		<PossibleValue Comment="Enable" Value="Enable" Semaphore="$IpInstance_Self_Calibrate"/>
 		<PossibleValue Comment="Disable" Value="Disable"/>
-		<Description>Self Calibration is not available for LL configuration.</Description> 
+		<Description>Self Calibration is not available for LL configuration.</Description>
 	</RefParameter>
 	<RefParameter Comment="Self Calibration" DefaultValue="Disable" Name="SelfCalibration" Type="list" Visible="false" Group="Basic Parameters">
 		<PossibleValue Comment="Enable" Value="Enable" />
 		<PossibleValue Comment="Disable" Value="Disable"/>
 	</RefParameter>
 		
-	
-	<!--<RefParameter Comment="OffSet Trimming Value (PMOS)" DefaultValue="16" Max="31" Min="0"  Name="TrimmingValueP" Type="integer" Visible="false" Group="Basic Parameters">
-		<Condition Expression="SelfCalibration = Enable &amp;   PowerMode = OPAMP_POWERMODE_NORMALPOWER" Diagnostic=""/>
+	<!-- (STM32L4|STM32L5) -->
+	<!-- <RefParameter Comment="OffSet Trimming Value (PMOS)" DefaultValue="16" Max="31" Min="0"  Name="TrimmingValueP" Type="integer" Visible="false" Group="Basic Parameters">
+		<Condition Expression="(STM32L4|STM32L5) &amp; SelfCalibration = Enable &amp; PowerMode = OPAMP_POWERMODE_NORMALPOWER" Diagnostic=""/>
 	</RefParameter> -->
 	<RefParameter Comment="OffSet Trimming Value (PMOS)" DefaultValue="16" Max="31" Min="0"  Name="TrimmingValueP" Type="integer" Group="Basic Parameters">
-		<Condition Expression="UserTrimming = OPAMP_TRIMMING_USER &amp; PowerMode = OPAMP_POWERMODE_NORMALPOWER &amp; SelfCalibration = Disable" Diagnostic=""/>
+		<Condition Expression="(STM32L4|STM32L5) &amp; UserTrimming = OPAMP_TRIMMING_USER &amp; PowerMode = OPAMP_POWERMODE_NORMALPOWER &amp; SelfCalibration = Disable" Diagnostic=""/>
 	</RefParameter>
-	<RefParameter Comment="OffSet Trimming Value (PMOS)" DefaultValue="null"  Name="TrimmingValueP" Type="integer" Visible="false" Group="Basic Parameters"/>
+	<RefParameter Comment="OffSet Trimming Value (PMOS)" DefaultValue="null"  Name="TrimmingValueP" Type="integer" Visible="false" Group="Basic Parameters">
+	<Condition Expression="(STM32L4|STM32L5)" Diagnostic=""/>
+	</RefParameter>
 		
 	
-	<!--<RefParameter Comment="OffSet Trimming Value (NMOS)" DefaultValue="16" Max="31" Min="0"  Name="TrimmingValueN" Type="integer" Visible="false" Group="Basic Parameters">
-        <Condition Expression="SelfCalibration = Enable &amp; PowerMode = OPAMP_POWERMODE_NORMALPOWER" Diagnostic=""/>
+	<!-- <RefParameter Comment="OffSet Trimming Value (NMOS)" DefaultValue="16" Max="31" Min="0"  Name="TrimmingValueN" Type="integer" Visible="false" Group="Basic Parameters">
+        <Condition Expression="(STM32L4|STM32L5) &amp; SelfCalibration = Enable &amp;   PowerMode = OPAMP_POWERMODE_NORMALPOWER" Diagnostic=""/>
 	</RefParameter> -->
 	<RefParameter Comment="OffSet Trimming Value (NMOS)" DefaultValue="16" Max="31" Min="0"  Name="TrimmingValueN" Type="integer" Group="Basic Parameters">
-        <Condition Expression="UserTrimming = OPAMP_TRIMMING_USER &amp; PowerMode = OPAMP_POWERMODE_NORMALPOWER &amp; SelfCalibration = Disable" Diagnostic=""/>
+        <Condition Expression="(STM32L4|STM32L5) &amp; UserTrimming = OPAMP_TRIMMING_USER &amp; PowerMode = OPAMP_POWERMODE_NORMALPOWER &amp; SelfCalibration = Disable" Diagnostic=""/>
 	</RefParameter>
-	<RefParameter Comment="OffSet Trimming Value (NMOS)" DefaultValue="null"  Name="TrimmingValueN" Type="integer" Visible="false" Group="Basic Parameters"/>
+	<RefParameter Comment="OffSet Trimming Value (NMOS)" DefaultValue="null"  Name="TrimmingValueN" Type="integer" Visible="false" Group="Basic Parameters">
+	<Condition Expression="(STM32L4|STM32L5)" Diagnostic=""/>
+	</RefParameter>
     
-    <!--<RefParameter Comment="OffSet Trimming Value Low Power (PMOS)" DefaultValue="16" Max="31" Min="0"  Name="TrimmingValuePLowPower" Type="integer" Visible="false" Group="Basic Parameters">
-		<Condition Expression=" SelfCalibration = Disable &amp; PowerMode = OPAMP_POWERMODE_LOWPOWER" Diagnostic=""/>
-	</RefParameter>-->	
+    <!-- <RefParameter Comment="OffSet Trimming Value Low Power (PMOS)" DefaultValue="16" Max="31" Min="0"  Name="TrimmingValuePLowPower" Type="integer" Visible="false" Group="Basic Parameters">
+		<Condition Expression="(STM32L4|STM32L5) &amp; SelfCalibration = Enable &amp;  PowerMode = OPAMP_POWERMODE_LOWPOWER" Diagnostic=""/>
+	</RefParameter> -->
 	<RefParameter Comment="OffSet Trimming Value Low Power (PMOS)" DefaultValue="16" Max="31" Min="0"  Name="TrimmingValuePLowPower" Type="integer" Group="Basic Parameters">
-		<Condition Expression="UserTrimming = OPAMP_TRIMMING_USER &amp; PowerMode = OPAMP_POWERMODE_LOWPOWER &amp; SelfCalibration = Disable" Diagnostic=""/>
+		<Condition Expression="(STM32L4|STM32L5) &amp; UserTrimming = OPAMP_TRIMMING_USER &amp; PowerMode = OPAMP_POWERMODE_LOWPOWER &amp; SelfCalibration = Disable" Diagnostic=""/>
 	</RefParameter>
-	<RefParameter Comment="OffSet Trimming Value Low Power (PMOS)" DefaultValue="null"  Name="TrimmingValuePLowPower" Type="integer" Visible="false" Group="Basic Parameters"/>
+	<RefParameter Comment="OffSet Trimming Value Low Power (PMOS)" DefaultValue="null"  Name="TrimmingValuePLowPower" Type="integer" Visible="false" Group="Basic Parameters">
+	<Condition Expression="(STM32L4|STM32L5)" Diagnostic=""/>
+	</RefParameter>
 		
 	
 	
-	<!--<RefParameter Comment="OffSet Trimming Value Low Power (NMOS)" DefaultValue="16" Max="31" Min="0"  Name="TrimmingValueNLowPower" Type="integer" Visible="false" Group="Basic Parameters">
-        <Condition Expression=" SelfCalibration = Enable &amp; PowerMode = OPAMP_POWERMODE_LOWPOWER" Diagnostic=""/>
-	</RefParameter>-->
+	<!-- <RefParameter Comment="OffSet Trimming Value Low Power (NMOS)" DefaultValue="16" Max="31" Min="0"  Name="TrimmingValueNLowPower" Type="integer" Visible="false" Group="Basic Parameters">
+        <Condition Expression="(STM32L4|STM32L5) &amp;  SelfCalibration = Enable &amp; PowerMode = OPAMP_POWERMODE_LOWPOWER" Diagnostic=""/>
+	</RefParameter> -->
 	<RefParameter Comment="OffSet Trimming Value Low Power (NMOS)" DefaultValue="16" Max="31" Min="0"  Name="TrimmingValueNLowPower" Type="integer" Group="Basic Parameters">
-        <Condition Expression="UserTrimming = OPAMP_TRIMMING_USER &amp; PowerMode = OPAMP_POWERMODE_LOWPOWER &amp; SelfCalibration = Disable" Diagnostic=""/>
+        <Condition Expression="(STM32L4|STM32L5) &amp; UserTrimming = OPAMP_TRIMMING_USER &amp;  PowerMode = OPAMP_POWERMODE_LOWPOWER &amp; SelfCalibration = Disable" Diagnostic=""/>
 	</RefParameter>
-	<RefParameter Comment="OffSet Trimming Value Low Power (NMOS)" DefaultValue="null"  Name="TrimmingValueNLowPower" Type="integer" Visible="false" Group="Basic Parameters"/>
+	<RefParameter Comment="OffSet Trimming Value Low Power (NMOS)" DefaultValue="null"  Name="TrimmingValueNLowPower" Type="integer" Visible="false" Group="Basic Parameters">
+	<Condition Expression="(STM32L4|STM32L5)" Diagnostic=""/>
+	</RefParameter>
+
+    <!-- STM32U5 -->
+	<!--<RefParameter Comment="OffSet Trimming Value (PMOS)" DefaultValue="16" Max="31" Min="0"  Name="TrimmingValueP" Type="integer" Visible="false" Group="Basic Parameters">
+		<Condition Expression="STM32U5 &amp; SelfCalibration = Enable &amp; (PowerMode = OPAMP_POWERMODE_NORMALPOWER_NORMALSPEED | PowerMode = OPAMP_POWERMODE_NORMALPOWER_HIGHSPEED)" Diagnostic=""/>
+	</RefParameter> -->
+	<RefParameter Comment="OffSet Trimming Value (PMOS)" DefaultValue="16" Max="31" Min="0"  Name="TrimmingValueP" Type="integer" Group="Basic Parameters">
+		<Condition Expression="STM32U5 &amp; UserTrimming = OPAMP_TRIMMING_USER &amp; (PowerMode = OPAMP_POWERMODE_NORMALPOWER_NORMALSPEED | PowerMode = OPAMP_POWERMODE_NORMALPOWER_HIGHSPEED) &amp; SelfCalibration = Disable" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="OffSet Trimming Value (PMOS)" DefaultValue="null"  Name="TrimmingValueP" Type="integer" Visible="false" Group="Basic Parameters">
+	<Condition Expression="STM32U5" Diagnostic=""/>
+	</RefParameter>
 		
+
+	<!--<RefParameter Comment="OffSet Trimming Value (NMOS)" DefaultValue="16" Max="31" Min="0"  Name="TrimmingValueN" Type="integer" Visible="false" Group="Basic Parameters">
+        <Condition Expression="STM32U5 &amp; SelfCalibration = Enable &amp; (PowerMode = OPAMP_POWERMODE_NORMALPOWER_NORMALSPEED | PowerMode = OPAMP_POWERMODE_NORMALPOWER_HIGHSPEED)" Diagnostic=""/>
+	</RefParameter> -->
+	<RefParameter Comment="OffSet Trimming Value (NMOS)" DefaultValue="16" Max="31" Min="0"  Name="TrimmingValueN" Type="integer" Group="Basic Parameters">
+        <Condition Expression="STM32U5 &amp; UserTrimming = OPAMP_TRIMMING_USER &amp;   (PowerMode = OPAMP_POWERMODE_NORMALPOWER_NORMALSPEED | PowerMode = OPAMP_POWERMODE_NORMALPOWER_HIGHSPEED) &amp; SelfCalibration = Disable" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="OffSet Trimming Value (NMOS)" DefaultValue="null" Name="TrimmingValueN" Type="integer" Visible="false" Group="Basic Parameters">
+	<Condition Expression="STM32U5" Diagnostic=""/>
+	</RefParameter>
+    
+    <!-- <RefParameter Comment="OffSet Trimming Value Low Power (PMOS)" DefaultValue="16" Max="31" Min="0"  Name="TrimmingValuePLowPower" Type="integer" Visible="false" Group="Basic Parameters">
+		<Condition Expression="STM32U5 &amp; SelfCalibration = Enable &amp; (PowerMode = OPAMP_POWERMODE_LOWPOWER_NORMALSPEED | PowerMode = OPAMP_POWERMODE_LOWPOWER_HIGHSPEED)" Diagnostic=""/>
+	</RefParameter> -->
+	<RefParameter Comment="OffSet Trimming Value Low Power (PMOS)" DefaultValue="16" Max="31" Min="0"  Name="TrimmingValuePLowPower" Type="integer" Group="Basic Parameters">
+		<Condition Expression="STM32U5 &amp; UserTrimming = OPAMP_TRIMMING_USER &amp; (PowerMode = OPAMP_POWERMODE_LOWPOWER_NORMALSPEED | PowerMode = OPAMP_POWERMODE_LOWPOWER_HIGHSPEED) &amp; SelfCalibration = Disable" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="OffSet Trimming Value Low Power (PMOS)" DefaultValue="null"  Name="TrimmingValuePLowPower" Type="integer" Visible="false" Group="Basic Parameters">
+	<Condition Expression="STM32U5" Diagnostic=""/>
+	</RefParameter>
+	
+	<!-- <RefParameter Comment="OffSet Trimming Value Low Power (NMOS)" DefaultValue="16" Max="31" Min="0"  Name="TrimmingValueNLowPower" Type="integer" Visible="false" Group="Basic Parameters">
+        <Condition Expression="STM32U5 &amp;  SelfCalibration = Enable &amp; (PowerMode = OPAMP_POWERMODE_LOWPOWER_NORMALSPEED | PowerMode = OPAMP_POWERMODE_LOWPOWER_HIGHSPEED)" Diagnostic=""/>
+	</RefParameter> -->
+	<RefParameter Comment="OffSet Trimming Value Low Power (NMOS)" DefaultValue="16" Max="31" Min="0"  Name="TrimmingValueNLowPower" Type="integer" Group="Basic Parameters">
+        <Condition Expression="STM32U5 &amp; UserTrimming = OPAMP_TRIMMING_USER &amp; (PowerMode = OPAMP_POWERMODE_LOWPOWER_NORMALSPEED | PowerMode = OPAMP_POWERMODE_LOWPOWER_HIGHSPEED) &amp; SelfCalibration = Disable" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="OffSet Trimming Value Low Power (NMOS)" DefaultValue="null"  Name="TrimmingValueNLowPower" Type="integer" Visible="false" Group="Basic Parameters">
+	<Condition Expression="STM32U5" Diagnostic=""/>
+	</RefParameter>
+	
 	
 	<RefParameter Comment="Mode" DefaultValue="OPAMP_STANDALONE_MODE" Name="Mode" Type="list" Group="Basic Parameters" Visible="false" >	
 	<Condition Expression="$IpInstance_STANDALONE" Diagnostic=""/>
@@ -133,8 +199,11 @@
 		<PossibleValue Comment="Follower" Value="OPAMP_FOLLOWER_MODE"/>
 	</RefParameter>
 	<RefMode Name="powerSupply" Abstract="true">
+        
 		<!-- Basic Parameters -->	
-		<Parameter Name="PowerSupplyRange"/>
+		<Parameter Name="PowerSupplyRange">
+        <Condition Expression="(STM32L4|STM32L5)" Diagnostic=""/>
+        </Parameter>
 	</RefMode>
 	<!-- RefModes for Ext-Gain-Setting mode -->
 	<RefMode Name="Standalone" HalMode="OPAMP" BaseMode="powerSupply">
@@ -586,7 +655,7 @@
 						<Signal Name="VINM"/>
 						<Signal Name="VOUT"/>
 					</SignalLogicalOp>
-				<Condition Expression="((DAC1_OUT2_Int)|(DAC1_OUT2_ExtAndInt)) &amp; ($Index=2) " Diagnostic="Only active when DAC channel out2 with internal connection is enabled"/>
+				<Condition Expression="((DAC1_OUT2_Int)|(DAC1_OUT2_ExtAndInt)) &amp; ($Index=2) " Diagnostic="Only active when DAC channel out2 with internal connection is enabled. &lt;br&gt; The non-inverting input VINP is connected internally to the dedicated DAC output. &lt;br&gt; The inverting input VINM is connected to dedicated IO pin. &lt;br&gt; The OPAMP output VOUT is connected to a dedicated IO pin."/>
 					<Semaphore>$IpInstance_STANDALONE</Semaphore>
 					<Semaphore>$IpInstance_Dac</Semaphore>
 				</Mode>
@@ -596,7 +665,7 @@
 						<Signal Name="VINM"/>
 						<Signal Name="VOUT"/>
 					</SignalLogicalOp>
-				<Condition Expression="((DAC1_OUT1_Int)|(DAC1_OUT1_ExtAndInt)) &amp; ($Index=1)" Diagnostic="Only active when DAC channel out1 with internal connection is enabled"/>
+				<Condition Expression="((DAC1_OUT1_Int)|(DAC1_OUT1_ExtAndInt)) &amp; ($Index=1)" Diagnostic="Only active when DAC channel out1 with internal connection is enabled. &lt;br&gt; The non-inverting input VINP is connected internally to the dedicated DAC output. &lt;br&gt; The inverting input VINM is connected to dedicated IO pin. &lt;br&gt; The OPAMP output VOUT is connected to a dedicated IO pin."/>
 				<Semaphore>$IpInstance_STANDALONE</Semaphore>
 				<Semaphore>$IpInstance_Dac</Semaphore>
 				</Mode>
@@ -611,7 +680,7 @@
 					<SignalLogicalOp Name="AND">
 						<Signal Name="VOUT"/>
 					</SignalLogicalOp>
-					<Condition Expression="((DAC1_OUT2_Int)|(DAC1_OUT2_ExtAndInt)) &amp; ($Index=2) " Diagnostic="Only active when DAC channel out2 with internal connection is enabled"/>
+					<Condition Expression="((DAC1_OUT2_Int)|(DAC1_OUT2_ExtAndInt)) &amp; ($Index=2) " Diagnostic="Only active when DAC channel out2 with internal connection is enabled. &lt;br&gt; The non-inverting input VINP is connected internally to the dedicated DAC output. &lt;br&gt; The inverting input VINM is internally connected to the OPAMP output. &lt;br&gt; The OPAMP output VOUT is connected to a dedicated IO pin."/>
 					<Semaphore>$IpInstance_FOLLOWER</Semaphore>
 					<Semaphore>$IpInstance_Dac</Semaphore>
 				</Mode>
@@ -619,7 +688,7 @@
 					<SignalLogicalOp Name="AND">
 						<Signal Name="VOUT"/>
 					</SignalLogicalOp>
-					<Condition Expression="((DAC1_OUT1_Int)|(DAC1_OUT1_ExtAndInt)) &amp; ($Index=1)" Diagnostic="Only active when DAC channel out1 with internal connection is enabled"/>
+					<Condition Expression="((DAC1_OUT1_Int)|(DAC1_OUT1_ExtAndInt)) &amp; ($Index=1)" Diagnostic="Only active when DAC channel out1 with internal connection is enabled. &lt;br&gt; The non-inverting input VINP is connected internally to the dedicated DAC output. &lt;br&gt; The inverting input VINM is internally connected to the OPAMP output. &lt;br&gt; The OPAMP output VOUT is connected to a dedicated IO pin."/>
 						<Semaphore>$IpInstance_FOLLOWER</Semaphore>
 						<Semaphore>$IpInstance_Dac</Semaphore>
 				</Mode>	
@@ -638,7 +707,7 @@
 						<Signal Name="VINM"/>
 						<Signal Name="VOUT"/>
 					</SignalLogicalOp>
-			<Condition Expression="((DAC1_OUT2_Int)|(DAC1_OUT2_ExtAndInt)) &amp; ($Index=2) " Diagnostic="Only active when DAC channel out2 with internal connection is enabled"/>
+			<Condition Expression="((DAC1_OUT2_Int)|(DAC1_OUT2_ExtAndInt)) &amp; ($Index=2) " Diagnostic="Only active when DAC channel out2 with internal connection is enabled. &lt;br&gt; The non-inverting input VINP is connected internally to the dedicated DAC output. &lt;br&gt; The inverting input VINM is connected to the OPAMP output with a feedback resistors and external IO for filtering. &lt;br&gt; The OPAMP output VOUT is connected to a dedicated IO pin."/>
 					<Semaphore>$IpInstance_PGA_Connected</Semaphore>
 					<Semaphore>$IpInstance_Dac</Semaphore>
 				</Mode>
@@ -647,7 +716,7 @@
 						<Signal Name="VINM"/>
 						<Signal Name="VOUT"/>
 					</SignalLogicalOp>
-                  <Condition Expression="((DAC1_OUT1_Int)|(DAC1_OUT1_ExtAndInt)) &amp; ($Index=1)" Diagnostic="Only active when DAC channel out1 with internal connection is enabled"/>
+                  <Condition Expression="((DAC1_OUT1_Int)|(DAC1_OUT1_ExtAndInt)) &amp; ($Index=1)" Diagnostic="Only active when DAC channel out1 with internal connection is enabled. &lt;br&gt; The non-inverting input VINP is connected internally to the dedicated DAC output. &lt;br&gt; The inverting input VINM is connected to the OPAMP output with a feedback resistors and external IO for filtering. &lt;br&gt; The OPAMP output VOUT is connected to a dedicated IO pin."/>
 					<Semaphore>$IpInstance_PGA_Connected</Semaphore>
 					<Semaphore>$IpInstance_Dac</Semaphore>
 				</Mode>
@@ -663,7 +732,7 @@
 					<SignalLogicalOp Name="AND">
 						<Signal Name="VOUT"/>
 					</SignalLogicalOp>
-			<Condition Expression="((DAC1_OUT2_Int)|(DAC1_OUT2_ExtAndInt)) &amp; ($Index=2) " Diagnostic="Only active when DAC channel out2 with internal connection is enabled"/>
+			<Condition Expression="((DAC1_OUT2_Int)|(DAC1_OUT2_ExtAndInt)) &amp; ($Index=2) " Diagnostic="Only active when DAC channel out2 with internal connection is enabled. &lt;br&gt; The non-inverting input VINP is connected internally to the dedicated DAC output. &lt;br&gt; The inverting input VINM is connected to the OPAMP output with a feedback resistors. &lt;br&gt; The OPAMP output VOUT is connected to a dedicated IO pin."/>
 					<Semaphore>$IpInstance_PGA_Not_Connected</Semaphore>
 					<Semaphore>$IpInstance_Dac</Semaphore>
 				</Mode>
@@ -671,7 +740,7 @@
 					<SignalLogicalOp Name="AND">
 						<Signal Name="VOUT"/>
 					</SignalLogicalOp>
-                  <Condition Expression="((DAC1_OUT1_Int)|(DAC1_OUT1_ExtAndInt)) &amp; ($Index=1)" Diagnostic="Only active when DAC channel out1 with internal connection is enabled"/>
+                  <Condition Expression="((DAC1_OUT1_Int)|(DAC1_OUT1_ExtAndInt)) &amp; ($Index=1)" Diagnostic="Only active when DAC channel out1 with internal connection is enabled. &lt;br&gt; The non-inverting input VINP is connected internally to the dedicated DAC output. &lt;br&gt; The inverting input VINM is connected to the OPAMP output with a feedback resistors. &lt;br&gt; The OPAMP output VOUT is connected to a dedicated IO pin."/>
 					<Semaphore>$IpInstance_PGA_Not_Connected</Semaphore>
 					<Semaphore>$IpInstance_Dac</Semaphore>
 				</Mode>

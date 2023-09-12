@@ -5,9 +5,19 @@
     ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd"
     xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
 
-    <!-- Useless modes removed (for G0, keep only FATFS_USER_DEFINED_Init) -->
+    <!-- Useless modes removed (for G0, keep only FATFS_USER_DEFINED_Init & USB since G0B/G0C (BZ 103653) -->
    
-    <RefConfig Name="FATFS_USER_DEFINED_Init" Comment="USER">  <!-- The only one valid on G0 (right now) -->
+    <RefConfig Name="FATFS_USB_Init" Comment="USBH">
+        <Component Name="Middleware:FATFS:USBH"/>
+        <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
+        <ConfigFile Name="FF_CONF"/>
+        <ConfigFile Name="FATFS_INIT"/>
+        <ConfigFile Name="FATFS_HEADER"/>
+        <ConfigFile Name="USBH_DISKIO_TEMPLATE_H"/>
+        <ConfigFile Name="USBH_DISKIO_TEMPLATE_C"/>
+    </RefConfig>
+
+    <RefConfig Name="FATFS_USER_DEFINED_Init" Comment="USER">
         <Component Name="Middleware:FATFS:GENERIC"/>
         <Component Name="Middleware:FATFS:CODE_PAGE:$VIRTUAL_CODE_PAGE"/>
         <ConfigFile Name="FF_CONF"/>
@@ -123,18 +133,35 @@
         <Argument Name="BOARD_NAME" GenericType="simple" Comment=""/>                 
     </RefConfigFile>    
 
+    <!-- NEW FILE FOR supporting USB on G0bx/G0Cx -->
+    <RefConfigFile Name="USBH_DISKIO_TEMPLATE_H" Description="TEMPLATE for USBH_DISKIO_H" Template="fatfs_usbh_diskio_template_h.ftl">
+        <File Name="Target/usbh_diskio.h" Category="header" Version="R0.12" Condition="all"/>  
+        <Argument Name="_HUSBH" GenericType="simple" Comment=""/>
+        <Argument Name="USE_DMA_CODE_USBH" GenericType="simple" Comment=""/>
+    </RefConfigFile>
+    
+    <!-- NEW FILE FOR supporting USB on G0bx/G0Cx -->
+    <RefConfigFile Name="USBH_DISKIO_TEMPLATE_C" Description="TEMPLATE for USBH_DISKIO_C" Template="fatfs_usbh_diskio_template_c.ftl">
+        <File Name="Target/usbh_diskio.c" Category="source" Version="R0.12" Condition="all"/>  
+        <Argument Name="_HUSBH" GenericType="simple" Comment=""/>
+        <Argument Name="USE_DMA_CODE_USBH" GenericType="simple" Comment=""/>  
+    </RefConfigFile>
 
     <!-- Generate a init code file (app_fatfs.c) -->
-    <RefConfigFile Name="FATFS_INIT" Description="FATFS Init code file" Template="fatfs_init_g0_wb.ftl">       
+    <RefConfigFile Name="FATFS_INIT" Description="FATFS Init code file" Template="fatfs_init_g0.ftl">       
         <File Name="App/app_fatfs.c" Category="source" Version="R0.12" Condition="all"/>        
         <Argument Name="_FS_NORTC" GenericType="simple" Comment="0 or 1"/>                           <!-- New in R0.11 -->                  
         <Argument Name="_MULTI_PARTITION" GenericType="simple" Comment="0 or 1"/>
+        <Argument Name="_FS_FATFS_USB" GenericType="simple" Comment=""/>
+        <Argument Name="_FS_FATFS_USER" GenericType="simple" Comment=""/>
         <Argument Name="DISKIO_CODE" GenericType="simple" Comment=""/>
     </RefConfigFile>
     
     <!-- Generate header for the init code file (app_fatfs.h) -->
-    <RefConfigFile Name="FATFS_HEADER" Description="FATFS header file" Template="fatfs_header_g0_wb.ftl">       
+    <RefConfigFile Name="FATFS_HEADER" Description="FATFS header file" Template="fatfs_header_g0.ftl">       
         <File Name="App/app_fatfs.h" Category="source" Version="R0.12" Condition="all"/>
+        <Argument Name="_FS_FATFS_USB" GenericType="simple" Comment=""/>
+        <Argument Name="_FS_FATFS_USER" GenericType="simple" Comment=""/>
         <Argument Name="DISKIO_CODE" GenericType="simple" Comment=""/>
     </RefConfigFile>
 

@@ -1,5 +1,6 @@
 [#ftl]
 [#assign CPUCORE = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    stm32_lpm_if.c
@@ -9,36 +10,49 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 [#--
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
                 ${definition.name}: ${definition.value}
-        [/#list]
-    [/#if]
-[/#list]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 --]
 [#assign SUBGHZ_APPLICATION = ""]
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            [#if definition.name == "SUBGHZ_APPLICATION"]
-                [#assign SUBGHZ_APPLICATION = definition.value]
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
+[#assign USE_UART = ""]
+[#assign USE_LPM = "false"]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "SUBGHZ_APPLICATION"]
+                    [#assign SUBGHZ_APPLICATION = definition.value]
+                [/#if]
+                [#if definition.name == "USE_LPM"]
+                    [#assign USE_LPM = definition.value]
+                [/#if]
+                [#if definition.name == "USE_UART"]
+                    [#assign USE_UART = definition.value]
+                [/#if]
+             [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 
 /* Includes ------------------------------------------------------------------*/
-[#if ((SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION"))]
-#include "sys_debug.h"
+[#if ((SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")) || (USE_LPM == "true")]
+#include "platform.h"
 [/#if]
 [#if CPUCORE != "CM0PLUS"]
 #include "stm32_lpm.h"
 [/#if]
 #include "stm32_lpm_if.h"
 [#if CPUCORE != "CM0PLUS"]
-[#if ((SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION"))]
+[#if ((SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")) || (USE_UART == "true")]
 #include "usart_if.h"
 [/#if]
 [/#if]
@@ -113,8 +127,7 @@ void PWR_EnterStopMode(void)
   /* USER CODE BEGIN EnterStopMode_1 */
 
   /* USER CODE END EnterStopMode_1 */
-[#if (SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
-  /* Suspend sysTick : work around for degugger problem in dual core (tickets 71085,  72038, 71087 ) */
+[#if ((SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")) || (USE_LPM == "true")]
   HAL_SuspendTick();
   /* Clear Status Flag before entering STOP/STANDBY Mode */
 [#if CPUCORE == "CM0PLUS"]
@@ -138,17 +151,19 @@ void PWR_ExitStopMode(void)
   /* USER CODE BEGIN ExitStopMode_1 */
 
   /* USER CODE END ExitStopMode_1 */
-[#if (SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
-  /* Resume sysTick : work around for degugger problem in dual core */
+[#if ((SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")) || (USE_LPM == "true")]
+  /* Resume sysTick : work around for debugger problem in dual core */
   HAL_ResumeTick();
   /*Not retained periph:
     ADC interface
     DAC interface USARTx, TIMx, i2Cx, SPIx
     SRAM ctrls, DMAx, DMAMux, AES, RNG, HSEM  */
 
+[#if ((SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")) || (USE_UART == "true")]
 [#if CPUCORE != "CM0PLUS"]
   /* Resume not retained USARTx and DMA */
   vcom_Resume();
+[/#if]
 [/#if]
   /* USER CODE BEGIN ExitStopMode_2 */
 
@@ -161,7 +176,7 @@ void PWR_EnterSleepMode(void)
   /* USER CODE BEGIN EnterSleepMode_1 */
 
   /* USER CODE END EnterSleepMode_1 */
-[#if ((SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION"))]
+[#if ((SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")) || (USE_LPM == "true")]
   /* Suspend sysTick */
   HAL_SuspendTick();
   /* USER CODE BEGIN EnterSleepMode_2 */
@@ -179,7 +194,7 @@ void PWR_ExitSleepMode(void)
   /* USER CODE BEGIN ExitSleepMode_1 */
 
   /* USER CODE END ExitSleepMode_1 */
-[#if ((SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION"))]
+[#if ((SUBGHZ_APPLICATION != "LORA_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SUBGHZ_USER_APPLICATION") && (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")) || (USE_LPM == "true")]
   /* Suspend sysTick */
   HAL_ResumeTick();
 

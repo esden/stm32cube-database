@@ -1,5 +1,6 @@
 [#ftl]
 [#assign CPUCORE = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    utilities_conf.h
@@ -9,25 +10,31 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
  */
+/* USER CODE END Header */
 [#--
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
                 ${definition.name}: ${definition.value}
-        [/#list]
-    [/#if]
-[/#list]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 --]
 [#assign SUBGHZ_APPLICATION = ""]
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            [#if definition.name == "SUBGHZ_APPLICATION"]
-                [#assign SUBGHZ_APPLICATION = definition.value]
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
+[#assign SECURE_PROJECTS = "0"]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "SUBGHZ_APPLICATION"]
+                    [#assign SUBGHZ_APPLICATION = definition.value]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __UTILITIES_CONF_H__
@@ -50,7 +57,19 @@ extern "C" {
 
 [#if CPUCORE == "CM0PLUS"]
 #include "mbmuxif_trace.h"
+[#if (SECURE_PROJECTS == "1")]
+#include "sys_privileged_wrap.h"
+#include "stm32_seq.h"
 
+[#if (SUBGHZ_APPLICATION == "SIGFOX_PUSHBUTTON") ]
+#if defined(__ARMCC_VERSION)
+#include "mapping_sbsfu.h"
+#elif defined (__ICCARM__) || defined(__GNUC__)
+#include "mapping_export.h"
+#endif /* __ARMCC_VERSION */
+
+[/#if]
+[/#if]
 [/#if]
 /* USER CODE BEGIN Includes */
 
@@ -101,6 +120,17 @@ extern "C" {
 /*                             eeprom configuration                       */
 /*---------------------------------------------------------------------------*/
 
+[#if (SECURE_PROJECTS == "1") && (CPUCORE == "CM0PLUS")]
+/**
+  * @brief Flash address
+  */
+#define HW_FLASH_ADDRESS                FLASH_BASE
+
+/**
+  * @brief Flash page size in bytes
+  */
+#define HW_FLASH_PAGE_SIZE              FLASH_PAGE_SIZE
+[#else]
 /**
   * @brief Flash address
   */
@@ -110,6 +140,7 @@ extern "C" {
   * @brief Flash page size in bytes
   */
 #define HW_FLASH_PAGE_SIZE              (0x00000800UL)
+[/#if]
 
 /**
   * @brief Flash width in bytes
@@ -137,14 +168,20 @@ extern "C" {
   */
 #define CFG_EE_BANK1_MAX_NB            0
 
+[#if (SECURE_PROJECTS == "1") && (CPUCORE == "CM0PLUS")]
+/**
+  * @brief EEPROM Flash address
+  */
+#define EE_BASE_ADRESS                  EE_DATASTORAGE_START
+[#else]
 /**
   * @brief EEPROM Flash address
   * @note last 2 sector of a 128kBytes device
   */
 #define EE_BASE_ADRESS                  (0x0801D000UL)
-
 [/#if]
 
+[/#if]
 #define VLEVEL_OFF    0  /*!< used to set UTIL_ADV_TRACE_SetVerboseLevel() (not as message param) */
 #define VLEVEL_ALWAYS 0  /*!< used as message params, if this level is given
                               trace will be printed even when UTIL_ADV_TRACE_SetVerboseLevel(OFF) */
@@ -202,6 +239,25 @@ extern "C" {
   */
 #define UTIL_SEQ_EXIT_CRITICAL_SECTION( )    UTILS_EXIT_CRITICAL_SECTION()
 
+[#if (SECURE_PROJECTS == "1") && (CPUCORE == "CM0PLUS") ]
+/**
+  * @brief macro to Enter CS used specifically by UTIL_SEQ_Run before going to Idle
+  */
+#define UTIL_SEQ_ENTER_CRITICAL_SECTION_IDLE( )   SYS_PRIVIL_DisableIrqsAndRemainPriv()
+
+/**
+  * @brief macro to Exit CS used specifically by UTIL_SEQ_Run exiting from Idle
+  */
+#define UTIL_SEQ_EXIT_CRITICAL_SECTION_IDLE( )    SYS_PRIVIL_EnableIrqsAndGoUnpriv()
+
+/**
+  * @brief Security: Map UTIL_TIMER_IRQ on Sequencer Task (rather then Isr) such to run Unprivileged
+  */
+#define UTIL_TIMER_IRQ_MAP_INIT()     do{ UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_UtilTimer_Process), UTIL_SEQ_RFU, UTIL_TIMER_IRQ_Handler);} while(0)
+
+#define UTIL_TIMER_IRQ_MAP_PROCESS()  do{ UTIL_SEQ_SetTask(1 << CFG_SEQ_Task_UtilTimer_Process, CFG_SEQ_Prio_0); } while(0)
+
+[/#if]
 /**
   * @brief Memset utilities interface to application
   */
@@ -212,6 +268,25 @@ extern "C" {
   */
 #define UTILS_INIT_CRITICAL_SECTION()
 
+[#if (SECURE_PROJECTS == "1") && (CPUCORE == "CM0PLUS") ]
+/**
+  * @brief macro used to enter the critical section
+  */
+#define UTILS_ENTER_CRITICAL_SECTION() uint32_t nvic_iser_state= SYS_PRIVIL_EnterCriticalSection()
+
+/**
+  * @brief macro used to exit the critical section
+  */
+#define UTILS_EXIT_CRITICAL_SECTION()  SYS_PRIVIL_ExitCriticalSection(nvic_iser_state)
+/**
+  * @brief macro used to Enter critical section specifically for UTIL_LPM_EnterLowPower()
+  */
+#define UTIL_LPM_ENTER_CRITICAL_SECTION_ELP()
+/**
+  * @brief macro used to Exit critical section specifically for UTIL_LPM_EnterLowPower()
+  */
+#define UTIL_LPM_EXIT_CRITICAL_SECTION_ELP()
+[#else]
 /**
   * @brief macro used to enter the critical section
   */
@@ -222,6 +297,7 @@ extern "C" {
   * @brief macro used to exit the critical section
   */
 #define UTILS_EXIT_CRITICAL_SECTION()  __set_PRIMASK(primask_bit)
+[/#if]
 
 /******************************************************************************
   * trace\advanced
@@ -240,7 +316,7 @@ extern "C" {
 #define UTIL_ADV_TRACE_INIT_CRITICAL_SECTION( )    UTILS_INIT_CRITICAL_SECTION()         /*!< init the critical section in trace feature */
 #define UTIL_ADV_TRACE_ENTER_CRITICAL_SECTION( )   UTILS_ENTER_CRITICAL_SECTION()        /*!< enter the critical section in trace feature */
 #define UTIL_ADV_TRACE_EXIT_CRITICAL_SECTION( )    UTILS_EXIT_CRITICAL_SECTION()         /*!< exit the critical section in trace feature */
-[#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
+[#if ((SUBGHZ_APPLICATION == "LORA_AT_SLAVE") || (SUBGHZ_APPLICATION == "LORA_END_NODE"))]
 #define UTIL_ADV_TRACE_TMP_BUF_SIZE                (512U)                                /*!< default trace buffer size */
 #define UTIL_ADV_TRACE_TMP_MAX_TIMESTMAP_SIZE      (15U)                                 /*!< default trace timestamp size */
 #define UTIL_ADV_TRACE_FIFO_SIZE                   (1024U)                               /*!< default trace fifo size */

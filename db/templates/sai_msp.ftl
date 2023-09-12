@@ -122,18 +122,20 @@
         [#assign dmaCurrentRequest = dmaconfig.dmaRequestName?lower_case]
         [#assign prefixList = dmaCurrentRequest?split("_")]
         [#list prefixList as p][#assign prefix= p][/#list]
-      [#if dmaconfig.dmaHandel?size > 1] [#-- if more than one dma handler--]
-        [#assign channel="channel"]
-        [#if (FamilyName=="STM32F2" || FamilyName=="STM32F4" || FamilyName=="STM32F7")]
-          [#assign channel="stream"]
+        [#if dmaconfig.dmaVersion?? && dmaconfig.dmaVersion!="DMA3"]
+            [#if dmaconfig.dmaHandel?size > 1] [#-- if more than one dma handler--]
+                [#assign channel="channel"]
+                [#if (FamilyName=="STM32F2" || FamilyName=="STM32F4" || FamilyName=="STM32F7")]
+                  [#assign channel="stream"]
+                [/#if]
+                #t#t/* Several peripheral DMA handle pointers point to the same DMA handle.
+                #t#t   Be aware that there is only one ${channel} to perform all the requested DMAs. */
+            [/#if]   [#-- if more than one dma handler--] 
+            [#list dmaconfig.dmaHandel as dmaH]
+                #t#t__HAL_LINKDMA(${instHandler},${dmaH},hdma_${dmaconfig.dmaRequestName?lower_case});
+                #n
+            [/#list]
         [/#if]
-#t#t/* Several peripheral DMA handle pointers point to the same DMA handle.
-#t#t   Be aware that there is only one ${channel} to perform all the requested DMAs. */
-[/#if]   [#-- if more than one dma handler--] 
-                            [#list dmaconfig.dmaHandel as dmaH]
-#t#t__HAL_LINKDMA(${instHandler},${dmaH},hdma_${dmaconfig.dmaRequestName?lower_case});
-#n
-                            [/#list]
     [/#list] [#-- list dmaService as dmaconfig --]
 #n
 [/#if]
@@ -144,17 +146,19 @@
         [#assign dmaCurrentRequest = dmaconfig.dmaRequestName?lower_case]
         [#assign prefixList = dmaCurrentRequest?split("_")]
         [#list prefixList as p][#assign prefix= p][/#list]
-        [#if dmaconfig.dmaHandel?size > 1] [#-- if more than one dma handler--]
-        [#assign channel="channel"]
-        [#if (FamilyName=="STM32F2" || FamilyName=="STM32F4" || FamilyName=="STM32F7")]
-          [#assign channel="stream"]
+        [#if dmaconfig.dmaVersion?? && dmaconfig.dmaVersion!="DMA3"]
+            [#if dmaconfig.dmaHandel?size > 1] [#-- if more than one dma handler--]
+                [#assign channel="channel"]
+                [#if (FamilyName=="STM32F2" || FamilyName=="STM32F4" || FamilyName=="STM32F7")]
+                  [#assign channel="stream"]
+                [/#if]
+                #t#t/* Several peripheral DMA handle pointers point to the same DMA handle.
+                #t#t   Be aware that there is only one ${channel} to perform all the requested DMAs. */
+            [/#if]   [#-- if more than one dma handler--] 
+            [#list dmaconfig.dmaHandel as dmaH]
+                #t#t__HAL_LINKDMA(${instHandler},${dmaH},hdma_${dmaconfig.dmaRequestName?lower_case});
+            [/#list]
         [/#if]
-#t#t/* Several peripheral DMA handle pointers point to the same DMA handle.
-#t#t   Be aware that there is only one ${channel} to perform all the requested DMAs. */
-  [/#if]   [#-- if more than one dma handler--] 
-                            [#list dmaconfig.dmaHandel as dmaH]
-#t#t__HAL_LINKDMA(${instHandler},${dmaH},hdma_${dmaconfig.dmaRequestName?lower_case});
-                            [/#list]
                       
     [/#list] [#-- list dmaService as dmaconfig --]
 [/#if]
@@ -282,17 +286,20 @@
 #t#tif (${ipName}_client == 0)
 #t#t#t{       
         #t#t#t/* Peripheral clock disable */ #n #t#t#t__HAL_RCC_${ipName}_CLK_DISABLE();
-[#if initService.nvic??]
-                [#list initService.nvic as initVector]                   
+[#if initService.nvic??&&initService.nvic?size>0]
+                [#list initService.nvic as initVector]
+#t#t#t/* ${ipName} interrupt DeInit */                    
                     #t#t#tHAL_NVIC_DisableIRQ(${initVector.vector});
                 [/#list]
             [/#if]
 #t#t#t}
     [/#if] 
 
+
+
   
 #t#t[@generateConfigCode ipName=ipName type=serviceType serviceName="gpioA" instHandler=instHandler tabN=tabN/]
-[#if dmaExistA &&  serviceType=="Init"]#n#t#t/* Peripheral DMA init*/
+[#if dmaExistA &&  serviceType=="Init"]#n#t#t#t/* Peripheral DMA init*/
 #t#t[@generateConfigCode ipName=ipName type=serviceType serviceName="dmaA" instHandler=instHandler tabN=tabN/]
 [#else]
     [#if dmaExistA]
@@ -308,8 +315,8 @@
                [#if dmaconfig.dmaHandel??][#assign ipdmahandler = dmaconfig.dmaHandel][#else][#assign ipdmahandler = ipdmahandler1][/#if]
 [#if dmaconfig.dmaHandel?size > 1] [#-- if more than one dma handler--]
                         [/#if]   [#-- if more than one dma handler--]
-
-                            [#list dmaconfig.dmaHandel as dmaH]
+                           #n#t#t/* ${ipName} DMA Deinit */
+                            [#list dmaconfig.dmaHandel as dmaH] 
 [#compress]                              #t#tHAL_DMA_DeInit(${instHandler}->${dmaH});[/#compress]
                             [/#list]
                    
@@ -373,9 +380,10 @@
 #t#t${ipName}_client --;
 #t#t#tif (${ipName}_client == 0)
 #t#t#t{  
-        #t#t#t/* Peripheral clock disable */#n#t#t#t__HAL_RCC_${ipName}_CLK_DISABLE(); 
-[#if initService.nvic??]
-                [#list initService.nvic as initVector]                   
+        #t#t#t/* Peripheral clock disable */#n#t#t#t__HAL_RCC_${ipName}_CLK_DISABLE();
+[#if initService.nvic??&&initService.nvic?size>0] 
+                [#list initService.nvic as initVector]
+#t#t/* ${ipName} interrupt DeInit */                   
                     #t#t#tHAL_NVIC_DisableIRQ(${initVector.vector});
                 [/#list]
             [/#if]
@@ -384,7 +392,7 @@
 
 
 #t#t[@generateConfigCode ipName=ipName type=serviceType serviceName="gpioB" instHandler=instHandler tabN=tabN/]	
-[#if dmaExistB && serviceType=="Init"]#n#t#t/* Peripheral DMA init*/
+[#if dmaExistB && serviceType=="Init"]#n#t#t#t/* Peripheral DMA init*/
 #t#t[@generateConfigCode ipName=ipName type=serviceType serviceName="dmaB" instHandler=instHandler tabN=tabN/]
 [#else]
 [#if dmaExistB]
@@ -398,6 +406,7 @@
         [#assign ipdmahandler1 = "hdma" + prefix]
          [#-- [#if getDmaHandler(ipName)!=""][#assign ipdmahandler = getDmaHandler(ipName)][#else][#assign ipdmahandler = ipdmahandler1][/#if]--]
            [#if dmaconfig.dmaHandel??][#assign ipdmahandler = dmaconfig.dmaHandel][#else][#assign ipdmahandler = ipdmahandler1][/#if]
+#n#t#t/* ${ipName} DMA Deinit */
                             [#list dmaconfig.dmaHandel as dmaH]
 [#compress]                              #t#tHAL_DMA_DeInit(${instHandler}->${dmaH});[/#compress]
                             [/#list]

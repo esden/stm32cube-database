@@ -377,7 +377,7 @@ uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len)
 
 /**
   * @brief  CDC_TransmitCplt_FS
-  *         Data transmited callback
+  *         Data transmitted callback
   *
   *         @note
   *         This function is IN transfer complete callback used to inform user that
@@ -546,7 +546,7 @@ uint8_t CDC_Transmit_HS(uint8_t* Buf, uint16_t Len)
 
 /**
   * @brief  CDC_TransmitCplt_HS
-  *         Data transmited callback
+  *         Data transmitted callback
   *
   *         @note
   *         This function is IN transfer complete callback used to inform user that

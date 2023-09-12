@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    sys_sensors.h
@@ -8,6 +9,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __SENSORS_H__
@@ -46,13 +48,12 @@ typedef struct
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
+
+/* USER CODE BEGIN EC */
 #if defined (SENSOR_ENABLED) && (SENSOR_ENABLED == 1) && defined (X_NUCLEO_IKS01A2)
 #define HTS221_0    0U
 #define LPS22HB_0   1U
 #endif /* SENSOR_ENABLED & X_NUCLEO_IKS01A2 */
-
-/* USER CODE BEGIN EC */
-
 /* USER CODE END EC */
 
 /* External variables --------------------------------------------------------*/
@@ -67,15 +68,15 @@ typedef struct
 
 /* Exported functions prototypes ---------------------------------------------*/
 /**
-  * @brief  initialises the environmental sensor
+  * @brief  initialize the environmental sensor
   */
-void  EnvSensors_Init(void);
+int32_t EnvSensors_Init(void);
 
 /**
   * @brief  Environmental sensor  read.
   * @param  sensor_data sensor data
   */
-void EnvSensors_Read(sensor_t *sensor_data);
+int32_t EnvSensors_Read(sensor_t *sensor_data);
 
 /* USER CODE BEGIN EFP */
 

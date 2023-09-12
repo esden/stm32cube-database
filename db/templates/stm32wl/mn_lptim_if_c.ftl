@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    mn_lptim_if.c
@@ -8,22 +9,25 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
+[#assign IpInstance = ""]
+[#assign IpName = ""]
+[#if BspIpDatas??]
+    [#list BspIpDatas as SWIP]
+        [#if SWIP.variables??]
+            [#list SWIP.variables as variables]
+                [#if variables.name?contains("IpInstance")]
+                    [#assign IpInstance = variables.value]
+                [/#if]
+                [#if variables.name?contains("IpName")]
+                    [#assign IpName = variables.value]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 
-[#assign LPTIM_Instance = ""]
-[#list BspIpDatas as SWIP]
-    [#if SWIP.variables??]
-        [#list SWIP.variables as variables]
-            [#if variables.name?contains("IpInstance")]
-                [#assign IpInstance = variables.value]
-            [/#if]
-            [#if variables.name?contains("IpName")]
-                [#assign IpName = variables.value]
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
 /* Includes ------------------------------------------------------------------*/
-#include "lptim.h"
 #include "mn_lptim_if.h"
 
 /* USER CODE BEGIN Includes */
@@ -72,9 +76,9 @@ void MN_LPTIM_IF_Init(void)
 
   /* USER CODE END MN_LPTIM_IF_Init_0 */
 
-  /* Force the ${IpInstance} Periheral Clock Reset */
+  /* Force the ${IpInstance} Peripheral Clock Reset */
   __HAL_RCC_${IpInstance}_FORCE_RESET();
-  /* Release the ${IpInstance} Periheral Clock Reset */
+  /* Release the ${IpInstance} Peripheral Clock Reset */
   __HAL_RCC_${IpInstance}_RELEASE_RESET();
 
   /* USER CODE BEGIN MN_LPTIM_IF_Init_1 */
@@ -127,10 +131,10 @@ void MN_LPTIM_IF_DeInit(void)
 
   /* USER CODE END MN_LPTIM_IF_DeInit_2 */
 
-  /* Force the ${IpInstance} Periheral Clock Reset */
+  /* Force the ${IpInstance} Peripheral Clock Reset */
   __HAL_RCC_${IpInstance}_FORCE_RESET();
 
-  /* Release the ${IpInstance} Periheral Clock Reset */
+  /* Release the ${IpInstance} Peripheral Clock Reset */
   __HAL_RCC_${IpInstance}_RELEASE_RESET();
 
   /* USER CODE BEGIN MN_LPTIM_IF_DeInit_3 */

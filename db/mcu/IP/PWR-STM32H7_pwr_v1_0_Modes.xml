@@ -33,6 +33,26 @@
 		<PossibleValue Comment="Event Mode with Rising/Falling edge trigger detection" Value="PWR_PVD_MODE_EVENT_RISING_FALLING" />
 	</RefParameter>
 	
+        <!--AVD support-->
+        <RefParameter Comment="AVD detection Level" DefaultValue="PWR_AVDLEVEL_0" Name="AVDLevel" Type="list">
+		
+		<PossibleValue Comment="PWR AVD LEVEL 0 (1.7 V)" Value="PWR_AVDLEVEL_0" />
+		<PossibleValue Comment="PWR AVD LEVEL 1 (2.1 V)" Value="PWR_AVDLEVEL_1" />
+		<PossibleValue Comment="PWR AVD LEVEL 2 (2.5 V)" Value="PWR_AVDLEVEL_2" />
+		<PossibleValue Comment="AWR AVD LEVEL 3 (2.8 V)" Value="PWR_AVDLEVEL_3" />
+
+	</RefParameter>
+
+	<RefParameter Comment="PWR AVD Mode" DefaultValue="PWR_AVD_MODE_NORMAL" Name="AVDMode" Type="list">
+		<Description>Mode: Specifies the PVD trigger mode.</Description>
+		<PossibleValue Comment="basic mode is used" Value="PWR_AVD_MODE_NORMAL" />
+		<PossibleValue Comment="External Interrupt Mode with Rising edge trigger detection" Value="PWR_AVD_MODE_IT_RISING" />
+		<PossibleValue Comment="External Interrupt Mode with Falling edge trigger detection" Value="PWR_AVD_MODE_IT_FALLING" />
+		<PossibleValue Comment="External Interrupt Mode with Rising/Falling edge trigger detection" Value="PWR_AVD_MODE_IT_RISING_FALLING" />
+		<PossibleValue Comment="Event Mode with Rising edge trigger detection" Value="PWR_AVD_MODE_EVENT_RISING" />
+		<PossibleValue Comment="Event Mode with Falling edge trigger detection" Value="PWR_AVD_MODE_EVENT_FALLING" />
+		<PossibleValue Comment="Event Mode with Rising/Falling edge trigger detection" Value="PWR_AVD_MODE_EVENT_RISING_FALLING" />
+	</RefParameter>
 		
    <RefParameter Comment="High impedance mode" DefaultValue="null" Name="HighImpedanceMode" Type="list" Visible="false"/>
 
@@ -68,7 +88,12 @@
 		<Parameter Name="Mode" />
 	</RefMode>
 	
-	
+	<RefMode Name="AVD"  Group="Programmable_Voltage_Detector_Settings">
+		<ConfigForMode>AVDConfig</ConfigForMode>
+		<ConfigForMode>AVDEnable</ConfigForMode>
+		<Parameter Name="AVDLevel" />
+		<Parameter Name="AVDMode" />
+	</RefMode>
 	<ModeLogicOperator Name="OR">
 		<Mode Name="WakeUp0" UserName="Wake-Up 0">
 			<ModeLogicOperator Name="OR">
@@ -138,6 +163,30 @@
 				</Mode>
 			</ModeLogicOperator>
 		</Mode>
+                <Mode Name="AVD" UserName="Analog voltage detector">
+			<ModeLogicOperator Name="OR">
+				<Mode Name="AVD">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VDDA" />
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+		</Mode>
+                <Mode Name="MonitoringState" UserName="Monitoring State">
+			<ModeLogicOperator Name="OR">
+				<Mode Name="MonitoringState">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="CSTOP" />
+					</SignalLogicalOp>
+                                        <SignalLogicalOp Name="AND">
+						<Signal Name="CSLEEP" />
+					</SignalLogicalOp>
+                                        <SignalLogicalOp Name="AND">
+						<Signal Name="NDSTOP2" />
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+		</Mode>
                 <Mode Name="PowerVD" UserName="Power Voltage Detector In">
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="Mode_PVD_Ext"
@@ -172,7 +221,12 @@
 	<RefSignal IOMode="System" Name="WKUP5" />
 	<RefSignal IOMode="System" Name="WKUP6" />
         <RefSignal IOMode="Analog" Name="PVD_IN" />
+        <RefSignal IOMode="System" Name="VDDA" Virtual="true"/>
 	<RefSignal IOMode="Analog" Name="V_PVD_IN" Virtual="true" />
+        
+        <RefSignal IOMode="AlternateFunctionPushPull" Name="CSTOP" />
+        <RefSignal IOMode="AlternateFunctionPushPull" Name="CSLEEP" />
+        <RefSignal IOMode="AlternateFunctionPushPull" Name="NDSTOP2" />
         <RefSignal Name="VS_Systick" Virtual="true" />    
         
 	

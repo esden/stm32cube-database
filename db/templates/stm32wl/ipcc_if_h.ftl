@@ -1,5 +1,6 @@
 [#ftl]
 [#assign CPUCORE = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    ipcc_if.h
@@ -9,6 +10,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __IPCC_IF_${CPUCORE}_H__
@@ -57,7 +59,7 @@ extern IPCC_HandleTypeDef hipcc;
 /* Exported functions prototypes ---------------------------------------------*/
 [#if CPUCORE == "CM4"]
 /**
-  * @brief Initialise IPCC and register upper and downer callbacks
+  * @brief Initialize IPCC and register upper and downer callbacks
   * @param  IPCC_IF_ResponseRcv_cb     response callback
   * @param  IPCC_IF_NotificationRcv_cb notification callback
   */
@@ -65,7 +67,7 @@ void IPCC_IF_Init(void (*IPCC_IF_ResponseRcv_cb)(uint32_t channelIdx),
                   void (*IPCC_IF_NotificationRcv_cb)(uint32_t channelIdx));
 [#else]
 /**
-  * @brief Initialise IPCC and register upper and downer callbacks
+  * @brief Initialize IPCC and register upper and downer callbacks
   * @param  IPCC_IF_CommandRcv_cb     command callback
   * @param  IPCC_IF_AcknowledgeRcv_cb acknowledge callback
   */
@@ -74,7 +76,7 @@ void IPCC_IF_Init(void (*IPCC_IF_CommandRcv_cb)(uint32_t channelIdx),
 [/#if]
 
 /**
-  * @brief Get Command status (abstract appl from Ipcc handler and ch direction)
+  * @brief Get Command status (abstract application from Ipcc handler and channel direction)
   * @param channelIdx  ipcc channel
   * @return ipcc channel status
   * @retval IPCC_CHANNEL_STATUS_FREE 0
@@ -83,7 +85,7 @@ void IPCC_IF_Init(void (*IPCC_IF_CommandRcv_cb)(uint32_t channelIdx),
 uint32_t IPCC_IF_CmdRespStatus(uint32_t channelIdx);
 
 /**
-  * @brief Get notification status (abstract appl from Ipcc handler and ch direction)
+  * @brief Get notification status (abstract application from Ipcc handler and channel direction)
   * @param channelIdx  ipcc channel
   * @return ipcc channel status
   * @retval IPCC_CHANNEL_STATUS_FREE 0
@@ -93,28 +95,28 @@ uint32_t IPCC_IF_NotifAckStatus(uint32_t channelIdx);
 
 [#if CPUCORE == "CM4"]
 /**
-  * @brief Send Cmd to the remote CPU (abstract appl from Ipcc handler and ch direction)
+  * @brief Send Cmd to the remote CPU (abstract application from Ipcc handler and channel direction)
   * @param channelIdx  ipcc channel
   * @return ipcc status [OK: 0 , fail: -1]
   */
 int32_t IPCC_IF_CommandSnd(uint32_t channelIdx);
 
 /**
-  * @brief Send Ack to the remote CPU (abstract appl from Ipcc handler and ch direction)
+  * @brief Send Ack to the remote CPU (abstract application from Ipcc handler and channel direction)
   * @param channelIdx  ipcc channel
   * @return ipcc status [OK: 0 , fail: -1]
   */
 int32_t IPCC_IF_AcknowledgeSnd(uint32_t channelIdx);
 [#else]
 /**
-  * @brief Send Cmd to the remote CPU (abstract appl from Ipcc handler and ch direction)
+  * @brief Send Cmd to the remote CPU (abstract application from Ipcc handler and channel direction)
   * @param channelIdx  ipcc channel
   * @return ipcc status [OK: 0 , fail: -1]
   */
 int32_t IPCC_IF_NotificationSnd(uint32_t channelIdx);
 
 /**
-  * @brief Send Ack to the remote CPU (abstract appl from Ipcc handler and ch direction)
+  * @brief Send Ack to the remote CPU (abstract application from Ipcc handler and channel direction)
   * @param channelIdx  ipcc channel
   * @return ipcc status [OK: 0 , fail: -1]
   */

@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    mn_lptim_if.h
@@ -8,6 +9,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __MN_LPTIM_IF_H__
@@ -17,6 +19,12 @@
 extern "C" {
 #endif
 /* Includes ------------------------------------------------------------------*/
+[#if HALCompliant??]
+#include "main.h"
+[#else]
+#include "lptim.h"
+[/#if]
+
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
@@ -63,4 +71,3 @@ void MN_LPTIM_IF_DeInit(void);
 #endif /* __MN_LPTIM_IF_H__ */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
-

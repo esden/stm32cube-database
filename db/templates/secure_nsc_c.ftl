@@ -21,8 +21,12 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "secure_nsc.h"
-
+[#if FamilyName=="STM32L5"]
 /** @addtogroup STM32L5xx_HAL_Examples
+[/#if]
+[#if FamilyName=="STM32U5"]
+/** @addtogroup STM32U5xx_HAL_Examples
+[/#if]
   * @{
   */
 

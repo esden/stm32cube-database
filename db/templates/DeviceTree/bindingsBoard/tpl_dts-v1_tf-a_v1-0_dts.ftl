@@ -68,7 +68,12 @@
 
 / {
 	[#if mx_boardName_uppercase?has_content]
+		[#local manifestVersion = srvcmx_getManifestVersion()]
+		[#if manifestVersion?has_content]
+	model = "STMicroelectronics ${mx_boardName_uppercase} STM32CubeMX board - ${manifestVersion}";
+		[#else]
 	model = "STMicroelectronics ${mx_boardName_uppercase} STM32CubeMX board";
+		[/#if]
 	[#else]
 		[@mlog  logMod=module logType="ERR" logMsg="unknown board type: 'model' not generated" varsMap={} /]
 	/*model = "STMicroelectronics unknown STM32CubeMX board";*/

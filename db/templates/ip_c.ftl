@@ -340,6 +340,7 @@ ETH_TxPacketConfig TxConfig;
 [#else] [#assign methodList = configModel.libMethod]
 
 [/#if]
+[#assign listofDeclaration = ""]
 [#assign writeConfigComments=false]
 [#list methodList as method]
     [#if method.status=="OK"][#assign writeConfigComments=true][/#if]
@@ -351,9 +352,13 @@ ETH_TxPacketConfig TxConfig;
 		[#if method.status=="OK"]
              	[#if method.arguments??]
                     [#list method.arguments as fargument][#compress]
-                    [#if fargument.addressOf] [#assign adr = "&"][#else ][#assign adr = ""][/#if][/#compress]
+                    [#if fargument.addressOf] [#assign adr = "&"][#else ][#assign adr = ""][/#if]
+                    [#if fargument.cast??] [#assign adr = fargument.cast + adr][/#if][/#compress]
                     [#if fargument.genericType == "struct"]
-                        [#if fargument.context??]
+                        [#if fargument.optional == "output"]
+                                [#assign arg = "" + adr + fargument.name]
+                        [/#if]
+                        [#if fargument.context?? && fargument.optional!="output"]
                             [#if fargument.context=="global"]
                                 [#if configModel.ipName=="DMA" || configModel.ipName?starts_with("BDMA") || configModel.ipName=="MDMA"]
                                     [#if configModel.dmaRequestName==""] [#-- if dma request name different from instanceName: case of I2S1 for example --]
@@ -367,7 +372,7 @@ ETH_TxPacketConfig TxConfig;
                                 [/#if]
                             [/#if]
                         [/#if]
-                        [#if instanceIndex??&&fargument.context=="global"][#if fargument.status!="NULL"][#assign arg = "" + adr + fargument.name + instanceIndex][#else][#assign arg = "NULL"][/#if][#else][#if  fargument.status!="NULL"][#assign arg = "" + adr + fargument.name][#else][#assign arg = "NULL"][/#if][/#if]
+                        [#if instanceIndex??&&fargument.context=="global" && fargument.optional!="output"][#if fargument.status!="NULL"][#assign arg = "" + adr + fargument.name + instanceIndex][#else][#assign arg = "NULL"][/#if][#else][#if  fargument.status!="NULL"][#assign arg = "" + adr + fargument.name][#else][#assign arg = "NULL"][/#if][/#if]
                         [#-- [#assign arg = "" + adr + fargument.name] --]
                         [#if ((!method.name?contains("Init")&&fargument.context=="global")||fargument.optional=="output")]
                         [#else]
@@ -375,7 +380,7 @@ ETH_TxPacketConfig TxConfig;
                             [#if argument.genericType != "struct"]
                                 [#if argument.mandatory]
                                 [#if argument.value??]
-                                    [#if instanceIndex??&&fargument.context=="global"]
+                                    [#if instanceIndex??&&fargument.context=="global" && fargument.optional!="output"]
                                         [#assign argValue=argument.value?replace("$Index",instanceIndex)]
                                     [#else]
                                         [#assign argValue=argument.value]
@@ -413,9 +418,11 @@ ETH_TxPacketConfig TxConfig;
                                               [#if argument.status=="KO"]
                                                    [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]//${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name} = ${argument.value};
                                               [/#if]
-                                              [#if argument.value??]
+                                              [#if argument.value??]                                              
                                                     [#if argument.value!="N/A"]
                                                         [#assign argValue=argument.value]
+                                                        [#if instanceIndex??&&fargument.context=="global" && fargument.optional!="output"][#assign varName=fargument.name +"." +instanceIndex][#else][#assign varName=fargument.name][/#if]
+                                                        
                                                         [#assign indicator = varName+"."+argument.name+" = "+argValue+" "]
                                                         [#assign indicatorName = varName+"."+argument.name]
                                                         [#if !listofDeclaration?contains(indicator)][#-- if not repeted --]  
@@ -435,7 +442,7 @@ ETH_TxPacketConfig TxConfig;
                                 [#if argument2.value??][#assign argValue=argument2.value][#else] [#assign argValue=""][/#if]
                                 [#if argument2.mandatory]
                                     [#if argument2.value??]
-                                    [#if instanceIndex??&&fargument.context=="global"][#assign argValue=argument2.value?replace("$Index",instanceIndex)][#else][#assign argValue=argument2.value][/#if]
+                                    [#if instanceIndex??&&fargument.context=="global" && fargument.optional!="output"][#assign argValue=argument2.value?replace("$Index",instanceIndex)][#else][#assign argValue=argument2.value][/#if]
                                     [#if argument2.genericType=="Array"][#-- if genericType=Array --]
                                         [#assign valList = argument2.value?split(":")]
                                             [#assign i = 0]
@@ -464,7 +471,7 @@ ETH_TxPacketConfig TxConfig;
  [#if argument3.value??][#assign argValue=argument3.value][#else] [#assign argValue=""][/#if]
                                 [#if argument3.mandatory]
                                     [#if argument3.value??]
-                                    [#if instanceIndex??&&fargument.context=="global"][#assign argValue=argument3.value?replace("$Index",instanceIndex)][#else][#assign argValue=argument3.value][/#if]
+                                    [#if instanceIndex??&&fargument.context=="global" && fargument.optional!="output"][#assign argValue=argument3.value?replace("$Index",instanceIndex)][#else][#assign argValue=argument3.value][/#if]
                                     [#if argument3.genericType=="Array"][#-- if genericType=Array --]
                                         [#assign valList = argument3.value?split(":")]
                                             [#assign i = 0]
@@ -474,14 +481,14 @@ ETH_TxPacketConfig TxConfig;
                                         [/#list]
                                         [#assign argValue="&"+argument3.name+"[0]"]
                                     [/#if] [#-- if genericType=Array --]
-                                    [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name}.${argument2.name}.${argument3.name} = ${argValue};
+                                    [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global" && fargument.optional!="output"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name}.${argument2.name}.${argument3.name} = ${argValue};
                                     [/#if]
                                [#else] [#-- !argument.mandatory --]
                                     [#if argument3.status=="KO"]
-                                        [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]//${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name}.${argument2.name}.${argument3.name} = ${argValue};
+                                        [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global" && fargument.optional!="output"]//${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name}.${argument2.name}.${argument3.name} = ${argValue};
                                     [/#if]
                                     [#if argument3.status=="OK"]
-                                    [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name}.${argument2.name}.${argument3.name} = ${argValue};
+                                    [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global" && fargument.optional!="output"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name}.${argument2.name}.${argument3.name} = ${argValue};
                                     [/#if]
                                 [/#if][#-- if argument.mandatory --]
 [/#list]
@@ -505,6 +512,7 @@ ETH_TxPacketConfig TxConfig;
                     [#if args == "" && arg!=""][#assign args = args + arg ][#else][#if arg!=""][#assign args = args + ', ' + arg][/#if][/#if]
                     [/#list]
                     [#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n--]
+                    [#if !(method.callMethod)][#else]
                             [#if method.returnHAL=="false"]
                                 [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});
                             [#else]
@@ -514,8 +522,9 @@ ETH_TxPacketConfig TxConfig;
                                 [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
                                 [#if nTab==2]#t#t[#else]#t[/#if]}
                             [/#if]#n
+                    [/#if]        
 		[#else]
-                    [#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n--]
+                    [#if !(method.callMethod)][#else]
                             [#if method.returnHAL=="false"]
                                 [#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
                             [#else]
@@ -525,6 +534,7 @@ ETH_TxPacketConfig TxConfig;
                                 [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler( );
                                 [#if nTab==2]#t#t[#else]#t[/#if]}
                             [/#if]#n
+                    [/#if]            
                 [/#if]
 		[/#if]
 		[#if method.status=="KO"]
@@ -532,9 +542,13 @@ ETH_TxPacketConfig TxConfig;
 			[#if method.arguments??]
 				[#list method.arguments as fargument]
 					[#if fargument.addressOf] [#assign adr = "&"][#else ] [#assign adr = ""][/#if]
+                                        [#if fargument.cast??] [#assign adr = fargument.cast + adr][/#if]
 					[#if fargument.genericType == "struct"][#assign arg = "" + adr + fargument.name]
-                                        [#if fargument.context??]
-                                            [#if fargument.context=="global"]
+                                            [#if fargument.optional == "output"]
+                                                [#assign arg = "" + adr + fargument.name]
+                                            [/#if]
+                                            [#if fargument.context?? && fargument.optional!="output"]                 
+                                              [#if fargument.context=="global"]
                                                 [#if configModel.ipName=="DMA" || configModel.ipName?starts_with("BDMA") || configModel.ipName=="MDMA"]
                                                 [#if configModel.dmaRequestName==""] [#-- if dma request name different from instanceName: case of I2S1 for example --]
                                                        [#assign instanceIndex = "_"+ configModel.instanceName?lower_case]
@@ -654,42 +668,43 @@ ETH_TxPacketConfig TxConfig;
      [@generateConfigModelCode configModel=dmaconfig inst=ipName  nTab=tabN index="" mode=type/]
         [#assign prefixList = dmaCurrentRequest?split("_")]
         [#list prefixList as p][#assign prefix= p][/#list]
-
-            [#-- #t__HAL_LINKDMA(${instHandler},[#if dmaconfig.dmaHandel??]${dmaconfig.dmaHandel}[#else]hdma${prefix}[/#if],${getDmaHandlePrefix(dmaconfig)}_${dmaconfig.instanceName?lower_case});#n --]
-            [#if dmaconfig.dmaHandel?size > 1] [#-- if more than one dma handler--]
-                [#assign channel="channel"]
-                [#if (FamilyName=="STM32F2" || FamilyName=="STM32F4" || FamilyName=="STM32F7")]
-                  [#assign channel="stream"]
+            [#if dmaconfig.dmaVersion?? && dmaconfig.dmaVersion!="DMA3"]
+                [#-- #t__HAL_LINKDMA(${instHandler},[#if dmaconfig.dmaHandel??]${dmaconfig.dmaHandel}[#else]hdma${prefix}[/#if],${getDmaHandlePrefix(dmaconfig)}_${dmaconfig.instanceName?lower_case});#n --]
+                [#if dmaconfig.dmaHandel?size > 1] [#-- if more than one dma handler--]
+                    [#assign channel="channel"]
+                    [#if (FamilyName=="STM32F2" || FamilyName=="STM32F4" || FamilyName=="STM32F7")]
+                      [#assign channel="stream"]
+                    [/#if]
+                    #t#t/* Several peripheral DMA handle pointers point to the same DMA handle.
+                    #t#t   Be aware that there is only one ${channel} to perform all the requested DMAs. */
+                    [#assign one_sdio_request=false]
+                    [#if (FamilyName=="STM32F1" || FamilyName=="STM32F2" || FamilyName=="STM32F4") && dmaconfig.dmaRequestName=="SDIO"]
+                      [#assign one_sdio_request=true]
+                    [/#if]
+                    [#if FamilyName=="STM32L1" && dmaconfig.dmaRequestName=="SD_MMC"]
+                      [#assign one_sdio_request=true]
+                    [/#if]
+                    [#if (FamilyName=="STM32F7" || FamilyName=="STM32L4") && dmaconfig.dmaRequestName=="SDMMC1"]
+                      [#assign one_sdio_request=true]
+                    [/#if]
+                    [#if one_sdio_request]
+                    #t#t/* Be sure to change transfer direction before calling
+                    #t#t   HAL_SD_ReadBlocks_DMA or HAL_SD_WriteBlocks_DMA. */
+                    [/#if]
+                [/#if]   [#-- if more than one dma handler--]
+                [#list dmaconfig.dmaHandel as dmaH]
+                    [#if dmaconfig.dmaRequestName==""] [#-- if dma request name different from instanceName: case of I2S1 for example --]
+                        #t#t__HAL_LINKDMA(${instHandler},${dmaH},${getDmaHandlePrefix(dmaconfig)}_${dmaconfig.instanceName?lower_case});
+                    [#else]
+            [#--workAround DFSDM--]
+                [#assign ind=""]
+                [#if dmaconfig.dmaRequestName?contains("DFSDM")]
+                    [#assign ind=dmaconfig.dmaRequestName?replace("DFSDM","")]
                 [/#if]
-                #t#t/* Several peripheral DMA handle pointers point to the same DMA handle.
-                #t#t   Be aware that there is only one ${channel} to perform all the requested DMAs. */
-                [#assign one_sdio_request=false]
-                [#if (FamilyName=="STM32F1" || FamilyName=="STM32F2" || FamilyName=="STM32F4") && dmaconfig.dmaRequestName=="SDIO"]
-                  [#assign one_sdio_request=true]
-                [/#if]
-                [#if FamilyName=="STM32L1" && dmaconfig.dmaRequestName=="SD_MMC"]
-                  [#assign one_sdio_request=true]
-                [/#if]
-                [#if (FamilyName=="STM32F7" || FamilyName=="STM32L4") && dmaconfig.dmaRequestName=="SDMMC1"]
-                  [#assign one_sdio_request=true]
-                [/#if]
-                [#if one_sdio_request]
-                #t#t/* Be sure to change transfer direction before calling
-                #t#t   HAL_SD_ReadBlocks_DMA or HAL_SD_WriteBlocks_DMA. */
-                [/#if]
-            [/#if]   [#-- if more than one dma handler--]
-            [#list dmaconfig.dmaHandel as dmaH]
-                [#if dmaconfig.dmaRequestName==""] [#-- if dma request name different from instanceName: case of I2S1 for example --]
-                    #t#t__HAL_LINKDMA(${instHandler},${dmaH},${getDmaHandlePrefix(dmaconfig)}_${dmaconfig.instanceName?lower_case});
-                [#else]
-        [#--workAround DFSDM--]
-            [#assign ind=""]
-            [#if dmaconfig.dmaRequestName?contains("DFSDM")]
-                [#assign ind=dmaconfig.dmaRequestName?replace("DFSDM","")]
+                        #t#t__HAL_LINKDMA(${instHandler},${dmaH},${getDmaHandlePrefix(dmaconfig)}_${dmaconfig.dmaRequestName?lower_case});
+                    [/#if]
+                [/#list]
             [/#if]
-                    #t#t__HAL_LINKDMA(${instHandler},${dmaH},${getDmaHandlePrefix(dmaconfig)}_${dmaconfig.dmaRequestName?lower_case});
-                [/#if]
-            [/#list]
             [#-- #t#t__HAL_LINKDMA(${instHandler},[#if dmaconfig.dmaHandel??]${dmaconfig.dmaHandel}[#else]hdma${prefix}[/#if],${getDmaHandlePrefix(dmaconfig)}_${dmaconfig.instanceName?lower_case});#n --]
 [#if dmaCurrentRequest?contains("dfsdm")]
     #t}
@@ -859,7 +874,7 @@ ETH_TxPacketConfig TxConfig;
 #t[@generateConfigCode ipName=ipName type=serviceType serviceName="dma" instHandler=instHandler tabN=tabN/]
     [/#if]
 [#-- bug 322189 Init--]
-[#if ipName?contains("OTG_FS")&&FamilyName=="STM32L4"]
+[#if ipName?contains("OTG_FS")&&(FamilyName=="STM32L4"|FamilyName=="STM32U5") || Line.equals("STM32G0x1") && ipName?contains("USB_DRD_FS")]
 #n#t#t/* Enable VDDUSB */
   #t#tif(__HAL_RCC_PWR_IS_CLK_DISABLED())
   #t#t{
@@ -1058,7 +1073,7 @@ ${variable.value} ${variable.name};
 
 [#-- if used Driver is LL --]
 [#if instanceData.usedDriver?? && instanceData.usedDriver!="HAL"][#--Check if LL driver is used. instanceData:ConfigModel --]
-    [#-- varaible declaration --]
+    [#-- variable declaration --]
     [#assign v = ""]
     [#if instanceData.initServices?? && instanceData.initServices.gpio?? ]
         [#assign service=instanceData.initServices.gpio]
@@ -1066,12 +1081,25 @@ ${variable.value} ${variable.name};
                [#if v?contains(variable.name)]
                [#-- no matches--]
                [#else]
-   #t${variable.value} ${variable.name} = {0};
+                    #t${variable.value} ${variable.name} = {0};
                    [#assign v = v + " "+ variable.name/]
                [/#if]
            [/#list]
     [/#if]
+    [#if  !(instName?starts_with("GPDMA")) && !(instName?starts_with("LPDMA")) && instanceData.initServices?? && instanceData.initServices.dma?? && FamilyName=="STM32U5"]
+        [#assign service=instanceData.initServices.dma]
+           [#list service as dmaConfig]
+                [#list dmaConfig.variables as variable] [#-- variables declaration --]
+                    [#if v?contains(variable.name)]
+                    [#-- no matches--]
+                    [#else]
+                        #t${variable.value} ${variable.name} = {0};
+                        [#assign v = v + " "+ variable.name/]	
+                    [/#if]	
+                [/#list]
+           [/#list]
 
+    [/#if]
 [#assign listOfLocalVariables =""]
     [#assign resultList =""]
 [#if instanceData.initServices??]
@@ -1317,10 +1345,16 @@ static uint32_t ${entry.value}=0;
         [/#if]
         #t{
    [#else]
-        [#if ipvar.instanceNbre > 1] [#-- IF number of IP instances greater than 0--]
-        #tif(${mode?lower_case}Handle->Instance==${words[0]?replace("I2S","SPI")})
-        #t{
-    [/#if]
+        [#assign word0 = words[0]]
+        [#if  word0.contains("ADF")||word0.contains("MDF")]              
+            #tif[#if word0.contains("ADF")](IS_ADF_INSTANCE(${mode?lower_case}Handle->Instance))[/#if][#if word0.contains("MDF")](IS_MDF_INSTANCE(${mode?lower_case}Handle->Instance))[/#if]
+            #t{
+        [#else]
+            [#if ipvar.instanceNbre > 1] [#-- IF number of IP instances greater than 0--]
+            #tif(${mode?lower_case}Handle->Instance==${words[0]?replace("I2S","SPI")})
+            #t{
+            [/#if]
+        [/#if]
     [/#if]
 
 [#if words?size > 1] [#-- Check if there is more than one ip instance--]
@@ -1363,14 +1397,19 @@ static uint32_t ${entry.value}=0;
     [#list words as inst]
     [#if i>0]
     [#if  words[i]?contains("DFSDM")]
-[#assign word0 = words[i]]
+        [#assign word0 = words[i]]
         [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4"]
             #tif(${words[0]}_Init == 0)
         [#else]
             #telse if([#if word0.contains("DFSDM1")&& mode=="DFSDM_Channel"](IS_DFSDM1_CHANNEL_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Channel"]!(IS_DFSDM1_CHANNEL_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if][#if word0.contains("DFSDM1")&& mode=="DFSDM_Filter"](IS_DFSDM1_FILTER_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Filter"]!(IS_DFSDM1_FILTER_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if](${words[i]}_Init == 0))
         [/#if]
     [#else]
+        [#assign word0 = words[i]]
+        [#if  word0.contains("ADF")||word0.contains("MDF")]              
+            #telse if[#if word0.contains("ADF")](IS_ADF_INSTANCE(${mode?lower_case}Handle->Instance))[/#if][#if word0.contains("MDF")](IS_MDF_INSTANCE(${mode?lower_case}Handle->Instance))[/#if]
+        [#else]
         #telse if(${mode?lower_case}Handle->Instance==${words[i]?replace("I2S","SPI")}) [#-- if I2S instance should be SPI--]
+        [/#if]
     [/#if]
     #t{
 #t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspInit 0 */
@@ -1536,9 +1575,15 @@ uint32_t DFSDM1_Init = 0;
     [/#if]
         #t{
 [#else]
-    [#if ipvar.instanceNbre >  1 ] [#-- IF number of IP instances greater than 0--]
- #tif(${mode?lower_case}Handle->Instance==${words[0]?replace("I2S","SPI")})
+    [#assign word0 = words[0]]
+    [#if  word0.contains("ADF")||word0.contains("MDF")]              
+        #tif[#if word0.contains("ADF")](IS_ADF_INSTANCE(${mode?lower_case}Handle->Instance))[/#if][#if word0.contains("MDF")](IS_MDF_INSTANCE(${mode?lower_case}Handle->Instance))[/#if]
         #t{
+    [#else]
+        [#if ipvar.instanceNbre >  1 ] [#-- IF number of IP instances greater than 0--]
+            #tif(${mode?lower_case}Handle->Instance==${words[0]?replace("I2S","SPI")})
+            #t{
+        [/#if]
     [/#if]
 [/#if]
 
@@ -1625,10 +1670,16 @@ uint32_t DFSDM1_Init = 0;
     [/#if]
     #t#t{
 [#else]
+    [#assign word0 = words[0]]
+    [#if  word0.contains("ADF")||word0.contains("MDF")]
+        #tif[#if word0.contains("ADF")](IS_ADF_INSTANCE(${mode?lower_case}Handle->Instance))[/#if][#if word0.contains("MDF")](IS_MDF_INSTANCE(${mode?lower_case}Handle->Instance))[/#if]
+        #t{
+    [#else]
         [#if ipvar.instanceNbre >  1 ] [#-- IF number of IP instances greater than 0--]
             #tif(${mode?lower_case}Handle->Instance==${words[0]?replace("I2S","SPI")})
             #t{
         [/#if]
+    [/#if]
 [/#if]
 
 [#if words?size > 1] [#-- Check if there is more than one ip instance--]
@@ -1648,16 +1699,21 @@ uint32_t DFSDM1_Init = 0;
     [#list words as inst]
         [#if i>0]
 [#if words[i]?contains("DFSDM")]
-[#assign word0 = words[i]]
-    [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4"]
-    [#else]
-        #telse if([#if word0.contains("DFSDM1")&& mode=="DFSDM_Channel"](IS_DFSDM1_CHANNEL_INSTANCE(${mode?lower_case}Handle->Instance))[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Channel"]!(IS_DFSDM1_CHANNEL_INSTANCE(${mode?lower_case}Handle->Instance))[/#if][#if word0.contains("DFSDM1")&& mode=="DFSDM_Filter"](IS_DFSDM1_FILTER_INSTANCE(${mode?lower_case}Handle->Instance))[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Filter"]!(IS_DFSDM1_FILTER_INSTANCE(${mode?lower_case}Handle->Instance))[/#if])
-        #t{
-    [/#if]
-#t#t${words[i]}_Init-- ;
-#t#tif((${words[i]}_Init == 0))
+    [#assign word0 = words[i]]
+        [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4"]
+        [#else]
+            #telse if([#if word0.contains("DFSDM1")&& mode=="DFSDM_Channel"](IS_DFSDM1_CHANNEL_INSTANCE(${mode?lower_case}Handle->Instance))[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Channel"]!(IS_DFSDM1_CHANNEL_INSTANCE(${mode?lower_case}Handle->Instance))[/#if][#if word0.contains("DFSDM1")&& mode=="DFSDM_Filter"](IS_DFSDM1_FILTER_INSTANCE(${mode?lower_case}Handle->Instance))[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Filter"]!(IS_DFSDM1_FILTER_INSTANCE(${mode?lower_case}Handle->Instance))[/#if])
+            #t{
+        [/#if]
+    #t#t${words[i]}_Init-- ;
+    #t#tif((${words[i]}_Init == 0))
 [#else]
-#telse if(${mode?lower_case}Handle->Instance==${words[i]?replace("I2S","SPI")})
+    [#assign word0 = words[i]]
+    [#if  word0.contains("ADF")||word0.contains("MDF")]              
+        #telse if[#if word0.contains("ADF")](IS_ADF_INSTANCE(${mode?lower_case}Handle->Instance))[/#if][#if word0.contains("MDF")](IS_MDF_INSTANCE(${mode?lower_case}Handle->Instance))[/#if]        
+    [#else]
+    #telse if(${mode?lower_case}Handle->Instance==${words[i]?replace("I2S","SPI")})
+    [/#if]
 [/#if]
 [#if words[i]?contains("DFSDM")]
 #t#t{

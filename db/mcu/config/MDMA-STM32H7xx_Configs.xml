@@ -2,15 +2,22 @@
 <IP DBVersion="V4.0" Name="DMA" Version="STM32Cube_FW_H7_V0.6.0" IncludeFile="stm32h7xx_hal.h" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd" xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
     <RefConfig Name="HAL_MDMA_Init">
       <IFCondition Expression = "Rank=First">
-        <CallLibMethod Name="HAL_MDMA_Init"/>
-        <IFCondition Expression = "!(Request=MDMA_REQUEST_SW)">
-          <CallLibMethod Name="HAL_MDMA_ConfigPostRequestMask"/>
+        <CallLibMethod Name="HAL_MDMA_Init">
+        <MethodArg Name="Request" ParameterName="Requestforcodegen"/>
+        </CallLibMethod>
+        <IFCondition Expression = "!(MaskAddress=0)">
+          <CallLibMethod Name="HAL_MDMA_ConfigPostRequestMask">
+           <MethodArg Name="Request" ParameterName="Requestforcodegen"/>
+        </CallLibMethod>
         </IFCondition>
       </IFCondition>
       <IFCondition Expression = "Rank=Intermediate">
         <CallLibMethod Name="HAL_MDMA_LinkedList_CreateNode">
+             <MethodArg Name="Request" ParameterName="Requestforcodegen"/>
           <MethodArg Name="PostRequestMaskAddress" ParameterName="MaskAddress"/>
           <MethodArg Name="PostRequestMaskData" ParameterName="MaskData"/>
+
+          
         <!--
           <MethodArg Name="SrcAddress" FValue="0"/>
           <MethodArg Name="DstAddress" FValue="0"/>
@@ -20,10 +27,12 @@
         </CallLibMethod>
         <CallLibMethod Name="HAL_MDMA_LinkedList_AddNode">
           <MethodArg Name="pPrevNode" FValue="0"/>
+           <MethodArg Name="Request" ParameterName="Requestforcodegen"/>
         </CallLibMethod>
       </IFCondition>
       <IFCondition Expression = "Rank=Last">
         <CallLibMethod Name="HAL_MDMA_LinkedList_CreateNode">
+             <MethodArg Name="Request" ParameterName="Requestforcodegen"/>
           <MethodArg Name="PostRequestMaskAddress" ParameterName="MaskAddress"/>
           <MethodArg Name="PostRequestMaskData" ParameterName="MaskData"/>
         <!--
@@ -35,9 +44,12 @@
         </CallLibMethod>
         <CallLibMethod Name="HAL_MDMA_LinkedList_AddNode">
           <MethodArg Name="pPrevNode" FValue="0"/>
+            <MethodArg Name="Request" ParameterName="Requestforcodegen"/>
         </CallLibMethod>
         <IFCondition Expression = "(CircularMode=MDMA_CIRCULAR_LIST_LOOPING_ON_FIRST_ELEMENT)|(CircularMode=MDMA_CIRCULAR_LIST_LOOPING_ON_SECOND_ELEMENT)">
-          <CallLibMethod Name="HAL_MDMA_LinkedList_EnableCircularMode"/>
+          <CallLibMethod Name="HAL_MDMA_LinkedList_EnableCircularMode">
+            <MethodArg Name="Request" ParameterName="Requestforcodegen"/>
+        </CallLibMethod>
         </IFCondition>
       </IFCondition>
       <Component Name="HAL:MDMA"/>

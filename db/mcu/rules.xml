@@ -52,12 +52,12 @@
 	
 -->
 <rules>
-	<rule cache="true">
-		<condition>S_SECURE</condition>
-		<match>STM32L5.*</match>
-		<match>GTZC.Enable</match>
-		<diagnostic>"Enable" mode mandatory for TZEN=1</diagnostic>
-	</rule>
+    <rule cache="true">
+        <condition>S_SECURE</condition>
+        <match>STM32L5.*</match>
+        <match>GTZC.Enable</match>
+        <diagnostic>"Enable" mode mandatory for TZEN=1</diagnostic>
+    </rule>
     <rule cache="true">
         <condition>S_SECURE</condition>
         <match>STM32L5.*</match>
@@ -77,60 +77,739 @@
         <diagnostic>Warning: In order that cache operations are possible in non secure<br/>application, it is recommended that the secure attribute<br/>is kept not secured in the secure application</diagnostic>
     </rule>
 
-	<rule cache="true">
-		<match>STM32.*</match>
-		<match>Stack Configuration.PD3 Full Stack</match>
-		<diagnostic>ALL PD3 feature are available (select the 'USBPDCORE_PD3_FULL_CMx_xxx.x lib')</diagnostic>
-	</rule>
-	<rule cache="true">
-		<match>STM32.*</match>
-		<match>Stack Configuration.PD3 Config 1</match>
-		<diagnostic>ALL PD3 feature are available except VDM (select the 'USBPDCORE_PD3_CONFIG_1_CMx_xxx.x lib')</diagnostic>
-	</rule>
-	<rule cache="true">
-		<match>STM32.*</match>
-		<match>Stack Configuration.PD3 Min Source</match>
-		<diagnostic>Source configuration only with minimum PD3 feature (select the 'USBPDCORE_PD3_CONFIG_MINSRC_CMx_xxx.x lib')</diagnostic>
-	</rule>
-	<rule cache="true">
-		<match>STM32.*</match>
-		<match>Stack Configuration.PD3 Min Sink</match>
-		<diagnostic>Sink configuration only with minimum PD3 feature (select the 'USBPDCORE_PD3_CONFIG_MINSNK_CMx_xxx.x lib')</diagnostic>
-	</rule>
-	<rule cache="true">
-		<match>STM32.*</match>
-		<match>Stack Configuration.Type C with State Machine</match>
-		<diagnostic>No PD available but the state machine Type-C is enabled (select the 'USBPDCORE_NO_PD_CMx_xxx.x lib' and USBPDCORE_LIB_NO_PD and USBPD_STATE_MACHINE switches should be enabled)</diagnostic>
-	</rule>
-	<rule cache="true">
-		<match>STM32.*</match>
-		<match>Stack Configuration.Type C only</match>
-		<diagnostic>No PD available but the state machine Type-C is disabled (select the 'USBPDCORE_NO_PD_CMx_xxx.x lib' and USBPDCORE_LIB_NO_PD switch should be enabled)</diagnostic>
-	</rule>
+    <rule cache="true">
+        <match>STM32.*</match>
+        <match>Stack Configuration.PD3 Full Stack</match>
+        <diagnostic>ALL PD3 feature are available (select the 'USBPDCORE_PD3_FULL_CMx_xxx.x lib')</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32.*</match>
+        <match>Stack Configuration.PD3 Config 1</match>
+        <diagnostic>ALL PD3 feature are available except VDM (select the 'USBPDCORE_PD3_CONFIG_1_CMx_xxx.x lib')</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32.*</match>
+        <match>Stack Configuration.PD3 Min Source</match>
+        <diagnostic>Source configuration only with minimum PD3 feature (select the 'USBPDCORE_PD3_CONFIG_MINSRC_CMx_xxx.x lib')</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32.*</match>
+        <match>Stack Configuration.PD3 Min Sink</match>
+        <diagnostic>Sink configuration only with minimum PD3 feature (select the 'USBPDCORE_PD3_CONFIG_MINSNK_CMx_xxx.x lib')</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32.*</match>
+        <match>Stack Configuration.Type C with State Machine</match>
+        <diagnostic>No PD available but the state machine Type-C is enabled (select the 'USBPDCORE_NO_PD_CMx_xxx.x lib' and USBPDCORE_LIB_NO_PD and USBPD_STATE_MACHINE switches should be enabled)</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32.*</match>
+        <match>Stack Configuration.Type C only</match>
+        <diagnostic>No PD available but the state machine Type-C is disabled (select the 'USBPDCORE_NO_PD_CMx_xxx.x lib' and USBPDCORE_LIB_NO_PD switch should be enabled)</diagnostic>
+    </rule>
 
     <!-- 3 following rules to add warning at UART4 mode level for MP1 when UART4 is selected on Cortx-M4 -->
     <rule cache="true">
-		<condition>UART4_CUBE  &amp; PA13_UART4_TX</condition>
-		<match>STM32MP1.*</match>
-		<match>root.Mode</match>
-		<diagnostic>This mode requires Pin PA13 (UART_TX) also used in Boot ROM (hardcoded) and as default debug console in OpenSTLinux.<br></br>Consequently the signal may be disturbed in case of Linux reboot</diagnostic>
+        <condition>UART4_CUBE  &amp; PA13_UART4_TX</condition>
+        <match>STM32MP1.*</match>
+        <match>root.Mode</match>
+        <diagnostic>This mode requires Pin PA13 (UART_TX) also used in Boot ROM (hardcoded) and as default debug console in OpenSTLinux.<br></br>Consequently the signal may be disturbed in case of Linux reboot</diagnostic>
+        <result>warning.png</result>
+    </rule>
+    <!-- rule to clean root warning-->
+    <rule cache="true">
+        <condition>UART4_CUBE  &amp; !PA13_UART4_TX</condition>
+        <match>STM32MP1.*</match>
+        <match>root.Mode</match>
+        <diagnostic></diagnostic>
+    </rule>
+    <rule cache="true">
+        <condition>UART4_CUBE  &amp; PA13_UART4_TX</condition>
+        <match>STM32MP1.*</match>
+        <match>Mode.*</match>
+        <diagnostic>This mode requires Pin PA13 (UART_TX) also used in Boot ROM (hardcoded) and as default debug console in OpenSTLinux.<br></br>Consequently the signal may be disturbed in case of Linux reboot</diagnostic>
+        <result>warning.png</result>
+    </rule>
+    <rule cache="true">
+        <match>STM32MP15.*</match>
+        <match>root.Direct MDMA Channels Allocation.*</match>
+        <diagnostic>Non-secure chained MDMA channels = 16<br></br>Direct MDMA channels = 16 (assignable by the user between secure and non-secure)<br></br>Secure chained MDMA channels = 16</diagnostic>
+    </rule>
+    <!-- rule to give details about OPAMP modes-->
+    <!-- G4 series-->
+    <rule cache="true">
+        <match>STM32G4.*|STM32H7.*</match>
+        <match>Mode.Standalone</match>
+        <diagnostic>The non-inverting input VINP is connected externally on IO pin.<br></br>The inverting input VINM is connected to dedicated IO pin.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32G4.*</match>
+        <match>Mode.Standalone-DAC3_OUT1-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output (or is connected externally on IO pin for OPAMP2 only).<br></br>The inverting input VINM is connected to dedicated IO pin.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32G4.*</match>
+        <match>Mode.Follower</match>
+        <diagnostic>The non-inverting input VINP is connected externally on IO pin.<br></br>The inverting input VINM is internally connected to the OPAMP output.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32G4.*</match>
+        <match>Mode.Follower-DAC3_OUT1-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output (or is connected externally on IO pin for OPAMP2 only).<br></br>The inverting input VINM is internally connected to the OPAMP output.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32G4.*</match>
+        <match>Mode.PGA Not Connected</match>
+        <diagnostic>The non-inverting input VINP is connected externally on IO pin.<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32G4.*</match>
+        <match>Mode.PGA Not Connected-DAC3_OUT1-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output (or is connected externally on IO pin for OPAMP2 only).<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32G4.*</match>
+        <match>Mode.PGA Connected-DAC3_OUT1-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output (or is connected externally on IO pin for OPAMP2 only).<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors and external IO on VINM0 for filtering.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32G4.*</match>
+        <match>Mode.PGA Connected-INVERTINGINPUT_IO0_BIAS</match>
+        <diagnostic>The non-inverting input VINP is connected externally on IO pin.<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors with VINM0 pin for input or bias.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32G4.*</match>
+        <match>Mode.PGA Connected-INVERTINGINPUT_IO0_BIAS-DAC3_OUT1-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output (or is connected externally on IO pin for OPAMP2 only).<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors with VINM0 pin for input or bias.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32G4.*</match>
+        <match>Mode.PGA Internally Connected</match>
+        <diagnostic>The non-inverting input VINP is connected externally on IO pin.<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors and external IO on VINM0 for filtering.<br></br>The OPAMP output VOUT is internally connected to a dedicated ADC channel.<br></br>(ADC channel can be found in the 'Operational amplifier possible connection' table from reference manual).</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32G4.*</match>
+        <match>Mode.Follower Internally Connected</match>
+        <diagnostic>The non-inverting input VINP is connected externally on IO.<br></br>The inverting input VINM is internally connected to the OPAMP output.<br></br>The OPAMP output VOUT is internally connected to a dedicated ADC channel.<br></br>(ADC channel can be found in the 'Operational amplifier possible connection' table from reference manual).</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32G4.*</match>
+        <match>Mode.PGA Internally connected_IO0_BIAS</match>
+        <diagnostic>The non-inverting input VINP is connected externally on IO.<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors with VINM0 pin for input or bias.<br></br>The OPAMP output VOUT is internally connected to a dedicated ADC channel.<br></br>(ADC channel can be found in the 'Operational amplifier possible connection' table from reference manual).</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32G4.*</match>
+        <match>Mode.PGA_Connected-INVERTINGINPUT_IO0_BIAS-DAC_OUT1-INP_Output_internal</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output (or is connected externally on IO pin for OPAMP2 only).<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors with VINM0 pin for input or bias.<br></br>The OPAMP output VOUT is internally connected to a dedicated ADC channel.<br></br>(ADC channel can be found in the 'Operational amplifier possible connection' table from reference manual).</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32G4.*</match>
+        <match>Mode.PGA Connected</match>
+        <diagnostic>The non-inverting input VINP is connected externally on IO pin.<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors and external IO on VINM0 for filtering.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32G4.*</match>
+        <match>Mode.Standalone-DAC3_OUT2-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output (or is connected externally on IO pin for OPAMP2 only).<br></br>The inverting input VINM is connected to dedicated IO pin.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32G4.*</match>
+        <match>Mode.Follower-DAC3_OUT2-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output (or is connected externally on IO pin for OPAMP2 only).<br></br>The inverting input VINM is internally connected to the OPAMP output.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32G4.*</match>
+        <match>Mode.PGA Not Connected-DAC3_OUT2-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output (or is connected externally on IO pin for OPAMP2 only).<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32G4.*</match>
+        <match>Mode.PGA Connected-DAC3_OUT2-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output (or is connected externally on IO pin for OPAMP2 only).<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors and external IO on VINM0 for filtering.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32G4.*</match>
+        <match>Mode.PGA Connected-INVERTINGINPUT_IO0_BIAS-DAC3_OUT2-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output (or is connected externally on IO pin for OPAMP2 only).<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors with VINM0 pin for input or bias.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32G4.*</match>
+        <match>Mode.PGA Connected-INVERTINGINPUT_IO0_IO1_BIAS</match>
+        <diagnostic>The non-inverting input VINP is connected externally on IO pin.<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors with VINM0 pin for input or bias and VINM1 pin for filtering.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32G4.*</match>
+        <match>Mode.PGA Connected-INVERTINGINPUT_IO0_IO1_BIAS-DAC3_OUT2-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output.<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors with VINM0 pin for input or bias and VINM1 pin for filtering.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32G4.*</match>
+        <match>Mode.PGA_Connected-INVERTINGINPUT_IO0_BIAS-DAC_OUT2-INP_Output_internal</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output (or is connected externally on IO pin for OPAMP2 only).<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors with VINM0 pin for input or bias.<br></br>The OPAMP output VOUT is internally connected to a dedicated ADC channel.<br></br>(ADC channel can be found in the 'Operational amplifier possible connection' table from reference manual).</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32G4.*</match>
+        <match>Mode.Standalone-DAC4_OUT1-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output (or is connected externally on IO pin for OPAMP2 only).<br></br>The inverting input VINM is connected to dedicated IO pin.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32G4.*</match>
+        <match>Mode.Standalone-DAC4_OUT2-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output (or is connected externally on IO pin for OPAMP2 only).<br></br>The inverting input VINM is connected to dedicated IO pin.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32G4.*</match>
+        <match>Mode.Follower-DAC4_OUT1-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output (or is connected externally on IO pin for OPAMP2 only).<br></br>The inverting input VINM is internally connected to the OPAMP output.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32G4.*</match>
+        <match>Mode.Follower-DAC4_OUT2-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output (or is connected externally on IO pin for OPAMP2 only).<br></br>The inverting input VINM is internally connected to the OPAMP output.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32G4.*</match>
+        <match>Mode.PGA Not Connected-DAC4_OUT1-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output (or is connected externally on IO pin for OPAMP2 only).<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32G4.*</match>
+        <match>Mode.PGA Not Connected-DAC4_OUT2-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output (or is connected externally on IO pin for OPAMP2 only).<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32G4.*</match>
+        <match>Mode.PGA Connected-DAC4_OUT1-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output (or is connected externally on IO pin for OPAMP2 only).<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors and external IO on VINM0 for filtering.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32G4.*</match>
+        <match>Mode.PGA Connected-DAC4_OUT2-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output (or is connected externally on IO pin for OPAMP2 only).<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors and external IO on VINM0 for filtering.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32G4.*</match>
+        <match>Mode.PGA Connected-INVERTINGINPUT_IO0_BIAS-DAC4_OUT1-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output (or is connected externally on IO pin for OPAMP2 only).<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors with VINM0 pin for input or bias.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32G4.*</match>
+        <match>Mode.PGA Connected-INVERTINGINPUT_IO0_BIAS-DAC4_OUT2-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output (or is connected externally on IO pin for OPAMP2 only).<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors with VINM0 pin for input or bias.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32G4.*</match>
+        <match>Mode.PGA Connected-INVERTINGINPUT_IO0_IO1_BIAS-DAC3_OUT1-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output.<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors with VINM0 pin for input or bias and VINM1 pin for filtering.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32G4.*</match>
+        <match>Mode.PGA Connected-INVERTINGINPUT_IO0_IO1_BIAS-DAC4_OUT1-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output.<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors with VINM0 pin for input or bias and VINM1 pin for filtering.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32G4.*</match>
+        <match>Mode.PGA Connected-INVERTINGINPUT_IO0_IO1_BIAS-DAC4_OUT2-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output.<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors with VINM0 pin for input or bias and VINM1 pin for filtering.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <!-- L1/L4/L4+/L5 F3/U5 series-->
+    <rule cache="true">
+        <match>STM32L1.*|STM32L4.*|STM32L5.*|STM32F3.*|STM32U5.*</match>
+        <match>Mode.Standalone</match>
+        <diagnostic>The non-inverting input VINP is connected externally on IO pin.<br></br>The inverting input VINM is connected to dedicated IO pin.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32L1.*|STM32L4.*|STM32L5.*|STM32F3.*|STM32U5.*</match>
+        <match>Mode.Standalone-DAC_OUT1-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output.<br></br>The inverting input VINM is connected to dedicated IO pin.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32L1.*|STM32L4.*|STM32L5.*|STM32F3.*|STM32U5.*</match>
+        <match>Mode.Standalone-DAC_OUT2-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output.<br></br>The inverting input VINM is connected to dedicated IO pin.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32L1.*|STM32L4.*|STM32L5.*|STM32F3.*|STM32U5.*</match>
+        <match>Mode.Follower</match>
+        <diagnostic>The non-inverting input VINP is connected externally on IO pin.<br></br>The inverting input VINM is internally connected to the OPAMP output.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32L1.*|STM32L4.*|STM32L5.*|STM32F3.*|STM32U5.*</match>
+        <match>Mode.Follower-DAC_OUT1-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output.<br></br>The inverting input VINM is internally connected to the OPAMP output.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32L1.*|STM32L4.*|STM32L5.*|STM32F3.*|STM32U5.*</match>
+        <match>Mode.Follower-DAC_OUT2-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output.<br></br>The inverting input VINM is internally connected to the OPAMP output.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32L4.*|STM32L5.*|STM32F3.*|STM32U5.*</match>
+        <match>Mode.PGA Connected</match>
+        <diagnostic>The non-inverting input VINP is connected externally on IO pin.<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors and external IO for filtering.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32L4.*|STM32L5.*|STM32F3.*|STM32U5.*</match>
+        <match>Mode.PGA Connected-DAC_OUT1-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output.<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors and external IO for filtering.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32L4.*|STM32L5.*|STM32F3.*|STM32U5.*</match>
+        <match>Mode.PGA Connected-DAC_OUT2-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output.<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors and external IO for filtering.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32L4.*|STM32L5.*|STM32F3.*|STM32U5.*</match>
+        <match>Mode.PGA Not Connected</match>
+        <diagnostic>The non-inverting input VINP is connected externally on IO pin.<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32L4.*|STM32L5.*|STM32F3.*|STM32U5.*</match>
+        <match>Mode.PGA Not Connected-DAC_OUT1-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output.<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32L4.*|STM32L5.*|STM32F3.*|STM32U5.*</match>
+        <match>Mode.PGA Not Connected-DAC_OUT2-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output.<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <!-- H7 series-->
+    <rule cache="true">
+        <match>STM32H7.*</match>
+        <match>Mode.Standalone</match>
+        <diagnostic>The non-inverting input VINP is connected externally on IO pin.<br></br>The inverting input VINM is connected to dedicated IO pin.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32H7.*</match>
+        <match>Mode.Standalone-DAC_OUT1-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output.<br></br>The inverting input VINM is connected to dedicated IO pin.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32H7.*</match>
+        <match>Mode.Follower</match>
+        <diagnostic>The non-inverting input VINP is connected externally on IO pin.<br></br>The inverting input VINM is internally connected to the OPAMP output.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32H7.*</match>
+        <match>Mode.Follower-DAC_OUT1-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output.<br></br>The inverting input VINM is internally connected to the OPAMP output.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32H7.*</match>
+        <match>Mode.PGA Not Connected</match>
+        <diagnostic>The non-inverting input VINP is connected externally on IO pin.<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32H7.*</match>
+        <match>Mode.PGA Not Connected-DAC_OUT1-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output.<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32H7.*</match>
+        <match>Mode.PGA Connected-INVERTINGINPUT_IO0</match>
+        <diagnostic>The non-inverting input VINP is connected externally on IO pin.<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors for input.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32H7.*</match>
+        <match>Mode.PGA Connected-INVERTINGINPUT_IO0-DAC_OUT1-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output.<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors for input.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32H7.*</match>
+        <match>Mode.PGA Connected-INVERTINGINPUT_IO0_BIAS</match>
+        <diagnostic>The non-inverting input VINP is connected externally on IO pin.<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors for input or bias.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32H7.*</match>
+        <match>Mode.PGA Connected-INVERTINGINPUT_IO0_BIAS-DAC_OUT1-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output.<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors for input or bias.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32H7.*</match>
+        <match>Mode.PGA Connected-INVERTINGINPUT_IO0_IO1_BIAS-DAC_OUT1-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output.<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors with VINM0 pin for input or bias and VINM1 pin for filtering.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32H7.*</match>
+        <match>Mode.PGA Connected-INVERTINGINPUT_IO0_IO1_BIAS-DAC_OUT2-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output.<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors with VINM0 pin for input or bias and VINM1 pin for filtering.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32H7.*</match>
+        <match>Mode.PGA Connected</match>
+        <diagnostic>The non-inverting input VINP is connected externally on IO pin.<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors and external IO for filtering.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32H7.*</match>
+        <match>Mode.Standalone-DAC_OUT2-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output.<br></br>The inverting input VINM is connected to dedicated IO pin.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32H7.*</match>
+        <match>Mode.Follower-DAC_OUT2-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output (or is connected externally on IO pin for OPAMP2 only).<br></br>The inverting input VINM is internally connected to the OPAMP output.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32H7.*</match>
+        <match>Mode.PGA Not Connected-DAC_OUT2-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output.<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32H7.*</match>
+        <match>Mode.PGA Connected-DAC_OUT2-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output.<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors and external IO for filtering.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32H7.*</match>
+        <match>Mode.PGA Connected-INVERTINGINPUT_IO0-DAC_OUT2-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output.<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors for input.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32H7.*</match>
+        <match>Mode.PGA Connected-INVERTINGINPUT_IO0_BIAS-DAC_OUT2-INP</match>
+        <diagnostic>The non-inverting input VINP is connected internally to the dedicated DAC output.<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors for input or bias.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32H7.*</match>
+        <match>Mode.PGA Connected-INVERTINGINPUT_IO0_IO1_BIAS</match>
+        <diagnostic>The non-inverting input VINP is connected externally on IO pin.<br></br>The inverting input VINM is connected to the OPAMP output with a feedback resistors for input or bias for filtering.<br></br>The OPAMP output VOUT is connected to a dedicated IO pin.</diagnostic>
+    </rule>
+    
+    <!-- MDF modes BEGIN -->
+    <rule cache="true">
+        <match>STM32U5.*</match>
+        <match>Instance 0.Digital Filter - DFLT0</match>
+        <diagnostic>
+            Activation of Digital Filter DFLT0. Parametrization in Intance_0 sheet below including:<br></br>
+            – A configurable CIC filter:<br></br>
+            - Can be split into 2 CIC filters: high-resolution filter and out-off limit detector<br></br>
+            - Can be configured in Sinc4 filter<br></br>
+            - Can be configured in Sinc5 filter<br></br>
+            - Adjustable decimation ratio<br></br>
+            – A reshape filter to improve the out-off band rejection and in-band ripple<br></br>
+            – A high-pass filter to cancel the DC offset<br></br>
+            – An offset error cancellation<br></br>
+            – Gain control<br></br>
+            – Saturation blocks<br></br>
+            – An out-off limit detector<br></br>
+        </diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32U5.*</match>
+        <match>Instance 1.Digital Filter - DFLT1</match>
+        <diagnostic>
+            Activation of Digital Filter DFLT1. Parametrization in Intance_1 sheet below including:<br></br>
+            – A configurable CIC filter:<br></br>
+            - Can be split into 2 CIC filters: high-resolution filter and out-off limit detector<br></br>
+            - Can be configured in Sinc4 filter<br></br>
+            - Can be configured in Sinc5 filter<br></br>
+            - Adjustable decimation ratio<br></br>
+            – A reshape filter to improve the out-off band rejection and in-band ripple<br></br>
+            – A high-pass filter to cancel the DC offset<br></br>
+            – An offset error cancellation<br></br>
+            – Gain control<br></br>
+            – Saturation blocks<br></br>
+            – An out-off limit detector<br></br>
+        </diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32U5.*</match>
+        <match>Instance 2.Digital Filter - DFLT2</match>
+        <diagnostic>
+            Activation of Digital Filter DFLT2. Parametrization in Intance_2 sheet below including:<br></br>
+            – A configurable CIC filter:<br></br>
+            - Can be split into 2 CIC filters: high-resolution filter and out-off limit detector<br></br>
+            - Can be configured in Sinc4 filter<br></br>
+            - Can be configured in Sinc5 filter<br></br>
+            - Adjustable decimation ratio<br></br>
+            – A reshape filter to improve the out-off band rejection and in-band ripple<br></br>
+            – A high-pass filter to cancel the DC offset<br></br>
+            – An offset error cancellation<br></br>
+            – Gain control<br></br>
+            – Saturation blocks<br></br>
+            – An out-off limit detector<br></br>
+        </diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32U5.*</match>
+        <match>Instance 3.Digital Filter - DFLT3</match>
+        <diagnostic>
+            Activation of Digital Filter DFLT3. Parametrization in Intance_3 sheet below including:<br></br>
+            – A configurable CIC filter:<br></br>
+            - Can be split into 2 CIC filters: high-resolution filter and out-off limit detector<br></br>
+            - Can be configured in Sinc4 filter<br></br>
+            - Can be configured in Sinc5 filter<br></br>
+            - Adjustable decimation ratio<br></br>
+            – A reshape filter to improve the out-off band rejection and in-band ripple<br></br>
+            – A high-pass filter to cancel the DC offset<br></br>
+            – An offset error cancellation<br></br>
+            – Gain control<br></br>
+            – Saturation blocks<br></br>
+            – An out-off limit detector<br></br>
+        </diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32U5.*</match>
+        <match>Instance 4.Digital Filter - DFLT4</match>
+        <diagnostic>
+            Activation of Digital Filter DFLT4. Parametrization in Intance_4 sheet below including:<br></br>
+            – A configurable CIC filter:<br></br>
+            - Can be split into 2 CIC filters: high-resolution filter and out-off limit detector<br></br>
+            - Can be configured in Sinc4 filter<br></br>
+            - Can be configured in Sinc5 filter<br></br>
+            - Adjustable decimation ratio<br></br>
+            – A reshape filter to improve the out-off band rejection and in-band ripple<br></br>
+            – A high-pass filter to cancel the DC offset<br></br>
+            – An offset error cancellation<br></br>
+            – Gain control<br></br>
+            – Saturation blocks<br></br>
+            – An out-off limit detector<br></br>
+        </diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32U5.*</match>
+        <match>Instance 5.Digital Filter - DFLT5</match>
+        <diagnostic>
+            Activation of Digital Filter DFLT5. Parametrization in Intance_5 sheet below including:<br></br>
+            – A configurable CIC filter:<br></br>
+            - Can be split into 2 CIC filters: high-resolution filter and out-off limit detector<br></br>
+            - Can be configured in Sinc4 filter<br></br>
+            - Can be configured in Sinc5 filter<br></br>
+            - Adjustable decimation ratio<br></br>
+            – A reshape filter to improve the out-off band rejection and in-band ripple<br></br>
+            – A high-pass filter to cancel the DC offset<br></br>
+            – An offset error cancellation<br></br>
+            – Gain control<br></br>
+            – Saturation blocks<br></br>
+            – An out-off limit detector<br></br>
+        </diagnostic>
+    </rule>
+    
+    
+    <rule cache="true">
+        <match>STM32U5.*</match>
+        <match>Instance 0.Serial Interface - SITF0</match>
+        <diagnostic>
+            Activation of Serial Interface - SITF0<br></br>
+            Set the MDF1_SDI0 pin <br></br>
+            SITF0 allow to connect an external sensor to one or several digital filters (DFLTx), via the bitstream matrix.<br></br>
+            – configurable SPI interface to connect various digital sensors<br></br>
+            – configurable Manchester coded interface support<br></br>
+            – compatible with PDM interface to support digital microphones<br></br>
+            <br></br>
+            SITF0 can be customized in Intance_0 sheet below, in the following modes: <br></br>
+            • LF_MASTER SPI mode (low-frequency) <br></br>
+            • normal SPI mode <br></br>
+            • Manchester mode <br></br>
+            <br></br>
+            Signals on MDF1_SDI0 pin could be sampled thanks to whether a specific clock CKI0 or the one of the two common clocks (choose the right mode) <br></br>
+        </diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32U5.*</match>
+        <match>Instance 1.Serial Interface - SITF1</match>
+        <diagnostic>
+            Activation of Serial Interface - SITF1<br></br>
+            Set the MDF1_SDI1 pin <br></br>
+            SITF1 allow to connect an external sensor to one or several digital filters (DFLTx), via the bitstream matrix.<br></br>
+            – configurable SPI interface to connect various digital sensors<br></br>
+            – configurable Manchester coded interface support<br></br>
+            – compatible with PDM interface to support digital microphones<br></br>
+            <br></br>
+            SITF1 can be customized in Intance_1 sheet below, in the following modes: <br></br>
+            • LF_MASTER SPI mode (low-frequency) <br></br>
+            • normal SPI mode <br></br>
+            • Manchester mode <br></br>
+            <br></br>
+            Signals on MDF1_SDI1 pin could be sampled thanks to whether a specific clock CKI1 or the one of the two common clocks (choose the right mode) <br></br>
+        </diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32U5.*</match>
+        <match>Instance 2.Serial Interface - SITF2</match>
+        <diagnostic>
+            Activation of Serial Interface - SITF2<br></br>
+            Set the MDF1_SDI2 pin <br></br>
+            SITF2 allow to connect an external sensor to one or several digital filters (DFLTx), via the bitstream matrix.<br></br>
+            – configurable SPI interface to connect various digital sensors<br></br>
+            – configurable Manchester coded interface support<br></br>
+            – compatible with PDM interface to support digital microphones<br></br>
+            <br></br>
+            SITF2 can be customized in Intance_2 sheet below, in the following modes: <br></br>
+            • LF_MASTER SPI mode (low-frequency) <br></br>
+            • normal SPI mode <br></br>
+            • Manchester mode <br></br>
+            <br></br>
+            Signals on MDF1_SDI2 pin could be sampled thanks to whether a specific clock CKI2 or the one of the two common clocks (choose the right mode) <br></br>
+        </diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32U5.*</match>
+        <match>Instance 3.Serial Interface - SITF3</match>
+        <diagnostic>
+            Activation of Serial Interface - SITF3<br></br>
+            Set the MDF1_SDI3 pin <br></br>
+            SITF3 allow to connect an external sensor to one or several digital filters (DFLTx), via the bitstream matrix.<br></br>
+            – configurable SPI interface to connect various digital sensors<br></br>
+            – configurable Manchester coded interface support<br></br>
+            – compatible with PDM interface to support digital microphones<br></br>
+            <br></br>
+            SITF3 can be customized in Intance_3 sheet below, in the following modes: <br></br>
+            • LF_MASTER SPI mode (low-frequency) <br></br>
+            • normal SPI mode <br></br>
+            • Manchester mode <br></br>
+            <br></br>
+            Signals on MDF1_SDI3 pin could be sampled thanks to whether a specific clock CKI3 or the one of the two common clocks (choose the right mode) <br></br>
+        </diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32U5.*</match>
+        <match>Instance 4.Serial Interface - SITF4</match>
+        <diagnostic>
+            Activation of Serial Interface - SITF4<br></br>
+            Set the MDF1_SDI4 pin <br></br>
+            SITF4 allow to connect an external sensor to one or several digital filters (DFLTx), via the bitstream matrix.<br></br>
+            – configurable SPI interface to connect various digital sensors<br></br>
+            – configurable Manchester coded interface support<br></br>
+            – compatible with PDM interface to support digital microphones<br></br>
+            <br></br>
+            SITF4 can be customized in Intance_4 sheet below, in the following modes: <br></br>
+            • LF_MASTER SPI mode (low-frequency) <br></br>
+            • normal SPI mode <br></br>
+            • Manchester mode <br></br>
+            <br></br>
+            Signals on MDF1_SDI4 pin could be sampled thanks to whether a specific clock CKI4 or the one of the two common clocks (choose the right mode) <br></br>
+        </diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32U5.*</match>
+        <match>Instance 5.Serial Interface - SITF5</match>
+        <diagnostic>
+            Activation of Serial Interface - SITF5<br></br>
+            Set the MDF1_SDI5 pin <br></br>
+            SITF5 allow to connect an external sensor to one or several digital filters (DFLTx), via the bitstream matrix.<br></br>
+            – configurable SPI interface to connect various digital sensors<br></br>
+            – configurable Manchester coded interface support<br></br>
+            – compatible with PDM interface to support digital microphones<br></br>
+            <br></br>
+            SITF5 can be customized in Intance_5 sheet below, in the following modes: <br></br>
+            • LF_MASTER SPI mode (low-frequency) <br></br>
+            • normal SPI mode <br></br>
+            • Manchester mode <br></br>
+            <br></br>
+            Signals on MDF1_SDI5 pin could be sampled thanks to whether a specific clock CKI5 or the one of the two common clocks (choose the right mode) <br></br>
+        </diagnostic>
+    </rule>
+ 
+    
+    
+    
+    <rule cache="true">
+        <match>STM32U5.*</match>
+        <match>Serial Interface - SITF0.SITF0 with its own specific clock source</match>
+        <diagnostic>
+            Activate CKI0 pin in order to use this clock as input for SITF0
+        </diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32U5.*</match>
+        <match>Serial Interface - SITF0.SITF0 with Common Clock 0 as clock source</match>
+        <diagnostic>
+            Use CCK0 clock as input for SITF0
+        </diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32U5.*</match>
+        <match>Serial Interface - SITF0.SITF0 with Common Clock 1 as clock source</match>
+        <diagnostic>
+            Use CCK1 clock as input for SITF0
+        </diagnostic>
+    </rule>
+    
+    <rule cache="true">
+        <match>STM32U5.*</match>
+        <match>Common Clocks.Common Clock CCK0</match>
+        <diagnostic>
+            Set MDF1_CCK0 pin <br></br> 
+            CCK0 activation ables <br></br>  
+            - SITFx to choose CCK0 has input clock <br></br> 
+            - Sensors to use CCK0 as clock for their need <br></br>
+        </diagnostic>
+    </rule>
+    <rule cache="true">
+        <match>STM32U5.*</match>
+        <match>Common Clocks.Common Clock CCK1</match>
+        <diagnostic>
+            Set MDF1_CCK1 pin <br></br> 
+            CCK1 activation ables <br></br>  
+            - SITFx to choose CCK1 has input clock <br></br> 
+            - Sensors to use CCK1 as clock for their need <br></br>
+        </diagnostic>
+    </rule>
+    <!-- MDF modes END -->
+
+	<rule cache="false">
+		<match>STM32.*</match>
+		<match>Channel1.DEPRECATED --> Input Capture indirect mode</match>
+		<diagnostic>This mode should only be used for compatibility with project constructed with CubeMX older than 6.3 version.<br></br>This mode might uselessly preemps the TIMx_CH2 IO in some circonstances<br></br> For new projects , it is advised to use  "Input Capture indirect mode" instead.<br></br>Configuration parameters remain the same anyway</diagnostic>
+		<!--<diagnostic>This mode should only be used for compatibility with project constructed with CubeMX older than 6.3 version</diagnostic>-->
 		<result>warning.png</result>
 	</rule>
-	<!-- rule to clean root warning-->
-    <rule cache="true">
-		<condition>UART4_CUBE  &amp; !PA13_UART4_TX</condition>
-		<match>STM32MP1.*</match>
-		<match>root.Mode</match>
-		<diagnostic></diagnostic>
+	<rule cache="false">
+		<match>STM32.*</match>
+		<match>Channel2.DEPRECATED --> Input Capture indirect mode</match>
+		<diagnostic>This mode should only be used for compatibility with project constructed with CubeMX older than 6.3 version.<br></br>This mode might uselessly preemps the TIMx_CH1 IO in some circonstances<br></br> For new projects , it is advised to use  "Input Capture indirect mode" instead.<br></br>Configuration parameters remain the same anyway</diagnostic>
+		<!--<diagnostic>This mode should only be used for compatibility with project constructed with CubeMX older than 6.3 version</diagnostic>-->
+		<result>warning.png</result>
 	</rule>
-    <rule cache="true">
-		<condition>UART4_CUBE  &amp; PA13_UART4_TX</condition>
-		<match>STM32MP1.*</match>
-		<match>Mode.*</match>
-		<diagnostic>This mode requires Pin PA13 (UART_TX) also used in Boot ROM (hardcoded) and as default debug console in OpenSTLinux.<br></br>Consequently the signal may be disturbed in case of Linux reboot</diagnostic>
+	<rule cache="false">
+		<match>STM32.*</match>
+		<match>Channel3.DEPRECATED --> Input Capture indirect mode</match>
+		<diagnostic>This mode should only be used for compatibility with project constructed with CubeMX older than 6.3 version.<br></br>This mode might uselessly preemps the TIMx_CH4 IO in some circonstances<br></br> For new projects , it is advised to use  "Input Capture indirect mode" instead.<br></br>Configuration parameters remain the same anyway</diagnostic>
+		<!--<diagnostic>This mode should only be used for compatibility with project constructed with CubeMX older than 6.3 version</diagnostic>-->
+		<result>warning.png</result>
+	</rule>
+	<rule cache="false">
+		<match>STM32.*</match>
+		<match>Channel4.DEPRECATED --> Input Capture indirect mode</match>
+		<diagnostic>This mode should only be used for compatibility with project constructed with CubeMX older than 6.3 version.<br></br>This mode might uselessly preemps the TIMx_CH3 IO in some circonstances<br></br> For new projects , it is advised to use  "Input Capture indirect mode" instead.<br></br>Configuration parameters remain the same anyway</diagnostic>
+		<!--<diagnostic>This mode should only be used for compatibility with project constructed with CubeMX older than 6.3 version</diagnostic>-->
 		<result>warning.png</result>
 	</rule>
 
+    <!-- DAC modes BEGIN -->
+    <rule cache="true">
+        <match>STM32U5.*|STM32H7.*</match>
+        <match>OUT1 connected to.only external pin</match>
+        <diagnostic>Analog output available on OUT1 pin</diagnostic>
+    </rule>  
+    <rule cache="true">
+        <match>STM32U5.*|STM32H7.*</match>
+        <match>OUT1 connected to.only on chip analog peripherals</match>
+        <diagnostic>Analog output available for other on-chip peripherals as ADC, OPAMP or COMP to use the DAC output for their needs</diagnostic>
+    </rule>  
+    <rule cache="true">
+        <match>STM32U5.*|STM32H7.*</match>
+        <match>OUT1 connected to.both external pin and on chip analog peripherals</match>
+        <diagnostic>Analog output available not only on OUT1 pin but also for other on-chip peripherals as ADC, OPAMP or COMP to use the DAC output for their needs</diagnostic>
+    </rule> 
+    <rule cache="true">
+        <match>STM32U5.*|STM32H7.*</match>
+        <match>OUT2 connected to.only external pin</match>
+        <diagnostic>Analog output available on OUT2 pin</diagnostic>
+    </rule>  
+    <rule cache="true">
+        <match>STM32U5.*|STM32H7.*</match>
+        <match>OUT2 connected to.only on chip analog peripherals</match>
+        <diagnostic>Analog output available for other on-chip peripherals as ADC, OPAMP or COMP to use the DAC output for their needs</diagnostic>
+    </rule>  
+    <rule cache="true">
+        <match>STM32U5.*|STM32H7.*</match>
+        <match>OUT2 connected to.both external pin and on chip analog peripherals</match>
+        <diagnostic>Analog output available not only on OUT2 pin but also for other on-chip peripherals as ADC, OPAMP or COMP to use the DAC output for their needs</diagnostic>
+    </rule>
+    
+    <!-- DAC modes END -->
 
 </rules>
 

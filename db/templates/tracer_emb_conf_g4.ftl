@@ -199,7 +199,7 @@ extern "C" {
 #define TRACER_EMB_TX_DMA_IRQ                        ${UART_TX_DMA_interrupt}
 #define TRACER_EMB_TX_DMA_IRQHANDLER                 ${UART_TX_DMA_interrupt.replace("IRQn", "IRQHandler")}
 #define TRACER_EMB_TX_DMA_ACTIVE_FLAG                LL_DMA_IsActiveFlag_TC${UART_TX_DMA_CHANNEL_ID}
-#define TRACER_EMB_TX_DMA_CLEAR_FLAG                 LL_DMA_ClearFlag_GI${UART_TX_DMA_CHANNEL_ID}
+#define TRACER_EMB_TX_DMA_CLEAR_FLAG                 LL_DMA_ClearFlag_TC${UART_TX_DMA_CHANNEL_ID}
 [/#if]
 
 [#if !UARTUsed]*/[/#if]

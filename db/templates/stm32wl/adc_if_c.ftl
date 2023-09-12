@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    adc_if.c
@@ -8,20 +9,24 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
+[#assign IpInstance = ""]
+[#assign IpName = ""]
+[#if BspIpDatas??]
+    [#list BspIpDatas as SWIP]
+        [#if SWIP.variables??]
+            [#list SWIP.variables as variables]
+                [#if variables.name?contains("IpInstance")]
+                    [#assign IpInstance = variables.value]
+                [/#if]
+                [#if variables.name?contains("IpName")]
+                    [#assign IpName = variables.value]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 
-[#assign ADC_Instance = ""]
-[#list BspIpDatas as SWIP]
-    [#if SWIP.variables??]
-        [#list SWIP.variables as variables]
-            [#if variables.name?contains("IpInstance")]
-                [#assign IpInstance = variables.value]
-            [/#if]
-            [#if variables.name?contains("IpName")]
-                [#assign IpName = variables.value]
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
 /* Includes ------------------------------------------------------------------*/
 #include "adc_if.h"
 #include "sys_app.h"

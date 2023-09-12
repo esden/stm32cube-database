@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    lora_command.c
@@ -8,6 +9,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
 #include <string.h>
@@ -51,7 +53,6 @@ struct ATCommand_s
 /* Private define ------------------------------------------------------------*/
 #define CMD_SIZE                        540
 #define CIRC_BUFF_SIZE                  8
-#define HELP_DISPLAY_FLUSH_DELAY        100
 
 /* USER CODE BEGIN PD */
 
@@ -77,7 +78,7 @@ static const char *const ATError_description[] =
   "\r\nAT_NO_NETWORK_JOINED\r\n",   /* AT_NO_NET_JOINED */
   "\r\nAT_RX_ERROR\r\n",            /* AT_RX_ERROR */
   "\r\nAT_NO_CLASS_B_ENABLE\r\n",   /* AT_NO_CLASS_B_ENABLE */
-  "\r\nAT_DUTYCYLE_RESTRICTED\r\n", /* AT_DUTYCYLE_RESTRICTED */
+  "\r\nAT_DUTYCYCLE_RESTRICTED\r\n", /* AT_DUTYCYCLE_RESTRICTED */
   "\r\nAT_CRYPTO_ERROR\r\n",        /* AT_CRYPTO_ERROR */
   "\r\nerror unknown\r\n",          /* AT_MAX */
 };
@@ -87,6 +88,7 @@ static const char *const ATError_description[] =
   */
 static const struct ATCommand_s ATCommand[] =
 {
+  /* General commands */
   {
     .string = AT_RESET,
     .size_string = sizeof(AT_RESET) - 1,
@@ -110,35 +112,69 @@ static const struct ATCommand_s ATCommand[] =
   },
 
   {
-    .string = AT_VER,
-    .size_string = sizeof(AT_VER) - 1,
+    .string = AT_LTIME,
+    .size_string = sizeof(AT_LTIME) - 1,
 #ifndef NO_HELP
-    .help_string = "AT"AT_VER" Get the FW version\r\n",
+    .help_string = "AT"AT_LTIME" Get the local time in UTC format\r\n",
 #endif /* !NO_HELP */
-    .get = AT_version_get,
+    .get = AT_LocalTime_get,
     .set = AT_return_error,
     .run = AT_return_error,
   },
 
+  /* Keys, IDs and EUIs management commands */
   {
-    .string = AT_BAND,
-    .size_string = sizeof(AT_BAND) - 1,
+    .string = AT_JOINEUI,
+    .size_string = sizeof(AT_JOINEUI) - 1,
 #ifndef NO_HELP
-    .help_string = "AT"AT_BAND"=<BandID><CR>. Get or Set the Active Region BandID=[0:AS923, 1:AU915, 2:CN470, 3:CN779, 4:EU433, 5:EU868, 6:KR920, 7:IN865, 8:US915, 9:RU864]\r\n",
+    .help_string = "AT"AT_JOINEUI"=<XX:XX:XX:XX:XX:XX:XX:XX><CR>. Get or Set the App Eui\r\n",
 #endif /* !NO_HELP */
-    .get = AT_Region_get,
-    .set = AT_Region_set,
+    .get = AT_JoinEUI_get,
+    .set = AT_JoinEUI_set,
     .run = AT_return_error,
   },
 
   {
-    .string = AT_DEUI,
-    .size_string = sizeof(AT_DEUI) - 1,
+    .string = AT_NWKKEY,
+    .size_string = sizeof(AT_NWKKEY) - 1,
 #ifndef NO_HELP
-    .help_string = "AT"AT_DEUI"=<XX:XX:XX:XX:XX:XX:XX:XX><CR>. Get or Set the Device EUI\r\n",
+    .help_string = "AT"AT_NWKKEY"=<XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX><CR>: Get or Set the Network Key\r\n",
 #endif /* !NO_HELP */
-    .get = AT_DevEUI_get,
-    .set = AT_DevEUI_set,
+    .get = AT_NwkKey_get,
+    .set = AT_NwkKey_set,
+    .run = AT_return_error,
+  },
+
+  {
+    .string = AT_APPKEY,
+    .size_string = sizeof(AT_APPKEY) - 1,
+#ifndef NO_HELP
+    .help_string = "AT"AT_APPKEY"=<XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX><CR>: Get or Set the Application Key\r\n",
+#endif /* !NO_HELP */
+    .get = AT_AppKey_get,
+    .set = AT_AppKey_set,
+    .run = AT_return_error,
+  },
+
+  {
+    .string = AT_NWKSKEY,
+    .size_string = sizeof(AT_NWKSKEY) - 1,
+#ifndef NO_HELP
+    .help_string = "AT"AT_NWKSKEY"=<XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX><CR>: Get or Set the Network Session Key\r\n",
+#endif /* !NO_HELP */
+    .get = AT_NwkSKey_get,
+    .set = AT_NwkSKey_set,
+    .run = AT_return_error,
+  },
+
+  {
+    .string = AT_APPSKEY,
+    .size_string = sizeof(AT_APPSKEY) - 1,
+#ifndef NO_HELP
+    .help_string = "AT"AT_APPSKEY"=<XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX><CR>: Get or Set the Application Session Key\r\n",
+#endif /* !NO_HELP */
+    .get = AT_AppSKey_get,
+    .set = AT_AppSKey_set,
     .run = AT_return_error,
   },
 
@@ -154,13 +190,70 @@ static const struct ATCommand_s ATCommand[] =
   },
 
   {
-    .string = AT_JOINEUI,
-    .size_string = sizeof(AT_JOINEUI) - 1,
+    .string = AT_DEUI,
+    .size_string = sizeof(AT_DEUI) - 1,
 #ifndef NO_HELP
-    .help_string = "AT"AT_JOINEUI"=<XX:XX:XX:XX:XX:XX:XX:XX><CR>. Get or Set the App Eui\r\n",
+    .help_string = "AT"AT_DEUI"=<XX:XX:XX:XX:XX:XX:XX:XX><CR>. Get or Set the Device EUI\r\n",
 #endif /* !NO_HELP */
-    .get = AT_JoinEUI_get,
-    .set = AT_JoinEUI_set,
+    .get = AT_DevEUI_get,
+    .set = AT_DevEUI_set,
+    .run = AT_return_error,
+  },
+
+  {
+    .string = AT_NWKID,
+    .size_string = sizeof(AT_NWKID) - 1,
+#ifndef NO_HELP
+    .help_string = "AT"AT_NWKID"=<NwkID><CR>. Get or Set the Network ID=[0..127]\r\n",
+#endif /* !NO_HELP */
+    .get = AT_NetworkID_get,
+    .set = AT_NetworkID_set,
+    .run = AT_return_error,
+  },
+
+  /* LoRaWAN join and send data commands */
+  {
+    .string = AT_JOIN,
+    .size_string = sizeof(AT_JOIN) - 1,
+#ifndef NO_HELP
+    .help_string = "AT"AT_JOIN"=<Mode><CR>. Join network with Mode=[0:ABP, 1:OTAA]\r\n",
+#endif /* !NO_HELP */
+    .get = AT_return_error,
+    .set = AT_Join,
+    .run = AT_return_error,
+  },
+
+  {
+    .string = AT_LINKC,
+    .size_string = sizeof(AT_LINKC) - 1,
+#ifndef NO_HELP
+    .help_string = "AT"AT_LINKC". Piggyback a Link Check Request to the next uplink\r\n",
+#endif /* !NO_HELP */
+    .get = AT_return_error,
+    .set = AT_return_error,
+    .run = AT_Link_Check,
+  },
+
+  {
+    .string = AT_SEND,
+    .size_string = sizeof(AT_SEND) - 1,
+#ifndef NO_HELP
+    .help_string = "AT"AT_SEND"=<Port>:<Ack>:<Payload><CR>. Send binary data with the application Port=[1..199] and Ack=[0:unconfirmed, 1:confirmed]\r\n",
+#endif /* !NO_HELP */
+    .get = AT_return_error,
+    .set = AT_Send,
+    .run = AT_return_error,
+  },
+
+  /* LoRaWAN network management commands */
+  {
+    .string = AT_VER,
+    .size_string = sizeof(AT_VER) - 1,
+#ifndef NO_HELP
+    .help_string = "AT"AT_VER" Get the FW version\r\n",
+#endif /* !NO_HELP */
+    .get = AT_version_get,
+    .set = AT_return_error,
     .run = AT_return_error,
   },
 
@@ -187,13 +280,24 @@ static const struct ATCommand_s ATCommand[] =
   },
 
   {
-    .string = AT_TXP,
-    .size_string = sizeof(AT_TXP) - 1,
+    .string = AT_BAND,
+    .size_string = sizeof(AT_BAND) - 1,
 #ifndef NO_HELP
-    .help_string = "AT"AT_TXP"=<Power><CR>. Get or Set the Transmit Power=[0..15](valid range according to region)\r\n",
+    .help_string = "AT"AT_BAND"=<BandID><CR>. Get or Set the Active Region BandID=[0:AS923, 1:AU915, 2:CN470, 3:CN779, 4:EU433, 5:EU868, 6:KR920, 7:IN865, 8:US915, 9:RU864]\r\n",
 #endif /* !NO_HELP */
-    .get = AT_TransmitPower_get,
-    .set = AT_TransmitPower_set,
+    .get = AT_Region_get,
+    .set = AT_Region_set,
+    .run = AT_return_error,
+  },
+
+  {
+    .string = AT_CLASS,
+    .size_string = sizeof(AT_CLASS) - 1,
+#ifndef NO_HELP
+    .help_string = "AT"AT_CLASS"=<Class><CR>. Get or Set the Device Class=[A, B, C]\r\n",
+#endif /* !NO_HELP */
+    .get = AT_DeviceClass_get,
+    .set = AT_DeviceClass_set,
     .run = AT_return_error,
   },
 
@@ -205,50 +309,6 @@ static const struct ATCommand_s ATCommand[] =
 #endif /* !NO_HELP */
     .get = AT_DutyCycle_get,
     .set = AT_DutyCycle_set,
-    .run = AT_return_error,
-  },
-
-  {
-    .string = AT_RX2FQ,
-    .size_string = sizeof(AT_RX2FQ) - 1,
-#ifndef NO_HELP
-    .help_string = "AT"AT_RX2FQ"=<Freq><CR>. Get or Set the Rx2 window Freq in Hz\r\n",
-#endif /* !NO_HELP */
-    .get = AT_Rx2Frequency_get,
-    .set = AT_Rx2Frequency_set,
-    .run = AT_return_error,
-  },
-
-  {
-    .string = AT_RX2DR,
-    .size_string = sizeof(AT_RX2DR) - 1,
-#ifndef NO_HELP
-    .help_string = "AT"AT_RX2DR"=<DataRate><CR>. Get or Set the Rx2 window DataRate=[0..7]\r\n",
-#endif /* !NO_HELP */
-    .get = AT_Rx2DataRate_get,
-    .set = AT_Rx2DataRate_set,
-    .run = AT_return_error,
-  },
-
-  {
-    .string = AT_RX1DL,
-    .size_string = sizeof(AT_RX1DL) - 1,
-#ifndef NO_HELP
-    .help_string = "AT"AT_RX1DL"=<Delay><CR>. Get or Set the delay between the end of the Tx and the Rx Window 1 in ms\r\n",
-#endif /* !NO_HELP */
-    .get = AT_Rx1Delay_get,
-    .set = AT_Rx1Delay_set,
-    .run = AT_return_error,
-  },
-
-  {
-    .string = AT_RX2DL,
-    .size_string = sizeof(AT_RX2DL) - 1,
-#ifndef NO_HELP
-    .help_string = "AT"AT_RX2DL"=<Delay><CR>. Get or Set the delay between the end of the Tx and the Rx Window 2 in ms\r\n",
-#endif /* !NO_HELP */
-    .get = AT_Rx2Delay_get,
-    .set = AT_Rx2Delay_set,
     .run = AT_return_error,
   },
 
@@ -275,48 +335,60 @@ static const struct ATCommand_s ATCommand[] =
   },
 
   {
-    .string = AT_NWKID,
-    .size_string = sizeof(AT_NWKID) - 1,
+    .string = AT_RX1DL,
+    .size_string = sizeof(AT_RX1DL) - 1,
 #ifndef NO_HELP
-    .help_string = "AT"AT_NWKID"=<NwkID><CR>. Get or Set the Network ID=[0..127]\r\n",
+    .help_string = "AT"AT_RX1DL"=<Delay><CR>. Get or Set the delay between the end of the Tx and the Rx Window 1 in ms\r\n",
 #endif /* !NO_HELP */
-    .get = AT_NetworkID_get,
-    .set = AT_NetworkID_set,
+    .get = AT_Rx1Delay_get,
+    .set = AT_Rx1Delay_set,
     .run = AT_return_error,
   },
 
   {
-    .string = AT_CLASS,
-    .size_string = sizeof(AT_CLASS) - 1,
+    .string = AT_RX2DL,
+    .size_string = sizeof(AT_RX2DL) - 1,
 #ifndef NO_HELP
-    .help_string = "AT"AT_CLASS"=<Class><CR>. Get or Set the Device Class=[A, B, C]\r\n",
+    .help_string = "AT"AT_RX2DL"=<Delay><CR>. Get or Set the delay between the end of the Tx and the Rx Window 2 in ms\r\n",
 #endif /* !NO_HELP */
-    .get = AT_DeviceClass_get,
-    .set = AT_DeviceClass_set,
+    .get = AT_Rx2Delay_get,
+    .set = AT_Rx2Delay_set,
     .run = AT_return_error,
   },
 
   {
-    .string = AT_JOIN,
-    .size_string = sizeof(AT_JOIN) - 1,
+    .string = AT_RX2DR,
+    .size_string = sizeof(AT_RX2DR) - 1,
 #ifndef NO_HELP
-    .help_string = "AT"AT_JOIN"=<Mode><CR>. Join network with Mode=[0:ABP, 1:OTAA]\r\n",
+    .help_string = "AT"AT_RX2DR"=<DataRate><CR>. Get or Set the Rx2 window DataRate=[0..7]\r\n",
 #endif /* !NO_HELP */
-    .get = AT_return_error,
-    .set = AT_Join,
+    .get = AT_Rx2DataRate_get,
+    .set = AT_Rx2DataRate_set,
     .run = AT_return_error,
   },
 
   {
-    .string = AT_SEND,
-    .size_string = sizeof(AT_SEND) - 1,
+    .string = AT_RX2FQ,
+    .size_string = sizeof(AT_RX2FQ) - 1,
 #ifndef NO_HELP
-    .help_string = "AT"AT_SEND"=<Port>:<Ack>:<Payload><CR>. Send binary data with the application Port=[1..199] and Ack=[0:unconfirmed, 1:confirmed]\r\n",
+    .help_string = "AT"AT_RX2FQ"=<Freq><CR>. Get or Set the Rx2 window Freq in Hz\r\n",
 #endif /* !NO_HELP */
-    .get = AT_return_error,
-    .set = AT_Send,
+    .get = AT_Rx2Frequency_get,
+    .set = AT_Rx2Frequency_set,
     .run = AT_return_error,
   },
+
+  {
+    .string = AT_TXP,
+    .size_string = sizeof(AT_TXP) - 1,
+#ifndef NO_HELP
+    .help_string = "AT"AT_TXP"=<Power><CR>. Get or Set the Transmit Power=[0..15](valid range according to region)\r\n",
+#endif /* !NO_HELP */
+    .get = AT_TransmitPower_get,
+    .set = AT_TransmitPower_set,
+    .run = AT_return_error,
+  },
+
   {
     .string = AT_PGSLOT,
     .size_string = sizeof(AT_PGSLOT) - 1,
@@ -328,40 +400,17 @@ static const struct ATCommand_s ATCommand[] =
     .run = AT_return_error,
   },
 
+  /* Radio tests commands */
   {
-    .string = AT_LTIME,
-    .size_string = sizeof(AT_LTIME) - 1,
+    .string = AT_TTONE,
+    .size_string = sizeof(AT_TTONE) - 1,
 #ifndef NO_HELP
-    .help_string = "AT"AT_LTIME" Get the local time in UTC format\r\n",
+    .help_string = "AT"AT_TTONE" Starts RF Tone test\r\n",
 #endif /* !NO_HELP */
-    .get = AT_LocalTime_get,
+    .get = AT_return_error,
     .set = AT_return_error,
-    .run = AT_return_error,
+    .run = AT_test_txTone,
   },
-
-#ifdef AT_RADIO_ACCESS
-  {
-    .string = AT_REGW,
-    .size_string = sizeof(AT_REGW) - 1,
-#ifndef NO_HELP
-    .help_string = "AT"AT_REGW"=<Addr>:<Data><CR> Write Radio Register Addr=[4 hexa char], Data=[2 hexa char]\r\n",
-#endif /* !NO_HELP */
-    .get = AT_return_error,
-    .set = AT_write_register,
-    .run = AT_return_error,
-  },
-
-  {
-    .string = AT_REGR,
-    .size_string = sizeof(AT_REGR) - 1,
-#ifndef NO_HELP
-    .help_string = "AT"AT_REGR"=<Addr><CR>. Read Radio Register Addr=[4 hexa char]\r\n",
-#endif /* !NO_HELP */
-    .get = AT_return_error,
-    .set = AT_read_register,
-    .run = AT_return_error,
-  },
-#endif /*AT_RADIO_ACCESS*/
 
   {
     .string = AT_TRSSI,
@@ -375,35 +424,15 @@ static const struct ATCommand_s ATCommand[] =
   },
 
   {
-    .string = AT_TTONE,
-    .size_string = sizeof(AT_TTONE) - 1,
+    .string = AT_TCONF,
+    .size_string = sizeof(AT_TCONF) - 1,
 #ifndef NO_HELP
-    .help_string = "AT"AT_TTONE" Starts RF Tone test\r\n",
+    .help_string = "AT"AT_TCONF"=<Freq in Hz>:<Power in dBm>:<Lora Bandwidth <0 to 6>, or FSK Bandwidth in Hz>:<Lora SF or FSK datarate (bps)>:<CodingRate 4/5, 4/6, 4/7, 4/8>:\r\n\
+         <Lna>:<PA Boost>:<Modulation 0:FSK, 1:Lora, 2:BPSK>:<PayloadLen in Bytes>:<FskDeviation in Hz>:<LowDrOpt 0:off, 1:on, 2:Auto>:\r\n\
+         <BTproduct: 0:no Gaussian Filter Applied, 1:BT=0,3, 2:BT=0,5, 3:BT=0,7, 4:BT=1><CR>. Configure RF test\r\n",
 #endif /* !NO_HELP */
-    .get = AT_return_error,
-    .set = AT_return_error,
-    .run = AT_test_txTone,
-  },
-
-  {
-    .string = AT_TTLRA,
-    .size_string = sizeof(AT_TTLRA) - 1,
-#ifndef NO_HELP
-    .help_string = "AT"AT_TTLRA"=<PacketNb><CR>. Set Nb of packets sent with RF Tx test\r\n",
-#endif /* !NO_HELP */
-    .get = AT_return_error,
-    .set = AT_test_tx,
-    .run = AT_return_error,
-  },
-
-  {
-    .string = AT_TRLRA,
-    .size_string = sizeof(AT_TRLRA) - 1,
-#ifndef NO_HELP
-    .help_string = "AT"AT_TRLRA"=<PacketNb><CR>. Set Nb of packets to be received with RF Rx test\r\n",
-#endif /* !NO_HELP */
-    .get = AT_return_error,
-    .set = AT_test_rx,
+    .get = AT_test_get_config,
+    .set = AT_test_set_config,
     .run = AT_return_error,
   },
 
@@ -430,6 +459,17 @@ static const struct ATCommand_s ATCommand[] =
   },
 
   {
+    .string = AT_CERTIF,
+    .size_string = sizeof(AT_CERTIF) - 1,
+#ifndef NO_HELP
+    .help_string = "AT"AT_CERTIF"=<Mode><CR>. Set the module in LoraWan Certification with Join Mode=[0:ABP, 1:OTAA]\r\n",
+#endif /* !NO_HELP */
+    .get = AT_return_error,
+    .set = AT_Certif,
+    .run = AT_return_error,
+  },
+
+  {
     .string = AT_TTH,
     .size_string = sizeof(AT_TTH) - 1,
 #ifndef NO_HELP
@@ -437,19 +477,6 @@ static const struct ATCommand_s ATCommand[] =
 #endif /* !NO_HELP */
     .get = AT_return_error,
     .set = AT_test_tx_hopping,
-    .run = AT_return_error,
-  },
-
-  {
-    .string = AT_TCONF,
-    .size_string = sizeof(AT_TCONF) - 1,
-#ifndef NO_HELP
-    .help_string = "AT"AT_TCONF"=<Freq in Hz>:<Power in dBm>:<Bandwidth in kHz>:<SF>:4/<CodingRate>:<Lna>:<PA Boost>:\r\n\
-         <Modulation 0:FSK, 1:Lora, 2:BPSK>:<PayloadLen in Bytes>:<FskDeviation in Hz>:<LowDrOpt 0:off, 1:on, 2:Auto>:\r\n\
-         <BTproduct: 0:no Gaussian Filter Applied, 1:BT=0,3, 2:BT=0,5, 3:BT=0,7, 4:BT=1><CR>. Configure RF test\r\n",
-#endif /* !NO_HELP */
-    .get = AT_test_get_config,
-    .set = AT_test_set_config,
     .run = AT_return_error,
   },
 
@@ -464,27 +491,44 @@ static const struct ATCommand_s ATCommand[] =
     .run = AT_test_stop,
   },
 
+#ifdef AT_RADIO_ACCESS
   {
-    .string = AT_CERTIF,
-    .size_string = sizeof(AT_CERTIF) - 1,
+    .string = AT_REGW,
+    .size_string = sizeof(AT_REGW) - 1,
 #ifndef NO_HELP
-    .help_string = "AT"AT_CERTIF"=<Mode><CR>. Set the module in LoraWan Certification with Join Mode=[0:ABP, 1:OTAA]\r\n",
+    .help_string = "AT"AT_REGW"=<Addr>:<Data><CR> Write Radio Register Addr=[4 hex char], Data=[2 hex char]\r\n",
 #endif /* !NO_HELP */
     .get = AT_return_error,
-    .set = AT_Certif,
+    .set = AT_write_register,
     .run = AT_return_error,
   },
 
   {
+    .string = AT_REGR,
+    .size_string = sizeof(AT_REGR) - 1,
+#ifndef NO_HELP
+    .help_string = "AT"AT_REGR"=<Addr><CR>. Read Radio Register Addr=[4 hex char]\r\n",
+#endif /* !NO_HELP */
+    .get = AT_return_error,
+    .set = AT_read_register,
+    .run = AT_return_error,
+  },
+#endif /*AT_RADIO_ACCESS*/
+
+  /* Information command */
+  {
     .string = AT_BAT,
     .size_string = sizeof(AT_BAT) - 1,
 #ifndef NO_HELP
-    .help_string = "AT"AT_BAT" Get the battery Level=[0..254]\r\n",
+    .help_string = "AT"AT_BAT" Get the battery Level in mV\r\n",
 #endif /* !NO_HELP */
     .get = AT_bat_get,
     .set = AT_return_error,
     .run = AT_return_error,
   },
+  /* USER CODE BEGIN ATCommand */
+
+  /* USER CODE END ATCommand */
 };
 
 static char circBuffer[CIRC_BUFF_SIZE];
@@ -503,15 +547,13 @@ static uint32_t circBuffOverflow = 0;
 
 /**
   * @brief  Parse a command and process it
-  * @param  The command
-  * @retval None
+  * @param  cmd The command
   */
 static void parse_cmd(const char *cmd);
 
 /**
   * @brief  Print a string corresponding to an ATEerror_t
-  * @param  The AT error code
-  * @retval None
+  * @param  error_type The AT error code
   */
 static void com_error(ATEerror_t error_type);
 
@@ -520,20 +562,17 @@ static void com_error(ATEerror_t error_type);
   * @param  rxChar th char received
   * @param  size
   * @param  error
-  * @retval None
   */
 static void CMD_GetChar(uint8_t *rxChar, uint16_t size, uint8_t error);
 
 /**
-  * @brief  CNotifies the upper layer that a charchter has been receveid
-  * @param  None
-  * @retval None
+  * @brief  CNotifies the upper layer that a character has been received
   */
 static void (*NotifyCb)(void);
 
 /**
   * @brief  Remove backspace and its preceding character in the Command string
-  * @param  Command string to process
+  * @param  cmd string to process
   * @retval 0 when OK, otherwise error
   */
 static int32_t CMD_ProcessBackSpace(char *cmd);
@@ -756,9 +795,11 @@ static void parse_cmd(const char *cmd)
     {
       AT_PPRINTF(ATCommand[i].help_string);
     }
-    /* Wait for the message queue to be flushed in order
-       not to disturb following com_error() display */
-    HAL_Delay(HELP_DISPLAY_FLUSH_DELAY);
+
+    while (1 != UTIL_ADV_TRACE_IsBufferEmpty())
+    {
+      /* Wait that all printfs are completed*/
+    }
 #endif /* !NO_HELP */
   }
   else

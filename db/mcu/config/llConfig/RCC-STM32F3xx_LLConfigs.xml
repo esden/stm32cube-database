@@ -70,25 +70,10 @@
 		       <IFCondition Expression ="RTCUsed_ForRCC|(LSEUsed=1)">
             <CallLibMethod Name="LL_PWR_EnableBkUpAccess">
             </CallLibMethod>
-        </IFCondition> 	
-
-        <IFCondition Expression ="LSEUsed=1 &amp; LSEByPass">
-            <CallLibMethod Name="LL_RCC_LSE_EnableBypass"/>
         </IFCondition>
-	 <IFCondition Expression ="LSEOscillator &amp;(LSEUsed=1)">
-            <CallLibMethod Name="LL_RCC_LSE_SetDriveCapability">
-			 <MethodArg Name="LSEDrive" ParameterName="LSE_Drive_Capability"/>
-            </CallLibMethod>
         
-        </IFCondition> 
-        <IFCondition Expression ="LSEUsed=1">
-            <CallLibMethod Name="LL_RCC_LSE_Enable"/>
-         
-            <CallLibMethod Name="" Type="HardCode">
-                <HardCode Text="#n#t /* Wait till LSE is ready */#n#twhile(LL_RCC_LSE_IsReady() != 1)#n#t{#n#t#t#n#t}"/>
-            </CallLibMethod>
-        </IFCondition> 
-	<IFCondition Expression ="RTCUsed_ForRCC &amp; RTCClockSelection=RCC_RTCCLKSOURCE_LSI">
+        
+        <IFCondition Expression ="RTCUsed_ForRCC &amp; RTCClockSelection=RCC_RTCCLKSOURCE_LSI">
             <CallLibMethod Name="" Type="HardCode">
                 <HardCode Text="#tif(LL_RCC_GetRTCClockSource() != LL_RCC_RTC_CLKSOURCE_LSI)#n#t{"/>
             </CallLibMethod>
@@ -116,7 +101,7 @@
             </CallLibMethod>
         </IFCondition>
 
-        <IFCondition Expression ="RTCUsed_ForRCC|LCDUsed_ForRCC">
+        <IFCondition Expression ="RTCUsed_ForRCC &amp; !RTCClockSelection=RCC_RTCCLKSOURCE_LSE">
             <CallLibMethod Name="#tLL_RCC_SetRTCClockSource">
                 <MethodArg Name="Source" ParameterName="RTCClockSelection"/>
             </CallLibMethod>
@@ -126,21 +111,46 @@
                 <HardCode Text="#t}"/>
             </CallLibMethod>
         </IFCondition>
-        <IFCondition Expression ="RTCUsed_ForRCC|LCDUsed_ForRCC">
+
+        <IFCondition Expression ="LSEUsed=1 &amp; LSEByPass">
+            <CallLibMethod Name="LL_RCC_LSE_EnableBypass"/>
+        </IFCondition>
+	 <IFCondition Expression ="LSEOscillator &amp;(LSEUsed=1)">
+            <CallLibMethod Name="LL_RCC_LSE_SetDriveCapability">
+			 <MethodArg Name="LSEDrive" ParameterName="LSE_Drive_Capability"/>
+            </CallLibMethod>
+        
+        </IFCondition> 
+        <IFCondition Expression ="LSEUsed=1">
+            <CallLibMethod Name="LL_RCC_LSE_Enable"/>
+         
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#n#t /* Wait till LSE is ready */#n#twhile(LL_RCC_LSE_IsReady() != 1)#n#t{#n#t#t#n#t}"/>
+            </CallLibMethod>
+        </IFCondition> 
+	<IFCondition Expression ="RTCUsed_ForRCC &amp; RTCClockSelection=RCC_RTCCLKSOURCE_LSE">
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#tif(LL_RCC_GetRTCClockSource() != LL_RCC_RTC_CLKSOURCE_LSE)#n#t{"/>
+            </CallLibMethod>
+        </IFCondition>
+        <IFCondition Expression ="RTCUsed_ForRCC &amp; RTCClockSelection=RCC_RTCCLKSOURCE_LSE">
+            <CallLibMethod Name="#tLL_RCC_SetRTCClockSource">
+                <MethodArg Name="Source" ParameterName="RTCClockSelection"/>
+            </CallLibMethod>
+        </IFCondition>
+        <IFCondition Expression ="RTCUsed_ForRCC &amp; RTCClockSelection=RCC_RTCCLKSOURCE_LSE">
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#t}"/>
+            </CallLibMethod>
+        </IFCondition>
+        <IFCondition Expression ="RTCUsed_ForRCC">
             <CallLibMethod Name="LL_RCC_EnableRTC"/>
         </IFCondition>
 
         <!--CSS enable code gen-->
         <IFCondition Expression ="CSSEnabled">
             <CallLibMethod Name="LL_RCC_HSE_EnableCSS"/>
-        </IFCondition>
-		
-     
-		
-		
-		
-   
-		
+        </IFCondition>		
 		 <!--PLL configuration-->
 		
         <IFCondition Expression ="PLLUsed=1 ">

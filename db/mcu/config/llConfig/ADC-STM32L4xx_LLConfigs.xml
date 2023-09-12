@@ -22,7 +22,7 @@
 				<MethodArg Name="MultiTwoSamplingDelay" ParameterName="TwoSamplingDelay" />
 			</CallLibMethod>
 		</IFCondition>
-		<IFCondition Expression="($Index=2 | $Index=3) &amp; !USE_ADC1">
+		<IFCondition Expression="($Index=2 | $Index=3)">
 			<CallLibMethod Name="LL_ADC_CommonInit">
 				<MethodArg Name="ADCxy_COMMON">
 					<CallLibMethod Name="__LL_ADC_COMMON_INSTANCE">
@@ -30,6 +30,7 @@
 					</CallLibMethod>
 				</MethodArg>
 				<MethodArg Name="CommonClock" ParameterName="ClockPrescaler" />
+
 			</CallLibMethod>
 		</IFCondition>
 		<CallLibMethod Name="LL_ADC_Init">
@@ -119,8 +120,19 @@
                     <MethodArg Name="ADCx" ParameterName="Instance" />
                     <MethodArg Name="OverSamplingDiscont" ParameterName="TriggeredMode" />
                 </CallLibMethod>
-                
-            <CallLibMethod Name="LL_ADC_SetCommonPathInternalCh">
+                <IFCondition Expression="!VrefTSelected$IpInstance &amp; !TS_IN17ATSelected$IpInstance &amp; !VtsATSelected$IpInstance &amp; !VbatfTSelected$IpInstance">
+
+                    <CallLibMethod Name="LL_ADC_SetCommonPathInternalCh">
+                        <MethodArg Name="ADCxy_COMMON">
+                            <CallLibMethod Name="__LL_ADC_COMMON_INSTANCE">
+                                <MethodArg Name="ADCx" ParameterName="Instance" />
+                            </CallLibMethod>
+                        </MethodArg>
+                        <MethodArg Name="PathInternal" ParameterName="Nochannel" />
+                    </CallLibMethod>
+                </IFCondition>
+
+                <CallLibMethod Name="LL_ADC_SetCommonPathInternalCh">
                 <MethodArg Name="ADCxy_COMMON">
                     <CallLibMethod Name="__LL_ADC_COMMON_INSTANCE">
                         <MethodArg Name="ADCx" ParameterName="Instance" />
@@ -168,6 +180,30 @@
     
   #n#t/* Enable ADC internal voltage regulator */
   #n#tLL_ADC_EnableInternalRegulator(ADC2);
+    
+  #n#t/* Delay for ADC internal voltage regulator stabilization.                */
+  #n#t/* Compute number of CPU cycles to wait for, from delay in us.            */
+  #n#t/* Note: Variable divided by 2 to compensate partially                    */
+  #n#t/*       CPU processing cycles (depends on compilation optimization).     */
+  #n#t/* Note: If system core clock frequency is below 200kHz, wait time        */
+  #n#t/*       is only a few CPU processing cycles.                             */
+  #n#tuint32_t wait_loop_index;                  
+  #n#twait_loop_index = ((LL_ADC_DELAY_INTERNAL_REGUL_STAB_US * (SystemCoreClock / (100000 * 2))) / 10);
+  #n#twhile(wait_loop_index != 0)
+  #n#t{
+  #n#t#twait_loop_index--;
+  #n#t}"
+                />
+	</CallLibMethod>
+        </IFCondition>
+        <IFCondition Expression="$Index=3">
+           <CallLibMethod Name="" Type="HardCode"> 
+             <HardCode Text="
+  #n#t/* Disable ADC deep power down (enabled by default after reset state) */
+  #n#tLL_ADC_DisableDeepPowerDown(ADC3);
+    
+  #n#t/* Enable ADC internal voltage regulator */
+  #n#tLL_ADC_EnableInternalRegulator(ADC3);
     
   #n#t/* Delay for ADC internal voltage regulator stabilization.                */
   #n#t/* Compute number of CPU cycles to wait for, from delay in us.            */

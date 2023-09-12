@@ -10,7 +10,6 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
-
 [#--
 ********************************
 BSP IP Data:
@@ -45,6 +44,8 @@ Defines:
 ********************************
 --]
 [#assign CPUCORE = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")]
+
+/* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef BOARD_RESOURCE_H
 #define BOARD_RESOURCE_H
 
@@ -88,31 +89,55 @@ extern "C" {
 typedef enum
 {
     [#assign j = 0]
-    [#list BspIpDatas as SWIP]
-        [#if SWIP.variables??]
-            [#list SWIP.variables as variables]
-                [#if variables.name?contains("IpInstance")]
-                    [#assign IpInstance = variables.value]
-                [/#if]
-                [#if variables.name?contains("IpName")]
-                    [#assign IpName = variables.value]
-                [/#if]
-                [#-- User BSP Led --]
-                [#if variables.value?contains("LED ") ]
-                    [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
+    [#if BspIpDatas??]
+        [#list BspIpDatas as SWIP]
+            [#if SWIP.variables??]
+                [#list SWIP.variables as variables]
+                    [#if variables.name?contains("IpInstance")]
+                        [#assign IpInstance = variables.value]
+                    [/#if]
+                    [#if variables.name?contains("IpName")]
+                        [#assign IpName = variables.value]
+                    [/#if]
+                    [#-- User BSP Led --]
+                    [#if variables.value?contains("LED ") ]
+                        [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
   SYS_LED${i} = ${j},
-                    [#assign j = j+1]
-                [/#if]
-            [/#list]
-        [/#if]
-    [/#list]
-  /* Color SYS_LED aliases */
-  SYS_LED_BLUE   = SYS_LED1,
-    [#if numLed > 1]
-  SYS_LED_GREEN  = SYS_LED2,
+                        [#assign j = j+1]
+                    [/#if]
+                [/#list]
+            [/#if]
+        [/#list]
     [/#if]
-    [#if numLed > 2]
-  SYS_LED_RED    = SYS_LED3
+  /* Color SYS_LED aliases */
+    [#assign j = 0]
+    [#if BspIpDatas??]
+        [#list BspIpDatas as SWIP]
+            [#if SWIP.variables??]
+                [#list SWIP.variables as variables]
+                    [#if variables.name?contains("IpInstance")]
+                        [#assign IpInstance = variables.value]
+                    [/#if]
+                    [#if variables.name?contains("IpName")]
+                        [#assign IpName = variables.value]
+                    [/#if]
+                    [#-- User BSP Led --]
+                    [#if variables.value?contains("LED ") ]
+                        [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
+                        [#if j = 0 ]
+  SYS_LED_BLUE  = SYS_LED${i},
+                        [/#if]
+                        [#if j = 1 ]
+  SYS_LED_GREEN = SYS_LED${i},
+                        [/#if]
+                        [#if j = 2 ]
+  SYS_LED_RED   = SYS_LED${i},
+                        [/#if]
+                        [#assign j = j+1]
+                    [/#if]
+                [/#list]
+            [/#if]
+        [/#list]
     [/#if]
 } Sys_Led_TypeDef;
 [/#if]
@@ -124,24 +149,26 @@ typedef enum
 typedef enum
 {
     [#assign j = 0]
-    [#list BspIpDatas as SWIP]
-        [#if SWIP.variables??]
-            [#list SWIP.variables as variables]
-                [#if variables.name?contains("IpInstance")]
-                    [#assign IpInstance = variables.value]
-                [/#if]
-                [#if variables.name?contains("IpName")]
-                    [#assign IpName = variables.value]
-                [/#if]
-                [#-- User BSP Led --]
-                [#if variables.value?contains("BUTTON ") ]
-                    [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
+    [#if BspIpDatas??]
+        [#list BspIpDatas as SWIP]
+            [#if SWIP.variables??]
+                [#list SWIP.variables as variables]
+                    [#if variables.name?contains("IpInstance")]
+                        [#assign IpInstance = variables.value]
+                    [/#if]
+                    [#if variables.name?contains("IpName")]
+                        [#assign IpName = variables.value]
+                    [/#if]
+                    [#-- User BSP Led --]
+                    [#if variables.value?contains("BUTTON ") ]
+                        [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
   SYS_BUTTON${i} = ${j},
-                    [#assign j = j+1]
-                [/#if]
-            [/#list]
-        [/#if]
-    [/#list]
+                        [#assign j = j+1]
+                    [/#if]
+                [/#list]
+            [/#if]
+        [/#list]
+    [/#if]
 } Sys_Button_TypeDef;
 [/#if]
 
@@ -164,18 +191,19 @@ typedef enum
   * @brief Number of leds
   */
 #define SYS_LEDn                                     ${numLed}U
-    [#list BspIpDatas as SWIP]
-        [#if SWIP.variables??]
-            [#list SWIP.variables as variables]
-                [#if variables.name?contains("IpInstance")]
-                    [#assign IpInstance = variables.value]
-                [/#if]
-                [#if variables.name?contains("IpName")]
-                    [#assign IpName = variables.value]
-                [/#if]
-                [#-- User BSP Led --]
-                [#if variables.value?contains("LED ") ]
-                    [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
+    [#if BspIpDatas??]
+        [#list BspIpDatas as SWIP]
+            [#if SWIP.variables??]
+                [#list SWIP.variables as variables]
+                    [#if variables.name?contains("IpInstance")]
+                        [#assign IpInstance = variables.value]
+                    [/#if]
+                    [#if variables.name?contains("IpName")]
+                        [#assign IpName = variables.value]
+                    [/#if]
+                    [#-- User BSP Led --]
+                    [#if variables.value?contains("LED ") ]
+                        [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
 
 /**  Definition for BSP USER LED ${i}  **/
 /**
@@ -193,11 +221,12 @@ typedef enum
 /**
   * @brief Disable GPIOs clock of Led${i}
   */
-#define SYS_LED${i}_GPIO_CLK_DISABLE()                 __HAL_RCC_${IpName}_CLK_ENABLE()
-                [/#if]
-            [/#list]
-        [/#if]
-    [/#list]
+#define SYS_LED${i}_GPIO_CLK_DISABLE()                 __HAL_RCC_${IpName}_CLK_DISABLE()
+                    [/#if]
+                [/#list]
+            [/#if]
+        [/#list]
+    [/#if]
 [/#if]
 
 [#if numButton > 0]
@@ -214,24 +243,25 @@ typedef enum
     [#assign BUTTON_PIN = ""]
     [#assign BUTTON_IRQn = ""]
     [#assign BUTTON_EXTI = ""]
-    [#list BspIpDatas as SWIP]
-        [#if SWIP.variables??]
-            [#list SWIP.variables as variables]
-                [#if variables.name?contains("IpInstance")]
-                    [#assign IpInstance = variables.value]
-                [/#if]
-                [#if variables.name?contains("IpName")]
-                    [#assign IpName = variables.value]
-                [/#if]
-                [#if variables.name?contains("GPIO_INT_NUM")]
-                    [#assign IrqNumber = variables.value]
-                [/#if]
-                [#if variables.name?contains("EXTI_LINE_NUMBER")]
-                    [#assign ExtiLine = variables.value]
-                [/#if]
-                [#-- User BSP Button --]
-                [#if variables.value?contains("BUTTON ") ]
-                    [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
+    [#if BspIpDatas??]
+        [#list BspIpDatas as SWIP]
+            [#if SWIP.variables??]
+                [#list SWIP.variables as variables]
+                    [#if variables.name?contains("IpInstance")]
+                        [#assign IpInstance = variables.value]
+                    [/#if]
+                    [#if variables.name?contains("IpName")]
+                        [#assign IpName = variables.value]
+                    [/#if]
+                    [#if variables.name?contains("GPIO_INT_NUM")]
+                        [#assign IrqNumber = variables.value]
+                    [/#if]
+                    [#if variables.name?contains("EXTI_LINE_NUMBER")]
+                        [#assign ExtiLine = variables.value]
+                    [/#if]
+                    [#-- User BSP Button --]
+                    [#if variables.value?contains("BUTTON ") ]
+                        [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
 /**  Definition for BSP USER BUTTON ${i}   **/
 [#--  [@common.optinclude name=mxTmpFolder+"/bsp_button_" + i + "_define_GPIO.tmp"/]  --]
 /**
@@ -249,53 +279,57 @@ typedef enum
 /**
   * @brief Disable GPIOs clock of Button${i}
   */
-#define SYS_BUTTON${i}_GPIO_CLK_DISABLE()     __HAL_RCC_${IpName}_CLK_ENABLE()
+#define SYS_BUTTON${i}_GPIO_CLK_DISABLE()     __HAL_RCC_${IpName}_CLK_DISABLE()
 /**
   * @brief Interrupt number of Button${i}
   */
-                    [#if CPUCORE != ""]
+                        [#if CPUCORE != ""]
 #if defined(CORE_CM0PLUS)
-                        [#if ((ExtiLine == "0") || (ExtiLine == "1"))]
+                            [#if ((ExtiLine == "0") || (ExtiLine == "1"))]
 #define SYS_BUTTON${i}_EXTI_IRQn              EXTI1_0_IRQn
-                        [#elseif ((ExtiLine == "2") || (ExtiLine == "3")) ]
+                            [#elseif ((ExtiLine == "2") || (ExtiLine == "3")) ]
 #define SYS_BUTTON${i}_EXTI_IRQn              EXTI3_2_IRQn
-                        [#else]
+                            [#else]
 #define SYS_BUTTON${i}_EXTI_IRQn              EXTI15_4_IRQn
-                        [/#if]
+                            [/#if]
 #else /* CORE_CM4 */
-                        [#if (ExtiLine == "0")]
+                            [#if (ExtiLine == "0")]
 #define SYS_BUTTON${i}_EXTI_IRQn              EXTI0_IRQn
-                        [#elseif (ExtiLine == "1")]
+                            [#elseif (ExtiLine == "1")]
 #define SYS_BUTTON${i}_EXTI_IRQn              EXTI1_IRQn
-                        [#elseif (ExtiLine == "2")]
+                            [#elseif (ExtiLine == "2")]
 #define SYS_BUTTON${i}_EXTI_IRQn              EXTI2_IRQn
-                        [#elseif (ExtiLine == "3")]
+                            [#elseif (ExtiLine == "3")]
 #define SYS_BUTTON${i}_EXTI_IRQn              EXTI3_IRQn
-                        [#elseif (ExtiLine == "4")]
+                            [#elseif (ExtiLine == "4")]
 #define SYS_BUTTON${i}_EXTI_IRQn              EXTI4_IRQn
-                        [#elseif (ExtiLine == "5") || (ExtiLine == "6") || (ExtiLine == "7") || (ExtiLine == "8") || (ExtiLine == "9") || (ExtiLine == "10")]
+                            [#elseif (ExtiLine == "5") || (ExtiLine == "6") || (ExtiLine == "7") || (ExtiLine == "8") || (ExtiLine == "9") || (ExtiLine == "10")]
 #define SYS_BUTTON${i}_EXTI_IRQn              EXTI9_5_IRQn
-                        [#else]
+                            [#else]
 #define SYS_BUTTON${i}_EXTI_IRQn              EXTI15_10_IRQn
-                        [/#if]
+                            [/#if]
 #endif /* CORE_CM0PLUS | CORE_CM4 */
-                    [#else]
+                        [#else]
 #define SYS_BUTTON${i}_EXTI_IRQn              ${IrqNumber}
-                    [/#if]
+                        [/#if]
 /**
   * @brief Interrupt line of Button${i}
   */
 #define SYS_BUTTON${i}_EXTI_LINE              EXTI_LINE_${ExtiLine}
-                    [#if useDefine]
+                        [#if useDefine]
 /**
   * @brief Exti handle of Button${i}
   */
-#define H_EXTI_${IpInstance}                  sys_hpb_exti[SYS_BUTTON${i}]
+                        [#assign ButInstance = IpInstance?replace("GPIO_PIN_","")]
+#ifndef H_EXTI_${ButInstance}
+#define H_EXTI_${ButInstance}                           sys_hpb_exti[SYS_BUTTON${i}]
+#endif
+                        [/#if]
                     [/#if]
-                [/#if]
-            [/#list]
-        [/#if]
-    [/#list]
+                [/#list]
+            [/#if]
+        [/#list]
+    [/#if]
 
 /**
   * IRQ priorities
@@ -316,21 +350,36 @@ typedef enum
 /**
   * @brief Disable all Leds clock
   */
-#define SYS_LEDx_GPIO_CLK_DISABLE(__INDEX__)        __HAL_RCC_GPIOB_CLK_ENABLE() /* All SYS_LED on same port */
+#define SYS_LEDx_GPIO_CLK_DISABLE(__INDEX__)        __HAL_RCC_GPIOB_CLK_DISABLE() /* All SYS_LED off same port */
 
+[#assign SYS_BUTTON_GPIO_CLK_ENABLE = ""]
+[#assign SYS_BUTTON_GPIO_CLK_DISABLE = ""]
+[#assign SYS_INDEX = "if ((__INDEX__) == SYS_BUTTON"]
+[#assign ELSE = "; else "]
+[#if BspIpDatas??]
+  [#list BspIpDatas as SWIP]
+    [#if SWIP.variables??]
+      [#list SWIP.variables as variables]
+        [#-- User BSP Button --]
+        [#if variables.value?contains("BUTTON ") ]
+          [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
+        [#assign SYS_BUTTON_GPIO_CLK_ENABLE = SYS_BUTTON_GPIO_CLK_ENABLE + SYS_INDEX + i + ") SYS_BUTTON" + i + "_GPIO_CLK_ENABLE()" + ELSE]
+        [#assign SYS_BUTTON_GPIO_CLK_DISABLE = SYS_BUTTON_GPIO_CLK_DISABLE + SYS_INDEX + i + ") SYS_BUTTON" + i + "_GPIO_CLK_DISABLE()" + ELSE]
+          [#assign j = j+1]
+        [/#if]
+      [/#list]
+    [/#if]
+  [/#list]
+[/#if]
 /**
   * @brief Enable all Buttons clock
   */
-#define SYS_BUTTONx_GPIO_CLK_ENABLE(__INDEX__)    do { if ((__INDEX__) == SYS_BUTTON1) SYS_BUTTON1_GPIO_CLK_ENABLE(); else \
-                                                       if ((__INDEX__) == SYS_BUTTON2) SYS_BUTTON2_GPIO_CLK_ENABLE(); else \
-                                                     if ((__INDEX__) == SYS_BUTTON3) SYS_BUTTON3_GPIO_CLK_ENABLE();} while(0)
+#define SYS_BUTTONx_GPIO_CLK_ENABLE(__INDEX__)    do { ${SYS_BUTTON_GPIO_CLK_ENABLE?remove_ending(" else ")}} while(0)
 
 /**
   * @brief Disable all Buttons clock
   */
-#define SYS_BUTTONx_GPIO_CLK_DISABLE(__INDEX__)    do { if ((__INDEX__) == SYS_BUTTON1) SYS_BUTTON1_GPIO_CLK_DISABLE(); else \
-                                                       if ((__INDEX__) == SYS_BUTTON2) SYS_BUTTON2_GPIO_CLK_DISABLE(); else \
-                                                     if ((__INDEX__) == SYS_BUTTON3) SYS_BUTTON3_GPIO_CLK_DISABLE();} while(0)
+#define SYS_BUTTONx_GPIO_CLK_DISABLE(__INDEX__)    do { ${SYS_BUTTON_GPIO_CLK_DISABLE?remove_ending(" else ")}} while(0)
 
 /* USER CODE BEGIN EM */
 
@@ -358,24 +407,26 @@ extern EXTI_HandleTypeDef sys_hpb_exti[SYS_BUTTONn];
   * @param  SYS_LED to be configured
   *         This parameter can be one of the following values:
 [#assign j = 0]
-[#list BspIpDatas as SWIP]
-    [#if SWIP.variables??]
-        [#list SWIP.variables as variables]
-            [#if variables.name?contains("IpInstance")]
-                [#assign IpInstance = variables.value]
-            [/#if]
-            [#if variables.name?contains("IpName")]
-                [#assign IpName = variables.value]
-            [/#if]
-            [#-- User BSP Led --]
-            [#if variables.value?contains("LED ") ]
-                [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
+[#if BspIpDatas??]
+    [#list BspIpDatas as SWIP]
+        [#if SWIP.variables??]
+            [#list SWIP.variables as variables]
+                [#if variables.name?contains("IpInstance")]
+                    [#assign IpInstance = variables.value]
+                [/#if]
+                [#if variables.name?contains("IpName")]
+                    [#assign IpName = variables.value]
+                [/#if]
+                [#-- User BSP Led --]
+                [#if variables.value?contains("LED ") ]
+                    [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
   *            @arg SYS_LED${i}
-                [#assign j = j+1]
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
+                    [#assign j = j+1]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
   * @return BSP status
   */
 int32_t          SYS_LED_Init(Sys_Led_TypeDef SYS_LED);
@@ -385,24 +436,26 @@ int32_t          SYS_LED_Init(Sys_Led_TypeDef SYS_LED);
   * @param  SYS_LED to be de-init
   *         This parameter can be one of the following values:
 [#assign j = 0]
-[#list BspIpDatas as SWIP]
-    [#if SWIP.variables??]
-        [#list SWIP.variables as variables]
-            [#if variables.name?contains("IpInstance")]
-                [#assign IpInstance = variables.value]
-            [/#if]
-            [#if variables.name?contains("IpName")]
-                [#assign IpName = variables.value]
-            [/#if]
-            [#-- User BSP Led --]
-            [#if variables.value?contains("LED ") ]
-                [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
+[#if BspIpDatas??]
+    [#list BspIpDatas as SWIP]
+        [#if SWIP.variables??]
+            [#list SWIP.variables as variables]
+                [#if variables.name?contains("IpInstance")]
+                    [#assign IpInstance = variables.value]
+                [/#if]
+                [#if variables.name?contains("IpName")]
+                    [#assign IpName = variables.value]
+                [/#if]
+                [#-- User BSP Led --]
+                [#if variables.value?contains("LED ") ]
+                    [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
   *            @arg SYS_LED${i}
-                [#assign j = j+1]
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
+                    [#assign j = j+1]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
   * @note Led DeInit does not disable the GPIO clock nor disable the Mfx
   * @return BSP status
   */
@@ -413,24 +466,26 @@ int32_t          SYS_LED_DeInit(Sys_Led_TypeDef SYS_LED);
   * @param  SYS_LED Specifies the Led to be set on
   *         This parameter can be one of the following values:
 [#assign j = 0]
-[#list BspIpDatas as SWIP]
-    [#if SWIP.variables??]
-        [#list SWIP.variables as variables]
-            [#if variables.name?contains("IpInstance")]
-                [#assign IpInstance = variables.value]
-            [/#if]
-            [#if variables.name?contains("IpName")]
-                [#assign IpName = variables.value]
-            [/#if]
-            [#-- User BSP Led --]
-            [#if variables.value?contains("LED ") ]
-                [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
+[#if BspIpDatas??]
+    [#list BspIpDatas as SWIP]
+        [#if SWIP.variables??]
+            [#list SWIP.variables as variables]
+                [#if variables.name?contains("IpInstance")]
+                    [#assign IpInstance = variables.value]
+                [/#if]
+                [#if variables.name?contains("IpName")]
+                    [#assign IpName = variables.value]
+                [/#if]
+                [#-- User BSP Led --]
+                [#if variables.value?contains("LED ") ]
+                    [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
   *            @arg SYS_LED${i}
-                [#assign j = j+1]
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
+                    [#assign j = j+1]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
   * @return BSP status
   */
 int32_t          SYS_LED_On(Sys_Led_TypeDef SYS_LED);
@@ -440,24 +495,26 @@ int32_t          SYS_LED_On(Sys_Led_TypeDef SYS_LED);
   * @param  SYS_LED Specifies the Led to be set off
   *         This parameter can be one of the following values:
 [#assign j = 0]
-[#list BspIpDatas as SWIP]
-    [#if SWIP.variables??]
-        [#list SWIP.variables as variables]
-            [#if variables.name?contains("IpInstance")]
-                [#assign IpInstance = variables.value]
-            [/#if]
-            [#if variables.name?contains("IpName")]
-                [#assign IpName = variables.value]
-            [/#if]
-            [#-- User BSP Led --]
-            [#if variables.value?contains("LED ") ]
-                [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
+[#if BspIpDatas??]
+    [#list BspIpDatas as SWIP]
+        [#if SWIP.variables??]
+            [#list SWIP.variables as variables]
+                [#if variables.name?contains("IpInstance")]
+                    [#assign IpInstance = variables.value]
+                [/#if]
+                [#if variables.name?contains("IpName")]
+                    [#assign IpName = variables.value]
+                [/#if]
+                [#-- User BSP Led --]
+                [#if variables.value?contains("LED ") ]
+                    [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
   *            @arg SYS_LED${i}
-                [#assign j = j+1]
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
+                    [#assign j = j+1]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
   * @return BSP status
   */
 int32_t          SYS_LED_Off(Sys_Led_TypeDef SYS_LED);
@@ -467,24 +524,26 @@ int32_t          SYS_LED_Off(Sys_Led_TypeDef SYS_LED);
   * @param  SYS_LED Specifies the Led to be toggled
   *         This parameter can be one of the following values:
 [#assign j = 0]
-[#list BspIpDatas as SWIP]
-    [#if SWIP.variables??]
-        [#list SWIP.variables as variables]
-            [#if variables.name?contains("IpInstance")]
-                [#assign IpInstance = variables.value]
-            [/#if]
-            [#if variables.name?contains("IpName")]
-                [#assign IpName = variables.value]
-            [/#if]
-            [#-- User BSP Led --]
-            [#if variables.value?contains("LED ") ]
-                [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
+[#if BspIpDatas??]
+    [#list BspIpDatas as SWIP]
+        [#if SWIP.variables??]
+            [#list SWIP.variables as variables]
+                [#if variables.name?contains("IpInstance")]
+                    [#assign IpInstance = variables.value]
+                [/#if]
+                [#if variables.name?contains("IpName")]
+                    [#assign IpName = variables.value]
+                [/#if]
+                [#-- User BSP Led --]
+                [#if variables.value?contains("LED ") ]
+                    [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
   *            @arg SYS_LED${i}
-                [#assign j = j+1]
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
+                    [#assign j = j+1]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
   * @return BSP status
   */
 int32_t          SYS_LED_Toggle(Sys_Led_TypeDef SYS_LED);
@@ -494,24 +553,26 @@ int32_t          SYS_LED_Toggle(Sys_Led_TypeDef SYS_LED);
   * @param  SYS_LED Specifies the Led to get its state
   *         This parameter can be one of following parameters:
 [#assign j = 0]
-[#list BspIpDatas as SWIP]
-    [#if SWIP.variables??]
-        [#list SWIP.variables as variables]
-            [#if variables.name?contains("IpInstance")]
-                [#assign IpInstance = variables.value]
-            [/#if]
-            [#if variables.name?contains("IpName")]
-                [#assign IpName = variables.value]
-            [/#if]
-            [#-- User BSP Led --]
-            [#if variables.value?contains("LED ") ]
-                [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
+[#if BspIpDatas??]
+    [#list BspIpDatas as SWIP]
+        [#if SWIP.variables??]
+            [#list SWIP.variables as variables]
+                [#if variables.name?contains("IpInstance")]
+                    [#assign IpInstance = variables.value]
+                [/#if]
+                [#if variables.name?contains("IpName")]
+                    [#assign IpName = variables.value]
+                [/#if]
+                [#-- User BSP Led --]
+                [#if variables.value?contains("LED ") ]
+                    [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
   *            @arg SYS_LED${i}
-                [#assign j = j+1]
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
+                    [#assign j = j+1]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
   * @return SYS_LED status
   */
 int32_t          SYS_LED_GetState(Sys_Led_TypeDef SYS_LED);
@@ -527,24 +588,26 @@ int32_t          SYS_LED_GetState(Sys_Led_TypeDef SYS_LED);
   * @param  Button Specifies the Button to be configured
   *         This parameter can be one of following parameters:
 [#assign j = 0]
-[#list BspIpDatas as SWIP]
-    [#if SWIP.variables??]
-        [#list SWIP.variables as variables]
-            [#if variables.name?contains("IpInstance")]
-                [#assign IpInstance = variables.value]
-            [/#if]
-            [#if variables.name?contains("IpName")]
-                [#assign IpName = variables.value]
-            [/#if]
-            [#-- User BSP Button --]
-            [#if variables.value?contains("BUTTON ") ]
-                [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
+[#if BspIpDatas??]
+    [#list BspIpDatas as SWIP]
+        [#if SWIP.variables??]
+            [#list SWIP.variables as variables]
+                [#if variables.name?contains("IpInstance")]
+                    [#assign IpInstance = variables.value]
+                [/#if]
+                [#if variables.name?contains("IpName")]
+                    [#assign IpName = variables.value]
+                [/#if]
+                [#-- User BSP Button --]
+                [#if variables.value?contains("BUTTON ") ]
+                    [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
   *            @arg SYS_BUTTON${i}
-                [#assign j = j+1]
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
+                    [#assign j = j+1]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
   * @param  ButtonMode Specifies Button mode
   *   This parameter can be one of following parameters:
   *     @arg SYS_BUTTON_MODE_GPIO: Button will be used as simple IO
@@ -559,24 +622,26 @@ int32_t          SYS_PB_Init(Sys_Button_TypeDef Button, Sys_ButtonMode_TypeDef B
   * @param  Button Button to be configured
   *         This parameter can be one of following parameters:
 [#assign j = 0]
-[#list BspIpDatas as SWIP]
-    [#if SWIP.variables??]
-        [#list SWIP.variables as variables]
-            [#if variables.name?contains("IpInstance")]
-                [#assign IpInstance = variables.value]
-            [/#if]
-            [#if variables.name?contains("IpName")]
-                [#assign IpName = variables.value]
-            [/#if]
-            [#-- User BSP Button --]
-            [#if variables.value?contains("BUTTON ") ]
-                [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
+[#if BspIpDatas??]
+    [#list BspIpDatas as SWIP]
+        [#if SWIP.variables??]
+            [#list SWIP.variables as variables]
+                [#if variables.name?contains("IpInstance")]
+                    [#assign IpInstance = variables.value]
+                [/#if]
+                [#if variables.name?contains("IpName")]
+                    [#assign IpName = variables.value]
+                [/#if]
+                [#-- User BSP Button --]
+                [#if variables.value?contains("BUTTON ") ]
+                    [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
   *            @arg SYS_BUTTON${i}
-                [#assign j = j+1]
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
+                    [#assign j = j+1]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
   * @note PB DeInit does not disable the GPIO clock
   * @return BSP status
   */
@@ -587,53 +652,62 @@ int32_t          SYS_PB_DeInit(Sys_Button_TypeDef Button);
   * @param  Button Specifies the Button to be checked
   *         This parameter can be one of following parameters:
 [#assign j = 0]
-[#list BspIpDatas as SWIP]
-    [#if SWIP.variables??]
-        [#list SWIP.variables as variables]
-            [#if variables.name?contains("IpInstance")]
-                [#assign IpInstance = variables.value]
-            [/#if]
-            [#if variables.name?contains("IpName")]
-                [#assign IpName = variables.value]
-            [/#if]
-            [#-- User BSP Button --]
-            [#if variables.value?contains("BUTTON ") ]
-                [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
+[#if BspIpDatas??]
+    [#list BspIpDatas as SWIP]
+        [#if SWIP.variables??]
+            [#list SWIP.variables as variables]
+                [#if variables.name?contains("IpInstance")]
+                    [#assign IpInstance = variables.value]
+                [/#if]
+                [#if variables.name?contains("IpName")]
+                    [#assign IpName = variables.value]
+                [/#if]
+                [#-- User BSP Button --]
+                [#if variables.value?contains("BUTTON ") ]
+                    [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
   *            @arg SYS_BUTTON${i}
-                [#assign j = j+1]
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
+                    [#assign j = j+1]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
   * @return The Button GPIO pin value.
   */
 int32_t          SYS_PB_GetState(Sys_Button_TypeDef Button);
 
+[#if numButton > 0]
+    [#if BspIpDatas??]
+        [#list BspIpDatas as SWIP]
+            [#if SWIP.variables??]
+                [#list SWIP.variables as variables]
+                    [#if variables.name?contains("IpInstance")]
+                        [#assign IpInstance = variables.value]
+                    [/#if]
+                    [#if variables.name?contains("IpName")]
+                        [#assign IpName = variables.value]
+                    [/#if]
+                    [#if variables.name?contains("GPIO_INT_NUM")]
+                        [#assign IrqNumber = variables.value]
+                    [/#if]
+                    [#if variables.name?contains("EXTI_LINE_NUMBER")]
+                        [#assign ExtiLine = variables.value]
+                    [/#if]
+                    [#-- User BSP Button --]
+                    [#if variables.value?contains("BUTTON ")]
+                        [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
 /**
-  * @brief  BSP Push Button callback
-  * @param  Button Specifies the Button to be checked
-  *         This parameter can be one of following parameters:
-[#assign j = 0]
-[#list BspIpDatas as SWIP]
-    [#if SWIP.variables??]
-        [#list SWIP.variables as variables]
-            [#if variables.name?contains("IpInstance")]
-                [#assign IpInstance = variables.value]
-            [/#if]
-            [#if variables.name?contains("IpName")]
-                [#assign IpName = variables.value]
-            [/#if]
-            [#-- User BSP Button --]
-            [#if variables.value?contains("BUTTON ") ]
-                [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
-  *            @arg SYS_BUTTON${i}
-                [#assign j = j+1]
+  * @brief Button SW${i} EXTI line detection callback.
+  * @return none
+  */
+void SYS_BUTTON${i}_EXTI_Callback(void);
+
+                    [/#if]
+                [/#list]
             [/#if]
         [/#list]
     [/#if]
-[/#list]
-  */
-void             SYS_PB_Callback(Sys_Button_TypeDef Button);
+[/#if]
 
 /**
   * @brief  This function handles Push-Button interrupt requests.

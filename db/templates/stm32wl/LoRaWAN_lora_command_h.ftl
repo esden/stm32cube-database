@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    lora_command.h
@@ -8,6 +9,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __LORA_COMMAND_H__
@@ -48,17 +50,12 @@ extern "C" {
 /* Exported functions prototypes ---------------------------------------------*/
 /**
   * @brief Initializes command module
-  *
-  * @param [IN] cb to signal appli that character has been received
-  * @retval None
+  * @param CmdProcessNotify cb to signal application that character has been received
   */
 void CMD_Init(void (*CmdProcessNotify)(void));
 
 /**
   * @brief Process the command
-  *
-  * @param [IN] None
-  * @retval None
   */
 void CMD_Process(void);
 

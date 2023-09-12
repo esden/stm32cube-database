@@ -1,7 +1,8 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file  : stm32_adv_trace_if_template.c
+  * @file  : stm32_adv_trace_if.c
   * @brief : Source file for interfacing the stm32_adv_trace to hardware
   ******************************************************************************
   * @attention
@@ -16,6 +17,8 @@
   *
   ******************************************************************************
 */
+/* USER CODE END Header */
+
 #include "stm32_adv_trace.h"
 #include "stm32_adv_trace_if.h"
 /* USER CODE BEGIN include */
@@ -84,7 +87,7 @@ UTIL_ADV_TRACE_Status_t UART_StartRx(void (*cb)(uint8_t *pdata, uint16_t size, u
 UTIL_ADV_TRACE_Status_t UART_TransmitDMA ( uint8_t *pdata, uint16_t size )
 {
 /* USER CODE BEGIN UART_TransmitDMA */
-	return UTIL_ADV_TRACE_OK;
+  return UTIL_ADV_TRACE_OK;
 /* USER CODE END UART_TransmitDMA */
 }
 

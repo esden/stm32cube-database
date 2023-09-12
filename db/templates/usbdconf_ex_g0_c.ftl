@@ -289,7 +289,7 @@ void HAL_PCD_ResetCallback(PCD_HandleTypeDef *hpcd)
   /* USER CODE END HAL_PCD_ResetCallback_PreTreatment */
   USBD_SpeedTypeDef speed = USBD_SPEED_FULL;
   [#-- BZ 94425 --]
-  if (( hpcd->Init.speed != USB_DRD_SPEED_FS) || (hpcd->Init.speed != USB_DRD_SPEED_LS))
+  if (hpcd->Init.speed != USBD_FS_SPEED)
   {
     Error_Handler();
   }
@@ -821,10 +821,10 @@ USBD_StatusTypeDef USBD_LL_PrepareReceive(USBD_HandleTypeDef *pdev, uint8_t ep_a
 
 
 /**
-  * @brief  Returns the last transfered packet size.
+  * @brief  Returns the last transferred packet size.
   * @param  pdev: Device handle
   * @param  ep_addr: Endpoint number
-  * @retval Recived Data Size
+  * @retval Received Data Size
   */
 uint32_t USBD_LL_GetRxDataSize(USBD_HandleTypeDef *pdev, uint8_t ep_addr)
 {
@@ -1008,7 +1008,7 @@ static void SystemClockConfig_Resume(void)
 /* USER CODE END 5 */
 
 /**
-  * @brief  Retuns the USB status depending on the HAL status:
+  * @brief  Returns the USB status depending on the HAL status:
   * @param  hal_status: HAL status
   * @retval USB status
   */

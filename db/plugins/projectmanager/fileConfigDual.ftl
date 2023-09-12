@@ -92,6 +92,12 @@
             [#if dataKey=="CdefinesList"]
                [#assign CdefinesList =  elem[dataKey]]
             [/#if]
+            [#if dataKey=="HeapSize"]
+               [#assign HeapSize =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="StackSize"]
+               [#assign StackSize =  elem[dataKey]]
+            [/#if]
             [#if dataKey=="linkerExtraLibList"]
                [#assign linkerExtraLibList =  elem[dataKey]]
             [/#if]
@@ -112,6 +118,9 @@
             [/#if]
             [#if dataKey=="LinkerFile"]
                [#assign LinkerFile =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="threadsafeCore"]
+               [#assign threadsafeCore =  elem[dataKey]]
             [/#if]
         [/#list]   
     [/#if]
@@ -273,6 +282,31 @@
         [/#list] 
         </LinkAdditionalLibs>
     [/#if]
+
+    [#if ThreadSafeSupport?? && ThreadSafeStrategy[threadsafeCore]??]
+        <ThreadSafeSupport>
+            <ThreadSafeStrategy>${ThreadSafeStrategy[threadsafeCore].getStrategyValue()}</ThreadSafeStrategy>
+				[#if FilesFromFW??]
+                <IDELockFiles>
+                    [#list cFileIDEList as cFileIDE]
+                        <cFile>${cFileIDE}</cFile>
+                    [/#list]
+                    [#list hFileIDEList as hFileIDE]
+                        <hFile>${hFileIDE}</hFile>
+                    [/#list]
+                </IDELockFiles>
+
+                <UserLockFiles>
+                    <Inc>
+                        [#list hFileUserList as hFileUser]
+                            <hFile>${hFileUser}</hFile>
+                        [/#list]
+                    </Inc>
+                </UserLockFiles>
+				[/#if]
+        </ThreadSafeSupport>
+    [/#if]
+
     </config>
 [/#macro]
 
@@ -357,6 +391,12 @@
             [/#if]
 [#if dataKey=="prj_ctx"]
                [#assign prj_ctx =  elem[dataKey]]
+            [/#if]            
+            [#if dataKey=="HeapSize"]
+               [#assign HeapSize =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="StackSize"]
+               [#assign StackSize =  elem[dataKey]]
             [/#if]
         [/#list]
         [#break]
@@ -368,6 +408,9 @@
 [#-- <ProjectPath>${ProjectPath}</ProjectPath>  --][#-- added to give project path --]
     <ProjectName>${projectName}[#if TrustZone=="1"][#if prjSecure=="1"]_S[#else]_NS[/#if][/#if][#if (MultiProject == "1")][#if prjSecure=="1"]_${cpuCore?replace("ARM Cortex-", "C")?replace("+", "PLUS")}[#else]_CM4[/#if][/#if]</ProjectName> [#-- modified to give only the project name without path --]
     <ProjectNature>${ProjectNature}</ProjectNature> [#-- Cpp --]
+    [#if CompilerVersionCte??]
+    <CompilerVersion>${CompilerVersionCte}</CompilerVersion>
+    [/#if]
  [#if TrustZone == "1"]     
 <Secure>${prjSecure}</Secure>
 [#else]

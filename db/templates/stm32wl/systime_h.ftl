@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    systime.h
@@ -8,8 +9,9 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
-/* Define to prevent recursive inclusion -------------------------------------*/
+/* USER CODE END Header */
 
+/* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __SYSTIME_H__
 #define __SYSTIME_H__
 

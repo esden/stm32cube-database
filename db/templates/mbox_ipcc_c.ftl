@@ -55,14 +55,14 @@
                         [#if definition.name="IPCC_CPU_M4"]
                         [#lt]#define IPCC_CPU_M4      ${definition.value}
 			[/#if]
-                        [#if definition.name="RX_NO_MSG"]
-                        [#lt]#define RX_NO_MSG        ${definition.value}
+                        [#if definition.name="MBOX_NO_MSG"]
+                        [#lt]#define MBOX_NO_MSG       ${definition.value}
 			[/#if]
-                        [#if definition.name="RX_NEW_MSG"]
-                        [#lt]#define RX_NEW_MSG       ${definition.value}
+                        [#if definition.name="MBOX_NEW_MSG"]
+                        [#lt]#define MBOX_NEW_MSG       ${definition.value}
 			[/#if]
-                        [#if definition.name="RX_BUF_FREE"]
-                        [#lt]#define RX_BUF_FREE      ${definition.value}
+                        [#if definition.name="MBOX_BUF_FREE"]
+                        [#lt]#define MBOX_BUF_FREE      ${definition.value}
 			[/#if]
 		[/#list]
 	[/#if]
@@ -74,8 +74,8 @@
 /* USER CODE END PFP */
 
 extern IPCC_HandleTypeDef hipcc;
-int msg_received_ch1 = RX_NO_MSG;
-int msg_received_ch2 = RX_NO_MSG;
+int msg_received_ch1 = MBOX_NO_MSG;
+int msg_received_ch2 = MBOX_NO_MSG;
 uint32_t vring0_id = 0; /* used for channel 1 */
 uint32_t vring1_id = 1; /* used for channel 2 */
 
@@ -133,7 +133,7 @@ int MAILBOX_Poll(struct virtio_device *vdev)
 
    /* USER CODE END  PRE_MAILBOX_POLL */
 
-  if (msg_received_ch1 == RX_BUF_FREE) {
+   if (msg_received_ch1 == MBOX_BUF_FREE) {
 
    /* USER CODE BEGIN MSG_CHANNEL1 */
 
@@ -141,12 +141,11 @@ int MAILBOX_Poll(struct virtio_device *vdev)
 
     OPENAMP_log_dbg("Running virt0 (ch_1 buf free)\r\n");
     rproc_virtio_notified(vdev, VRING0_ID);
-    msg_received_ch1 = RX_NO_MSG;
     ret = 0;
-
+    msg_received_ch1 = MBOX_NO_MSG;
   }
 
-  if (msg_received_ch2 == RX_NEW_MSG) {
+  if (msg_received_ch2 == MBOX_NEW_MSG) {
 
    /* USER CODE BEGIN MSG_CHANNEL2 */
 
@@ -154,12 +153,9 @@ int MAILBOX_Poll(struct virtio_device *vdev)
 
     OPENAMP_log_dbg("Running virt1 (ch_2 new msg)\r\n");
     rproc_virtio_notified(vdev, VRING1_ID);
-    msg_received_ch2 = RX_NO_MSG;
+    msg_received_ch2 = MBOX_NO_MSG;
 
-    /* The OpenAMP framework does not notify for free buf: do it here */
-      rproc_virtio_notified(NULL, VRING1_ID);
     ret = 0;
-
   }
 
   /* USER CODE BEGIN POST_MAILBOX_POLL */
@@ -213,7 +209,6 @@ int MAILBOX_Notify(void *priv, uint32_t id)
 
  /* USER CODE END  POST_MAILBOX_NOTIFY */
 
-
   return 0;
 }
 
@@ -230,10 +225,10 @@ void IPCC_channel1_callback(IPCC_HandleTypeDef * hipcc,
 
   /* USER CODE END  PRE_MAILBOX_CHANNEL1_CALLBACK */
 
-  if (msg_received_ch1 != RX_NO_MSG)
+  if (msg_received_ch1 != MBOX_NO_MSG)
     OPENAMP_log_dbg("IPCC_channel1_callback: previous IRQ not treated (status = %d)\r\n", msg_received_ch1);
 
-  msg_received_ch1 = RX_BUF_FREE;
+  msg_received_ch1 = MBOX_BUF_FREE;
 
   /* Inform A7 that we have received the 'buff free' msg */
   OPENAMP_log_dbg("Ack 'buff free' message on ch1\r\n");
@@ -253,10 +248,10 @@ void IPCC_channel2_callback(IPCC_HandleTypeDef * hipcc,
 
   /* USER CODE END  PRE_MAILBOX_CHANNEL2_CALLBACK */
 
-  if (msg_received_ch2 != RX_NO_MSG)
+  if (msg_received_ch2 != MBOX_NO_MSG)
     OPENAMP_log_dbg("IPCC_channel2_callback: previous IRQ not treated (status = %d)\r\n", msg_received_ch2);
 
-  msg_received_ch2 = RX_NEW_MSG;
+  msg_received_ch2 = MBOX_NEW_MSG;
 
   /* Inform A7 that we have received the new msg */
   OPENAMP_log_dbg("Ack new message on ch2\r\n");

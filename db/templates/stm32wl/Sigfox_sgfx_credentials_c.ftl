@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    sgfx_credentials.c
@@ -8,32 +9,31 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 [#--
-********************************
-SWIP Data:
 [#if SWIPdatas??]
-  [#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-Defines:
-      [#list SWIP.defines as definition]
-        ${definition.name}: ${definition.value}
-      [/#list]
-    [/#if]
-  [/#list]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                ${definition.name}: ${definition.value}
+            [/#list]
+        [/#if]
+    [/#list]
 [/#if]
-********************************
 --]
 [#assign CPUCORE = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")]
 [#assign SUBGHZ_APPLICATION = ""]
-[#list SWIPdatas as SWIP]
-  [#if SWIP.defines??]
-    [#list SWIP.defines as definition]
-            [#if definition.name == "SUBGHZ_APPLICATION"]
-                [#assign SUBGHZ_APPLICATION = definition.value]
-            [/#if]
-        [/#list]
-  [/#if]
-[/#list]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "SUBGHZ_APPLICATION"]
+                    [#assign SUBGHZ_APPLICATION = definition.value]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 
 /* Includes ------------------------------------------------------------------*/
 #include <stdint.h>
@@ -202,10 +202,10 @@ sfx_error_t CREDENTIALS_aes_128_cbc_encrypt(uint8_t *encrypted_data, uint8_t *da
   memset(key, 0, AES_KEY_LEN);
 
   sigfox_aes_cbc_encrypt(data_to_encrypt,
-                  encrypted_data,
-                  blocks,
-                  iv,
-                  &AesContext);
+                         encrypted_data,
+                         blocks,
+                         iv,
+                         &AesContext);
 [#if (CPUCORE == "CM0PLUS")]
 #else
   sfx_key_type_t KeyType = SE_NVM_get_key_type();
@@ -245,10 +245,10 @@ sfx_error_t CREDENTIALS_aes_128_cbc_encrypt_with_session_key(uint8_t *encrypted_
   sigfox_aes_set_key(session_key, AES_KEY_LEN,  &AesContext);
 
   sigfox_aes_cbc_encrypt(data_to_encrypt,
-                  encrypted_data,
-                  blocks,
-                  iv,
-                  &AesContext);
+                         encrypted_data,
+                         blocks,
+                         iv,
+                         &AesContext);
 [#if (CPUCORE == "CM0PLUS")]
 #else
   /* encrypt with session key */
@@ -283,10 +283,10 @@ sfx_error_t CREDENTIALS_wrap_session_key(uint8_t *data, uint8_t blocks)
   memset(key, 0, AES_KEY_LEN);
 
   sigfox_aes_cbc_encrypt(data,
-                  session_key,
-                  blocks,
-                  iv,
-                  &AesContext);
+                         session_key,
+                         blocks,
+                         iv,
+                         &AesContext);
 [#if (CPUCORE == "CM0PLUS")]
 #else
   /* DestroyKey: to be done before new deriveKey */
@@ -311,7 +311,9 @@ const char *CREDENTIALS_get_version(void)
   return sgfxSeeLibVersion;
 [#else]
   char  *retval=  "1.0.0";
+  /* USER CODE BEGIN CREDENTIALS_get_version_user_retval */
 
+  /* USER CODE END CREDENTIALS_get_version_user_retval */
   return retval;
 [/#if]
   /* USER CODE BEGIN CREDENTIALS_get_version_2 */
@@ -376,14 +378,15 @@ void CREDENTIALS_get_initial_pac(uint8_t *pac)
 
 sfx_bool CREDENTIALS_get_payload_encryption_flag(void)
 {
+  sfx_bool ret = SFX_FALSE;
+
+[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
+  ret = (sfx_bool) SE_NVM_get_encrypt_flag();
+[/#if]
   /* USER CODE BEGIN CREDENTIALS_get_payload_encryption_flag_1 */
 
   /* USER CODE END CREDENTIALS_get_payload_encryption_flag_1 */
-[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
-  return (sfx_bool) SE_NVM_get_encrypt_flag();
-[#else]
-  return SFX_FALSE;
-[/#if]
+  return ret;
 }
 
 void CREDENTIALS_set_payload_encryption_flag(uint8_t enable)
@@ -467,10 +470,10 @@ static sfx_error_t CREDENTIALS_get_cra(sfx_u8 *decrypted_data, sfx_u8 *data_to_d
   memset(CredentialKey, 0, AES_KEY_LEN);
 
   sigfox_aes_cbc_decrypt(data_to_decrypt,
-                  decrypted_data,
-                  sizeof(manuf_device_info_t) / AES_KEY_LEN,
-                  iv,
-                  &AesContext);
+                         decrypted_data,
+                         sizeof(manuf_device_info_t) / AES_KEY_LEN,
+                         iv,
+                         &AesContext);
 #else
   /* default sigfox_data.h provided, sigfox_data.h is not encrypted*/
   memcpy((uint8_t *) decrypted_data, (uint8_t *) data_to_decrypt, sizeof(manuf_device_info_t));

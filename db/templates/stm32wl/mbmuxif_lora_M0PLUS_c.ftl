@@ -1,13 +1,15 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    mbmuxif_lora.c
   * @author  MCD Application Team
-  * @brief   allows CM0 applic to register and handle LoraWAN to MBMUX
+  * @brief   allows CM0 application to register and handle LoraWAN to MBMUX
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
 #include "platform.h"
@@ -48,21 +50,27 @@ static MBMUX_ComParam_t *LoraComObj;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
+/**
+  * @brief   LORA acknowledge callbacks: set event to release waiting task
+  * @param   ComObj pointer to the LORA com param buffer
+  */
 static void MBMUXIF_IsrLoraAckRcvCb(void *ComObj);
+
+/**
+  * @brief   LORA command callbacks: schedules a task in order to quit the ISR
+  * @param   ComObj pointer to the LORA com param buffer
+  */
 static void MBMUXIF_IsrLoraCmdRcvCb(void *ComObj);
+
+/**
+  * @brief   LORA task to process the command
+  */
 static void MBMUXIF_TaskLoraCmdRcv(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Exported functions --------------------------------------------------------*/
-
-/**
-  * @brief   Registers LORA feature to the mailbox and to the sequencer
-  * @param   none
-  * @retval  0: OK; -1: if ch hasn't been registered by CM4
-  * @note    this function is supposed to be called by the System on request (Cmd) of CM4
-  */
 int8_t MBMUXIF_LoraInit(void)
 {
   int8_t ret;
@@ -87,11 +95,6 @@ int8_t MBMUXIF_LoraInit(void)
   return ret;
 }
 
-/**
-  * @brief gives back the pointer to the com buffer associated to Lora feature Notif
-  * @param none
-  * @retval  return pointer to the com param buffer
-  */
 MBMUX_ComParam_t *MBMUXIF_GetLoraFeatureNotifComPtr(void)
 {
   /* USER CODE BEGIN MBMUXIF_GetLoraFeatureNotifComPtr_1 */
@@ -100,7 +103,7 @@ MBMUX_ComParam_t *MBMUXIF_GetLoraFeatureNotifComPtr(void)
   MBMUX_ComParam_t *com_param_ptr = MBMUX_GetFeatureComPtr(FEAT_INFO_LORAWAN_ID, MBMUX_NOTIF_ACK);
   if (com_param_ptr == NULL)
   {
-    while (1) {} /* ErrorHandler() : feature isn't registered */
+    Error_Handler(); /* feature isn't registered */
   }
   return com_param_ptr;
   /* USER CODE BEGIN MBMUXIF_GetLoraFeatureNotifComPtr_Last */
@@ -108,11 +111,6 @@ MBMUX_ComParam_t *MBMUXIF_GetLoraFeatureNotifComPtr(void)
   /* USER CODE END MBMUXIF_GetLoraFeatureNotifComPtr_Last */
 }
 
-/**
-  * @brief Sends a Lora-Notif via Ipcc and Wait for the ack
-  * @param none
-  * @retval   none
-  */
 void MBMUXIF_LoraSendNotif(void)
 {
   /* to check vs radio. radio call this on irq so it moves here on task */
@@ -126,18 +124,13 @@ void MBMUXIF_LoraSendNotif(void)
   }
   else
   {
-    while (1) {} /* ErrorHandler(); */
+    Error_Handler();
   }
   /* USER CODE BEGIN MBMUXIF_LoraSendNotif_Last */
 
   /* USER CODE END MBMUXIF_LoraSendNotif_Last */
 }
 
-/**
-  * @brief Sends a Lora-Resp  via Ipcc without waiting for the response
-  * @param none
-  * @retval   none
-  */
 void MBMUXIF_LoraSendResp(void)
 {
   /* USER CODE BEGIN MBMUXIF_LoraSendResp_1 */
@@ -145,7 +138,7 @@ void MBMUXIF_LoraSendResp(void)
   /* USER CODE END MBMUXIF_LoraSendResp_1 */
   if (MBMUX_ResponseSnd(FEAT_INFO_LORAWAN_ID) != 0)
   {
-    while (1) {} /* ErrorHandler(); */
+    Error_Handler();
   }
   /* USER CODE BEGIN MBMUXIF_LoraSendResp_Last */
 
@@ -157,11 +150,6 @@ void MBMUXIF_LoraSendResp(void)
 /* USER CODE END EFD */
 
 /* Private functions ---------------------------------------------------------*/
-/**
-  * @brief  LORA acknowledge callbacks: set event to release waiting task
-  * @param  pointer to the LORA com param buffer
-  * @retval  none
-  */
 static void MBMUXIF_IsrLoraAckRcvCb(void *ComObj)
 {
   /* USER CODE BEGIN MBMUXIF_IsrLoraAckRcvCb_1 */
@@ -173,11 +161,6 @@ static void MBMUXIF_IsrLoraAckRcvCb(void *ComObj)
   /* USER CODE END MBMUXIF_IsrLoraAckRcvCb_Last */
 }
 
-/**
-  * @brief  LORA command callbacks: schedules a task in order to quit the ISR
-  * @param  pointer to the LORA com param buffer
-  * @retval  none
-  */
 static void MBMUXIF_IsrLoraCmdRcvCb(void *ComObj)
 {
   /* USER CODE BEGIN MBMUXIF_IsrLoraCmdRcvCb_1 */
@@ -190,11 +173,6 @@ static void MBMUXIF_IsrLoraCmdRcvCb(void *ComObj)
   /* USER CODE END MBMUXIF_IsrLoraCmdRcvCb_Last */
 }
 
-/**
-  * @brief  LORA task to process the command
-  * @param  pointer to the LORA com param buffer
-  * @retval  none
-  */
 static void MBMUXIF_TaskLoraCmdRcv(void)
 {
   /* USER CODE BEGIN MBMUXIF_TaskLoraCmdRcv_1 */

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V3.0" IPType="service" Name="IWDG" Version="iwdg1_v3_0" IpGroup="System" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../db/IP_Modes_V3_0.xsd" xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+  <About>IWDG: Independent WatchDoG</About>
+
+  <RefParameter Name="Instance" Comment="IWDG instance" DefaultValue="IWDG$Index" Type="list" Visible="false"/>
+  <RefParameter Name="Prescaler" Comment="IWDG counter clock prescaler" DefaultValue="IWDG_PRESCALER_4" Type="list" Group="Watchdog Clocking">
+    <PossibleValue Value="IWDG_PRESCALER_4" Comment="4"/>
+    <PossibleValue Value="IWDG_PRESCALER_8" Comment="8"/>
+    <PossibleValue Value="IWDG_PRESCALER_16" Comment="16"/>
+    <PossibleValue Value="IWDG_PRESCALER_32" Comment="32"/>
+    <PossibleValue Value="IWDG_PRESCALER_64" Comment="64"/>
+    <PossibleValue Value="IWDG_PRESCALER_128" Comment="128"/>
+    <PossibleValue Value="IWDG_PRESCALER_256" Comment="256"/>
+    <PossibleValue Value="IWDG_PRESCALER_512" Comment="512"/>
+    <PossibleValue Value="IWDG_PRESCALER_1024" Comment="1024"/>
+    <Description>These bits are written by software to select the prescaler divider feeding the counter clock.</Description>
+  </RefParameter> 
+  <RefParameter Name="Window" Comment="IWDG window value" DefaultValue="4095" Max="4095" Min="0" Type="integer" Group="Watchdog Clocking">
+    <Description>These bits contain the high limit of the window value to be compared with the downcounter.</Description>
+  </RefParameter>
+  <RefParameter Name="Reload" Comment="IWDG down-counter reload value" DefaultValue="4095" Max="4095" Min="0" Type="integer" Group="Watchdog Clocking">
+    <Description> These bits are written by software to define the value to be loaded in the watchdog counter each time the value 0xAAAA is written in the IWDG key register (IWDG_KR). The watchdog counter counts down from this value.</Description>
+	</RefParameter>
+  <RefParameter Name="EWI" Comment="IWDG Early Wakeup Interrupt" DefaultValue="0" Max="4095" Min="0" Type="integer" Group="Watchdog Interrupt">
+    <Description> The IWDG offers the possibility to generate an early interrupt depending on the value of the down-counter. The early interrupt is enabled by setting the EWIE bit of the IWDG early wakeup interrupt register (IWDG_EWCR) to 1. This parameter must be a number between 0 and 0x0FFF. Value 0 means that EWI is disabled.</Description>
+	</RefParameter>
+  <RefMode Name="IWDG_Activate" HalMode ="IWDG">
+    <ConfigForMode>IWDG_Init</ConfigForMode>
+    <Parameter Name="Prescaler"/>
+    <Parameter Name="Window"/>
+    <Parameter Name="Reload"/>
+    <Parameter Name="EWI"/>
+  </RefMode>
+
+	<!-- ModeLogicOperator for IWDG -->
+  <ModeLogicOperator Name="OR">
+    <Mode Name="IWDG_State" UserName="Activated">
+      <ModeLogicOperator Name="XOR">
+        <Mode Name="IWDG_Activate" UserName="Activated">
+          <SignalLogicalOp Name="AND">
+            <Signal Name="VS_IWDG" />
+          </SignalLogicalOp>
+        </Mode>
+      </ModeLogicOperator>
+    </Mode>
+  </ModeLogicOperator>
+
+  <!-- RefSignal for IWDG -->
+  <RefSignal Name="VS_IWDG" Virtual="true"/>
+
+  <Semaphore>IWDGUsed_ForRCC</Semaphore>
+</IP>

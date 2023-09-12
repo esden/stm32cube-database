@@ -66,13 +66,13 @@
 [#--basic boot devices--]
 [#local basicBootDevicesList = ["rcc_cfg", "i2c4", "quadspi", "sdmmc1", "sdmmc2", "sai2", "sai4"]]
 
-#ifndef CONFIG_STM32MP1_TRUSTED
+#ifndef CONFIG_TFABOOT
 
 [#list basicBootDevicesList as deviceName]
 [@DTBindedDtsElmtDMsList_print  pParentElmt="" pElmtsList=srvcmx_getElmtsMatchingBindedHwName(mxDtDM.dts_bindedElmtsList, deviceName) pDtLevel=0 pOrdering=true/]
 [/#list]
 
-#endif	/*CONFIG_STM32MP1_TRUSTED*/
+#endif	/*CONFIG_TFABOOT*/
 
 [#--dts level elmts--]
 [#local basicBootDevicesList = basicBootDevicesList + ["rcc"]]

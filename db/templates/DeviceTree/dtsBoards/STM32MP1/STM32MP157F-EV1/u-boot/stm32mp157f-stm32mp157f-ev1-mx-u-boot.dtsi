@@ -3,6 +3,9 @@
 #include "stm32mp15-u-boot.dtsi"
 #include "stm32mp15-ddr.dtsi"
 
+/* USER CODE BEGIN includes */
+/* USER CODE END includes */
+
 /{
 
 	/* USER CODE BEGIN root */
@@ -22,19 +25,25 @@
 	config{
 		u-boot,boot-led = "heartbeat";
 		u-boot,error-led = "error";
-		u-boot,mmc-env-partition = "ssbl";
+		u-boot,mmc-env-partition = "fip";
 		st,fastboot-gpios = <&gpioa 13 GPIO_ACTIVE_LOW>;
 		st,stm32prog-gpios = <&gpioa 14 GPIO_ACTIVE_LOW>;
 	};
 
 	led{
 
-		red{
+		led-red{
 			label = "error";
 			gpios = <&gpioa 13 GPIO_ACTIVE_LOW>;
 			default-state = "off";
 			status = "okay";
 		};
+	};
+
+#ifdef CONFIG_STM32MP15x_STM32IMAGE
+
+	config{
+		u-boot,mmc-env-partition = "ssbl";
 	};
 
 	firmware{
@@ -52,11 +61,12 @@
 			no-map;
 		};
 	};
+#endif
 	/* USER CODE END root */
 
 	clocks{
 
-#ifndef CONFIG_STM32MP1_TRUSTED
+#ifndef CONFIG_TFABOOT
 
 		clk_lsi:clk-lsi{
 		};
@@ -79,7 +89,7 @@
 	};
 };
 
-#ifndef CONFIG_STM32MP1_TRUSTED
+#ifndef CONFIG_TFABOOT
 
 &rcc{
 	u-boot,dm-pre-reloc;

@@ -87,6 +87,7 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
     return HAL_ERROR;
   }
 [/#if]
+#n
   /* Enable ${instance} clock */
   __HAL_RCC_${instance}_CLK_ENABLE();
 [#if FamilyName=="STM32MP1"]
@@ -184,6 +185,7 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
  /* Return function status */
   return status;
 [#else]
+#n
   if(HAL_TIM_Base_Init(&h${instance?lower_case}) == HAL_OK)
   {
     /* Start the TIM time Base generation in interrupt mode */

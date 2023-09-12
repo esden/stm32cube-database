@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    sys_conf.h
@@ -8,96 +9,101 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 [#--
-cpucore: ${cpucore}
-Line: ${Line}
-McuName: ${McuName}
-FamilyName: ${FamilyName}
-
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
                 ${definition.name}: ${definition.value}
-        [/#list]
-    [/#if]
-[/#list]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 --]
 [#assign CPUCORE = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")]
-[#assign LINE = Line]
 [#assign SUBGHZ_APPLICATION = ""]
+[#assign SECURE_PROJECTS = "0"]
+[#assign Activate_DEBUG_LINE = ""]
+[#assign LINE = Line]
 [#assign VERBOSE_LEVEL = ""]
 [#assign APP_LOG_ENABLED = "0"]
 [#assign DEBUGGER_ON = "0"]
 [#assign LOW_POWER_DISABLE = "0"]
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            [#if definition.name == "SUBGHZ_APPLICATION"]
-                [#assign SUBGHZ_APPLICATION = definition.value]
-            [/#if]
-            [#if (CPUCORE == "") && (LINE == "STM32WLEx")]
-        [#if definition.name == "VERBOSE_LEVEL"]
-          [#assign VERBOSE_LEVEL = definition.value]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "SUBGHZ_APPLICATION"]
+                    [#assign SUBGHZ_APPLICATION = definition.value]
+                [/#if]
+                [#if definition.name == "Activate_DEBUG_LINE"]
+                    [#assign Activate_DEBUG_LINE = definition.value]
+                [/#if]
+                [#if (CPUCORE == "") && (LINE == "STM32WLEx")]
+                    [#if definition.name == "VERBOSE_LEVEL"]
+                        [#assign VERBOSE_LEVEL = definition.value]
+                    [/#if]
+                    [#if definition.name == "APP_LOG_ENABLED"]
+                        [#if definition.value == "true"]
+                            [#assign APP_LOG_ENABLED = "1"]
+                        [/#if]
+                    [/#if]
+                    [#if definition.name == "DEBUGGER_ON"]
+                        [#if definition.value == "true"]
+                            [#assign DEBUGGER_ON = "1"]
+                        [/#if]
+                    [/#if]
+                    [#if definition.name == "LOW_POWER_DISABLE"]
+                        [#if definition.value == "true"]
+                            [#assign LOW_POWER_DISABLE = "1"]
+                        [/#if]
+                    [/#if]
+                [/#if]
+                [#if CPUCORE == "CM0PLUS"]
+                    [#if definition.name == "VERBOSE_LEVEL_CM0PLUS"]
+                        [#assign VERBOSE_LEVEL = definition.value]
+                    [/#if]
+                    [#if definition.name == "APP_LOG_ENABLED_CM0PLUS"]
+                        [#if definition.value == "true"]
+                            [#assign APP_LOG_ENABLED = "1"]
+                        [/#if]
+                    [/#if]
+                    [#if definition.name == "DEBUGGER_ON_CM0PLUS"]
+                        [#if definition.value == "true"]
+                            [#assign DEBUGGER_ON = "1"]
+                        [/#if]
+                    [/#if]
+                    [#if definition.name == "LOW_POWER_DISABLE_CM0PLUS"]
+                        [#if definition.value == "true"]
+                            [#assign LOW_POWER_DISABLE = "1"]
+                        [/#if]
+                    [/#if]
+                [/#if]
+                [#if ((CPUCORE == "") && (LINE == "STM32WL5x")) || (CPUCORE == "CM4")]
+                    [#if definition.name == "VERBOSE_LEVEL_CM4"]
+                        [#assign VERBOSE_LEVEL = definition.value]
+                    [/#if]
+                    [#if definition.name == "APP_LOG_ENABLED_CM4"]
+                        [#if definition.value == "true"]
+                            [#assign APP_LOG_ENABLED = "1"]
+                        [/#if]
+                    [/#if]
+                    [#if definition.name == "DEBUGGER_ON_CM4"]
+                        [#if definition.value == "true"]
+                            [#assign DEBUGGER_ON = "1"]
+                        [/#if]
+                    [/#if]
+                    [#if definition.name == "LOW_POWER_DISABLE_CM4"]
+                        [#if definition.value == "true"]
+                            [#assign LOW_POWER_DISABLE = "1"]
+                        [/#if]
+                    [/#if]
+                [/#if]
+            [/#list]
         [/#if]
-        [#if definition.name == "APP_LOG_ENABLED"]
-          [#if definition.value == "true"]
-            [#assign APP_LOG_ENABLED = "1"]
-          [/#if]
-        [/#if]
-        [#if definition.name == "DEBUGGER_ON"]
-          [#if definition.value == "true"]
-            [#assign DEBUGGER_ON = "1"]
-          [/#if]
-        [/#if]
-        [#if definition.name == "LOW_POWER_DISABLE"]
-          [#if definition.value == "true"]
-            [#assign LOW_POWER_DISABLE = "1"]
-          [/#if]
-        [/#if]
-      [/#if]
-            [#if CPUCORE == "CM0PLUS"]
-        [#if definition.name == "VERBOSE_LEVEL_CM0PLUS"]
-          [#assign VERBOSE_LEVEL = definition.value]
-        [/#if]
-        [#if definition.name == "APP_LOG_ENABLED_CM0PLUS"]
-          [#if definition.value == "true"]
-            [#assign APP_LOG_ENABLED = "1"]
-          [/#if]
-        [/#if]
-        [#if definition.name == "DEBUGGER_ON_CM0PLUS"]
-          [#if definition.value == "true"]
-            [#assign DEBUGGER_ON = "1"]
-          [/#if]
-        [/#if]
-        [#if definition.name == "LOW_POWER_DISABLE_CM0PLUS"]
-          [#if definition.value == "true"]
-            [#assign LOW_POWER_DISABLE = "1"]
-          [/#if]
-        [/#if]
-      [/#if]
-            [#if ((CPUCORE == "") && (LINE == "STM32WL5x")) || (CPUCORE == "CM4")]
-        [#if definition.name == "VERBOSE_LEVEL_CM4"]
-          [#assign VERBOSE_LEVEL = definition.value]
-        [/#if]
-        [#if definition.name == "APP_LOG_ENABLED_CM4"]
-          [#if definition.value == "true"]
-            [#assign APP_LOG_ENABLED = "1"]
-          [/#if]
-        [/#if]
-        [#if definition.name == "DEBUGGER_ON_CM4"]
-          [#if definition.value == "true"]
-            [#assign DEBUGGER_ON = "1"]
-          [/#if]
-        [/#if]
-        [#if definition.name == "LOW_POWER_DISABLE_CM4"]
-          [#if definition.value == "true"]
-            [#assign LOW_POWER_DISABLE = "1"]
-          [/#if]
-        [/#if]
-      [/#if]
     [/#list]
-    [/#if]
-[/#list]
+[/#if]
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __SYS_CONF_H__
@@ -130,7 +136,7 @@ extern "C" {
   * @brief Temperature and pressure values are retrieved from sensors shield
   *        (instead of sending dummy values). It requires MEMS IKS shield
   */
-#define SENSOR_ENABLED  0
+#define SENSOR_ENABLED              0
 [/#if]
 [/#if]
 
@@ -140,25 +146,41 @@ extern "C" {
   * @note In AT_SLAVE usart speed is just 9600. VLEVEL_H will not work
 [/#if]
   */
-#define VERBOSE_LEVEL     ${VERBOSE_LEVEL}
+#define VERBOSE_LEVEL               ${VERBOSE_LEVEL}
 
 /**
   * @brief Enable trace logs
   */
-#define APP_LOG_ENABLED   ${APP_LOG_ENABLED}
+#define APP_LOG_ENABLED             ${APP_LOG_ENABLED}
 
 /**
-  * @brief Enable Debugger mode
-  * @note  1:ON it enables the debbugger plus 4 dgb pins, 0:OFF the debugger is OFF (lower consumption)
+  * @brief Enable MCU Debugger pins (dbg serial wires, sbg spi, etc)
   */
-#define DEBUGGER_ON       ${DEBUGGER_ON}
+#define DEBUGGER_ENABLED            ${DEBUGGER_ON}
+
+/**
+  * @brief Enable four wires usable as probes (two of them PROBE1 and PROBE2 used by the MW)
+  */
+[#if (Activate_DEBUG_LINE == "false") ]
+#define PROBE_PINS_ENABLED          0
+[#else]
+#define PROBE_PINS_ENABLED          ${DEBUGGER_ON}
+[/#if]
 
 /**
   * @brief Disable Low Power mode
   * @note  0: LowPowerMode enabled. MCU enters stop2 mode, 1: LowPowerMode disabled. MCU enters sleep mode only
   */
-#define LOW_POWER_DISABLE ${LOW_POWER_DISABLE}
+#define LOW_POWER_DISABLE           ${LOW_POWER_DISABLE}
 
+[#if (SECURE_PROJECTS == "1") && (CPUCORE == "CM0PLUS") ]
+/**
+  * @brief Enable unprivilege mode
+  * @note 1: execute the code in unprivileged mode, 0: execute the code fully in privileged mode
+  */
+#define SECURE_UNPRIVILEGE_ENABLE   1
+
+[/#if]
 /* USER CODE BEGIN EC */
 
 /* USER CODE END EC */

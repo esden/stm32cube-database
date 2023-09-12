@@ -107,8 +107,8 @@ ${res.errors} - deviceName=${deviceName}*/
 							[#local periphIdsMap = srvc_map_putElmtsList(periphIdsMap, "Non Secured", newPeriphIdsList)]
 						[/#if]
 					[#elseif isCtxtSecure]
-						[#--Specific DDR: multi-assigned but declared as Secured only--]
-						[#local periphIdsMap = srvc_map_putElmtsList(periphIdsMap, "Secured", newPeriphIdsList)]
+						[#--Specific DDR: multi-assigned but declared as Secured (NS_R S_W) only--]
+						[#local periphIdsMap = srvc_map_putElmtsList(periphIdsMap, "NS_R S_W", newPeriphIdsList)]
 					[/#if]
 				[#else]
 /*ERR : bind_etzpc() returns errors. The DTS may be incomplete. Reason:
@@ -133,12 +133,21 @@ ${TABnode}st,decprot = <
 ${TABnode}/*"${securityArea}" peripherals*/
 			[#local periphIdsList = srvc_map_getValue(periphIdsMap, securityArea)]
 			[#list periphIdsList as periphId]
-				[#if securityArea=="Secured"]
-${TABnode}DECPROT(${mx_family?upper_case}_ETZPC_${periphId}_ID, DECPROT_S_RW, DECPROT_UNLOCK)
-				[#elseif securityArea=="Mcu Isolation"]
-${TABnode}DECPROT(${mx_family?upper_case}_ETZPC_${periphId}_ID, DECPROT_MCU_ISOLATION, DECPROT_UNLOCK)
+[#t]
+				[#if (periphId=="DDRCTRL" || periphId=="DDRPHYC")]
+					[#local lockingStatus = "DECPROT_LOCK"]
 				[#else]
-${TABnode}DECPROT(${mx_family?upper_case}_ETZPC_${periphId}_ID, DECPROT_NS_RW, DECPROT_UNLOCK)
+					[#local lockingStatus = "DECPROT_UNLOCK"]
+				[/#if]
+[#t]
+				[#if securityArea=="Secured"]
+${TABnode}DECPROT(${mx_family?upper_case}_ETZPC_${periphId}_ID, DECPROT_S_RW, ${lockingStatus})
+				[#elseif securityArea=="NS_R S_W"]
+${TABnode}DECPROT(${mx_family?upper_case}_ETZPC_${periphId}_ID, DECPROT_NS_R_S_W, ${lockingStatus})
+				[#elseif securityArea=="Mcu Isolation"]
+${TABnode}DECPROT(${mx_family?upper_case}_ETZPC_${periphId}_ID, DECPROT_MCU_ISOLATION, ${lockingStatus})
+				[#else]
+${TABnode}DECPROT(${mx_family?upper_case}_ETZPC_${periphId}_ID, DECPROT_NS_RW, ${lockingStatus})
 				[/#if]
 			[/#list]
 		[/#list]

@@ -13,36 +13,33 @@
 [#--
 ********************************
 BSP IP Data:
-
 [#if BspIpDatas??]
-  [#list BspIpDatas as SWIP]
-    [#if SWIP.defines??]
+    [#list BspIpDatas as SWIP]
+        [#if SWIP.defines??]
 Defines:
-      [#list SWIP.defines as defines]
-        ${defines.name}: ${defines.value}
-      [/#list]
-    [/#if]
-    [#if SWIP.variables??]
+            [#list SWIP.defines as defines]
+                ${defines.name}: ${defines.value}
+            [/#list]
+        [/#if]
+        [#if SWIP.variables??]
 Variables:
-      [#list SWIP.variables as variables]
-        ${variables.name}: ${variables.value}
-      [/#list]
-    [/#if]
-  [/#list]
+            [#list SWIP.variables as variables]
+                ${variables.name}: ${variables.value}
+            [/#list]
+        [/#if]
+    [/#list]
 [/#if]
-
 ********************************
 SWIP Data:
-
 [#if SWIPdatas??]
-  [#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
 Defines:
-      [#list SWIP.defines as definition]
-        ${definition.name}: ${definition.value}
-      [/#list]
-    [/#if]
-  [/#list]
+            [#list SWIP.defines as definition]
+                ${definition.name}: ${definition.value}
+            [/#list]
+        [/#if]
+    [/#list]
 [/#if]
 ********************************
 --]
@@ -72,56 +69,57 @@ extern "C" {
 /* Exported constants --------------------------------------------------------*/
 /* Pin defines */
 
-[#list BspIpDatas as SWIP]
-  [#if SWIP.variables??]
-    [#list SWIP.variables as variables]
-      [#if variables.name?contains("IpInstance")]
-        [#assign IpInstance = variables.value]
-      [/#if]
-      [#if variables.name?contains("IpName")]
-        [#assign IpName = variables.value]
-      [/#if]
-      [#-- User BSP Debug --]
-      [#if variables.value?contains("Debug ") ]
-        [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
-          [#if (i == "1") && CPUCORE != ""]
-/* make sure a pin is not used simultaneusly by the two cores */
-/* DGB_LINE1 & DGB_LINE2 for CM4: this mapping can be changed*/
+[#if CPUCORE != ""]
+/* make sure a pin is not used simultaneously by the two cores */
+/* PROBE_LINE1 & PROBE_LINE2 for CM4: this mapping can be changed*/
 #if defined(CORE_CM0PLUS)
-          [/#if]
+[/#if]
+[#if BspIpDatas??]
+  [#list BspIpDatas as SWIP]
+    [#if SWIP.variables??]
+      [#list SWIP.variables as variables]
+        [#if variables.name?contains("IpInstance")]
+          [#assign IpInstance = variables.value]
+        [/#if]
+        [#if variables.name?contains("IpName")]
+          [#assign IpName = variables.value]
+        [/#if]
+        [#-- User BSP Debug --]
+        [#if variables.value?contains("Debug ") ]
+          [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
+
           [#if (i == "3") && CPUCORE != ""]
 #else
           [/#if]
-/**  Definition for Debug Line ${i}   **/
+/**  Definition for Probe Line ${i}   **/
 /**
-  * @brief Pin of Debug Line ${i}
+  * @brief Pin of Probe Line ${i}
   */
-#define DGB_LINE${i}_PIN                           ${IpInstance}
+#define PROBE_LINE${i}_PIN                           ${IpInstance}
 
 /**
-  * @brief Port of Debug Line ${i}
+  * @brief Port of Probe Line ${i}
   */
-#define DGB_LINE${i}_PORT                          ${IpName}
+#define PROBE_LINE${i}_PORT                          ${IpName}
 
 /**
-  * @brief Enable GPIOs clock of Debug Line ${i}
+  * @brief Enable GPIOs clock of Probe Line ${i}
   */
-#define DGB_LINE${i}_CLK_ENABLE()                  __HAL_RCC_${IpName}_CLK_ENABLE()
+#define PROBE_LINE${i}_CLK_ENABLE()                  __HAL_RCC_${IpName}_CLK_ENABLE()
 
 /**
-  * @brief Disable GPIOs clock of Debug Line ${i}
+  * @brief Disable GPIOs clock of Probe Line ${i}
   */
-#define DGB_LINE${i}_CLK_DISABLE()                 __HAL_RCC_${IpName}_CLK_DISABLE()
-          [#if (i == "4") && CPUCORE != ""]
-#endif /* CORE_CM4 */
-          [/#if]
-          [#if (i != "4")]
+#define PROBE_LINE${i}_CLK_DISABLE()                 __HAL_RCC_${IpName}_CLK_DISABLE()
 
           [/#if]
-        [/#if]
-    [/#list]
-  [/#if]
-[/#list]
+      [/#list]
+    [/#if]
+  [/#list]
+[/#if]
+[#if CPUCORE != ""]
+#endif /* CORE_CM0PLUS */
+[/#if]
 
 /* USER CODE BEGIN EC */
 
@@ -133,49 +131,70 @@ extern "C" {
 /* USER CODE END EV */
 
 /* Exported macro ------------------------------------------------------------*/
-#if defined (DEBUGGER_ON) && (DEBUGGER_ON == 1)
+#if defined (PROBE_PINS_ENABLED) && (PROBE_PINS_ENABLED == 1)
 
-#define DBG_GPIO_WRITE( gpio, n, x )  HAL_GPIO_WritePin( gpio, n, (GPIO_PinState)(x) )
+#define PROBE_GPIO_WRITE( gpio, n, x )  HAL_GPIO_WritePin( gpio, n, (GPIO_PinState)(x) )
 
 /**
   * @brief Set pin to high level
   */
-#define DBG_GPIO_SET_LINE( gpio, n )       LL_GPIO_SetOutputPin( gpio, n )
+#define PROBE_GPIO_SET_LINE( gpio, n )       LL_GPIO_SetOutputPin( gpio, n )
 
 /**
   * @brief Set pin to low level
   */
-#define DBG_GPIO_RST_LINE( gpio, n )       LL_GPIO_ResetOutputPin ( gpio, n )
+#define PROBE_GPIO_RST_LINE( gpio, n )       LL_GPIO_ResetOutputPin ( gpio, n )
 
-/*enabling RTC_OUTPUT should be set via MX GUI because MX_RTC_Init is now entirely generated */
+/*enabling RTC_OUTPUT should be set via STM32CubeMX GUI because MX_RTC_Init is now entirely generated */
 
-#elif defined (DEBUGGER_ON) && (DEBUGGER_ON == 0) /* DEBUGGER_OFF */
+#elif defined (PROBE_PINS_ENABLED) && (PROBE_PINS_ENABLED == 0) /* PROBE_PINS_OFF */
 
-/**
-  * @brief not usable
-  */
-#define DBG_GPIO_SET_LINE( gpio, n )
+#define PROBE_GPIO_WRITE( gpio, n, x )
 
 /**
   * @brief not usable
   */
-#define DBG_GPIO_RST_LINE( gpio, n )
+#define PROBE_GPIO_SET_LINE( gpio, n )
 
-/*disabling RTC_OUTPUT should be set via MX GUI because MX_RTC_Init is now entirely generated */
+/**
+  * @brief not usable
+  */
+#define PROBE_GPIO_RST_LINE( gpio, n )
+
+/*disabling RTC_OUTPUT should be set via STM32CubeMX GUI because MX_RTC_Init is now entirely generated */
 
 #else
-#error "DEBUGGER_ON not defined or out of range <0,1>"
-#endif /* DEBUGGER_OFF */
+#error "PROBE_PINS_ENABLED not defined or out of range <0,1>"
+#endif /* PROBE_PINS_ENABLED */
 
 /* USER CODE BEGIN EM */
 
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
+[#if (CPUCORE != "") ]
+#if defined(CORE_CM4)
+
+[/#if]
 /**
-  * @brief Initializes the debug
+  * @brief Disable debugger (serial wires pins)
   */
-void DBG_Init(void);
+void DBG_Disable(void);
+
+/**
+  * @brief Config debugger when working in Low Power Mode
+  * @note  When in Dual Core DbgMcu pins should be better disable only after CM0+ is started
+  */
+void DBG_ConfigForLpm(uint8_t enableDbg);
+[#if (CPUCORE != "") ]
+
+#endif /* CORE_CM4 */
+[/#if]
+
+/**
+  * @brief Initializes the SW probes pins and the monitor RF pins via Alternate Function
+  */
+void DBG_ProbesInit(void);
 
 /* USER CODE BEGIN EFP */
 

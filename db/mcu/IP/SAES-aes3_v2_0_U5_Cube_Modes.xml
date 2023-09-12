@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+    ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
+    xmlns="http://mcd.rou.st.com/modules.php?name=mcu"
+    DBVersion="V4.0"
+    IPType="service"
+    IpGroup="Security"
+    Name="SAES"
+    Version="aes3_v2_0_U5_Cube">
+
+    <About>AES: Advanced Encryption Standard</About>
+
+    <RefParameter Name="Algorithm" Comment="Data encryption type" DefaultValue="SAES_AES_ECB" Type="list" Group="Algorithm">
+        <Description>SAES Algorithm Mode encryption types list
+		Possible values are:&lt;br&gt;
+		CRYP_AES_ECB: Electronic codebook chaining algorithm&lt;br&gt;
+		CRYP_AES_CBC: Cipher block chaining algorithm
+		</Description>
+        <PossibleValue Value="CRYP_AES_ECB" Comment="SAES ECB" Semaphore="Semaphore_CRYP_Coding_AESECB$IpInstance"/>
+        <PossibleValue Value="CRYP_AES_CBC" Comment="SAES CBC" Semaphore="Semaphore_CRYP_Coding_AESCBC$IpInstance"/>
+    </RefParameter>
+
+    <RefParameter Comment="Data type" DefaultValue="CRYP_NO_SWAP" Name="DataType" Type="list" Group="Parameters">
+        <Description>AES Data Type selection: 32-bit data, 16-bit data, 8-bit data or 1-bit string.&lt;br&gt;This parameter can be a value of @ref CRYP_Data_Type.&lt;br&gt;
+		Possible values are:&lt;br&gt;
+		CRYP_NO_SWAP: 32-bit data type (no swapping)&lt;br&gt;
+		CRYP_HALFWORD_SWAP: 16-bit data type (half-word swapping)&lt;br&gt;
+		CRYP_BYTE_SWAP: 8-bit data type (byte swapping)&lt;br&gt;
+		CRYP_BIT_SWAP: 1-bit data type (bit swapping)</Description>
+        <PossibleValue Comment="CRYP_NO_SWAP" Value="CRYP_NO_SWAP"/>
+        <PossibleValue Comment="CRYP_HALFWORD_SWAP" Value="CRYP_HALFWORD_SWAP"/>
+        <PossibleValue Comment="CRYP_BYTE_SWAP" Value="CRYP_BYTE_SWAP"/>
+        <PossibleValue Comment="CRYP_BIT_SWAP" Value="CRYP_BIT_SWAP"/>
+    </RefParameter>
+
+    <RefParameter Comment="Key size" DefaultValue="CRYP_KEYSIZE_128B" Name="KeySize" Type="list" Group="Parameters">
+        <Description>Key size selection: 128 or 256 bit key length.&lt;br&gt;
+		This parameter can be a value of @ref CRYP_Key_Size.&lt;br&gt;
+		Possible values are:&lt;br&gt;
+		CRYP_KEYSIZE_128B&lt;br&gt;
+		CRYP_KEYSIZE_256B&lt;br&gt;
+		if you need  to use Shared key between AES and SAES, then you must use the same key size
+		</Description>
+        <PossibleValue Comment="128b" Value="CRYP_KEYSIZE_128B" Semaphore="Semaphore_CRYP_KEYSIZE_128B$IpInstance"/>
+        <PossibleValue Comment="256b" Value="CRYP_KEYSIZE_256B" Semaphore="Semaphore_CRYP_KEYSIZE_256B$IpInstance"/>
+    </RefParameter>
+
+    <RefParameter Name="pKey" Comment="Encryption/Decryption key" ArraySize="4" ArrayTypeElement="uint32_t;16" Type="Array" Separator=" " Group="Parameters" DefaultValue="00000000 00000000 00000000 00000000">
+        <Condition Diagnostic="" Expression="(Semaphore_CRYP_KEYSIZE_128B$IpInstance &amp; Semaphore_CRYP_SAES_KEYSEL_NORMAL$IpInstance)"/>
+        <Description>Encryption/Decryption key</Description>
+    </RefParameter>
+    <RefParameter Name="pKey" Comment="Encryption/Decryption key" ArraySize="8" ArrayTypeElement="uint32_t;16" Type="Array" Separator=" " Group="Parameters" DefaultValue="00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000">
+        <Condition Diagnostic="" Expression="(Semaphore_CRYP_KEYSIZE_256B$IpInstance  &amp; Semaphore_CRYP_SAES_KEYSEL_NORMAL$IpInstance)"/>
+        <Description>Encryption/Decryption key</Description>
+    </RefParameter>
+    <RefParameter Name="pKey" Comment="Encryption/Decryption key" Type="string" DefaultValue="null" Visible = "false">
+        <Description>Encryption/Decryption key</Description>
+    </RefParameter>
+
+    <RefParameter Comment="Initialization vector" ArraySize="4" ArrayTypeElement="uint32_t;16" Name="pInitVect" Type="Array" Separator=" " Group="Parameters" DefaultValue="00000000 00000000 00000000 00000000">
+        <Condition Diagnostic="" Expression="Semaphore_CRYP_Coding_AESCBC$IpInstance"/>
+        <Description>Initialization Vector used for CBC mode</Description>
+    </RefParameter>
+    <RefParameter Comment="Initialization vector" Name="pInitVect" Type="list" Group="Parameters" DefaultValue="null" Visible="false">
+        <Description>Initialization Vector used for CBC mode</Description>
+    </RefParameter>
+
+    <RefParameter Comment="Key and IV configuration skip" DefaultValue="CRYP_KEYIVCONFIG_ALWAYS" Name="KeyIVConfigSkip" Type="list" Group="Parameters">
+        <Description>CRYP key and IV Configuration Skip Mode:&lt;br&gt;
+		This parameter can be a value of @ref CRYP_Configuration_Skip.&lt;br&gt;Possible values are:&lt;br&gt;
+		CRYP_KEYIVCONFIG_ALWAYS: Peripheral Key and IV configuration to do systematically&lt;br&gt;
+		CRYP_KEYIVCONFIG_ONCE: Peripheral Key and IV configuration to do only once&lt;br&gt;
+		CRYP_KEYNOCONFIG: Peripheral Key configuration to not do&lt;br&gt;
+		</Description>
+        <PossibleValue Comment="Always" Value="CRYP_KEYIVCONFIG_ALWAYS" Semaphore="Semaphore_CRYP_KEYIVCONFIG_ALWAYS$IpInstance"/>
+        <PossibleValue Comment="Only once" Value="CRYP_KEYIVCONFIG_ONCE" Semaphore="Semaphore_CRYP_KEYIVCONFIG_ONCE$IpInstance"/>
+        <PossibleValue Comment="Not" Value="CRYP_KEYNOCONFIG" Semaphore="Semaphore_CRYP_KEYNOCONFIG$IpInstance"/>
+    </RefParameter>
+
+    <RefParameter Comment="Key mode" DefaultValue="CRYP_KEYMODE_NORMAL" Name="KeyMode" Type="list" Group="Parameters">
+        <Description>CRYP key Mode:&lt;br&gt;
+		This parameter can be a value of @ref CRYP_Key_Mode.&lt;br&gt;Possible values are:&lt;br&gt;
+		CRYP_KEYMODE_NORMAL: Normal key usage, Key registers are freely useable&lt;br&gt;
+		CRYP_KEYMODE_WRAPPED: Wrapped key, to encrypt or decrypt AES keys&lt;br&gt;
+		It is strongly recommended to select the DHUK when KMOD[1:0] is 01, by setting KEYSEL[2:0] to 001 or 100.&lt;br&gt;
+		CRYP_KEYMODE_SHARED: Shared key&lt;br&gt;
+		It is strongly recommended to select the DHUK when KMOD[1:0] = 10, by setting KEYSEL[2:0] to 001 or 100.
+		</Description>
+        <PossibleValue Comment="Normal key" Value="CRYP_KEYMODE_NORMAL" Semaphore="Semaphore_CRYP_KEYMODE_NORMAL$IpInstance"/>
+        <PossibleValue Comment="Wrapped key" Value="CRYP_KEYMODE_WRAPPED" Semaphore="Semaphore_CRYP_KEYMODE_WRAPPED$IpInstance"/>
+        <PossibleValue Comment="Shared key" Value="CRYP_KEYMODE_SHARED" Semaphore="Semaphore_CRYP_KEYMODE_SHARED$IpInstance"/>
+    </RefParameter>
+
+    <RefParameter Comment="Key selection" DefaultValue="CRYP_KEYSEL_NORMAL" Name="KeySelect" Type="list" Group="Parameters">
+        <Description>CRYP key selection:&lt;br&gt;
+		This parameter can be a value of @ref CRYP_Key_Select.&lt;br&gt;Possible values are:&lt;br&gt;
+		CRYP_KEYSEL_NORMAL: Normal key, key registers SAES_KEYx or CRYP_KEYx&lt;br&gt;
+		CRYP_KEYSEL_HW: Hardware key, derived hardware unique key (DHUK 256-bit)&lt;br&gt;
+		CRYP_KEYSEL_SW: Software key, boot hardware key BHK (256-bit)&lt;br&gt;
+		CRYP_KEYSEL_HSW: DHUK XOR BHK Hardware unique key XOR software key
+		</Description>
+        <PossibleValue Comment="Normal key" Value="CRYP_KEYSEL_NORMAL" Semaphore="Semaphore_CRYP_SAES_KEYSEL_NORMAL$IpInstance"/>
+        <PossibleValue Comment="Hardware key" Value="CRYP_KEYSEL_HW" Semaphore="Semaphore_CRYP_KEYSEL_HW$IpInstance"/>
+        <PossibleValue Comment="Software key" Value="CRYP_KEYSEL_SW" Semaphore="Semaphore_CRYP_KEYSEL_SW$IpInstance"/>
+        <PossibleValue Comment="Hardware XOR software key" Value="CRYP_KEYSEL_HSW" Semaphore="Semaphore_CRYP_KEYSEL_HSW$IpInstance"/>
+    </RefParameter>
+
+    <RefParameter Comment="Key protection" DefaultValue="CRYP_KEYPROT_DISABLE" Name="KeyProtection" Type="list" Group="Parameters">
+        <Description>AES key protection:&lt;br&gt;
+		This parameter can be a value of @ref AES_Key_Protection.&lt;br&gt;Possible values are:&lt;br&gt;
+		CRYP_KEYPROT_ENABLE: Key protection between 2 applications with different security contexts&lt;br&gt;
+		CRYP_KEYPROT_DISABLE: Key not protected between 2 applications with different security contexts&lt;br&gt;
+		</Description>
+        <PossibleValue Comment="Enabled" Value="CRYP_KEYPROT_ENABLE" Semaphore="Semaphore_CRYP_KEYPROT_ENABLE$IpInstance"/>
+        <PossibleValue Comment="Disabled" Value="CRYP_KEYPROT_DISABLE" Semaphore="Semaphore_CRYP_CRYP_KEYPROT_DISABLE$IpInstance"/>
+    </RefParameter>
+
+    <RefMode Name="SAES_Activate" HalMode ="AES">
+        <ConfigForMode>AES_Init</ConfigForMode>
+        <Parameter Name="Algorithm"/>
+        <Parameter Name="DataType"/>
+        <Parameter Name="KeySize"/>
+        <Parameter Name="pKey"/>
+        <Parameter Name="pInitVect"/>
+        <Parameter Name="KeyIVConfigSkip"/>
+        <Parameter Name="KeyMode"/>
+        <Parameter Name="KeySelect"/>
+        <Parameter Name="KeyProtection"/>
+    </RefMode>
+
+    <ModeLogicOperator Name="OR">
+		<Mode Name="SAES_State" UserName="Activated">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="SAES_Activate" UserName="Activated">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VS_SAES" />
+					</SignalLogicalOp>
+					<Semaphore>S_SAES</Semaphore>
+				</Mode>
+			</ModeLogicOperator>
+			<Condition Diagnostic="Active only if RNGis enabled" Expression="S_RNG"/>
+		</Mode>
+	</ModeLogicOperator>
+
+    <!-- RefSignal for AES -->
+    <RefSignal Name="VS_SAES" Virtual="true"/>
+</IP>

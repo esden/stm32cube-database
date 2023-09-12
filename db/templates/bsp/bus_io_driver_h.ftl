@@ -59,154 +59,159 @@
 [#assign DMAisTrue = false]
 
 [#if busIODriverWithDma??]
-	[#assign DMAisTrue = true]	
+    [#assign DMAisTrue = true]
 [/#if]
 
-[#list BspIpDatas as SWIP] 
-	[#if SWIP.bsp??]
-		[#list SWIP.bsp as bsp]
-			[#assign IpName = bsp.bspIpName]			
-			[#if IpName??]
-				[#switch IpName]
-					[#case "SPI"]
-					[#assign SPIisTrue = true]					
-					[#if SpiIpInstanceList == ""]
-						[#assign SpiIpInstance = bsp.solution]
-						[#assign SpiIpInstanceList = bsp.solution]
+[#list BspIpDatas as SWIP]
+    [#assign IpName = "?"]
+    [#list SWIP.variables as variables]
+        [#if variables.name?contains("IpName")]
+            [#assign IpName = variables.value]
+        [/#if]	
+    [/#list]
+    [#if SWIP.bsp??]
+        [#list SWIP.bsp as bsp]
+            [#if IpName??]
+                [#switch IpName]
+                    [#case "SPI"]
+                    [#assign SPIisTrue = true]
+                    [#if SpiIpInstanceList == ""]
+                        [#assign SpiIpInstance = bsp.solution]
+                        [#assign SpiIpInstanceList = bsp.solution]
 [#-- A.T Include temporary generated files for the generated code for IP used by the Platform Settings --]
-						[@common.optinclude name=mxTmpFolder+"/${SpiIpInstance?lower_case}_define_h.tmp"/]
+                        [@common.optinclude name=mxTmpFolder+"/${SpiIpInstance?lower_case}_define_h.tmp"/]
 #ifndef BUS_${SpiIpInstance}_POLL_TIMEOUT
   #define BUS_${SpiIpInstance}_POLL_TIMEOUT                   0x1000U
 #endif
 /* ${SpiIpInstance} Baud rate in bps  */
-#ifndef BUS_${SpiIpInstance}_BAUDRATE   
+#ifndef BUS_${SpiIpInstance}_BAUDRATE
    #define BUS_${SpiIpInstance}_BAUDRATE   10000000U /* baud rate of SPIn = 10 Mbps*/
 #endif
-					[#elseif !SpiIpInstanceList?contains(bsp.solution)]
-						[#assign SpiIpInstance = bsp.solution]
-						[#assign SpiIpInstanceList = SpiIpInstanceList + "," + bsp.solution]
+                    [#elseif !SpiIpInstanceList?contains(bsp.solution)]
+                        [#assign SpiIpInstance = bsp.solution]
+                        [#assign SpiIpInstanceList = SpiIpInstanceList + "," + bsp.solution]
 [#-- A.T Include temporary generated files for the generated code for IP used by the Platform Settings --]
-						[@common.optinclude name=mxTmpFolder+"/${SpiIpInstance?lower_case}_define_h.tmp"/]
+                        [@common.optinclude name=mxTmpFolder+"/${SpiIpInstance?lower_case}_define_h.tmp"/]
 #ifndef BUS_${SpiIpInstance}_POLL_TIMEOUT
   #define BUS_${SpiIpInstance}_POLL_TIMEOUT                   0x1000U
 #endif
 /* ${SpiIpInstance} Baud rate in bps  */
-#ifndef BUS_${SpiIpInstance}_BAUDRATE   
+#ifndef BUS_${SpiIpInstance}_BAUDRATE
    #define BUS_${SpiIpInstance}_BAUDRATE   10000000U /* baud rate of SPIn = 10 Mbps*/
 #endif
-					[/#if]
-				[#break]
-				[#case "I2C"]
-					[#assign I2CisTrue = true]
-					[#if I2CIpInstanceList == ""]
-						[#assign I2CIpInstance = bsp.solution]
-						[#assign I2CIpInstanceList = bsp.solution]
+                    [/#if]
+                [#break]
+                [#case "I2C"]
+                    [#assign I2CisTrue = true]
+                    [#if I2CIpInstanceList == ""]
+                        [#assign I2CIpInstance = bsp.solution]
+                        [#assign I2CIpInstanceList = bsp.solution]
 [#-- A.T Include temporary generated files for the generated code for IP used by the Platform Settings --]
-						[@common.optinclude name=mxTmpFolder+"/${I2CIpInstance?lower_case}_define_h.tmp"/]
+                        [@common.optinclude name=mxTmpFolder+"/${I2CIpInstance?lower_case}_define_h.tmp"/]
 #ifndef BUS_${I2CIpInstance}_POLL_TIMEOUT
-   #define BUS_${I2CIpInstance}_POLL_TIMEOUT                0x1000U   
+   #define BUS_${I2CIpInstance}_POLL_TIMEOUT                0x1000U
 #endif
 /* ${I2CIpInstance} Frequeny in Hz  */
-#ifndef BUS_${I2CIpInstance}_FREQUENCY  
+#ifndef BUS_${I2CIpInstance}_FREQUENCY
    #define BUS_${I2CIpInstance}_FREQUENCY  1000000U /* Frequency of I2Cn = 100 KHz*/
 #endif
-					[#elseif !I2CIpInstanceList?contains(bsp.solution)]
-						[#assign I2CIpInstance = bsp.solution]
-						[#assign I2CIpInstanceList = I2CIpInstanceList + "," + bsp.solution]
+                    [#elseif !I2CIpInstanceList?contains(bsp.solution)]
+                        [#assign I2CIpInstance = bsp.solution]
+                        [#assign I2CIpInstanceList = I2CIpInstanceList + "," + bsp.solution]
 [#-- A.T Include temporary generated files for the generated code for IP used by the Platform Settings --]
-						[@common.optinclude name=mxTmpFolder+"/${I2CIpInstance?lower_case}_define_h.tmp"/]
+                        [@common.optinclude name=mxTmpFolder+"/${I2CIpInstance?lower_case}_define_h.tmp"/]
 #ifndef BUS_${I2CIpInstance}_POLL_TIMEOUT
-   #define BUS_${I2CIpInstance}_POLL_TIMEOUT                0x1000U   
+   #define BUS_${I2CIpInstance}_POLL_TIMEOUT                0x1000U
 #endif
 /* ${I2CIpInstance} Frequeny in Hz  */
-#ifndef BUS_${I2CIpInstance}_FREQUENCY  
+#ifndef BUS_${I2CIpInstance}_FREQUENCY
    #define BUS_${I2CIpInstance}_FREQUENCY  1000000U /* Frequency of I2Cn = 100 KHz*/
 #endif
-					[/#if]
-				[#break] 
-                [#case "UART"]                
-				[#assign USARTisTrue = true]
-					[#if UsartIpInstanceList == ""]
-						[#assign UsartIpInstance = bsp.solution]
-						[#assign UsartIpInstanceList = bsp.solution]
+                    [/#if]
+                [#break]
+                [#case "UART"]
+                [#assign USARTisTrue = true]
+                    [#if UsartIpInstanceList == ""]
+                        [#assign UsartIpInstance = bsp.solution]
+                        [#assign UsartIpInstanceList = bsp.solution]
 [#-- A.T Include temporary generated files for the generated code for IP used by the Platform Settings --]
-						[@common.optinclude name=mxTmpFolder+"/${UsartIpInstance?lower_case}_define_h.tmp"/]
-#ifndef BUS_${UsartIpInstance}_BAUDRATE 
+                        [@common.optinclude name=mxTmpFolder+"/${UsartIpInstance?lower_case}_define_h.tmp"/]
+#ifndef BUS_${UsartIpInstance}_BAUDRATE
    #define BUS_${UsartIpInstance}_BAUDRATE  9600U /* baud rate of UARTn = 9600 baud*/
-#endif  
-#ifndef BUS_${UsartIpInstance}_POLL_TIMEOUT
-   #define BUS_${UsartIpInstance}_POLL_TIMEOUT                9600U   
 #endif
-					[#elseif !UsartIpInstanceList?contains(bsp.solution)]
-						[#assign UsartIpInstance = bsp.solution]
-						[#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
-[#-- A.T Include temporary generated files for the generated code for IP used by the Platform Settings --]
-						[@common.optinclude name=mxTmpFolder+"/${UsartIpInstance?lower_case}_define_h.tmp"/]
-#ifndef BUS_${UsartIpInstance}_BAUDRATE 
-   #define BUS_${UsartIpInstance}_BAUDRATE  9600U /* baud rate of UARTn = 9600 baud*/
-#endif  
 #ifndef BUS_${UsartIpInstance}_POLL_TIMEOUT
-   #define BUS_${UsartIpInstance}_POLL_TIMEOUT                9600U   
+   #define BUS_${UsartIpInstance}_POLL_TIMEOUT                9600U
 #endif
-					[/#if]
-				[#break]
-				[#case "USART"]
-				[#assign USARTisTrue = true]
-					[#if UsartIpInstanceList == ""]
-						[#assign UsartIpInstance = bsp.solution]
-						[#assign UsartIpInstanceList = bsp.solution]
+                    [#elseif !UsartIpInstanceList?contains(bsp.solution)]
+                        [#assign UsartIpInstance = bsp.solution]
+                        [#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
 [#-- A.T Include temporary generated files for the generated code for IP used by the Platform Settings --]
-						[@common.optinclude name=mxTmpFolder+"/${UsartIpInstance?lower_case}_define_h.tmp"/]
-#ifndef BUS_${UsartIpInstance}_BAUDRATE 
+                        [@common.optinclude name=mxTmpFolder+"/${UsartIpInstance?lower_case}_define_h.tmp"/]
+#ifndef BUS_${UsartIpInstance}_BAUDRATE
    #define BUS_${UsartIpInstance}_BAUDRATE  9600U /* baud rate of UARTn = 9600 baud*/
-#endif  
-#ifndef BUS_${UsartIpInstance}_POLL_TIMEOUT
-   #define BUS_${UsartIpInstance}_POLL_TIMEOUT                9600U   
-#endif						
-					[#elseif !UsartIpInstanceList?contains(bsp.solution)]
-						[#assign UsartIpInstance = bsp.solution]
-						[#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
-[#-- A.T Include temporary generated files for the generated code for IP used by the Platform Settings --]
-						[@common.optinclude name=mxTmpFolder+"/${UsartIpInstance?lower_case}_define_h.tmp"/]
-#ifndef BUS_${UsartIpInstance}_BAUDRATE 
-   #define BUS_${UsartIpInstance}_BAUDRATE  9600U /* baud rate of UARTn = 9600 baud*/
-#endif  
-#ifndef BUS_${UsartIpInstance}_POLL_TIMEOUT
-   #define BUS_${UsartIpInstance}_POLL_TIMEOUT                9600U   
 #endif
-					[/#if]
-				[#break]
-				[#case "LPUART"]
-				[#assign USARTisTrue = true]
-					[#if UsartIpInstanceList == ""]
-						[#assign UsartIpInstance = bsp.solution]
-						[#assign UsartIpInstanceList = bsp.solution]
-[#-- A.T Include temporary generated files for the generated code for IP used by the Platform Settings --]
-						[@common.optinclude name=mxTmpFolder+"/${UsartIpInstance?lower_case}_define_h.tmp"/]
-#ifndef BUS_${UsartIpInstance}_BAUDRATE 
-   #define BUS_${UsartIpInstance}_BAUDRATE  9600U /* baud rate of UARTn = 9600 baud*/
-#endif  
 #ifndef BUS_${UsartIpInstance}_POLL_TIMEOUT
-   #define BUS_${UsartIpInstance}_POLL_TIMEOUT                9600U   
-#endif						
-					[#elseif !UsartIpInstanceList?contains(bsp.solution)]
-						[#assign UsartIpInstance = bsp.solution]
-						[#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
-[#-- A.T Include temporary generated files for the generated code for IP used by the Platform Settings --]
-						[@common.optinclude name=mxTmpFolder+"/${UsartIpInstance?lower_case}_define_h.tmp"/]
-#ifndef BUS_${UsartIpInstance}_BAUDRATE 
-   #define BUS_${UsartIpInstance}_BAUDRATE  9600U /* baud rate of UARTn = 9600 baud*/
-#endif  
-#ifndef BUS_${UsartIpInstance}_POLL_TIMEOUT
-   #define BUS_${UsartIpInstance}_POLL_TIMEOUT                9600U   
+   #define BUS_${UsartIpInstance}_POLL_TIMEOUT                9600U
 #endif
-					[/#if]
-				[#break]
-				[/#switch]
-			[/#if]			
-		[/#list]
-	[/#if]
-[/#list] 
+                    [/#if]
+                [#break]
+                [#case "USART"]
+                [#assign USARTisTrue = true]
+                    [#if UsartIpInstanceList == ""]
+                        [#assign UsartIpInstance = bsp.solution]
+                        [#assign UsartIpInstanceList = bsp.solution]
+[#-- A.T Include temporary generated files for the generated code for IP used by the Platform Settings --]
+                        [@common.optinclude name=mxTmpFolder+"/${UsartIpInstance?lower_case}_define_h.tmp"/]
+#ifndef BUS_${UsartIpInstance}_BAUDRATE
+   #define BUS_${UsartIpInstance}_BAUDRATE  9600U /* baud rate of UARTn = 9600 baud*/
+#endif
+#ifndef BUS_${UsartIpInstance}_POLL_TIMEOUT
+   #define BUS_${UsartIpInstance}_POLL_TIMEOUT                9600U
+#endif
+                    [#elseif !UsartIpInstanceList?contains(bsp.solution)]
+                        [#assign UsartIpInstance = bsp.solution]
+                        [#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
+[#-- A.T Include temporary generated files for the generated code for IP used by the Platform Settings --]
+                        [@common.optinclude name=mxTmpFolder+"/${UsartIpInstance?lower_case}_define_h.tmp"/]
+#ifndef BUS_${UsartIpInstance}_BAUDRATE
+   #define BUS_${UsartIpInstance}_BAUDRATE  9600U /* baud rate of UARTn = 9600 baud*/
+#endif
+#ifndef BUS_${UsartIpInstance}_POLL_TIMEOUT
+   #define BUS_${UsartIpInstance}_POLL_TIMEOUT                9600U
+#endif
+                    [/#if]
+                [#break]
+                [#case "LPUART"]
+                [#assign USARTisTrue = true]
+                    [#if UsartIpInstanceList == ""]
+                        [#assign UsartIpInstance = bsp.solution]
+                        [#assign UsartIpInstanceList = bsp.solution]
+[#-- A.T Include temporary generated files for the generated code for IP used by the Platform Settings --]
+                        [@common.optinclude name=mxTmpFolder+"/${UsartIpInstance?lower_case}_define_h.tmp"/]
+#ifndef BUS_${UsartIpInstance}_BAUDRATE
+   #define BUS_${UsartIpInstance}_BAUDRATE  9600U /* baud rate of UARTn = 9600 baud*/
+#endif
+#ifndef BUS_${UsartIpInstance}_POLL_TIMEOUT
+   #define BUS_${UsartIpInstance}_POLL_TIMEOUT                9600U
+#endif
+                    [#elseif !UsartIpInstanceList?contains(bsp.solution)]
+                        [#assign UsartIpInstance = bsp.solution]
+                        [#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
+[#-- A.T Include temporary generated files for the generated code for IP used by the Platform Settings --]
+                        [@common.optinclude name=mxTmpFolder+"/${UsartIpInstance?lower_case}_define_h.tmp"/]
+#ifndef BUS_${UsartIpInstance}_BAUDRATE
+   #define BUS_${UsartIpInstance}_BAUDRATE  9600U /* baud rate of UARTn = 9600 baud*/
+#endif
+#ifndef BUS_${UsartIpInstance}_POLL_TIMEOUT
+   #define BUS_${UsartIpInstance}_POLL_TIMEOUT                9600U
+#endif
+                    [/#if]
+                [#break]
+                [/#switch]
+            [/#if]
+        [/#list]
+    [/#if]
+[/#list]
 
 /**
   * @}
@@ -225,16 +230,16 @@ typedef struct
 #endif /* (USE_HAL_I2C_REGISTER_CALLBACKS == 1U) */
 [/#if]
 [#if SPIisTrue]
-#if (USE_HAL_SPI_REGISTER_CALLBACKS == 1U) 
+#if (USE_HAL_SPI_REGISTER_CALLBACKS == 1U)
 typedef struct
 {
   pSPI_CallbackTypeDef  pMspInitCb;
   pSPI_CallbackTypeDef  pMspDeInitCb;
 }BSP_SPI_Cb_t;
 #endif /* (USE_HAL_SPI_REGISTER_CALLBACKS == 1U) */
-[/#if] 
+[/#if]
 [#if USARTisTrue]
-#if (USE_HAL_UART_REGISTER_CALLBACKS  == 1U) 
+#if (USE_HAL_UART_REGISTER_CALLBACKS  == 1U)
 typedef struct
 {
   pUART_CallbackTypeDef  pMspInitCb;
@@ -246,7 +251,7 @@ typedef struct
 /**
   * @}
   */
-  
+
 /** @defgroup ${BoardName?upper_case}_LOW_LEVEL_Exported_Variables LOW LEVEL Exported Constants
   * @{
   */
@@ -273,77 +278,82 @@ typedef struct
 [#assign I2CInstance = ""]
 
 
-[#list BspIpDatas as SWIP] 
-	[#if SWIP.bsp??]
-		[#list SWIP.bsp as bsp]
-			[#assign IpName = bsp.bspIpName]			
-			[#if IpName??]
-				[#switch IpName]
-					[#case "SPI"]
-					[#assign SPIisTrue = true]					
-					[#if SpiIpInstanceList == ""]
-						[#assign SpiIpInstance = bsp.solution]
-						[#assign SpiIpInstanceList = bsp.solution]
+[#list BspIpDatas as SWIP]
+    [#assign IpName = "?"]
+    [#list SWIP.variables as variables]
+        [#if variables.name?contains("IpName")]
+            [#assign IpName = variables.value]
+        [/#if]	
+    [/#list]
+    [#if SWIP.bsp??]
+        [#list SWIP.bsp as bsp]
+            [#if IpName??]
+                [#switch IpName]
+                    [#case "SPI"]
+                    [#assign SPIisTrue = true]
+                    [#if SpiIpInstanceList == ""]
+                        [#assign SpiIpInstance = bsp.solution]
+                        [#assign SpiIpInstanceList = bsp.solution]
 extern SPI_HandleTypeDef h${SpiIpInstance?lower_case};
-					[#elseif !SpiIpInstanceList?contains(bsp.solution)]
-						[#assign SpiIpInstance = bsp.solution]
-						[#assign SpiIpInstanceList = SpiIpInstanceList + "," + bsp.solution]
+                    [#elseif !SpiIpInstanceList?contains(bsp.solution)]
+                        [#assign SpiIpInstance = bsp.solution]
+                        [#assign SpiIpInstanceList = SpiIpInstanceList + "," + bsp.solution]
 extern SPI_HandleTypeDef h${SpiIpInstance?lower_case};
-					[/#if]
-				[#break]
-				[#case "I2C"]
-					[#assign I2CisTrue = true]
-					[#if I2CIpInstanceList == ""]
-						[#assign I2CIpInstance = bsp.solution]
-						[#assign I2CIpInstanceList = bsp.solution]
+                    [/#if]
+                [#break]
+                [#case "I2C"]
+                    [#assign I2CisTrue = true]
+                    [#if I2CIpInstanceList == ""]
+                        [#assign I2CIpInstance = bsp.solution]
+                        [#assign I2CIpInstanceList = bsp.solution]
 extern I2C_HandleTypeDef h${I2CIpInstance?lower_case};
-					[#elseif !I2CIpInstanceList?contains(bsp.solution)]
-						[#assign I2CIpInstance = bsp.solution]
-						[#assign I2CIpInstanceList = I2CIpInstanceList + "," + bsp.solution]
+                    [#elseif !I2CIpInstanceList?contains(bsp.solution)]
+                        [#assign I2CIpInstance = bsp.solution]
+                        [#assign I2CIpInstanceList = I2CIpInstanceList + "," + bsp.solution]
 extern I2C_HandleTypeDef h${I2CIpInstance?lower_case};
-					[/#if]
-				[#break] 
-                [#case "UART"]                
-				[#assign USARTisTrue = true]
-					[#if UsartIpInstanceList == ""]
-						[#assign UsartIpInstance = bsp.solution]
-						[#assign UsartIpInstanceList = bsp.solution]
+                    [/#if]
+                [#break]
+                [#case "UART"]
+                [#assign USARTisTrue = true]
+                    [#if UsartIpInstanceList == ""]
+                        [#assign UsartIpInstance = bsp.solution]
+                        [#assign UsartIpInstanceList = bsp.solution]
 extern UART_HandleTypeDef h${UsartIpInstance?lower_case?replace("s","")};
-					[#elseif !UsartIpInstanceList?contains(bsp.solution)]
-						[#assign UsartIpInstance = bsp.solution]
-						[#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
+                    [#elseif !UsartIpInstanceList?contains(bsp.solution)]
+                        [#assign UsartIpInstance = bsp.solution]
+                        [#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
 extern UART_HandleTypeDef h${UsartIpInstance?lower_case?replace("s","")};
-					[/#if]
-				[#break]
-				[#case "USART"]
-				[#assign USARTisTrue = true]
-					[#if UsartIpInstanceList == ""]
-						[#assign UsartIpInstance = bsp.solution]
-						[#assign UsartIpInstanceList = bsp.solution]
-extern UART_HandleTypeDef h${UsartIpInstance?lower_case?replace("s","")};						
-					[#elseif !UsartIpInstanceList?contains(bsp.solution)]
-						[#assign UsartIpInstance = bsp.solution]
-						[#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
+                    [/#if]
+                [#break]
+                [#case "USART"]
+                [#assign USARTisTrue = true]
+                    [#if UsartIpInstanceList == ""]
+                        [#assign UsartIpInstance = bsp.solution]
+                        [#assign UsartIpInstanceList = bsp.solution]
 extern UART_HandleTypeDef h${UsartIpInstance?lower_case?replace("s","")};
-					[/#if]
-				[#break]
-				[#case "LPUART"]
-				[#assign USARTisTrue = true]
-					[#if UsartIpInstanceList == ""]
-						[#assign UsartIpInstance = bsp.solution]
-						[#assign UsartIpInstanceList = bsp.solution]
-extern UART_HandleTypeDef h${UsartIpInstance?lower_case?replace("s","")};					
-					[#elseif !UsartIpInstanceList?contains(bsp.solution)]
-						[#assign UsartIpInstance = bsp.solution]
-						[#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
+                    [#elseif !UsartIpInstanceList?contains(bsp.solution)]
+                        [#assign UsartIpInstance = bsp.solution]
+                        [#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
 extern UART_HandleTypeDef h${UsartIpInstance?lower_case?replace("s","")};
-					[/#if]
-				[#break]
-				[/#switch]
-			[/#if]			
-		[/#list]
-	[/#if]
-[/#list]  
+                    [/#if]
+                [#break]
+                [#case "LPUART"]
+                [#assign USARTisTrue = true]
+                    [#if UsartIpInstanceList == ""]
+                        [#assign UsartIpInstance = bsp.solution]
+                        [#assign UsartIpInstanceList = bsp.solution]
+extern UART_HandleTypeDef h${UsartIpInstance?lower_case?replace("s","")};
+                    [#elseif !UsartIpInstanceList?contains(bsp.solution)]
+                        [#assign UsartIpInstance = bsp.solution]
+                        [#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
+extern UART_HandleTypeDef h${UsartIpInstance?lower_case?replace("s","")};
+                    [/#if]
+                [#break]
+                [/#switch]
+            [/#if]
+        [/#list]
+    [/#if]
+[/#list]
 
 /**
   * @}
@@ -351,7 +361,7 @@ extern UART_HandleTypeDef h${UsartIpInstance?lower_case?replace("s","")};
 
 /** @addtogroup ${BoardName?upper_case}_BUS_Exported_Functions
   * @{
-  */    
+  */
 
 
 [#assign IpName = ""]
@@ -377,84 +387,89 @@ extern UART_HandleTypeDef h${UsartIpInstance?lower_case?replace("s","")};
 [#assign I2CInstance = ""]
 [#assign I2CDmaIsTrue = false]
 
-[#list BspIpDatas as SWIP] 
-	[#if SWIP.bsp??]
-		[#list SWIP.bsp as bsp]
-			[#assign IpName = bsp.bspIpName]			
-			[#if IpName??]
-				[#switch IpName]
-					[#case "SPI"]					
-					[#if SpiIpInstanceList == ""]
+[#list BspIpDatas as SWIP]
+    [#assign IpName = "?"]
+    [#list SWIP.variables as variables]
+        [#if variables.name?contains("IpName")]
+            [#assign IpName = variables.value]
+        [/#if]	
+    [/#list]
+    [#if SWIP.bsp??]
+        [#list SWIP.bsp as bsp]
+            [#if IpName??]
+                [#switch IpName]
+                    [#case "SPI"]
+                    [#if SpiIpInstanceList == ""]
 /* BUS IO driver over SPI Peripheral */
-						[#assign SpiIpInstance = bsp.solution]
-						[#assign SpiIpInstanceList = bsp.solution]
-						[#assign SPIDmaIsTrue = bsp.dmaUsed]						
-						[@generateBspSPI_Driver SpiIpInstance/]						
-					[#elseif !SpiIpInstanceList?contains(bsp.solution)]
-						[#assign SpiIpInstance = bsp.solution]
-						[#assign SpiIpInstanceList = SpiIpInstanceList + "," + bsp.solution]
-						[@generateBspSPI_Driver SpiIpInstance/]
-					[/#if]
-				[#break]
-				[#case "I2C"]
-					[#if I2CIpInstanceList == ""]
+                        [#assign SpiIpInstance = bsp.solution]
+                        [#assign SpiIpInstanceList = bsp.solution]
+                        [#assign SPIDmaIsTrue = bsp.dmaUsed]
+                        [@generateBspSPI_Driver SpiIpInstance/]
+                    [#elseif !SpiIpInstanceList?contains(bsp.solution)]
+                        [#assign SpiIpInstance = bsp.solution]
+                        [#assign SpiIpInstanceList = SpiIpInstanceList + "," + bsp.solution]
+                        [@generateBspSPI_Driver SpiIpInstance/]
+                    [/#if]
+                [#break]
+                [#case "I2C"]
+                    [#if I2CIpInstanceList == ""]
 /* BUS IO driver over I2C Peripheral */
-						[#assign I2CIpInstance = bsp.solution]
-						[#assign I2CIpInstanceList = bsp.solution]
-						[#assign I2CDmaIsTrue = bsp.dmaUsed]
-						[@generateBspI2C_Driver I2CIpInstance/]						
-					[#elseif !I2CIpInstanceList?contains(bsp.solution)]
-						[#assign I2CIpInstance = bsp.solution]
-						[#assign I2CIpInstanceList = I2CIpInstanceList + "," + bsp.solution]
-						[@generateBspI2C_Driver I2CIpInstance/]
-					[/#if]
-				[#break] 
-				[#case "UART"]
-				[#assign USARTisTrue = true]
-					[#if UsartIpInstanceList == ""]
-						[#assign UsartIpInstance = bsp.solution]
-						[#assign UsartIpInstanceList = bsp.solution]
-						[#assign USARTDmaIsTrue = bsp.dmaUsed]
-						[@generateBspUSART_Driver UsartIpInstance/]						
-					[#elseif !UsartIpInstanceList?contains(bsp.solution)]
-						[#assign UsartIpInstance = bsp.solution]
-						[#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
-						[@generateBspUSART_Driver UsartIpInstance/]	
-					[/#if]
-				[#break]
-				[#case "USART"]
-				[#assign USARTisTrue = true]
-					[#if UsartIpInstanceList == ""]
-						[#assign UsartIpInstance = bsp.solution]
-						[#assign UsartIpInstanceList = bsp.solution]
-						[#assign USARTDmaIsTrue = bsp.dmaUsed]
-						[@generateBspUSART_Driver UsartIpInstance/]							
-					[#elseif !UsartIpInstanceList?contains(bsp.solution)]
-						[#assign UsartIpInstance = bsp.solution]
-						[#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
-						[@generateBspUSART_Driver UsartIpInstance/]	
-					[/#if]
-				[#break]				
-				[#case "LPUART"]
-				[#assign USARTisTrue = true]
-					[#if UsartIpInstanceList == ""]
-						[#assign UsartIpInstance = bsp.solution]
-						[#assign UsartIpInstanceList = bsp.solution]
-						[#assign USARTDmaIsTrue = bsp.dmaUsed]
-						[@generateBspUSART_Driver UsartIpInstance/]							
-					[#elseif !UsartIpInstanceList?contains(bsp.solution)]
-						[#assign UsartIpInstance = bsp.solution]
-						[#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
-						[@generateBspUSART_Driver UsartIpInstance/]	
-					[/#if]
-				[#break]	
-				[/#switch]
-			[/#if]			
-		[/#list]
-	[/#if]
+                        [#assign I2CIpInstance = bsp.solution]
+                        [#assign I2CIpInstanceList = bsp.solution]
+                        [#assign I2CDmaIsTrue = bsp.dmaUsed]
+                        [@generateBspI2C_Driver I2CIpInstance/]
+                    [#elseif !I2CIpInstanceList?contains(bsp.solution)]
+                        [#assign I2CIpInstance = bsp.solution]
+                        [#assign I2CIpInstanceList = I2CIpInstanceList + "," + bsp.solution]
+                        [@generateBspI2C_Driver I2CIpInstance/]
+                    [/#if]
+                [#break]
+                [#case "UART"]
+                [#assign USARTisTrue = true]
+                    [#if UsartIpInstanceList == ""]
+                        [#assign UsartIpInstance = bsp.solution]
+                        [#assign UsartIpInstanceList = bsp.solution]
+                        [#assign USARTDmaIsTrue = bsp.dmaUsed]
+                        [@generateBspUSART_Driver UsartIpInstance/]
+                    [#elseif !UsartIpInstanceList?contains(bsp.solution)]
+                        [#assign UsartIpInstance = bsp.solution]
+                        [#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
+                        [@generateBspUSART_Driver UsartIpInstance/]
+                    [/#if]
+                [#break]
+                [#case "USART"]
+                [#assign USARTisTrue = true]
+                    [#if UsartIpInstanceList == ""]
+                        [#assign UsartIpInstance = bsp.solution]
+                        [#assign UsartIpInstanceList = bsp.solution]
+                        [#assign USARTDmaIsTrue = bsp.dmaUsed]
+                        [@generateBspUSART_Driver UsartIpInstance/]
+                    [#elseif !UsartIpInstanceList?contains(bsp.solution)]
+                        [#assign UsartIpInstance = bsp.solution]
+                        [#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
+                        [@generateBspUSART_Driver UsartIpInstance/]
+                    [/#if]
+                [#break]
+                [#case "LPUART"]
+                [#assign USARTisTrue = true]
+                    [#if UsartIpInstanceList == ""]
+                        [#assign UsartIpInstance = bsp.solution]
+                        [#assign UsartIpInstanceList = bsp.solution]
+                        [#assign USARTDmaIsTrue = bsp.dmaUsed]
+                        [@generateBspUSART_Driver UsartIpInstance/]
+                    [#elseif !UsartIpInstanceList?contains(bsp.solution)]
+                        [#assign UsartIpInstance = bsp.solution]
+                        [#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
+                        [@generateBspUSART_Driver UsartIpInstance/]
+                    [/#if]
+                [#break]
+                [/#switch]
+            [/#if]
+        [/#list]
+    [/#if]
 [/#list]
 
-  
+
 [#-- macro generateBspI2C_Driver --]
 [#macro generateBspI2C_Driver IpInstance]
 HAL_StatusTypeDef MX_${IpInstance}_Init(I2C_HandleTypeDef* hi2c);

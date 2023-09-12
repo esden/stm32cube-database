@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    mcu_api.c
@@ -8,26 +9,35 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 [#--
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
                 ${definition.name}: ${definition.value}
-        [/#list]
-    [/#if]
-[/#list]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 --]
 [#assign CPUCORE = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")]
 [#assign SUBGHZ_APPLICATION = ""]
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            [#if definition.name == "SUBGHZ_APPLICATION"]
-                [#assign SUBGHZ_APPLICATION = definition.value]
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
+[#assign FILL_UCS = ""]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "SUBGHZ_APPLICATION"]
+                    [#assign SUBGHZ_APPLICATION = definition.value]
+                [/#if]
+                [#if definition.name == "FILL_UCS"]
+                    [#assign FILL_UCS = definition.value]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 
 /* Includes ------------------------------------------------------------------*/
 #include "platform.h"
@@ -49,6 +59,7 @@
 #include "utilities_def.h"
 #include "sys_app.h" /*for APP_LOG*/
 #include "radio_board_if.h"
+#include "radio_conf.h" /* RF_WAKEUP_TIME */
 [/#if]
 
 /* USER CODE BEGIN Includes */
@@ -143,9 +154,6 @@ sfx_u8 MCU_API_malloc(sfx_u16 size, sfx_u8 **returned_pointer)
 
   /* USER CODE END MCU_API_malloc_1 */
 
-  /* ------------------------------------------------------ */
-  /* PSEUDO code */
-  /* ------------------------------------------------------ */
   /* Allocate a memory : static or dynamic allocation */
   /* knowing that the sigfox library will ask for a buffer once at the SIGFOX_API_open() call. */
   /* This buffer will be released after SIGFOX_API_close() call. */
@@ -173,6 +181,8 @@ sfx_u8 MCU_API_free(sfx_u8 *ptr)
   /* USER CODE BEGIN MCU_API_free_1 */
 
   /* USER CODE END MCU_API_free_1 */
+  /* Free the buffer allocated during the MCU_API_malloc()
+   * called only when SIGFOX_API_close() is called. */
   return SFX_ERR_NONE;
   /* USER CODE BEGIN MCU_API_free_2 */
 
@@ -187,8 +197,11 @@ sfx_u8 MCU_API_get_voltage_temperature(sfx_u16 *voltage_idle, sfx_u16 *voltage_t
 
   /* USER CODE END MCU_API_get_voltage_temperature_1 */
 
-  /* brief Get voltage and temperature for Out of band frames*/
-  /* Value must respect the units bellow for backend compatibility*/
+  /* Get the idle voltage of the complete device
+   * Get the TX voltage of the complete device ( during transmission )
+   * Get the temperature of the device
+   * If those values are not available : set it to 0x0000
+   * return the voltage_idle in 1/10 volt on 16bits and 1/10 degrees for the temperature */
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
 [#if (CPUCORE == "")]
   *voltage_idle = (uint16_t) SYS_GetBatteryLevel(); /* mV */
@@ -226,8 +239,12 @@ sfx_u8 MCU_API_delay(sfx_delay_t delay_type)
   switch (delay_type)
   {
     case SFX_DLY_INTER_FRAME_TRX :
+      /* Interframe used when sending an Uplink Message with a downlink request */
       /* Delay  is 500ms  in FCC and ETSI
-        * In ARIB : minimum delay is 50 ms */
+       * In ARIB : minimum delay is 50 ms */
+      /* USER CODE BEGIN SFX_DLY_INTER_FRAME_TRX1 */
+
+      /* USER CODE END SFX_DLY_INTER_FRAME_TRX1 */
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
       if ((sfx_rc == SFX_RC3A) ||
           (sfx_rc == SFX_RC3C) ||
@@ -245,16 +262,19 @@ sfx_u8 MCU_API_delay(sfx_delay_t delay_type)
       {
         Delay_Lp(510 - (T_RADIO_DELAY_ON) - T_RADIO_DELAY_OFF); /* 500-525 ms */
       }
-[#else]
-      /* USER CODE BEGIN SFX_DLY_INTER_FRAME_TRX */
-
-      /* USER CODE END SFX_DLY_INTER_FRAME_TRX */
 [/#if]
+      /* USER CODE BEGIN SFX_DLY_INTER_FRAME_TRX2 */
+
+      /* USER CODE END SFX_DLY_INTER_FRAME_TRX2 */
       break;
 
     case SFX_DLY_INTER_FRAME_TX :
+      /* Interframe used when sending an Uplink Message without downlink request */
       /* Start delay 0 seconds to 2 seconds in FCC and ETSI*/
       /* In ARIB : minimum delay is 50 ms */
+      /* USER CODE BEGIN SFX_DLY_INTER_FRAME_TX1 */
+
+      /* USER CODE END SFX_DLY_INTER_FRAME_TX1 */
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
       if ((sfx_rc == SFX_RC3A) ||
           (sfx_rc == SFX_RC3C) ||
@@ -267,47 +287,46 @@ sfx_u8 MCU_API_delay(sfx_delay_t delay_type)
       {
         Delay_Lp(1000 - T_RADIO_DELAY_ON - T_RADIO_DELAY_OFF); /* 1000 ms */
       }
-[#else]
-      /* USER CODE BEGIN SFX_DLY_INTER_FRAME_TX */
-
-      /* USER CODE END SFX_DLY_INTER_FRAME_TX */
 [/#if]
+      /* USER CODE BEGIN SFX_DLY_INTER_FRAME_TX2 */
+
+      /* USER CODE END SFX_DLY_INTER_FRAME_TX2 */
       break;
 
     case SFX_DLY_OOB_ACK :
+      /*  Delay between RX frame and sending ack in oob service frame*/
+      /* USER CODE BEGIN SFX_DLY_OOB_ACK1 */
+
+      /* USER CODE END SFX_DLY_OOB_ACK1 */
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
       /* Start delay between 1.4 seconds to 4 seconds in FCC and ETSI */
       Delay_Lp(1600 - T_RADIO_DELAY_ON);
-[#else]
-      /* USER CODE BEGIN SFX_DLY_OOB_ACK */
-
-      /* USER CODE END SFX_DLY_OOB_ACK */
 [/#if]
+      /* USER CODE BEGIN SFX_DLY_OOB_ACK2 */
+
+      /* USER CODE END SFX_DLY_OOB_ACK2 */
       break;
 
     case SFX_DLY_CS_SLEEP :
+      /* Delay between attempts of carrier sense for the first frame*/
+      /* USER CODE BEGIN SFX_DLY_CS_SLEEP1 */
+
+      /* USER CODE END SFX_DLY_CS_SLEEP1 */
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
       Delay_Lp(500 - T_RADIO_DELAY_ON); /* 500 ms */
-[#else]
-      /* USER CODE BEGIN SFX_DLY_CS_SLEEP */
-
-      /* USER CODE END SFX_DLY_CS_SLEEP */
 [/#if]
-      break;
-[#if (SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION")]
+      /* USER CODE BEGIN SFX_DLY_CS_SLEEP2 */
 
+      /* USER CODE END SFX_DLY_CS_SLEEP2 */
+      break;
     /* USER CODE BEGIN SFX_DLY_ADD_CASE */
 
     /* USER CODE END SFX_DLY_ADD_CASE */
-[/#if]
-
     default :
       err = MCU_ERR_API_DLY;
-[#if (SUBGHZ_APPLICATION == "SIGFOX_USER_APPLICATION")]
       /* USER CODE BEGIN SFX_DLY_DEFAULT */
 
       /* USER CODE END SFX_DLY_DEFAULT */
-[/#if]
       break;
   }
   /* USER CODE BEGIN MCU_API_delay_Last */
@@ -319,79 +338,83 @@ sfx_u8 MCU_API_delay(sfx_delay_t delay_type)
 /*******************************************************************/
 sfx_u8 MCU_API_get_nv_mem(sfx_u8 read_data[SFX_NVMEM_BLOCK_SIZE])
 {
-[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
-  /* USER CODE BEGIN MCU_API_get_nv_mem_1 */
+  sfx_u8 ret = SFX_ERR_NONE;
+  /* USER CODE BEGIN MCU_API_get_nv_mem1 */
 
-  /* USER CODE END MCU_API_get_nv_mem_1 */
+  /* USER CODE END MCU_API_get_nv_mem1 */
+  /* Read out SFX_NVMEM_BLOCK_SIZE bytes in eeprom or equivalent
+   * in flash as Non Volatile Memory (NVM)
+   * This cannot be in RAM : must be remanent*/
+[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
   if (E2P_Read_McuNvm(read_data, SFX_NVMEM_BLOCK_SIZE) != E2P_OK)
   {
     return MCU_ERR_API_GETNVMEM;
   }
-  /* USER CODE BEGIN MCU_API_get_nv_mem_2 */
-
-  /* USER CODE END MCU_API_get_nv_mem_2 */
-[#else]
-  /* USER CODE BEGIN MCU_API_get_nv_mem */
-
-  /* USER CODE END MCU_API_get_nv_mem */
 [/#if]
-  return SFX_ERR_NONE;
+  /* USER CODE BEGIN MCU_API_get_nv_mem2 */
+
+  /* USER CODE END MCU_API_get_nv_mem2 */
+  return ret;
 }
 
 /*******************************************************************/
 sfx_u8 MCU_API_set_nv_mem(sfx_u8 data_to_write[SFX_NVMEM_BLOCK_SIZE])
 {
-[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
+  sfx_u8 ret = SFX_ERR_NONE;
   /* USER CODE BEGIN MCU_API_set_nv_mem_1 */
 
   /* USER CODE END MCU_API_set_nv_mem_1 */
-
+  /* Write down SFX_NVMEM_BLOCK_SIZE bytes
+   * in the eeprom or flash such as it can be retrieved
+   * later even if device is switched off or rebooting*/
+[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
   if (E2P_Write_McuNvm(data_to_write, SFX_NVMEM_BLOCK_SIZE) != E2P_OK)
   {
     return MCU_ERR_API_SETNVMEM;
   }
+[/#if]
   /* USER CODE BEGIN MCU_API_set_nv_mem_2 */
 
   /* USER CODE END MCU_API_set_nv_mem_2 */
-[#else]
-  /* USER CODE BEGIN MCU_API_set_nv_mem */
-
-  /* USER CODE END MCU_API_set_nv_mem */
-[/#if]
-  return SFX_ERR_NONE;
+  return ret;
 }
 
 /*******************************************************************/
 sfx_u8 MCU_API_timer_start_carrier_sense(sfx_u16 time_duration_in_ms)
 {
-[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
+  sfx_u8 ret = SFX_ERR_NONE;
   /* USER CODE BEGIN MCU_API_timer_start_carrier_sense_1 */
 
   /* USER CODE END MCU_API_timer_start_carrier_sense_1 */
+  /* Starts a timer for the carrier sense. You can plug your timer
+   * expiration to a callback that will update the timer event
+   * status checked by RF_API_wait_for_clear_channel*/
+  /* Starts CS timeout during time_duration_in_ms */
+[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
+
   APP_LOG(TS_ON, VLEVEL_M, "CS timeout Started= %d msec\n\r", time_duration_in_ms);
   UTIL_TIMER_Create(&Timer_TimeoutCs, 0xFFFFFFFFU, UTIL_TIMER_ONESHOT, OnTimerTimeoutCsEvt, NULL);
   UTIL_TIMER_Stop(&Timer_TimeoutCs);
   UTIL_TIMER_SetPeriod(&Timer_TimeoutCs,  time_duration_in_ms);
   UTIL_TIMER_Start(&Timer_TimeoutCs);
+[/#if]
   /* USER CODE BEGIN MCU_API_timer_start_carrier_sense_2 */
 
   /* USER CODE END MCU_API_timer_start_carrier_sense_2 */
-[#else]
-  /*Starts CS timeout during time_duration_in_ms */
-  /* USER CODE BEGIN MCU_API_timer_start_carrier_sense */
-
-  /* USER CODE END MCU_API_timer_start_carrier_sense */
-[/#if]
-  return SFX_ERR_NONE;
+  return ret;
 }
 
 /*******************************************************************/
 sfx_u8 MCU_API_timer_start(sfx_u32 time_duration_in_s)
 {
-[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
+  sfx_u8 ret = SFX_ERR_NONE;
   /* USER CODE BEGIN MCU_API_timer_start_1 */
 
   /* USER CODE END MCU_API_timer_start_1 */
+  /* Starts MCU timer during time_duration_in_ms */
+  /* This timer start can install a callback to indicate when it occurs
+   * This event will be caught in the MCU_API_wait_for_end_timer() function. */
+[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
   uint32_t time_duration_in_millisec = time_duration_in_s * 1000;
   APP_LOG(TS_ON, VLEVEL_M, "TIM timeout Started= %d sec\n\r", time_duration_in_s);
 
@@ -399,94 +422,82 @@ sfx_u8 MCU_API_timer_start(sfx_u32 time_duration_in_s)
   UTIL_TIMER_Stop(&Timer_Timeout);
   UTIL_TIMER_SetPeriod(&Timer_Timeout, time_duration_in_millisec);
   UTIL_TIMER_Start(&Timer_Timeout);
+
+[/#if]
   /* USER CODE BEGIN MCU_API_timer_start_2 */
 
   /* USER CODE END MCU_API_timer_start_2 */
-[#else]
-  /*Starts MCU timer during time_duration_in_ms */
-  /* USER CODE BEGIN MCU_API_timer_start */
 
-  /* USER CODE END MCU_API_timer_start */
-[/#if]
-
-  return SFX_ERR_NONE;
+  return ret;
 }
 
 /*******************************************************************/
 sfx_u8 MCU_API_timer_stop(void)
 {
-[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
+  sfx_u8 ret = SFX_ERR_NONE;
   /* USER CODE BEGIN MCU_API_timer_stop_1 */
 
   /* USER CODE END MCU_API_timer_stop_1 */
+  /* Stops MCU timer started in MCU_API_timer_start*/
+[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
   APP_LOG(TS_ON, VLEVEL_M, "timer_stop\n\r");
 
   UTIL_TIMER_Stop(&Timer_Timeout);
+[/#if]
   /* USER CODE BEGIN MCU_API_timer_stop_2 */
 
   /* USER CODE END MCU_API_timer_stop_2 */
-[#else]
-  /*Stops MCU timer timeout during time_duration_in_ms */
-  /* USER CODE BEGIN MCU_API_timer_stop */
-
-  /* USER CODE END MCU_API_timer_stop */
-[/#if]
-
-  return SFX_ERR_NONE;
+  return ret;
 }
 
 /*******************************************************************/
 sfx_u8 MCU_API_timer_stop_carrier_sense(void)
 {
-[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
+  sfx_u8 ret = SFX_ERR_NONE;
   /* USER CODE BEGIN MCU_API_timer_stop_carrier_sense_1 */
 
   /* USER CODE END MCU_API_timer_stop_carrier_sense_1 */
+  /* Abort the carrier sense: stops CS timer */
+[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
   APP_LOG(TS_ON, VLEVEL_M, "CS timer_stop\n\r");
 
   UTIL_TIMER_Stop(&Timer_TimeoutCs);
+[/#if]
   /* USER CODE BEGIN MCU_API_timer_stop_carrier_sense_2 */
 
   /* USER CODE END MCU_API_timer_stop_carrier_sense_2 */
-[#else]
-  /*Stops CS timer timeout during time_duration_in_ms */
-  /* USER CODE BEGIN MCU_API_timer_stop_carrier_sense */
-
-  /* USER CODE END MCU_API_timer_stop_carrier_sense */
-[/#if]
-
-  return SFX_ERR_NONE;
+  return ret;
 }
 
 /*******************************************************************/
 sfx_u8 MCU_API_timer_wait_for_end(void)
 {
-[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
+  sfx_u8 ret = SFX_ERR_NONE;
   /* USER CODE BEGIN MCU_API_timer_wait_for_end_1 */
 
   /* USER CODE END MCU_API_timer_wait_for_end_1 */
+  /* This function is waiting (actively or not) on the event for end timer
+   * (started by MCU_API_timer_start) elapsed and then returns*/
+[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
   APP_LOG(TS_ON, VLEVEL_M, "TIM timeout Wait\n\r");
 
   UTIL_SEQ_WaitEvt(1 << CFG_SEQ_Evt_Timeout);
+[/#if]
   /* USER CODE BEGIN MCU_API_timer_wait_for_end_2 */
 
   /* USER CODE END MCU_API_timer_wait_for_end_2 */
-[#else]
-  /*Wait here until MCU timer timeout */
-  /* USER CODE BEGIN MCU_API_timer_wait_for_end */
-
-  /* USER CODE END MCU_API_timer_wait_for_end */
-[/#if]
-
-  return SFX_ERR_NONE;
+  return ret;
 }
 
 /*******************************************************************/
 sfx_u8 MCU_API_report_test_result(sfx_bool status, sfx_s16 rssi)
 {
+  sfx_u8 ret = SFX_ERR_NONE;
   /* USER CODE BEGIN MCU_API_report_test_result_1 */
 
   /* USER CODE END MCU_API_report_test_result_1 */
+  /* this function is used to to report status and rssi
+   * optionally, it can log data on terminal*/
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
   rxcount++;
 [/#if]
@@ -494,76 +505,71 @@ sfx_u8 MCU_API_report_test_result(sfx_bool status, sfx_s16 rssi)
   if (status == SFX_TRUE)
   {
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
-    /* Set the LED3 to inform the user that we received a frame for the device */
-#if defined(USE_BSP_DRIVER)
+    /* Last Rx Packet received*/
+    /* USER CODE BEGIN SFX_TRUE_1 */
+[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION") && (FILL_UCS == "true")]
     BSP_LED_On(LED_GREEN);
     HAL_Delay(50);
     BSP_LED_Off(LED_GREEN);
-#elif defined(MX_BOARD_PSEUDODRIVER)
-    SYS_LED_On(SYS_LED_GREEN);
-    HAL_Delay(50);
-    SYS_LED_Off(SYS_LED_GREEN);
-#endif /* defined(USE_BSP_DRIVER) */
+[#else]
+
+[/#if]
+    /* USER CODE END SFX_TRUE_1 */
     okcount++;
     APP_LOG(TS_ON, VLEVEL_H, TERM_GREEN"RX OK. RSSI= %d dBm, cnt=%d, PER=%d%""%""\n\r  "TERM_RESET, (int32_t) rssi, rxcount,
             ((rxcount - okcount) * 100) / rxcount);
-[#else]
-    /* USER CODE BEGIN SFX_TRUE */
-    /*Last Rx Packet received*/
+    /* USER CODE BEGIN SFX_TRUE_2 */
 
-    /* USER CODE END SFX_TRUE */
+    /* USER CODE END SFX_TRUE_2 */
 [/#if]
   }
   else
   {
-[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
-#if defined(USE_BSP_DRIVER)
+    /* Last Rx Packet on error or timeout*/
+    /* USER CODE BEGIN SFX_FALSE_1 */
+[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION") && (FILL_UCS == "true")]
     BSP_LED_On(LED_BLUE);
     HAL_Delay(50);
     BSP_LED_Off(LED_BLUE);
-#elif defined(MX_BOARD_PSEUDODRIVER)
-    SYS_LED_On(SYS_LED_BLUE);
-    HAL_Delay(50);
-    SYS_LED_Off(SYS_LED_BLUE);
-#endif /* defined(USE_BSP_DRIVER) */
+[#else]
+
+[/#if]
+    /* USER CODE END SFX_FALSE_1 */
+[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
     APP_LOG(TS_ON, VLEVEL_H, TERM_RED"RX KO. RSSI= %d dBm, cnt=%d, PER=%d%""%""\n\r "TERM_RESET, (int32_t)rssi, rxcount,
             ((rxcount - okcount) * 100) / rxcount);
-[#else]
-    /* USER CODE BEGIN SFX_FALSE */
-    /*Last Rx Packet on error or timeout*/
-    /* USER CODE END SFX_FALSE */
+    /* USER CODE BEGIN SFX_FALSE_2 */
+
+    /* USER CODE END SFX_FALSE_2 */
 [/#if]
   }
-
-  return SFX_ERR_NONE;
   /* USER CODE BEGIN MCU_API_report_test_result_2 */
 
   /* USER CODE END MCU_API_report_test_result_2 */
+  return ret;
 }
 
 /*******************************************************************/
 sfx_u8 MCU_API_get_version(sfx_u8 **version, sfx_u8 *size)
 {
-[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
+  sfx_u8 ret = SFX_ERR_NONE;
   /* USER CODE BEGIN MCU_API_get_version_1 */
 
   /* USER CODE END MCU_API_get_version_1 */
+  /* Reports version and the size of the version buffer*/
+[#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]
   *version = (sfx_u8 *)mcu_api_version;
   if (size == SFX_NULL)
   {
     return MCU_ERR_API_GET_VERSION;
   }
   *size = sizeof(mcu_api_version);
+[/#if]
   /* USER CODE BEGIN MCU_API_get_version_2 */
 
   /* USER CODE END MCU_API_get_version_2 */
-[#else]
-  /* USER CODE BEGIN MCU_API_get_version */
-  /*Report version*/
-  /* USER CODE END MCU_API_get_version */
-[/#if]
 
-  return SFX_ERR_NONE;
+  return ret;
 }
 
 [#if (SUBGHZ_APPLICATION != "SIGFOX_USER_APPLICATION")]

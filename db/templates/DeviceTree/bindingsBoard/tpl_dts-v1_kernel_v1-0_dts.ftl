@@ -41,7 +41,7 @@
 [#local coproDeviceName = srvcmx_getMatchingBindedHwName_inDTS(".+_copro")]
 [#if coproDeviceName?has_content][#--at least 1 IP should be assigned--]
 	[#local coproName = coproDeviceName?replace("_copro", "")]
-#include "${mx_socRPNSuperset?substring(0,10)}-${coproName}-srm.dtsi"
+#include "${mx_socDtRPN}-${coproName}-srm.dtsi"
 [/#if]
 
 /* USER CODE BEGIN includes */
@@ -50,7 +50,12 @@
 
 / {
 	[#if mx_boardName_uppercase?has_content]
+		[#local manifestVersion = srvcmx_getManifestVersion()]
+		[#if manifestVersion?has_content]
+	model = "STMicroelectronics ${mx_boardName_uppercase} STM32CubeMX board - ${manifestVersion}";
+		[#else]
 	model = "STMicroelectronics ${mx_boardName_uppercase} STM32CubeMX board";
+		[/#if]
 	[#else]
 		[@mlog  logMod=module logType="ERR" logMsg="unknown board type: 'model' not generated" varsMap={} /]
 	/*model = "STMicroelectronics unknown STM32CubeMX board";*/

@@ -9,6 +9,7 @@
  ******************************************************************************
  */
 /* USER CODE END Header */
+[#assign DIE = DIE]
 
 /* Includes ------------------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -43,6 +44,19 @@ typedef PACKED_STRUCT
  * THIS SHALL BE SET TO A VALUE DIFFERENT FROM 0 ONLY ON REQUEST FROM ST SUPPORT
  */
 #define BLE_DTB_CFG     0
+
+/**
+ * System Debug Options flags to be configured with:
+ * - SHCI_C2_DEBUG_OPTIONS_IPCORE_LP
+ * - SHCI_C2_DEBUG_OPTIONS_IPCORE_NO_LP
+ * - SHCI_C2_DEBUG_OPTIONS_CPU2_STOP_EN
+ * - SHCI_C2_DEBUG_OPTIONS_CPU2_STOP_DIS
+ * which are used to set following configuration bits:
+   * - bit 0:   0: IP BLE core in LP mode    1: IP BLE core in run mode (no LP supported)
+   * - bit 1:   0: CPU2 STOP mode Enable     1: CPU2 STOP mode Disable
+   * - bit [2-7]: bits reserved ( shall be set to 0)
+ */
+#define SYS_DBG_CFG1  (SHCI_C2_DEBUG_OPTIONS_IPCORE_LP | SHCI_C2_DEBUG_OPTIONS_CPU2_STOP_EN)
 /* USER CODE END PD */
 
 /* Private macros ------------------------------------------------------------*/
@@ -52,7 +66,7 @@ typedef PACKED_STRUCT
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
 PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static SHCI_C2_DEBUG_TracesConfig_t APPD_TracesConfig={0, 0, 0, 0};
-PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static SHCI_C2_DEBUG_GeneralConfig_t APPD_GeneralConfig={BLE_DTB_CFG, {0, 0, 0}};
+PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static SHCI_C2_DEBUG_GeneralConfig_t APPD_GeneralConfig={BLE_DTB_CFG, SYS_DBG_CFG1, {0, 0}};
 
 #ifdef CFG_DEBUG_TRACE_UART
 #if(CFG_HW_LPUART1_ENABLED == 1)
@@ -128,8 +142,13 @@ static const APPD_GpioConfig_t aRfConfigList[GPIO_NBR_OF_RF_SIGNALS] =
     { GPIOA, LL_GPIO_PIN_10, 0, 0},     /* DTB14 - FSM0 */
     { GPIOA, LL_GPIO_PIN_11, 0, 0},     /* DTB15 - FSM1 */
     { GPIOB, LL_GPIO_PIN_8, 0, 0},      /* DTB16 - FSM2 */
+[#if DIE == "DIE494"]
+    { GPIOA, LL_GPIO_PIN_13, 0, 0},     /* DTB17 - FSM3 */
+    { GPIOA, LL_GPIO_PIN_14, 0, 0},     /* DTB18 - FSM4 */
+[#else]
     { GPIOB, LL_GPIO_PIN_11, 0, 0},     /* DTB17 - FSM3 */
     { GPIOB, LL_GPIO_PIN_10, 0, 0},     /* DTB18 - FSM4 */
+[/#if]
 };
 #endif
 /* USER CODE END PV */

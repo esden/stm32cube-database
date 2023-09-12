@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    lora_info.h
@@ -17,6 +18,8 @@
   *
   ******************************************************************************
   */
+/* USER CODE END Header */
+
 #ifndef __LORA_INFO_H__
 #define __LORA_INFO_H__
 
@@ -69,15 +72,12 @@ typedef struct
 
 /* Exported functions ------------------------------------------------------- */
 /**
-  * @brief initialises the LoraInfo table
-  * @param none
-  * @retval  none
+  * @brief initialize the LoraInfo table
   */
 void LoraInfo_Init(void);
 
 /**
   * @brief returns the pointer to the LoraInfo capabilities table
-  * @param none
   * @retval LoraInfo pointer
   */
 LoraInfo_t *LoraInfo_GetPtr(void);

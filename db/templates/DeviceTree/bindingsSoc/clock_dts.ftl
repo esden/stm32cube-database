@@ -27,7 +27,7 @@ ${TABP}/* USER CODE END clocks */
 #n
 [#t]
 [#if !srvcmx_isTargetedFw_inDTS("TF-A")]
-#ifndef CONFIG_STM32MP1_TRUSTED
+#ifndef CONFIG_TFABOOT
 [/#if]
 		[#list RCCClockSourceParam.get("Source").entrySet() as paramEntry]
 [#t]
@@ -143,7 +143,7 @@ ${TABN1}/* USER CODE END ${nodeLabel} */
 [/#if]
 		[/#list]
 [#if !srvcmx_isTargetedFw_inDTS("TF-A")]
-#endif	/*CONFIG_STM32MP1_TRUSTED*/
+#endif	/*CONFIG_TFABOOT*/
 [/#if]
 ${TABN}};
 #n

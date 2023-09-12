@@ -43,7 +43,7 @@ extern "C" {
 [#-- Tracker 276386 -- GetHandle Start --]
 [#--${variable.value}* MX_${variable.name?replace("h","")?upper_case}_GetHandle(void);--]
 [#-- Tracker 276386 -- GetHandle End --]
-[#if !variable.value?contains("static const")]
+[#if !variable.value?contains("static const") && !variable.value?contains("uint")]
 extern ${variable.value} ${variable.name};
 [/#if]
 [/#list]

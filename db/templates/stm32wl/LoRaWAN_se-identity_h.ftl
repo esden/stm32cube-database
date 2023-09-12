@@ -1,6 +1,6 @@
 [#ftl]
 /*!
- * \file      se-identity_template.h
+ * \file      se-identity.h
  *
  * \brief     Secure Element identity and keys
  *
@@ -29,19 +29,21 @@
   *
   *          Portions COPYRIGHT 2020 STMicroelectronics
   *
-  * @file    se-identity_template.c
+  * @file    se-identity.h
   * @author  MCD Application Team
   * @brief   Secure Element identity and keys
   ******************************************************************************
   */
 [#--
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
                 ${definition.name}: ${definition.value}
-        [/#list]
-    [/#if]
-[/#list]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 --]
 [#assign STATIC_DEVICE_EUI = "0"]
 [#assign IEEE_OUI_HEX = ""]
@@ -53,46 +55,49 @@
 [#assign LORAWAN_DEVICE_ADDRESS = ""]
 [#assign LORAWAN_NWK_S_KEY = ""]
 [#assign LORAWAN_APP_S_KEY = ""]
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            [#if definition.name == "STATIC_DEVICE_EUI"]
-                [#if definition.value == "true"]
-                    [#assign STATIC_DEVICE_EUI = "1"]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "STATIC_DEVICE_EUI"]
+                    [#if definition.value == "true"]
+                        [#assign STATIC_DEVICE_EUI = "1"]
+                    [/#if]
                 [/#if]
-            [/#if]
-            [#if definition.name == "IEEE_OUI_HEX"]
-                [#assign IEEE_OUI_HEX = definition.value]
-            [/#if]
-            [#if definition.name == "LORAWAN_DEVICE_EUI_HEX"]
-                [#assign LORAWAN_DEVICE_EUI_HEX = definition.value]
-            [/#if]
-            [#if definition.name == "LORAWAN_JOIN_EUI_HEX"]
-                [#assign LORAWAN_JOIN_EUI_HEX = definition.value]
-            [/#if]
-            [#if definition.name == "LORAWAN_APP_KEY"]
-                [#assign LORAWAN_APP_KEY = definition.value]
-            [/#if]
-            [#if definition.name == "LORAWAN_NWK_KEY"]
-                [#assign LORAWAN_NWK_KEY = definition.value]
-            [/#if]
-            [#if definition.name == "STATIC_DEVICE_ADDRESS"]
-                [#if definition.value == "true"]
-                    [#assign STATIC_DEVICE_ADDRESS = "1"]
+                [#if definition.name == "IEEE_OUI_HEX"]
+                    [#assign IEEE_OUI_HEX = definition.value]
                 [/#if]
-            [/#if]
-            [#if definition.name == "LORAWAN_DEVICE_ADDRESS"]
-                [#assign LORAWAN_DEVICE_ADDRESS = definition.value]
-            [/#if]
-            [#if definition.name == "LORAWAN_NWK_S_KEY"]
-                [#assign LORAWAN_NWK_S_KEY = definition.value]
-            [/#if]
-            [#if definition.name == "LORAWAN_APP_S_KEY"]
-                [#assign LORAWAN_APP_S_KEY = definition.value]
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
+                [#if definition.name == "LORAWAN_DEVICE_EUI_HEX"]
+                    [#assign LORAWAN_DEVICE_EUI_HEX = definition.value]
+                [/#if]
+                [#if definition.name == "LORAWAN_JOIN_EUI_HEX"]
+                    [#assign LORAWAN_JOIN_EUI_HEX = definition.value]
+                [/#if]
+                [#if definition.name == "LORAWAN_APP_KEY"]
+                    [#assign LORAWAN_APP_KEY = definition.value]
+                [/#if]
+                [#if definition.name == "LORAWAN_NWK_KEY"]
+                    [#assign LORAWAN_NWK_KEY = definition.value]
+                [/#if]
+                [#if definition.name == "STATIC_DEVICE_ADDRESS"]
+                    [#if definition.value == "true"]
+                        [#assign STATIC_DEVICE_ADDRESS = "1"]
+                    [/#if]
+                [/#if]
+                [#if definition.name == "LORAWAN_DEVICE_ADDRESS"]
+                    [#assign LORAWAN_DEVICE_ADDRESS = definition.value]
+                [/#if]
+                [#if definition.name == "LORAWAN_NWK_S_KEY"]
+                    [#assign LORAWAN_NWK_S_KEY = definition.value]
+                [/#if]
+                [#if definition.name == "LORAWAN_APP_S_KEY"]
+                    [#assign LORAWAN_APP_S_KEY = definition.value]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
+
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __SOFT_SE_IDENTITY_H__
 #define __SOFT_SE_IDENTITY_H__
@@ -205,7 +210,7 @@ extern "C" {
 
 #if (USE_LRWAN_1_1_X_CRYPTO == 1)
 #define SESSION_KEYS_LIST                                                                                           \
-           {                                                                                                        \
+        {                                                                                                           \
             /*!                                                                                                     \
              * Join session integrity key (Dynamically updated)                                                     \
              * WARNING: NOT USED FOR 1.0.x DEVICES                                                                  \

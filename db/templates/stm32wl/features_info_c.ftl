@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    features_info.c
@@ -8,25 +9,30 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 [#--
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
                 ${definition.name}: ${definition.value}
-        [/#list]
-    [/#if]
-[/#list]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 --]
 [#assign SUBGHZ_APPLICATION = ""]
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            [#if definition.name == "SUBGHZ_APPLICATION"]
-                [#assign SUBGHZ_APPLICATION = definition.value]
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "SUBGHZ_APPLICATION"]
+                    [#assign SUBGHZ_APPLICATION = definition.value]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 
 /* Includes ------------------------------------------------------------------*/
 #include <stddef.h>
@@ -42,7 +48,7 @@
 #include "sigfox_version.h"
 #include "sgfx_app_version.h"
 [/#if]
-[#if (SUBGHZ_APPLICATION == "SUBGHZ_PINGPONG") || (SUBGHZ_APPLICATION == "SUBGHZ_USER_APPLICATION") ]
+[#if (SUBGHZ_APPLICATION == "SUBGHZ_ADV_APPLICATION") || (SUBGHZ_APPLICATION == "SUBGHZ_USER_APPLICATION") ]
 #include "app_version.h"
 [/#if]
 #include "subghz_phy_version.h"

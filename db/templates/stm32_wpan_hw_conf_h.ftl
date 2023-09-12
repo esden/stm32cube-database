@@ -261,6 +261,13 @@
  * Semaphores
  * THIS SHALL NO BE CHANGED AS THESE SEMAPHORES ARE USED AS WELL ON THE CM0+
  *****************************************************************************/
+[#if DIE == "DIE494"]
+/**
+* Index of the semaphore used the prevent conflicts after standby sleep.
+* Each CPUs takes this semaphore at standby wakeup until conclicting elements are restored.
+*/
+#define CFG_HW_PWR_STANDBY_SEMID                    10
+[/#if]
 /**
 *  The CPU2 may be configured to store the Thread persistent data either in internal NVM storage on CPU2 or in
 *  SRAM2 buffer provided by the user application. This can be configured with the system command SHCI_C2_Config()

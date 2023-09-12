@@ -151,10 +151,11 @@ void                USBPD_DPM_UserTimerCounter(uint8_t PortNum);
   * @}
   */
 
-[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
 /** @addtogroup USBPD_USER_EXPORTED_FUNCTIONS_GROUP2
   * @{
   */
+void                USBPD_DPM_Notification(uint8_t PortNum, USBPD_NotifyEventValue_TypeDef EventVal);
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
 [#if SRC || DRP]
 USBPD_StatusTypeDef USBPD_DPM_SetupNewPower(uint8_t PortNum);
 [/#if]
@@ -162,7 +163,6 @@ void                USBPD_DPM_HardReset(uint8_t PortNum, USBPD_PortPowerRole_Typ
 [#if DRP]
 USBPD_StatusTypeDef USBPD_DPM_EvaluatePowerRoleSwap(uint8_t PortNum);
 [/#if]
-void                USBPD_DPM_Notification(uint8_t PortNum, USBPD_NotifyEventValue_TypeDef EventVal);
 void                USBPD_DPM_ExtendedMessageReceived(uint8_t PortNum, USBPD_ExtendedMsg_TypeDef MsgType, uint8_t *ptrData, uint16_t DataSize);
 void                USBPD_DPM_GetDataInfo(uint8_t PortNum, USBPD_CORE_DataInfoType_TypeDef DataId , uint8_t *Ptr, uint32_t *Size);
 void                USBPD_DPM_SetDataInfo(uint8_t PortNum, USBPD_CORE_DataInfoType_TypeDef DataId , uint8_t *Ptr, uint32_t Size);

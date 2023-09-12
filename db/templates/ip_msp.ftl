@@ -558,7 +558,7 @@
 [#-- if I2C clk_enable should be after GPIO Init End --]
     [#if serviceType=="Init"] 
 [#-- bug 322189 Init--]
-[#if ipName?contains("OTG_FS")&&FamilyName=="STM32L4"]
+[#if ipName?contains("OTG_FS")&&(FamilyName=="STM32L4"|FamilyName=="STM32U5") || Line.equals("STM32G0x1") && ipName?contains("USB_DRD_FS")]
 #n#t#t/* Enable VDDUSB */
   #t#tif(__HAL_RCC_PWR_IS_CLK_DISABLED())
   #t#t{

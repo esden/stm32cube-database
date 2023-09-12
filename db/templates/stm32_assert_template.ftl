@@ -1,5 +1,5 @@
 [#ftl]
-[#assign familyName=FamilyName?lower_case][#assign year="2018"][#if familyName="stm32h7"][#assign year="2017"][/#if][#if familyName="stm32g4" || familyName="stm32l5" ||familyName="stm32wb" ||familyName="stm32mp1"][#assign year="2019"][/#if][#if familyName="stm32wl"][#assign year="2020"][/#if] 
+[#assign familyName=FamilyName?lower_case][#assign year="2018"][#if familyName="stm32h7"][#assign year="2017"][/#if][#if familyName="stm32g4" || familyName="stm32l5" ||familyName="stm32wb" ||familyName="stm32mp1"][#assign year="2019"][/#if][#if familyName="stm32wl"][#assign year="2020"][/#if][#if familyName="stm32u5"][#assign year="2021"][/#if] 
 /**
   ******************************************************************************
   * @file    stm32_assert.h

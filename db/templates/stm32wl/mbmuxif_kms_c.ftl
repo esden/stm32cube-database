@@ -1,5 +1,6 @@
 [#ftl]
 [#assign CPUCORE = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    mbmuxif_kms.c
@@ -9,6 +10,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
 #include "platform.h"
@@ -66,22 +68,7 @@ static MBMUX_ComParam_t *KmsComObj;
 [#if CPUCORE == "CM4"]
 static void MBMUXIF_IsrKmsRespRcvCb(void *ComObj);
 [#if FREERTOS??][#-- If FreeRtos is used --]
-
 static osSemaphoreId_t Sem_MbKmsRespRcv;
-
-osThreadId_t Thd_KmsNotifRcvProcessId;
-
-const osThreadAttr_t Thd_KmsNotifRcvProcess_attr =
-{
-  .name = CFG_MB_KMS_PROCESS_NAME,
-  .attr_bits = CFG_MB_KMS_PROCESS_ATTR_BITS,
-  .cb_mem = CFG_MB_KMS_PROCESS_CB_MEM,
-  .cb_size = CFG_MB_KMS_PROCESS_CB_SIZE,
-  .stack_mem = CFG_MB_KMS_PROCESS_STACK_MEM,
-  .priority = CFG_MB_KMS_PROCESS_PRIORITY,
-  .stack_size = CFG_MB_KMS_PROCESS_STACk_SIZE
-};
-static void Thd_KmsNotifRcvProcess(void *argument);
 [/#if]
 [#else]
 static void MBMUXIF_IsrKmsCmdRcvCb(void *ComObj);
@@ -184,7 +171,7 @@ void MBMUXIF_KmsSendCmd(void)
   }
   else
   {
-    while (1) {} /* ErrorHandler(); */
+    ErrorHandler();
   }
   /* USER CODE BEGIN MBMUXIF_KmsSendCmd_Last */
 
@@ -204,7 +191,7 @@ void MBMUXIF_KmsSendResp(void)
   /* USER CODE END MBMUXIF_KmsSendResp_1 */
   if (MBMUX_ResponseSnd(FEAT_INFO_KMS_ID) != 0)
   {
-    while (1) {} /* ErrorHandler(); */
+    Error_Handler();
   }
   /* USER CODE BEGIN MBMUXIF_KmsSendResp_Last */
 

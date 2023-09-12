@@ -156,6 +156,8 @@
 [#assign AD_TYPE_MANUFACTURER_DATA_22 = ""]
 [#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_22 = ""]
 [#assign DIE = DIE]
+[#assign CFG_STATIC_RANDOM_ADDRESS = ""]
+[#assign CFG_RNG = ""]
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
 		[#list SWIP.defines as definition]
@@ -243,10 +245,10 @@
             [#if definition.name == "CFG_FAST_CONN_ADV_INTERVAL_MAX_HEXA"]
                 [#assign CFG_FAST_CONN_ADV_INTERVAL_MAX_HEXA = definition.value]
             [/#if]
-			[#if definition.name == "CFG_SC_SUPPORT"]
+            [#if definition.name == "CFG_SC_SUPPORT"]
                 [#assign CFG_SC_SUPPORT = definition.value]
             [/#if]
-			 [#if definition.name == "CFG_KEYPRESS_NOTIFICATION_SUPPORT"]
+            [#if definition.name == "CFG_KEYPRESS_NOTIFICATION_SUPPORT"]
                 [#assign CFG_KEYPRESS_NOTIFICATION_SUPPORT = definition.value]
             [/#if]
             [#if definition.name == "AD_DATA_LENGTH"]
@@ -326,50 +328,86 @@
             [/#if]
             [#if definition.name == "AD_SERVICE_CLASS_UUID_1_INV"]
                 [#assign AD_SERVICE_CLASS_UUID_1_INV = definition.value]
+                [#if AD_SERVICE_CLASS_UUID_1_INV = "00 00"]
+                [#assign AD_SERVICE_CLASS_UUID_1_INV = "[00, 00]"]
+                [/#if]
                 [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_1_INV]]
             [/#if]
             [#if definition.name == "AD_SERVICE_CLASS_UUID_2_INV"]
                 [#assign AD_SERVICE_CLASS_UUID_2_INV = definition.value]
+                [#if AD_SERVICE_CLASS_UUID_2_INV = "00 00"]
+                [#assign AD_SERVICE_CLASS_UUID_2_INV = "[00, 00]"]
+                [/#if]
                 [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_2_INV]]
             [/#if]
             [#if definition.name == "AD_SERVICE_CLASS_UUID_3_INV"]
                 [#assign AD_SERVICE_CLASS_UUID_3_INV = definition.value]
+                [#if AD_SERVICE_CLASS_UUID_3_INV = "00 00"]
+                [#assign AD_SERVICE_CLASS_UUID_3_INV = "[00, 00]"]
+                [/#if]
                 [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_3_INV]]
             [/#if]
             [#if definition.name == "AD_SERVICE_CLASS_UUID_4_INV"]
                 [#assign AD_SERVICE_CLASS_UUID_4_INV = definition.value]
+                [#if AD_SERVICE_CLASS_UUID_4_INV = "00 00"]
+                [#assign AD_SERVICE_CLASS_UUID_4_INV = "[00, 00]"]
+                [/#if]
                 [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_4_INV]]
             [/#if]
             [#if definition.name == "AD_SERVICE_CLASS_UUID_5_INV"]
                 [#assign AD_SERVICE_CLASS_UUID_5_INV = definition.value]
+                [#if AD_SERVICE_CLASS_UUID_5_INV = "00 00"]
+                [#assign AD_SERVICE_CLASS_UUID_5_INV = "[00, 00]"]
+                [/#if]
                 [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_5_INV]]
             [/#if]
             [#if definition.name == "AD_SERVICE_CLASS_UUID_6_INV"]
                 [#assign AD_SERVICE_CLASS_UUID_6_INV = definition.value]
+                [#if AD_SERVICE_CLASS_UUID_6_INV = "00 00"]
+                [#assign AD_SERVICE_CLASS_UUID_6_INV = "[00, 00]"]
+                [/#if]
                 [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_6_INV]]
             [/#if]
             [#if definition.name == "AD_SERVICE_CLASS_UUID_7_INV"]
                 [#assign AD_SERVICE_CLASS_UUID_7_INV = definition.value]
+                [#if AD_SERVICE_CLASS_UUID_7_INV = "00 00"]
+                [#assign AD_SERVICE_CLASS_UUID_7_INV = "[00, 00]"]
+                [/#if]
                 [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_7_INV]]
             [/#if]
             [#if definition.name == "AD_SERVICE_CLASS_UUID_8_INV"]
                 [#assign AD_SERVICE_CLASS_UUID_8_INV = definition.value]
+                [#if AD_SERVICE_CLASS_UUID_8_INV = "00 00"]
+                [#assign AD_SERVICE_CLASS_UUID_8_INV = "[00, 00]"]
+                [/#if]
                 [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_8_INV]]
             [/#if]
             [#if definition.name == "AD_SERVICE_CLASS_UUID_9_INV"]
                 [#assign AD_SERVICE_CLASS_UUID_9_INV = definition.value]
+                [#if AD_SERVICE_CLASS_UUID_9_INV = "00 00"]
+                [#assign AD_SERVICE_CLASS_UUID_9_INV = "[00, 00]"]
+                [/#if]
                 [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_9_INV]]
             [/#if]
             [#if definition.name == "AD_SERVICE_CLASS_UUID_10_INV"]
                 [#assign AD_SERVICE_CLASS_UUID_10_INV = definition.value]
+                [#if AD_SERVICE_CLASS_UUID_10_INV = "00 00"]
+                [#assign AD_SERVICE_CLASS_UUID_10_INV = "[00, 00]"]
+                [/#if]
                 [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_10_INV]]
             [/#if]
             [#if definition.name == "AD_SERVICE_CLASS_UUID_11_INV"]
                 [#assign AD_SERVICE_CLASS_UUID_11_INV = definition.value]
+                [#if AD_SERVICE_CLASS_UUID_11_INV = "00 00"]
+                [#assign AD_SERVICE_CLASS_UUID_11_INV = "[00, 00]"]
+                [/#if]
                 [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_11_INV]]
             [/#if]
             [#if definition.name == "AD_SERVICE_CLASS_UUID_12_INV"]
                 [#assign AD_SERVICE_CLASS_UUID_12_INV = definition.value]
+                [#if AD_SERVICE_CLASS_UUID_12_INV = "00 00"]
+                [#assign AD_SERVICE_CLASS_UUID_12_INV = "[00, 00]"]
+                [/#if]
                 [#assign AD_SERVICE_CLASS_UUID_TABLE = AD_SERVICE_CLASS_UUID_TABLE + [AD_SERVICE_CLASS_UUID_12_INV]]
             [/#if]
             [#if definition.name == "INCLUDE_AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST"]
@@ -383,6 +421,9 @@
             [/#if]
             [#if definition.name == "AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST_INV"]
                 [#assign AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST_INV = definition.value]
+                [#if AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST_INV = "00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00"]
+                [#assign AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST_INV = "[00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00]"]
+                [/#if]
             [/#if]
             [#if definition.name == "INCLUDE_AD_TYPE_SLAVE_CONN_INTERVAL"]
                 [#assign INCLUDE_AD_TYPE_SLAVE_CONN_INTERVAL = definition.value]
@@ -608,7 +649,12 @@
                 [#assign AD_TYPE_MANUFACTURER_DATA_COMMENT_22 = definition.value]
                 [#assign AD_TYPE_MANUFACTURER_DATA_TABLE = AD_TYPE_MANUFACTURER_DATA_TABLE + [AD_TYPE_MANUFACTURER_DATA_COMMENT_22]]
             [/#if]
-
+            [#if definition.name == "CFG_STATIC_RANDOM_ADDRESS"]
+                [#assign CFG_STATIC_RANDOM_ADDRESS = definition.value]
+            [/#if]
+            [#if definition.name == "CFG_RNG"]
+                [#assign CFG_RNG = definition.value]
+            [/#if]
         [/#list]
 	[/#if]
 [/#list]
@@ -921,11 +967,11 @@ uint8_t ad_data[${AD_DATA_LENGTH}] = {
 [#assign size = AD_SERVICE_CLASS_UUID_NBR?number-1]
 [#list 0..size as i]
 [#assign j = size-i]
-0x${AD_SERVICE_CLASS_UUID_TABLE[j]?replace(", ",", 0x")?replace("[","")?replace("]","")},
+0x${AD_SERVICE_CLASS_UUID_TABLE[j]?replace(", ",", 0x")?replace("[","")?replace("]","")}, [#rt]
 [/#list]
 [/#if]
 [#if  (INCLUDE_AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST = "1")]
-    ${AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST_LENGTH}, AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST, 0x${AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST_INV?replace(", ",", 0x")?replace("[","")?replace("]","")},
+#n    ${AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST_LENGTH}, AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST, 0x${AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST_INV?replace(", ",", 0x")?replace("[","")?replace("]","")},
 [/#if]
 [#if  (INCLUDE_AD_TYPE_SLAVE_CONN_INTERVAL = "1")]
 [#if  (AD_TYPE_SLAVE_CONN_INTERVAL_MIN_MAX = "1")]
@@ -941,7 +987,7 @@ uint8_t ad_data[${AD_DATA_LENGTH}] = {
     [/#list][#lt]
 [/#if]
 [#if  (INCLUDE_AD_TYPE_MANUFACTURER_SPECIFIC_DATA = "1")]
-    ${AD_TYPE_MANUFACTURER_SPECIFIC_DATA_LENGTH}, AD_TYPE_MANUFACTURER_SPECIFIC_DATA, 0x${AD_TYPE_MANUFACTURER_SPECIFIC_DATA_COMPANY_IDENTIFIER?replace(",",", 0x")}, [#rt]
+#n    ${AD_TYPE_MANUFACTURER_SPECIFIC_DATA_LENGTH}, AD_TYPE_MANUFACTURER_SPECIFIC_DATA, 0x${AD_TYPE_MANUFACTURER_SPECIFIC_DATA_COMPANY_IDENTIFIER?replace(",",", 0x")}, [#rt]
 [#assign size = (AD_TYPE_MANUFACTURER_DATA_NBR?number-1)]
 [#list 0..size as i]
 0x${AD_TYPE_MANUFACTURER_DATA_TABLE[2*i]?replace(" ",", 0x")} /* ${AD_TYPE_MANUFACTURER_DATA_TABLE[2*i+1]} */, [#rt]
@@ -1071,7 +1117,7 @@ uint8_t manuf_data[14] = {
 };
 #endif
 [#else]
-[#if (BT_SIG_HEART_RATE_SENSOR = 1)]
+[#if (BT_SIG_HEART_RATE_SENSOR = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)]
 static const char local_name[] = { AD_TYPE_COMPLETE_LOCAL_NAME ${LOCAL_NAME_FORMATTED}};
 uint8_t  manuf_data[14] = {
     sizeof(manuf_data)-1, AD_TYPE_MANUFACTURER_SPECIFIC_DATA,
@@ -1089,10 +1135,6 @@ uint8_t  manuf_data[14] = {
     0x00, /* BLE MAC stop */
 
 };
-[#else]
-[#if  (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)]
-static const char local_name[] = {AD_TYPE_COMPLETE_LOCAL_NAME ${LOCAL_NAME_FORMATTED}};
-[/#if]
 [/#if]
 [/#if]
 
@@ -1158,7 +1200,7 @@ static void Adv_Cancel( void );
 static void Adv_Cancel_Req( void );
 static void Switch_OFF_GPIO( void );
 [/#if]
-#if(L2CAP_REQUEST_NEW_CONN_PARAM != 0)  
+#if(L2CAP_REQUEST_NEW_CONN_PARAM != 0)
 static void BLE_SVC_L2CAP_Conn_Update(uint16_t Connection_Handle);
 static void Connection_Interval_Update_Req( void );
 #endif
@@ -1167,6 +1209,15 @@ static void Connection_Interval_Update_Req( void );
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
+
+/* External variables --------------------------------------------------------*/
+[#if  ((CFG_STATIC_RANDOM_ADDRESS == "0") && (CFG_RNG == "1") && ((BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)))]
+extern RNG_HandleTypeDef hrng;
+[/#if]
+
+/* USER CODE BEGIN EV */
+
+/* USER CODE END EV */
 
 /* Functions Definition ------------------------------------------------------*/
 void APP_BLE_Init( void )
@@ -1251,7 +1302,7 @@ void APP_BLE_Init( void )
    * Initialization of the BLE App Context
    */
   BleApplicationContext.Device_Connection_Status = APP_BLE_IDLE;
-  BleApplicationContext.BleApplicationContext_legacy.connectionHandle = 0xFFFF;  
+  BleApplicationContext.BleApplicationContext_legacy.connectionHandle = 0xFFFF;
 [/#if]
   /**
    * From here, all initialization are BLE application specific
@@ -1345,6 +1396,9 @@ void APP_BLE_Init( void )
   Custom_APP_Init();
 
 [/#if]
+/* USER CODE BEGIN APP_BLE_Init_3 */
+
+/* USER CODE END APP_BLE_Init_3 */
 
 [#if  (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1)]
   /**
@@ -1418,6 +1472,11 @@ void APP_BLE_Init( void )
 [#if (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1)] 
   /**
   * Start to Advertise to be connected by Collector
+   */
+[/#if]
+[#if  (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)] 
+  /**
+   * Start to Advertise to be connected by a Client
    */
 [/#if]
 [#if  (CUSTOM_P2P_SERVER = 1)] 
@@ -1695,7 +1754,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
         case ACI_GAP_NUMERIC_COMPARISON_VALUE_VSEVT_CODE:
             evt_numeric_value = (aci_gap_numeric_comparison_value_event_rp0 *)blecore_evt->data;
             numeric_value = evt_numeric_value->Numeric_Value;
-            APP_DBG_MSG("numeric_value = %lx\n", numeric_value);
+            APP_DBG_MSG("numeric_value = %ld\n", numeric_value);
             aci_gap_numeric_comparison_value_confirm_yesno(BleApplicationContext.BleApplicationContext_legacy.connectionHandle, YES);
         break;
         
@@ -1763,7 +1822,9 @@ static void Ble_Hci_Gap_Gatt_Init(void){
   uint8_t role;
   uint16_t gap_service_handle, gap_dev_name_char_handle, gap_appearance_char_handle;
   const uint8_t *bd_addr;
+[#if ((BLE_ADDR_TYPE = "RANDOM_ADDR") && ((BT_SIG_HEART_RATE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)))]
   uint32_t srd_bd_addr[2];
+[/#if]
   uint16_t appearance[1] = { BLE_CFG_GAP_APPEARANCE }; 
 
   /**
@@ -1781,20 +1842,9 @@ static void Ble_Hci_Gap_Gatt_Init(void){
                             CONFIG_DATA_PUBADDR_LEN,
                             (uint8_t*) bd_addr);
 
-[#if (BT_SIG_BEACON != "0") || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)]
-  /**
-   * Static random Address
-   * The two upper bits shall be set to 1
-   * The lowest 32bits is read from the UDN to differentiate between devices
-   * The RNG may be used to provide a random number on each power on
-   */
-  srd_bd_addr[1] =  0x0000ED6E;
-  srd_bd_addr[0] =  LL_FLASH_GetUDN( );
-  aci_hal_write_config_data( CONFIG_DATA_RANDOM_ADDRESS_OFFSET, CONFIG_DATA_RANDOM_ADDRESS_LEN, (uint8_t*)srd_bd_addr );
-  
-[/#if]                        
-[#if (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
-[#if (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1)]
+[#if (BT_SIG_HEART_RATE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
+[#if (BT_SIG_HEART_RATE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1)]
+#if (CFG_BLE_ADDRESS_TYPE == PUBLIC_ADDR)
   /* BLE MAC in ADV Packet */
   manuf_data[ sizeof(manuf_data)-6] = bd_addr[5];
   manuf_data[ sizeof(manuf_data)-5] = bd_addr[4];
@@ -1802,6 +1852,7 @@ static void Ble_Hci_Gap_Gatt_Init(void){
   manuf_data[ sizeof(manuf_data)-3] = bd_addr[2];
   manuf_data[ sizeof(manuf_data)-2] = bd_addr[1];
   manuf_data[ sizeof(manuf_data)-1] = bd_addr[0];
+#endif
 
 [/#if]   
 [#if (BT_SIG_HEART_RATE_SENSOR = 1)]
@@ -1812,43 +1863,91 @@ static void Ble_Hci_Gap_Gatt_Init(void){
     CONFIG_DATA_IR_LEN,
                             (uint8_t*) BLE_CFG_IR_VALUE);
     
-   /**
+  /**
    * Write Encryption root key used to derive LTK and CSRK
    */
     aci_hal_write_config_data(CONFIG_DATA_ER_OFFSET,
-    CONFIG_DATA_ER_LEN,
-                            (uint8_t*) BLE_CFG_ER_VALUE);
-
-   /**
-   * Write random bd_address
-   */
-   /* random_bd_address = R_bd_address;
-    aci_hal_write_config_data(CONFIG_DATA_RANDOM_ADDRESS_WR,
-    CONFIG_DATA_RANDOM_ADDRESS_LEN,
-                            (uint8_t*) random_bd_address);
-  */
+                              CONFIG_DATA_ER_LEN,
+                              (uint8_t*) BLE_CFG_ER_VALUE);
 
 [/#if]
+
+[#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
   /**
    * Static random Address
    * The two upper bits shall be set to 1
    * The lowest 32bits is read from the UDN to differentiate between devices
    * The RNG may be used to provide a random number on each power on
    */
-  srd_bd_addr[1] =  0x0000ED6E;
-  srd_bd_addr[0] =  LL_FLASH_GetUDN( );
+#if defined(CFG_STATIC_RANDOM_ADDRESS)
+  srd_bd_addr[0] = CFG_STATIC_RANDOM_ADDRESS & 0xFFFFFFFF;
+  srd_bd_addr[1] = (uint32_t)((uint64_t)CFG_STATIC_RANDOM_ADDRESS >> 32);
+  srd_bd_addr[1] |= 0xC000; /* The two upper bits shall be set to 1 */
+#elif (CFG_BLE_ADDRESS_TYPE == RANDOM_ADDR)
+  /* Get RNG semaphore */
+  while( LL_HSEM_1StepLock( HSEM, CFG_HW_RNG_SEMID ) );
+
+  /* Enable RNG */
+  __HAL_RNG_ENABLE(&hrng);
+
+[#if DIE == "DIE495"]
+  /* Enable HSI48 oscillator */
+  LL_RCC_HSI48_Enable();
+  /* Wait until HSI48 is ready */
+  while( ! LL_RCC_HSI48_IsReady( ) );
+[/#if]
+
+  if (HAL_RNG_GenerateRandomNumber(&hrng, &srd_bd_addr[1]) != HAL_OK)
+  {
+    /* Random number generation error */
+    Error_Handler();
+  }
+  if (HAL_RNG_GenerateRandomNumber(&hrng, &srd_bd_addr[0]) != HAL_OK)
+  {
+    /* Random number generation error */
+    Error_Handler();
+  }
+  srd_bd_addr[1] |= 0xC000; /* The two upper bits shall be set to 1 */
+
+[#if DIE == "DIE495"]
+  /* Disable HSI48 oscillator */
+  LL_RCC_HSI48_Disable();
+[/#if]
+
+  /* Disable RNG */
+  __HAL_RNG_DISABLE(&hrng);
+  
+  /* Release RNG semaphore */
+  LL_HSEM_ReleaseLock( HSEM, CFG_HW_RNG_SEMID, 0 );
+#endif
+
+[#if (BT_SIG_HEART_RATE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
+#if (CFG_BLE_ADDRESS_TYPE == STATIC_RANDOM_ADDR)
+[#if (BT_SIG_HEART_RATE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1)]
+  /* BLE MAC in ADV Packet */
+  manuf_data[ sizeof(manuf_data)-6] = srd_bd_addr[1] >> 8 ;
+  manuf_data[ sizeof(manuf_data)-5] = srd_bd_addr[1];
+  manuf_data[ sizeof(manuf_data)-4] = srd_bd_addr[0] >> 24;
+  manuf_data[ sizeof(manuf_data)-3] = srd_bd_addr[0] >> 16;
+  manuf_data[ sizeof(manuf_data)-2] = srd_bd_addr[0] >> 8;
+  manuf_data[ sizeof(manuf_data)-1] = srd_bd_addr[0];
+
+[/#if]
   aci_hal_write_config_data( CONFIG_DATA_RANDOM_ADDRESS_OFFSET, CONFIG_DATA_RANDOM_ADDRESS_LEN, (uint8_t*)srd_bd_addr );
+#endif
+[/#if]
+[/#if]
 
 [/#if]
   /**
    * Write Identity root key used to derive LTK and CSRK 
    */
-    aci_hal_write_config_data( CONFIG_DATA_IR_OFFSET, CONFIG_DATA_IR_LEN, (uint8_t*)BLE_CFG_IR_VALUE );
+  aci_hal_write_config_data( CONFIG_DATA_IR_OFFSET, CONFIG_DATA_IR_LEN, (uint8_t*)BLE_CFG_IR_VALUE );
     
-   /**
+  /**
    * Write Encryption root key used to derive LTK and CSRK
    */
-    aci_hal_write_config_data( CONFIG_DATA_ER_OFFSET, CONFIG_DATA_ER_LEN, (uint8_t*)BLE_CFG_ER_VALUE );
+  aci_hal_write_config_data( CONFIG_DATA_ER_OFFSET, CONFIG_DATA_ER_LEN, (uint8_t*)BLE_CFG_ER_VALUE );
 
   /**
    * Set TX Power to 0dBm.
@@ -1880,19 +1979,31 @@ static void Ble_Hci_Gap_Gatt_Init(void){
 [#else]
     const char *name = "${LOCAL_NAME}";
 [/#if]
-    aci_gap_init(role, 0,
+    aci_gap_init(role,
+[#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
+#if ((CFG_BLE_ADDRESS_TYPE == RESOLVABLE_PRIVATE_ADDR) || (CFG_BLE_ADDRESS_TYPE == NON_RESOLVABLE_PRIVATE_ADDR))
+                 2,
+#else
+                 0,
+#endif
+[#else]
+                 0,
+[/#if]
 [#if (CUSTOM_TEMPLATE = 1)]
-                CFG_GAP_DEVICE_NAME_LENGTH,
+                 CFG_GAP_DEVICE_NAME_LENGTH,
 [#else]
                  APPBLE_GAP_DEVICE_NAME_LENGTH,
 [/#if]
-                 &gap_service_handle, &gap_dev_name_char_handle, &gap_appearance_char_handle);
+                 &gap_service_handle,
+                 &gap_dev_name_char_handle,
+                 &gap_appearance_char_handle);
 
     if (aci_gatt_update_char_value(gap_service_handle, gap_dev_name_char_handle, 0, strlen(name), (uint8_t *) name))
     {
       BLE_DBG_SVCCTL_MSG("Device Name aci_gatt_update_char_value failed.\n");
     }
   }
+
 
   if(aci_gatt_update_char_value(gap_service_handle,
                                 gap_appearance_char_handle,
@@ -1935,7 +2046,7 @@ static void Ble_Hci_Gap_Gatt_Init(void){
                                          BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.encryptionKeySizeMax,
                                          BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.Use_Fixed_Pin,
                                          BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.Fixed_Pin,
-                                         PUBLIC_ADDR
+                                         CFG_BLE_ADDRESS_TYPE
                                          );
 
   /**
@@ -2043,7 +2154,7 @@ static void Adv_Request(APP_BLE_ConnStatus_t New_Status)
         ADV_TYPE,
         CFG_FAST_CONN_ADV_INTERVAL_MIN,
         CFG_FAST_CONN_ADV_INTERVAL_MAX,
-        BLE_ADDR_TYPE,
+        CFG_BLE_ADDRESS_TYPE,
         ADV_FILTER,
         0,
         0,
@@ -2056,7 +2167,7 @@ static void Adv_Request(APP_BLE_ConnStatus_t New_Status)
         ADV_IND,
         Min_Inter,
         Max_Inter,
-        PUBLIC_ADDR,
+        CFG_BLE_ADDRESS_TYPE,
         NO_WHITE_LIST_USE, /* use white list */
         sizeof(local_name),
         (uint8_t*) &local_name,
@@ -2071,7 +2182,7 @@ static void Adv_Request(APP_BLE_ConnStatus_t New_Status)
     ret = aci_gap_update_adv_data(sizeof(ad_data), (uint8_t*) ad_data);
 
 [#else]
-[#if (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1)]
+[#if (BT_SIG_HEART_RATE_SENSOR = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1)]
     /* Update Advertising data */
     ret = aci_gap_update_adv_data(sizeof(manuf_data), (uint8_t*) manuf_data);
 [/#if]
@@ -2188,7 +2299,6 @@ static void Add_Advertisment_Service_UUID( uint16_t servUUID )
 
   return;
 }
-
 
 static void Adv_Mgr( void )
 {

@@ -57,7 +57,7 @@
          const osThreadAttr_t ${threadName}_attributes = {
          #t.name = "${threadName}",
          #t.priority = (osPriority_t) ${threadPriority},
-         #t.stack_size = ${threadStackSize}
+         #t.stack_size = ${threadStackSize} * 4
          };
         [#else]
          const osThreadAttr_t ${threadName}_attributes = {

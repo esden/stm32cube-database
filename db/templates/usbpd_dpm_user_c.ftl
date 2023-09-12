@@ -258,7 +258,7 @@ void USBPD_DPM_UserExecute(void const *argument)
 /* USER CODE BEGIN USBPD_DPM_UserExecute */
 
 /* USER CODE END USBPD_DPM_UserExecute */
-[#if FREERTOS?? && Secure!="true"]
+[#if (FREERTOS?? || THREADX??) && Secure!="true"]
 [#else]
 [#if GUI_INTERFACE??]
   GUI_Execute();
@@ -345,10 +345,69 @@ void USBPD_DPM_UserTimerCounter(uint8_t PortNum)
   * @}
   */
 
-[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
 /** @defgroup USBPD_USER_EXPORTED_FUNCTIONS_GROUP2 USBPD USER Exported Callbacks functions called by PE
   * @{
   */
+
+/**
+  * @brief  Callback function called by PE to inform DPM about PE event.
+  * @param  PortNum The current port number
+  * @param  EventVal @ref USBPD_NotifyEventValue_TypeDef
+  * @retval None
+  */
+void USBPD_DPM_Notification(uint8_t PortNum, USBPD_NotifyEventValue_TypeDef EventVal)
+{
+[#if GUI_INTERFACE??]
+  /* Forward PE notifications to GUI if enabled */
+  if (NULL != DPM_GUI_PostNotificationMessage)
+  {
+    DPM_GUI_PostNotificationMessage(PortNum, EventVal);
+  }
+[/#if]
+/* USER CODE BEGIN USBPD_DPM_Notification */
+  /* Manage event notified by the stack? */
+  switch(EventVal)
+  {
+//    case USBPD_NOTIFY_POWER_EXPLICIT_CONTRACT :
+//      break;
+//    case USBPD_NOTIFY_REQUEST_ACCEPTED:
+//      break;
+//    case USBPD_NOTIFY_REQUEST_REJECTED:
+//    case USBPD_NOTIFY_REQUEST_WAIT:
+//      break;
+//    case USBPD_NOTIFY_POWER_SWAP_TO_SNK_DONE:
+//      break;
+//    case USBPD_NOTIFY_STATE_SNK_READY:
+//      break;
+//    case USBPD_NOTIFY_HARDRESET_RX:
+//    case USBPD_NOTIFY_HARDRESET_TX:
+//      break;
+//    case USBPD_NOTIFY_STATE_SRC_DISABLED:
+//      break;
+//    case USBPD_NOTIFY_ALERT_RECEIVED :
+//      break;
+//    case USBPD_NOTIFY_CABLERESET_REQUESTED :
+//      break;
+//    case USBPD_NOTIFY_MSG_NOT_SUPPORTED :
+//      break;
+//    case USBPD_NOTIFY_PE_DISABLED :
+//      break;
+//    case USBPD_NOTIFY_USBSTACK_START:
+//      break;
+//    case USBPD_NOTIFY_USBSTACK_STOP:
+//      break;
+//    case USBPD_NOTIFY_DATAROLESWAP_DFP :
+//      break;
+//    case USBPD_NOTIFY_DATAROLESWAP_UFP :
+//      break;
+    default:
+      DPM_USER_DEBUG_TRACE(PortNum, "ADVICE: USBPD_DPM_Notification:%d", EventVal);
+      break;
+  }
+/* USER CODE END USBPD_DPM_Notification */
+}
+
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
 
 /**
   * @brief  Callback function called by PE layer when HardReset message received from PRL
@@ -392,25 +451,6 @@ USBPD_StatusTypeDef USBPD_DPM_EvaluatePowerRoleSwap(uint8_t PortNum)
 }
 
 [/#if]
-/**
-  * @brief  Callback function called by PE to inform DPM about PE event.
-  * @param  PortNum The current port number
-  * @param  EventVal @ref USBPD_NotifyEventValue_TypeDef
-  * @retval None
-  */
-void USBPD_DPM_Notification(uint8_t PortNum, USBPD_NotifyEventValue_TypeDef EventVal)
-{
-[#if GUI_INTERFACE??]
-  /* Forward PE notifications to GUI if enabled */
-  if (NULL != DPM_GUI_PostNotificationMessage)
-  {
-    DPM_GUI_PostNotificationMessage(PortNum, EventVal);
-  }
-[/#if]
-/* USER CODE BEGIN USBPD_DPM_Notification */
-
-/* USER CODE END USBPD_DPM_Notification */
-}
 
 /**
   * @brief  DPM callback to allow PE to retrieve information from DPM/PWR_IF.

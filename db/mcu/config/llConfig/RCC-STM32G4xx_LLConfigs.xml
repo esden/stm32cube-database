@@ -353,7 +353,46 @@
         <IFCondition Expression ="RTCUsed_ForRCC|LSCOConfig|(LSEUsed=1)">
             <CallLibMethod Name="LL_PWR_EnableBkUpAccess">
             </CallLibMethod>
-        </IFCondition>       
+        </IFCondition>  
+        
+             <IFCondition Expression ="(CodegenConfigPeriph=true) &amp;RTCUsed_ForRCC &amp; RTCClockSelection=RCC_RTCCLKSOURCE_LSI">
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#tif(LL_RCC_GetRTCClockSource() != LL_RCC_RTC_CLKSOURCE_LSI)#n#t{"/>
+            </CallLibMethod>
+        <Else>
+            <IFCondition Expression ="(CodegenConfigPeriph=true) &amp;RTCUsed_ForRCC &amp; RTCClockSelection=RCC_RTCCLKSOURCE_LSE">
+                <CallLibMethod Name="" Type="HardCode">
+                    <HardCode Text="#tif(LL_RCC_GetRTCClockSource() != LL_RCC_RTC_CLKSOURCE_LSE)#n#t{"/>
+                </CallLibMethod>
+                <Else>
+                    <IFCondition Expression ="(CodegenConfigPeriph=true) &amp;RTCUsed_ForRCC &amp; RTCClockSelection=RCC_RTCCLKSOURCE_HSE_DIV32">
+                        <CallLibMethod Name="" Type="HardCode">
+                            <HardCode Text="#tif(LL_RCC_GetRTCClockSource() != LL_RCC_RTC_CLKSOURCE_HSE_DIV32)#n#t{"/>
+                            </CallLibMethod>
+                    </IFCondition>
+                </Else>
+            </IFCondition>
+        </Else>
+        </IFCondition>
+
+        <IFCondition Expression ="(CodegenConfigPeriph=true) &amp;RTCUsed_ForRCC">
+            <CallLibMethod Name="#tLL_RCC_ForceBackupDomainReset">
+            </CallLibMethod>
+
+            <CallLibMethod Name="#tLL_RCC_ReleaseBackupDomainReset">
+            </CallLibMethod>
+        </IFCondition>
+
+        <IFCondition Expression ="(CodegenConfigPeriph=true) &amp; (RTCUsed_ForRCC|LCDUsed_ForRCC) &amp; !RTCClockSelection=RCC_RTCCLKSOURCE_LSE">
+            <CallLibMethod Name="#tLL_RCC_SetRTCClockSource">
+                <MethodArg Name="Source" ParameterName="RTCClockSelection"/>
+            </CallLibMethod>
+        </IFCondition>
+        <IFCondition Expression ="(CodegenConfigPeriph=true) &amp;RTCUsed_ForRCC">
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#t}"/>
+            </CallLibMethod>
+        </IFCondition>     
 		
         <!--LSCO  code gen-->
         <IFCondition Expression ="LSCOConfig">
@@ -616,40 +655,19 @@
     </RefConfig>
         <RefConfig Name="RCC_PClockConfig">
 
-        <IFCondition Expression ="(CodegenConfigPeriph=true) &amp;RTCUsed_ForRCC &amp; RTCClockSelection=RCC_RTCCLKSOURCE_LSI">
+        <IFCondition Expression ="(CodegenConfigPeriph=true) &amp;RTCUsed_ForRCC &amp; RTCClockSelection=RCC_RTCCLKSOURCE_LSE">
             <CallLibMethod Name="" Type="HardCode">
-                <HardCode Text="#tif(LL_RCC_GetRTCClockSource() != LL_RCC_RTC_CLKSOURCE_LSI)#n#t{"/>
-            </CallLibMethod>
-        <Else>
-            <IFCondition Expression ="(CodegenConfigPeriph=true) &amp;RTCUsed_ForRCC &amp; RTCClockSelection=RCC_RTCCLKSOURCE_LSE">
-                <CallLibMethod Name="" Type="HardCode">
-                    <HardCode Text="#tif(LL_RCC_GetRTCClockSource() != LL_RCC_RTC_CLKSOURCE_LSE)#n#t{"/>
-                </CallLibMethod>
-                <Else>
-                    <IFCondition Expression ="(CodegenConfigPeriph=true) &amp;RTCUsed_ForRCC &amp; RTCClockSelection=RCC_RTCCLKSOURCE_HSE_DIV32">
-                        <CallLibMethod Name="" Type="HardCode">
-                            <HardCode Text="#tif(LL_RCC_GetRTCClockSource() != LL_RCC_RTC_CLKSOURCE_HSE_DIV32)#n#t{"/>
-                            </CallLibMethod>
-                    </IFCondition>
-                </Else>
-            </IFCondition>
-        </Else>
-        </IFCondition>
-
-        <IFCondition Expression ="(CodegenConfigPeriph=true) &amp;RTCUsed_ForRCC">
-            <CallLibMethod Name="#tLL_RCC_ForceBackupDomainReset">
-            </CallLibMethod>
-
-            <CallLibMethod Name="#tLL_RCC_ReleaseBackupDomainReset">
+                <HardCode Text="#tif(LL_RCC_GetRTCClockSource() != LL_RCC_RTC_CLKSOURCE_LSE)#n#t{"/>
             </CallLibMethod>
         </IFCondition>
 
-        <IFCondition Expression ="(CodegenConfigPeriph=true) &amp; (RTCUsed_ForRCC|LCDUsed_ForRCC)">
+
+        <IFCondition Expression ="(CodegenConfigPeriph=true) &amp; (RTCUsed_ForRCC|LCDUsed_ForRCC) &amp; RTCClockSelection=RCC_RTCCLKSOURCE_LSE">
             <CallLibMethod Name="#tLL_RCC_SetRTCClockSource">
                 <MethodArg Name="Source" ParameterName="RTCClockSelection"/>
             </CallLibMethod>
         </IFCondition>
-        <IFCondition Expression ="(CodegenConfigPeriph=true) &amp;RTCUsed_ForRCC">
+        <IFCondition Expression ="(CodegenConfigPeriph=true) &amp;RTCUsed_ForRCC &amp; RTCClockSelection=RCC_RTCCLKSOURCE_LSE">
             <CallLibMethod Name="" Type="HardCode">
                 <HardCode Text="#t}"/>
             </CallLibMethod>
@@ -664,7 +682,7 @@
             </CallLibMethod>
         </IFCondition>
         
-        <IFCondition Expression ="FDCAN1Used_ForRCC">
+        <IFCondition Expression ="FDCAN1Used_ForRCC|FDCAN2Used_ForRCC|FDCAN3Used_ForRCC">
             <CallLibMethod Name="LL_RCC_SetFDCANClockSource">
                 <MethodArg Name="FDCANxSource" ParameterName="FDCANCLockSelection"/>
             </CallLibMethod>

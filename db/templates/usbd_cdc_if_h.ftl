@@ -80,12 +80,13 @@
   * @brief Defines.
   * @{
   */
-/* USER CODE BEGIN EXPORTED_DEFINES */
+[#-- BZ 102389 Generate RX, TX Buffer size  out of user code section --]
 [#--  BZ 74391 --]
 /* Define size for the receive and transmit buffer over CDC */
-/* It's up to user to redefine and/or remove those define */
+[#--  /* It's up to user to redefine and/or remove those define */ --]
 #define APP_RX_DATA_SIZE  ${RX_DATA_SIZE}
 #define APP_TX_DATA_SIZE  ${TX_DATA_SIZE}
+/* USER CODE BEGIN EXPORTED_DEFINES */
 
 /* USER CODE END EXPORTED_DEFINES */
 

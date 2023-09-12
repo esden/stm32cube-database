@@ -30,7 +30,7 @@ void MX_GPIO_Init(void)
 [/#if]
 
         [#assign v = ""]
-[#if data.ipName=="gpio"][#-- Actualy we don't need to generate code for gpio modes not associated to any peripheral --]
+[#if data.ipName=="gpio"][#-- Actually we don't need to generate code for gpio modes not associated to any peripheral --]
         [#list data.variables as variable]				
             [#if v?contains(variable.name)]
             [#-- no matches--]
@@ -74,7 +74,7 @@ static void MX_${data.ipName}_GPIO_Init(void)
 [/#if]
 
 [#if data.methods??] [#-- if the pin configuration contains a list of LibMethods--]
-[#if data.ipName=="gpio"][#-- Actualy we don't need to generate code for gpio modes not associated to any peripheral --]
+[#if data.ipName=="gpio"][#-- Actually we don't need to generate code for gpio modes not associated to any peripheral --]
 
 	[#list data.methods as method][#assign args = ""]	
 		[#if method.status=="OK"]	
@@ -82,9 +82,13 @@ static void MX_${data.ipName}_GPIO_Init(void)
                 [#if method.name == "HAL_GPIO_Init"]
                     [#assign pin = ""]
                     [#assign port = ""]
+                    [#assign isLPGPIO = "false"]
                     [#list method.arguments as fargument]
                     [#if fargument.name =="GPIOx"]							
                        [#assign port = port + " " + fargument.value]
+[#if fargument.value?contains("LPGPIO")]
+[#assign isLPGPIO = "true"]
+[/#if]
                         [#assign i =port?length-1]
                         [#assign j =port?length]
                        [#assign port = "P"+port?substring(i,j)]
@@ -97,8 +101,16 @@ static void MX_${data.ipName}_GPIO_Init(void)
                         [/#list]
                     [/#if]
                     [/#list]
+
                     [#compress]
-  [#--comment of GPIO configuration--]  #n#t/*Configure GPIO [#if pin?split("|")?size>1]pins[#else]pin[/#if] : [#list pin?split("|") as x][#if x?contains("GPIO_PIN")][#assign i =x?split("_")] [#assign j =i?last]${port}${j}[#else]${x} [/#if] [/#list] */[/#compress]
+[#if isLPGPIO == "false"]
+  [#--comment of GPIO configuration--]  #n#t/*Configure GPIO [#if pin?split("|")?size>1]pins[#else]pin[/#if] : [#list pin?split("|") as x][#if x?contains("GPIO_PIN")][#assign i =x?split("_")] [#assign j =i?last]${port}${j}[#else]${x} [/#if] [/#list] */
+[#else]
+#n#t/*Configure LPGPIO  [#if pin?split("|")?size>1]pins[#else]pin[/#if] : [#list pin?split("|") as x][#if x?contains("GPIO_PIN")][#assign i =x?split("_")] [#assign j =i?last]Pin${j}[#else]${x} [/#if] [/#list] */
+[/#if]
+[/#compress]
+
+
                 [#else]
                 [#if method.comment??]#n#t/*[#compress]${method.comment} */[/#compress][/#if]			
                 [/#if]    

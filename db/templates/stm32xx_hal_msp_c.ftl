@@ -32,7 +32,8 @@
 [#-- Add global dma Handler --]
 [#list IPdatas as IP]  
 [#list IP.configModelList as instanceData]
-    [#if instanceData.dmaHandel??]
+    [#assign instName = instanceData.instanceName]
+    [#if !(instName?starts_with("GPDMA")) && !(instName?starts_with("LPDMA")) && instanceData.dmaHandel??]
         [#list instanceData.dmaHandel as dHandle]
             extern ${dHandle};#n
             [#assign cmp = true] [#-- Flag to check if DMA is used--]
@@ -437,7 +438,10 @@ void HAL_MspInit(void)
                     [#list method.arguments as fargument][#compress]
                     [#if fargument.addressOf] [#assign adr = "&"][#else ][#assign adr = ""][/#if][/#compress] 
                     [#if fargument.genericType == "struct"]
-                        [#if fargument.context??]
+                         [#if fargument.optional == "output"]
+                                [#assign arg = "" + adr + fargument.name]                             
+                        [/#if]
+                        [#if fargument.context?? && fargument.optional!="output"]
                             [#if fargument.context=="global"]
                                 [#if configModel.ipName=="DMA" || configModel.ipName?starts_with("BDMA") || configModel.ipName=="MDMA"]
                                     [#if configModel.dmaRequestName==""] [#-- if dma request name different from instanceName: case of I2S1 for example --]
@@ -601,7 +605,10 @@ void HAL_MspInit(void)
 				[#list method.arguments as fargument]
 					[#if fargument.addressOf] [#assign adr = "&"][#else ] [#assign adr = ""][/#if]
 					[#if fargument.genericType == "struct"][#assign arg = "" + adr + fargument.name]
-                                        [#if fargument.context??]                   
+                                            [#if fargument.optional == "output"]
+                                                [#assign arg = "" + adr + fargument.name]
+                                            [/#if]
+                                        [#if fargument.context?? && fargument.optional!="output"]                   
                                             [#if fargument.context=="global"]
                                                 [#if configModel.ipName=="DMA" || configModel.ipName?starts_with("BDMA") || configModel.ipName=="MDMA"]
                                                     [#if configModel.dmaRequestName==""] [#-- if dma request name different from instanceName: case of I2S1 for example --]
@@ -749,6 +756,8 @@ void HAL_MspInit(void)
            #t#t   HAL_SD_ReadBlocks_DMA or HAL_SD_WriteBlocks_DMA. */
            [/#if]
         [/#if]   [#-- if more than one dma handler--]  
+
+[#if dmaconfig.dmaVersion?? && dmaconfig.dmaVersion!="DMA3"]
         [#list dmaconfig.dmaHandel as dmaH]
             [#if dmaconfig.dmaRequestName==""] [#-- if dma request name different from instanceName: case of I2S1 for example --]
                 #t#t__HAL_LINKDMA(${instHandler},${dmaH},${getDmaHandlePrefix(dmaconfig)}_${dmaconfig.instanceName?lower_case});
@@ -756,6 +765,7 @@ void HAL_MspInit(void)
             #t#t__HAL_LINKDMA(${instHandler},${dmaH},${getDmaHandlePrefix(dmaconfig)}_${dmaconfig.dmaRequestName?lower_case});
             [/#if]
         [/#list]
+[/#if]
 [#if dmaCurrentRequest?contains("dfsdm")]
 #t}
 [/#if]
@@ -911,7 +921,7 @@ void HAL_MspInit(void)
 
     [#if serviceType=="Init"] 
 [#-- bug 322189 Init--]
-[#if ipName?contains("OTG_FS")&&FamilyName=="STM32L4"]
+[#if ipName?contains("OTG_FS")&&(FamilyName=="STM32L4"||FamilyName=="STM32U5") || Line.equals("STM32G0x1") && ipName?contains("USB_DRD_FS")]
 #n#t#t/* Enable VDDUSB */
   #t#tif(__HAL_RCC_PWR_IS_CLK_DISABLED())
   #t#t{
@@ -1263,7 +1273,7 @@ static uint32_t ${entry.value}=0;
 [#-- declare Variable GPIO_InitTypeDef once --]
        [#assign v = ""]
 [#assign mspExist="false"]
-[#list words as inst] [#-- loop on ip instances datas --] 
+[#list words as inst] [#-- loop on ip instances data --] 
     [#assign services = getInitServiceMode(inst)]
     [#if services.gpio??][#assign service=services.gpio]
 
@@ -1364,11 +1374,17 @@ static uint32_t ${entry.value}=0;
             #tif([#if word0.contains("DFSDM1")&& mode=="DFSDM_Channel"](IS_DFSDM1_CHANNEL_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Channel"]!(IS_DFSDM1_CHANNEL_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM1")&& mode=="DFSDM_Filter"](IS_DFSDM1_FILTER_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Filter"]!(IS_DFSDM1_FILTER_INSTANCE(h${mode?lower_case}->Instance))&&[/#if](${words[0]}_Init == 0))   
             [/#if]
             #t{
-    [#else]    
-        [#if ipvar.instanceNbre > 1] [#-- IF number of IP instances greater than 0--]
-             [#if !words[0].contains("HASH") &&  !words[0].contains("SUBGHZ")] 
-            #tif(h${mode?lower_case}->Instance==${words[0]?replace("I2S","SPI")})  
-            #t{ 
+    [#else] 
+        [#assign word0 = words[0]]
+        [#if  word0.contains("ADF")||word0.contains("MDF")]
+            #tif[#if word0.contains("ADF")](IS_ADF_INSTANCE(h${mode?lower_case}->Instance))[/#if][#if word0.contains("MDF")](IS_MDF_INSTANCE(h${mode?lower_case}->Instance))[/#if]
+            #t{
+        [#else]
+            [#if ipvar.instanceNbre > 1] [#-- IF of IP instances greater than 0--]
+                 [#if !words[0].contains("HASH") &&  !words[0].contains("SUBGHZ")] 
+                #tif(h${mode?lower_case}->Instance==${words[0]?replace("I2S","SPI")})  
+                #t{ 
+                [/#if]
             [/#if]
         [/#if]
     [/#if]
@@ -1418,9 +1434,14 @@ static uint32_t ${entry.value}=0;
         [#else]
              #telse if([#if word0.contains("DFSDM1")&& mode=="DFSDM_Channel"](IS_DFSDM1_CHANNEL_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Channel"]!(IS_DFSDM1_CHANNEL_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM1")&& mode=="DFSDM_Filter"](IS_DFSDM1_FILTER_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Filter"]!(IS_DFSDM1_FILTER_INSTANCE(h${mode?lower_case}->Instance))&&[/#if](${inst}_Init == 0))
         [/#if]
-[#else]
- #telse if(h${mode?lower_case}->Instance==${words[i]?replace("I2S","SPI")})
-[/#if]
+    [#else]
+         [#if  inst.contains("ADF")||inst.contains("MDF")]
+            [#assign word0 = inst]
+            #telse if[#if word0.contains("ADF")](IS_ADF_INSTANCE(h${mode?lower_case}->Instance))[/#if][#if word0.contains("MDF")](IS_MDF_INSTANCE(h${mode?lower_case}->Instance))[/#if]
+        [#else]
+        #telse if(h${mode?lower_case}->Instance==${words[i]?replace("I2S","SPI")})
+        [/#if]
+    [/#if]
     #t{
 #t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspInit 0 */
 
@@ -1514,7 +1535,7 @@ static uint32_t ${entry.value}=0;
 [#-- Section2-1: Msp Post Init --]
 [#if ipvar.initCallBacksForMsp??]
 [#compress]
-[#-- Get List of all IP instances to cerate the MspPostInit --]
+[#-- Get List of all IP instances to create the MspPostInit --]
 [#assign DFSDM_var = "false"]
 [#assign instanceMap = ipvar.instances]
 
@@ -1557,7 +1578,7 @@ uint32_t DFSDM_Init = 0;
 [#-- declare Variable GPIO_InitTypeDef once --]
 [#assign v = ""]
 [#assign mspExist="false"]
-[#list words as inst] [#-- loop on ip instances datas --] 
+[#list words as inst] [#-- loop on ip instances data--] 
     [#assign services = getInitServiceMode(inst)]
     [#if services?? && services!="" && services.gpioOut??][#assign service=services.gpioOut]
         [#list service.variables as variable] [#-- variables declaration --]
@@ -1581,10 +1602,15 @@ uint32_t DFSDM_Init = 0;
     [/#if]
     #t{
 [#else]
-    [#if ipvar.instanceNbre > 1] [#-- IF number of IP instances greater than 0--]
-         [#if !words[0].contains("HASH") &&  !words[0].contains("SUBGHZ") ] 
-        #tif(h${mode?lower_case}->Instance==${words[0]?replace("I2S","SPI")})
-        #t{
+    [#assign word0 = words[0]]
+    [#if word0.contains("ADF")||word0.contains("MDF")]
+       #tif[#if word0.contains("ADF")](IS_ADF_INSTANCE(h${mode?lower_case}->Instance))[/#if][#if word0.contains("MDF")](IS_MDF_INSTANCE(h${mode?lower_case}->Instance))[/#if]
+    [#else]
+        [#if ipvar.instanceNbre > 1] [#-- IF number of IP instances greater than 0--]
+             [#if !words[0].contains("HASH") &&  !words[0].contains("SUBGHZ") ] 
+            #tif(h${mode?lower_case}->Instance==${words[0]?replace("I2S","SPI")})
+            #t{
+            [/#if]
         [/#if]
     [/#if]
 [/#if]
@@ -1609,8 +1635,13 @@ uint32_t DFSDM_Init = 0;
                 [#else]
                      #tif([#if word0.contains("DFSDM1")&& mode=="DFSDM_Channel"](IS_DFSDM1_CHANNEL_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Channel"]!(IS_DFSDM1_CHANNEL_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM1")&& mode=="DFSDM_Filter"](IS_DFSDM1_FILTER_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Filter"]!(IS_DFSDM1_FILTER_INSTANCE(h${mode?lower_case}->Instance))&&[/#if](${words[i]}_Init == 0))
                 [/#if]
-            [#else]
-                #telse if(h${mode?lower_case}->Instance==${words[i]?replace("I2S","SPI")})
+            [#else]   
+                [#assign word0 = words[i]]
+                [#if word0.contains("ADF")||word0.contains("MDF")]                
+                   #telse if[#if word0.contains("ADF")](IS_ADF_INSTANCE(h${mode?lower_case}->Instance))[/#if][#if word0.contains("MDF")](IS_MDF_INSTANCE(h${mode?lower_case}->Instance))[/#if]
+                [#else]
+                    #telse if(h${mode?lower_case}->Instance==${words[i]?replace("I2S","SPI")})
+                [/#if]
             [/#if]
 
             #t{
@@ -1675,7 +1706,7 @@ uint32_t DFSDM_Init = 0;
 [#if mspIsEmpty=="no"]
 [#assign words = instanceList]
 [#if words[0]?contains("DFSDM")]
-[#assign word0 = words[0]]  
+    [#assign word0 = words[0]]  
     [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4"]
         #t${words[0]}_Init-- ;
         #tif(${words[0]}_Init == 0)           
@@ -1687,10 +1718,16 @@ uint32_t DFSDM_Init = 0;
     [/#if]
         #t#t{
 [#else]
-    [#if ipvar.instanceNbre > 1] [#-- IF number of IP instances greater than 0--] 
-         [#if !words[0].contains("HASH")  &&  !words[0].contains("SUBGHZ") ] 
-        #tif(h${mode?lower_case}->Instance==${words[0]?replace("I2S","SPI")})
-        #t{
+    [#assign word0 = words[0]]
+    [#if word0.contains("ADF")||word0.contains("MDF")] 
+       #tif[#if word0.contains("ADF")](IS_ADF_INSTANCE(h${mode?lower_case}->Instance))[/#if][#if word0.contains("MDF")](IS_MDF_INSTANCE(h${mode?lower_case}->Instance))[/#if]
+       #t{
+    [#else]
+        [#if ipvar.instanceNbre > 1] [#-- IF number of IP instances greater than 0--] 
+            [#if !words[0].contains("HASH")  &&  !words[0].contains("SUBGHZ") ] 
+            #tif(h${mode?lower_case}->Instance==${words[0]?replace("I2S","SPI")})
+            #t{
+            [/#if]
         [/#if]
     [/#if]
 [/#if]
@@ -1730,7 +1767,12 @@ uint32_t DFSDM_Init = 0;
         #t#tif((${words[i]}_Init == 0))
     [/#if]
 [#else]
-#telse if(h${mode?lower_case}->Instance==${words[i]?replace("I2S","SPI")})
+    [#assign word0 = words[i]]
+    [#if word0.contains("ADF")||word0.contains("MDF")]                
+       #tif[#if word0.contains("ADF")](IS_ADF_INSTANCE(h${mode?lower_case}->Instance))[/#if][#if word0.contains("MDF")](IS_MDF_INSTANCE(h${mode?lower_case}->Instance))[/#if]
+    [#else]
+    #telse if(h${mode?lower_case}->Instance==${words[i]?replace("I2S","SPI")})
+    [/#if]
 [/#if]
 [#if words[i]?contains("DFSDM")&&!(DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4")]
 #t#t{

@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    features_info.h
@@ -8,26 +9,31 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 [#--
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            ${definition.name}: ${definition.value}
-        [/#list]
-    [/#if]
-[/#list]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                ${definition.name}: ${definition.value}
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 --]
 [#assign CPUCORE = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")]
 [#assign SUBGHZ_APPLICATION = ""]
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            [#if definition.name == "SUBGHZ_APPLICATION"]
-                [#assign SUBGHZ_APPLICATION = definition.value]
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "SUBGHZ_APPLICATION"]
+                    [#assign SUBGHZ_APPLICATION = definition.value]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __SYSTEM_INFO_H
@@ -48,7 +54,7 @@ extern "C" {
 /**
   * @brief Feature enumeration
   * @note This is the list of all available feature so far,
-          the one available in a fiven build are listed in the Feat_Info_Table[]
+          the one available in a given build are listed in the Feat_Info_Table[]
           to keep compatibility, in order to add a feature
           use a new value to the bottom without changing the existing order
   */
@@ -133,7 +139,6 @@ typedef struct
 /* Exported functions ------------------------------------------------------- */
 /**
   * @brief  Init configuration params by calling specific feature xxx_info.c
-  * @return void
   */
 void FEAT_INFO_Init(void);
 /**

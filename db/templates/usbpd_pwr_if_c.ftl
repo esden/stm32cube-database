@@ -177,7 +177,28 @@ USBPD_StatusTypeDef USBPD_PWR_IF_SetProfile(uint8_t PortNum)
 USBPD_StatusTypeDef USBPD_PWR_IF_SupplyReady(uint8_t PortNum, USBPD_VSAFE_StatusTypeDef Vsafe)
 {
 /* USER CODE BEGIN USBPD_PWR_IF_SupplyReady */
-  return USBPD_ERROR;
+  USBPD_StatusTypeDef status = USBPD_ERROR;
+  uint32_t _voltage;
+
+  /* check for valid port */
+  if (!USBPD_PORT_IsValid(PortNum))
+  {
+    return USBPD_ERROR;
+  }
+
+  BSP_USBPD_PWR_VBUSGetVoltage(PortNum, &_voltage);
+  if (USBPD_VSAFE_0V == Vsafe)
+  {
+    /* Vsafe0V */
+    status = ((_voltage < USBPD_PWR_LOW_VBUS_THRESHOLD) ? USBPD_OK : USBPD_ERROR);
+  }
+  else
+  {
+    /* Vsafe5V */
+    status = ((_voltage > USBPD_PWR_HIGH_VBUS_THRESHOLD) ? USBPD_OK : USBPD_ERROR);
+  }
+
+  return status;
 /* USER CODE END USBPD_PWR_IF_SupplyReady */
 }
 [/#if]

@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    lora_app.c
@@ -8,18 +9,46 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
+[#--
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                ${definition.name}: ${definition.value}
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
+--]
 [#assign CPUCORE = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")]
 [#assign SUBGHZ_APPLICATION = ""]
+[#assign SECURE_PROJECTS = "0"]
+[#assign INTROPACK_EXAMPLE = ""]
+[#assign FILL_UCS = ""]
+[#assign LORAWAN_TIMER_OR_BUTTON = ""]
+[#assign LORAWAN_FUOTA = "0"]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "SUBGHZ_APPLICATION"]
+                    [#assign SUBGHZ_APPLICATION = definition.value]
+                [/#if]
+                [#if definition.name == "INTROPACK_EXAMPLE"]
+                    [#assign INTROPACK_EXAMPLE = definition.value]
+                [/#if]
+                [#if definition.name == "FILL_UCS"]
+                    [#assign FILL_UCS = definition.value]
+                [/#if]
+                [#if definition.name == "LORAWAN_TIMER_OR_BUTTON"]
+                    [#assign LORAWAN_TIMER_OR_BUTTON = definition.value]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            [#if definition.name == "SUBGHZ_APPLICATION"]
-                [#assign SUBGHZ_APPLICATION = definition.value]
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
 /* Includes ------------------------------------------------------------------*/
 #include "platform.h"
 #include "Region.h" /* Needed for LORAWAN_DEFAULT_DATA_RATE */
@@ -66,6 +95,13 @@
 /* USER CODE END Includes */
 
 /* External variables ---------------------------------------------------------*/
+[#if (SECURE_PROJECTS == "1") && (CPUCORE == "CM4") ]
+#if defined (DEBUGGER_ENABLED) && ( DEBUGGER_ENABLED == 1 )
+extern __IO uint32_t lets_go_on;
+#elif !defined (DEBUGGER_ENABLED)
+#error "DEBUGGER_ENABLED not defined or out of range <0,1>"
+#endif /* DEBUGGER_ENABLED */
+[/#if]
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -78,11 +114,11 @@
 typedef enum TxEventType_e
 {
   /**
-    * @brief AppdataTransmition issue based on timer every TxDutyCycleTime
+    * @brief Appdata Transmission issue based on timer every TxDutyCycleTime
     */
   TX_ON_TIMER,
   /**
-    * @brief AppdataTransmition external event plugged on OnSendEvent( )
+    * @brief Appdata Transmission external event plugged on OnSendEvent( )
     */
   TX_ON_EVENT
   /* USER CODE BEGIN TxEventType_t */
@@ -108,65 +144,44 @@ typedef enum TxEventType_e
 /* Private function prototypes -----------------------------------------------*/
 [#if (SUBGHZ_APPLICATION == "LORA_END_NODE")]
 /**
-  * @brief  LoRa endNode send request
-  * @param  none
-  * @retval none
+  * @brief  LoRa End Node send request
   */
 static void SendTxData(void);
 
 /**
   * @brief  TX timer callback function
-  * @param  timer context
-  * @retval none
+  * @param  context ptr of timer context
   */
 static void OnTxTimerEvent(void *context);
 
 [/#if]
-[#if (SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
-/**
-  * @brief  LED Tx timer callback function
-  * @param  LED context
-  * @retval none
-  */
-static void OnTxTimerLedEvent(void *context);
-
-/**
-  * @brief  LED Rx timer callback function
-  * @param  LED context
-  * @retval none
-  */
-static void OnRxTimerLedEvent(void *context);
-
-/**
-  * @brief  LED Join timer callback function
-  * @param  LED context
-  * @retval none
-  */
-static void OnJoinTimerLedEvent(void *context);
-
-[/#if]
 /**
   * @brief  join event callback function
-  * @param  params
-  * @retval none
+  * @param  joinParams status of join
   */
 static void OnJoinRequest(LmHandlerJoinParams_t *joinParams);
 
 /**
   * @brief  tx event callback function
-  * @param  params
-  * @retval none
+  * @param  params status of last Tx
   */
 static void OnTxData(LmHandlerTxParams_t *params);
 
 /**
-  * @brief callback when LoRa endNode has received a frame
-  * @param appData
-  * @param params
-  * @retval None
+  * @brief callback when LoRa application has received a frame
+  * @param appData data received in the last Rx
+  * @param params status of last Rx
   */
 static void OnRxData(LmHandlerAppData_t *appData, LmHandlerRxParams_t *params);
 
+[#if (LORAWAN_FUOTA == "1")]
+/**
+  * @brief callback when LoRa application Class is changed
+  * @param deviceClass new class
+  */
+static void OnClassChange(DeviceClass_t deviceClass );
+
+[/#if]
 /*!
  * Will be called each time a Radio IRQ is handled by the MAC layer
  *
@@ -179,28 +194,36 @@ static void OnMacProcessNotify(void);
 [#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
 /**
   * @brief  call back when LoRaWan Stack needs update
-  * @param  none
-  * @retval none
   */
 static void CmdProcessNotify(void);
 
 [/#if]
 /* USER CODE BEGIN PFP */
 
+[#if ((SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")) && (FILL_UCS == "true")]
+/**
+  * @brief  LED Tx timer callback function
+  * @param  context ptr of LED context
+  */
+static void OnTxTimerLedEvent(void *context);
+
+/**
+  * @brief  LED Rx timer callback function
+  * @param  context ptr of LED context
+  */
+static void OnRxTimerLedEvent(void *context);
+
+/**
+  * @brief  LED Join timer callback function
+  * @param  context ptr of LED context
+  */
+static void OnJoinTimerLedEvent(void *context);
+
+[/#if]
 /* USER CODE END PFP */
 
 /* Private variables ---------------------------------------------------------*/
 [#if (SUBGHZ_APPLICATION == "LORA_END_NODE")]
-/**
-  * @brief User application buffer
-  */
-static uint8_t AppDataBuffer[LORAWAN_APP_DATA_BUFFER_MAX_SIZE];
-
-/**
-  * @brief User application data structure
-  */
-static LmHandlerAppData_t AppData = { 0, 0, AppDataBuffer };
-
 static ActivationType_t ActivationType = LORAWAN_DEFAULT_ACTIVATION_TYPE;
 
 [/#if]
@@ -211,10 +234,19 @@ static LmHandlerCallbacks_t LmHandlerCallbacks =
 {
   .GetBatteryLevel =           GetBatteryLevel,
   .GetTemperature =            GetTemperatureLevel,
+[#if CPUCORE == ""]
+  .GetUniqueId =               GetUniqueId,
+  .GetDevAddr =                GetDevAddr,
+[/#if]
   .OnMacProcess =              OnMacProcessNotify,
   .OnJoinRequest =             OnJoinRequest,
   .OnTxData =                  OnTxData,
+[#if (LORAWAN_FUOTA == "1")]
+  .OnRxData =                  OnRxData,
+  .OnClassChange =             OnClassChange
+[#else]
   .OnRxData =                  OnRxData
+[/#if]
 };
 
 [#if (SUBGHZ_APPLICATION != "LORA_USER_APPLICATION")]
@@ -233,14 +265,9 @@ static LmHandlerParams_t LmHandlerParams =
 [/#if]
 [#if (SUBGHZ_APPLICATION == "LORA_END_NODE")]
 /**
-  * @brief Specifies the state of the application LED
-  */
-static uint8_t AppLedStateOn = RESET;
-
-/**
   * @brief Type of Event to generate application Tx
   */
-static TxEventType_t EventType = TX_ON_TIMER;
+static TxEventType_t EventType = ${LORAWAN_TIMER_OR_BUTTON};
 
 /**
   * @brief Timer to handle the application Tx
@@ -249,6 +276,56 @@ static UTIL_TIMER_Object_t TxTimer;
 
 [/#if]
 [#if (SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
+[#if FREERTOS??][#-- If FreeRtos is used --]
+osThreadId_t Thd_LoraSendProcessId;
+
+const osThreadAttr_t Thd_LoraSendProcess_attr =
+{
+  .name = CFG_APP_LORA_PROCESS_NAME,
+  .attr_bits = CFG_APP_LORA_PROCESS_ATTR_BITS,
+  .cb_mem = CFG_APP_LORA_PROCESS_CB_MEM,
+  .cb_size = CFG_APP_LORA_PROCESS_CB_SIZE,
+  .stack_mem = CFG_APP_LORA_PROCESS_STACK_MEM,
+  .priority = CFG_APP_LORA_PROCESS_PRIORITY,
+  .stack_size = CFG_APP_LORA_PROCESS_STACk_SIZE
+};
+static void Thd_LoraSendProcess(void *argument);
+
+[#if  (CPUCORE == "") ] [#-- If FreeRtos is used and single core--]
+osThreadId_t Thd_LmHandlerProcessId;
+
+const osThreadAttr_t Thd_LmHandlerProcess_attr = {
+    .name = CFG_LM_HANDLER_PROCESS_NAME,
+    .attr_bits = CFG_LM_HANDLER_PROCESS_ATTR_BITS,
+    .cb_mem = CFG_LM_HANDLER_PROCESS_CB_MEM,
+    .cb_size = CFG_LM_HANDLER_PROCESS_CB_SIZE,
+    .stack_mem = CFG_LM_HANDLER_PROCESS_STACK_MEM,
+    .priority = CFG_LM_HANDLER_PROCESS_PRIORITY,
+    .stack_size = CFG_LM_HANDLER_PROCESS_STACk_SIZE
+};
+static void Thd_LmHandlerProcess(void *argument);
+[/#if]
+[/#if]
+[/#if]
+/* USER CODE BEGIN PV */
+[#if (SUBGHZ_APPLICATION == "LORA_END_NODE") && (FILL_UCS == "true")]
+/**
+  * @brief User application buffer
+  */
+static uint8_t AppDataBuffer[LORAWAN_APP_DATA_BUFFER_MAX_SIZE];
+
+/**
+  * @brief User application data structure
+  */
+static LmHandlerAppData_t AppData = { 0, 0, AppDataBuffer };
+
+/**
+  * @brief Specifies the state of the application LED
+  */
+static uint8_t AppLedStateOn = RESET;
+
+[/#if]
+[#if ((SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")) && (FILL_UCS == "true")]
 /**
   * @brief Timer to handle the application Tx Led to toggle
   */
@@ -264,24 +341,7 @@ static UTIL_TIMER_Object_t RxLedTimer;
   */
 static UTIL_TIMER_Object_t JoinLedTimer;
 
-[#if FREERTOS??][#-- If FreeRtos is used --]
-osThreadId_t Thd_LoraSendProcessId;
-
-const osThreadAttr_t Thd_LoraSendProcess_attr = {
-    .name = CFG_APP_LORA_PROCESS_NAME,
-    .attr_bits = CFG_APP_LORA_PROCESS_ATTR_BITS,
-    .cb_mem = CFG_APP_LORA_PROCESS_CB_MEM,
-    .cb_size = CFG_APP_LORA_PROCESS_CB_SIZE,
-    .stack_mem = CFG_APP_LORA_PROCESS_STACK_MEM,
-    .priority = CFG_APP_LORA_PROCESS_PRIORITY,
-    .stack_size = CFG_APP_LORA_PROCESS_STACk_SIZE
-};
-static void Thd_LoraSendProcess(void *argument);
-
 [/#if]
-[/#if]
-/* USER CODE BEGIN PV */
-
 /* USER CODE END PV */
 
 /* Exported functions ---------------------------------------------------------*/
@@ -296,29 +356,20 @@ void LoRaWAN_Init(void)
   uint32_t lora_cm0plus_app;
 
 [/#if]
+[#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
+  CMD_Init(CmdProcessNotify);
+
+[/#if]
   /* USER CODE BEGIN LoRaWAN_Init_1 */
 
-  /* USER CODE END LoRaWAN_Init_1 */
-[#if (SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
-#if defined(USE_BSP_DRIVER)
+[#if ((SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")) && (FILL_UCS == "true")]
   BSP_LED_Init(LED_BLUE);
   BSP_LED_Init(LED_GREEN);
   BSP_LED_Init(LED_RED);
   BSP_PB_Init(BUTTON_SW2, BUTTON_MODE_EXTI);
-#elif defined(MX_BOARD_PSEUDODRIVER)
-  SYS_LED_Init(SYS_LED_BLUE);
-  SYS_LED_Init(SYS_LED_GREEN);
-  SYS_LED_Init(SYS_LED_RED);
-  SYS_PB_Init(SYS_BUTTON2, SYS_BUTTON_MODE_EXTI);
-#else
-#error user to provide its board code or to call his board driver functions
-#endif  /* USE_BSP_DRIVER || MX_BOARD_PSEUDODRIVER */
-[/#if]
-[#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
 
-  CMD_Init(CmdProcessNotify);
 [/#if]
-
+[#if ((SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")) && (FILL_UCS == "true")]
 [#if (SUBGHZ_APPLICATION != "LORA_USER_APPLICATION")]
 [#if CPUCORE == "CM4"]
   /* Get CM4 LoRa APP version*/
@@ -368,10 +419,9 @@ void LoRaWAN_Init(void)
           (uint8_t)(__SUBGHZ_PHY_VERSION >> __APP_VERSION_MAIN_SHIFT),
           (uint8_t)(__SUBGHZ_PHY_VERSION >> __APP_VERSION_SUB1_SHIFT),
           (uint8_t)(__SUBGHZ_PHY_VERSION >> __APP_VERSION_SUB2_SHIFT));
-[/#if]
-[/#if]
-[#if (SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
 
+[/#if]
+[/#if]
   UTIL_TIMER_Create(&TxLedTimer, 0xFFFFFFFFU, UTIL_TIMER_ONESHOT, OnTxTimerLedEvent, NULL);
   UTIL_TIMER_Create(&RxLedTimer, 0xFFFFFFFFU, UTIL_TIMER_ONESHOT, OnRxTimerLedEvent, NULL);
   UTIL_TIMER_Create(&JoinLedTimer, 0xFFFFFFFFU, UTIL_TIMER_PERIODIC, OnJoinTimerLedEvent, NULL);
@@ -380,16 +430,32 @@ void LoRaWAN_Init(void)
   UTIL_TIMER_SetPeriod(&JoinLedTimer, 500);
 
 [/#if]
+  /* USER CODE END LoRaWAN_Init_1 */
+
 [#if (SUBGHZ_APPLICATION == "LORA_END_NODE")]
-[#if CPUCORE == "CM4"]
+[#if CPUCORE == "CM4"] [#-- dualCore CM4 --]
 [#if !FREERTOS??][#-- If FreeRtos is not used --]
   UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_MbLoRaSendOnTxTimerOrButtonEvent), UTIL_SEQ_RFU, SendTxData);
 [#else]
   Thd_LoraSendProcessId = osThreadNew(Thd_LoraSendProcess, NULL, &Thd_LoraSendProcess_attr);
 [/#if]
-[#else]
+[#else] [#-- Single Core--]
+[#if !FREERTOS??][#-- If FreeRtos is not used --]
   UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_LmHandlerProcess), UTIL_SEQ_RFU, LmHandlerProcess);
   UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_LoRaSendOnTxTimerOrButtonEvent), UTIL_SEQ_RFU, SendTxData);
+[#else]
+  Thd_LoraSendProcessId = osThreadNew(Thd_LoraSendProcess, NULL, &Thd_LoraSendProcess_attr);
+  if (Thd_LoraSendProcessId==NULL)
+  {
+    Error_Handler();
+  }
+  Thd_LmHandlerProcessId = osThreadNew(Thd_LmHandlerProcess, NULL, &Thd_LmHandlerProcess_attr);
+  if (Thd_LmHandlerProcessId==NULL)
+  {
+    Error_Handler();
+  }
+
+[/#if]
 [/#if]
 [#elseif (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
 [#if CPUCORE == "CM4"]
@@ -415,10 +481,15 @@ void LoRaWAN_Init(void)
 [#if (SUBGHZ_APPLICATION != "LORA_USER_APPLICATION")]
   LmHandlerConfigure(&LmHandlerParams);
 
+[/#if]
+[#if (SUBGHZ_APPLICATION == "LORA_END_NODE")]
+  /* USER CODE BEGIN LoRaWAN_Init_2 */
+[#if (SUBGHZ_APPLICATION == "LORA_END_NODE") && (FILL_UCS == "true")]
   UTIL_TIMER_Start(&JoinLedTimer);
 
 [/#if]
-[#if (SUBGHZ_APPLICATION == "LORA_END_NODE")]
+  /* USER CODE END LoRaWAN_Init_2 */
+
   LmHandlerJoin(ActivationType);
 
   if (EventType == TX_ON_TIMER)
@@ -430,120 +501,97 @@ void LoRaWAN_Init(void)
   }
   else
   {
+    /* USER CODE BEGIN LoRaWAN_Init_3 */
+[#if (SUBGHZ_APPLICATION == "LORA_END_NODE") && (FILL_UCS == "true")]
+
     /* send every time button is pushed */
-#if defined(USE_BSP_DRIVER)
     BSP_PB_Init(BUTTON_SW1, BUTTON_MODE_EXTI);
-#elif defined(MX_BOARD_PSEUDODRIVER)
-    SYS_PB_Init(SYS_BUTTON1, SYS_BUTTON_MODE_EXTI);
-#endif /* USE_BSP_DRIVER || MX_BOARD_PSEUDODRIVER */
+[/#if]
+    /* USER CODE END LoRaWAN_Init_3 */
   }
 
 [/#if]
-[#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
+
+  /* USER CODE BEGIN LoRaWAN_Init_Last */
+[#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")  && (FILL_UCS == "true")]
+  UTIL_TIMER_Start(&JoinLedTimer);
+
   APP_PPRINTF("ATtention command interface\r\n");
   APP_PPRINTF("AT? to list all available functions\r\n");
 [/#if]
-  /* USER CODE BEGIN LoRaWAN_Init_Last */
 
   /* USER CODE END LoRaWAN_Init_Last */
 }
 
-[#if (SUBGHZ_APPLICATION == "LORA_END_NODE")]
-#if defined(USE_BSP_DRIVER)
-void BSP_PB_Callback(Button_TypeDef Button)
-{
-#warning: adapt stm32wlxx_it.c to call BSP_PB_IRQHandler if you want to use BSP
-  /* USER CODE BEGIN BSP_PB_Callback_1 */
-
-  /* USER CODE END BSP_PB_Callback_1 */
-  switch (Button)
-  {
-    case  BUTTON_SW1:
-[#if CPUCORE == "CM4"]
-[#if !FREERTOS??][#-- If FreeRtos is not used --]
-      UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_MbLoRaSendOnTxTimerOrButtonEvent), CFG_SEQ_Prio_0);
-[#else]
-      osThreadFlagsSet( Thd_LoraSendProcessId, 1 );
-[/#if]
-[#else]
-      UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_LoRaSendOnTxTimerOrButtonEvent), CFG_SEQ_Prio_0);
-[/#if]
-      /* USER CODE BEGIN PB_Callback 1 */
-      /* USER CODE END PB_Callback 1 */
-      break;
-    case  BUTTON_SW2:
-      /* USER CODE BEGIN PB_Callback 2 */
-      /* USER CODE END PB_Callback 2 */
-      break;
-    case  BUTTON_SW3:
-      /* USER CODE BEGIN PB_Callback 3 */
-      /* USER CODE END PB_Callback 3 */
-      break;
-    default:
-      break;
-  }
-  /* USER CODE BEGIN BSP_PB_Callback_Last */
-
-  /* USER CODE END BSP_PB_Callback_Last */
-}
-
-#elif defined(MX_BOARD_PSEUDODRIVER)
-
-/* Note: Current MX does not support EXTI IP neither BSP. */
+/* USER CODE BEGIN PB_Callbacks */
+[#if (SUBGHZ_APPLICATION == "LORA_END_NODE") && (FILL_UCS == "true")]
+/* Note: Current the stm32wlxx_it.c generated by STM32CubeMX does not support BSP for PB in EXTI mode. */
 /* In order to get a push button IRS by code automatically generated */
-/* this function is today the only available possibility. */
-/* Calling BSP_PB_Callback() from here it shortcuts the BSP. */
-/* If users wants to go through the BSP, it can remove BSP_PB_Callback() from here */
-/* and add a call to BSP_PB_IRQHandler() in the USER CODE SESSION of the */
-/* correspondent EXTIn_IRQHandler() in the stm32wlxx_it.c */
+/* HAL_GPIO_EXTI_Callback is today the only available possibility. */
+/* Using HAL_GPIO_EXTI_Callback() shortcuts the BSP. */
+/* If users wants to go through the BSP, stm32wlxx_it.c should be updated  */
+/* in the USER CODE SESSION of the correspondent EXTIn_IRQHandler() */
+/* to call the BSP_PB_IRQHandler() or the HAL_EXTI_IRQHandler(&H_EXTI_n);. */
+/* Then the below HAL_GPIO_EXTI_Callback() can be replaced by BSP callback */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-  /* USER CODE BEGIN HAL_GPIO_EXTI_Callback_1 */
-
-  /* USER CODE END HAL_GPIO_EXTI_Callback_1 */
   switch (GPIO_Pin)
   {
-    case  SYS_BUTTON1_PIN:
-      /* Note: when "EventType == TX_ON_TIMER" this GPIO is not initialised */
-[#if CPUCORE == "CM4"]
+    case  BUTTON_SW1_PIN:
+      /* Note: when "EventType == TX_ON_TIMER" this GPIO is not initialized */
 [#if !FREERTOS??][#-- If FreeRtos is not used --]
+[#if CPUCORE == "CM4"]
       UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_MbLoRaSendOnTxTimerOrButtonEvent), CFG_SEQ_Prio_0);
-[#else]
-      osThreadFlagsSet( Thd_LoraSendProcessId, 1 );
-[/#if]
 [#else]
       UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_LoRaSendOnTxTimerOrButtonEvent), CFG_SEQ_Prio_0);
 [/#if]
-      /* USER CODE BEGIN EXTI_Callback_Switch_B1 */
-      /* USER CODE END EXTI_Callback_Switch_B1 */
+[#else]
+      osThreadFlagsSet(Thd_LoraSendProcessId, 1);
+[/#if]
       break;
-    case  SYS_BUTTON2_PIN:
-      /* USER CODE BEGIN EXTI_Callback_Switch_B2 */
-      /* USER CODE END EXTI_Callback_Switch_B2 */
+    case  BUTTON_SW2_PIN:
+[#if (SECURE_PROJECTS == "1") && (CPUCORE == "CM4") ]
+#if defined (DEBUGGER_ENABLED) && ( DEBUGGER_ENABLED == 1 )
+      lets_go_on = 1;
+#elif !defined (DEBUGGER_ENABLED)
+#error "DEBUGGER_ENABLED not defined or out of range <0,1>"
+#endif /* DEBUGGER_ENABLED */
+[/#if]
       break;
-    /* USER CODE BEGIN EXTI_Callback_Switch_case */
-
-    /* USER CODE END EXTI_Callback_Switch_case */
+    case  BUTTON_SW3_PIN:
+      break;
     default:
-    /* USER CODE BEGIN EXTI_Callback_Switch_default */
-    /* USER CODE END EXTI_Callback_Switch_default */
       break;
   }
-  /* USER CODE BEGIN HAL_GPIO_EXTI_Callback_Last */
-
-  /* USER CODE END HAL_GPIO_EXTI_Callback_Last */
 }
-#else
-#error user to provide its board code or to call his board driver functions
-#endif  /* USE_BSP_DRIVER || MX_BOARD_PSEUDODRIVER*/
-
 [/#if]
+
+/* USER CODE END PB_Callbacks */
+
 /* Private functions ---------------------------------------------------------*/
 /* USER CODE BEGIN PrFD */
 
 /* USER CODE END PrFD */
 [#if (SUBGHZ_APPLICATION == "LORA_END_NODE")]
 [#if FREERTOS??][#-- If FreeRtos is used --]
+[#if CPUCORE == ""] [#-- singleCore --]
+
+static void Thd_LmHandlerProcess(void *argument)
+{
+  /* USER CODE BEGIN Thd_LmHandlerProcess_1 */
+
+  /* USER CODE END Thd_LmHandlerProcess_1 */
+  UNUSED(argument);
+  for(;;)
+  {
+    osThreadFlagsWait( 1, osFlagsWaitAny, osWaitForever);
+    LmHandlerProcess( ); /*what you want to do*/
+  }
+  /* USER CODE BEGIN Thd_LmHandlerProcess_2 */
+
+  /* USER CODE END Thd_LmHandlerProcess_2 */
+}
+[/#if]
 
 static void Thd_LoraSendProcess(void *argument)
 {
@@ -551,11 +599,12 @@ static void Thd_LoraSendProcess(void *argument)
 
   /* USER CODE END Thd_LoraSendProcess_1 */
   UNUSED(argument);
-  for(;;)
+  for (;;)
   {
-    osThreadFlagsWait( 1, osFlagsWaitAny, osWaitForever);
-    SendTxData( ); /*what you want to do*/
+    osThreadFlagsWait(1, osFlagsWaitAny, osWaitForever);
+    SendTxData();  /*what you want to do*/
   }
+
   /* USER CODE BEGIN Thd_LoraSendProcess_2 */
 
   /* USER CODE END Thd_LoraSendProcess_2 */
@@ -566,16 +615,11 @@ static void Thd_LoraSendProcess(void *argument)
 static void OnRxData(LmHandlerAppData_t *appData, LmHandlerRxParams_t *params)
 {
   /* USER CODE BEGIN OnRxData_1 */
-
-  /* USER CODE END OnRxData_1 */
-[#if (SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
-  if ((appData != NULL) && (params != NULL))
+[#if ((SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")) && (FILL_UCS == "true")]
+  if ((appData != NULL) || (params != NULL))
   {
-#if defined(USE_BSP_DRIVER)
     BSP_LED_On(LED_BLUE) ;
-#elif defined(MX_BOARD_PSEUDODRIVER)
-    SYS_LED_On(SYS_LED_BLUE) ;
-#endif /* USE_BSP_DRIVER || MX_BOARD_PSEUDODRIVER */
+
     UTIL_TIMER_Start(&RxLedTimer);
 
 [#if (SUBGHZ_APPLICATION == "LORA_END_NODE")]
@@ -619,47 +663,33 @@ static void OnRxData(LmHandlerAppData_t *appData, LmHandlerRxParams_t *params)
           if (AppLedStateOn == RESET)
           {
             APP_LOG(TS_OFF, VLEVEL_H,   "LED OFF\r\n");
-
-#if defined(USE_BSP_DRIVER)
             BSP_LED_Off(LED_RED) ;
-#elif defined(MX_BOARD_PSEUDODRIVER)
-            SYS_LED_Off(SYS_LED_RED) ;
-#endif /* USE_BSP_DRIVER || MX_BOARD_PSEUDODRIVER */
           }
           else
           {
             APP_LOG(TS_OFF, VLEVEL_H, "LED ON\r\n");
-#if defined(USE_BSP_DRIVER)
             BSP_LED_On(LED_RED) ;
-#elif defined(MX_BOARD_PSEUDODRIVER)
-            SYS_LED_On(SYS_LED_RED) ;
-#endif /* USE_BSP_DRIVER || MX_BOARD_PSEUDODRIVER */
           }
         }
         break;
-    /* USER CODE BEGIN OnRxData_Switch_case */
 
-    /* USER CODE END OnRxData_Switch_case */
       default:
-    /* USER CODE BEGIN OnRxData_Switch_default */
 
-    /* USER CODE END OnRxData_Switch_default */
         break;
     }
 [#elseif (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
     AT_event_receive(appData, params);
 [/#if]
   }
-
-  /* USER CODE BEGIN OnRxData_2 */
-
-  /* USER CODE END OnRxData_2 */
 [/#if]
+  /* USER CODE END OnRxData_1 */
 }
 
 [#if (SUBGHZ_APPLICATION == "LORA_END_NODE")]
 static void SendTxData(void)
 {
+  /* USER CODE BEGIN SendTxData_1 */
+[#if (FILL_UCS == "true")]
   uint16_t pressure = 0;
   int16_t temperature = 0;
   sensor_t sensor_data;
@@ -674,9 +704,6 @@ static void SendTxData(void)
   int32_t longitude = 0;
   uint16_t altitudeGps = 0;
 #endif /* CAYENNE_LPP */
-  /* USER CODE BEGIN SendTxData_1 */
-
-  /* USER CODE END SendTxData_1 */
 
   EnvSensors_Read(&sensor_data);
   temperature = (SYS_GetTemperatureLevel() >> 8);
@@ -744,24 +771,44 @@ static void SendTxData(void)
   {
     APP_LOG(TS_ON, VLEVEL_L, "Next Tx in  : ~%d second(s)\r\n", (nextTxIn / 1000));
   }
-  /* USER CODE BEGIN SendTxData_2 */
+[/#if]
 
-  /* USER CODE END SendTxData_2 */
+  /* USER CODE END SendTxData_1 */
 }
 
+[#if (LORAWAN_FUOTA == "1")]
+static void OnClassChange(DeviceClass_t deviceClass )
+{
+  /*
+   * This implementation should be modified to adapt to the network configuration.
+   * This custom code allows to temporarily remove the Tx transactions from the device
+   * during the class C session, in order to avoid any conflict during
+   * the reception of frames in Multicast Class C.
+   */
+  if (deviceClass == CLASS_C)
+  {
+    UTIL_TIMER_Stop(&TxTimer);
+  }
+  else
+  {
+    UTIL_TIMER_Start(&TxTimer);
+  }
+}
+
+[/#if]
 static void OnTxTimerEvent(void *context)
 {
   /* USER CODE BEGIN OnTxTimerEvent_1 */
 
   /* USER CODE END OnTxTimerEvent_1 */
-[#if CPUCORE == "CM4"]
 [#if !FREERTOS??][#-- If FreeRtos is not used --]
+[#if CPUCORE == "CM4"]
   UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_MbLoRaSendOnTxTimerOrButtonEvent), CFG_SEQ_Prio_0);
 [#else]
-  osThreadFlagsSet( Thd_LoraSendProcessId, 1 );
+  UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_LoRaSendOnTxTimerOrButtonEvent), CFG_SEQ_Prio_0);
 [/#if]
 [#else]
-  UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_LoRaSendOnTxTimerOrButtonEvent), CFG_SEQ_Prio_0);
+  osThreadFlagsSet(Thd_LoraSendProcessId, 1);
 [/#if]
 
   /*Wait for next tx slot*/
@@ -770,113 +817,74 @@ static void OnTxTimerEvent(void *context)
 
   /* USER CODE END OnTxTimerEvent_2 */
 }
-
 [/#if]
-[#if (SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
+
+/* USER CODE BEGIN PrFD_LedEvents */
+[#if ((SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")) && (FILL_UCS == "true")]
 static void OnTxTimerLedEvent(void *context)
 {
-  /* USER CODE BEGIN OnTxTimerLedEvent_1 */
-
-  /* USER CODE END OnTxTimerLedEvent_1 */
-#if defined(USE_BSP_DRIVER)
   BSP_LED_Off(LED_GREEN) ;
-#else
-  SYS_LED_Off(SYS_LED_GREEN) ;
-#endif /* USE_BSP_DRIVER || MX_BOARD_PSEUDODRIVER */
-  /* USER CODE BEGIN OnTxTimerLedEvent_2 */
-
-  /* USER CODE END OnTxTimerLedEvent_2 */
 }
 
 static void OnRxTimerLedEvent(void *context)
 {
-  /* USER CODE BEGIN OnRxTimerLedEvent_1 */
-
-  /* USER CODE END OnRxTimerLedEvent_1 */
-#if defined(USE_BSP_DRIVER)
   BSP_LED_Off(LED_BLUE) ;
-#else
-  SYS_LED_Off(SYS_LED_BLUE) ;
-#endif /* USE_BSP_DRIVER || MX_BOARD_PSEUDODRIVER */
-  /* USER CODE BEGIN OnRxTimerLedEvent_2 */
-
-  /* USER CODE END OnRxTimerLedEvent_2 */
 }
 
 static void OnJoinTimerLedEvent(void *context)
 {
-  /* USER CODE BEGIN OnJoinTimerLedEvent_1 */
-
-  /* USER CODE END OnJoinTimerLedEvent_1 */
-#if defined(USE_BSP_DRIVER)
   BSP_LED_Toggle(LED_RED) ;
-#else
-  SYS_LED_Toggle(SYS_LED_RED) ;
-#endif /* USE_BSP_DRIVER || MX_BOARD_PSEUDODRIVER */
-  /* USER CODE BEGIN OnJoinTimerLedEvent_2 */
-
-  /* USER CODE END OnJoinTimerLedEvent_2 */
 }
-
 [/#if]
+
+/* USER CODE END PrFD_LedEvents */
+
 static void OnTxData(LmHandlerTxParams_t *params)
 {
   /* USER CODE BEGIN OnTxData_1 */
-
-  /* USER CODE END OnTxData_1 */
-[#if (SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
-  if ((params != NULL) && (params->IsMcpsConfirm != 0))
+[#if ((SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")) && (FILL_UCS == "true")]
+  if ((params != NULL))
   {
-#if defined(USE_BSP_DRIVER)
-    BSP_LED_On(LED_GREEN) ;
-#elif defined(MX_BOARD_PSEUDODRIVER)
-    SYS_LED_On(SYS_LED_GREEN) ;
-#endif /* USE_BSP_DRIVER || MX_BOARD_PSEUDODRIVER */
-    UTIL_TIMER_Start(&TxLedTimer);
+    /* Process Tx event only if its a mcps response to prevent some internal events (mlme) */
+    if (params->IsMcpsConfirm != 0)
+    {
+      BSP_LED_On(LED_GREEN) ;
+      UTIL_TIMER_Start(&TxLedTimer);
 [#if (SUBGHZ_APPLICATION == "LORA_END_NODE")]
 
-    APP_LOG(TS_OFF, VLEVEL_M, "\r\n###### ========== MCPS-Confirm =============\r\n");
-    APP_LOG(TS_OFF, VLEVEL_H, "###### U/L FRAME:%04d | PORT:%d | DR:%d | PWR:%d", params->UplinkCounter,
-            params->AppData.Port, params->Datarate, params->TxPower);
+      APP_LOG(TS_OFF, VLEVEL_M, "\r\n###### ========== MCPS-Confirm =============\r\n");
+      APP_LOG(TS_OFF, VLEVEL_H, "###### U/L FRAME:%04d | PORT:%d | DR:%d | PWR:%d", params->UplinkCounter,
+              params->AppData.Port, params->Datarate, params->TxPower);
 
-    APP_LOG(TS_OFF, VLEVEL_H, " | MSG TYPE:");
-    if (params->MsgType == LORAMAC_HANDLER_CONFIRMED_MSG)
-    {
-      APP_LOG(TS_OFF, VLEVEL_H, "CONFIRMED [%s]\r\n", (params->AckReceived != 0) ? "ACK" : "NACK");
+      APP_LOG(TS_OFF, VLEVEL_H, " | MSG TYPE:");
+      if (params->MsgType == LORAMAC_HANDLER_CONFIRMED_MSG)
+      {
+        APP_LOG(TS_OFF, VLEVEL_H, "CONFIRMED [%s]\r\n", (params->AckReceived != 0) ? "ACK" : "NACK");
+      }
+      else
+      {
+        APP_LOG(TS_OFF, VLEVEL_H, "UNCONFIRMED\r\n");
+      }
     }
-    else
-    {
-      APP_LOG(TS_OFF, VLEVEL_H, "UNCONFIRMED\r\n");
-    }
-  }
 [#elseif (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
+    }
+    AT_event_confirm(params);
+[/#if]
   }
-  AT_event_confirm(params);
 [/#if]
-
-  /* USER CODE BEGIN OnTxData_2 */
-
-  /* USER CODE END OnTxData_2 */
-[/#if]
+  /* USER CODE END OnTxData_1 */
 }
 
 static void OnJoinRequest(LmHandlerJoinParams_t *joinParams)
 {
   /* USER CODE BEGIN OnJoinRequest_1 */
-
-  /* USER CODE END OnJoinRequest_1 */
-[#if (SUBGHZ_APPLICATION != "LORA_USER_APPLICATION")]
+[#if ((SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")) && (FILL_UCS == "true")]
   if (joinParams != NULL)
   {
     if (joinParams->Status == LORAMAC_HANDLER_SUCCESS)
     {
       UTIL_TIMER_Stop(&JoinLedTimer);
-
-#if defined(USE_BSP_DRIVER)
       BSP_LED_Off(LED_RED) ;
-#elif defined(MX_BOARD_PSEUDODRIVER)
-      SYS_LED_Off(SYS_LED_RED) ;
-#endif /* USE_BSP_DRIVER || MX_BOARD_PSEUDODRIVER */
 
 [#if (SUBGHZ_APPLICATION == "LORA_END_NODE")]
       APP_LOG(TS_OFF, VLEVEL_M, "\r\n###### = JOINED = ");
@@ -888,22 +896,23 @@ static void OnJoinRequest(LmHandlerJoinParams_t *joinParams)
       {
         APP_LOG(TS_OFF, VLEVEL_M, "OTAA =====================\r\n");
       }
+[#if (LORAWAN_FUOTA == "1")]
+
+      /* Force a clock synchronization to be able to start a Multicast Session */
+      LmHandlerDeviceTimeReq();
+[/#if]
     }
     else
     {
       APP_LOG(TS_OFF, VLEVEL_M, "\r\n###### = JOIN FAILED\r\n");
     }
-  }
 [#elseif (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
     }
+    AT_event_join(joinParams);
+[/#if]
   }
-  AT_event_join(joinParams);
 [/#if]
-[/#if]
-
-  /* USER CODE BEGIN OnJoinRequest_2 */
-
-  /* USER CODE END OnJoinRequest_2 */
+  /* USER CODE END OnJoinRequest_1 */
 }
 
 [#if (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
@@ -930,11 +939,16 @@ static void OnMacProcessNotify(void)
   /* USER CODE END OnMacProcessNotify_1 */
 [#if (SUBGHZ_APPLICATION == "LORA_END_NODE") || (SUBGHZ_APPLICATION == "LORA_AT_SLAVE")]
 [#if CPUCORE != "CM4"]
+[#if !FREERTOS??][#-- If FreeRtos is used --]
   UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_LmHandlerProcess), CFG_SEQ_Prio_0);
+[#else]
+  osThreadFlagsSet( Thd_LmHandlerProcessId, 1 );
 [/#if]
+
   /* USER CODE BEGIN OnMacProcessNotify_2 */
 
   /* USER CODE END OnMacProcessNotify_2 */
+[/#if]
 [/#if]
 }
 

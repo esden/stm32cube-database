@@ -131,8 +131,23 @@
             [#if dataKey=="LinkerFile"]
                [#assign LinkerFile =  elem[dataKey]]
             [/#if]
+            [#if dataKey=="HeapSize"]
+               [#assign HeapSize =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="StackSize"]
+               [#assign StackSize =  elem[dataKey]]
+            [/#if]
             [#if dataKey=="startup"]
                [#assign startup =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="AdefinesList"]
+               [#assign AdefinesList =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="aDefineToRemove"]
+               [#assign aDefineToRemove =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="threadsafeCore"]
+               [#assign threadsafeCore =  elem[dataKey]]
             [/#if]
         [/#list]   
     [/#if]
@@ -296,6 +311,14 @@
         [/#list] 
         </LinkAdditionalLibs>
     [/#if]
+
+
+    [#if ThreadSafeSupport?? && ThreadSafeStrategy[threadsafeCore]??]
+        <ThreadSafeSupport>
+            <ThreadSafeStrategy>${ThreadSafeStrategy[threadsafeCore].getStrategyValue()}</ThreadSafeStrategy>
+        </ThreadSafeSupport>
+    [/#if]
+
     </config>
 [/#macro]
 
@@ -391,6 +414,18 @@
             [#if dataKey=="localMwDriver"]
                [#assign localMwDriver =  elem[dataKey]]
             [/#if]
+[#if dataKey=="AdefinesList"]
+               [#assign AdefinesList =  elem[dataKey]]
+            [/#if]
+[#if dataKey=="aDefineToRemove"]
+               [#assign aDefineToRemove =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="HeapSize"]
+               [#assign HeapSize =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="StackSize"]
+               [#assign StackSize =  elem[dataKey]]
+            [/#if]
         [/#list]
         [#--break--]
     [#--/#if--]
@@ -455,7 +490,7 @@
                 <name>${src}</name>
                 </sourceEntry>
                 [#list AppSourceEntries as SrcEntry] [#-- add application Groups --]
-                    [#if !SrcEntry?ends_with("FREERTOS")]
+                    [#if !SrcEntry?ends_with("FREERTOS")&& !SrcEntry?ends_with("ThreadX")]
             <sourceEntry>
             <name>${SrcEntry}</name>
             </sourceEntry>
@@ -473,7 +508,7 @@
                             [/#if]             
                         [/#list] 
                         [#list AppSourceEntries as SrcEntry]
-                            [#if !SrcEntry?ends_with("FREERTOS")]
+                            [#if !SrcEntry?ends_with("FREERTOS") && !SrcEntry?ends_with("ThreadX")]
                             <sourceEntry>
                             <name>${SrcEntry}</name>
                             </sourceEntry>
@@ -534,7 +569,7 @@
             [/#if]
         [#if sourceStructure == "Advanced"]
             [#list MiddlewareList as Middleware] 
-                [#if !Middleware?ends_with("FREERTOS") && !AppSourceEntries?seq_contains(Middleware?replace("/","\\")?replace("CM0Plus","CM0PLUS"))]
+                [#if !Middleware?ends_with("FREERTOS") && !Middleware?ends_with("ThreadX") && !AppSourceEntries?seq_contains(Middleware?replace("/","\\")?replace("CM0Plus","CM0PLUS"))]
                     [#if TrustZone == "0"]
                         <sourceEntry>
                         <name>${Middleware}</name>      
@@ -777,7 +812,7 @@
        	[#if src??]
             [#if !multiConfigurationProject??]
                 [#list AppSourceEntries as SrcEntry] [#-- add application Groups --]
-                    [#if !SrcEntry?ends_with("FREERTOS")]
+                    [#if !SrcEntry?ends_with("FREERTOS") && !SrcEntry?ends_with("ThreadX")]
             <sourceEntry>
             <name>${SrcEntry}</name>
             </sourceEntry>
@@ -805,7 +840,7 @@
                                           
                     [/#list] 
                     [#list AppSourceEntries as SrcEntry]
-                        [#if !SrcEntry?ends_with("FREERTOS")]
+                        [#if !SrcEntry?ends_with("FREERTOS") && !SrcEntry?ends_with("ThreadX")]
                         <sourceEntry>
                         <name>${SrcEntry}</name>
                         </sourceEntry>
@@ -870,7 +905,7 @@
             [/#if]
             [#if sourceStructure == "Advanced"]
                 [#list MiddlewareList as Middleware] 
-                    [#if !Middleware?ends_with("FREERTOS")&& !AppSourceEntries?seq_contains(Middleware?replace("/","\\")?replace("CM0Plus","CM0PLUS"))]
+                    [#if !Middleware?ends_with("FREERTOS") && !Middleware?ends_with("ThreadX") && !AppSourceEntries?seq_contains(Middleware?replace("/","\\")?replace("CM0Plus","CM0PLUS"))]
                         [#if TrustZone == "0"]
                             <sourceEntry>
                             <name>${Middleware}</name>
@@ -998,7 +1033,7 @@
                 [/#list]
             [/#if]
         </group>		   
-			[#if family!="STM32L5xx" && cmsisSourceFileNameList?size>0]
+			[#if family!="STM32L5xx" && family!="STM32U5xx" && cmsisSourceFileNameList?size>0]
             <group>			
                 <name>CMSIS</name>
                 [#assign cmsisFilesAdded = ""]

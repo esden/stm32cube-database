@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    adc_if.h
@@ -8,6 +9,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __ADC_IF_H__
@@ -75,7 +77,7 @@ void SYS_DeInitMeasurement(void);
 
 /**
   * @brief  Get the current temperature
-  * @return value temperature in degreeCelcius( q7.8 )
+  * @return value temperature in degree Celsius( q7.8 )
   */
 int16_t SYS_GetTemperatureLevel(void);
 
@@ -96,4 +98,3 @@ uint16_t SYS_GetBatteryLevel(void);
 #endif /* __ADC_IF_H__ */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
-

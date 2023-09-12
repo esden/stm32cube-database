@@ -185,8 +185,8 @@ extern "C" {
 [#else]
 #define TRACER_EMB_RX_AF_FUNCTION                    LL_GPIO_SetAFPin_8_15
 [/#if]
-
-[#if UART_TX_DMA != ""]
+#define TRACER_EMB_TX_IRQ_PRIORITY                   3
+[#if UART_TX_DMA != ""] /* TRACER_EMB_DMA_MODE == 1UL */
 #define TRACER_EMB_DMA_INSTANCE                      ${UART_TX_DMA}
 #define TRACER_EMB_ENABLE_CLK_DMA()                  ${UART_TX_DMA_enableClock}
 #define TRACER_EMB_TX_DMA_REQUEST                    LL_DMAMUX_REQ_${UART_TX_DMA_REQUEST}
@@ -197,7 +197,8 @@ extern "C" {
 #define TRACER_EMB_TX_DMA_IRQHANDLER                 ${UART_TX_DMA_interrupt.replace("IRQn", "IRQHandler")}
 #define TRACER_EMB_TX_DMA_ACTIVE_FLAG                LL_DMA_IsActiveFlag_TC${UART_TX_DMA_CHANNEL_ID}
 #define TRACER_EMB_TX_DMA_CLEAR_FLAG                 LL_DMA_ClearFlag_GI${UART_TX_DMA_CHANNEL_ID}
-[/#if]
+#define TRACER_EMB_TX_DMA_PRIORITY                   0
+[/#if] /* TRACER_EMB_DMA_MODE == 1UL */
 
 [#if !UARTUsed]*/[/#if]
 

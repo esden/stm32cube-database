@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    lora_app.h
@@ -8,15 +9,19 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 [#--
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
                 ${definition.name}: ${definition.value}
-        [/#list]
-    [/#if]
-[/#list]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 --]
+[#assign CPUCORE = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")]
 [#assign SUBGHZ_APPLICATION = ""]
 [#assign ACTIVE_REGION = ""]
 [#assign APP_TX_DUTYCYCLE = ""]
@@ -28,45 +33,47 @@
 [#assign LORAWAN_DEFAULT_ACTIVATION_TYPE = ""]
 [#assign LORAWAN_DEFAULT_DATA_RATE = ""]
 [#assign LORAWAN_DEFAULT_PING_SLOT_PERIODICITY = ""]
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            [#if definition.name == "SUBGHZ_APPLICATION"]
-                [#assign SUBGHZ_APPLICATION = definition.value]
-            [/#if]
-            [#if definition.name == "ACTIVE_REGION"]
-                [#assign ACTIVE_REGION = definition.value]
-            [/#if]
-            [#if definition.name == "APP_TX_DUTYCYCLE"]
-                [#assign APP_TX_DUTYCYCLE = definition.value]
-            [/#if]
-            [#if definition.name == "LORAWAN_SWITCH_CLASS_PORT"]
-                [#assign LORAWAN_SWITCH_CLASS_PORT = definition.value]
-            [/#if]
-            [#if definition.name == "LORAWAN_USER_APP_PORT"]
-                [#assign LORAWAN_USER_APP_PORT = definition.value]
-            [/#if]
-            [#if definition.name == "LORAWAN_DEFAULT_CLASS"]
-                [#assign LORAWAN_DEFAULT_CLASS = definition.value]
-            [/#if]
-            [#if definition.name == "LORAWAN_DEFAULT_CONFIRMED_MSG_STATE"]
-                [#assign LORAWAN_DEFAULT_CONFIRMED_MSG_STATE = definition.value]
-            [/#if]
-            [#if definition.name == "LORAWAN_ADR_STATE"]
-                [#assign LORAWAN_ADR_STATE = definition.value]
-            [/#if]
-            [#if definition.name == "LORAWAN_DEFAULT_ACTIVATION_TYPE"]
-                [#assign LORAWAN_DEFAULT_ACTIVATION_TYPE = definition.value]
-            [/#if]
-            [#if definition.name == "LORAWAN_DEFAULT_DATA_RATE"]
-                [#assign LORAWAN_DEFAULT_DATA_RATE = definition.value]
-            [/#if]
-            [#if definition.name == "LORAWAN_DEFAULT_PING_SLOT_PERIODICITY"]
-                [#assign LORAWAN_DEFAULT_PING_SLOT_PERIODICITY = definition.value]
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "SUBGHZ_APPLICATION"]
+                    [#assign SUBGHZ_APPLICATION = definition.value]
+                [/#if]
+                [#if definition.name == "ACTIVE_REGION"]
+                    [#assign ACTIVE_REGION = definition.value]
+                [/#if]
+                [#if definition.name == "APP_TX_DUTYCYCLE"]
+                    [#assign APP_TX_DUTYCYCLE = definition.value]
+                [/#if]
+                [#if definition.name == "LORAWAN_SWITCH_CLASS_PORT"]
+                    [#assign LORAWAN_SWITCH_CLASS_PORT = definition.value]
+                [/#if]
+                [#if definition.name == "LORAWAN_USER_APP_PORT"]
+                    [#assign LORAWAN_USER_APP_PORT = definition.value]
+                [/#if]
+                [#if definition.name == "LORAWAN_DEFAULT_CLASS"]
+                    [#assign LORAWAN_DEFAULT_CLASS = definition.value]
+                [/#if]
+                [#if definition.name == "LORAWAN_DEFAULT_CONFIRMED_MSG_STATE"]
+                    [#assign LORAWAN_DEFAULT_CONFIRMED_MSG_STATE = definition.value]
+                [/#if]
+                [#if definition.name == "LORAWAN_ADR_STATE"]
+                    [#assign LORAWAN_ADR_STATE = definition.value]
+                [/#if]
+                [#if definition.name == "LORAWAN_DEFAULT_ACTIVATION_TYPE"]
+                    [#assign LORAWAN_DEFAULT_ACTIVATION_TYPE = definition.value]
+                [/#if]
+                [#if definition.name == "LORAWAN_DEFAULT_DATA_RATE"]
+                    [#assign LORAWAN_DEFAULT_DATA_RATE = definition.value]
+                [/#if]
+                [#if definition.name == "LORAWAN_DEFAULT_PING_SLOT_PERIODICITY"]
+                    [#assign LORAWAN_DEFAULT_PING_SLOT_PERIODICITY = definition.value]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __LORA_APP_H__
@@ -87,6 +94,7 @@ extern "C" {
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
+[#if (CPUCORE != "CM0PLUS")]
 
 [#if (SUBGHZ_APPLICATION != "LORA_USER_APPLICATION")]
 /* LoraWAN application configuration (Mw is configured by lorawan_conf.h) */
@@ -161,6 +169,29 @@ extern "C" {
 #define LORAWAN_DEFAULT_PING_SLOT_PERIODICITY       ${LORAWAN_DEFAULT_PING_SLOT_PERIODICITY}
 
 [/#if]
+[/#if]
+[#if CPUCORE == ""]
+[#if FREERTOS??][#-- If FreeRtos is used --]
+/*Send*/
+#define CFG_APP_LORA_PROCESS_NAME                  "LORA_SEND_PROCESS"
+#define CFG_APP_LORA_PROCESS_ATTR_BITS             (0)
+#define CFG_APP_LORA_PROCESS_CB_MEM                (0)
+#define CFG_APP_LORA_PROCESS_CB_SIZE               (0)
+#define CFG_APP_LORA_PROCESS_STACK_MEM             (0)
+#define CFG_APP_LORA_PROCESS_PRIORITY              osPriorityNone
+#define CFG_APP_LORA_PROCESS_STACk_SIZE            (256 * 4)
+
+/*LM Handler*/
+#define CFG_LM_HANDLER_PROCESS_NAME                "LM_HANDLER_PROCESS"
+#define CFG_LM_HANDLER_PROCESS_ATTR_BITS           (0)
+#define CFG_LM_HANDLER_PROCESS_CB_MEM              (0)
+#define CFG_LM_HANDLER_PROCESS_CB_SIZE             (0)
+#define CFG_LM_HANDLER_PROCESS_STACK_MEM           (0)
+#define CFG_LM_HANDLER_PROCESS_PRIORITY            osPriorityNone
+#define CFG_LM_HANDLER_PROCESS_STACk_SIZE          (256 * 4)
+
+[/#if]
+[/#if]
 /* USER CODE BEGIN EC */
 
 /* USER CODE END EC */
@@ -171,12 +202,17 @@ extern "C" {
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
+[#if (CPUCORE == "CM0PLUS")]
+
+void InitPackageProcess(void);
+
+void OnMacProcessNotify(void);
+[#else]
 /**
   * @brief  Init Lora Application
-  * @param None
-  * @retval None
   */
 void LoRaWAN_Init(void);
+[/#if]
 
 /* USER CODE BEGIN EFP */
 

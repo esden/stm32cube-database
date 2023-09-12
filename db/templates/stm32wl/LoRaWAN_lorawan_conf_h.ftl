@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    lorawan_conf.h
@@ -17,19 +18,22 @@
   *
   ******************************************************************************
   */
+/* USER CODE END Header */
 [#--
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            ${definition.name}: ${definition.value}
-        [/#list]
-    [/#if]
-[/#list]
- --]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                ${definition.name}: ${definition.value}
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
+--]
 [#assign CPUCORE = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")]
 [#assign REGION = ""]
 [#assign HYBRID_ENABLED = "0"]
-[#assign KEY_LOG_ENABLED = "0"]
+[#assign KEY_EXTRACTABLE = "0"]
 [#assign LORAMAC_CLASSB_ENABLED = "0"]
 [#assign REGION_AS923 = ""]
 [#assign REGION_AU915 = ""]
@@ -44,63 +48,67 @@
 [#assign SUBGHZ_APPLICATION = ""]
 [#assign ipNameList = configs[0].peripheralParams?keys]
 [#assign useKMS = ipNameList?seq_contains("KMS")]
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            [#if definition.name == "REGION"]
-                [#assign REGION = definition.value]
-            [/#if]
-            [#if definition.name == "HYBRID_ENABLED"]
-                [#if definition.value == "true"]
-                    [#assign HYBRID_ENABLED = "1"]
+[#assign LORAWAN_KMS = "0"]
+[#assign LORAWAN_FUOTA = "0"]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "REGION"]
+                    [#assign REGION = definition.value]
                 [/#if]
-            [/#if]
-            [#if definition.name == "KEY_LOG_ENABLED"]
-                [#if definition.value == "true"]
-                    [#assign KEY_LOG_ENABLED = "1"]
+                [#if definition.name == "HYBRID_ENABLED"]
+                    [#if definition.value == "true"]
+                        [#assign HYBRID_ENABLED = "1"]
+                    [/#if]
                 [/#if]
-            [/#if]
-            [#if definition.name == "LORAMAC_CLASSB_ENABLED"]
-                [#if definition.value == "true"]
-                    [#assign LORAMAC_CLASSB_ENABLED = "1"]
+                [#if definition.name == "KEY_EXTRACTABLE"]
+                    [#if definition.value == "true"]
+                        [#assign KEY_EXTRACTABLE = "1"]
+                    [/#if]
                 [/#if]
-            [/#if]
-            [#if definition.name == "REGION_AS923"]
-                [#assign REGION_AS923 = definition.value]
-            [/#if]
-            [#if definition.name == "REGION_AU915"]
-                [#assign REGION_AU915 = definition.value]
-            [/#if]
-            [#if definition.name == "REGION_CN470"]
-                [#assign REGION_CN470 = definition.value]
-            [/#if]
-            [#if definition.name == "REGION_CN779"]
-                [#assign REGION_CN779 = definition.value]
-            [/#if]
-            [#if definition.name == "REGION_EU433"]
-                [#assign REGION_EU433 = definition.value]
-            [/#if]
-            [#if definition.name == "REGION_EU868"]
-                [#assign REGION_EU868 = definition.value]
-            [/#if]
-            [#if definition.name == "REGION_KR920"]
-                [#assign REGION_KR920 = definition.value]
-            [/#if]
-            [#if definition.name == "REGION_IN865"]
-                [#assign REGION_IN865 = definition.value]
-            [/#if]
-            [#if definition.name == "REGION_US915"]
-                [#assign REGION_US915 = definition.value]
-            [/#if]
-            [#if definition.name == "REGION_RU864"]
-                [#assign REGION_RU864 = definition.value]
-            [/#if]
-            [#if definition.name == "SUBGHZ_APPLICATION"]
-                [#assign SUBGHZ_APPLICATION = definition.value]
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
+                [#if definition.name == "LORAMAC_CLASSB_ENABLED"]
+                    [#if definition.value == "true"]
+                        [#assign LORAMAC_CLASSB_ENABLED = "1"]
+                    [/#if]
+                [/#if]
+                [#if definition.name == "REGION_AS923"]
+                    [#assign REGION_AS923 = definition.value]
+                [/#if]
+                [#if definition.name == "REGION_AU915"]
+                    [#assign REGION_AU915 = definition.value]
+                [/#if]
+                [#if definition.name == "REGION_CN470"]
+                    [#assign REGION_CN470 = definition.value]
+                [/#if]
+                [#if definition.name == "REGION_CN779"]
+                    [#assign REGION_CN779 = definition.value]
+                [/#if]
+                [#if definition.name == "REGION_EU433"]
+                    [#assign REGION_EU433 = definition.value]
+                [/#if]
+                [#if definition.name == "REGION_EU868"]
+                    [#assign REGION_EU868 = definition.value]
+                [/#if]
+                [#if definition.name == "REGION_KR920"]
+                    [#assign REGION_KR920 = definition.value]
+                [/#if]
+                [#if definition.name == "REGION_IN865"]
+                    [#assign REGION_IN865 = definition.value]
+                [/#if]
+                [#if definition.name == "REGION_US915"]
+                    [#assign REGION_US915 = definition.value]
+                [/#if]
+                [#if definition.name == "REGION_RU864"]
+                    [#assign REGION_RU864 = definition.value]
+                [/#if]
+                [#if definition.name == "SUBGHZ_APPLICATION"]
+                    [#assign SUBGHZ_APPLICATION = definition.value]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __LORAWAN_CONF_H__
@@ -110,10 +118,6 @@
 extern "C" {
 #endif
 /* Includes ------------------------------------------------------------------*/
-#include "stm32_systime.h"
-[#if CPUCORE != "CM4"]
-#include "sys_app.h"   /* needed for APP_PRINTF */
-[/#if]
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
@@ -125,8 +129,8 @@ extern "C" {
 
 /* Exported constants --------------------------------------------------------*/
 [#if CPUCORE != "CM4"]
-[#if CPUCORE == "CM0PLUS"]
-[#if useKMS]
+[#if (CPUCORE == "CM0PLUS") || (LORAWAN_FUOTA == "1")]
+[#if (useKMS) && (LORAWAN_FUOTA == "0")]
 /* To enable the KMS Middleware with LoRaWAN, you must update these files from the DualCore example project:
    - CM0PLUS/Core/Inc/kms_platf_objects_config.h : Add all LoRaWAN keys as kms_object_keyhead_32_t structures.
    - CM0PLUS/Core/Inc/kms_platf_objects_interface.h : Add all LoRaWAN key indexes
@@ -136,23 +140,27 @@ extern "C" {
 */
 [/#if]
 /* USER CODE BEGIN LORAWAN_KMS */
-#define LORAWAN_KMS 0
+#define LORAWAN_KMS ${LORAWAN_KMS}
 /* USER CODE END LORAWAN_KMS */
 
 #if (!defined (LORAWAN_KMS) || (LORAWAN_KMS == 0))
 #else /* LORAWAN_KMS == 1 */
 #define OVER_THE_AIR_ACTIVATION 1
-#define ACTIVATION_BY_PERSONALISATION 1
-#endif
+#define ACTIVATION_BY_PERSONALIZATION 1
+#endif /* LORAWAN_KMS */
+[#if (LORAWAN_FUOTA == "1")]
+
+#define LORAWAN_DATA_DISTRIB_MGT   1
+[/#if]
 [/#if]
 
 /* Region ------------------------------------*/
 [#if CPUCORE == ""]
 /* the region listed here will be linked in the MW code */
-/* the applic (on sys_conf.h) shall just configure one region at the time */
+/* the application (on sys_conf.h) shall just configure one region at the time */
 [#else]
 /* the region listed here will be linked in the CM0 MW code */
-/* the applic (on CM4/sys_conf.h) shall just configure one region at the time */
+/* the application (on CM4/sys_conf.h) shall just configure one region at the time */
 [/#if]
 [#if REGION_AS923 == "true"]
 #define REGION_AS923
@@ -205,21 +213,36 @@ extern "C" {
 /*#define REGION_RU864*/
 [/#if]
 
-#define HYBRID_ENABLED          ${HYBRID_ENABLED}
+/**
+  * \brief Limits the number usable channels by default for AU915, CN470 and US915 regions
+  * \note the default channel mask with this option activates the first 8 channels. \
+  *       this default mask can be modified in the RegionXXXXXInitDefaults function associated with the active region.
+  */
+#define HYBRID_ENABLED                                  ${HYBRID_ENABLED}
 
+/**
+  * \brief Define the read access of the keys in memory
+  * \note this value should be disabled after the development process
+  */
 [#if (SUBGHZ_APPLICATION != "LORA_USER_APPLICATION")]
-#define KEY_LOG_ENABLED         ${KEY_LOG_ENABLED}
+#define KEY_EXTRACTABLE                                 ${KEY_EXTRACTABLE}
 [#else]
-/* USER CODE BEGIN KEY_LOG_ENABLED */
-#define KEY_LOG_ENABLED         0
-/* USER CODE END KEY_LOG_ENABLED */
+/* USER CODE BEGIN KEY_EXTRACTABLE */
+#define KEY_EXTRACTABLE                                 0
+/* USER CODE END KEY_EXTRACTABLE */
 [/#if]
+
+/*!
+ * Enables/Disables the context storage management storage.
+ * Must be enabled for LoRaWAN 1.0.4 or later.
+ */
+#define CONTEXT_MANAGEMENT_ENABLED                      0
 
 /* Class B ------------------------------------*/
 #define LORAMAC_CLASSB_ENABLED  ${LORAMAC_CLASSB_ENABLED}
 
 #if ( LORAMAC_CLASSB_ENABLED == 1 )
-/* CLASS B LSE crystall calibration*/
+/* CLASS B LSE crystal calibration*/
 /**
   * \brief Temperature coefficient of the clock source
   */

@@ -61,8 +61,5 @@ int MAILBOX_Notify(void *priv, uint32_t id);
 int MAILBOX_Init(void);
 int MAILBOX_Poll(struct virtio_device *vdev);
 
-/* USER CODE BEGIN lastSection */
-/* can be used to modify / undefine previous code or add new definitions */
-/* USER CODE END lastSection */
 
 #endif /* MBOX_IPCC_H_ */

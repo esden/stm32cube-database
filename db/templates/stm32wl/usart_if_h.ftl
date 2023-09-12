@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    usart_if.h
@@ -8,6 +9,8 @@
 [@common.optinclude name=mxTmpFolder+ "/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
+
 #include "stm32_adv_trace.h"
 [#if HALCompliant??]
 #include "main.h"

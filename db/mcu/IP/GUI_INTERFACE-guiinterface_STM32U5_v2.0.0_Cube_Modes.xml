@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+    ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
+    xmlns="http://mcd.rou.st.com/modules.php?name=mcu"
+    DBVersion="V4.0"
+    IPType="service"
+    IpGroup="Utilities"
+    Name="GUI_INTERFACE"
+    Version="guiinterface_STM32U5_v2.0.0_Cube">
+
+    <About>GUI_INTERFACE : GUI Interface</About>
+
+    <!-- Generic RefParameters for GUI_INTERFACE -->
+    <RefParameter Name="Version" Comment="Version" Type="string" DefaultValue="2.0.0"/>
+    <RefParameter Name="IntVersion" Comment="IntVersion" Type="integer" DefaultValue="2000"/>
+
+    <RefParameter Name="HWBoardVersionName" Comment="HWBoardVersionName" Type="stringRW" DefaultValue=""/>
+    <RefParameter Name="PDTypeName" Comment="PDTypeName" Type="stringRW" DefaultValue=""/>
+
+    <RefParameter Comment="GUI_INTERFACE memory pool size" DefaultValue="5000" Group="Memory Configuration" Max="262144" Min="512" Name="GUI_INTERFACE_APP_MEM_POOL_SIZE" Type="integer">
+        <Description>Default memory pool size for the GUI_INTERFACE application.</Description>
+        <Condition Diagnostic="" Expression="(ThreadX:AZRTOS_APP_MEM_ALLOCATION_METHOD = 1)"/>
+    </RefParameter>
+
+    <!-- RefModes for GUI_INTERFACE -->
+    <RefMode Name="GUI_INTERFACE" Abstract="true">
+        <ConfigForMode>GUI_INTERFACE_Init</ConfigForMode>
+
+        <Parameter Name="Version"/>
+
+        <Parameter Name="HWBoardVersionName"/>
+        <Parameter Name="PDTypeName"/>
+
+        <Parameter Name="GUI_INTERFACE_APP_MEM_POOL_SIZE">
+            <Condition Diagnostic="" Expression="SEMThreadXCcRTOSJjThreadXJjCore" Name="GUI_INTERFACE_MEM_POOL_CONDITION"/>
+        </Parameter>
+
+    </RefMode>
+
+    <!-- ModeLogicOperator for GUI_INTERFACE -->
+    <ModeLogicOperator Name="OR">
+
+        <Mode Name="Enable" UserName="Enable">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="GUI_INTERFACE" UserName="Enabled">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_gui_interface"/>
+                    </SignalLogicalOp>
+                    <Semaphore>GUI_INTERFACE</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+            <Condition Expression="USBPD_TRACEREMB &amp; !USBPD_PD3TYPEC" Diagnostic="only available when TRACER_EMB configured and used by USBPD else USBPD Stack = Type C"/>
+        </Mode>
+
+    </ModeLogicOperator>
+
+    <!-- RefSignal for GUI_INTERFACE -->
+    <RefSignal Name="VS_gui_interface" Virtual="true"/>
+
+    <Semaphore>MW_GUI_INTERFACE_MW</Semaphore>
+
+</IP>

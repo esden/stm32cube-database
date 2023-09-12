@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    app_sigfox.h
@@ -8,19 +9,34 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
+[#--
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                ${definition.name}: ${definition.value}
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
+--]
 [#assign CPUCORE = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")]
 [#assign SUBGHZ_APPLICATION = ""]
 [#assign ipNameList = configs[0].peripheralParams?keys]
 [#assign useKMS = ipNameList?seq_contains("KMS")]
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            [#if definition.name == "SUBGHZ_APPLICATION"]
-                [#assign SUBGHZ_APPLICATION = definition.value]
-            [/#if]
-        [/#list]
-    [/#if]
-[/#list]
+[#assign SIGFOX_KMS = "0"]
+[#if SWIPdatas??]
+    [#list SWIPdatas as SWIP]
+        [#if SWIP.defines??]
+            [#list SWIP.defines as definition]
+                [#if definition.name == "SUBGHZ_APPLICATION"]
+                    [#assign SUBGHZ_APPLICATION = definition.value]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __APP_SIGFOX_H__
@@ -52,7 +68,7 @@ extern "C" {
 */
 [/#if]
 /* USER CODE BEGIN SIGFOX_KMS */
-#define SIGFOX_KMS 0
+#define SIGFOX_KMS ${SIGFOX_KMS}
 /* USER CODE END SIGFOX_KMS */
 [#elseif (CPUCORE == "CM4")]
 #define DEFAULT_RC SFX_RC1
@@ -74,17 +90,15 @@ extern "C" {
 /* Exported functions prototypes ---------------------------------------------*/
 /**
   * @brief  Init Sigfox Application
-  * @param None
-  * @retval None
   */
 void MX_Sigfox_Init(void);
 
+[#if !FREERTOS??][#-- If FreeRtos, only available in CM4 is not used --]
 /**
   * @brief  entry Sigfox Process or scheduling
-  * @param None
-  * @retval None
   */
 void MX_Sigfox_Process(void);
+[/#if]
 
 /* USER CODE BEGIN EFP */
 

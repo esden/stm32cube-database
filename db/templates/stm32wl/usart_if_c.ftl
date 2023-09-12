@@ -1,37 +1,33 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    usart_if.c
   * @author  MCD Application Team
-  * @brief   Configuration of UART MX driver interface for hyperterminal communication
+  * @brief   Configuration of UART driver interface for hyperterminal communication
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 [#assign UsartInstance = ""]
-[#list BspIpDatas as SWIP]
-  [#if SWIP.variables??]
-    [#list SWIP.variables as variables]
-      [#if variables.name?contains("IpInstance")]
-        [#assign IpInstance = variables.value]
-      [/#if]
-      [#if variables.value?contains("BSP USART")]
-        [#assign UsartInstance = IpInstance]
-        [#assign useUSART = true]
-      [/#if]
-      [#if variables.name?contains("EXTI_LINE_NUMBER")]
-        [#assign ExtiLine = variables.value]
-      [/#if]
+[#assign IpInstance = ""]
+[#if BspIpDatas??]
+    [#list BspIpDatas as SWIP]
+        [#if SWIP.variables??]
+            [#list SWIP.variables as variables]
+                [#if variables.name?contains("IpInstance")]
+                    [#assign IpInstance = variables.value]
+                [/#if]
+                [#if variables.value?contains("BSP USART")]
+                    [#assign UsartInstance = IpInstance]
+                    [#assign useUSART = true]
+                [/#if]
+            [/#list]
+        [/#if]
     [/#list]
-  [/#if]
-[/#list]
-[#--[#list BspIpDatas as SWIP]
-  [#if SWIP.variables??]
-    [#list SWIP.variables as variables]
-      ${variables.name}: ${variables.value}
-    [/#list]
-  [/#if]
-[/#list]--]
+[/#if]
+
 /* Includes ------------------------------------------------------------------*/
 #include "usart_if.h"
 
@@ -147,8 +143,6 @@ UTIL_ADV_TRACE_Status_t vcom_DeInit(void)
   HAL_UART_MspDeInit(&h${IpInstance?lower_case?replace("s","")});
 
   /* ##-3- Disable the NVIC for DMA ########################################### */
-  /* temporary while waiting CR 50840: MX implementation of  MX_DMA_DeInit() */
-  /* For the time being user should change manually the channel according to the MX settings */
   /* USER CODE BEGIN 1 */
   HAL_NVIC_DisableIRQ(DMA1_Channel5_IRQn);
 

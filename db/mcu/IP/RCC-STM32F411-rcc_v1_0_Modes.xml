@@ -587,47 +587,6 @@
 	<RefParameter Visible="false" Comment="PLLI2S_R" DefaultValue="2" Max="7" Min="2" Name="PLLI2SR" Type="integer" IP="I2S1,I2S2,I2S3,I2S4,I2S5"/>
 	
 
-
-<!--params for Code Generation for IPs -->
-	<RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelection" DefaultValue="+RCC_PERIPHCLK_TIMVar+|RCC_PERIPHCLK_PLLI2SVar+|RCC_PERIPHCLK_I2SVar+|RCC_PERIPHCLK_RTCVar" Type="list"/>
-
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_PLLI2SVar" Comment="RCC_PERIPHCLK_PLLI2SVar" Type="list" DefaultValue="RCC_PERIPHCLK_I2S">
-        <Condition Expression="((RCC_MCO2Source=RCC_MCO2SOURCE_PLLI2SCLK)&amp; MCO2Config)" Diagnostic="I2S Activated and source is PLLI2S"/>
-        <PossibleValue Value="RCC_PERIPHCLK_I2S" Comment="RCC_PERIPHCLK_I2S"/>
-    </RefParameter>
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_PLLI2SVar" Comment="RCC_PERIPHCLK_PLLI2SVar" Type="list" DefaultValue=""/>
-
-	<RefParameter Visible="false" Name="RCC_PERIPHCLK_I2SVar" Comment="RCC_PERIPHCLK_I2SVar" Type="list" DefaultValue="RCC_PERIPHCLK_I2S">
-		<Condition Expression="(I2SSourceIsPll &amp; I2SUsed_ForRCC)" Diagnostic="I2S Activated and source is PLLI2S"/>
-		<PossibleValue Value="RCC_PERIPHCLK_I2S" Comment="RCC_PERIPHCLK_I2S"/>
-	</RefParameter>
-	<RefParameter Visible="false" Name="RCC_PERIPHCLK_I2SVar" Comment="RCC_PERIPHCLK_I2SVar" Type="list" DefaultValue=""/>
-	<RefParameter Visible="false" Name="RCC_PERIPHCLK_RTCVar" Comment="RCC_PERIPHCLK_RTCVar" Type="list" DefaultValue="RCC_PERIPHCLK_RTC">
-		<Condition Expression="((HSEByPass|HSEOscillator)&amp;(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11))|RTCUsed_ForRCC" Diagnostic="RTC Prescaler Activated"/>
-		<PossibleValue Value="RCC_PERIPHCLK_RTC" Comment="RCC_PERIPHCLK_RTC"/>
-	</RefParameter>
-	<RefParameter Visible="false" Name="RCC_PERIPHCLK_RTCVar" Comment="RCC_PERIPHCLK_RTC" Type="list" DefaultValue=""/>
-	<RefParameter Visible="false" Name="PLLI2SNARG" Comment="PLLI2SNARG" Type="list" DefaultValue="+PLLI2SN">
-		<Condition Expression="(I2SSourceIsPll &amp; I2SUsed_ForRCC)|((RCC_MCO2Source=RCC_MCO2SOURCE_PLLI2SCLK)&amp; MCO2Config)" Diagnostic="PLLI2SN is used for I2S"/>
-		
-	</RefParameter>
-	<RefParameter Visible="false" Name="PLLI2SNARG" Comment="PLLI2SNARG" Type="list" DefaultValue="null"/>
-	<RefParameter Visible="false" Name="PLLI2SMARG" Comment="PLLI2SMARG" Type="list" DefaultValue="+PLLI2SM">
-		<Condition Expression="(I2SSourceIsPll &amp; I2SUsed_ForRCC)|((RCC_MCO2Source=RCC_MCO2SOURCE_PLLI2SCLK)&amp; MCO2Config)" Diagnostic="PLLI2SM is used for I2S"/>
-	</RefParameter>
-	<RefParameter Visible="false" Name="PLLI2SMARG" Comment="PLLI2SMARG" Type="list" DefaultValue="null"/>
-	
-	
-	
-	<RefParameter Visible="false" Name="PLLI2SRARG" Comment="PLLI2SRARG" Type="list" DefaultValue="+PLLI2SR">
-		<Condition Expression="(I2SSourceIsPll &amp; I2SUsed_ForRCC)|((RCC_MCO2Source=RCC_MCO2SOURCE_PLLI2SCLK)&amp; MCO2Config)" Diagnostic="PLLI2S is used for I2S"/>
-	</RefParameter>
-	<RefParameter Visible="false" Name="PLLI2SRARG" Comment="PLLI2SRARG" Type="list" DefaultValue="null"/>
-	<RefParameter Visible="false" Name="RTCClockSelectionARG" Comment="RTCClockSelectionARG" Type="list" DefaultValue="+RCC_RTC_Clock_Source">
-		<Condition Expression="RTCUsed_ForRCC|((HSEByPass|HSEOscillator)&amp;(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11))" Diagnostic="PLLSAI is used for SAI"/>
-	</RefParameter>
-	<RefParameter Visible="false" Name="RTCClockSelectionARG" Comment="RTCClockSelectionARG" Type="list" DefaultValue="null"/>
-	
 	<RefParameter Visible="false" Comment="Hse StateARG" DefaultValue="+HSEState" Name="HSEStateARG" Type="list">
 		<Condition Diagnostic="HSE used" Expression="HSEUsed=1"/>
 	</RefParameter>
@@ -709,23 +668,133 @@
 		<Condition Expression="PCLK2toConfigure" Diagnostic=""/>
 	</RefParameter>
 	<RefParameter Visible="false" Comment="APB2CLKDividerARG" DefaultValue="null" Name="APB2CLKDividerARG" Type="list"/>
-	<RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" DefaultValue="+PeriphClockSelection" Type="list">
-	<Condition Expression="(I2SSourceIsPll &amp; I2SUsed_ForRCC)|((RCC_MCO2Source=RCC_MCO2SOURCE_PLLI2SCLK)&amp; (MCO2Config))|TimPrescalerEnabled|RTCUsed_ForRCC|((HSEByPass|HSEOscillator)&amp;(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11))" Diagnostic="clock used by RCC"/>
+        
+        
+                                    <!-- ****************** Clock Update Ticket 90818 CubeAzure _____Begin **************** -->
+        
+        <RefParameter Visible="false" Comment="PLLI2S is Used" DefaultValue="=plli2sForI2S1+plli2sForI2S2+plli2sForI2S3+plli2sForI2S4+plli2sForI2S5+plli2sForMCO2" Name="plli2susage" Min="0" Type="integer"/>
+    
+        <RefParameter Visible="false" Comment="PLLI2S is Used for I2S1" DefaultValue="1" Name="plli2sForI2S1" Min="0" Type="integer">
+            <Condition Expression="(I2S1Used_ForRCC &amp; I2SSourceIsPll)" Diagnostic=""/>
+        </RefParameter>
+        <RefParameter Visible="false" Comment="PLLI2S not Used for I2S1" DefaultValue="0" Name="plli2sForI2S1" Min="0" Type="integer"/>
+        
+        <RefParameter Visible="false" Comment="PLLI2S is Used for I2S2" DefaultValue="1" Name="plli2sForI2S2" Min="0" Type="integer">
+            <Condition Expression="(I2S2Used_ForRCC &amp; I2SSourceIsPll)" Diagnostic=""/>
+        </RefParameter>
+        <RefParameter Visible="false" Comment="PLLI2S not Used for I2S2" DefaultValue="0" Name="plli2sForI2S2" Min="0" Type="integer"/>
+        
+        <RefParameter Visible="false" Comment="PLLI2S is Used for I2S3" DefaultValue="1" Name="plli2sForI2S3" Min="0" Type="integer">
+            <Condition Expression="(I2S3Used_ForRCC &amp; I2SSourceIsPll)" Diagnostic=""/>
+        </RefParameter>
+        <RefParameter Visible="false" Comment="PLLI2S not Used for I2S3" DefaultValue="0" Name="plli2sForI2S3" Min="0" Type="integer"/>
+        
+        <RefParameter Visible="false" Comment="PLLI2S is Used for I2S4" DefaultValue="1" Name="plli2sForI2S4" Min="0" Type="integer">
+            <Condition Expression="(I2S4Used_ForRCC &amp; I2SSourceIsPll)" Diagnostic=""/>
+        </RefParameter>
+        <RefParameter Visible="false" Comment="PLLI2S not Used for I2S4" DefaultValue="0" Name="plli2sForI2S4" Min="0" Type="integer"/>
+        
+        <RefParameter Visible="false" Comment="PLLI2S is Used for I2S5" DefaultValue="1" Name="plli2sForI2S5" Min="0" Type="integer">
+            <Condition Expression="(I2S5Used_ForRCC &amp; I2SSourceIsPll)" Diagnostic=""/>
+        </RefParameter>
+        <RefParameter Visible="false" Comment="PLLI2S not Used for I2S5" DefaultValue="0" Name="plli2sForI2S" Min="0" Type="integer"/>
+        
+        <RefParameter Visible="false" Comment="PLLI2S is Used for MCO2" DefaultValue="1" Name="plli2sForMCO2" Min="0" Type="integer">
+            <Condition Expression="((RCC_MCO2Source=RCC_MCO2SOURCE_PLLI2SCLK)&amp; (MCO2Config))" Diagnostic=""/>
+        </RefParameter>
+        <RefParameter Visible="false" Comment="PLLI2S not Used for MCO2" DefaultValue="0" Name="plli2sForMCO2" Min="0" Type="integer"/>
+                                    
+        <!-- old PeriphClockSelectionARG -->
+	<!--RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" DefaultValue="+PeriphClockSelection" Type="list">
+            <Condition Expression="(I2SSourceIsPll &amp; I2SUsed_ForRCC)|((RCC_MCO2Source=RCC_MCO2SOURCE_PLLI2SCLK)&amp; (MCO2Config))|TimPrescalerEnabled|RTCUsed_ForRCC|((HSEByPass|HSEOscillator)&amp;(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11))" Diagnostic="clock used by RCC"/>
 	</RefParameter>
-	<RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" DefaultValue="null" Type="list"/>	
+	<RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" DefaultValue="null" Type="list"/-->
+        
+        <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" DefaultValue="RCC_PERIPHCLK_I2S" IP="I2S1,I2S2,I2S3,I2S4,I2S5" Type="list">
+            <Condition Expression="I2SSourceIsPll &amp; I2SUsed_ForRCC &amp; (plli2susage &lt; 2)" Diagnostic=""/>
+        </RefParameter>
+        <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" DefaultValue="RCC_PERIPHCLK_RTC" IP="RTC" Type="list">
+            <Condition Expression="RTCUsed_ForRCC" Diagnostic=""/>
+        </RefParameter>
+        <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" DefaultValue="RCC_PERIPHCLK_RTC" IP="TIM11" Type="list">
+            <Condition Expression="((HSEByPass|HSEOscillator)&amp;(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11))" Diagnostic=""/>
+        </RefParameter>
+        
+	<RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" DefaultValue="null" Type="list"/>
+        
+        
+        <!-- Old PeriphClockSelection -->
+        <!--RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelection" DefaultValue="+RCC_PERIPHCLK_TIMVar+|RCC_PERIPHCLK_PLLI2SVar+|RCC_PERIPHCLK_I2SVar+|RCC_PERIPHCLK_RTCVar" Type="list"/-->
+        
+        <RefParameter Visible="false" Comment="Periph Clock Selection" Name="C_PeriphClockSelectionARG" DefaultValue="+RCC_PERIPHCLK_TIMVar+|RCC_PERIPHCLK_PLLI2SVar+|RCC_PERIPHCLK_I2SVar" Type="list">
+        </RefParameter>
+        
+	<RefParameter Visible="false" Comment="Periph Clock Selection" Name="C_PeriphClockSelectionARG" DefaultValue="null" Type="list"/>
+        
+        <RefParameter Visible="false" Name="RCC_PERIPHCLK_PLLI2SVar" Comment="RCC_PERIPHCLK_PLLI2SVar" Type="list" DefaultValue="RCC_PERIPHCLK_PLLI2S">
+            <Condition Expression="((RCC_MCO2Source=RCC_MCO2SOURCE_PLLI2SCLK)&amp; MCO2Config)" Diagnostic="I2S Activated and source is PLLI2S"/>
+        </RefParameter>
+        <RefParameter Visible="false" Name="RCC_PERIPHCLK_PLLI2SVar" Comment="RCC_PERIPHCLK_PLLI2SVar" Type="list" DefaultValue=""/>
+
+	<RefParameter Visible="false" Name="RCC_PERIPHCLK_I2SVar" Comment="RCC_PERIPHCLK_I2SVar" Type="list" DefaultValue="RCC_PERIPHCLK_I2S">
+		<Condition Expression="(I2SSourceIsPll &amp; I2SUsed_ForRCC &amp; (plli2susage &gt; 1))" Diagnostic="I2S Activated and source is PLLI2S"/>
+		<PossibleValue Value="RCC_PERIPHCLK_I2S" Comment="RCC_PERIPHCLK_I2S"/>
+	</RefParameter>
+	<RefParameter Visible="false" Name="RCC_PERIPHCLK_I2SVar" Comment="RCC_PERIPHCLK_I2SVar" Type="list" DefaultValue=""/>
+        
+        <RefParameter Visible="false" Name="RCC_PERIPHCLK_TIMVar" Comment="RCC_PERIPHCLK_TIMVar" Type="list" DefaultValue="RCC_PERIPHCLK_TIM">
+            <Condition Expression="TimPrescalerEnabled" Diagnostic="Timer Prescaler Activated"/>
+            <PossibleValue Value="RCC_PERIPHCLK_TIM" Comment="RCC_PERIPHCLK_TIM"/>
+        </RefParameter>
+        <RefParameter Visible="false" Name="RCC_PERIPHCLK_TIMVar" Comment="RCC_PERIPHCLK_TIMVar" Type="list" DefaultValue=""/>
+    
+        <RefParameter Visible="false" Name="TIMPresSelectionARG" Comment="TIMPresSelectionARG" Type="list" DefaultValue="+RCC_TIM_PRescaler_Selection">
+            <Condition Expression="TimPrescalerEnabled" Diagnostic="PLLSAI is used for SAI"/>
+        </RefParameter>
+        <RefParameter Visible="false" Name="TIMPresSelectionARG" Comment="TIMPresSelectionARG" Type="list" DefaultValue="null"/>
+    
+        <RefParameter Visible="false" Name="RTCClockSelectionARG" Comment="RTCClockSelectionARG" Type="list" IP="RTC" DefaultValue="+RCC_RTC_Clock_Source">
+            <Condition Expression="RTCUsed_ForRCC" Diagnostic=""/>
+	</RefParameter>
+        <RefParameter Visible="false" Name="RTCClockSelectionARG" Comment="RTCClockSelectionARG" Type="list" IP="TIM11" DefaultValue="+RCC_RTC_Clock_Source">
+            <Condition Expression="((HSEByPass|HSEOscillator)&amp;(SEM2RCC_HSE_REQUIRED_TIM11 &amp; TIM11 &amp; Semaphore_input_Channel1TIM11))" Diagnostic="PLLSAI is used for SAI"/>
+	</RefParameter>
+	<RefParameter Visible="false" Name="RTCClockSelectionARG" Comment="RTCClockSelectionARG" Type="list" DefaultValue="null"/>
+        
+        
+        <RefParameter Visible="false" Name="PLLI2SNARG" Comment="PLLI2SNARG" Type="list" IP="I2S1,I2S2,I2S3,I2S4,I2S5" DefaultValue="+PLLI2SN">
+            <Condition Expression="(I2SSourceIsPll &amp; I2SUsed_ForRCC &amp; (plli2susage &lt; 2))" Diagnostic="PLLI2SN is used for I2S"/>	
+	</RefParameter>
+	<RefParameter Visible="false" Name="PLLI2SNARG" Comment="PLLI2SNARG" Type="list" DefaultValue="null"/>
+        
+        <RefParameter Visible="false" Name="C_PLLI2SNARG" Comment="C_PLLI2SNARG" Type="list" DefaultValue="+PLLI2SN">
+            <Condition Expression="(I2SSourceIsPll &amp; I2SUsed_ForRCC &amp; (plli2susage &gt; 1))|((RCC_MCO2Source=RCC_MCO2SOURCE_PLLI2SCLK)&amp; MCO2Config)" Diagnostic="PLLI2SN is used for I2S"/>	
+	</RefParameter>
+	<RefParameter Visible="false" Name="C_PLLI2SNARG" Comment="C_PLLI2SNARG" Type="list" DefaultValue="null"/>
+        
+	<RefParameter Visible="false" Name="PLLI2SMARG" Comment="PLLI2SMARG" Type="list" IP="I2S1,I2S2,I2S3,I2S4,I2S5" DefaultValue="+PLLI2SM">
+            <Condition Expression="(I2SSourceIsPll &amp; I2SUsed_ForRCC &amp; (plli2susage &lt; 2))" Diagnostic="PLLI2SM is used for I2S"/>
+	</RefParameter>
+	<RefParameter Visible="false" Name="PLLI2SMARG" Comment="PLLI2SMARG" Type="list" DefaultValue="null"/>
+        
+        <RefParameter Visible="false" Name="C_PLLI2SMARG" Comment="C_PLLI2SMARG" Type="list" DefaultValue="+PLLI2SM">
+            <Condition Expression="(I2SSourceIsPll &amp; I2SUsed_ForRCC &amp; (plli2susage &gt; 1))|((RCC_MCO2Source=RCC_MCO2SOURCE_PLLI2SCLK)&amp; MCO2Config)" Diagnostic="PLLI2SM is used for I2S"/>
+	</RefParameter>
+	<RefParameter Visible="false" Name="C_PLLI2SMARG" Comment="C_PLLI2SMARG" Type="list" DefaultValue="null"/>
 	
-    <RefParameter Visible="false" Name="TIMPresSelectionARG" Comment="TIMPresSelectionARG" Type="list" DefaultValue="+RCC_TIM_PRescaler_Selection">
-        <Condition Expression="TimPrescalerEnabled" Diagnostic="PLLSAI is used for SAI"/>
-    </RefParameter>
-    <RefParameter Visible="false" Name="TIMPresSelectionARG" Comment="TIMPresSelectionARG" Type="list" DefaultValue="null"/>
-		
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_TIMVar" Comment="RCC_PERIPHCLK_TIMVar" Type="list" DefaultValue="RCC_PERIPHCLK_TIM">
-        <Condition Expression="TimPrescalerEnabled" Diagnostic="Timer Prescaler Activated"/>
-        <PossibleValue Value="RCC_PERIPHCLK_TIM" Comment="RCC_PERIPHCLK_TIM"/>
-    </RefParameter>
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_TIMVar" Comment="RCC_PERIPHCLK_TIMVar" Type="list" DefaultValue=""/>
+	<RefParameter Visible="false" Name="PLLI2SRARG" Comment="PLLI2SRARG" Type="list" IP="I2S1,I2S2,I2S3,I2S4,I2S5" DefaultValue="+PLLI2SR">
+            <Condition Expression="(I2SSourceIsPll &amp; I2SUsed_ForRCC &amp; (plli2susage &lt; 2))" Diagnostic="PLLI2S is used for I2S"/>
+	</RefParameter>
+	<RefParameter Visible="false" Name="PLLI2SRARG" Comment="PLLI2SRARG" Type="list" DefaultValue="null"/>
+        
+        <RefParameter Visible="false" Name="C_PLLI2SRARG" Comment="C_PLLI2SRARG" Type="list" DefaultValue="+PLLI2SR">
+            <Condition Expression="(I2SSourceIsPll &amp; I2SUsed_ForRCC &amp; (plli2susage &gt; 1))|((RCC_MCO2Source=RCC_MCO2SOURCE_PLLI2SCLK)&amp; MCO2Config)" Diagnostic="PLLI2S is used for I2S"/>
+	</RefParameter>
+	<RefParameter Visible="false" Name="C_PLLI2SRARG" Comment="C_PLLI2SRARG" Type="list" DefaultValue="null"/>
 	
-	
+                            <!-- ****************** Clock Update Ticket 90818 CubeAzure _____End. **************** -->
+        
+        
 	<!-- Enable refParameters list -->
 	<!--RefEnabel Parameters -->
 	<RefParameter Visible="false" Name="EnableHSE" Comment="EnableHSE" Type="list" DefaultValue="true">
@@ -1129,15 +1198,24 @@
         <Parameter Name="SDIOEnable"/>
         <Parameter Name="USBFSEnable"/>
         <Parameter Name="USBHSEnable"/>
-        <Parameter Name="PeriphClockSelection"/>
+        <!--Parameter Name="PeriphClockSelection"/-->
         <Parameter Name="RCC_PERIPHCLK_I2SVar"/>
-        <Parameter Name="RCC_PERIPHCLK_RTCVar"/>
+        <!--Parameter Name="RCC_PERIPHCLK_RTCVar"/-->
         <Parameter Name="PLLI2SNARG"/>
         <Parameter Name="PLLI2SMARG"/>
         <Parameter Name="PLLI2SRARG"/>
         <Parameter Name="RTCClockSelectionARG"/>
         <Parameter Name="FamilyName"/>
     </RefMode>
+    
+    <RefMode Name="PClockTree">
+        <ConfigForMode>RCC_PeriphClockConfig</ConfigForMode>
+    </RefMode>
+
+    <RefMode Name="CommonPClockTree">
+        <ConfigForMode>RCC_CommonPeriphClockConfig</ConfigForMode>
+    </RefMode>
+    
     <RefMode Name="AdvancedSettings">
         <Parameter Name="VDD_VALUE"/>
         <Parameter Name="INSTRUCTION_CACHE_ENABLE"/>

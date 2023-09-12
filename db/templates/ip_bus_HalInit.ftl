@@ -187,9 +187,9 @@
                                         [#assign argValue="&"+argument1.name]
                                     [/#if] [#-- if genericType=Array --]
                                     [#if argument.value!="" && argument.value!="N/A"]
-                                    [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}[#else]${fargument.name}[/#if]->${argument.name} = ${argValue};
+                                    [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}->[#else]${fargument.name}.[/#if]${argument.name} = ${argValue};
                                     [#else]
-                                    [#if nTab==2]#t#t[#else]#t[/#if]//[#if instanceIndex??&&fargument.context=="global"]${fargument.name}[#else]${fargument.name}[/#if]->${argument.name} = [#if argument.value!="N/A"]${argValue}[/#if];
+                                    [#if nTab==2]#t#t[#else]#t[/#if]//[#if instanceIndex??&&fargument.context=="global"]${fargument.name}->[#else]${fargument.name}.[/#if]${argument.name} = [#if argument.value!="N/A"]${argValue}[/#if];
                                     [/#if]                                                                     
                                     [/#if]
                                     [#else] [#-- else argument.mandatory--]
@@ -198,16 +198,16 @@
                                               [#-- calculate the value of Instance argument if contains $Index --]
                                                 [#if  (argument.value??) && (argument.value?contains("$Index"))]
                                                     [#assign instanceValue=argument.value?replace("$Index",index)]
-                                                [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}[#else]${fargument.name}[/#if]->${argument.name} = ${instanceValue};
+                                                [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}->[#else]${fargument.name}.[/#if]${argument.name} = ${instanceValue};
                                                 [#else]
-                                                   [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}[#else]${fargument.name}[/#if]->${argument.name} = [#if argument.value??]${argument.value};[#else]${inst}[/#if]
+                                                   [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}->[#else]${fargument.name}.[/#if]${argument.name} = [#if argument.value??]${argument.value};[#else]${inst}[/#if]
                                                 [/#if]
                                           [#else]
                                               [#if argument.status=="KO"]
-                                                   [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]//${fargument.name}[#else]${fargument.name}[/#if]->${argument.name} = ${argument.value};                                        
+                                                   [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]//${fargument.name}->[#else]${fargument.name}.[/#if]${argument.name} = ${argument.value};                                        
                                               [/#if]
                                               [#if argument.value??]
-                                                   [#if argument.value!="N/A"][#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}[#else]${fargument.name}[/#if]->${argument.name} = ${argument.value};  [/#if]
+                                                   [#if argument.value!="N/A"][#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}->[#else]${fargument.name}.[/#if]${argument.name} = ${argument.value};  [/#if]
                                               [/#if]                                    
                                           [/#if][#-- if argument=Instance--]                                
                                       [/#if]    
@@ -232,14 +232,14 @@
                                         [/#list]
                                         [#assign argValue="&"+argument2.name+"[0]"]
                                     [/#if] [#-- if genericType=Array --]
-                                    [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}[#else]${fargument.name}[/#if]->${argument.name}.${argument2.name} = ${argValue};                                    
+                                    [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}->[#else]${fargument.name}.[/#if]${argument.name}.${argument2.name} = ${argValue};                                    
                                     [/#if]
                                [#else] [#-- !argument.mandatory --]
                                     [#if argument2.status=="KO"]
-                                        [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]//${fargument.name}[#else]${fargument.name}[/#if]->${argument.name}.${argument2.name} = ${argValue};
+                                        [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]//${fargument.name}->[#else]${fargument.name}.[/#if]${argument.name}.${argument2.name} = ${argValue};
                                     [/#if]
                                     [#if argument2.status=="OK"]
-                                    [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}[#else]${fargument.name}[/#if]->${argument.name}.${argument2.name} = ${argValue};
+                                    [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}->[#else]${fargument.name}.[/#if]${argument.name}.${argument2.name} = ${argValue};
                                     [/#if]
                                 [/#if][#-- if argument.mandatory --]
 [#else]
@@ -260,14 +260,14 @@
                                         [/#list]
                                         [#assign argValue="&"+argument3.name+"[0]"]
                                     [/#if] [#-- if genericType=Array --]
-                                    [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}[#else]${fargument.name}[/#if]->${argument.name}.${argument2.name}.${argument3.name} = ${argValue};                                    
+                                    [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}->[#else]${fargument.name}.[/#if]${argument.name}.${argument2.name}.${argument3.name} = ${argValue};                                    
                                     [/#if]
                                [#else] [#-- !argument.mandatory --]
                                     [#if argument3.status=="KO"]
-                                        [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]//${fargument.name}[#else]${fargument.name}[/#if]->${argument.name}.${argument2.name}.${argument3.name} = ${argValue};
+                                        [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]//${fargument.name}->[#else]${fargument.name}.[/#if]${argument.name}.${argument2.name}.${argument3.name} = ${argValue};
                                     [/#if]
                                     [#if argument3.status=="OK"]
-                                    [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}[#else]${fargument.name}[/#if]->${argument.name}.${argument2.name}.${argument3.name} = ${argValue};
+                                    [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}->[#else]${fargument.name}.[/#if]${argument.name}.${argument2.name}.${argument3.name} = ${argValue};
                                     [/#if]
                                 [/#if][#-- if argument.mandatory --]
 [/#list]
@@ -354,10 +354,10 @@
                                 [#if argument.genericType != "struct"]
                                 [#if argument.mandatory && argument.value??]
                                     [#if instanceIndex??&&fargument.context=="global"][#assign argValue=argument.value?replace("$Index",instanceIndex)][#else][#assign argValue=argument.value][/#if]
-                                    [#if nTab==2]#t#t[#else]#t[/#if]//[#if instanceIndex??&&fargument.context=="global"]${fargument.name}[#else]${fargument.name}[/#if]->${argument.name} = ${argValue};
+                                    [#if nTab==2]#t#t[#else]#t[/#if]//[#if instanceIndex??&&fargument.context=="global"]${fargument.name}->[#else]${fargument.name}.[/#if]${argument.name} = ${argValue};
                                  [#else]
                                     [#if argument.name=="Instance"]
-                                        [#if nTab==2]#t#t[#else]#t[/#if]//[#if instanceIndex??&&fargument.context=="global"]${fargument.name}[#else]${fargument.name}[/#if]->${argument.name} = ${inst};
+                                        [#if nTab==2]#t#t[#else]#t[/#if]//[#if instanceIndex??&&fargument.context=="global"]${fargument.name}->[#else]${fargument.name}.[/#if]${argument.name} = ${inst};
                                     [/#if]                                
                                 [/#if]
                             [#else]
@@ -581,15 +581,9 @@
         [#assign args = ""]
         [#assign listOfLocalVariables =""]
         [#assign resultList =""]
-[#if instName?contains("TIM")]
-[@common.getLocalVariableList instanceData=instanceData/]
-[#else]
- 	[#list instanceData.configs as config]
-            [@getLocalVariable configModel1=config listOfLocalVariables=listOfLocalVariables resultList=resultList/]
-            [#assign listOfLocalVariables =resultList]
 
-        [/#list]
-[/#if]
+[@common.getLocalVariableList instanceData=instanceData/]
+#n
 [#if instName!="DSIHOST"]
         [#list instanceData.configs as config]
                 

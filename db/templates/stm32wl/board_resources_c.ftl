@@ -10,7 +10,6 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
-
 [#--
 ********************************
 BSP IP Data:
@@ -66,6 +65,7 @@ Defines:
 [#if numButton > 0]
     [#assign useBUTTON = true]
 [/#if]
+
 /* Includes ------------------------------------------------------------------*/
 #include "platform.h"
 #include "board_resources.h"
@@ -108,24 +108,26 @@ typedef void (* SYS_RES_EXTI_LineCallback)(void);
         [#-- assign first value for the LED --]
         [#assign LED_GPIO_PORT=""]
         [#assign LED_PIN=""]
-        [#list BspIpDatas as SWIP]
-            [#if SWIP.variables??]
-                [#list SWIP.variables as variables]
-                    [#if variables.name?contains("IpInstance")]
-                        [#assign IpInstance = variables.value]
-                    [/#if]
-                    [#if variables.name?contains("IpName")]
-                        [#assign IpName = variables.value]
-                    [/#if]
-                    [#-- User BSP Led --]
-                    [#if variables.value?contains("LED ") ]
-                        [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
-                        [#assign LED_GPIO_PORT = LED_GPIO_PORT + "SYS_LED" + i + "_GPIO_PORT" + ", "]
-                        [#assign LED_PIN = LED_PIN + "SYS_LED" + i + "_PIN" + ", "]
-                    [/#if]
-                [/#list]
-            [/#if]
-        [/#list]
+        [#if BspIpDatas??]
+            [#list BspIpDatas as SWIP]
+                [#if SWIP.variables??]
+                    [#list SWIP.variables as variables]
+                        [#if variables.name?contains("IpInstance")]
+                            [#assign IpInstance = variables.value]
+                        [/#if]
+                        [#if variables.name?contains("IpName")]
+                            [#assign IpName = variables.value]
+                        [/#if]
+                        [#-- User BSP Led --]
+                        [#if variables.value?contains("LED ") ]
+                            [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
+                            [#assign LED_GPIO_PORT = LED_GPIO_PORT + "SYS_LED" + i + "_GPIO_PORT" + ", "]
+                            [#assign LED_PIN = LED_PIN + "SYS_LED" + i + "_PIN" + ", "]
+                        [/#if]
+                    [/#list]
+                [/#if]
+            [/#list]
+        [/#if]
     [/#if]
 /**
   * @brief Ports led list
@@ -143,32 +145,34 @@ static const uint16_t SYS_LED_PIN[SYS_LEDn] = {${LED_PIN}};
 [#assign BUTTON_IRQN=""]
 [#assign BUTTON_EXTI_LINE= ""]
 [#if numButton > 0]
-    [#list BspIpDatas as SWIP]
-        [#if SWIP.variables??]
-            [#list SWIP.variables as variables]
-                [#if variables.name?contains("IpInstance")]
-                    [#assign IpInstance = variables.value]
-                [/#if]
-                [#if variables.name?contains("IpName")]
-                    [#assign IpName = variables.value]
-                [/#if]
-                [#if variables.name?contains("GPIO_INT_NUM")]
-                    [#assign IrqNumber = variables.value]
-                [/#if]
-                [#if variables.name?contains("EXTI_LINE_NUMBER")]
-                    [#assign ExtiLine = variables.value]
-                [/#if]
-                [#-- User BSP Button --]
-                [#if variables.value?contains("BUTTON ") ]
-                    [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
-                    [#assign BUTTON_GPIO_PORT = BUTTON_GPIO_PORT + "SYS_BUTTON" + i + "_GPIO_PORT" + ", "]
-                    [#assign BUTTON_PIN = BUTTON_PIN + "SYS_BUTTON" + i + "_PIN" + ", "]
-                    [#assign BUTTON_IRQN = BUTTON_IRQN + "SYS_BUTTON" + i + "_EXTI_IRQn" + ", "]
-                    [#assign BUTTON_EXTI_LINE = BUTTON_EXTI_LINE + ".Line = SYS_BUTTON" + i + "_EXTI_LINE" + ", "]
-                [/#if]
-            [/#list]
-        [/#if]
-    [/#list]
+    [#if BspIpDatas??]
+        [#list BspIpDatas as SWIP]
+            [#if SWIP.variables??]
+                [#list SWIP.variables as variables]
+                    [#if variables.name?contains("IpInstance")]
+                        [#assign IpInstance = variables.value]
+                    [/#if]
+                    [#if variables.name?contains("IpName")]
+                        [#assign IpName = variables.value]
+                    [/#if]
+                    [#if variables.name?contains("GPIO_INT_NUM")]
+                        [#assign IrqNumber = variables.value]
+                    [/#if]
+                    [#if variables.name?contains("EXTI_LINE_NUMBER")]
+                        [#assign ExtiLine = variables.value]
+                    [/#if]
+                    [#-- User BSP Button --]
+                    [#if variables.value?contains("BUTTON ") ]
+                        [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
+                        [#assign BUTTON_GPIO_PORT = BUTTON_GPIO_PORT + "SYS_BUTTON" + i + "_GPIO_PORT" + ", "]
+                        [#assign BUTTON_PIN = BUTTON_PIN + "SYS_BUTTON" + i + "_PIN" + ", "]
+                        [#assign BUTTON_IRQN = BUTTON_IRQN + "SYS_BUTTON" + i + "_EXTI_IRQn" + ", "]
+                        [#assign BUTTON_EXTI_LINE = BUTTON_EXTI_LINE + ".Line = SYS_BUTTON" + i + "_EXTI_LINE" + ", "]
+                    [/#if]
+                [/#list]
+            [/#if]
+        [/#list]
+    [/#if]
 /**
   * @brief Ports button list
   */
@@ -196,39 +200,11 @@ EXTI_HandleTypeDef* sys_hpb_exti[SYS_BUTTONn];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
-[#if numButton > 1]
-    [#list BspIpDatas as SWIP]
-        [#if SWIP.variables??]
-            [#list SWIP.variables as variables]
-                [#if variables.name?contains("IpInstance")]
-                    [#assign IpInstance = variables.value]
-                [/#if]
-                [#if variables.name?contains("IpName")]
-                    [#assign IpName = variables.value]
-                [/#if]
-                [#if variables.name?contains("GPIO_INT_NUM")]
-                    [#assign IrqNumber = variables.value]
-                [/#if]
-                [#if variables.name?contains("EXTI_LINE_NUMBER")]
-                    [#assign ExtiLine = variables.value]
-                [/#if]
-                [#-- User BSP Button --]
-                [#if variables.value?contains("BUTTON ")]
-                    [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
-/**
-  * @brief Button SW${i} EXTI line detection callback.
-  * @return none
-  */
-static void SYS_BUTTON${i}_EXTI_Callback(void);
 
-                [/#if]
-            [/#list]
-        [/#if]
-    [/#list]
-[/#if]
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
+
 
 /* Exported functions --------------------------------------------------------*/
 int32_t SYS_LED_Init(Sys_Led_TypeDef Led)
@@ -289,9 +265,30 @@ int32_t SYS_LED_GetState(Sys_Led_TypeDef Led)
 int32_t SYS_PB_Init(Sys_Button_TypeDef Button, Sys_ButtonMode_TypeDef ButtonMode)
 {
   GPIO_InitTypeDef gpio_init_structure = {0};
-  static SYS_RES_EXTI_LineCallback button_callback[SYS_BUTTONn] = {SYS_BUTTON1_EXTI_Callback, SYS_BUTTON2_EXTI_Callback, SYS_BUTTON3_EXTI_Callback};
-  static uint32_t button_interrupt_priority[SYS_BUTTONn] = {SYS_BUTTONx_IT_PRIORITY, SYS_BUTTONx_IT_PRIORITY, SYS_BUTTONx_IT_PRIORITY};
-  static const uint32_t button_exti_line[SYS_BUTTONn] = {SYS_BUTTON1_EXTI_LINE, SYS_BUTTON2_EXTI_LINE, SYS_BUTTON3_EXTI_LINE};
+
+[#assign j = 0]
+[#assign SYS_BUTTON_EXTI_Callback =""]
+[#assign SYS_BUTTONx_IT_PRIORITY =""]
+[#assign SYS_BUTTON_EXTI_LINE =""]
+[#if BspIpDatas??]
+  [#list BspIpDatas as SWIP]
+    [#if SWIP.variables??]
+      [#list SWIP.variables as variables]
+        [#-- User BSP Button --]
+        [#if variables.value?contains("BUTTON ") ]
+          [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
+        [#assign SYS_BUTTON_EXTI_Callback = SYS_BUTTON_EXTI_Callback + ", SYS_BUTTON"+ i + "_EXTI_Callback"]
+        [#assign SYS_BUTTONx_IT_PRIORITY = SYS_BUTTONx_IT_PRIORITY + ", SYS_BUTTONx_IT_PRIORITY"]
+        [#assign SYS_BUTTON_EXTI_LINE = SYS_BUTTON_EXTI_LINE + ", SYS_BUTTON" + i + "_EXTI_LINE"]
+          [#assign j = j+1]
+        [/#if]
+      [/#list]
+    [/#if]
+  [/#list]
+[/#if]
+  static SYS_RES_EXTI_LineCallback button_callback[SYS_BUTTONn] = {${SYS_BUTTON_EXTI_Callback?remove_beginning(", ")}};
+  static uint32_t button_interrupt_priority[SYS_BUTTONn] = {${SYS_BUTTONx_IT_PRIORITY?remove_beginning(", ")}};
+  static const uint32_t button_exti_line[SYS_BUTTONn] = {${SYS_BUTTON_EXTI_LINE?remove_beginning(", ")}};
 
   /* Enable the SYS_BUTTON Clock */
   SYS_BUTTONx_GPIO_CLK_ENABLE(Button);
@@ -342,43 +339,40 @@ void SYS_PB_IRQHandler(Sys_Button_TypeDef Button)
   HAL_EXTI_IRQHandler(&sys_hpb_exti[Button]);
 }
 
-__weak void SYS_PB_Callback(Sys_Button_TypeDef Button)
+[#assign j = 0]
+[#if BspIpDatas??]
+  [#list BspIpDatas as SWIP]
+    [#if SWIP.variables??]
+      [#list SWIP.variables as variables]
+        [#if variables.name?contains("IpInstance")]
+          [#assign IpInstance = variables.value]
+        [/#if]
+        [#if variables.name?contains("IpName")]
+          [#assign IpName = variables.value]
+        [/#if]
+        [#-- User BSP Button --]
+        [#if variables.value?contains("BUTTON ") ]
+          [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
+__weak void SYS_BUTTON${i}_EXTI_Callback(void)
 {
-  /* Prevent unused argument(s) compilation warning */
-  UNUSED(Button);
-
   /* This function should be implemented by the user application.
      It is called into this driver when an event on Button is triggered.*/
 }
+
+          [#assign j = j+1]
+        [/#if]
+      [/#list]
+    [/#if]
+  [/#list]
+[/#if]
+
 
 /* USER CODE BEGIN EF */
 
 /* USER CODE END EF */
 
 /* Private Functions Definition -----------------------------------------------*/
-[#assign j = 0]
-[#list BspIpDatas as SWIP]
-  [#if SWIP.variables??]
-    [#list SWIP.variables as variables]
-      [#if variables.name?contains("IpInstance")]
-        [#assign IpInstance = variables.value]
-      [/#if]
-      [#if variables.name?contains("IpName")]
-        [#assign IpName = variables.value]
-      [/#if]
-      [#-- User BSP Button --]
-      [#if variables.value?contains("BUTTON ") ]
-        [#assign i=(variables.value?substring((variables.value?last_index_of(" ") + 1) ,variables.value?length))]
-static void SYS_BUTTON${i}_EXTI_Callback(void)
-{
-  SYS_PB_Callback(SYS_BUTTON${i});
-}
 
-        [#assign j = j+1]
-      [/#if]
-    [/#list]
-  [/#if]
-[/#list]
 /* USER CODE BEGIN PrFD */
 
 /* USER CODE END PrFD */

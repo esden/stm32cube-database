@@ -1,5 +1,6 @@
 [#ftl]
 [#assign CPUCORE = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    LmHandler_mbwrapper.h
@@ -10,6 +11,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __LMHANDLER_MBWRAPPER_${CPUCORE}_H__
@@ -48,8 +50,16 @@ extern "C" {
 
 /* Exported functions prototypes ---------------------------------------------*/
 [#if CPUCORE == "CM4"]
+/**
+  * @brief  This function processes the LmHandler events callbacks from CM0+
+  * @param  ComObj exchange buffer parameter
+  */
 void Process_Lora_Notif(MBMUX_ComParam_t *ComObj);
 [#else]
+/**
+  * @brief  This function processes the LmHandler events callbacks from CM4
+  * @param  ComObj exchange buffer parameter
+  */
 void Process_Lora_Cmd(MBMUX_ComParam_t *ComObj);
 [/#if]
 
