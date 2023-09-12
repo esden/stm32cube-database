@@ -323,5 +323,3 @@ ATEerror_t AT_verbose_get(const char *param);
 #endif
 
 #endif /* __SGFX_AT_H__ */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

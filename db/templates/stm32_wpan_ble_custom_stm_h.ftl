@@ -2,13 +2,13 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * File Name          : ${name}
-  * Description        : Header for custom_stm.c module.
-  *
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   Header for custom_stm.c module.
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
- ******************************************************************************
- */
+  ******************************************************************************
+  */
 /* USER CODE END Header */
 
 [#assign NUMBER_OF_SERVICES = "0"]
@@ -1108,5 +1108,3 @@ tBleStatus Custom_STM_App_Update_Char(Custom_STM_Char_Opcode_t CharOpcode,  uint
 #endif
 
 #endif /*__CUSTOM_STM_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

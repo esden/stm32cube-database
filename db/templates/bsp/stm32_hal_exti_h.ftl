@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    ${FamilyName?lower_case}xx_hal_exti.h
@@ -33,6 +34,7 @@
   *
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef ${FamilyName?upper_case}xx_HAL_EXTI_H
@@ -278,4 +280,3 @@ void              HAL_EXTI_IRQHandler(EXTI_HandleTypeDef *hexti);
 
 #endif /* ${FamilyName?upper_case}_HAL_EXTI_H */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

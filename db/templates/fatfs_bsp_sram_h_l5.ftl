@@ -48,5 +48,3 @@ void BSP_SRAM_DMA_IRQHandler(void);
 #endif
 
 #endif /* __${FamilyName}_SRAM_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

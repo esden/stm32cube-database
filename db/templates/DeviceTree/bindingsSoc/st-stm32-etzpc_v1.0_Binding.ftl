@@ -1,53 +1,31 @@
 [#ftl]
 
-[#--ETZPC binding--]
+[#--ETZPC binding: generic binding--]
 [#--/////////////--]
 
-[#--Identifiers list of peripherals under ETZPC control.
-ETZPC peripheral Ids definitions are part of ETZPC binding, this is why they
-are defined in this file.
-	*key = MX device name (regexp) - only one regexp group possible corresponding to device index
-	*value = ETZPC Peripheral Ids - if empty value, keep MX device name
 
-NB: if the device name does not match, the device is skipped from ETZPC list. The default HW reset
-value will be applied.
---]
-[#assign etzpc_map_periphIds={
-	 "adc":""
-	,"crc2":""
-	,"cryp(.+)":""
-	,"dac1":"DAC"
-	,"dcmi":""
-	,"ddr":"DDRCTRL" [#--special case--]
-	,"dfsdm":"DFSDM"
-	,"dma(\\w)":""
-	,"dmamux1":"DMAMUX"
-	,"eth1":"ETH"
-	,"fdcan1":"TT_FDCAN" [#--only fdcan1 is managed--]
-	,"hdmi_cec":"CEC"
-	,"fmc":""
-	,"hash(.+)":""
-	,"i2c(.+)":""
-	,"i2s(.+)":"SPI$1"
-	,"iwdg1":""
-	,"lptim(.+)":""
-	,"mdios":""
-	,"quadspi":"QSPI"
-	,"rng(.+)":""
-	,"sai(.+)":""
-	,"sdmmc3":""
-	,"spdifrx":""
-	,"spi(.+)":""
-	,"tim(.+)":""
-	,"uart(.+)":""
-	,"usart(.+)":""
-	,"usb_otg_hs":"OTG"
-	,"vrefbuf":""
-	,"wwdg1":""
-}]
+[#--update the security areas map w the new periph ids list taking into acount the device controls--]
+[#function bind_etzpc_updateSecurityAreasMap    periphIdsMap newPeriphIdsList targetedSecurityAreaName deviceSecurityAreasControlsList]
+	[#local module = "bind_etzpc_updateSecurityAreasMap"]
+	[#local traces =  ftrace("", "module="+module+"\n") ]
+	[#local errors = ""]
 
+	[#if !deviceSecurityAreasControlsList?seq_contains("!" + targetedSecurityAreaName)]
+		[#local securityAreaName = targetedSecurityAreaName]
+		[#list deviceSecurityAreasControlsList as controlledAreaName]
+			[#if !controlledAreaName?contains("!")]
+				[#local securityAreaName = controlledAreaName]
+				[#break]
+			[/#if]
+		[/#list]
 
-[#macro bind_etzpc	pElmt pDtLevel]
+		[#local periphIdsMap = srvc_map_putElmtsList(periphIdsMap, securityAreaName, newPeriphIdsList)]
+	[/#if]
+
+[#return {"errors":errors!, "periphIdsMap":periphIdsMap, "traces":traces!} ]
+[/#function]
+
+[#macro bind_etzpc_genericBinding	pElmt pDtLevel]
 [#compress]
 [#local TABres = dts_get_tabs(pDtLevel)]
 [#local TABnode = TABres.TABN]
@@ -70,49 +48,45 @@ ${res.errors} - deviceName=${deviceName}*/
 			[/#if]
 
 			[#if res.isMatching]
-				[#if res.res?has_content]
-					[#local newPeriphId = res.res?upper_case]
+
+				[#if res.res[0]?has_content]
+					[#local newPeriphIdsList = []]
+					[#local newPeriphIdsListRes = srvc_list_replaceString(res.res[0], "$1", res.group1)]
+					[#if !newPeriphIdsListRes.errors?has_content]
+						[#local newPeriphIdsList = newPeriphIdsListRes.res]
+					[#else]
+/*ERR : bind_etzpc() returns errors. The DTS may be incomplete. Reason:
+${res.errors} - deviceName=${deviceName}*/
+					[/#if]
 				[#else]
-					[#local newPeriphId = deviceName?upper_case]
-				[/#if]
-				[#local newPeriphIdsList = [newPeriphId]]
-
-				[#--Special configurations => a device can lead to several IDs--]
-				[#if (deviceName=="quadspi")]
-					[#local newPeriphIdsList = newPeriphIdsList + ["DLYBQ"]]
-				[#elseif (deviceName=="sdmmc3")]
-					[#local newPeriphIdsList = newPeriphIdsList + ["DLYBSD3"]]
-				[#elseif (deviceName=="ddr")]
-					[#local newPeriphIdsList = newPeriphIdsList + ["DDRPHYC"]]
+					[#local newPeriphIdsList = [deviceName?upper_case]]
 				[/#if]
 
-				[#local deviceRtCtxtNber = srvcmx_getDeviceRtCtxtNber(deviceName)]
-				[#if (deviceRtCtxtNber==1)]
-					[#if isCtxtSecure]
-						[#if deviceName!="tim15"][#--HW restriction (Wildcat specific): TIM15 cannot be declared Secured--]
-							[#local periphIdsMap = srvc_map_putElmtsList(periphIdsMap, "Secured", newPeriphIdsList)]
+				[#if newPeriphIdsList?has_content]
+
+					[#local deviceSecurityAreasControlsList = res.res[1]!]
+
+					[#local deviceRtCtxtNber = srvcmx_getDeviceRtCtxtNber(deviceName)]
+					[#if (deviceRtCtxtNber==1)]
+						[#if isCtxtSecure]
+							[#local periphIdsMap = bind_etzpc_updateSecurityAreasMap(periphIdsMap, newPeriphIdsList, "Secured", deviceSecurityAreasControlsList).periphIdsMap]
+						[#else]
+							[#if (ctxtCoreName?contains("Cortex-M"))][#--All Cortex-M cores are isolated--]
+								[#local periphIdsMap = bind_etzpc_updateSecurityAreasMap(periphIdsMap, newPeriphIdsList, "Mcu Isolation", deviceSecurityAreasControlsList).periphIdsMap]
+							[#else]
+								[#local periphIdsMap = bind_etzpc_updateSecurityAreasMap(periphIdsMap, newPeriphIdsList, "Non Secured", deviceSecurityAreasControlsList).periphIdsMap]
+							[/#if]
+						[/#if]
+					[#elseif (deviceRtCtxtNber>1)]
+						[#--multi-assignments => "Non Secured" & only one time--]
+						[#if !srvc_map_isElmtInValuesAsList(periphIdsMap, newPeriphIdsList[0])][#--1st Id is enough--]
+							[#local periphIdsMap = bind_etzpc_updateSecurityAreasMap(periphIdsMap, newPeriphIdsList, "Non Secured", deviceSecurityAreasControlsList).periphIdsMap]
 						[/#if]
 					[#else]
-						[#if (ctxtCoreName?contains("Cortex-M"))][#--All Cortex-M cores are isolated--]
-							[#local periphIdsMap = srvc_map_putElmtsList(periphIdsMap, "Mcu Isolation", newPeriphIdsList)]
-						[#else]
-							[#local periphIdsMap = srvc_map_putElmtsList(periphIdsMap, "Non Secured", newPeriphIdsList)]
-						[/#if]
+	/*ERR : bind_etzpc() returns errors. The DTS may be incomplete. Reason:
+	device has no context*/
 					[/#if]
-				[#elseif (deviceRtCtxtNber>1)]
-					[#if deviceName!="ddr"]
-						[#--multi-assignments => DECPROT_NS_RW--]
-						[#local periphIdsList = srvc_map_getValue(periphIdsMap, "Non Secured")]
-						[#if !periphIdsList?? || !periphIdsList?seq_contains(newPeriphId)]
-							[#local periphIdsMap = srvc_map_putElmtsList(periphIdsMap, "Non Secured", newPeriphIdsList)]
-						[/#if]
-					[#elseif isCtxtSecure]
-						[#--Specific DDR: multi-assigned but declared as Secured (NS_R S_W) only--]
-						[#local periphIdsMap = srvc_map_putElmtsList(periphIdsMap, "NS_R S_W", newPeriphIdsList)]
-					[/#if]
-				[#else]
-/*ERR : bind_etzpc() returns errors. The DTS may be incomplete. Reason:
-device has no context*/
+				[#--else: error, skip peripheral--]
 				[/#if]
 			[#--else: no match, skip peripheral--]
 			[/#if]
@@ -134,7 +108,7 @@ ${TABnode}/*"${securityArea}" peripherals*/
 			[#local periphIdsList = srvc_map_getValue(periphIdsMap, securityArea)]
 			[#list periphIdsList as periphId]
 [#t]
-				[#if (periphId=="DDRCTRL" || periphId=="DDRPHYC")]
+				[#if periphId?starts_with("DDR")][#--Specific DDR--]
 					[#local lockingStatus = "DECPROT_LOCK"]
 				[#else]
 					[#local lockingStatus = "DECPROT_UNLOCK"]
@@ -153,7 +127,11 @@ ${TABnode}DECPROT(${mx_family?upper_case}_ETZPC_${periphId}_ID, DECPROT_NS_RW, $
 		[/#list]
 #n
 ${TABnode}/*Restriction: following IDs are not managed  - please to use User-Section if needed:
-${TABnode}	${mx_family?upper_case}_ETZPC_SRAMx_ID, ${mx_family?upper_case}_ETZPC_RETRAM_ID, ${mx_family?upper_case}_ETZPC_BKPSRAM_ID*/
+	${TABnode}[#rt]
+		[#list etzpc_list_notManagedPeriphIds as notManagedPeriphIds][#t]
+  [#rt]${mx_family?upper_case}_ETZPC_${notManagedPeriphIds}_ID
+		[/#list][#t]
+*/
 #n
 ${TABnode}/* USER CODE BEGIN etzpc_decprot */
 ${TABnode}	/*STM32CubeMX generates a basic and standard configuration for ETZPC.

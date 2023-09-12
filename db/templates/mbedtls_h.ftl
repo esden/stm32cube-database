@@ -81,5 +81,3 @@ void MX_MBEDTLS_Init(void);
 /**
   * @}
   */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

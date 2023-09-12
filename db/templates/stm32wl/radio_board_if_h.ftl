@@ -278,4 +278,3 @@ int32_t RBI_IsDCDC(void);
 
 #endif /* RADIO_BOARD_IF_H */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

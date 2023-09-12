@@ -52,6 +52,7 @@
 	
 	<!-- Clock RefParameters for SPI --> 
 	<RefParameter Comment="Prescaler (for Baud Rate)" DefaultValue="SPI_BAUDRATEPRESCALER_2" Group="Clock Parameters" Name="BaudRatePrescaler" Type="list">
+		<Condition Diagnostic="" Expression="$IpInstance_Master"/>
 		<PossibleValue Comment="2" Value="SPI_BAUDRATEPRESCALER_2"/>
 		<PossibleValue Comment="4" Value="SPI_BAUDRATEPRESCALER_4"/>
 		<PossibleValue Comment="8" Value="SPI_BAUDRATEPRESCALER_8"/>
@@ -61,10 +62,11 @@
 		<PossibleValue Comment="128" Value="SPI_BAUDRATEPRESCALER_128"/>
 		<PossibleValue Comment="256" Value="SPI_BAUDRATEPRESCALER_256"/>
 	</RefParameter>
-	
-	<RefParameter Comment="Baud Rate" DefaultValue="18000000" Group="Clock Parameters" Max="18000000" Min="0" Name="CalculateBaudRate" Type="string">
+	<RefParameter Comment="Prescaler (for Baud Rate)" DefaultValue="null" Group="Clock Parameters" Name="BaudRatePrescaler" Type="list" Visible="false"/>
+
+	<RefParameter Comment="Baud Rate" DefaultValue="8000000" Group="Clock Parameters" Max="18000000" Min="0" Name="CalculateBaudRate" Type="string">
 		<Description>Calculated Baudrate value based on SPI Clock source and Prescaler</Description>
-		<Condition Diagnostic="" Expression="DIE418"/>
+		<Condition Diagnostic="" Expression="$IpInstance_Master &amp; DIE418"/>
 	</RefParameter>
 	
 	<RefParameter Comment="Baud Rate" DefaultValue="null" Group="Clock Parameters" Max="18000000" Min="0" Name="CalculateBaudRate" Type="string" Visible="false">
@@ -455,10 +457,11 @@
 						<Signal Name="NSS"/>
 					</SignalLogicalOp>
 					<Semaphore>$IpInstance_NSSHARD_Output</Semaphore>
-					<Condition Diagnostic="$IpInstance must be in Master mode" Expression="$IpInstance_Master"/>
+					<Condition Diagnostic="$IpInstance must have a master mode selected" Expression="$IpInstance_Master"/>
 				</Mode>
 			</ModeLogicOperator>
-			<Condition Diagnostic="$IpInstance must be have a valid Mode" Expression="$IpInstance"/>
+			<Condition Diagnostic="I2S$IpNumber must be disabled" Expression="!I2S$IpNumber"/>
+			<Condition Diagnostic="$IpInstance must have a mode selected" Expression="$IpInstance"/>
 		</Mode>
 	</ModeLogicOperator>
 	

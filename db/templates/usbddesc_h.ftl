@@ -172,4 +172,3 @@ extern USBD_DescriptorsTypeDef FS_Desc;
 
 #endif /* __${inclusion_protection}__ */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

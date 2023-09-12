@@ -1,20 +1,12 @@
 [#ftl]
 /* USER CODE BEGIN Header */
 /**
- ***************************************************************************************
-  * File Name          : ${name}
-  * Description        : Low layer function to enter/exit low power modes (stop, sleep).
- ***************************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
-  *
+  ***************************************************************************************
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   Low layer function to enter/exit low power modes (stop, sleep).
+  ***************************************************************************************
+  [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 /* USER CODE END Header */
@@ -365,19 +357,11 @@ static void EnterLowPower( void )
       /* Release ENTRY_STOP_MODE semaphore */
       LL_HSEM_ReleaseLock( HSEM, CFG_HW_ENTRY_STOP_MODE_SEMID, 0 );
 
-      /**
-       * The switch on HSI before entering Stop Mode is required on Cut2.0
-       * It is useless from Cut2.1
-       */
       Switch_On_HSI( );
     }
   }
   else
   {
-    /**
-     * The switch on HSI before entering Stop Mode is required on Cut2.0
-     * It is useless from Cut2.1
-     */
     Switch_On_HSI( );
   }
 
@@ -472,6 +456,4 @@ static void Switch_On_HSI( void )
 /* USER CODE BEGIN Private_Functions */
 
 /* USER CODE END Private_Functions */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 

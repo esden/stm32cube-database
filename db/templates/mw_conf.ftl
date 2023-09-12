@@ -70,4 +70,3 @@ extern ${variable.value} ${variable.name};
   * @}
   */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

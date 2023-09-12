@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    partition_[#if McuName?starts_with("STM32U585")]stm32u585xx.h[#else]stm32u575xx.h[/#if]
@@ -34,6 +35,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/* USER CODE END Header */
+
 [#assign enabledIT = ""]
 [#if nvic??]
 [#list nvic as vector]

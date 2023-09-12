@@ -210,5 +210,3 @@ void USBD_static_free(void *p);
 
 #endif /* __${inclusion_protection}__ */
 
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

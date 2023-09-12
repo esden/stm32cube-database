@@ -113,4 +113,3 @@ void vcom_Resume(void);
 
 #endif /* __USART_IF_H__ */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -912,4 +912,3 @@ void HAL_Delay(__IO uint32_t Delay)
 [/#if]
 [/#if]
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -491,4 +491,3 @@ void MX_${name}_Init(void)
   * @}
   */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

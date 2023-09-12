@@ -593,5 +593,3 @@ static int32_t Prbs9_generator(uint8_t *payload, uint8_t len)
 /* USER CODE BEGIN PrFD */
 
 /* USER CODE END PrFD */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

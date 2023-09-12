@@ -1,10 +1,11 @@
 [#ftl]
 /* USER CODE BEGIN Header */
 /**
- ******************************************************************************
-  * File Name          : ${name}
-  * Description        : Hardware configuration file for STM32WPAN Middleware.
- ******************************************************************************
+  ******************************************************************************
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   Configuration of hardware interface
+  ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
@@ -586,5 +587,3 @@
 
 
 #endif /*HW_CONF_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

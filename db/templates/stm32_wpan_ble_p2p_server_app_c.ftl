@@ -1,10 +1,11 @@
 [#ftl]
 /* USER CODE BEGIN Header */
 /**
- ******************************************************************************
- * File Name          : ${name}
- * Description        : P2P Server Application
- ******************************************************************************
+  ******************************************************************************
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   Peer to peer Server Application
+  ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
@@ -164,5 +165,3 @@ void P2PS_APP_Init(void)
 /* USER CODE BEGIN FD_LOCAL_FUNCTIONS*/
 
 /* USER CODE END FD_LOCAL_FUNCTIONS*/
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

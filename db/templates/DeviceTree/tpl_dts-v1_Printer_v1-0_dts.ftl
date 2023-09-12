@@ -323,9 +323,9 @@ ${dtsTAB}/${name}/[#t]
 						[#local dtsTABCpp = dtsTABCpp?substring(1)][#--cf inclusion into container--]
 					[/#if]
 					[#if value?has_content]
-${printerTAG}#${name} ${value}
+${printerTAG}${name} ${value}
 					[#else]
-${printerTAG}#${name}
+${printerTAG}${name}
 					[/#if]
 					[#--Print--]
 					[#local inspectAndPrint = true]
@@ -400,7 +400,6 @@ ${dtsTAB}/* USER CODE END ${usName} */
 				[#break]
 [#t]
 			[#case "CPreProcConditionsContainer"]
-#endif
 			[#break]
 [#t]
 			[#case "CPreProcCondition"]

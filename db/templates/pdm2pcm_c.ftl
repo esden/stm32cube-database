@@ -168,5 +168,3 @@ uint8_t MX_${ipName}${instName}_Process(uint16_t *PDMBuf, uint16_t *PCMBuf)
 /**
   * @}
   */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    mbox_ipcc.c
@@ -6,19 +7,10 @@
   * @brief   This file provides code for the configuration
   *                      of the mailbox_ipcc_if.c MiddleWare.
   ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics. 
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the 
-  * License. You may obtain a copy of the License at:
-  *                       opensource.org/licenses/BSD-3-Clause
-  *
+  [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
-
+/* USER CODE END Header */
 /*
  * Channel direction and usage:
  *
@@ -261,5 +253,3 @@ void IPCC_channel2_callback(IPCC_HandleTypeDef * hipcc,
 
   /* USER CODE END  POST_MAILBOX_CHANNEL2_CALLBACK */
 }
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

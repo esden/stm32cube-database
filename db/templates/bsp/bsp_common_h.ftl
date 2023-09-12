@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file  : ${BoardName}.h
@@ -7,6 +8,7 @@
 [@common.optinclude name=mxTmpFolder+ "/license.tmp"/][#--include License text --]
   ******************************************************************************
 */
+/* USER CODE END Header */
 [#assign IpInstance = ""]
 [#assign IpName = ""]
 [#assign IrqNumber = ""]
@@ -393,4 +395,3 @@ int32_t BSP_COM_RegisterMspCallbacks(COM_TypeDef COM , BSP_COM_Cb_t *Callback);
 
 #endif /* __${BoardName?upper_case}__H */
     
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

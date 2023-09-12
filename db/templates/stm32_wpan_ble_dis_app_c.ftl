@@ -2,8 +2,9 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * File Name          : ${name}
-  * Description        : Device Information Service Application
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   Device Information Service Application
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
@@ -88,5 +89,3 @@ void DISAPP_Init(void)
 /* USER CODE BEGIN FD */
 
 /* USER CODE END FD */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -447,5 +447,3 @@ void HalfTransfer_CallBack_HS(void)
 /**
   * @}
   */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

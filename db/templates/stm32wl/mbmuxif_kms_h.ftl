@@ -67,5 +67,3 @@ void MBMUXIF_KmsSendResp(void);
 #endif
 
 #endif /*__MBMUXIF_KMS_${CPUCORE}_H__ */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

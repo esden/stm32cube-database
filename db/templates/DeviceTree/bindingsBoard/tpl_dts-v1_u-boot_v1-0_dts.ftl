@@ -17,13 +17,15 @@
  * https://wiki.st.com/stm32mpu/wiki/Category:Device_tree_configuration
  */
 
+[#if !srvcmx_isDbFeatureEnabled("noUBootSplSupport")]
 #include <dt-bindings/clock/stm32mp1-clksrc.h>
-[#if mx_ddrConfigs["general"]?? && mx_ddrConfigs["general"]["isConfigured"]?? && mx_ddrConfigs["general"]["isConfigured"]=="true" ]
-	[#if mxDtDM.dts_ddrConfigFileName??]
+	[#if mx_ddrConfigs["general"]?? && mx_ddrConfigs["general"]["isConfigured"]?? && mx_ddrConfigs["general"]["isConfigured"]=="true" ]
+		[#if mxDtDM.dts_ddrConfigFileName??]
 #include "${mxDtDM.dts_ddrConfigFileName}"
-	[#else]
+		[#else]
 		[@mlog  logMod=module logType="WARN" logMsg="DDR not configured: unknown DDR config include" varsMap={} /]
 /*#include "???"*/
+		[/#if]
 	[/#if]
 [/#if]
 
@@ -33,16 +35,18 @@
 	[@mlog  logMod=module logType="ERR" logMsg="unknown 'U-BOOT' dtsi" varsMap={} /]
 /*#include "???.dtsi"*/
 [/#if]
-[#if mx_ddrConfigs["general"]?? && mx_ddrConfigs["general"]["isConfigured"]?? && mx_ddrConfigs["general"]["isConfigured"]=="true" ]
-	[#if mx_socDtRPN?has_content]
+[#if !srvcmx_isDbFeatureEnabled("noUBootSplSupport")]
+	[#if mx_ddrConfigs["general"]?? && mx_ddrConfigs["general"]["isConfigured"]?? && mx_ddrConfigs["general"]["isConfigured"]=="true" ]
+		[#if mx_socDtRPN?has_content]
 #include "${mx_socDtRPN}-ddr.dtsi"
-	[#else]
+		[#else]
 	[@mlog  logMod=module logType="ERR" logMsg="unknown DDR dtsi" varsMap={} /]
 /*#include "???-ddr.dtsi"*/
-	[/#if]
-[#else]
+		[/#if]
+	[#else]
 	[@mlog  logMod=module logType="WARN" logMsg="DDR not configured: unknown DDR dtsi" varsMap={} /]
 /*#include "???-ddr.dtsi"*/
+	[/#if]
 [/#if]
 
 /* USER CODE BEGIN includes */
@@ -63,8 +67,9 @@
 [#--pinctrl--]
 [@DTBindedDtsElmtDMsList_print  pParentElmt="" pElmtsList=srvcmx_getElmtsMatchingBindedHwName(mxDtDM.dts_bindedElmtsList, "pinctrl") pDtLevel=0 pOrdering=true/]
 
+[#if !srvcmx_isDbFeatureEnabled("noUBootSplSupport")][#--noUBootSplSupport--]
 [#--basic boot devices--]
-[#local basicBootDevicesList = ["rcc_cfg", "i2c4", "quadspi", "sdmmc1", "sdmmc2", "sai2", "sai4"]]
+[#local basicBootDevicesList = ["rcc", "i2c4", "quadspi", "sdmmc1", "sdmmc2", "sai2", "sai4"]]
 
 #ifndef CONFIG_TFABOOT
 
@@ -77,6 +82,13 @@
 [#--dts level elmts--]
 [#local basicBootDevicesList = basicBootDevicesList + ["rcc"]]
 [@DTBindedDtsElmtDMsList_print  pParentElmt="" pElmtsList=srvcmx_getDeviceElmtsByPathExcludingSome(mxDtDM.dts_bindedElmtsList, "", basicBootDevicesList) pDtLevel=0 pOrdering=true/][#--get only "dts" level elmts--]
+
+[#else][#--noUBootSplSupport--]
+
+[#--dts level elmts--]
+[@DTBindedDtsElmtDMsList_print  pParentElmt="" pElmtsList=srvcmx_getDeviceElmtsByPath(mxDtDM.dts_bindedElmtsList, "") pDtLevel=0 pOrdering=true/][#--get only "dts" level elmts--]
+
+[/#if][#--noUBootSplSupport--]
 
 
 /* USER CODE BEGIN addons */

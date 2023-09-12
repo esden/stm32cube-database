@@ -987,4 +987,3 @@ static int32_t tx_payload_generator(void)
 [/#if]
 /* USER CODE END PrFD */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

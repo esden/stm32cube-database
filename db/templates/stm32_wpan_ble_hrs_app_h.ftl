@@ -2,8 +2,9 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * File Name          : ${name}
-  * Description        : Header for hrs_application.c module
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   Header for hrs_application.c module
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
@@ -56,5 +57,3 @@ void HRSAPP_Init( void );
 #endif
 
 #endif /*__HRS_APP_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

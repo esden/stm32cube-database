@@ -147,4 +147,3 @@ void USBPD_USBIF_DeviceSetVDMInfo(uint32_t PortNum, void *DataPtr);
 
 #endif /* USBPD_USBIF_H_ */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

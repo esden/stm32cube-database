@@ -18,11 +18,6 @@
 
 [#include mx_dtLibsPath + "tpl_MxLibs_v1-0.ftl"]
 
-[#--Load SOC system bindings--]
-[#--FIX: load from DTConfigs.xml--]
-[#include mx_dtLibsPath + mx_dtBindingsSocPath +  "system-soc_and_common_v1.0_Bindings.ftl"]
-
-
 [#--Check DTGen config--]
 [#assign global_allowBinding = true]
 [#if !mxDtDM.dts_fwsList?has_content]
@@ -152,11 +147,12 @@ Before printing, are positioned elements respecting ordering.--]
 
 		[#--Apply re-ordering rules--]
 		[#if pOrdering]
-			[#-- systProp - pinCtrl - other elmts - Nodes (nodes in alphabetic order) --]
-			[#--FIX: would be better to sort by localNodeId (after wrapping)--]
-			[#local outElmtsList = systemPropertiesElmtsList + pinCtrlBindedElmtsList + otherElmtsList + statusPropertiesElmtsList + usersectionElmtsList + NodeElmtsList?sort_by("name")]
+			[#-- syst Prop - pinCtrl prop - status prop - other elmts - Nodes (nodes in alphabetic order) --]
+			[#--NB: all prop should be before any node--]
+			[#local outElmtsList = systemPropertiesElmtsList + pinCtrlBindedElmtsList + statusPropertiesElmtsList + otherElmtsList + usersectionElmtsList + NodeElmtsList?sort_by("name")]
 		[#else]
 			[#-- keep ordering excepted pinCtrl --]
+			[#--NB: all prop should be before any node--]
 			[#local outElmtsList = systemPropertiesElmtsList + pinCtrlBindedElmtsList + statusPropertiesElmtsList + usersectionElmtsList + notOrderedElmtsList]
 		[/#if]
 
@@ -174,6 +170,12 @@ Before printing, are positioned elements respecting ordering.--]
 [#assign global_includeFtlPath = mx_dtBindingsSocPath] [#--path for included ftl--]
 [#include mx_dtLibsPath + "tpl_dts-v1_Printer_v1-0_dts.ftl"]
 
+[#--------------------------------------------------------------------------------------------------------------------------------]
+[#-- Load common bindings --]
+[#--------------------------------------------------------------------------------------------------------------------------------]
+
+[#--Load SOC system bindings--]
+[@DTDtsElmtDMsList_print pElmtsList=srvcmx_getElmtsMatchingBindedHwName(mxDtDM.dts_bindedElmtsList, "socdevices_common") pElmtClassPrintLevel="DTDtsElmtDM" pDtLevel=0 pConfigsList=[]/]
 
 [#--------------------------------------------------------------------------------------------------------------------------------]
 [#-- Board DTS generation --]

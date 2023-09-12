@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
  ******************************************************************************
   * File Name          : lwippools.h
@@ -8,6 +9,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */ 
   
  /******************************************************************************
  * If MEMP_USE_CUSTOM_POOLS option is enabled:
@@ -43,5 +45,3 @@ LWIP_MALLOC_MEMPOOL_END
 #ifdef __cplusplus
 }
 #endif
-  
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

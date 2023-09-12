@@ -2,8 +2,9 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * File Name          : ${name}
-  * Description        : Header for ibeacon_application.c module
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   Header for ibeacon_application.c module
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
@@ -59,5 +60,3 @@ extern "C"
 #endif
 
 #endif /* IBEACON_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

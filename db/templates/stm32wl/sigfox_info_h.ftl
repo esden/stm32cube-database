@@ -75,4 +75,3 @@ SigfoxInfo_t *SigfoxInfo_GetPtr(void);
 
 #endif /* __SIGFOX_INFO_H__ */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

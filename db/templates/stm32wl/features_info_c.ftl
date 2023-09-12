@@ -190,5 +190,3 @@ FEAT_INFO_List_t *FEAT_INFO_GetListPtr(void)
 /* USER CODE BEGIN PrFD */
 
 /* USER CODE END PrFD */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

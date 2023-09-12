@@ -20,6 +20,7 @@
 [#assign IpInit_ToIgnore = "VREFBUF CORTEX_M4 CORTEX_M7 CORTEX_M33_S CORTEX_M33_NS HSEM PWR RCC"]
 [#assign azureMW_list = "threadx levelx filex netxduo usbx"]
 [#assign staticVoids =""]
+[#assign includeList =""]
 [#compress]
 [#assign usb_device = false]
 /* Includes ------------------------------------------------------------------*/
@@ -73,11 +74,14 @@
 					[#-- FileX, NetXDuo and USBX calls should be performed in threadx.
 					This should be updated to support the bare-metal mode
 					--]
-					[#if !THREADX??]
+					[#if !THREADX?? && ip?lower_case!="usb"]
 						#include "app_${ip?lower_case}.h"
 					[/#if]	
                                 [#else]
-					#include "${ip?lower_case}.h"				
+                                        [#if !includeList?contains("${ip?lower_case}.h")]
+					#include "${ip?lower_case}.h"
+                                        [#assign includeList =includeList + " "+ '${ip?lower_case}.h']
+                                        [/#if]
 				[/#if]	
                 [#break]
             [/#if]
@@ -90,7 +94,10 @@
         [/#list]
     [/#if]
     [#if (ip?has_content && ipExistsIntoreducevoids == false) && !ip?lower_case?contains("threadx")]
+    [#if !includeList?contains("${ip?lower_case}.h")]
     #include "${ip?lower_case}.h"
+    [#assign includeList =includeList + " "+ '${ip?lower_case}.h']
+    [/#if] 
     [/#if]    
 [/#if]
 [/#if]
@@ -113,7 +120,10 @@
 [#-- BZ 106035 --]
 [#if includesFilesByMw??]
 [#list includesFilesByMw as includeFile]
+[#if !includeList?contains("${includeFile?lower_case}.h")]
 #include "${includeFile?lower_case}.h"
+[#assign includeList =includeList + " "+ '${includeFile?lower_case}.h']
+[/#if]
 [/#list]
 [/#if]
 [#if RESMGR_UTILITY?? && !RESMGR_UTILITYUsed]
@@ -398,7 +408,7 @@ int main(void)
 
 #t/* USER CODE END 1 */
 [#compress]
-[#if bootMode?? && bootMode=="boot0" && cpucore=="ARM_CORTEX_M7" && McuDualCore?? && FamilyName=="STM32H7"][#-- M7 boot0 sequence --]
+[#if bootMode?? && bootMode=="boot0" && cpucore=="ARM_CORTEX_M7" && McuDualCore?? && FamilyName=="STM32H7" && isHALUsed??][#-- M7 boot0 sequence --]
   /* USER CODE BEGIN Boot_Mode_Sequence_0 */
   #tint32_t timeout; 
   /* USER CODE END Boot_Mode_Sequence_0 */
@@ -422,7 +432,7 @@ int main(void)
 [/#if]
 [#--/#if--]
 #n
-[#if bootMode?? && McuDualCore?? && FamilyName=="STM32H7"]
+[#if bootMode?? && McuDualCore?? && FamilyName=="STM32H7" && isHALUsed??]
 /* USER CODE BEGIN Boot_Mode_Sequence_1 */
     [#if bootMode=="boot0" && cpucore=="ARM_CORTEX_M7"] [#-- M7 boot0 sequence --]
 #t/* Wait until CPU2 boots and enters in stop mode or timeout*/
@@ -473,7 +483,6 @@ int main(void)
 [/#if]
 [#list voids as void]
 [#if void.functionName?? && void.functionName?contains("APPE_Init")]
-
 #t/* Config code for STM32_WPAN (HSE Tuning must be done before system clock configuration) */
 #tMX_APPE_Config();
 [/#if]
@@ -588,7 +597,7 @@ int main(void)
 #t/* Update SystemCoreClock variable */
   #tSystemCoreClockUpdate();
 [/#if] 
-[#if bootMode?? && cpucore=="ARM_CORTEX_M7" && McuDualCore?? && FamilyName=="STM32H7"] [#-- M7 boot0 sequence --]
+[#if bootMode?? && cpucore=="ARM_CORTEX_M7" && McuDualCore?? && FamilyName=="STM32H7" && isHALUsed??] [#-- M7 boot0 sequence --]
 /* USER CODE BEGIN Boot_Mode_Sequence_2 */
  /* When system initialization is finished, Cortex-M7 will release Cortex-M4  by means of 
      HSEM notification */
@@ -744,8 +753,11 @@ int main(void)
   [#if HALCompliant??]
 [#list voids as void]
 [#if void.functionName?? && void.functionName?contains("APPE_Init")]
+[#-- BZ 114099 --]
+[#if !void.isNotGenerated && void.genCode]
 #t/* Init code for STM32_WPAN */
 #tMX_APPE_Init();
+[/#if]
 [/#if]
 [/#list]
   [#else]
@@ -797,19 +809,22 @@ int main(void)
 [#if USBPD?? && void.functionName?? && void.functionName?contains("USBPD") && !FREERTOS?? && !THREADX?? && !void.isNotGenerated && void.genCode]
 #t#tUSBPD_DPM_Run();
 [/#if]
+[#if void.functionName?? && void.functionName?contains("APPE_Init") && !FREERTOS?? && !THREADX?? && !void.isNotGenerated && void.genCode]
+#t#tMX_APPE_Process();
+[/#if]
 [/#list]
 [#list ips as ip]
-[#if ip?contains("LoRaWAN") && !FREERTOS??]
+[#if ip?contains("LoRaWAN") && !FREERTOS?? && !THREADX??]
 #t#tMX_LoRaWAN_Process();
 [/#if]
-[#if ip?contains("SubGHz_Phy") && !FREERTOS??]
+[#if ip?contains("SubGHz_Phy") && !FREERTOS?? && !THREADX??]
 #t#tMX_SubGHz_Phy_Process();
 [/#if]
-[#if ip?contains("Sigfox") && !FREERTOS??]
+[#if ip?contains("Sigfox") && !FREERTOS?? && !THREADX??]
 #t#tMX_Sigfox_Process();
 [/#if]
-[#if ip?contains("STM32_WPAN") && !FREERTOS??]
-#t#tMX_APPE_Process();
+[#if ip?contains("STM32_WPAN") && !FREERTOS?? && !THREADX??]
+[#--#t#tMX_APPE_Process();--]
 [/#if]
 [/#list]
 #n
@@ -1333,6 +1348,3 @@ void assert_failed(uint8_t *file, uint32_t line)
 }
 #endif /* USE_FULL_ASSERT */
 
-
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

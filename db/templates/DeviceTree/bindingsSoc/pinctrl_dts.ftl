@@ -27,17 +27,33 @@
 	[#assign T5 = "\t\t\t\t\t"][#-- 5 Tab --]
 
 	[#--build nodes list to generate based on dtIODevicesList IPs list--]
-	[#assign ipToGenerate = []]
+	[#assign nodeRulesToGenerate = {}]
 	[#assign generateNode = true]
 	[#assign generateNodeZ = true]
 	[#list srvcmx_getListOfDevicesWithPinCtrl_inDTS() as ip]
 		[#assign ipUpper = ip?upper_case ]
 		[#if ipPinCtrlNodesNoZ.containsKey(ipUpper)]
-			[#assign ipToGenerate = ipToGenerate + [ipUpper] ]
+
+			[#list ipPinCtrlNodesNoZ[ipUpper] as ipNodeRule]
+				[#if !srvc_map_isContainsKey(nodeRulesToGenerate, ipNodeRule) || (nodeRulesToGenerate[ipNodeRule] == ipUpper)]
+					[#assign nodeRulesToGenerate = nodeRulesToGenerate + {ipNodeRule:ipUpper} ]
+				[#else]
+					[@mlog  logMod="pinctrl_dts.ftl" logType="ERR" logMsg="duplicated ipNodeRule - nodesNoZ\n" varsMap={"ipNodeRule":ipNodeRule!} /]
+				[/#if]
+			[/#list]
+
 			[#assign generateNode = true]
 		[/#if]
 		[#if ipPinCtrlNodesZ.containsKey(ipUpper) && pinCtrlBankZ]
-			[#assign ipToGenerate = ipToGenerate + [ipUpper] ]
+
+			[#list ipPinCtrlNodesZ[ipUpper] as ipNodeRule]
+				[#if !srvc_map_isContainsKey(nodeRulesToGenerate, ipNodeRule) || (nodeRulesToGenerate[ipNodeRule] == ipUpper)]
+					[#assign nodeRulesToGenerate = nodeRulesToGenerate + {ipNodeRule:ipUpper} ]
+				[#else]
+					[@mlog  logMod="pinctrl_dts.ftl" logType="ERR" logMsg="duplicated ipNodeRule - nodesZ\n" varsMap={"ipNodeRule":ipNodeRule!} /]
+				[/#if]
+			[/#list]
+
 			[#assign generateNodeZ = true]
 		[/#if]
 	[/#list]
@@ -59,7 +75,9 @@
 		[#if generateNode][#--to not generate empty nodes for atf DT & not pinCtrl for uBoot DT--]
 &pinctrl {
 			[#if kernelDt][#--no 'u-boot,dm-pre-reloc' tags for atf DT--]
+				[#if !srvcmx_isDbFeatureEnabled("noUBootSplSupport")]
 ${T1}u-boot,dm-pre-reloc;
+				[/#if]
 #n
 				[@pinctrlPrint dtPinCtrlDataModel=dtPinCtrlDataModelNoZ ipInstanceList=ipInstanceListExtraNodeNoZ bankZ=false/]
 			[#else]
@@ -73,17 +91,21 @@ ${T1}/* USER CODE END pinctrl */
 		[#if pinCtrlBankZ]
 			[#if generateNodeZ][#--to not generate empty nodes for atf DT & not pinCtrl for uBoot DT--]
 #n
+				[#if (mx_socDtRPN == "stm32mp15")]
 &pinctrl_z {
-			[#if kernelDt][#--no 'u-boot,dm-pre-reloc' tags for atf DT--]
+					[#if kernelDt][#--no 'u-boot,dm-pre-reloc' tags for atf DT--]
+						[#if !srvcmx_isDbFeatureEnabled("noUBootSplSupport")]
 ${T1}u-boot,dm-pre-reloc;
+						[/#if]
 #n
-				[@pinctrlPrint dtPinCtrlDataModel=dtPinCtrlDataModelZ ipInstanceList=ipInstanceListExtraNodeZ bankZ=true/]
-			[#else]
-				[@pinctrlPrint dtPinCtrlDataModel=dtPinCtrlDataModelZ ipInstanceList=ipInstanceListZ bankZ=true/]
-			[/#if]
+						[@pinctrlPrint dtPinCtrlDataModel=dtPinCtrlDataModelZ ipInstanceList=ipInstanceListExtraNodeZ bankZ=true/]
+					[#else]
+						[@pinctrlPrint dtPinCtrlDataModel=dtPinCtrlDataModelZ ipInstanceList=ipInstanceListZ bankZ=true/]
+					[/#if]
 ${T1}/* USER CODE BEGIN pinctrl_z */
 ${T1}/* USER CODE END pinctrl_z */
 };
+				[/#if]
 			[/#if]
 		[/#if]
 	[/#if]
@@ -112,7 +134,7 @@ ${T1}/* USER CODE END pinctrl_z */
 		[#local nodeName = ""]
 		[#local configName = ""]
 
-		[#local ip = srvc_list_getStringElmtStartingTheString(ipToGenerate, nodeRule)]
+		[#local ip = srvc_map_getValue(nodeRulesToGenerate, nodeRule)]
 		[#if ip?has_content]
 			[#--nodeName w no prefix--]
 			[#local res = nodeRule?matches( "(\\w+)(/(.+))?" )]
@@ -132,7 +154,7 @@ ${T1}/* USER CODE END pinctrl_z */
 				[#local nodeName = res[0]?groups[2]! ]
 				[#local configName = res[0]?groups[4]! ]
 
-				[#local ip = srvc_list_getStringElmtStartingTheString( ipToGenerate, res[0]?groups[2]! )]
+				[#local ip = srvc_map_getValue(nodeRulesToGenerate, nodeRule)]
 			[#else]
 				[@mlog  logMod="pinctrlPrint" logType="ERR" logMsg="wrong match in nodeRule w prefix\n" varsMap={"nodeRule":nodeRule!} /]
 			[/#if]
@@ -167,7 +189,7 @@ ${T1}/* USER CODE END pinctrl_z */
 		[/#if][#--else ip wo pinctrl --]
 
 
-		[#if srvcmx_getBootloadersEnabledDevicesList()?seq_contains(ip?lower_case) && kernelDt][#--ip upper - device lower--]
+		[#if srvcmx_getBootloadersEnabledDevicesList()?seq_contains(ip?lower_case) && kernelDt && !srvcmx_isDbFeatureEnabled("noUBootSplSupport")][#--ip upper - device lower--]
 			[#assign ipBootTag = true ]
 		[#else]
 			[#assign ipBootTag = false ]

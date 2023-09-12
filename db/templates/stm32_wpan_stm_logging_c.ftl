@@ -1,11 +1,11 @@
 [#ftl]
 /* USER CODE BEGIN Header */
 /**
- ******************************************************************************
-  * File Name          : ${name}
-  * Description        : This file contains all the defines and functions used 
+  ******************************************************************************
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   This file contains all the defines and functions used 
   *                     for logging on Application examples.
-  *
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************

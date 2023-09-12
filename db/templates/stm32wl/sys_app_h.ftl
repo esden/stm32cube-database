@@ -190,4 +190,3 @@ void Process_Kms_Cmd(MBMUX_ComParam_t *ComObj);
 
 #endif /* __SYS_APP_H__ */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

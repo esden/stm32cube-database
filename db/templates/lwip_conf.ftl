@@ -1,5 +1,5 @@
 [#ftl]
-
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * File Name          : ${name}
@@ -9,6 +9,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */ 
  
 [#assign s_ori = name]
 [#assign s1 = s_ori?replace(".","__")]
@@ -617,5 +618,3 @@ extern ${variable.value} ${variable.name};
 }
 #endif
 #endif /*__${inclusion_protection}__ */
-
-/************************* (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

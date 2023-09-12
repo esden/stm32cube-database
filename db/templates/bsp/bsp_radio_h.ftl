@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    ${Board_RPN?lower_case}_radio.h
@@ -8,6 +9,7 @@
  [@common.optinclude name=mxTmpFolder+ "/license.tmp"/][#--include License text --]
   ******************************************************************************
 */
+/* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __${BoardName?upper_case}_H
@@ -164,5 +166,5 @@ int32_t BSP_RADIO_IsDCDC(void);
 
 #endif /*__${BoardName?upper_case}__H */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+
 

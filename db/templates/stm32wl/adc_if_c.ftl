@@ -235,4 +235,3 @@ static uint32_t ADC_ReadChannels(uint32_t channel)
   /* USER CODE END ADC_ReadChannels_2 */
 }
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

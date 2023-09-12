@@ -190,4 +190,3 @@ extern USBD_DescriptorsTypeDef #t#t${CLASS_FS}_Desc;
 
 #endif /* __${inclusion_protection}__ */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
  ******************************************************************************
   * File Name          : ethernetif.h
@@ -8,6 +9,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
   
 [#-- SWIPdatas is a list of SWIPconfigModel --]
 [#list SWIPdatas as SWIP]
@@ -106,6 +108,3 @@ u32_t sys_now(void);
 
 /* USER CODE END 1 */
 #endif
-
-  
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

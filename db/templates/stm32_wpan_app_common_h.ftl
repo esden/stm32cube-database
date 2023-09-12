@@ -1,10 +1,10 @@
 [#ftl]
 /* USER CODE BEGIN Header */
 /**
- ******************************************************************************
-  * File Name          : ${name}
-  * Description        : App Common application configuration file for STM32WPAN Middleware.
-  *
+  ******************************************************************************
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   App Common application configuration file for STM32WPAN Middleware.
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
@@ -109,5 +109,3 @@ extern "C"{
 #endif
 
 #endif /*APP_COMMON_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

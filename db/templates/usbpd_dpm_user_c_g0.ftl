@@ -568,6 +568,14 @@ void USBPD_DPM_SetDataInfo(uint8_t PortNum, USBPD_CORE_DataInfoType_TypeDef Data
 USBPD_StatusTypeDef USBPD_DPM_EvaluateRequest(uint8_t PortNum, USBPD_CORE_PDO_Type_TypeDef *PtrPowerObject)
 {
 /* USER CODE BEGIN USBPD_DPM_EvaluateRequest */
+  /* 
+    Set power data object to initialize value.
+    This parameter is used by the stack to start or not tPPSTimeout
+    (in case of USBPD_CORE_PDO_TYPE_APDO, stack will wait for periodic request
+    from the port partner in PPS mode).
+  */
+  *PtrPowerObject = USBPD_CORE_PDO_TYPE_FIXED;
+  
   DPM_USER_DEBUG_TRACE(PortNum, "ADVICE: update USBPD_DPM_EvaluateRequest");
   return USBPD_REJECT;
 /* USER CODE END USBPD_DPM_EvaluateRequest */
@@ -1246,5 +1254,3 @@ USBPD_StatusTypeDef USBPD_DPM_RequestSecurityRequest(uint8_t PortNum)
 /** 
   * @}
   */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

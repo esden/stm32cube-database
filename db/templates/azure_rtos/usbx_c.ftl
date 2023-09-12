@@ -99,4 +99,3 @@ UINT MX_USBX_Host_Init(VOID *memory_ptr)
 }
 [/#if]
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

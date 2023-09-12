@@ -21,17 +21,18 @@
 	[#if mx_socDtRPN?has_content && mx_ddrConfigs["general"]?? && mx_ddrConfigs["general"]["ddrDecSize"]??]
 
 		[#local ddrProfiles_map={
-			 "1":"128m"
-			,"2":"256m"
-			,"5":"512m"
-			,"10":"1g"
+			 "0x8000000":"128MB"
+			,"0x10000000":"256MB"
+			,"0x20000000":"512MB"
+			,"0x40000000":"1GB"
 		}]
 
-		[#local ddrDecSizeStr = ((mx_ddrConfigs["general"]["ddrDecSize"]?number) / 100000000)?floor?string]	
-		[#local ddrProfile = srvc_map_getValue(ddrProfiles_map, ddrDecSizeStr)]
+		[#local ddrHexSizeStr = mx_ddrConfigs["general"]["ddrSize"] ]
+		[#local ddrProfile = srvc_map_getValue(ddrProfiles_map, ddrHexSizeStr)]
 
 		[#if ddrProfile?has_content]
-#include "${mx_socDtRPN}-ddr-${ddrProfile}-fw-config.dts"
+#define DDR_SIZE	${ddrHexSizeStr} /* ${ddrProfile} */
+#include "${mx_socDtRPN}-fw-config.dts"
 		[#else]
 [@mlog  logMod=module logType="ERR" logMsg="Unknown DDR profile: FW config not generated" varsMap={} /]
 		[/#if]

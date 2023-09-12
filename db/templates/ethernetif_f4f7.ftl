@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * File Name          : ethernetif.c
@@ -8,6 +9,8 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
+
 [#-- SWIPdatas is a list of SWIPconfigModel --]
 [#compress] 
 [#list SWIPdatas as SWIP]
@@ -846,5 +849,3 @@ __weak void ethernetif_notify_conn_changed(struct netif *netif)
 /* USER CODE BEGIN 9 */
 
 /* USER CODE END 9 */
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
-

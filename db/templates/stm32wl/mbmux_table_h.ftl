@@ -95,5 +95,3 @@ typedef struct
 #endif
 
 #endif /* __MBMUX_TABLE_H__ */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

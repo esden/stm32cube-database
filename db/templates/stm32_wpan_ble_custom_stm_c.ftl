@@ -2,13 +2,13 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * File Name          : ${name}
-  * Description        : Custom Example Service.
-  *
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   Custom Example Service.
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
- ******************************************************************************
- */
+  ******************************************************************************
+  */
 /* USER CODE END Header */
 
 [#assign NUMBER_OF_SERVICES = "0"]
@@ -3764,5 +3764,3 @@ tBleStatus Custom_STM_App_Update_Char(Custom_STM_Char_Opcode_t CharOpcode, uint8
 
   return result;
 }
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

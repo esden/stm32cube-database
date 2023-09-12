@@ -288,4 +288,3 @@ typedef enum
 
 #endif /* __MSG_ID_H__ */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

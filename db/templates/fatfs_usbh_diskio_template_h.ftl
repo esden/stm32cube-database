@@ -13,6 +13,7 @@
 [/#if]
 [/#list]
 [/#if]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
 [#if use_dma = 1]
@@ -25,6 +26,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __USBH_DISKIO_H
 #define __USBH_DISKIO_H
@@ -46,6 +48,4 @@ extern const Diskio_drvTypeDef  USBH_Driver;
 /* USER CODE END lastSection */
 
 #endif /* __USBH_DISKIO_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 

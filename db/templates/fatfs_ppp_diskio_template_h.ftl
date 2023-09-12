@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
  ******************************************************************************
   * @file    user_diskio.h
@@ -8,7 +9,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
-  
+/* USER CODE END Header */  
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __USER_DISKIO_H
 #define __USER_DISKIO_H
@@ -32,5 +33,3 @@ extern Diskio_drvTypeDef  USER_Driver;
 #endif
 
 #endif /* __USER_DISKIO_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

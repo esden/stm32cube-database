@@ -1,13 +1,14 @@
 [#ftl]
 /* USER CODE BEGIN Header */
 /**
- ******************************************************************************
-  * File Name          : ${name}
-  * Description        : OTA Service Application.
+  ******************************************************************************
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   OTA Service Application.
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
- ******************************************************************************
- */
+  ******************************************************************************
+  */
 /* USER CODE END Header */
 [#assign FREERTOS_STATUS = 0]
 [#list SWIPdatas as SWIP]
@@ -195,5 +196,3 @@ void OTAS_STM_Notification( OTA_STM_Notification_t *p_notification )
 /* USER CODE BEGIN PF */
 
 /* USER CODE END PF */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

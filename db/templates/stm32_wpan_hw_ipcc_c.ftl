@@ -1,11 +1,11 @@
 [#ftl]
 /* USER CODE BEGIN Header */
 /**
- ******************************************************************************
-  * File Name          : ${name}
-  * Description        : Hardware IPCC source file for STM32WPAN Middleware.
-  *
- ******************************************************************************
+  ******************************************************************************
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   Hardware IPCC source file for STM32WPAN Middleware.
+  ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
@@ -170,10 +170,6 @@ void HW_IPCC_Tx_Handler( void )
       HW_IPCC_ZIGBEE_CmdEvtHandler();
   }
 #endif /* ZIGBEE_WB */
-  else if (HW_IPCC_TX_PENDING( HW_IPCC_SYSTEM_CMD_RSP_CHANNEL ))
-  {
-    HW_IPCC_SYS_CmdEvtHandler();
-  }
   else if (HW_IPCC_TX_PENDING( HW_IPCC_MM_RELEASE_BUFFER_CHANNEL ))
   {
     HW_IPCC_MM_FreeBufHandler();
@@ -742,5 +738,3 @@ static void HW_IPCC_TRACES_EvtHandler( void )
 }
 
 __weak void HW_IPCC_TRACES_EvtNot( void ){};
-
-/******************* (C) COPYRIGHT 2019 STMicroelectronics *****END OF FILE****/

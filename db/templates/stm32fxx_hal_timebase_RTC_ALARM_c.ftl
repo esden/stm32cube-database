@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    ${FamilyName?lower_case}xx_hal_timebase_RTC_ALARM.c 
@@ -7,6 +8,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
 #include "${FamilyName?lower_case}xx_hal.h"
@@ -208,5 +210,3 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 /**
   * @}
   */ 
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

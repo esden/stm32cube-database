@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    rsc_table.c
@@ -9,18 +10,10 @@
   *  load the elf file. It also allows to add debug trace using a shared buffer.
   *
   ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics. 
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                       opensource.org/licenses/BSD-3-Clause
-  *
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 /** @addtogroup RSC_TABLE
   * @{
@@ -174,4 +167,3 @@ void resource_table_init(int RPMsgRole, void **table_ptr, int *length)
   *length = sizeof(resource_table);
   *table_ptr = (void *)&resource_table;
 }
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

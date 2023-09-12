@@ -693,5 +693,3 @@ static void Sgfx_KMS_DeleteDerivedKeys(CK_OBJECT_HANDLE input)
 /* USER CODE BEGIN PrFD */
 
 /* USER CODE END PrFD */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

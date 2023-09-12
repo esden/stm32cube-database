@@ -104,4 +104,3 @@ uint32_t SYS_EE_WriteBuffer_mbwrapper(e_EE_ID EEsgfxID, uint32_t data)
 
 /* USER CODE END EF */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

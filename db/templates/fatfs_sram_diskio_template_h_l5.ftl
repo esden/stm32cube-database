@@ -28,5 +28,3 @@
 extern const Diskio_drvTypeDef SRAMDISK_Driver;
 #endif /* __SRAM_DISKIO_H */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
-

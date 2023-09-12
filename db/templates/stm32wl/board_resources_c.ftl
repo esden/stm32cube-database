@@ -376,5 +376,3 @@ __weak void SYS_BUTTON${i}_EXTI_Callback(void)
 /* USER CODE BEGIN PrFD */
 
 /* USER CODE END PrFD */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

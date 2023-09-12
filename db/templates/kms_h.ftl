@@ -94,5 +94,3 @@ void HAL_${mode}_BspDeInit(${mode}_HandleTypeDef* h${mode?lower_case});
 /**
   * @}
   */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

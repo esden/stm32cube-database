@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file           : ${BoardName}_bus.h
@@ -7,6 +8,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
 */
+/* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef ${BoardName?upper_case}_BUS_H
@@ -557,4 +559,3 @@ int32_t BSP_GetTick(void);
 
 #endif /* ${BoardName?upper_case}_BUS_H */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

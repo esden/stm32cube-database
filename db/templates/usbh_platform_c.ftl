@@ -100,12 +100,12 @@ void MX_DriverVbusFS(uint8_t state)
   if(state == 0)
   {
     /* Drive high Charge pump */ 	     
-    data = GPIO_PIN_SET;
+    data = GPIO_PIN_RESET;
   }
   else
   {
     /* Drive low Charge pump */
-    data = GPIO_PIN_RESET;
+    data = GPIO_PIN_SET;
   }
   /* USER CODE END PREPARE_GPIO_DATA_VBUS_FS */
   HAL_GPIO_WritePin(${IpNameFS},${IpInstanceFS},(GPIO_PinState)data);
@@ -190,4 +190,3 @@ void MX_DriverVbusHS(uint8_t state)
 }
 [/#if]
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -202,4 +202,4 @@ extern "C" {
 #endif
 
 #endif /* TRACER_EMB_CONF_H */
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+

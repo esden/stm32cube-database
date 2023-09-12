@@ -951,5 +951,3 @@ static void OnMacProcessNotify(void)
 [/#if]
 [/#if]
 }
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

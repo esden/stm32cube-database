@@ -6,16 +6,7 @@
   * @author  MCD Application Team
   * @brief   app_azure_rtos application implementation file
   ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under Ultimate Liberty license
-  * SLA0044, the "License"; You may not use this file except in compliance with
-  * the License. You may obtain a copy of the License at:
-  *                             www.st.com/SLA0044
-  *
+  [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 /* USER CODE END Header */
@@ -100,56 +91,60 @@
 /* USER CODE END PV */
 
 #if (USE_MEMORY_POOL_ALLOCATION == 1)
+#if defined ( __ICCARM__ ) 
+#pragma data_alignment=4
+#endif
 [#if TX_ENABLED == "true"]
 /* USER CODE BEGIN TX_Pool_Buffer */
 /* USER CODE END TX_Pool_Buffer */
-static UCHAR tx_byte_pool_buffer[TX_APP_MEM_POOL_SIZE];
+
+__ALIGN_BEGIN static UCHAR tx_byte_pool_buffer[TX_APP_MEM_POOL_SIZE] __ALIGN_END;
 static TX_BYTE_POOL tx_app_byte_pool;
 [/#if]
 
 [#if FX_ENABLED == "true"]
 /* USER CODE BEGIN FX_Pool_Buffer */
 /* USER CODE END FX_Pool_Buffer */
-static UCHAR  fx_byte_pool_buffer[FX_APP_MEM_POOL_SIZE];
+__ALIGN_BEGIN static UCHAR  fx_byte_pool_buffer[FX_APP_MEM_POOL_SIZE] __ALIGN_END;
 static TX_BYTE_POOL fx_app_byte_pool;
 [/#if]
 
 [#if NX_ENABLED == "true"]
 /* USER CODE BEGIN NX_Pool_Buffer */
 /* USER CODE END NX_Pool_Buffer */
-static UCHAR  nx_byte_pool_buffer[NX_APP_MEM_POOL_SIZE];
+__ALIGN_BEGIN static UCHAR  nx_byte_pool_buffer[NX_APP_MEM_POOL_SIZE] __ALIGN_END;
 static TX_BYTE_POOL nx_app_byte_pool;
 [/#if]
 
 [#if UX_HOST_ENABLED == "true"]
 /* USER CODE BEGIN UX_HOST_Pool_Buffer */
 /* USER CODE END UX_HOST_Pool_Buffer */
-static UCHAR  ux_host_byte_pool_buffer[UX_HOST_APP_MEM_POOL_SIZE];
+__ALIGN_BEGIN static UCHAR  ux_host_byte_pool_buffer[UX_HOST_APP_MEM_POOL_SIZE] __ALIGN_END;
 static TX_BYTE_POOL ux_host_app_byte_pool;
 [/#if]
 
 [#if UX_DEVICE_ENABLED == "true"]
 /* USER CODE BEGIN UX_Device_Pool_Buffer */
 /* USER CODE END UX_Device_Pool_Buffer */
-static UCHAR  ux_device_byte_pool_buffer[UX_DEVICE_APP_MEM_POOL_SIZE];
+__ALIGN_BEGIN static UCHAR  ux_device_byte_pool_buffer[UX_DEVICE_APP_MEM_POOL_SIZE] __ALIGN_END;
 static TX_BYTE_POOL ux_device_app_byte_pool;
 [/#if]
 [#if USBPD_DEVICE_ENABLED == "true"]
 /* USER CODE BEGIN USBPD_Pool_Buffer */
 /* USER CODE END USBPD_Pool_Buffer */
-static UCHAR  usbpd_byte_pool_buffer[USBPD_DEVICE_APP_MEM_POOL_SIZE];
+__ALIGN_BEGIN static UCHAR  usbpd_byte_pool_buffer[USBPD_DEVICE_APP_MEM_POOL_SIZE] __ALIGN_END;
 static TX_BYTE_POOL usbpd_app_byte_pool;
 [/#if]
 [#if TOUCHSENSING_ENABLED == "true"]
 /* USER CODE BEGIN TOUCHSENSING_Pool_Buffer */
 /* USER CODE END TOUCHSENSING_Pool_Buffer */
-static UCHAR  tsc_byte_pool_buffer[TOUCHSENSING_APP_MEM_POOL_SIZE];
+__ALIGN_BEGIN static UCHAR  tsc_byte_pool_buffer[TOUCHSENSING_APP_MEM_POOL_SIZE] __ALIGN_END;
 static TX_BYTE_POOL tsc_app_byte_pool;
 [/#if]
 [#if GUI_INTERFACE_ENABLED == "true"]
 /* USER CODE BEGIN GUI_INTERFACE_Pool_Buffer */
 /* USER CODE END GUI_INTERFACE_Pool_Buffer */
-static UCHAR  gui_interface_byte_pool_buffer[GUI_INTERFACE_APP_MEM_POOL_SIZE];
+__ALIGN_BEGIN static UCHAR  gui_interface_byte_pool_buffer[GUI_INTERFACE_APP_MEM_POOL_SIZE] __ALIGN_END;
 static TX_BYTE_POOL gui_interface_app_byte_pool;
 [/#if]
 

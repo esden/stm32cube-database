@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
  ******************************************************************************
  [#assign familyName=FamilyName?lower_case]
@@ -21,6 +22,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
  ******************************************************************************
  */
+/* USER CODE END Header */
 [#if SWIPdatas??]
 [#list SWIPdatas as SWIP]  
 [#if SWIP.defines??]
@@ -338,5 +340,3 @@ __weak uint8_t BSP_SD_IsDetected(void)
 /* USER CODE BEGIN AdditionalCode */
 /* user code can be inserted here */
 /* USER CODE END AdditionalCode */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

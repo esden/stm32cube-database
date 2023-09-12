@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu"
 xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
 CodeTemplate=""
@@ -210,7 +210,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <MethodArg Name="PeriphID" FValue="GTZC_PERIPH_DCMI"/>
       </CallLibMethod>
     </IFCondition>
-    <IFCondition Expression="(OTG_Illegal_Access_Interrupt=Enabled)">
+    <IFCondition Expression="(OTG_FS_Illegal_Access_Interrupt=Enabled)">
       <CallLibMethod Name="HAL_GTZC_TZIC_EnableIT">
         <MethodArg Name="PeriphID" FValue="GTZC_PERIPH_OTG"/>
       </CallLibMethod>
@@ -1477,426 +1477,94 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
     </IFCondition>
 
     <!-- MPCBB -->
-    <IFCondition Expression="!(MPCBB1_Area_Secure_Size = 0)">
-      <IFCondition Expression="($IpInstance=GTZC_S)">
-        <IFCondition Expression="!(MPCBB1_Area_Secure_Size = MPCBB1_Area_Max)">
-          <IFCondition Expression="!(MPCBB1_Area_Privilege_Size = 0)">
-            <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
-              <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
-              <MethodArg Name="MemBaseAddress" FValue="SRAM1_BASE"/>
-              <MethodArg Name="SecureRWIllegalMode" ParameterName="MPCBB1_SRWILADIS"/>
-              <MethodArg Name="InvertSecureState" ParameterName="MPCBB1_INVSECSTATE"/>
-              <MethodArg Name="MPCBB_SecConfig_array" ParameterName="MPCBB1_SecConfig_array"/>
-              <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB1_PrivConfig_array"/>
-              <MethodArg Name="MPCBB_LockConfig_array" ParameterName="MPCBB1_LockConfig_array"/>
-            </CallLibMethod>
-            <Else>
-              <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
-                <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
-                <MethodArg Name="MemBaseAddress" FValue="SRAM1_BASE"/>
-                <MethodArg Name="SecureRWIllegalMode" ParameterName="MPCBB1_SRWILADIS"/>
-                <MethodArg Name="InvertSecureState" ParameterName="MPCBB1_INVSECSTATE"/>
-                <MethodArg Name="MPCBB_SecConfig_array" ParameterName="MPCBB1_SecConfig_array"/>
-                <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB1_PrivConfig_array"/>
-                <MethodArg Name="MPCBB_LockConfig_array" ParameterName="MPCBB1_LockConfig_array"/>
-              </CallLibMethod>
-            </Else>
-          </IFCondition>
-          <Else><!-- IFCondition Expression="(MPCBB1_Area_Secure_Size = MPCBB1_Area_Max)" -->
-            <IFCondition Expression="!(MPCBB1_Area_Privilege_Size = 0)">
-              <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
-                <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
-                <MethodArg Name="MemBaseAddress" FValue="SRAM1_BASE"/>
-                <MethodArg Name="SecureRWIllegalMode" ParameterName="MPCBB1_SRWILADIS"/>
-                <MethodArg Name="InvertSecureState" ParameterName="MPCBB1_INVSECSTATE"/>
-                <MethodArg Name="MPCBB_SecConfig_array" ParameterName="MPCBB1_SecConfig_array"/>
-                <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB1_PrivConfig_array"/>
-                <MethodArg Name="MPCBB_LockConfig_array" ParameterName="MPCBB1_LockConfig_array"/>
-              </CallLibMethod>
-              <Else>
-                <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
-                  <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
-                  <MethodArg Name="MemBaseAddress" FValue="SRAM1_BASE"/>
-                  <MethodArg Name="SecureRWIllegalMode" ParameterName="MPCBB1_SRWILADIS"/>
-                  <MethodArg Name="InvertSecureState" ParameterName="MPCBB1_INVSECSTATE"/>
-                  <MethodArg Name="MPCBB_SecConfig_array" ParameterName="MPCBB1_SecConfig_array"/>
-                  <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB1_PrivConfig_array"/>
-                  <MethodArg Name="MPCBB_LockConfig_array" ParameterName="MPCBB1_LockConfig_array"/>
-                </CallLibMethod>
-              </Else>
-            </IFCondition>
-          </Else>
-        </IFCondition>
-        <Else><!-- IFCondition Expression="($IpInstance=GTZC_S)" -->
+    <IFCondition Expression="($IpInstance=GTZC_S)">
+      <IFCondition Expression="!(MPCBB1_Area_Secure_Size = 0) | !(MPCBB1_LockConfig=UNLOCK) | !(MPCBB1_Area_Privilege_Size = 0)">
+        <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
+          <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
+          <MethodArg Name="MemBaseAddress" FValue="SRAM1_BASE"/>
+          <MethodArg Name="SecureRWIllegalMode" ParameterName="MPCBB1_SRWILADIS"/>
+          <MethodArg Name="InvertSecureState" ParameterName="MPCBB1_INVSECSTATE"/>
+          <MethodArg Name="MPCBB_SecConfig_array" ParameterName="MPCBB1_SecConfig_array"/>
+          <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB1_PrivConfig_array"/>
+          <MethodArg Name="MPCBB_LockConfig_array" ParameterName="MPCBB1_LockConfig_array"/>
+        </CallLibMethod>
+      </IFCondition>
+      <Else><!-- IFCondition Expression="($IpInstance=GTZC_S)" -->
+        <IFCondition Expression="!(MPCBB1_Area_Privilege_Size = 0)">
           <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
             <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
             <MethodArg Name="MemBaseAddress" FValue="SRAM1_BASE"/>
             <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB1_PrivConfig_array"/>
           </CallLibMethod>
-        </Else>
-      </IFCondition>
-      <Else><!-- IFCondition Expression="(MPCBB1_Area_Secure_Size = 0)" -->
-        <IFCondition Expression="($IpInstance=GTZC_S)">
-          <IFCondition Expression="!(MPCBB1_LockConfig=UNLOCK) &amp; !(MPCBB1_Area_Privilege_Size = 0)">
-            <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
-              <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
-              <MethodArg Name="MemBaseAddress" FValue="SRAM1_BASE"/>
-              <MethodArg Name="SecureRWIllegalMode" ParameterName="MPCBB1_SRWILADIS"/>
-              <MethodArg Name="InvertSecureState" ParameterName="MPCBB1_INVSECSTATE"/>
-              <MethodArg Name="MPCBB_SecConfig_array" ParameterName="MPCBB1_SecConfig_array"/>
-              <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB1_PrivConfig_array"/>
-              <MethodArg Name="MPCBB_LockConfig_array" ParameterName="MPCBB1_LockConfig_array"/>
-            </CallLibMethod>
-            <Else><!-- IFCondition Expression="!(MPCBB1_LockConfig=UNLOCK) | !(MPCBB1_Area_Privilege_Size = 0)" -->
-              <IFCondition Expression="!(MPCBB1_LockConfig=UNLOCK)">
-                <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
-                  <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
-                  <MethodArg Name="MemBaseAddress" FValue="SRAM1_BASE"/>
-                  <MethodArg Name="SecureRWIllegalMode" ParameterName="MPCBB1_SRWILADIS"/>
-                  <MethodArg Name="InvertSecureState" ParameterName="MPCBB1_INVSECSTATE"/>
-                  <MethodArg Name="MPCBB_SecConfig_array" ParameterName="MPCBB1_SecConfig_array"/>
-                  <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB1_PrivConfig_array"/>
-                  <MethodArg Name="MPCBB_LockConfig_array" ParameterName="MPCBB1_LockConfig_array"/>
-                </CallLibMethod>
-              </IFCondition>
-              <IFCondition Expression="!(MPCBB1_Area_Privilege_Size = 0)">
-                <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
-                  <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
-                  <MethodArg Name="MemBaseAddress" FValue="SRAM1_BASE"/>
-                  <MethodArg Name="SecureRWIllegalMode" ParameterName="MPCBB1_SRWILADIS"/>
-                  <MethodArg Name="InvertSecureState" ParameterName="MPCBB1_INVSECSTATE"/>
-                  <MethodArg Name="MPCBB_SecConfig_array" ParameterName="MPCBB1_SecConfig_array"/>
-                  <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB1_PrivConfig_array"/>
-                  <MethodArg Name="MPCBB_LockConfig_array" ParameterName="MPCBB1_LockConfig_array"/>
-                </CallLibMethod>
-              </IFCondition>
-            </Else>
-          </IFCondition>
-          <Else><!-- IFCondition Expression="($IpInstance=GTZC_S)" -->
-            <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
-              <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
-              <MethodArg Name="MemBaseAddress" FValue="SRAM1_BASE"/>
-              <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB1_PrivConfig_array"/>
-            </CallLibMethod>
-          </Else>
         </IFCondition>
       </Else>
     </IFCondition>
 
-    <IFCondition Expression="!(MPCBB2_Area_Secure_Size = 0)">
-      <IFCondition Expression="($IpInstance=GTZC_S)">
-        <IFCondition Expression="!(MPCBB2_Area_Secure_Size = MPCBB2_Area_Max)">
-          <IFCondition Expression="!(MPCBB3_Area_Privilege_Size = 0)">
-            <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
-              <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
-              <MethodArg Name="MemBaseAddress" FValue="SRAM2_BASE"/>
-              <MethodArg Name="SecureRWIllegalMode" ParameterName="MPCBB2_SRWILADIS"/>
-              <MethodArg Name="InvertSecureState" ParameterName="MPCBB2_INVSECSTATE"/>
-              <MethodArg Name="MPCBB_SecConfig_array" ParameterName="MPCBB2_SecConfig_array"/>
-              <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB2_PrivConfig_array"/>
-              <MethodArg Name="MPCBB_LockConfig_array" ParameterName="MPCBB2_LockConfig_array"/>
-            </CallLibMethod>
-            <Else>
-              <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
-                <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
-                <MethodArg Name="MemBaseAddress" FValue="SRAM2_BASE"/>
-                <MethodArg Name="SecureRWIllegalMode" ParameterName="MPCBB2_SRWILADIS"/>
-                <MethodArg Name="InvertSecureState" ParameterName="MPCBB2_INVSECSTATE"/>
-                <MethodArg Name="MPCBB_SecConfig_array" ParameterName="MPCBB2_SecConfig_array"/>
-                <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB2_PrivConfig_array"/>
-                <MethodArg Name="MPCBB_LockConfig_array" ParameterName="MPCBB2_LockConfig_array"/>
-              </CallLibMethod>
-            </Else>
-          </IFCondition>
-          <Else><!-- IFCondition Expression="(MPCBB2_Area_Secure_Size = MPCBB2_Area_Max)" -->
-            <IFCondition Expression="!(MPCBB3_Area_Privilege_Size = 0)">
-              <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
-                <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
-                <MethodArg Name="MemBaseAddress" FValue="SRAM2_BASE"/>
-                <MethodArg Name="SecureRWIllegalMode" ParameterName="MPCBB2_SRWILADIS"/>
-                <MethodArg Name="InvertSecureState" ParameterName="MPCBB2_INVSECSTATE"/>
-                <MethodArg Name="MPCBB_SecConfig_array" ParameterName="MPCBB2_SecConfig_array"/>
-                <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB2_PrivConfig_array"/>
-                <MethodArg Name="MPCBB_LockConfig_array" ParameterName="MPCBB2_LockConfig_array"/>
-              </CallLibMethod>
-              <Else>
-                <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
-                  <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
-                  <MethodArg Name="MemBaseAddress" FValue="SRAM2_BASE"/>
-                  <MethodArg Name="SecureRWIllegalMode" ParameterName="MPCBB2_SRWILADIS"/>
-                  <MethodArg Name="InvertSecureState" ParameterName="MPCBB2_INVSECSTATE"/>
-                  <MethodArg Name="MPCBB_SecConfig_array" ParameterName="MPCBB2_SecConfig_array"/>
-                  <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB2_PrivConfig_array"/>
-                  <MethodArg Name="MPCBB_LockConfig_array" ParameterName="MPCBB2_LockConfig_array"/>
-                </CallLibMethod>
-              </Else>
-            </IFCondition>
-          </Else>
-        </IFCondition>
-        <Else><!-- IFCondition Expression="($IpInstance=GTZC_S)" -->
+    <IFCondition Expression="($IpInstance=GTZC_S)">
+      <IFCondition Expression="!(MPCBB2_Area_Secure_Size = 0) | !(MPCBB2_LockConfig=UNLOCK) | !(MPCBB2_Area_Privilege_Size = 0)">
+        <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
+          <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
+          <MethodArg Name="MemBaseAddress" FValue="SRAM2_BASE"/>
+          <MethodArg Name="SecureRWIllegalMode" ParameterName="MPCBB2_SRWILADIS"/>
+          <MethodArg Name="InvertSecureState" ParameterName="MPCBB2_INVSECSTATE"/>
+          <MethodArg Name="MPCBB_SecConfig_array" ParameterName="MPCBB2_SecConfig_array"/>
+          <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB2_PrivConfig_array"/>
+          <MethodArg Name="MPCBB_LockConfig_array" ParameterName="MPCBB2_LockConfig_array"/>
+        </CallLibMethod>
+      </IFCondition>
+      <Else>
+        <IFCondition Expression="!(MPCBB2_Area_Privilege_Size = 0)">
           <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
             <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
             <MethodArg Name="MemBaseAddress" FValue="SRAM2_BASE"/>
             <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB2_PrivConfig_array"/>
           </CallLibMethod>
-        </Else>
-      </IFCondition>
-      <Else><!-- IFCondition Expression="(MPCBB2_Area_Secure_Size = 0)" -->
-        <IFCondition Expression="($IpInstance=GTZC_S)">
-          <IFCondition Expression="!(MPCBB2_LockConfig=UNLOCK) &amp; !(MPCBB2_Area_Privilege_Size = 0)">
-            <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
-              <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
-              <MethodArg Name="MemBaseAddress" FValue="SRAM2_BASE"/>
-              <MethodArg Name="SecureRWIllegalMode" ParameterName="MPCBB2_SRWILADIS"/>
-              <MethodArg Name="InvertSecureState" ParameterName="MPCBB2_INVSECSTATE"/>
-              <MethodArg Name="MPCBB_SecConfig_array" ParameterName="MPCBB2_SecConfig_array"/>
-              <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB2_PrivConfig_array"/>
-              <MethodArg Name="MPCBB_LockConfig_array" ParameterName="MPCBB2_LockConfig_array"/>
-            </CallLibMethod>
-            <Else><!-- IFCondition Expression="!(MPCBB2_LockConfig=UNLOCK) | !(MPCBB2_Area_Privilege_Size = 0)" -->
-              <IFCondition Expression="!(MPCBB2_LockConfig=UNLOCK)">
-                <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
-                  <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
-                  <MethodArg Name="MemBaseAddress" FValue="SRAM2_BASE"/>
-                  <MethodArg Name="SecureRWIllegalMode" ParameterName="MPCBB2_SRWILADIS"/>
-                  <MethodArg Name="InvertSecureState" ParameterName="MPCBB2_INVSECSTATE"/>
-                  <MethodArg Name="MPCBB_SecConfig_array" ParameterName="MPCBB2_SecConfig_array"/>
-                  <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB2_PrivConfig_array"/>
-                  <MethodArg Name="MPCBB_LockConfig_array" ParameterName="MPCBB2_LockConfig_array"/>
-                </CallLibMethod>
-              </IFCondition>
-              <IFCondition Expression="!(MPCBB2_Area_Privilege_Size = 0)">
-                <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
-                  <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
-                  <MethodArg Name="MemBaseAddress" FValue="SRAM2_BASE"/>
-                  <MethodArg Name="SecureRWIllegalMode" ParameterName="MPCBB2_SRWILADIS"/>
-                  <MethodArg Name="InvertSecureState" ParameterName="MPCBB2_INVSECSTATE"/>
-                  <MethodArg Name="MPCBB_SecConfig_array" ParameterName="MPCBB2_SecConfig_array"/>
-                  <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB2_PrivConfig_array"/>
-                  <MethodArg Name="MPCBB_LockConfig_array" ParameterName="MPCBB2_LockConfig_array"/>
-                </CallLibMethod>
-              </IFCondition>
-            </Else>
-          </IFCondition>
-          <Else><!-- IFCondition Expression="($IpInstance=GTZC_S)" -->
-            <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
-              <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
-              <MethodArg Name="MemBaseAddress" FValue="SRAM2_BASE"/>
-              <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB2_PrivConfig_array"/>
-            </CallLibMethod>
-          </Else>
         </IFCondition>
       </Else>
     </IFCondition>
 
-    <IFCondition Expression="!(MPCBB3_Area_Secure_Size = 0)">
-      <IFCondition Expression="($IpInstance=GTZC_S)">
-        <IFCondition Expression="!(MPCBB3_Area_Secure_Size = MPCBB3_Area_Max)">
-          <IFCondition Expression="!(MPCBB3_Area_Privilege_Size = 0)">
-            <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
-              <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
-              <MethodArg Name="MemBaseAddress" FValue="SRAM3_BASE"/>
-              <MethodArg Name="SecureRWIllegalMode" ParameterName="MPCBB3_SRWILADIS"/>
-              <MethodArg Name="InvertSecureState" ParameterName="MPCBB3_INVSECSTATE"/>
-              <MethodArg Name="MPCBB_SecConfig_array" ParameterName="MPCBB3_SecConfig_array"/>
-              <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB3_PrivConfig_array"/>
-              <MethodArg Name="MPCBB_LockConfig_array" ParameterName="MPCBB3_LockConfig_array"/>
-            </CallLibMethod>
-            <Else>
-              <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
-                <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
-                <MethodArg Name="MemBaseAddress" FValue="SRAM3_BASE"/>
-                <MethodArg Name="SecureRWIllegalMode" ParameterName="MPCBB3_SRWILADIS"/>
-                <MethodArg Name="InvertSecureState" ParameterName="MPCBB3_INVSECSTATE"/>
-                <MethodArg Name="MPCBB_SecConfig_array" ParameterName="MPCBB3_SecConfig_array"/>
-                <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB3_PrivConfig_array"/>
-                <MethodArg Name="MPCBB_LockConfig_array" ParameterName="MPCBB3_LockConfig_array"/>
-              </CallLibMethod>
-            </Else>
-          </IFCondition>
-          <Else><!-- IFCondition Expression="(MPCBB3_Area_Secure_Size = MPCBB3_Area_Max)" -->
-            <IFCondition Expression="!(MPCBB3_Area_Privilege_Size = 0)">
-              <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
-                <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
-                <MethodArg Name="MemBaseAddress" FValue="SRAM3_BASE"/>
-                <MethodArg Name="SecureRWIllegalMode" ParameterName="MPCBB3_SRWILADIS"/>
-                <MethodArg Name="InvertSecureState" ParameterName="MPCBB3_INVSECSTATE"/>
-                <MethodArg Name="MPCBB_SecConfig_array" ParameterName="MPCBB3_SecConfig_array"/>
-                <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB3_PrivConfig_array"/>
-                <MethodArg Name="MPCBB_LockConfig_array" ParameterName="MPCBB3_LockConfig_array"/>
-              </CallLibMethod>
-              <Else>
-                <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
-                  <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
-                  <MethodArg Name="MemBaseAddress" FValue="SRAM3_BASE"/>
-                  <MethodArg Name="SecureRWIllegalMode" ParameterName="MPCBB3_SRWILADIS"/>
-                  <MethodArg Name="InvertSecureState" ParameterName="MPCBB3_INVSECSTATE"/>
-                  <MethodArg Name="MPCBB_SecConfig_array" ParameterName="MPCBB3_SecConfig_array"/>
-                  <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB3_PrivConfig_array"/>
-                  <MethodArg Name="MPCBB_LockConfig_array" ParameterName="MPCBB3_LockConfig_array"/>
-                </CallLibMethod>
-              </Else>
-            </IFCondition>
-          </Else>
-        </IFCondition>
-        <Else><!-- IFCondition Expression="($IpInstance=GTZC_S)" -->
+    <IFCondition Expression="($IpInstance=GTZC_S)">
+      <IFCondition Expression="!(MPCBB3_Area_Secure_Size = 0) | !(MPCBB3_LockConfig=UNLOCK) | !(MPCBB3_Area_Privilege_Size = 0)">
+        <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
+          <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
+          <MethodArg Name="MemBaseAddress" FValue="SRAM3_BASE"/>
+          <MethodArg Name="SecureRWIllegalMode" ParameterName="MPCBB3_SRWILADIS"/>
+          <MethodArg Name="InvertSecureState" ParameterName="MPCBB3_INVSECSTATE"/>
+          <MethodArg Name="MPCBB_SecConfig_array" ParameterName="MPCBB3_SecConfig_array"/>
+          <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB3_PrivConfig_array"/>
+          <MethodArg Name="MPCBB_LockConfig_array" ParameterName="MPCBB3_LockConfig_array"/>
+        </CallLibMethod>
+      </IFCondition>
+      <Else><!-- IFCondition Expression="($IpInstance=GTZC_S)" -->
+        <IFCondition Expression="!(MPCBB3_Area_Privilege_Size = 0)">
           <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
             <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
             <MethodArg Name="MemBaseAddress" FValue="SRAM3_BASE"/>
             <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB3_PrivConfig_array"/>
           </CallLibMethod>
-        </Else>
-      </IFCondition>
-      <Else><!-- IFCondition Expression="(MPCBB3_Area_Secure_Size = 0)" -->
-        <IFCondition Expression="($IpInstance=GTZC_S)">
-          <IFCondition Expression="!(MPCBB3_LockConfig=UNLOCK) &amp; !(MPCBB3_Area_Privilege_Size = 0)">
-            <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
-              <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
-              <MethodArg Name="MemBaseAddress" FValue="SRAM3_BASE"/>
-              <MethodArg Name="SecureRWIllegalMode" ParameterName="MPCBB3_SRWILADIS"/>
-              <MethodArg Name="InvertSecureState" ParameterName="MPCBB3_INVSECSTATE"/>
-              <MethodArg Name="MPCBB_SecConfig_array" ParameterName="MPCBB3_SecConfig_array"/>
-              <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB3_PrivConfig_array"/>
-              <MethodArg Name="MPCBB_LockConfig_array" ParameterName="MPCBB3_LockConfig_array"/>
-            </CallLibMethod>
-            <Else><!-- IFCondition Expression="!(MPCBB3_LockConfig=UNLOCK) | !(MPCBB3_Area_Privilege_Size = 0)" -->
-              <IFCondition Expression="!(MPCBB3_LockConfig=UNLOCK)">
-                <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
-                  <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
-                  <MethodArg Name="MemBaseAddress" FValue="SRAM3_BASE"/>
-                  <MethodArg Name="SecureRWIllegalMode" ParameterName="MPCBB3_SRWILADIS"/>
-                  <MethodArg Name="InvertSecureState" ParameterName="MPCBB3_INVSECSTATE"/>
-                  <MethodArg Name="MPCBB_SecConfig_array" ParameterName="MPCBB3_SecConfig_array"/>
-                  <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB3_PrivConfig_array"/>
-                  <MethodArg Name="MPCBB_LockConfig_array" ParameterName="MPCBB3_LockConfig_array"/>
-                </CallLibMethod>
-              </IFCondition>
-              <IFCondition Expression="!(MPCBB3_Area_Privilege_Size = 0)">
-                <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
-                  <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
-                  <MethodArg Name="MemBaseAddress" FValue="SRAM3_BASE"/>
-                  <MethodArg Name="SecureRWIllegalMode" ParameterName="MPCBB3_SRWILADIS"/>
-                  <MethodArg Name="InvertSecureState" ParameterName="MPCBB3_INVSECSTATE"/>
-                  <MethodArg Name="MPCBB_SecConfig_array" ParameterName="MPCBB3_SecConfig_array"/>
-                  <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB3_PrivConfig_array"/>
-                  <MethodArg Name="MPCBB_LockConfig_array" ParameterName="MPCBB3_LockConfig_array"/>
-                </CallLibMethod>
-              </IFCondition>
-            </Else>
-          </IFCondition>
-          <Else><!-- IFCondition Expression="($IpInstance=GTZC_S)" -->
-            <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
-              <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
-              <MethodArg Name="MemBaseAddress" FValue="SRAM3_BASE"/>
-              <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB3_PrivConfig_array"/>
-            </CallLibMethod>
-          </Else>
         </IFCondition>
       </Else>
     </IFCondition>
 
-    <IFCondition Expression="!(MPCBB4_Area_Secure_Size = 0)">
-      <IFCondition Expression="($IpInstance=GTZC_S)">
-        <IFCondition Expression="!(MPCBB4_Area_Secure_Size = MPCBB4_Area_Max)">
-          <IFCondition Expression="!(MPCBB4_Area_Privilege_Size = 0)">
-            <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
-              <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
-              <MethodArg Name="MemBaseAddress" FValue="SRAM4_BASE"/>
-              <MethodArg Name="SecureRWIllegalMode" ParameterName="MPCBB4_SRWILADIS"/>
-              <MethodArg Name="InvertSecureState" ParameterName="MPCBB4_INVSECSTATE"/>
-              <MethodArg Name="MPCBB_SecConfig_array" ParameterName="MPCBB4_SecConfig_array"/>
-              <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB4_PrivConfig_array"/>
-              <MethodArg Name="MPCBB_LockConfig_array" ParameterName="MPCBB4_LockConfig_array"/>
-            </CallLibMethod>
-            <Else>
-              <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
-                <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
-                <MethodArg Name="MemBaseAddress" FValue="SRAM4_BASE"/>
-                <MethodArg Name="SecureRWIllegalMode" ParameterName="MPCBB4_SRWILADIS"/>
-                <MethodArg Name="InvertSecureState" ParameterName="MPCBB4_INVSECSTATE"/>
-                <MethodArg Name="MPCBB_SecConfig_array" ParameterName="MPCBB4_SecConfig_array"/>
-                <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB4_PrivConfig_array"/>
-                <MethodArg Name="MPCBB_LockConfig_array" ParameterName="MPCBB4_LockConfig_array"/>
-              </CallLibMethod>
-            </Else>
-          </IFCondition>
-          <Else><!-- IFCondition Expression="(MPCBB4_Area_Secure_Size = MPCBB4_Area_Max)" -->
-            <IFCondition Expression="!(MPCBB4_Area_Privilege_Size = 0)">
-              <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
-                <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
-                <MethodArg Name="MemBaseAddress" FValue="SRAM4_BASE"/>
-                <MethodArg Name="SecureRWIllegalMode" ParameterName="MPCBB4_SRWILADIS"/>
-                <MethodArg Name="InvertSecureState" ParameterName="MPCBB4_INVSECSTATE"/>
-                <MethodArg Name="MPCBB_SecConfig_array" ParameterName="MPCBB4_SecConfig_array"/>
-                <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB4_PrivConfig_array"/>
-                <MethodArg Name="MPCBB_LockConfig_array" ParameterName="MPCBB4_LockConfig_array"/>
-              </CallLibMethod>
-              <Else>
-                <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
-                  <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
-                  <MethodArg Name="MemBaseAddress" FValue="SRAM4_BASE"/>
-                  <MethodArg Name="SecureRWIllegalMode" ParameterName="MPCBB4_SRWILADIS"/>
-                  <MethodArg Name="InvertSecureState" ParameterName="MPCBB4_INVSECSTATE"/>
-                  <MethodArg Name="MPCBB_SecConfig_array" ParameterName="MPCBB4_SecConfig_array"/>
-                  <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB4_PrivConfig_array"/>
-                  <MethodArg Name="MPCBB_LockConfig_array" ParameterName="MPCBB4_LockConfig_array"/>
-                </CallLibMethod>
-              </Else>
-            </IFCondition>
-          </Else>
-        </IFCondition>
-        <Else><!-- IFCondition Expression="($IpInstance=GTZC_S)" -->
+    <IFCondition Expression="($IpInstance=GTZC_S)">
+      <IFCondition Expression="!(MPCBB4_Area_Secure_Size = 0) | !(MPCBB4_LockConfig=UNLOCK) | !(MPCBB4_Area_Privilege_Size = 0)">
+        <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
+          <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
+          <MethodArg Name="MemBaseAddress" FValue="SRAM4_BASE"/>
+          <MethodArg Name="SecureRWIllegalMode" ParameterName="MPCBB4_SRWILADIS"/>
+          <MethodArg Name="InvertSecureState" ParameterName="MPCBB4_INVSECSTATE"/>
+          <MethodArg Name="MPCBB_SecConfig_array" ParameterName="MPCBB4_SecConfig_array"/>
+          <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB4_PrivConfig_array"/>
+          <MethodArg Name="MPCBB_LockConfig_array" ParameterName="MPCBB4_LockConfig_array"/>
+        </CallLibMethod>
+      </IFCondition>
+      <Else><!-- IFCondition Expression="($IpInstance=GTZC_S)" -->
+        <IFCondition Expression="!(MPCBB4_Area_Privilege_Size = 0)">
           <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
             <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
             <MethodArg Name="MemBaseAddress" FValue="SRAM4_BASE"/>
             <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB4_PrivConfig_array"/>
           </CallLibMethod>
-        </Else>
-      </IFCondition>
-      <Else><!-- IFCondition Expression="(MPCBB4_Area_Secure_Size = 0)" -->
-        <IFCondition Expression="($IpInstance=GTZC_S)">
-          <IFCondition Expression="!(MPCBB4_LockConfig=UNLOCK) &amp; !(MPCBB4_Area_Privilege_Size = 0)">
-            <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
-              <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
-              <MethodArg Name="MemBaseAddress" FValue="SRAM4_BASE"/>
-              <MethodArg Name="SecureRWIllegalMode" ParameterName="MPCBB4_SRWILADIS"/>
-              <MethodArg Name="InvertSecureState" ParameterName="MPCBB4_INVSECSTATE"/>
-              <MethodArg Name="MPCBB_SecConfig_array" ParameterName="MPCBB4_SecConfig_array"/>
-              <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB4_PrivConfig_array"/>
-              <MethodArg Name="MPCBB_LockConfig_array" ParameterName="MPCBB4_LockConfig_array"/>
-            </CallLibMethod>
-            <Else><!-- IFCondition Expression="!(MPCBB4_LockConfig=UNLOCK) | !(MPCBB4_Area_Privilege_Size = 0)" -->
-              <IFCondition Expression="!(MPCBB4_LockConfig=UNLOCK)">
-                <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
-                  <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
-                  <MethodArg Name="MemBaseAddress" FValue="SRAM4_BASE"/>
-                  <MethodArg Name="SecureRWIllegalMode" ParameterName="MPCBB4_SRWILADIS"/>
-                  <MethodArg Name="InvertSecureState" ParameterName="MPCBB4_INVSECSTATE"/>
-                  <MethodArg Name="MPCBB_SecConfig_array" ParameterName="MPCBB4_SecConfig_array"/>
-                  <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB4_PrivConfig_array"/>
-                  <MethodArg Name="MPCBB_LockConfig_array" ParameterName="MPCBB4_LockConfig_array"/>
-                </CallLibMethod>
-              </IFCondition>
-              <IFCondition Expression="!(MPCBB4_Area_Privilege_Size = 0)">
-                <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
-                  <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
-                  <MethodArg Name="MemBaseAddress" FValue="SRAM4_BASE"/>
-                  <MethodArg Name="SecureRWIllegalMode" ParameterName="MPCBB4_SRWILADIS"/>
-                  <MethodArg Name="InvertSecureState" ParameterName="MPCBB4_INVSECSTATE"/>
-                  <MethodArg Name="MPCBB_SecConfig_array" ParameterName="MPCBB4_SecConfig_array"/>
-                  <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB4_PrivConfig_array"/>
-                  <MethodArg Name="MPCBB_LockConfig_array" ParameterName="MPCBB4_LockConfig_array"/>
-                </CallLibMethod>
-              </IFCondition>
-            </Else>
-          </IFCondition>
-          <Else><!-- IFCondition Expression="($IpInstance=GTZC_S)" -->
-            <CallLibMethod Name="HAL_GTZC_MPCBB_ConfigMem">
-              <MethodArg Name="pMPCBB_desc" ParameterName="MPCBB_Area_Desc"/>
-              <MethodArg Name="MemBaseAddress" FValue="SRAM4_BASE"/>
-              <MethodArg Name="MPCBB_PrivConfig_array" ParameterName="MPCBB4_PrivConfig_array"/>
-            </CallLibMethod>
-          </Else>
         </IFCondition>
       </Else>
     </IFCondition>
@@ -2029,6 +1697,10 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
 
   <LibMethod Name="HAL_GTZC_MPCBB_Lock" Comment="">
     <Argument AddressOf="false" Context="local" GenericType="simple" Name="MemBaseAddress" TypeName="uint32_t"/>
+  </LibMethod>
+
+  <LibMethod Name="HAL_GTZC_TZIC_DisableIT" Comment="">
+    <Argument AddressOf="false" Context="local" GenericType="simple" Name="PeriphID" TypeName="uint32_t"/>
   </LibMethod>
 
   <LibMethod Name="HAL_GTZC_TZIC_EnableIT" Comment="">

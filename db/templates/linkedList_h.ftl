@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * File Name          : linked_list.h
@@ -8,6 +9,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */ 
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef LINKED_LIST_H
@@ -32,5 +34,3 @@ HAL_StatusTypeDef MX_${queueName}_Config(void);
 
 #endif /* LINKED_LIST_H */
 
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

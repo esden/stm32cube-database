@@ -1,9 +1,10 @@
 [#ftl]
 /* USER CODE BEGIN Header */
 /**
- ******************************************************************************
-  * File Name          : ${name}
-  * Description        : Application configuration file for STM32WPAN Middleware.
+  ******************************************************************************
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   Application configuration file for STM32WPAN Middleware.
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
@@ -882,6 +883,10 @@
  * - SHCI_C2_BLE_INIT_OPTIONS_WITH_SVC_CHANGE_DESC
  * - SHCI_C2_BLE_INIT_OPTIONS_DEVICE_NAME_RO
  * - SHCI_C2_BLE_INIT_OPTIONS_DEVICE_NAME_RW
+ * - SHCI_C2_BLE_INIT_OPTIONS_EXT_ADV
+ * - SHCI_C2_BLE_INIT_OPTIONS_NO_EXT_ADV
+ * - SHCI_C2_BLE_INIT_OPTIONS_CS_ALGO2
+ * - SHCI_C2_BLE_INIT_OPTIONS_NO_CS_ALGO2
  * - SHCI_C2_BLE_INIT_OPTIONS_POWER_CLASS_1
  * - SHCI_C2_BLE_INIT_OPTIONS_POWER_CLASS_2_3
  * which are used to set following configuration bits:
@@ -891,17 +896,33 @@
  *          0: with service change desc.
  * (bit 2): 1: device name Read-Only
  *          0: device name R/W
+ * (bit 3): 1: extended advertizing supported       [NOT SUPPORTED]
+ *          0: extended advertizing not supported   [NOT SUPPORTED]
+ * (bit 4): 1: CS Algo #2 supported
+ *          0: CS Algo #2 not supported
  * (bit 7): 1: LE Power Class 1
  *          0: LE Power Class 2-3
  * other bits: reserved (shall be set to 0)
  */
-#define CFG_BLE_OPTIONS  (${CFG_BLE_OPTIONS_LL} | ${CFG_BLE_OPTIONS_SVC} | ${CFG_BLE_OPTIONS_DEVICE_NAME} | ${CFG_BLE_OPTIONS_POWER_CLASS})
+#define CFG_BLE_OPTIONS  (SHCI_C2_BLE_INIT_OPTIONS_LL_HOST | SHCI_C2_BLE_INIT_OPTIONS_WITH_SVC_CHANGE_DESC | SHCI_C2_BLE_INIT_OPTIONS_DEVICE_NAME_RW | SHCI_C2_BLE_INIT_OPTIONS_NO_EXT_ADV | SHCI_C2_BLE_INIT_OPTIONS_NO_CS_ALGO2 | SHCI_C2_BLE_INIT_OPTIONS_POWER_CLASS_2_3)
 
 #define CFG_BLE_MAX_COC_INITIATOR_NBR   (${CFG_BLE_MAX_COC_INITIATOR_NBR})
 
 #define CFG_BLE_MIN_TX_POWER            (${CFG_BLE_MIN_TX_POWER})
 
 #define CFG_BLE_MAX_TX_POWER            (${CFG_BLE_MAX_TX_POWER})
+
+/**
+ * BLE Rx model configuration flags to be configured with:
+ * - SHCI_C2_BLE_INIT_RX_MODEL_AGC_RSSI_LEGACY
+ * - SHCI_C2_BLE_INIT_RX_MODEL_AGC_RSSI_BLOCKER 
+ * which are used to set following configuration bits:
+ * (bit 0): 1: agc_rssi model improved vs RF blockers
+ *          0: Legacy agc_rssi model
+ * other bits: reserved (shall be set to 0)
+ */
+
+#define CFG_BLE_RX_MODEL_CONFIG         SHCI_C2_BLE_INIT_RX_MODEL_AGC_RSSI_LEGACY
 
 [/#if]
 [/#if]
@@ -1143,8 +1164,9 @@
 
 #endif
 
-/** tick timer value in us */
+/** tick timer values */
 #define CFG_TS_TICK_VAL           DIVR( (CFG_RTCCLK_DIV * 1000000), LSE_VALUE )
+#define CFG_TS_TICK_VAL_PS        DIVR( ((uint64_t)CFG_RTCCLK_DIV * 1e12), (uint64_t)LSE_VALUE )
 
 typedef enum
 {
@@ -1434,12 +1456,22 @@ typedef enum
     CFG_TASK_TX_TO_HOST_ID,
 [/#if]
 [#if (BT_SIG_BEACON != "0") || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_OTA = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_P2P_ROUTER = 1) || (CUSTOM_P2P_CLIENT = 1) || (BLE_TRANSPARENT_MODE_UART = 1) || (BLE_TRANSPARENT_MODE_VCP = 1) || (CUSTOM_TEMPLATE = 1)]
-/* USER CODE BEGIN CFG_Task_Id_With_HCI_Cmd_t */
+    /* USER CODE BEGIN CFG_Task_Id_With_HCI_Cmd_t */
 
-/* USER CODE END CFG_Task_Id_With_HCI_Cmd_t */
+    /* USER CODE END CFG_Task_Id_With_HCI_Cmd_t */
+[#else]
+[#-- BZ 112688, 109187 --]
+    CFG_TASK_APP_WITH_HCICMD_1,
+    CFG_TASK_APP_WITH_HCICMD_2,
+    CFG_TASK_APP_WITH_HCICMD_3,
+    CFG_TASK_APP_WITH_HCICMD_4,
+    CFG_TASK_APP_WITH_HCICMD_5,
+    /* USER CODE BEGIN CFG_Task_Id_With_HCI_Cmd_t */
+
+    /* USER CODE END CFG_Task_Id_With_HCI_Cmd_t */
+[/#if]
     CFG_LAST_TASK_ID_WITH_HCICMD,                                               /**< Shall be LAST in the list */
 } CFG_Task_Id_With_HCI_Cmd_t;
-[/#if]
 
 /**< Add in that list all tasks that never send a ACI/HCI command */
 typedef enum
@@ -1449,11 +1481,23 @@ typedef enum
     CFG_TASK_VCP_SEND_DATA_ID,
 [/#if]
     CFG_TASK_SYSTEM_HCI_ASYNCH_EVT_ID,
-/* USER CODE BEGIN CFG_Task_Id_With_NO_HCI_Cmd_t */
+[#if (BT_SIG_BEACON != "0") || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_OTA = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_P2P_ROUTER = 1) || (CUSTOM_P2P_CLIENT = 1) || (BLE_TRANSPARENT_MODE_UART = 1) || (BLE_TRANSPARENT_MODE_VCP = 1) || (CUSTOM_TEMPLATE = 1)]
+    /* USER CODE BEGIN CFG_Task_Id_With_NO_HCI_Cmd_t */
 
-/* USER CODE END CFG_Task_Id_With_NO_HCI_Cmd_t */
+    /* USER CODE END CFG_Task_Id_With_NO_HCI_Cmd_t */
+[#else]
+    CFG_TASK_APP_WITH_NO_HCICMD_1,
+    CFG_TASK_APP_WITH_NO_HCICMD_2,
+    CFG_TASK_APP_WITH_NO_HCICMD_3,
+    CFG_TASK_APP_WITH_NO_HCICMD_4,
+    CFG_TASK_APP_WITH_NO_HCICMD_5,
+    /* USER CODE BEGIN CFG_Task_Id_With_NO_HCI_Cmd_t */
+
+    /* USER CODE END CFG_Task_Id_With_NO_HCI_Cmd_t */
+[/#if]
     CFG_LAST_TASK_ID_WITHO_NO_HCICMD                                            /**< Shall be LAST in the list */
 } CFG_Task_Id_With_NO_HCI_Cmd_t;
+
 #define CFG_TASK_NBR    CFG_LAST_TASK_ID_WITHO_NO_HCICMD
 
 /**
@@ -1633,9 +1677,9 @@ typedef enum
 [#if (THREAD = 1)]
     CFG_LPM_APP_THREAD,
 [/#if]
-  /* USER CODE BEGIN CFG_LPM_Id_t */
+    /* USER CODE BEGIN CFG_LPM_Id_t */
 
-  /* USER CODE END CFG_LPM_Id_t */
+    /* USER CODE END CFG_LPM_Id_t */
 } CFG_LPM_Id_t;
 
 
@@ -1648,4 +1692,3 @@ typedef enum
 
 #endif /*APP_CONF_H */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

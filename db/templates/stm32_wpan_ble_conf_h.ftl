@@ -1,11 +1,11 @@
 [#ftl]
 /* USER CODE BEGIN Header */
 /**
- ******************************************************************************
-  * File Name          : ${name}
-  * Description        : Configuration file for BLE Middleware.
-  *
- ******************************************************************************
+  ******************************************************************************
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   Configuration file for BLE Middleware.
+  ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
@@ -468,4 +468,3 @@
 [/#if]
 
 #endif /*BLE_CONF_H */
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

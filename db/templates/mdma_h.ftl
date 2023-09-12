@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * File Name          : mdma.h
@@ -8,6 +9,8 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
+
 [#assign ipName = "MDMA"]
 [#if dmas?size > 0]
   [#list dmas as dma]
@@ -57,5 +60,3 @@ void MX_${ipName}_Init(void);
 /**
   * @}
   */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -3,6 +3,7 @@
 [#if cpucore!=""]    
 [#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")+"/"]
 [/#if]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file   fatfs.c
@@ -11,7 +12,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
-
+/* USER CODE END Header */
 #include "fatfs.h"
 
 [@common.optinclude name=contextFolder+mxTmpFolder+"/fatfs_vars.tmp"/]
@@ -71,5 +72,3 @@ DWORD get_fattime(void)
 /* USER CODE BEGIN Application */
      
 /* USER CODE END Application */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

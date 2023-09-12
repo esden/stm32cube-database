@@ -16,12 +16,17 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Component Name="HAL:UTILS"/>
         <Component Name="HAL:TIM"/>
         <Component Name="HAL:HSEM"/>
+        <Component Name="HAL:GPIO"/>
+        <Component Name="HAL:RTC"/>
         <Component Name="Middleware:WPAN_COMMON"/>
         <Component Name="Middleware:WPAN_INTERFACES"/>
         <Component Name="Middleware:WPAN_UTILITIES"/>
 <!--
         <Component Name="Middleware:WPAN_UTILITIES_NO_FREERTOS:NO_FREERTOS:$FREERTOS_STATUS"/>
 -->
+        <!-- MZA Add the BLE Stack BZ 112688 Start -->
+        <Component Name="Middleware:BLE_STACK:BLE_STACK:$BLE_NO_SERVER_MODE"/>
+        
         <Component Name="Middleware:BLE_HOST_COMMON:BLE:$BLE"/>
         <Component Name="Middleware:BLE_HOST_BEACON_ENABLED:BEACON:$BT_SIG_BEACON_ENABLED"/>
         <Component Name="Middleware:BLE_HOST_BLOOD_PRESSURE:BLOOD_PRESSURE:$BT_SIG_BLOOD_PRESSURE_SENSOR"/>
@@ -257,6 +262,43 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
 -->        </SubComponent>
     </RefComponent>
 
+    <!-- MZA add the BLE Stack BZ 112688 Start -->
+    <RefComponent Cclass="Middleware" Cgroup="BLE_STACK" Cversion="1.0.0">   
+        <SubComponent Csub="BLE_STACK" Cvariant="Enabled">
+            <File Category="source" Name="ble/core/auto/ble_gap_aci.c" Condition="Semaphore_BLE_SERVER_PROFILE &amp;
+                !(Semaphore_BT_SIG_BEACON | Semaphore_BT_SIG_BLOOD_PRESSURE_SENSOR | Semaphore_BT_SIG_HEART_RATE_SENSOR | Semaphore_BT_SIG_HEALTH_THERMOMETER_SENSOR| Semaphore_CUSTOM_P2P_SERVER)
+                &amp; !(S_THREAD | S_ZIGBEE)"/>
+            <File Category="source" Name="ble/core/auto/ble_gatt_aci.c" Condition="Semaphore_BLE_SERVER_PROFILE &amp;
+                !(Semaphore_BT_SIG_BEACON | Semaphore_BT_SIG_BLOOD_PRESSURE_SENSOR | Semaphore_BT_SIG_HEART_RATE_SENSOR | Semaphore_BT_SIG_HEALTH_THERMOMETER_SENSOR| Semaphore_CUSTOM_P2P_SERVER)
+                &amp; !(S_THREAD | S_ZIGBEE)"/>
+            <File Category="source" Name="ble/core/auto/ble_hal_aci.c" Condition="Semaphore_BLE_SERVER_PROFILE &amp;
+                !(Semaphore_BT_SIG_BEACON | Semaphore_BT_SIG_BLOOD_PRESSURE_SENSOR | Semaphore_BT_SIG_HEART_RATE_SENSOR | Semaphore_BT_SIG_HEALTH_THERMOMETER_SENSOR| Semaphore_CUSTOM_P2P_SERVER)
+                &amp; !(S_THREAD | S_ZIGBEE)"/>
+            <File Category="source" Name="ble/core/auto/ble_hci_le.c" Condition="Semaphore_BLE_SERVER_PROFILE &amp;
+                !(Semaphore_BT_SIG_BEACON | Semaphore_BT_SIG_BLOOD_PRESSURE_SENSOR | Semaphore_BT_SIG_HEART_RATE_SENSOR | Semaphore_BT_SIG_HEALTH_THERMOMETER_SENSOR| Semaphore_CUSTOM_P2P_SERVER)
+                &amp; !(S_THREAD | S_ZIGBEE)"/>
+            <File Category="source" Name="ble/core/auto/ble_l2cap_aci.c" Condition="Semaphore_BLE_SERVER_PROFILE &amp;
+                !(Semaphore_BT_SIG_BEACON | Semaphore_BT_SIG_BLOOD_PRESSURE_SENSOR | Semaphore_BT_SIG_HEART_RATE_SENSOR | Semaphore_BT_SIG_HEALTH_THERMOMETER_SENSOR| Semaphore_CUSTOM_P2P_SERVER)
+                &amp; !(S_THREAD | S_ZIGBEE)"/>            
+            <File Category="source" Name="interface/patterns/ble_thread/tl/hci_tl.c" Condition="Semaphore_BLE_SERVER_PROFILE &amp;
+                !(Semaphore_BT_SIG_BEACON | Semaphore_BT_SIG_BLOOD_PRESSURE_SENSOR | Semaphore_BT_SIG_HEART_RATE_SENSOR | Semaphore_BT_SIG_HEALTH_THERMOMETER_SENSOR| Semaphore_CUSTOM_P2P_SERVER)
+                &amp; !(S_THREAD | S_ZIGBEE)"/>
+            <File Category="source" Name="interface/patterns/ble_thread/tl/hci_tl_if.c" Condition="Semaphore_BLE_SERVER_PROFILE &amp;
+                !(Semaphore_BT_SIG_BEACON | Semaphore_BT_SIG_BLOOD_PRESSURE_SENSOR | Semaphore_BT_SIG_HEART_RATE_SENSOR | Semaphore_BT_SIG_HEALTH_THERMOMETER_SENSOR| Semaphore_CUSTOM_P2P_SERVER)
+                &amp; !(S_THREAD | S_ZIGBEE)"/>
+            <File Category="source" Name="interface/patterns/ble_thread/tl/shci_tl.c" Condition="Semaphore_BLE_SERVER_PROFILE &amp;
+                !(Semaphore_BT_SIG_BEACON | Semaphore_BT_SIG_BLOOD_PRESSURE_SENSOR | Semaphore_BT_SIG_HEART_RATE_SENSOR | Semaphore_BT_SIG_HEALTH_THERMOMETER_SENSOR| Semaphore_CUSTOM_P2P_SERVER)
+                &amp; !(S_THREAD | S_ZIGBEE)"/>
+            <File Category="source" Name="interface/patterns/ble_thread/tl/shci_tl_if.c" Condition="Semaphore_BLE_SERVER_PROFILE &amp;
+                !(Semaphore_BT_SIG_BEACON | Semaphore_BT_SIG_BLOOD_PRESSURE_SENSOR | Semaphore_BT_SIG_HEART_RATE_SENSOR | Semaphore_BT_SIG_HEALTH_THERMOMETER_SENSOR| Semaphore_CUSTOM_P2P_SERVER)
+                &amp; !(S_THREAD | S_ZIGBEE)"/>
+            <File Category="source" Name="ble/svc/Src/svc_ctl.c" Condition="Semaphore_BLE_SERVER_PROFILE &amp;
+                !(Semaphore_BT_SIG_BEACON | Semaphore_BT_SIG_BLOOD_PRESSURE_SENSOR | Semaphore_BT_SIG_HEART_RATE_SENSOR | Semaphore_BT_SIG_HEALTH_THERMOMETER_SENSOR| Semaphore_CUSTOM_P2P_SERVER)
+                &amp; !(S_THREAD | S_ZIGBEE)"/>        
+        </SubComponent>
+    </RefComponent>
+    <!-- MZA add the BLE Stack BZ 112688 End -->
+    
     <RefComponent Cclass="Middleware" Cgroup="BLE_HOST_BEACON_ENABLED" Cversion="1.0.0">
         <SubComponent Csub="BEACON" Cvariant="Enabled">
             <File Category="source" Name="ble/core/auto/ble_gap_aci.c"/>
@@ -473,8 +515,8 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
             <File Category="header" Name="zigbee/core/inc/*.h"/>
             <File Category="source" Name="zigbee/core/src/*.c"/>
             <!-- Libraries -->
-            <File Category="library" Condition="KEIL6;!(SIiTideIiMDKAaARMOoV5 | SIiTideIiMDKAaARMOoV5Gg27)" Name="zigbee/lib/stm32wb_zigbee_wb_lib.a" Version=""/>
-            <File Category="library" Condition="KEIL5;(SIiTideIiMDKAaARMOoV5 | SIiTideIiMDKAaARMOoV5Gg27)" Name="zigbee/lib/stm32wb_zigbee_wb_lib_keil.lib" Version=""/>
+            <File Category="library" Condition="KEIL6;!(SIiTideIiMDKAaARMOoV5 | SIiTideIiMDKAaARMOoV5Gg27 | SIiTideIiMDKAaARMOoV5Gg32)" Name="zigbee/lib/stm32wb_zigbee_wb_lib.a" Version=""/>
+            <File Category="library" Condition="KEIL5;(SIiTideIiMDKAaARMOoV5 | SIiTideIiMDKAaARMOoV5Gg27 | SIiTideIiMDKAaARMOoV5Gg32)" Name="zigbee/lib/stm32wb_zigbee_wb_lib_keil.lib" Version=""/>
 
             <!-- Files for patterns -->
             <File Category="header" Name="interface/patterns/ble_thread/tl/tl_zigbee_hci.h"/>
@@ -1353,11 +1395,13 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="CB_METER_SERVER_GETPROFILE_ENDPOINT1" GenericType="Simple" Comment="get_profile:static enum ZclStatusCodeT:(struct ZbZclClusterT *cluster, void *arg, struct ZbZclMeterClientGetProfileReqT *req, struct ZbZclAddrInfoT *srcInfo)"/>
         <Argument Name="CB_METER_SERVER_GETSAMPLEDDATA_ENDPOINT1" GenericType="Simple" Comment="get_sampled_data:static enum ZclStatusCodeT:(struct ZbZclClusterT *cluster, void *arg, struct ZbZclMeterClientGetSampledDataReqT *req, struct ZbZclAddrInfoT *srcInfo)"/>
         <Argument Name="CB_METER_SERVER_LOCALCHANGESUPPLY_ENDPOINT1" GenericType="Simple" Comment="local_change_supply:static enum ZclStatusCodeT:(struct ZbZclClusterT *cluster, void *arg, struct ZbZclMeterClientLocalChangeSupplyReqT *req, struct ZbZclAddrInfoT *srcInfo)"/>
-        <Argument Name="CB_METER_SERVER_REQUESTMIRROR_ENDPOINT1" GenericType="Simple" Comment="request_mirror:static uint16_t:(void *arg, struct ZbZclClusterT *cluster, struct ZbZclAddrInfoT *srcInfo, struct ZbApsdeDataIndT *dataIndPtr)"/>
-        <Argument Name="CB_METER_SERVER_REMOVEMIRROR_ENDPOINT1" GenericType="Simple" Comment="remove_mirror:static uint16_t:(void *arg, struct ZbZclClusterT *cluster, struct ZbZclAddrInfoT *srcInfo, struct ZbApsdeDataIndT *dataIndPtr)"/>
+        <Argument Name="CB_METER_SERVER_MIRRORREPORTATTR_ENDPOINT1" GenericType="Simple" Comment="mirror_report_attr_rsp:enum ZclStatusCodeT:(struct ZbZclClusterT *cluster, void *arg, struct ZbZclMeterClientMirrorReportAttrRspT *notify, struct ZbZclAddrInfoT *srcInfo)"/>
         <Argument Name="CB_METER_SERVER_OPTIONAL_ENDPOINT1" GenericType="Simple" Comment="optional:static enum ZclStatusCodeT:(struct ZbZclClusterT *cluster, struct ZbZclHeaderT *zclHdrPtr, struct ZbApsdeDataIndT *dataIndPtr)"/>
+        <Argument Name="CB_METER_CLIENT_REQUESTMIRROR_ENDPOINT1" GenericType="Simple" Comment="request_mirror:static uint16_t:(struct ZbZclClusterT *cluster, struct ZbZclAddrInfoT *srcInfo, void *arg)"/>
+        <Argument Name="CB_METER_CLIENT_REMOVEMIRROR_ENDPOINT1" GenericType="Simple" Comment="remove_mirror:static uint16_t:(struct ZbZclClusterT *cluster, struct ZbZclAddrInfoT *srcInfo, void *arg)"/>
+        <Argument Name="CB_METER_CLIENT_CONFIGMIRROR_ENDPOINT1" GenericType="Simple" Comment="config_mirror:static enum ZclStatusCodeT:(struct ZbZclClusterT *cluster, struct ZbZclMeterServerConfigMirrorT *req, struct ZbZclAddrInfoT *srcInfo, void *arg)"/>
         <Argument Name="CB_METER_CLIENT_OPTIONAL_ENDPOINT1" GenericType="Simple" Comment="optional:static enum ZclStatusCodeT:(struct ZbZclClusterT *cluster, struct ZbZclHeaderT *zclHdrPtr, struct ZbApsdeDataIndT *dataIndPtr)"/>
- 
+
         <Argument Name="ZCL_PRICE_ENDPOINT1" GenericType="Simple" 
                   Comment="zcl/se/zcl.price.h:price:price:static struct ZbZclPrice$ROLECallbacksT:Price$ROLECallbacks_$ENDPOINT:ZbZclPrice$ROLEAlloc:(zigbee_app_info.zb, SW$ENDPOINT_ENDPOINT, &amp;PriceClientCallbacks_$ENDPOINT, NULL):(zigbee_app_info.zb, SW$ENDPOINT_ENDPOINT, &amp;PriceServerCallbacks_$ENDPOINT, NULL)"/>
         <Argument Name="CB_PRICE_SERVER_GETCURRENTPRICE_ENDPOINT1" GenericType="Simple" Comment="get_current_price:static enum ZclStatusCodeT:(struct ZbZclClusterT *cluster, void *arg, struct ZbZclPriceClientGetCurrentPriceT *req, struct ZbZclAddrInfoT *srcInfo)"/>

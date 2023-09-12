@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
  ******************************************************************************
   * @file    bsp_driver_sram.h (based on stm32756g_eval_sram.h)
@@ -8,7 +9,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
-  
+ /* USER CODE END Header */     
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __${FamilyName}_SRAM_H
 #define __${FamilyName}_SRAM_H
@@ -51,5 +52,3 @@ uint8_t BSP_SRAM_WriteData_DMA(uint32_t uwStartAddress, uint16_t *pData, uint32_
 #endif
 
 #endif /* __${FamilyName}_SRAM_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

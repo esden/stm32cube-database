@@ -1,11 +1,11 @@
 [#ftl]
 /* USER CODE BEGIN Header */
 /**
- ******************************************************************************
-  * File Name          : ${name}
-  * Description        : Application file for BLE Middleware.
-  *
- ******************************************************************************
+  ******************************************************************************
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   BLE Application
+  ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
@@ -590,5 +590,3 @@ void SVCCTL_ResumeUserEventFlow( void )
 /* USER CODE BEGIN FD */
 
 /* USER CODE END FD */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

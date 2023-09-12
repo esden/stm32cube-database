@@ -2,8 +2,9 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * File Name          : ${name}
-  * Description        : Health Thermometer Service Application
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   Health Thermometer Service Application
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
@@ -230,5 +231,3 @@ void HTSAPP_Profile_UpdateChar(void)
 /* USER CODE BEGIN FD */
 
 /* USER CODE END FD */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

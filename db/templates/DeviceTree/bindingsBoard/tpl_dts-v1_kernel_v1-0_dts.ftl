@@ -32,11 +32,13 @@
 	[@mlog  logMod=module logType="ERR" logMsg="unknown SOC package dtsi" varsMap={} /]
 /*#include "???.dtsi"*/
 [/#if]
-[#if mx_socPtCPN?has_content]
+[#if (mx_socDtRPN == "stm32mp15")]
+	[#if mx_socPtCPN?has_content]
 #include "${mx_socPtCPN?substring(0,9) + "xx" + mx_socPtCPN?substring(11)}-pinctrl.dtsi"
-[#else]
-	[@mlog  logMod=module logType="ERR" logMsg="unknown SOC pinCtrl package dtsi" varsMap={} /]
+	[#else]
+		[@mlog  logMod=module logType="ERR" logMsg="unknown SOC pinCtrl package dtsi" varsMap={} /]
 /*#include "???-pinctrl.dtsi"*/
+	[/#if]
 [/#if]
 [#local coproDeviceName = srvcmx_getMatchingBindedHwName_inDTS(".+_copro")]
 [#if coproDeviceName?has_content][#--at least 1 IP should be assigned--]

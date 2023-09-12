@@ -2,8 +2,9 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * File Name          : ${name}
-  * Description        : 
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
@@ -86,5 +87,3 @@ enum
 #endif
 
 #endif /* EDDYSTONE_BEACON_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

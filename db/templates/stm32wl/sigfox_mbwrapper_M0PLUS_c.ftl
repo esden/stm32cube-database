@@ -364,4 +364,3 @@ static void sfx_monarch_test_mode_wait_end_cb(void)
 
 /* USER CODE END PrFD */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

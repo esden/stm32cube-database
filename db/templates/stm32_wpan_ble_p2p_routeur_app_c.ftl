@@ -1,10 +1,11 @@
 [#ftl]
 /* USER CODE BEGIN Header */
 /**
- ******************************************************************************
- * File Name          : ${name}
- * Description        : P2P Router Application
- ******************************************************************************
+  ******************************************************************************
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   Peer to peer Router Application
+  ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
@@ -793,4 +794,3 @@ static SVCCTL_EvtAckStatus_t Client_Event_Handler(void *Event)
 /* USER CODE BEGIN FD_LOCAL_FUNCTIONS */
 
 /* USER CODE END FD_LOCAL_FUNCTIONS */
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

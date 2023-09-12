@@ -1,13 +1,14 @@
 [#ftl]
 /* USER CODE BEGIN Header */
 /**
- ******************************************************************************
- * File Name          : ${name}
- * Description        : Custom Example Application (Server)
- ******************************************************************************
+  ******************************************************************************
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   Custom Example Application (Server)
+  ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
- ******************************************************************************
- */
+  ******************************************************************************
+  */
 /* USER CODE END Header */
 
 [#assign NUMBER_OF_SERVICES = "0"]
@@ -1294,5 +1295,3 @@ void Custom_[@capitalizeServChar service characteristic/]_Send_Indication(void) 
 /* USER CODE BEGIN FD_LOCAL_FUNCTIONS*/
 
 /* USER CODE END FD_LOCAL_FUNCTIONS*/
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

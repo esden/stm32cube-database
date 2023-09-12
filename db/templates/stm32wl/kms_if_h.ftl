@@ -70,4 +70,3 @@ extern "C" {
 
 #endif /* KMS_IF_H */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

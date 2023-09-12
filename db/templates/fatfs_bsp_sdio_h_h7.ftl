@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
  ******************************************************************************
   * @file    bsp_driver_sd.h (based on stm32h743i_eval_sd.h)
@@ -8,7 +9,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
-
+/* USER CODE END Header */
 [#assign use_dma=0]
 [#assign use_rtos=0]
 [#if SWIPdatas??]
@@ -90,5 +91,3 @@ void    BSP_SD_ReadCpltCallback(void);
 #endif
 
 #endif /* __${FamilyName}_SD_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

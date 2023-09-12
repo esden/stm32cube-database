@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file           : fatfs_f4xxsd_detect.h
@@ -7,6 +8,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
 */
+/* USER CODE END Header */
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __STM32F4XX_SD_DETECT_H
 #define __STM32F4XX_SD_DETECT_H
@@ -29,5 +31,3 @@ uint8_t MX_SD_IsDetected(void);
 #endif
 
 #endif /* __STM32F4XX_SD_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

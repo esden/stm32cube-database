@@ -1,13 +1,14 @@
 [#ftl]
 /* USER CODE BEGIN Header */
 /**
- ******************************************************************************
-  * File Name          : ${name}
-  * Description        : Header for bls_app.c module.
+  ******************************************************************************
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   Header for bls_app.c module
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
- ******************************************************************************
- */
+  ******************************************************************************
+  */
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -59,5 +60,4 @@ void BLSAPP_IntCuffPressure(void);
 
 #endif /*__BLS_APP_H */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 /* USER CODE END */

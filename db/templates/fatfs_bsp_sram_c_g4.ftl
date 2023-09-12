@@ -61,5 +61,3 @@ __weak void BSP_SRAM_DMA_IRQHandler(void)
 /* USER CODE BEGIN AdditionalCode */
 /* user code can be inserted here */
 /* USER CODE END AdditionalCode */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

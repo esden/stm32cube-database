@@ -56,5 +56,3 @@ void ${vector.irqHandler}(void);
 #endif
 
 #endif /* __${FamilyName}xx_IT_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

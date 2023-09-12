@@ -142,5 +142,3 @@ extern USBD_CCID_ItfTypeDef USBD_CCID_fops_HS;
 #endif
 
 #endif /* __USBD_CCID_IF_H__ */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

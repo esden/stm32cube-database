@@ -214,5 +214,3 @@ tsl_user_status_t tsl_user_Exec(void);
 void tsl_user_SetThresholds(void);
 
 #endif /* __TSL_USER_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

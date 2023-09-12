@@ -1,23 +1,16 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    openamp_conf.h
   * @author  MCD Application Team
   * @brief   Configuration file for OpenAMP MW
   ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics. 
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the 
-  * License. You may obtain a copy of the License at:
-  *                       opensource.org/licenses/BSD-3-Clause
+  [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   *
   ******************************************************************************
   */
-
+/* USER CODE END Header */
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __OPENAMP_CONF__H__
 #define __OPENAMP_CONF__H__
@@ -125,7 +118,7 @@ extern const uint8_t  __OPENAMP_region_size__;
 #define SHM_START_ADDRESS       ((metal_phys_addr_t)&__OPENAMP_region_start__)
 #define SHM_SIZE        ((size_t)&__OPENAMP_region_size__)
 
-#elif defined(__CC_ARM)
+#elif defined(__CC_ARM) || defined (__clang__)
 /*
  * For MDK-ARM, the scatter file .sct should contain the following line:
  * LR_IROM1 ....  {
@@ -261,4 +254,3 @@ extern int __OPENAMP_region_end__[];    /* defined by linker script */
 
 #endif /* __OPENAMP_CONF__H__ */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

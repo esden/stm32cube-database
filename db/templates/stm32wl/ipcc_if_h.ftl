@@ -132,5 +132,3 @@ int32_t IPCC_IF_ResponseSnd(uint32_t channelIdx);
 #endif
 
 #endif /* __IPCC_IF_${CPUCORE}_H__ */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE***/

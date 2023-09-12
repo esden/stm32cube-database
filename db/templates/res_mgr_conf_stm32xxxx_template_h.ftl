@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    res_mgr_conf_stm32xxxx_template.h
@@ -37,6 +38,7 @@
   *
   ******************************************************************************
   */
+/* USER CODE END Header */
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
         [#list SWIP.defines as definition]
@@ -277,4 +279,3 @@ ${valueDynamicSystemResourcesUpdate}
   */
 #endif /* RES_MGR_CONF_H__ */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

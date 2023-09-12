@@ -242,5 +242,3 @@ __weak void MX_${ipName}_Callback(uint32_t id, uint32_t msg)
 /**
   * @}
   */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

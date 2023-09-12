@@ -1503,4 +1503,3 @@ static int32_t RadioSetTxGenericConfig(GenericModems_t modem, TxConfigGeneric_t 
 
 /* USER CODE END PrFD */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

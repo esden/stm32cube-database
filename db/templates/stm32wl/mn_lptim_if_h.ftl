@@ -70,4 +70,3 @@ void MN_LPTIM_IF_DeInit(void);
 
 #endif /* __MN_LPTIM_IF_H__ */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

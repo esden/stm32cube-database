@@ -512,4 +512,3 @@ static void RadioRxError_mbwrapper(void)
 
 /* USER CODE END PrFD */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

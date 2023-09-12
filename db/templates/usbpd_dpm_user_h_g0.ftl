@@ -249,4 +249,3 @@ USBPD_StatusTypeDef USBPD_DPM_RequestSecurityRequest(uint8_t PortNum);
 
 #endif /* __USBPD_DPM_USER_H_ */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

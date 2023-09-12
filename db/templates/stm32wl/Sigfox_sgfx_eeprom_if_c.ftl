@@ -841,4 +841,3 @@ static void E2P_Read(e_EE_ID addr, uint32_t *data)
 
 /* USER CODE END PrFD */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

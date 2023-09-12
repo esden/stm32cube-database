@@ -79,5 +79,3 @@ void HW_LPM_OffMode(HW_LPM_OffModeConf_t configuration)
 
   return;
 }
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

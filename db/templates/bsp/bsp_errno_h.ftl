@@ -1,13 +1,14 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file           : ${BoardName}_errno.h
   * @brief          : Error Code
   ******************************************************************************
-[@common.optinclude name="Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder + "/license.tmp"/][#--include License text --]
   ******************************************************************************
 */
-
+/* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef ${BoardName?upper_case}_ERRNO_H
@@ -49,4 +50,3 @@
 #endif  
 #endif /*${BoardName?upper_case}_ERRNO_H */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

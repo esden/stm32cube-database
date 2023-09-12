@@ -209,6 +209,3 @@ extern ${variable.value} ${variable.name};
 #endif
 
 #endif /* __${inclusion_protection}__ */
-
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

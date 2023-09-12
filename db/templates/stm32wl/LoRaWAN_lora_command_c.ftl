@@ -873,4 +873,3 @@ static void com_error(ATEerror_t error_type)
 
 /* USER CODE END PrFD */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -143,5 +143,3 @@ __weak uint8_t BSP_SRAM_WriteData_DMA(uint32_t uwStartAddress, uint16_t *pData, 
 /* USER CODE END AdditionalCode */
 
 #endif
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

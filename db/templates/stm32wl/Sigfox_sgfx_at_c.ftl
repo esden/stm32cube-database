@@ -1779,5 +1779,3 @@ static sfx_error_t testmode_12(sfx_rc_enum_t rc_enum)
 /* USER CODE BEGIN PrFD */
 
 /* USER CODE END PrFD */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

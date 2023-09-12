@@ -206,4 +206,3 @@ void DBG_ProbesInit(void);
 
 #endif /* __SYS_DEBUG_H__ */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -734,4 +734,3 @@ void Process_Sigfox_Notif(MBMUX_ComParam_t *ComObj)
 
 /* USER CODE END PrFD */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -2,8 +2,9 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * File Name          : ${name}
-  * Description        : Header for hts_application.c module
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   Header for hts_application.c module
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
@@ -61,5 +62,3 @@ void HTSAPP_Profile_UpdateChar(void);
 #endif
 
 #endif /*__HTS_APP_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

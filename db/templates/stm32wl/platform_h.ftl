@@ -109,5 +109,3 @@ extern "C" {
 #endif
 
 #endif /* __PLATFORM_H__ */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

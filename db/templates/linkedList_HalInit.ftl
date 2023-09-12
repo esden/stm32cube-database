@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * File Name          : linked_list.c
@@ -8,7 +9,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
- 
+/* USER CODE END Header */ 
 /* Includes ------------------------------------------------------------------*/
 #include "linked_list.h"
 

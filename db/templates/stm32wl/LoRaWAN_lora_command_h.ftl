@@ -69,4 +69,3 @@ void CMD_Process(void);
 
 #endif /* __LORA_COMMAND_H__*/
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

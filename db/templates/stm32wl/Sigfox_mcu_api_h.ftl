@@ -342,4 +342,3 @@ sfx_u8 MCU_API_get_version(sfx_u8 **version, sfx_u8 *size);
 
 #endif /*__SIGFOX_MCU_API_H__*/
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

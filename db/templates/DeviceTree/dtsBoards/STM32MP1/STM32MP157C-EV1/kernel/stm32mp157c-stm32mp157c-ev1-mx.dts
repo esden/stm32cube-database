@@ -13,7 +13,7 @@
 /* USER CODE END includes */
 
 /{
-	model = "STMicroelectronics STM32MP157C-EV1 STM32CubeMX board";
+	model = "STMicroelectronics STM32MP157C-EV1 STM32CubeMX board - openstlinux-5.10-dunfell-mp1-21-11-17";
 	compatible = "st,stm32mp157c-board_157c-ev1-mx", "st,stm32mp157";
 
 	/* USER CODE BEGIN root */
@@ -249,6 +249,12 @@
 		vdev0buffer:vdev0buffer@10042000{
 			compatible = "shared-dma-pool";
 			reg = <0x10042000 0x4000>;
+			no-map;
+		};
+
+		mcu_rsc_table:mcu_rsc_table@10048000{
+			compatible = "shared-dma-pool";
+			reg = <0x10048000 0x8000>;
 			no-map;
 		};
 
@@ -955,7 +961,7 @@
 
 	/* USER CODE BEGIN m4_rproc */
 	memory-region = <&retram>, <&mcuram>, <&mcuram2>, <&vdev0vring0>,
-			<&vdev0vring1>, <&vdev0buffer>;
+			<&vdev0vring1>, <&vdev0buffer>, <&mcu_rsc_table>;
 	interrupt-parent = <&exti>;
 	interrupts = <68 1>;
 	wakeup-source;
@@ -1545,6 +1551,7 @@
 };
 
 &iwdg2{
+	u-boot,dm-pre-reloc;
 	status = "okay";
 
 	/* USER CODE BEGIN iwdg2 */
@@ -1838,7 +1845,11 @@
 	/* USER CODE BEGIN usbphyc_port0 */
 	phy-supply = <&vdd_usb>;
 	st,phy-tuning = <&usb_phy_tuning>;
-	vbus-supply = <&vbus_sw>;
+
+	connector{
+		compatible = "usb-a-connector";
+		vbus-supply = <&v3v3>;
+	};
 	/* USER CODE END usbphyc_port0 */
 };
 

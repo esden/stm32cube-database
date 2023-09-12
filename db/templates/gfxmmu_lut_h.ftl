@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * File Name          : gfxmmu_lut.h
@@ -7,6 +8,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __gfxmmu_lut_H
 #define __gfxmmu_lut_H
@@ -37,5 +39,3 @@ uint32_t gfxmmu_lut_config[2*GFXMMU_LUT_SIZE] = {
 /**
   * @}
   */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
  ******************************************************************************
   * @file    user_diskio.c
@@ -7,7 +8,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
-
+/* USER CODE END Header */
 /* USER CODE BEGIN 0 */
 
 /* Includes ------------------------------------------------------------------*/
@@ -146,5 +147,3 @@ DRESULT USER_ioctl (
 #endif /* _USE_IOCTL == 1 */
 
 /* USER CODE END 0 */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

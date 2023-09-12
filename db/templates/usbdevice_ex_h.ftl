@@ -141,4 +141,3 @@ void MX_${name}_Init(void);
 
 #endif /* __${name?upper_case}__H__ */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

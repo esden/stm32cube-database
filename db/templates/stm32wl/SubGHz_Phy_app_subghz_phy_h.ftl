@@ -66,5 +66,3 @@ void MX_SubGHz_Phy_Process(void);
 #endif
 
 #endif /*__APP_SUBGHZ_PHY_H__*/
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

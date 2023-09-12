@@ -87,4 +87,4 @@ int32_t EnvSensors_Read(sensor_t *sensor_data);
 #endif
 
 #endif /* __SENSORS_H__ */
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+

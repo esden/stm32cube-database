@@ -763,4 +763,3 @@ static uint16_t EE_Crc(uint64_t v)
 
 /* USER CODE END PrFD */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

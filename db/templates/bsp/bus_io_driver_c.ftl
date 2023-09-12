@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file           : ${BoardName}_bus.c
@@ -7,7 +8,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
 */
-
+/* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
 #include "${BoardName}_bus.h"
@@ -423,7 +424,7 @@ UART_HandleTypeDef h${UsartIpInstance?lower_case?replace("s","")};
                         [#assign UsartIpInstance = bsp.solution]
                         [#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
 [#-- extern : A.T removed after review with Maher --]
-UART_HandleTypeDef h${UsartIpInstance?lower_case};
+UART_HandleTypeDef h${UsartIpInstance?lower_case?replace("s","")};
                     [/#if]
                 [#break]
                 [#case "UART"]
@@ -767,11 +768,11 @@ static void ${UsartIpInstance}_MspDeInit(UART_HandleTypeDef* huart);
 /* BUS IO driver over SPI Peripheral */
                         [#assign SpiIpInstance = bsp.solution]
                         [#assign SpiIpInstanceList = bsp.solution]
-                        [@generateBspSPI_Driver SpiIpInstance/]
+                        [@generateBspSPI_Driver SpiIpInstance bsp.dmaUsed/]
                     [#elseif !SpiIpInstanceList?contains(bsp.solution)]
                         [#assign SpiIpInstance = bsp.solution]
                         [#assign SpiIpInstanceList = SpiIpInstanceList + "," + bsp.solution]
-                        [@generateBspSPI_Driver SpiIpInstance/]
+                        [@generateBspSPI_Driver SpiIpInstance bsp.dmaUsed/]
                     [/#if]
                 [#break]
                 [#case "I2C"]
@@ -779,11 +780,11 @@ static void ${UsartIpInstance}_MspDeInit(UART_HandleTypeDef* huart);
 /* BUS IO driver over I2C Peripheral */
                         [#assign I2CIpInstance = bsp.solution]
                         [#assign I2CIpInstanceList = bsp.solution]
-                        [@generateBspI2C_Driver I2CIpInstance/]
+                        [@generateBspI2C_Driver I2CIpInstance bsp.dmaUsed/]
                     [#elseif !I2CIpInstanceList?contains(bsp.solution)]
                         [#assign I2CIpInstance = bsp.solution]
                         [#assign I2CIpInstanceList = I2CIpInstanceList + "," + bsp.solution]
-                        [@generateBspI2C_Driver I2CIpInstance/]
+                        [@generateBspI2C_Driver I2CIpInstance bsp.dmaUsed/]
                     [/#if]
                 [#break]
                 [#case "USART"]
@@ -791,11 +792,11 @@ static void ${UsartIpInstance}_MspDeInit(UART_HandleTypeDef* huart);
 /* BUS IO driver over USART Peripheral */
                         [#assign UsartIpInstance = bsp.solution]
                         [#assign UsartIpInstanceList = bsp.solution]
-                        [@generateBspUSART_Driver UsartIpInstance/]
+                        [@generateBspUSART_Driver UsartIpInstance bsp.dmaUsed/]
                     [#elseif !UsartIpInstanceList?contains(bsp.solution)]
                         [#assign UsartIpInstance = bsp.solution]
                         [#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
-                        [@generateBspUSART_Driver UsartIpInstance/]
+                        [@generateBspUSART_Driver UsartIpInstance bsp.dmaUsed/]
                     [/#if]
                 [#break]
                 [#case "UART"]
@@ -803,11 +804,11 @@ static void ${UsartIpInstance}_MspDeInit(UART_HandleTypeDef* huart);
 /* BUS IO driver over UART Peripheral */
                         [#assign UsartIpInstance = bsp.solution]
                         [#assign UsartIpInstanceList = bsp.solution]
-                        [@generateBspUSART_Driver UsartIpInstance/]
+                        [@generateBspUSART_Driver UsartIpInstance bsp.dmaUsed/]
                     [#elseif !UsartIpInstanceList?contains(bsp.solution)]
                         [#assign UsartIpInstance = bsp.solution]
                         [#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
-                        [@generateBspUSART_Driver UsartIpInstance/]
+                        [@generateBspUSART_Driver UsartIpInstance bsp.dmaUsed/]
                     [/#if]
                 [#break]
                 [#case "LPUART"]
@@ -815,11 +816,11 @@ static void ${UsartIpInstance}_MspDeInit(UART_HandleTypeDef* huart);
 /* BUS IO driver over UART Peripheral */
                         [#assign UsartIpInstance = bsp.solution]
                         [#assign UsartIpInstanceList = bsp.solution]
-                        [@generateBspUSART_Driver UsartIpInstance/]
+                        [@generateBspUSART_Driver UsartIpInstance bsp.dmaUsed/]
                     [#elseif !UsartIpInstanceList?contains(bsp.solution)]
                         [#assign UsartIpInstance = bsp.solution]
                         [#assign UsartIpInstanceList = UsartIpInstanceList + "," + bsp.solution]
-                        [@generateBspUSART_Driver UsartIpInstance/]
+                        [@generateBspUSART_Driver UsartIpInstance bsp.dmaUsed/]
                     [/#if]
                 [#break]
                 [/#switch]
@@ -920,7 +921,7 @@ static void ${UsartIpInstance}_MspDeInit(UART_HandleTypeDef* huart);
 [/#list]
 
 [#-- macro generateBspI2C_Driver --]
-[#macro generateBspI2C_Driver IpInstance]
+[#macro generateBspI2C_Driver IpInstance dmaUsed]
 /*******************************************************************************
                             BUS OPERATIONS OVER I2C
 *******************************************************************************/
@@ -1181,7 +1182,7 @@ int32_t BSP_${IpInstance}_Recv(uint16_t DevAddr, uint8_t *pData, uint16_t Length
   return ret;
 }
 
-[#if I2CDmaIsTrue]
+[#if dmaUsed]
 /**
   * @brief  Write Data through I2C BUS with DMA.
   * @param  pData: Pointer to data buffer to send
@@ -1264,7 +1265,7 @@ int32_t BSP_${IpInstance}_SendRecv(uint16_t DevAddr, uint8_t *pTxdata, uint8_t *
 [#-- End macro generateBspI2C_Driver --]
 
 [#-- macro generateBspSPI_Driver --]
-[#macro generateBspSPI_Driver IpInstance]
+[#macro generateBspSPI_Driver IpInstance dmaUsed]
 /*******************************************************************************
                             BUS OPERATIONS OVER SPI
 *******************************************************************************/
@@ -1388,7 +1389,7 @@ int32_t BSP_${IpInstance}_SendRecv(uint8_t *pTxData, uint8_t *pRxData, uint16_t 
   return ret;
 }
 
-[#if SPIDmaIsTrue]
+[#if dmaUsed]
 /**
   * @brief  Write Data through SPI BUS with DMA.
   * @param  pData: Pointer to data buffer to send
@@ -1444,7 +1445,7 @@ int32_t BSP_${IpInstance}_SendRecv_DMA(uint8_t *pTxData, uint8_t *pRxData, uint1
 [#-- End macro generateBspSPI_Driver --]
 
 [#-- macro generateBspUSART_Driver --]
-[#macro generateBspUSART_Driver IpInstance]
+[#macro generateBspUSART_Driver IpInstance dmaUsed]
 /*******************************************************************************
                             BUS OPERATIONS OVER USART
 *******************************************************************************/
@@ -1550,7 +1551,7 @@ int32_t  BSP_${IpInstance}_Recv(uint8_t *pData, uint16_t Length)
   }
   return ret;
 }
-[#if USARTDmaIsTrue]
+[#if dmaUsed]
 /**
   * @brief  Write Data through USART BUS with DMA.
   * @param  pData: Pointer to data buffer to send
@@ -2077,4 +2078,4 @@ static uint32_t SPI_GetPrescaler( uint32_t clock_src_hz, uint32_t baudrate_mbps 
 /**
   * @}
   */
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+

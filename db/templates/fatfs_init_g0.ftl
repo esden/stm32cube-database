@@ -195,5 +195,3 @@ DWORD get_fattime(void)
 /* USER CODE BEGIN Application */
      
 /* USER CODE END Application */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -1,10 +1,11 @@
 [#ftl]
 /* USER CODE BEGIN Header */
 /**
- ******************************************************************************
- * File Name          : ${name}
- * Description        : P2P Server Application
- ******************************************************************************
+  ******************************************************************************
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   Peer to peer Server Application
+  ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
@@ -188,5 +189,3 @@ static void TEMPLATE_Send_Notification_Task(void)
 
   return;
 }
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

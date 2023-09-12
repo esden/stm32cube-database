@@ -30,6 +30,7 @@ ${TABnode}*/
 	[/#if]
 #n	
 
+[#if (mx_socDtRPN == "stm32mp15") && !srvcmx_isTargetedFw_inDTS("TF-A")]
 	[#--reserved memory--]
 ${TABnode}reserved-memory {
 ${TABprop}#address-cells = <1>;
@@ -39,5 +40,6 @@ ${TABprop}ranges;
 ${TABprop}/* USER CODE BEGIN reserved-memory */
 ${TABprop}/* USER CODE END reserved-memory */
 ${TABnode}};
+[/#if]
 
 [/#macro]

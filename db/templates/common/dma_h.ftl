@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * File Name          : dma.h
@@ -32,6 +33,7 @@
   *
   ******************************************************************************
   */
+/* USER CODE END Header */
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __dma_H
 #define __dma_H
@@ -57,4 +59,3 @@ void MX_DMA_Init(void);
   * @}
   */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

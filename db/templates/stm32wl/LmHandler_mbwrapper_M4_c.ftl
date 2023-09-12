@@ -2065,5 +2065,3 @@ void Process_Lora_Notif(MBMUX_ComParam_t *ComObj)
 /* USER CODE BEGIN PrFD */
 
 /* USER CODE END PrFD */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

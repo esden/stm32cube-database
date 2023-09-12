@@ -169,5 +169,3 @@ DRESULT SRAMDISK_ioctl(BYTE lun, BYTE cmd, void *buff)
 /* USER CODE BEGIN UserCode */
 /* can be used to add code */
 /* USER CODE END UserCode */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

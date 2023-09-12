@@ -69,6 +69,62 @@
 [/#function]
 [#-- End Function getDeInitServiceMode --]
 
+[#-- function getNbVariable --]
+[#function getNbVariable configModel1]
+    [#if configModel1.methods??] 
+        [#assign methodList1 = configModel1.methods]
+    [#else] [#assign methodList1 = configModel1.libMethod]
+    [/#if]
+ [#assign nbVars = 0]
+ [#assign myListOfLocalVariables = ""]
+    [#list methodList1 as method][#-- list methodList1 --][#if method.arguments?? && method.status!="WARNING"]
+        [#list method.arguments as argument][#-- list method.arguments --]
+            [#if argument.genericType == "struct"][#-- if struct --]
+                [#if argument.context??][#-- if argument.context?? --]
+                    [#if argument.context!="global"&&argument.status!="WARNING"&&argument.status!="NULL"] [#-- if !global --]
+                    [#assign varName= " "+argument.name]                    
+                    [#assign ll= myListOfLocalVariables?split(" ")]
+                    [#assign exist=false]
+                    [#list ll as var  ]
+                        [#if var==argument.name]
+                            [#assign exist=true]
+                        [/#if]
+                    [/#list]
+                    [#if !exist]  [#-- if exist --]                  
+                      [#assign myListOfLocalVariables = myListOfLocalVariables + " "+ argument.name]
+                      [#assign nbVars = nbVars + 1]
+                      [#assign resultList = myListOfLocalVariables]
+                    [/#if][#-- if exist --]
+                    [/#if][#-- if global --]
+                [#else][#-- if context?? --]
+            [/#if][#-- if argument.context?? --]
+[#else][#-- if non struct --]
+                [#if argument.context??][#-- if argument.context?? --]
+                    [#if argument.context!="global"&&argument.status!="WARNING"&&argument.status!="NULL"&&argument.returnValue="true"] [#-- if !global --]
+                    [#assign varName= " "+argument.name]                    
+                    [#assign ll= myListOfLocalVariables?split(" ")]
+                    [#assign exist=false]
+                    [#list ll as var  ]
+                        [#if var==argument.name]
+                            [#assign exist=true]
+                        [/#if]
+                    [/#list]
+                    [#if !exist]  [#-- if exist --]                  
+                      [#assign myListOfLocalVariables = myListOfLocalVariables + " "+ argument.name]
+                      [#assign nbVars = nbVars + 1]
+                      [#assign resultList = myListOfLocalVariables]
+                    [/#if][#-- if exist --]
+                    [/#if][#-- if global --]
+                [#else][#-- if context?? --]
+            [/#if]
+            [/#if][#-- if struct --]
+        [/#list][#-- list method.arguments --]
+        [/#if]
+    [/#list][#-- list methodList1 --]
+[#return nbVars]
+[/#function]
+[#-- function getNbVariable of a config End--]
+
 [#-- macro getLocalVariable of a config Start--]
 [#macro getLocalVariable configModel1 listOfLocalVariables resultList]
     [#if configModel1.methods??] 
@@ -719,11 +775,11 @@
 [#compress]
 [#if name !="TIM"]
     [#if (name=="USB" && (FamilyName=="STM32WB"| FamilyName=="STM32G4"))]
-#if (USE_HAL_${mode}_REGISTER_CALLBACK == 1U)
+#if (USE_HAL_${mode}_REGISTER_CALLBACKS == 1U)
 static void ${entry.key}(${mode}_HandleTypeDef* ${mode?lower_case}Handle)
 #else
 void ${entry.key}(${mode}_HandleTypeDef* ${mode?lower_case}Handle)
-#endif /* USE_HAL_${mode}_REGISTER_CALLBACK */
+#endif /* USE_HAL_${mode}_REGISTER_CALLBACKS */
 {
     [#else]
 #nvoid ${entry.key}(${mode}_HandleTypeDef* ${mode?lower_case}Handle)
@@ -795,41 +851,25 @@ void ${entry.key}(${mode}_HandleTypeDef* ${mode?lower_case}Handle)
 [#if IP.ipName==ipvar.ipName]
     [#assign listOfLocalVariables = ""]
     [#assign  resultList  = ""]
+    [#assign  nbVars  = 0]
+
+[#list words as inst]
+[#if  nbVars == 0]
     [#list IP.configModelList as instanceData]
-    [#assign  halMode  = getHalMode(IP.ipName)]
-        [#if instanceData.initServices?? && halMode==instanceData.halMode]
-            [#if instanceData.initServices.pclockConfig??]
-                [#list instanceData.initServices.pclockConfig.configs as config] [#--list1--]
-                    [#assign listOfLocalVariables = getLocalVariableCLK(config)]
-[#if listOfLocalVariables !="" ]
-                    [#if resultList == ""]
-                        [#list  listOfLocalVariables?split("/") as variable]
-                            #t${variable} = {0};
-                            [#if resultList == ""]
-                                [#assign resultList = variable]
-                            [#else]
-                                [#assign resultList = resultList + ":"+ variable]
-                            [/#if]
-                        [/#list]
-                    [#else]
-                        [#list  listOfLocalVariables?split(":") as variable]                
-                            [#assign  dup  = ""]
-                            [#list  resultList?split(":") as v]
-                                [#if v == variable]
-                                    [#assign  dup  = "yes"]
-                                [/#if]
-                            [/#list]
-                            [#if dup != "yes"]
-                                #t${variable} = {0};
-                                [#assign resultList = resultList + ":"+ variable]
-                            [/#if]
-                        [/#list]
-                    [/#if]
-[/#if]
-                [/#list]
+        [#if instanceData.initServices??]
+            [#if instanceData.initServices.pclockConfig?? ]
+                [#assign pclockConfig=instanceData.initServices.pclockConfig]
+                [#if pclockConfig.ipName?replace("HDMI_CEC","CEC")==inst]                    
+                    [#compress] [@common.getLocalVariable configModel1=pclockConfig listOfLocalVariables=listOfLocalVariables resultList=resultList/][/#compress]
+                    [#assign listOfLocalVariables =resultList]
+                    [#assign nbVars = nbVars + getNbVariable(pclockConfig)]
+                [/#if]
             [/#if]
         [/#if]
+
     [/#list]
+[/#if]
+[/#list]
 [/#if]
 
  #tif(${mode?lower_case}Handle->Instance==${words[0]?replace("I2S","SPI")})
@@ -1122,11 +1162,11 @@ uint32_t DFSDM_Init = 0;
 [#assign ipHandler = mode?lower_case+ "Handle"]
 [#if name !="TIM"]
     [#if (name=="USB" && (FamilyName=="STM32WB" | FamilyName=="STM32G4"))]
-#if (USE_HAL_${mode}_REGISTER_CALLBACK == 1U)
+#if (USE_HAL_${mode}_REGISTER_CALLBACKS == 1U)
 static void ${entry.key}(${mode}_HandleTypeDef* ${mode?lower_case}Handle)
 #else
 void ${entry.key}(${mode}_HandleTypeDef* ${mode?lower_case}Handle)
-#endif /* USE_HAL_${mode}_REGISTER_CALLBACK */
+#endif /* USE_HAL_${mode}_REGISTER_CALLBACKS */
 {
     [#else]
 #nvoid ${entry.key}(${mode}_HandleTypeDef* ${mode?lower_case}Handle)

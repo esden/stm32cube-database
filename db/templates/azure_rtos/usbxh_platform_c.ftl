@@ -95,14 +95,15 @@ void USBH_DriverVBUS(uint8_t state)
   /* USER CODE BEGIN PREPARE_GPIO_DATA_VBUS_FS */
   if(state == 0)
   {
-    /* Drive high Charge pump */ 	     
-    data = GPIO_PIN_SET;
-  }
-  else
-  {
     /* Drive low Charge pump */
     data = GPIO_PIN_RESET;
   }
+  else
+  {
+    /* Drive high Charge pump */ 	     
+    data = GPIO_PIN_SET;
+  }
+  
   /* USER CODE END PREPARE_GPIO_DATA_VBUS_FS */
   HAL_GPIO_WritePin(${IpNameFS},${IpInstanceFS},(GPIO_PinState)data);
 [#else] 
@@ -140,13 +141,13 @@ void USBH_DriverVBUS(uint8_t state)
   /* USER CODE BEGIN PREPARE_GPIO_DATA_VBUS_HS */
   if(state == 0)
   {
-    /* Drive high Charge pump */ 	     
-    data = GPIO_PIN_SET;
+    /* Drive low Charge pump */ 	     
+    data = GPIO_PIN_RESET;
   }
   else
   {
-    /* Drive low Charge pump */
-    data = GPIO_PIN_RESET;
+    /* Drive high Charge pump */
+    data = GPIO_PIN_SET;
   }
   /* USER CODE END PREPARE_GPIO_DATA_VBUS_HS */
   HAL_GPIO_WritePin(${IpNameHS},${IpInstanceHS},(GPIO_PinState)data);
@@ -178,4 +179,3 @@ void USBH_DriverVBUS(uint8_t state)
 
 [/#if]
 }
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

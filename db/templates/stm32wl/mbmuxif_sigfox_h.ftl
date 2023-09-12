@@ -100,4 +100,3 @@ void MBMUXIF_SigfoxSendResp(void);
 
 #endif /*__MBMUXIF_SIGFOX_${CPUCORE}_H__ */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

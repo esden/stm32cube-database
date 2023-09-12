@@ -172,4 +172,3 @@ void  SE_NVM_set_encrypt_flag(sfx_u8 encryption_flag)
 
 /* USER CODE END PrFD */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -1,13 +1,14 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file           : ${BoardName}_conf.h
   * @brief          : Configuration file
   ******************************************************************************
-[@common.optinclude name="Src/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder + "/license.tmp"/][#--include License text --]
   ******************************************************************************
 */
-
+/* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef ${BoardName?upper_case}_CONF_H
@@ -24,7 +25,10 @@
 [#if FamilyName?lower_case?contains("wl")]
 [#assign STM32WL=true]
 [/#if]
-
+[#assign STM32WB=false]
+[#if FamilyName?lower_case?contains("wb")]
+[#assign STM32WB=true]
+[/#if]
 
 /** @addtogroup BSP
   * @{
@@ -81,7 +85,15 @@
 #define USE_COM_LOG                         1U
    
 /* IRQ priorities */
+[#if !RTOS_ACTIVATED??]
 #define BSP_BUTTON_USER_IT_PRIORITY         15U
+[#else]
+#define BSP_BUTTON_USER_IT_PRIORITY         14U
+[/#if]
+
+[#if STM32WL || STM32WL]
+#define BSP_BUTTON_SWx_IT_PRIORITY         BSP_BUTTON_USER_IT_PRIORITY
+[/#if]
 
 /* I2C1 Frequeny in Hz  */
 #define BUS_I2C1_FREQUENCY                  100000U /* Frequency of I2C1 = 100 KHz*/
@@ -92,22 +104,6 @@
 /* UART1 Baud rate in bps  */
 #define BUS_UART1_BAUDRATE                  9600U /* baud rate of UARTn = 9600 baud */
 
-[#if STM32WL]
-/* Radio maximum wakeup time (in ms) */
-#define RF_WAKEUP_TIME                     100U
-
-/* Indicates whether or not TCXO is supported by the board
- * 0: TCXO not supported
- * 1: TCXO supported
- */
-#define IS_TCXO_SUPPORTED                   0U
-
-/* Indicates whether or not DCDC is supported by the board
- * 0: DCDC not supported
- * 1: DCDC supported
- */
-#define IS_DCDC_SUPPORTED                   1U
-[/#if]
 /**
   * @}
   */
@@ -129,4 +125,3 @@
 #endif   
 #endif  /* ${BoardName?upper_case}_CONF_H */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

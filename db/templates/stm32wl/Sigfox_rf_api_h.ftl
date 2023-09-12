@@ -281,4 +281,3 @@ sfx_u8 RF_API_get_version(sfx_u8 **version, sfx_u8 *size);
 
 #endif /*__SIGFOX_RF_API_H__*/
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

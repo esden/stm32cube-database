@@ -288,4 +288,3 @@ extern SUBGHZ_HandleTypeDef hsubghz;
 
 #endif /* __RADIO_CONF_H__*/
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

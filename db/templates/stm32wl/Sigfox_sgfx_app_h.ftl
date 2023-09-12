@@ -92,5 +92,3 @@ void Sigfox_Init(void);
 #endif
 
 #endif /*__SGFX_APP_H__*/
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

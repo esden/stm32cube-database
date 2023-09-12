@@ -479,5 +479,3 @@ static int8_t MBMUXIF_FeatureCm0plusRegistrationCmd(uint32_t *pBuf)
 /* USER CODE BEGIN PrFD */
 
 /* USER CODE END PrFD */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

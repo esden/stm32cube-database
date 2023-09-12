@@ -161,5 +161,3 @@ __weak uint8_t BSP_SDRAM_Sendcmd(FMC_SDRAM_CommandTypeDef *SdramCmd)
 /* USER CODE END AdditionalCode */
 
 #endif
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

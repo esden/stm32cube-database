@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    partition_[#if McuName?starts_with("STM32L562")]stm32l562xx.h[#else]stm32l552xx.h[/#if]
@@ -25,6 +26,8 @@
   *
   ******************************************************************************
  */
+/* USER CODE END Header */
+
 [#assign enabledIT = ""]
 [#if nvic??]
 [#list nvic as vector]

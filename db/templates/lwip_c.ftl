@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
  ******************************************************************************
   * File Name          : ${name}.c
@@ -8,6 +9,8 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */ 
+
 [#compress][#--- Macro START ---]
 [#--- Generation lwip_dhcp = 0 or 1 ---]
 [#--- Generation with_rtos = 0 or 1 ---]
@@ -642,8 +645,8 @@ void MX_LWIP_Init(void)
   */
 static void Ethernet_Link_Periodic_Handle(struct netif *netif)
 {
-/* USER CODE BEGIN 4_3 */
-/* USER CODE END 4_3 */
+/* USER CODE BEGIN 4_4_1 */
+/* USER CODE END 4_4_1 */
 
   /* Ethernet Link every 100ms */
   if (HAL_GetTick() - EthernetLinkTimer >= 100)
@@ -788,5 +791,3 @@ u32_t sio_tryread(sio_fd_t fd, u8_t *data, u32_t len)
 [/#if][#-- endif keil --]
 #endif /* MDK ARM Compiler */
 
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

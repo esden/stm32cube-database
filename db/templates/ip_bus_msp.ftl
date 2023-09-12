@@ -287,26 +287,14 @@ ${dHandle};
                     [#if args == "" && arg!=""][#assign args = args + arg ][#else][#if arg!=""][#assign args = args + ', ' + arg][/#if][/#if]
                     [/#list]
                     [#--[#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n--]
-                            [#if method.returnHAL=="false"]
-                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});
-                            [#else]
-                                [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
-                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
-                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]{
-                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler( );
-                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]}
-                            [/#if]#n                                    
+                            [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});
+                            #n
+                            
     [#else]
                     [#--[#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n--]
-                            [#if method.returnHAL=="false"]
+                           
                                 [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
-                            [#else]
-                                [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
-                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
-                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]{
-                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler( );
-                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]}
-                            [/#if]#n
+                           #n
 
                 [/#if]      
     [/#if]
@@ -368,15 +356,8 @@ ${dHandle};
                                 [#if nTab==2]#t#t[#else]#t[/#if]#t//${method.name}(${args});
                         [#else] [#-- if method without argument --]
                                [#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}()#n;--]
-                            [#if method.returnHAL=="false"]
-                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});
-                            [#else]
-                                [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
-                                [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
-                                [#if nTab==2]#t#t[#else]#t[/#if]{
-                                [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler( );
-                                [#if nTab==2]#t#t[#else]#t[/#if]}
-                            [/#if]#n                                
+                               [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});
+                               #n                                
                         [/#if]
                 [/#if]
         [/#list]
@@ -411,12 +392,13 @@ ${dHandle};
         [#assign dmaCurrentRequest = dmaconfig.instanceName?lower_case]
         [#assign prefixList = dmaCurrentRequest?split("_")]
         [#list prefixList as p][#assign prefix= p][/#list]
+            [#if dmaconfig.dmaVersion?? && dmaconfig.dmaVersion!="DMA3"]
                 [#if dmaconfig.dmaRequestName==""] [#-- if dma request name different from instanceName: case of I2S1 for example --]
 #t__HAL_LINKDMA(${instHandler},[#if dmaconfig.dmaHandel??]${dmaconfig.dmaHandel[0]}[#else]hdma${prefix}[/#if],hdma_${dmaconfig.instanceName?lower_case});#n
                 [#else]
 #t__HAL_LINKDMA(${instHandler},[#if dmaconfig.dmaHandel??]${dmaconfig.dmaHandel[0]}[#else]hdma${prefix}[/#if],hdma_${dmaconfig.dmaRequestName?lower_case});#n
                 [/#if]        
-
+            [/#if]
 #n
     [/#list] [#-- list dmaService as dmaconfig --]
 #n

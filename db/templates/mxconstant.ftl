@@ -68,4 +68,3 @@
 */ 
 #n
 #endif /* __MXCONSTANT_H */
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
  ******************************************************************************
  * @file    bsp_driver_sd.c for L1 (based on stm32l152d_eval_sd.c)
@@ -12,6 +13,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
  ******************************************************************************
  */
+/* USER CODE END Header */
 [#if SWIPdatas??]
 [#list SWIPdatas as SWIP]  
 [#if SWIP.defines??]
@@ -399,4 +401,3 @@ __weak HAL_StatusTypeDef SD_DMAConfigTx(SD_HandleTypeDef *hsd)
 /* user code can be inserted here */
 /* USER CODE END AdditionalCode */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

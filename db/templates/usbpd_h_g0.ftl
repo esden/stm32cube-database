@@ -56,4 +56,4 @@ const uint8_t*  BSP_GetBoardID(void);
 /**
   * @}
   */
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+

@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
  ******************************************************************************
   * @file    bsp_driver_sd.h (based on stm32l552e_eval_sd.h)
@@ -8,7 +9,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
-
+/* USER CODE END Header */
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __${FamilyName}_SD_H
 #define __${FamilyName}_SD_H
@@ -85,5 +86,3 @@ __weak void    BSP_SD_ReadCpltCallback(void);
 #endif
 
 #endif /* __${FamilyName}_SD_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

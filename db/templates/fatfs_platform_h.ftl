@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file           : fatfs_platform.h
@@ -7,6 +8,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
 */
+/* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "${FamilyName?lower_case}xx_hal.h"           [#--include "stm32f4xx_hal.h", for instance --]
 [#if Platform??]

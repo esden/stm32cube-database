@@ -330,5 +330,3 @@ int8_t SC_If_Decode_HS(uint8_t msg, uint8_t *pbuf, uint16_t length)
 /**
   * @}
   */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

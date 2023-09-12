@@ -114,4 +114,3 @@ int16_t GetTemperatureLevel_mbwrapper(void);
 
 #endif /*__SIGFOX_MBWRAPPER_${CPUCORE}_H__ */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

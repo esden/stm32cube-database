@@ -170,5 +170,3 @@ extern "C" {
 #endif
 
 #endif /*__APP_VERSION_H__*/
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

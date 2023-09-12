@@ -9,6 +9,45 @@
     </RefConfig>
 
     <RefConfig Name="ADC_RegularConfig" Comment="Common config">
+        <IFCondition Expression="1=1">
+            <IFCondition Expression="(DIE483) &amp; $Index=3">
+
+                <CallLibMethod Name="LL_ADC_Init">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                    <MethodArg Name="Resolution" ParameterName="ResolutionADC3" />
+                    <MethodArg Name="LowPowerMode" ParameterName="LowPowerAutoWait" />
+                </CallLibMethod>
+            </IFCondition>
+
+            <IFCondition Expression="(DIE483) &amp; ($Index=1|$Index=2)">
+                <CallLibMethod Name="LL_ADC_Init">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                    <MethodArg Name="Resolution" ParameterName="Resolution" />
+                    <MethodArg Name="LowPowerMode" ParameterName="LowPowerAutoWait" />
+                </CallLibMethod>
+            </IFCondition>
+            <IFCondition Expression="(DIE480|DIE450)">
+                <CallLibMethod Name="LL_ADC_Init">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                    <MethodArg Name="Resolution" ParameterName="Resolution" />
+                    <MethodArg Name="LowPowerMode" ParameterName="LowPowerAutoWait" />
+                </CallLibMethod>
+            </IFCondition>
+        </IFCondition>
+           
+        <IFCondition Expression="1=1">
+           <CallLibMethod Name="LL_ADC_REG_Init">
+            <MethodArg Name="ADCx" ParameterName="Instance" />
+            <MethodArg Name="TriggerSource" ParameterName="ExternalTrigConv" />
+            <MethodArg Name="SequencerLength" ParameterName="NbrOfConversion" />
+            <MethodArg Name="SequencerDiscont" ParameterName="DiscontinuousConvMode" />
+            <MethodArg Name="ContinuousMode" ParameterName="ContinuousConvMode" />
+            <MethodArg Name="DMATransfer" ParameterName="DMAContinuousRequestsForConfigFile" />
+            <MethodArg Name="Overrun" ParameterName="Overrun" />
+        </CallLibMethod>
+           
+        </IFCondition>
+         
         <IFCondition Expression="$Index=1 | $Index=3">
             <CallLibMethod Name="LL_ADC_CommonInit">
                 <MethodArg Name="ADCxy_COMMON">
@@ -33,20 +72,7 @@
                 <MethodArg Name="CommonClock" ParameterName="ClockPrescaler" />
             </CallLibMethod>
         </IFCondition>
-        <CallLibMethod Name="LL_ADC_Init">
-            <MethodArg Name="ADCx" ParameterName="Instance" />
-            <MethodArg Name="Resolution" ParameterName="Resolution" />
-            <MethodArg Name="LowPowerMode" ParameterName="LowPowerAutoWait" />
-        </CallLibMethod>
-        <CallLibMethod Name="LL_ADC_REG_Init">
-            <MethodArg Name="ADCx" ParameterName="Instance" />
-            <MethodArg Name="TriggerSource" ParameterName="ExternalTrigConv" />
-            <MethodArg Name="SequencerLength" ParameterName="NbrOfConversion" />
-            <MethodArg Name="SequencerDiscont" ParameterName="DiscontinuousConvMode" />
-            <MethodArg Name="ContinuousMode" ParameterName="ContinuousConvMode" />
-            <MethodArg Name="DMATransfer" ParameterName="DMAContinuousRequestsForConfigFile" />
-            <MethodArg Name="Overrun" ParameterName="Overrun" />
-        </CallLibMethod>
+
         <CallLibMethod Name="LL_ADC_SetGainCompensation">
             <MethodArg Name="ADCx" ParameterName="Instance" />
             <MethodArg Name="GainCompensation" ParameterName="GainCompensation" />
@@ -264,17 +290,14 @@
             </CallLibMethod>
         </IFCondition>
         <!-- PathInternal Depend on selected channel -->
-        <IFCondition
-            Expression="(Channel = ADC_CHANNEL_TEMPSENSOR) | (Channel = ADC_CHANNEL_VREFINT) | (Channel = ADC_CHANNEL_VBAT)">
             <CallLibMethod Name="LL_ADC_SetCommonPathInternalCh">
                 <MethodArg Name="ADCxy_COMMON">
                     <CallLibMethod Name="__LL_ADC_COMMON_INSTANCE">
                         <MethodArg Name="ADCx" ParameterName="Instance" />
                     </CallLibMethod>
                 </MethodArg>
-                <MethodArg Name="Channel" ParameterName="InjectedChannel" />
+                <MethodArg Name="PathInternal" ParameterName="ChannelVREF|ChannelTS|ChannelVBAT" />
             </CallLibMethod>
-        </IFCondition>
     </RefConfig>
 
     <RefConfig Name="ADC_InjectedChannelConfig" Comment="Configure Injected Channel">
@@ -331,17 +354,15 @@
             </CallLibMethod>
         </IFCondition>
         <!-- PathInternal Depend on selected channel -->
-        <IFCondition
-            Expression="(InjectedChannel = ADC_CHANNEL_TEMPSENSOR) | (InjectedChannel = ADC_CHANNEL_VREFINT) | (InjectedChannel = ADC_CHANNEL_VBAT)">
+        
             <CallLibMethod Name="LL_ADC_SetCommonPathInternalCh">
                 <MethodArg Name="ADCxy_COMMON">
                     <CallLibMethod Name="__LL_ADC_COMMON_INSTANCE">
                         <MethodArg Name="ADCx" ParameterName="Instance" />
                     </CallLibMethod>
                 </MethodArg>
-                <MethodArg Name="Channel" ParameterName="InjectedChannel" />
+                <MethodArg Name="PathInternal" ParameterName="ChannelVREF|ChannelTS|ChannelVBAT" />
             </CallLibMethod>
-        </IFCondition>
     </RefConfig>
     
     <RefConfig Name="ADC_InjectedQueueEnable" Comment="Configure injected channel ADC_JSQR register">
@@ -525,10 +546,10 @@
         <Argument AddressOf="false" GenericType="baseaddress" Name="ADCxy_COMMON"
                   TypeName="ADC_Common_TypeDef" />
     </LibMethod>
-    <LibMethod Comment="" Name="LL_ADC_SetCommonPathInternalCh">
+    <LibMethod Comment="" Name="LL_ADC_SetCommonPathInternalCh" Optimizable="true" >
         <Argument AddressOf="false" GenericType="baseaddress" Name="ADCxy_COMMON"
                   TypeName="ADC_Common_TypeDef" />
-        <Argument AddressOf="false" GenericType="simple" Name="Channel"
+        <Argument AddressOf="false" GenericType="simple" Name="PathInternal"
                   OptimizationCondition="equal" />
     </LibMethod>
     <LibMethod Comment="" Name="LL_ADC_GetCommonPathInternalCh">

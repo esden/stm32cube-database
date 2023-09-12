@@ -305,15 +305,15 @@
 	</RefParameter>	
 	
 	<RefParameter Comment="Mic Pairs Nbr" DefaultValue="1" Max="1" Min="1" Group="Pdm Parameters" Name="MicPairsNbr" Type="integer" Visible="true">
-		<Condition Expression="!(SEM_MIC_2 | SEM_MIC_3)" Diagnostic=""/>
+		<Condition Expression="!$IpInstance_SEM_MIC2 &amp;!$IpInstance_SEM_MIC3" Diagnostic=""/>
 		<Description>Specifies the number of microphone pairs used.</Description>
 	</RefParameter>
 	<RefParameter Comment="Mic Pairs Nbr" DefaultValue="2" Max="2" Min="2" Group="Pdm Parameters" Name="MicPairsNbr" Type="integer" Visible="true">
-		<Condition Expression="SEM_MIC_2 &amp; !SEM_MIC_3" Diagnostic=""/>
+		<Condition Expression="$IpInstance_PDM_CK1 &amp; $IpInstance_PDM_CK2 &amp; SEM_MIC_2 &amp; !SEM_MIC_3" Diagnostic=""/>
 		<Description>Specifies the number of microphone pairs used.</Description>
 	</RefParameter>
 	<RefParameter Comment="Mic Pairs Nbr" DefaultValue="3" Max="3" Min="3" Group="Pdm Parameters" Name="MicPairsNbr" Type="integer" Visible="true">
-		<Condition Expression="SEM_MIC_3 &amp; !SEM_MIC_2" Diagnostic=""/>
+		<Condition Expression="$IpInstance_PDM_CK1 &amp; $IpInstance_PDM_CK2 &amp; SEM_MIC_3 &amp; !SEM_MIC_2" Diagnostic=""/>
 		<Description>Specifies the number of microphone pairs used.</Description>
 	</RefParameter>
 	<RefParameter Comment="Mic Pairs Nbr" DefaultValue="0" Max="4" Min="0" Group="Pdm Parameters" Name="MicPairsNbr" Type="integer" Visible="true">
@@ -323,12 +323,12 @@
 	<RefParameter Comment="Clock Enable" DefaultValue="SAI_PDM_CLOCK1_ENABLE" Group="Pdm Parameters" Name="ClockEnable" Type="list" Visible="true">
 		<Description>Specifies which clock must be enabled.</Description>
 		<PossibleValue Comment="Pdm Clock1 Enable" Value="SAI_PDM_CLOCK1_ENABLE"/>
-		<Condition Expression="(SEM_CK1 &amp; !SEM_CK1_CK2)" Diagnostic="CK1 only"/>
+		<Condition Expression="($IpInstance_SEM_CK1 &amp; SEM_CK1 &amp; !SEM_CK1_CK2)" Diagnostic="CK1 only"/>
 	</RefParameter>
 	<RefParameter Comment="Clock Enable" DefaultValue="SAI_PDM_CLOCK2_ENABLE" Group="Pdm Parameters" Name="ClockEnable" Type="list" Visible="true">
 		<Description>Specifies which clock must be enabled.</Description>
 		<PossibleValue Comment="Pdm Clock2 Enable" Value="SAI_PDM_CLOCK2_ENABLE"/>
-		<Condition Expression="(SEM_CK2 &amp; !SEM_CK1_CK2)" Diagnostic="CK2 only"/>
+		<Condition Expression="($IpInstance_SEM_CK2 &amp;SEM_CK2 &amp; !SEM_CK1_CK2)" Diagnostic="CK2 only"/>
 	</RefParameter>
 	<RefParameter Comment="Clock Enable" DefaultValue="SAI_PDM_CLOCK1_ENABLE | SAI_PDM_CLOCK2_ENABLE" Group="Pdm Parameters" Name="ClockEnable" Type="list" Visible="true">
 		<Description>Specifies which clock must be enabled.</Description>
@@ -1892,8 +1892,9 @@
 								<Signal Name="CK1"/>								
 							</SignalLogicalOp>
 							<Semaphore>$IpInstance_PDM$noContext</Semaphore>
-							<Semaphore>$IpInstance_PDM_CK1$noContext</Semaphore>							
-							<Semaphore>SEM_CK1$noContext</Semaphore>
+							<Semaphore>$IpInstance_PDM_CK1$noContext</Semaphore>
+                                                        <Semaphore>SEM_CK1$noContext</Semaphore>							
+							<Semaphore>$IpInstance_SEM_CK1$noContext</Semaphore>
 						</Mode>	
 						<!-- 69799 ThePDM must be activate if we have at least D1 and CK1 or CK2 avaialble -->						
 						<Mode Name="PDM_Master_Mode_CK2" UserName="Pulse Density Modulation using MicroPhones pairs (1-2) and CK2 as clock"  RemoveCondition="($IpNumber=2) | ($IpNumber=3)">
@@ -1903,7 +1904,8 @@
 							</SignalLogicalOp>
 							<Semaphore>$IpInstance_PDM$noContext</Semaphore>
 							<Semaphore>$IpInstance_PDM_CK2$noContext</Semaphore>
-							<Semaphore>SEM_CK2$noContext</Semaphore>
+                                                        <Semaphore>SEM_CK2$noContext</Semaphore>
+							<Semaphore>$IpInstance_SEM_CK2$noContext</Semaphore>
 						</Mode>
 						
 					</ModeLogicOperator>
@@ -1931,6 +1933,9 @@
 								<Signal Name="D2"/>															
 							</SignalLogicalOp>	
 							<Semaphore>SEM_MIC_2$noContext</Semaphore>
+                                                        <Semaphore>$IpInstance_PDM_CK1$noContext</Semaphore>
+                                                        <Semaphore>$IpInstance_PDM_CK2$noContext</Semaphore>
+                                                        <Semaphore>$IpInstance_SEM_MIC2$noContext</Semaphore>
 						</Mode>						
 						<Mode Name="5_6_MicroPhones" UserName="Add MicroPhones paris (5-6)">
 							<SignalLogicalOp Name="AND">																
@@ -1938,6 +1943,9 @@
 								<Signal Name="D3"/>															
 							</SignalLogicalOp>	
 							<Semaphore>SEM_MIC_3$noContext</Semaphore>
+                                                        <Semaphore>$IpInstance_PDM_CK1$noContext</Semaphore>
+                                                        <Semaphore>$IpInstance_PDM_CK2$noContext</Semaphore>
+                                                        <Semaphore>$IpInstance_SEM_MIC3$noContext</Semaphore>
 						</Mode>						
 					</ModeLogicOperator>
 					<Condition Expression="$IpInstance_PDM" Diagnostic="Pulse Density Modulation mode disabled"/>

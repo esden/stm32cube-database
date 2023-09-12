@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * File Name          : ${name}.h
@@ -32,6 +33,8 @@
   *
   ******************************************************************************
   */
+/* USER CODE END Header */
+
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __${name?upper_case}_H
 #define __${name?upper_case}_H
@@ -106,4 +109,4 @@ void HAL_${mode}_MspDeInit(${mode}_HandleTypeDef* h${mode?lower_case});
   * @}
   */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+

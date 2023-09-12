@@ -73,4 +73,3 @@ void Process_Lora_Cmd(MBMUX_ComParam_t *ComObj);
 
 #endif /*__LMHANDLER_MBWRAPPER_${CPUCORE}_H__ */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

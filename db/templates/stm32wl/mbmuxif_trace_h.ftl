@@ -88,4 +88,3 @@ void MBMUXIF_TraceSendNotif_NoWait(void);
 
 #endif /*__MBMUXIF_TRACE_${CPUCORE}_H__ */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    sdram_diskio.h (based on sdram_diskio_template.h v2.0.2)
@@ -7,7 +8,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
-
+/* USER CODE END Header */
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __SDRAM_DISKIO_H
 #define __SDRAM_DISKIO_H
@@ -28,6 +29,4 @@ extern const Diskio_drvTypeDef  SDRAMDISK_Driver;
 /* USER CODE END lastSection */ 
 
 #endif /* __SDRAM_DISKIO_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 

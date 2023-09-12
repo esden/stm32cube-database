@@ -100,5 +100,3 @@ void MBMUXIF_RadioSendResp(void);
 #endif
 
 #endif /*__MBMUXIF_RADIO_${CPUCORE}_H__ */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

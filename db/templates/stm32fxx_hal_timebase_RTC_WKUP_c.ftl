@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    ${FamilyName?lower_case}_hal_timebase_RTC_WKUP.c 
@@ -7,6 +8,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
 #include "${FamilyName?lower_case}xx_hal.h"
@@ -179,5 +181,3 @@ void RTC_WKUP_IRQHandler(void)
 /**
   * @}
   */ 
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

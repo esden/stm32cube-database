@@ -1154,4 +1154,3 @@ be configured to output push-pull low (excepted for Linear sensors).
 
 #endif /* __TSL_CONF_H */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

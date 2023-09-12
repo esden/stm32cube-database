@@ -281,5 +281,3 @@ int16_t MBMUXIF_ChipRevId(void);
 #endif
 
 #endif /*__MBMUXIF_SYS_${CPUCORE}_H__ */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -277,4 +277,3 @@ static void Thd_RadioNotifRcvProcess(void *argument)
 
 /* USER CODE END PrFD */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

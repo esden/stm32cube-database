@@ -110,4 +110,3 @@ void MX_Sigfox_Process(void);
 
 #endif /*__APP_SIGFOX_H__*/
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

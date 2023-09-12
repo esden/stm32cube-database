@@ -97,4 +97,3 @@ uint16_t SYS_GetBatteryLevel(void);
 
 #endif /* __ADC_IF_H__ */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -93,4 +93,3 @@ UINT MX_USBX_Init(void);
  }
 #endif
 #endif  /* __APP_USBX_DEVICE_H__ */
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

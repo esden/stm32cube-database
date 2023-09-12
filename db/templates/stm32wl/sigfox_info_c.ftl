@@ -146,4 +146,3 @@ static void StoreValueInFeatureListTable(void)
 
 /* USER CODE END PrFD */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

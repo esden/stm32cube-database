@@ -226,4 +226,3 @@ static void MBMUXIF_TaskTraceAckRcv(void)
 
 /* USER CODE END PrFD */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

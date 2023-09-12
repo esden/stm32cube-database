@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /********************************************************************************
   * @file    s70kl1281_conf.h
   * @author  MCD Application Team
@@ -8,16 +9,16 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
-  * All rights reserved.</center></h2>
+  * Copyright (c) 2020 STMicroelectronics.
+  * All rights reserved.
   *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef S70KL1281_CONF_H
@@ -51,5 +52,3 @@
 #endif
 
 #endif /* S70KL1281_CONF_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

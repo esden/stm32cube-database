@@ -1,10 +1,10 @@
 [#ftl]
 /* USER CODE BEGIN Header */
 /**
- ******************************************************************************
-  * File Name          : ${name}
-  * Description        : HW UART source file for STM32WPAN Middleware.
-  *
+  ******************************************************************************
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   HW UART source file for STM32WPAN Middleware.
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
@@ -308,5 +308,3 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 
     return;
 }
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

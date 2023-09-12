@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * File Name          : ${name}.h
@@ -9,6 +10,7 @@
   *************************************************************************  
 
   */
+/* USER CODE END Header */ 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __mx_${name?lower_case}_H
 #define __mx_${name?lower_case}_H
@@ -100,5 +102,3 @@ void MX_LWIP_Process(void);
 /**
   * @}
   */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

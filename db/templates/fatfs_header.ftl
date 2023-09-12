@@ -3,6 +3,7 @@
 [#if cpucore!=""]    
 [#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")+"/"]
 [/#if]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file   fatfs.h
@@ -11,7 +12,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
-
+/* USER CODE END Header */
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __fatfs_H
 #define __fatfs_H
@@ -40,5 +41,3 @@
 }
 #endif
 #endif /*__fatfs_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

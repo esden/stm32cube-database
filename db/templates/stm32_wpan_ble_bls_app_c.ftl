@@ -1,13 +1,14 @@
 [#ftl]
 /* USER CODE BEGIN Header */
 /**
- ******************************************************************************
-  * File Name          : ${name}
-  * Description        : Blood Pressure Service Application.
+  ******************************************************************************
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   Blood Pressure Service Application
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
- ******************************************************************************
- */
+  ******************************************************************************
+  */
 /* USER CODE END Header */
 [#assign FREERTOS_STATUS = 0]
 [#list SWIPdatas as SWIP]
@@ -486,5 +487,3 @@ void BLSAPP_Init(void)
 /* USER CODE BEGIN FD */
 
 /* USER CODE END FD */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

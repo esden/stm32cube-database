@@ -130,5 +130,3 @@ void MN_API_TimerStop(void);
 #endif
 
 #endif /* __MN_API_H__ */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

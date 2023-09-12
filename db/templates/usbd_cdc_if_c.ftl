@@ -529,5 +529,3 @@ uint8_t CDC_Transmit_HS(uint8_t* Buf, uint16_t Len)
 /**
   * @}
   */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

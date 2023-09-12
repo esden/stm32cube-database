@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file  : ${BoardName}.c
@@ -7,6 +8,7 @@
 [@common.optinclude name=mxTmpFolder + "/license.tmp"/][#--include License text --]
   ******************************************************************************
 */
+/* USER CODE END Header */
 [#assign IpInstance = ""]
 [#assign UsartInstance = ""]
 [#assign SpiInstance = ""]
@@ -643,7 +645,7 @@ int32_t BSP_COM_SelectLogPort(COM_TypeDef COM)
 /**
  * @}
  */  
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+
 
 
 

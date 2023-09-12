@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file  : ${BoardName}.h
@@ -7,6 +8,7 @@
 [@common.optinclude name=mxTmpFolder+ "/license.tmp"/][#--include License text --]
   ******************************************************************************
 */
+/* USER CODE END Header */
 [#assign IpInstance = ""]
 [#assign IpName = ""]
 [#assign IrqNumber = ""]
@@ -114,10 +116,7 @@
 #include "main.h"
 
 #if (USE_BSP_COM_FEATURE > 0)
-  #if (USE_COM_LOG > 0)
-  [#-- BZ 92300  
-    #if defined(__ICCARM__) || defined(__CC_ARM) || (defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)) /* For IAR and ARM Compiler 5 and 6*/
-  --] 
+  #if (USE_COM_LOG > 0)  
     #if defined(__ICCARM__) || defined(__CC_ARM) || (defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)) /* For IAR and ARM Compiler 5 and 6*/ 
       #include <stdio.h>
     #endif
@@ -553,5 +552,4 @@ int32_t BSP_COM_RegisterMspCallbacks(COM_TypeDef COM , BSP_COM_Cb_t *Callback);
 #endif
 
 #endif /* __${BoardName?upper_case}__H */
-    
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+

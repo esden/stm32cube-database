@@ -76,6 +76,9 @@
 [/#if]
 
 [#if FREERTOS_STATUS = 1 ]
+
+osMutexId_t MtxOtCmdId;
+
 /* FreeRtos stacks attributes */
 const osThreadAttr_t ThreadMsgM0ToM4Process_attr = {
     .name = CFG_THREAD_MSG_M0_TO_M4_PROCESS_NAME,
@@ -96,6 +99,12 @@ const osThreadAttr_t ThreadCliProcess_attr = {
      .priority = CFG_THREAD_CLI_PROCESS_PRIORITY,
      .stack_size = CFG_THREAD_CLI_PROCESS_STACK_SIZE
  };
+
+typedef enum
+{
+  ot_TL_CmdBusy,
+  ot_TL_CmdAvailable
+} ot_TL_CmdStatus_t;
 
  [/#if]
 /* USER CODE BEGIN PD */
@@ -120,6 +129,9 @@ static void HostTxCb( void );
 static void Wait_Getting_Ack_From_M0(void);
 static void Receive_Ack_From_M0(void);
 static void Receive_Notification_From_M0(void);
+[#if FREERTOS_STATUS = 1 ]
+static void ot_StatusNot(ot_TL_CmdStatus_t status);
+[/#if]
 #if (CFG_HW_LPUART1_ENABLED == 1)
 extern void MX_LPUART1_UART_Init(void);
 #endif
@@ -558,6 +570,10 @@ Thread_OT_Cmd_Request_t* THREAD_Get_NotificationPayloadBuffer(void)
 
 static void Ot_Cmd_Transfer_Common(void)
 {
+[#if FREERTOS_STATUS = 1 ]
+  ot_StatusNot(ot_TL_CmdBusy);
+[/#if]  
+  
   /* OpenThread OT command cmdcode range 0x280 .. 0x3DF = 352 */
   p_thread_otcmdbuffer->cmdserial.cmd.cmdcode = 0x280U;
   /* Size = otCmdBuffer->Size (Number of OT cmd arguments : 1 arg = 32bits so multiply by 4 to get size in bytes)
@@ -569,6 +585,10 @@ static void Ot_Cmd_Transfer_Common(void)
 
   /* Wait completion of cmd */
   Wait_Getting_Ack_From_M0();
+  
+[#if FREERTOS_STATUS = 1 ]
+  ot_StatusNot(ot_TL_CmdAvailable);
+[/#if]
 }
 
 /**
@@ -695,6 +715,26 @@ static void Receive_Notification_From_M0(void)
 [/#if]
 }
 
+[#if FREERTOS_STATUS = 1 ]
+static void ot_StatusNot( ot_TL_CmdStatus_t status )
+{
+  switch (status)
+  {
+    case ot_TL_CmdBusy:
+      osMutexAcquire( MtxOtCmdId, osWaitForever );
+      break;
+
+    case ot_TL_CmdAvailable:
+      osMutexRelease( MtxOtCmdId );
+      break;
+
+    default:
+      break;
+  }
+  return;
+}
+[/#if]
+ 
 #if (CFG_USB_INTERFACE_ENABLE != 0)
 #else
 #if (CFG_FULL_LOW_POWER == 0)
@@ -950,4 +990,3 @@ void VCP_DataReceived(uint8_t* Buf , uint32_t *Len)
 /* USER CODE BEGIN FD_WRAP_FUNCTIONS */
 
 /* USER CODE END FD_WRAP_FUNCTIONS */
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

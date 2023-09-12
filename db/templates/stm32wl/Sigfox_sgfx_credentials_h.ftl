@@ -152,5 +152,3 @@ sfx_error_t CREDENTIALS_wrap_session_key(uint8_t *data, uint8_t blocks);
 #endif
 
 #endif /* __SGFX_CREDENTIALS_H__ */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

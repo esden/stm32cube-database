@@ -68,5 +68,3 @@ void CMD_Process(void);
 #endif
 
 #endif /* __SGFX_COMMAND_H__*/
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

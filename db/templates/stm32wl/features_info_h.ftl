@@ -156,5 +156,3 @@ FEAT_INFO_List_t *FEAT_INFO_GetListPtr(void);
 #endif
 
 #endif /* __SYSTEM_INFO_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

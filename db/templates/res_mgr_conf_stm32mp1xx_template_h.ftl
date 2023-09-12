@@ -210,4 +210,3 @@ ${valueDynamicSystemResourcesUpdate}
   */
 #endif /* RES_MGR_CONF_H__ */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

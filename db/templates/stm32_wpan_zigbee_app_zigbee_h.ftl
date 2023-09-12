@@ -1,13 +1,14 @@
 [#ftl]
 /* USER CODE BEGIN Header */
 /**
- ******************************************************************************
- * File Name          : ${name}
-  * Description        : Header for Zigbee Application.
+  ******************************************************************************
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   Header for Zigbee Application.
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
- */
+  */
 /* USER CODE END Header */
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef APP_ZIGBEE_H
@@ -80,5 +81,3 @@ void Pre_ZigbeeCmdProcessing(void);
 #endif
 
 #endif /* APP_ZIGBEE_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

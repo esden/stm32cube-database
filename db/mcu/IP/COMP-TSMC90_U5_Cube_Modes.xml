@@ -57,6 +57,7 @@
 	<RefParameter Comment="Window Mode" DefaultValue="COMP_WINDOWMODE_DISABLE" Group="Pinout Parameters" Name="WindowMode" Type="list" Visible="false">
             <PossibleValue Comment="Window mode disabled (Plus input of comparator 1 connected to PC5/PB2) " Value="COMP_WINDOWMODE_DISABLE"/>
             <PossibleValue Comment="Window mode enabled: Plus input of comparator 1 shorted with Plus input of comparator 2 " Value="COMP_WINDOWMODE_COMP1_INPUT_PLUS_COMMON"/>
+            <PossibleValue Comment="Window mode enabled: Plus input of comparator 2 shorted with Plus input of comparator 1 " Value="COMP_WINDOWMODE_COMP2_INPUT_PLUS_COMMON"/>
 	</RefParameter>
 
 
@@ -181,6 +182,13 @@
 			<PossibleValue>COMP_WINDOWMODE_COMP1_INPUT_PLUS_COMMON</PossibleValue>
 		</Parameter>
 	</RefMode>
+
+	<RefMode BaseMode="InputPlus_BaseMode" Name="WindowMode">
+           <Condition Diagnostic="" Expression="$IpNumber=1"/>
+		<Parameter Name="WindowMode">
+			<PossibleValue>COMP_WINDOWMODE_COMP2_INPUT_PLUS_COMMON</PossibleValue>
+		</Parameter>
+	</RefMode>
 	
 
 
@@ -233,13 +241,13 @@
 	                                <Semaphore>Semaphore_$IpInstance_Enable</Semaphore>
 				</Mode>
 			
-				<Mode Name="WindowMode"  UserName="Window Mode" RemoveCondition="($IpNumber=1)">
+				<Mode Name="WindowMode"  UserName="Window Mode">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="VS_WindowMode"/>
 					</SignalLogicalOp>
 	                                <Semaphore>Semaphore_$IpInstance_Enable</Semaphore>
 	                                <Semaphore>Semaphore_WindowMode_$IpInstance_Enable</Semaphore>
-					<Condition Diagnostic="Need to have an INP (External Input [+]) on the other Comparator." Expression="(($IpNumber=2) &amp; COMP1_ExternalInputPlus)"/>
+					<Condition Diagnostic="Need to have an INP (External Input [+]) on the other Comparator" Expression="(($IpNumber=2) &amp; COMP1_ExternalInputPlus)|(($IpNumber=1) &amp; COMP2_ExternalInputPlus) |(($IpNumber=3) &amp; (COMP2_ExternalInputPlus|Semaphore_WindowMode_COMP2_Enable))"/>
 				</Mode>
 			</ModeLogicOperator>
 			<Semaphore>$IpInstance_InputPlus</Semaphore>

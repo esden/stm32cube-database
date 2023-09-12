@@ -223,5 +223,3 @@ void SubghzApp_Init(void);
 #endif
 
 #endif /*__SUBGHZ_PHY_APP_H__*/
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file  : ${BoardName}.c
@@ -7,6 +8,7 @@
 [@common.optinclude name=mxTmpFolder + "/license.tmp"/][#--include License text --]
   ******************************************************************************
 */
+/* USER CODE END Header */
 [#assign IpInstance = ""]
 [#assign UsartInstance = ""]
 [#assign SpiInstance = ""]
@@ -951,8 +953,7 @@ int32_t BSP_COM_SelectLogPort(COM_TypeDef COM)
   } 
   return BSP_ERROR_NONE; 
 }
-
-[#-- BZ 92300 
+ 
 #if defined(__CC_ARM) /* For arm compiler 5 */
 #if !defined(__MICROLIB) /* If not Microlib */
 
@@ -962,14 +963,12 @@ struct __FILE
 };
 
 FILE __stdout;
-FILE __stdin;
 
 #endif /* If not Microlib */
 #elif defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050) /* For arm compiler 6 */
 #if !defined(__MICROLIB) /* If not Microlib */
 
 FILE __stdout;
-FILE __stdin;
 
 #endif /* If not Microlib */
 #endif /* For arm compiler 5 */
@@ -979,12 +978,6 @@ FILE __stdin;
 #else /* For GCC Toolchains */
  int __io_putchar (int ch)
 #endif /* For IAR and ARM Compiler 5 and 6 */
---]
-#if defined(__ICCARM__) || defined(__CC_ARM) || (defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)) /* For IAR and ARM Compiler 5 and 6*/
- int fputc (int ch, FILE *f)
-#else /* For GCC Toolchains */
- int __io_putchar (int ch)
-#endif /* __GNUC__ */
 { 
   (void)HAL_UART_Transmit(&hcom_uart[COM_ActiveLogPort], (uint8_t *)&ch, 1, COM_POLL_TIMEOUT); 
   return ch;
@@ -1015,7 +1008,6 @@ FILE __stdin;
 /**
  * @}
  */  
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 
 
 

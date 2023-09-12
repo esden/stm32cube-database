@@ -63,9 +63,42 @@
         <Description>Specifies the external trigger for the selected DAC channel.</Description>
     </RefParameter>
 
+    <!-- ######################################################################################################### -->
+    <RefParameter Comment="Obsolete Output Buffer keep for compatibility" DefaultValue="" Name="DAC_OutputBuffer" Type="list" Visible="false"/>
+    <!--  
+        NOTE 1 : 
+        This DAC_OutputBuffer has been added to keep compatibility with former CubeMX version where DAC_OutputBuffer
+        was unique and now split in DAC1_OutputBuffer and DAC2_OutputBuffer to manage the condition in a better way.
+    -->
+    <!-- ######################################################################################################### -->
+    <RefParameter Comment="Output Buffer" DefaultValue="DAC_OUTPUTBUFFER_DISABLE" Name="DAC1_OutputBuffer" Type="list" >
+        <Condition Diagnostic="" Expression="DAC_OutputBuffer=DAC_OUTPUTBUFFER_DISABLE"/> <!-- see NOTE 1  -->
+        <PossibleValue Comment="Enable" Value="DAC_OUTPUTBUFFER_ENABLE" Condition="$IpInstance_OUT1_Int" Diagnostic="Buffer not available when DAC OUT1 is not connected to an external pin"/>
+        <PossibleValue Comment="Disable" Value="DAC_OUTPUTBUFFER_DISABLE" Condition="($IpInstance_OUT1_ExtAndInt&amp;(DAC_SampleAndHold=DAC_SAMPLEANDHOLD_DISABLE)) | ($IpInstance_OUT1_Ext&amp;(DAC_SampleAndHold=DAC_SAMPLEANDHOLD_ENABLE))" Diagnostic="To disable the output buffer change Mode or the out connection"/>
+        <Description>
+            The activation/deactivation of the buffer is linked to the combination the mode selected and the out connection. &lt;br/&gt;
+            Buffer could be enabled only if out is at least connected to the external pin (with or without the on chip peripheral connection)&lt;br/&gt;
+            Buffer could be disabled is not possible in two case : &lt;br/&gt;
+            - out connected to external pin only with Sample and Hold selected mode&lt;br/&gt;
+            - out connected to external pin and internal on chip peripheral with the Normal selected mode &lt;br/&gt;
+        </Description>
+    </RefParameter>
     <RefParameter Comment="Output Buffer" DefaultValue="DAC_OUTPUTBUFFER_ENABLE" Name="DAC1_OutputBuffer" Type="list" >
         <PossibleValue Comment="Enable" Value="DAC_OUTPUTBUFFER_ENABLE" Condition="$IpInstance_OUT1_Int" Diagnostic="Buffer not available when DAC OUT1 is not connected to an external pin"/>
         <PossibleValue Comment="Disable" Value="DAC_OUTPUTBUFFER_DISABLE" Condition="($IpInstance_OUT1_ExtAndInt&amp;(DAC_SampleAndHold=DAC_SAMPLEANDHOLD_DISABLE)) | ($IpInstance_OUT1_Ext&amp;(DAC_SampleAndHold=DAC_SAMPLEANDHOLD_ENABLE))" Diagnostic="To disable the output buffer change Mode or the out connection"/>
+        <Description>
+            The activation/deactivation of the buffer is linked to the combination the mode selected and the out connection. &lt;br/&gt;
+            Buffer could be enabled only if out is at least connected to the external pin (with or without the on chip peripheral connection)&lt;br/&gt;
+            Buffer could be disabled is not possible in two case : &lt;br/&gt;
+            - out connected to external pin only with Sample and Hold selected mode&lt;br/&gt;
+            - out connected to external pin and internal on chip peripheral with the Normal selected mode &lt;br/&gt;
+        </Description>
+    </RefParameter>
+    
+    <RefParameter Comment="Output Buffer" DefaultValue="DAC_OUTPUTBUFFER_DISABLE" Name="DAC2_OutputBuffer" Type="list" >
+        <Condition Diagnostic="" Expression="DAC_OutputBuffer=DAC_OUTPUTBUFFER_DISABLE"/><!-- see NOTE 1  -->
+        <PossibleValue Comment="Enable" Value="DAC_OUTPUTBUFFER_ENABLE" Condition="$IpInstance_OUT2_Int" Diagnostic="Buffer not available when DAC OUT2 is not connected to an external pin"/>
+        <PossibleValue Comment="Disable" Value="DAC_OUTPUTBUFFER_DISABLE" Condition="($IpInstance_OUT2_ExtAndInt&amp;(DAC_SampleAndHold=DAC_SAMPLEANDHOLD_DISABLE)) | ($IpInstance_OUT2_Ext&amp;(DAC_SampleAndHold=DAC_SAMPLEANDHOLD_ENABLE))" Diagnostic="To disable the output buffer change Mode or the out connection"/>
         <Description>
             The activation/deactivation of the buffer is linked to the combination the mode selected and the out connection. &lt;br/&gt;
             Buffer could be enabled only if out is at least connected to the external pin (with or without the on chip peripheral connection)&lt;br/&gt;
@@ -247,7 +280,7 @@
             The internal link is fully configured
         </Description>
     </RefParameter>
-     <RefParameter Name="DAC_ConnectedPeripherals_OUT1" Comment="On chip peripheral(s)" DefaultValue="NO" Type="list">
+    <RefParameter Name="DAC_ConnectedPeripherals_OUT1" Comment="On chip peripheral(s)" DefaultValue="NO" Type="list">
         <PossibleValue Value="NO" Comment="not yet connected"/>
         <Description>
             DAC OUT1 is selected to be connected to on chip analog peripherals (ADCs, COMPs and/or OPAMPs)&lt;br/&gt;
@@ -256,7 +289,7 @@
         </Description>
     </RefParameter>
 
-     <RefParameter Name="DAC_ConnectedPeripherals_OUT2" Comment="On chip peripheral(s)" DefaultValue="YES" Type="list" Visible="true">
+    <RefParameter Name="DAC_ConnectedPeripherals_OUT2" Comment="On chip peripheral(s)" DefaultValue="YES" Type="list" Visible="true">
         <Condition Expression="COMP1_DACChannel2|COMP2_DACChannel2|ADC2_DAC1_OUT2|OPAMP2_STANDALONE_DAC2_INP|OPAMP2_FOLLOWER_DAC2_INP|OPAMP2_PGA_DAC_INP" Diagnostic=""/>
         <PossibleValue Value="YES" Comment="connected"/>
         <Description>
@@ -264,7 +297,7 @@
             The internal link is fully configured
         </Description>
     </RefParameter>
-     <RefParameter Name="DAC_ConnectedPeripherals_OUT2" Comment="On chip peripheral(s)" DefaultValue="NO" Type="list">
+    <RefParameter Name="DAC_ConnectedPeripherals_OUT2" Comment="On chip peripheral(s)" DefaultValue="NO" Type="list">
         <PossibleValue Value="NO" Comment="not yet connected"/>
         <Description>
             DAC OUT2 is selected to be connected to on chip analog peripherals (ADCs, COMPs and/or OPAMPs)&lt;br/&gt;

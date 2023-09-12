@@ -25,8 +25,10 @@
 
 int mbedtls_hardware_poll( void *Data, unsigned char *Output, size_t Len, size_t *oLen )
 {
+/* USER CODE BEGIN custom_rng */
   #error "please complete this function mbedtls_hardware_poll with your own code";
   return -1;
+/* USER CODE END custom_rng */
 }
 
 

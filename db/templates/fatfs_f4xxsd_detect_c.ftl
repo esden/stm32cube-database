@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file           : fatfs_f4xxsd_detect.c
@@ -7,6 +8,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
 */
+/* USER CODE END Header */
 #include "fatfs_f4xxsd_detect.h"
 [#if GPIO_IP??] 
 [#else]

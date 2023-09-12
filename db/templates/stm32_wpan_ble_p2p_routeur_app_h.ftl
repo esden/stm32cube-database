@@ -1,10 +1,11 @@
 [#ftl]
 /* USER CODE BEGIN Header */
 /**
- ******************************************************************************
- * File Name          : ${name}
- * Description        : Header for P2P router application module
- ******************************************************************************
+  ******************************************************************************
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   Header for p2p_routeur_app.c module
+  ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
@@ -64,5 +65,3 @@ void P2PR_APP_End_Device_Mgt_Connection_Update( P2PR_APP_Device_Status_t *p_devi
 #endif
 
 #endif /*__P2P_ROUTEUR_APP_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

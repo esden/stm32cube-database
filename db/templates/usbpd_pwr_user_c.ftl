@@ -792,5 +792,4 @@ __weak void BSP_USBPD_PWR_EventCallback(uint32_t Instance)
   * @}
   */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 

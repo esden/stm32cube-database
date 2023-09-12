@@ -1,10 +1,11 @@
 [#ftl]
 /* USER CODE BEGIN Header */
 /**
- ******************************************************************************
- * File Name          : ${name}
- * Description        : P2P Client Application
- ******************************************************************************
+  ******************************************************************************
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   Peer to peer Client Application
+  ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
@@ -560,5 +561,3 @@ uint8_t P2P_Client_APP_Get_State( void ) {
 /* USER CODE BEGIN LF */
 
 /* USER CODE END LF */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

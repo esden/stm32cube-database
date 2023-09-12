@@ -333,4 +333,3 @@ __weak uint8_t BSP_SD_IsDetected(void)
 /* user code can be inserted here */
 /* USER CODE END AdditionalCode */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

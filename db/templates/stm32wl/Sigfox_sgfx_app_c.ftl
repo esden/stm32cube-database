@@ -495,5 +495,3 @@ static void SendSigfox(void)
 [/#if]
 
 /* USER CODE END PrFD */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

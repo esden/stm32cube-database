@@ -272,4 +272,3 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *h${IpInstance?lower_case?replac
 
 /* USER CODE END PrFD */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

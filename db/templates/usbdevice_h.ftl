@@ -124,5 +124,3 @@ void MX_USB_DEVICE_Init(void);
 #endif
 
 #endif /* __${name?upper_case}__H__ */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -136,5 +136,3 @@ int32_t TST_stop(void);
 #endif
 
 #endif /* __TEST_RF_H__*/
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

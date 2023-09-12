@@ -1,10 +1,10 @@
 [#ftl]
 /* USER CODE BEGIN Header */
 /**
- ******************************************************************************
-  * File Name          : ${name}
-  * Description        : Debug configuration file for stm32wpan transport layer interface.
-  *
+  ******************************************************************************
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   Debug configuration file for stm32wpan transport layer interface.
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
@@ -125,5 +125,3 @@ extern "C" {
 #endif
 
 #endif /*__TL_DBG_CONF_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

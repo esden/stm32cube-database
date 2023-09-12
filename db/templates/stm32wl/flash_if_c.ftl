@@ -319,5 +319,3 @@ static int32_t FLASH_IF_IsEmpty(uint8_t *addr, uint32_t size)
 /* USER CODE BEGIN PrFD */
 
 /* USER CODE END PrFD */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE***/

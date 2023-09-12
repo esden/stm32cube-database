@@ -2,8 +2,9 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * File Name          : ${name}
-  * Description        : Heart Rate Service Application
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   Heart Rate Service Application
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
@@ -213,5 +214,3 @@ static uint32_t HRSAPP_Read_RTC_SSR_SS ( void )
 /* USER CODE BEGIN FD */
 
 /* USER CODE END FD */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

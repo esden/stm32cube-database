@@ -223,5 +223,3 @@ void LoRaWAN_Init(void);
 #endif
 
 #endif /*__LORA_APP_H__*/
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

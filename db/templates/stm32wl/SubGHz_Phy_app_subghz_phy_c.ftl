@@ -120,5 +120,3 @@ void MX_SubGHz_Phy_Process(void)
 /* USER CODE BEGIN PrFD */
 
 /* USER CODE END PrFD */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

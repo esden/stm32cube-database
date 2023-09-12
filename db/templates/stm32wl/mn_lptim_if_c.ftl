@@ -152,4 +152,3 @@ void MN_LPTIM_IF_DeInit(void)
 
 /* USER CODE END PrFD */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

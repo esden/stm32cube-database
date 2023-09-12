@@ -90,5 +90,3 @@ extern char SDPath[4];   /* SD logical drive path */
 [/#list]
 
 #endif /*__APP_FATFS_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

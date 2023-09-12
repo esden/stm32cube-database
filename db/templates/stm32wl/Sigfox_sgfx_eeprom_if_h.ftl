@@ -331,4 +331,3 @@ int32_t EE_WriteValue(e_EE_ID EEsgfxID,  uint32_t data);
 
 #endif /* __SGFX_EEPROM_IF_H__ */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

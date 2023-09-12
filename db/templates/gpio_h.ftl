@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    ${name?lower_case}.h
@@ -8,6 +9,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __${name}_H__
 #define __${name}_H__
@@ -45,4 +47,3 @@ void MX_${data.ipName}_GPIO_Init(void);
 #endif
 #endif /*__ GPIO_H__ */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

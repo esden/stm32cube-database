@@ -1,13 +1,14 @@
 [#ftl]
 /* USER CODE BEGIN Header */
 /**
- ******************************************************************************
-  * File Name          : ${name}
-  * Description        : Debug capabilities source file for STM32WPAN Middleware
- ******************************************************************************
+  ******************************************************************************
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   Debug capabilities source file for STM32WPAN Middleware
+  ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
- ******************************************************************************
- */
+  ******************************************************************************
+  */
 /* USER CODE END Header */
 [#assign DIE = DIE]
 
@@ -36,7 +37,7 @@ typedef PACKED_STRUCT
 /* Private defines -----------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define GPIO_NBR_OF_RF_SIGNALS                  9
-#define GPIO_CFG_NBR_OF_FEATURES                34
+#define GPIO_CFG_NBR_OF_FEATURES                38
 #define NBR_OF_TRACES_CONFIG_PARAMETERS         4
 #define NBR_OF_GENERAL_CONFIG_PARAMETERS        4
 
@@ -121,8 +122,16 @@ static const APPD_GpioConfig_t aGpioConfigList[GPIO_CFG_NBR_OF_FEATURES] =
 /* From v1.4.0 */
     { GPIOA, LL_GPIO_PIN_0, 0, 0},  /* NVMA_START - Set on Entry / Reset on Exit */
     { GPIOA, LL_GPIO_PIN_0, 0, 0},  /* FLASH_EOP - Set on Entry / Reset on Exit */
+/* From v1.5.0 */
     { GPIOA, LL_GPIO_PIN_0, 0, 0},  /* FLASH_WRITE - Set on Entry / Reset on Exit */
     { GPIOA, LL_GPIO_PIN_0, 0, 0},  /* FLASH_ERASE - Set on Entry / Reset on Exit */
+/* From v1.6.0 */
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  /* BLE_RESCHEDULE_EVENT - Set on Entry / Reset on Exit */
+/* From v1.8.0 */
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  /* IPCC_BLE_LLD_CMD_RX - Set on Entry / Reset on Exit */
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  /* IPCC_BLE_LLD_ACK_TX - Set on Entry / Reset on Exit */
+/* From v1.9.0 */
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  /* BLE_ASYNCH_EVENT_NACKED - Set on Entry / Reset on Exit */
 };
 
 /**
@@ -406,5 +415,3 @@ void DbgOutputTraces(  uint8_t *p_data, uint16_t size, void (*cb)(void) )
   return;
 }
 #endif
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

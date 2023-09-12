@@ -81,4 +81,3 @@ void exitLock (void) {
     stm_studio_lock.flag[TARGET_LOCK_ID] = 0;
 }
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

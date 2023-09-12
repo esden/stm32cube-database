@@ -91,4 +91,3 @@ void PWR_ExitSleepMode(void);
 
 #endif /*__STM32_LPM_IF_H__ */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

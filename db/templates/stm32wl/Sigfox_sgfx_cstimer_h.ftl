@@ -64,5 +64,3 @@ int32_t RxCarrierSenseGetStatus(void);
 #endif
 
 #endif  /* __SGFX_CSTIMER_H__ */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

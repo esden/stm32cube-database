@@ -655,4 +655,3 @@ static void MBMUXIF_IsrSystemPrioBNotifRcvCb(void *ComObj)
 
 /* USER CODE END PrFD */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -111,5 +111,3 @@ void HWCB_FLASH_EndOfCleanup(void);
 #endif
 
 #endif /* __FLASH_IF_H__ */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

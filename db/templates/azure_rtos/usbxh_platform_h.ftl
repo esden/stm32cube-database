@@ -51,5 +51,3 @@ void USBH_DriverVBUS(uint8_t state);
 
 #endif /* __USBH_PLATFORM_H__ */
 
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

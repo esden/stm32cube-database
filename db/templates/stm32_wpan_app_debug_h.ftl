@@ -1,10 +1,11 @@
 [#ftl]
 /* USER CODE BEGIN Header */
 /**
- ******************************************************************************
-  * File Name          : ${name}
-  * Description        : Header for app_debug.c module
- ******************************************************************************
+  ******************************************************************************
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   Header for app_debug.c module
+  ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
@@ -57,5 +58,3 @@ extern "C" {
 #endif
 
 #endif /*__APP_DEBUG_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

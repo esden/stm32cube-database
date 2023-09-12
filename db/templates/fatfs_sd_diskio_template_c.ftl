@@ -561,5 +561,3 @@ void BSP_SD_ReadCpltCallback(void)
 /* can be used to modify / undefine previous code or add new code */
 /* USER CODE END lastSection */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
-

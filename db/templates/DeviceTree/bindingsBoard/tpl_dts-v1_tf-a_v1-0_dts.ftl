@@ -19,8 +19,12 @@
 
 /dts-v1/;
 #include <dt-bindings/pinctrl/stm32-pinfunc.h>
+[#if (mx_socDtRPN == "stm32mp15")]
 #include <dt-bindings/clock/stm32mp1-clksrc.h>
-[#if srvcmx_isDeviceEnabled("etzpc")]
+[#else]
+#include <dt-bindings/clock/${mx_socDtRPN}-clksrc.h>
+[/#if]
+[#if srvcmx_isDeviceEnabled("etzpc") && srvcmx_getMatchingBindedHwName_inDTS("etzpc")?has_content]
 #include <dt-bindings/soc/st,stm32-etzpc.h>
 [/#if]
 [#if mx_ddrConfigs["general"]?? && mx_ddrConfigs["general"]["isConfigured"]?? && mx_ddrConfigs["general"]["isConfigured"]=="true" ]
@@ -44,11 +48,13 @@
 	[@mlog  logMod=module logType="ERR" logMsg="unknown SOC package dtsi" varsMap={} /]
 /*#include "???.dtsi"*/
 [/#if]
-[#if mx_socPtCPN?has_content]
+[#if (mx_socDtRPN == "stm32mp15")]
+	[#if mx_socPtCPN?has_content]
 #include "${mx_socPtCPN?substring(0,9) + "xx" + mx_socPtCPN?substring(11)}-pinctrl.dtsi"
-[#else]
+	[#else]
 	[@mlog  logMod=module logType="ERR" logMsg="unknown SOC pinCtrl package dtsi" varsMap={} /]
 /*#include "???-pinctrl.dtsi"*/
+	[/#if]
 [/#if]
 [#if mx_ddrConfigs["general"]?? && mx_ddrConfigs["general"]["isConfigured"]?? && mx_ddrConfigs["general"]["isConfigured"]=="true" ]
 	[#if mx_socDtRPN?has_content]
@@ -85,6 +91,10 @@
 	/*compatible = "st,???-mx", "st,???";*/
 	[/#if]
 
+	[#--memory mapping--]
+	[@DTBindedDtsElmtDMsList_print  pParentElmt="" pElmtsList=srvcmx_getElmtsMatchingBindedHwName(mxDtDM.dts_bindedElmtsList, "memories") pDtLevel=0 pOrdering=true/]
+	[@bind_memories pDtLevel=1 /]
+
 	/* USER CODE BEGIN root */
 	/* USER CODE END root */
 
@@ -99,10 +109,6 @@
 
 [#--pinctrl--]
 [@DTBindedDtsElmtDMsList_print  pParentElmt="" pElmtsList=srvcmx_getElmtsMatchingBindedHwName(mxDtDM.dts_bindedElmtsList, "pinctrl") pDtLevel=0 pOrdering=true/]
-
-
-[#--RCC node--]
-[@DTBindedDtsElmtDMsList_print  pParentElmt="" pElmtsList=srvcmx_getElmtsMatchingBindedHwName(mxDtDM.dts_bindedElmtsList, "rcc_cfg") pDtLevel=0 pOrdering=true/]
 
 
 [#--dts level elmts--]

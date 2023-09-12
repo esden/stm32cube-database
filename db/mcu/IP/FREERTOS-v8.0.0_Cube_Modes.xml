@@ -813,7 +813,15 @@
 
     <!-- cf BZ 68320 -->
     <RefParameter Name="INCLUDE_eTaskGetState" Comment="eTaskGetState" DefaultValue="1" Type="list" Group="Include definitions" TabName="Include parameters">
-        <Condition Diagnostic="Default is enabled (may be required by some toolchains such as MDK-ARM to compile cmsis_os2.c)" Expression="S_CMSIS_RTOS_V2$context"/>
+        <Condition Diagnostic="Forced to enabled when USBPD is enabled" Expression="USBPD_Used"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>It is one of the macros allowing those components of the real time kernel not utilized by your application to be excluded from your build. &lt;br&gt;
+                     - this ensures the RTOS does not use any more ROM or RAM than necessary for your particular embedded application. &lt;br&gt;
+                     To include the eTaskGetState() API function, set eTaskGetState to 1 (Enabled). &lt;br&gt;
+                     To exclude it from your build, set eTaskGetState to 0 (Disabled).</Description>
+    </RefParameter>
+    <RefParameter Name="INCLUDE_eTaskGetState" Comment="eTaskGetState" DefaultValue="1" Type="list" Group="Include definitions" TabName="Include parameters">
+        <Condition Diagnostic="Default is enabled (may be required by some toolchains such as MDK-ARM to compile cmsis_os2.c)" Expression="S_CMSIS_RTOS_V2$context &amp; !USBPD_Used"/>
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>It is one of the macros allowing those components of the real time kernel not utilized by your application to be excluded from your build. &lt;br&gt;
@@ -1396,7 +1404,9 @@
             </SignalLogicalOp>
             <Semaphore>S_FREERTOS$context</Semaphore>
             <Semaphore>S_CMSIS_RTOS_V1$context</Semaphore>
-              <Condition Expression="(!(STM32WL &amp; (S_LoRaWAN | S_Sigfox | S_SubGhzPhy))) &amp; (!(STM32WB &amp; (S_THREAD | S_BLE_HOST | S_ZIGBEE))) &amp; (!S_AzureRTOS$context)" Diagnostic="CMSIS-RTOS V1 not available when connectivity middlewares are enabled"/>
+              <Condition Expression="(!S_AzureRTOS$context)" Diagnostic="Enable only when the AzureRTOS (ThreadX,FileX,..) are disabled"/>
+              <Condition Expression="(!(STM32WL &amp; (S_LoRaWAN | S_Sigfox | S_SubGhzPhy))) &amp; (!(STM32WB &amp; (S_THREAD | S_BLE_HOST | S_ZIGBEE)))" Diagnostic="CMSIS-RTOS V1 not available when connectivity middlewares are enabled"/>              
+              <!--<Condition Expression="(!(STM32WL &amp; (S_LoRaWAN | S_Sigfox | S_SubGhzPhy))) &amp; (!(STM32WB &amp; (S_THREAD | S_BLE_HOST | S_ZIGBEE))) &amp; (!S_AzureRTOS$context)" Diagnostic="CMSIS-RTOS V1 not available when connectivity middlewares are enabled"/>-->
           </Mode>
 
           <Mode Name="CMSIS_V2">
@@ -1405,7 +1415,9 @@
             </SignalLogicalOp>
             <Semaphore>S_FREERTOS$context</Semaphore>
             <Semaphore>S_CMSIS_RTOS_V2$context</Semaphore>
-              <Condition Expression="(!S_AzureRTOS$context) &amp; (!S_ZIGBEE)" Diagnostic="CMSIS-RTOS V2 not available when ZIGBEE enabled on WB series"/>
+              <Condition Expression="(!S_AzureRTOS$context)" Diagnostic="Enable only when the AzureRTOS (ThreadX,FileX,..) are disabled"/>
+              <Condition Expression="(!S_ZIGBEE)" Diagnostic="CMSIS-RTOS V2 not available when ZIGBEE enabled on WB series"/>
+              <!--<Condition Expression="(!S_AzureRTOS$context) &amp; (!S_ZIGBEE)" Diagnostic="CMSIS-RTOS V2 not available when ZIGBEE enabled on WB series"/>-->
           </Mode>
 
           <!-- "Pure FreeRTOS mode" for test purposes 

@@ -52,5 +52,3 @@ __weak int32_t BSP_SRAM_Init(uint32_t Instance)
 }
 /* USER CODE BEGIN UserCode */
 
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

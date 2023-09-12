@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
  ******************************************************************************
  [#assign familyName=FamilyName?lower_case]
@@ -17,7 +18,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
-
+/* USER CODE END Header */
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __${FamilyName}_SD_H
 #define __${FamilyName}_SD_H
@@ -92,5 +93,3 @@ void    BSP_SD_ReadCpltCallback(void);
 #endif
 
 #endif /* __${FamilyName}_SD_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -5,16 +5,7 @@
   * @file  : stm32_adv_trace_if.c
   * @brief : Source file for interfacing the stm32_adv_trace to hardware
   ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
-  *
+ [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
 */
 /* USER CODE END Header */
@@ -95,4 +86,3 @@ UTIL_ADV_TRACE_Status_t UART_TransmitDMA ( uint8_t *pdata, uint16_t size )
 
 /* USER CODE END Private_Functions */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -778,4 +778,3 @@ bool RF_API_isChannelFree(int16_t rssiThresh, uint32_t maxCarrierSenseTime)
 /* USER CODE BEGIN PrFD */
 
 /* USER CODE END PrFD */
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

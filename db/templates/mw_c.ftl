@@ -160,5 +160,3 @@ void MX_${ipName}${instName}_Init(void)
 /**
   * @}
   */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

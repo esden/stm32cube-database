@@ -6,16 +6,7 @@
   * @author  MCD Application Team
   * @brief   USBX Device descriptor header file
   ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under Ultimate Liberty license
-  * SLA0044, the "License"; You may not use this file except in compliance with
-  * the License. You may obtain a copy of the License at:
-  *                             www.st.com/SLA0044
-  *
+ [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 /* USER CODE END Header */
@@ -1170,14 +1161,14 @@ static void USBD_FrameWork_CDCDesc(USBD_DevClassHandleTypeDef *pdev,
   pHeadDesc->bLength = 0x05;
   pHeadDesc->bDescriptorType = 0x24;
   pHeadDesc->bDescriptorSubtype = 0x00;
-  pHeadDesc->bcdCDC = 0x1001;
+  pHeadDesc->bcdCDC = 0x0110;
   *Sze += (uint32_t)sizeof(USBD_CDCHeaderFuncDescTypedef);
 
   /* Call Management Functional Descriptor*/
   pCallMgmDesc = ((USBD_CDCCallMgmFuncDescTypedef *)((uint32_t)pConf + *Sze));
   pCallMgmDesc->bLength = 0x05;
   pCallMgmDesc->bDescriptorType = 0x24;
-  pCallMgmDesc->bDescriptorSubtype = 0x00;
+  pCallMgmDesc->bDescriptorSubtype = 0x01;
   pCallMgmDesc->bmCapabilities = 0x00;
   pCallMgmDesc->bDataInterface = pdev->tclasslist[pdev->classId].Ifs[1];
   *Sze += (uint32_t)sizeof(USBD_CDCCallMgmFuncDescTypedef);
@@ -1380,4 +1371,4 @@ static void USBD_FrameWork_DFUDesc(USBD_DevClassHandleTypeDef *pdev, uint32_t pC
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+

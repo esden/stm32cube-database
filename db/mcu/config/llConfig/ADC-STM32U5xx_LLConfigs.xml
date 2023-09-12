@@ -68,7 +68,10 @@
                     <MethodArg Name="DataTransferMode" ParameterName="ConversionDataManagement" />
 
                 </CallLibMethod>
-                
+                <CallLibMethod Name="LL_ADC_SetGainCompensation">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                    <MethodArg Name="GainCompensation" ParameterName="GainCompensation" />
+                </CallLibMethod>
                 <IFCondition Expression="$Index=1">
 
                        <CallLibMethod Name="LL_ADC_SetOverSamplingScope">
@@ -88,15 +91,24 @@
                     </IFCondition>
 
                     
-                <IFCondition Expression="$Index=4 &amp; Sequencer = NOT_FULLY_CONFIGURABLE ">
-                    <CallLibMethod Name="LL_ADC_REG_SetSequencerChAdd">
-                        <MethodArg Name="ADCx" ParameterName="Instance" />
-                        <MethodArg Name="Channel" ParameterName="SelectedChannel" />
-                    </CallLibMethod>   
-                    
-                   
-                   
-        </IFCondition>
+                    <IFCondition Expression="$Index=4 &amp; Sequencer = NOT_FULLY_CONFIGURABLE ">
+                        <CallLibMethod Name="LL_ADC_REG_SetSequencerChAdd">
+                            <MethodArg Name="ADCx" ParameterName="Instance" />
+                            <MethodArg Name="Channel" ParameterName="SelectedChannel" />
+                        </CallLibMethod>                   
+                    </IFCondition>
+                    <IFCondition Expression="$Index=4">
+                        <CallLibMethod Name="LL_ADC_SetSamplingTimeCommonChannels">
+                            <MethodArg Name="ADCx" ParameterName="Instance" />
+                            <MethodArg Name="SamplingTimeY" ParameterName="SAMPLINGTIME_COMMON1" />
+                            <MethodArg Name="SamplingTime" ParameterName="SamplingTimeCommon1" />
+                        </CallLibMethod>      
+                        <CallLibMethod Name="LL_ADC_SetSamplingTimeCommonChannels">
+                            <MethodArg Name="ADCx" ParameterName="Instance" />
+                            <MethodArg Name="SamplingTimeY" ParameterName="SAMPLINGTIME_COMMON2" />
+                            <MethodArg Name="SamplingTime" ParameterName="SamplingTimeCommon2" />
+                        </CallLibMethod>
+                    </IFCondition>
                 <IFCondition Expression="Injected_Mode_Enabled" >
              
                     <CallLibMethod Name="LL_ADC_INJ_Init">
@@ -259,7 +271,12 @@
                     <MethodArg Name="ADCx" ParameterName="Instance" />
                     <MethodArg Name="Channel" ParameterName="Channel" />
                     <MethodArg Name="SamplingTime" ParameterName="SamplingTime" />
+                   
                 </CallLibMethod> 
+                <CallLibMethod Name="LL_ADC_SetChannelPreselection">
+                    <MethodArg Name="ADCx" ParameterName="Instance" />
+                    <MethodArg Name="Channel" ParameterName="Channel" />
+                </CallLibMethod>
         </IFCondition>
 
 		<CallLibMethod Name="LL_ADC_SetChannelSingleDiff">
@@ -296,6 +313,8 @@
 				<MethodArg Name="PathInternal" ParameterName="CommonPathInternal" />
 			</CallLibMethod>
 		</IFCondition>
+                
+
 	</RefConfig>
        <RefConfig Name="ADC_RegularChannelRankConfig" Comment="Configure Regular Channel">
         <IFCondition
@@ -318,13 +337,11 @@
         <RefConfig Name="ADC_InjectedChannelConfig" Comment="Configure Injected Channel">
  
             <!-- Injected Channel configuration -->
-             <IFCondition Expression="QueueDisable$IpInstance">
             <CallLibMethod Name="LL_ADC_INJ_SetSequencerRanks">
                 <MethodArg Name="ADCx" ParameterName="Instance" />
                 <MethodArg Name="Rank" ParameterName="InjectedRank" />
                 <MethodArg Name="Channel" ParameterName="InjectedChannel" />
             </CallLibMethod>
-             </IFCondition>
 
             <CallLibMethod Name="LL_ADC_SetChannelSamplingTime">
                 <MethodArg Name="ADCx" ParameterName="Instance" />
@@ -963,6 +980,12 @@
         <Argument AddressOf="false" GenericType="simple" Name="Configurability"
                   OptimizationCondition="equal" />
     </LibMethod>
+    <LibMethod Comment="" Name="LL_ADC_SetChannelPreselection">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="ADCx"
+                  TypeName="ADC_TypeDef" />
+        <Argument AddressOf="false" GenericType="simple" Name="Channel"
+                  OptimizationCondition="equal" />
+    </LibMethod>
 	<LibMethod Comment="" Name="LL_ADC_GetChannelSamplingTime">
 		<Argument AddressOf="false" GenericType="baseaddress" Name="ADCx"
 			TypeName="ADC_TypeDef" />
@@ -1089,6 +1112,12 @@
 		<Argument AddressOf="false" GenericType="baseaddress" Name="ADCx"
 			TypeName="ADC_TypeDef" />
 	</LibMethod>
+        <LibMethod Comment="" Name="LL_ADC_SetGainCompensation">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="ADCx"
+                  TypeName="ADC_TypeDef" />
+        <Argument AddressOf="false" GenericType="simple" Name="GainCompensation"
+                  OptimizationCondition="equal" />
+    </LibMethod>
 	<LibMethod Comment="" Name="LL_ADC_IsActiveFlag_MST_ADRDY">
 		<Argument AddressOf="false" GenericType="baseaddress" Name="ADCxy_COMMON"
 			TypeName="ADC_Common_TypeDef" />
@@ -1604,6 +1633,14 @@
 		<Argument AddressOf="false" GenericType="baseaddress" Name="ADCx"
 			TypeName="ADC_TypeDef" />
 	</LibMethod>
+        <LibMethod Comment="" Name="LL_ADC_SetSamplingTimeCommonChannels">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="ADCx"
+                      TypeName="ADC_TypeDef" />
+            <Argument AddressOf="false" GenericType="simple" Name="SamplingTimeY"
+                      OptimizationCondition="equal" />
+            <Argument AddressOf="false" GenericType="simple" Name="SamplingTime"
+                      OptimizationCondition="equal" />
+        </LibMethod> 
 	<RefComponent Cclass="HAL" Cgroup="ADC__LL" Cversion="1.5.0">
 		<File Category="header"
 			Name="Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_ll_adc.h" />

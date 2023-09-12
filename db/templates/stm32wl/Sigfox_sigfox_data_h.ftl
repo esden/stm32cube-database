@@ -26,5 +26,3 @@
 /* External variables --------------------------------------------------------*/
 
 #endif /*__SIGFOX_DATA_H__*/
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

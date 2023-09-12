@@ -1,10 +1,10 @@
 [#ftl]
 /* USER CODE BEGIN Header */
 /**
- ******************************************************************************
-  * File Name          : ${name}
-  * Description        : Application file for BLE Middleware.
-  *
+  ******************************************************************************
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   BLE Application
   *****************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
@@ -1229,26 +1229,27 @@ void APP_BLE_Init( void )
   {
     {{0,0,0}},                          /**< Header unused */
     {0,                                 /** pBleBufferAddress not used */
-    0,                                  /** BleBufferSize not used */
-    CFG_BLE_NUM_GATT_ATTRIBUTES,
-    CFG_BLE_NUM_GATT_SERVICES,
-    CFG_BLE_ATT_VALUE_ARRAY_SIZE,
-    CFG_BLE_NUM_LINK,
-    CFG_BLE_DATA_LENGTH_EXTENSION,
-    CFG_BLE_PREPARE_WRITE_LIST_SIZE,
-    CFG_BLE_MBLOCK_COUNT,
-    CFG_BLE_MAX_ATT_MTU,
-    CFG_BLE_SLAVE_SCA,
-    CFG_BLE_MASTER_SCA,
-    CFG_BLE_LSE_SOURCE,
-    CFG_BLE_MAX_CONN_EVENT_LENGTH,
-    CFG_BLE_HSE_STARTUP_TIME,
-    CFG_BLE_VITERBI_MODE,
-    CFG_BLE_OPTIONS,
-    0,
-    CFG_BLE_MAX_COC_INITIATOR_NBR,
-    CFG_BLE_MIN_TX_POWER,
-    CFG_BLE_MAX_TX_POWER}
+     0,                                 /** BleBufferSize not used */
+     CFG_BLE_NUM_GATT_ATTRIBUTES,
+     CFG_BLE_NUM_GATT_SERVICES,
+     CFG_BLE_ATT_VALUE_ARRAY_SIZE,
+     CFG_BLE_NUM_LINK,
+     CFG_BLE_DATA_LENGTH_EXTENSION,
+     CFG_BLE_PREPARE_WRITE_LIST_SIZE,
+     CFG_BLE_MBLOCK_COUNT,
+     CFG_BLE_MAX_ATT_MTU,
+     CFG_BLE_SLAVE_SCA,
+     CFG_BLE_MASTER_SCA,
+     CFG_BLE_LSE_SOURCE,
+     CFG_BLE_MAX_CONN_EVENT_LENGTH,
+     CFG_BLE_HSE_STARTUP_TIME,
+     CFG_BLE_VITERBI_MODE,
+     CFG_BLE_OPTIONS,
+     0,
+     CFG_BLE_MAX_COC_INITIATOR_NBR,
+     CFG_BLE_MIN_TX_POWER,
+     CFG_BLE_MAX_TX_POWER,
+     CFG_BLE_RX_MODEL_CONFIG}
   };
 
   /**
@@ -2529,6 +2530,8 @@ static void BLE_UserEvtRx( void * pPayload )
   {
     pParam->status = HCI_TL_UserEventFlow_Disable;
   }
+
+  return;
 }
 
 static void BLE_StatusNot( HCI_TL_CmdStatus_t status )
@@ -2582,4 +2585,3 @@ void SVCCTL_ResumeUserEventFlow( void )
 /* USER CODE BEGIN FD_WRAP_FUNCTIONS */
 
 /* USER CODE END FD_WRAP_FUNCTIONS */
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

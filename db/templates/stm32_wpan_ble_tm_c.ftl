@@ -1,13 +1,14 @@
 [#ftl]
 /* USER CODE BEGIN Header */
 /**
- ******************************************************************************
- * File Name          : ${name}
- * Description        : Transparent mode
- ******************************************************************************
- * [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
- ******************************************************************************
- */
+  ******************************************************************************
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   Transparent mode
+  ******************************************************************************
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
+  ******************************************************************************
+  */
 /* USER CODE END Header */
 [#assign FREERTOS_STATUS = 0]
 [#assign CFG_UART_GUI = ""]
@@ -520,5 +521,3 @@ void shci_send( uint16_t cmd_code, uint8_t len_cmd_payload, uint8_t * p_cmd_payl
 /* USER CODE BEGIN FD_WRAP_FUNCTIONS*/
 
 /* USER CODE END FD_WRAP_FUNCTIONS*/
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

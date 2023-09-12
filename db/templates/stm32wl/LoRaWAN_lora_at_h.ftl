@@ -608,4 +608,3 @@ ATEerror_t AT_bat_get(const char *param);
 
 #endif /* __LORA_AT_H__ */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

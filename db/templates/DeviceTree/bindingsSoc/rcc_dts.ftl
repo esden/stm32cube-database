@@ -1,5 +1,4 @@
 [#ftl]
-
 [#list configs as dt]
 [#assign data = dt]
 [#assign peripheralParams =dt.peripheralParams]
@@ -14,10 +13,6 @@
 [#t]
 [#t]
 [#-- Clock Tree configuration (rcc node)--]
-&rcc {
-[#if srvcmx_isTargetedFw_inDTS("U-BOOT")][#--FW contextualization--]
-	[#lt]${T1}u-boot,dm-pre-reloc;
-[/#if]
 [#if srvcmx_isTargetedFw_inDTS("TF-A")][#--FW contextualization--]
 [#assign HSICalibration="Disable"]
 [#assign CSICalibration="Disable"]
@@ -114,12 +109,11 @@
 				[#if PLLCSG == "true"]
 									[#lt]${T2}csg = < ${PLLMODPER} ${PLLINCSTEP} ${PLLSSCGMODE} >;
 								[/#if]
-[#if srvcmx_isTargetedFw_inDTS("U-BOOT")][#--FW contextualization--]
+[#if srvcmx_isTargetedFw_inDTS("U-BOOT") && !srvcmx_isDbFeatureEnabled("noUBootSplSupport")][#--FW contextualization--]
 				[#lt]${T2}u-boot,dm-pre-reloc;
 [/#if]
 			[#lt]${T1}};
 						[/#if]
 		[/#list]
 	[/#if]
-};
 [/#list]

@@ -194,5 +194,3 @@ static void IpccIfIsrRxCb(IPCC_HandleTypeDef *hIpcc, uint32_t ChannelIndex, IPCC
 /* USER CODE BEGIN PrFD */
 
 /* USER CODE END PrFD */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

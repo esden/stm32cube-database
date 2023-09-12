@@ -151,7 +151,7 @@
     </RefParameter>
 
    <!--diviseur RNG 1..8-->
-    <RefParameter Visible="false" Comment="RNG Divider" DefaultValue="RCC_RNGCLK_DIV1" Name="RNGCLKDivider" Type="list">
+    <RefParameter Visible="false" Comment="RNG Divider" DefaultValue="RCC_RNGCLK_DIV1" Name="RNGCLKDivider" Type="list" IP="RNG">
         <PossibleValue Comment="1"   Value="RCC_RNGCLK_DIV1"/>
         <PossibleValue Comment="2"   Value="RCC_RNGCLK_DIV2"/>
         <PossibleValue Comment="4"   Value="RCC_RNGCLK_DIV4"/>
@@ -227,7 +227,7 @@
     </RefParameter>
 
     <!--LPUART1CLockSelection-->
-    <RefParameter Visible="false"  Comment="LPUART1 Clock Selection" DefaultValue="RCC_LPUART1CLKSOURCE_PCLK1" Name="LPUART1CLockSelection" Type="list" IP="LPUART">
+    <RefParameter Visible="false"  Comment="LPUART1 Clock Selection" DefaultValue="RCC_LPUART1CLKSOURCE_PCLK1" Name="LPUART1CLockSelection" Type="list" IP="LPUART1">
         <PossibleValue Comment="LPUART1 Clksource Pclk2"  Value="RCC_LPUART1CLKSOURCE_PCLK1"  Semaphore="LPUART1SourcePCLK1"/>
         <PossibleValue Comment="LPUART1 Clksource Sysclk" Value="RCC_LPUART1CLKSOURCE_SYSCLK" Semaphore="LPUART1SourceSys"/>
         <PossibleValue Comment="LPUART1 Clksource Hsi"    Value="RCC_LPUART1CLKSOURCE_HSI"    Semaphore="LPUART1SourceHSI"/>
@@ -299,7 +299,7 @@
 	
     <!-- Clock Security System on LSE for RTC-->
     <RefParameter Visible="false" Name="EnableCSSLSE" Comment="LSE Clock Security System: available only when LSE is used as Clock Source for RTC/LCD" Type="list" DefaultValue="false">
-        <Condition Diagnostic="" Expression="(((RTCClockSelection=RCC_RTCCLKSOURCE_LSE)) &amp; (RTCUsed_ForRCC|LCDUsed_ForRCC))"/>
+        <Condition Diagnostic="" Expression="(((RTCClockSelection=RCC_RTCCLKSOURCE_LSE)) &amp; RTCUsed_ForRCC)"/>
         <PossibleValue Value="true" Comment="Enabled" Semaphore="RCC_LSECSS_ENABLED"/>
         <PossibleValue Value="false" Comment="Disabled"/>
     </RefParameter>
@@ -371,12 +371,7 @@
     <RefParameter Visible="false" Comment="TIM1 clock Source"   Name="TIM1Freq_Value"  DefaultValue="=APBTimFreq_Value"  Type="double" Display="value/1000000" Unit="MHz" IP="TIMER1"/>
   
 	
-    <RefParameter Visible="false" Comment="CK48 clock Source"   Name="USBFreq_Value"   DefaultValue="16000000" Min="47880000" Max="48120000"  Type="double" Display="value/1000000" Unit="MHz" IP="USB_OTG_FS">
-    <Condition Diagnostic="HSE in bypass Mode" Expression="USB_OTG_FSUsed_ForRCC"/>
-    </RefParameter> 
-	<RefParameter Visible="false" Comment="CK48 clock Source"   Name="USBFreq_Value"   DefaultValue="16000000" Min="47880000" Max="48120000"  Type="double" Display="value/1000000" Unit="MHz" IP="USB_OTG_FS"/>
-    
-	<RefParameter Visible="false" Comment="CK48 clock Source"   Name="SDMMCFreq_Value" DefaultValue="16000000" Max="50000000"  Type="double" Display="value/1000000" Unit="MHz" IP="SDMMC1"/>
+    <RefParameter Visible="false" Comment="CK48 clock Source"   Name="SDMMCFreq_Value" DefaultValue="16000000" Max="50000000"  Type="double" Display="value/1000000" Unit="MHz" IP="SDMMC1"/>
     <RefParameter Visible="false" Comment="CK48 clock Source"   Name="RNGFreq_Value"   DefaultValue="16000000" Max="48000000" Type="double" Display="value/1000000" Unit="MHz" IP="RNG"/>
     <RefParameter Visible="false" Comment="ADC clock Source"    Name="ADCFreq_Value" Min="1400000"   Max="26000000"  DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz" >
      <Condition Diagnostic="HSE in bypass Mode" Expression="scale2"/>
@@ -735,7 +730,7 @@
 
     <RefParameter Visible="false" Comment="HSE is Used" DefaultValue="0" Name="HSEUsedForSys" Min="0" Type="integer"/>	
     <RefParameter Visible="false" Comment="HSE used flag" DefaultValue="1" Name="HSEUsed" Type="integer" Min="1" Max="1">
-        <Condition Expression="(SEM2RCC_HSE_REQUIRED_TIM17 &amp; TIM17 &amp;Semaphore_input_Channel1TIM17)|((RTCUsed_ForRCC|LCDUsed_ForRCC)&amp;!((RTCClockSelection=RCC_RTCCLKSOURCE_LSE)|(RTCClockSelection=RCC_RTCCLKSOURCE_LSI)))|((PLLSourceHSE) &amp; (PLLUsed=1))|(SYSCLKSource=RCC_SYSCLKSOURCE_HSE)|((RCC_MCO1Source=RCC_MCO1SOURCE_HSE)&amp;(((Semaphore_input_Channel1TIM17 &amp; TIM17 &amp; SEM2RCC_MCO_REQUIRED_TIM17)|MCOConfig)))" Diagnostic="SYSCLK source OR PLL source OR RTC source OR MCO1 source OR MCO2 source"/>
+        <Condition Expression="(SEM2RCC_HSE_REQUIRED_TIM17 &amp; TIM17 &amp;Semaphore_input_Channel1TIM17)|(RTCUsed_ForRCC&amp;!((RTCClockSelection=RCC_RTCCLKSOURCE_LSE)|(RTCClockSelection=RCC_RTCCLKSOURCE_LSI)))|((PLLSourceHSE) &amp; (PLLUsed=1))|(SYSCLKSource=RCC_SYSCLKSOURCE_HSE)|((RCC_MCO1Source=RCC_MCO1SOURCE_HSE)&amp;(((Semaphore_input_Channel1TIM17 &amp; TIM17 &amp; SEM2RCC_MCO_REQUIRED_TIM17)|MCOConfig)))" Diagnostic="SYSCLK source OR PLL source OR RTC source OR MCO1 source OR MCO2 source"/>
     </RefParameter>
 	
     <RefParameter Visible="false" Comment="HSE Is Used" DefaultValue="0" Name="HSEUsed" Min="0" Type="integer"/>
@@ -774,13 +769,13 @@
 	
     <!-- LSE used -->
     <RefParameter Visible="false" Comment="LSE Is Used" DefaultValue="1" Name="LSEUsed" Min="1" Type="integer">
-        <Condition Expression="(SYSCLKSource=RCC_SYSCLKSOURCE_LSE)|(LSCOSSourceLSE &amp; LSCOConfig)|(Semaphore_input_Channel1TIM16 &amp; TIM16 &amp; SEM2RCC_LSE_REQUIRED1_TIM16)|(SEM2RCC_LSE_REQUIRED_TIM2 &amp; Semaphore_TIM2_L4_ETR_REMAPTIM2 &amp; TIM2)|(USART1SourceLSE &amp; USART1Used_ForRCC)|(LPUART1SourceLSE &amp; LPUARTUsed_ForRCC)|(LPTIM1SOURCELSE &amp; LPTIM1Used_ForRCC)|(LPTIM2SOURCELSE &amp; LPTIM2Used_ForRCC)|((RCC_MCO1Source=RCC_MCO1SOURCE_LSE)&amp; ((Semaphore_input_Channel1TIM17 &amp; TIM17 &amp; SEM2RCC_MCO_REQUIRED_TIM17)|MCOConfig))|((RTCClockSelection=RCC_RTCCLKSOURCE_LSE) &amp;(RTCUsed_ForRCC|LCDUsed_ForRCC) )" Diagnostic="LSE is used if "/>
+        <Condition Expression="(SYSCLKSource=RCC_SYSCLKSOURCE_LSE)|(LSCOSSourceLSE &amp; LSCOConfig)|(Semaphore_input_Channel1TIM16 &amp; TIM16 &amp; SEM2RCC_LSE_REQUIRED1_TIM16)|(SEM2RCC_LSE_REQUIRED_TIM2 &amp; Semaphore_TIM2_L4_ETR_REMAPTIM2 &amp; TIM2)|(USART1SourceLSE &amp; USART1Used_ForRCC)|(LPUART1SourceLSE &amp; LPUARTUsed_ForRCC)|(LPTIM1SOURCELSE &amp; LPTIM1Used_ForRCC)|(LPTIM2SOURCELSE &amp; LPTIM2Used_ForRCC)|((RCC_MCO1Source=RCC_MCO1SOURCE_LSE)&amp; ((Semaphore_input_Channel1TIM17 &amp; TIM17 &amp; SEM2RCC_MCO_REQUIRED_TIM17)|MCOConfig))|((RTCClockSelection=RCC_RTCCLKSOURCE_LSE) &amp;RTCUsed_ForRCC )" Diagnostic="LSE is used if "/>
     </RefParameter>
 	
     <RefParameter Visible="false" Comment="LSE Is Used" DefaultValue="0" Name="LSEUsed" Min="0" Type="integer"/>
     <!-- LSE used -->
     <RefParameter Visible="false" Comment="LSE Is Used" DefaultValue="1" Name="LSEUsedLL" Min="1" Type="integer">
-        <Condition Expression="(LSCOSSourceLSE &amp; LSCOConfig)|(Semaphore_input_Channel1TIM16 &amp; TIM16 &amp; SEM2RCC_LSE_REQUIRED1_TIM16)|(SEM2RCC_LSE_REQUIRED_TIM2 &amp; Semaphore_TIM2_L4_ETR_REMAPTIM2 &amp; TIM2)|(USART1SourceLSE &amp; USART1Used_ForRCC)|(LPUART1SourceLSE &amp; LPUARTUsed_ForRCC)|(LPTIM1SOURCELSE &amp; LPTIM1Used_ForRCC)|(LPTIM2SOURCELSE &amp; LPTIM2Used_ForRCC)|((RCC_MCO1Source=RCC_MCO1SOURCE_LSE)&amp; ((Semaphore_input_Channel1TIM17 &amp; TIM17 &amp; SEM2RCC_MCO_REQUIRED_TIM17)|MCOConfig))|((RTCClockSelection=RCC_RTCCLKSOURCE_LSE) &amp;(RTCUsed_ForRCC|LCDUsed_ForRCC) )" Diagnostic="LSE is used if "/>
+        <Condition Expression="(LSCOSSourceLSE &amp; LSCOConfig)|(Semaphore_input_Channel1TIM16 &amp; TIM16 &amp; SEM2RCC_LSE_REQUIRED1_TIM16)|(SEM2RCC_LSE_REQUIRED_TIM2 &amp; Semaphore_TIM2_L4_ETR_REMAPTIM2 &amp; TIM2)|(USART1SourceLSE &amp; USART1Used_ForRCC)|(LPUART1SourceLSE &amp; LPUARTUsed_ForRCC)|(LPTIM1SOURCELSE &amp; LPTIM1Used_ForRCC)|(LPTIM2SOURCELSE &amp; LPTIM2Used_ForRCC)|((RCC_MCO1Source=RCC_MCO1SOURCE_LSE)&amp; ((Semaphore_input_Channel1TIM17 &amp; TIM17 &amp; SEM2RCC_MCO_REQUIRED_TIM17)|MCOConfig))|((RTCClockSelection=RCC_RTCCLKSOURCE_LSE) &amp;RTCUsed_ForRCC )" Diagnostic="LSE is used if "/>
     </RefParameter>
 	
     <RefParameter Visible="false" Comment="LSE Is Used" DefaultValue="0" Name="LSEUsedLL" Min="0" Type="integer"/>
@@ -821,7 +816,7 @@
 	
     <!-- LSI used -->
     <RefParameter Visible="false" Comment="LSI used flag" DefaultValue="1" Name="LSIUsed" Type="integer" Min="1" Max="1">
-        <Condition Expression="(SYSCLKSource=RCC_SYSCLKSOURCE_LSI)|(LSCOSSourceLSI &amp; LSCOConfig)|RCC_DAC_SAMPLEANDHOLD|(SEM2RCC_LSI_REQUIRED_TIM16 &amp; TIM16 &amp;  Semaphore_input_Channel1TIM16)|(LPTIM1SOURCELSI &amp; LPTIM1Used_ForRCC)|(LPTIM2SOURCELSI &amp; LPTIM2Used_ForRCC)|IWDGUsed_ForRCC|((RTCClockSelection=RCC_RTCCLKSOURCE_LSI)&amp;(RTCUsed_ForRCC|LCDUsed_ForRCC))|((RCC_MCO1Source=RCC_MCO1SOURCE_LSI)&amp;(((Semaphore_input_Channel1TIM17 &amp; TIM17 &amp; SEM2RCC_MCO_REQUIRED_TIM17)|MCOConfig)))" Diagnostic=""/>
+        <Condition Expression="(SYSCLKSource=RCC_SYSCLKSOURCE_LSI)|(LSCOSSourceLSI &amp; LSCOConfig)|RCC_DAC_SAMPLEANDHOLD|(SEM2RCC_LSI_REQUIRED_TIM16 &amp; TIM16 &amp;  Semaphore_input_Channel1TIM16)|(LPTIM1SOURCELSI &amp; LPTIM1Used_ForRCC)|(LPTIM2SOURCELSI &amp; LPTIM2Used_ForRCC)|IWDGUsed_ForRCC|((RTCClockSelection=RCC_RTCCLKSOURCE_LSI)&amp;RTCUsed_ForRCC)|((RCC_MCO1Source=RCC_MCO1SOURCE_LSI)&amp;(((Semaphore_input_Channel1TIM17 &amp; TIM17 &amp; SEM2RCC_MCO_REQUIRED_TIM17)|MCOConfig)))" Diagnostic=""/>
     </RefParameter>
     <RefParameter Visible="false" Comment="LSI used flag" DefaultValue="0" Name="LSIUsed" Type="integer" Min="0" Max="0"/>
    
@@ -945,197 +940,107 @@
 
 	<!--params for code generation-->
     <!--params for IP codgen-->
-    <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" DefaultValue="+PeriphClockSelection" Type="list">
-        <Condition Expression="((ADC1_USED)|TIM1|RTCUsed_ForRCC|LCDUsed_ForRCC|USART1Used_ForRCC|LPUARTUsed_ForRCC|LPTIM1Used_ForRCC|LPTIM2Used_ForRCC|SAI2Used_ForRCC|I2C1Used_ForRCC|USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC|RNGUsed_ForRCC|SDMMC1Used_ForRCC|I2S1Used_ForRCC) &amp; CodegenConfigPeriph=true" Diagnostic="clock used by RCC"/>
-    </RefParameter>
-    <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" DefaultValue="null" Type="list"/>
-     
-    
-    <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelection" DefaultValue="+RCC_PERIPHCLK_RTCVar+|RCC_PERIPHCLK_USART1Var+|RCC_PERIPHCLK_LPUART1Var+|RCC_PERIPHCLK_LPTIM1Var+|RCC_PERIPHCLK_LPTIM2Var+|RCC_PERIPHCLK_SAI2Var+|RCC_PERIPHCLK_I2C1Var+|RCC_PERIPHCLK_I2S1Var+|RCC_PERIPHCLK_USBVar+|RCC_PERIPHCLK_SDMMCVar+|RCC_PERIPHCLK_RNGVar+|RCC_PERIPHCLK_ADCVar+|RCC_PERIPHCLK_TIM1Var" Type="list"/>
-   
-
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_USBVar" Comment="RCC_PERIPHCLK_USBVar" Type="list" DefaultValue="RCC_PERIPHCLK_USB">
-        <Condition Expression="USB_OTG_FSUsed_ForRCC|USB_OTG_HSEmbeddedPHYUsed_ForRCC" Diagnostic="RTC Activated"/>
-        <PossibleValue Comment="Periphclk RTC" Value="RCC_PERIPHCLK_USB"/>
-    </RefParameter>
-	
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_USBVar" Comment="RCC_PERIPHCLK_USBVar" Type="list" DefaultValue=""/> 
-	
-
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_SDMMCVar" Comment="RCC_PERIPHCLK_SDMMCVar" Type="list" DefaultValue="RCC_PERIPHCLK_SDMMC1">
+    <RefParameter Visible="false" Name="PeriphClockSelectionARG" Comment="PeriphClockSelectionARG" IP="SDMMC1" Type="list" DefaultValue="RCC_PERIPHCLK_SDMMC1">
         <Condition Expression="SDMMC1Used_ForRCC" Diagnostic="RTC Activated"/>
         <PossibleValue Comment="Periphclk SDMMC1" Value="RCC_PERIPHCLK_SDMMC1"/>
     </RefParameter>
-	
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_SDMMCVar" Comment="RCC_PERIPHCLK_SDMMCVar" Type="list" DefaultValue=""/> 
-
-    
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_RNGVar" Comment="RCC_PERIPHCLK_RNGVar" Type="list" DefaultValue="RCC_PERIPHCLK_RNG">
+    <RefParameter Visible="false" Name="PeriphClockSelectionARG" Comment="PeriphClockSelectionARG" IP="RNG" Type="list" DefaultValue="RCC_PERIPHCLK_RNG">
         <Condition Expression="RNGUsed_ForRCC" Diagnostic="RTC Activated"/>
         <PossibleValue Comment="Periphclk RTC" Value="RCC_PERIPHCLK_RNG"/>
     </RefParameter>
-	
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_RNGVar" Comment="RCC_PERIPHCLK_RNGVar" Type="list" DefaultValue=""/> 
-	
-
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_RTCVar" Comment="RCC_PERIPHCLK_RTCVar" Type="list" DefaultValue="RCC_PERIPHCLK_RTC">
+    <RefParameter Visible="false" Name="PeriphClockSelectionARG" Comment="PeriphClockSelectionARG" IP="RTC" Type="list" DefaultValue="RCC_PERIPHCLK_RTC">
         <Condition Expression="RTCUsed_ForRCC" Diagnostic="RTC Activated"/>
         <PossibleValue Comment="Periphclk RTC" Value="RCC_PERIPHCLK_RTC"/>
     </RefParameter>
-	
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_RTCVar" Comment="RCC_PERIPHCLK_RTCVar" Type="list" DefaultValue=""/> 
-    
-    
-
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_TIM1Var" Comment="RCC_PERIPHCLK_TIM1Var" Type="list" DefaultValue="RCC_PERIPHCLK_TIM1">
+    <RefParameter Visible="false" Name="PeriphClockSelectionARG" Comment="PeriphClockSelectionARG" IP="TIM1" Type="list" DefaultValue="RCC_PERIPHCLK_TIM1">
         <Condition Expression="TIM1 &amp; !STM32G0x0_Value_line" Diagnostic="TIM1 Activated"/>
         <PossibleValue Comment="Periphclk TIM1" Value="RCC_PERIPHCLK_TIM1"/>
     </RefParameter>
-	
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_TIM1Var" Comment="RCC_PERIPHCLK_TIM1Var" Type="list" DefaultValue=""/>
-    
-    
-	 <RefParameter Visible="false" Name="RCC_PERIPHCLK_USART1Var" Comment="RCC_PERIPHCLK_USART1Var" Type="list" DefaultValue="RCC_PERIPHCLK_USART1">
+    <RefParameter Visible="false" Name="PeriphClockSelectionARG" Comment="PeriphClockSelectionARG" IP="USART1" Type="list" DefaultValue="RCC_PERIPHCLK_USART1">
         <Condition Expression="USART1Used_ForRCC" Diagnostic="RTC Activated"/>
         <PossibleValue Comment="Periphclk RTC" Value="RCC_PERIPHCLK_USART1"/>
     </RefParameter>
-	
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_USART1Var" Comment="RCC_PERIPHCLK_USART1Var" Type="list" DefaultValue=""/> 
-	
-
-	
-	 <RefParameter Visible="false" Name="RCC_PERIPHCLK_LPUART1Var" Comment="RCC_PERIPHCLK_LPUART1Var" Type="list" DefaultValue="RCC_PERIPHCLK_LPUART1">
+    <RefParameter Visible="false" Name="PeriphClockSelectionARG" Comment="PeriphClockSelectionARG" IP="LPUART1" Type="list" DefaultValue="RCC_PERIPHCLK_LPUART1">
         <Condition Expression="LPUARTUsed_ForRCC" Diagnostic="LPUART1 Activated"/>
         <PossibleValue Comment="Periphclk LPUART1" Value="RCC_PERIPHCLK_LPUART1"/>
     </RefParameter>
-	
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_LPUART1Var" Comment="RCC_PERIPHCLK_LPUART1Var" Type="list" DefaultValue=""/> 
-	
-	
-	 <RefParameter Visible="false" Name="RCC_PERIPHCLK_LPTIM1Var" Comment="RCC_PERIPHCLK_LPTIM1Var" Type="list" DefaultValue="RCC_PERIPHCLK_LPTIM1">
+    <RefParameter Visible="false" Name="PeriphClockSelectionARG" Comment="PeriphClockSelectionARG" IP="LPTIM1" Type="list" DefaultValue="RCC_PERIPHCLK_LPTIM1">
         <Condition Expression="LPTIM1Used_ForRCC" Diagnostic="LPTIM1 Activated"/>
         <PossibleValue Comment="Periphclk RTC" Value="RCC_PERIPHCLK_LPTIM1"/>
     </RefParameter>
-	
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_LPTIM1Var" Comment="RCC_PERIPHCLK_LPTIM1Var" Type="list" DefaultValue=""/> 
-	
-	
-	 <RefParameter Visible="false" Name="RCC_PERIPHCLK_LPTIM2Var" Comment="RCC_PERIPHCLK_LPTIM2Var" Type="list" DefaultValue="RCC_PERIPHCLK_LPTIM2">
+    <RefParameter Visible="false" Name="PeriphClockSelectionARG" Comment="PeriphClockSelectionARG" IP="LPTIM2" Type="list" DefaultValue="RCC_PERIPHCLK_LPTIM2">
         <Condition Expression="LPTIM2Used_ForRCC" Diagnostic="LPTIM2 Activated"/>
         <PossibleValue Comment="Periphclk RTC" Value="RCC_PERIPHCLK_LPTIM2"/>
     </RefParameter>
-	
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_LPTIM2Var" Comment="RCC_PERIPHCLK_LPTIM2Var" Type="list" DefaultValue=""/> 
-	
-	
-		
-	
-	
-	 <RefParameter Visible="false" Name="RCC_PERIPHCLK_SAI2Var" Comment="RCC_PERIPHCLK_SAI2Var" Type="list" DefaultValue="RCC_PERIPHCLK_SAI2">
-        <Condition Expression="SAI2Used_ForRCC" Diagnostic="SAI2 Activated"/>
-        <PossibleValue Comment="Periphclk SAI2" Value="RCC_PERIPHCLK_SAI2"/>
-    </RefParameter>
-	
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_SAI2Var" Comment="RCC_PERIPHCLK_SAI2Var" Type="list" DefaultValue=""/> 
-	
-	
-	 <RefParameter Visible="false" Name="RCC_PERIPHCLK_I2C1Var" Comment="RCC_PERIPHCLK_I2C1Var" Type="list" DefaultValue="RCC_PERIPHCLK_I2C1">
+    <RefParameter Visible="false" Name="PeriphClockSelectionARG" Comment="PeriphClockSelectionARG" IP="I2C1" Type="list" DefaultValue="RCC_PERIPHCLK_I2C1">
         <Condition Expression="I2C1Used_ForRCC" Diagnostic="I2C1 Activated"/>
         <PossibleValue Comment="Periphclk I2C1" Value="RCC_PERIPHCLK_I2C1"/>
     </RefParameter>
-	
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_I2C1Var" Comment="RCC_PERIPHCLK_I2C1Var" Type="list" DefaultValue=""/> 
-	
-	
-	
-<RefParameter Visible="false" Name="RCC_PERIPHCLK_I2S1Var" Comment="RCC_PERIPHCLK_I2S1Var" Type="list" DefaultValue="RCC_PERIPHCLK_I2S1">
+    <RefParameter Visible="false" Name="PeriphClockSelectionARG" Comment="PeriphClockSelectionARG" IP="I2S1" Type="list" DefaultValue="RCC_PERIPHCLK_I2S1">
         <Condition Expression="I2S1Used_ForRCC" Diagnostic="I2S1 Activated"/>
         <PossibleValue Comment="Periphclk I2S1" Value="RCC_PERIPHCLK_I2S1"/>
     </RefParameter>
-	
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_I2S1Var" Comment="RCC_PERIPHCLK_I2S1Var" Type="list" DefaultValue=""/> 
-	
-	
-
-	
-	 <RefParameter Visible="false" Name="RCC_PERIPHCLK_ADCVar" Comment="RCC_PERIPHCLK_ADCVar" Type="list" DefaultValue="RCC_PERIPHCLK_ADC">
+    <RefParameter Visible="false" Name="PeriphClockSelectionARG" Comment="PeriphClockSelectionARG" IP="ADC1" Type="list" DefaultValue="RCC_PERIPHCLK_ADC">
         <Condition Expression="(ADC1_USED)" Diagnostic="ADC Activated"/>
         <PossibleValue Comment="Periphclk ADC" Value="RCC_PERIPHCLK_ADC"/>
     </RefParameter>
-	
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_ADCVar" Comment="RCC_PERIPHCLK_ADCVar" Type="list" DefaultValue=""/> 
-	
+    <RefParameter Visible="false" Name="PeriphClockSelectionARG" Comment="PeriphClockSelectionARG" Type="list" DefaultValue=""/>
 	
 	
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_LCDVar" Comment="RCC_PERIPHCLK_LCDVar" Type="list" DefaultValue="RCC_PERIPHCLK_LCD">
-        <Condition Expression="LCDUsed_ForRCC" Diagnostic="LCD Activated"/>
-        <PossibleValue Comment="Periphclk LCD" Value="RCC_PERIPHCLK_LCD"/>
-    </RefParameter>
-	
-    <RefParameter Visible="false" Name="RCC_PERIPHCLK_LCDVar" Comment="RCC_PERIPHCLK_LCDVar" Type="list" DefaultValue=""/>
-	
-	
-    <RefParameter Visible="false" Name="RTCClockSelectionARG" Comment="RTCClockSelectionARG" Type="list" DefaultValue="+RTCClockSelection">
-        <Condition Expression="(RTCUsed_ForRCC|LCDUsed_ForRCC)&amp; CodegenConfigPeriph=true" Diagnostic="RTC Activated"/>
+    <RefParameter Visible="false" Name="RTCClockSelectionARG" Comment="RTCClockSelectionARG" IP="RTC" Type="list" DefaultValue="+RTCClockSelection">
+        <Condition Expression="RTCUsed_ForRCC&amp; CodegenConfigPeriph=true" Diagnostic="RTC Activated"/>
     </RefParameter>
     <RefParameter Visible="false" Name="RTCClockSelectionARG" Comment="RTCClockSelectionARG" Type="list" DefaultValue="null"/>
 	
 	
 	
-    <RefParameter Visible="false" Name="Usart1ClockSelectionARG" Comment="Usart1ClockSelectionARG" Type="list" DefaultValue="+USART1CLockSelection">
+    <RefParameter Visible="false" Name="Usart1ClockSelectionARG" Comment="Usart1ClockSelectionARG" IP="USART1" Type="list" DefaultValue="+USART1CLockSelection">
         <Condition Expression="USART1Used_ForRCC &amp; CodegenConfigPeriph=true" Diagnostic="USART1 Activated"/>
     </RefParameter>
     <RefParameter Visible="false" Name="Usart1ClockSelectionARG" Comment="Usart1ClockSelectionARG" Type="list" DefaultValue="null"/>
 	
 	
-    <RefParameter Visible="false" Name="Lpuart1ClockSelectionARG" Comment="Lpuart1ClockSelectionARG" Type="list" DefaultValue="+LPUART1CLockSelection">
+    <RefParameter Visible="false" Name="Lpuart1ClockSelectionARG" Comment="Lpuart1ClockSelectionARG" IP="LPUART1" Type="list" DefaultValue="+LPUART1CLockSelection">
         <Condition Expression="LPUARTUsed_ForRCC &amp; CodegenConfigPeriph=true" Diagnostic="LPUART1 Activated"/>
     </RefParameter>
     <RefParameter Visible="false" Name="Lpuart1ClockSelectionARG" Comment="Lpuart1ClockSelectionARG" Type="list" DefaultValue="null"/>
 	
 	
-	
-    <RefParameter Visible="false" Name="Lptim1ClockSelectionARG" Comment="Lptim1ClockSelectionARG" Type="list" DefaultValue="+LPTIM1CLockSelection">
+    <RefParameter Visible="false" Name="Lptim1ClockSelectionARG" Comment="Lptim1ClockSelectionARG" IP="LPTIM1" Type="list" DefaultValue="+LPTIM1CLockSelection">
         <Condition Expression="LPTIM1Used_ForRCC &amp; CodegenConfigPeriph=true" Diagnostic="LPTIM1 Activated"/>
     </RefParameter>
     <RefParameter Visible="false" Name="Lptim1ClockSelectionARG" Comment="Lptim1ClockSelectionARG" Type="list" DefaultValue="null"/>
 	
-    <RefParameter Visible="false" Name="Lptim2ClockSelectionARG" Comment="Lptim2ClockSelectionARG" Type="list" DefaultValue="+LPTIM2CLockSelection">
+    <RefParameter Visible="false" Name="Lptim2ClockSelectionARG" Comment="Lptim2ClockSelectionARG" IP="LPTIM2" Type="list" DefaultValue="+LPTIM2CLockSelection">
         <Condition Expression="LPTIM2Used_ForRCC &amp; CodegenConfigPeriph=true" Diagnostic="LPTIM2 Activated"/>
     </RefParameter>
     <RefParameter Visible="false" Name="Lptim2ClockSelectionARG" Comment="Lptim2ClockSelectionARG" Type="list" DefaultValue="null"/>
 	
 
     
-    <RefParameter Visible="false" Name="Tim1ClockSelectionARG" Comment="Tim1ClockSelectionARG" Type="list" DefaultValue="+TIM1CLockSelection">
+    <RefParameter Visible="false" Name="Tim1ClockSelectionARG" Comment="Tim1ClockSelectionARG" IP="TIM1" Type="list" DefaultValue="+TIM1CLockSelection">
         <Condition Expression="(TIM1 &amp; CodegenConfigPeriph=true) &amp; !STM32G0x0_Value_line" Diagnostic="TIM1 Activated"/>
     </RefParameter>
     <RefParameter Visible="false" Name="Tim1ClockSelectionARG" Comment="Tim1ClockSelectionARG" Type="list" DefaultValue="null"/>
-
-    
 	
-    <RefParameter Visible="false" Name="I2c1ClockSelectionARG" Comment="I2c1ClockSelectionARG" Type="list" DefaultValue="+I2C1CLockSelection">
+    <RefParameter Visible="false" Name="I2c1ClockSelectionARG" Comment="I2c1ClockSelectionARG" IP="I2C1" Type="list" DefaultValue="+I2C1CLockSelection">
         <Condition Expression="I2C1Used_ForRCC &amp; CodegenConfigPeriph=true" Diagnostic="I2c1 Activated"/>
     </RefParameter>
     <RefParameter Visible="false" Name="I2c1ClockSelectionARG" Comment="I2c1ClockSelectionARG" Type="list" DefaultValue="null"/>
-	
-	
 
 
-	<RefParameter Visible="false" Name="I2S1CLockSelectionARG" Comment="I2S1CLockSelectionARG" Type="list" DefaultValue="+I2S1CLockSelection">
+    <RefParameter Visible="false" Name="I2S1CLockSelectionARG" Comment="I2S1CLockSelectionARG" IP="I2S1" Type="list" DefaultValue="+I2S1CLockSelection">
         <Condition Expression="I2S1Used_ForRCC &amp; CodegenConfigPeriph=true" Diagnostic="I2c1 Activated"/>
     </RefParameter>
     <RefParameter Visible="false" Name="I2S1CLockSelectionARG" Comment="I2S1CLockSelectionARG" Type="list" DefaultValue="null"/>
-	
-	
 
-    <RefParameter Visible="false" Name="RNGClockSelectionARG" Comment="RNGClockSelectionARG" Type="list" DefaultValue="+RNGCLockSelection">
+    <RefParameter Visible="false" Name="RNGClockSelectionARG" Comment="RNGClockSelectionARG" IP="RNG" Type="list" DefaultValue="+RNGCLockSelection">
         <Condition Expression="RNGUsed_ForRCC &amp; CodegenConfigPeriph=true" Diagnostic="LCD Activated"/>
     </RefParameter>
     <RefParameter Visible="false" Name="RNGClockSelectionARG" Comment="RNGClockSelectionARG" Type="list" DefaultValue="null"/>
 	
 	
-    <RefParameter Visible="false" Name="AdcClockSelectionARG" Comment="AdcClockSelectionARG" Type="list" DefaultValue="+ADCCLockSelection">
+    <RefParameter Visible="false" Name="AdcClockSelectionARG" Comment="AdcClockSelectionARG" IP="ADC1" Type="list" DefaultValue="+ADCCLockSelection">
         <Condition Expression="(ADC1_USED)&amp; CodegenConfigPeriph=true" Diagnostic="ADC Activated"/>
     </RefParameter>
     <RefParameter Visible="false" Name="AdcClockSelectionARG" Comment="AdcClockSelectionARG" Type="list" DefaultValue="null"/>
@@ -1305,7 +1210,7 @@
     <RefParameter Visible="false" Comment="HSISYSCLKDividerARG" DefaultValue="null" Name="HSISYSCLKDividerARG" Type="list"/>
    
     
-    <RefParameter Visible="false" Comment="RNGCLKDividerARG" DefaultValue="+RNGCLKDivider" Name="RNGCLKDividerARG" Type="list">
+    <RefParameter Visible="false" Comment="RNGCLKDividerARG" DefaultValue="+RNGCLKDivider" IP="RNG" Name="RNGCLKDividerARG" Type="list">
         <Condition Diagnostic="RNG used" Expression="RNGUsed_ForRCC &amp; CodegenConfigPeriph=true"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="RNGCLKDividerARG" DefaultValue="null" Name="RNGCLKDividerARG" Type="list"/>	
@@ -1435,21 +1340,23 @@
 	
     <RefParameter Visible="false" Comment="RCC_MCO1SourceARG" DefaultValue="null" Name="RCC_MCO1SourceARG" Type="list"/>
     
-    <RefMode Name="ClockTree">
+    <RefMode Name="PClockTree">
+        <Condition Expression="CodegenConfigPeriph=true" Diagnostic=""/>
+        <ConfigForMode>RCC_RNGDIV_CONFIG</ConfigForMode>
+        <ConfigForMode>RCC_PClockConfig</ConfigForMode>
+    </RefMode>
 
+    <RefMode Name="ClockTree">
         <ConfigForMode>RCC_ConfigVoltageScaling</ConfigForMode> 
         <ConfigForMode>RCC_LSEDRIVE_CONFIG</ConfigForMode>
         <ConfigForMode>RCC_OSCConfig</ConfigForMode>            
         <ConfigForMode>RCC_ClockConfig</ConfigForMode>
-        <ConfigForMode>RCC_PClockConfig</ConfigForMode>              
         <ConfigForMode>RCC_MCOConfig</ConfigForMode>        
         <ConfigForMode>RCC_LSCOConfig</ConfigForMode>        
         <ConfigForMode>RCC_CSS_Enable</ConfigForMode>
         <ConfigForMode>RCC_CSS_EnableLSE</ConfigForMode>    
 	        
-	<ConfigForMode>RCC_interrupt_Time_SYSTICK_Config</ConfigForMode>
 	<!--ConfigForMode>RCC_SYSTICK_CONFIG</ConfigForMode-->
-        <ConfigForMode>RCC_RNGDIV_CONFIG</ConfigForMode>
 
         <Parameter Name="OscillatorType"/>
         <Parameter Name="APB1TimCLKDivider"/>
@@ -1491,7 +1398,6 @@
         <Parameter Name="MCO1PinFreq_Value"/>
 
         <Parameter Name="HCLKFreq_Value"/>
-        <Parameter Name="USBFreq_Value"/>
         <Parameter Name="ADCFreq_Value"/>
         <Parameter Name="I2C1Freq_Value"/>
         <Parameter Name="I2S1Freq_Value"/>

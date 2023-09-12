@@ -278,4 +278,3 @@ typedef enum
 
 #endif /* __UTILITIES_DEF_H__ */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

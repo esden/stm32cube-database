@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    ${FamilyName?lower_case}xx_hal_exti.c
@@ -99,6 +100,7 @@
   *
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
 #include "${FamilyName?lower_case}xx_hal_exti.h"
@@ -306,4 +308,3 @@ void HAL_EXTI_IRQHandler(EXTI_HandleTypeDef *hexti)
   * @}
   */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

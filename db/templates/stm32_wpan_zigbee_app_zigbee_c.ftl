@@ -403,9 +403,10 @@
 
 /* USER CODE BEGIN Header */
 /**
- ******************************************************************************
-  * File Name          : ${name}
-  * Description        : Zigbee Application.
+  ******************************************************************************
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   Zigbee Application.
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
@@ -1043,6 +1044,3 @@ void APP_ZIGBEE_ProcessRequestM0ToM4(void)
 }
 /* USER CODE BEGIN FD_LOCAL_FUNCTIONS */
 /* USER CODE END FD_LOCAL_FUNCTIONS */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
-

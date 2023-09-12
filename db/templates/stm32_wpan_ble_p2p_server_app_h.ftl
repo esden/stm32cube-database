@@ -1,10 +1,11 @@
 [#ftl]
 /* USER CODE BEGIN Header */
 /**
- ******************************************************************************
- * File Name          : ${name}
- * Description        : Header for p2p_server_app.c module
- ******************************************************************************
+  ******************************************************************************
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   Header for p2p_server_app.c module
+  ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
@@ -68,5 +69,3 @@ typedef struct
 #endif
 
 #endif /*__P2P_SERVER_APP_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

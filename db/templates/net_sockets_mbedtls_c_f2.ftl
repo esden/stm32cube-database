@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /** 
   ******************************************************************************
   * File Name       : ${name}.h
@@ -9,7 +10,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
-
+/* USER CODE END Header */
 #if !defined(MBEDTLS_CONFIG_FILE)
 #include "mbedtls/config.h"
 #else

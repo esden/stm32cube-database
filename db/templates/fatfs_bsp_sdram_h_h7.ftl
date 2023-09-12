@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
  ******************************************************************************
   * @file    bsp_driver_sdram.h (based on stm32h743i_eval_sdram.h)
@@ -8,7 +9,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
-  
+/* USER CODE END Header */    
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __${FamilyName}_SDRAM_H
 #define __${FamilyName}_SDRAM_H
@@ -85,5 +86,3 @@ uint8_t BSP_SDRAM_Sendcmd(FMC_SDRAM_CommandTypeDef *SdramCmd);
 #endif
 
 #endif /* __${FamilyName}_SDRAM_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

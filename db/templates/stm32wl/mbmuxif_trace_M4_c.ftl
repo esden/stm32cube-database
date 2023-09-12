@@ -184,5 +184,3 @@ static void MBMUXIF_IsrTraceNotifRcvCb(void *ComObj)
 /* USER CODE BEGIN PrFD */
 
 /* USER CODE END PrFD */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

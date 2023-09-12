@@ -24,6 +24,7 @@
 ${TABN}clocks {
 ${TABP}/* USER CODE BEGIN clocks */
 ${TABP}/* USER CODE END clocks */
+[#if !srvcmx_isDbFeatureEnabled("noUBootSplSupport") || (srvcmx_isDbFeatureEnabled("noUBootSplSupport") && (srvcmx_isTargetedFw_inDTS("TF-A")))][#--noUBootSplSupport--]
 #n
 [#t]
 [#if !srvcmx_isTargetedFw_inDTS("TF-A")]
@@ -145,6 +146,7 @@ ${TABN1}/* USER CODE END ${nodeLabel} */
 [#if !srvcmx_isTargetedFw_inDTS("TF-A")]
 #endif	/*CONFIG_TFABOOT*/
 [/#if]
+[/#if][#--noUBootSplSupport--]
 ${TABN}};
 #n
 [/#list]

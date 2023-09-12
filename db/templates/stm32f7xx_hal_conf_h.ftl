@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    stm32f7xx_hal_conf_template.h
@@ -9,16 +10,16 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2017 STMicroelectronics.
-  * All rights reserved.</center></h2>
+  * Copyright (c) 2017 STMicroelectronics.
+  * All rights reserved.
   *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
   */ 
+/* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __STM32F7xx_HAL_CONF_H
@@ -130,7 +131,7 @@
 #define  TICK_INT_PRIORITY            ((uint32_t)[#if TICK_INT_PRIORITY??]${TICK_INT_PRIORITY}[#else]0x0F[/#if]U) /*!< tick interrupt priority */
 #define  USE_RTOS                     [#if advancedSettings?? && advancedSettings.USE_RTOS??]${advancedSettings.USE_RTOS}[#else]0[/#if]U
 #define  PREFETCH_ENABLE              [#if PREFETCH_ENABLE??]${PREFETCH_ENABLE}[#else]1[/#if]U
-#define  ART_ACCLERATOR_ENABLE        [#if ART_ACCLERATOR_ENABLE??]${ART_ACCLERATOR_ENABLE}[#else]1[/#if]U /* To enable instruction cache and prefetch */
+#define  ART_ACCLERATOR_ENABLE        [#if ART_ACCELERATOR_ENABLE??]${ART_ACCELERATOR_ENABLE}[#else]1[/#if]U /* To enable instruction cache and prefetch */
 
 #define  USE_HAL_ADC_REGISTER_CALLBACKS         0U /* ADC register callback disabled       */
 #define  USE_HAL_CAN_REGISTER_CALLBACKS         0U /* CAN register callback disabled       */
@@ -478,5 +479,3 @@
 
 #endif /* __STM32F7xx_HAL_CONF_H */
  
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

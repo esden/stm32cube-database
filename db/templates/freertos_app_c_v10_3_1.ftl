@@ -446,4 +446,3 @@ void MX_FREERTOS_Init(void) {
      
 /* USER CODE END Application */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

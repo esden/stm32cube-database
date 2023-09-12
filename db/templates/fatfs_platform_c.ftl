@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file           : fatfs_platform.c
@@ -7,6 +8,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
 */
+/* USER CODE END Header */
 #include "fatfs_platform.h"
 
 uint8_t	BSP_PlatformIsDetected(void) {

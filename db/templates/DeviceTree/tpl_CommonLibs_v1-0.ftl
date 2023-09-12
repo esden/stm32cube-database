@@ -91,7 +91,7 @@ Return empty value if key not found.--]
 [#--Return value from map if key match.
 "keyIn" is compared to a "regexp".
 Exact matching is expected: no subStr extraction (?size==1).
-One possible group replacement: "$1" replacement is performed when matching.
+One possible regexp group extraction: the 1st group is returned. Nothing if no group.
 Other groups are ignored.
 Return empty value if no match.--]
 [#function srvc_map_getValueIfMatchWithStatus  map keyIn]
@@ -112,10 +112,9 @@ Return empty value if no match.--]
 				[#if matchres?size==1]
 					[#local isMatching = true]
 					[#if key?contains("(")]
-						[#local res = value?replace("$1", matchres[0]?groups[1])]
-					[#else]
-						[#local res = value]
+						[#local group1 = matchres[0]?groups[1]]
 					[/#if]
+					[#local res = value]
 				[#else]
 					[#local errors = "malformed regexp"]
 				[/#if]
@@ -125,7 +124,7 @@ Return empty value if no match.--]
 		[/#if]
 	[/#list]
 
-[#return {"errors":errors!, "isMatching":isMatching, "res":res!, "traces":traces!} ]
+[#return {"errors":errors!, "isMatching":isMatching, "res":res!, "group1":group1!, "traces":traces!} ]
 [/#function]
 
 
@@ -159,6 +158,21 @@ is supposed to contain elmts of list type--]
 [/#function]
 
 
+[#--search the provided elmt in the entry map with values composed as list of elmts--]
+[#function srvc_map_isElmtInValuesAsList  mapIn elmtIn]
+
+	[#local isElmtFound = false]
+	[#list mapIn?values as valuesList]
+		[#if valuesList?seq_contains(elmtIn)]
+			[#local isElmtFound = true]
+			[#break]
+		[/#if]
+	[/#list]
+
+[#return isElmtFound]
+[/#function]
+
+
 [#--Search in a strings list an element starting the provided string.
 	Return the 1st found element from the list. Empty if nothing match.--]
 [#function srvc_list_getStringElmtStartingTheString  pStringsListIn pStringIn]
@@ -170,6 +184,30 @@ is supposed to contain elmts of list type--]
 		[/#if]
 	[/#list]
 [#return ""]
+[/#function]
+
+
+[#-- replace anywhere in a strings list the origin str by the destination str--]
+[#function srvc_list_replaceString  strInList oriStr destStr]
+	[#local module = "srvc_list_replaceString"]
+	[#local traces =  ftrace("", "module="+module+"\n") ]
+	[#local errors = ""]
+
+	[#local strOutList = []]
+	[#list strInList  as strIn]
+		[#if strIn?contains(oriStr)]
+			[#if destStr?has_content]
+				[#local strOutList = strOutList + [strIn?replace(oriStr, destStr)] ]
+			[#else]
+				[#local errors = "empty destStr - strInList= " + strInList! + " - oriStr= " + oriStr!]
+				[#break]
+			[/#if]
+		[#else]
+			[#local strOutList = strOutList + [strIn] ]
+		[/#if]
+	[/#list]
+
+[#return {"errors":errors!, "res":strOutList!, "traces":traces!} ]
 [/#function]
 
 

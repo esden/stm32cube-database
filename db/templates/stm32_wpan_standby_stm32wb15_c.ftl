@@ -2,8 +2,9 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * File Name          : ${name}
-  * Description        : Application configuration file for STM32WPAN Middleware. 
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   Specific code for standby mode
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
@@ -154,5 +155,3 @@ uint32_t standby_boot_mng(void)
 
   return boot_after_standby;
 }
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

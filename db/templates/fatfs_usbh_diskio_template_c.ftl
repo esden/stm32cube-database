@@ -13,6 +13,7 @@
 [/#if]
 [/#list]
 [/#if]  
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
 [#if use_dma = 1]
@@ -25,6 +26,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 /* USER CODE BEGIN firstSection */ 
 /* can be used to modify / undefine following code or add new definitions */
 /* USER CODE END firstSection */ 
@@ -329,6 +331,3 @@ DRESULT USBH_ioctl(BYTE lun, BYTE cmd, void *buff)
 /* USER CODE BEGIN lastSection */ 
 /* can be used to modify / undefine previous code or add new code */
 /* USER CODE END lastSection */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
-

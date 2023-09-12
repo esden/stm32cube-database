@@ -53,4 +53,3 @@ void  MX_TOUCHSENSING_Init(void);
 /**
   * @}
   */
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

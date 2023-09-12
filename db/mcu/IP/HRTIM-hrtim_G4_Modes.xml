@@ -1860,9 +1860,9 @@
 
 <RefParameter Comment="Sync Options" DefaultValue="HRTIM_SYNCOPTION_NONE" Name="SyncOptions" Type="list" TabName="Synchro Configuration" Group="Master Timer Synchronization">
         <PossibleValue Comment="HRTIM instance doesn't handle external synchronization signals (SYNCIN, SYNCOUT) " Value="HRTIM_SYNCOPTION_NONE" />
-        <PossibleValue Comment="HRTIM instance acts as a MASTER, i.e. generates external synchronization output (SYNCOUT) " Value="HRTIM_SYNCOPTION_MASTER" Semaphore="Semaphore_HRTIMER_SynchroOut$IpInstance" Condition="!(Semaphore_MASTER_Enable$IpInstance &amp; Semaphore_SCOUT_GPIO_Enable$IpInstance )" Diagnostic="Master Timer must be enabled and SYNCOUT Pin configured" Action="Disable"/>
+        <PossibleValue Comment="HRTIM instance acts as a MASTER, i.e. generates external synchronization output (SYNCOUT) " Value="HRTIM_SYNCOPTION_MASTER" Semaphore="Semaphore_HRTIMER_SynchroOut$IpInstance" Condition="!(Semaphore_MASTER_Enable$IpInstance)" Diagnostic="Master Timer must be enabled and SYNCOUT Pin configured" Action="Disable"/>
         <PossibleValue Comment="HRTIM instance acts as a SLAVE, i.e. it is synchronized by external sources (SYNCIN) " Value="HRTIM_SYNCOPTION_SLAVE" Semaphore="Semaphore_HRTIMER_SynchroIn$IpInstance" Condition="!Semaphore_MASTER_Enable$IpInstance" Diagnostic="Master Timer must be enabled" Action="Disable"/>
-       <PossibleValue Comment="HRTIM instance acts as a SLAVE and a MASTER i.e. it is synchronized by external sources (SYNCIN) and  generates external synchronization output (SYNCOUT) " Value="HRTIM_SYNCOPTION_SLAVE|HRTIM_SYNCOPTION_MASTER" Semaphore="Semaphore_HRTIMER_SynchroInOut$IpInstance" Condition="!(Semaphore_MASTER_Enable$IpInstance &amp; Semaphore_SCOUT_GPIO_Enable$IpInstance)" Diagnostic="Master Timer must be enabled and SYNCOUT Pin configured " Action="Disable"/>
+       <PossibleValue Comment="HRTIM instance acts as a SLAVE and a MASTER i.e. it is synchronized by external sources (SYNCIN) and  generates external synchronization output (SYNCOUT) " Value="HRTIM_SYNCOPTION_SLAVE|HRTIM_SYNCOPTION_MASTER" Semaphore="Semaphore_HRTIMER_SynchroInOut$IpInstance" Condition="!(Semaphore_MASTER_Enable$IpInstance)" Diagnostic="Master Timer must be enabled and SYNCOUT Pin configured " Action="Disable"/>
 </RefParameter>
 
 <!-- only if SYNCIN -->
@@ -22669,19 +22669,26 @@
                 <Mode Name=" External Synchronization">
                     <Condition Diagnostic="you must configure at least one Timer" Expression="Semaphore_TF_Enable$IpInstance | Semaphore_TE_Enable$IpInstance | Semaphore_TD_Enable$IpInstance | Semaphore_TC_Enable$IpInstance |Semaphore_TB_Enable$IpInstance | Semaphore_TA_Enable$IpInstance | Semaphore_MASTER_Enable$IpInstance"/> 
 	              <ModeLogicOperator Name="XOR">
-                           <Mode Name="SCOUTmode" UserName="Output Synchronization (Master)">
+                           <Mode Name="SCOUT_SCINmodeVirtual" UserName="No Synchronizations PINs enabled">
+                                <Semaphore>Semaphore_VS_SCIN_GPIO_Enable$IpInstance</Semaphore>
+                                <Semaphore>Semaphore_VS_SCOUT_GPIO_Enable$IpInstance</Semaphore>
+			       <SignalLogicalOp Name="AND">
+				    <Signal  Name="VirtualSync"/>
+			       </SignalLogicalOp>
+	                  </Mode>
+                           <Mode Name="SCOUTmode" UserName="Enable Output Synchronization PIN">
                                 <Semaphore>Semaphore_SCOUT_GPIO_Enable$IpInstance</Semaphore>
 			       <SignalLogicalOp Name="AND">
 				    <Signal  Name="SCOUT"/>
 			       </SignalLogicalOp>
 	                  </Mode>
-                           <Mode Name="SCINmode" UserName="Input Synchronization (Slave)">
+                           <Mode Name="SCINmode" UserName="Enable Input Synchronization PIN">
                                 <Semaphore>Semaphore_SCIN_GPIO_Enable$IpInstance</Semaphore>
 			       <SignalLogicalOp Name="AND">
 				    <Signal  Name="SCIN"/>
 			       </SignalLogicalOp>
 	                  </Mode>
-                           <Mode Name="SCOUT_SCINmode" UserName="Both Synchronizations (Master and Slave)">
+                           <Mode Name="SCOUT_SCINmode" UserName="Enable Both Synchronizations PINs">
                                 <Semaphore>Semaphore_SCIN_GPIO_Enable$IpInstance</Semaphore>
                                 <Semaphore>Semaphore_SCOUT_GPIO_Enable$IpInstance</Semaphore>
 			       <SignalLogicalOp Name="AND">
@@ -22689,6 +22696,8 @@
 				    <Signal  Name="SCIN"/>
 			       </SignalLogicalOp>
 	                  </Mode>
+
+                           
 		      </ModeLogicOperator>
 		</Mode>
 
@@ -22726,7 +22735,7 @@
             <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="CHF1" Direction="Output"/>
             <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="CHF2" Direction="Output"/>
 
-
+<RefSignal Name="VirtualSync"           Virtual="true"/>
 	<RefSignal Name="VS_hrtimEnable"           Virtual="true"/>
 	<RefSignal Name="VS_hrtimMasterTimerNoOutput"   Virtual="true"/>
 	<RefSignal Name="VS_hrtimTimerANoOutput"   Virtual="true"/>

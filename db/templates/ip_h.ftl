@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    ${name?lower_case}.h
@@ -8,6 +9,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __${name}_H__
 #define __${name}_H__
@@ -88,4 +90,3 @@ extern ${variable.value} ${variable.name};
 
 #endif /* __${name}_H__ */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

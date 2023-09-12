@@ -150,5 +150,3 @@ uint32_t *MBMUX_SEC_VerifySramBufferPtr(uint32_t *pBufferAddress, uint32_t buffe
 #endif
 
 #endif /*__MBMUX_${CPUCORE}_H__ */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

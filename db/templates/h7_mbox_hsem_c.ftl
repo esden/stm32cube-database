@@ -1,24 +1,15 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * File Name          : mbox_hsem.c
   * Description        : This file provides code for the configuration
   *                      of the mailbox based on hardware semaphore.
   ******************************************************************************
-
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics. 
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the 
-  * License. You may obtain a copy of the License at:
-  *                       opensource.org/licenses/BSD-3-Clause
-  *
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
-
+/* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "openamp/open_amp.h"
 #include "stm32h7xx_hal.h"
@@ -223,4 +214,3 @@ int MAILBOX_Notify(void *priv, uint32_t id)
 
   return 0;
 }
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

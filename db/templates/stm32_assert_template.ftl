@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 [#assign familyName=FamilyName?lower_case][#assign year="2018"][#if familyName="stm32h7"][#assign year="2017"][/#if][#if familyName="stm32g4" || familyName="stm32l5" ||familyName="stm32wb" ||familyName="stm32mp1"][#assign year="2019"][/#if][#if familyName="stm32wl"][#assign year="2020"][/#if][#if familyName="stm32u5"][#assign year="2021"][/#if] 
 /**
   ******************************************************************************
@@ -7,16 +8,16 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) ${year} STMicroelectronics. 
-  * All rights reserved.</center></h2>
+  * Copyright (c) ${year} STMicroelectronics.
+  * All rights reserved.
   *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __STM32_ASSERT_H
@@ -52,5 +53,3 @@
 
 #endif /* __STM32_ASSERT_H */
 
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

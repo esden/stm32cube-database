@@ -334,4 +334,3 @@ int32_t RBI_IsDCDC(void)
 
 /* USER CODE END PrFD */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

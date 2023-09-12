@@ -194,4 +194,3 @@ extern int32_t EE_Clean(int32_t bank, int32_t interrupt);
 
 #endif /* EE_H__ */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

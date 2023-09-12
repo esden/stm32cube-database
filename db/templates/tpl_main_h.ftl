@@ -64,9 +64,16 @@ extern "C" {
 [/#if]
 [#list ips as ip]
 [#if ip?contains("STM32_WPAN")]
+[#list voids as void]
+[#-- BZ114099 --]
+[#if void.functionName?? && void.functionName?contains("APPE_Init")]
 #include "app_conf.h"
 #include "app_entry.h"
+[#if !void.isNotGenerated && void.genCode]
 #include "app_common.h"
+[/#if]
+[/#if]
+[/#list]
 [/#if]
 [#if ip?contains("KMS")]
 #include "app_kms.h"
@@ -303,5 +310,3 @@ void ${""?right_pad(2)}${void.functionName}(void);
 #endif
 
 #endif /* __MAIN_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

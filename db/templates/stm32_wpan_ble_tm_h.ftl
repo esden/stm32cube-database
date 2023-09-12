@@ -2,8 +2,9 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * File Name          : ${name}
-  * Description        : Transparent mode interface
+  * @file    ${name}
+  * @author  MCD Application Team
+  * @brief   Transparent mode interface
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
@@ -98,5 +99,3 @@ extern "C" {
 #endif
 
 #endif /*__TM_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
