@@ -83,18 +83,7 @@
   [/#if]
 [/#list]
 
-[#if useGpio]
-#include "gpio.h"
-[/#if]
-[#if useBdma]
-#include "bdma.h"
-[/#if]
-[#if useDma]
-#include "dma.h"
-[/#if]
-[#if useMdma]
-#include "mdma.h"
-[/#if]
+
 [#-- End Define includes --]
 [#-- Tracker 276386 -- GetHandle Start --]
 #n
@@ -315,7 +304,12 @@ ETH_TxPacketConfig TxConfig;
 [#--------------DMA DFSDM --]
 [#-- macro generateConfigModelCode --]
 
-[#macro generateConfigModelCode configModel inst nTab index]
+[#macro generateConfigModelCode configModel inst nTab index mode]
+[#if configModel.clockEnableMacro?? && mode=="Init"] [#-- Enable Port clock --]
+    [#list configModel.clockEnableMacro as clkmacroList]	
+            [#if nTab==2]#t#t[#else]#t[/#if]${clkmacroList}[#if !clkmacroList?contains("(")]()[/#if];
+    [/#list]
+[/#if]
 [#if configModel.methods??] [#-- if the pin configuration contains a list of LibMethods--]
     [#assign methodList = configModel.methods]
 [#else] [#assign methodList = configModel.libMethod]
@@ -483,7 +477,7 @@ ETH_TxPacketConfig TxConfig;
                                 [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                                 [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
                                 [#if nTab==2]#t#t[#else]#t[/#if]{
-                                [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
+                                [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
                                 [#if nTab==2]#t#t[#else]#t[/#if]}
                             [/#if]#n                                    
 		[#else]
@@ -494,7 +488,7 @@ ETH_TxPacketConfig TxConfig;
                                 [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                                 [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
                                 [#if nTab==2]#t#t[#else]#t[/#if]{
-                                [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
+                                [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler( );
                                 [#if nTab==2]#t#t[#else]#t[/#if]}
                             [/#if]#n                            
                 [/#if]			
@@ -563,7 +557,7 @@ ETH_TxPacketConfig TxConfig;
                                 [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                                 [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
                                 [#if nTab==2]#t#t[#else]#t[/#if]{
-                                [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
+                                [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler( );
                                 [#if nTab==2]#t#t[#else]#t[/#if]}
                             [/#if]#n                                
                         [/#if]
@@ -576,7 +570,7 @@ ETH_TxPacketConfig TxConfig;
 [#-- End macro generateConfigModelCode --]
 
 [#-- macro generateConfigCode --]
-[#macro generateConfigCode ipName type serviceName instHandler tabN]
+[#macro generateConfigCode ipName type serviceName instHandler tabN ]
 [#if type=="Init"]
  [#assign service = getInitServiceMode(ipName)]
 [#else]
@@ -599,12 +593,12 @@ ETH_TxPacketConfig TxConfig;
    
 [#if serviceName=="gpio"]
  [#assign instanceIndex =""]
-    [@generateConfigModelCode configModel=gpioService inst=ipName nTab=tabN index=""/]
+    [@generateConfigModelCode configModel=gpioService inst=ipName nTab=tabN index="" mode=type/]
 [/#if]
 [#if serviceName=="gpioOut"]
  [#assign instanceIndex =""]
 [#if gpioOutService!="empty"]
-    [@generateConfigModelCode configModel=gpioOutService inst=ipName nTab=tabN index=""/]
+    [@generateConfigModelCode configModel=gpioOutService inst=ipName nTab=tabN index="" mode=type/]
 [/#if]
 [/#if]
 [#if serviceName=="dma" && dmaService??]
@@ -622,7 +616,7 @@ ETH_TxPacketConfig TxConfig;
     [#assign ind=dmaconfig.dmaRequestName?substring(dmaconfig.dmaRequestName?length-1)]
 #tif(${instHandler}->Instance == ${ipName}_Filter${ind}){
 [/#if]
-     [@generateConfigModelCode configModel=dmaconfig inst=ipName  nTab=tabN index=""/]
+     [@generateConfigModelCode configModel=dmaconfig inst=ipName  nTab=tabN index="" mode=type/]
         [#assign prefixList = dmaCurrentRequest?split("_")]
         [#list prefixList as p][#assign prefix= p][/#list]
         
@@ -1019,7 +1013,7 @@ ${variable.value} ${variable.name};
                [#if v?contains(variable.name)]
                [#-- no matches--]
                [#else]
-   #t${variable.value} ${variable.name};
+   #t${variable.value} ${variable.name} = {0};
                    [#assign v = v + " "+ variable.name/]	
                [/#if]	
            [/#list]  
@@ -1031,7 +1025,7 @@ ${variable.value} ${variable.name};
                [#if v?contains(variable.name)]
                [#-- no matches--]
                [#else]
-   #t${variable.value} ${variable.name};
+   #t${variable.value} ${variable.name} = {0};
                    [#assign v = v + " "+ variable.name/]	
                [/#if]	
            [/#list]  
@@ -1146,7 +1140,7 @@ static uint32_t ${entry.value}=0;
             [#if v?contains(variable.name)]
             [#-- no matches--]
             [#else]
-#t${variable.value} ${variable.name};
+#t${variable.value} ${variable.name} = {0};
                 [#assign v = v + " "+ variable.name/]	
             [/#if]	
         [/#list]  
@@ -1165,7 +1159,7 @@ static uint32_t ${entry.value}=0;
             [#if func_argument.genericType == "struct" && func_argument.context != "global"]
               [#if !list_contains(local_dma_variables, func_argument.name)]
                 [#assign local_dma_variables = local_dma_variables + " " + func_argument.name]
-#t${func_argument.typeName} ${func_argument.name};
+#t${func_argument.typeName} ${func_argument.name}= {0};
               [/#if]
             [/#if]
           [/#list]
@@ -1178,7 +1172,7 @@ static uint32_t ${entry.value}=0;
 [#if mspIsEmpty=="no"]
     [#if  words[0]?contains("DFSDM")]
         [#assign word0 = words[0]]  
-        [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || FamilyName == "STM32L4"]
+        [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE500" || FamilyName == "STM32L4"]
             #tif(${words[0]}_Init == 0)             
         [#else]
             #tif([#if word0.contains("DFSDM1")&& mode=="DFSDM_Channel"](IS_DFSDM1_CHANNEL_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Channel"]!(IS_DFSDM1_CHANNEL_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if][#if word0.contains("DFSDM1")&& mode=="DFSDM_Filter"](IS_DFSDM1_FILTER_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Filter"]!(IS_DFSDM1_FILTER_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if](${words[0]}_Init == 0)) 
@@ -1212,7 +1206,7 @@ static uint32_t ${entry.value}=0;
     [#if i>0] 
     [#if  words[i]?contains("DFSDM")]
 [#assign word0 = words[i]]  
-        [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || FamilyName == "STM32L4"]
+        [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE500" || FamilyName == "STM32L4"]
             #tif(${words[0]}_Init == 0)             
         [#else]
             #telse if([#if word0.contains("DFSDM1")&& mode=="DFSDM_Channel"](IS_DFSDM1_CHANNEL_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Channel"]!(IS_DFSDM1_CHANNEL_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if][#if word0.contains("DFSDM1")&& mode=="DFSDM_Filter"](IS_DFSDM1_FILTER_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Filter"]!(IS_DFSDM1_FILTER_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if](${words[i]}_Init == 0))
@@ -1326,7 +1320,7 @@ uint32_t DFSDM1_Init = 0;
                    [#if v?contains(variable.name)]
                    [#-- no matches--]
                    [#else]
-       #t${variable.value} ${variable.name};
+       #t${variable.value} ${variable.name} = {0};
                        [#assign v = v + " "+ variable.name/]	
                    [/#if]	
                [/#list]  
@@ -1337,7 +1331,7 @@ uint32_t DFSDM1_Init = 0;
 [#if mspIsEmpty1=="no"]
 [#if  words[0]?contains("DFSDM")]
 [#assign word0 = words[0]]  
-    [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || FamilyName == "STM32L4"]
+    [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE500" || FamilyName == "STM32L4"]
         #tif(${words[0]}_Init == 0)             
     [#else]
         #tif([#if word0.contains("DFSDM1")&& mode=="DFSDM_Channel"](IS_DFSDM1_CHANNEL_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Channel"]!(IS_DFSDM1_CHANNEL_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if][#if word0.contains("DFSDM1")&& mode=="DFSDM_Filter"](IS_DFSDM1_FILTER_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Filter"]!(IS_DFSDM1_FILTER_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if](${words[0]}_Init == 0))
@@ -1418,7 +1412,7 @@ uint32_t DFSDM1_Init = 0;
 [#assign words = instanceList]
 [#if words[0]?contains("DFSDM")]
 [#assign word0 = words[0]] 
-    [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || FamilyName == "STM32L4"]
+    [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE500" || FamilyName == "STM32L4"]
         #t${words[0]}_Init-- ;
         #tif(${words[0]}_Init == 0)           
     [#else]
@@ -1427,7 +1421,7 @@ uint32_t DFSDM1_Init = 0;
         #t#t${words[0]}_Init-- ;
         #t#tif((${words[0]}_Init == 0))
     [/#if]
-    [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || FamilyName == "STM32L4"]
+    [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE500" || FamilyName == "STM32L4"]
     [#else]
         
     [/#if]
@@ -1448,7 +1442,7 @@ uint32_t DFSDM1_Init = 0;
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspDeInit 1 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspDeInit 1 */
-[#if words[0]?contains("DFSDM") &&(DIE != "DIE451" && DIE != "DIE449" && DIE != "DIE441" && DIE != "DIE450" && FamilyName != "STM32L4" )]
+[#if words[0]?contains("DFSDM") &&(DIE != "DIE451" && DIE != "DIE449" && DIE != "DIE441" && DIE != "DIE450" && DIE != "DIE500" && FamilyName != "STM32L4" )]
 #t#t}
 [/#if]
 #t}
@@ -1457,7 +1451,7 @@ uint32_t DFSDM1_Init = 0;
         [#if i>0]
 [#if words[i]?contains("DFSDM")]
 [#assign word0 = words[i]]  
-    [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || FamilyName == "STM32L4"]        
+    [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE500" || FamilyName == "STM32L4"]        
     [#else]        
         #telse if([#if word0.contains("DFSDM1")&& mode=="DFSDM_Channel"](IS_DFSDM1_CHANNEL_INSTANCE(${mode?lower_case}Handle->Instance))[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Channel"]!(IS_DFSDM1_CHANNEL_INSTANCE(${mode?lower_case}Handle->Instance))[/#if][#if word0.contains("DFSDM1")&& mode=="DFSDM_Filter"](IS_DFSDM1_FILTER_INSTANCE(${mode?lower_case}Handle->Instance))[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Filter"]!(IS_DFSDM1_FILTER_INSTANCE(${mode?lower_case}Handle->Instance))[/#if])
         #t{
@@ -1482,7 +1476,7 @@ uint32_t DFSDM1_Init = 0;
 #t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspDeInit 1 */
 
 #n#t/* USER CODE END ${words[i]?replace("I2S","SPI")}_MspDeInit 1 */
-[#if words[i]?contains("DFSDM") &&(DIE != "DIE451" && DIE != "DIE449" && DIE != "DIE441" && DIE != "DIE450" && FamilyName != "STM32L4" )]
+[#if words[i]?contains("DFSDM") &&(DIE != "DIE451" && DIE != "DIE449" && DIE != "DIE441" && DIE != "DIE450" && DIE != "DIE500" && FamilyName != "STM32L4" )]
 #t#t}
 [/#if]
 #t}
@@ -1506,7 +1500,7 @@ uint32_t DFSDM1_Init = 0;
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspDeInit 1 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspDeInit 1 */
-[#if words[0]?contains("DFSDM")&&(DIE != "DIE451" && DIE != "DIE449" && DIE != "DIE441" && DIE != "DIE450" && FamilyName!="STM32L4")]
+[#if words[0]?contains("DFSDM")&&(DIE != "DIE451" && DIE != "DIE449" && DIE != "DIE441" && DIE != "DIE450" && DIE != "DIE500" && FamilyName!="STM32L4")]
 #t#t}
 [/#if]
 [/#if]
@@ -1529,13 +1523,5 @@ uint32_t DFSDM1_Init = 0;
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

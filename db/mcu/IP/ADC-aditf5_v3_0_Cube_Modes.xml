@@ -66,7 +66,7 @@
          <Condition Diagnostic="" Expression="Mode=ADC_MODE_INDEPENDENT | Mode=null "/>
         </RefParameter>   
         <RefParameter Comment="DMA Access Mode" DefaultValue="DISABLED" Group="ADCsgroup" Name="DMAAccessModeView" Type="list">
-          <Condition Diagnostic="" Expression="DualModeData=ADC_DMAACCESSMODE_DISABLED"/>
+          <Condition Diagnostic="" Expression="DualModeData=ADC_DUALMODEDATAFORMAT_DISABLED"/>
              <PossibleValue  Comment="DMA access mode disabled" Value="DISABLED" />
             <PossibleValue  Comment="DMA access mode enabled" Value="ENABLE"/>
         </RefParameter>
@@ -81,8 +81,8 @@
             <Condition Diagnostic="" Expression="Mode=ADC_MODE_INDEPENDENT | Mode=null "/>
         </RefParameter>
         
-        <RefParameter Comment="DMA Access Mode" DefaultValue="ADC_DMAACCESSMODE_DISABLED" Group="ADCsgroup" Name="DualModeData" Type="list" Visible="false">
-            <PossibleValue Action="Remove" Condition="DMAAccessModeView=ENABLE" Comment="DMA access mode enabled" Value="ADC_DMAACCESSMODE_DISABLED"/>
+        <RefParameter Comment="DMA Access Mode" DefaultValue="ADC_DUALMODEDATAFORMAT_DISABLED" Group="ADCsgroup" Name="DualModeData" Type="list" Visible="false">
+            <PossibleValue Action="Remove" Condition="DMAAccessModeView=ENABLE" Comment="DMA access mode enabled" Value="ADC_DUALMODEDATAFORMAT_DISABLED"/>
             <PossibleValue Action="Remove" Condition="(DMAAccessModeView=DISABLED) | (ADC_RESOLUTION16b_$IpInstance|ADC_RESOLUTION14b_$IpInstance|ADC_RESOLUTION12b_$IpInstance|ADC_RESOLUTION10b_$IpInstance)" Comment="DMA access mode enabled" Value="ADC_DUALMODEDATAFORMAT_8_BITS"/>
             <PossibleValue Action="Remove" Condition="(DMAAccessModeView=DISABLED) | (ADC_RESOLUTION8b_$IpInstance)" Comment="DMA access mode enabled" Value="ADC_DUALMODEDATAFORMAT_32_10_BITS"/>
         </RefParameter>
@@ -268,13 +268,13 @@
     </RefParameter>
   		
     <!-- Possible values of NbrOfDiscConversion parameter -->
-    <RefParameter Comment="Number Of Discontinuous Conversions" DefaultValue="1" Max="1" Min="1" Name="NbrOfDiscConversion" Type="integer" Visible="false">
+    <RefParameter Comment="Number Of Discontinuous Conversions" DefaultValue="__NULL" Max="1" Min="1" Name="NbrOfDiscConversion" Type="integer" Visible="false">
         <Condition Diagnostic="" Expression="DiscontinuousConvMode=DISABLE"/>
     </RefParameter>
     <RefParameter Comment="Number Of Discontinuous Conversions" DefaultValue="1" Group="ADCgroup" Max="8" Min="1" Name="NbrOfDiscConversion" Type="integer"/>
 		
     <!-- Possible values of DMAContinuousRequests parameter -->
-    <RefParameter Comment="DMA Continuous Requests" DefaultValue="DISABLE" Group="ADCgroup" Name="DMAContinuousRequests" Type="list">
+    <RefParameter Comment="DMA Continuous Requests" DefaultValue="DISABLE" Group="ADCgroup" Name="DMAContinuousRequests" Type="list" Visible="false">
         <PossibleValue Comment="Disabled" Value="DISABLE"/>
         <PossibleValue Comment="Enabled" Value="ENABLE"/>
         <Description>Enable/Disable DMA Continuous Requests</Description>
@@ -295,23 +295,24 @@
     </RefParameter>
         
     <!-- Possible values of BoostMode parameters -->
-    <RefParameter Comment="Boost Mode" DefaultValue="ENABLE" Group="ADCgroup" Name="BoostMode" Type="list">
+    <!--RefParameter Comment="Boost Mode" DefaultValue="ENABLE" Group="ADCgroup" Name="BoostMode" Type="list">
         <Condition Diagnostic="The slave must have the same value of the master" Expression="($IpNumber=2) &amp; USE_ADC2 &amp; USE_ADC1 &amp; (ADC1:BoostMode=ENABLE) &amp; !(Mode=ADC_MODE_INDEPENDENT)"/>
         <PossibleValue    Comment="Enabled" Value="ENABLE"/>
     </RefParameter> 
     <RefParameter Comment="Boost Mode" DefaultValue="DISABLE" Group="ADCgroup" Name="BoostMode" Type="list">
         <Condition Diagnostic="The slave must have the same value of the master" Expression="($IpNumber=2) &amp; USE_ADC2 &amp; USE_ADC1 &amp; (ADC1:BoostMode=DISABLE) &amp; !(Mode=ADC_MODE_INDEPENDENT)"/>
         <PossibleValue    Comment="Disabled" Value="DISABLE" />
-    </RefParameter>
+    </RefParameter-->
          
     <RefParameter Comment="Boost Mode" DefaultValue="DISABLE" Group="ADCgroup" Name="BoostMode" Type="list">
-        <!-- <Condition Diagnostic="The Boost Mode is enable when ADC clock is more than 20 MHz " Expression="(RCC:ADCFreq_Value &gt; 20000000)" /> -->
-        <Condition Diagnostic="" Expression="BoostMode_isNotAllowed"/>
+         <Condition Diagnostic="" Expression="(RCC:ADCFreq_Value&gt;20000000)" /> 
+                                                                                                                                  
+        <!--Condition Diagnostic="" Expression="BoostMode_isNotAllowed"/-->
         <PossibleValue    Comment="Disabled" Value="DISABLE"/>
         <Description>The Boost Mode is disable because the  ADC clock is less than 20 MHz to save power at lower clock frequency.</Description> 
     </RefParameter> 
     <RefParameter Comment="Boost Mode" DefaultValue="ENABLE" Group="ADCgroup" Name="BoostMode" Type="list">
-        <!-- <Condition Diagnostic="The Boost Mode is disable because the  ADC clock is less than 20 MHz to save power at lower clock frequency" Expression="(RCC:ADCFreq_Value &lt; 20000000)" /> -->
+        
         <PossibleValue    Comment="Enabled" Value="ENABLE" />
         <Description>The Boost Mode is enable when ADC clock is more than 20 MHz.</Description> 
     </RefParameter>
@@ -513,7 +514,7 @@
 	
     <!-- Possible Value of OffsetNumber parameters  -->
      <RefParameter Comment="Offset Number" DefaultValue="ADC_OFFSET_NONE" Group="ADCgroup" Name="OffsetNumber" Type="list">
-         <Condition Diagnostic="" Expression="Regular_OversamplingMode_Enabled_$IpInstance"/>
+         <Condition Diagnostic="" Expression="Regular_OversamplingMode_Enabled_$IpInstance | Injected_OversamplingMode_Enabled_$IpInstance"/>
         <PossibleValue Comment="No offset" Value="ADC_OFFSET_NONE"/>
      
         <Description>Regular Channel x offset number selection</Description>
@@ -884,7 +885,7 @@
         <Condition Diagnostic="" Expression="EnableInjectedConversion=DISABLE"/>
     </RefParameter>
       <RefParameter Comment="Offset Number" DefaultValue="ADC_OFFSET_NONE" Group="ADCgroup" Name="InjectedOffsetNumber" Type="list" >
-        <Condition Diagnostic="Offset is not supported with oversampling mode" Expression="Injected_OversamplingMode_Enabled_$IpInstance"/>
+        <Condition Diagnostic="Offset is not supported with oversampling mode" Expression="Injected_OversamplingMode_Enabled_$IpInstance | Regular_OversamplingMode_Enabled_$IpInstance"/>
         <PossibleValue Comment="No offset" Value="ADC_OFFSET_NONE"/>
     </RefParameter>
 
@@ -1533,7 +1534,7 @@
     <RefParameter Comment="Interrupt Mode" DefaultValue="DISABLE" Group="ADCgroup" Name="AWD3ITMode" Type="list">
         <PossibleValue Comment="Disabled" Value="DISABLE"/>
         <PossibleValue Comment="Enabled" Value="ENABLE"/>
-        <Description>Specifies whether the analog watchdog is configured is interrupt mode or in polling mode.</Description>
+        <Description>Specifies whether the analog watchdog is configured in interrupt mode or in polling mode.</Description>
     </RefParameter>
 	
 
@@ -1603,7 +1604,7 @@
     <RefParameter Comment="Interrupt Mode" DefaultValue="DISABLE" Group="ADCgroup" Name="AWD2ITMode" Type="list">
         <PossibleValue Comment="Disabled" Value="DISABLE"/>
         <PossibleValue Comment="Enabled" Value="ENABLE"/>
-        <Description>Specifies whether the analog watchdog is configured is interrupt mode or in polling mode.</Description>
+        <Description>Specifies whether the analog watchdog is configured in interrupt mode or in polling mode.</Description>
     </RefParameter>
 	
     
@@ -1780,7 +1781,7 @@
     <RefParameter Comment="Interrupt Mode" DefaultValue="DISABLE" Group="ADCgroup" Name="AWD1ITMode" Type="list">
         <PossibleValue Comment="Disabled" Value="DISABLE"/>
         <PossibleValue Comment="Enabled" Value="ENABLE"/>
-        <Description>Specifies whether the analog watchdog is configured is interrupt mode or in polling mode.</Description>
+        <Description>Specifies whether the analog watchdog is configured in interrupt mode or in polling mode.</Description>
     </RefParameter>	
 	
     <!-- List of all available channel used to -->

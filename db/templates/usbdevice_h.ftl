@@ -49,8 +49,8 @@
 [#-- Global variables --]
 [#if IP.variables??]
 	[#list IP.variables as variable]
-/** USB device core handle. */
-extern ${variable.value} ${variable.name};
+[#--/** USB device core handle. */--]
+[#--extern ${variable.value} ${variable.name};--]
 	[/#list]
 [/#if]
 [#-- Global variables --]

@@ -22,16 +22,13 @@
 
                     [#assign IpInstance = variables.value]
 
-[#if IpInstance?contains("GPIO") && IpInstance != Prev_IpInstance]
-                    [#if i == 0] [#assign type0="CS"] [#assign port0=IpName][#assign pin0=IpInstance][/#if]
-                    [#if i == 1] [#assign type1="WRX"][#assign port1=IpName][#assign pin1=IpInstance][/#if]
-                    [#if i == 2] [#assign type2="RDX"][#assign port2=IpName][#assign pin2=IpInstance][/#if]
-
-
-
- [#assign i = i + 1]
-[#assign Prev_IpInstance = variables.value]
-[/#if]
+                    [#if IpInstance?contains("GPIO") && IpInstance != Prev_IpInstance]
+                        [#if BSPIP.ipName?contains("Chip Select")] [#assign type0="CS"] [#assign port0=IpName][#assign pin0=IpInstance][/#if]
+                        [#if BSPIP.ipName?contains("WRX High")] [#assign type1="WRX"][#assign port1=IpName][#assign pin1=IpInstance][/#if]
+                        [#if BSPIP.ipName?contains("RDX High")] [#assign type2="RDX"][#assign port2=IpName][#assign pin2=IpInstance][/#if]
+                        [#assign i = i + 1]
+                        [#assign Prev_IpInstance = variables.value]
+                     [/#if]
 
 [#if IpInstance?contains("SPI")]
 [#assign spiExist = "1"]

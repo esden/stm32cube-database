@@ -184,16 +184,26 @@ extern CONST TSL_Bank_T MyBanks[];
     [#if SWIP.defines??]
         [#list SWIP.defines as define]
 [#-- if touchkey --]
-            [#if define.name == "TSLPRM_TOTAL_ALL_TOUCHKEYS"]
+            [#if define.name == "TSLPRM_TOTAL_TOUCHKEYS"]
                 [#if define.value != "0"]
                     [#lt]extern CONST TSL_TouchKey_T MyTKeys[];
                 [/#if]
             [/#if]
+            [#if define.name == "TSLPRM_TOTAL_TOUCHKEYS_B"]
+                [#if define.value != "0"]
+                    [#lt]extern CONST TSL_TouchKeyB_T MyTKeysB[];
+                [/#if]
+            [/#if]
 [#-- *************end of touchkey user parameter******************* --]
 [#-- if lin/rot --]
-            [#if define.name == "TSLPRM_TOTAL_LINROTS + TSLPRM_TOTAL_LINROTS_B"]
+            [#if define.name == "TSLPRM_TOTAL_LINROTS"]
                 [#if define.value != "0"]
                     [#lt]extern CONST TSL_LinRot_T MyLinRots[];
+                [/#if]
+            [/#if]
+            [#if define.name == "TSLPRM_TOTAL_LINROTS_B"]
+                [#if define.value != "0"]
+                    [#lt]extern CONST TSL_LinRotB_T MyLinRotsB[];
                 [/#if]
             [/#if]
 [#-- *************end of lin/rot user parameter******************** --]

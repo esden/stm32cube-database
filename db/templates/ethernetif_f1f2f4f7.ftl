@@ -51,7 +51,7 @@
 [/#list][/#compress]
 
 /* Includes ------------------------------------------------------------------*/
-#include "${FamilyName?lower_case}xx_hal.h"
+#include "main.h"
 #include "lwip/opt.h"
 [#compress]
 [#if with_rtos == 0]

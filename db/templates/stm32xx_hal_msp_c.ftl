@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * File Name          : ${FamilyName?lower_case}xx_hal_msp.c
@@ -8,8 +9,13 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
+
 /* Includes ------------------------------------------------------------------*/
-#include "${FamilyName?lower_case}xx_hal.h"
+#include "${main_h}"
+/* USER CODE BEGIN Includes */
+
+/* USER CODE END Includes */
 [#function list_contains string_list element]
   [#list string_list?split(" ") as string_element]
     [#if string_element == element]
@@ -19,18 +25,53 @@
   [#return false]
 [/#function]
 [#compress]
+[#assign cmp = false]
 [#-- Add global dma Handler --]
 [#list IPdatas as IP]  
 [#list IP.configModelList as instanceData]
     [#if instanceData.dmaHandel??]
         [#list instanceData.dmaHandel as dHandle]
             extern ${dHandle};#n
+            [#assign cmp = true] [#-- Flag to check if DMA is used--]
         [/#list]
+
     [/#if]
 [/#list]
 [/#list]
-extern void _Error_Handler(char *, int);
+
 [/#compress]
+#n
+
+
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN TD */
+
+/* USER CODE END TD */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN Define */
+ 
+/* USER CODE END Define */
+
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN Macro */
+
+/* USER CODE END Macro */
+
+/* Private variables ---------------------------------------------------------*/
+/* USER CODE BEGIN PV */
+
+/* USER CODE END PV */
+
+/* Private function prototypes -----------------------------------------------*/
+/* USER CODE BEGIN PFP */
+
+/* USER CODE END PFP */
+
+/* External functions --------------------------------------------------------*/
+/* USER CODE BEGIN ExternalFunctions */
+
+/* USER CODE END ExternalFunctions */
 
 /* USER CODE BEGIN 0 */
 
@@ -63,7 +104,9 @@ void HAL_MspInit(void)
 #n
 
   [#if NVICPriorityGroup??]
+  [#if NVICPriorityGroup!="NVIC_PRIORITYGROUP_4"]
 #tHAL_NVIC_SetPriorityGrouping(${NVICPriorityGroup});#n
+  [/#if]
   [/#if]
 
 [#-- configure system interrupts (RCC, systick, ...) --]
@@ -86,8 +129,12 @@ void HAL_MspInit(void)
 #t/* Peripheral interrupt init */
 [/#if]
 [#if initVector.codeInMspInit]
+    [#if initVector.systemHandler=="false" || initVector.preemptionPriority!="0" || initVector.subPriority!="0"]
+    [#if initVector.vector!="SysTick_IRQn"]
     #t/* ${initVector.vector} interrupt configuration */
     #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+    [/#if]
+    [/#if]
     [#if initVector.systemHandler=="false"]
       #tHAL_NVIC_EnableIRQ(${initVector.vector});
     [/#if]
@@ -279,7 +326,12 @@ void HAL_MspInit(void)
 [#-- *************************************** --]
 
 [#-- macro generateConfigModelCode --]
-[#macro generateConfigModelCode configModel inst nTab index]
+[#macro generateConfigModelCode configModel inst nTab index mode]
+[#if configModel.clockEnableMacro?? && mode=="Init"] [#-- Enable Port clock --]
+    [#list configModel.clockEnableMacro as clkmacroList]	
+            [#if nTab==2]#t#t[#else]#t[/#if]${clkmacroList}();
+    [/#list]
+[/#if] 
 [#if configModel.methods??] [#-- if the pin configuration contains a list of LibMethods--]
     [#assign methodList = configModel.methods]
 [#else] [#assign methodList = configModel.libMethod]
@@ -440,7 +492,7 @@ void HAL_MspInit(void)
                                 [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                                 [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
                                 [#if nTab==2]#t#t[#else]#t[/#if]{
-                                [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
+                                [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
                                 [#if nTab==2]#t#t[#else]#t[/#if]}
                             [/#if]#n                                    
 		[#else]
@@ -451,7 +503,7 @@ void HAL_MspInit(void)
                                 [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                                 [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
                                 [#if nTab==2]#t#t[#else]#t[/#if]{
-                                [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
+                                [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
                                 [#if nTab==2]#t#t[#else]#t[/#if]}
                             [/#if]#n                             
                 [/#if]			
@@ -521,7 +573,7 @@ void HAL_MspInit(void)
                                 [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                                 [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
                                 [#if nTab==2]#t#t[#else]#t[/#if]{
-                                [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
+                                [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
                                 [#if nTab==2]#t#t[#else]#t[/#if]}
                             [/#if]#n                                 
                         [/#if]
@@ -559,12 +611,12 @@ void HAL_MspInit(void)
    
 [#if serviceName=="gpio"]
  [#assign instanceIndex =""]
-    [@generateConfigModelCode configModel=gpioService inst=ipName nTab=tabN index=""/]
+    [@generateConfigModelCode configModel=gpioService inst=ipName nTab=tabN index="" mode=type/]
 [/#if]
 [#if serviceName=="gpioOut" && service.gpioOut??]
  [#assign instanceIndex =""]
 [#if gpioOutService!="empty"]
-    [@generateConfigModelCode configModel=gpioOutService inst=ipName nTab=tabN index=""/]
+    [@generateConfigModelCode configModel=gpioOutService inst=ipName nTab=tabN index="" mode=type/]
 [/#if]
 [/#if]
 [#if serviceName=="dma" && dmaService??]
@@ -583,7 +635,7 @@ void HAL_MspInit(void)
     [#assign ind=dmaconfig.dmaRequestName?substring(dmaconfig.dmaRequestName?length-1)]
 #tif(${instHandler}->Instance == ${ipName}_Filter${ind}){
 [/#if]
-     [@generateConfigModelCode configModel=dmaconfig inst=ipName  nTab=tabN index=""/]
+     [@generateConfigModelCode configModel=dmaconfig inst=ipName  nTab=tabN index="" mode=type/]
         
         [#assign prefixList = dmaCurrentRequest?split("_")]
         [#list prefixList as p][#assign prefix= p][/#list]
@@ -737,7 +789,7 @@ void HAL_MspInit(void)
     [/#if]
     
 [#if gpioExist]
-#t[@generateConfigCode ipName=ipName type=serviceType serviceName="gpio" instHandler=instHandler tabN=tabN/]
+#t[@generateConfigCode ipName=ipName type=serviceType serviceName="gpio" instHandler=instHandler tabN=tabN/] [#-- generate gpio init config for peripheral --]
 [/#if]
 [#-- if I2C clk_enable should be after GPIO Init Begin --]
     [#if serviceType=="Init" && (ipName?contains("I2C")||(ipName?contains("USB")))] 
@@ -1058,7 +1110,14 @@ static uint32_t ${entry.value}=0;
     [/#list]
 [#assign DFSDM_var = "true"]
 [/#if]
-
+[#compress]
+/**
+  * @brief ${mode} MSP Initialization
+  *        This function configures the hardware resources used in this example
+  * @param h${mode?lower_case}: ${mode} handle pointer
+  * @retval None
+  */
+[/#compress]
 [#-- #nvoid HAL_${mode}_MspInit(${mode}_HandleTypeDef* h${mode?lower_case}){--] 
 [#if !mode?contains("TIM")||mode?contains("LPTIM")||mode?contains("HRTIM")]
 #nvoid ${entry.key}(${mode}_HandleTypeDef* h${mode?lower_case})
@@ -1115,7 +1174,7 @@ static uint32_t ${entry.value}=0;
                [#if v?contains(variable.name)]
                [#-- no matches--]
                [#else]
-   #t${variable.value} ${variable.name};
+   #t${variable.value} ${variable.name} = {0};
                    [#assign v = v + " "+ variable.name/]	
                [/#if]	
            [/#list]  
@@ -1149,7 +1208,7 @@ static uint32_t ${entry.value}=0;
     
     [#if  words[0].contains("DFSDM")]
         [#assign word0 = words[0]]  
-            [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || FamilyName == "STM32L4"]
+            [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE500" || FamilyName == "STM32L4"]
                 #tif(${words[0]}_Init == 0)             
             [#else]
             #tif([#if word0.contains("DFSDM1")&& mode=="DFSDM_Channel"](IS_DFSDM1_CHANNEL_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Channel"]!(IS_DFSDM1_CHANNEL_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM1")&& mode=="DFSDM_Filter"](IS_DFSDM1_FILTER_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Filter"]!(IS_DFSDM1_FILTER_INSTANCE(h${mode?lower_case}->Instance))&&[/#if](${words[0]}_Init == 0))   
@@ -1178,7 +1237,7 @@ static uint32_t ${entry.value}=0;
     [#if i>0]    
     [#if  inst.contains("DFSDM")]
     [#assign word0 = inst]  
-        [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || FamilyName == "STM32L4"]
+        [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE500" || FamilyName == "STM32L4"]
             #tif(${inst}_Init == 0)             
         [#else]
              #telse if([#if word0.contains("DFSDM1")&& mode=="DFSDM_Channel"](IS_DFSDM1_CHANNEL_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Channel"]!(IS_DFSDM1_CHANNEL_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM1")&& mode=="DFSDM_Filter"](IS_DFSDM1_FILTER_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Filter"]!(IS_DFSDM1_FILTER_INSTANCE(h${mode?lower_case}->Instance))&&[/#if](${inst}_Init == 0))
@@ -1288,7 +1347,7 @@ uint32_t DFSDM_Init = 0;
             [#if v?contains(variable.name)]
             [#-- no matches--]
             [#else]
-#t${variable.value} ${variable.name};
+#t${variable.value} ${variable.name} = {0};
                 [#assign v = v + " "+ variable.name/]	
             [/#if]	
         [/#list]  
@@ -1298,7 +1357,7 @@ uint32_t DFSDM_Init = 0;
 
 [#if  words[0]?contains("DFSDM")]
     [#assign word0 = words[0]]  
-    [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || FamilyName == "STM32L4"]
+    [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE500" || FamilyName == "STM32L4"]
         #tif(${inst}_Init == 0)             
     [#else]
          #tif([#if word0.contains("DFSDM1")&& mode=="DFSDM_Channel"](IS_DFSDM1_CHANNEL_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Channel"]!(IS_DFSDM1_CHANNEL_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM1")&& mode=="DFSDM_Filter"](IS_DFSDM1_FILTER_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Filter"]!(IS_DFSDM1_FILTER_INSTANCE(h${mode?lower_case}->Instance))&&[/#if](${words[0]}_Init == 0))
@@ -1324,7 +1383,7 @@ uint32_t DFSDM_Init = 0;
         [#if i>0]   
             [#if  words[i]?contains("DFSDM")]
                 [#assign word0 = words[i]] 
-                [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || FamilyName == "STM32L4"]
+                [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE500" || FamilyName == "STM32L4"]
                     #tif(${words[i]}_Init == 0)             
                 [#else]
                      #tif([#if word0.contains("DFSDM1")&& mode=="DFSDM_Channel"](IS_DFSDM1_CHANNEL_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Channel"]!(IS_DFSDM1_CHANNEL_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM1")&& mode=="DFSDM_Filter"](IS_DFSDM1_FILTER_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Filter"]!(IS_DFSDM1_FILTER_INSTANCE(h${mode?lower_case}->Instance))&&[/#if](${words[i]}_Init == 0))
@@ -1375,6 +1434,12 @@ uint32_t DFSDM_Init = 0;
 [#assign instanceList = entry.value]
 [#assign mode=entry.key?replace("_MspDeInit","")?replace("MspDeInit","")?replace("_BspDeInit","")?replace("HAL_","")]
 [#assign ipHandler = "h" + mode?lower_case]
+/**
+  * @brief ${mode} MSP De-Initialization
+  *        This function freeze the hardware resources used in this example
+  * @param h${mode?lower_case}: ${mode} handle pointer
+  * @retval None
+  */
 [#if !mode?contains("TIM")||mode?contains("LPTIM")||mode?contains("HRTIM")]
 #nvoid ${entry.key}(${mode}_HandleTypeDef* h${mode?lower_case})
 {
@@ -1388,7 +1453,7 @@ uint32_t DFSDM_Init = 0;
 [#assign words = instanceList]
 [#if words[0]?contains("DFSDM")]
 [#assign word0 = words[0]]  
-    [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || FamilyName == "STM32L4"]
+    [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE500" || FamilyName == "STM32L4"]
         #t${words[0]}_Init-- ;
         #tif(${words[0]}_Init == 0)           
     [#else]
@@ -1416,7 +1481,7 @@ uint32_t DFSDM_Init = 0;
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspDeInit 1 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspDeInit 1 */
-[#if words[0]?contains("DFSDM")&&!(DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || FamilyName == "STM32L4")]
+[#if words[0]?contains("DFSDM")&&!(DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE500" || FamilyName == "STM32L4")]
 #t#t}
 [/#if]
 #t}
@@ -1425,7 +1490,7 @@ uint32_t DFSDM_Init = 0;
         [#if i>0]
 [#if words[i]?contains("DFSDM")]
 [#assign word0 = words[i]]  
-    [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || FamilyName == "STM32L4"]
+    [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE500" || FamilyName == "STM32L4"]
         #t${words[i]}_Init-- ;
         #tif(${words[i]}_Init == 0)           
     [#else]
@@ -1437,7 +1502,7 @@ uint32_t DFSDM_Init = 0;
 [#else]
 #telse if(h${mode?lower_case}->Instance==${words[i]?replace("I2S","SPI")})
 [/#if]
-[#if words[i]?contains("DFSDM")&&!(DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || FamilyName == "STM32L4")]
+[#if words[i]?contains("DFSDM")&&!(DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE500" || FamilyName == "STM32L4")]
 #t#t{
 [#else]
 #t{
@@ -1452,7 +1517,7 @@ uint32_t DFSDM_Init = 0;
 #t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspDeInit 1 */
 
 #n#t/* USER CODE END ${words[i]?replace("I2S","SPI")}_MspDeInit 1 */
-[#if words[i]?contains("DFSDM")&&!(DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || FamilyName == "STM32L4")]
+[#if words[i]?contains("DFSDM")&&!(DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE500" || FamilyName == "STM32L4")]
 #t#t}
 [/#if]
 #t}
@@ -1474,7 +1539,7 @@ uint32_t DFSDM_Init = 0;
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspDeInit 1 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspDeInit 1 */
-[#if words[0]?contains("DFSDM")&&!(DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || FamilyName == "STM32L4")]
+[#if words[0]?contains("DFSDM")&&!(DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE500" || FamilyName == "STM32L4")]
 #t#t}
 [/#if]
 [#if ipvar.instanceNbre >  1 || words[0]?contains("DFSDM")] [#-- IF number of IP instances greater than 0--]
@@ -1505,12 +1570,5 @@ uint32_t DFSDM_Init = 0;
 
 /* USER CODE END 1 */
 
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -106,7 +106,17 @@ extern ${variable.value} ${variable.name};
 #define GUI_WINSUPPORT                (1)    /* Use window manager */
 #define GUI_SUPPORT_MEMDEV            (1)    /* Memory device package available */
 #define GUI_SUPPORT_DEVICES           (1)    /* Enable use of device pointers */
- 
+[#elseif definition.name = "GUI_RGB_ORDERING"]
+
+/* This define swaps the meaning of a logical color from
+   ABGR to ARGB.
+   
+   It further swaps the meaning of a transparent pixel:
+   ABGR: 0x00 means opaque, 0xFF means transparent (default)
+   ARGB: 0x00 means transparent, 0xFF means opaque
+*/
+#define GUI_USE_ARGB [#if definition.value=="ARGB"]1[#else]0[/#if]
+
 [/#if]
 [/#list]
 [/#if]

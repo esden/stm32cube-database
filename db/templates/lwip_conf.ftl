@@ -18,7 +18,7 @@
 #ifndef __${inclusion_protection}__
 #define __${inclusion_protection}__
 
-#include "${FamilyName?lower_case}xx_hal.h"
+#include "main.h"
 
 [#-- SWIPdatas is a list of SWIPconfigModel --]
 [#list SWIPdatas as SWIP]

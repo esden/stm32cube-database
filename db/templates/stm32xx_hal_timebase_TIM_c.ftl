@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    ${FamilyName?lower_case}xx_hal_timebase_TIM.c 
@@ -7,24 +8,17 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
 #include "${FamilyName?lower_case}xx_hal.h"
 #include "${FamilyName?lower_case}xx_hal_tim.h"
-/** @addtogroup STM32F7xx_HAL_Examples
-  * @{
-  */
-
-/** @addtogroup HAL_TimeBase
-  * @{
-  */ 
-
+ 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 TIM_HandleTypeDef        h${instance?lower_case}; 
-uint32_t                 uwIncrementState = 0;
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 
@@ -34,7 +28,7 @@ uint32_t                 uwIncrementState = 0;
   *         Tick interrupt priority. 
   * @note   This function is called  automatically at the beginning of program after
   *         reset by HAL_Init() or at any time when clock is configured, by HAL_RCC_ClockConfig(). 
-  * @param  TickPriority: Tick interrupt priorty.
+  * @param  TickPriority: Tick interrupt priority.
   * @retval HAL status
   */
 [#assign APB = "APB2"]
@@ -154,12 +148,5 @@ void TIM6_DAC_IRQHandler(void)
   HAL_TIM_IRQHandler(&h${instance});
 }--]
 
-/**
-  * @}
-  */ 
-
-/**
-  * @}
-  */ 
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

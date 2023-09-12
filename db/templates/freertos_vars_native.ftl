@@ -5,10 +5,21 @@
 [#assign timerControlBlock  = "NULL"]
 [#assign queueControlBlock  = "NULL"]
 [#assign semaphoreControl   = "NULL"]
-[#assign USE_MPU = "0"]
+[#assign nbThreads = 0]
+[#assign useMPU = "0"]
 
 [#list SWIPdatas as SWIP]
-  [#if SWIP.variables??]  
+  [#if SWIP.defines??]
+    [#list SWIP.defines as definition]
+      [#if definition.name=="USE_MPU"]
+        [#assign useMPU = definition.value]
+      [/#if]
+     [/#list]
+  [/#if]
+[/#list]     
+
+[#list SWIPdatas as SWIP]
+  [#if SWIP.variables??]
     [#list SWIP.variables as variable]
       [#if variable.name=="Threads"]
         [#assign s = variable.valueList]
@@ -46,12 +57,18 @@
           [/#if]
           [#assign index = index + 1]
         [/#list]
-        TaskHandle_t ${threadName}Handle;
-        [#if threadControlBlock != "NULL"]
-          [#-- /* Buffer that the task being created will use as its stack. */ --]
-          StackType_t ${threadBuffer}[ ${threadStackSize} ];
-          [#-- /* Structure that will hold the TCB of the task being created. */ --]
-          StaticTask_t ${threadControlBlock};
+        [#assign nbThreads = nbThreads + 1]
+        
+        [#if nbThreads == 1 && useMPU == "1"]
+          [#-- For Dory and MPU: do not generate default task --]
+        [#else]
+          TaskHandle_t ${threadName}Handle;
+          [#if threadControlBlock != "NULL"]
+            [#-- /* Buffer that the task being created will use as its stack. */ --]
+            StackType_t ${threadBuffer}[ ${threadStackSize} ];
+            [#-- /* Structure that will hold the TCB of the task being created. */ --]
+            StaticTask_t ${threadControlBlock};
+          [/#if]
         [/#if]
       [/#if]
       
@@ -225,37 +242,7 @@
         [/#if]
       [/#if]
     [/#list] 
+     
   [/#if]
 [/#list]
-
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-     [#list SWIP.defines as definition]
-        [#if definition.name=="USE_MPU"]
-          [#if definition.value=="1"]
-#n/* For using MPU properly: to be cleaned for final version */
-#if defined ( __GNUC__ )
-extern uint32_t __FLASH_segment_start__[];
-extern uint32_t __FLASH_segment_end__[];
-extern uint32_t __SRAM_segment_end__[];
-extern uint32_t __privileged_functions_start__[];
-extern uint32_t __privileged_functions_end__[];
-extern uint32_t __privileged_data_start__[];
-extern uint32_t __privileged_data_end__[];
-#else
-const uint32_t * __FLASH_segment_start__ = ( uint32_t * ) 0x08000000UL;
-const uint32_t * __FLASH_segment_end__ = ( uint32_t * ) 0x08100000UL;
-const uint32_t * __SRAM_segment_start__ = ( uint32_t * ) 0x20000000UL;
-const uint32_t * __SRAM_segment_end__ = ( uint32_t * ) 0x20050000UL;
-const uint32_t * __privileged_functions_start__ = ( uint32_t * ) 0x08000000UL;
-const uint32_t * __privileged_functions_end__ = ( uint32_t * ) 0x08004000UL;
-const uint32_t * __privileged_data_start__ = ( uint32_t * ) 0x20000000UL;
-const uint32_t * __privileged_data_end__ = ( uint32_t * ) 0x20000200UL;
-#endif        
-          [/#if]
-        [/#if]
-     [/#list]
- [/#if]
-[/#list]
-
 [/#compress]

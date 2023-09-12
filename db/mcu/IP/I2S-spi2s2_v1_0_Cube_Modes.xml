@@ -20,7 +20,7 @@
         <PossibleValue Comment="Mode Master Transmit" Value="I2S_MODE_MASTER_TX" Semaphore="$IpInstance_TX"/>
         <PossibleValue Comment="Mode Master Receive" Value="I2S_MODE_MASTER_RX" Semaphore="$IpInstance_RX"/>
     </RefParameter>
-    <RefParameter Comment="Transmission Mode" DefaultValue="I2S_MODE_SLAVE_TX" Name="Mode" Type="list" Group="Generic Parameters">
+    <RefParameter Comment="Transmission Mode" DefaultValue="I2S_MODE_SLAVE_RX" Name="Mode" Type="list" Group="Generic Parameters">
         <Condition Expression="$IpInstance_Slave" Diagnostic=""/>
         <PossibleValue Comment="Mode Slave Transmit" Value="I2S_MODE_SLAVE_TX" Semaphore="$IpInstance_TX"/>
         <PossibleValue Comment="Mode Slave Receive" Value="I2S_MODE_SLAVE_RX" Semaphore="$IpInstance_RX"/>
@@ -117,7 +117,13 @@
         <PossibleValue Comment="Ws Inversion Disable" Value="I2S_WS_INVERSION_DISABLE"/>
         <PossibleValue Comment="Ws Inversion Enable" Value="I2S_WS_INVERSION_ENABLE"/>
     </RefParameter>
+    <RefParameter Comment="Io Swap" DefaultValue="I2S_IO_SWAP_ENABLE" Name="IOSwap" Type="list" Group="Advanced Parameters">
+        <Condition Expression="($IpInstance_RX &amp; $IpInstance_SEM_Half_Duplex_Master) | ($IpInstance_TX &amp; $IpInstance_SEM_Half_Duplex_Slave)" Diagnostic=""/>
+        <Description>Invert MISO/MOSI alternate functions This parameter can be a value of Control I2S IO Swap </Description>
+        <PossibleValue Comment="Io Swap Enable" Value="I2S_IO_SWAP_ENABLE"/>
+    </RefParameter>
     <RefParameter Comment="Io Swap" DefaultValue="I2S_IO_SWAP_DISABLE" Name="IOSwap" Type="list" Group="Advanced Parameters">
+        <Condition Expression="!(($IpInstance_RX &amp; $IpInstance_SEM_Half_Duplex_Master) | ($IpInstance_TX &amp; $IpInstance_SEM_Half_Duplex_Slave))" Diagnostic=""/>
         <Description>Invert MISO/MOSI alternate functions This parameter can be a value of Control I2S IO Swap </Description>
         <PossibleValue Comment="Io Swap Disable" Value="I2S_IO_SWAP_DISABLE"/>
         <PossibleValue Comment="Io Swap Enable" Value="I2S_IO_SWAP_ENABLE"/>
@@ -333,14 +339,16 @@
                         <Signal Name="WS"/>
                     </SignalLogicalOp>
                     <Semaphore>$IpInstance_Master</Semaphore>
+        	    <Semaphore>$IpInstance_SEM_Half_Duplex_Master</Semaphore>
                 </Mode>
                 <Mode Name="Half_Duplex_Slave" UserName="Half-Duplex Slave">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="CK"/>
-                        <Signal Name="SDO"/>
+                        <Signal Name="SDI"/>
                         <Signal Name="WS"/>
                     </SignalLogicalOp>
                     <Semaphore>$IpInstance_Slave</Semaphore>
+        	    <Semaphore>$IpInstance_SEM_Half_Duplex_Slave</Semaphore>
                 </Mode>
             </ModeLogicOperator>
             <Semaphore>$IpInstance</Semaphore>

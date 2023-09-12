@@ -17,15 +17,8 @@
 
 /* Includes ------------------------------------------------------------------*/
 [#compress]
-[#assign includesList = ""]
-[#if includes??]
-    [#list includes as include]
-        [#if !includesList?contains(include)]
-#include "${include}"
-            [#assign includesList = includesList+" "+include]
-        [/#if]
-    [/#list]
-[/#if]
+#include "main.h"
+
 [#if H7_ETH_NoLWIP?? &&HALCompliant??]
 #include "string.h"
 [/#if]
@@ -56,7 +49,7 @@ extern ${variable.value} ${variable.name};
 
 /* USER CODE END Private defines */
 #n
-extern void _Error_Handler(char *, int);
+
 [#-- extract hal mode list used by all instances of the ip --]
 [#assign halModeList= ""]
 

@@ -45,6 +45,9 @@
     <RefParameter Comment="Baud Rate" DefaultValue="115200" Group="Basic Parameters" Max="115200" Min="115200" Name="BaudRate" Type="integer" Unit="Bits/s" Visible="false">
         <Condition Diagnostic="" Expression="$IpInstance_UART_AutoBaudRate_Enable"/>
     </RefParameter>
+    <RefParameter Comment="Baud Rate" DefaultValue="921600" Group="Basic Parameters" Max="10500000" Min="110" Name="BaudRate" Type="integer" Unit="Bits/s">
+        <Condition Diagnostic="" Expression="USBPD_$IpInstance"/>
+    </RefParameter>
     <RefParameter Comment="Baud Rate" DefaultValue="115200" Group="Basic Parameters" Max="10500000" Min="110" Name="BaudRate" Type="integer" Unit="Bits/s" Visible="true"/>
    
 	
@@ -1029,12 +1032,12 @@
     <RefParameter Comment="Auto Baudrate Mode" DefaultValue="null" Group="Advanced Features" Name="AutoBaudRateMode" Type="list" Visible="false"/>
 
 
-    <RefParameter Comment="Nss" DefaultValue="USART_NSS_HW" Group="Advanced Parameters" Name="NSS" Type="list">
-        <Condition Diagnostic="" Expression="$IpInstance_Hardware_Management"/>
+    <RefParameter Visible="false" Comment="Nss" DefaultValue="USART_NSS_HW" Group="Advanced Parameters" Name="NSS" Type="list">
+        <Condition Diagnostic="" Expression="$IpInstance_Hardware_Management &amp; $IpInstance_Slave_Select"/>
         <PossibleValue Comment="Hardware management" Value="USART_NSS_HW"/>
-        <PossibleValue Comment="Software management" Value="USART_NSS_SW"/>
     </RefParameter>
-    <RefParameter Comment="Nss" DefaultValue="USART_NSS_SW" Group="Advanced Parameters" Name="NSS" Type="list">	 
+    <RefParameter Visible="false" Comment="Nss" DefaultValue="USART_NSS_SW" Group="Advanced Parameters" Name="NSS" Type="list">
+        <Condition Diagnostic="" Expression="$IpInstance_Software_Management &amp; $IpInstance_Slave_Select"/>
         <PossibleValue Comment="Software management" Value="USART_NSS_SW"/>
     </RefParameter>
 		
@@ -1663,7 +1666,7 @@
             <ModeLogicOperator Name="XOR">
                 <Mode Name="CTS_Only" UserName="CTS Only">
                     <SignalLogicalOp Name="AND">
-                        <Signal Name="CTS_NSS"/>
+                        <Signal Name="CTS"/>
                     </SignalLogicalOp>
                     <Semaphore>$IpInstance_Clear</Semaphore>
                 </Mode>
@@ -1675,7 +1678,7 @@
                 </Mode>
                 <Mode Name="CTS_RTS" UserName="CTS/RTS">
                     <SignalLogicalOp Name="AND">
-                        <Signal Name="CTS_NSS"/>
+                        <Signal Name="CTS"/>
                         <Signal Name="RTS"/>
                     </SignalLogicalOp>
                     <Semaphore>$IpInstance_CTS_RTS</Semaphore>
@@ -1712,13 +1715,13 @@
             <ModeLogicOperator Name="XOR">
                 <Mode Name="Software NSS Management">
                     <SignalLogicalOp Name="AND">
-                        <Signal Name="CTS_NSS"/>
+                        <Signal Name="VNSS"/>
                     </SignalLogicalOp>
                     <Semaphore>$IpInstance_Software_Management</Semaphore>
                 </Mode>
                 <Mode Name="Hardware NSS Management">
                     <SignalLogicalOp Name="AND">
-                        <Signal Name="CTS_NSS"/>
+                        <Signal Name="NSS"/>
                     </SignalLogicalOp>
                     <Semaphore>$IpInstance_Hardware_Management</Semaphore>
                 </Mode>
@@ -1731,7 +1734,9 @@
 
     <!-- RefSignal for USART/UART/IRDA/SmartCard -->
     <RefSignal IOMode="AlternateFunctionPushPull" Name="CK"/>
-    <RefSignal IOMode="AlternateFunctionPushPull" Name="CTS_NSS"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="CTS"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="NSS"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="VNSS" Virtual="true"/>
     <RefSignal IOMode="AlternateFunctionPushPull" Name="RTS"/>
     <RefSignal IOMode="AlternateFunctionPushPull" Name="DE"/>
     <RefSignal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPP" Name="RX"/>

@@ -1,4 +1,5 @@
 [#ftl]
+[#--  Default template in Config file of old series --]
 [#-- IPdatas is a list of IPconfigModel --]  
 [#list IPdatas as IP]  
 	[#assign ipvar = IP] 

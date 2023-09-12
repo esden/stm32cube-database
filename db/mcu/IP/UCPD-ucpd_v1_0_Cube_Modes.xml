@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP  xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+    ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
+    xmlns="http://mcd.rou.st.com/modules.php?name=mcu"
+    DBVersion="V4.0"
+    IPType="peripheral"
+    Name="UCPD"
+    Version="ucpd_v1_0_Cube">
+
+    <About>UCPD: Universal Serial Bus Type-C with Power Delivery</About>
+
+    <!-- Generic RefParameters for USB Type-C with Power Delivery Modes -->
+    <RefParameter Name="Version" DefaultValue="1.0" Comment="Version" Type="String" />
+
+    <!-- RefModes for UCPD -->
+    <RefMode Name="UCPD_Activate">
+        <ConfigForMode>UCPD_Init</ConfigForMode>
+        <Parameter Name="Version"/>
+    </RefMode>
+
+    <!-- RefMode for UCPD modes -->
+    <RefMode Name="Source_AllSignals" BaseMode="UCPD_Activate"/>
+    <RefMode Name="Source_NoCC2" BaseMode="UCPD_Activate"/>
+    <RefMode Name="Source_CC1Only" BaseMode="UCPD_Activate"/>
+    <RefMode Name="Sink_AllSignals" BaseMode="UCPD_Activate"/>
+    <RefMode Name="Sink_NoCC2" BaseMode="UCPD_Activate"/>
+    <RefMode Name="Sink_CC1Only" BaseMode="UCPD_Activate"/>
+    <RefMode Name="Dual_Role_AllSignals" BaseMode="UCPD_Activate"/>
+    <RefMode Name="Dual_Role_NoCC2" BaseMode="UCPD_Activate"/>
+    <RefMode Name="Dual_Role_CC1Only" BaseMode="UCPD_Activate"/>
+
+    <ModeLogicOperator Name="OR">
+        <Mode Name="Mode">
+            <ModeLogicOperator Name="XOR">
+                <!-- Source_AllSignals will be used for all MCUs where CC1, DBCC1, CC2 and DBCC2 are present -->
+                <Mode UserName="Source" Name="Source_AllSignals">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="CC1" IOMode="System"/>
+                        <Signal Name="CC2" IOMode="System"/>
+                        <Signal Name="DBCC1" IOMode="System"/>
+                        <Signal Name="DBCC2" IOMode="System"/>
+                    </SignalLogicalOp>
+                    <Semaphore>Source$IpInstance</Semaphore>
+                </Mode>
+                <!-- Source_NoCC2 will be used for all MCUs where CC1, DBCC1 and DBCC2 are present and CC2 is not present -->
+                <Mode UserName="Source" Name="Source_NoCC2" RemoveCondition="$modeexist_Source_AllSignals">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="CC1" IOMode="System"/>
+                        <Signal Name="DBCC1" IOMode="System"/>
+                        <Signal Name="DBCC2" IOMode="System"/>
+                    </SignalLogicalOp>
+                    <Semaphore>Source$IpInstance</Semaphore>
+                </Mode>
+                <!-- Source_CC1Only will be used for all MCUs where CC1 is present and DBCC1, DBCC2 and CC2 are not present -->
+                <Mode UserName="Source" Name="Source_CC1Only" RemoveCondition="$modeexist_Source_AllSignals|$modeexist_Source_NoCC2">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="CC1" IOMode="System"/>
+                    </SignalLogicalOp>
+                    <Semaphore>Source$IpInstance</Semaphore>
+                </Mode>
+                <!-- Sink_AllSignals will be used for all MCUs where CC1, DBCC1, CC2 and DBCC2 are present -->
+                <Mode UserName="Sink" Name="Sink_AllSignals">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="CC1" IOMode="System"/>
+                        <Signal Name="CC2" IOMode="System"/>
+                        <Signal Name="DBCC1" IOMode="System"/>
+                        <Signal Name="DBCC2" IOMode="System"/>
+                    </SignalLogicalOp>
+                    <Semaphore>Sink$IpInstance</Semaphore>
+                </Mode>
+                <!-- Sink_NoCC2 will be used for all MCUs where CC1, DBCC1 and DBCC2 are present and CC2 is not present -->
+                <Mode UserName="Sink" Name="Sink_NoCC2" RemoveCondition="$modeexist_Sink_AllSignals">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="CC1" IOMode="System"/>
+                        <Signal Name="DBCC1" IOMode="System"/>
+                        <Signal Name="DBCC2" IOMode="System"/>
+                    </SignalLogicalOp>
+                    <Semaphore>Sink$IpInstance</Semaphore>
+                </Mode>
+                <!-- Sink_CC1Only will be used for all MCUs where CC1 is present and DBCC1, DBCC2 and CC2 are not present -->
+                <Mode UserName="Sink" Name="Sink_CC1Only" RemoveCondition="$modeexist_Sink_AllSignals|$modeexist_Sink_NoCC2">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="CC1" IOMode="System"/>
+                    </SignalLogicalOp>
+                    <Semaphore>Sink$IpInstance</Semaphore>
+                </Mode>
+                <!-- Dual Role_AllSignals will be used for all MCUs where CC1, DBCC1, CC2 and DBCC2 are present -->
+                <Mode UserName="Dual Role" Name="Dual_Role_AllSignals">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="CC1" IOMode="System"/>
+                        <Signal Name="CC2" IOMode="System"/>
+                        <Signal Name="DBCC1" IOMode="System"/>
+                        <Signal Name="DBCC2" IOMode="System"/>
+                    </SignalLogicalOp>
+                    <Semaphore>DualRole$IpInstance</Semaphore>
+                </Mode>
+                <!-- Dual Role_NoCC2 will be used for all MCUs where CC1, DBCC1 and DBCC2 are present and CC2 is not present -->
+                <Mode UserName="Dual Role" Name="Dual_Role_NoCC2" RemoveCondition="$modeexist_Dual_Role_AllSignals">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="CC1" IOMode="System"/>
+                        <Signal Name="DBCC1" IOMode="System"/>
+                        <Signal Name="DBCC2" IOMode="System"/>
+                    </SignalLogicalOp>
+                    <Semaphore>DualRole$IpInstance</Semaphore>
+                </Mode>
+                <!-- Dual Role_CC1Only will be used for all MCUs where CC1 is present and DBCC1, DBCC2 and CC2 are not present -->
+                <Mode UserName="Dual Role" Name="Dual_Role_CC1Only" RemoveCondition="$modeexist_Dual_Role_AllSignals|$modeexist_Dual_Role_NoCC2">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="CC1" IOMode="System"/>
+                    </SignalLogicalOp>
+                    <Semaphore>DualRole$IpInstance</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>Semaphore_UCPD_Active$IpInstance</Semaphore>
+        </Mode>
+        <Mode Name="UCPD_FRSTX" UserName="Fast Role Swap">
+            <ModeLogicOperator Name="XOR">
+                <!-- CC2 does not exists -->
+                <Mode UserName="FRSTX" Name="FRSTX_NoCC2" RemoveCondition="$modeexist_Dual_Role_AllSignals">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="FRSTX1" IOMode="System"/>
+                    </SignalLogicalOp>
+                    <Condition Diagnostic="The instance must be activated in dual-role mode" Expression="DualRole$IpInstance"/>
+                </Mode>
+                <!-- CC1 & CC2 exists -->
+                <Mode UserName="FRSTX" Name="FRSTX_CC2" RemoveCondition="!$modeexist_Dual_Role_AllSignals">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="FRSTX1" IOMode="System"/>
+                        <Signal Name="FRSTX2" IOMode="System"/>
+                    </SignalLogicalOp>
+                    <Condition Diagnostic="The instance must be activated in dual-role mode" Expression="DualRole$IpInstance"/>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
+    </ModeLogicOperator>
+
+    <RefSignal IOMode="System" Name="CC1"/>
+    <RefSignal IOMode="System" Name="CC2"/>
+    <RefSignal IOMode="System" Name="DBCC1"/>
+    <RefSignal IOMode="System" Name="DBCC2"/>
+    <RefSignal IOMode="System" Name="FRSTX1"/>
+    <RefSignal IOMode="System" Name="FRSTX2"/>
+
+    <!-- UCPD Semaphore for this IP. -->
+    <Semaphore>UCPD_Used</Semaphore>
+
+</IP>

@@ -3,6 +3,18 @@
 [#assign nbThreads = 0]
 [#assign generateFunction = "1"]
 [#assign option = "Default"]
+[#assign useMPU = "0"]
+
+[#list SWIPdatas as SWIP]
+  [#if SWIP.defines??]
+    [#list SWIP.defines as definition]
+      [#if definition.name=="USE_MPU"]
+        [#assign useMPU = definition.value]
+      [/#if]
+     [/#list]
+  [/#if]
+[/#list]
+
 [#-- SWIPdatas is a list of SWIPconfigModel --]  
 [#list SWIPdatas as SWIP]
   [#if SWIP.variables??]
@@ -23,13 +35,20 @@
           [/#if]
           [#assign index = index + 1]
         [/#list]
-        [#if generateFunction == "1"]
-         [#if option == "As external"]
-         extern void ${threadFunction}(void  * argument);
-         [#else]
-         void ${threadFunction}(void * argument);
+
+        [#assign nbThreads = nbThreads + 1]
+        [#if nbThreads == 1 && useMPU == "1"]
+          [#-- For Dory and MPU: do not generate default task --]
+        [#else]
+         [#if generateFunction == "1"]
+          [#if option == "As external"]
+           extern void ${threadFunction}(void  * argument);
+          [#else]
+           void ${threadFunction}(void * argument);
+          [/#if]
          [/#if]
-        [/#if]
+        [/#if]        
+
       [/#if]
       [#-- Look for timers --]  
       [#if variable.name == "Timers"]
@@ -59,3 +78,4 @@
   [/#if]
 [/#list]
 [/#compress]
+#n

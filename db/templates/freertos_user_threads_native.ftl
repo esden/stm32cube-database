@@ -12,6 +12,9 @@
         [#assign s = variable.valueList]
         [#assign index = 0]
         [#list s as i]
+          [#if index == 0]
+            [#assign threadName = i]
+          [/#if]        
           [#if index == 3]
             [#assign threadFunction = i]
           [/#if]
@@ -29,22 +32,29 @@
          [#if generateFunction == "1"]
           [#if option == "As external"]
           [#else]
-           /* ${threadFunction} function */
+           [#-- /* ${threadFunction} function */ --]
+           /* USER CODE BEGIN Header_${threadFunction} */
+           /**
+             * @brief  Function implementing the ${threadName} thread.
+             * @param  argument: Not used 
+             * @retval None
+             */ 
+           /* USER CODE END Header_${threadFunction} */
            [#if option == "As weak"]
            __weak void ${threadFunction}(void * argument) 
            [#else]
            void ${threadFunction}(void * argument) 
            [/#if]
-        {
-        #t/* USER CODE BEGIN ${threadFunction} */
-        #t/* Infinite loop */
-        #tfor(;;)
-        #t{
-        #t#tvTaskDelay(1);          /* 1 ms (with default settings) */
-        #t}        
-        #t/* USER CODE END ${threadFunction} */
-        }
-        #n
+           {
+           #t/* USER CODE BEGIN ${threadFunction} */
+           #t/* Infinite loop */
+           #tfor(;;)
+           #t{
+           #t#tvTaskDelay(1);          /* 1 ms (with default settings) */
+           #t}        
+           #t/* USER CODE END ${threadFunction} */
+           }
+           #n
           [/#if]
          [/#if]
         [/#if]
@@ -75,17 +85,16 @@
          [#else]
          void ${timerCallback}(void * argument) 
          [/#if]
-        {
-        #t/* USER CODE BEGIN ${timerCallback} */
-        #t        
-        #t/* USER CODE END ${timerCallback} */
-        }
-        #n
+         {
+         #t/* USER CODE BEGIN ${timerCallback} */
+         #t        
+         #t/* USER CODE END ${timerCallback} */
+         }
+         #n
+         [/#if]
         [/#if]
-       [/#if]   
       [/#if]   
     [/#list]
-	
   [/#if]
 [/#list]
 [/#compress]

@@ -27,11 +27,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "main.h"
 [#if SWIncludes??]
 [#list SWIncludes as include]
 [#assign includeFile = include]
 [#if  includeFile!="usbd_def.h"]
-#include "${includeFile}"
+[#if include !="usbd_def.h"]
+#include "${include}"
+[/#if]
 [/#if]
 [/#list]
 [/#if]

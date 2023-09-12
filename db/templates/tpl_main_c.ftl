@@ -5,7 +5,7 @@
 [#assign coreDir=""]
 [/#if]
 [#assign coreDir=sourceDir]
-
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file           : main.c
@@ -14,15 +14,14 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
+
 [#assign staticVoids =""]
 [#compress]
 [#assign usb_device = false]
 /* Includes ------------------------------------------------------------------*/
 #include "${main_h}"
-[#if isHalSupported?? && isHALUsed?? ]
-#include "${FamilyName?lower_case}xx_hal.h"
-[/#if]
-[#if H7_ETH_NoLWIP?? &&HALCompliant??]
+[#if H7_ETH_NoLWIP?? &&HALCompliant?? && ETH_Core?? && ETH_Core==CoreName]
 #include "string.h"
 [/#if]
 [#-- IF GFXMMU is used and all is generated in the main and the Lut is configured--]
@@ -43,10 +42,20 @@
 [/#if]
 [/#list]
 [#list ips as ip]
-[#if !ip?contains("FREERTOS") && !ip?contains("NVIC")&& !ip?contains("CORTEX")&& !ip?contains("GRAPHICS")]
+[#if !ip?contains("FATFS") && !ip?contains("FREERTOS") && !ip?contains("NVIC")&& !ip?contains("CORTEX")&& !ip?contains("GRAPHICS")]
 [#if !ip?contains("LWIP") || (ip?contains("LWIP") && (MBEDTLSUSed=="false"))]
 #include "${ip?lower_case}.h"
 [/#if][/#if]
+[#-- Examples Migration (FCR) - Begin--]
+[#if ip?contains("FATFS")]
+ [#assign familyName=FamilyName?lower_case]
+ [#if familyName="stm32g0" || familyName="stm32wb"]
+ #include "app_fatfs.h"
+ [#else]
+ #include "fatfs.h"
+ [/#if]
+[/#if]
+[#-- Examples Migration (FCR) - End--]
 [#if ip?contains("USB_DEVICE")]
 [#assign usb_device = true]
 [/#if]
@@ -58,10 +67,26 @@
        [#--include "BoardConfiguration.hpp"--]
 [/#if]
 #n
+/* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
 #n
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
+
+/* USER CODE END PTD */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+
+/* USER CODE END PD */
+
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
+
 [#if usb_device]
   [#if vectors??]
     [#assign wakeupInterrupt = false]
@@ -82,7 +107,7 @@ extern PCD_HandleTypeDef ${handleName};
 [/#if]
 /* Private variables ---------------------------------------------------------*/
 [#-- WorkAround for Ticket 30863 --]
-[#if H7_ETH_NoLWIP?? &&HALCompliant??]
+[#if H7_ETH_NoLWIP?? &&HALCompliant??  && ETH_Core?? && ETH_Core==CoreName]
 #if defined ( __ICCARM__ ) /*!< IAR Compiler */
 
 #pragma location=[#if RxDescAddress??]${RxDescAddress}[#else]0x30040000[/#if]
@@ -157,7 +182,7 @@ ${dHandle};
     [@common.optinclude name=mxTmpFolder+"/rtos_vars.tmp"/]   
     [#-- ADD RTOS Code End--]
     [/#compress]
-[/#if][#-- if HALCompliant End --]
+   [/#if][#-- if HALCompliant End --]
 [#if HALCompliant??]
   [#-- CEC array --]
   [#compress]
@@ -172,22 +197,26 @@ ${dHandle};
 [/#if]
     [#-- Global variables --]
 [#-- If HAL compliant generate Global variable : Peripherals handler -End --]
-#n#n
 
 /* USER CODE BEGIN PV */
-/* Private variables ---------------------------------------------------------*/
 
 /* USER CODE END PV */
 #n
+[#list voids as void] 
+[#if void.functionName?? && void.functionName == "SystemClock_Config" ]
+[#assign rccFctName ="SystemClock_Config"]
+[/#if]
+[/#list]
 [#compress]
 [#if clockConfig??]
 /* Private function prototypes -----------------------------------------------*/
-[#if isHALUsed??]
-[#-- Use HAL_MspInit--]
+[#if rccFctName??]
+[#if USE_Touch_GFX_STACK??]
+extern "C" void SystemClock_Config(void); [#-- remove static --]
 [#else]
-static void LL_Init(void);
-[/#if]
 void SystemClock_Config(void); [#-- remove static --]
+[/#if]
+[/#if]
 [/#if]
 [#if mpuControl??] [#-- if MPU config is enabled --]
 static void MPU_Config(void); 
@@ -201,8 +230,8 @@ static void MPU_Config(void);
 [/#if]
 [#if HALCompliant??]
     [#list voids as void]
-        [#if !void.ipType?contains("thirdparty")&&!void.functionName?contains("FREERTOS")&&void.functionName!="Init"&&!void.functionName?contains("FATFS")&& !void.functionName?contains("LWIP")&& !void.functionName?contains("MBEDTLS")&& !void.functionName?contains("USB_DEVICE")&& !void.functionName?contains("USB_HOST")&& !void.functionName?contains("CORTEX")&& !void.functionName?contains("SystemClock_Config")&& !void.functionName?contains("LIBJPEG")&& !void.functionName?contains("PDM2PCM")&& !void.functionName?contains("TOUCHSENSING")&& !void.functionName?contains("MotorControl")]
-            [#if !void.functionName?contains("GRAPHICS")]
+        [#if ((McuDualCore?? && (void.core == CoreName || void.core =="")||!McuDualCore??) )&& !void.ipType?contains("thirdparty")&&!void.functionName?contains("FREERTOS")&&void.functionName!="Init"&&!void.functionName?contains("FATFS")&& !void.functionName?contains("LWIP")&& !void.functionName?contains("MBEDTLS")&& !void.functionName?contains("USB_DEVICE")&& !void.functionName?contains("USB_HOST")&& !void.functionName?contains("CORTEX")&& !void.functionName?contains("SystemClock_Config")&& !void.functionName?contains("LIBJPEG")&& !void.functionName?contains("PDM2PCM")&& !void.functionName?contains("TOUCHSENSING")&& !void.functionName?contains("MotorControl")&& !void.functionName?contains("RESMGR_UTILITY")]
+            [#if !void.functionName?contains("GRAPHICS") && !void.functionName?contains("USBPD")]
                 [#if void.isStatic]
                     static void ${""?right_pad(2)}${void.functionName}(void);
                     [#assign staticVoids =staticVoids + " "+ '${void.functionName}']
@@ -235,59 +264,19 @@ static void MX_NVIC_Init(void);
 [#if USB_HOST?? && !FREERTOS??]
 #nvoid MX_USB_HOST_Process(void);
 [/#if]
-[#-- PostInit declaration --]
-[#if Peripherals??]
-    [#assign postinitList = ""]
-    [#list Peripherals as Peripheral]
-        [#if Peripheral??]
-            [#list Peripheral as IP]
-                [#list IP.configModelList as instanceData]
-                [#if instanceData.initServices??]
-                    [#if instanceData.initServices.gpioOut??] 
-                        [#list instanceData.initCallBackInitMethodList as initCallBack]
-                            [#if initCallBack?contains("PostInit")]
-                                [#assign halMode = instanceData.halMode]
-                                [#assign ipName = instanceData.ipName]
-                                [#assign ipInstance = instanceData.instanceName]
-                                [#if halMode!=ipName&&!ipName?contains("TIM")&&!ipName?contains("CEC")]
-                                    [#if !postinitList?contains(initCallBack)]
-                                        #nvoid ${initCallBack}(${instanceData.halMode}_HandleTypeDef *h${instanceData.halMode?lower_case});
-                                        [#assign postinitList = postinitList+" "+initCallBack]
-                                    [/#if]
-                                [#else]
-                                    [#if !postinitList?contains(initCallBack)]
-                                    #nvoid ${initCallBack}([#if ipName?contains("TIM")&&!(ipName?contains("HRTIM")||ipName?contains("LPTIM"))]TIM_HandleTypeDef *htim[#else]${ipName}_HandleTypeDef *h${ipName?lower_case}[/#if]);
-                                    [#assign postinitList = postinitList+" "+initCallBack]
-                                    [/#if]
-                                [/#if]
-                                [#break] [#-- take only the first PostInit : case of timer--]
-                            [/#if]
-                        [/#list]
-                    [/#if]
-                [/#if]
 
-                [/#list]
-            [/#list]
-        [/#if]
-    [/#list]
-[/#if]
-
-[#-- PostInit declaration : End --]
-#n
 /* USER CODE BEGIN PFP */
-/* Private function prototypes -----------------------------------------------*/
 
 /* USER CODE END PFP */
 
-
+/* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
 /* USER CODE END 0 */
 
 /**
   * @brief  The application entry point.
-  *
-  * @retval None
+  * @retval int
   */
 [#if noMain?? && noMain=="false"]
 int main(void)
@@ -297,27 +286,37 @@ int main(void)
   /* USER CODE END 1 */
 
 [#compress]
+[#if RESMGR_UTILITY??]
+#t/* Resource Manager Utility initialisation ---------------------------------*/
+    #tMX_RESMGR_UTILITY_Init();
+[/#if]
 [#if mpuControl??] [#-- if MPU config is enabled --]
-#t/* MPU Configuration----------------------------------------------------------*/
+#t/* MPU Configuration--------------------------------------------------------*/
+
     #tMPU_Config();
 [/#if]
 [#if ICache??] [#-- if CPU ICache is enabled --]
-#n#t/* Enable I-Cache-------------------------------------------------------------*/
+#n#t/* Enable I-Cache---------------------------------------------------------*/
+
     #tSCB_EnableICache();
 [/#if]
 [#if DCache??] [#-- if CPU DCache config is enabled --]
-#n#t/* Enable D-Cache-------------------------------------------------------------*/
+#n#t/* Enable D-Cache---------------------------------------------------------*/
+
     #tSCB_EnableDCache();
 [/#if]
 #n
-#t/* MCU Configuration----------------------------------------------------------*/
+#t/* MCU Configuration--------------------------------------------------------*/
+
 [#if clockConfig??]
 #n#t/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-    [#if isHALUsed??]
+[#if isHALUsed??]
 #tHAL_Init();
-    [#else]
-    #tLL_Init();
-    [/#if]
+[#else]
+    [#if clockConfig??]
+#t[@common.optinclude name=mxTmpFolder+"/system.tmp"/] [#-- if LL include system.tmp --]
+[/#if]
+[/#if]
 #n
 #t/* USER CODE BEGIN Init */
 
@@ -325,8 +324,10 @@ int main(void)
 #n
 [#list voids as void]
     [#if void.functionName?? && void.functionName?contains("SystemClock_Config") && !void.isNotGenerated]
+
+[#if rccFctName??]
     #n#t/* Configure the system clock */
-    #tSystemClock_Config();
+#tSystemClock_Config();[/#if]
     [/#if]
 [/#list]
 [/#if]
@@ -337,10 +338,17 @@ int main(void)
 #n
 #n#t/* Initialize all configured peripherals */
 [#list voids as void]
-[#if void.functionName?? && !void.functionName?contains("FREERTOS")&&!void.functionName?contains("CORTEX")&& !void.functionName?contains("SystemClock_Config")&&void.functionName!="Init" && !void.functionName?contains("Process")]
+[#if void.functionName?? && !void.functionName?contains("FREERTOS")&&!void.functionName?contains("CORTEX")&& !void.functionName?contains("SystemClock_Config")&&void.functionName!="Init" && !void.functionName?contains("Process") && !void.functionName?contains("RESMGR_UTILITY")]
 [#if !void.isNotGenerated]
 [#if ((FREERTOS?? && void.ipType=="peripheral") || !FREERTOS??) && void.functionName!="GRAPHICS_Init"]
+ [#if void.functionName?contains("FATFS") && familyName="stm32g0"]
+ [#-- Required by the examples migration (due to the fact that the function signature has changed and returns a value now. --]
+ #tif (MX_FATFS_Init() != APP_OK) {
+ #t#tError_Handler();
+ #t}
+ [#else]
 #t${void.functionName}();
+[/#if]
 [/#if]
 [/#if]
 [/#if]
@@ -355,6 +363,11 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
+
+[#if USBPD??]
+    [#lt]#t/* USBPD initialisation ---------------------------------*/
+    [#lt]#tMX_USBPD_Init();
+[/#if]
 
 [#if FREERTOS??] [#-- If FreeRtos is used --]
     [#if GRAPHICS??]
@@ -397,8 +410,7 @@ int main(void)
 #t/* USER CODE BEGIN WHILE */
 #twhile (1)
 #t{
-#n
-#t/* USER CODE END WHILE */
+#t#t/* USER CODE END WHILE */
 [#if USB_HOST?? && !FREERTOS??]
 #t#tMX_USB_HOST_Process();
 [/#if]
@@ -408,80 +420,46 @@ int main(void)
 #t${void.functionName}();
 [/#if]
 [/#list]
-#t/* USER CODE BEGIN 3 */
-
+#t#t/* USER CODE BEGIN 3 */
 #t}
 #t/* USER CODE END 3 */
 [/#if]
-#n
 [#-- if --]
 }
 [/#if]
-[#if isHALUsed??]
-[#-- Use HAL_MspInit--]
-[#else]
-    [#if clockConfig??]
-static void LL_Init(void)
-{
-#t[@common.optinclude name=mxTmpFolder+"/system.tmp"/] [#-- if LL include system.tmp --]
-}
-    [/#if]
-[/#if]
 [#compress]
-[#if clockConfig??]
+
+[#if clockConfig?? && rccFctName??]
 #n/**
 #t* @brief System Clock Configuration
 #t* @retval None
 #t*/
 void SystemClock_Config(void)
 {
-#n
 [#compress]
+[#assign nbVars = 0]
 [#assign listOfLocalVariables =""]
         [#assign resultList =""]
     [#list clockConfig as configModel] [#--list0--]
         [#list configModel.configs as config] [#--list1--]
            [#compress] [@common.getLocalVariable configModel1=config listOfLocalVariables=listOfLocalVariables resultList=resultList/][/#compress]
             [#assign listOfLocalVariables =resultList]
+            [#assign nbVars = nbVars + getNbVariable(config)]
         [/#list]
     [/#list]
-[/#compress]#n
+[/#compress]
+[#if nbVars != 0 ]
+#n
+[/#if]
 [#assign clockInst=""]
 [#assign nTab=1]
 [#if clockConfig??] 
 [#list clockConfig as configModel] [#--list0--]
     [#--list configModel.configs as config--] [#--list1--]
-   [#compress] [@common.generateConfigModelListCode configModel=configModel inst=clockInst  nTab=1 index=""/][/#compress]#n
+   [#compress] [@common.generateConfigModelListCode configModel=configModel inst=clockInst  nTab=1 index=""/][/#compress]
     [#--/#list--]
 [/#list][/#if]
-[#-- configure systick interrupts  --]
-[#if systemVectors??]
-    [#list systemVectors as initVector] 
-        [#if initVector.vector=="SysTick_IRQn" && initVector.codeInMspInit]
-            #t/* ${initVector.vector} interrupt configuration */
-            [#if rccUsedDriver == "HAL"]
-                #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
-            [#else]
-                [#if FamilyName=="STM32L0" || FamilyName=="STM32F0"]
-                #tNVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
-                [#else]
-                #tNVIC_SetPriority(${initVector.vector}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),${initVector.preemptionPriority}, ${initVector.subPriority}));
-                [/#if]
-            [/#if]
-            [#if initVector.systemHandler=="false"]
-                [#if rccUsedDriver == "HAL"]
-                    #tHAL_NVIC_EnableIRQ(${initVector.vector});#n
-                [#else]
-                    #tNVIC_EnableIRQ(${initVector.vector});#n
-                [/#if]
-                    
-            [/#if]
-        [/#if]
-    [/#list]
-[/#if]
 }[/#if]
-#n
-
 [/#compress]
 
 [#compress]
@@ -504,7 +482,7 @@ static void MX_NVIC_Init(void)
     #t#tHAL_NVIC_SetPriority(${vector.vector}, ${vector.preemptionPriority}, ${vector.subPriority});
     #t#tHAL_NVIC_EnableIRQ(${vector.vector});
     [#else]
-      [#if FamilyName=="STM32L0" || FamilyName=="STM32F0"]
+      [#if !NVICPriorityGroup??]
     #t#tNVIC_SetPriority(${vector.vector}, ${vector.preemptionPriority});
       [#else]
     #t#tNVIC_SetPriority(${vector.vector}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),${vector.preemptionPriority}, ${vector.subPriority}));
@@ -516,7 +494,7 @@ static void MX_NVIC_Init(void)
     [#if vector.usedDriver == "HAL"]
     #tHAL_NVIC_SetPriority(${vector.vector}, ${vector.preemptionPriority}, ${vector.subPriority});
     [#else]
-      [#if FamilyName=="STM32L0" || FamilyName=="STM32F0"]
+      [#if !NVICPriorityGroup??]
     #tNVIC_SetPriority(${vector.vector}, ${vector.preemptionPriority});
       [#else]
     #tNVIC_SetPriority(${vector.vector}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),${vector.preemptionPriority}, ${vector.subPriority}));
@@ -558,6 +536,62 @@ static void MX_NVIC_Init(void)
     [#return ""]
 [/#function]
 
+[#-- function getNbVariable --]
+[#function getNbVariable configModel1]
+    [#if configModel1.methods??] 
+        [#assign methodList1 = configModel1.methods]
+    [#else] [#assign methodList1 = configModel1.libMethod]
+    [/#if]
+ [#assign nbVars = 0]
+ [#assign myListOfLocalVariables = ""]
+    [#list methodList1 as method][#-- list methodList1 --][#if method.arguments?? && method.status!="WARNING"]
+        [#list method.arguments as argument][#-- list method.arguments --]
+            [#if argument.genericType == "struct"][#-- if struct --]
+                [#if argument.context??][#-- if argument.context?? --]
+                    [#if argument.context!="global"&&argument.status!="WARNING"&&argument.status!="NULL"] [#-- if !global --]
+                    [#assign varName= " "+argument.name]                    
+                    [#assign ll= myListOfLocalVariables?split(" ")]
+                    [#assign exist=false]
+                    [#list ll as var  ]
+                        [#if var==argument.name]
+                            [#assign exist=true]
+                        [/#if]
+                    [/#list]
+                    [#if !exist]  [#-- if exist --]                  
+                      [#assign myListOfLocalVariables = myListOfLocalVariables + " "+ argument.name]
+                      [#assign nbVars = nbVars + 1]
+                      [#assign resultList = myListOfLocalVariables]
+                    [/#if][#-- if exist --]
+                    [/#if][#-- if global --]
+                [#else][#-- if context?? --]
+            [/#if][#-- if argument.context?? --]
+[#else][#-- if non struct --]
+                [#if argument.context??][#-- if argument.context?? --]
+                    [#if argument.context!="global"&&argument.status!="WARNING"&&argument.status!="NULL"&&argument.returnValue="true"] [#-- if !global --]
+                    [#assign varName= " "+argument.name]                    
+                    [#assign ll= myListOfLocalVariables?split(" ")]
+                    [#assign exist=false]
+                    [#list ll as var  ]
+                        [#if var==argument.name]
+                            [#assign exist=true]
+                        [/#if]
+                    [/#list]
+                    [#if !exist]  [#-- if exist --]                  
+                      [#assign myListOfLocalVariables = myListOfLocalVariables + " "+ argument.name]
+                      [#assign nbVars = nbVars + 1]
+                      [#assign resultList = myListOfLocalVariables]
+                    [/#if][#-- if exist --]
+                    [/#if][#-- if global --]
+                [#else][#-- if context?? --]
+            [/#if]
+            [/#if][#-- if struct --]
+        [/#list][#-- list method.arguments --]
+        [/#if]
+    [/#list][#-- list methodList1 --]
+[#return nbVars]
+[/#function]
+[#-- function getNbVariable of a config End--]
+
 [#if HALCompliant??][#-- if HALCompliant Begin --]
 #n[#list Peripherals as Peripheral][#if Peripheral??]
 [#list Peripheral as IP]
@@ -569,17 +603,23 @@ static void MX_NVIC_Init(void)
      [#assign instName = instanceData.instanceName]
 
         [#assign halMode= instanceData.halMode]
-        /* ${instName} init function */ 
-       
+/**
+#t* @brief  ${instName} Initialization Function
+#t* @param  None
+#t* @retval None
+#t*/
             [#if halMode!=ipName&&!ipName?contains("TIM")&&!ipName?contains("CEC")][#if staticVoids?contains('MX_${instName}_${halMode}_Init')]static[/#if] void MX_${instName}_${halMode}_Init(void)[#else][#if staticVoids?contains('MX_${instName}_Init')]static[/#if] void MX_${instName}_Init(void)[/#if]
             {     
   #n
-        [#if ipName=="RTC"]
+[#if RESMGR_UTILITY??]
+    [@common.optinclude name=mxTmpFolder+"/resmgrutility_"+instName+".tmp"/][#-- ADD RESMGR_UTILITY Code--]
+[/#if]
+      
 
- #t/* USER CODE BEGIN RTC_Init 0 */
+#t/* USER CODE BEGIN ${instName}_Init 0 */
 #n
- #t/* USER CODE END RTC_Init 0 */
-        [/#if]
+ #t/* USER CODE END ${instName}_Init 0 */
+     
 #n
         [#-- assign ipInstanceIndex = instName?replace(name,"")--]
         [#assign args = ""]
@@ -588,16 +628,13 @@ static void MX_NVIC_Init(void)
  	[#--list instanceData.configs as config--]
             [@common.getLocalVariableList instanceData=instanceData/]            
         [#--/#list--]#n
-[#if ipName=="RTC"]
- #t/* USER CODE BEGIN RTC_Init 1 */
-#n
- #t/* USER CODE END RTC_Init 1 */
- [/#if]
+
 #n
         [#--list instanceData.configs as config--]
 [#--debug instance name = ${instName}--]
 [#if instanceData.usedDriver?? && instanceData.usedDriver!="HAL"][#--Check if LL driver is used. instanceData:ConfigModel --]
     [#-- varaible declaration --]
+
     [#assign v = ""]
     [#if instanceData.initServices?? && instanceData.initServices.gpio??]
         [#assign service=instanceData.initServices.gpio]
@@ -605,11 +642,13 @@ static void MX_NVIC_Init(void)
                [#if v?contains(variable.name)]
                [#-- no matches--]
                [#else]
-   #t${variable.value} ${variable.name};
+   #t${variable.value} ${variable.name} = {0};
                    [#assign v = v + " "+ variable.name/]	
                [/#if]	
            [/#list]  
+
     [/#if]
+
     [#-- if used with LL and MspPost init is required using gpioOut service --]
     [#if instanceData.initServices?? && instanceData.initServices.gpioOut?? ]
            [#assign service=instanceData.initServices.gpioOut]
@@ -617,24 +656,39 @@ static void MX_NVIC_Init(void)
                [#if v?contains(variable.name)]
                [#-- no matches--]
                [#else]
-   #t${variable.value} ${variable.name};
+   #t${variable.value} ${variable.name} = {0};
                    [#assign v = v + " "+ variable.name/]	
                [/#if]	
            [/#list]  
+
     [/#if]
+
     [#-- Generate service code --]
     #n[@common.generateServiceCode ipName=instName serviceType="Init" modeName="mode" instHandler=instName tabN=1 IPData=instanceData/] 
+#n
 [/#if]
+ #t/* USER CODE BEGIN ${instName}_Init 1 */
+#n
+ #t/* USER CODE END ${instName}_Init 1 */
 [#if ipName?contains("SPI")]
 #t/* ${instName}   parameter configuration*/
 [/#if]
+
 [#if instanceData.instIndex??][@common.generateConfigModelListCode configModel=instanceData inst=instName  nTab=1 index=instanceData.instIndex/][#else][@common.generateConfigModelListCode configModel=instanceData inst=instName  nTab=1 index=""/][/#if]
 
 [#list ips as ip]
 [#if ip?contains("PDM2PCM") && instName?contains("CRC")]
 #t__HAL_CRC_DR_RESET(&h${instName?lower_case});
 [/#if]
+
 [/#list]
+
+
+
+ #t/* USER CODE BEGIN ${instName}_Init 2 */
+#n
+ #t/* USER CODE END ${instName}_Init 2 */
+
 
 [#-- MspPostInit callBack if needed for output gpio config --]
 [#if instanceData.initServices??]
@@ -670,6 +724,7 @@ static void MX_NVIC_Init(void)
 [#-- FSMC Init --]
 [@common.optinclude name=mxTmpFolder+"/mx_fsmc_HC.tmp"/]
 #n
+
 /* USER CODE BEGIN 4 */
 
 /* USER CODE END 4 */
@@ -710,20 +765,15 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 /**
   * @brief  This function is executed in case of error occurrence.
-  * @param  file: The file name as string.
-  * @param  line: The line in file as a number.
   * @retval None
   */
-void _Error_Handler(char *file, int line)
+void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
-  while(1)
-  {
-  }
+
   /* USER CODE END Error_Handler_Debug */
 }
-
 
 #ifdef  USE_FULL_ASSERT
 /**
@@ -733,7 +783,12 @@ void _Error_Handler(char *file, int line)
   * @param  line: assert_param error line source number
   * @retval None
   */
-void assert_failed(uint8_t* file, uint32_t line)
+[#assign familyName=FamilyName?lower_case]
+[#if familyName="stm32f0" || familyName="stm32f3" ||familyName="stm32l4"]
+void assert_failed(char *file, uint32_t line)
+[#else]
+void assert_failed(uint8_t *file, uint32_t line)
+[/#if]
 { 
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
@@ -742,12 +797,6 @@ void assert_failed(uint8_t* file, uint32_t line)
 }
 #endif /* USE_FULL_ASSERT */
 
-/**
-  * @}
-  */
 
-/**
-  * @}
-  */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

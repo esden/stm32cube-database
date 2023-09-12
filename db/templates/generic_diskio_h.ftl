@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
  ******************************************************************************
   * @file    user_diskio.h
@@ -8,6 +9,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+ /* USER CODE END Header */
   
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __USER_DISKIO_H

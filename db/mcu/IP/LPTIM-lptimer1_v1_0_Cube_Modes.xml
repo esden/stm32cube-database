@@ -58,10 +58,10 @@
         <PossibleValue Comment="LPTIM1_ETR IO" Value="LPTIM_TRIGSOURCE_0"/>
         <PossibleValue Comment="RTC Alarm A" Value="LPTIM_TRIGSOURCE_1"/>
         <PossibleValue Comment="RTC Alarm B" Value="LPTIM_TRIGSOURCE_2"/>
-        <PossibleValue Comment="RTC TAMP1 Input Detection" Value="LPTIM_TRIGSOURCE_3"/>
-        <PossibleValue Comment="RTC TAMP2 Input Detection" Value="LPTIM_TRIGSOURCE_4"/>
-        <PossibleValue Comment="COMP1 OUT" Value="LPTIM_TRIGSOURCE_6"/>
-        <PossibleValue Comment="COMP2 OUT" Value="LPTIM_TRIGSOURCE_7"/>
+        <PossibleValue Comment="RTC TAMP1 Input Detection" Value="LPTIM_TRIGSOURCE_3" Condition="!(RTC:$modeexist_Tamper_1)" Action="Remove"/>
+        <PossibleValue Comment="RTC TAMP2 Input Detection" Value="LPTIM_TRIGSOURCE_4" Condition="!(RTC:$modeexist_Tamper_2)" Action="Remove"/>
+        <PossibleValue Comment="COMP1 OUT" Value="LPTIM_TRIGSOURCE_6" Condition="!(COMP1_Exist)" Action="Remove"/>
+        <PossibleValue Comment="COMP2 OUT" Value="LPTIM_TRIGSOURCE_7" Condition="!(COMP2_Exist)" Action="Remove"/>
     </RefParameter>
 <!-- for L07x L01x L02x L03x add RTC tamp3-->
     <RefParameter Comment="Trigger Source" DefaultValue="LPTIM_TRIGSOURCE_0" Name="TriggerSource" Type="list" Group="Trigger">
@@ -73,8 +73,8 @@
         <PossibleValue Comment="RTC TAMP1 Input Detection" Value="LPTIM_TRIGSOURCE_3" Condition="!(RTC:$modeexist_Tamper_1)" Action="Remove"/>
         <PossibleValue Comment="RTC TAMP2 Input Detection" Value="LPTIM_TRIGSOURCE_4" Condition="!(RTC:$modeexist_Tamper_2)" Action="Remove"/>
         <PossibleValue Comment="RTC TAMP3 Input Detection" Value="LPTIM_TRIGSOURCE_5" Condition="!(RTC:$modeexist_Tamper_3)" Action="Remove"/>
-        <PossibleValue Comment="COMP1 OUT" Value="LPTIM_TRIGSOURCE_6"/>
-        <PossibleValue Comment="COMP2 OUT" Value="LPTIM_TRIGSOURCE_7"/>
+        <PossibleValue Comment="COMP1 OUT" Value="LPTIM_TRIGSOURCE_6" Condition="!(COMP1_Exist)" Action="Remove"/>
+        <PossibleValue Comment="COMP2 OUT" Value="LPTIM_TRIGSOURCE_7" Condition="!(COMP2_Exist)" Action="Remove"/>
     </RefParameter>
 <!-- for all L0 but L07x L01x L02x L03x -->
     <RefParameter Comment="Trigger Source" DefaultValue="LPTIM_TRIGSOURCE_SOFTWARE" Name="TriggerSource" Type="list" Group="Trigger">
@@ -82,10 +82,10 @@
         <PossibleValue Comment="Software Trigger" Value="LPTIM_TRIGSOURCE_SOFTWARE" Semaphore="Semaphore_SWTrigger_$IpInstance"/>
         <PossibleValue Comment="RTC Alarm A" Value="LPTIM_TRIGSOURCE_1"/>
         <PossibleValue Comment="RTC Alarm B" Value="LPTIM_TRIGSOURCE_2"/>
-        <PossibleValue Comment="RTC TAMP1 Input Detection" Value="LPTIM_TRIGSOURCE_3"/>
-        <PossibleValue Comment="RTC TAMP2 Input Detection" Value="LPTIM_TRIGSOURCE_4"/>
-        <PossibleValue Comment="COMP1 OUT" Value="LPTIM_TRIGSOURCE_6"/>
-        <PossibleValue Comment="COMP2 OUT" Value="LPTIM_TRIGSOURCE_7"/>
+        <PossibleValue Comment="RTC TAMP1 Input Detection" Value="LPTIM_TRIGSOURCE_3" Condition="!(RTC:$modeexist_Tamper_1)" Action="Remove"/>
+        <PossibleValue Comment="RTC TAMP2 Input Detection" Value="LPTIM_TRIGSOURCE_4" Condition="!(RTC:$modeexist_Tamper_2)" Action="Remove"/>
+        <PossibleValue Comment="COMP1 OUT" Value="LPTIM_TRIGSOURCE_6" Condition="!(COMP1_Exist)" Action="Remove"/>
+        <PossibleValue Comment="COMP2 OUT" Value="LPTIM_TRIGSOURCE_7" Condition="!(COMP2_Exist)" Action="Remove"/>
     </RefParameter>
 <!-- for L07x L01x L02x L03x add RTC tamp3-->
     <RefParameter Comment="Trigger Source" DefaultValue="LPTIM_TRIGSOURCE_SOFTWARE" Name="TriggerSource" Type="list" Group="Trigger">
@@ -96,8 +96,8 @@
         <PossibleValue Comment="RTC TAMP1 Input Detection" Value="LPTIM_TRIGSOURCE_3" Condition="!(RTC:$modeexist_Tamper_1)" Action="Remove"/>
         <PossibleValue Comment="RTC TAMP2 Input Detection" Value="LPTIM_TRIGSOURCE_4" Condition="!(RTC:$modeexist_Tamper_2)" Action="Remove"/>
         <PossibleValue Comment="RTC TAMP3 Input Detection" Value="LPTIM_TRIGSOURCE_5" Condition="!(RTC:$modeexist_Tamper_3)" Action="Remove"/>
-        <PossibleValue Comment="COMP1 OUT" Value="LPTIM_TRIGSOURCE_6"/>
-        <PossibleValue Comment="COMP2 OUT" Value="LPTIM_TRIGSOURCE_7"/>
+        <PossibleValue Comment="COMP1 OUT" Value="LPTIM_TRIGSOURCE_6" Condition="!(COMP1_Exist)" Action="Remove"/>
+        <PossibleValue Comment="COMP2 OUT" Value="LPTIM_TRIGSOURCE_7" Condition="!(COMP2_Exist)" Action="Remove"/>
     </RefParameter>
     <RefParameter Comment="Active Edge" DefaultValue="LPTIM_ACTIVEEDGE_RISING" Name="TriggerActiveEdge" Type="list" Group="Trigger">
         <Condition Diagnostic="External trigger is selected" Expression="!Semaphore_SWTrigger_$IpInstance"/><!--pour tous les extriggers-->
@@ -237,7 +237,7 @@
       <Signal Name="IN1"/>
      </SignalLogicalOp>
     </Mode>
-    <Mode Name="Counts_external_clock_with_synchro_01_occur2" UserName="Counts COMPx events with internal synchronization">
+    <Mode Name="Counts_external_clock_with_synchro_01_occur2" UserName="Counts COMPx events with internal synchronization" RemoveCondition="!(COMP1_Exist|COMP2_Exist)">
                                         <Condition Diagnostic="COMP1 or COMP2 link to LPTIM must be enabled in COMPx settings" Expression="Semaphore_COMP1_LPTIM_enabled |Semaphore_COMP2_LPTIM_enabled"/>
                                         <Semaphore>Semaphore_CounterExternalClk_synchro$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
@@ -251,7 +251,7 @@
       <Signal Name="IN1"/>
      </SignalLogicalOp>
     </Mode>
-    <Mode Name="Counts_external_clock_standalone_1X_occur2" UserName="Standalone : counts COMPx events">
+    <Mode Name="Counts_external_clock_standalone_1X_occur2" UserName="Standalone : counts COMPx events" RemoveCondition="!(COMP1_Exist|COMP2_Exist)">
                                         <Condition Diagnostic="COMP1 or COMP2  links to LPTIM must be enabled in COMPx settings" Expression="Semaphore_COMP1_LPTIM_enabled|Semaphore_COMP2_LPTIM_enabled"/>
                                         <Semaphore>Semaphore_CounterExternalClk_standalone$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
@@ -266,21 +266,21 @@
       <Signal Name="IN2"/>
      </SignalLogicalOp>
     </Mode>
-    <Mode Name="Encoder_mode_occur2" UserName="Encoder mode: From COMPx And IN2 IO">
+    <Mode Name="Encoder_mode_occur2" UserName="Encoder mode: From COMPx And IN2 IO" RemoveCondition="!(COMP1_Exist|COMP2_Exist)">
                                         <Condition Diagnostic="A COMP1 or COMP2 link  to LPTIM must be enabled  in COMP1 and COMP2 settings" Expression="(Semaphore_COMP1_LPTIM_enabled | Semaphore_COMP2_LPTIM_enabled) &amp;!Semaphore_COMP2_IN2_LPTIM_enabled"/>
                                         <Semaphore>Semaphore_Encoder$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
       <Signal Name="IN2"/>
      </SignalLogicalOp>
     </Mode>
-    <Mode Name="Encoder_mode_occur3" UserName="Encoder mode: From IN1 IO And COMP2">
+    <Mode Name="Encoder_mode_occur3" UserName="Encoder mode: From IN1 IO And COMP2" RemoveCondition="!(COMP2_Exist)">
                                         <Condition Diagnostic="COMP1 links to LPTIM must be disabled while COMP2 link to LPTIM must be enabled in COMP1 and COMP2 settings" Expression="!Semaphore_COMP1_LPTIM_enabled &amp;Semaphore_COMP2_IN2_LPTIM_enabled"/>
                                         <Semaphore>Semaphore_Encoder$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">
       <Signal Name="IN1"/>
      </SignalLogicalOp>
     </Mode>
-    <Mode Name="Encoder_mode_occur4" UserName="Encoder mode: From COMP1 And COMP2">
+    <Mode Name="Encoder_mode_occur4" UserName="Encoder mode: From COMP1 And COMP2" RemoveCondition="!(COMP1_Exist|COMP2_Exist)">
                                         <Condition Diagnostic="COMP1 and COMP2 links to LPTIM must be enabled in COMP1 and COMP2 settings" Expression="Semaphore_COMP1_LPTIM_enabled &amp;Semaphore_COMP2_IN2_LPTIM_enabled"/>
                                         <Semaphore>Semaphore_Encoder$IpInstance</Semaphore>
      <SignalLogicalOp Name="AND">

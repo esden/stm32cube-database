@@ -121,7 +121,12 @@
 
 [#-- macro generateConfigModelCode --]
 
-[#macro generateConfigModelCode configModel inst nTab index]
+[#macro generateConfigModelCode configModel inst nTab index mode]
+[#if configModel.clockEnableMacro?? && mode=="Init"] [#-- Enable Port clock --]
+    [#list configModel.clockEnableMacro as clkmacroList]	
+            [#if nTab==2]#t#t[#else]#t[/#if]${clkmacroList}[#if !clkmacroList?contains("(")]()[/#if];
+    [/#list]
+[/#if]
 [#if configModel.methods??] [#-- if the pin configuration contains a list of LibMethods--]
     [#assign methodList = configModel.methods]
 [#else] [#assign methodList = configModel.libMethod]
@@ -281,7 +286,7 @@
                                 [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                                 [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
                                 [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]{
-                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
+                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler( );
                                 [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]}
                             [/#if]#n                                    
     [#else]
@@ -292,7 +297,7 @@
                                 [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                                 [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
                                 [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]{
-                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
+                                [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler( );
                                 [#if nTab==3 ]#t[/#if][#if nTab==2]#t#t[#else]#t[/#if]}
                             [/#if]#n
 
@@ -362,7 +367,7 @@
                                 [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                                 [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
                                 [#if nTab==2]#t#t[#else]#t[/#if]{
-                                [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
+                                [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler( );
                                 [#if nTab==2]#t#t[#else]#t[/#if]}
                             [/#if]#n                                
                         [/#if]
@@ -390,12 +395,12 @@
    
 [#if serviceName=="gpio"]
  [#assign instanceIndex =""]
-    [@generateConfigModelCode configModel=gpioService inst=ipName nTab=tabN index=""/]
+    [@generateConfigModelCode configModel=gpioService inst=ipName nTab=tabN index="" mode="type"/]
 [/#if]
 [#if serviceName=="dma" && dmaService??]
  [#assign instanceIndex =""]
     [#list dmaService as dmaconfig] 
-     [@generateConfigModelCode configModel=dmaconfig inst=ipName  nTab=tabN index=""/]
+     [@generateConfigModelCode configModel=dmaconfig inst=ipName  nTab=tabN index="" mode="type"/]
         [#assign dmaCurrentRequest = dmaconfig.instanceName?lower_case]
         [#assign prefixList = dmaCurrentRequest?split("_")]
         [#list prefixList as p][#assign prefix= p][/#list]

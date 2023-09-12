@@ -2,6 +2,7 @@
 [#assign s = name]
 [#assign temp = s?replace(".","__")]
 [#assign inclusion_protection = temp?upper_case]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   *  FatFs - Generic FAT file system module  R0.12c (C)ChaN, 2017
@@ -9,6 +10,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 #ifndef _FFCONF
 #define _FFCONF 68300	/* Revision ID */
@@ -17,6 +19,7 @@
 / Additional user header to be used  
 /-----------------------------------------------------------------------------*/
 [#assign usbhInUse = 0]
+#include "main.h"
 #include "${FamilyName?lower_case}xx_hal.h"
 [#list SWIPdatas as SWIP]
 [#if SWIP.defines??]

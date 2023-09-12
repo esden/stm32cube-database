@@ -35,8 +35,8 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef ${FamilyName?upper_case}_HAL_EXTI_H
-#define ${FamilyName?upper_case}_HAL_EXTI_H
+#ifndef ${FamilyName?upper_case}xx_HAL_EXTI_H
+#define ${FamilyName?upper_case}xx_HAL_EXTI_H
 
 #ifdef __cplusplus
 extern "C" {

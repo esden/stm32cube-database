@@ -23,13 +23,7 @@
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-[#assign includesList = ""]
-[#list includes as include]
-[#if !includesList?contains(include)]
-#include "${include}"
-[#assign includesList = includesList+" "+include]
-[/#if]
-[/#list]
+#include "main.h"
 #n
 /* DMA memory to memory transfer handles -------------------------------------*/
 [#if variables?? && variables?size > 0]
@@ -37,7 +31,7 @@
 extern ${variable.value} ${variable.name};
 [/#list]
 [/#if]
-extern void _Error_Handler(char*, int);
+
 #n
 /* USER CODE BEGIN Includes */
 

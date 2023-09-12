@@ -127,9 +127,28 @@
             <PossibleValue Comment="Enabled" Value="ENABLE" Semaphore="Semaphore_DMAContinuousRequests_Enable"/>
             <Description>Enable/Disable DMA Continuous Requests</Description>
     </RefParameter-->
+    <RefParameter Comment="DMA Continuous Requests" DefaultValue="LIMITED" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
+         <Condition Diagnostic="" Expression="$IpNumber=1 &amp; DMARequest_ADC &amp; DMAContinuousRequests=DISABLE"/>
+        <PossibleValue Comment="LIMITED" Value="LIMITED"/>
+        <Description>Enable/Disable DMA Continuous Requests</Description>
+    </RefParameter>
+    <RefParameter Comment="DMA Continuous Requests" DefaultValue="UNLIMITED" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
+         <Condition Diagnostic="" Expression="$IpNumber=1 &amp; DMARequest_ADC &amp; DMAContinuousRequests=ENABLE"/>
+        <PossibleValue Comment="LIMITED" Value="UNLIMITED"/>
+        <Description>Enable/Disable DMA Continuous Requests</Description>
+    </RefParameter>
+    <RefParameter Comment="DMA Continuous Requests" DefaultValue="NONE" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
+         <Condition Diagnostic="" Expression="$IpNumber=1 &amp; !DMARequest_ADC &amp; DMAContinuousRequests=DISABLE"/>
+        <PossibleValue Comment="none" Value="NONE"/>
+        <Description>Enable/Disable DMA Continuous Requests</Description>
+    </RefParameter>
+    <RefParameter Comment="DMA Continuous Requests" DefaultValue="NONE" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
+        <PossibleValue Comment="none" Value="NONE"/>
+        <Description>Enable/Disable DMA Continuous Requests</Description>
+    </RefParameter>
     <RefParameter Comment="DMA Continuous Requests" DefaultValue="DISABLE" Group="ADCgroup" Name="DMAContinuousRequests" Type="list">
         <PossibleValue Comment="Disabled" Value="DISABLE"/>
-        <PossibleValue Comment="Enabled" Semaphore="Semaphore_DMAContinuousRequests_Enable" Value="ENABLE"/>
+        <PossibleValue Comment="Enabled" Semaphore="Semaphore_DMAContinuousRequests_Enable" Value="ENABLE" Action="Remove" Condition="!DMARequest_ADC" Diagnostic="The DMAContinuousRequests parameter can be set to enable only if DMA request is active in DMA settings tab"/>
         <Description>Enable/Disable DMA Continuous Requests</Description>
     </RefParameter>
 	    
@@ -137,7 +156,7 @@
     <RefParameter Comment="End Of Conversion Selection" DefaultValue="ADC_EOC_SINGLE_CONV" Group="ADCgroup" Name="EOCSelection" Type="list">
         <PossibleValue Comment="End of single conversion" Value="ADC_EOC_SINGLE_CONV"/>
         <PossibleValue Comment="End of sequence of conversion" Value="ADC_EOC_SEQ_CONV"/>
-        <PossibleValue Comment="End of single or sequence of conversion" Value="ADC_EOC_SINGLE_SEQ_CONV"/>
+        <!--PossibleValue Comment="End of single or sequence of conversion" Value="ADC_EOC_SINGLE_SEQ_CONV"/-->
         <Description>Regular channel end of conversion selection</Description>
     </RefParameter>
 	    
@@ -409,7 +428,7 @@
     <RefParameter Comment="Interrupt Mode" DefaultValue="DISABLE" Group="ADCgroup" Name="ITMode" Type="list">
         <PossibleValue Comment="Disabled" Value="DISABLE"/>
         <PossibleValue Comment="Enabled" Value="ENABLE"/>
-        <Description>Specifies whether the analog watchdog is configured is interrupt mode or in polling mode.</Description>
+        <Description>Specifies whether the analog watchdog is configured in interrupt mode or in polling mode.</Description>
     </RefParameter>
     
     <!-- Not displayed parameters -->
@@ -779,7 +798,7 @@
             <Semaphore>channelSelected</Semaphore>
         </Mode>
         <!-- Internal channels -->
-        <Mode Name="IN-TempSens" UserName="Temperature Sensor Channel">
+        <Mode Name="IN-TempSens" UserName="Temperature Sensor Channel" RemoveCondition="STM32L0x0_Value_Line">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="IN-TempSens" UserName="Single-ended">
                     <SignalLogicalOp Name="AND">

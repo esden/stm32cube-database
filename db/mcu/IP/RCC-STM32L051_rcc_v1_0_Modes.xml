@@ -110,7 +110,7 @@
     <RefParameter Comment="APB2 Timer Clock Divider" DefaultValue="2" Max="2" Min="2" Name="APB2TimCLKDivider" Type="integer" Visible="false"/>
 	
     <RefParameter Comment="Clock Output" DefaultValue="RCC_MCO3" Name="RCC_MCO" Type="list" Visible="false">
-        <Condition Diagnostic="" Expression="MCOConfig&amp;PB13_RCC_MCO|(SEM2RCC_MCO_REQUIRED_TIM21 &amp; TIM21 &amp; Semaphore_input_Channel1TIM21)"/>
+        <Condition Diagnostic="" Expression="(MCOConfig&amp;PB13_RCC_MCO|(SEM2RCC_MCO_REQUIRED_TIM21 &amp; TIM21 &amp; Semaphore_input_Channel1TIM21)) &amp; !STM32L0x0_Value_Line"/>
         <PossibleValue Comment="Clock Output" Value="RCC_MCO3"/>
     </RefParameter>
     <RefParameter Comment="Clock Output" DefaultValue="RCC_MCO1" Name="RCC_MCO" Type="list" Visible="false">
@@ -127,6 +127,16 @@
     </RefParameter>
     <RefParameter Comment="Clock Output" DefaultValue="null" Name="RCC_MCO" Type="list" Visible="false"/>
 	
+    <RefParameter Comment="MCO Clock Source" DefaultValue="RCC_MCO1SOURCE_SYSCLK" Name="RCC_MCOSource" Type="list" Visible="false">
+        <Condition Expression="STM32L0x0_Value_Line" Diagnostic=""/>
+        <PossibleValue Comment="MCO1SRC SYSCLK" Value="RCC_MCO1SOURCE_SYSCLK"/>
+        <PossibleValue Comment="MCO1SRC HSI" Value="RCC_MCO1SOURCE_HSI"/>
+        <PossibleValue Comment="MCO1SRC MSI" Value="RCC_MCO1SOURCE_MSI"/>
+        <PossibleValue Comment="MCO1SRC HSE" Value="RCC_MCO1SOURCE_HSE"/>
+        <PossibleValue Comment="MCO1SRC PLLCLK" Semaphore="MCOSourcePLL" Value="RCC_MCO1SOURCE_PLLCLK"/>
+        <PossibleValue Comment="MCO1SRC LSI" Value="RCC_MCO1SOURCE_LSI"/>
+        <PossibleValue Comment="MCO1SRC LSE" Value="RCC_MCO1SOURCE_LSE"/>
+    </RefParameter>
     <RefParameter Comment="MCO Clock Source" DefaultValue="RCC_MCO1SOURCE_SYSCLK" Name="RCC_MCOSource" Type="list" Visible="false">
         <PossibleValue Comment="MCO1SRC SYSCLK" Value="RCC_MCO1SOURCE_SYSCLK"/>
         <PossibleValue Comment="MCO1SRC HSI" Value="RCC_MCO1SOURCE_HSI"/>
@@ -337,7 +347,11 @@
         <Condition Diagnostic="RTC Has HSE as source" Expression="(!(RTCClockSelection=RCC_RTCCLKSOURCE_LSE)&amp;!(RTCClockSelection=RCC_RTCCLKSOURCE_LSI)&amp; (RTCEnable=true))"/>
     </RefParameter>
     <RefParameter Comment="RTC clock" DefaultValue="37000" Display="value/1000" IP="RTC" Name="RTCFreq_Value" Type="double" Unit="KHz" Visible="false"/>
+    <RefParameter Comment="RTC Clock Source_HSEDiv" DefaultValue="4000000" Display="value/1000000" Max="4000000" Min="4000000" Name="RTCHSEDivFreq_Value" Type="double" Unit="MHz" Visible="false">
+        <Condition Expression="STM32L0x0_Value_Line" Diagnostic=""/>
+    </RefParameter>
     <RefParameter Comment="RTC Clock Source_HSEDiv" DefaultValue="12500000" Display="value/1000000" Max="1000000" Min="0" Name="RTCHSEDivFreq_Value" Type="double" Unit="MHz" Visible="false"/>
+    
     <RefParameter Comment="LCD clock" DefaultValue="32000" Display="value/1000" IP="LCD" Max="1000000" Min="1000000" Name="LCDFreq_Value" Type="double" Unit="KHz" Visible="false">
         <Condition Diagnostic="RTC Has HSE as source" Expression="(!(RTCClockSelection=RCC_RTCCLKSOURCE_LSE)&amp;!(RTCClockSelection=RCC_RTCCLKSOURCE_LSI)&amp; (LCDEnable=true))"/>
     </RefParameter>   
@@ -1080,6 +1094,10 @@
         <Condition Diagnostic="HSI used" Expression="HSIUsed=1"/>
     </RefParameter>
     <RefParameter Comment="HSI StateARG" DefaultValue="null" Name="HSIStateARG" Type="list" Visible="false"/>
+    
+    <RefParameter Visible="false" Comment="HSICalibrationValueARG" DefaultValue="RCC_HSICALIBRATION_DEFAULT" Name="HSICalibrationValueARG" Type="list">
+        <Condition Diagnostic="HSI used" Expression="HSIUsed=1 &amp; HSICalibrationValue=16"/>
+    </RefParameter>
     <RefParameter Comment="HSICalibrationValueARG" DefaultValue="+HSICalibrationValue" Name="HSICalibrationValueARG" Type="list" Visible="false">
         <Condition Diagnostic="HSI used" Expression="HSIUsed=1"/>
     </RefParameter>
@@ -1408,7 +1426,7 @@
             </ModeLogicOperator>
         </Mode>
       
-        <Mode Name="USB_CRS" RemoveCondition="STM32L0x1" UserName="CRS SYNC">
+        <Mode Name="USB_CRS" RemoveCondition="(STM32L0x1|STM32L0x0_Value_Line)" UserName="CRS SYNC">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="CRS SYNC Source GPIO">
                     <SignalLogicalOp Name="AND">

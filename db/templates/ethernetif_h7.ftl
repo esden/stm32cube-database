@@ -66,7 +66,7 @@
 [#list BspComponent.variables as variables]
 		[#if variables.name?contains("BspComponent")]
 			[#assign BspComponent = variables.value]
-			[#if (variables.value == "Choose")]			
+			[#if (variables.value == "Undefined")]			
 				[#assign bsp = 0]
 			[#else]
 				[#assign bsp = 1]
@@ -78,7 +78,7 @@
 [/#if][#-- end "BspComponentDatas??" --]
 
 /* Includes ------------------------------------------------------------------*/
-#include "${FamilyName?lower_case}xx_hal.h"
+#include "main.h"
 #include "lwip/opt.h"
 [#if with_rtos == 0]
 #include "lwip/mem.h"
@@ -201,6 +201,7 @@ ${BspComponent?lower_case}_IOCtx_t  ${BspComponent}_IOCtx = {ETH_PHY_IO_Init,
 /* Private functions ---------------------------------------------------------*/
 [#if custom_pbuf == 1]
 void pbuf_free_custom(struct pbuf *p);
+void Error_Handler(void);
 [/#if][#-- endif custom_pbuf --]
 
 [#include mxTmpFolder+"/eth_Msp.tmp"]
@@ -321,7 +322,7 @@ static void low_level_init(struct netif *netif)
   }
   else 
   {
-    _Error_Handler(__FILE__, __LINE__);
+    Error_Handler();
   }
 
 /* USER CODE BEGIN PHY_POST_CONFIG */ 

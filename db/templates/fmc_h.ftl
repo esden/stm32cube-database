@@ -17,9 +17,8 @@
 
 /* Includes ------------------------------------------------------------------*/
 [#if includes??]
-[#list includes as include]
-#include "${include}"
-[/#list]
+#include "main.h"
+
 [/#if]
 #n
 /* USER CODE BEGIN Includes */
@@ -34,7 +33,7 @@
 extern ${variable.value} ${variable.name};
 [/#list]
 [/#if]
-extern void _Error_Handler(char *, int);
+
 [#-- Global variables --]
 
 [#-- extract hal mode list used by all instances of the ip --]

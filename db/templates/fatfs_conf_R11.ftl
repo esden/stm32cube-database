@@ -1,8 +1,8 @@
-
 [#ftl]
 [#assign s = name]
 [#assign temp = s?replace(".","__")]
 [#assign inclusion_protection = temp?upper_case]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   *  FatFs - FAT file system module configuration file  R0.11 (C)ChaN, 2015
@@ -10,6 +10,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 #ifndef _FFCONF
 #define _FFCONF 32020	/* Revision ID */
@@ -18,6 +19,7 @@
 / Additional user header to be used  
 /-----------------------------------------------------------------------------*/
 [#assign usbhInUse = 0]
+#include "main.h"
 #include "${FamilyName?lower_case}xx_hal.h"
 [#list SWIPdatas as SWIP]  
 [#if SWIP.defines??]

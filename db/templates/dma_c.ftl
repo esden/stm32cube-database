@@ -83,7 +83,7 @@ void MX_${ipName}_Init(void)
         [#if func_argument.genericType == "struct" && func_argument.context != "global"]
           [#if !list_contains(local_variables, func_argument.name)]
             [#assign local_variables = local_variables + " " + func_argument.name]
-  ${func_argument.typeName} ${func_argument.name};
+  ${func_argument.typeName} ${func_argument.name} = {0};
           [/#if]
         [/#if]
       [/#list]
@@ -193,7 +193,7 @@ void MX_${ipName}_Init(void)
     [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
   if (${method.name}(${args}) != HAL_OK)
   {
-    _Error_Handler(__FILE__, __LINE__);
+    Error_Handler();
   }
           [/#if]
         [#else]
@@ -205,7 +205,7 @@ void MX_${ipName}_Init(void)
     [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
   if (${method.name}() != HAL_OK)
   {
-    _Error_Handler(__FILE__, __LINE__);
+    Error_Handler();
   }
           [/#if]
         [/#if][#--if method.arguments??--]
@@ -273,7 +273,7 @@ void MX_${ipName}_Init(void)
         [#if initVector.codeInMspInit]
           #t/* ${initVector.vector} interrupt configuration */
           [#if initVector.usedDriver == "LL"]
-            [#if FamilyName=="STM32L0" || FamilyName=="STM32F0"]
+            [#if !NVICPriorityGroup??]
           #tNVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
             [#else]
           #tNVIC_SetPriority(${initVector.vector}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),${initVector.preemptionPriority}, ${initVector.subPriority}));

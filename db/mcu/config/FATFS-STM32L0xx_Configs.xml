@@ -53,8 +53,17 @@
     </RefConfig>
     
     <RefComponent Cclass="Middleware" Cgroup="FATFS" Cversion="0.1.0">
-        <File Name="src/*.h" Category="header"/>
-        <File Name="src/*.c" Category="source"/>
+        <!-- <File Name="src/*.h" Category="header"/>  -->
+        <File Name="src/diskio.h" Category="header"/>
+        <File Name="src/ff.h" Category="header"/>
+        <File Name="src/ff_gen_drv.h" Category="header"/>
+        <File Name="src/integer.h" Category="header"/>
+        
+        <!--  <File Name="src/*.c" Category="source"/> -->
+        <File Name="src/diskio.c" Category="source"/>
+        <File Name="src/ff.c" Category="source"/>
+        <File Name="src/ff_gen_drv.c" Category="source"/>
+        
         <File Name="src/option/syscall.c" Category="source"/>
 
         <SubComponent Csub="CODE_PAGE" Cvariant="932" >
@@ -72,26 +81,11 @@
         <SubComponent Csub="CODE_PAGE" Cvariant="850" >
             <File Name="src/option/ccsbcs.c" Category="source"/>
         </SubComponent>
-          
-        <SubComponent Csub="SDIO">
-            <File Name="src/drivers/sd_diskio.c" Category="source"/>
-            <File Name="src/drivers/sd_diskio.h" Category="header"/>
-        </SubComponent>
-        <SubComponent Csub="SDRAM">
-            <File Name="src/drivers/sdram_diskio.c" Category="source"/>
-            <File Name="src/drivers/sdram_diskio.h" Category="header"/>
-        </SubComponent>
-        <SubComponent Csub="USBH">
-            <File Name="src/drivers/usbh_diskio.c" Category="source"/>
-            <File Name="src/drivers/usbh_diskio.h" Category="header"/>
-        </SubComponent>
     </RefComponent>
 
-
-    <!-- use specific template file "fatfs_conf_R11.ftl" to generate header file containing #define -->
-
-    <RefConfigFile Name="FF_CONF" Description="Header file for #define" Template="fatfs_conf_R11.ftl">      
-        <File Name="Target/ffconf.h" Category="header" Version="R0.11" Condition="all"/>
+    <!-- use specific template file "fatfs_conf_R12c.ftl" to generate header file containing #define -->
+    <RefConfigFile Name="FF_CONF" Description="Header file for #define" Template="fatfs_conf_R12c.ftl">      
+        <File Name="Target/ffconf.h" Category="header" Version="R0.12" Condition="all"/>
         <!-- Parameters for Function and Buffer Configurations -->
         <Argument Name="_FS_TINY" GenericType="simple" Comment="0:Normal or 1:Tiny"/>
         <Argument Name="_FS_READONLY" GenericType="simple" Comment="0:Read/Write or 1:Read only"/>
@@ -102,7 +96,6 @@
         <Argument Name="_USE_FORWARD" GenericType="simple" Comment="0:Disable or 1:Enable"/>
         <Argument Name="_USE_LABEL" GenericType="simple" Comment="0:Disable or 1:Enable"/>
         <Argument Name="_USE_FASTSEEK" GenericType="simple" Comment="0:Disable or 1:Enable"/>
-        <Argument Name="_USE_BUFF_WO_ALIGNMENT" GenericType="simple" Comment="0:Disable or 1:Enable"/>     <!-- New in R0.11 --> 
         <!-- Parameters for Locale and Namespace Configurations -->
         <Argument Name="_CODE_PAGE" GenericType="simple" Comment="The _CODE_PAGE specifies the OEM code page to be used on the target system"/>
         <Argument Name="_USE_LFN" GenericType="simple" Comment="0 to 3"/>
@@ -132,28 +125,32 @@
         <Argument Name="_FS_FATFS_SRAM" GenericType="simple" Comment="0:Disable or >=1:Enable"/> 
         <Argument Name="_FS_FATFS_USB" GenericType="simple" Comment="0:Disable or >=1:Enable"/> 
         <Argument Name="_HUSBH" GenericType="simple" Comment=""/>
+        <!-- R0.12 -->
+        <Argument Name="_USE_EXPAND" GenericType="simple" Comment=""/>
+        <Argument Name="_USE_CHMOD" GenericType="simple" Comment=""/>
+        <Argument Name="_FS_EXFAT" GenericType="simple" Comment=""/>
     </RefConfigFile> 
    
     <!-- Generate a generic diskio C driver file  -->
     <RefConfigFile Name="USER_DISKIO_C" Description="GENERIC C diskio driver file" Template="fatfs_generic_diskio_c.ftl">       
-        <File Name="Target/user_diskio.c" Category="source" Version="R0.11" Condition="all"/>    
+        <File Name="Target/user_diskio.c" Category="source" Version="R0.12" Condition="all"/>    
         <Argument Name="NEW_DISKIO_API" GenericType="simple" Comment=""/>
     </RefConfigFile>
     
     <!-- Generate a generic diskio H driver file -->
     <RefConfigFile Name="USER_DISKIO_H" Description="GENERIC H driver file" Template="generic_diskio_h.ftl">       
-        <File Name="Target/user_diskio.h" Category="header" Version="R0.11" Condition="all"/>                    
+        <File Name="Target/user_diskio.h" Category="header" Version="R0.12" Condition="all"/>                    
     </RefConfigFile>
     
     <!-- Generate a init code file (fatfs.c) -->
     <RefConfigFile Name="FATFS_INIT" Description="FATFS Init code file" Template="fatfs_init.ftl">       
-        <File Name="App/fatfs.c" Category="source" Version="R0.11" Condition="all"/>        
+        <File Name="App/fatfs.c" Category="source" Version="R0.12" Condition="all"/>        
         <Argument Name="_FS_NORTC" GenericType="simple" Comment="0 or 1"/>                           <!-- New in R0.11 -->                  
         <Argument Name="_MULTI_PARTITION" GenericType="simple" Comment="0 or 1"/>
     </RefConfigFile>
     
     <!-- Generate header for the init code file (fatfs.h) -->
     <RefConfigFile Name="FATFS_HEADER" Description="FATFS header file" Template="fatfs_header.ftl">       
-        <File Name="App/fatfs.h" Category="source" Version="R0.11" Condition="all"/>                    
+        <File Name="App/fatfs.h" Category="source" Version="R0.12" Condition="all"/>
     </RefConfigFile>
 </IP>

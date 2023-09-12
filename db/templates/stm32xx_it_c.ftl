@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    ${FamilyName?lower_case}xx_it.c
@@ -31,12 +32,11 @@
   *
   ******************************************************************************
   */
+/* USER CODE END Header */
+#n
 [#compress]
 /* Includes ------------------------------------------------------------------*/
-[#if isHalSupported?? && isHALUsed??]
-#include "${FamilyName?lower_case}xx_hal.h"
-[/#if]
-#include "${FamilyName?lower_case}xx.h"
+#include "${main_h}"
 #include "${FamilyName?lower_case}xx_it.h"
 [#if FREERTOS??] [#-- If FreeRtos is used --]
 #include "cmsis_os.h"
@@ -44,7 +44,10 @@
 [#if TOUCHSENSING??] [#-- If TouchSensing is used --]
 #include "tsl_time.h"
 [/#if]
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
 
+/* USER CODE END Includes */
 [#assign noUsbWakeUpInterruptHalHandler = missingUsbWakeUpInterruptHalHandler()]
 [#if noUsbWakeUpInterruptHalHandler]
   [#assign requireSystemClockConfig = false]
@@ -75,11 +78,37 @@ void SystemClock_Config(void);
   [#assign CortexName = "Cortex-M0+"]
 [/#if]
 
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN TD */
+
+/* USER CODE END TD */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+ 
+/* USER CODE END PD */
+
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
+
+/* Private variables ---------------------------------------------------------*/
+/* USER CODE BEGIN PV */
+
+/* USER CODE END PV */
+
+/* Private function prototypes -----------------------------------------------*/
+/* USER CODE BEGIN PFP */
+
+/* USER CODE END PFP */
+
+/* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
 /* USER CODE END 0 */
 
-[#compress]
+
 /* External variables --------------------------------------------------------*/
 [#assign handleList = ""]
 [#list handlers as handler]
@@ -99,9 +128,8 @@ extern ${ipHandle.type} ${ipHandle.name};
     [/#list]
   [/#if]
 [/#list]
-#n
 [#-- If Time Base Source is different to Systick--]
-[#if timeBaseSource?? && timeBaseSource!="SysTick"]
+[#if timeBaseSource?? && timeBaseSource!="SysTick" && timeBaseSource!="None"]
 extern ${timeBaseHandlerType} ${timeBaseHandler};
 #n
 [/#if]
@@ -113,28 +141,38 @@ extern void GRAPHICS_IncTick(void);
 extern void GRAPHICS_IncTick(void);
 #n
 [/#if]
-[/#compress]
-/******************************************************************************/
-/*            ${CortexName} Processor Interruption and Exception Handlers         */ 
-/******************************************************************************/
+/* USER CODE BEGIN EV */
 
+/* USER CODE END EV */
+
+/******************************************************************************/
+/*           ${CortexName} Processor Interruption and Exception Handlers          */ 
+/******************************************************************************/
 [#compress]
 [#list nvic as vector]
 [#if vector.systemHandler && vector.irqHandlerGenerated]
 /**
-  * @brief  This function handles ${vector.comment}.  
-  */
+#t* @brief  This function handles ${vector.comment}.   
+#t*/
 void ${vector.irqHandler}(void)
 {
 #t/* USER CODE BEGIN ${vector.name} 0 */
 
 #n#t/* USER CODE END ${vector.name} 0 */
-[#if vector.halHandler != "NONE"]
+[#if vector.halHandler != "NONE" && timeBaseSource!="None"]
       #t${vector.halHandler}
 [/#if]
+[#if vector.name != "HardFault_IRQn"]
+[#if vector.name != "MemoryManagement_IRQn"]
+[#if vector.name != "BusFault_IRQn"]
+[#if vector.name != "UsageFault_IRQn"]
 #t/* USER CODE BEGIN ${vector.name} 1 */
 
 #n#t/* USER CODE END ${vector.name} 1 */
+[/#if]
+[/#if]
+[/#if]
+[/#if]
 }#n
 [/#if]
 [/#list]
@@ -201,8 +239,8 @@ void ${vector.irqHandler}(void)
 
 [#if !vector.systemHandler && vector.irqHandlerGenerated]
 /**
-  * @brief  This function handles ${vector.comment}.  
-  */
+#t* @brief  This function handles ${vector.comment}.  
+#t*/
 void ${vector.irqHandler}(void)
 {
 #t/* USER CODE BEGIN ${vector.name} 0 */

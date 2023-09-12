@@ -11,6 +11,7 @@
 [#if paramEntry.value??  && paramEntry.key=="LSE_Timout"][#assign LSE_Timout = paramEntry.value][/#if]
 [/#list]
 [/#list]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file           : main.h
@@ -20,12 +21,20 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __MAIN_H__
-#define __MAIN_H__
+#ifndef __MAIN_H
+#define __MAIN_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* Includes ------------------------------------------------------------------*/
+[#if isHALUsed??]
+#include "${FamilyName?lower_case}xx_hal.h"
+[/#if]
 [#compress]
 [#--include "mxconstants.h"--]
 [#assign includesList = ""]
@@ -38,6 +47,9 @@
     [/#list]
 [/#if]
 #n
+
+[#-- /#if --]
+
 [#--Include common LL driver --]
 [#if isLLUsed??] [#-- Include LL headers --]
     [#-- Include common LL driver that should be always included--]
@@ -85,6 +97,13 @@
     #include "${FamilyName?lower_case}xx_ll_dma.h"
         [#assign includesList = includesList+" "+FamilyName?lower_case+"xx_ll_dma.h"]
     [/#if]
+
+[#if ! isHALUsed??]
+#if defined(USE_FULL_ASSERT)
+#include "stm32_assert.h"
+#endif /* USE_FULL_ASSERT */
+[/#if]
+
 [/#if]
 [/#compress]
 #n
@@ -92,12 +111,14 @@
 [#compress]
 [#if GRAPHICS?? ]
     [#if USE_OTM?? && FamilyName!="STM32L4"]
+
+
         #include "otm8009a.h"
     [/#if]
     [#if USE_MFX?? && FamilyName=="STM32L4"]
         #include "mfxstm32l152.h"
     [/#if]
-    #include "${FamilyName?lower_case}xx_hal.h"
+
     [#if USE_STemWin_STACK??]
         #include "GUI.h"        
         [#if USE_ILI??]
@@ -128,25 +149,88 @@
         #include "ew_bsp_serial.h" --]
     [/#if]
     [#if USE_Touch_GFX_STACK??]
-       #include "HW_Init.hpp"
+       [#--include "HW_Init.hpp"--]
     [/#if]
    
 [/#if]
+
 [/#compress]
 
 
+/* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
 #n
-/* Private define ------------------------------------------------------------*/
+/* Exported types ------------------------------------------------------------*/
+/* USER CODE BEGIN ET */
+
+/* USER CODE END ET */
+
+/* Exported constants --------------------------------------------------------*/
+/* USER CODE BEGIN EC */
+
+/* USER CODE END EC */
+
+/* Exported macro ------------------------------------------------------------*/
+/* USER CODE BEGIN EM */
+
+/* USER CODE END EM */
+[#compress]
+[#-- PostInit declaration --]
+[#if Peripherals??]
+    [#assign postinitList = ""]
+    [#list Peripherals as Peripheral]
+        [#if Peripheral??]
+            [#list Peripheral as IP]
+                [#list IP.configModelList as instanceData]
+                [#if instanceData.initServices??]
+                    [#if instanceData.initServices.gpioOut??] 
+                        [#list instanceData.initCallBackInitMethodList as initCallBack]
+                            [#if initCallBack?contains("PostInit")]
+                                [#assign halMode = instanceData.halMode]
+                                [#assign ipName = instanceData.ipName]
+                                [#assign ipInstance = instanceData.instanceName]
+                                [#if halMode!=ipName&&!ipName?contains("TIM")&&!ipName?contains("CEC")]
+                                    [#if !postinitList?contains(initCallBack)]
+                                        #nvoid ${initCallBack}(${instanceData.halMode}_HandleTypeDef *h${instanceData.halMode?lower_case});
+                                        [#assign postinitList = postinitList+" "+initCallBack]
+                                    [/#if]
+                                [#else]
+                                    [#if !postinitList?contains(initCallBack)]
+                                    #nvoid ${initCallBack}([#if ipName?contains("TIM")&&!(ipName?contains("HRTIM")||ipName?contains("LPTIM"))]TIM_HandleTypeDef *htim[#else]${ipName}_HandleTypeDef *h${ipName?lower_case}[/#if]);
+                                    [#assign postinitList = postinitList+" "+initCallBack]
+                                    [/#if]
+                                [/#if]
+                                [#break] [#-- take only the first PostInit : case of timer--]
+                            [/#if]
+                        [/#list]
+                    [/#if]
+                [/#if]
+
+                [/#list]
+            [/#list]
+        [/#if]
+    [/#list]
+[/#if]
+
+[#-- PostInit declaration : End --]
+[/#compress] 
+#n
+/* Exported functions prototypes ---------------------------------------------*/
+void Error_Handler(void);
+
+/* USER CODE BEGIN EFP */
+
+/* USER CODE END EFP */
+
+/* Private defines -----------------------------------------------------------*/
 [#if UserDefines??][#-- user defines declaration --]
 [#assign defines = UserDefines.get(0)]
 [#list defines.entrySet() as define]
 #define ${define.key} ${define.value}
 [/#list]
 [/#if]
-#n
 [#if LabelDefines??][#-- user defines declaration --]
 [#assign defines = LabelDefines.get(0)]
 [#list defines.entrySet() as define]
@@ -167,35 +251,20 @@
 #define NVIC_PRIORITYGROUP_4         ((uint32_t)0x00000003) /*!< 4 bits for pre-emption priority,
                                                                  0 bit  for subpriority */
 #endif
-
 [/#if]
-
 [#list voids as void]
   [#if void.bspUsed?? && void.bspUsed]
 void ${""?right_pad(2)}${void.functionName}(void);
   [/#if]
 [/#list] 
-/* ########################## Assert Selection ############################## */
-/**
-  * @brief Uncomment the line below to expanse the "assert_param" macro in the 
-  *        HAL drivers code
-  */
-[#if !fullAssert??]/*[/#if] #define USE_FULL_ASSERT    1U [#if !fullAssert??]*/[/#if]
-
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
- extern "C" {
-#endif
-void _Error_Handler(char *, int);
-
-#define Error_Handler() _Error_Handler(__FILE__, __LINE__)
-#ifdef __cplusplus
 }
 #endif
 
-#endif /* __MAIN_H__ */
+#endif /* __MAIN_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

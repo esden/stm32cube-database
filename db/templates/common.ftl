@@ -2,7 +2,12 @@
 [#assign cmp0 =1]
 [#-- macro generateConfigModelCode --]
 
-[#macro generateConfigModelCode configModel inst nTab index]
+[#macro generateConfigModelCode configModel inst nTab index mode]
+[#if configModel.clockEnableMacro?? && mode=="Init"] [#-- Enable Port clock --]
+    [#list configModel.clockEnableMacro as clkmacroList]	
+            [#if nTab==2]#t#t[#else]#t[/#if]${clkmacroList}[#if !clkmacroList?contains("(")]()[/#if];
+    [/#list]
+[/#if] 
 [#if configModel.methods??] [#-- if the pin configuration contains a list of LibMethods--]
     [#assign methodList = configModel.methods]
 [#else]
@@ -206,7 +211,7 @@
                             [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                             [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
                             [#if nTab==2]#t#t[#else]#t[/#if]{
-                            [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
+                            [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
                             [#if nTab==2]#t#t[#else]#t[/#if]}
                         [/#if]#n
             [#-- [/#if] --]
@@ -218,7 +223,7 @@
                             [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                             [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
                             [#if nTab==2]#t#t[#else]#t[/#if]{
-                            [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
+                            [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
                             [#if nTab==2]#t#t[#else]#t[/#if]}
                         [/#if]#n
                 [/#if]			
@@ -278,7 +283,7 @@
                                 [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                                 [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
                                 [#if nTab==2]#t#t[#else]#t[/#if]{
-                                [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
+                                [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
                                 [#if nTab==2]#t#t[#else]#t[/#if]}
                             [/#if]#n
                         [/#if]
@@ -312,13 +317,13 @@
                         [/#if]
                     [/#list]
                     [#if !exist]  [#-- if exist --]                  
-                    #t${argument.typeName} ${argument.name};                        
+                    #t${argument.typeName} ${argument.name} = {0};                        
                       [#assign myListOfLocalVariables = myListOfLocalVariables + " "+ argument.name]
                       [#assign resultList = myListOfLocalVariables]
                     [/#if][#-- if exist --]
                     [/#if][#-- if global --]
                 [#else][#-- if context?? --]
-                #t${argument.typeName} ${argument.name};
+                #t${argument.typeName} ${argument.name} = {0};
             [/#if][#-- if argument.context?? --]
 
             [#-- Array type --]
@@ -348,13 +353,13 @@
                         [/#if]
                     [/#list]
                     [#if !exist]  [#-- if exist --]                  
-                    #t${argument.typeName} ${argument.name};                        
+                    #t${argument.typeName} ${argument.name} = {0};                        
                       [#assign myListOfLocalVariables = myListOfLocalVariables + " "+ argument.name]
                       [#assign resultList = myListOfLocalVariables]
                     [/#if][#-- if exist --]
                     [/#if][#-- if global --]
                 [#else][#-- if context?? --]
-                #t${argument.typeName} ${argument.name};
+                #t${argument.typeName} ${argument.name} = {0};
             [/#if]
             [/#if][#-- if struct --]
         [/#list][#-- list method.arguments --]
@@ -400,7 +405,7 @@
 [#if config.ipName?contains("CORTEX")]
 [#if config.comments?? && config.comments!=""] #t/**${config.comments} #n#t*/[/#if]
 [#else]
-[#if config.comments?? && config.comments!=""] #t#t/**${config.comments?replace("#t","#t#t")} #n#t#t*/[/#if]
+[#if config.comments?? && config.comments!=""] #t/**${config.comments?replace("#t","#t")} #n#t*/[/#if]
 [/#if]
 [/#if]
     [#list methodList as method][#assign args = ""]	 
@@ -455,12 +460,12 @@
                                         [#assign argValue=argument.value]
                                     [/#if][#-- if global --]
                                     [#-- Bz40086 - Begin tweak of the value in case of ADC --]
-                                    [#if (config.name == "ADC_RegularChannelConfig" || config.name == "ADC_InjectedChannelConfig") && (FamilyName!="STM32F0" && FamilyName!="STM32L0" && FamilyName!="STM32F2" && FamilyName!="STM32F4")]
+
+                                    [#if ( (config.name == "ADC_RegularChannelConfig" && FamilyName!="STM32G0" )|| config.name == "ADC_InjectedChannelConfig" || (FamilyName=="STM32G0" && config.name == "ADC_RegularChannelRankConfig")) && (FamilyName!="STM32F0" && FamilyName!="STM32L0" && FamilyName!="STM32F2" && FamilyName!="STM32F4")]
                                         [#list argument?keys as k]
                                             [#if k == "name"]
                                                 [#if argument[k] == "Rank"]
-
-
+                                                 
                                                     [#assign argValue="ADC_REGULAR_RANK_"+argument.value]
                                                 [#elseif argument[k] == "InjectedRank"]
                                                     [#assign argValue="ADC_INJECTED_RANK_"+argument.value]
@@ -530,9 +535,6 @@
                                                             [/#if]
                                                             [#if bz36245]
                                                               
-
-
-
                                                             [/#if]
                                                    [/#if]
                                                 [/#if]
@@ -548,7 +550,7 @@
 
 
                                                    [#if argument.value!="N/A"][#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name} = ${argument.value};  [/#if]
-                                                  [#if index1 == fargument.argument?size]
+ [#if index1 == fargument.argument?size]
                                                                 #n
                                                             [/#if]
 
@@ -737,7 +739,7 @@
             [#if !listofCalledMethod?contains(methodName) && method.optimizale??]
                 [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
                 [#if nTab==2]#t#t[#else]#t[/#if]{
-                [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
+                [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
 
 				
 
@@ -748,7 +750,7 @@
 
 
             [/#if]
-        [/#if]#n
+        [/#if]
 [/#if]
                     
             [#else]
@@ -760,7 +762,7 @@
                             [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                             [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
                             [#if nTab==2]#t#t[#else]#t[/#if]{
-                            [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
+                            [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
                             [#if nTab==2]#t#t[#else]#t[/#if]}
                         [/#if]#n                  
                     [/#if]
@@ -830,7 +832,7 @@
                                 [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                                 [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
                                 [#if nTab==2]#t#t[#else]#t[/#if]{
-                                [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
+                                [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
                                 [#if nTab==2]#t#t[#else]#t[/#if]}
                             [/#if]#n
                                [#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();--]
@@ -840,6 +842,13 @@
         [/#list]
 [#-- assign instanceIndex = "" --]
  [#-- else there is no LibMethod to call--]
+[#if bz36245]                                                           
+    #n
+    #t/* USER CODE BEGIN Check_RTC_BKUP */
+    #t#t
+    #t/* USER CODE END Check_RTC_BKUP */
+    #n
+[/#if]
 [/#list]
 
 
@@ -870,13 +879,13 @@
                         [/#if]
                     [/#list]
                     [#if !exist]  [#-- if exist --]                  
-                    #t${argument.typeName} ${argument.name};                        
+                    #t${argument.typeName} ${argument.name} = {0};                        
                       [#assign myListOfLocalVariables = myListOfLocalVariables + " "+ argument.name]
                       [#assign resultList = myListOfLocalVariables]
                     [/#if][#-- if exist --]
                     [/#if][#-- if global --]
                 [#else][#-- if context?? --]
-                #t${argument.typeName} ${argument.name};
+                #t${argument.typeName} ${argument.name} = {0};
             [/#if][#-- if argument.context?? --]
 
             [#-- Array type --]
@@ -898,7 +907,7 @@
                 [#if argument.context??][#-- if argument.context?? --]
 
                 [#else][#-- if context?? --]
-                #t${argument.typeName} ${argument.name};
+                #t${argument.typeName} ${argument.name} = {0};
             [/#if]
             [/#if][#-- if struct --]
         [/#list][#-- list method.arguments --]
@@ -1198,7 +1207,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
                             [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                             [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
                             [#if nTab==2]#t#t[#else]#t[/#if]{
-                            [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
+                            [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
                             [#if nTab==2]#t#t[#else]#t[/#if]}
                         [/#if]#n
             [#-- [/#if] --]
@@ -1210,7 +1219,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
                             [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                             [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
                             [#if nTab==2]#t#t[#else]#t[/#if]{
-                            [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
+                            [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
                             [#if nTab==2]#t#t[#else]#t[/#if]}
                         [/#if]#n
                 [/#if]			
@@ -1270,7 +1279,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
                                 [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                                 [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}() != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
                                 [#if nTab==2]#t#t[#else]#t[/#if]{
-                                [#if nTab==2]#t#t[#else]#t[/#if]#t_Error_Handler(__FILE__, __LINE__);
+                                [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
                                 [#if nTab==2]#t#t[#else]#t[/#if]}
                             [/#if]#n
                         [/#if]
@@ -1802,9 +1811,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
 #t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
 #t#tHAL_NVIC_EnableIRQ(${initVector.vector});
                     [#else]
-                        [#if FamilyName=="STM32L0" || FamilyName=="STM32F0"]
-
-
+                        [#if !NVICPriorityGroup??]
 #tNVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
                         [#else]
 #tNVIC_SetPriority(${initVector.vector}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),${initVector.preemptionPriority}, ${initVector.subPriority}));
@@ -1971,12 +1978,12 @@ ${bufferType} ${bufferName}[${bufferSize}];
 
 [#if serviceName=="gpio"]
  [#assign instanceIndex =""]
-    [@generateConfigModelCode configModel=gpioService inst=ipName nTab=tabN index=""/]
+    [@generateConfigModelCode configModel=gpioService inst=ipName nTab=tabN index="" mode=type/]
 [/#if]
 [#if serviceName=="gpioOut"]
  [#assign instanceIndex =""]
 [#if gpioOutService!="empty"]
-    [@generateConfigModelCode configModel=gpioOutService inst=ipName nTab=tabN index=""/]
+    [@generateConfigModelCode configModel=gpioOutService inst=ipName nTab=tabN index="" mode=type/]
 [/#if]
 [/#if]
 [#if serviceName=="dma" && dmaService??]
@@ -1993,7 +2000,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
     [#assign ind=dmaconfig.dmaRequestName?substring(dmaconfig.dmaRequestName?length-1)]
 #tif(${instHandler}->Instance == ${ipName}_Filter${ind}){
 [/#if]
-     [@generateConfigModelCode configModel=dmaconfig inst=ipName  nTab=tabN index=""/]
+     [@generateConfigModelCode configModel=dmaconfig inst=ipName  nTab=tabN index="" mode=type/]
         [#assign prefixList = dmaCurrentRequest?split("_")]
         [#list prefixList as p][#assign prefix= p][/#list]
 
@@ -2066,12 +2073,12 @@ ${bufferType} ${bufferName}[${bufferSize}];
 
 [#if serviceName=="gpio"]
  [#assign instanceIndex =""]
-    [@generateConfigModelCode configModel=gpioService inst=ipName nTab=tabN index=""/]
+    [@generateConfigModelCode configModel=gpioService inst=ipName nTab=tabN index="" mode=type/]
 [/#if]
 [#if serviceName=="gpioOut"]
  [#assign instanceIndex =""]
 [#if gpioOutService!="empty"]
-    [@generateConfigModelCode configModel=gpioOutService inst=ipName nTab=tabN index=""/]
+    [@generateConfigModelCode configModel=gpioOutService inst=ipName nTab=tabN index="" mode=type/]
 [/#if]
 [/#if]
 [#if serviceName=="dma" && dmaService??]
@@ -2089,7 +2096,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
     [#assign ind=dmaconfig.dmaRequestName?substring(dmaconfig.dmaRequestName?length-1)]
 #tif(${instHandler}->Instance == ${ipName}_Filter${ind}){
 [/#if]
-    [@generateConfigModelCode configModel=dmaconfig inst=ipName  nTab=tabN index=""/]
+    [@generateConfigModelCode configModel=dmaconfig inst=ipName  nTab=tabN index="" mode=type/]
     [#if IPData1.usedDriver == "HAL" && dmaconfig.usedDriver == "HAL"]
         [#assign prefixList = dmaCurrentRequest?split("_")]
         [#list prefixList as p][#assign prefix= p][/#list]

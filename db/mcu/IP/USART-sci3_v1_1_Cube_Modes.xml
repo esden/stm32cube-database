@@ -29,7 +29,7 @@
     
 	
     <RefParameter Comment="Auto Baudrate" DefaultValue="UART_ADVFEATURE_AUTOBAUDRATE_DISABLE" Group="Advanced Features" Name="AutoBaudRateEnableParam" Type="list">
-        <Condition Diagnostic="" Expression="!(((($IpNumber=4)|($IpNumber=5))&amp; DIE447)|DIE457)"/>
+        <Condition Diagnostic="" Expression="!(((($IpNumber=4)|($IpNumber=5))&amp; DIE447)|DIE457) &amp; !(STM32L0x0_Value_Line &amp; (DIE457 | DIE425))"/>
         <PossibleValue Comment="Disable" Value="UART_ADVFEATURE_AUTOBAUDRATE_DISABLE"/>
         <PossibleValue Comment="Enable" Semaphore="$IpInstance_UART_AutoBaudRate_Enable" Value="UART_ADVFEATURE_AUTOBAUDRATE_ENABLE"/>
     </RefParameter>
@@ -45,6 +45,9 @@
     <!-- BaudRate Parameters ; based on Uart Instance (AHB Clock), and if IrDa Mode on a Small maximum. -->
     <RefParameter Comment="Baud Rate" DefaultValue="115200" Group="Basic Parameters" Max="115200" Min="115200" Name="BaudRate" Type="integer" Unit="Bits/s" Visible="false">
         <Condition Diagnostic="" Expression="$IpInstance_UART_AutoBaudRate_Enable"/>
+    </RefParameter>
+    <RefParameter Comment="Baud Rate" DefaultValue="921600" Group="Basic Parameters" Max="10500000" Min="110" Name="BaudRate" Type="integer" Unit="Bits/s">
+        <Condition Diagnostic="" Expression="USBPD_$IpInstance"/>
     </RefParameter>
     <RefParameter Comment="Baud Rate" DefaultValue="115200" Group="Basic Parameters" Max="10500000" Min="110" Name="BaudRate" Type="integer" Unit="Bits/s" Visible="true"/>
    
@@ -1206,7 +1209,7 @@
                     <Semaphore>$IpInstance_Asynchronous</Semaphore>
                     <Semaphore>Asynchronous</Semaphore>
                 </Mode>
-                <Mode Name="Synchronous" RemoveCondition="DIE457">
+                <Mode Name="Synchronous" RemoveCondition="DIE457|(DIE425 &amp; STM32L0x0_Value_Line) &amp; ($IpNumber=2)">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="CK"/>
                         <Signal Name="RX"/>
@@ -1224,30 +1227,30 @@
                         <Signal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultOD" Name="TX"/>
                     </SignalLogicalOp>
                 </Mode>
-                <Mode Name="IrDA" RemoveCondition="($IpNumber=4)|($IpNumber=5)|($IpNumber=7)|($IpNumber=8)|(STM32L0x0)">
+                <Mode Name="IrDA" RemoveCondition="STM32L010K8Tx|($IpNumber=4)|($IpNumber=5)|($IpNumber=7)|($IpNumber=8)|(STM32L0x0_Value_Line) &amp; ($IpNumber=2) &amp; !(DIE417 | DIE447)">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="RX"/>
                         <Signal Name="TX"/>
                     </SignalLogicalOp>
                 </Mode>
-                <Mode Name="LIN" RemoveCondition="($IpNumber=4)|($IpNumber=5)|($IpNumber=7)|($IpNumber=8)|DIE457|(STM32L0x0)">
+                <Mode Name="LIN" RemoveCondition="($IpNumber=4)|($IpNumber=5)|($IpNumber=7)|($IpNumber=8)|DIE457|((DIE457|DIE425) &amp; STM32L0x0_Value_Line) &amp; ($IpNumber=2)">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="RX"/>
                         <Signal Name="TX"/>
                     </SignalLogicalOp>
                 </Mode>
-                <Mode Name="SmartCard" RemoveCondition="($IpNumber=4)|($IpNumber=5)|($IpNumber=7)|($IpNumber=8)|(STM32L0x0)">
+                <Mode Name="SmartCard" RemoveCondition="($IpNumber=4)|($IpNumber=5)|($IpNumber=7)|($IpNumber=8)|((DIE457|DIE425) &amp; STM32L0x0_Value_Line) &amp; ($IpNumber=2)">
                     <SignalLogicalOp Name="AND">
                         <Signal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultOD" Name="TX"/>
                     </SignalLogicalOp>
                 </Mode>
-                <Mode Name="SmartCard_With_Clock" RemoveCondition="($IpNumber=4)|($IpNumber=5)|($IpNumber=7)|($IpNumber=8)|(STM32L0x0)" UserName="SmartCard with Card Clock">
+                <Mode Name="SmartCard_With_Clock" RemoveCondition="($IpNumber=4)|($IpNumber=5)|($IpNumber=7)|($IpNumber=8)|((DIE457|DIE425) &amp; STM32L0x0_Value_Line) &amp; ($IpNumber=2)" UserName="SmartCard with Card Clock">
                     <SignalLogicalOp Name="AND">
                         <Signal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultOD" Name="TX"/>
                         <Signal Name="CK"/>
                     </SignalLogicalOp>
                 </Mode>
-                <Mode Name="ModbusCommunication" RemoveCondition="($IpNumber=4)|($IpNumber=5)|($IpNumber=7)|($IpNumber=8)|DIE457" UserName="Modbus Communication">
+                <Mode Name="ModbusCommunication" RemoveCondition="($IpNumber=4)|($IpNumber=5)|($IpNumber=7)|($IpNumber=8)|DIE457|((DIE425) &amp; STM32L0x0_Value_Line) &amp; ($IpNumber=2)" UserName="Modbus Communication">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="TX"/>
                     </SignalLogicalOp>
@@ -1256,7 +1259,7 @@
              
         </Mode>
 		
-        <Mode Name="Hardware Flow Control (RS232)" RemoveCondition="($IpNumber=5 &amp; !DIE447)|($IpNumber=7)|($IpNumber=8)|(STM32L0x0)">
+        <Mode Name="Hardware Flow Control (RS232)" RemoveCondition="($IpNumber=5 &amp; !DIE447)|($IpNumber=7)|($IpNumber=8)">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="CTS_Only" UserName="CTS Only">
                     <SignalLogicalOp Name="AND">
@@ -1293,7 +1296,7 @@
                 <Condition Expression="$IpInstance_SmartCard" Diagnostic="Active only with SmartCard Mode"/>
         </Mode>
         -->
-        <Mode Name="Hardware Flow Control (RS485)" RemoveCondition="(STM32L0x0)">
+        <Mode Name="Hardware Flow Control (RS485)" RemoveCondition="STM32L0x0_Value_Line &amp; !(DIE417 | DIE447)">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="Hardware Flow Control (RS485)">
                     <SignalLogicalOp Name="AND">

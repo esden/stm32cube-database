@@ -1,5 +1,6 @@
 [#ftl]
 [#compress]
+/* Scheduler includes. */
 #include "FreeRTOS.h"
 #include "task.h"
 #include "timers.h"

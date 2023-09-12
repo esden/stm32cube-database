@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /*
  * FreeRTOS Kernel V10.0.1
  * Copyright (C) 2017 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
@@ -24,11 +25,13 @@
  * http://aws.amazon.com/freertos
  *
  * 1 tab == 4 spaces!
- */#n
+ */
+ /* USER CODE END Header */
 
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
 
+[#assign familyName=FamilyName?lower_case]
 [#-- SWIPdatas is a list of SWIPconfigModel --]
 [#list SWIPdatas as SWIP]
 [#assign instName = SWIP.ipName]
@@ -441,6 +444,8 @@ to exclude the API function. */
 #define INCLUDE_xTaskGetHandle              1
 [/#if]
 
+[#if (familyName=="stm32g0") || (familyName=="stm32f0") || (familyName=="stm32l0")] 
+[#else]
 /* Cortex-M specific definitions. */
 #ifdef __NVIC_PRIO_BITS
  /* __BVIC_PRIO_BITS will be specified when CMSIS is being used. */
@@ -465,6 +470,7 @@ to all Cortex-M ports, and do not rely on any particular library functions. */
 /* !!!! configMAX_SYSCALL_INTERRUPT_PRIORITY must not be set to zero !!!!
 See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY 	( configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY << (8 - configPRIO_BITS) )
+[/#if]
 
 /* Normal assert() semantics without relying on the provision of an assert.h
 header file. */
@@ -477,9 +483,13 @@ standard names. */
 #define vPortSVCHandler    SVC_Handler
 #define xPortPendSVHandler PendSV_Handler
 
-/* IMPORTANT: This define MUST be commented when used with STM32Cube firmware, 
+/* IMPORTANT: This define is commented when used with STM32Cube firmware, when the timebase source is SysTick,
               to prevent overwriting SysTick_Handler defined within STM32Cube HAL */
+[#if timeBaseSource?? && timeBaseSource!="SysTick"]
+#define xPortSysTickHandler SysTick_Handler
+[#else]
 /* #define xPortSysTickHandler SysTick_Handler */
+[/#if]
 
 [#if configGENERATE_RUN_TIME_STATS=="1"]
 /* USER CODE BEGIN 2 */    

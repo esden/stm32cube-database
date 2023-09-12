@@ -17,6 +17,7 @@
 [/#list]
 [/#if]
 #include "usbh_core.h"
+#include "main.h"
 [#assign BspPlatform = "false"]
 [#if Platform??]
 	[#if Platform = "true"]

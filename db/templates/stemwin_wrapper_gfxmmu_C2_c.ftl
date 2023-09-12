@@ -743,12 +743,12 @@ void DMA2D_Init(void)
 	
   if (HAL_DMA2D_Init(&hdma2d) != HAL_OK)
   {
-    _Error_Handler(__FILE__, __LINE__);
+    Error_Handler( );
   }
 
   if (HAL_DMA2D_ConfigLayer(&hdma2d, 1) != HAL_OK)
   {
-    _Error_Handler(__FILE__, __LINE__);
+    Error_Handler( );
   }
 
 }  

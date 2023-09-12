@@ -14,11 +14,22 @@
 [#assign queueAllocation = "Dynamic"]
 [#assign timerAllocation = "Dynamic"]
 [#assign queueThreadId = "NULL"]
+[#assign useMPU = "0"]
+
+[#list SWIPdatas as SWIP]
+  [#if SWIP.defines??]
+    [#list SWIP.defines as definition]
+      [#if definition.name=="USE_MPU"]
+        [#assign useMPU = definition.value]
+      [/#if]
+     [/#list]
+  [/#if]
+[/#list]
 
 [#list SWIPdatas as SWIP]
   [#if SWIP.variables??]
-        [#list SWIP.variables as variable]
-          [#if variable.name=="Mutexes"]
+    [#list SWIP.variables as variable]
+      [#if variable.name=="Mutexes"]
         [#assign s = variable.valueList]
         [#assign index = 0]
         [#list s as i]
@@ -82,7 +93,7 @@
         [/#if]
       [/#if] 	
     [/#list]
-  [/#if]
+  [/#if] 
 [/#list]
 
 #n
@@ -123,7 +134,7 @@
       [/#if]
     [/#list]
   [/#if]
-[/#list]	
+[/#list]
 
 [#list SWIPdatas as SWIP]
   [#if SWIP.variables??]
@@ -159,7 +170,7 @@
           [/#if]
         [/#if]
       [/#if]
-	[/#list]
+    [/#list]
   [/#if]
 [/#list]
 
@@ -242,28 +253,7 @@
             [#assign threadName = i]
           [/#if]
           [#if index == 1]
-            [#assign threadPriority = i]
-            [#if threadPriority == "osPriorityIdle"]
-              [#assign taskPriority = 0]
-            [/#if]
-            [#if threadPriority == "osPriorityLow"]
-              [#assign taskPriority = 1]
-            [/#if]
-            [#if threadPriority == "osPriorityBelowNormal"]
-              [#assign taskPriority = 2]
-            [/#if]
-            [#if threadPriority == "osPriorityNormal"]
-              [#assign taskPriority = 3]
-            [/#if]
-            [#if threadPriority == "osPriorityAboveNormal"]
-              [#assign taskPriority = 4]
-            [/#if]
-            [#if threadPriority == "osPriorityHigh"]
-              [#assign taskPriority = 5]
-            [/#if] 
-            [#if threadPriority == "osPriorityRealtime"]
-              [#assign taskPriority = 6]
-            [/#if]                     
+            [#assign taskPriority = i]
           [/#if]
           [#if index == 2]
             [#assign threadStackSize = i]
@@ -292,14 +282,17 @@
           [#assign index = index + 1]
         [/#list]
         [#assign nbThreads = nbThreads + 1]
-        [#if nbThreads == 1]
-          #n#t/* Create the thread(s) */
-        [/#if]
-        #t/* definition and creation of ${threadName} */
-        [#if threadAllocation == "Dynamic"]
-         #txTaskCreate(${threadFunction}, "${threadName}", ${threadStackSize}, NULL, ${taskPriority}, &${threadName}Handle);
+
+        [#if nbThreads == 1 && useMPU == "1"]
+          [#-- For Dory and MPU: do not generate default task --]
         [#else]
-         #t${threadName}Handle = xTaskCreateStatic(${threadFunction}, "${threadName}", ${threadStackSize}, NULL, ${taskPriority}, ${threadBuffer}, &${threadControlBlock});
+            #n#t/* Create the thread(s) */
+            #t/* definition and creation of ${threadName} */
+          [#if threadAllocation == "Dynamic"]
+            #txTaskCreate(${threadFunction}, "${threadName}", ${threadStackSize}, NULL, ${taskPriority}, &${threadName}Handle);
+          [#else]
+            #t${threadName}Handle = xTaskCreateStatic(${threadFunction}, "${threadName}", ${threadStackSize}, NULL, ${taskPriority}, ${threadBuffer}, &${threadControlBlock});
+          [/#if]       
         [/#if]
       [/#if]
 	[/#list]

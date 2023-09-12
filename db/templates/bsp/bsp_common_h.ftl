@@ -74,6 +74,7 @@
 /* Includes ------------------------------------------------------------------*/ 
 #include "${FamilyName?lower_case}xx_hal.h"
 #include <stdio.h>
+#include "main.h"
 
 /** @addtogroup BSP
  * @{

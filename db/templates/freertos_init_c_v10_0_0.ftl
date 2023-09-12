@@ -332,7 +332,7 @@
           [/#if]
           #t/* definition and creation of ${queueName} */
           [#if queueAllocation == "Dynamic"]
-            /* what about the sizeof here??? cd native code */
+            [#-- what about the sizeof here??? cd native code  --]
             #tosMessageQDef(${queueName}, ${queueSize}, ${queueElementType});
           [#else]
             #tosMessageQStaticDef(${queueName}, ${queueSize}, ${queueElementType}, ${queueBuffer}, &${queueControlBlock});

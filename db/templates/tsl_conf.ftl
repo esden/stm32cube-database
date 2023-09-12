@@ -22,6 +22,9 @@
 #ifndef __TSL_CONF_H
 #define __TSL_CONF_H
 [#assign familyName=FamilyName?lower_case]
+
+#include "main.h"
+
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /*+++++++++++++++++++++++++++ COMMON PARAMETERS ++++++++++++++++++++++++++++++*/
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -177,19 +180,6 @@
 	[#if SWIP.defines??]
 		[#list SWIP.defines as definition]
 			[#if definition.name="TSLPRM_USE_PROX"]
-				[#lt]#define ${definition.name} (${definition.value})
-			[/#if]
-		[/#list]
-	[/#if]
-[/#list]
-
-
- /** Zone management usage (0=No, 1=Yes)
-*/
-[#list SWIPdatas as SWIP]
-	[#if SWIP.defines??]
-		[#list SWIP.defines as definition]
-			[#if definition.name="TSLPRM_USE_ZONE"]
 				[#lt]#define ${definition.name} (${definition.value})
 			[/#if]
 		[/#list]

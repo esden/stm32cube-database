@@ -1,4 +1,5 @@
 [#ftl]
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * File Name          : ${name?lower_case}.h
@@ -8,6 +9,7 @@
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 [#-- 'UserCode sections' are indexed dynamically --]
 [#assign userCodeIdx = 0]
@@ -21,6 +23,7 @@
 
 [#compress]
     /* Includes ------------------------------------------------------------------*/
+ #include "main.h"
     [#if includes??]
         [#list includes as include]
             #include "${include}"

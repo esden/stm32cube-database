@@ -43,11 +43,13 @@
     #t/* Peripheral interrupt init*/
     [/#if]
     [#if initVector.codeInMspInit]
+        [#if initVector.systemHandler=="false" || initVector.preemptionPriority!="0" || initVector.subPriority!="0"]
     #t/* ${initVector.vector} interrupt configuration */
         [#if NVICPriorityGroup??]
     #tNVIC_SetPriority(${initVector.vector}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),${initVector.preemptionPriority}, ${initVector.subPriority}));
         [#else]
     #tNVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
+        [/#if]
         [/#if]
         [#if initVector.systemHandler=="false"]
     #tNVIC_EnableIRQ(${initVector.vector});

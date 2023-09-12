@@ -39,22 +39,22 @@
 					[#if SpiIpInstanceList == ""]
 						[#assign SpiIpInstance = bsp.solution]
 						[#assign SpiIpInstanceList = bsp.solution]
-[#-- extern SPI_HandleTypeDef hbus${SpiIpInstance?lower_case};						--]
+[#-- extern SPI_HandleTypeDef h${SpiIpInstance?lower_case};						--]
 					[#elseif !SpiIpInstanceList?contains(bsp.solution)]
 						[#assign SpiIpInstance = bsp.solution]
 						[#assign SpiIpInstanceList = SpiIpInstanceList + "," + bsp.solution]
-[#-- extern SPI_HandleTypeDef hbus${SpiIpInstance?lower_case};--]
+[#-- extern SPI_HandleTypeDef h${SpiIpInstance?lower_case};--]
 					[/#if]
 				[#break]
 				[#case "I2C"]
 					[#if I2CIpInstanceList == ""]
 						[#assign I2CIpInstance = bsp.solution]	
 						[#assign I2CIpInstanceList = bsp.solution]
-[#-- extern I2C_HandleTypeDef hbus${I2CIpInstance?lower_case};	--]										
+[#-- extern I2C_HandleTypeDef h${I2CIpInstance?lower_case};	--]										
 					[#elseif !I2CIpInstanceList?contains(bsp.solution)]
 						[#assign I2CIpInstance = bsp.solution]
 						[#assign I2CIpInstanceList = I2CIpInstanceList + "," + bsp.solution]
-[#-- extern I2C_HandleTypeDef hbus${I2CIpInstance?lower_case}; --]
+[#-- extern I2C_HandleTypeDef h${I2CIpInstance?lower_case}; --]
 					[/#if]
 				[#break]  
 				[#default]
@@ -147,12 +147,12 @@ __weak HAL_StatusTypeDef MX_${I2CIpInstance}_Init(I2C_HandleTypeDef* hi2c);
 						[#assign SpiIpInstance = bsp.solution]
 						[#assign SpiIpInstanceList = bsp.solution]
 [#-- extern : A.T removed after reveiw with Maher --]
-SPI_HandleTypeDef hbus${SpiIpInstance?lower_case};						
+SPI_HandleTypeDef h${SpiIpInstance?lower_case};						
 					[#elseif !SpiIpInstanceList?contains(bsp.solution)]
 						[#assign SpiIpInstance = bsp.solution]
 						[#assign SpiIpInstanceList = SpiIpInstanceList + "," + bsp.solution]
 [#-- extern : A.T removed after reveiw with Maher --]
-SPI_HandleTypeDef hbus${SpiIpInstance?lower_case};
+SPI_HandleTypeDef h${SpiIpInstance?lower_case};
 					[/#if]
 				[#break]
 				[#case "I2C"]
@@ -160,12 +160,12 @@ SPI_HandleTypeDef hbus${SpiIpInstance?lower_case};
 						[#assign I2CIpInstance = bsp.solution]
 						[#assign I2CIpInstanceList = bsp.solution]
 [#-- extern : A.T removed after reveiw with Maher --]
-I2C_HandleTypeDef hbus${I2CIpInstance?lower_case};											
+I2C_HandleTypeDef h${I2CIpInstance?lower_case};											
 					[#elseif !I2CIpInstanceList?contains(bsp.solution)]
 						[#assign I2CIpInstance = bsp.solution]
 						[#assign I2CIpInstanceList = I2CIpInstanceList + "," + bsp.solution]
 [#-- extern : A.T removed after reveiw with Maher --]
-I2C_HandleTypeDef hbus${I2CIpInstance?lower_case};
+I2C_HandleTypeDef h${I2CIpInstance?lower_case};
 					[/#if]
 				[#break]  
 				[#default]
@@ -406,13 +406,13 @@ int32_t BSP_${IpInstance}_Init(void) {
 
   int32_t ret = BSP_ERROR_NONE;
   
-  hbus${IpInstance?lower_case}.Instance  = ${IpInstance?upper_case};
+  h${IpInstance?lower_case}.Instance  = ${IpInstance?upper_case};
 
-  if (HAL_I2C_GetState(&hbus${IpInstance?lower_case}) == HAL_I2C_STATE_RESET)
+  if (HAL_I2C_GetState(&h${IpInstance?lower_case}) == HAL_I2C_STATE_RESET)
   {  
     #if (USE_HAL_I2C_REGISTER_CALLBACKS == 0)
       /* Init the I2C Msp */
-      ${IpInstance?upper_case}_MspInit(&hbus${IpInstance?lower_case});
+      ${IpInstance?upper_case}_MspInit(&h${IpInstance?lower_case});
     #else
       if(Is${I2CIpInstance}MspCbValid == 0U)
       {
@@ -424,13 +424,13 @@ int32_t BSP_${IpInstance}_Init(void) {
     #endif
 
     /* Init the I2C */
-    if(MX_${IpInstance}_Init(&hbus${IpInstance?lower_case}) != HAL_OK)
+    if(MX_${IpInstance}_Init(&h${IpInstance?lower_case}) != HAL_OK)
     {
       ret = BSP_ERROR_BUS_FAILURE;
     }
-	[#if FamilyName.contains("STM32L1")]
+	[#if FamilyName.contains("STM32L1") || FamilyName.contains("STM32F1") || FamilyName.contains("STM32F2")]
 	[#else]
-    else if(HAL_I2CEx_ConfigAnalogFilter(&hbus${IpInstance?lower_case}, I2C_ANALOGFILTER_ENABLE) != HAL_OK) 
+    else if(HAL_I2CEx_ConfigAnalogFilter(&h${IpInstance?lower_case}, I2C_ANALOGFILTER_ENABLE) != HAL_OK) 
     {
       ret = BSP_ERROR_BUS_FAILURE;
     }
@@ -455,10 +455,10 @@ int32_t BSP_${IpInstance}_DeInit(void) {
   
   #if (USE_HAL_I2C_REGISTER_CALLBACKS == 0)
     /* DeInit the I2C */ 
-    ${IpInstance?upper_case}_MspDeInit(&hbus${IpInstance?lower_case});
+    ${IpInstance?upper_case}_MspDeInit(&h${IpInstance?lower_case});
   #endif  
   
-  if (HAL_I2C_DeInit(&hbus${IpInstance?lower_case}) == HAL_OK) {
+  if (HAL_I2C_DeInit(&h${IpInstance?lower_case}) == HAL_OK) {
     ret = BSP_ERROR_NONE;
   }
   
@@ -470,7 +470,7 @@ int32_t BSP_${IpInstance}_DeInit(void) {
   *	@retval bool
   */
 int32_t BSP_${IpInstance}_IsReady(void) {
-	return (HAL_I2C_GetState(&hbus${IpInstance?lower_case}) == HAL_I2C_STATE_READY);
+	return (HAL_I2C_GetState(&h${IpInstance?lower_case}) == HAL_I2C_STATE_READY);
 }
 
 
@@ -484,7 +484,7 @@ int32_t BSP_${IpInstance}_IsReady(void) {
 int32_t BSP_${IpInstance}_WriteReg(uint16_t DevAddr, uint16_t Reg, uint8_t *pData, uint16_t len) {
   int32_t ret = BSP_ERROR_BUS_FAILURE;
 
-  if(HAL_I2C_Mem_Write(&hbus${IpInstance?lower_case}, (uint8_t)DevAddr,
+  if(HAL_I2C_Mem_Write(&h${IpInstance?lower_case}, (uint8_t)DevAddr,
                        (uint16_t)Reg, I2C_MEMADD_SIZE_8BIT,
                        (uint8_t *)pData, len, TIMEOUT_DURATION) == HAL_OK)
   {
@@ -504,7 +504,7 @@ int32_t BSP_${IpInstance}_WriteReg(uint16_t DevAddr, uint16_t Reg, uint8_t *pDat
 int32_t  BSP_${IpInstance}_ReadReg(uint16_t DevAddr, uint16_t Reg, uint8_t *pData, uint16_t len) {
   int32_t ret = BSP_ERROR_BUS_FAILURE;
 
-  if (HAL_I2C_Mem_Read(&hbus${IpInstance?lower_case}, DevAddr, (uint16_t)Reg,
+  if (HAL_I2C_Mem_Read(&h${IpInstance?lower_case}, DevAddr, (uint16_t)Reg,
                        I2C_MEMADD_SIZE_8BIT, pData,
                        len, TIMEOUT_DURATION) == HAL_OK)
   {
@@ -525,7 +525,7 @@ int32_t  BSP_${IpInstance}_ReadReg(uint16_t DevAddr, uint16_t Reg, uint8_t *pDat
 int32_t BSP_${IpInstance}_WriteReg16(uint16_t DevAddr, uint16_t Reg, uint8_t *pData, uint16_t len) {
   int32_t ret = BSP_ERROR_BUS_FAILURE;
   
-  if(HAL_I2C_Mem_Write(&hbus${IpInstance?lower_case}, (uint8_t)DevAddr,
+  if(HAL_I2C_Mem_Write(&h${IpInstance?lower_case}, (uint8_t)DevAddr,
                        (uint16_t)Reg, I2C_MEMADD_SIZE_16BIT,
                        (uint8_t *)pData, len, TIMEOUT_DURATION) == HAL_OK)
   {
@@ -545,7 +545,7 @@ int32_t BSP_${IpInstance}_WriteReg16(uint16_t DevAddr, uint16_t Reg, uint8_t *pD
 int32_t  BSP_${IpInstance}_ReadReg16(uint16_t DevAddr, uint16_t Reg, uint8_t *pData, uint16_t len) {
   int32_t ret = BSP_ERROR_BUS_FAILURE;
   
-  if (HAL_I2C_Mem_Read(&hbus${IpInstance?lower_case}, DevAddr, (uint16_t)Reg,
+  if (HAL_I2C_Mem_Read(&h${IpInstance?lower_case}, DevAddr, (uint16_t)Reg,
                        I2C_MEMADD_SIZE_16BIT, pData,
                        len, TIMEOUT_DURATION) == HAL_OK)
   {
@@ -566,7 +566,7 @@ int32_t  BSP_${IpInstance}_ReadReg16(uint16_t DevAddr, uint16_t Reg, uint8_t *pD
 int32_t BSP_${IpInstance}_Send(uint16_t DevAddr, uint8_t *pData, uint16_t len) {
 	int32_t ret = BSP_ERROR_BUS_FAILURE;
 
-	if (HAL_I2C_Master_Transmit (&hbus${IpInstance?lower_case}, DevAddr, pData, len, TIMEOUT_DURATION) == HAL_OK) {
+	if (HAL_I2C_Master_Transmit (&h${IpInstance?lower_case}, DevAddr, pData, len, TIMEOUT_DURATION) == HAL_OK) {
 		ret = len;
 	}
 
@@ -584,7 +584,7 @@ int32_t BSP_${IpInstance}_Send(uint16_t DevAddr, uint8_t *pData, uint16_t len) {
 int32_t BSP_${IpInstance}_Recv(uint16_t DevAddr, uint8_t *pData, uint16_t len) {
 	int32_t ret = BSP_ERROR_BUS_FAILURE;
 
-	if (HAL_I2C_Master_Receive (&hbus${IpInstance?lower_case}, DevAddr, pData, len, TIMEOUT_DURATION) == HAL_OK) {
+	if (HAL_I2C_Master_Receive (&h${IpInstance?lower_case}, DevAddr, pData, len, TIMEOUT_DURATION) == HAL_OK) {
 		ret = len;
 	}
 
@@ -630,12 +630,12 @@ int32_t BSP_${IpInstance}_SendRecv(uint16_t DevAddr, uint8_t *pTxdata, uint8_t *
 int32_t BSP_${IpInstance}_Init(void) {
   int32_t ret = BSP_ERROR_NONE;
   
-  hbus${IpInstance?lower_case}.Instance  = ${IpInstance?upper_case};
-  if (HAL_SPI_GetState(&hbus${IpInstance?lower_case}) == HAL_SPI_STATE_RESET) 
+  h${IpInstance?lower_case}.Instance  = ${IpInstance?upper_case};
+  if (HAL_SPI_GetState(&h${IpInstance?lower_case}) == HAL_SPI_STATE_RESET) 
   { 
 #if (USE_HAL_SPI_REGISTER_CALLBACKS == 0)
     /* Init the SPI Msp */
-    ${IpInstance?upper_case}_MspInit(&hbus${IpInstance?lower_case});
+    ${IpInstance?upper_case}_MspInit(&h${IpInstance?lower_case});
 #else
     if(Is${SpiIpInstance}MspCbValid == 0U)
     {
@@ -647,7 +647,7 @@ int32_t BSP_${IpInstance}_Init(void) {
 #endif   
     
     /* Init the SPI */
-    if (MX_${IpInstance}_Init(&hbus${IpInstance?lower_case}) != HAL_OK)
+    if (MX_${IpInstance}_Init(&h${IpInstance?lower_case}) != HAL_OK)
     {
       ret = BSP_ERROR_BUS_FAILURE;
     }
@@ -666,10 +666,10 @@ int32_t BSP_${IpInstance}_DeInit(void) {
   int32_t ret = BSP_ERROR_BUS_FAILURE;
 
 #if (USE_HAL_SPI_REGISTER_CALLBACKS == 0)
-  ${IpInstance?upper_case}_MspDeInit(&hbus${IpInstance?lower_case});
+  ${IpInstance?upper_case}_MspDeInit(&h${IpInstance?lower_case});
 #endif  
   
-  if (HAL_SPI_DeInit(&hbus${IpInstance?lower_case}) == HAL_OK) {
+  if (HAL_SPI_DeInit(&h${IpInstance?lower_case}) == HAL_OK) {
     ret = BSP_ERROR_NONE;
   }
   
@@ -687,7 +687,7 @@ int32_t BSP_${IpInstance}_Send(uint8_t *pData, uint16_t len)
 {
   int32_t ret = BSP_ERROR_UNKNOWN_FAILURE;
   
-  if(HAL_SPI_Transmit(&hbus${IpInstance?lower_case}, pData, len, TIMEOUT_DURATION) == HAL_OK)
+  if(HAL_SPI_Transmit(&h${IpInstance?lower_case}, pData, len, TIMEOUT_DURATION) == HAL_OK)
   {
       ret = len;
   }
@@ -705,7 +705,7 @@ int32_t  BSP_${IpInstance}_Recv(uint8_t *pData, uint16_t len)
 {
   int32_t ret = BSP_ERROR_UNKNOWN_FAILURE;
   
-  if(HAL_SPI_Receive(&hbus${IpInstance?lower_case}, pData, len, TIMEOUT_DURATION) == HAL_OK)
+  if(HAL_SPI_Receive(&h${IpInstance?lower_case}, pData, len, TIMEOUT_DURATION) == HAL_OK)
   {
       ret = len;
   }
@@ -723,7 +723,7 @@ int32_t BSP_${IpInstance}_SendRecv(uint8_t *pTxData, uint8_t *pRxData, uint16_t 
 {
   int32_t ret = BSP_ERROR_UNKNOWN_FAILURE;
   
-  if(HAL_SPI_TransmitReceive(&hbus${IpInstance?lower_case}, pTxData, pRxData, len, TIMEOUT_DURATION) == HAL_OK)
+  if(HAL_SPI_TransmitReceive(&h${IpInstance?lower_case}, pTxData, pRxData, len, TIMEOUT_DURATION) == HAL_OK)
   {
       ret = len;
   }
@@ -750,16 +750,16 @@ int32_t BSP_GetTick(void) {
 int32_t BSP_${IpInstance}_RegisterDefaultMspCallbacks (void)
 {
 
-  __HAL_${IpName}_RESET_HANDLE_STATE(&hbus${IpHandle?lower_case});
+  __HAL_${IpName}_RESET_HANDLE_STATE(&h${IpHandle?lower_case});
   
   /* Register MspInit Callback */
-  if (HAL_${IpName}_RegisterCallback(&hbus${IpHandle?lower_case}, HAL_${IpName}_MSPINIT_CB_ID, ${IpInstance}_MspInit)  != HAL_OK)
+  if (HAL_${IpName}_RegisterCallback(&h${IpHandle?lower_case}, HAL_${IpName}_MSPINIT_CB_ID, ${IpInstance}_MspInit)  != HAL_OK)
   {
     return BSP_ERROR_PERIPH_FAILURE;
   }
   
   /* Register MspDeInit Callback */
-  if (HAL_${IpName}_RegisterCallback(&hbus${IpHandle?lower_case}, HAL_${IpName}_MSPDEINIT_CB_ID, ${IpInstance}_MspDeInit) != HAL_OK)
+  if (HAL_${IpName}_RegisterCallback(&h${IpHandle?lower_case}, HAL_${IpName}_MSPDEINIT_CB_ID, ${IpInstance}_MspDeInit) != HAL_OK)
   {
     return BSP_ERROR_PERIPH_FAILURE;
   }
@@ -776,16 +776,16 @@ int32_t BSP_${IpInstance}_RegisterDefaultMspCallbacks (void)
 int32_t BSP_${IpInstance}_RegisterMspCallbacks (BSP_${IpName}_Cb_t *Callbacks)
 {
   /* Prevent unused argument(s) compilation warning */
-  __HAL_${IpName}_RESET_HANDLE_STATE(&hbus${IpHandle?lower_case});  
+  __HAL_${IpName}_RESET_HANDLE_STATE(&h${IpHandle?lower_case});  
  
    /* Register MspInit Callback */
-  if (HAL_${IpName}_RegisterCallback(&hbus${IpHandle?lower_case}, HAL_${IpName}_MSPINIT_CB_ID, Callbacks->pMspSpiInitCb)  != HAL_OK)
+  if (HAL_${IpName}_RegisterCallback(&h${IpHandle?lower_case}, HAL_${IpName}_MSPINIT_CB_ID, Callbacks->pMspSpiInitCb)  != HAL_OK)
   {
     return BSP_ERROR_PERIPH_FAILURE;
   }
   
   /* Register MspDeInit Callback */
-  if (HAL_${IpName}_RegisterCallback(&hbus${IpHandle?lower_case}, HAL_${IpName}_MSPDEINIT_CB_ID, Callbacks->pMspSpiDeInitCb) != HAL_OK)
+  if (HAL_${IpName}_RegisterCallback(&h${IpHandle?lower_case}, HAL_${IpName}_MSPDEINIT_CB_ID, Callbacks->pMspSpiDeInitCb) != HAL_OK)
   {
     return BSP_ERROR_PERIPH_FAILURE;
   }
@@ -808,16 +808,16 @@ int32_t BSP_${IpInstance}_RegisterMspCallbacks (BSP_${IpName}_Cb_t *Callbacks)
 int32_t BSP_${IpInstance}_RegisterDefaultMspCallbacks (void)
 {
 
-  __HAL_${IpName}_RESET_HANDLE_STATE(&hbus${IpHandle?lower_case});
+  __HAL_${IpName}_RESET_HANDLE_STATE(&h${IpHandle?lower_case});
   
   /* Register MspInit Callback */
-  if (HAL_${IpName}_RegisterCallback(&hbus${IpHandle?lower_case}, HAL_${IpName}_MSPINIT_CB_ID, ${IpInstance}_MspInit)  != HAL_OK)
+  if (HAL_${IpName}_RegisterCallback(&h${IpHandle?lower_case}, HAL_${IpName}_MSPINIT_CB_ID, ${IpInstance}_MspInit)  != HAL_OK)
   {
     return BSP_ERROR_PERIPH_FAILURE;
   }
   
   /* Register MspDeInit Callback */
-  if (HAL_${IpName}_RegisterCallback(&hbus${IpHandle?lower_case}, HAL_${IpName}_MSPDEINIT_CB_ID, ${IpInstance}_MspDeInit) != HAL_OK)
+  if (HAL_${IpName}_RegisterCallback(&h${IpHandle?lower_case}, HAL_${IpName}_MSPDEINIT_CB_ID, ${IpInstance}_MspDeInit) != HAL_OK)
   {
     return BSP_ERROR_PERIPH_FAILURE;
   }
@@ -834,16 +834,16 @@ int32_t BSP_${IpInstance}_RegisterDefaultMspCallbacks (void)
 int32_t BSP_${IpInstance}_RegisterMspCallbacks (BSP_${IpName}_Cb_t *Callbacks)
 {
   /* Prevent unused argument(s) compilation warning */
-  __HAL_${IpName}_RESET_HANDLE_STATE(&hbus${IpHandle?lower_case});  
+  __HAL_${IpName}_RESET_HANDLE_STATE(&h${IpHandle?lower_case});  
  
    /* Register MspInit Callback */
-  if (HAL_${IpName}_RegisterCallback(&hbus${IpHandle?lower_case}, HAL_${IpName}_MSPINIT_CB_ID, Callbacks->pMspI2cInitCb)  != HAL_OK)
+  if (HAL_${IpName}_RegisterCallback(&h${IpHandle?lower_case}, HAL_${IpName}_MSPINIT_CB_ID, Callbacks->pMspI2cInitCb)  != HAL_OK)
   {
     return BSP_ERROR_PERIPH_FAILURE;
   }
   
   /* Register MspDeInit Callback */
-  if (HAL_${IpName}_RegisterCallback(&hbus${IpHandle?lower_case}, HAL_${IpName}_MSPDEINIT_CB_ID, Callbacks->pMspI2cDeInitCb) != HAL_OK)
+  if (HAL_${IpName}_RegisterCallback(&h${IpHandle?lower_case}, HAL_${IpName}_MSPDEINIT_CB_ID, Callbacks->pMspI2cDeInitCb) != HAL_OK)
   {
     return BSP_ERROR_PERIPH_FAILURE;
   }

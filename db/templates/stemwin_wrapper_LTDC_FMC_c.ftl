@@ -190,12 +190,18 @@ extern ${variable.value} ${variable.name};
 extern LTDC_HandleTypeDef    hltdc;
 [#if dma2d != "0" ]
 extern DMA2D_HandleTypeDef   hdma2d;
+
 [/#if]
 [#if  freeRTOS == "0" ]
 extern volatile GUI_TIMER_TIME OS_TimeMS;
 [/#if]
 static          LCD_LayerPropTypedef          layer_prop[GUI_NUM_LAYERS];
 volatile char   TransferInProgress  = 0;
+
+#if (GUI_USE_ARGB == 0)
+static U32 _aBuffer[XSIZE_PHYS * sizeof(U32) * 3];
+static U32 * _pBuffer_DMA2D = &_aBuffer[XSIZE_PHYS * sizeof(U32) * 0];
+#endif
 
 [#if useIli9341?? && useIli9341=="1"]
 [#assign objectConstructor = "freemarker.template.utility.ObjectConstructor"?new()]
@@ -397,12 +403,12 @@ void DMA2D_Init(void)
 	
   if (HAL_DMA2D_Init(&hdma2d) != HAL_OK)
   {
-    _Error_Handler(__FILE__, __LINE__);
+    Error_Handler( );
   }
 
   if (HAL_DMA2D_ConfigLayer(&hdma2d, 1) != HAL_OK)
   {
-    _Error_Handler(__FILE__, __LINE__);
+    Error_Handler( );
   }
 
 }
@@ -555,6 +561,113 @@ static void _DMA_ConvertColor(void * pSrc, void * pDst,  U32 PixelFormatSrc, U32
   _DMA_ExecOperation();
 }
 
+#if (GUI_USE_ARGB == 0)
+/*********************************************************************
+*
+*       _InvertAlpha_SwapRB_MOD
+*
+* Purpose:
+*   Color format of DMA2D is different to emWin color format. This routine
+*   swaps red and blue and inverts alpha that it is compatible to emWin
+*   and vice versa. Conversion is done in given buffer.
+*
+* Performance:
+*   10.9 MPixel/s
+*/
+static void _InvertAlpha_SwapRB_MOD(LCD_COLOR * pColor, U32 NumItems) {
+  U32 Color;
+  while (NumItems >= 4) {
+    Color = *(pColor + 0);
+    Color = ((Color << 24) >>  8)  // Red
+          |  (Color & 0xFF00)      // Green
+          | ((Color <<  8) >> 24)  // Blue
+          | (~Color & 0xFF000000); // Alpha
+    *(pColor + 0) = Color;
+    Color = *(pColor + 1);
+    Color = ((Color << 24) >>  8)  // Red
+          |  (Color & 0xFF00)      // Green
+          | ((Color <<  8) >> 24)  // Blue
+          | (~Color & 0xFF000000); // Alpha
+    *(pColor + 1) = Color;
+    Color = *(pColor + 2);
+    Color = ((Color << 24) >>  8)  // Red
+          |  (Color & 0xFF00)      // Green
+          | ((Color <<  8) >> 24)  // Blue
+          | (~Color & 0xFF000000); // Alpha
+    *(pColor + 2) = Color;
+    Color = *(pColor + 3);
+    Color = ((Color << 24) >>  8)  // Red
+          |  (Color & 0xFF00)      // Green
+          | ((Color <<  8) >> 24)  // Blue
+          | (~Color & 0xFF000000); // Alpha
+    *(pColor + 3) = Color;
+    pColor += 4;
+    NumItems -= 4;
+  }
+  while (NumItems--) {
+    Color = *pColor;
+    Color = ((Color << 24) >>  8)  // Red
+          |  (Color & 0xFF00)      // Green
+          | ((Color <<  8) >> 24)  // Blue
+          | (~Color & 0xFF000000); // Alpha
+    *pColor++ = Color;
+  };
+}
+
+/*********************************************************************
+*
+*       _InvertAlpha_SwapRB_CPY
+*
+* Purpose:
+*   Color format of DMA2D is different to emWin color format. This routine
+*   swaps red and blue and inverts alpha that it is compatible to emWin
+*   and vice versa. Result is located in destination buffer.
+*
+* Performance:
+*   10.8 MPixel/s
+*/
+static void _InvertAlpha_SwapRB_CPY(LCD_COLOR * pColorSrc, LCD_COLOR * pColorDst, U32 NumItems) {
+  U32 Color;
+  while (NumItems >= 4) {
+    Color = *(pColorSrc + 0);
+    Color = ((Color << 24) >>  8)  // Red
+          |  (Color & 0xFF00)      // Green
+          | ((Color <<  8) >> 24)  // Blue
+          | (~Color & 0xFF000000); // Alpha
+    *(pColorDst + 0) = Color;
+    Color = *(pColorSrc + 1);
+    Color = ((Color << 24) >>  8)  // Red
+          |  (Color & 0xFF00)      // Green
+          | ((Color <<  8) >> 24)  // Blue
+          | (~Color & 0xFF000000); // Alpha
+    *(pColorDst + 1) = Color;
+    Color = *(pColorSrc + 2);
+    Color = ((Color << 24) >>  8)  // Red
+          |  (Color & 0xFF00)      // Green
+          | ((Color <<  8) >> 24)  // Blue
+          | (~Color & 0xFF000000); // Alpha
+    *(pColorDst + 2) = Color;
+    Color = *(pColorSrc + 3);
+    Color = ((Color << 24) >>  8)  // Red
+          |  (Color & 0xFF00)      // Green
+          | ((Color <<  8) >> 24)  // Blue
+          | (~Color & 0xFF000000); // Alpha
+    *(pColorDst + 3) = Color;
+    pColorSrc += 4;
+    pColorDst += 4;
+    NumItems -= 4;
+  };
+  while (NumItems--) {
+    Color = *pColorSrc++;
+    Color = ((Color << 24) >>  8)  // Red
+          |  (Color & 0xFF00)      // Green
+          | ((Color <<  8) >> 24)  // Blue
+          | (~Color & 0xFF000000); // Alpha
+    *pColorDst++ = Color;
+  };
+}
+
+#endif
 
 /*********************************************************************
 *
@@ -580,7 +693,6 @@ static void _DMA_Index2ColorBulk(void * pIndex, LCD_COLOR * pColor, U32 NumItems
   _InvertAlpha_SwapRB_MOD(pColor, NumItems);
 #endif
 }
-
 
 /*********************************************************************
 *

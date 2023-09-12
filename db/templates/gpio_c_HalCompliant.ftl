@@ -3,19 +3,19 @@
 [#compress]
 [#list datas as data]
     [#if data.ipName=="gpio"]
-[#if data.comments??]
-#n/** ${data.comments}
-*/
-[/#if]
+/**
+#t* @brief  GPIO Initialization Function
+#t* @param  None
+#t* @retval None
+#t*/
 static void MX_GPIO_Init(void) 
 {
-#n
         [#assign v = ""]
         [#list data.variables as variable]				
             [#if v?contains(variable.name)]
             [#-- no matches--]
             [#else]
-#t${variable.value} ${variable.name};
+#t${variable.value} ${variable.name} = {0};
         	[#assign v = v + " "+ variable.name/]	
             [/#if]	
         [/#list]
@@ -45,7 +45,7 @@ static void MX_${data.ipName}_GPIO_Init(void)
             [#if v?contains(variable.name)]
             [#-- no matches--]
             [#else]
-#t${variable.value} ${variable.name};
+#t${variable.value} ${variable.name} = {0};
                 [#assign v = v + " "+ variable.name/]	
             [/#if]	
         [/#list]

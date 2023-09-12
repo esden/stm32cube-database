@@ -17,9 +17,7 @@
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-[#list includes as include]
-#include "${include}"
-[/#list]
+#include "main.h"
 #n
 /* USER CODE BEGIN Includes */
 

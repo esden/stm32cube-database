@@ -41,7 +41,7 @@ void MX_GPIO_Init(void)
             [#if v?contains(variable.name)]
             [#-- no matches--]
             [#else]
-#t${variable.value} ${variable.name};
+#t${variable.value} ${variable.name} = {0};
         	[#assign v = v + " "+ variable.name/]	
             [/#if]	
         [/#list]
@@ -70,7 +70,7 @@ void MX_${data.ipName}_GPIO_Init(void)
             [#if v?contains(variable.name)]
             [#-- no matches--]
             [#else]
-#t${variable.value} ${variable.name};
+#t${variable.value} ${variable.name} = {0};
                 [#assign v = v + " "+ variable.name/]	
             [/#if]	
         [/#list]
@@ -195,13 +195,5 @@ void MX_${data.ipName}_GPIO_Init(void)
 /* USER CODE BEGIN 2 */
 
 /* USER CODE END 2 */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
