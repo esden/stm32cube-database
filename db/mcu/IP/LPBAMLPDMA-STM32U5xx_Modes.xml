@@ -15,6 +15,8 @@
     </RefParameter>
     <RefParameter Name="DESCRIPTOR_NAME_START" Comment="name of the descriptor"   DefaultValue="descriptorx_OPAMP_START"  Type="StringRW" >
     </RefParameter>
+    <RefParameter Name="DESCRIPTOR_NAME_STOP" Comment="name of the descriptor"   DefaultValue="descriptorx_LPDMA_STOP"  Type="StringRW" >
+    </RefParameter>
 
     <!-- tempory parameters to be replaced by names provided by UI/lpbam service-->
 
@@ -26,7 +28,13 @@
     </RefParameter>
     <!-- parameter for circular Mode management for Mode START-->
 
- 
+     <!-- parameter for circular Mode management for Mode STOP-->
+    <RefParameter Comment="Circular Node for STOP" DefaultValue="__NULL" Name="CircularNode_STOP" Type="list" Group="Stop" Visible="false">
+        <Description>description</Description>
+        <PossibleValue Comment="DISABLE" Value="__NULL"/>
+        <PossibleValue Comment="Configuration Node" Value="LPBAM_DMA_STOP_FULLQ_CONFIG_NODE"/>
+    </RefParameter>
+    <!-- parameter for circular Mode management for Mode START-->
     <RefParameter Comment="Queue to start" DefaultValue="Yes" Name="OriginOfQueue" Type="list"  Group="Start Parameters - Queue Configuration">
         <Description>description</Description>
         <PossibleValue Comment="Designed inside LPBAM tool" Value="YES"/>
@@ -77,14 +85,23 @@
         <PossibleValue Comment="Disable" Value="LPBAM_DMA_IT_NONE"/>
     </RefParameter>
 
-
-    <RefParameter Name="InstanceIP" Comment="DMA channel to be started"   DefaultValue="LPDMA1_Channel0"  Type="list"  Group="Start Parameters - Queue Configuration">
+    <RefParameter Name="InstanceIPStop" Comment="DMA channel to be stopped"   DefaultValue="LPDMA1_Channel0"  Type="list"  Group="Stop Parameters - Queue Configuration">
+        <Condition Diagnostic="QUEUE is output by LPBAM TOOL" Expression="Semaphore_$IpInstance_STOP"/>
         <Description>description</Description>
         <PossibleValue Comment="LPDMA1 Channel0" Value="LPDMA1_Channel0"/>
         <PossibleValue Comment="LPDMA1 Channel1" Value="LPDMA1_Channel1"/>
         <PossibleValue Comment="LPDMA1 Channel2" Value="LPDMA1_Channel2"/>
         <PossibleValue Comment="LPDMA1 Channel3" Value="LPDMA1_Channel3"/>
     </RefParameter>
+    <RefParameter Name="InstanceIP" Comment="DMA channel to be started"   DefaultValue="LPDMA1_Channel0"  Type="list"  Group="Start Parameters - Queue Configuration">
+        <Condition Diagnostic="QUEUE is output by LPBAM TOOL" Expression="Semaphore_$IpInstance_START"/>
+        <Description>description</Description>
+        <PossibleValue Comment="LPDMA1 Channel0" Value="LPDMA1_Channel0"/>
+        <PossibleValue Comment="LPDMA1 Channel1" Value="LPDMA1_Channel1"/>
+        <PossibleValue Comment="LPDMA1 Channel2" Value="LPDMA1_Channel2"/>
+        <PossibleValue Comment="LPDMA1 Channel3" Value="LPDMA1_Channel3"/>
+    </RefParameter>
+
 
 
 
@@ -117,7 +134,7 @@
         <PossibleValue Comment="LPTIM3 CH1" Value="LPBAM_LPDMA1_TRIGGER_LPTIM3_CH1" />
         <PossibleValue Comment="LPTIM4 OUT" Value="LPBAM_LPDMA1_TRIGGER_LPTIM4_OUT" />
         <PossibleValue Comment="COMP1 OUT" Value="LPBAM_LPDMA1_TRIGGER_COMP1_OUT"  />
-        <PossibleValue Comment="COMP2 OUT" Value="LPBAM_LPDMA1_TRIGGER_COMP2_OUT"  />
+        <PossibleValue Action="Remove" Comment="COMP2 OUT" Value="LPBAM_LPDMA1_TRIGGER_COMP2_OUT" Condition="DIE455"/>
         <PossibleValue Comment="RTC ALRA TRG" Value="LPBAM_LPDMA1_TRIGGER_RTC_ALRA_TRG" />
         <PossibleValue Comment="RTC ALRB TRG" Value="LPBAM_LPDMA1_TRIGGER_RTC_ALRB_TRG" />
         <PossibleValue Comment="RTC WUT TRG" Value="LPBAM_LPDMA1_TRIGGER_RTC_WUT_TRG" />
@@ -139,6 +156,7 @@
         <Description>description</Description>
         <PossibleValue Comment="NONE" Value="NONE"/>
         <PossibleValue Comment="Config Node" Value="LPBAM_DMA_START_FULLQ_CONFIG_NODE"/> <!-- ADV_LPBAM_DMA_Start_SetFullQ-->
+        <PossibleValue Comment="Config Node" Value="LPBAM_DMA_STOP_FULLQ_CONFIG_NODE"/> <!-- ADV_LPBAM_DMA_Stop_SetFullQ-->
     </RefParameter> 
 
 
@@ -177,7 +195,39 @@
 
         <Parameter  Name="CircularNode_START"/> 
          
-    </RefMode> 
+    </RefMode>
+        <RefMode Name="STOP">
+	 
+        <ConfigForMode>LPDMA_STOP</ConfigForMode>
+        <Parameter  Name="InstanceIPStop"/>
+        <!-- <Parameter  Name="OriginOfQueue"/>     -->
+        <!-- <Parameter  Name="HeadQAddress_RW"/>    -->
+        <!-- <Parameter  Name="HeadQAddress_LIST"/> -->
+        <!-- <Parameter  Name="HeadQAddressArg"/> -->
+        <!-- <Parameter  Name="Interrupt1"/> -->
+        <!-- <Parameter Name="Interrupt2"/> -->
+         
+
+
+        <!--Trigger -->
+        <Parameter Name="TriggerPolarity_STOP" RefParameter="TriggerPolarity"/>
+
+        <Parameter Name="TriggerSelection_STOP" RefParameter="TriggerSelection">
+            <Condition Diagnostic=""  Expression="!(TriggerPolarity_STOP=LPBAM_DMA_TRIG_POLARITY_MASKED)"/>
+        </Parameter>
+
+        <Parameter Name="TriggerMode_STOP" RefParameter="TriggerMode_CONFIG"> 
+            <Condition Diagnostic="" Expression="!(TriggerPolarity_STOP=LPBAM_DMA_TRIG_POLARITY_MASKED)"/>
+        </Parameter>
+
+        <Parameter Name="NodeLevel_STOP" RefParameter="NodeLevel">
+            <PossibleValue>LPBAM_DMA_STOP_FULLQ_CONFIG_NODE</PossibleValue>
+        </Parameter>
+        <!--Trigger -->
+
+        <Parameter  Name="CircularNode_STOP"/> 
+         
+    </RefMode>  
 
     <ModeLogicOperator Name="OR">
         <Mode Name="START" UserName="Start"> 
@@ -190,13 +240,24 @@
                     </SignalLogicalOp>
                 </Mode> 
             </ModeLogicOperator>
-        </Mode>        
+        </Mode>
+        <Mode Name="STOP" UserName="Stop"> 
+            <Condition Diagnostic="hardware IP must be selected to be part of LPBAM" Expression="Semaphore_LPBAM_LPDMA$IpNumber_SELECTED"/>  
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="STOP" UserName="Stop"> 
+                    <Semaphore>Semaphore_$IpInstance_STOP</Semaphore>
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_STOP"/>
+                    </SignalLogicalOp>
+                </Mode> 
+            </ModeLogicOperator>
+        </Mode>         
     </ModeLogicOperator>    
 
  
 
 
     <RefSignal Name="VS_START" Virtual="true"/>
-
+    <RefSignal Name="VS_STOP" Virtual="true"/>
 
 </IP>

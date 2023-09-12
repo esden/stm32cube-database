@@ -27,7 +27,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    nx_secure_user.h                                    PORTABLE C      */
-/*                                                           6.0          */
+/*                                                           6.1.9        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -47,6 +47,15 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  05-19-2020     Timothy Stapko           Initial Version 6.0           */
+/*  09-30-2020     Timothy Stapko           Modified comment(s),          */
+/*                                            resulting in version 6.1    */
+/*  08-02-2021     Timothy Stapko           Modified comment(s),          */
+/*                                            resulting in version 6.1.8  */
+/*  10-15-2021     Timothy Stapko           Modified comment(s), added    */
+/*                                            macro to disable client     */
+/*                                            initiated renegotiation for */
+/*                                            TLS server instances,       */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -139,18 +148,6 @@
 
 	[#if name == "NX_SECURE_ENABLE_CLIENT_CERTIFICATE_VERIFY"]
       [#assign NX_SECURE_ENABLE_CLIENT_CERTIFICATE_VERIFY_value = value]
-    [/#if]
-		
-	[#if name == "NX_SECURE_DISABLE_ECC_CIPHERSUITE"]
-      [#assign NX_SECURE_DISABLE_ECC_CIPHERSUITE_value = value]
-    [/#if]
-	
-	[#if name == "NX_SECURE_TLS_DISABLE_TLS_1_1"]
-      [#assign NX_SECURE_TLS_DISABLE_TLS_1_1_value = value]
-    [/#if]
-	
-	[#if name == "NX_SECURE_TLS_ENABLE_TLS_1_0"]
-      [#assign NX_SECURE_TLS_ENABLE_TLS_1_0_value = value]
     [/#if]
 	
 	[#if name == "NX_SECURE_TLS_ENABLE_TLS_1_1"]
@@ -288,10 +285,6 @@
 	[#if name == "NX_SECURE_X509_USE_EXTENDED_DISTINGUISHED_NAMES"]
       [#assign NX_SECURE_X509_USE_EXTENDED_DISTINGUISHED_NAMES_value = value]
     [/#if]
-	
-	[#if name == "NX_SECURE_DTLS_INIT"]
-      [#assign NX_SECURE_DTLS_INIT_value = value]
-    [/#if]
 
 	[#if name == "NX_SECURE_ENABLE_ECC_CIPHERSUITE"]
       [#assign NX_SECURE_ENABLE_ECC_CIPHERSUITE_value = value]
@@ -301,24 +294,12 @@
       [#assign NX_SECURE_TLS_ENABLE_SSL_3_0_value = value]
     [/#if]
 	
-	[#if name == "NX_SECURE_TLS_TLS_1_2_ENABLED"]
-      [#assign NX_SECURE_TLS_TLS_1_2_ENABLED_value = value]
-    [/#if]
-	
-	[#if name == "NX_SECURE_TLS_TLS_1_3_ENABLED"]
-      [#assign NX_SECURE_TLS_TLS_1_3_ENABLED_value = value]
-    [/#if]
-	
 	[#if name == "NX_SECURE_TLS_MAX_PSK_NONCE_SIZE"]
       [#assign NX_SECURE_TLS_MAX_PSK_NONCE_SIZE_value = value]
     [/#if]
 	
 	[#if name == "NX_SECURE_TLS_ENABLE_SECURE_RENEGOTIATION"]
       [#assign NX_SECURE_TLS_ENABLE_SECURE_RENEGOTIATION_value = value]
-    [/#if]
-	
-	[#if name == "NX_SECURE_TLS_INIT"]
-      [#assign NX_SECURE_TLS_INIT_value = value]
     [/#if]
 	
 	[#if name == "NX_SECURE_X509_CERTIFICATE_VERIFY_EXTENSION"]
@@ -339,6 +320,22 @@
 	
 	[#if name == "NX_SECURE_TLS_SERVER_DISABLED"]
       [#assign NX_SECURE_TLS_SERVER_DISABLED_value = value]
+    [/#if]
+	
+	[#if name == "NX_SECURE_TLS_REQUIRE_RENEGOTIATION_EXT"]
+      [#assign NX_SECURE_TLS_REQUIRE_RENEGOTIATION_EXT_value = value]
+    [/#if]
+	
+	[#if name == "NX_SECURE_TLS_DISABLE_CLIENT_INITIATED_RENEGOTIATION"]
+      [#assign NX_SECURE_TLS_DISABLE_CLIENT_INITIATED_RENEGOTIATION_value = value]
+    [/#if]
+	
+	[#if name == "NX_SECURE_TLS_DISABLE_SECURE_RENEGOTIATION"]
+      [#assign NX_SECURE_TLS_DISABLE_SECURE_RENEGOTIATION_value = value]
+    [/#if]
+	
+	[#if name == "NX_CRYPTO_AES_USE_RAM_TABLES"]
+      [#assign NX_CRYPTO_AES_USE_RAM_TABLES_value = value]
     [/#if]
 
   [/#list]
@@ -534,38 +531,6 @@
 [#else]
 /*
 #define NX_SECURE_ENABLE_CLIENT_CERTIFICATE_VERIFY
-*/
-[/#if]
-
-/* Defined, this option removes all TLS logic for Elliptic Curve Cryptography 
-  (ECC) ciphersuites. These ciphersuites are optional in TLS 1.2 and earlier 
-  and disabling them can result in significant code and data size reduction. */
-[#if NX_SECURE_DISABLE_ECC_CIPHERSUITE_value == "true"]
-#define NX_SECURE_DISABLE_ECC_CIPHERSUITE
-[#else]
-/*
-#define NX_SECURE_DISABLE_ECC_CIPHERSUITE
-*/
-[/#if]
-
-/* Defined, this option disables TLSv1.1 mode. It is defined by default.
-   TLSv1.1 is disabled in favor of using only the more-secure TLSv1.25. */
-[#if NX_SECURE_TLS_DISABLE_TLS_1_1_value == "true"]
-#define NX_SECURE_TLS_DISABLE_TLS_1_1
-[#else]
-/*
-#define NX_SECURE_TLS_DISABLE_TLS_1_1
-*/
-[/#if]
-
-/* Defined, this option enables the legacy TLSv1.0 mode. TLSv1.0 is considered
-   obsolete so it should only be enabled for backward-compatibility with older 
-   applications. */
-[#if NX_SECURE_TLS_ENABLE_TLS_1_0_value == "true"]
-#define NX_SECURE_TLS_ENABLE_TLS_1_0
-[#else]
-/*
-#define NX_SECURE_TLS_ENABLE_TLS_1_0
 */
 [/#if]
 
@@ -912,15 +877,6 @@
 */
 [/#if]
 
-/* Defined, this option enables TLS initialisation. */
-[#if NX_SECURE_DTLS_INIT_value == "true"]
-#define NX_SECURE_DTLS_INIT         
-[#else]
-/*
-#define NX_SECURE_DTLS_INIT       
-*/
-[/#if]
-
 /* Defined, this option enables the ECC support in TLS. */
 [#if NX_SECURE_ENABLE_ECC_CIPHERSUITE_value == "true"]
 #define NX_SECURE_ENABLE_ECC_CIPHERSUITE         
@@ -939,24 +895,6 @@
 */
 [/#if]
 
-/* Defined, this option enables TLS 1.2 .*/
-[#if NX_SECURE_TLS_TLS_1_2_ENABLED_value == "true"]
-#define NX_SECURE_TLS_TLS_1_2_ENABLED         
-[#else]
-/*
-#define NX_SECURE_TLS_TLS_1_2_ENABLED       
-*/
-[/#if]
-
-/* Defined, this option enables TLS 1.3 .*/
-[#if NX_SECURE_TLS_TLS_1_3_ENABLED_value == "true"]
-#define NX_SECURE_TLS_TLS_1_3_ENABLED         
-[#else]
-/*
-*#define NX_SECURE_TLS_TLS_1_3_ENABLED       
-*/
-[/#if]
-
 /* This option defines the TLS maximum psk monce size.  
    The default value is 255.*/
 [#if NX_SECURE_TLS_MAX_PSK_NONCE_SIZE_value == "255"]
@@ -967,6 +905,7 @@
 #define NX_SECURE_TLS_MAX_PSK_NONCE_SIZE       ${NX_SECURE_TLS_MAX_PSK_NONCE_SIZE_value}
 [/#if]
 
+[#if NX_SECURE_TLS_ENABLE_SECURE_RENEGOTIATION_value??]
 /* Defined, this option enables secure renegotiation.*/
 [#if NX_SECURE_TLS_ENABLE_SECURE_RENEGOTIATION_value == "true"]
 #define NX_SECURE_TLS_ENABLE_SECURE_RENEGOTIATION         
@@ -975,14 +914,6 @@
 #define NX_SECURE_TLS_ENABLE_SECURE_RENEGOTIATION       
 */
 [/#if]
-
-/* Defined, this option enables TLS initialisation.*/
-[#if NX_SECURE_TLS_INIT_value == "true"]
-#define NX_SECURE_TLS_INIT         
-[#else]
-/*
-#define NX_SECURE_TLS_INIT       
-*/
 [/#if]
 
 /* Defined, this option enables certificate verify extension.*/
@@ -1029,6 +960,44 @@
 /*
 #define NX_SECURE_TLS_SERVER_DISABLED   
 */                   
+[/#if]
+
+/* When defined the AES Tabled are  moved to RAM. */
+[#if NX_CRYPTO_AES_USE_RAM_TABLES_value == "false"]
+/*
+#define NX_CRYPTO_AES_USE_RAM_TABLES
+*/
+[#else]
+#define NX_CRYPTO_AES_USE_RAM_TABLES
+[/#if]
+
+/* Defines whether or not the connection should be terminated immediately upon failure to receive the secure renegotiation extension during the initial handshake.
+   By default, the connection is not terminated.*/
+[#if NX_SECURE_TLS_REQUIRE_RENEGOTIATION_EXT_value == "false"]
+/*
+#define NX_SECURE_TLS_REQUIRE_RENEGOTIATION_EXT
+*/
+[#else]
+#define NX_SECURE_TLS_REQUIRE_RENEGOTIATION_EXT
+[/#if]
+
+/* Disables client-initiated renegotiation for TLS servers. 
+   In some instances, client-initiated renegotiation can become a possible denial-of-service vulnerability. */
+[#if NX_SECURE_TLS_DISABLE_CLIENT_INITIATED_RENEGOTIATION_value == "false"]
+/*
+#define NX_SECURE_TLS_DISABLE_CLIENT_INITIATED_RENEGOTIATION
+*/
+[#else]
+#define NX_SECURE_TLS_DISABLE_CLIENT_INITIATED_RENEGOTIATION
+[/#if]
+
+/* Disable secure session renegotiation extension. */
+[#if NX_SECURE_TLS_DISABLE_SECURE_RENEGOTIATION_value == "false"]
+/*
+#define NX_SECURE_TLS_DISABLE_SECURE_RENEGOTIATION
+*/
+[#else]
+#define NX_SECURE_TLS_DISABLE_SECURE_RENEGOTIATION
 [/#if]
 
 /* USER CODE BEGIN 2 */

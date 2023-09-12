@@ -35,7 +35,7 @@
   */
 #define HAL_MODULE_ENABLED  
 
-  [#assign allModules = ["ADC","FDCAN","FMAC","CEC", "COMP", "CORDIC", "CRC","CRYP","DAC","DCMI","DMA2D","ETH","NAND","NOR","OTFDEC","SRAM","SDRAM","HASH", "HRTIM", "HSEM", "GFXMMU", "JPEG", "OPAMP", "OSPI", "OCTOSPI", "I2S", "SMBUS","IWDG","LPTIM","LTDC","QUADSPI","RAMECC","RNG","RTC","SAI","SD","MMC","SPDIFRX","SPI", "SWPMI","TIM","UART","USART","IRDA","SMARTCARD","WWDG","PCD","HCD", "DFSDM", "DSI","JPEG", "MDIOS","PSSI","DTS"]]
+  [#assign allModules = ["ADC","FDCAN","FMAC","CEC", "COMP", "CORDIC", "CRC","CRYP","DAC","DCMI","DMA2D","ETH","ETH_LEGACY","NAND","NOR","OTFDEC","SRAM","SDRAM","HASH", "HRTIM", "HSEM", "GFXMMU", "JPEG", "OPAMP", "OSPI", "OCTOSPI", "I2S", "SMBUS","IWDG","LPTIM","LTDC","QUADSPI","RAMECC","RNG","RTC","SAI","SD","MMC","SPDIFRX","SPI", "SWPMI","TIM","UART","USART","IRDA","SMARTCARD","WWDG","PCD","HCD", "DFSDM", "DSI","JPEG", "MDIOS","PSSI","DTS"]]
   [#list allModules as module]
 	[#if isModuleUsed(module)]
 [#compress]#define HAL_${module?replace("QUADSPI","QSPI")?replace("AES","CRYP")?replace("OCTOSPI","OSPI")}_MODULE_ENABLED[/#compress]
@@ -186,8 +186,8 @@
 #define  USE_HAL_WWDG_REGISTER_CALLBACKS    0U /* WWDG register callback disabled    */
 
 /* ########################### Ethernet Configuration ######################### */
-#define ETH_TX_DESC_CNT         [#if ETH_TX_DESC_CNT??]${ETH_TX_DESC_CNT}[#else]4[/#if]  /* number of Ethernet Tx DMA descriptors */
-#define ETH_RX_DESC_CNT         [#if ETH_RX_DESC_CNT??]${ETH_RX_DESC_CNT}[#else]4[/#if]  /* number of Ethernet Rx DMA descriptors */
+#define ETH_TX_DESC_CNT         [#if ETH_TX_DESC_CNT??]${ETH_TX_DESC_CNT}U[#else]4U[/#if]  /* number of Ethernet Tx DMA descriptors */
+#define ETH_RX_DESC_CNT         [#if ETH_RX_DESC_CNT??]${ETH_RX_DESC_CNT}U[#else]4U[/#if]  /* number of Ethernet Rx DMA descriptors */
 
 #define ETH_MAC_ADDR0    (0x02UL)
 #define ETH_MAC_ADDR1    (0x00UL)
@@ -252,6 +252,10 @@
 #ifdef HAL_ETH_MODULE_ENABLED
   #include "stm32h7xx_hal_eth.h"
 #endif /* HAL_ETH_MODULE_ENABLED */
+
+#ifdef HAL_ETH_LEGACY_MODULE_ENABLED
+  #include "stm32h7xx_hal_eth_legacy.h"
+#endif /* HAL_ETH_LEGACY_MODULE_ENABLED */
 
 #ifdef HAL_EXTI_MODULE_ENABLED
   #include "stm32h7xx_hal_exti.h"

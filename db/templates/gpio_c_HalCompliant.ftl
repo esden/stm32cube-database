@@ -58,7 +58,10 @@ static void MX_GPIO_Init(void)
         [/#list]
         
     [#else]
-        [#if clock?size >0 ]#n#t/* GPIO Ports Clock Enable */[/#if]
+/* USER CODE BEGIN MX_GPIO_Init_1 */
+
+/* USER CODE END MX_GPIO_Init_1 */
+  		[#if clock?size >0 ]#n#t/* GPIO Ports Clock Enable */[/#if]
             [#list clock as clockMacro]
                 [#if clockMacro!=""] 
                     [#if clockMacro?contains("(")]
@@ -216,6 +219,9 @@ static void MX_${data.ipName}_GPIO_Init(void)
 [/#compress]
 [/#if]
 #n
+/* USER CODE BEGIN MX_GPIO_Init_2 */
+
+/* USER CODE END MX_GPIO_Init_2 */
 [/#if]
 }
 

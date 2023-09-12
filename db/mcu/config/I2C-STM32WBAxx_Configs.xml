@@ -1,0 +1,1340 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" DBVersion="V4.0" Name="I2C" Version="STM32Cube_FW_WBA_V0.1.0" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
+    <RefConfig Name="I2C">
+        <CallLibMethod Name="HAL_I2C_Init">
+            <MethodArg Name="OwnAddress2" ParameterName="OwnAddress22"/>
+        </CallLibMethod>
+        <ImplementCallBack Name="HAL_I2C_MspInit"/> 
+        <ImplementCallBack Name="HAL_I2C_MspDeInit"/>
+    </RefConfig>
+    <RefConfig Name="I2C_DeInit">
+        <CallLibMethod Name="HAL_I2C_DeInit"/>
+    </RefConfig>
+    <RefConfig Comment="Configure Digital filter" Name="I2C_DigitalFolter">
+        <CallLibMethod Name="HAL_I2CEx_ConfigDigitalFilter">
+            <MethodArg Name="DigitalFilter" ParameterName="I2C_Coeff_DF"/>		
+        </CallLibMethod>		
+    </RefConfig>
+    <RefConfig Comment="Configure Analogue filter" Name="I2C_Analogue">
+        <CallLibMethod Name="HAL_I2CEx_ConfigAnalogFilter">
+            <MethodArg Name="AnalogFilter" ParameterName="Analog_Filter"/>		
+        </CallLibMethod>		
+    </RefConfig>
+    <RefConfig Comment="I2C Fast mode Plus enable" Name="FASTMODE_Config">
+        <CallLibMethod Name="HAL_I2CEx_ConfigFastModePlus"/>
+    </RefConfig>
+    <!--Autonomous Mode-->
+    <RefConfig Comment="Configure Autonomous Mode" Name="AutonomousMode_Config">
+        <IFCondition Expression="(AutonomousMode=AUTONOMOUS_MODE_ENABLE)">
+            <CallLibMethod Name="HAL_I2CEx_SetConfigAutonomousMode">
+                <MethodArg Name="sConfig" ParameterName="sConfigI2C$Index"/>
+                <MethodArg Name="TriggerState" ParameterName="TriggerState"/>
+                <MethodArg Name="TriggerSelection" ParameterName="TriggerSelection"/>
+                <MethodArg Name="TriggerPolarity" ParameterName="TriggerPolarity"/>
+            </CallLibMethod>
+        </IFCondition>
+    </RefConfig>
+
+ 
+    <RefConfig Name="LPBAM_ADD_HALCONFIG" Comment="Configuration in LPBAM context">
+        <IFCondition Expression="LPBAM$IpInstance_Used">
+            <CallLibMethod Name="__HAL_I2C_ENABLE_IT" ReturnHAL="false">
+            </CallLibMethod>
+            <CallLibMethod Name="HAL_I2CEx_EnableWakeUp">
+            </CallLibMethod>
+            <CallLibMethod Name="ADV_LPBAM_I2C_EnableDMARequests">
+            </CallLibMethod>
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#t/** Register ISR#n#t*/"/>
+            </CallLibMethod>
+            <CallLibMethod Name="ADV_LPBAM_I2C_RegisterISR">
+            </CallLibMethod>
+        </IFCondition>
+    </RefConfig>
+
+         <LibMethod Comment="" Name="__HAL_I2C_ENABLE_IT">
+         <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="ORingInterrupt" OptimizationCondition="equal"/>
+    </LibMethod>
+
+     <LibMethod Comment="" Name="HAL_I2CEx_EnableWakeUp">
+         <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+       
+    </LibMethod>
+
+    <LibMethod Comment="" Name="ADV_LPBAM_I2C_EnableDMARequests">
+            <Argument AddressOf="false" GenericType="simple" Name="Instance" OptimizationCondition="equal"/>
+     </LibMethod>  
+
+
+    <LibMethod Comment="" Name="HAL_I2CEx_ConfigFastModePlus">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="FASTMODEPLUS"/>
+    </LibMethod>
+	<LibMethod Comment="" Name="HAL_I2C_Init">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2C_DeInit">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2C_MspInit">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2C_MspDeInit">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2C_Master_Transmit">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="DevAddress" OptimizationCondition="equal"/>
+        <Argument AddressOf="true" GenericType="simple" Name="pData" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Size" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timeout" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2C_Master_Receive">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="DevAddress" OptimizationCondition="equal"/>
+        <Argument AddressOf="true" GenericType="simple" Name="pData" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Size" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timeout" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2C_Slave_Transmit">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="true" GenericType="simple" Name="pData" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Size" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timeout" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2C_Slave_Receive">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="true" GenericType="simple" Name="pData" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Size" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timeout" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2C_Mem_Write">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="DevAddress" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="MemAddress" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="MemAddSize" OptimizationCondition="equal"/>
+        <Argument AddressOf="true" GenericType="simple" Name="pData" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Size" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timeout" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2C_Mem_Read">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="DevAddress" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="MemAddress" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="MemAddSize" OptimizationCondition="equal"/>
+        <Argument AddressOf="true" GenericType="simple" Name="pData" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Size" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timeout" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2C_IsDeviceReady">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="DevAddress" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Trials" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timeout" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2C_Master_Transmit_IT">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="DevAddress" OptimizationCondition="equal"/>
+        <Argument AddressOf="true" GenericType="simple" Name="pData" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Size" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2C_Master_Receive_IT">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="DevAddress" OptimizationCondition="equal"/>
+        <Argument AddressOf="true" GenericType="simple" Name="pData" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Size" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2C_Slave_Transmit_IT">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="true" GenericType="simple" Name="pData" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Size" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2C_Slave_Receive_IT">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="true" GenericType="simple" Name="pData" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Size" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2C_Mem_Write_IT">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="DevAddress" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="MemAddress" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="MemAddSize" OptimizationCondition="equal"/>
+        <Argument AddressOf="true" GenericType="simple" Name="pData" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Size" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2C_Mem_Read_IT">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="DevAddress" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="MemAddress" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="MemAddSize" OptimizationCondition="equal"/>
+        <Argument AddressOf="true" GenericType="simple" Name="pData" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Size" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2C_Master_Transmit_DMA">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="DevAddress" OptimizationCondition="equal"/>
+        <Argument AddressOf="true" GenericType="simple" Name="pData" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Size" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2C_Master_Receive_DMA">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="DevAddress" OptimizationCondition="equal"/>
+        <Argument AddressOf="true" GenericType="simple" Name="pData" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Size" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2C_Slave_Transmit_DMA">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="true" GenericType="simple" Name="pData" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Size" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2C_Slave_Receive_DMA">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="true" GenericType="simple" Name="pData" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Size" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2C_Mem_Write_DMA">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="DevAddress" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="MemAddress" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="MemAddSize" OptimizationCondition="equal"/>
+        <Argument AddressOf="true" GenericType="simple" Name="pData" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Size" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2C_Mem_Read_DMA">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="DevAddress" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="MemAddress" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="MemAddSize" OptimizationCondition="equal"/>
+        <Argument AddressOf="true" GenericType="simple" Name="pData" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Size" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2C_EV_IRQHandler">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2C_ER_IRQHandler">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2C_MasterTxCpltCallback">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2C_MasterRxCpltCallback">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2C_SlaveTxCpltCallback">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2C_SlaveRxCpltCallback">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2C_MemTxCpltCallback">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2C_MemRxCpltCallback">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2C_ErrorCallback">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2C_GetState">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2C_GetError">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2CEx_ConfigAnalogFilter">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="AnalogFilter" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2CEx_ConfigDigitalFilter">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="DigitalFilter" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2CEx_EnableWakeUp">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_I2CEx_DisableWakeUp">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <!--Autonomous Mode-->
+    <LibMethod Comment="" Name="HAL_I2CEx_SetConfigAutonomousMode">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferOptions" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PreviousState" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="XferISR" OptimizationCondition="equal" TypeName="HAL_StatusTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddrEventCount" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="true" GenericType="struct" Name="sConfig" TypeName="I2C_AutonomousModeConfTypeDef">
+            <Argument AddressOf="false" GenericType="simple" Name="TriggerState" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TriggerSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TriggerPolarity" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    
+    <LibMethod Comment="" Name="ADV_LPBAM_I2C_RegisterISR">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hi2c" TypeName="I2C_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="I2C_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="I2C_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Timing" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualAddressMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OwnAddress2Masks" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="GeneralCallMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NoStretchMode" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="XferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod> 
+    
+    <RefComponent Cclass="HAL" Cgroup="I2C" Cversion="0.3.0">
+        <File Category="header" Name="Drivers/STM32WBAxx_HAL_Driver/Inc/stm32wbaxx_hal_i2c.h"/>
+        <File Category="header" Name="Drivers/STM32WBAxx_HAL_Driver/Inc/stm32wbaxx_ll_i2c.h"/>
+        <File Category="header" Name="Drivers/STM32WBAxx_HAL_Driver/Inc/stm32wbaxx_hal_i2c_ex.h"/>
+        <File Category="source" Name="Drivers/STM32WBAxx_HAL_Driver/Src/stm32wbaxx_hal_i2c.c"/>
+        <File Category="source" Name="Drivers/STM32WBAxx_HAL_Driver/Src/stm32wbaxx_hal_i2c_ex.c"/>
+    </RefComponent>
+</IP>

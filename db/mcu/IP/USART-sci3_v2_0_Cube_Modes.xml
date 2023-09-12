@@ -1384,12 +1384,12 @@
     
     <!-- Autonomous Mode with Parameters __begin -->
     <RefParameter Comment="Autonomous Mode" DefaultValue="AUTONOMOUS_MODE_DISABLE" Group="Advanced Parameters" Name="AutonomousMode" Type="list">
-        <Condition Diagnostic="" Expression="STM32U5 &amp; ($IpInstance_Asynchronous | $IpInstance_Synchronous_Master) &amp; !$IpInstance_FlowControl"/>
+        <Condition Diagnostic="" Expression="(STM32U5|STM32WBA) &amp; ($IpInstance_Asynchronous | $IpInstance_Synchronous_Master) &amp; !$IpInstance_FlowControl"/>
         <PossibleValue Comment="Disable " Value="AUTONOMOUS_MODE_DISABLE"/>
         <PossibleValue Comment="Enable " Value="AUTONOMOUS_MODE_ENABLE"/>
     </RefParameter>
     <RefParameter Comment="Autonomous Mode" DefaultValue="null" Group="Advanced Parameters" Name="AutonomousMode" Type="list" Visible="false">
-        <Condition Diagnostic="" Expression="!STM32U5"/>
+        <Condition Diagnostic="" Expression="!(STM32U5|STM32WBA)"/>
     </RefParameter>
         
     <RefParameter Comment="Autonomous Mode" DefaultValue="AUTONOMOUS_MODE_DISABLE" Group="Advanced Parameters" Name="AutonomousModeState" Type="list">
@@ -1401,11 +1401,11 @@
         <PossibleValue Comment="Enable " Value="UART_AUTONOMOUS_MODE_ENABLE"/>
     </RefParameter>    
     <RefParameter Comment="Autonomous Mode" DefaultValue="null" Name="AutonomousModeState" Type="list" Visible="false">
-        <Condition Diagnostic="" Expression="!STM32U5 | (AutonomousMode = AUTONOMOUS_MODE_DISABLE)"/>
+        <Condition Diagnostic="" Expression="!(STM32U5|STM32WBA) | (AutonomousMode = AUTONOMOUS_MODE_DISABLE)"/>
     </RefParameter>
     
     <RefParameter Comment="     Trigger Polarity" DefaultValue="null" Group="Advanced Parameters" Name="TriggerPolarity" Type="list" Visible="false">
-        <Condition Diagnostic="" Expression="!STM32U5 | (AutonomousMode = AUTONOMOUS_MODE_DISABLE)"/>
+        <Condition Diagnostic="" Expression="!(STM32U5|STM32WBA) | (AutonomousMode = AUTONOMOUS_MODE_DISABLE)"/>
     </RefParameter>  
     <RefParameter Comment="     Trigger Polarity" DefaultValue="USART_TRIG_POLARITY_RISING" Group="Advanced Parameters" Name="TriggerPolarity" Type="list">
         <Condition Diagnostic="" Expression="AutonomousMode = AUTONOMOUS_MODE_ENABLE &amp; $IpInstance_Synchronous_Master"/>
@@ -1419,10 +1419,10 @@
     </RefParameter>
     
     <RefParameter Comment="     Trigger Selection" DefaultValue="null" Group="Advanced Parameters" Name="TriggerSelection" Type="list" Visible="false">
-        <Condition Diagnostic="" Expression="!STM32U5 | (AutonomousMode = AUTONOMOUS_MODE_DISABLE)"/>
-    </RefParameter>    
+        <Condition Diagnostic="" Expression="!(STM32U5|STM32WBA) | (AutonomousMode = AUTONOMOUS_MODE_DISABLE)"/>
+    </RefParameter>  
     <RefParameter Comment="     Trigger Selection" DefaultValue="USART_GPDMA1_CH0_TCF_TRG" Group="Advanced Parameters" Name="TriggerSelection" Type="list">
-        <Condition Diagnostic="" Expression="AutonomousMode = AUTONOMOUS_MODE_ENABLE &amp; $IpInstance_Synchronous_Master"/>
+        <Condition Diagnostic="" Expression="AutonomousMode = AUTONOMOUS_MODE_ENABLE &amp; $IpInstance_Synchronous_Master &amp; !(STM32WBA52CGUx|STM32WBA52CEUx|STM32WBA50KGUxSTM32WBA50KEUx)" />
         <PossibleValue Comment="USART GPDMA1 channel0" Value="USART_GPDMA1_CH0_TCF_TRG"/>
         <PossibleValue Comment="USART GPDMA1 channel1" Value="USART_GPDMA1_CH1_TCF_TRG"/>
         <PossibleValue Comment="USART GPDMA1 channel2" Value="USART_GPDMA1_CH2_TCF_TRG"/>
@@ -1432,12 +1432,26 @@
         <PossibleValue Comment="USART LPTIM1 out" Value="USART_LPTIM1_OUT_TRG"/>
         <PossibleValue Comment="USART LPTIM2 out" Value="USART_LPTIM2_OUT_TRG"/>
         <PossibleValue Comment="USART COMP1 out" Value="USART_COMP1_OUT_TRG"/>
-        <PossibleValue Comment="USART COMP2 out" Value="USART_COMP2_OUT_TRG"/>
+        <PossibleValue Action="Remove" Comment="USART COMP2 out" Value="USART_COMP2_OUT_TRG" Condition="DIE455"/>
+        <PossibleValue Comment="USART RTC alarm" Value="USART_RTC_ALRA_TRG"/>
+        <PossibleValue Comment="USART RTC wakeup" Value="USART_RTC_WUT_TRG"/>
+    </RefParameter>
+    <!-- Without COMP -->
+    <RefParameter Comment="     Trigger Selection" DefaultValue="USART_GPDMA1_CH0_TCF_TRG" Group="Advanced Parameters" Name="TriggerSelection" Type="list">
+        <Condition Diagnostic="" Expression="AutonomousMode = AUTONOMOUS_MODE_ENABLE &amp; $IpInstance_Synchronous_Master &amp; (STM32WBA52CGUx|STM32WBA52CEUx|STM32WBA50KGUxSTM32WBA50KEUx)"/>
+        <PossibleValue Comment="USART GPDMA1 channel0" Value="USART_GPDMA1_CH0_TCF_TRG"/>
+        <PossibleValue Comment="USART GPDMA1 channel1" Value="USART_GPDMA1_CH1_TCF_TRG"/>
+        <PossibleValue Comment="USART GPDMA1 channel2" Value="USART_GPDMA1_CH2_TCF_TRG"/>
+        <PossibleValue Comment="USART GPDMA1 channel3" Value="USART_GPDMA1_CH3_TCF_TRG"/>
+        <PossibleValue Comment="USART EXTI line 6" Value="USART_EXTI_LINE6_TRG"/>
+        <PossibleValue Comment="USART EXTI line 9" Value="USART_EXTI_LINE9_TRG"/>
+        <PossibleValue Comment="USART LPTIM1 out" Value="USART_LPTIM1_OUT_TRG"/>
+        <PossibleValue Comment="USART LPTIM2 out" Value="USART_LPTIM2_OUT_TRG"/>
         <PossibleValue Comment="USART RTC alarm" Value="USART_RTC_ALRA_TRG"/>
         <PossibleValue Comment="USART RTC wakeup" Value="USART_RTC_WUT_TRG"/>
     </RefParameter>
     <RefParameter Comment="     Trigger Selection" DefaultValue="UART_GPDMA1_CH0_TCF_TRG" Group="Advanced Parameters" Name="TriggerSelection" Type="list">
-        <Condition Diagnostic="" Expression="AutonomousMode = AUTONOMOUS_MODE_ENABLE &amp; $IpInstance_Asynchronous"/>
+        <Condition Diagnostic="" Expression="AutonomousMode = AUTONOMOUS_MODE_ENABLE &amp; $IpInstance_Asynchronous &amp; !(STM32WBA52CGUx|STM32WBA52CEUx|STM32WBA50KGUxSTM32WBA50KEUx)"/>
         <PossibleValue Comment="UART GPDMA1 channel0" Value="UART_GPDMA1_CH0_TCF_TRG"/>
         <PossibleValue Comment="UART GPDMA1 channel1" Value="UART_GPDMA1_CH1_TCF_TRG"/>
         <PossibleValue Comment="UART GPDMA1 channel2" Value="UART_GPDMA1_CH2_TCF_TRG"/>
@@ -1447,13 +1461,27 @@
         <PossibleValue Comment="UART LPTIM1 out" Value="UART_LPTIM1_OUT_TRG"/>
         <PossibleValue Comment="UART LPTIM2 out" Value="UART_LPTIM2_OUT_TRG"/>
         <PossibleValue Comment="UART COMP1 out" Value="UART_COMP1_OUT_TRG"/>
-        <PossibleValue Comment="UART COMP2 out" Value="UART_COMP2_OUT_TRG"/>
+        <PossibleValue Action="Remove" Comment="UART COMP2 out" Value="UART_COMP2_OUT_TRG" Condition="DIE455"/>
+        <PossibleValue Comment="UART RTC alarm" Value="UART_RTC_ALRA_TRG"/>
+        <PossibleValue Comment="UART RTC wakeup" Value="UART_RTC_WUT_TRG"/>
+    </RefParameter>
+    <!-- Without COMP -->
+    <RefParameter Comment="     Trigger Selection" DefaultValue="UART_GPDMA1_CH0_TCF_TRG" Group="Advanced Parameters" Name="TriggerSelection" Type="list">
+        <Condition Diagnostic="" Expression="AutonomousMode = AUTONOMOUS_MODE_ENABLE &amp; $IpInstance_Asynchronous &amp; (STM32WBA52CGUx|STM32WBA52CEUx|STM32WBA50KGUxSTM32WBA50KEUx)"/>
+        <PossibleValue Comment="UART GPDMA1 channel0" Value="UART_GPDMA1_CH0_TCF_TRG"/>
+        <PossibleValue Comment="UART GPDMA1 channel1" Value="UART_GPDMA1_CH1_TCF_TRG"/>
+        <PossibleValue Comment="UART GPDMA1 channel2" Value="UART_GPDMA1_CH2_TCF_TRG"/>
+        <PossibleValue Comment="UART GPDMA1 channel3" Value="UART_GPDMA1_CH3_TCF_TRG"/>
+        <PossibleValue Comment="UART EXTI line 6" Value="UART_EXTI_LINE6_TRG"/>
+        <PossibleValue Comment="UART EXTI line 9" Value="UART_EXTI_LINE9_TRG"/>
+        <PossibleValue Comment="UART LPTIM1 out" Value="UART_LPTIM1_OUT_TRG"/>
+        <PossibleValue Comment="UART LPTIM2 out" Value="UART_LPTIM2_OUT_TRG"/>
         <PossibleValue Comment="UART RTC alarm" Value="UART_RTC_ALRA_TRG"/>
         <PossibleValue Comment="UART RTC wakeup" Value="UART_RTC_WUT_TRG"/>
     </RefParameter>    
 
     <RefParameter Comment="     Data Size" DefaultValue="null" Group="Advanced Parameters" Name="DataSize" Type="integer" Visible="false">
-        <Condition Diagnostic="" Expression="!STM32U5 | (AutonomousMode = AUTONOMOUS_MODE_DISABLE)"/>
+        <Condition Diagnostic="" Expression="!(STM32U5|STM32WBA) | (AutonomousMode = AUTONOMOUS_MODE_DISABLE)"/>
     </RefParameter> 
     <RefParameter Comment="     Data Size" DefaultValue="0" Group="Advanced Parameters" Name="DataSize" Min="0" Type="integer">
         <Condition Diagnostic="" Expression="AutonomousMode = AUTONOMOUS_MODE_ENABLE &amp; $IpInstance_Synchronous_Master"/>
@@ -1463,7 +1491,7 @@
     </RefParameter>
 
     <RefParameter Comment="     Idle Frame" DefaultValue="null" Group="Advanced Parameters" Name="IdleFrame" Type="list" Visible="false">
-        <Condition Diagnostic="" Expression="!STM32U5 | (AutonomousMode = AUTONOMOUS_MODE_DISABLE)"/>
+        <Condition Diagnostic="" Expression="!(STM32U5|STM32WBA) | (AutonomousMode = AUTONOMOUS_MODE_DISABLE)"/>
     </RefParameter>     
     <RefParameter Comment="     Idle Frame" DefaultValue="USART_IDLE_FRAME_DISABLE" Group="Advanced Parameters" Name="IdleFrame" Type="list">
         <Condition Diagnostic="" Expression="AutonomousMode = AUTONOMOUS_MODE_ENABLE &amp; $IpInstance_Synchronous_Master"/>
@@ -1941,6 +1969,7 @@
                     </SignalLogicalOp>
                 </Mode>
             </ModeLogicOperator>
+            <Semaphore>$IpInstance</Semaphore>
         </Mode>
 		
         <Mode Name="Hardware Flow Control (RS232)">
@@ -1967,6 +1996,7 @@
             </ModeLogicOperator>
             <Condition Diagnostic="Active only with Asynchronous Mode" Expression="$IpInstance_Asynchronous &amp; !$IpInstance_HardwareControl"/>
             <Semaphore>$IpInstance_FlowControl</Semaphore>
+            <Semaphore>$IpInstance</Semaphore>
         </Mode>
         <!--
         <Mode Name = "SmartCard Clock">
@@ -1990,6 +2020,7 @@
             </ModeLogicOperator>
             <Condition Diagnostic="Active only with Asynchronous Mode" Expression="!$IpInstance_FlowControl &amp; $IpInstance_Asynchronous"/>
             <Semaphore>$IpInstance_HardwareControl</Semaphore>
+            <Semaphore>$IpInstance</Semaphore>
         </Mode>
 		
         <Mode Name="Slave Select(NSS) Management" RemoveCondition="(STM32H735VGHx &amp; ($Index=10))">
@@ -2009,6 +2040,7 @@
             </ModeLogicOperator>
             <Condition Diagnostic="Active only with Synchronous Slave Mode" Expression="$IpInstance_Synchronous_Slave"/>
             <Semaphore>$IpInstance_Slave_Select</Semaphore>
+            <Semaphore>$IpInstance</Semaphore>
         </Mode>
 		
     </ModeLogicOperator>

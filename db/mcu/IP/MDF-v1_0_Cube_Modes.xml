@@ -133,6 +133,14 @@
         <PossibleValue Value="MDF_DFLT_SITF0" Comment="SITF0"/>
     </RefParameter> 
     <RefParameter Name="MDF_DFLT0_SITF_Choice" DefaultValue="" Comment="bitstream matrix Serial-ITF selection" Type="list">
+        <Condition Diagnostic="" Expression="S_MDF_$IpInstance_DFLT0_BSMX_DataSource &amp; DIE455"/>
+        <PossibleValue Value="MDF_DFLT_SITF0" Comment="SITF0" Condition="!S_MDF_$IpInstance_SITF0" Diagnostic="Activate the related SITF in the Instance Mode 0 to make it available"/>
+        <PossibleValue Value="MDF_DFLT_SITF1" Comment="SITF1" Condition="!S_MDF_$IpInstance_SITF1" Diagnostic="Activate the related SITF in the Instance Mode 1 (if exists) to make it available"/>
+        <Description>
+            Selection of the serial interface (SITF) to use for the current Filter configuration (DFLT) as well as the related Short Circuit Detector (SCD)
+        </Description>
+    </RefParameter>
+    <RefParameter Name="MDF_DFLT0_SITF_Choice" DefaultValue="" Comment="bitstream matrix Serial-ITF selection" Type="list">
         <Condition Diagnostic="" Expression="S_MDF_$IpInstance_DFLT0_BSMX_DataSource"/>
         <PossibleValue Value="MDF_DFLT_SITF0" Comment="SITF0" Condition="!S_MDF_$IpInstance_SITF0" Diagnostic="Activate the related SITF in the Instance Mode 0 to make it available"/>
         <PossibleValue Value="MDF_DFLT_SITF1" Comment="SITF1" Condition="!S_MDF_$IpInstance_SITF1" Diagnostic="Activate the related SITF in the Instance Mode 1 to make it available"/>
@@ -745,6 +753,15 @@
         </Description>
     </RefParameter>
     <RefParameter Name="MDF_SITF1_ClockSource" DefaultValue="__NULL" Comment="Serial interface clock source" Type="string"  Visible="false"/>
+  
+    <RefParameter Name="MDF_DFLT1_SITF_Choice" DefaultValue="" Comment="bitstream matrix Serial-ITF selection" Type="list">
+        <Condition Diagnostic="" Expression="S_MDF_$IpInstance_DFLT1_BSMX_DataSource &amp; DIE455"/>
+        <PossibleValue Value="MDF_DFLT_SITF0" Comment="SITF0" Condition="!S_MDF_$IpInstance_SITF0" Diagnostic="Activate the related SITF in the Instance Mode 0 to make it available"/>
+        <PossibleValue Value="MDF_DFLT_SITF1" Comment="SITF1" Condition="!S_MDF_$IpInstance_SITF1" Diagnostic="Activate the related SITF in the Instance Mode 1 (if exists) to make it available"/>
+        <Description>
+            Selection of the serial interface (SITF) to use for the current Filter configuration (DFLT) as well as the related Short Circuit Detector (SCD)
+        </Description>
+    </RefParameter> 
     
     <RefParameter Name="MDF_DFLT1_SITF_Choice" DefaultValue="" Comment="bitstream matrix Serial-ITF selection" Type="list">
         <Condition Diagnostic="" Expression="S_MDF_$IpInstance_DFLT1_BSMX_DataSource"/>
@@ -3573,7 +3590,16 @@
     <!--############################################################################################################-->
     <!--###################################### RefParameters Common Param Begin  ###################################-->
     
-    
+     <RefParameter Name="MDF_COMPARAM_InterleavedFilters" DefaultValue="0" Comment="Number of Interleaved mode filters" Group="Common Parameter" Type="list" >
+        <Condition Diagnostic="" Expression="!($IpInstance=ADF1)&amp;(DIE455)"/>
+        <PossibleValue Value="0" Comment="No interleaved channels"/>
+        <PossibleValue Value="1" Comment="DFLT0 and DFLT1"                              Condition="!(S_MDF_$IpInstance_DFLT0)|!(S_MDF_$IpInstance_DFLT1)"/>
+        <Description>
+            Number of filters in interleaved mode.&lt;br&gt;
+            The number of interleaved SITF is from the SITF0 up to the number of SITF. &lt;br&gt;
+            &lt;b&gt;&lt;font color=&quot;orange&quot;&gt;Warning&lt;/b&gt; : &lt;/font&gt;the ADC interface cannot be used in the interleaved Mode.&lt;br&gt;
+        </Description>
+    </RefParameter>
     <RefParameter Name="MDF_COMPARAM_InterleavedFilters" DefaultValue="0" Comment="Number of Interleaved mode filters" Group="Common Parameter" Type="list" >
         <Condition Diagnostic="" Expression="!($IpInstance=ADF1)"/>
         <PossibleValue Value="0" Comment="No interleaved channels"/>
@@ -3604,12 +3630,11 @@
             Activate Common Clock 0 and/or 1  as output clocks
         </Description>
     </RefParameter>
-    
     <RefParameter Name="MDF_COMPARAM_Pins" DefaultValue="None" Comment="Output Clock Pin" Group="Output Clock" Type="list" >
         <Condition Expression="MDF_COMPARAM_ActivationOutputClock=ENABLE" Diagnostic=""/>
         <PossibleValue Value="MDF_OUTPUT_CLOCK_0" Comment="CCK0 is used as output clock" Condition="!S_MDF_$IpInstance_CCK0"/>
-        <PossibleValue Value="MDF_OUTPUT_CLOCK_1" Comment="CCK1 is used as output clock" Condition="!S_MDF_$IpInstance_CCK1"/>
-        <PossibleValue Value="MDF_OUTPUT_CLOCK_ALL" Comment="CCK0 and CCK1 are used as output clock" Condition="!S_MDF_$IpInstance_CCK1|!S_MDF_$IpInstance_CCK0" />
+        <PossibleValue Value="MDF_OUTPUT_CLOCK_1" Comment="CCK1 is used as output clock" Condition="!S_MDF_$IpInstance_CCK1" Diagnostic="Activate Common Clock 1 in the Common Clocks Mode (if exist)"/>
+        <PossibleValue Value="MDF_OUTPUT_CLOCK_ALL" Comment="CCK0 and CCK1 are used as output clock" Condition="!S_MDF_$IpInstance_CCK1|!S_MDF_$IpInstance_CCK0" Diagnostic="Activate Common Clock 0 and Common Clock 1 in the Common Clocks Mode (if exist)"/>
         <Description>
             Select which common clocks have to be defined as output clocks
         </Description>
@@ -4391,7 +4416,7 @@
         <!--$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$-->
         <!--$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$   INSTANCE 2 BEGIN   $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$-->
         
-        <Mode Name="Instance 2" UserName="Instance 2" RemoveCondition="$IpInstance=ADF1">
+        <Mode Name="Instance 2" UserName="Instance 2" RemoveCondition="(($IpInstance=ADF1)|(DIE455))">
             <ModeLogicOperator Name="OR">
                 <Mode Name="DFLT2" UserName="Digital Filter - DFLT2">
                     <ModeLogicOperator Name="OR">
@@ -4439,7 +4464,7 @@
         
         <!--$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$-->
         <!--$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$   INSTANCE 3 BEGIN   $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$-->
-        <Mode Name="Instance 3" UserName="Instance 3" RemoveCondition="$IpInstance=ADF1">
+        <Mode Name="Instance 3" UserName="Instance 3" RemoveCondition="(($IpInstance=ADF1)|(DIE455))">
             <ModeLogicOperator Name="OR">
                 <Mode Name="DFLT3" UserName="Digital Filter - DFLT3">
                     <ModeLogicOperator Name="OR">
@@ -4486,7 +4511,7 @@
         <!--$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$-->
         <!--$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$-->
         <!--$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$   INSTANCE 4 BEGIN   $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$-->
-        <Mode Name="Instance 4" UserName="Instance 4" RemoveCondition="$IpInstance=ADF1">
+        <Mode Name="Instance 4" UserName="Instance 4" RemoveCondition="(($IpInstance=ADF1)|(DIE455))">
             <ModeLogicOperator Name="OR">
                 <Mode Name="DFLT4" UserName="Digital Filter - DFLT4">
                     <ModeLogicOperator Name="OR">
@@ -4534,7 +4559,7 @@
         
         <!--$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$-->
         <!--$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$   INSTANCE 5 BEGIN   $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$-->
-        <Mode Name="Instance 5" UserName="Instance 5" RemoveCondition="$IpInstance=ADF1">
+        <Mode Name="Instance 5" UserName="Instance 5" RemoveCondition="(($IpInstance=ADF1)|(DIE455))">
             <ModeLogicOperator Name="OR">
                 <Mode Name="DFLT5" UserName="Digital Filter - DFLT5">
                     <ModeLogicOperator Name="OR">

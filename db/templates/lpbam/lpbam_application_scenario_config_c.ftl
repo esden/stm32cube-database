@@ -493,13 +493,13 @@ static void MX_AutonomousMode_Init(void)
         [#if ipCLOCK?? && !periph?starts_with("LPDMA") && !periph?starts_with("GPIO") && !periph?starts_with("NVIC") && !periph?starts_with("TAMP") && periph!="PWR"]
             [#list ipCLOCK as clk]
                 [#if clk!="none"  && clk!="__HAL_RCC_RTC_ENABLE"]
-                    [#if !allClocks?contains(clk?replace("CLK", "CLKAM")?replace("VREFBUF", "VREF")?replace("COMP", "COMP12"))]                        
+                    [#if !allClocks?contains(clk?replace("CLK_", "CLKAM_")?replace("VREFBUF", "VREF")?replace("COMP", "COMP12"))]                        
 #n
 #t/* Enable ${periph} Sleep Clock */
 #t${clk?replace("CLK_ENABLE", "CLK_SLEEP_ENABLE")?replace("VREFBUF", "VREF")}();
 #t/* Enable ${periph} Autonomous Mode */
-#t${clk?replace("CLK", "CLKAM")?replace("VREFBUF", "VREF")?replace("COMP", "COMP12")}();
-                        [#assign allClocks = allClocks + " " + clk?replace("CLK", "CLKAM")?replace("VREFBUF", "VREF")?replace("COMP", "COMP12")]
+#t${clk?replace("CLK_", "CLKAM_")?replace("VREFBUF", "VREF")?replace("COMP", "COMP12")}();
+                        [#assign allClocks = allClocks + " " + clk?replace("CLK_", "CLKAM_")?replace("VREFBUF", "VREF")?replace("COMP", "COMP12")]
                         [#assign allClocks = allClocks + " " + clk?replace("CLK_ENABLE", "CLK_SLEEP_ENABLE")?replace("VREFBUF", "VREF")]
                     [/#if]
                 [/#if]
@@ -508,14 +508,14 @@ static void MX_AutonomousMode_Init(void)
             [#if periph?starts_with("GPIO") && GPIO_CLK_LIST??]
                 [#list GPIO_CLK_LIST as clk]
                     [#if clk!="none"  && clk?starts_with("__HAL_RCC_LPGPIO")]
-                        [#if !allClocks?contains(clk?replace("CLK", "CLKAM")?replace("VREFBUF", "VREF"))]
+                        [#if !allClocks?contains(clk?replace("CLK_", "CLKAM_")?replace("VREFBUF", "VREF"))]
 #n
 #t/* Enable ${clk?replace("__HAL_RCC_", "")?replace("_CLK_ENABLE", "")} Sleep Clock */
 #t${clk?replace("CLK_ENABLE", "CLK_SLEEP_ENABLE")}();
 #t/* Enable ${clk?replace("__HAL_RCC_", "")?replace("_CLK_ENABLE", "")} Autonomous Mode */
-#t${clk?replace("CLK", "CLKAM")}();
+#t${clk?replace("CLK_", "CLKAM_")}();
 
-                    [#assign allClocks = allClocks + " " + clk?replace("CLK", "CLKAM")]
+                    [#assign allClocks = allClocks + " " + clk?replace("CLK_", "CLKAM_")]
                     [#assign allClocks = allClocks + " " + clk?replace("CLK_ENABLE", "CLK_SLEEP_ENABLE")]
                         [/#if]
                     [/#if]
@@ -557,13 +557,13 @@ static void MX_AutonomousMode_DeInit(void)
         [#if ipCLOCK?? && !periph?starts_with("LPDMA") && !periph?starts_with("GPIO") && !periph?starts_with("NVIC") && !periph?starts_with("TAMP") && periph!="PWR"]
             [#list ipCLOCK as clk]
                 [#if clk!="none" && clk!="__HAL_RCC_RTC_ENABLE"]
-                    [#if !allClocks?contains(clk?replace("CLK", "CLKAM")?replace("VREFBUF", "VREF"))]                        
+                    [#if !allClocks?contains(clk?replace("CLK_", "CLKAM_")?replace("VREFBUF", "VREF"))]                        
 #t/* Disable ${periph} Sleep Clock */
 #t${clk?replace("CLK_ENABLE", "CLK_SLEEP_DISABLE")?replace("VREFBUF", "VREF")}();
 #t/* Disable ${periph} Autonomous Mode */
-#t${clk?replace("CLK_ENABLE", "CLKAM_DISABLE")?replace("VREFBUF", "VREF")?replace("COMP", "COMP12")}();
+#t${clk?replace("CLK_ENABLE", "CLKAM_DISABLE")?replace("CLKAM_ENABLE", "CLKAM_DISABLE")?replace("VREFBUF", "VREF")?replace("COMP", "COMP12")}();
 #n
-                        [#assign allClocks = allClocks + " " + clk?replace("CLK_ENABLE", "CLKAM_DISABLE")?replace("VREFBUF", "VREF")]
+                        [#assign allClocks = allClocks + " " + clk?replace("CLK_ENABLE", "CLKAM_DISABLE")?replace("CLKAM_ENABLE", "CLKAM_DISABLE")?replace("VREFBUF", "VREF")]
                         [#assign allClocks = allClocks + " " + clk?replace("CLK_ENABLE", "CLK_SLEEP_DISABLE")?replace("VREFBUF", "VREF")]                        
                     [/#if]
                 [/#if]
@@ -572,7 +572,7 @@ static void MX_AutonomousMode_DeInit(void)
             [#if periph?starts_with("GPIO") && GPIO_CLK_LIST??]
                 [#list GPIO_CLK_LIST as clk]
                     [#if clk!="none"  && clk?starts_with("__HAL_RCC_LPGPIO")]
-                        [#if !allClocks?contains(clk?replace("CLK", "CLKAM")?replace("VREFBUF", "VREF"))]
+                        [#if !allClocks?contains(clk?replace("CLK_", "CLKAM_")?replace("VREFBUF", "VREF"))]
 #t/* Disable ${clk?replace("__HAL_RCC_", "")?replace("_CLK_ENABLE", "")} Sleep Clock */
 #t${clk?replace("CLK_ENABLE", "CLK_SLEEP_DISABLE")}();
 #t/* Disable ${clk?replace("__HAL_RCC_", "")?replace("_CLK_ENABLE", "")} Autonomous Mode */

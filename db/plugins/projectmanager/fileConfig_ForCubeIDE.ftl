@@ -173,12 +173,49 @@
      [#if TrustZone == "1" && prj_ctx=="1"]
     <ExePath>${ExePath}</ExePath>
     [/#if]
-
+    [#if OutputFilesFormat??]
+    <OutputFilesFormat>${OutputFilesFormat}</OutputFilesFormat>
+    [/#if]
+    [#if ReinitLink??]
+    <ReInitLinker>true</ReInitLinker>
+    [/#if]
     <memories>  [#-- add MemoriesList for UC30 --] 
     [#list memoriesList as memory]
         <memory ${memory} />
     [/#list]
         </memories>
+[#if LinkerFilesUpdate??]
+<ForceLinkerUpdate>true</ForceLinkerUpdate> 
+<BootPathConfig>
+[#------------------------ BootPath Linker Updates ------------------]
+    [#list LinkerFilesUpdate?keys as linkerContext]
+        [#if (Secure=="1" && linkerContext=="Secure") || (Secure=="0" && linkerContext=="NonSecure")]        
+            [#assign ctxData = LinkerFilesUpdate[linkerContext]]
+            [#list ctxData?keys as linkerData]
+                <linkerSymbol name="${linkerData}" value="${ctxData[linkerData]}" />        
+            [/#list]
+        [/#if]
+    [/#list]    
+</BootPathConfig>
+[#if ReInitLinkerFile??]
+<ReInitLinkerFile>true</ReInitLinkerFile>
+[/#if]
+[/#if]
+[#------------------------ BootPath Linker Updates ------------------]
+
+
+[#if PostBuildCommand??]
+<BuildAction>
+[#------------------------ BootPath Linker Updates ------------------]
+    [#list PostBuildCommand?keys as postBuildContext]
+        [#if (Secure=="1" && postBuildContext=="Secure") || (Secure=="0" && postBuildContext=="NonSecure")]        
+            [#assign ctxData = PostBuildCommand[postBuildContext]]
+            <PostBuildCmd>${PostBuildCommand[postBuildContext]}</PostBuildCmd>
+        [/#if]
+    [/#list]
+</BuildAction>
+[/#if]
+[#------------------------ BootPath Linker Updates ------------------]
     <startup>${startup}</startup> [#-- add relatif startup path needed for UC30 --]     
 <LinkSettings>
         [#if LinkerFile??]
@@ -190,11 +227,11 @@
         <icfloc>${icfloc}</icfloc>
         [/#if]
 	<LinkAdditionalLibs>
-[#if TrustZone == "1" && prj_ctx=="0"]
+[#if TrustZone == "1" &&prj_ctx?? && prj_ctx=="0" && SecureOnly=="0"]
 	<lib>${LinkAdditionalLibs}</lib>
 [/#if]
 	</LinkAdditionalLibs>
-[#if TrustZone == "1" && prj_ctx=="1"]
+[#if TrustZone == "1" && prj_ctx?? && prj_ctx=="1" && SecureOnly=="0"]
 	<TrustZoneLibName>${TrustZoneLibName}</TrustZoneLibName>
 [/#if]
 </LinkSettings>
@@ -357,7 +394,10 @@
             [/#if]
             [#if dataKey=="cpuCore" || dataKey=="cpucore"]
                [#assign cpuCore =  elem[dataKey]]           
-            [/#if]  
+            [/#if]
+            [#if dataKey=="memoriesList"]
+               [#assign memoriesList =  elem[dataKey]]           
+            [/#if] 
             [#if dataKey=="bspComponentGroups"]            
                [#assign bspComponentGroups =  elem[dataKey]]
             [/#if] 
@@ -429,6 +469,12 @@
             [#if dataKey=="StackSize"]
                [#assign StackSize =  elem[dataKey]]
             [/#if]
+            [#if dataKey=="Configuration"]
+               [#assign Configuration =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="active"]
+               [#assign active =  elem[dataKey]]
+            [/#if]
         [/#list]
         [#--break--]
     [#--/#if--]
@@ -438,6 +484,9 @@
 <Project>    
 [#-- <ProjectPath>${ProjectPath}</ProjectPath>  --][#-- added to give project path --]
     <ProjectName>${projectName}[#if TrustZone=="1"][#if ConfigSecure=="1"]_S[#else]_NS[/#if][/#if][#if (MultiProject == "1")][#if MultiProject=="1" && cpuCore??]_${cpuCore?replace("ARM Cortex-", "C")?replace("+", "PLUS")}[#else]_CM4[/#if][/#if]</ProjectName> [#-- modified to give only the project name without path --]
+    [#if active?? && !active]
+    <Excluded>true</Excluded>
+[/#if]
     <ProjectNature>${ProjectNature}</ProjectNature> [#-- Cpp --]
  [#if TrustZone == "1"]     
 <Secure>${ConfigSecure}</Secure>
@@ -1062,7 +1111,7 @@
                 [/#list]
             [/#if]
         </group>		   
-			[#if family!="STM32L5xx" && family!="STM32U5xx" && cmsisSourceFileNameList?size>0]
+			[#if family!="STM32L5xx" && family!="STM32U5xx" && family!="STM32H5xx" && family!="STM32WBAxx"&& cmsisSourceFileNameList?size>0]
             <group>			
                 <name>CMSIS</name>
                 [#assign cmsisFilesAdded = ""]

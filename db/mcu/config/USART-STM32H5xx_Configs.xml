@@ -1,0 +1,1333 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" DBVersion="V2.0" Name="USART" Version="STM32Cube_FW_H5_V0.1.0" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
+  <RefConfig Name="Usart_Init">
+        <CallLibMethod Name="HAL_USART_Init">
+        <MethodArg Name="StopBits" ParameterName="UsartStopBits"/>
+        <MethodArg Name="Mode" ParameterName="UsartMode"/>
+        <MethodArg Name="Parity" ParameterName="UsartParity"/>
+        <MethodArg Name="ClockPrescaler" ParameterName="UsartPrescaler"/>
+        <MethodArg Name="WordLength" ParameterName="UsartWordLength"/>
+        </CallLibMethod>
+        
+        <IFCondition Expression="$IpInstance_Synchronous_Slave">          
+            <CallLibMethod Name="HAL_USARTEx_ConfigNSS">
+                <MethodArg Name="NSSConfig" ParameterName="NSS"/>
+            </CallLibMethod>
+        </IFCondition>
+        <IFCondition Expression="(UsartFIFOMode=USART_FIFOMODE_ENABLE)">
+            <CallLibMethod Name="HAL_USARTEx_EnableFifoMode">
+            </CallLibMethod>
+        </IFCondition>
+        <IFCondition Expression="(UsartFIFOMode=USART_FIFOMODE_DISABLE)">          
+            <CallLibMethod Name="HAL_USARTEx_DisableFifoMode">
+            </CallLibMethod>
+        </IFCondition>
+        <CallLibMethod Name="HAL_USARTEx_SetTxFifoThreshold">
+            <MethodArg Name="Threshold" ParameterName="UsartTXFIFOThreshold"/>
+        </CallLibMethod>
+        <CallLibMethod Name="HAL_USARTEx_SetRxFifoThreshold">
+            <MethodArg Name="Threshold" ParameterName="UsartRXFIFOThreshold"/>
+        </CallLibMethod>
+        <IFCondition Expression="(SlaveMode=USART_SLAVEMODE_ENABLE)">
+            <CallLibMethod Name="HAL_USARTEx_EnableSlaveMode">
+            </CallLibMethod>
+        </IFCondition>
+        <ImplementCallBack Name="HAL_USART_MspInit"/>
+        <ImplementCallBack Name="HAL_USART_MspDeInit"/>
+    </RefConfig>
+    <RefConfig Name="Usart_DeInit">
+        <CallLibMethod Name="HAL_USART_DeInit"/>
+    </RefConfig>   
+
+    <LibMethod Comment="" Name="HAL_USARTEx_RxFifoFullCallback">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_USARTEx_TxFifoEmptyCallback">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_USARTEx_EnableSlaveMode">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_USARTEx_DisableSlaveMode">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_USARTEx_ConfigNSS">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="NSSConfig" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_USARTEx_EnableFifoMode">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_USARTEx_DisableFifoMode">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_USARTEx_SetTxFifoThreshold">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="Threshold" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_USARTEx_SetRxFifoThreshold">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="Threshold" OptimizationCondition="equal"/>
+    </LibMethod>    
+    <LibMethod Comment="" Name="HAL_USART_Init">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_USART_DeInit">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_USART_MspInit">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_USART_MspDeInit">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_USART_Transmit">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="true" GenericType="simple" Name="pTxData" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Size" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timeout" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_USART_Receive">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="true" GenericType="simple" Name="pRxData" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Size" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timeout" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_USART_TransmitReceive">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="true" GenericType="simple" Name="pTxData" OptimizationCondition="equal"/>
+        <Argument AddressOf="true" GenericType="simple" Name="pRxData" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Size" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timeout" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_USART_Transmit_IT">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="true" GenericType="simple" Name="pTxData" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Size" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_USART_Receive_IT">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="true" GenericType="simple" Name="pRxData" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Size" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_USART_TransmitReceive_IT">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="true" GenericType="simple" Name="pTxData" OptimizationCondition="equal"/>
+        <Argument AddressOf="true" GenericType="simple" Name="pRxData" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Size" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_USART_Transmit_DMA">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="true" GenericType="simple" Name="pTxData" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Size" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_USART_Receive_DMA">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="true" GenericType="simple" Name="pRxData" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Size" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_USART_TransmitReceive_DMA">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="true" GenericType="simple" Name="pTxData" OptimizationCondition="equal"/>
+        <Argument AddressOf="true" GenericType="simple" Name="pRxData" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Size" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_USART_DMAPause">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_USART_DMAResume">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_USART_DMAStop">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_USART_Abort">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_USART_Abort_IT">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_USART_IRQHandler">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_USART_TxHalfCpltCallback">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_USART_TxCpltCallback">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_USART_RxCpltCallback">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_USART_RxHalfCpltCallback">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_USART_TxRxCpltCallback">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_USART_ErrorCallback">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_USART_AbortCpltCallback">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_USART_GetState">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_USART_GetError">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="husart" TypeName="USART_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="USART_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="USART_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BaudRate" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WordLength" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="StopBits" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Parity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPolarity" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKPhase" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="CLKLastBit" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="pTxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="pRxBuffPtr" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RxXferCount" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbRxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbTxDataToProcess" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SlaveMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FifoMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="RxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="TxISR" OptimizationCondition="equal"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmatx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="true" GenericType="simple" Name="hdmarx" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <RefComponent Cclass="HAL" Cgroup="USART" Cversion="0.1.0">
+        <File Category="header" Name="Drivers/STM32H5xx_HAL_Driver/Inc/stm32h5xx_hal_usart.h"/>
+        <File Category="header" Name="Drivers/STM32H5xx_HAL_Driver/Inc/stm32h5xx_hal_usart_ex.h"/>
+        <File Category="source" Name="Drivers/STM32H5xx_HAL_Driver/Src/stm32h5xx_hal_usart.c"/>
+        <File Category="source" Name="Drivers/STM32H5xx_HAL_Driver/Src/stm32h5xx_hal_usart_ex.c"/>
+    </RefComponent>
+</IP>

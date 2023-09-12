@@ -1,0 +1,533 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" 
+    xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" 
+    DBVersion="V4.0" 
+    IPType="peripheral" 
+    Name="I3C" 
+    Version="i3c1_v1_0_Cube" 
+    ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd">
+    
+    <About>I3C: Improved inter-integrated circuit</About>
+ 
+ 
+    <RefParameter Comment="Instance" DefaultValue="I3C$Index" Name="Instance" Type="" Visible="false"/>
+    
+    <RefParameter Comment="Mode" DefaultValue="HAL_I3C_MODE_CONTROLLER" Name="Mode" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Controller"/>
+    </RefParameter>
+    
+    <RefParameter Comment="Mode" DefaultValue="HAL_I3C_MODE_TARGET" Name="Mode" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Target"/>
+    </RefParameter>
+    
+    <!-- Hardware Specific Timing Constraints -->
+    <RefParameter Comment="SDA Rise Time (ns)" DefaultValue="350" Group="Hardware Specific Timing Constraints" Min="0" Max="1000" Name="SDARiseTime" Type="integer" Visible="true">													 
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Controller"/>
+        <Description>Time in ns for SDA rise to 70% VDD from GND, capacitor effect, as example Value measure on Nucleo around 350ns.</Description>
+    </RefParameter>
+    
+   <!-- Bus characteristics -->
+   <RefParameter Comment="Bus usage" DefaultValue="PureUsage" Group="Bus Characteristics" Name="BusUsage" Type="list" Visible="true">
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Controller"/>
+        <PossibleValue Comment="I3C pure bus" Semaphore="S_$IpInstance_Pure" Value="PureUsage"/>
+        <PossibleValue Comment="Mixed I3C and I2C" Semaphore="S_$IpInstance_Mixed" Value="MixedUsage"/>
+        <Description>I3C Controller Mode: Using only I3C or mixed I3C + I2C.</Description>
+    </RefParameter>
+   
+   <RefParameter Comment="Frequency I3C Controller" DefaultValue="12500" Group="Bus Characteristics" Max="12500" Min="1" Name="FrequencyI3C" Type="integer" Unit="Khz" Visible="true">													 
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Controller"/>
+        <Description>Frequency I3C (Khz).</Description> 
+    </RefParameter>
+    <!--RefParameter Comment="Frequency Push Pull" DefaultValue="1250" Group="Bus Characteristics" Max="12500" Min="1" Name="FrequencyPP" Type="integer" Unit="Khz" Visible="true">													 
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Controller"/>
+        <Description>Frequency Push Pull (Khz).</Description> 
+    </RefParameter-->
+    <RefParameter Comment="Frequency I2C Controller" DefaultValue="null" Group="Bus Characteristics" Name="FrequencyI2C" Type="integer" Visible="false">													 
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Controller &amp; S_$IpInstance_Pure"/>
+        <Description>Frequency I2C Controller (Khz).</Description> 
+    </RefParameter>
+    <RefParameter Comment="Frequency I2C Controller" DefaultValue="1000" Group="Bus Characteristics" Max="1000" Min="100" Name="FrequencyI2C" Type="integer" Unit="Khz" Visible="true">													 
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Controller &amp; S_$IpInstance_Mixed"/>
+        <Description>Frequency I2C Controller (Khz).</Description> 
+    </RefParameter>
+    <RefParameter Comment="I3C Duty Cycle" DefaultValue="50" Group="Bus Characteristics" Max="50" Min="0" Name="DutyCycleI3C" Type="integer"  Unit="%" Visible="true">													 
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Controller &amp; S_$IpInstance_Pure"/>
+        <Description>I3C Duty cycle (in %).</Description> 
+    </RefParameter>
+    <RefParameter Comment="I3C Duty Cycle" DefaultValue="40" Group="Bus Characteristics" Max="50" Min="0" Name="DutyCycleI3C" Type="String"  Unit="%" Visible="true">													 
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Controller &amp; S_$IpInstance_Mixed"/>
+        <Description>I3C Duty cycle (in %).</Description> 
+    </RefParameter>
+    <!--RefParameter Comment="Duty Cycle Push Pull" DefaultValue="40" Group="Bus Characteristics" Max="100" Min="0" Name="DutyCyclePP" Type="String" Unit="%" Visible="true">													 
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Controller"/>
+        <Description>Duty cycle Push Pull (in %).</Description> 
+    </RefParameter-->
+    <RefParameter Comment="I2C Duty Cycle" DefaultValue="0" Group="Bus Characteristics" Max="50" Min="0" Name="DutyCycleI2C" Type="integer" Unit="%" Visible="false">													 
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Controller &amp; S_$IpInstance_Pure"/>
+        <Description>I2C Duty Cycle (in %).</Description> 
+    </RefParameter>
+    <RefParameter Comment="I2C Duty Cycle" DefaultValue="30" Group="Bus Characteristics" Max="50" Min="0" Name="DutyCycleI2C" Type="integer" Unit="%" Visible="true">													 
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Controller &amp; S_$IpInstance_Mixed"/>
+        <Description>I2C Duty Cycle (in %).</Description> 
+    </RefParameter>
+   
+    <RefParameter Comment="Timing Register 0" DefaultValue="0x00000000" Group="Bus Characteristics" Name="Register0" Max="0xFFFFFFFF" Min="0x00000000" Type="string">
+    </RefParameter>
+    <RefParameter Comment="Timing Register 1" DefaultValue="0x00000000" Group="Bus Timing Activity" Name="Register1" Max="0xFFFFFFFF" Min="0x00000000" Type="string">
+    </RefParameter>
+    <RefParameter Comment="Timing Register 2" DefaultValue="0x00000000" Group="Basic Configuration" Name="Register2" Max="0xFFFFFFFF" Min="0x00000000" Type="string">
+    </RefParameter>
+    
+   <!-- Params to be generated for HAL bus characteristics -->
+    <RefParameter Comment="SCL PP Low Duration" DefaultValue="0x00" Group="Bus Characteristics" Max="65535" Min="0" Name="SCLPPLowDuration" Type="String" Visible="false">													 
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Controller"/>
+        <Description>SCL low duration in I3C push-pull phases (ns).</Description>
+    </RefParameter>	
+    
+    <RefParameter Comment="SCL I3C High Duration" DefaultValue="0x00" Group="Bus Characteristics" Max="65535" Min="0" Name="SCLI3CHighDuration" Type="String" Visible="false">													 
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Controller"/>
+        <Description>SCL high duration, used for I3C messages (ns) for I3C open-drain and push pull phases.</Description>
+    </RefParameter>
+    
+    <RefParameter Comment="SCL OD Low Duration" DefaultValue="0x00" Group="Bus Characteristics" Max="65535" Min="0" Name="SCLODLowDuration" Type="String" Visible="false">													 
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Controller"/>
+        <Description>SCL low duration in open-drain phases, used for legacy I2C commands and for I3C open-drain phases (ns).</Description>
+    </RefParameter>
+    
+    <RefParameter Comment="SCL I2C High Duration" DefaultValue="0x00" Group="Bus Characteristics" Max="65535" Min="0" Name="SCLI2CHighDuration" Type="String" Visible="false">													 
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Controller"/>
+        <Description>SCL high duration used for legacy I2C commands (ns).</Description>
+    </RefParameter>
+    <!-- **************************** -->
+    
+    <!-- Params to be generated for HAL bus Timing Acivities -->
+    <RefParameter Comment="Bus free duration" DefaultValue="0x00" Group="Bus Timing Activity" Name="hexBusFreeDuration" Type="String" Visible="false">													 
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Controller"/>
+        <Description>Bus free duration value in hexadicimal to be generated.</Description>
+    </RefParameter>
+    
+    <RefParameter Comment="Bus idle duration" DefaultValue="0x00" Group="Bus Timing Activity" Name="hexBusIdleDuration" Type="String" Visible="false">													 
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Controller"/>
+        <Description>Bus idle duration value in hexadicimal to be generated.</Description>
+    </RefParameter>
+    
+    <RefParameter Comment="Bus Available duration" DefaultValue="0x00" Group="Bus Timing Activity" Name="hexBusAvailableDuration" Type="String" Visible="false">													 
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Target"/>
+        <Description>Bus Available duration value in hexadicimal to be generated.</Description>
+    </RefParameter>
+    <!-- **************************** -->
+    
+    <RefParameter Comment="SDA Hold Time" DefaultValue="HAL_I3C_SDA_HOLD_TIME_0_5" Group="Bus Timing Activity" Name="SDAHoldTime" Type="list">
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Controller"/>
+        <PossibleValue Comment="SDA Hold 0.5 multiple of Kernel Clock Period" Value="HAL_I3C_SDA_HOLD_TIME_0_5"/>
+        <PossibleValue Comment="SDA Hold 1.5 multiple of Kernel Clock Period" Value="HAL_I3C_SDA_HOLD_TIME_1_5"/>
+        <Description>SDA hold time: SDA Hold 0.5 or 1.5 multiple of Kernel Clock Period (SDA_HOLD_0.5,  SDA_HOLD_1.5).</Description>
+    </RefParameter>
+    
+    <!--RefParameter Comment="Wait Time" DefaultValue="0" Group="Bus Timing Activity" Max="65535" Min="0" Name="WaitTime" Type="integer" Unit="ns" Visible="true">													 
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Controller"/>
+        <Description>Field indicates the time that the main and the new controllers should wait before issuing a start (ns).</Description>
+    </RefParameter-->
+    
+    <RefParameter Comment="Wait Time" DefaultValue="HAL_I3C_OWN_ACTIVITY_STATE_0" Group="Bus Timing Activity" Name="WaitTime" Type="list" Visible="true">													 
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Controller"/>
+        <Description>Field indicates the time that the main and the new controllers should wait before issuing a start (ns).</Description>
+        <PossibleValue Comment="Own Controller Activity state 0" Value="HAL_I3C_OWN_ACTIVITY_STATE_0"/>
+        <PossibleValue Comment="Own Controller Activity state 1" Value="HAL_I3C_OWN_ACTIVITY_STATE_1"/>
+        <PossibleValue Comment="Own Controller Activity state 2" Value="HAL_I3C_OWN_ACTIVITY_STATE_2"/>
+        <PossibleValue Comment="Own Controller Activity state 3" Value="HAL_I3C_OWN_ACTIVITY_STATE_3"/>
+    </RefParameter>
+    
+    <RefParameter Comment="Bus Free Duration (ns)" DefaultValue="20" Group="Bus Timing Activity" Min="20" Max="50000000" Name="BusFreeDuration" Type="integer" Visible="true">													 
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Controller"/>
+        <Description>The duration after a stop and before a start (ns).</Description>
+    </RefParameter>
+    
+    <RefParameter Comment="Bus Available Duration (ns)" DefaultValue="1000" Group="Bus Timing Activity" Min="1000" Name="T_BusAvailableDuration" Type="integer" Visible="true">
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Target"/>
+        <Description>The duration when the SDA and the SCL are high for at least taval (ns).</Description>
+    </RefParameter>
+    <RefParameter Comment="Bus Available Duration (ns)" DefaultValue="null" Group="Bus Timing Activity" Min="1000" Name="T_BusAvailableDuration" Type="integer" Visible="false">
+    </RefParameter>
+    
+    <RefParameter Comment="Bus Idle Duration (ns)" DefaultValue="200000" Group="Bus Timing Activity" Name="BusIdleDuration" Min="200000" Type="integer" Visible="true">													 
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Controller"/>
+        <Description>An extended duration of the bus free to allow the devices to Hot Join the I3C bus.(ns).</Description>
+    </RefParameter>
+    
+   
+    <!-- Controller Configuration -->
+        <!-- Basic Configuration -->
+    <RefParameter Comment="Target Hot Join Acknowledgement" DefaultValue="DISABLE" Group="Basic Configuration" Name="HotJoinAllowed" Type="list">
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Controller"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+        <PossibleValue Comment="Enable" Value="ENABLE"/>
+        <Description>Enable/Disable the controller Hot Join acknowledgement.</Description>
+    </RefParameter>
+  
+    <RefParameter Name="StallConf1" Comment="Stall Configuration" DefaultValue="" Type="subtitle" Group="Basic Configuration">
+    </RefParameter>
+    
+    <RefParameter Comment="     - Stall Time (ns)" DefaultValue="0" Group="Basic Configuration" Max="65535" Min="0" Name="StallTime" Type="integer" Visible="true">													 
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Controller"/>
+        <Description>The controller clock stall time (ns).</Description>
+    </RefParameter>
+    
+    <!-- Stall time hex value to be generated -->
+    <RefParameter Comment="Stall Time" DefaultValue="0x00" Group="Basic Configuration" Name="hexStallTime" Type="String" Visible="false">													 
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Controller"/>
+        <Description>Stall Time value in hexadicimal to be generated.</Description>
+    </RefParameter>
+    
+    <RefParameter Comment="     - ACK Stalling" DefaultValue="DISABLE" Group="Basic Configuration" Name="ACKStallState" Type="list">
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Controller"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+        <PossibleValue Comment="Enable" Value="ENABLE"/>
+        <Description>Enable/disable the controller clock stall on the ACK phase.</Description>
+    </RefParameter>
+    
+    <RefParameter Comment="     - CCC T-Bit Stalling" DefaultValue="DISABLE" Group="Basic Configuration" Name="CCCStallState" Type="list">
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Controller"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+        <PossibleValue Comment="Enable" Value="ENABLE"/>
+        <Description>Enable/disable the controller clock stall on the T bit phase of a CCC communication to allow the target to decode command.</Description>
+    </RefParameter>
+    
+    <RefParameter Comment="     - Tx Parity Stalling" DefaultValue="DISABLE" Group="Basic Configuration" Name="TxStallState" Type="list">
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Controller"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+        <PossibleValue Comment="Enable" Value="ENABLE"/>
+        <Description>Enable/disable the controller clock stall on parity phase of data to allow the target to read received data.</Description>
+    </RefParameter>
+    
+    <RefParameter Comment="     - Rx Parity Stalling" DefaultValue="DISABLE" Group="Basic Configuration" Name="RxStallState" Type="list">
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Controller"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+        <PossibleValue Comment="Enable" Value="ENABLE"/>
+        <Description>Enable/disable the controller clock stall on the T bit phase of data enable to allow the target to prepare data to be sent.</Description>
+    </RefParameter>
+    
+        <!-- Advanced Configuration -->
+    <RefParameter Comment="Own Dynamic Address" DefaultValue="0" Group="Advanced Configuration" Max="0x7F" Min="0x0" Name="DynamicAddr" Type="hex" Visible="true">													 
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Controller"/>
+        <Description>The dynamic address of the controller, when goes Target.</Description>
+    </RefParameter>
+    
+    <RefParameter Comment="SDA High Keeper" DefaultValue="DISABLE" Group="Advanced Configuration" Name="HighKeeperSDA" Type="list">
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Controller"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+        <PossibleValue Comment="Enable" Value="ENABLE"/>
+        <Description>Enable/disable the controller SDA high keeper.</Description>
+    </RefParameter>
+    
+
+    <!-- Target Configuration -->
+    
+    <RefParameter Comment="Target Characterics ID " DefaultValue="0" Group="Basic Configuration" Max="255" Min="0" Name="Identifier" Type="integer" Visible="true">													 
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Target"/>
+        <Description>The target characteristic ID (MIPI named reference DCR) This parameter must be a value between Min_Data = 0 and Max_Data = 255.</Description>
+    </RefParameter>
+    
+    <RefParameter Comment="MIPI Identifier" DefaultValue="0" Group="Basic Configuration" Max="255" Min="0" Name="MIPIIdentifier" Type="integer" Visible="true">													 
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Target"/>
+        <Description>The bits [12-15] of the 48-provisioned ID (MIPI named reference PID), other 48-provisioned ID are hardcoded.</Description>
+    </RefParameter>
+
+    <RefParameter Name="IBIconfig" Comment="In-Band-Interrupt Request Configuration" DefaultValue="" Type="subtitle" Group="Basic Configuration">
+    </RefParameter>
+    <RefParameter Comment="     - In-Band-Interrupt authorized" DefaultValue="DISABLE" Group="Basic Configuration" Name="IBIRequest" Type="list">
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Target"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+        <PossibleValue Comment="Enable" Value="ENABLE"/>
+        <Description>Field to enable/disable the target In Band Interrupt authorized request.</Description>
+    </RefParameter>
+    
+    <RefParameter Comment="     - In-Band-Interrupt associated additional data" DefaultValue="DISABLE" Group="Basic Configuration" Name="IBIPayload" Type="list">
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Target"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+        <PossibleValue Comment="Enable" Value="ENABLE"/>
+        <Description>Field to enable/disable the data payload after an accepted IBI .</Description>
+    </RefParameter>
+    
+    <RefParameter Comment="     - In-Band-Interrupt payload size" DefaultValue="HAL_I3C_PAYLOAD_1_BYTE" Group="Basic Configuration" Name="IBIPayloadSize" Type="list">
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Target"/>
+        <PossibleValue Comment="Empty payload" Value="HAL_I3C_PAYLOAD_EMPTY"/>
+        <PossibleValue Comment="Payload 1 byte" Value="HAL_I3C_PAYLOAD_1_BYTE"/>
+        <PossibleValue Comment="Payload 2 bytes" Value="HAL_I3C_PAYLOAD_2_BYTES"/>
+        <PossibleValue Comment="Payload 3 bytes" Value="HAL_I3C_PAYLOAD_3_BYTES"/>
+        <PossibleValue Comment="Payload 4 bytes" Value="HAL_I3C_PAYLOAD_4_BYTES"/>
+        <Description>Payload data size.</Description>
+    </RefParameter>
+    
+    <RefParameter Name="CRRconfig" Comment="Controller Role Request Configuration" DefaultValue="" Type="subtitle" Group="Basic Configuration">
+    </RefParameter>
+    
+    <RefParameter Comment="     - Controller Role Request Autorized" DefaultValue="DISABLE" Group="Basic Configuration" Name="CtrlRoleRequest" Type="list">
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Target"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+        <PossibleValue Comment="Enable" Value="ENABLE"/>
+        <Description>Field to enable/disable the autorisation target request for a second masterChip.</Description>
+    </RefParameter>
+    
+    <RefParameter Comment="     - Controller Role Capabilities" DefaultValue="DISABLE" Group="Basic Configuration" Name="CtrlCapability" Type="list">
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Target"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+        <PossibleValue Comment="Enable" Value="ENABLE"/>
+        <Description>Field to enable/disable the target controller capability.</Description>
+    </RefParameter>
+    
+    <RefParameter Comment="Hot Join Request Autorized" DefaultValue="DISABLE" Group="Basic Configuration" Name="HotJoinRequest" Type="list">
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Target"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+        <PossibleValue Comment="Enable" Value="ENABLE"/>
+        <Description>Field to enable/disable the target hot join authorized request.</Description>
+    </RefParameter>
+    
+    <RefParameter Name="MaxDataSSconfig" Comment="Max Data Size/Speed Configuration" DefaultValue="" Type="subtitle" Group="Advanced Configuration">
+    </RefParameter>
+    
+    <RefParameter Comment="     - Max Read Data Size" DefaultValue="0" Group="Advanced Configuration" Max="65535" Min="0" Name="MaxReadDataSize" Type="integer" Visible="true">													 
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Target"/>
+        <Description>The numbers of data bytes that the target can read at maximum.</Description>
+    </RefParameter>
+    
+    <RefParameter Comment="     - Max Write Data Size" DefaultValue="0" Group="Advanced Configuration" Max="65535" Min="0" Name="MaxWriteDataSize" Type="integer" Visible="true">													 
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Target"/>
+        <Description>The numbers of data bytes that the target can write at maximum.</Description>
+    </RefParameter>
+
+    <RefParameter Comment="     - Data Speed Limitation" DefaultValue="DISABLE" Group="Advanced Configuration" Name="MaxSpeedLimitation" Type="list">
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Target"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+        <PossibleValue Comment="Enable" Value="ENABLE"/>
+        <Description>Field to enable/disable the max data speed limitation.</Description>
+    </RefParameter>
+    
+    <RefParameter Comment="     - Max Speed Format" DefaultValue="HAL_I3C_GETMXDS_FORMAT_1" Group="Advanced Configuration" Name="MaxDataSpeed" Type="list">
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Target"/>
+        <PossibleValue Comment="CCC Format 1" Value="HAL_I3C_GETMXDS_FORMAT_1"/>
+        <PossibleValue Comment="CCC Format 2" Value="HAL_I3C_GETMXDS_FORMAT_2_LSB"/>
+        <PossibleValue Comment="CCC Format 3" Value="HAL_I3C_GETMXDS_FORMAT_2_MID"/>
+        <PossibleValue Comment="CCC Format 4" Value="HAL_I3C_GETMXDS_FORMAT_2_MSB"/>
+        <Description>This field describes the returned GETMXDS CCC format, .</Description>
+    </RefParameter>
+
+    <RefParameter Name="HandOffConfig" Comment="Hand Off Configuration" DefaultValue="" Type="subtitle" Group="Advanced Configuration">
+    </RefParameter>
+
+    <RefParameter Comment="     - Hand Off Delay" DefaultValue="DISABLE" Group="Advanced Configuration" Name="HandOffDelay" Type="list">
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Target"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+        <PossibleValue Comment="Enable" Value="ENABLE"/>
+        <Description>Field to enable/disable the target need of delay to process the controller rôle hand-off.</Description>
+    </RefParameter>
+    
+    <RefParameter Comment="     - Hand Off Activity State" DefaultValue="HAL_I3C_HANDOFF_ACTIVITY_STATE_0" Group="Advanced Configuration" Name="HandOffActivityState" Type="list">
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Target"/>
+        <PossibleValue Comment="Activity state 0" Value="HAL_I3C_HANDOFF_ACTIVITY_STATE_0"/>
+        <PossibleValue Comment="Activity state 1" Value="HAL_I3C_HANDOFF_ACTIVITY_STATE_1"/>
+        <PossibleValue Comment="Activity state 2" Value="HAL_I3C_HANDOFF_ACTIVITY_STATE_2"/>
+        <PossibleValue Comment="Activity state 3" Value="HAL_I3C_HANDOFF_ACTIVITY_STATE_3"/>
+        <Description>This field describes the target activity state when becoming controller.</Description>
+    </RefParameter>
+    
+    <RefParameter Comment="Group Address Capabilities" DefaultValue="DISABLE" Group="Advanced Configuration" Name="GroupAddrCapability" Type="list">
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Target"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+        <PossibleValue Comment="Enable" Value="ENABLE"/>
+        <Description>Field to enable/disable the target support of group address after a controller rôle hand-off.</Description>
+    </RefParameter>
+    
+    <RefParameter Comment="Pending Read Mandatory Data Byte" DefaultValue="DISABLE" Group="Advanced Configuration" Name="PendingReadMDB" Type="list">
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Target"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+        <PossibleValue Comment="Enable" Value="ENABLE"/>
+        <Description>Field to enable/disable the target transmission of a mandatory data bytes indicating a pending read notification For getcapr CCC command.</Description>
+    </RefParameter>
+    
+    <RefParameter Name="TurnAroundConfig" Comment="Turn Around Configuration" DefaultValue="" Type="subtitle" Group="Advanced Configuration">
+    </RefParameter>
+    
+    <RefParameter Comment="     - Max Read TurnAround" DefaultValue="0" Group="Advanced Configuration" Max="255" Min="0" Name="MaxReadTurnAround" Type="integer" Visible="true">													 
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Target"/>
+        <Description>This field indicates the maximum read turnaround byte. This parameter must be a value between Min_Data = 0 and Max_Data = 255.</Description>
+    </RefParameter>
+    
+    <RefParameter Comment="     - Data TurnAround Duration" DefaultValue="HAL_I3C_TURNAROUND_TIME_TSCO_LESS_12NS" Group="Advanced Configuration" Name="DataTurnAroundDuration" Type="list">
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Target"/>
+        <PossibleValue Comment="Clock to data turnaround &#60;&#61; 12ns" Value="HAL_I3C_TURNAROUND_TIME_TSCO_LESS_12NS"/>
+        <PossibleValue Comment="Clock to data turnaround &#62; 12ns" Value="HAL_I3C_TURNAROUND_TIME_TSCO_GREATER_12NS"/>
+        <Description>This filed indicates the clock to data turnaround time.</Description>
+    </RefParameter>
+    
+    
+    <!-- Fifo Configuration -->
+    <RefParameter Name="FifoConf" Comment="Fifo Configuration" DefaultValue="" Type="subtitle" Group="Advanced Configuration">
+    </RefParameter>
+    
+    <RefParameter Comment="     - Transmit Fifo Threshold" DefaultValue="HAL_I3C_TXFIFO_THRESHOLD_1_4" Group="Advanced Configuration" Name="TXFIFOThreshold" Type="list">
+        <PossibleValue Comment="Threshold 1 byte" Value="HAL_I3C_TXFIFO_THRESHOLD_1_4"/>
+        <PossibleValue Comment="Threshold 4 bytes"  Value="HAL_I3C_TXFIFO_THRESHOLD_4_4"/>
+    </RefParameter>
+    
+    <RefParameter Comment="     - Receive Fifo Threshold" DefaultValue="HAL_I3C_RXFIFO_THRESHOLD_1_4" Group="Advanced Configuration" Name="RXFIFOThreshold" Type="list">
+        <PossibleValue Comment="Threshold 1 byte" Value="HAL_I3C_RXFIFO_THRESHOLD_1_4"/>
+        <PossibleValue Comment="Threshold 4 bytes" Value="HAL_I3C_RXFIFO_THRESHOLD_4_4"/>
+    </RefParameter>
+    
+    <RefParameter Comment="     - Control Fifo" DefaultValue="HAL_I3C_CONTROLFIFO_DISABLE" Group="Advanced Configuration" Name="FIFOControl" Type="list">
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Controller"/>
+        <PossibleValue Comment="Disable " Value="HAL_I3C_CONTROLFIFO_DISABLE"/>
+        <PossibleValue Comment="Enable " Value="HAL_I3C_CONTROLFIFO_ENABLE"/>
+    </RefParameter>
+    
+    <RefParameter Comment="     - Status Fifo" DefaultValue="HAL_I3C_STATUSFIFO_DISABLE" Group="Advanced Configuration" Name="FIFOStatus" Type="list">
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Controller"/>
+        <PossibleValue Comment="Disable " Value="HAL_I3C_STATUSFIFO_DISABLE"/>
+        <PossibleValue Comment="Enable " Value="HAL_I3C_STATUSFIFO_ENABLE"/>
+    </RefParameter>
+    
+    <RefParameter Comment="     - Control Fifo" DefaultValue="HAL_I3C_CONTROLFIFO_DISABLE" Group="Advanced Configuration" Name="FIFOControl" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Target"/>
+        <PossibleValue Comment="Disable " Value="HAL_I3C_CONTROLFIFO_DISABLE"/>
+    </RefParameter>
+    
+    <RefParameter Comment="     - Status Fifo" DefaultValue="HAL_I3C_STATUSFIFO_DISABLE" Group="Advanced Configuration" Name="FIFOStatus" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="$IpInstance_I3C_Target"/>
+        <PossibleValue Comment="Disable " Value="HAL_I3C_STATUSFIFO_DISABLE"/>
+    </RefParameter>
+    
+    <!-- RefMode for I3C Controller -->
+    <RefMode BaseMode="I3C" Name="Controller">
+        <ConfigForMode>I3C_Controller_Init</ConfigForMode>
+        <ConfigForMode>Fifo_Config</ConfigForMode>
+        <ConfigForMode>Contoller_Config</ConfigForMode>
+        <ConfigForMode>Enable_I3C_LL</ConfigForMode>
+        
+        <!-- Controller parameters -->
+        <Parameter Name="SDARiseTime"/>
+        <Parameter Name="BusUsage"/>
+        <Parameter Name="FrequencyI3C"/>
+        <Parameter Name="FrequencyI2C"/>
+        <Parameter Name="DutyCycleI3C"/>
+        <Parameter Name="DutyCycleI2C"/>
+        
+        <Parameter Name="SCLPPLowDuration"/>
+        <Parameter Name="SCLI3CHighDuration"/>
+        <Parameter Name="SCLODLowDuration"/>
+        <Parameter Name="SCLI2CHighDuration"/>
+        
+        <Parameter Name="Register0"/>
+        
+        <Parameter Name="SDAHoldTime"/>
+        <Parameter Name="WaitTime"/>
+        <Parameter Name="BusFreeDuration"/>
+        <Parameter Name="BusIdleDuration"/>     
+        <Parameter Name="hexBusFreeDuration"/>
+        <Parameter Name="hexBusIdleDuration"/>
+        <Parameter Name="Register1"/>
+        
+        <!-- Controller parameters -->
+            <!-- Basic parameters -->
+        <Parameter Name="HotJoinAllowed"/>
+        <Parameter Name="StallConf1"/>
+        <Parameter Name="StallTime"/>
+        <Parameter Name="hexStallTime"/>
+        <Parameter Name="ACKStallState"/>
+        <Parameter Name="CCCStallState"/>
+        <Parameter Name="TxStallState"/>
+        <Parameter Name="RxStallState"/>
+        <Parameter Name="Register2"/>
+            
+            <!-- Advanced parameters -->
+        <Parameter Name="DynamicAddr"/>
+        <Parameter Name="HighKeeperSDA"/>
+        
+        <Parameter Name="FifoConf"/>
+        <Parameter Name="TXFIFOThreshold"/>
+        <Parameter Name="RXFIFOThreshold"/>
+        <Parameter Name="FIFOControl"/>
+        <Parameter Name="FIFOStatus"/>
+        
+    </RefMode>
+    
+    <!-- RefMode for I3C Target -->
+    <RefMode BaseMode="I3C" Name="Target">
+        <ConfigForMode>I3C_Target_Init</ConfigForMode>
+        <ConfigForMode>Fifo_Config</ConfigForMode>
+        <ConfigForMode>Target_Config</ConfigForMode>
+        <ConfigForMode>Enable_I3C_LL</ConfigForMode>
+        
+        <Parameter Name="T_BusAvailableDuration"/>
+        <Parameter Name="hexBusAvailableDuration"/>
+        <Parameter Name="Register1"/>
+        
+        <Parameter Name="Identifier"/>
+        <Parameter Name="MIPIIdentifier"/>
+        
+        <Parameter Name="IBIconfig"/>
+        <Parameter Name="IBIRequest"/>
+        <Parameter Name="IBIPayload"/>
+        <Parameter Name="IBIPayloadSize"/>
+        
+        <Parameter Name="CRRconfig"/>
+        <Parameter Name="CtrlRoleRequest"/>
+        <Parameter Name="CtrlCapability"/>
+        
+        <Parameter Name="HotJoinRequest"/>
+        
+        <Parameter Name="MaxDataSSconfig"/>
+        <Parameter Name="MaxReadDataSize"/>
+        <Parameter Name="MaxWriteDataSize"/>
+        <Parameter Name="MaxSpeedLimitation"/>
+        <Parameter Name="MaxDataSpeed"/>
+        
+        <Parameter Name="HandOffConfig"/>
+        <Parameter Name="HandOffDelay"/>
+        <Parameter Name="HandOffActivityState"/>
+        
+        <Parameter Name="PendingReadMDB"/>
+        <Parameter Name="GroupAddrCapability"/>
+        
+        <Parameter Name="TurnAroundConfig"/>
+        <Parameter Name="MaxReadTurnAround"/>
+        <Parameter Name="DataTurnAroundDuration"/>
+        
+        <Parameter Name="FifoConf"/>
+        <Parameter Name="TXFIFOThreshold"/>
+        <Parameter Name="RXFIFOThreshold"/>
+    </RefMode>
+    
+    <!-- ModeLogicOperator for I3C -->
+    <ModeLogicOperator Name="OR">
+        <Mode Name="Mode">
+                <ModeLogicOperator Name="XOR">
+                    <Mode  Name="Controller" UserName="Controller">
+                        <SignalLogicalOp Name="AND">
+                            <Signal Name="SCL"/>
+                            <Signal Name="SDA"/>							
+                        </SignalLogicalOp>
+                        <Semaphore>$IpInstance_I3C_Controller</Semaphore>
+                        <Semaphore>$IpInstance_Dma_CTRL</Semaphore>
+                    </Mode>						
+
+                    <Mode Name="Target" UserName="Target">
+                        <SignalLogicalOp Name="AND">
+                            <Signal Name="SCL" IOMode="AlternateFunctionNoPushPullVeryHighTargetMode"/>
+                            <Signal Name="SDA" IOMode="AlternateFunctionNoPushPullVeryHighTargetMode"/>							
+                        </SignalLogicalOp>
+                        <Semaphore>$IpInstance_I3C_Target</Semaphore>
+                        <Semaphore>$IpInstance_Dma</Semaphore>	
+                    </Mode>							
+
+                </ModeLogicOperator>
+        </Mode>                                                                                                							
+    </ModeLogicOperator>
+   
+    <!-- RefSignal for I3C -->
+    <RefSignal IOMode="AlternateFunctionNoPushPullVeryHigh" Name="SCL"/>        
+    <RefSignal IOMode="AlternateFunctionNoPushPullVeryHigh" Name="SDA"/>
+ 
+    
+    <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+</IP>

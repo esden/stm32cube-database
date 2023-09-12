@@ -113,7 +113,7 @@
 #ifndef BUS_${I2CIpInstance}_POLL_TIMEOUT
    #define BUS_${I2CIpInstance}_POLL_TIMEOUT                0x1000U
 #endif
-/* ${I2CIpInstance} Frequeny in Hz  */
+/* ${I2CIpInstance} Frequency in Hz  */
 #ifndef BUS_${I2CIpInstance}_FREQUENCY
    #define BUS_${I2CIpInstance}_FREQUENCY  1000000U /* Frequency of I2Cn = 100 KHz*/
 #endif
@@ -125,7 +125,7 @@
 #ifndef BUS_${I2CIpInstance}_POLL_TIMEOUT
    #define BUS_${I2CIpInstance}_POLL_TIMEOUT                0x1000U
 #endif
-/* ${I2CIpInstance} Frequeny in Hz  */
+/* ${I2CIpInstance} Frequency in Hz  */
 #ifndef BUS_${I2CIpInstance}_FREQUENCY
    #define BUS_${I2CIpInstance}_FREQUENCY  1000000U /* Frequency of I2Cn = 100 KHz*/
 #endif

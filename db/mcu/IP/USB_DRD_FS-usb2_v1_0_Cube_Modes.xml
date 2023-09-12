@@ -26,6 +26,11 @@
 		<PossibleValue Value="HCD_PHY_EMBEDDED" Comment="Internal Phy"/>
 	</RefParameter>
 	
+    <!-- Parameters Sof_enable --> 
+    <RefParameter Comment="Signal start of frame" DefaultValue="DISABLE" Name="Sof_enable" Type="List" Group="Basic Parameters">
+        <PossibleValue Value="ENABLE" Comment="Enabled"/>
+        <PossibleValue Value="DISABLE" Comment="Disabled"/>
+    </RefParameter>
 	<RefParameter Comment="Sof Enable" DefaultValue="DISABLE" Name="Sof_enable" Type="List" Group="Basic Parameters" Visible="false"/>		
 	
 	<RefParameter Comment="Low Power" DefaultValue="DISABLE" Name="low_power_enable" Type="List" Group="Power Parameters" Visible="true">
@@ -64,6 +69,7 @@
 		<PossibleValue Value="DISABLE" Comment="Disabled"/>	
 	</RefParameter>
   
+
 	<RefMode Name="Device" HalMode="PCD">
 		<ConfigForMode>PCD_Init_FS</ConfigForMode>	
 		<Parameter Name="dev_endpoints"/>	
@@ -90,26 +96,62 @@
 		<Parameter Name="iso_singlebuffer_enable"/>	     
 	</RefMode>
 	
+    <RefMode Name="Activate_SOF_FS" HalMode="">
+        <Parameter Name="Sof_enable">
+            <PossibleValue>ENABLE</PossibleValue>
+        </Parameter>
+    </RefMode>
+
 	<ModeLogicOperator Name="OR">
 		<Mode Name="Mode">
 			<ModeLogicOperator Name="XOR">
-				<Mode Name="Device" UserName="Device_Only (FS)">
+				<Mode Name="Device" UserName="Device_Only_FS" RemoveCondition="DIE455">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="$SingleInstanceUSB_DM"/>
 						<Signal Name="$SingleInstanceUSB_DP"/>						
 					</SignalLogicalOp>
 					<Semaphore>MW_USB_DRD_FS_MW_DEVICE</Semaphore>
+					<Semaphore>SEMAOoUSBOoDRDOoFSOoDEVICEOoFOROoUSBX</Semaphore>
 				</Mode>
-				<Mode Name="Host" UserName="Host_Only (FS)">
+				<Mode Name="Host" UserName="Host_Only_FS" RemoveCondition="DIE455">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="$SingleInstanceUSB_DM"/>
 						<Signal Name="$SingleInstanceUSB_DP"/>						
 					</SignalLogicalOp>
 					<Semaphore>MW_USB_DRD_FS_MW_HOST</Semaphore>
+					<Semaphore>SEMAOoUSBOoDRDOoFSOoHOSTOoFOROoUSBX</Semaphore>
+				</Mode>
+				<Mode Name="Device" UserName="Device_Only_FS" RemoveCondition="!DIE455">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="$SingleInstanceUSB_DM" IOMode="AlternateFunctionPushPull"/>
+						<Signal Name="$SingleInstanceUSB_DP" IOMode="AlternateFunctionPushPull"/>						
+					</SignalLogicalOp>
+					<Semaphore>MW_USB_DRD_FS_MW_DEVICE</Semaphore>
+					<Semaphore>SEMAOoUSBOoDRDOoFSOoDEVICEOoFOROoUSBX</Semaphore>
+				</Mode>
+				<Mode Name="Host" UserName="Host_Only_FS" RemoveCondition="!DIE455">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="$SingleInstanceUSB_DM" IOMode="AlternateFunctionPushPull"/>
+						<Signal Name="$SingleInstanceUSB_DP" IOMode="AlternateFunctionPushPull"/>						
+					</SignalLogicalOp>
+					<Semaphore>MW_USB_DRD_FS_MW_HOST</Semaphore>
+					<Semaphore>SEMAOoUSBOoDRDOoFSOoHOSTOoFOROoUSBX</Semaphore>
 				</Mode>
 			</ModeLogicOperator>
 		</Mode>
 		
+        <Mode Name="Activate_SOF">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="Activate_SOF_FS" UserName="Activate SOF">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="$SingleInstanceUSB_SOF"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>USB_FS_SOF</Semaphore>
+            <Condition Expression="MW_USB_DRD_FS_MW_DEVICE | MW_USB_DRD_FS_MW_HOST" Diagnostic="USB Mode must be selected first"/>
+        </Mode>
+
 		<Mode Name="Activate_NOE" UserName="Activate NOE">
 			<ModeLogicOperator Name="OR">
 				<Mode Name="Activate_OE">					
@@ -123,7 +165,8 @@
 	</ModeLogicOperator>
 	
 	<RefSignal IOMode="System" Name="$SingleInstanceUSB_DM"/>
-	<RefSignal IOMode="System" Name="$SingleInstanceUSB_DP"/>	
+	<RefSignal IOMode="System" Name="$SingleInstanceUSB_DP"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="$SingleInstanceUSB_SOF"/>
 	<RefSignal IOMode="AlternateFunctionPushPull" Name="$SingleInstanceUSB_NOE"/>
 	
 	<!-- Clock Semaphore for this IP. -->

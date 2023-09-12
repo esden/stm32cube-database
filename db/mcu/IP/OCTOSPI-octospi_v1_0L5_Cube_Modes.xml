@@ -57,12 +57,12 @@
     <RefParameter Comment="Fifo Threshold" DefaultValue="1" Max="32" Min="1" Name="FifoThreshold" Type="integer" Group="Generic"/>
 
     <!-- DualQuad (Only) -->
-    <RefParameter Comment="Dual mode" DefaultValue="HAL_OSPI_DUALQUAD_ENABLE" Name="DualQuad" Type="list" Group="Generic">
-	<Condition Diagnostic="" Expression="Sem_$IpInstance_DualQuad | Sem_$IpInstance_DualDual | Sem_$IpInstance_DualSingle"/>
+    <RefParameter Comment="Dual Quad mode" DefaultValue="HAL_OSPI_DUALQUAD_ENABLE" Name="DualQuad" Type="list" Group="Generic">
+	<Condition Diagnostic="" Expression="Sem_$IpInstance_DualQuad"/>
 	<PossibleValue Comment="Enable" Value="HAL_OSPI_DUALQUAD_ENABLE"/>
     </RefParameter>
-    <RefParameter Comment="Dual mode" DefaultValue="HAL_OSPI_DUALQUAD_DISABLE" Name="DualQuad" Type="list" Group="Generic">
-	<Condition Diagnostic="" Expression="!(Sem_$IpInstance_DualQuad) &amp; !(Sem_$IpInstance_DualDual) &amp; !(Sem_$IpInstance_DualSingle)"/>
+    <RefParameter Comment="Dual Quad mode" DefaultValue="HAL_OSPI_DUALQUAD_DISABLE" Name="DualQuad" Type="list" Group="Generic">
+	<Condition Diagnostic="" Expression="!(Sem_$IpInstance_DualQuad)"/>
 	<PossibleValue Comment="Disable" Value="HAL_OSPI_DUALQUAD_DISABLE"/>
     </RefParameter>
 
@@ -123,13 +123,38 @@
 
     <!-- ChipSelectBoundary -->
     <RefParameter Comment="Chip Select Boundary" DefaultValue="0" Max="31" Min="0" Name="ChipSelectBoundary" Type="integer" Group="Generic"/>
-       
+
     <!-- DelayBlockBypass -->
     <RefParameter Comment="Delay Block" DefaultValue="HAL_OSPI_DELAY_BLOCK_BYPASSED" Name="DelayBlockBypass" Type="list" Group="Generic">
+	<Condition Diagnostic="DLYB parameter for L5" Expression="DIE472"/>
 	<PossibleValue Comment="Disable" Value="HAL_OSPI_DELAY_BLOCK_BYPASSED"/>
 	<PossibleValue Comment="Enable" Value="HAL_OSPI_DELAY_BLOCK_USED"/>
     </RefParameter>
+      
+    <!-- DelayBlockBypass -->
+    <RefParameter Comment="Delay Block" DefaultValue="HAL_OSPI_DELAY_BLOCK_BYPASSED" Name="DelayBlockBypass" Type="list" Group="Delay Block Settings">
+	    <Condition Diagnostic="" Expression="(Sem_$IpInstance_OctoDs|Sem_$IpInstance_HyperBus) &amp; !LQFP48 &amp; !UFQFPN48 &amp; DIE455"/>
+	<PossibleValue Comment="Bypassed" Value="HAL_OSPI_DELAY_BLOCK_BYPASSED"/>
+	<PossibleValue Comment="Used" Value="HAL_OSPI_DELAY_BLOCK_USED" Semaphore="DLYB_USED"/>
+    </RefParameter>
 
+    <!-- DlyB Units (LL) -->
+    <RefParameter Comment="Unit Delay Cell" DefaultValue="0" Max="128" Min="0" Name="Units" Type="integer" Group="Delay Block Settings">
+	    <Condition Diagnostic="" Expression="DLYB_USED &amp; (Sem_$IpInstance_OctoDs|Sem_$IpInstance_HyperBus) &amp; !LQFP48 &amp; !UFQFPN48 &amp; DIE455"/>
+    </RefParameter>
+    <RefParameter Comment="Unit Delay Cell" DefaultValue="0" Max="128" Min="0" Name="Units" Type="integer" Group="Delay Block Settings" Visible="false"/>
+
+    <!-- DlyB PhaseSel (LL) -->
+    <RefParameter Comment="Output Clock Phase" DefaultValue="0" Max="12" Min="0" Name="PhaseSel" Type="integer" Group="Delay Block Settings">
+	    <Condition Diagnostic="" Expression="DLYB_USED &amp; (Sem_$IpInstance_OctoDs|Sem_$IpInstance_HyperBus) &amp; !LQFP48 &amp; !UFQFPN48 &amp; DIE455"/>
+    </RefParameter>
+    <RefParameter Comment="Output Clock Phase" DefaultValue="0" Max="12" Min="0" Name="PhaseSel" Type="integer" Group="Delay Block Settings" Visible="false"/>
+
+    <!-- MaxTran -->
+    <RefParameter Comment="Maximum Transfer" DefaultValue="0" Max="255" Min="0" Name="MaxTran" Type="integer" Group="Generic">
+	    <Condition Diagnostic="" Expression="DIE455"/>
+	</RefParameter>
+	
     <!-- Refresh -->
     <RefParameter Comment="Refresh Rate" DefaultValue="0" Max="0xFFFFFFFF" Min="0" Name="Refresh" Type="integer" Group="Generic"/>
 
@@ -348,6 +373,9 @@
         <Parameter Name="DelayHoldQuarterCycle" />
         <Parameter Name="ChipSelectBoundary" />
         <Parameter Name="DelayBlockBypass" />
+	    <Parameter Name="Units" />
+        <Parameter Name="PhaseSel" />
+        <Parameter Name="MaxTran" />
         <Parameter Name="Refresh" />
         <!-- Operating Type-->
 	<!-- <Parameter Name="OperationType" />
@@ -384,6 +412,9 @@
         <Parameter Name="DelayHoldQuarterCycle" />
         <Parameter Name="ChipSelectBoundary" />	
         <Parameter Name="DelayBlockBypass" />
+	    <Parameter Name="Units" />
+        <Parameter Name="PhaseSel" />
+        <Parameter Name="MaxTran" />
         <Parameter Name="Refresh" />
         <!-- Operating Type-->
 	<!-- <Parameter Name="OperationType" />
@@ -420,6 +451,9 @@
         <Parameter Name="DelayHoldQuarterCycle" />
         <Parameter Name="ChipSelectBoundary" />	
         <Parameter Name="DelayBlockBypass" />
+	    <Parameter Name="Units" />
+        <Parameter Name="PhaseSel" />
+        <Parameter Name="MaxTran" />
         <Parameter Name="Refresh" />
         <!-- Operating Type-->
 	<!-- <Parameter Name="OperationType" />
@@ -456,6 +490,9 @@
         <Parameter Name="DelayHoldQuarterCycle" />
         <Parameter Name="ChipSelectBoundary" />	
         <Parameter Name="DelayBlockBypass" />
+	    <Parameter Name="Units" />
+        <Parameter Name="PhaseSel" />
+        <Parameter Name="MaxTran" />
         <Parameter Name="Refresh" />
         <!-- Operating Type-->
 	<!-- <Parameter Name="OperationType" />
@@ -492,6 +529,9 @@
         <Parameter Name="DelayHoldQuarterCycle" />
         <Parameter Name="ChipSelectBoundary" />	
         <Parameter Name="DelayBlockBypass" />
+	    <Parameter Name="Units" />
+        <Parameter Name="PhaseSel" />
+        <Parameter Name="MaxTran" />
         <Parameter Name="Refresh" />
         <!-- Operating Type-->
 	<!-- <Parameter Name="OperationType" />
@@ -528,6 +568,9 @@
         <Parameter Name="DelayHoldQuarterCycle" />
         <Parameter Name="ChipSelectBoundary" />	
         <Parameter Name="DelayBlockBypass" />
+	    <Parameter Name="Units" />
+        <Parameter Name="PhaseSel" />
+        <Parameter Name="MaxTran" />
         <Parameter Name="Refresh" />
         <!-- Operating Type-->
 	<!-- <Parameter Name="OperationType" />
@@ -564,6 +607,9 @@
         <Parameter Name="DelayHoldQuarterCycle" />
         <Parameter Name="ChipSelectBoundary" />
         <Parameter Name="DelayBlockBypass" />
+	    <Parameter Name="Units" />
+        <Parameter Name="PhaseSel" />
+        <Parameter Name="MaxTran" />
         <Parameter Name="Refresh" />
         <!-- Hyperbus -->
 	<Parameter Name="RWRecoveryTime" />
@@ -591,6 +637,7 @@
 	<ConfigForMode>OSPI_Init</ConfigForMode>
         <ConfigForMode>Memory_mapped</ConfigForMode>
         <ConfigForMode>Auto_Polling</ConfigForMode>
+		<ConfigForMode>Dlyb_Config</ConfigForMode>
         <!-- Initialization -->
         <Parameter Name="FifoThreshold" />
         <Parameter Name="DualQuad" />
@@ -605,6 +652,9 @@
         <Parameter Name="DelayHoldQuarterCycle" />
         <Parameter Name="ChipSelectBoundary" />
         <Parameter Name="DelayBlockBypass" />
+	    <Parameter Name="Units" />
+        <Parameter Name="PhaseSel" />
+        <Parameter Name="MaxTran" />
         <Parameter Name="Refresh" />
         <!-- Hyperbus -->
 	<Parameter Name="RWRecoveryTime" />
@@ -634,6 +684,7 @@
         <ConfigForMode>HyperBus</ConfigForMode>
         <ConfigForMode>Memory_mapped</ConfigForMode>
         <ConfigForMode>Auto_Polling</ConfigForMode>
+		<ConfigForMode>Dlyb_Config</ConfigForMode>
         <!-- Initialization -->
         <Parameter Name="FifoThreshold" />
         <Parameter Name="DualQuad" />
@@ -648,6 +699,9 @@
         <Parameter Name="DelayHoldQuarterCycle" />
         <Parameter Name="ChipSelectBoundary" />	
         <Parameter Name="DelayBlockBypass" />
+	    <Parameter Name="Units" />
+        <Parameter Name="PhaseSel" />
+        <Parameter Name="MaxTran" />
         <Parameter Name="Refresh" />
         <!-- Hyperbus -->
 	<Parameter Name="RWRecoveryTime" />

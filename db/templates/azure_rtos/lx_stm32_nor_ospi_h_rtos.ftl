@@ -47,6 +47,14 @@
       [#assign LX_USE_OSPI_OCTOSPI_value = value]
     [/#if]
 	
+	[#if "${FamilyName?lower_case}" == "stm32u5"]
+      [#assign  used_api= "OSPI"]
+    [/#if]
+	
+    [#if "${FamilyName?lower_case}" == "stm32h5"]
+      [#assign used_api = "XSPI"]
+    [/#if]
+	
   [/#list]
 [/#if]
 [/#list]
@@ -94,8 +102,8 @@ extern "C" {
 [#if glue_api == "DMA_API"]
   [#if TRANSFER_NOTIFICATION == "ThreadX_Semaphore"]
 /* The following semaphore is being to notify about RX/TX completion. It needs to be released in the transfer callbacks */
-extern TX_SEMAPHORE ospi_rx_semaphore;
-extern TX_SEMAPHORE ospi_tx_semaphore;
+extern TX_SEMAPHORE ${used_api ?lower_case}_rx_semaphore;
+extern TX_SEMAPHORE ${used_api ?lower_case}_tx_semaphore;
   [/#if]
 [/#if]
 
@@ -138,11 +146,11 @@ extern TX_SEMAPHORE ospi_tx_semaphore;
  /* USER CODE BEGIN LX_STM32_OSPI_POST_INIT */
 
 #define LX_STM32_OSPI_POST_INIT()                        do { \
-                                                         if (tx_semaphore_create(&ospi_rx_semaphore, "ospi rx transfer semaphore", 0) != TX_SUCCESS) \
+                                                         if (tx_semaphore_create(&${used_api ?lower_case}_rx_semaphore, "${used_api ?lower_case} rx transfer semaphore", 0) != TX_SUCCESS) \
                                                          { \
                                                            return LX_ERROR; \
                                                          } \
-                                                         if (tx_semaphore_create(&ospi_tx_semaphore, "ospi tx transfer semaphore", 0) != TX_SUCCESS) \
+                                                         if (tx_semaphore_create(&${used_api ?lower_case}_tx_semaphore, "${used_api ?lower_case} tx transfer semaphore", 0) != TX_SUCCESS) \
                                                          { \
                                                            return LX_ERROR; \
                                                          } \
@@ -178,7 +186,7 @@ extern TX_SEMAPHORE ospi_tx_semaphore;
 /* USER CODE BEGIN LX_STM32_OSPI_READ_CPLT_NOTIFY */
 
 #define LX_STM32_OSPI_READ_CPLT_NOTIFY(__status__)      do { \
-                                                          if(tx_semaphore_get(&ospi_rx_semaphore, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) != TX_SUCCESS) \
+                                                          if(tx_semaphore_get(&${used_api ?lower_case}_rx_semaphore, HAL_${used_api}_TIMEOUT_DEFAULT_VALUE) != TX_SUCCESS) \
                                                           { \
                                                             __status__ = LX_ERROR; \
                                                           } \
@@ -223,7 +231,7 @@ extern TX_SEMAPHORE ospi_tx_semaphore;
 /* USER CODE BEGIN LX_STM32_OSPI_WRITE_CPLT_NOTIFY */
 
 #define LX_STM32_OSPI_WRITE_CPLT_NOTIFY(__status__)     do { \
-                                                          if(tx_semaphore_get(&ospi_tx_semaphore, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) != TX_SUCCESS) \
+                                                          if(tx_semaphore_get(&${used_api ?lower_case}_tx_semaphore, HAL_${used_api}_TIMEOUT_DEFAULT_VALUE) != TX_SUCCESS) \
                                                           { \
                                                             __status__ = LX_ERROR; \
                                                           } \

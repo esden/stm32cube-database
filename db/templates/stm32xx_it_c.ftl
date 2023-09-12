@@ -39,7 +39,7 @@
         [#assign timeBaseHandler = timeBaseHandler_M0PLUS]
     [/#if]
 [/#if]
-[#if FREERTOS?? && (Secure == "false" || Secure == "-1")] [#-- If FreeRtos is used --]
+[#if ( FREERTOS?? || XCUBEFREERTOS?? ) && (Secure == "false" || Secure == "-1")] [#-- If FreeRtos is used --]
 [#-- [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_inc.tmp"/] --] [#--include freertos includes --]
 [#-- cf BZ 64089 --]
 [#if timeBaseSource?? && timeBaseSource=="SysTick"] [#-- BZ 74529 --]
@@ -59,6 +59,35 @@
 [#if GUI_INTERFACE?? && timeBaseSource=="SysTick"] [#-- If GUI_INTERFACE is used and timebase source is SysTick --]
 #include "gui_api.h"
 [/#if]
+[#assign swlowRadioIrqSelected = false]
+[#if FamilyName?lower_case=="stm32wba"]
+    [#assign rccIrqEnabled = false]
+    [#assign radioIrqEnabled = false]
+    [#list nvic as vector]
+        [#if vector?? && vector.irqHandlerGenerated && vector.name=="RCC_IRQn" ]
+            [#assign rccIrqEnabled = true]
+        [/#if]
+        [#if vector?? && vector.irqHandlerGenerated && (vector.name=="RADIO_IRQn")]
+            [#assign radioIrqEnabled = true]
+        [/#if]
+    [/#list]
+    [#if STM32_WPAN??]
+        #include "app_conf.h"
+    [/#if]
+    [#if STM32_WPAN?? && rccIrqEnabled]
+        #include "ll_sys.h"
+    [/#if]
+    [#if STM32_WPAN??]
+        #include "stm32wbaxx_hal.h"
+    [/#if]
+    [#if STM32_WPAN?? && rccIrqEnabled]
+        #include "scm.h"
+    [/#if]
+    [#if STM32_WPAN?? && radioIrqEnabled]
+        [#assign swlowRadioIrqSelected = true]    
+    [/#if]
+[/#if]
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -80,6 +109,12 @@ void SystemClock_Config(void);
 [/#if]
 [/#compress]
 
+[#if FamilyName=="STM32WBA" && STM32_WPAN?? && radioIrqEnabled]
+#n
+/* External functions --------------------------------------------------------*/
+extern void (*radio_callback)(void);
+extern void (*low_isr_callback)(void);
+[/#if]
 [#assign CortexName = "Cortex"]
 [#if FamilyName=="STM32F7"]  [#-- FamilyName is in reality series name --]
   [#assign CortexName = "Cortex-M7"]
@@ -126,6 +161,9 @@ void SystemClock_Config(void);
 
 /* External variables --------------------------------------------------------*/
 [#compress]
+[#if FamilyName=="STM32WBA" && STM32_WPAN?? && radioIrqEnabled]
+extern volatile uint8_t radio_sw_low_isr_is_running_high_prio;
+[/#if]
 [#assign handleList = ""]
 [#list handlers as handler] [#-- handlers is a list of ipHandlers (hashmap)  --] 
   [#list handler.entrySet() as entry]  [#-- handler is a set of handles --]
@@ -287,6 +325,24 @@ void ${vector.irqHandler}(void)
 #t/* USER CODE BEGIN ${vector.name} 1 */
 
 #n#t/* USER CODE END ${vector.name} 1 */
+}#n
+[/#if]
+[/#list]
+[#list services as service]
+[#if service?? && swlowRadioIrqSelected && service.swlowRadioInterruptExist]
+[#assign swlowRadioInterrupt = service.swlowRadioInterrupt]
+/**
+#t* @brief  This function handles ${swlowRadioInterrupt.comment}.  
+#t*/
+void ${swlowRadioInterrupt.irqHandler}(void)
+{
+#t/* USER CODE BEGIN ${swlowRadioInterrupt.name} 0 */
+
+#n#t/* USER CODE END ${swlowRadioInterrupt.name} 0 */
+ #t${swlowRadioInterrupt.swlowRadioIrqHandler}
+#t/* USER CODE BEGIN ${swlowRadioInterrupt.name} 1 */
+
+#n#t/* USER CODE END ${swlowRadioInterrupt.name} 1 */
 }#n
 [/#if]
 [/#list]

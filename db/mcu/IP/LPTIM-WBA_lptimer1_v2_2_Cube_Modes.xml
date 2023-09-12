@@ -1,0 +1,659 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://mcd.rou.st.com/modules.php?name=mcu" DBVersion="V4.0" Name="LPTIM" Version="WBA_lptimer1_v2_2_Cube" IPType="peripheral" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd">
+  <About>LPTIM: Low Power Timer</About>
+    <RefParameter Comment="Clock Source" DefaultValue="LPTIM_CLOCKSOURCE_APBCLOCK_LPOSC" Name="ClockSource" Type="list" Visible="false">
+        <Condition Diagnostic="Internal Clock Selected" Expression="Semaphore_CounterInternalClk$IpInstance|Semaphore_CounterExternalClk_synchro$IpInstance|Semaphore_Encoder$IpInstance"/>
+        <PossibleValue Comment="Clocksource Apbclock Lposc" Value="LPTIM_CLOCKSOURCE_APBCLOCK_LPOSC"/>
+    </RefParameter>
+    <RefParameter Comment="Clock Source" DefaultValue="LPTIM_CLOCKSOURCE_ULPTIM" Name="ClockSource" Type="list" Visible="false">
+        <Condition Diagnostic="External Clock Selected" Expression="Semaphore_CounterExternalClk_standalone$IpInstance"/>
+        <PossibleValue Comment="Clocksource Ulptim" Value="LPTIM_CLOCKSOURCE_ULPTIM"/>
+    </RefParameter>
+    <RefParameter Comment="Clock Prescaler" DefaultValue="LPTIM_PRESCALER_DIV1" Name="ClockPrescaler" Type="list" Group="Clock">
+        <Condition Diagnostic="Internal or External clock Selected" Expression="Semaphore_CounterExternalClk_standalone$IpInstance|Semaphore_CounterInternalClk$IpInstance"/>
+        <PossibleValue Comment="Prescaler Div1" Value="LPTIM_PRESCALER_DIV1"/>
+        <PossibleValue Comment="Prescaler Div2" Value="LPTIM_PRESCALER_DIV2"/>
+        <PossibleValue Comment="Prescaler Div4" Value="LPTIM_PRESCALER_DIV4"/>
+        <PossibleValue Comment="Prescaler Div8" Value="LPTIM_PRESCALER_DIV8"/>
+        <PossibleValue Comment="Prescaler Div16" Value="LPTIM_PRESCALER_DIV16"/>
+        <PossibleValue Comment="Prescaler Div32" Value="LPTIM_PRESCALER_DIV32"/>
+        <PossibleValue Comment="Prescaler Div64" Value="LPTIM_PRESCALER_DIV64"/>
+        <PossibleValue Comment="Prescaler Div128" Value="LPTIM_PRESCALER_DIV128"/>
+    </RefParameter>
+    <RefParameter Comment="Clock Prescaler" DefaultValue="LPTIM_PRESCALER_DIV1" Name="ClockPrescaler" Type="list" Group="Clock" Visible="false">
+        <Condition Diagnostic="Internal or External clock Selected" Expression="!(Semaphore_CounterExternalClk_standalone$IpInstance|Semaphore_CounterInternalClk$IpInstance)"/>
+        <PossibleValue Comment="Prescaler Div1" Value="LPTIM_PRESCALER_DIV1"/>
+    </RefParameter>
+    <RefParameter Comment="ULP Clock Sample Time" DefaultValue="LPTIM_CLOCKSAMPLETIME_DIRECTTRANSITION" Name="ULPClockSampleTime" Type="list" Group="Clock">
+        <Condition Diagnostic="" Expression="!Semaphore_CounterExternalClk_standalone$IpInstance &amp; !Semaphore_CounterInternalClk$IpInstance"/>
+        <PossibleValue Comment="Direct Transition" Value="LPTIM_CLOCKSAMPLETIME_DIRECTTRANSITION"/>
+        <PossibleValue Comment="2 Transitions" Value="LPTIM_CLOCKSAMPLETIME_2TRANSITIONS"/>
+        <PossibleValue Comment="4 Transitions" Value="LPTIM_CLOCKSAMPLETIME_4TRANSITIONS"/>
+        <PossibleValue Comment="8 Transitions" Value="LPTIM_CLOCKSAMPLETIME_8TRANSITIONS"/>
+    </RefParameter>
+    <RefParameter Comment="ULP Clock Sample Time" DefaultValue="LPTIM_CLOCKSAMPLETIME_DIRECTTRANSITION" Name="ULPClockSampleTime" Type="list" Group="Clock">
+        <Condition Diagnostic="" Expression="Semaphore_CounterExternalClk_standalone$IpInstance"/>
+        <PossibleValue Comment="Direct Transition" Value="LPTIM_CLOCKSAMPLETIME_DIRECTTRANSITION"/>
+        <PossibleValue Comment="2 Transitions (requires internal clock)" Value="LPTIM_CLOCKSAMPLETIME_2TRANSITIONS"/>
+        <PossibleValue Comment="4 Transitions (requires internal clock)" Value="LPTIM_CLOCKSAMPLETIME_4TRANSITIONS"/>
+        <PossibleValue Comment="8 Transitions (requires internal clock)" Value="LPTIM_CLOCKSAMPLETIME_8TRANSITIONS"/>
+    </RefParameter>
+    <RefParameter Comment="ULP Clock Sample Time" DefaultValue="null" Name="ULPClockSampleTime" Type="list" Group="Clock" Visible="false">
+        <Condition Diagnostic="" Expression="Semaphore_CounterInternalClk$IpInstance"/>
+    </RefParameter>
+    <RefParameter Comment="ULP Clock Polarity" DefaultValue="LPTIM_CLOCKPOLARITY_RISING" Name="ULPClockPolarity" Type="list" Group="Clock">
+        <Condition Diagnostic="" Expression="!Semaphore_CounterInternalClk$IpInstance"/>
+        <PossibleValue Comment="Rising Edge" Value="LPTIM_CLOCKPOLARITY_RISING"/>
+        <PossibleValue Comment="Falling Edge" Value="LPTIM_CLOCKPOLARITY_FALLING"/>
+        <PossibleValue Comment="Both Edges (Requires internal clock freq. > 4 x Fin1) " Value="LPTIM_CLOCKPOLARITY_RISING_FALLING"/>
+    </RefParameter>
+    <RefParameter Comment="ULP Clock Polarity" DefaultValue="null" Name="ULPClockPolarity" Type="list" Group="Clock" Visible="false">
+        <Condition Diagnostic="" Expression="Semaphore_CounterInternalClk$IpInstance"/>
+    </RefParameter>
+<!-- trigger management -->
+    <RefParameter Comment="Trigger Source" DefaultValue="LPTIM_TRIGSOURCE_0" Name="TriggerSource" Type="list" Group="Trigger">
+        <Condition Diagnostic="External trigger is selected" Expression="Semaphore_ETR$IpInstance &amp;($IpNumber=1)"/>
+        <PossibleValue Comment="Software Trigger" Value="LPTIM_TRIGSOURCE_SOFTWARE" Semaphore="Semaphore_SWTrigger_$IpInstance"/>
+        <PossibleValue Comment="LPTIM1_ETR IO" Value="LPTIM_TRIGSOURCE_0"/>
+        <PossibleValue Comment="RTC Alarm A" Value="LPTIM_TRIGSOURCE_1"/>
+        <PossibleValue Comment="RTC Alarm B" Value="LPTIM_TRIGSOURCE_2"/>
+        <PossibleValue Comment="RTC TAMP1 Input Detection" Value="LPTIM_TRIGSOURCE_3"/>
+        <PossibleValue Comment="RTC TAMP2 Input Detection" Value="LPTIM_TRIGSOURCE_4"/>
+        <PossibleValue Comment="COMP1 OUT" Value="LPTIM_TRIGSOURCE_6" Condition="!(COMP1_Exist)" Action="Remove"/>
+        <PossibleValue Comment="COMP2 OUT" Value="LPTIM_TRIGSOURCE_7" Condition="!(COMP2_Exist)" Action="Remove"/>
+    </RefParameter>
+    <RefParameter Comment="Trigger Source" DefaultValue="LPTIM_TRIGSOURCE_0" Name="TriggerSource" Type="list" Group="Trigger">
+        <Condition Diagnostic="External trigger is selected" Expression="!Semaphore_ETR$IpInstance &amp;($IpNumber=1)"/>
+        <PossibleValue Comment="Software Trigger" Value="LPTIM_TRIGSOURCE_SOFTWARE" Semaphore="Semaphore_SWTrigger_$IpInstance"/>
+        <PossibleValue Comment="RTC Alarm A" Value="LPTIM_TRIGSOURCE_1"/>
+        <PossibleValue Comment="RTC Alarm B" Value="LPTIM_TRIGSOURCE_2"/>
+        <PossibleValue Comment="RTC TAMP1 Input Detection" Value="LPTIM_TRIGSOURCE_3"/>
+        <PossibleValue Comment="RTC TAMP2 Input Detection" Value="LPTIM_TRIGSOURCE_4"/>
+        <PossibleValue Comment="COMP1 OUT" Value="LPTIM_TRIGSOURCE_6" Condition="!(COMP1_Exist)" Action="Remove"/>
+        <PossibleValue Comment="COMP2 OUT" Value="LPTIM_TRIGSOURCE_7" Condition="!(COMP2_Exist)" Action="Remove"/>
+    </RefParameter>
+    <RefParameter Comment="Trigger Source" DefaultValue="LPTIM_TRIGSOURCE_0" Name="TriggerSource" Type="list" Group="Trigger">
+        <Condition Diagnostic="External trigger is selected" Expression="Semaphore_ETR$IpInstance &amp;($IpNumber=2)"/>
+        <PossibleValue Comment="Software Trigger" Value="LPTIM_TRIGSOURCE_SOFTWARE" Semaphore="Semaphore_SWTrigger_$IpInstance"/>
+        <PossibleValue Comment="LPTIM1_ETR IO" Value="LPTIM_TRIGSOURCE_0"/>
+        <PossibleValue Comment="RTC Alarm A" Value="LPTIM_TRIGSOURCE_1"/>
+        <PossibleValue Comment="RTC Alarm B" Value="LPTIM_TRIGSOURCE_2"/>
+        <PossibleValue Comment="RTC TAMP1 Input Detection" Value="LPTIM_TRIGSOURCE_3"/>
+        <PossibleValue Comment="GPDMA CH0 transfer complete" Value="LPTIM_TRIGSOURCE_4"/>
+        <PossibleValue Comment="GPDMA CH4 transfer complete" Value="LPTIM_TRIGSOURCE_5"/>
+        <PossibleValue Comment="COMP1 OUT" Value="LPTIM_TRIGSOURCE_6" Condition="!(COMP1_Exist)" Action="Remove"/>
+        <PossibleValue Comment="COMP2 OUT" Value="LPTIM_TRIGSOURCE_7" Condition="!(COMP2_Exist)" Action="Remove"/>
+    </RefParameter>
+    <RefParameter Comment="Trigger Source" DefaultValue="LPTIM_TRIGSOURCE_0" Name="TriggerSource" Type="list" Group="Trigger">
+        <Condition Diagnostic="External trigger is selected" Expression="!Semaphore_ETR$IpInstance &amp;($IpNumber=2)"/>
+        <PossibleValue Comment="Software Trigger" Value="LPTIM_TRIGSOURCE_SOFTWARE" Semaphore="Semaphore_SWTrigger_$IpInstance"/>
+        <PossibleValue Comment="RTC Alarm A" Value="LPTIM_TRIGSOURCE_1"/>
+        <PossibleValue Comment="RTC Alarm B" Value="LPTIM_TRIGSOURCE_2"/>
+        <PossibleValue Comment="RTC TAMP1 Input Detection" Value="LPTIM_TRIGSOURCE_3"/>
+        <PossibleValue Comment="GPDMA CH0 transfer complete" Value="LPTIM_TRIGSOURCE_4"/>
+        <PossibleValue Comment="GPDMA CH4 transfer complete" Value="LPTIM_TRIGSOURCE_5"/>
+        <PossibleValue Comment="COMP1 OUT" Value="LPTIM_TRIGSOURCE_6" Condition="!(COMP1_Exist)" Action="Remove"/>
+        <PossibleValue Comment="COMP2 OUT" Value="LPTIM_TRIGSOURCE_7" Condition="!(COMP2_Exist)" Action="Remove"/>
+    </RefParameter>
+    <RefParameter Comment="Active Edge" DefaultValue="LPTIM_ACTIVEEDGE_RISING" Name="TriggerActiveEdge" Type="list" Group="Trigger">
+        <Condition Diagnostic="External trigger is selected" Expression="!Semaphore_SWTrigger_$IpInstance"/><!--pour tous les extriggers-->
+        <PossibleValue Comment="Active Edge Rising" Value="LPTIM_ACTIVEEDGE_RISING"/>
+        <PossibleValue Comment="Active Edge Falling" Value="LPTIM_ACTIVEEDGE_FALLING"/>
+        <PossibleValue Comment="Active Edge Rising Falling" Value="LPTIM_ACTIVEEDGE_RISING_FALLING"/>
+    </RefParameter>
+    <RefParameter Comment="Active Edge" DefaultValue="null" Name="TriggerActiveEdge" Type="list" Visible="false">
+        <Condition Diagnostic="External trigger is not selected" Expression="Semaphore_SWTrigger_$IpInstance"/>
+   <!-- <PossibleValue Comment="Active Edge Rising" Value="LPTIM_ACTIVEEDGE_RISING"/>-->
+    </RefParameter>
+<!-- Change naming since not available in legacy file -->
+    <RefParameter Comment="Sample Time" DefaultValue="LPTIM_TRIGSAMPLETIME_DIRECTTRANSITION" Name="TriggerSampleTime" Type="list" Group="Trigger">
+        <Condition Diagnostic="External trigger is selected" Expression="!Semaphore_SWTrigger_$IpInstance &amp;!Semaphore_CounterExternalClk_standalone$IpInstance"/><!--pour tous les extriggers-->
+        <PossibleValue Comment="Direct Transition" Value="LPTIM_TRIGSAMPLETIME_DIRECTTRANSITION"/>
+        <PossibleValue Comment="2 Transitions" Value="LPTIM_TRIGSAMPLETIME_2TRANSITIONS"/>
+        <PossibleValue Comment="4 Transitions" Value="LPTIM_TRIGSAMPLETIME_4TRANSITIONS"/>
+        <PossibleValue Comment="8 Transitions" Value="LPTIM_TRIGSAMPLETIME_8TRANSITIONS"/>
+    </RefParameter>
+    <RefParameter Comment="Sample Time" DefaultValue="LPTIM_TRIGSAMPLETIME_DIRECTTRANSITION" Name="TriggerSampleTime" Type="list" Group="Trigger">
+        <Condition Diagnostic="External trigger is selected" Expression="!Semaphore_SWTrigger_$IpInstance &amp;Semaphore_CounterExternalClk_standalone$IpInstance"/><!--pour tous les extriggers-->
+        <PossibleValue Comment="Direct Transition" Value="LPTIM_TRIGSAMPLETIME_DIRECTTRANSITION"/>
+        <PossibleValue Comment="2 Transitions (requires internal clock)" Value="LPTIM_TRIGSAMPLETIME_2TRANSITIONS"/>
+        <PossibleValue Comment="4 Transitions (requires internal clock)" Value="LPTIM_TRIGSAMPLETIME_4TRANSITIONS"/>
+        <PossibleValue Comment="8 Transitions (requires internal clock)" Value="LPTIM_TRIGSAMPLETIME_8TRANSITIONS"/>
+    </RefParameter>
+    <RefParameter Comment="Sample Time" DefaultValue="null" Name="TriggerSampleTime" Type="list" Visible="false">
+        <Condition Diagnostic="External trigger is not selected" Expression="Semaphore_SWTrigger_$IpInstance"/>
+   <!-- <PossibleValue Comment="Direct Transition" Value="LPTIM_TRIGSAMPLETIME_DIRECTTRANSISTION"/>-->
+    </RefParameter>
+<!-- Output Polarity management -->
+    <RefParameter Comment="Output Polarity" DefaultValue="LPTIM_OUTPUTPOLARITY_HIGH" Name="OutputPolarity" Type="list" Group="Output">
+        <Condition Diagnostic="Waveform gen. is selected" Expression="Semaphore_OUT$IpInstance"/>
+        <PossibleValue Comment="Output Polarity High" Value="LPTIM_OUTPUTPOLARITY_HIGH"/>
+        <PossibleValue Comment="Output Polarity Low" Value="LPTIM_OUTPUTPOLARITY_LOW"/>
+    </RefParameter>
+    <RefParameter Comment="Output Polarity" DefaultValue="LPTIM_OUTPUTPOLARITY_HIGH" Name="OutputPolarity" Type="list" Visible="false">
+        <Condition Diagnostic="Wavegorm gen.  is not selected" Expression="!Semaphore_OUT$IpInstance"/>
+        <PossibleValue Comment="Output Polarity High" Value="LPTIM_OUTPUTPOLARITY_HIGH"/>
+    </RefParameter>
+<!-- Period Management for V2.2 API -->
+    <RefParameter Name="Period" Comment="Period" DefaultValue="65535" Max="65535" Min="0" Type="integer" Group="Counter"/>
+    <RefParameter Comment="Update Mode" DefaultValue="LPTIM_UPDATE_IMMEDIATE" Name="UpdateMode" Type="list" Group="Preload">
+        <PossibleValue Comment="Update Immediate" Value="LPTIM_UPDATE_IMMEDIATE"/>
+        <PossibleValue Comment="Update End Of Period" Value="LPTIM_UPDATE_ENDOFPERIOD"/>
+    </RefParameter>
+    <RefParameter Comment="Counter Source" DefaultValue="LPTIM_COUNTERSOURCE_INTERNAL" Name="CounterSource" Type="list" Visible="false">
+        <Condition Diagnostic="Encoder, internal" Expression="(Semaphore_CounterInternalClk$IpInstance)"/>
+        <PossibleValue Comment="Countersource Internal" Value="LPTIM_COUNTERSOURCE_INTERNAL"/>
+    </RefParameter>
+    <RefParameter Comment="Counter Source" DefaultValue="LPTIM_COUNTERSOURCE_EXTERNAL" Name="CounterSource" Type="list" Visible="false">
+        <Condition Diagnostic="external or standalone" Expression="!(Semaphore_CounterInternalClk$IpInstance)"/>
+        <PossibleValue Comment="Countersource External" Value="LPTIM_COUNTERSOURCE_EXTERNAL"/>
+    </RefParameter>
+    <RefParameter Comment="Repetition counter" DefaultValue="0" Max="255" Min="0" Name="RepetitionCounter" Type="integer" Group="Counter"/>
+    <RefParameter Comment="Input1 Source" DefaultValue="LPTIM_INPUT1SOURCE_GPIO" Name="Input1Source" Type="list" Visible="false">
+        <Condition Diagnostic="external or standalone" Expression="Semaphore_Input1_gpio$IpInstance"/>
+        <PossibleValue Comment="GPIO" Value="LPTIM_INPUT1SOURCE_GPIO"/>
+    </RefParameter>
+    <RefParameter Comment="Input1 Source" DefaultValue="LPTIM_INPUT1SOURCE_COMP1" Name="Input1Source" Type="list" Visible="false">
+        <Condition Diagnostic="external or standalone" Expression="Semaphore_Input1_comp1$IpInstance"/>
+        <PossibleValue Comment="COMP1" Value="LPTIM_INPUT1SOURCE_COMP1"/>
+    </RefParameter>
+    <RefParameter Comment="Input1 Source" DefaultValue="LPTIM_INPUT1SOURCE_COMP2" Name="Input1Source" Type="list" Visible="false">
+        <Condition Diagnostic="external or standalone" Expression="Semaphore_Input1_comp2$IpInstance"/>
+        <PossibleValue Comment="COMP2" Value="LPTIM_INPUT1SOURCE_COMP2"/>
+    </RefParameter>
+    <RefParameter Comment="Input1 Source" DefaultValue="LPTIM_INPUT1SOURCE_COMP1_COMP2" Name="Input1Source" Type="list" Visible="false">
+        <Condition Diagnostic="external or standalone" Expression="Semaphore_Input1_comp1comp2$IpInstance"/>
+        <PossibleValue Comment="COMP1 OR COMP2 " Value="LPTIM_INPUT1SOURCE_COMP1_COMP2"/>
+    </RefParameter>
+    <RefParameter Comment="Input2 Source" DefaultValue="LPTIM_INPUT2SOURCE_GPIO" Name="Input2Source" Type="list" Visible="false">
+         <Condition Diagnostic="external or standalone" Expression="Semaphore_Input2_gpio$IpInstance"/>
+        <PossibleValue Comment="GPIO" Value="LPTIM_INPUT2SOURCE_GPIO"/>
+    </RefParameter>
+    <RefParameter Comment="Input2 Source" DefaultValue="LPTIM_INPUT2SOURCE_COMP2" Name="Input2Source" Type="list" Visible="false">
+         <Condition Diagnostic="external or standalone" Expression="Semaphore_Input2_comp2$IpInstance"/>
+        <PossibleValue Comment="COMP2" Value="LPTIM_INPUT2SOURCE_COMP2"/>
+    </RefParameter>
+    <RefParameter Name="ICInputSource_1" Comment="InputCapture1 Source" DefaultValue="LPTIM_IC1SOURCE_COMP1" Type="list" Group="Channel 1">
+        <Condition Diagnostic="IO input is not selected" Expression="($IpNumber=1) &amp; Semaphore_input_int_ch1_$IpInstance"/>
+        <PossibleValue Value="LPTIM_IC1SOURCE_COMP1" Comment="COMP1"/>
+        <PossibleValue Value="LPTIM_IC1SOURCE_COMP2" Comment="COMP2"/>
+    </RefParameter>
+    <RefParameter Name="ICInputSource_1" Comment="InputCapture1 Source" DefaultValue="LPTIM_IC1SOURCE_GPIO" Type="list" Visible="false">
+        <Condition Diagnostic="IO input is selected" Expression="($IpNumber=1) &amp; !Semaphore_input_int_ch1_$IpInstance"/>
+        <PossibleValue Value="LPTIM_IC1SOURCE_GPIO" Comment="GPIO"/>
+    </RefParameter>
+    <RefParameter Name="ICInputSource_2" Comment="InputCapture2 Source" DefaultValue="LPTIM_IC2SOURCE_LSI" Type="list" Group="Channel 2">
+        <Condition Diagnostic="IO input is not selected" Expression="($IpNumber=1) &amp;  Semaphore_input_int_ch2_$IpInstance"/>
+        <PossibleValue Value="LPTIM_IC2SOURCE_LSI" Comment="LSI"/>
+        <PossibleValue Value="LPTIM_IC2SOURCE_LSE" Comment="LSE"/>
+    </RefParameter>
+    <RefParameter Name="ICInputSource_2" Comment="InputCapture2 Source" DefaultValue="LPTIM_IC2SOURCE_GPIO" Type="list" Visible="false">
+        <Condition Diagnostic="IO input is selected" Expression="($IpNumber=1) &amp;  !Semaphore_input_int_ch2_$IpInstance"/>
+        <PossibleValue Comment="GPIO" Value="LPTIM_IC2SOURCE_GPIO"/>
+    </RefParameter>
+    <RefParameter Name="ICInputSource_1" Comment="InputCapture1 Source" DefaultValue="LPTIM_IC1SOURCE_COMP1" Type="list" Group="Channel 1">
+        <Condition Diagnostic="IO input is not selected" Expression="($IpNumber=2) &amp; Semaphore_input_int_ch1_$IpInstance"/>
+        <PossibleValue Value="LPTIM_IC1SOURCE_COMP1" Comment="COMP1"/>
+        <PossibleValue Value="LPTIM_IC1SOURCE_COMP2" Comment="COMP2"/>
+    </RefParameter>
+    <RefParameter Name="ICInputSource_1" Comment="InputCapture1 Source" DefaultValue="LPTIM_IC1SOURCE_GPIO" Type="list" Visible="false">
+        <Condition Diagnostic="IO input is selected" Expression="($IpNumber=2) &amp; !Semaphore_input_int_ch1_$IpInstance"/>
+        <PossibleValue Value="LPTIM_IC1SOURCE_GPIO" Comment="GPIO"/>
+    </RefParameter>
+    <RefParameter Name="ICInputSource_2" Comment="InputCapture2 Source" DefaultValue="LPTIM_IC2SOURCE_HSI_256" Type="list" Group="Channel 2">
+        <Condition Diagnostic="IO input is not selected" Expression="($IpNumber=2) &amp;  Semaphore_input_int_ch2_$IpInstance"/>
+        <PossibleValue Value="LPTIM_IC2SOURCE_HSI_256" Comment="HSI_256" />
+    </RefParameter>
+    <RefParameter Name="ICInputSource_2" Comment="InputCapture2 Source" DefaultValue="LPTIM_IC2SOURCE_GPIO" Type="list" Visible="false">
+        <Condition Diagnostic="IO input is selected" Expression="($IpNumber=2) &amp;  !Semaphore_input_int_ch2_$IpInstance"/>
+        <PossibleValue Comment="GPIO" Value="LPTIM_IC2SOURCE_GPIO"/>
+    </RefParameter>
+    <RefParameter Name="ICPrescaler_1" Comment="Prescaler ch1" DefaultValue="LPTIM_ICPSC_DIV1" Type="list" Group="Channel 1">
+        <PossibleValue Value="LPTIM_ICPSC_DIV1" Comment="DIV1"/>
+        <PossibleValue Value="LPTIM_ICPSC_DIV2" Comment="DIV2" />
+        <PossibleValue Value="LPTIM_ICPSC_DIV4" Comment="DIV4" />
+        <PossibleValue Value="LPTIM_ICPSC_DIV8" Comment="DIV8" />
+    </RefParameter>
+    <RefParameter Name="ICPrescaler_2" Comment="Prescaler ch2" DefaultValue="LPTIM_ICPSC_DIV1" Type="list" Group="Channel 2">
+        <PossibleValue Value="LPTIM_ICPSC_DIV1" Comment="DIV1"/>
+        <PossibleValue Value="LPTIM_ICPSC_DIV2" Comment="DIV2" />
+        <PossibleValue Value="LPTIM_ICPSC_DIV4" Comment="DIV4" />
+        <PossibleValue Value="LPTIM_ICPSC_DIV8" Comment="DIV8" />
+    </RefParameter>
+    <RefParameter Name="ICPolarity_1" Comment="Polarity ch1" DefaultValue="LPTIM_ICPSC_DIV1" Type="list" Group="Channel 1">
+        <PossibleValue Value="LPTIM_ICPOLARITY_RISING" Comment="rising edge"/>
+        <PossibleValue Value="LPTIM_ICPOLARITY_FALLING" Comment="falling edge" />
+        <PossibleValue Value="LPTIM_ICPOLARITY_RISING_FALLING" Comment="rising and falling edge" />
+    </RefParameter>
+    <RefParameter Name="ICPolarity_2" Comment="Polarity ch2" DefaultValue="LPTIM_ICPSC_DIV1" Type="list" Group="Channel 2">
+        <PossibleValue Value="LPTIM_ICPOLARITY_RISING" Comment="rising edge"/>
+        <PossibleValue Value="LPTIM_ICPOLARITY_FALLING" Comment="falling edge" />
+        <PossibleValue Value="LPTIM_ICPOLARITY_RISING_FALLING" Comment="rising and falling edge" />
+    </RefParameter>
+    <RefParameter Name="ICFilter_1" Comment="Filter ch1" DefaultValue="LPTIM_ICFLT_CLOCK_DIV1" Type="list" Group="Channel 1">
+        <PossibleValue Value="LPTIM_ICFLT_CLOCK_DIV1" Comment="1 clock period"/>
+        <PossibleValue Value="LPTIM_ICFLT_CLOCK_DIV2" Comment="2 clock periods" />
+        <PossibleValue Value="LPTIM_ICFLT_CLOCK_DIV4" Comment="4 clock periods" />
+        <PossibleValue Value="LPTIM_ICFLT_CLOCK_DIV8" Comment="8 clock periods" />
+    </RefParameter>
+    <RefParameter Name="ICFilter_2" Comment="Filter ch2" DefaultValue="LPTIM_ICFLT_CLOCK_DIV1" Type="list" Group="Channel 2">
+        <PossibleValue Value="LPTIM_ICFLT_CLOCK_DIV1" Comment="1 clock period"/>
+        <PossibleValue Value="LPTIM_ICFLT_CLOCK_DIV2" Comment="2 clock periods" />
+        <PossibleValue Value="LPTIM_ICFLT_CLOCK_DIV4" Comment="4 clock periods" />
+        <PossibleValue Value="LPTIM_ICFLT_CLOCK_DIV8" Comment="8 clock periods" />
+    </RefParameter>
+    <RefParameter Name="Capture_Compare_Selection_1" Comment="Capture-Compare Selection" DefaultValue="UI_input" Type="list" Group="Channel 1" Visible="true">
+        <Condition Diagnostic="Internal signals" Expression="!(STM32WBAx0 | STM32WBAx2) &amp; ((($IpNumber=1)|($IpNumber=2)) &amp;!(Semaphore_CH1_Input$IpInstance|Semaphore_CH1_Output$IpInstance))"/>
+        <PossibleValue Value="UI_input" Comment="Capture" Semaphore="Semaphore_input_int_ch1_$IpInstance" />
+        <PossibleValue Value="UI_output" Comment="Compare" Semaphore="Semaphore_output_int_ch1_$IpInstance"/>
+    </RefParameter>
+    <RefParameter Name="Capture_Compare_Selection_1" Comment="Capture-Compare Selection" DefaultValue="UI_output" Type="list" Group="Channel 1" Visible="true">
+        <Condition Diagnostic="Internal signals" Expression="(STM32WBAx0 | STM32WBAx2) &amp; ((($IpNumber=1)|($IpNumber=2)) &amp;!(Semaphore_CH1_Input$IpInstance|Semaphore_CH1_Output$IpInstance))"/>
+        <PossibleValue Value="UI_output" Comment="Compare" Semaphore="Semaphore_output_int_ch1_$IpInstance"/>
+    </RefParameter>
+    <RefParameter Name="Capture_Compare_Selection_1" Comment="Capture-Compare Selection" DefaultValue="UI_input" Type="list" Group="Channel 1" Visible="true">
+        <Condition Diagnostic="Internal signals" Expression="Semaphore_CH1_Input$IpInstance"/>
+        <PossibleValue Value="UI_input" Comment="Capture from CH1 IO"/>
+    </RefParameter>
+    <RefParameter Name="Capture_Compare_Selection_1" Comment="Capture-Compare Selection" DefaultValue="UI_output" Type="list" Group="Channel 1" Visible="true">
+        <Condition Diagnostic="Internal signals" Expression="Semaphore_CH1_Output$IpInstance"/>
+        <PossibleValue Value="UI_output" Comment="Compare on CH1 IO"/>
+    </RefParameter>
+    <RefParameter Name="Capture_Compare_Selection_2" Comment="Capture-Compare Selection" DefaultValue="UI_input" Type="list" Group="Channel 2" Visible="true">
+        <Condition Diagnostic="Internal signals" Expression="(($IpNumber=1)|($IpNumber=2)) &amp; !(Semaphore_CH2_Input$IpInstance|Semaphore_CH2_Output$IpInstance)"/>
+        <PossibleValue Value="UI_input" Comment="Capture" Semaphore="Semaphore_input_int_ch2_$IpInstance"/>
+        <PossibleValue Value="UI_output" Comment="Compare" Semaphore="Semaphore_output_int_ch2_$IpInstance"/>
+    </RefParameter>
+    <RefParameter Name="Capture_Compare_Selection_2" Comment="Capture-Compare Selection" DefaultValue="UI_input" Type="list" Group="Channel 2" Visible="true">
+        <Condition Diagnostic="Internal signals" Expression="Semaphore_CH2_Input$IpInstance"/>
+        <PossibleValue Value="UI_input" Comment="Capture from CH2 IO"/>
+    </RefParameter>
+    <RefParameter Name="Capture_Compare_Selection_2" Comment="Capture-Compare Selection" DefaultValue="UI_output" Type="list" Group="Channel 2" Visible="true">
+        <Condition Diagnostic="Internal signals" Expression="Semaphore_CH2_Output$IpInstance"/>
+        <PossibleValue Value="UI_output" Comment="Compare on CH2 IO"/>
+    </RefParameter>
+    <RefParameter Name="OCPulse_1" Comment="Pulse value" DefaultValue="0" Max="65535" Min="0" Type="integer" Group="Channel 1"/>
+    <RefParameter Name="OCPulse_2" Comment="Pulse value" DefaultValue="0" Max="65535" Min="0" Type="integer" Group="Channel 2"/>
+    <RefParameter Name="OCPolarity_1" Comment="Polarity ch1" DefaultValue="LPTIM_OCPOLARITY_HIGH" Type="list" Group="Channel 1">
+        <PossibleValue Value="LPTIM_OCPOLARITY_HIGH" Comment="Active high"/>
+        <PossibleValue Value="LPTIM_OCPOLARITY_LOW" Comment="Active low"/>
+    </RefParameter>
+    <RefParameter Name="OCPolarity_2" Comment="Polarity ch2" DefaultValue="LPTIM_OCPOLARITY_HIGH" Type="list" Group="Channel 2">
+        <PossibleValue Value="LPTIM_OCPOLARITY_HIGH" Comment="Active high"/>
+        <PossibleValue Value="LPTIM_OCPOLARITY_LOW" Comment="Active low"/>
+    </RefParameter>
+    <RefMode Name="NoIO_Channel_1_Active" Comment="">
+        <Condition Diagnostic="capture mode" Expression="Semaphore_input_int_ch1_$IpInstance"/>
+        <ConfigForMode>Channel1_Configuration_input</ConfigForMode>
+        <Parameter Name="Capture_Compare_Selection_1"/>
+        <Parameter Name="ICInputSource_1"/>
+        <Parameter Name="ICPolarity_1"/>
+        <Parameter Name="ICFilter_1"/>
+        <Parameter Name="ICPrescaler_1"/>
+    </RefMode>
+    <RefMode Name="NoIO_Channel_1_Active" Comment="">
+        <Condition Diagnostic="Compare mode" Expression="Semaphore_output_int_ch1_$IpInstance"/>
+    <ConfigForMode>Channel1_Configuration_output</ConfigForMode>
+        <Parameter Name="Capture_Compare_Selection_1"/>
+        <Parameter Name="OCPulse_1"/>
+        <Parameter Name="OCPolarity_1"/>
+    </RefMode>
+    <RefMode Name="NoIO_Channel_2_Active" Comment="">
+        <Condition Diagnostic="capture mode" Expression="Semaphore_input_int_ch2_$IpInstance"/>
+        <ConfigForMode>Channel2_Configuration_input</ConfigForMode>
+        <Parameter Name="Capture_Compare_Selection_2"/>
+        <Parameter Name="ICInputSource_2"/>
+        <Parameter Name="ICPolarity_2"/>
+        <Parameter Name="ICFilter_2"/>
+        <Parameter Name="ICPrescaler_2"/>
+    </RefMode>
+    <RefMode Name="NoIO_Channel_2_Active" Comment="">
+        <Condition Diagnostic="Compare mode" Expression="Semaphore_output_int_ch2_$IpInstance"/>
+        <ConfigForMode>Channel2_Configuration_output</ConfigForMode>
+        <Parameter Name="Capture_Compare_Selection_2"/>
+        <Parameter Name="OCPulse_2"/>
+        <Parameter Name="OCPolarity_2"/>
+    </RefMode>
+    <RefMode Name="InputIO_CH1" Comment="">
+        <Condition Diagnostic="capture mode" Expression="Semaphore_CH1_Input$IpInstance &amp; !Semaphore_OUT$IpInstance"/>
+        <ConfigForMode>Channel1_Configuration_input</ConfigForMode>
+        <Parameter Name="Capture_Compare_Selection_1"/>
+        <Parameter Name="ICInputSource_1"/>
+        <Parameter Name="ICPolarity_1"/>
+        <Parameter Name="ICFilter_1"/>
+        <Parameter Name="ICPrescaler_1"/>
+    </RefMode>
+    <RefMode Name="OutputIO_CH1" Comment="">
+        <Condition Diagnostic="Compare mode" Expression="Semaphore_CH1_Output$IpInstance|Semaphore_OUT$IpInstance"/>
+        <ConfigForMode>Channel1_Configuration_output</ConfigForMode>
+        <Parameter Name="Capture_Compare_Selection_1"/>
+        <Parameter Name="OCPulse_1"/>
+        <Parameter Name="OCPolarity_1"/>
+    </RefMode>
+    <RefMode Name="InputIO_CH2" Comment="">
+        <Condition Diagnostic="capture mode" Expression="Semaphore_CH2_Input$IpInstance"/>
+        <ConfigForMode>Channel2_Configuration_input</ConfigForMode>
+        <Parameter Name="Capture_Compare_Selection_2"/>
+        <Parameter Name="ICInputSource_2"/>
+        <Parameter Name="ICPolarity_2"/>
+        <Parameter Name="ICFilter_2"/>
+        <Parameter Name="ICPrescaler_2"/>
+    </RefMode>
+    <RefMode Name="OutputIO_CH2" Comment="">
+        <Condition Diagnostic="Compare mode" Expression="Semaphore_CH2_Output$IpInstance"/>
+        <ConfigForMode>Channel2_Configuration_output</ConfigForMode>
+        <Parameter Name="Capture_Compare_Selection_2"/>
+        <Parameter Name="OCPulse_2"/>
+        <Parameter Name="OCPolarity_2"/>
+    </RefMode>
+    <RefMode BaseMode="OutputIO_CH1" Name="WaveformGeneration" Comment="">
+    </RefMode>
+ <RefMode Name="Counts__internal_clock_event_00" Comment="" >
+  <ConfigForMode>lptim_Initialization</ConfigForMode>
+  <Parameter Name="ClockSource"/>
+  <Parameter Name="ClockPrescaler"/>
+  <Parameter Name="Period"/>
+  <Parameter Name="RepetitionCounter"/>
+  <Parameter Name="UpdateMode"/>
+  <Parameter Name="TriggerSource"/>
+  <Parameter Name="TriggerActiveEdge"/>
+  <Parameter Name="TriggerSampleTime"/>
+  <Parameter Name="CounterSource"/>
+  <Parameter Name="Input1Source"/>
+  <Parameter Name="Input2Source"/>
+ </RefMode>
+ <RefMode Name="Counts_external_clock_with_synchro_01_occur1" Comment="" BaseMode="Counts_external_clock_with_synchro_01"/>
+ <RefMode Name="Counts_external_clock_with_synchro_01_occur2" Comment="" BaseMode="Counts_external_clock_with_synchro_01"/>
+ <RefMode Name="Counts_external_clock_with_synchro_01_occur3" Comment="" BaseMode="Counts_external_clock_with_synchro_01"/>
+ <RefMode Name="Counts_external_clock_with_synchro_01_occur4" Comment="" BaseMode="Counts_external_clock_with_synchro_01"/>
+ <RefMode Name="Counts_external_clock_with_synchro_01_occur5" Comment="" BaseMode="Counts_external_clock_with_synchro_01"/>
+ <RefMode Name="Counts_external_clock_with_synchro_01_occur6" Comment="" BaseMode="Counts_external_clock_with_synchro_01"/>
+ <RefMode Name="Counts_external_clock_with_synchro_01" Comment="">
+  <ConfigForMode>lptim_Initialization</ConfigForMode>
+  <Parameter Name="ClockSource"/>
+  <Parameter Name="ClockPrescaler"/>
+  <Parameter Name="ULPClockPolarity"/>
+  <Parameter Name="ULPClockSampleTime"/>
+  <Parameter Name="Period"/>
+  <Parameter Name="RepetitionCounter"/>
+  <Parameter Name="UpdateMode"/>
+  <Parameter Name="TriggerSource"/>
+  <Parameter Name="TriggerActiveEdge"/>
+  <Parameter Name="TriggerSampleTime"/>
+  <Parameter Name="CounterSource"/>
+  <Parameter Name="Input1Source"/>
+  <Parameter Name="Input2Source"/>
+ </RefMode>
+ <RefMode Name="Counts_external_clock_standalone_1X_occur1" Comment="" BaseMode="Counts_external_clock_standalone_1X"/>
+ <RefMode Name="Counts_external_clock_standalone_1X_occur2" Comment="" BaseMode="Counts_external_clock_standalone_1X"/>
+ <RefMode Name="Counts_external_clock_standalone_1X_occur3" Comment="" BaseMode="Counts_external_clock_standalone_1X"/>
+ <RefMode Name="Counts_external_clock_standalone_1X_occur4" Comment="" BaseMode="Counts_external_clock_standalone_1X"/>
+ <RefMode Name="Counts_external_clock_standalone_1X_occur5" Comment="" BaseMode="Counts_external_clock_standalone_1X"/>
+ <RefMode Name="Counts_external_clock_standalone_1X_occur6" Comment="" BaseMode="Counts_external_clock_standalone_1X"/>
+ <RefMode Name="Counts_external_clock_standalone_1X" Comment="">
+  <ConfigForMode>lptim_Initialization</ConfigForMode>
+  <Parameter Name="ClockSource"/>
+  <Parameter Name="ClockPrescaler"/>
+  <Parameter Name="ULPClockPolarity"/>
+  <Parameter Name="ULPClockSampleTime"/>
+  <Parameter Name="Period"/>
+  <Parameter Name="RepetitionCounter"/>
+  <Parameter Name="UpdateMode"/>
+  <Parameter Name="TriggerSource"/>
+  <Parameter Name="TriggerActiveEdge"/>
+  <Parameter Name="TriggerSampleTime"/>
+  <Parameter Name="CounterSource"/>
+  <Parameter Name="Input1Source"/>
+  <Parameter Name="Input2Source"/>
+ </RefMode>
+ <RefMode Name="Encoder_mode_occur1" Comment="" BaseMode="Encoder_mode"/>
+ <RefMode Name="Encoder_mode_occur2" Comment="" BaseMode="Encoder_mode"/>
+ <RefMode Name="Encoder_mode_occur3" Comment="" BaseMode="Encoder_mode"/>
+ <RefMode Name="Encoder_mode_occur4" Comment="" BaseMode="Encoder_mode"/>
+ <RefMode Name="Encoder_mode_occur5" Comment="" BaseMode="Encoder_mode"/>
+ <RefMode Name="Encoder_mode" Comment="" >
+  <ConfigForMode>lptim_Initialization</ConfigForMode>
+  <Parameter Name="ClockSource">
+   <PossibleValue>LPTIM_CLOCKSOURCE_APBCLOCK_LPOSC</PossibleValue>
+  </Parameter>
+  <Parameter Name="ULPClockPolarity"/>
+  <Parameter Name="ULPClockSampleTime"/>
+  <Parameter Name="Period"/>
+  <Parameter Name="RepetitionCounter"/>
+  <Parameter Name="UpdateMode"/>
+  <Parameter Name="TriggerSource"/>
+  <Parameter Name="TriggerActiveEdge"/>
+  <Parameter Name="TriggerSampleTime"/>
+  <Parameter Name="CounterSource"/>
+  <Parameter Name="Input1Source"/>
+  <Parameter Name="Input2Source"/>
+ </RefMode>
+ <ModeLogicOperator Name="OR">
+  <Mode Name="Mode">
+                        <Semaphore>Semaphore_ModeSelected$IpInstance</Semaphore>
+                        <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+   <ModeLogicOperator Name="XOR">
+<!-- <Mode Name="Counter_mode_on_internal_clock" UserName="Counter mode on internal clock">-->
+    <Mode Name="Counts__internal_clock_event_00" UserName="Counts internal clock events">
+                                        <Semaphore>Semaphore_CounterInternalClk$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_Input1_gpio$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_Input2_gpio$IpInstance</Semaphore>
+     <SignalLogicalOp Name="AND">
+      <Signal Name="VS_LPTIM_counterModeInternalClock"/>
+     </SignalLogicalOp>
+    </Mode>
+                                <Mode Name="Counts_external_clock_with_synchro_01_occur1" UserName="Counts external Clock events with internal synchronization">
+                                        <Semaphore>Semaphore_CounterExternalClk_synchro$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_Input1_gpio$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_Input2_gpio$IpInstance</Semaphore>
+     <SignalLogicalOp Name="AND">
+      <Signal Name="IN1"/>
+     </SignalLogicalOp>
+    </Mode>
+                                <Mode Name="Counts_external_clock_with_synchro_01_occur2" UserName="Counts external Clock events from COMP1 with internal synchronization" RemoveCondition="!(COMP1_Exist)">
+                                        <Semaphore>Semaphore_CounterExternalClk_synchro$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_Input1_comp1$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_Input2_gpio$IpInstance</Semaphore>
+                                        <SignalLogicalOp Name="AND">
+                                                <Signal Name="VS_COMP1_LPTIM"/>
+                                        </SignalLogicalOp>
+                                </Mode>
+                                <Mode Name="Counts_external_clock_with_synchro_01_occur3" UserName="Counts external Clock events from COMP2 with internal synchronization" RemoveCondition="!($IpNumber=1999)">
+                                        <Semaphore>Semaphore_CounterExternalClk_synchro$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_Input1_comp2$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_Input2_gpio$IpInstance</Semaphore>
+                                        <SignalLogicalOp Name="AND">
+                                                <Signal Name="VS_COMP2_LPTIM"/>
+                                        </SignalLogicalOp>
+                                </Mode>
+                                <Mode Name="Counts_external_clock_with_synchro_01_occur4" UserName="Counts external Clock events from COMP1 OR COMP2 with internal synchronization" RemoveCondition="!($IpNumber=1999)">
+                                        <Semaphore>Semaphore_CounterExternalClk_synchro$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_Input1_comp1comp2$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_Input2_gpio$IpInstance</Semaphore>
+                                        <SignalLogicalOp Name="AND">
+                                                <Signal Name="VS_COMP12_LPTIM"/>
+                                        </SignalLogicalOp>
+                                </Mode>
+    <Mode Name="Counts_external_clock_standalone_1X_occur1" UserName="Standalone : counts external Clock events">
+                                        <Condition Diagnostic="COMP1 link to LPTIM must be disabled in COMP1 settings" Expression="!Semaphore_COMP1_LPTIM_enabled"/>
+                                        <Semaphore>Semaphore_CounterExternalClk_standalone$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_Input1_gpio$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_Input2_gpio$IpInstance</Semaphore>
+     <SignalLogicalOp Name="AND">
+      <Signal Name="IN1"/>
+     </SignalLogicalOp>
+    </Mode>
+                                <Mode Name="Counts_external_clock_standalone_1X_occur2" UserName="Standalone : counts external Clock events from COMP1" RemoveCondition="!(COMP1_Exist)">
+                                        <Condition Diagnostic="COMP1 link to LPTIM must be disabled in COMP1 settings" Expression="!Semaphore_COMP1_LPTIM_enabled"/>
+                                        <Semaphore>Semaphore_CounterExternalClk_standalone$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_Input1_comp1$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_Input2_gpio$IpInstance</Semaphore>
+                                        <SignalLogicalOp Name="AND">
+                                                <Signal Name="VS_COMP1_LPTIM"/>
+                                        </SignalLogicalOp>
+                                </Mode>
+                                <Mode Name="Counts_external_clock_standalone_1X_occur3" UserName="Standalone : counts external Clock events from COMP2" RemoveCondition="!($IpNumber=1999)">
+                                        <Condition Diagnostic="COMP1 link to LPTIM must be disabled in COMP1 settings" Expression="!Semaphore_COMP1_LPTIM_enabled"/>
+                                        <Semaphore>Semaphore_CounterExternalClk_standalone$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_Input1_comp2$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_Input2_gpio$IpInstance</Semaphore>
+                                        <SignalLogicalOp Name="AND">
+                                                <Signal Name="VS_COMP2_LPTIM"/>
+                                        </SignalLogicalOp>
+                                </Mode>
+                                <Mode Name="Counts_external_clock_standalone_1X_occur4" UserName="Standalone : counts external Clock events from COMP1 OR COMP2" RemoveCondition="!($IpNumber=1999)">
+                                        <Condition Diagnostic="COMP1 link to LPTIM must be disabled in COMP1 settings" Expression="!Semaphore_COMP1_LPTIM_enabled"/>
+                                        <Semaphore>Semaphore_CounterExternalClk_standalone$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_Input1_comp1comp2$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_Input2_gpio$IpInstance</Semaphore>
+                                        <SignalLogicalOp Name="AND">
+                                                <Signal Name="VS_COMP12_LPTIM"/>
+                                        </SignalLogicalOp>
+                                </Mode>
+                                <Mode Name="Encoder_mode_occur1" UserName="Encoder mode from IN1 IN2">
+                                        <Semaphore>Semaphore_Encoder$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_Input1_gpio$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_Input2_gpio$IpInstance</Semaphore>
+                                        <SignalLogicalOp Name="AND">
+                                                <Signal Name="IN1"/>
+                                                <Signal Name="IN2"/>
+                                        </SignalLogicalOp>
+                                </Mode>
+                                <Mode Name="Encoder_mode_occur2" UserName="Encoder mode from COMP1 and IN2" RemoveCondition="!(COMP1_Exist)">
+                                        <Semaphore>Semaphore_Encoder$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_Input1_comp1$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_Input2_gpio$IpInstance</Semaphore>
+                                        <SignalLogicalOp Name="AND">
+                                                <Signal Name="VS_COMP1_LPTIM"/>
+                                                <Signal Name="IN2"/>
+                                        </SignalLogicalOp>
+                                </Mode>
+                                <Mode Name="Encoder_mode_occur3" UserName="Encoder mode from IN1 and COMP2" RemoveCondition="!(COMP1_Exist)">
+                                        <Semaphore>Semaphore_Encoder$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_Input1_gpio$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_Input2_comp2$IpInstance</Semaphore>
+                                        <SignalLogicalOp Name="AND">
+                                                <Signal Name="IN1"/>
+                                                <Signal Name="VS_COMP2_LPTIM"/>
+                                        </SignalLogicalOp>
+                                </Mode>
+                                <Mode Name="Encoder_mode_occur4" UserName="Encoder mode from COMP1 and COMP2" RemoveCondition="!(COMP1_Exist &amp; COMP2_Exist)">
+                                        <Semaphore>Semaphore_Encoder$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_Input1_comp1$IpInstance</Semaphore>
+                                        <Semaphore>Semaphore_Input2_comp2$IpInstance</Semaphore>
+                                        <SignalLogicalOp Name="AND">
+                                                <Signal Name="VS_COMP12_LPTIM"/>
+                                        </SignalLogicalOp>
+                                </Mode>
+   </ModeLogicOperator>
+  </Mode>
+  <Mode Name="External_Trigger" UserName="External Trigger" >
+                        <Condition Diagnostic="A mode must be selected before" Expression="Semaphore_ModeSelected$IpInstance"/>
+                        <Semaphore>Semaphore_ETR$IpInstance</Semaphore>
+   <ModeLogicOperator Name="XOR">
+    <Mode Name="ExternalTrigger">
+     <SignalLogicalOp Name="AND">
+      <Signal Name="ETR"/>
+     </SignalLogicalOp>
+    </Mode>
+   </ModeLogicOperator>
+  </Mode>
+  <Mode Name="Waveform_Generation" UserName="Waveform Generation">
+                        <Condition Diagnostic="A mode must be selected before" Expression="Semaphore_ModeSelected$IpInstance"/>
+                        <Semaphore>Semaphore_OUT$IpInstance</Semaphore>
+   <ModeLogicOperator Name="XOR">
+    <Mode Name="WaveformGeneration">
+     <SignalLogicalOp Name="AND">
+      <Signal Name="OUT"/>
+     </SignalLogicalOp>
+    </Mode>
+   </ModeLogicOperator>
+  </Mode>
+    <Mode Name="Channel_1_Active" UserName="Channel_1_Active" >
+        <Condition Diagnostic="A mode must be selected before" Expression="Semaphore_ModeSelected$IpInstance"/>
+        <Semaphore>Semaphore_Channel1_Active$IpInstance</Semaphore>
+        <ModeLogicOperator Name="XOR">
+            <Mode Name="Channel_1_Active">
+                <SignalLogicalOp Name="AND">
+                    <Signal Name="VS_CH1"/>
+                </SignalLogicalOp>
+            </Mode>
+        </ModeLogicOperator>
+    </Mode>
+    <Mode Name="Channel_1_IO" UserName="    CH1 IO usage" RemoveDisable="true" >
+        <Condition Diagnostic="A mode must be selected before" Expression="Semaphore_Channel1_Active$IpInstance"/>
+        <ModeLogicOperator Name="XOR">
+            <Mode Name="NoIO_Channel_1_Active" UserName="no IO used : only internal input/output connections" RemoveCondition="STM32WBAx0 | STM32WBAx2">
+                <SignalLogicalOp Name="AND">
+                    <Signal Name="VS_noIO1"/>
+                </SignalLogicalOp>
+            </Mode>
+   <Mode Name="NoIO_Channel_1_Active" UserName="no IO used : only internal output connections" RemoveCondition="!(STM32WBAx0 | STM32WBAx2)">
+                <SignalLogicalOp Name="AND">
+                    <Signal Name="VS_noIO1"/>
+                </SignalLogicalOp>
+            </Mode>
+            <Mode Name="InputIO_CH1" UserName="Input">
+                <Semaphore>Semaphore_CH1_Input$IpInstance</Semaphore>
+                <SignalLogicalOp Name="AND">
+                    <Signal Name="CH1" IOMode="AlternateFunctionPushPull" Direction="Input"/>
+                </SignalLogicalOp>
+            </Mode>
+            <Mode Name="OutputIO_CH1" UserName="Output">
+                <Semaphore>Semaphore_CH1_Output$IpInstance</Semaphore>
+                <SignalLogicalOp Name="AND">
+                    <Signal Name="CH1" Direction="Output"/>
+                </SignalLogicalOp>
+            </Mode>
+        </ModeLogicOperator>
+    </Mode>
+    <Mode Name="Channel_2_Active" UserName="Channel_2_Active" >
+        <Condition Diagnostic="A mode must be selected before" Expression="Semaphore_ModeSelected$IpInstance"/>
+        <Semaphore>Semaphore_Channel2_Active$IpInstance</Semaphore>
+        <ModeLogicOperator Name="XOR">
+            <Mode Name="Channel_2_Active">
+                <SignalLogicalOp Name="AND">
+                    <Signal Name="VS_CH2"/>
+                </SignalLogicalOp>
+            </Mode>
+        </ModeLogicOperator>
+    </Mode>
+    <Mode Name="Channel_2_IO" UserName="    CH2 IO usage" RemoveDisable="true" >
+        <Condition Diagnostic="A mode must be selected before" Expression="Semaphore_Channel2_Active$IpInstance"/>
+        <ModeLogicOperator Name="XOR">
+            <Mode Name="NoIO_Channel_2_Active" UserName="no IO used : only internal input/output connections">
+                <SignalLogicalOp Name="AND">
+                    <Signal Name="VS_noIO2"/>
+                </SignalLogicalOp>
+            </Mode>
+            <Mode Name="InputIO_CH2" UserName="Input">
+                <Semaphore>Semaphore_CH2_Input$IpInstance</Semaphore>
+                <SignalLogicalOp Name="AND">
+                    <Signal Name="CH2" IOMode="AlternateFunctionPushPull" Direction="Input"/>
+                </SignalLogicalOp>
+            </Mode>
+            <Mode Name="OutputIO_CH2" UserName="Output">
+                <Semaphore>Semaphore_CH2_Output$IpInstance</Semaphore>
+                <SignalLogicalOp Name="AND">
+                    <Signal Name="CH2" Direction="Output"/>
+                </SignalLogicalOp>
+            </Mode>
+     </ModeLogicOperator>
+  </Mode>
+ </ModeLogicOperator>
+ <RefSignal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPP" Name="OUT"/>
+ <RefSignal IOMode="AlternateFunctionPushPull" Name="IN1"/>
+ <RefSignal IOMode="AlternateFunctionPushPull" Name="IN2"/>
+ <RefSignal IOMode="AlternateFunctionPushPull" Name="ETR"/>
+ <RefSignal Name="VS_LPTIM_counterModeInternalClock" Virtual="true"/>
+ <RefSignal Name="VS_COMP1_LPTIM" Virtual="true"/>
+        <RefSignal Name="VS_COMP2_LPTIM" Virtual="true"/>
+        <RefSignal Name="VS_COMP12_LPTIM" Virtual="true"/>
+<!-- Ajout CH1 CH2 pour IP v2.2 -->
+    <RefSignal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPP" Name="CH1" ShareableGroupName="S_$IpInstance_CH1"/>
+    <RefSignal IOMode="AlternateFunctionOpenDrainAndPushPullDefaultPP" Name="CH2" ShareableGroupName="S_$IpInstance_CH2"/>
+    <RefSignal Name="VS_CH1" Virtual="true"/>
+    <RefSignal Name="VS_CH2" Virtual="true"/>
+    <RefSignal Name="VS_noIO1" Virtual="true"/>
+    <RefSignal Name="VS_noIO2" Virtual="true"/>
+</IP>

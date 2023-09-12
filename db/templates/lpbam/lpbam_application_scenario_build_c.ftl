@@ -165,6 +165,7 @@ static void MX_${QName?replace(" ","_")}_Q_Build(void)
 [#if I2CTransferUsed?? && I2CTransferUsed == "true"]
 [#-- I2C special variables --]
 #tuint32_t data_size = 0;
+#tuint32_t tmp_data_size = 0;
 #tuint32_t transfer_idx = 0;
 #n
 [#else]
@@ -794,6 +795,7 @@ static void MX_${QName?replace(" ","_")}_Q_Build(void)
                        [/#if]           
                     #t/* Set transfer parameters */
                     #tdata_size = ${sizeArg}.Size;
+                    #ttmp_data_size = ${sizeArg}.Size;
                     #ttransfer_idx = 0;
                     #n
                     #t/* Repeat inserting I2C master Tx data queue until completing all data */
@@ -814,7 +816,10 @@ static void MX_${QName?replace(" ","_")}_Q_Build(void)
                     #t#t{
                       #t#t#tdata_size = 0U;
                     #t#t}
+                    #n
+                    #t#t${sizeArg}.Size = data_size;
                     #t}
+                    #t${sizeArg}.Size = tmp_data_size;
                 [#else]
                     [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != [#if method.returnHAL == "true"]LPBAM_OK[#else]${method.returnHAL}[/#if])                
                     [#if nTab==2]#t#t[#else]#t[/#if]{

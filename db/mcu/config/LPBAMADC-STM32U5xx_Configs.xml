@@ -362,6 +362,26 @@
     </CallLibMethod>
     </IFCondition>
   </RefConfig>
+ <RefConfig Name="ADC_STOP">
+   <IFCondition Expression = "1=1">
+	 <CallLibMethod Name="ADV_LPBAM_ADC_Stop_SetFullQ">
+	 	<MethodArg Name="InstanceIP" ParameterName="InstanceHAL" />
+		<MethodArg Name="pInstance" FValue="LPDMA1" />
+		<MethodArg Name="QueueType" FValue="LPBAM_LINEAR_ADDRESSING_Q" />
+		<MethodArg Name="pQueue" ParameterName="QUEUE_NAME" />
+		<MethodArg Name="pDescriptor" ParameterName="DESCRIPTOR_NAME_STOP" />
+	  </CallLibMethod>
+    </IFCondition>
+	<IFCondition Expression="!(TriggerPolarity_STOP=LPBAM_DMA_TRIG_POLARITY_MASKED)">
+		<CallLibMethod Name="ADV_LPBAM_Q_SetTriggerConfig">
+			<MethodArg Name="NodeLevel" ParameterName="NodeLevel_STOP" />
+			<MethodArg Name="TriggerMode" ParameterName="TriggerMode_STOP" />
+			<MethodArg Name="TriggerPolarity" ParameterName="TriggerPolarity_STOP" />
+			<MethodArg Name="TriggerSelection" ParameterName="TriggerSelection_STOP" />
+			<MethodArg Name="pDescriptor" ParameterName="DESCRIPTOR_NAME_STOP" />
+		</CallLibMethod>
+    </IFCondition>
+   </RefConfig>
   
 <!--LPBAM_Status_t ADV_LPBAM_ADC_Conversion_SetConfigQ(ADC_TypeDef                *const pInstance,
                                                    LPBAM_DMAListInfo_t        const *const pDMAListInfo,
@@ -657,15 +677,29 @@
          <Argument AddressOf="false" GenericType="simple" Name="TriggerSelection"/> 
       </Argument>  
     </Argument>   
-
     <Argument AddressOf="false" GenericType="simple" Name="NodeLevel"/>
-
     <Argument Comment="" AddressOf="true" GenericType="struct" Name="pDescriptor" TypeName="DONTCARE" Optional="output">
       <Argument Comment="" AddressOf="false" GenericType="simple" Name="fake_for_struct"/>
     </Argument>   
   </LibMethod>
-
-
+ <!-- LPBAM_Status_t ADV_LPBAM_ADC_Stop_SetFullQ(ADC_TypeDef              *const pInstance,
+                                           LPBAM_DMAListInfo_t      const *const pDMAListInfo,
+                                           LPBAM_ADC_ConvStopDesc_t *const pDescriptor,
+                                           DMA_QListTypeDef         *const pQueue);-->
+                                           
+	 <LibMethod Comment="" Name="ADV_LPBAM_ADC_Stop_SetFullQ">
+		<Argument AddressOf="false" GenericType="simple" Name="InstanceIP" />
+		<Argument AddressOf="true" GenericType="struct" Name="pDMAListInfo" TypeName="LPBAM_DMAListInfo_t">
+			<Argument AddressOf="false" GenericType="simple" Name="QueueType" />
+			<Argument AddressOf="true" GenericType="baseaddress" Name="pInstance" TypeName="DMA_TypeDef" />
+		</Argument>
+		<Argument Comment="" AddressOf="true" GenericType="struct" Name="pDescriptor" TypeName="LPBAM_ADC_ConvStopDesc_t" Optional="output">
+			<Argument Comment="" AddressOf="false" GenericType="simple" Name="fake_for_struct" />
+		</Argument>
+		<Argument Comment="" AddressOf="true" GenericType="struct" Name="pQueue" TypeName="DMA_QListTypeDef" Optional="output">
+			<Argument Comment="" AddressOf="false" GenericType="simple" Name="fake_for_struct" />
+		</Argument>
+	</LibMethod>
 
   <RefComponent Cclass="HAL" Cgroup="LPBAM" Cversion="1.0">
     <File Category="header" Name="Utilities/lpbam/STM32U5/stm32_platform_lpbam_adc.h"/>

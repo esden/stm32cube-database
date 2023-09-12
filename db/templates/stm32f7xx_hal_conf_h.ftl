@@ -39,7 +39,7 @@
   */
 #define HAL_MODULE_ENABLED  
 
-  [#assign allModules = ["AES","CRYP","ADC","CAN","CEC","CRC","DAC","DCMI","DMA2D","ETH","NAND","NOR","SRAM","SDRAM","HASH","I2S","IWDG","LPTIM","LTDC","QUADSPI","RNG","RTC","SAI","SD","MMC","SPDIFRX","SPI","TIM","UART","USART","IRDA","SMARTCARD","WWDG","PCD","HCD", "DFSDM", "DSI","JPEG", "MDIOS", "SMBUS","EXTI"]]
+  [#assign allModules = ["AES","CRYP","ADC","CAN","CEC","CRC","DAC","DCMI","DMA2D","ETH","ETH_LEGACY","NAND","NOR","SRAM","SDRAM","HASH","I2S","IWDG","LPTIM","LTDC","QUADSPI","RNG","RTC","SAI","SD","MMC","SPDIFRX","SPI","TIM","UART","USART","IRDA","SMARTCARD","WWDG","PCD","HCD", "DFSDM", "DSI","JPEG", "MDIOS", "SMBUS","EXTI"]]
 [#assign isUsed=false]
 [#list allModules as module]
 [#if isModuleUsed(module)]
@@ -337,6 +337,10 @@
 #ifdef HAL_ETH_MODULE_ENABLED
   #include "stm32f7xx_hal_eth.h"
 #endif /* HAL_ETH_MODULE_ENABLED */
+
+#ifdef HAL_ETH_LEGACY_MODULE_ENABLED
+  #include "stm32f7xx_hal_eth_legacy.h"
+#endif /* HAL_ETH_LEGACY_MODULE_ENABLED */
 
 #ifdef HAL_FLASH_MODULE_ENABLED
   #include "stm32f7xx_hal_flash.h"

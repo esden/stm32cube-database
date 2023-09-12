@@ -40,9 +40,6 @@
 		[#assign FX_STANDALONE_ENABLE_value = value]
 	[/#if]
 	[/#list]
-	[#if name == "FX_STANDALONE_ENABLE"]
-		[#assign FX_STANDALONE_ENABLE_value = value]
-	[/#if]
 [/#if]
 [/#list]
 [/#compress]
@@ -106,7 +103,7 @@ extern __IO UINT sd_tx_cplt;
  * and accessing buffers in cacheable area
  * this is valid only for CM7 based products or those
  * with dedicated cache IP.
- * For STM32U5 this flag should be always set to 0 unless external
+ * For ${FamilyName} this flag should be always set to 0 unless external
  * memories are being used.
  */
 #define FX_STM32_SD_CACHE_MAINTENANCE                    	  ${maintain_cpu_cache}

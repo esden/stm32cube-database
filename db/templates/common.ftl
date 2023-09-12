@@ -510,7 +510,7 @@
                                         [#assign argValue=argument.value]
                                     [/#if][#-- if global --]
                                     [#-- Bz40086 - Begin tweak of the value in case of ADC --]
-[#if ((config.name == "ADC_RegularChannelConfig" && (FamilyName!="STM32C0" || FamilyName!="STM32G0" || FamilyName!="STM32WL"|| FamilyName!="STM32U5") ) || config.name == "ADC_InjectedChannelConfig" ||  ((FamilyName=="STM32C0" || FamilyName=="STM32G0" || FamilyName=="STM32WL" || FamilyName=="STM32U5") && config.name == "ADC_RegularChannelRankConfig")) && (FamilyName!="STM32F0" && FamilyName!="STM32L0" && FamilyName!="STM32F2" && FamilyName!="STM32F4")]                                        [#list argument?keys as k]
+[#if ((config.name == "ADC_RegularChannelConfig" && (FamilyName!="STM32C0" || FamilyName!="STM32WBA" || FamilyName!="STM32G0" || FamilyName!="STM32WL"|| FamilyName!="STM32U5") ) || config.name == "ADC_InjectedChannelConfig" ||  ((FamilyName=="STM32C0" || FamilyName=="STM32G0" || FamilyName=="STM32WBA" || FamilyName=="STM32WL" || FamilyName=="STM32U5") && config.name == "ADC_RegularChannelRankConfig")) && (FamilyName!="STM32F0" && FamilyName!="STM32L0" && FamilyName!="STM32F2" && FamilyName!="STM32F4")]                                        [#list argument?keys as k]
                                             [#if k == "name" && !(argument.value)?starts_with("ADC")]
                                                 [#if argument[k] == "Rank"]
                                                  
@@ -1903,7 +1903,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
                 [/#if]
             [#else]
 [#if tabN == 2]#t[/#if]#t/* Peripheral clock enable */
-[#if tabN == 2]#t[/#if]#t__HAL_RCC_${ipName}_CLK_ENABLE(); 
+[#if tabN == 2]#t[/#if][#if ipName!="TAMP"]#t__HAL_RCC_${ipName}_CLK_ENABLE(); [/#if]
             [/#if]
         [/#if] [#-- if not I2C --]
     [#else]  [#-- serviceType = deInit --]     
@@ -1949,7 +1949,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
             [/#if]
         [#else]
 #t#t/* Peripheral clock enable */
-[#if tabN == 2]#t[/#if]#t__HAL_RCC_${ipName}_CLK_ENABLE(); 
+[#if tabN == 2]#t[/#if][#if ipName!="TAMP"]#t__HAL_RCC_${ipName}_CLK_ENABLE(); [/#if]
         [/#if]
     [/#if]
 [#-- if I2C clk_enable should be after GPIO Init End --]    
@@ -2527,7 +2527,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
                                         [#assign argValue=argument.value]
                                     [/#if][#-- if global --]
                                     [#-- Bz40086 - Begin tweak of the value in case of ADC --]
-[#if ((config.name == "ADC_RegularChannelConfig" && (FamilyName!="STM32G0" || FamilyName!="STM32WL") ) || config.name == "ADC_InjectedChannelConfig" ||  ((FamilyName=="STM32G0" || FamilyName=="STM32WL" || FamilyName=="STM32U5") && config.name == "ADC_RegularChannelRankConfig")) && (FamilyName!="STM32F0" && FamilyName!="STM32L0" && FamilyName!="STM32F2" && FamilyName!="STM32F4")]                                        [#list argument?keys as k]
+[#if ((config.name == "ADC_RegularChannelConfig" && (FamilyName!="STM32G0" || FamilyName!="STM32WBA" || FamilyName!="STM32WL") ) || config.name == "ADC_InjectedChannelConfig" ||  ((FamilyName=="STM32G0" || FamilyName=="STM32WBA" || FamilyName=="STM32WL" || FamilyName=="STM32U5") && config.name == "ADC_RegularChannelRankConfig")) && (FamilyName!="STM32F0" && FamilyName!="STM32L0" && FamilyName!="STM32F2" && FamilyName!="STM32F4")]                                        [#list argument?keys as k]
                                             [#if k == "name" && !(argument.value)?starts_with("ADC")]
                                                 [#if argument[k] == "Rank"]                                                 
                                                     [#assign argValue="ADC_REGULAR_RANK_"+argument.value]

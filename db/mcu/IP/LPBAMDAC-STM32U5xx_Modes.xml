@@ -8,6 +8,7 @@
    
     <RefParameter Name="Instance" DefaultValue="LPBAMDAC$Index" Comment="LPBAM IP Instance" Type="" Visible="false"/>
     <RefParameter Name="InstanceHAL" DefaultValue="DAC$Index" Comment="HAL IP Instance" Type="" Visible="false"/>
+
                           
     <!-- tempory parameters to be replaced by names provided by UI/lpbam service-->
 
@@ -19,8 +20,9 @@
     </RefParameter>
     <RefParameter Name="DESCRIPTOR_NAME_CONVERSION" Comment="name of the descriptor"   DefaultValue="descriptorx_DAC_CONVERSION"  Type="StringRW" >
     </RefParameter>
-     
 
+     <RefParameter Name="DESCRIPTOR_NAME_STOP" Comment="name of the descriptor" DefaultValue="descriptorx_DAC_STOP" Type="StringRW">
+    </RefParameter>
     <!-- tempory parameters to be replaced by names provided by UI/lpbam service-->
 
 
@@ -64,7 +66,15 @@
         <PossibleValue Comment="Channel 2" Value="LPBAM_DAC_CHANNEL_2"/>
     </RefParameter>
 
- 
+
+    <!-- parameter for circular Mode management for Mode STOP-->
+     <RefParameter Comment="Circular Node for STOP" DefaultValue="__NULL" Name="CircularNode_STOP" Type="list" Group="Stop" Visible="false">
+         <Description>description</Description>
+         <PossibleValue Comment="DISABLE" Value="__NULL"/>
+         <PossibleValue Comment="Configuration Node" Value="LPBAM_DAC_STOP_FULLQ_CONFIG_NODE"/>
+     </RefParameter>
+  <!-- parameter for circular Mode management for Mode STOP-->
+
     <!-- Trigger common description   -->
 
 
@@ -90,7 +100,7 @@
         <PossibleValue Comment="LPTIM3 CH1" Value="LPBAM_LPDMA1_TRIGGER_LPTIM3_CH1" />
         <PossibleValue Comment="LPTIM4 OUT" Value="LPBAM_LPDMA1_TRIGGER_LPTIM4_OUT" />
         <PossibleValue Comment="COMP1 OUT" Value="LPBAM_LPDMA1_TRIGGER_COMP1_OUT"  />
-        <PossibleValue Comment="COMP2 OUT" Value="LPBAM_LPDMA1_TRIGGER_COMP2_OUT"  />
+        <PossibleValue Action="Remove" Comment="COMP2 OUT" Value="LPBAM_LPDMA1_TRIGGER_COMP2_OUT" Condition="DIE455"/>
         <PossibleValue Comment="RTC ALRA TRG" Value="LPBAM_LPDMA1_TRIGGER_RTC_ALRA_TRG" />
         <PossibleValue Comment="RTC ALRB TRG" Value="LPBAM_LPDMA1_TRIGGER_RTC_ALRB_TRG" />
         <PossibleValue Comment="RTC WUT TRG" Value="LPBAM_LPDMA1_TRIGGER_RTC_WUT_TRG" />
@@ -451,7 +461,6 @@
     <!-- data config CONVERSION-->
 
 
-
     <RefParameter Name="DAC_Trigger_CONVERSION_CONFIG" Comment="DAC Trigger"  DefaultValue="LPBAM_DAC_TRIGGER_NONE"  Type="list" Group="Conversion Config">
         <PossibleValue Comment="Conversion is not conditioned by Trigger" Value="LPBAM_DAC_TRIGGER_NONE"/>
         <!--   <PossibleValue Comment="TIM1 TRGO " Value="LPBAM_DAC_TRIGGER_T1_TRGO"/>
@@ -466,6 +475,7 @@
         <PossibleValue Comment="LPTIM3 CH1" Value="LPBAM_DAC_TRIGGER_LPTIM3_CH1"/>
         <PossibleValue Comment="EXTI Line 9" Value="LPBAM_DAC_TRIGGER_EXT_IT9"/>     
     </RefParameter>
+
     <RefParameter Name="Alignment_CONVERSION_DATA" Comment="Alignment"  DefaultValue="LPBAM_DAC_ALIGN_12B_R"  Type="list" Group="Conversion Data">
         <PossibleValue Comment="12 bits right alignment" Value="LPBAM_DAC_ALIGN_12B_R"/>
         <PossibleValue Comment="12 bits left alignment" Value="LPBAM_DAC_ALIGN_12B_L"/>
@@ -500,6 +510,7 @@
         <PossibleValue Comment="LPTIM3 CH1" Value="LPBAM_DAC_TRIGGER_LPTIM3_CH1"/>
         <PossibleValue Comment="EXTI Line 9" Value="LPBAM_DAC_TRIGGER_EXT_IT9"/>     
     </RefParameter>
+
     <RefParameter Name="Alignment_CONVERSION" Comment="Alignment"  DefaultValue="LPBAM_DAC_ALIGN_12B_R"  Type="list" Group="Conversion">
         <PossibleValue Comment="12 bits right alignment" Value="LPBAM_DAC_ALIGN_12B_R"/>
         <PossibleValue Comment="12 bits left alignment" Value="LPBAM_DAC_ALIGN_12B_L"/>
@@ -524,6 +535,7 @@
         <ConfigForMode>DAC_CONVERSION_CONFIG</ConfigForMode>
         <Parameter Name="MYCHANNELCONVERSION_CONFIG"/>
         <Parameter Name="DAC_Trigger_CONVERSION_CONFIG"/>
+
 
         <!--Trigger -->
         <Parameter Name="TriggerPolarity_CONVERSION_CONFIG" RefParameter="TriggerPolarity"/>
@@ -641,8 +653,24 @@
         <Parameter Name="CircularNode_CONVERSION"/>
 
     </RefMode>
-   
-    
+
+    <RefMode Name="STOP">
+        <ConfigForMode>DAC_STOP</ConfigForMode>
+
+        <!--Trigger -->
+        <Parameter Name="TriggerPolarity_STOP" RefParameter="TriggerPolarity" />
+        <Parameter Name="TriggerSelection_STOP" RefParameter="TriggerSelection">
+            <Condition Diagnostic="" Expression="!(TriggerPolarity_STOP=LPBAM_DMA_TRIG_POLARITY_MASKED)" />
+        </Parameter>
+        <Parameter Name="TriggerMode_STOP" RefParameter="TriggerMode_CONFIG">
+            <Condition Diagnostic="" Expression="!(TriggerPolarity_STOP=LPBAM_DMA_TRIG_POLARITY_MASKED)" />
+        </Parameter>
+        <Parameter Name="NodeLevel_STOP" RefParameter="NodeLevel">
+            <PossibleValue>LPBAM_DAC_STOP_FULLQ_CONFIG_NODE</PossibleValue>
+        </Parameter>
+        <!--Trigger -->
+        <Parameter Name="CircularNode_STOP" />
+    </RefMode>
 
     <ModeLogicOperator Name="OR">
         <Mode Name="CONVERSION_CONFIG" UserName="Conversion Config"> 
@@ -681,6 +709,17 @@
             </ModeLogicOperator>
         </Mode>
 
+        <Mode Name="STOP" UserName="Stop">
+            <Condition Diagnostic="hardware IP must be selected to be part of LPBAM" Expression="Semaphore_LPBAM_DAC$IpNumber_SELECTED" />
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="STOP" UserName="Stop">
+                    <Semaphore>Semaphore_$IpInstance_STOP</Semaphore>
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_STOP" />
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
                      
                    
                     
@@ -693,5 +732,5 @@
     <RefSignal Name="VS_CONVERSION_DATA" Virtual="true"/>
     <RefSignal Name="VS_CONVERSION_CONFIG" Virtual="true"/>
     <RefSignal Name="VS_CONVERSION" Virtual="true"/>
-
+    <RefSignal Name="VS_STOP" Virtual="true"/>
 </IP>

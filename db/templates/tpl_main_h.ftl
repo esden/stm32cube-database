@@ -1,6 +1,7 @@
 [#ftl]
 [#list configs as dt]
 [#assign data = dt]
+[#assign coreDir=sourceDir]
 [#assign peripheralParams =dt.peripheralParams]
 [#assign peripheralGPIOParams =dt.peripheralGPIOParams]
 [#assign peripheralDMAParams =dt.peripheralDMAParams]
@@ -64,16 +65,21 @@ extern "C" {
 [/#if]
 [#list ips as ip]
 [#if ip?contains("STM32_WPAN")]
-[#list voids as void]
-[#-- BZ114099 --]
-[#if void.functionName?? && void.functionName?contains("APPE_Init")]
+    [#assign name=contextFolder + coreDir+"/Inc/app_conf.h"/]
+    [#assign appFileExist = common.fileExist(name)]  [#-- Check if app file exists --]	    
+    [#list voids as void]
+        [#-- BZ114099 --]
+        [#if void.functionName?? && void.functionName?contains("APPE_Init")]
+		[#if appFileExist=="true"]
 #include "app_conf.h"
+		[/#if]
 #include "app_entry.h"
-[#if !void.isNotGenerated && void.genCode]
 #include "app_common.h"
+[#if FamilyName=="STM32WBA"]
+#include "app_debug.h"
 [/#if]
-[/#if]
-[/#list]
+        [/#if]
+    [/#list]
 [/#if]
 [#if ip?contains("KMS")]
 #include "app_kms.h"
@@ -98,7 +104,10 @@ extern "C" {
 
 [#-- /#if --]
 [#if TZEN=="1" && Secure=="false"]
+[#if (Structure?? && Structure=="FullNonSecure")]
+[#else]
 #include "secure_nsc.h"    /* For export Non-secure callable APIs */
+[/#if]
 [/#if]
 [#--Include common LL driver --]
 [#if isLLUsed??] [#-- Include LL headers --]
@@ -249,7 +258,7 @@ void Error_Handler(void);
 [#list voids as void]
   [#if (void.isStatic?? && !void.isStatic) && ((void.bspUsed?? && void.bspUsed && !void.isNotGenerated)||(void.functionName!="SystemClock_Config"))]
 [#if !void.ipType?contains("thirdparty")&&!void.ipType?contains("middleware")&&!void.functionName?contains("VREFBUF")&&void.functionName!="Init" && !void.functionName?contains("MotorControl") && !void.functionName?contains("ETZPC") && !void.functionName?contains("TRACER_EMB") && !void.functionName?contains("GUI_INTERFACE")]
-void ${""?right_pad(2)}${void.functionName}(void);
+void ${void.functionName}(void);
 [/#if]
   [/#if]
 [/#list]

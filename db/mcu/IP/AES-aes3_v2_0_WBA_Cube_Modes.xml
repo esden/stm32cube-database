@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+    ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
+    xmlns="http://mcd.rou.st.com/modules.php?name=mcu"
+    DBVersion="V4.0"
+    IPType="service"
+    IpGroup="Security"
+    Name="AES"
+    Version="aes3_v2_0_WBA_Cube">
+
+    <About>AES: Advanced Encryption Standard</About>
+
+    <RefParameter Name="Algorithm" Comment="Data encryption type" DefaultValue="CRYP_AES_ECB" Type="list" Group="Algorithm">
+        <Description>AES Algorithm Mode encryption types list&lt;br&gt;
+		This parameter can be a value of @ref CRYP_Algorithm_Mode&lt;br&gt;
+		Possible values are:&lt;br&gt;
+		CRYP_AES_ECB: Electronic codebook chaining algorithm&lt;br&gt;
+		CRYP_AES_CBC: Cipher block chaining algorithm&lt;br&gt;
+		CRYP_AES_CTR: Counter mode chaining algorithm&lt;br&gt;
+		CRYP_AES_GCM_GMAC: Galois counter mode - Galois message authentication code&lt;br&gt;
+		CRYP_AES_CCM: Counter with Cipher Mode
+		</Description>
+        <PossibleValue Value="CRYP_AES_ECB" Comment="AES ECB" Semaphore="Semaphore_CRYP_Coding_AESECB$IpInstance"/>
+        <PossibleValue Value="CRYP_AES_CBC" Comment="AES CBC" Semaphore="Semaphore_CRYP_Coding_AESCBC$IpInstance"/>
+        <PossibleValue Value="CRYP_AES_CTR" Comment="AES CTR" Semaphore="Semaphore_CRYP_Coding_AESCTR$IpInstance"/>
+        <PossibleValue Value="CRYP_AES_GCM_GMAC" Comment="AES GCM GMAC" Semaphore="Semaphore_CRYP_Coding_AESGCM$IpInstance"/>
+        <PossibleValue Value="CRYP_AES_CCM" Comment="AES CCM" Semaphore="Semaphore_CRYP_Coding_AESCCM$IpInstance"/>
+    </RefParameter>
+
+    <RefParameter Comment="Data type" DefaultValue="CRYP_NO_SWAP" Name="DataType" Type="list" Group="Parameters">
+        <Description>AES Data Type selection: 32-bit data, 16-bit data, 8-bit data or 1-bit string.&lt;br&gt;
+		This parameter can be a value of @ref CRYP_Data_Type.&lt;br&gt;
+		Possible values are:&lt;br&gt;
+		CRYP_NO_SWAP: 32-bit data type (no swapping)&lt;br&gt;
+		CRYP_HALFWORD_SWAP: 16-bit data type (half-word swapping)&lt;br&gt;
+		CRYP_BYTE_SWAP: 8-bit data type (byte swapping)&lt;br&gt;
+		CRYP_BIT_SWAP: 1-bit data type (bit swapping)
+		</Description>
+        <PossibleValue Comment="CRYP_NO_SWAP" Value="CRYP_NO_SWAP"/>
+        <PossibleValue Comment="CRYP_HALFWORD_SWAP" Value="CRYP_HALFWORD_SWAP"/>
+        <PossibleValue Comment="CRYP_BYTE_SWAP" Value="CRYP_BYTE_SWAP"/>
+        <PossibleValue Comment="CRYP_BIT_SWAP" Value="CRYP_BIT_SWAP"/>
+    </RefParameter>
+
+    <RefParameter Comment="KeySize" DefaultValue="CRYP_KEYSIZE_128B" Name="KeySize" Type="list" Group="Parameters">
+        <Description>Key size selection: 128 or 256 bit key length.&lt;br&gt;
+		This parameter can be a value of @ref CRYP_Key_Size.&lt;br&gt;
+		Possible values are:&lt;br&gt;
+		CRYP_KEYSIZE_128B: 128-bit long key&lt;br&gt;
+		CRYP_KEYSIZE_256B: 256-bit long key&lt;br&gt;
+		if you need  to use Shared key between AES and SAES, then you must use the same key size
+		</Description>
+        <PossibleValue Comment="128b" Value="CRYP_KEYSIZE_128B" Semaphore="Semaphore_CRYP_AES_KEYSIZE_128B$IpInstance"/>
+        <PossibleValue Comment="256b" Value="CRYP_KEYSIZE_256B" Semaphore="Semaphore_CRYP_AES_KEYSIZE_256B$IpInstance"/>
+    </RefParameter>
+
+    <RefParameter Name="pKey" Comment="Encryption/Decryption key" ArraySize="4" ArrayTypeElement="uint32_t;16" Type="Array" Separator=" " Group="Parameters" DefaultValue="00000000 00000000 00000000 00000000">
+        <Condition Diagnostic="" Expression="(Semaphore_CRYP_AES_KEYSIZE_128B$IpInstance)"/>
+        <Description>Encryption/Decryption key</Description>
+    </RefParameter>
+    <RefParameter Name="pKey" Comment="Encryption/Decryption key" ArraySize="8" ArrayTypeElement="uint32_t;16" Type="Array" Separator=" " Group="Parameters" DefaultValue="00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000">
+        <Condition Diagnostic="" Expression="(Semaphore_CRYP_AES_KEYSIZE_256B$IpInstance)"/>
+        <Description>Encryption/Decryption key</Description>
+    </RefParameter>
+    <RefParameter Name="pKey" Comment="Encryption/Decryption key" Type="string" DefaultValue="null" Visible = "false">
+        <Description>Encryption/Decryption key</Description>
+    </RefParameter>
+
+    <RefParameter Comment="Initialization vector" ArraySize="4" ArrayTypeElement="uint32_t;16" Name="pInitVect" Type="Array" Separator=" " Group="Parameters" DefaultValue="00000000 00000000 00000000 00000000">
+        <Condition Diagnostic="" Expression="((Semaphore_CRYP_Coding_AESCBC$IpInstance)|(Semaphore_CRYP_Coding_AESCTR$IpInstance)|(Semaphore_CRYP_Coding_AESGCM$IpInstance))"/>
+        <Description>Initialization Vector used for CTR, CBC,GCM GMAC, CMAC (and CCM when applicable) modes</Description>
+    </RefParameter>
+    <RefParameter Comment="Initialization vector" Name="pInitVect" Type="list" Group="Parameters" DefaultValue="null" Visible="false">
+        <Condition Diagnostic="" Expression="(Semaphore_CRYP_Coding_AESECB$IpInstance)|(Semaphore_CRYP_Coding_AES_CCM$IpInstance)"/>
+        <Description>Initialization Vector used for CTR, CBC,GCM GMAC, CMAC (and CCM when applicable) modes</Description>
+    </RefParameter>
+
+    <RefParameter Name="Header" Comment="Header" Group="Parameters" Type="Array" Separator=" " ArraySize="1" ArrayTypeElement="uint32_t;16" DefaultValue="00000000" Visible="false">
+        <Condition Diagnostic="" Expression="Semaphore_CRYP_Coding_AESGCM$IpInstance"/>
+        <Description>The header also known as Additional Authentication Data is used for authentication</Description>
+    </RefParameter>
+    <RefParameter Name="Header" Comment="Header(B1) formaté" Group="Parameters" Type="Array" Separator=" " ArraySize="4" ArrayTypeElement="uint32_t;16" DefaultValue="00000000 00000000 00000000 00000000" Visible="false">
+        <Condition Diagnostic="" Expression="Semaphore_CRYP_Coding_AESCCM$IpInstance"/>
+        <Description>The header, also named B1 is used for authentication and composed of the associated data length and Associated Data.</Description>
+    </RefParameter>
+    <RefParameter Name="Header" Comment="Header" Group="Parameters" Type="list" DefaultValue="null" Visible="false">
+        <Description>Not used.</Description>
+    </RefParameter>
+
+    <RefParameter Name="HeaderInput" Comment="Header(Additional Authentication Data)" Group="Parameters" Type="StringRW"  DefaultValue="0">
+        <Condition Diagnostic="" Expression="Semaphore_CRYP_Coding_AESGCM$IpInstance"/>
+        <Description>The header, also known as Additional Authentication Data in GCM mode is used as first part of the message just after the Initial Counter Block (ICB), and precede the plain text message.&lt;br&gt; Input format: hexadecimal (ex: 0123456789abcdef)</Description>
+    </RefParameter>
+    <RefParameter Name="HeaderInput" Comment="Header(B1)" Group="Parameters" Type="StringRW"  DefaultValue="0">
+        <Condition Diagnostic="" Expression="Semaphore_CRYP_Coding_AESCCM$IpInstance"/>
+        <Description>The header, also named B1 is used for authentication and composed of the associated data length and Associated Data.&lt;br&gt; Input format: hexadecimal (ex: 0123456789abcdef)</Description>
+    </RefParameter>
+    <RefParameter Name="HeaderInput" Comment="Header input" Group="Parameters" Type="list" DefaultValue="null" Visible="false">
+        <Description>Not used.</Description>
+    </RefParameter>
+
+    <RefParameter Name="HeaderSize" Comment="Header size" Group="Parameters" DefaultValue="1" Min="0" Max="4294967295" Type="String">
+        <Condition Diagnostic="" Expression="(Semaphore_CRYP_Coding_AESGCM$IpInstance)"/>
+        <Description>Header size in word</Description>
+    </RefParameter>
+<!--
+    <RefParameter Name="HeaderSize" Comment="ALen" Group="Parameters" DefaultValue="4" Min="4" Max="4294967295" Type="integer" NoCheckOpt="false">
+-->
+    <RefParameter Name="HeaderSize" Comment="Header(B1) size" Group="Parameters" DefaultValue="4" Min="4" Max="4294967295" Type="String">
+        <Condition Diagnostic="" Expression="(Semaphore_CRYP_Coding_AESCCM$IpInstance)"/>
+        <Description>Lenght of 16-bytes blocks (B) associated to the Associated Data (A), part of CBC-MAC mode Counter</Description>
+    </RefParameter>
+    <RefParameter Name="HeaderSize" Comment="Header size" Group="Parameters" Type="list" DefaultValue="null" Visible="false">
+        <Description>Not used</Description>
+    </RefParameter>
+
+    <RefParameter Name="B0" Comment="B0" Type="Array" ArraySize="4" ArrayTypeElement="uint32_t;16" Separator=" " Group="Parameters" DefaultValue="00000000 00000000 00000000 00000000">
+        <Condition Diagnostic="" Expression="Semaphore_CRYP_Coding_AESCCM$IpInstance"/>
+        <Description>One 16-byte first authentication block, part of CBC-MAC mode Counter</Description>
+    </RefParameter>
+    <RefParameter Name="B0" Comment="B0" Group="Parameters" Type="list" DefaultValue="null" Visible="false">
+        <Description>Not used</Description>
+    </RefParameter>
+
+    <RefParameter Comment="Data width unit" DefaultValue="" Name="DataWidthUnit" Type="List" Group="Parameters">
+        <Description> Payload Data Width Unit&lt;br&gt;
+		This parameter can be value of @ref CRYP_Data_Width_Unit&lt;br&gt;
+		Possible values are:&lt;br&gt;
+		CRYP_DATAWIDTHUNIT_WORD: By default, header size unit is word&lt;br&gt;
+		CRYP_DATAWIDTHUNIT_BYTE: Header size unit is byte&lt;br&gt;
+		</Description>
+        <PossibleValue Comment="Word" Value="CRYP_DATAWIDTHUNIT_WORD"/>
+        <PossibleValue Comment="Byte" Value="CRYP_DATAWIDTHUNIT_BYTE"/>
+    </RefParameter>
+
+    <RefParameter Comment="Header width unit" DefaultValue="CRYP_HEADERWIDTHUNIT_WORD" Name="HeaderWidthUnit" Type="List" Group="Parameters">
+        <Description> Header Width Unit&lt;br&gt;
+		This parameter can be value of @ref CRYP_Header_Width_Unit&lt;br&gt;
+		Possible values are:&lt;br&gt;
+		CRYP_HEADERWIDTHUNIT_WORD: By default, header size unit is word&lt;br&gt;
+		CRYP_HEADERWIDTHUNIT_BYTE: Header size unit is byte&lt;br&gt;
+		</Description>
+        <PossibleValue Comment="Word" Value="CRYP_HEADERWIDTHUNIT_WORD"/>
+        <PossibleValue Comment="Byte" Value="CRYP_HEADERWIDTHUNIT_BYTE"/>
+    </RefParameter>
+
+    <RefParameter Comment="Key and IV configuration skip" DefaultValue="CRYP_KEYIVCONFIG_ALWAYS" Name="KeyIVConfigSkip" Type="list" Group="Parameters">
+        <Description>CRYP key and IV Configuration Skip Mode:&lt;br&gt;
+		This parameter can be a value of @ref CRYP_Configuration_Skip.&lt;br&gt;Possible values are:&lt;br&gt;
+		CRYP_KEYIVCONFIG_ALWAYS: Peripheral Key and IV configuration to do systematically&lt;br&gt;
+		CRYP_KEYIVCONFIG_ONCE: Peripheral Key and IV configuration to do only once&lt;br&gt;
+		CRYP_KEYNOCONFIG: Peripheral Key configuration to not do&lt;br&gt;
+		</Description>
+        <PossibleValue Comment="Always" Value="CRYP_KEYIVCONFIG_ALWAYS" Semaphore="Semaphore_CRYP_AES_KEYIVCONFIG_ALWAYS$IpInstance"/>
+        <PossibleValue Comment="Only once" Value="CRYP_KEYIVCONFIG_ONCE" Semaphore="Semaphore_CRYP_AES_KEYIVCONFIG_ONCE$IpInstance"/>
+        <PossibleValue Comment="Not" Value="CRYP_KEYNOCONFIG" Semaphore="Semaphore_CRYP_AES_KEYNOCONFIG$IpInstance"/>
+    </RefParameter>
+
+    <RefParameter Comment="Key mode" DefaultValue="CRYP_KEYMODE_NORMAL" Name="KeyMode" Type="list" Group="Parameters">
+        <Description>CRYP key Mode:&lt;br&gt;
+		This parameter can be a value of @ref CRYP_Key_Mode.&lt;br&gt;Possible values are:&lt;br&gt;
+		CRYP_KEYMODE_NORMAL: Normal key usage, Key registers are freely useable&lt;br&gt;
+		CRYP_KEYMODE_WRAPPED: Wrapped key, to encrypt or decrypt AES keys&lt;br&gt;
+		It is strongly recommended to select the DHUK when KMOD[1:0] is 01, by setting KEYSEL[2:0] to 001 or 100.&lt;br&gt;
+		CRYP_KEYMODE_SHARED: Shared key&lt;br&gt;
+		It is strongly recommended to select the DHUK when KMOD[1:0] = 10, by setting KEYSEL[2:0] to 001 or 100.
+		</Description>
+        <PossibleValue Comment="Normal key" Value="CRYP_KEYMODE_NORMAL" Semaphore="Semaphore_CRYP_AES_KEYMODE_NORMAL$IpInstance"/>
+        <PossibleValue Comment="Wrapped key" Value="CRYP_KEYMODE_WRAPPED" Semaphore="Semaphore_CRYP_AES_KEYMODE_WRAPPED$IpInstance"/>
+        <PossibleValue Comment="Shared key" Value="CRYP_KEYMODE_SHARED" Semaphore="Semaphore_CRYP_AES_KEYMODE_SHARED$IpInstance"/>
+    </RefParameter>
+
+    <RefParameter Name="CRYP_SUSPEND_RESUME" Comment="cryp suspend resume" Type="List" Group="Parameters" DefaultValue="CRYP_SUSPEND_NONE">
+        <PossibleValue Value="CRYP_SUSPEND_NONE" Comment="0"/>
+        <PossibleValue Value="CRYP_SUSPEND" Comment="1"/>
+    </RefParameter>
+
+    <RefMode Name="AES_Activate" HalMode ="AES">
+        <ConfigForMode>AES_Init</ConfigForMode>
+        <Parameter Name="Algorithm"/>
+        <Parameter Name="DataType"/>
+        <Parameter Name="KeySize"/>
+        <Parameter Name="pKey"/>
+        <Parameter Name="pInitVect"/>
+        <Parameter Name="HeaderSize"/>
+        <Parameter Name="HeaderInput"/>
+        <Parameter Name="Header"/>
+        <Parameter Name="B0"/>
+        <Parameter Name="DataWidthUnit"/>
+        <Parameter Name="HeaderWidthUnit"/>
+        <Parameter Name="KeyIVConfigSkip"/>
+        <Parameter Name="KeyMode"/>
+        <Parameter Name="CRYP_SUSPEND_RESUME"></Parameter>
+    </RefMode>
+
+    <ModeLogicOperator Name="OR">
+		<Mode Name="AES_State" UserName="Activated">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="AES_Activate" UserName="Activated">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VS_AES" />
+					</SignalLogicalOp>
+					<Semaphore>S_AES</Semaphore>
+				</Mode>
+			</ModeLogicOperator>
+		</Mode>
+	</ModeLogicOperator>
+
+    <!-- RefSignal for AES -->
+    <RefSignal Name="VS_AES" Virtual="true"/>
+</IP>

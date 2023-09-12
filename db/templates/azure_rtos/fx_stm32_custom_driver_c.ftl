@@ -120,9 +120,9 @@ VOID  fx_stm32_custom_driver(FX_MEDIA *media_ptr)
 
       media_ptr->fx_media_driver_status = FX_SUCCESS;
 
-    /* USER CODE BEGIN DRIVER_BOOT_WRITE */
+    /* USER CODE BEGIN POST_DRIVER_BOOT_WRITE */
 
-     /* USER CODE END DRIVER_BOOT_WRITE */
+     /* USER CODE END POST_DRIVER_BOOT_WRITE */
       break;
     }
 

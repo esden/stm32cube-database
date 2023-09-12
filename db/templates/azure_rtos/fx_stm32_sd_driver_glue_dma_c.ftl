@@ -141,16 +141,17 @@ INT fx_stm32_sd_get_status(UINT instance)
 INT fx_stm32_sd_read_blocks(UINT instance, UINT *buffer, UINT start_block, UINT total_blocks)
 {
   INT ret = 0;
-  
+
   /* USER CODE BEGIN PRE_READ_BLOCKS */
   [#if transfer_notification=="ThreadX_Semaphore"]
 	UNUSED(instance);
   [/#if]
   /* USER CODE END PRE_READ_BLOCKS */
+
   [#if transfer_notification=="Global_state_variables"]
   sd_rx_cplt = 0;
   [/#if]
-  
+
   if(HAL_SD_ReadBlocks_DMA(&hsd${sd_instance+1}, (uint8_t *)buffer, start_block, total_blocks) != HAL_OK)
   {
     ret = 1;
@@ -180,11 +181,11 @@ INT fx_stm32_sd_write_blocks(UINT instance, UINT *buffer, UINT start_block, UINT
 	UNUSED(instance);
   [/#if]
   /* USER CODE END PRE_WRITE_BLOCKS */
-  
+
   [#if transfer_notification=="Global_state_variables"]
   sd_tx_cplt = 0;
   [/#if]
-  
+
   if(HAL_SD_WriteBlocks_DMA(&hsd${sd_instance+1}, (uint8_t *)buffer, start_block, total_blocks) != HAL_OK)
   {
     ret = 1;
@@ -242,7 +243,7 @@ void HAL_SD_TxCpltCallback(SD_HandleTypeDef *hsd)
 /* USER CODE BEGIN TX_COMPLETED_0 */
 
 /* USER CODE END TX_COMPLETED_0 */
-  
+
   sd_tx_cplt = 1;
 
 /* USER CODE BEGIN TX_COMPLETED_1 */
@@ -251,7 +252,7 @@ void HAL_SD_TxCpltCallback(SD_HandleTypeDef *hsd)
 
 }
 [/#if]  
-  
+
 [#if transfer_notification=="ThreadX_Semaphore"]
 /**
 * @brief SD DMA Rx Transfer completed callbacks
@@ -285,7 +286,7 @@ void HAL_SD_RxCpltCallback(SD_HandleTypeDef *hsd)
    /* USER CODE BEGIN HAL_SD_RxCpltCallback */
 
   /* USER CODE END HAL_SD_RxCpltCallback */
-  
+
 }
 [/#if]  
 

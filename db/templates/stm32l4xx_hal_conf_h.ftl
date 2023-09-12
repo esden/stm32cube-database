@@ -37,7 +37,7 @@
   * @brief This is the list of modules to be used in the HAL driver
   */
 #define HAL_MODULE_ENABLED  
-[#assign allModules = ["ADC", "AES", "CAN", "COMP", "CRC", "CRYP", "DAC", "DCMI", "DMA2D", "DFSDM", "DSI", "FIREWALL", "GFXMMU", "HCD", "HASH", "I2S", "IRDA", "IWDG", "LTDC","LCD", "LPTIM", "MMC", "NAND", "NOR", "OPAMP", "OSPI", "OCTOSPI", "PCD", "PKA", "QSPI", "QUADSPI", "RNG", "RTC", "SAI", "SD", "SMBUS", "SMARTCARD", "SPI", "SRAM", "SWPMI", "TIM", "TSC", "UART", "USART", "WWDG","EXTI","PSSI" ]]
+[#assign allModules = ["ADC", "AES", "CAN", "COMP", "I2C","CRC", "CRYP", "DAC", "DCMI", "DMA2D", "DFSDM", "DSI", "FIREWALL", "GFXMMU", "HCD", "HASH", "I2S", "IRDA", "IWDG", "LTDC","LCD", "LPTIM", "MMC", "NAND", "NOR", "OPAMP", "OSPI", "OCTOSPI", "PCD", "PKA", "QSPI", "QUADSPI", "RNG", "RTC", "SAI", "SD", "SMBUS", "SMARTCARD", "SPI", "SRAM", "SWPMI", "TIM", "TSC", "UART", "USART", "WWDG","EXTI","PSSI" ]]
   [#list allModules as module]
 	[#if isModuleUsed(module)]
 [#compress]#define HAL_${module?replace("QUADSPI","QSPI")?replace("AES","CRYP")?replace("OCTOSPI","OSPI")}_MODULE_ENABLED[/#compress]
@@ -57,7 +57,6 @@
   [/#function]
 #define HAL_GPIO_MODULE_ENABLED
 #define HAL_EXTI_MODULE_ENABLED 
-#define HAL_I2C_MODULE_ENABLED
 #define HAL_DMA_MODULE_ENABLED
 #define HAL_RCC_MODULE_ENABLED
 #define HAL_FLASH_MODULE_ENABLED

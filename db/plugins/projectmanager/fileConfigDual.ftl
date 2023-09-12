@@ -48,6 +48,10 @@
 <WorkspacePath>${WorkspacePath}</WorkspacePath>
 <underRoot>${underRoot}</underRoot>
 <TrustZone>${TrustZone}</TrustZone>
+
+ [#if Multi_folder == "true"] 
+<ProjectStructure>${ProjectStructure}</ProjectStructure>
+ [/#if]
 <HAL_Driver>${HAL_Driver}</HAL_Driver>[#-- modified to give only the hal driver path --]
 <CMSIS>${CMSISPath}</CMSIS> [#-- modified to give only the relatif path to cmsis folder --]
 [#-- list of toolchains to be generated: EWARM,MDK-ARM,TrueSTUDIO,RIDE: This tag can contain one or more than one toolchain: EWARM,MDK-ARM,TrueSTUDIO,RIDE --]
@@ -88,6 +92,9 @@
             [/#if]
             [#if dataKey=="cpuCore" || dataKey=="cpucore"]
                [#assign cpuCore =  elem[dataKey]]            
+            [/#if]
+[#if dataKey=="memoriesList"]
+               [#assign memoriesList =  elem[dataKey]]           
             [/#if]
             [#if dataKey=="CdefinesList"]
                [#assign CdefinesList =  elem[dataKey]]
@@ -147,7 +154,37 @@
     [#list memoriesList as memory]
         <memory ${memory} />
     [/#list]
+[#if LinkerFilesUpdate??]
+<BootPathConfig>
+[#------------------------ BootPath Linker Updates ------------------]
+    [#list LinkerFilesUpdate?keys as linkerContext]
+        [#if (Secure=="1" && linkerContext=="Secure") || (Secure=="0" && linkerContext=="NonSecure")]        
+            [#assign ctxData = LinkerFilesUpdate[linkerContext]]
+            [#list ctxData?keys as linkerData]
+                <linkerSymbol name="${linkerData}" value="${ctxData[linkerData]}" />        
+            [/#list]
+        [/#if]
+    [/#list]    
+</BootPathConfig>
+[#if ReInitLinkerFile??]
+<ReInitLinkerFile>true</ReInitLinkerFile>
+[/#if]
+[/#if]
+[#------------------------ BootPath Linker Updates ------------------]
+
         </memories>
+[#if PostBuildCommand??]
+<BuildAction>
+[#------------------------ BootPath Linker Updates ------------------]
+    [#list PostBuildCommand?keys as postBuildContext]
+        [#if (Secure=="1" && postBuildContext=="Secure") || (Secure=="0" && postBuildContext=="NonSecure")]        
+            [#assign ctxData = PostBuildCommand[postBuildContext]]
+            <PostBuildCmd>${PostBuildCommand[postBuildContext]}</PostBuildCmd>
+        [/#if]
+    [/#list]
+</BuildAction>
+[/#if]
+[#------------------------ BootPath Linker Updates ------------------]
     <startup>${startup}</startup> [#-- add relatif startup path needed for UC30 --]     
 <LinkSettings>
         [#if LinkerFile??]

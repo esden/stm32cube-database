@@ -20,26 +20,50 @@
 		<PossibleValue Comment="OPAMP Non Inverting Input VP0" Value="OPAMP_NONINVERTINGINPUT_IO0"/>
 	</RefParameter>
 	
-	<!-- InvertingInput -->
+	<!-- Only for STM32H5 -->
+	<RefParameter Comment="Non Inverting Input" DefaultValue="OPAMP_NONINVERTINGINPUT_IO1" Group="Basic Parameters" Name="NonInvertingInput" Type="list" Visible="false">
+		<Condition Diagnostic="" Expression="STM32H5"/>
+		<PossibleValue Comment="OPAMP Non Inverting Input VP1" Value="OPAMP_NONINVERTINGINPUT_IO1"/>
+	</RefParameter>
 	
+	<!-- InvertingInput -->
+	<!-- Only for STM32H7 -->
 	<RefParameter Comment="Inverting Input" DefaultValue="OPAMP_INVERTINGINPUT_IO0" Group="Basic Parameters" Name="InvertingInput" Type="list" Visible="false">
-	    <Condition Diagnostic="" Expression="PC5_OPAMP1_VINM &amp; ($IpNumber=1) &amp; ($IpInstance_STANDALONE)"/>
+	    <Condition Diagnostic="" Expression="PC5_OPAMP1_VINM &amp; ($IpNumber=1) &amp; ($IpInstance_STANDALONE) &amp; !STM32H5"/>
 		<PossibleValue Comment="OPAMP Inverting Input VM0" Value="OPAMP_INVERTINGINPUT_IO0"/>
 	</RefParameter>
 	<RefParameter Comment="Inverting Input" DefaultValue="OPAMP_INVERTINGINPUT_IO0" Group="Basic Parameters" Name="InvertingInput" Type="list" Visible="false">
-	    <Condition Diagnostic="" Expression="PE8_OPAMP2_VINM &amp; ($IpNumber=2) &amp; ($IpInstance_STANDALONE)"/>
+	    <Condition Diagnostic="" Expression="PE8_OPAMP2_VINM &amp; ($IpNumber=2) &amp; ($IpInstance_STANDALONE) &amp; !STM32H5"/>
 		<PossibleValue Comment="OPAMP Inverting Input VM0" Value="OPAMP_INVERTINGINPUT_IO0"/>
 	</RefParameter>
 	<RefParameter Comment="Inverting Input" DefaultValue="OPAMP_INVERTINGINPUT_IO1" Group="Basic Parameters" Name="InvertingInput" Type="list" Visible="false">
-		 <Condition Diagnostic="" Expression="($IpInstance_STANDALONE)"/>
+		 <Condition Diagnostic="" Expression="(PB1_OPAMP1_VINM &amp; $IpInstance_STANDALONE &amp; !STM32H5)"/>
 		<PossibleValue Comment="OPAMP Inverting Input VM1" Value="OPAMP_INVERTINGINPUT_IO1"/>
 	</RefParameter>
-	
-	<RefParameter Comment="Inverting Input" DefaultValue="null" Group="Basic Parameters" Name="InvertingInput" Type="list" Visible="false"/>
-	
-	
-	
 
+		<!-- Only for STM32H5 -->
+	<RefParameter Comment="Inverting Input" DefaultValue="OPAMP_INVERTINGINPUT_IO1" Group="Basic Parameters" Name="InvertingInput" Type="list" Visible="false">
+	    <Condition Diagnostic="" Expression="(PB1_OPAMP1_VINM | PC5_OPAMP1_VINM) &amp; ($IpInstance_PGA_Connected_mode_with_external_filtering &amp; $IpInstance_PGA_INV_IO0 &amp; $IpInstance_PGA &amp; STM32H5)"/>
+		<PossibleValue Comment="OPAMP Inverting Input VM1" Value="OPAMP_INVERTINGINPUT_IO1"/>
+	</RefParameter>
+	<RefParameter Comment="Inverting Input" DefaultValue="OPAMP_INVERTINGINPUT_IO0" Group="Basic Parameters" Name="InvertingInput" Type="list" Visible="false">
+	    <Condition Diagnostic="" Expression="PC5_OPAMP1_VINM &amp; ($IpNumber=1) &amp; ($IpInstance_STANDALONE) &amp; !$IpInstance_STANDALONE_DAC_INP &amp; STM32H5"/>
+		<PossibleValue Comment="OPAMP Inverting Input VM0" Value="OPAMP_INVERTINGINPUT_IO0"/>
+	</RefParameter>
+	<RefParameter Comment="Inverting Input" DefaultValue="OPAMP_INVERTINGINPUT_IO0" Group="Basic Parameters" Name="InvertingInput" Type="list" Visible="false">
+	    <Condition Diagnostic="" Expression="PE8_OPAMP2_VINM &amp; ($IpNumber=2) &amp; ($IpInstance_STANDALONE) &amp; !$IpInstance_STANDALONE_DAC_INP &amp; STM32H5"/>
+		<PossibleValue Comment="OPAMP Inverting Input VM0" Value="OPAMP_INVERTINGINPUT_IO0"/>
+	</RefParameter>
+	<RefParameter Comment="Inverting Input" DefaultValue="OPAMP_INVERTINGINPUT_IO1" Group="Basic Parameters" Name="InvertingInput" Type="list" Visible="false">
+		 <Condition Diagnostic="" Expression="(PB1_OPAMP1_VINM &amp; $IpInstance_STANDALONE &amp; !$IpInstance_STANDALONE_DAC_INP &amp; STM32H5)"/>
+		<PossibleValue Comment="OPAMP Inverting Input VM1" Value="OPAMP_INVERTINGINPUT_IO1"/>
+	</RefParameter>
+	<RefParameter Comment="Inverting Input" DefaultValue="OPAMP_INVERTINGINPUT_CONNECT_NO" Name="InvertingInput" Type="list" Visible="false" Group="Basic Parameters">
+		 <Condition Expression="($IpInstance_PGA_Not_Connected &amp; STM32H5) | ($IpInstance_FOLLOWER &amp; STM32H5) | ($IpInstance_STANDALONE &amp; $IpInstance_STANDALONE_DAC_INP &amp; STM32H5) | ($IpInstance_FOLLOWER_DAC_INP &amp; STM32H5) | ($IpInstance_PGA_Not_Connected &amp; $IpInstance_PGA_DAC_INP &amp; STM32H5) | ($IpInstance_PGA_INV_IO0 &amp; $IpInstance_PGA &amp; $IpInstance_PGA_DAC_INP &amp; STM32H5) | ($IpInstance_PGA_Connected_non_inverting_with_external_bias_or_inverting_mode &amp; $IpInstance_PGA_INV_IO0_BIAS &amp; $IpInstance_PGA &amp; $IpInstance_PGA_DAC_INP &amp; STM32H5)" Diagnostic=""/>
+		<PossibleValue Comment="OPAMP INVERTINGINPUT CONNECT NO" Value="OPAMP_INVERTINGINPUT_CONNECT_NO"/>
+	</RefParameter>
+
+	<RefParameter Comment="Inverting Input" DefaultValue="null" Group="Basic Parameters" Name="InvertingInput" Type="list" Visible="false"/>	
 	
 	<RefParameter Comment="Power Mode" DefaultValue="OPAMP_POWERMODE_NORMAL" Group="Basic Parameters" Name="PowerMode" Type="list">
 		<PossibleValue Comment="Normal" Value="OPAMP_POWERMODE_NORMAL"/>
@@ -62,27 +86,27 @@
 		<Description>Self Calibration is not available for LL configuration.</Description> 
 	</RefParameter>
 	
-	<RefParameter Comment="OffSet Trimming Value (PMOS)" DefaultValue="15" Group="Basic Parameters" Max="31" Min="0" Name="TrimmingValueP" Type="integer" Visible="false">
+	<!-- <RefParameter Comment="OffSet Trimming Value (PMOS)" DefaultValue="15" Group="Basic Parameters" Max="31" Min="0" Name="TrimmingValueP" Type="integer" Visible="false">
 		<Condition Diagnostic="" Expression="SelfCalibration = Disable  &amp;  PowerMode = OPAMP_POWERMODE_NORMAL"/>
-	</RefParameter>
+	</RefParameter> -->
 	<RefParameter Comment="OffSet Trimming Value (PMOS)" DefaultValue="15" Group="Basic Parameters" Max="31" Min="0" Name="TrimmingValueP" Type="integer" Visible="true">
 		<Condition Diagnostic="" Expression="UserTrimming = OPAMP_TRIMMING_USER &amp; SelfCalibration = Disable &amp;  PowerMode = OPAMP_POWERMODE_NORMAL"/>
 	</RefParameter>
 	<RefParameter Comment="OffSet Trimming Value (PMOS)" DefaultValue="null" Group="Basic Parameters" Name="TrimmingValueP" Type="integer" Visible="false"/>
 		
 		
-	<RefParameter Comment="OffSet Trimming Value (NMOS)" DefaultValue="15" Group="Basic Parameters" Max="31" Min="0" Name="TrimmingValueN" Type="integer" Visible="false">
+	<!-- <RefParameter Comment="OffSet Trimming Value (NMOS)" DefaultValue="15" Group="Basic Parameters" Max="31" Min="0" Name="TrimmingValueN" Type="integer" Visible="false">
       <Condition Diagnostic="" Expression="SelfCalibration = Disable  &amp; PowerMode = OPAMP_POWERMODE_NORMAL"/>
-	</RefParameter>
+	</RefParameter> -->
 	<RefParameter Comment="OffSet Trimming Value (NMOS)" DefaultValue="15" Group="Basic Parameters" Max="31" Min="0" Name="TrimmingValueN" Type="integer" Visible="true">
         <Condition Diagnostic="" Expression="UserTrimming = OPAMP_TRIMMING_USER &amp;  SelfCalibration = Disable &amp; PowerMode = OPAMP_POWERMODE_NORMAL"/>
 	</RefParameter>
 	<RefParameter Comment="OffSet Trimming Value (NMOS)" DefaultValue="null" Group="Basic Parameters" Name="TrimmingValueN" Type="integer" Visible="false"/>
 	
 	
-	<RefParameter Comment="OffSet Trimming Value in High Speed Mode (PMOS)" DefaultValue="15" Group="Basic Parameters" Max="31" Min="0" Name="TrimmingValuePHighSpeed" Type="integer" Visible="false">
+	<!-- <RefParameter Comment="OffSet Trimming Value in High Speed Mode (PMOS)" DefaultValue="15" Group="Basic Parameters" Max="31" Min="0" Name="TrimmingValuePHighSpeed" Type="integer" Visible="false">
 		<Condition Diagnostic="" Expression=" SelfCalibration = Disable &amp;  PowerMode = OPAMP_POWERMODE_HIGHSPEED"/>
-	</RefParameter>
+	</RefParameter> -->
 	<RefParameter Comment="OffSet Trimming Value in High Speed Mode (PMOS)" DefaultValue="15" Group="Basic Parameters" Max="31" Min="0" Name="TrimmingValuePHighSpeed" Type="integer">
 		<Condition Diagnostic="" Expression="UserTrimming = OPAMP_TRIMMING_USER &amp;  SelfCalibration = Disable &amp; PowerMode = OPAMP_POWERMODE_HIGHSPEED"/>
 	</RefParameter>
@@ -90,9 +114,9 @@
 		
 	
 	
-	<RefParameter Comment="OffSet Trimming Value in High Speed Mode (NMOS)" DefaultValue="15" Group="Basic Parameters" Max="31" Min="0" Name="TrimmingValueNHighSpeed" Type="integer" Visible="false">
+	<!-- <RefParameter Comment="OffSet Trimming Value in High Speed Mode (NMOS)" DefaultValue="15" Group="Basic Parameters" Max="31" Min="0" Name="TrimmingValueNHighSpeed" Type="integer" Visible="false">
         <Condition Diagnostic="" Expression=" SelfCalibration = Disable &amp; PowerMode = OPAMP_POWERMODE_HIGHSPEED"/>
-	</RefParameter>
+	</RefParameter> -->
 	<RefParameter Comment="OffSet Trimming Value in High Speed Mode (NMOS)" DefaultValue="15" Group="Basic Parameters" Max="31" Min="0" Name="TrimmingValueNHighSpeed" Type="integer">
         <Condition Diagnostic="" Expression="UserTrimming = OPAMP_TRIMMING_USER &amp;  SelfCalibration = Disable &amp; PowerMode = OPAMP_POWERMODE_HIGHSPEED"/>
 	</RefParameter>

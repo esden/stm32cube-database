@@ -99,7 +99,7 @@ void HAL_MspInit(void)
             [@common.getLocalVariableList instanceData=config/] 
 [/#list]
 [/#if]
-[#if pwrConfig?? && FamilyName!="STM32U5"]
+[#if pwrConfig?? && FamilyName!="STM32U5"&& FamilyName!="STM32WBA"]
 [#list pwrConfig as config]
  [#assign listOfLocalVariables =""]
         [#assign resultList =""] 	
@@ -158,26 +158,26 @@ void HAL_MspInit(void)
 #t/* Peripheral interrupt init */
 [/#if]
 
-[#if initVector.codeInMspInit && initVector.usedDriver=="HAL" && initVector.vector!="RCC_IRQn" && initVector.vector!="RCC_WAKEUP_IRQn"]
+[#if (initVector.codeInMspInit && initVector.usedDriver=="HAL" && initVector.vector!="RCC_IRQn" && initVector.vector!="RCC_WAKEUP_IRQn") || (FamilyName=="STM32WBA" && PWR_interrupt?? && Secure=="false" && initVector.vector?contains("WKUP") && initVector.usedDriver=="HAL")]
     [#if initVector.systemHandler=="false" || initVector.preemptionPriority!="0" || initVector.subPriority!="0"]
     [#if initVector.vector!="SysTick_IRQn"]
-    [#if (initVector.vector!="PVD_AVD_IRQn" && FamilyName=="STM32U5") && (initVector.vector!="PVD_PVM_IRQn" && FamilyName=="STM32U5")]
+    [#if (initVector.vector!="PVD_AVD_IRQn" && FamilyName=="STM32U5") && (initVector.vector!="PVD_PVM_IRQn" && FamilyName=="STM32U5") || (initVector.vector!="PVD_IRQn" && FamilyName=="STM32WBA")]
     #t/* ${initVector.vector} interrupt configuration */
     #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
-    [/#if]
-[#if FamilyName!="STM32U5"]
+ [/#if]
+[#if ((FamilyName!="STM32U5" && FamilyName!="STM32WBA"))]
     #t/* ${initVector.vector} interrupt configuration */
     #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
     [/#if]
     [/#if]
     [/#if]
     [#if initVector.systemHandler=="false"]
-    [#if (initVector.vector!="PVD_AVD_IRQn" && FamilyName=="STM32U5")&& (initVector.vector!="PVD_PVM_IRQn" && FamilyName=="STM32U5")]
+    [#if (initVector.vector!="PVD_AVD_IRQn" && FamilyName=="STM32U5")&& (initVector.vector!="PVD_PVM_IRQn" && FamilyName=="STM32U5") || (initVector.vector!="PVD_IRQn" && FamilyName=="STM32WBA")]
     [#if EnableCode??]
       #tHAL_NVIC_EnableIRQ(${initVector.vector});
 [/#if]
     [/#if]
-[#if FamilyName!="STM32U5"]
+[#if (FamilyName!="STM32U5" && (FamilyName!="STM32WBA"))]
  [#if EnableCode??]
     #tHAL_NVIC_EnableIRQ(${initVector.vector});
  [/#if]
@@ -188,27 +188,42 @@ void HAL_MspInit(void)
 [#if initVector.codeInMspInit]
     [#if initVector.systemHandler=="false" || initVector.preemptionPriority!="0" || initVector.subPriority!="0"]
     [#if initVector.vector!="SysTick_IRQn"]
-    [#if (initVector.vector!="PVD_AVD_IRQn" && FamilyName=="STM32U5") && (initVector.vector!="PVD_PVM_IRQn" && FamilyName=="STM32U5")]
+    [#if (initVector.vector!="PVD_AVD_IRQn" && FamilyName=="STM32U5") && (initVector.vector!="PVD_PVM_IRQn" && FamilyName=="STM32U5") || (initVector.vector!="PVD_IRQn" && FamilyName=="STM32WBA")]
     #t/* ${initVector.vector} interrupt configuration */
     #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
     [/#if]
-[#if FamilyName!="STM32U5"]
+[#if (FamilyName!="STM32U5" && (FamilyName!="STM32WBA")) || (FamilyName=="STM32WBA" && PWR_interrupt?? && Secure=="false" && initVector.vector?contains("WKUP") && initVector.usedDriver=="HAL")]
     #t/* ${initVector.vector} interrupt configuration */
     #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
     [/#if]
     [/#if]
     [/#if]
     [#if initVector.systemHandler=="false"]
-    [#if (initVector.vector!="PVD_AVD_IRQn" && FamilyName=="STM32U5")&& (initVector.vector!="PVD_PVM_IRQn" && FamilyName=="STM32U5")]
+    [#if (initVector.vector!="PVD_AVD_IRQn" && FamilyName=="STM32U5")&& (initVector.vector!="PVD_PVM_IRQn" && FamilyName=="STM32U5") || (initVector.vector!="PVD_IRQn" && FamilyName=="STM32WBA")]
      [#if EnableCode??]
       #tHAL_NVIC_EnableIRQ(${initVector.vector});
 [/#if]
     [/#if]
-[#if FamilyName!="STM32U5"]
+[#if (FamilyName!="STM32U5" && (FamilyName!="STM32WBA"))|| (FamilyName=="STM32WBA" && PWR_interrupt?? && Secure=="false" && initVector.vector?contains("WKUP") && initVector.usedDriver=="HAL")]
 [#if EnableCode??]
       #tHAL_NVIC_EnableIRQ(${initVector.vector});
- [/#if]
+[/#if] 
     [/#if]
+[/#if]
+[/#if]
+[/#if]
+
+[#if  (initVector.vector=="HSEM_IRQn" || initVector.vector=="HSEM_S_IRQn") && initVector.usedDriver=="LL"]
+[#if initVector.codeInMspInit]
+    [#if initVector.systemHandler=="false" || initVector.preemptionPriority!="0" || initVector.subPriority!="0"]
+    #t/* ${initVector.vector} interrupt configuration */
+    #tNVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
+    [/#if]
+
+    [#if initVector.systemHandler=="false"]
+    
+      #tNVIC_EnableIRQ(${initVector.vector});
+
 [/#if]
 [/#if]
 [/#if]
@@ -223,7 +238,7 @@ void HAL_MspInit(void)
 [/#if]
 #n
 [#-- pwr configuration --]
-[#if pwrConfig?? && FamilyName!="STM32U5"]
+[#if pwrConfig?? && FamilyName!="STM32U5"&& FamilyName!="STM32WBA"]
 [#list pwrConfig as config]
 [@common.generateConfigModelListCode configModel=config inst="PWR"  nTab=1 index=""/]
 [/#list]
@@ -274,11 +289,12 @@ void HAL_MspInit(void)
     [#if instanceData.initServices.nvic??]
         [#assign useNvic = true]
     [/#if]
-[#if instanceData.initServices.EnableCode??]
+    [#if instanceData.initServices.EnableCode??]
         [#assign GenerateNvicEnable = true]
     [/#if]
 
-  [/#if]
+[/#if]
+
 [/#list]
 
 [#-- *************************************** --]
@@ -1003,6 +1019,39 @@ void HAL_MspInit(void)
       [#--  #endif --]
     [/#if]
 [/#if]
+
+[#if ipName?contains("DRD_FS") && FamilyName=="STM32U5"]
+[#if serviceType=="Init"]
+#n#t#t/* Enable VDDUSB */
+	#t#tif(__HAL_RCC_PWR_IS_CLK_DISABLED())
+	#t#t{
+	#t#t#t__HAL_RCC_PWR_CLK_ENABLE();
+
+	#t#t#tHAL_PWREx_EnableVddUSB();
+
+	#t#t#t__HAL_RCC_PWR_CLK_DISABLE();
+	#t#t}
+	#t#telse
+	#t#t{
+	#t#t#tHAL_PWREx_EnableVddUSB();
+	#t#t}
+[#else]
+#n#t#t/* Disable VDDUSB */
+	#t#tif(__HAL_RCC_PWR_IS_CLK_DISABLED())
+	#t#t{
+	#t#t#t__HAL_RCC_PWR_CLK_ENABLE();
+
+	#t#t#tHAL_PWREx_DisableVddUSB();
+
+	#t#t#t__HAL_RCC_PWR_CLK_DISABLE();
+	#t#t}
+	#t#telse
+	#t#t{
+	#t#t#tHAL_PWREx_DisableVddUSB();
+	#t#t}
+[/#if]
+[/#if]
+
 [#-- if I2C clk_enable should be after GPIO Init Begin --]
     [#if serviceType=="Init" && (ipName?contains("I2C")||(ipName?contains("USB")))] 
            [#if initService.clock??]
@@ -1092,7 +1141,7 @@ void HAL_MspInit(void)
                     #t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
 [#if GenerateNvicEnable]
                     #t#tHAL_NVIC_EnableIRQ(${initVector.vector});
-   [/#if]
+[/#if]
                   [/#if]
                 [/#list]
                 [#assign lowPower = "no"]
@@ -1114,7 +1163,7 @@ void HAL_MspInit(void)
                       [/#if]
                   [/#list]
                   [#-- Even if init code is in MX_NVIC_Init, if there is no specific USB wake-up interrupt, some code needs to be generated here --]
-                  [#if codeInMspInit || !wakeupVector]
+                  [#if (codeInMspInit || !wakeupVector) && (FamilyName!="STM32H5") && (FamilyName!="STM32U5")]
                     #t#tif(hpcd->Init.low_power_enable == 1)
                     #t#t{
                     [@common.generateUsbWakeUpInterrupt ipName=ipName tabN=3/]
@@ -1174,7 +1223,7 @@ void HAL_MspInit(void)
                            #t#t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
                            [#if GenerateNvicEnable]
                            #t#t#tHAL_NVIC_EnableIRQ(${initVector.vector});
-                            [/#if]
+                           [/#if]
                        [/#if]
                     [/#list]
                     #t#t}

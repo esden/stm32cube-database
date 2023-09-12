@@ -28,17 +28,29 @@
 
 	[#lt]${T1}st,clksrc = <
 [#t]
+[#if srvcmx_isTargetedFw_inDTS("TF-A")]
 		[#list peripheralRCCParams.get("CLKSystemSource").entrySet() as paramEntry]
 			[#lt]${T2}${paramEntry.value}
 		[/#list]
+[/#if]
+[#if srvcmx_isTargetedFw_inDTS("OP-TEE")]
+        [#list peripheralRCCParams.get("CLKSystemSourceOP").entrySet() as paramEntry]
+			[#lt]${T2}${paramEntry.value}
+		[/#list]
+[/#if]
 [#t]
 	[#lt]${T1}>;
 [#t]
 	[#lt]${T1}st,clkdiv = <
 [#t]
-		[#list peripheralRCCParams.get("CLKDivider").entrySet() as paramEntry]
+        [#list peripheralRCCParams.get("CLKDivider").entrySet() as paramEntry]
 			[#lt]${T2}${paramEntry.value}
 		[/#list]
+[#if srvcmx_isTargetedFw_inDTS("OP-TEE")]
+		[#list peripheralRCCParams.get("CLKDividerOP").entrySet() as paramEntry]
+			[#lt]${T2}${paramEntry.value}
+		[/#list]
+[/#if]
 [#t]
 	[#lt]${T1}>;
 [#t]
@@ -64,10 +76,11 @@
 			[#assign VCOM="0"]
 			[#assign PLLSource="0"]
 			[#list peripheralParams.get("RCC").entrySet() as paramEntry]
-				[#if paramEntry.key == "PLL${PLLnb}Used"][#assign PLLUsed=paramEntry.value?number][/#if]
+				[#if paramEntry.key == "PLL${PLLnb}UsedTFA"][#assign PLLUsedTFA=paramEntry.value?number][/#if]
+				[#if paramEntry.key == "PLL${PLLnb}UsedA7"][#assign PLLUsedA7=paramEntry.value?number][/#if]
 				[#if paramEntry.key == "DIVN${PLLnb}"][#assign DIVN=paramEntry.value?number -1][/#if]
 				[#if paramEntry.key == "DIVM${PLLnb}"][#assign DIVM=paramEntry.value?number -1][/#if]
-                                [#if paramEntry.key == "PLL${PLLnb}FRACV"][#assign PLLFRAC="${paramEntry.value}"][/#if]
+                [#if paramEntry.key == "PLL${PLLnb}FRACV"][#assign PLLFRAC="${paramEntry.value}"][/#if]
 				[#if paramEntry.key == "VCO${PLLnb}M"][#assign VCOM="${paramEntry.value?number}"][/#if]
 				[#if paramEntry.key == "PLL${PLLnb}MODPER"][#assign PLLMODPER="${paramEntry.value}"][/#if]
 				[#if paramEntry.key == "PLL${PLLnb}INCSTEP"][#assign PLLINCSTEP="${paramEntry.value}"][/#if]
@@ -78,7 +91,7 @@
                         [#list peripheralRCCParams.get("CLKDTPLLSource").entrySet() as paramEntry]
 				[#if paramEntry.key == "PLL${PLLnb}SourceARG"][#assign PLLSource="${paramEntry.value}"][/#if]
 			[/#list]
-						[#if (PLLUsed! = 1) ]
+						[#if ((PLLUsedTFA! = 1) && srvcmx_isTargetedFw_inDTS("TF-A")) || ((PLLUsedA7! = 1) && srvcmx_isTargetedFw_inDTS("OP-TEE"))]
 			[#lt]${T2}pll${PLLnb}_vco_${VCOM}Mhz: pll${PLLnb}-vco-${VCOM}Mhz {
 				[#lt]${T3}src = < ${PLLSource} >;
 				[#lt]${T3}divmn = < ${DIVM} ${DIVN} >;
@@ -114,14 +127,15 @@
 			[#assign VCOM="0"]
 [#t]
 			[#list peripheralParams.get("RCC").entrySet() as paramEntry]
-				[#if paramEntry.key == "PLL${PLLnb}Used"][#assign PLLUsed=paramEntry.value?number][/#if]
+				[#if paramEntry.key == "PLL${PLLnb}UsedTFA"][#assign PLLUsedTFA=paramEntry.value?number][/#if]
+                [#if paramEntry.key == "PLL${PLLnb}UsedA7"][#assign PLLUsedA7=paramEntry.value?number][/#if]
 				[#if paramEntry.key == "DIVP${PLLnb}"][#assign DIVP=paramEntry.value?number -1][/#if]
 				[#if paramEntry.key == "DIVQ${PLLnb}"][#assign DIVQ=paramEntry.value?number -1][/#if]
 				[#if paramEntry.key == "DIVR${PLLnb}"][#assign DIVR=paramEntry.value?number -1][/#if]
 				[#if paramEntry.key == "VCO${PLLnb}M"][#assign VCOM="${paramEntry.value?number}"][/#if]
 			[/#list]
 
-						[#if (PLLUsed! = 1) ]
+						[#if ((PLLUsedTFA! = 1) && srvcmx_isTargetedFw_inDTS("TF-A")) || ((PLLUsedA7! = 1) && srvcmx_isTargetedFw_inDTS("OP-TEE"))]
 			[#lt]${T1}pll${PLLnb}:st,pll@${PLLnb?number -1} {
 				[#lt]${T2}compatible = "st,stm32mp1-pll";
 				[#lt]${T2}reg = <${PLLnb?number -1}>;
@@ -139,6 +153,7 @@
 	[/#if]
 
 [#-- st,clk_opp node creation --]
+[#if srvcmx_isTargetedFw_inDTS("OP-TEE")]
 [#list peripheralRCCParams.get("CLKSystemSource").entrySet() as paramEntry]
     [#if paramEntry.key == "MPUCLKSource"][#assign MPUCLKSource=paramEntry.value][/#if]
     [#if paramEntry.key == "AXICLKSource"][#assign AXICLKSource=paramEntry.value][/#if]
@@ -196,4 +211,5 @@
 [#lt]${T3}/* USER CODE END rcc_st-ck_mlahbs */
 [#lt]${T2}};
 [#lt]${T1}};
+[/#if]
 [/#list]

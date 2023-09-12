@@ -15,6 +15,8 @@
     </RefParameter>
     <RefParameter Name="DESCRIPTOR_NAME_START" Comment="name of the descriptor"   DefaultValue="descriptorx_COMP_START"  Type="StringRW" >
     </RefParameter>
+    <RefParameter Name="DESCRIPTOR_NAME_STOP" Comment="name of the descriptor"   DefaultValue="descriptorx_COMP_STOP"  Type="StringRW" >
+    </RefParameter>
 
      <RefParameter Name="DESCRIPTOR_NAME_OUTPUTLEVEL" Comment="name of the descriptor"   DefaultValue="descriptorx_OUTPUTLEVEL"  Type="StringRW" >
     </RefParameter>
@@ -28,6 +30,11 @@
         <Description>description</Description>
         <PossibleValue Comment="DISABLE" Value="__NULL"/>
         <PossibleValue Comment="Configuration Node" Value="LPBAM_COMP_START_FULLQ_CONFIG_NODE"/>
+    </RefParameter>
+    <RefParameter Comment="Circular Node for STOP" DefaultValue="__NULL" Name="CircularNode_STOP" Type="list" Group="Stop" Visible="false">
+        <Description>description</Description>
+        <PossibleValue Comment="DISABLE" Value="__NULL"/>
+        <PossibleValue Comment="Configuration Node" Value="LPBAM_COMP_STOP_FULLQ_CONFIG_NODE"/>
     </RefParameter>
  <!-- parameter for circular Mode management for Mode START-->
 
@@ -133,7 +140,7 @@
         <PossibleValue Comment="LPTIM3 CH1" Value="LPBAM_LPDMA1_TRIGGER_LPTIM3_CH1" />
         <PossibleValue Comment="LPTIM4 OUT" Value="LPBAM_LPDMA1_TRIGGER_LPTIM4_OUT" />
         <PossibleValue Comment="COMP1 OUT" Value="LPBAM_LPDMA1_TRIGGER_COMP1_OUT"  />
-        <PossibleValue Comment="COMP2 OUT" Value="LPBAM_LPDMA1_TRIGGER_COMP2_OUT"  />
+        <PossibleValue Action="Remove" Comment="COMP2 OUT" Value="LPBAM_LPDMA1_TRIGGER_COMP2_OUT" Condition="DIE455"/>
         <PossibleValue Comment="RTC ALRA TRG" Value="LPBAM_LPDMA1_TRIGGER_RTC_ALRA_TRG" />
         <PossibleValue Comment="RTC ALRB TRG" Value="LPBAM_LPDMA1_TRIGGER_RTC_ALRB_TRG" />
         <PossibleValue Comment="RTC WUT TRG" Value="LPBAM_LPDMA1_TRIGGER_RTC_WUT_TRG" />
@@ -162,6 +169,7 @@
          <PossibleValue Comment="NONE" Value="NONE"/>
          <PossibleValue Comment="Config Node" Value="LPBAM_COMP_START_FULLQ_CONFIG_NODE"/>
          <PossibleValue Comment="Data Node" Value="LPBAM_COMP_OUTPUTLEVEL_FULLQ_DATA_NODE"/>
+         <PossibleValue Comment="Config Node" Value="LPBAM_COMP_STOP_FULLQ_CONFIG_NODE"/>
      </RefParameter> 
 
 
@@ -356,6 +364,23 @@
 
     </RefMode>
 
+    <RefMode Name="STOP">
+        <ConfigForMode>COMP_STOP</ConfigForMode>
+        <!--Trigger -->
+        <Parameter Name="TriggerPolarity_STOP_CONFIG" RefParameter="TriggerPolarity"  />
+        
+        <Parameter Name="NodeLevel_STOP_CONFIG" RefParameter="NodeLevel">
+            <PossibleValue>LPBAM_COMP_STOP_FULLQ_CONFIG_NODE</PossibleValue>
+        </Parameter>
+        <Parameter Name="TriggerMode_STOP_CONFIG" RefParameter="TriggerMode_CONFIG"> 
+           <Condition Diagnostic="" Expression="!(TriggerPolarity_STOP_CONFIG=LPBAM_DMA_TRIG_POLARITY_MASKED)"/>
+        </Parameter>
+        <Parameter Name="TriggerSelection_STOP_CONFIG" RefParameter="TriggerSelection">
+           <Condition Diagnostic=""  Expression="!(TriggerPolarity_STOP_CONFIG=LPBAM_DMA_TRIG_POLARITY_MASKED)"/>
+        </Parameter>
+        <Parameter Name="CircularNode_STOP"/> 
+        <!--Trigger -->
+    </RefMode>
 
 
     <RefMode Name="OUTPUTLEVEL">
@@ -415,6 +440,19 @@
                          </ModeLogicOperator>
                     </Mode>
 
+                    <Mode Name="STOP" UserName="Stop"> 
+                        <Semaphore>STOP_Mode</Semaphore>
+                        <Condition Diagnostic="hardware IP must be selected to be part of LPBAM" Expression="Semaphore_LPBAM_COMP$IpNumber_SELECTED"/>
+                        <ModeLogicOperator Name="XOR">
+                             <Mode Name="STOP" UserName="Stop"> 
+                               <Semaphore>Semaphore_$IpInstance_STOP</Semaphore>
+                               <SignalLogicalOp Name="AND">
+                               <Signal Name="VS_STOP"/>
+                              </SignalLogicalOp>
+                         </Mode> 
+                         </ModeLogicOperator>
+                    </Mode>
+
                     <Mode Name="OUTPUTLEVEL" UserName="OutputLevel"> 
                         <Condition Diagnostic="hardware IP must be selected to be part of LPBAM" Expression="Semaphore_LPBAM_COMP$IpNumber_SELECTED"/>  
                          <ModeLogicOperator Name="XOR">
@@ -437,6 +475,7 @@
 
 <RefSignal Name="VS_START" Virtual="true"/>
 <RefSignal Name="VS_OUTPUTLEVEL" Virtual="true"/>
+<RefSignal Name="VS_STOP" Virtual="true"/>
 
 
 </IP>

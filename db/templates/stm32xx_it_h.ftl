@@ -45,6 +45,14 @@
 
 void ${vector.irqHandler}(void);
 [/#list]
+[#if FamilyName=="STM32WBA"]
+[#list services as service]
+[#if service?? && service.swlowRadioInterruptExist]
+[#assign swlowRadioInterrupt = service.swlowRadioInterrupt]
+void ${swlowRadioInterrupt.irqHandler}(void);
+[/#if]
+[/#list]
+[/#if]
 [/#compress]
 
 /* USER CODE BEGIN EFP */

@@ -3,6 +3,24 @@
     <Background  imageName="shsihidecross" name="shsihidecross"  x="195" y="1568">
         <Condition Diagnostic="" Expression="!SAES_Exist"/>
     </Background>
+    <Background  imageName="hideUcpd" name="hideucpd"  x="168" y="868">
+        <Condition Diagnostic="" Expression="!UCPD1_Exist"/>
+    </Background>
+
+    <Background  imageName="hidemux3inputs" name="hideusart2"  x="1400" y="885">
+        <Condition Diagnostic="" Expression="!USART2_Exist"/>
+    </Background>    
+    <Background  imageName="blackline2" name="hideusart2cross"  x="1530" y="955">
+        <Condition Diagnostic="" Expression="!USART2_Exist"/>
+    </Background>
+    
+    <Background  imageName="hidemux3inputs" name="hideusart5"  x="1580" y="992">
+        <Condition Diagnostic="" Expression="!UART5_Exist"/>
+    </Background>
+    <Background  imageName="blackline" name="hideusart5cross"  x="1608" y="1065">
+        <Condition Diagnostic="" Expression="!UART5_Exist"/>
+    </Background>
+    
     <Background  imageName="WKUPCLOCK" name="WKUPClock"  x="730" y="50">
         <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
     </Background>
@@ -16,16 +34,16 @@
         <Condition Diagnostic="" Expression="!SAI2_Exist"/>
     </Background>    
     <Background  imageName="STM32U5HideMux" name="STM32U5HideCK48Mux"  x="890" y="472">
-        <Condition Diagnostic="" Expression="!SDMMC1_Exist &amp; !SDMMC2_Exist &amp; !USB_OTG_FS_Exist"/>
+        <Condition Diagnostic="" Expression="!SDMMC1_Exist &amp; !SDMMC2_Exist &amp; !USB_OTG_FS_Exist &amp; !USB_Exist"/>
     </Background>
     <Background  imageName="blackline" name="blacklineCK48Mux"  x="990" y="570">
-        <Condition Diagnostic="" Expression="!SDMMC1_Exist &amp; !SDMMC2_Exist &amp; !USB_OTG_FS_Exist"/>
+        <Condition Diagnostic="" Expression="!SDMMC1_Exist &amp; !SDMMC2_Exist &amp; !USB_OTG_FS_Exist &amp; !USB_Exist"/>
     </Background>
     <Background  imageName="STM32U5HideMux2" name="STM32U5HideSDMMCMux"  x="1585" y="1570">
         <Condition Diagnostic="" Expression="!SDMMC1_Exist &amp; !SDMMC2_Exist"/>
     </Background>
     <Background  imageName="stm32U5UsbExist" name="stm32U5UsbExist"  x="977" y="532">
-        <Condition Diagnostic="" Expression="USB_OTG_FS_Exist"/>
+        <Condition Diagnostic="" Expression="USB_OTG_FS_Exist|USB_Exist"/>
     </Background>
     <Background  imageName="securableelem" name="LSE_SEC"  x="85" y="120">
         <Condition Diagnostic="" Expression="S_SECURE&amp;!S_LPBAM_CONF"/>
@@ -61,7 +79,7 @@
         <Condition Diagnostic="" Expression="S_SECURE&amp;!S_LPBAM_CONF"/>
     </Background>
     <Background  imageName="securableelem" name="CK48_SEC"  x="1000" y="520">
-        <Condition Diagnostic="" Expression="S_SECURE &amp; (SDMMC1_Exist |SDMMC2_Exist | USB_OTG_FS_Exist)&amp;!S_LPBAM_CONF"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; (SDMMC1_Exist |SDMMC2_Exist | USB_OTG_FS_Exist|USB_Exist)&amp;!S_LPBAM_CONF"/>
     </Background>
     
     <Tree id="ClockTree">
@@ -201,7 +219,7 @@
             <Output signalId="LSE" to="LSCOMult"/>
         </Element>
         <Element id="LSEOSC" type="variedSource" refParameter="LSE_VALUE" x="200" y="194">
-s            <Output signalId="LSE" to="RTCClkSource"/>
+            <Output signalId="LSE" to="RTCClkSource"/>
             <Output signalId="LSE" to="MCOMult"/>
             <Output signalId="LSE" to="USART1Mult"/>
             <Output signalId="LSE" to="USART2Mult"/>
@@ -371,6 +389,7 @@ s            <Output signalId="LSE" to="RTCClkSource"/>
             <Input signalId="USART1CLK" from="USART1Mult"/>
         </Element>
         <Element id="USART2Mult" type="multiplexor" refParameter="USART2CLockSelectionVirtual" orientation="LEFT" x="1308" y="814" refEnable="USART2Enable" refSecure="USART2TZEnable">
+            <Condition Diagnostic="" Expression="USART2_Exist"/>
             <Input signalId="PCLK1"  from="APB1Prescaler" refValue="RCC_USART2CLKSOURCE_PCLK1"/>
             <Input signalId="SYSCLK" from="SysCLKOutput"  refValue="RCC_USART2CLKSOURCE_SYSCLK"/>
             <Input signalId="HSI"    from="HSIRC"         refValue="RCC_USART2CLKSOURCE_HSI"/>
@@ -378,6 +397,7 @@ s            <Output signalId="LSE" to="RTCClkSource"/>
             <Output signalId="USART2CLK" to="USART2output"/>
         </Element>
         <Element id="USART2output" type="activeOutput" refParameter="USART2Freq_Value" x="1490" y="847"  refEnable="USART2Enable">
+            <Condition Diagnostic="" Expression="USART2_Exist"/>
             <Input signalId="USART2CLK" from="USART2Mult"/>
         </Element> 
         <Element id="USART3Mult" type="multiplexor" refParameter="USART3CLockSelectionVirtual" orientation="LEFT" x="1425" y="751" refEnable="USART3Enable" refSecure="USART3TZEnable">
@@ -401,6 +421,7 @@ s            <Output signalId="LSE" to="RTCClkSource"/>
             <Input signalId="UART4CLK" from="UART4Mult"/>
         </Element>
         <Element id="UART5Mult" type="multiplexor" refParameter="UART5CLockSelectionVirtual" orientation="LEFT" x="1425" y="895" refEnable="UART5Enable" refSecure="UART5TZEnable">
+            <Condition Diagnostic="" Expression="UART5_Exist"/>
             <Input signalId="PCLK1"  from="APB1Prescaler" refValue="RCC_UART5CLKSOURCE_PCLK1"/>
             <Input signalId="SYSCLK" from="SysCLKOutput"  refValue="RCC_UART5CLKSOURCE_SYSCLK"/>
             <Input signalId="HSI"    from="HSIRC"         refValue="RCC_UART5CLKSOURCE_HSI"/>
@@ -408,6 +429,7 @@ s            <Output signalId="LSE" to="RTCClkSource"/>
             <Output signalId="UART5CLK" to="UART5output"/>
         </Element>
         <Element id="UART5output" type="activeOutput" refParameter="UART5Freq_Value" x="1490" y="930"  refEnable="UART5Enable">
+            <Condition Diagnostic="" Expression="UART5_Exist"/>
             <Input signalId="UART5CLK" from="UART5Mult"/>
         </Element>
         <Element id="LPUART1Mult" type="multiplexor" refParameter="LPUART1CLockSelectionVirtual" orientation="LEFT" x="1308" y="645" refEnable="LPUART1Enable" refSecure="LPUART1TZEnable">
@@ -467,7 +489,7 @@ s            <Output signalId="LSE" to="RTCClkSource"/>
         </Element>
      
         <Element id="CK48Mult" type="multiplexor" refParameter="CK48CLockSelection" orientation="LEFT" x="908" y="526" refEnable="USBEnable,SDMMCEnable" isTZRes="true">
-            <Condition Diagnostic="" Expression="SDMMC1_Exist | SDMMC2_Exist | USB_OTG_FS_Exist"/>
+            <Condition Diagnostic="" Expression="SDMMC1_Exist | SDMMC2_Exist | USB_OTG_FS_Exist|USB_Exist"/>
             <Input  signalId="PLL2QCLK" from="PLL2Q" refValue="RCC_CLK48CLKSOURCE_PLL2"/>
             <Input  signalId="PLLQCLK"     from="PLL1Q"     refValue="RCC_CLK48CLKSOURCE_PLL1"/>
             <Input  signalId="MSIK"         from="MSIKRC"    refValue="RCC_CLK48CLKSOURCE_MSIK"/>
@@ -480,11 +502,11 @@ s            <Output signalId="LSE" to="RTCClkSource"/>
         </Element>
 
 	<Element id="CK48output" type="activeOutput"   refParameter="CK48Freq_Value"   x="1055" y="557" refEnable="USBEnable,SDMMCEnable">
-            <Condition Diagnostic="" Expression="SDMMC1_Exist | SDMMC2_Exist | USB_OTG_FS_Exist"/>
+            <Condition Diagnostic="" Expression="SDMMC1_Exist | SDMMC2_Exist | USB_OTG_FS_Exist|USB_Exist"/>
             <Input signalId="CK48CLK" from="CK48Mult"/>
         </Element>
         <Element id="USBoutput" type="activeOutput"   refParameter="USBFreq_Value"   x="1055" y="527" refEnable="USBEnable">
-            <Condition Diagnostic="" Expression="USB_OTG_FS_Exist"/>
+            <Condition Diagnostic="" Expression="USB_OTG_FS_Exist|USB_Exist"/>
             <Input signalId="CK48CLK" from="CK48Mult"/>
         </Element>
  
@@ -762,6 +784,7 @@ s            <Output signalId="LSE" to="RTCClkSource"/>
         </Element>
         
         <Element id="UCPD1Output" type="output" refParameter="UCPD1outputFreq_Value" x="431" y="918" refEnable="UCPDEnable" >
+            <Condition Diagnostic="" Expression="UCPD1_Exist"/>
             <Input signalId="HSI"    from="HSIRC"/>
         </Element>
         
@@ -1028,7 +1051,9 @@ s            <Output signalId="LSE" to="RTCClkSource"/>
     <Label id="PLL2RoutputLabel"     type="info" text="PLL2R"     posX="661" posY="627"/>
     <Label id="PLL2PoutputLabel"     type="info" text="PLL2P"     posX="661" posY="706"/>
     
-    <Label id="HCLK2" type="SpecialInfo" posX="501" posY="928" text="To UCPD1 (MHz)"/>
+    <Label id="HCLK2" type="SpecialInfo" posX="501" posY="928" text="To UCPD1 (MHz)">
+        <Condition Diagnostic="" Expression="UCPD1_Exist"/>
+    </Label>
 
     <!-- freq value label -->
     <Label id="HCLK1" type="SpecialInfo" posX="1550" posY="513" text="HCLK to AHB bus, core, memory and DMA (MHz)"/>
@@ -1149,16 +1174,22 @@ s            <Output signalId="LSE" to="RTCClkSource"/>
     <Label id="USART3PCLK1Label"  type="signal"      text="LSE"              posX="1380" posY="820" refEnable="USART3Enable"/>
     <!--UART5 mux-->
     <Label id="UART5MUXLabel"    type="muxLabel"    text="UART5 Clock Mux"  posX="1370" posY="865" refEnable="UART5Enable">
+        <Condition Diagnostic="" Expression="UART5_Exist"/>
     </Label>
-    <Label id="UART5Output"      type="SpecialInfo" text="To UART5 (MHz)"   posX="1550" posY="933" refEnable="UART5Enable"> 	
+    <Label id="UART5Output"      type="SpecialInfo" text="To UART5 (MHz)"   posX="1550" posY="933" refEnable="UART5Enable">
+        <Condition Diagnostic="" Expression="UART5_Exist"/>	
     </Label>
     <Label id="UART5SYSCLKLabel" type="signal"      text="PCLK1"            posX="1380" posY="885" refEnable="UART5Enable">
+        <Condition Diagnostic="" Expression="UART5_Exist"/>
     </Label>        
     <Label id="UART5HSILabel"    type="signal"      text="SYSCLK"           posX="1380" posY="910" refEnable="UART5Enable">
+        <Condition Diagnostic="" Expression="UART5_Exist"/>
     </Label>
     <Label id="UART5LSELabel"    type="signal"      text="HSI"              posX="1380" posY="935" refEnable="UART5Enable">
+        <Condition Diagnostic="" Expression="UART5_Exist"/>
     </Label>
     <Label id="UART5PCLK1Label"  type="signal"      text="LSE"              posX="1380" posY="960" refEnable="UART5Enable"> 
+        <Condition Diagnostic="" Expression="UART5_Exist"/>
     </Label>
     <!--LPTIM1 mux-->
     <Label id="LPTIM1MUXLabel"    type="muxLabel"    text="LPTIM1 Clock Mux" posX="1370" posY="1005" refEnable="LPTIM1Enable"/>
@@ -1176,12 +1207,24 @@ s            <Output signalId="LSE" to="RTCClkSource"/>
     <Label id="LPTIM1LSELabel"    type="signal"      text="HSI"              posX="1380" posY="1215" refEnable="SPI1Enable"/>
     <Label id="LPTIM1PCLK1Label"  type="signal"      text="MSIK"              posX="1380" posY="1245" refEnable="SPI1Enable"/>
     <!--USART2 mux-->
-    <Label id="USART2MUXLabel"    type="muxLabel"    text="USART2 Clock Mux" posX="1250" posY="785" refEnable="USART2Enable"/>
-    <Label id="USART2Output"      type="SpecialInfo" text="To USART2 (MHz)"  posX="1550" posY="853" refEnable="USART2Enable"/> 	
-    <Label id="USART2SYSCLKLabel" type="signal"      text="PCLK1"            posX="1262" posY="805" refEnable="USART2Enable"/>
-    <Label id="USART2HSILabel"    type="signal"      text="SYSCLK"           posX="1262" posY="830" refEnable="USART2Enable"/>
-    <Label id="USART2LSELabel"    type="signal"      text="HSI"              posX="1262" posY="855" refEnable="USART2Enable"/>
-    <Label id="USART2PCLK1Label"  type="signal"      text="LSE"              posX="1262" posY="880" refEnable="USART2Enable"/>
+    <Label id="USART2MUXLabel"    type="muxLabel"    text="USART2 Clock Mux" posX="1250" posY="785" refEnable="USART2Enable">
+        <Condition Diagnostic="" Expression="USART2_Exist"/>
+    </Label>
+    <Label id="USART2Output"      type="SpecialInfo" text="To USART2 (MHz)"  posX="1550" posY="853" refEnable="USART2Enable">
+        <Condition Diagnostic="" Expression="USART2_Exist"/>
+    </Label> 	
+    <Label id="USART2SYSCLKLabel" type="signal"      text="PCLK1"            posX="1262" posY="805" refEnable="USART2Enable">
+        <Condition Diagnostic="" Expression="USART2_Exist"/>
+    </Label>
+    <Label id="USART2HSILabel"    type="signal"      text="SYSCLK"           posX="1262" posY="830" refEnable="USART2Enable">
+        <Condition Diagnostic="" Expression="USART2_Exist"/>
+    </Label>
+    <Label id="USART2LSELabel"    type="signal"      text="HSI"              posX="1262" posY="855" refEnable="USART2Enable">
+        <Condition Diagnostic="" Expression="USART2_Exist"/>
+    </Label>
+    <Label id="USART2PCLK1Label"  type="signal"      text="LSE"              posX="1262" posY="880" refEnable="USART2Enable">
+        <Condition Diagnostic="" Expression="USART2_Exist"/>
+    </Label>
     <!--UART4 mux-->
     <Label id="UART4MUXLabel"    type="muxLabel"    text="UART4 Clock Mux" posX="1250" posY="925" refEnable="UART4Enable"/>
     <Label id="UART4Output"      type="SpecialInfo" text="To UART4 (MHz)"  posX="1550" posY="993" refEnable="UART4Enable"/> 	
@@ -1323,23 +1366,23 @@ s            <Output signalId="LSE" to="RTCClkSource"/>
     <Label id="SPI2MSIKQLabel"  type="signal"      text="MSIK"           posX="1262" posY="1635" refEnable="SPI2Enable"/>
     <!--clk48 mux-->
     <Label id="clk48MUXLabel"    type="muxLabel"    text="CLK48 Clock Mux"    posX="865" posY="495" refEnable="USBEnable,SDMMCEnable">
-        <Condition Diagnostic="" Expression="SDMMC1_Exist | SDMMC2_Exist | USB_OTG_FS_Exist"/>
+        <Condition Diagnostic="" Expression="SDMMC1_Exist | SDMMC2_Exist | USB_OTG_FS_Exist|USB_Exist"/>
     </Label>
     <Label id="clk48Output"      type="SpecialInfo" text="To USB (MHz)"       posX="1113" posY="533" refEnable="USBEnable">
-        <Condition Diagnostic="" Expression="SDMMC1_Exist | SDMMC2_Exist | USB_OTG_FS_Exist"/>
+        <Condition Diagnostic="" Expression="SDMMC1_Exist | SDMMC2_Exist | USB_OTG_FS_Exist|USB_Exist"/>
     </Label>
     <Label id="clk48Output"      type="SpecialInfo" text="To CK48 (MHz)"       posX="1113" posY="563" refEnable="USBEnable"/>
     <Label id="clk48SYSCLKLabel" type="signal"      text="PLL2Q"           posX="858" posY="517" refEnable="USBEnable,SDMMCEnable">
-        <Condition Diagnostic="" Expression="SDMMC1_Exist | SDMMC2_Exist | USB_OTG_FS_Exist"/>
+        <Condition Diagnostic="" Expression="SDMMC1_Exist | SDMMC2_Exist | USB_OTG_FS_Exist|USB_Exist"/>
     </Label>
     <Label id="clk48HSILabel"    type="signal"      text="PLL1Q"               posX="858" posY="542" refEnable="USBEnable,SDMMCEnable">
-        <Condition Diagnostic="" Expression="SDMMC1_Exist | SDMMC2_Exist | USB_OTG_FS_Exist"/>
+        <Condition Diagnostic="" Expression="SDMMC1_Exist | SDMMC2_Exist | USB_OTG_FS_Exist|USB_Exist"/>
     </Label>
     <Label id="clk48PCLK1Label"  type="signal"      text="MSIK"                posX="858" posY="567" refEnable="USBEnable,SDMMCEnable">
-        <Condition Diagnostic="" Expression="SDMMC1_Exist | SDMMC2_Exist | USB_OTG_FS_Exist"/>
+        <Condition Diagnostic="" Expression="SDMMC1_Exist | SDMMC2_Exist | USB_OTG_FS_Exist|USB_Exist"/>
     </Label>
     <Label id="clk48PCLK1Label"  type="signal"      text="HSI48"              posX="858" posY="590" refEnable="USBEnable,SDMMCEnable">
-        <Condition Diagnostic="" Expression="SDMMC1_Exist | SDMMC2_Exist | USB_OTG_FS_Exist"/>
+        <Condition Diagnostic="" Expression="SDMMC1_Exist | SDMMC2_Exist | USB_OTG_FS_Exist|USB_Exist"/>
     </Label>
     <!--ADC mux-->
     <Label id="ADCMUXLabel"    type="muxLabel"    text="DAC Clock Mux"  posX="865" posY="655" refEnable="DACEnable"/>
@@ -1432,7 +1475,7 @@ s            <Output signalId="LSE" to="RTCClkSource"/>
     <Label id="APB2MaxLimitConstraint" type="dynamiConstraint" posX="1170" posY="390" text="160 MHz max"/>
     <Label id="APB2MaxLimitConstraint" type="dynamiConstraint" posX="1170" posY="460" text="160 MHz max"/>	
  	
-    <BButton id="CSSEnable" text="CSS" refParameter="EnableCSS" x="675" y="507">
+    <BButton id="CSSEnable" text="CSS" refParameter="EnbaleCSS" x="675" y="507">
     </BButton>
     <BButton id="CSSLSEEnable" text="CSS" refParameter="EnableCSSLSE" x="525" y="273">
 

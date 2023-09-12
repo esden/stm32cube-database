@@ -20,6 +20,20 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "ux_api.h"
+#include "ux_device_class_cdc_acm.h"
+[#compress]
+[#list SWIPdatas as SWIP]
+[#if SWIP.defines??]
+  [#list SWIP.defines as definition]
+    [#assign value = definition.value]
+    [#assign name = definition.name]
+    [#if name == "REG_UX_DEVICE_CDC_ACM"]
+      [#assign REG_UX_DEVICE_CDC_ACM_value = value]
+    [/#if]
+   [/#list]
+[/#if]
+[/#list]
+[/#compress]
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -42,7 +56,12 @@ extern "C" {
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
+[#if REG_UX_DEVICE_CDC_ACM_value == "1"]
+VOID USBD_CDC_ACM_Activate(VOID *cdc_acm_instance);
+VOID USBD_CDC_ACM_Deactivate(VOID *cdc_acm_instance);
+VOID USBD_CDC_ACM_ParameterChange(VOID *cdc_acm_instance);
 
+[/#if]
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */
@@ -60,4 +79,3 @@ extern "C" {
 }
 #endif
 #endif  /* __UX_DEVICE_CDC_ACM_H__ */
-

@@ -37,7 +37,7 @@
   
 #define HAL_MODULE_ENABLED
 
-[#assign allModules = ["ADC","MDF","COMP","CORDIC","CRC","AES","DAC","DMA2D","DSI","FDCAN","FMAC","GFXMMU","GPU2D","GTZC","HASH","HRTIM","IRDA","IWDG","I2C", "I2S","LPTIM","LTDC","NAND","NOR","OPAMP", "OCTOSPI","OTFDEC","PCD","PKA","QUADSPI","RNG","RTC","SAI","SAES","SD","MMC", "SMARTCARD","SMBUS","SPI","SRAM","TIM","TSC","RAMCFG","UART","USART","WWDG","DCMI","PSSI", "ICACHE","DCACHE", "PCD", "HCD", "HSPI"]]
+[#assign allModules = ["ADC","MDF","COMP","CORDIC","CRC","AES","DAC","DMA2D","DSI","FDCAN","FMAC","GFXMMU","GPU2D","GTZC","HASH","HRTIM","IRDA","IWDG","I2C", "I2S","LPTIM","LTDC","NAND","NOR","OPAMP", "OCTOSPI","OTFDEC","PKA","QUADSPI","RNG","RTC","SAI","SAES","SD","MMC", "SMARTCARD","SMBUS","SPI","SRAM","TIM","TSC","RAMCFG","UART","USART","WWDG","DCMI","PSSI", "ICACHE","DCACHE", "PCD", "HCD", "HSPI"]]
 [#list allModules as module]
     [#if isModuleUsed(module)]
 [#compress]#define HAL_${module?replace("QUADSPI","QSPI")?replace("OCTOSPI","OSPI")?replace("HSPI","XSPI")?replace("AES","CRYP")?replace("SCRYP","CRYP")?replace("ADF","MDF")}_MODULE_ENABLED[/#compress]
@@ -45,13 +45,18 @@
 [#compress]/*#define HAL_${module?replace("QUADSPI","QSPI")?replace("OCTOSPI","OSPI")?replace("HSPI","XSPI")?replace("AES","CRYP")?replace("SCRYP","CRYP")?replace("ADF","MDF")}_MODULE_ENABLED   */[/#compress]
 	[/#if]	
   [/#list]
+  
   [#function isModuleUsed moduleName]
 	[#assign used=false]
 	[#list modules as usedModule]
-		[#if usedModule==moduleName]
+	[#if usedModule=="USB" && (moduleName="PCD" || moduleName="HCD")]
 			[#assign used=true]
 			[#return true]
 		[/#if]
+		[#if usedModule==moduleName]
+			[#assign used=true]
+			[#return true]
+		[/#if]			
 	[/#list]
 	[#return used]
   [/#function]

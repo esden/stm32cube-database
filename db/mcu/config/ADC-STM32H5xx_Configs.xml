@@ -1,0 +1,585 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" DBVersion="V4.0" Name="ADC" Version="STM32Cube_FW_H5_V0.1.0" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
+	<RefConfig Comment="Configure the ADC multi-mode" Name="multiMode">
+		<IFCondition Expression="!(Mode = ADC_MODE_INDEPENDENT)">
+			<CallLibMethod Name="HAL_ADCEx_MultiModeConfigChannel" />
+		</IFCondition>
+	</RefConfig>
+    <RefConfig Comment="Common config" Name="ADC_RegularConfig">
+        <CallLibMethod Name="HAL_ADC_Init"/>
+        <ImplementCallBack Name="HAL_ADC_MspInit"/>
+        <ImplementCallBack Name="HAL_ADC_MspDeInit"/>
+    </RefConfig>
+    <RefConfig Comment="Configure Regular Channel" Name="ADC_RegularChannelConfig">
+        <CallLibMethod Name="HAL_ADC_ConfigChannel">
+        </CallLibMethod>
+    </RefConfig>
+    
+    
+    
+    <RefConfig Comment="Disable Injected Queue" Name="ADC_InjectedQueueDisable">
+        <CallLibMethod Name="HAL_ADCEx_DisableInjectedQueue" ReturnHAL="false"/>
+    </RefConfig>
+    
+    <RefConfig Comment="Configure Injected Channel" Name="ADC_InjectedChannelConfig">
+        <CallLibMethod Name="HAL_ADCEx_InjectedConfigChannel">
+            <MethodArg Name="InjectedNbrOfConversion" ParameterName="InjNumberOfConversion"/>
+            <MethodArg Name="InjecOversamplingMode" ParameterName="EnableInjectedOversampling"/>
+            <MethodArg Name="Ratio" ParameterName="InjOversamplingRatio"/>
+            <MethodArg Name="RightBitShift" ParameterName="InjOversamplingRightShift"/>
+        </CallLibMethod>
+    </RefConfig>
+    <RefConfig Comment="Enable Injected Queue" Name="ADC_InjectedQueueEnable">
+        <CallLibMethod Name="HAL_ADCEx_EnableInjectedQueue" ReturnHAL="false"/>
+    </RefConfig>
+    <!--  -->
+    <RefConfig Comment="Configure Analog WatchDog 1" Name="ADC_AnalogWDGConfig">
+        <CallLibMethod Name="HAL_ADC_AnalogWDGConfig">
+            <MethodArg Name="Channel" ParameterName="WatchdogChannel"/>
+            <MethodArg Name="WatchdogNumber" ParameterName="AWD1WatchdogNumber"/>
+            <MethodArg Name="HighThreshold" ParameterName="AWD1HighThreshold"/>
+            <MethodArg Name="LowThreshold" ParameterName="AWD1LowThreshold"/>
+            <MethodArg Name="ITMode" ParameterName="AWD1ITMode"/>
+            <MethodArg Name="FilteringConfig" ParameterName="AWD1FilteringConfig"/>
+        </CallLibMethod>
+    </RefConfig>
+    <RefConfig Comment="Configure Analog WatchDog 2" Name="ADC_AnalogWDGConfigForAWD2">
+        <!--CallLibMethod Name="HAL_ADC_AnalogWDGConfig">
+            <MethodArg Name="Channel" ParameterName="UnUsedParameter"/>
+            <MethodArg Name="WatchdogNumber" ParameterName="AWD2WatchdogNumber"/>
+            <MethodArg Name="HighThreshold" ParameterName="AWD2HighThreshold"/>
+            <MethodArg Name="WatchdogMode" ParameterName="UnUsedParameter"/>
+            <MethodArg Name="LowThreshold" ParameterName="AWD2LowThreshold"/>
+            <MethodArg Name="ITMode" ParameterName="AWD2ITMode"/>
+            <MethodArg Name="FilteringConfig" ParameterName="AWD2FilteringConfig"/>
+
+        </CallLibMethod-->
+    </RefConfig>
+    <RefConfig Comment="Configure Analog WatchDog 3" Name="ADC_AnalogWDGConfigForAWD3">
+        <!--CallLibMethod Name="HAL_ADC_AnalogWDGConfig">
+            <MethodArg Name="Channel" ParameterName="UnUsedParameter"/>
+            <MethodArg Name="WatchdogNumber" ParameterName="AWD3WatchdogNumber"/>
+            <MethodArg Name="HighThreshold" ParameterName="AWD3HighThreshold"/>
+            <MethodArg Name="WatchdogMode" ParameterName="UnUsedParameter"/>
+            <MethodArg Name="LowThreshold" ParameterName="AWD3LowThreshold"/>
+            <MethodArg Name="ITMode" ParameterName="AWD3ITMode"/>
+            <MethodArg Name="FilteringConfig" ParameterName="AWD3FilteringConfig"/>
+
+        </CallLibMethod-->
+    </RefConfig>
+  
+   <RefConfig Comment="Configure the  WatchDogs 2 or 3" Name="ADC_InjectedChannelConfigForWD">
+        <IFCondition Expression="(InjMonitoredBy=ADC_ANALOGWATCHDOG_2 &amp; EnableAnalogWatchDog2=true)|(InjMonitoredBy=ADC_ANALOGWATCHDOG_3 &amp; EnableAnalogWatchDog3=true)">
+        <CallLibMethod Name="HAL_ADC_AnalogWDGConfig">
+            <MethodArg Name="WatchdogMode" ParameterName="InjWDModeFC"/>
+            <MethodArg Name="WatchdogNumber" ParameterName="InjMonitoredBy"/>
+            <MethodArg Name="Channel" ParameterName="InjAWDChannel"/>
+            <MethodArg Name="ITMode" ParameterName="InjITMode"/>
+            <MethodArg Name="HighThreshold" ParameterName="InjHighThreshold"/>
+            <MethodArg Name="LowThreshold" ParameterName="InjLowThreshold"/>
+            <MethodArg Name="FilteringConfig" ParameterName="InjFilteringConfig"/>
+            <MethodArg Name="FilteringConfig" ParameterName="AWD2FilteringConfig"/>
+            <MethodArg Name="FilteringConfig" ParameterName="AWD3FilteringConfig"/>	
+        </CallLibMethod>
+        </IFCondition>
+         <IFCondition Expression="InjMonitoredBy=ADC_ANALOGWATCHDOG_32">
+            <CallLibMethod Name="HAL_ADC_AnalogWDGConfig">
+                <MethodArg Name="WatchdogMode" ParameterName="WatchdogMode2"/>
+                <MethodArg Name="WatchdogNumber" ParameterName="AWD2WatchdogNumber"/>
+                <MethodArg Name="Channel" ParameterName="InjAWDChannel"/>
+                <MethodArg Name="ITMode" ParameterName="AWD2ITMode"/>
+                <MethodArg Name="HighThreshold" ParameterName="AWD2HighThreshold"/>
+                <MethodArg Name="LowThreshold" ParameterName="AWD2LowThreshold"/>
+                <MethodArg Name="FilteringConfig" ParameterName="AWD2FilteringConfig"/>
+
+            </CallLibMethod>
+            <CallLibMethod Name="HAL_ADC_AnalogWDGConfig">
+                <MethodArg Name="WatchdogMode" ParameterName="WatchdogMode3"/>
+                <MethodArg Name="WatchdogNumber" ParameterName="AWD3WatchdogNumber"/>
+                <MethodArg Name="Channel" ParameterName="InjAWDChannel"/>
+                <MethodArg Name="ITMode" ParameterName="AWD3ITMode"/>
+                <MethodArg Name="HighThreshold" ParameterName="AWD3HighThreshold"/>
+                <MethodArg Name="LowThreshold" ParameterName="AWD3LowThreshold"/>
+                <MethodArg Name="FilteringConfig" ParameterName="AWD3FilteringConfig"/>
+
+            </CallLibMethod>
+        </IFCondition> 
+    </RefConfig>
+
+    <RefConfig Comment="Configure the WatchDogs 2 or 3" Name="ADC_RegularChannelConfigForWD">
+        <IFCondition Expression="(MonitoredBy=ADC_ANALOGWATCHDOG_2 &amp; EnableAnalogWatchDog2=true)|(MonitoredBy=ADC_ANALOGWATCHDOG_3 &amp; EnableAnalogWatchDog3=true)">
+            <CallLibMethod Name="HAL_ADC_AnalogWDGConfig">
+                <MethodArg Name="WatchdogMode" ParameterName="RegWDModeFC"/>
+                <MethodArg Name="WatchdogNumber" ParameterName="MonitoredBy"/>
+                <MethodArg Name="Channel" ParameterName="AWDChannel"/>
+                <MethodArg Name="ITMode" ParameterName="RegITMode"/>
+                <MethodArg Name="HighThreshold" ParameterName="RegHighThreshold"/>
+                <MethodArg Name="LowThreshold" ParameterName="RegLowThreshold"/>
+                <MethodArg Name="FilteringConfig" ParameterName="RegFilteringConfig"/>
+                <MethodArg Name="FilteringConfig" ParameterName="AWD2FilteringConfig"/>
+                <MethodArg Name="FilteringConfig" ParameterName="AWD3FilteringConfig"/>	
+            </CallLibMethod>
+        </IFCondition> 
+        <IFCondition Expression="MonitoredBy=ADC_ANALOGWATCHDOG_32">
+            <CallLibMethod Name="HAL_ADC_AnalogWDGConfig">
+                <MethodArg Name="WatchdogMode" ParameterName="WatchdogMode2"/>
+                <MethodArg Name="WatchdogNumber" ParameterName="AWD2WatchdogNumber"/>
+                <MethodArg Name="Channel" ParameterName="AWDChannel"/>
+                <MethodArg Name="ITMode" ParameterName="AWD2ITMode"/>
+                <MethodArg Name="HighThreshold" ParameterName="AWD2HighThreshold"/>
+                <MethodArg Name="LowThreshold" ParameterName="AWD2LowThreshold"/>
+                <MethodArg Name="FilteringConfig" ParameterName="AWD2FilteringConfig"/>
+
+            </CallLibMethod>
+            <CallLibMethod Name="HAL_ADC_AnalogWDGConfig">
+                <MethodArg Name="WatchdogMode" ParameterName="WatchdogMode3"/>
+                <MethodArg Name="WatchdogNumber" ParameterName="AWD3WatchdogNumber"/>
+                <MethodArg Name="Channel" ParameterName="AWDChannel"/>
+                <MethodArg Name="ITMode" ParameterName="AWD3ITMode"/>
+                <MethodArg Name="HighThreshold" ParameterName="AWD3HighThreshold"/>
+                <MethodArg Name="LowThreshold" ParameterName="AWD3LowThreshold"/>
+                <MethodArg Name="FilteringConfig" ParameterName="AWD3FilteringConfig"/>
+
+            </CallLibMethod>
+        </IFCondition> 
+        
+    </RefConfig>
+    
+    <LibMethod Comment="" Name="HAL_ADCEx_InjectedConfigChannel">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="__ADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+
+                <Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="enum" Name="LowPowerAutoWait" TypeName="HAL_ADCEx_InjectedGetValue()"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ConversionDataManagement" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Overrun" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="LeftBitShift" OptimizationCondition="equal"/>
+                <!--Argument AddressOf="false" GenericType="simple" Name="BoostMode" OptimizationCondition="equal"/-->
+                <Argument AddressOf="false" GenericType="simple" Name="OversamplingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="struct" Name="Oversampling" TypeName="ADC_OversamplingTypeDef">
+                    <Argument AddressOf="false" GenericType="simple" Name="Ratio" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="RightBitShift" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="TriggeredMode" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="OversamplingStopReset" OptimizationCondition="equal"/>
+
+                </Argument>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="struct" Name="InjectionConfig" TypeName="ADC_InjectionConfigTypeDef">
+                <Argument AddressOf="false" GenericType="enum" Name="ContextQueue" TypeName="HAL_ADCEx_InjectedConfigChannel()"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ChannelCount" OptimizationCondition="equal"/>
+            </Argument>
+        </Argument>
+        <Argument AddressOf="true" GenericType="struct" Name="sConfigInjected" TypeName="ADC_InjectionConfTypeDef">
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedChannel" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedRank" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedSamplingTime" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedSingleDiff" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedOffsetNumber" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedOffset" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedOffsetRightShift" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjectedOffsetSignedSaturation" OptimizationCondition="equal"/>
+            <!--Argument AddressOf="false" GenericType="simple" Name="InjectedLeftBitShift" OptimizationCondition="equal"/-->
+           
+
+            <Argument AddressOf="false" GenericType="enum" Name="InjectedNbrOfConversion" TypeName="HAL_ADCEx_InjectedConfigChannel()"/>
+            <Argument AddressOf="false" GenericType="enum" Name="InjectedDiscontinuousConvMode" TypeName="HAL_ADCEx_InjectedConfigChannel()"/>
+            <Argument AddressOf="false" GenericType="enum" Name="AutoInjectedConv" TypeName="HAL_ADCEx_InjectedConfigChannel()"/>
+            <Argument AddressOf="false" GenericType="enum" Name="QueueInjectedContext" TypeName="HAL_ADCEx_InjectedConfigChannel()"/>
+            <Argument AddressOf="false" GenericType="enum" Name="ExternalTrigInjecConv" TypeName="HAL_ADCEx_InjectedConfigChannel()"/>
+            <Argument AddressOf="false" GenericType="enum" Name="ExternalTrigInjecConvEdge" TypeName="HAL_ADCEx_InjectedConfigChannel()"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InjecOversamplingMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="struct" Name="InjecOversampling" TypeName="ADC_InjOversamplingTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="Ratio" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="RightBitShift" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="RightShiftOffset" OptimizationCondition="equal"/>
+
+            </Argument>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_ADCEx_MultiModeConfigChannel">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="__ADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="enum" Name="LowPowerAutoWait" TypeName="HAL_ADCEx_InjectedGetValue()"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SamplingMode" OptimizationCondition="equal"/>
+
+                <Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ConversionDataManagement" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Overrun" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="LeftBitShift" OptimizationCondition="equal"/>
+                <!--Argument AddressOf="false" GenericType="simple" Name="BoostMode" OptimizationCondition="equal"/-->
+                <Argument AddressOf="false" GenericType="simple" Name="OversamplingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="struct" Name="Oversampling" TypeName="ADC_OversamplingTypeDef">
+                    <Argument AddressOf="false" GenericType="simple" Name="Ratio" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="RightBitShift" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="TriggeredMode" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="OversamplingStopReset" OptimizationCondition="equal"/>
+                </Argument>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="struct" Name="InjectionConfig" TypeName="ADC_InjectionConfigTypeDef">
+                <Argument AddressOf="false" GenericType="enum" Name="ContextQueue" TypeName="HAL_ADCEx_InjectedConfigChannel()"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ChannelCount" OptimizationCondition="equal"/>
+            </Argument>
+        </Argument>
+        <Argument AddressOf="true" GenericType="struct" Name="multimode" TypeName="ADC_MultiModeTypeDef">
+            <Argument AddressOf="false" GenericType="simple" Name="Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="DMAAccessMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TwoSamplingDelay" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_ADCEx_EnableInjectedQueue">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+
+                <Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="enum" Name="LowPowerAutoWait" TypeName="HAL_ADCEx_InjectedGetValue()"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ConversionDataManagement" OptimizationCondition="equal"/>
+                
+
+                <Argument AddressOf="false" GenericType="simple" Name="Overrun" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="LeftBitShift" OptimizationCondition="equal"/>
+                <!--Argument AddressOf="false" GenericType="simple" Name="BoostMode" OptimizationCondition="equal"/-->
+                <Argument AddressOf="false" GenericType="simple" Name="OversamplingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="struct" Name="Oversampling" TypeName="ADC_OversamplingTypeDef">
+                    <Argument AddressOf="false" GenericType="simple" Name="Ratio" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="RightBitShift" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="TriggeredMode" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="OversamplingStopReset" OptimizationCondition="equal"/>
+                </Argument>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="struct" Name="InjectionConfig" TypeName="ADC_InjectionConfigTypeDef">
+                <Argument AddressOf="false" GenericType="enum" Name="ContextQueue" TypeName="HAL_ADCEx_InjectedConfigChannel()"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ChannelCount" OptimizationCondition="equal"/>
+            </Argument>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_ADCEx_DisableInjectedQueue">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="enum" Name="LowPowerAutoWait" TypeName="HAL_ADCEx_InjectedGetValue()"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SamplingMode" OptimizationCondition="equal"/>
+
+                <Argument AddressOf="false" GenericType="simple" Name="ConversionDataManagement" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Overrun" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="LeftBitShift" OptimizationCondition="equal"/>
+                <!--Argument AddressOf="false" GenericType="simple" Name="BoostMode" OptimizationCondition="equal"/-->
+                <Argument AddressOf="false" GenericType="simple" Name="OversamplingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="struct" Name="Oversampling" TypeName="ADC_OversamplingTypeDef">
+                    <Argument AddressOf="false" GenericType="simple" Name="Ratio" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="RightBitShift" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="TriggeredMode" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="OversamplingStopReset" OptimizationCondition="equal"/>
+                </Argument>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="struct" Name="InjectionConfig" TypeName="ADC_InjectionConfigTypeDef">
+                <Argument AddressOf="false" GenericType="enum" Name="ContextQueue" TypeName="HAL_ADCEx_InjectedConfigChannel()"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ChannelCount" OptimizationCondition="equal"/>
+            </Argument>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_ADC_Init">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+
+
+                <Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="enum" Name="LowPowerAutoWait" TypeName="HAL_ADCEx_InjectedGetValue()"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>       
+                <Argument AddressOf="false" GenericType="simple" Name="SamplingMode" OptimizationCondition="equal"/>
+     
+                <Argument AddressOf="false" GenericType="simple" Name="ConversionDataManagement" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Overrun" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="LeftBitShift" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="BoostMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="OversamplingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="struct" Name="Oversampling" TypeName="ADC_OversamplingTypeDef">
+                    <Argument AddressOf="false" GenericType="simple" Name="Ratio" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="RightBitShift" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="TriggeredMode" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="OversamplingStopReset" OptimizationCondition="equal"/>
+                </Argument>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="struct" Name="InjectionConfig" TypeName="ADC_InjectionConfigTypeDef">
+                <Argument AddressOf="false" GenericType="enum" Name="ContextQueue" TypeName="HAL_ADCEx_InjectedConfigChannel()"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ChannelCount" OptimizationCondition="equal"/>
+            </Argument>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_ADC_MspInit">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+
+                <Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="enum" Name="LowPowerAutoWait" TypeName="HAL_ADCEx_InjectedGetValue()"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SamplingMode" OptimizationCondition="equal"/>
+
+                <Argument AddressOf="false" GenericType="simple" Name="ConversionDataManagement" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Overrun" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="LeftBitShift" OptimizationCondition="equal"/>
+                <!--Argument AddressOf="false" GenericType="simple" Name="BoostMode" OptimizationCondition="equal"/-->
+                <Argument AddressOf="false" GenericType="simple" Name="OversamplingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="struct" Name="Oversampling" TypeName="ADC_OversamplingTypeDef">
+                    <Argument AddressOf="false" GenericType="simple" Name="Ratio" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="RightBitShift" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="TriggeredMode" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="OversamplingStopReset" OptimizationCondition="equal"/>
+                </Argument>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="struct" Name="InjectionConfig" TypeName="ADC_InjectionConfigTypeDef">
+                <Argument AddressOf="false" GenericType="enum" Name="ContextQueue" TypeName="HAL_ADCEx_InjectedConfigChannel()"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ChannelCount" OptimizationCondition="equal"/>
+            </Argument>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_ADC_MspDeInit">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+
+                <Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="enum" Name="LowPowerAutoWait" TypeName="HAL_ADCEx_InjectedGetValue()"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SamplingMode" OptimizationCondition="equal"/>
+
+                <Argument AddressOf="false" GenericType="simple" Name="ConversionDataManagement" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Overrun" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="LeftBitShift" OptimizationCondition="equal"/>
+                <!--Argument AddressOf="false" GenericType="simple" Name="BoostMode" OptimizationCondition="equal"/-->
+                <Argument AddressOf="false" GenericType="simple" Name="OversamplingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="struct" Name="Oversampling" TypeName="ADC_OversamplingTypeDef">
+                    <Argument AddressOf="false" GenericType="simple" Name="Ratio" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="RightBitShift" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="TriggeredMode" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="OversamplingStopReset" OptimizationCondition="equal"/>
+                </Argument>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="struct" Name="InjectionConfig" TypeName="ADC_InjectionConfigTypeDef">
+                <Argument AddressOf="false" GenericType="enum" Name="ContextQueue" TypeName="HAL_ADCEx_InjectedConfigChannel()"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ChannelCount" OptimizationCondition="equal"/>
+            </Argument>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_ADC_ConfigChannel">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="enum" Name="LowPowerAutoWait" TypeName="HAL_ADCEx_InjectedGetValue()"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SamplingMode" OptimizationCondition="equal"/>
+
+                <Argument AddressOf="false" GenericType="simple" Name="ConversionDataManagement" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Overrun" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="LeftBitShift" OptimizationCondition="equal"/>
+                <!--Argument AddressOf="false" GenericType="simple" Name="BoostMode" OptimizationCondition="equal"/-->
+                <Argument AddressOf="false" GenericType="simple" Name="OversamplingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="struct" Name="Oversampling" TypeName="ADC_OversamplingTypeDef">
+                    <Argument AddressOf="false" GenericType="simple" Name="Ratio" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="RightBitShift" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="TriggeredMode" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="OversamplingStopReset" OptimizationCondition="equal"/>
+                </Argument>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="struct" Name="InjectionConfig" TypeName="ADC_InjectionConfigTypeDef">
+                <Argument AddressOf="false" GenericType="enum" Name="ContextQueue" TypeName="HAL_ADCEx_InjectedConfigChannel()"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ChannelCount" OptimizationCondition="equal"/>
+            </Argument>
+        </Argument>
+        <Argument AddressOf="true" GenericType="struct" Name="sConfig" TypeName="ADC_ChannelConfTypeDef">
+            <Argument AddressOf="false" GenericType="simple" Name="Channel" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Rank" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SamplingTime" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SingleDiff" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="OffsetNumber" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Offset" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="OffsetRightShift" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="OffsetSignedSaturation" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="OffsetSign" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="OffsetSaturation" OptimizationCondition="equal"/>
+
+
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_ADC_AnalogWDGConfig"  >
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hadc" TypeName="ADC_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="ADC_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="ADC_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Resolution" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DataAlign" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ScanConvMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="EOCSelection" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="enum" Name="LowPowerAutoWait" TypeName="HAL_ADCEx_InjectedGetValue()"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ContinuousConvMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NbrOfConversion" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DiscontinuousConvMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="NbrOfDiscConversion" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConv" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ExternalTrigConvEdge" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DMAContinuousRequests" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SamplingMode" OptimizationCondition="equal"/>
+
+                <Argument AddressOf="false" GenericType="simple" Name="ConversionDataManagement" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Overrun" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="LeftBitShift" OptimizationCondition="equal"/>
+                <!--Argument AddressOf="false" GenericType="simple" Name="BoostMode" OptimizationCondition="equal"/-->
+                <Argument AddressOf="false" GenericType="simple" Name="OversamplingMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="struct" Name="Oversampling" TypeName="ADC_OversamplingTypeDef">
+                    <Argument AddressOf="false" GenericType="simple" Name="Ratio" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="RightBitShift" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="TriggeredMode" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="OversamplingStopReset" OptimizationCondition="equal"/>
+                </Argument>
+            </Argument>
+            <Argument AddressOf="true" GenericType="simple" Name="DMA_Handle" OptimizationCondition="equal" TypeName="DMA_HandleTypeDef"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lock" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="struct" Name="InjectionConfig" TypeName="ADC_InjectionConfigTypeDef">
+                <Argument AddressOf="false" GenericType="enum" Name="ContextQueue" TypeName="HAL_ADCEx_InjectedConfigChannel()"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ChannelCount" OptimizationCondition="equal"/>
+            </Argument>
+        </Argument>
+        <Argument AddressOf="true" GenericType="struct" Name="AnalogWDGConfig" TypeName="ADC_AnalogWDGConfTypeDef">
+            <Argument AddressOf="false" GenericType="simple" Name="WatchdogNumber" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="WatchdogMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Channel" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ITMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="HighThreshold" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="LowThreshold" OptimizationCondition="equal"/>  
+            <Argument AddressOf="false" GenericType="simple" Name="LowThreshold" OptimizationCondition="equal"/>      
+            <Argument AddressOf="false" GenericType="simple" Name="FilteringConfig" OptimizationCondition="equal"/>
+
+        </Argument>
+    </LibMethod>
+  
+
+
+    
+    <RefComponent Cclass="HAL" Cgroup="ADC" Cversion="0.1.0">
+        <File Category="header" Name="Drivers/STM32H5xx_HAL_Driver/Inc/stm32h5xx_hal_adc.h"/>
+        <File Category="header" Name="Drivers/STM32H5xx_HAL_Driver/Inc/stm32h5xx_hal_adc_ex.h"/>
+        <File Category="header" Name="Drivers/STM32H5xx_HAL_Driver/Inc/stm32h5xx_ll_adc.h"/>        
+        <File Category="source" Name="Drivers/STM32H5xx_HAL_Driver/Src/stm32h5xx_hal_adc.c"/>
+        <File Category="source" Name="Drivers/STM32H5xx_HAL_Driver/Src/stm32h5xx_hal_adc_ex.c"/>
+    </RefComponent>
+</IP>

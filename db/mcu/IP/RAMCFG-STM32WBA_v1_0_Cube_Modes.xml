@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" 
+    ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
+    xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+    DBVersion="V4.0"
+    IPType="service"
+    IpGroup="System Core"
+    Name="RAMCFG"
+    Version="STM32WBA_v1_0_Cube">
+    
+    
+    <About>RAMCFG: RAMs configuration controller</About>
+    
+    <RefParameter Comment="Instance" DefaultValue="RAMCFG" Name="Instance" Type="" Visible="false"/>
+   
+    <!-- Read Access Latency (Wait State)-->
+    <RefParameter Comment="Wait State" DefaultValue="WS_DISABLE" Name="WaitState" Type="list">
+        <PossibleValue Comment="Disable" Value="WS_DISABLE"/>
+        <PossibleValue Comment="0" Value="RAMCFG_WAITSTATE_0"/>
+        <PossibleValue Comment="1" Value="RAMCFG_WAITSTATE_1"/>
+        <PossibleValue Comment="2" Value="RAMCFG_WAITSTATE_2"/>
+        <PossibleValue Comment="3" Value="RAMCFG_WAITSTATE_3"/>
+        <PossibleValue Comment="4" Value="RAMCFG_WAITSTATE_4"/>
+        <PossibleValue Comment="5" Value="RAMCFG_WAITSTATE_5"/>
+        <PossibleValue Comment="6" Value="RAMCFG_WAITSTATE_6"/>
+        <PossibleValue Comment="7" Value="RAMCFG_WAITSTATE_7"/>
+    </RefParameter>
+     
+    <!-- Software Erase -->
+    <RefParameter Comment="Hardware Erase" DefaultValue="HE_DISABLE" Name="HardwareErase" Type="list">
+        <PossibleValue Comment="Disable" Value="HE_DISABLE"/>
+        <PossibleValue Comment="Enable" Value="HE_ENABLE"/>
+    </RefParameter>  
+    
+    <!-- RefMode RAMCFG SRAM1 -->
+    <RefMode BaseMode="RAMCFG SRAM1" Group="SRAM1" Name="RAMCFG1_Activate">
+        <ConfigForMode>Ramcfg1_Init</ConfigForMode>
+        <Parameter Name="Instance">
+            <PossibleValue>RAMCFG_SRAM1</PossibleValue>
+	</Parameter>
+        <Parameter Name="HardwareErase"/>
+        <Parameter Name="WaitState"/>	
+    </RefMode>
+    
+    <!-- RefMode RAMCFG SRAM2 -->
+    <RefMode BaseMode="RAMCFG SRAM2" Group="SRAM2" Name="RAMCFG2_Activate">
+        <ConfigForMode>Ramcfg2_Init</ConfigForMode>
+        <Parameter Name="Instance">
+            <PossibleValue>RAMCFG_SRAM2</PossibleValue>
+	</Parameter>
+        <Parameter Name="HardwareErase"/>
+        <Parameter Name="WaitState"/>	
+    </RefMode>
+    
+    <!-- RefMode RAMCFG SRAM3 -->
+    <RefMode BaseMode="RAMCFG SRAM6" Group="SRAM6" Name="RAMCFG6_Activate">
+        <ConfigForMode>Ramcfg6_Init</ConfigForMode>
+        <Parameter Name="Instance">
+            <PossibleValue>RAMCFG_SRAM6</PossibleValue>
+	</Parameter>
+    </RefMode>
+    
+    <!-- ModeLogicOperator for RAMCFG -->
+    <ModeLogicOperator Name="OR">
+      <Mode Name="RAMCFG1_Activate" UserName="RAMCFG SRAM1">
+        <ModeLogicOperator Name="XOR">
+          <Mode Name="RAMCFG1_Activate" UserName="Activated">
+            <SignalLogicalOp Name="AND">
+              <Signal Name="VS_RAMCFG1"/>
+            </SignalLogicalOp>
+          <Semaphore>S_RAMCFG1</Semaphore>
+          </Mode>
+        </ModeLogicOperator>
+      </Mode>
+                    
+      <Mode Name="RAMCFG2_Activate" UserName="RAMCFG SRAM2">
+        <ModeLogicOperator Name="XOR">
+          <Mode Name="RAMCFG2_Activate" UserName="Activated">
+            <SignalLogicalOp Name="AND">
+              <Signal Name="VS_RAMCFG2"/>
+            </SignalLogicalOp>
+          </Mode>
+        </ModeLogicOperator>
+      </Mode>
+                                        
+      <Mode Name="RAMCFG6_Activate" UserName="2.4 GHz RADIO SRAMs (SRAM6)">
+        <ModeLogicOperator Name="XOR">
+          <Mode Name="RAMCFG6_Activate" UserName="Activated">
+            <SignalLogicalOp Name="AND">
+              <Signal Name="VS_RAMCFG6"/>
+            </SignalLogicalOp>
+          </Mode>
+        </ModeLogicOperator>
+      </Mode>
+    </ModeLogicOperator>
+	
+        <!-- RefSignal for RAMCFG -->
+        <RefSignal Name="VS_RAMCFG1" Virtual="true"/>
+        <RefSignal Name="VS_RAMCFG2" Virtual="true"/>
+        <RefSignal Name="VS_RAMCFG6" Virtual="true"/>
+        
+        <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+</IP>

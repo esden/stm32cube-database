@@ -1,0 +1,548 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu"
+    xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+    ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd"
+    CodeTemplate="usbpd_c_stm32h5.ftl;usbpd_h_stm32h5.ftl"
+    DBVersion="V4.0"
+    IncludeFile="usbpd_core.h,usbpd_dpm_core.h,usbpd_hw_if.h"
+    Name="USBPD"
+    RootFolder="Middlewares/ST/STM32_USBPD_Library/"
+    Version="STM32Cube_FW_H5_v1.0.0">
+    <RefConfig Name="USBPD_Init_PDO">
+        <ConfigFile Name="USBPD_PDO_DEFS"/>
+    </RefConfig>
+
+    <RefConfig Name="USBPD_Init">
+        <IFCondition Expression="SEMThreadXCcRTOSJjThreadXJjCore &amp; (!S_SECURE | SEM_M33NS)"><!-- this function is called only for THREADX -->
+             <CallLibMethod Name="USBPD_PreInitOs" Phase="preOS"/>
+        </IFCondition>
+
+        <Component Name="Middleware:USBPD_Core"/>
+        <ConfigFile Name="USBPD_DPM_CONF"/>
+        <ConfigFile Name="USBPD_DPM_USER_H"/>
+        <ConfigFile Name="USBPD_DPM_USER_C"/>
+        <ConfigFile Name="USBPD_DPM_CORE_H"/>
+        <ConfigFile Name="USBPD_DPM_CORE_C"/>
+        <ConfigFile Name="USBPD_VDM_USER_H"/>
+        <ConfigFile Name="USBPD_VDM_USER_C"/>
+        <ConfigFile Name="USBPD_OS_PORT_H"/>
+
+        <Component Name="Middleware:USBPD_Device"/>
+        <ConfigFile Name="USBPD_PDO_DEFS"/>
+        <ConfigFile Name="USBPD_PWR_IF_H"/>
+        <ConfigFile Name="USBPD_PWR_IF_C"/>
+        <ConfigFile Name="USBPD_PWR_USER_H"/>
+        <ConfigFile Name="USBPD_PWR_USER_C"/>
+        <ConfigFile Name="USBPD_DEVICES_CONF"/>
+
+        <!-- USB-USBPD Cohabitation -->
+        <ConfigFile Name="USBPD_USB_IF_H"/>
+        <ConfigFile Name="USBPD_USB_IF_C"/>
+
+        <Defines Name="USBPD_PORT_COUNT" Value="$USBPD_NbPorts"/>
+        <Defines Name="_RTOS" Value="" Condition="S_FREERTOS &amp; SEM_M33NS"/>
+        <Defines Name="USBPD_THREADX" Value="" Condition="SEMThreadXCcRTOSJjThreadXJjCore &amp; (!S_SECURE | SEM_M33NS)"/>
+        <Defines Name="_DRP" Value="" Condition="DualRoleUCPD1 | DualRoleUCPD2 | (SourceUCPD1 &amp; SinkUCPD2) | (SourceUCPD2 &amp; SinkUCPD1)"/>
+        <Defines Name="_SRC" Value="" Condition="(SourceUCPD1 &amp; !(SinkUCPD2 | DualRoleUCPD2)) | (SourceUCPD2 &amp; !(SinkUCPD1 | DualRoleUCPD1))"/>
+        <Defines Name="_SNK" Value="" Condition="(SinkUCPD1 &amp; !(SourceUCPD2 | DualRoleUCPD2)) | (SinkUCPD2 &amp; !(SourceUCPD1 | DualRoleUCPD1))"/>
+        <Defines Name="_TRACE" Value="" Condition="USBPD_TRACEREMB"/>
+        <Defines Name="_GUI_INTERFACE" Value="" Condition="GUI_INTERFACE"/>
+
+        <Defines Name="USBPDCORE_LIB_PD3_FULL" Value="" Condition="USBPD_PD3FULL"/>
+        <Defines Name="USBPDCORE_LIB_PD3_CONFIG_1" Value="" Condition="USBPD_PD3CFG1"/>
+        <Defines Name="USBPDCORE_LIB_PD3_CONFIG_MINSRC" Value="" Condition="USBPD_PD3MINSRC"/>
+        <Defines Name="USBPDCORE_LIB_PD3_CONFIG_MINSNK" Value="" Condition="USBPD_PD3MINSNK"/>
+        <Defines Name="USBPDCORE_LIB_PD3_CONFIG_MINDRP" Value="" Condition="USBPD_PD3MINDRP"/>
+        <Defines Name="USBPDCORE_LIB_NO_PD" Value="" Condition="USBPD_PD3TYPEC"/>
+
+    </RefConfig>
+
+    <RefComponent Cclass="Middleware" Cgroup="USBPD_Core" Cversion="4.1.0">
+        <!-- USB Power Delivery - Core -->
+        <File Category="header" Name="Core/inc/usbpd_core.h"/>
+        <File Category="header" Name="Core/inc/usbpd_def.h"/>
+        <File Category="header" Name="Core/inc/usbpd_tcpm.h"/>
+        <File Category="header" Name="Core/inc/usbpd_trace.h"/>
+
+        <File Category="source" Name="Core/src/usbpd_trace.c"/>
+
+        <!-- Libraries -->
+        <File Category="library" Condition="GCCUSBPD_PD3FULL;SIiTcompilerIiGCC &amp; USBPD_PD3FULL" Name="Core/lib/USBPDCORE_PD3_FULL_CM33_wc32.a" Version=""/>
+        <File Category="library" Condition="IAR832USBPD_PD3FULL;SIiTideIiEWARMOoV8Gg32 &amp; USBPD_PD3FULL" Name="Core/lib/USBPDCORE_PD3_FULL_CM33_wc32.a" Version=""/>
+        <File Category="library" Condition="IAR850USBPD_PD3FULL;SIiTideIiEWARMOoV8Gg50 &amp; USBPD_PD3FULL" Name="Core/lib/USBPDCORE_PD3_FULL_CM33_wc32.a" Version=""/>
+        <File Category="library" Condition="IAR920USBPD_PD3FULL;SIiTideIiEWARMOoV9Gg20 &amp; USBPD_PD3FULL" Name="Core/lib/USBPDCORE_PD3_FULL_CM33_wc32.a" Version=""/>
+        <File Category="library" Condition="KEIL6USBPD_PD3FULL;SIiTideIiMDKAaARMOoV6 &amp; USBPD_PD3FULL" Name="Core/lib/USBPDCORE_PD3_FULL_CM33_wc32.a" Version=""/>
+        <File Category="library" Condition="KEIL5USBPD_PD3FULL;(SIiTideIiMDKAaARMOoV5 | SIiTideIiMDKAaARMOoV5Gg27 | SIiTideIiMDKAaARMOoV5Gg32 | SIiTideIiMDKAaARMOoV5Gg37) &amp; USBPD_PD3FULL" Name="Core/lib/USBPDCORE_PD3_FULL_CM33_Keil.lib" Version=""/>
+
+        <File Category="library" Condition="GCCUSBPD_PD3CFG1;SIiTcompilerIiGCC &amp; USBPD_PD3CFG1" Name="Core/lib/USBPDCORE_PD3_CONFIG_1_CM33_wc32.a" Version=""/>
+        <File Category="library" Condition="IAR832USBPD_PD3CFG1;SIiTideIiEWARMOoV8Gg32 &amp; USBPD_PD3CFG1" Name="Core/lib/USBPDCORE_PD3_CONFIG_1_CM33_wc32.a" Version=""/>
+        <File Category="library" Condition="IAR850USBPD_PD3CFG1;SIiTideIiEWARMOoV8Gg50 &amp; USBPD_PD3CFG1" Name="Core/lib/USBPDCORE_PD3_CONFIG_1_CM33_wc32.a" Version=""/>
+        <File Category="library" Condition="IAR920USBPD_PD3CFG1;SIiTideIiEWARMOoV9Gg20 &amp; USBPD_PD3CFG1" Name="Core/lib/USBPDCORE_PD3_CONFIG_1_CM33_wc32.a" Version=""/>
+        <File Category="library" Condition="KEIL6USBPD_PD3CFG1;SIiTideIiMDKAaARMOoV6 &amp; USBPD_PD3CFG1" Name="Core/lib/USBPDCORE_PD3_CONFIG_1_CM33_wc32.a" Version=""/>
+        <File Category="library" Condition="KEIL5USBPD_PD3CFG1;(SIiTideIiMDKAaARMOoV5 | SIiTideIiMDKAaARMOoV5Gg27 | SIiTideIiMDKAaARMOoV5Gg32 | SIiTideIiMDKAaARMOoV5Gg37) &amp; USBPD_PD3CFG1" Name="Core/lib/USBPDCORE_PD3_CONFIG_1_CM33_Keil.lib" Version=""/>
+
+        <File Category="library" Condition="GCCUSBPD_PD3MINSRC;SIiTcompilerIiGCC &amp; USBPD_PD3MINSRC" Name="Core/lib/USBPDCORE_PD3_CONFIG_MINSRC_CM33_wc32.a" Version=""/>
+        <File Category="library" Condition="IAR832USBPD_PD3MINSRC;SIiTideIiEWARMOoV8Gg32 &amp; USBPD_PD3MINSRC" Name="Core/lib/USBPDCORE_PD3_CONFIG_MINSRC_CM33_wc32.a" Version=""/>
+        <File Category="library" Condition="IAR850USBPD_PD3MINSRC;SIiTideIiEWARMOoV8Gg50 &amp; USBPD_PD3MINSRC" Name="Core/lib/USBPDCORE_PD3_CONFIG_MINSRC_CM33_wc32.a" Version=""/>
+        <File Category="library" Condition="IAR920USBPD_PD3MINSRC;SIiTideIiEWARMOoV9Gg20 &amp; USBPD_PD3MINSRC" Name="Core/lib/USBPDCORE_PD3_CONFIG_MINSRC_CM33_wc32.a" Version=""/>
+        <File Category="library" Condition="KEIL6USBPD_PD3MINSRC;SIiTideIiMDKAaARMOoV6 &amp; USBPD_PD3MINSRC" Name="Core/lib/USBPDCORE_PD3_CONFIG_MINSRC_CM33_wc32.a" Version=""/>
+        <File Category="library" Condition="KEIL5USBPD_PD3MINSRC;(SIiTideIiMDKAaARMOoV5 | SIiTideIiMDKAaARMOoV5Gg27 | SIiTideIiMDKAaARMOoV5Gg32 | SIiTideIiMDKAaARMOoV5Gg37) &amp; USBPD_PD3MINSRC" Name="Core/lib/USBPDCORE_PD3_CONFIG_MINSRC_CM33_Keil.lib" Version=""/>
+
+        <File Category="library" Condition="GCCUSBPD_PD3MINSNK;SIiTcompilerIiGCC &amp; USBPD_PD3MINSNK" Name="Core/lib/USBPDCORE_PD3_CONFIG_MINSNK_CM33_wc32.a" Version=""/>
+        <File Category="library" Condition="IAR832USBPD_PD3MINSNK;SIiTideIiEWARMOoV8Gg32 &amp; USBPD_PD3MINSNK" Name="Core/lib/USBPDCORE_PD3_CONFIG_MINSNK_CM33_wc32.a" Version=""/>
+        <File Category="library" Condition="IAR850USBPD_PD3MINSNK;SIiTideIiEWARMOoV8Gg50 &amp; USBPD_PD3MINSNK" Name="Core/lib/USBPDCORE_PD3_CONFIG_MINSNK_CM33_wc32.a" Version=""/>
+        <File Category="library" Condition="IAR920USBPD_PD3MINSNK;SIiTideIiEWARMOoV9Gg20 &amp; USBPD_PD3MINSNK" Name="Core/lib/USBPDCORE_PD3_CONFIG_MINSNK_CM33_wc32.a" Version=""/>
+        <File Category="library" Condition="KEIL6USBPD_PD3MINSNK;SIiTideIiMDKAaARMOoV6 &amp; USBPD_PD3MINSNK" Name="Core/lib/USBPDCORE_PD3_CONFIG_MINSNK_CM33_wc32.a" Version=""/>
+        <File Category="library" Condition="KEIL5USBPD_PD3MINSNK;(SIiTideIiMDKAaARMOoV5 | SIiTideIiMDKAaARMOoV5Gg27 | SIiTideIiMDKAaARMOoV5Gg32 | SIiTideIiMDKAaARMOoV5Gg37) &amp; USBPD_PD3MINSNK" Name="Core/lib/USBPDCORE_PD3_CONFIG_MINSNK_CM33_Keil.lib" Version=""/>
+
+        <File Category="library" Condition="GCCUSBPD_PD3MINDRP;SIiTcompilerIiGCC &amp; USBPD_PD3MINDRP" Name="Core/lib/USBPDCORE_PD3_CONFIG_MINDRP_CM33_wc32.a" Version=""/>
+        <File Category="library" Condition="IAR832USBPD_PD3MINDRP;SIiTideIiEWARMOoV8Gg32 &amp; USBPD_PD3MINDRP" Name="Core/lib/USBPDCORE_PD3_CONFIG_MINDRP_CM33_wc32.a" Version=""/>
+        <File Category="library" Condition="IAR850USBPD_PD3MINDRP;SIiTideIiEWARMOoV8Gg50 &amp; USBPD_PD3MINDRP" Name="Core/lib/USBPDCORE_PD3_CONFIG_MINDRP_CM33_wc32.a" Version=""/>
+        <File Category="library" Condition="IAR920USBPD_PD3MINDRP;SIiTideIiEWARMOoV9Gg20 &amp; USBPD_PD3MINDRP" Name="Core/lib/USBPDCORE_PD3_CONFIG_MINDRP_CM33_wc32.a" Version=""/>
+        <File Category="library" Condition="KEIL6USBPD_PD3MINDRP;SIiTideIiMDKAaARMOoV6 &amp; USBPD_PD3MINDRP" Name="Core/lib/USBPDCORE_PD3_CONFIG_MINDRP_CM33_wc32.a" Version=""/>
+        <File Category="library" Condition="KEIL5USBPD_PD3MINDRP;(SIiTideIiMDKAaARMOoV5 | SIiTideIiMDKAaARMOoV5Gg27 | SIiTideIiMDKAaARMOoV5Gg32 | SIiTideIiMDKAaARMOoV5Gg37) &amp; USBPD_PD3MINDRP" Name="Core/lib/USBPDCORE_PD3_CONFIG_MINDRP_CM33_Keil.lib" Version=""/>
+
+        <File Category="library" Condition="GCCUSBPD_PD3TYPEC;SIiTcompilerIiGCC &amp; USBPD_PD3TYPEC" Name="Core/lib/USBPDCORE_NOPD_CM33_wc32.a" Version=""/>
+        <File Category="library" Condition="IAR832USBPD_PD3TYPEC;SIiTideIiEWARMOoV8Gg32 &amp; USBPD_PD3TYPEC" Name="Core/lib/USBPDCORE_NOPD_CM33_wc32.a" Version=""/>
+        <File Category="library" Condition="IAR850USBPD_PD3TYPEC;SIiTideIiEWARMOoV8Gg50 &amp; USBPD_PD3TYPEC" Name="Core/lib/USBPDCORE_NOPD_CM33_wc32.a" Version=""/>
+        <File Category="library" Condition="IAR920USBPD_PD3TYPEC;SIiTideIiEWARMOoV9Gg20 &amp; USBPD_PD3TYPEC" Name="Core/lib/USBPDCORE_NOPD_CM33_wc32.a" Version=""/>
+        <File Category="library" Condition="KEIL6USBPD_PD3TYPEC;SIiTideIiMDKAaARMOoV6 &amp; USBPD_PD3TYPEC" Name="Core/lib/USBPDCORE_NOPD_CM33_wc32.a" Version=""/>
+        <File Category="library" Condition="KEIL5USBPD_PD3TYPEC;(SIiTideIiMDKAaARMOoV5 | SIiTideIiMDKAaARMOoV5Gg27 | SIiTideIiMDKAaARMOoV5Gg32 | SIiTideIiMDKAaARMOoV5Gg37) &amp; USBPD_PD3TYPEC" Name="Core/lib/USBPDCORE_NOPD_CM33_Keil.lib" Version=""/>
+
+    </RefComponent>
+
+    <RefComponent Cclass="Middleware" Cgroup="USBPD_Device" Cversion="1.0.0">
+        <!-- USB Power Delivery - Devices -->
+        <File Category="header" Name="Devices/STM32H5XX/inc/usbpd_cad_hw_if.h"/>
+        <File Category="header" Name="Devices/STM32H5XX/inc/usbpd_hw.h"/>
+        <File Category="header" Name="Devices/STM32H5XX/inc/usbpd_hw_if.h"/>
+        <File Category="header" Condition="USBPD_TYPECONLY;!USBPD_TYPECONLY" Name="Devices/STM32H5XX/inc/usbpd_phy.h"/>
+        <File Category="header" Condition="USBPD_TYPECONLY;!USBPD_TYPECONLY" Name="Devices/STM32H5XX/inc/usbpd_timersserver.h"/>
+
+        <File Category="source" Name="Devices/STM32H5XX/src/usbpd_cad_hw_if.c"/>
+        <File Category="source" Name="Devices/STM32H5XX/src/usbpd_hw.c"/>
+        <File Category="source" Name="Devices/STM32H5XX/src/usbpd_hw_if_it.c"/>
+        <File Category="source" Condition="USBPD_TYPECONLY;!USBPD_TYPECONLY" Name="Devices/STM32H5XX/src/usbpd_phy.c"/>
+        <File Category="source" Name="Devices/STM32H5XX/src/usbpd_phy_hw_if.c"/>
+        <File Category="source" Name="Devices/STM32H5XX/src/usbpd_pwr_hw_if.c"/>
+        <File Category="source" Condition="USBPD_TYPECONLY;!USBPD_TYPECONLY" Name="Devices/STM32H5XX/src/usbpd_timersserver.c"/>
+
+        <!-- TIM requested by usbpd_timersserver -->
+        <File Category="header" Name="../../../Drivers/STM32H5xx_HAL_Driver/Inc/stm32h5xx_ll_tim.h"/>
+        <File Category="source" Name="../../../Drivers/STM32H5xx_HAL_Driver/Src/stm32h5xx_ll_tim.c"/>
+
+    </RefComponent>
+
+    <RefConfigFile Description="Definitions for the header file usbpd_dpm_conf.h" Name="USBPD_DPM_CONF" Template="usbpd_dpm_conf_h5.ftl" destinationFolder="USBPD/Target">
+        <File Name="Target/usbpd_dpm_conf.h" Category="header" Condition="all" Version="4.1.0"/>
+        <!--  Common -->
+        <Argument Name="USBPD_CoreLib" GenericType="simple" Comment="the USBPD core library"/>
+        <Argument Name="DRP" GenericType="simple" Comment=""/>
+        <Argument Name="SRC" GenericType="simple" Comment=""/>
+        <Argument Name="SNK" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_NbPorts" GenericType="simple" Comment="The number of the USBPD ports"/>
+        <Argument Name="USBPD_VID" GenericType="simple" Comment="This is the Vendor ID"/>
+        <Argument Name="USBPD_PID" GenericType="simple" Comment="This is the Product ID"/>
+        <Argument Name="USBPD_XID" GenericType="simple" Comment="Value provided by the USB-IF assigned to the product"/>
+        <Argument Name="GUI_V1_8_0_OR_NEWER" GenericType="simple" Comment="GUI Version embedded in FW package"/>
+        <!-- Instance 0 -->
+        <Argument Name="PE_SupportedSOP_P0" GenericType="simple" Comment="Port 0 SOP support"/>
+        <Argument Name="PE_SupportedSOPapos_P0" GenericType="simple" Comment="Port 0 SOP' support"/>
+        <Argument Name="PE_SupportedSOPquot_P0" GenericType="simple" Comment="Port 0 SOP&quot; support"/>
+        <Argument Name="PE_SupportedSOPaposDBG_P0" GenericType="simple" Comment="Port 0 SOP' debug support"/>
+        <Argument Name="PE_SupportedSOPquotDBG_P0" GenericType="simple" Comment="Port 0 SOP&quot; debug support"/>
+        <Argument Name="PE_SpecRevision_P0" GenericType="simple" Comment="Port 0 Specification revision value"/>
+        <Argument Name="PE_DefaultRole_P0" GenericType="simple" Comment="Port 0 Default port role"/>
+        <Argument Name="PE_RoleSwap_P0" GenericType="simple" Comment="Port 0 Port role swap"/>
+        <Argument Name="PE_DataSwap_P0" GenericType="simple" Comment="Port 0 Data Swap support"/>
+        <Argument Name="PE_DR_Swap_To_DFP_P0" GenericType="simple" Comment="Port 0 Data Swap to DFP support"/>
+        <Argument Name="PE_DR_Swap_To_UFP_P0" GenericType="simple" Comment="Port 0 Data Swap to UFP support"/>
+        <Argument Name="PE_VconnSwap_P0" GenericType="simple" Comment="Port 0 Vconn Swap support"/>
+        <Argument Name="PE_VDMSupport_P0" GenericType="simple" Comment="Port 0 Vendor defined messages"/>
+        <Argument Name="PE_RespondsToDiscovSOP_P0" GenericType="simple" Comment="Port 0 Can respond successfully to a Discover Identity"/>
+        <Argument Name="PE_AttemptsDiscovSOP_P0" GenericType="simple" Comment="Port 0 Can send a Discover Identits"/>
+        <Argument Name="PE_PingSupport_P0" GenericType="simple" Comment="Port 0 Ping"/>
+        <Argument Name="PE_UnchunkSupport_P0" GenericType="simple" Comment="Port 0 Unchunk mode"/>
+        <Argument Name="PE_CapscounterSupport_P0" GenericType="simple" Comment="Port 0 Caps counter"/>
+        <Argument Name="PE_FastRoleSwapSupport_P0" GenericType="simple" Comment="Port 0 Fast role swap"/>
+        <Argument Name="CAD_RoleToggle_P0" GenericType="simple" Comment="Port 0 CAD role toggle"/>
+        <Argument Name="CAD_DefaultResistor_P0" GenericType="simple" Comment="Port 0 CAD default resistor"/>
+        <Argument Name="CAD_TryFeature_P0" GenericType="simple" Comment="Port 0 CAD try feature"/>
+        <Argument Name="CAD_AccesorySupport_P0" GenericType="simple" Comment="Port 0 CAD accessory support"/>
+        <Argument Name="Is_GetPPSStatus_Supported_P0" GenericType="simple" Comment="Port 0 PPS message"/>
+        <Argument Name="Is_SrcCapaExt_Supported_P0" GenericType="simple" Comment="Port 0 Source Capabilities Extended message"/>
+        <Argument Name="Is_Alert_Supported_P0" GenericType="simple" Comment="Port 0 Alert message"/>
+        <Argument Name="Is_GetStatus_Supported_P0" GenericType="simple" Comment="Port 0 Status message"/>
+        <Argument Name="Is_GetManufacturerInfo_Supported_P0" GenericType="simple" Comment="Port 0 Manufacturer Info message"/>
+        <Argument Name="Is_GetCountryCodes_Supported_P0" GenericType="simple" Comment="Port 0 Country Codes message"/>
+        <Argument Name="Is_GetCountryInfo_Supported_P0" GenericType="simple" Comment="Port 0 Country Info message"/>
+        <Argument Name="Is_SecurityRequest_Supported_P0" GenericType="simple" Comment="Port 0 Security Response message"/>
+        <Argument Name="Is_FirmUpdateRequest_Supported_P0" GenericType="simple" Comment="Port 0 Firmware update Response message"/>
+        <Argument Name="Is_GetBattery_Supported_P0" GenericType="simple" Comment="Port 0 Get Battery Capability and Status messages"/>
+        <Argument Name="CAD_SRCToggleTime_P0" GenericType="simple" Comment="Port 0 CAD source toggle time"/>
+        <Argument Name="CAD_SNKToggleTime_P0" GenericType="simple" Comment="Port 0 CAD sink toggle time"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="Definitions for the header file usbpd_dpm_user.h" Name="USBPD_DPM_USER_H" Template="usbpd_dpm_user_h_h5.ftl" destinationFolder="USBPD/Target">
+        <File Name="Target/usbpd_dpm_user.h" Category="header" Condition="all" Version="4.1.0"/>
+        <Argument Name="USBPD_CoreLib" GenericType="simple" Comment="the USBPD core library"/>
+        <Argument Name="DRP" GenericType="simple" Comment=""/>
+        <Argument Name="SNK" GenericType="simple" Comment=""/>
+        <Argument Name="SRC" GenericType="simple" Comment=""/>
+        <Argument Name="PE_DR_Swap_To_DFP_P0" GenericType="simple" Comment="Port 0 Data Swap to DFP support"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="Definitions for the file usbpd_dpm_user.c" Name="USBPD_DPM_USER_C" Template="usbpd_dpm_user_c_h5.ftl" destinationFolder="USBPD/Target">
+        <File Name="Target/usbpd_dpm_user.c" Category="source" Condition="all" Version="4.1.0"/>
+        <Argument Name="USBPD_CoreLib" GenericType="simple" Comment="the USBPD core library"/>
+        <Argument Name="DRP" GenericType="simple" Comment=""/>
+        <Argument Name="SRC" GenericType="simple" Comment=""/>
+        <Argument Name="SNK" GenericType="simple" Comment=""/>
+        <Argument Name="PE_DR_Swap_To_DFP_P0" GenericType="simple" Comment="Port 0 Data Swap to DFP support"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="Definitions for the header file usbpd_dpm_core.h" Name="USBPD_DPM_CORE_H" Template="usbpd_dpm_core_h_h5.ftl" destinationFolder="USBPD/App">
+        <File Name="App/usbpd_dpm_core.h" Category="header" Condition="all" Version="4.1.0"/>
+        <Argument Name="USBPD_CoreLib" GenericType="simple" Comment="the USBPD core library"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="Definitions for the file usbpd_dpm_core.c" Name="USBPD_DPM_CORE_C" Template="usbpd_dpm_core_c_h5.ftl" destinationFolder="USBPD/App">
+        <File Name="App/usbpd_dpm_core.c" Category="source" Condition="all" Version="4.1.0"/>
+        <Argument Name="PE_SpecRevision_P0" GenericType="simple" Comment="Port 0 Specification revision value"/>
+        <Argument Name="USBPD_CoreLib" GenericType="simple" Comment="the USBPD core library"/>
+        <Argument Name="USBPD_StateMachine" GenericType="simple" Comment="the USBPD state machine"/>
+        <Argument Name="DRP" GenericType="simple" Comment=""/>
+        <Argument Name="SRC" GenericType="simple" Comment=""/>
+        <Argument Name="SNK" GenericType="simple" Comment=""/>
+        <Argument Name="TRACE" GenericType="simple" Comment=""/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="Definitions for the header file usbpd_vdm_user.h" Name="USBPD_VDM_USER_H" Template="usbpd_vdm_user_h_h5.ftl" destinationFolder="USBPD/Target">
+        <File Name="Target/usbpd_vdm_user.h" Category="header" Condition="USBPD_PD3FULL | USBPD_PD3CFG1" Version="4.1.0"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="Definitions for the  file usbpd_vdm_user.c" Name="USBPD_VDM_USER_C" Template="usbpd_vdm_user_c_h5.ftl" destinationFolder="USBPD/Target">
+        <File Name="Target/usbpd_vdm_user.c" Category="header" Condition="USBPD_PD3FULL | USBPD_PD3CFG1" Version="4.1.0"/>
+        <Argument Name="USBPD_NbPorts" GenericType="simple" Comment="The number of the USBPD ports"/>
+        <Argument Name="PE_SpecRevision_P0" GenericType="simple" Comment="Port 0 PD Specification"/>
+        <Argument Name="VDM_ModalOperation_P0" GenericType="simple" Comment="Port 0 VDM"/>
+        <Argument Name="VDM_bcdDevice_SOP_P0" GenericType="simple" Comment="Port 0 VDM"/>
+        <Argument Name="VDM_USBHostSupport_P0" GenericType="simple" Comment="Port 0 VDM"/>
+        <Argument Name="VDM_USBDeviceSupport_P0" GenericType="simple" Comment="Port 0 VDM"/>
+        <Argument Name="VDM_ProductTypeUFPorCP_P0" GenericType="simple" Comment="Port 0 VDM"/>
+        <Argument Name="VDM_ProductTypeDFP_P0" GenericType="simple" Comment="Port 0 VDM"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="Definitions for the header file usbpd_os_port.h" Name="USBPD_OS_PORT_H" Template="usbpd_os_port_h_h5.ftl" destinationFolder="USBPD/App">
+        <File Name="App/usbpd_os_port_mx.h" Category="header" Condition="all" Version="4.1.0"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="Definitions for the header file usbpd_pwr_user.h" Name="USBPD_PWR_USER_H" Template="usbpd_pwr_user_h_h5.ftl" destinationFolder="USBPD/Target">
+        <File Name="Target/usbpd_pwr_user.h" Category="header" Condition="all" Version="3.3.0"/>
+    </RefConfigFile>
+    <RefConfigFile Description="Definitions for the file usbpd_pwr_user.c" Name="USBPD_PWR_USER_C" Template="usbpd_pwr_user_c_h5.ftl" destinationFolder="USBPD/Target">
+        <File Name="Target/usbpd_pwr_user.c" Category="source" Condition="all" Version="3.3.0"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="Definitions for the header file usbpd_pdo_defs.h" Name="USBPD_PDO_DEFS" Template="usbpd_pdo_defs_h5.ftl" destinationFolder="USBPD/App">
+        <File Name="App/usbpd_pdo_defs.h" Category="header" Condition="all" Version="3.3.0"/>
+        <Argument Name="PORT0_NB_SOURCEPDO" GenericType="simple" Comment="Number of Source PDOs for port 0"/>
+        <Argument Name="PORT0_NB_SINKPDO" GenericType="simple" Comment="Number of Sink PDOs for port 0"/>
+        <Argument Name="USBPD_NbPorts" GenericType="simple" Comment="The number of the USBPD ports"/>
+
+        <!-- Begin of copy  -->    
+        <Argument Name="PORT0_UCPD_MODE" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_NB" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_FIXED_UNCHUNK_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_FIXED_DRD_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_FIXED_USBCOMM_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_FIXED_EXT_POWER_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_FIXED_USBSUSPEND_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_FIXED_DRP_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_TYPE_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_FIXED_SET_VOLTAGE_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_FIXED_SET_MAX_CURRENT_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_FIXED_PEAKCURRENT_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_POWER_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_VOLTAGE_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MIN_VOLTAGE_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_CURRENT_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_SET_MIN_VOLTAGE_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_VOLTAGE_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_CURRENT_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_PPS_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_PPS_PWR_LIMITED_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_TYPE_1" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_FIXED_SET_VOLTAGE_1" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_FIXED_SET_MAX_CURRENT_1" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_FIXED_PEAKCURRENT_1" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_POWER_1" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_VOLTAGE_1" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MIN_VOLTAGE_1" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_CURRENT_1" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE_1" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE_1" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_SET_MIN_VOLTAGE_1" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_VOLTAGE_1" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_CURRENT_1" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_PPS_1" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_PPS_PWR_LIMITED_1" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_TYPE_2" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_FIXED_SET_VOLTAGE_2" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_FIXED_SET_MAX_CURRENT_2" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_FIXED_PEAKCURRENT_2" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_POWER_2" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_VOLTAGE_2" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MIN_VOLTAGE_2" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_CURRENT_2" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE_2" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE_2" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_SET_MIN_VOLTAGE_2" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_VOLTAGE_2" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_CURRENT_2" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_PPS_2" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_PPS_PWR_LIMITED_2" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_TYPE_3" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_FIXED_SET_VOLTAGE_3" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_FIXED_SET_MAX_CURRENT_3" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_FIXED_PEAKCURRENT_3" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_POWER_3" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_VOLTAGE_3" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MIN_VOLTAGE_3" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_CURRENT_3" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE_3" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE_3" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_SET_MIN_VOLTAGE_3" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_VOLTAGE_3" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_CURRENT_3" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_PPS_3" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_PPS_PWR_LIMITED_3" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_TYPE_4" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_FIXED_SET_VOLTAGE_4" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_FIXED_SET_MAX_CURRENT_4" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_FIXED_PEAKCURRENT_4" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_POWER_4" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_VOLTAGE_4" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MIN_VOLTAGE_4" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_CURRENT_4" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE_4" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE_4" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_SET_MIN_VOLTAGE_4" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_VOLTAGE_4" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_CURRENT_4" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_PPS_4" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_PPS_PWR_LIMITED_4" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_TYPE_5" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_FIXED_SET_VOLTAGE_5" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_FIXED_SET_MAX_CURRENT_5" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_FIXED_PEAKCURRENT_5" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_POWER_5" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_VOLTAGE_5" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MIN_VOLTAGE_5" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_CURRENT_5" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE_5" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE_5" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_SET_MIN_VOLTAGE_5" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_VOLTAGE_5" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_CURRENT_5" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_PPS_5" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_PPS_PWR_LIMITED_5" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_TYPE_6" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_FIXED_SET_VOLTAGE_6" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_FIXED_SET_MAX_CURRENT_6" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_FIXED_PEAKCURRENT_6" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_POWER_6" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_VOLTAGE_6" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MIN_VOLTAGE_6" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_CURRENT_6" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE_6" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE_6" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_SET_MIN_VOLTAGE_6" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_VOLTAGE_6" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_CURRENT_6" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_PPS_6" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_PPS_PWR_LIMITED_6" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_TYPE_7" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_FIXED_SET_VOLTAGE_7" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_FIXED_SET_MAX_CURRENT_7" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_FIXED_PEAKCURRENT_7" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_POWER_7" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MAX_VOLTAGE_7" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_BATTERY_SET_MIN_VOLTAGE_7" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_CURRENT_7" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MAX_VOLTAGE_7" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_VARIABLE_SET_MIN_VOLTAGE_7" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_SET_MIN_VOLTAGE_7" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_VOLTAGE_7" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_SET_MAX_CURRENT_7" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_PPS_7" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SRC_APDO_PPS_PWR_LIMITED_7" GenericType="simple" Comment=""/>
+
+        <Argument Name="USBPD_PORT0_PDO_SNK_NB" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_FIXED_FRS_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_FIXED_DRD_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_FIXED_USBCOMM_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_FIXED_EXT_POWER_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_FIXED_HIGHERCAPAB_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_FIXED_DRP_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_TYPE_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_FIXED_SET_VOLTAGE_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_FIXED_SET_OP_CURRENT_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MAX_VOLTAGE_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MIN_VOLTAGE_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_OP_POWER_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_OP_CURRENT_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_APDO_PPS_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_APDO_SET_MIN_VOLTAGE_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_VOLTAGE_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_CURRENT_0" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_TYPE_1" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_FIXED_SET_VOLTAGE_1" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_FIXED_SET_OP_CURRENT_1" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MAX_VOLTAGE_1" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MIN_VOLTAGE_1" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_OP_POWER_1" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE_1" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE_1" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_OP_CURRENT_1" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_APDO_PPS_1" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_APDO_SET_MIN_VOLTAGE_1" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_VOLTAGE_1" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_CURRENT_1" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_TYPE_2" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_FIXED_SET_VOLTAGE_2" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_FIXED_SET_OP_CURRENT_2" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MAX_VOLTAGE_2" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MIN_VOLTAGE_2" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_OP_POWER_2" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE_2" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE_2" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_OP_CURRENT_2" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_APDO_PPS_2" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_APDO_SET_MIN_VOLTAGE_2" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_VOLTAGE_2" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_CURRENT_2" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_TYPE_3" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_FIXED_SET_VOLTAGE_3" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_FIXED_SET_OP_CURRENT_3" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MAX_VOLTAGE_3" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MIN_VOLTAGE_3" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_OP_POWER_3" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE_3" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE_3" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_OP_CURRENT_3" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_APDO_PPS_3" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_APDO_SET_MIN_VOLTAGE_3" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_VOLTAGE_3" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_CURRENT_3" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_TYPE_4" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_FIXED_SET_VOLTAGE_4" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_FIXED_SET_OP_CURRENT_4" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MAX_VOLTAGE_4" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MIN_VOLTAGE_4" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_OP_POWER_4" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE_4" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE_4" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_OP_CURRENT_4" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_APDO_PPS_4" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_APDO_SET_MIN_VOLTAGE_4" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_VOLTAGE_4" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_CURRENT_4" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_TYPE_5" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_FIXED_SET_VOLTAGE_5" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_FIXED_SET_OP_CURRENT_5" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MAX_VOLTAGE_5" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MIN_VOLTAGE_5" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_OP_POWER_5" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE_5" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE_5" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_OP_CURRENT_5" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_APDO_PPS_5" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_APDO_SET_MIN_VOLTAGE_5" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_VOLTAGE_5" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_CURRENT_5" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_TYPE_6" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_FIXED_SET_VOLTAGE_6" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_FIXED_SET_OP_CURRENT_6" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MAX_VOLTAGE_6" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MIN_VOLTAGE_6" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_OP_POWER_6" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE_6" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE_6" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_OP_CURRENT_6" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_APDO_PPS_6" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_APDO_SET_MIN_VOLTAGE_6" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_VOLTAGE_6" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_CURRENT_6" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_TYPE_7" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_FIXED_SET_VOLTAGE_7" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_FIXED_SET_OP_CURRENT_7" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MAX_VOLTAGE_7" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_MIN_VOLTAGE_7" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_BATTERY_SET_OP_POWER_7" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MAX_VOLTAGE_7" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_MIN_VOLTAGE_7" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_VARIABLE_SET_OP_CURRENT_7" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_APDO_PPS_7" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_APDO_SET_MIN_VOLTAGE_7" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_VOLTAGE_7" GenericType="simple" Comment=""/>
+        <Argument Name="USBPD_PORT0_PDO_SNK_APDO_SET_MAX_CURRENT_7" GenericType="simple" Comment=""/>
+        <!-- End of copy -->
+    </RefConfigFile>
+
+    <RefConfigFile Description="Definitions for the header file usbpd_pwr_if.h" Name="USBPD_PWR_IF_H" Template="usbpd_pwr_if_h_h5.ftl" destinationFolder="USBPD/App">
+        <File Name="App/usbpd_pwr_if.h" Category="header" Condition="all" Version="3.3.0"/>
+        <Argument Name="DRP" GenericType="simple" Comment=""/>
+        <Argument Name="SRC" GenericType="simple" Comment=""/>
+        <Argument Name="SNK" GenericType="simple" Comment=""/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="Definitions for the file usbpd_pwr_if.c" Name="USBPD_PWR_IF_C" Template="usbpd_pwr_if_c_h5.ftl" destinationFolder="USBPD/App">
+        <File Name="App/usbpd_pwr_if.c" Category="source" Condition="all" Version="3.3.0"/>
+        <Argument Name="USBPD_NbPorts" GenericType="simple" Comment="The number of the USBPD ports"/>
+        <Argument Name="USBPD_CoreLib" GenericType="simple" Comment="the USBPD core library"/>
+        <Argument Name="DRP" GenericType="simple" Comment=""/>
+        <Argument Name="SRC" GenericType="simple" Comment=""/>
+        <Argument Name="SNK" GenericType="simple" Comment=""/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="Definitions for the header file usbpd_devices_conf.h" Name="USBPD_DEVICES_CONF" Template="usbpd_devices_conf_h5.ftl" destinationFolder="USBPD/Target">
+        <File Name="Target/usbpd_devices_conf.h" Category="header" Condition="all" Version="3.3.0"/>
+        <Argument Name="USBPD_CoreLib" GenericType="simple" Comment="the USBPD core library"/>
+
+        <Argument Name="USBPD_PORT0" GenericType="simple" Comment="UCPD instance used for USBPD port 0"/>
+        <Argument Name="USBPDenableClock" GenericType="simple" Comment="USBPD DMA enable Clock"/>
+        <Argument Name="USBPD_PORT0_RX_DMA_CHANNEL" GenericType="simple" Comment="DMA Request RX for USB Port 0"/>
+        <Argument Name="USBPD_PORT0_TX_DMA_CHANNEL" GenericType="simple" Comment="DMA Request TX for USB Port 0"/>
+        <Argument Name="USBPD_PORT0_FRSTX1_PIN" GenericType="simple" Comment="FRSTX1 for USB port 0"/>
+        <Argument Name="USBPD_PORT0_FRSTX2_PIN" GenericType="simple" Comment="FRSTX2 for USB port 0"/>
+        <Argument Name="USBPD_PORT0_IRQ" GenericType="simple" Comment="External Interrupt number for USB port 0"/>
+
+        <Argument Name="TIMinstance" GenericType="simple" Comment="USBPD Timer Service Source selected"/>
+        <Argument Name="TIMinterrupt" GenericType="simple" Comment="USBPD Timer interrupt"/>
+        <Argument Name="TIMenableClock" GenericType="simple" Comment="USBPD Timer enable clock"/>
+        <Argument Name="TIMdisableClock" GenericType="simple" Comment="USBPD Timer disable clock"/>
+
+    </RefConfigFile>
+
+    <RefConfigFile Description="Definitions for the header file usbpd_usb_if.h" Name="USBPD_USB_IF_H" Template="usbpd_usb_if_h_h5.ftl" destinationFolder="USBPD/App">
+        <File Name="App/usbpd_usb_if.h" Category="header" Condition="USBPD_USB_SUPPORT" Version="4.1.0"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="Definitions for the  file usbpd_usb_if.c" Name="USBPD_USB_IF_C" Template="usbpd_usb_if_c_h5.ftl" destinationFolder="USBPD/App">
+        <File Name="App/usbpd_usb_if.c" Category="source" Condition="USBPD_USB_SUPPORT" Version="4.1.0"/>
+    </RefConfigFile>
+
+    <LibMethod Name="MX_USBPD_Init" Comment="Initialize the USBPD stack">
+        <Argument AddressOf="true" Context="local" GenericType="simple" Name="memory_pool" TypeName="uint32_t"/>
+    </LibMethod>
+    <LibMethod Name="USBPD_DPM_Init" Comment="USBPD DPM initialization">
+        <!--Argument Name="" GenericType=""/-->
+    </LibMethod>
+    <LibMethod Name="USBPD_PreInitOs" Comment="Global PreInitOs"/>
+
+</IP>

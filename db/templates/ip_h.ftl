@@ -55,9 +55,14 @@ extern ${variable.value} ${variable.name};
 
 [/#list]
 [/#if]
-[#if name=="TAMP" && !var1?contains("hrtc")]
+[#list IP.configModelList as instanceData]
+        [#assign instName = instanceData.instanceName]
+        [#assign halMode= instanceData.halMode]
+[#if instanceData.ipName?contains("TAMP") && !(instanceData.usedDriver == "LL")&& !var1?contains("hrtc")]
 extern RTC_HandleTypeDef hrtc;
 [/#if]
+[/#list]
+
 [#-- Global variables --]
 
 #n

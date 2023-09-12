@@ -1,0 +1,565 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+  <IP xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+    ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
+    xmlns="http://mcd.rou.st.com/modules.php?name=mcu"
+    DBVersion="V4.0"
+    IPType="Service"
+    IpGroup="Security"
+    Name="GTZC"
+    Version="tzsc1_v2_2_rc1_LittleMustang128K">
+  <About>GTZC : Global Trust Zone Software Controler</About>
+
+  <!-- RefParameters for GTZC -->
+  <RefParameter Name="GTZC" Type="List" Comment="" Visible="false" DefaultValue="disable">
+    <PossibleValue Value="disable" Comment="disable"/>
+  </RefParameter>
+
+  <RefParameter Name="CRS_Privilege_Status" Comment="((GTZC_S:CRS_Secure=GTZC_TZSC_PERIPH_NSEC) &amp; !($IpInstance=GTZC_S))" DefaultValue="true" Type="boolean" TabName="TrustZone Security Controller - Securable Peripherals" Visible="false">
+    <Condition Expression="((GTZC_S:CRS_Secure=GTZC_TZSC_PERIPH_NSEC) &amp; !($IpInstance=GTZC_S))" Diagnostic=""/>
+  </RefParameter>
+  <RefParameter Name="CRS_Privilege_Status" Comment="(GTZC_S:CRS_Secure=GTZC_TZSC_PERIPH_SEC) &amp; ($IpInstance=GTZC_S)" DefaultValue="true" Type="boolean" TabName="TrustZone Security Controller - Securable Peripherals" Visible="false">
+    <Condition Expression="(GTZC_S:CRS_Secure=GTZC_TZSC_PERIPH_SEC) &amp; ($IpInstance=GTZC_S)" Diagnostic=""/>
+  </RefParameter>
+  <RefParameter Name="CRS_Privilege_Status" Comment="($IpInstance=GTZC)" DefaultValue="true" Type="boolean" TabName="TrustZone Security Controller - Securable Peripherals" Visible="false">
+    <Condition Expression="($IpInstance=GTZC)" Diagnostic=""/>
+  </RefParameter>
+  <RefParameter Name="CRS_Privilege_Status" Comment="" DefaultValue="false" Type="boolean" TabName="TrustZone Security Controller - Securable Peripherals" Visible="false"/>
+  <RefParameter Name="ICACHE_Privilege_Status" Comment="((GTZC_S:ICACHE_Secure=GTZC_TZSC_PERIPH_NSEC) &amp; !($IpInstance=GTZC_S))" DefaultValue="true" Type="boolean" TabName="TrustZone Security Controller - Securable Peripherals" Visible="false">
+    <Condition Expression="((GTZC_S:ICACHE_Secure=GTZC_TZSC_PERIPH_NSEC) &amp; !($IpInstance=GTZC_S))" Diagnostic=""/>
+  </RefParameter>
+  <RefParameter Name="ICACHE_Privilege_Status" Comment="((GTZC_S:ICACHE_Secure=GTZC_TZSC_PERIPH_SEC) &amp; $IpInstance=GTZC_S)" DefaultValue="true" Type="boolean" TabName="TrustZone Security Controller - Securable Peripherals" Visible="false">
+    <Condition Expression="((GTZC_S:ICACHE_Secure=GTZC_TZSC_PERIPH_SEC) &amp; $IpInstance=GTZC_S)" Diagnostic=""/>
+  </RefParameter>
+  <RefParameter Name="ICACHE_Privilege_Status" Comment="($IpInstance=GTZC)" DefaultValue="true" Type="boolean" TabName="TrustZone Security Controller - Securable Peripherals" Visible="false">
+    <Condition Expression="($IpInstance=GTZC)" Diagnostic=""/>
+  </RefParameter>
+  <RefParameter Name="ICACHE_Privilege_Status" Comment="" DefaultValue="false" Type="boolean" TabName="TrustZone Security Controller - Securable Peripherals" Visible="false"/>
+
+
+  <!-- RefParameters for GTZC - Peripheral Privileged -->
+  <RefParameter Name="TZSC_Privilege_IP_Choice" Comment="Configure Privilege IP" DefaultValue="by Individual Privileging from full Not Privileged" Type="list" Group="Privilegeable Peripherals" TabName="TrustZone Security Controller - Privilegeable Peripherals">
+    <PossibleValue Value="by Individual Privileging from full Not Privileged" Comment="by Individual Privileging from full Not Privileged" Semaphore="S_$IpInstance_No_IP_Privileged"/>
+    <PossibleValue Value="by Individual Unprivileging from full Privileged" Comment="by Individual Unprivileging from full Privileged" Semaphore="S_$IpInstance_All_IP_Privileged"/>
+    <Description>Privilege/Unprivilege all the Peripherals in one time until individuals are modified.</Description>
+  </RefParameter>
+
+  <RefParameter Name="Privilegeable_Peripheral" Comment="Privilegeable Peripheral" DefaultValue="Privilege Attribute" Type="string" Group="Privilegeable Peripherals" TabName="TrustZone Security Controller - Privilegeable Peripherals"/>
+  <RefParameter Name="IP_Privilege" Comment="" DefaultValue="GTZC_TZSC_PERIPH_PRIV" Type="list" Group="Privilegeable Peripherals" TabName="TrustZone Security Controller - Privilegeable Peripherals">
+    <Condition Expression="S_$IpInstance_All_IP_Privileged" Diagnostic="pre-selected all Peripheral Privileged"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_PRIV" Comment="privileged"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_NPRIV" Comment="not privileged"/>
+  </RefParameter>
+  <RefParameter Name="IP_Privilege" Comment="" DefaultValue="GTZC_TZSC_PERIPH_NPRIV" Type="list" Group="Privilegeable Peripherals" TabName="TrustZone Security Controller - Privilegeable Peripherals">
+    <PossibleValue Value="GTZC_TZSC_PERIPH_NPRIV" Comment="not privileged"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_PRIV" Comment="privileged"/>
+  </RefParameter>
+  <RefParameter Name="AES_Privilege" Comment="AES" DefaultValue="GTZC_TZSC_PERIPH_PRIV" Type="list" Group="Privilegeable Peripherals" TabName="TrustZone Security Controller - Privilegeable Peripherals">
+    <Condition Expression="AES_Exist &amp; S_$IpInstance_All_IP_Privileged" Diagnostic="pre-selected all Peripheral Privileged"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_PRIV" Comment="privileged"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_NPRIV" Comment="not privileged"/>
+  </RefParameter>
+  <RefParameter Name="AES_Privilege" Comment="AES" DefaultValue="GTZC_TZSC_PERIPH_NPRIV" Type="list" Group="Privilegeable Peripherals" TabName="TrustZone Security Controller - Privilegeable Peripherals">
+    <Condition Expression="AES_Exist" Diagnostic="pre-selected no Peripheral Privileged"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_NPRIV" Comment="not privileged"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_PRIV" Comment="privileged"/>
+  </RefParameter>
+  <RefParameter Name="SAES_Privilege" Comment="SAES" DefaultValue="GTZC_TZSC_PERIPH_PRIV" Type="list" Group="Privilegeable Peripherals" TabName="TrustZone Security Controller - Privilegeable Peripherals">
+    <Condition Expression="SAES_Exist &amp; S_$IpInstance_All_IP_Privileged" Diagnostic="pre-selected all Peripheral Privileged"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_PRIV" Comment="privileged"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_NPRIV" Comment="not privileged"/>
+  </RefParameter>
+  <RefParameter Name="SAES_Privilege" Comment="SAES" DefaultValue="GTZC_TZSC_PERIPH_NPRIV" Type="list" Group="Privilegeable Peripherals" TabName="TrustZone Security Controller - Privilegeable Peripherals">
+    <Condition Expression="SAES_Exist" Diagnostic="pre-selected no Peripheral Privileged"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_NPRIV" Comment="not privileged"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_PRIV" Comment="privileged"/>
+  </RefParameter>
+  <RefParameter Name="PKA_Privilege" Comment="PKA" DefaultValue="GTZC_TZSC_PERIPH_PRIV" Type="list" Group="Privilegeable Peripherals" TabName="TrustZone Security Controller - Privilegeable Peripherals">
+    <Condition Expression="PKA_Exist &amp; S_$IpInstance_All_IP_Privileged" Diagnostic="pre-selected all Peripheral Privileged"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_PRIV" Comment="privileged"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_NPRIV" Comment="not privileged"/>
+  </RefParameter>
+  <RefParameter Name="PKA_Privilege" Comment="PKA" DefaultValue="GTZC_TZSC_PERIPH_NPRIV" Type="list" Group="Privilegeable Peripherals" TabName="TrustZone Security Controller - Privilegeable Peripherals">
+    <Condition Expression="PKA_Exist" Diagnostic="pre-selected no Peripheral Privileged"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_NPRIV" Comment="not privileged"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_PRIV" Comment="privileged"/>
+  </RefParameter>
+
+  <RefParameter Name="CRS_Privilege" Comment="CRS" DefaultValue="GTZC_TZSC_PERIPH_PRIV" Type="list" Group="Privilegeable Peripherals" TabName="TrustZone Security Controller - Privilegeable Peripherals">
+    <Condition Expression="($IpInstance=GTZC_S &amp; CRS_GTZC_SECURE) &amp; S_$IpInstance_All_IP_Privileged" Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project) and pre-selected all Peripheral Privileged"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_PRIV" Comment="privileged"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_NPRIV" Comment="not privileged"/>
+  </RefParameter>
+  <RefParameter Name="CRS_Privilege" Comment="CRS" DefaultValue="GTZC_TZSC_PERIPH_NPRIV" Type="list" Group="Privilegeable Peripherals" TabName="TrustZone Security Controller - Privilegeable Peripherals">
+    <Condition Expression="($IpInstance=GTZC_S &amp; CRS_GTZC_SECURE)" Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_NPRIV" Comment="not privileged"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_PRIV" Comment="privileged"/>
+  </RefParameter>
+  <RefParameter Name="CRS_Privilege" Comment="CRS" DefaultValue="GTZC_TZSC_PERIPH_PRIV" Type="list" Group="Privilegeable Peripherals" TabName="TrustZone Security Controller - Privilegeable Peripherals">
+    <Condition Expression="((!($IpInstance=GTZC_S)) &amp; (!CRS_GTZC_SECURE)) &amp; S_$IpInstance_All_IP_Privileged" Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project) and pre-selected all Peripheral Privileged"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_PRIV" Comment="privileged"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_NPRIV" Comment="not privileged"/>
+  </RefParameter>
+  <RefParameter Name="CRS_Privilege" Comment="CRS" DefaultValue="GTZC_TZSC_PERIPH_NPRIV" Type="list" Group="Privilegeable Peripherals" TabName="TrustZone Security Controller - Privilegeable Peripherals">
+    <Condition Expression="((!($IpInstance=GTZC_S)) &amp; (!CRS_GTZC_SECURE))" Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_NPRIV" Comment="not privileged"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_PRIV" Comment="privileged"/>
+  </RefParameter>
+  <RefParameter Name="CRS_Privilege" Comment="CRS" DefaultValue="" Type="list" Group="Privilegeable Peripherals" TabName="TrustZone Security Controller - Privilegeable Peripherals">
+  </RefParameter>
+  <RefParameter Name="ICACHE_Privilege" Comment="ICACHE" DefaultValue="GTZC_TZSC_PERIPH_PRIV" Type="list" Group="Privilegeable Peripherals" TabName="TrustZone Security Controller - Privilegeable Peripherals">
+    <Condition Expression="($IpInstance=GTZC_S &amp; ICACHE_GTZC_SECURE) &amp; S_$IpInstance_All_IP_Privileged" Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project) and pre-selected all Peripheral Privileged"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_PRIV" Comment="privileged"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_NPRIV" Comment="not privileged"/>
+  </RefParameter>
+  <RefParameter Name="ICACHE_Privilege" Comment="ICACHE" DefaultValue="GTZC_TZSC_PERIPH_NPRIV" Type="list" Group="Privilegeable Peripherals" TabName="TrustZone Security Controller - Privilegeable Peripherals">
+    <Condition Expression="($IpInstance=GTZC_S &amp; ICACHE_GTZC_SECURE)" Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_PRIV" Comment="privileged"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_NPRIV" Comment="not privileged"/>
+  </RefParameter>
+  <RefParameter Name="ICACHE_Privilege" Comment="ICACHE" DefaultValue="GTZC_TZSC_PERIPH_PRIV" Type="list" Group="Privilegeable Peripherals" TabName="TrustZone Security Controller - Privilegeable Peripherals">
+    <Condition Expression="((!($IpInstance=GTZC_S)) &amp; (!ICACHE_GTZC_SECURE)) &amp; S_$IpInstance_All_IP_Privileged" Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project) and pre-selected all Peripheral Privileged"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_PRIV" Comment="privileged"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_NPRIV" Comment="not privileged"/>
+  </RefParameter>
+  <RefParameter Name="ICACHE_Privilege" Comment="ICACHE" DefaultValue="GTZC_TZSC_PERIPH_NPRIV" Type="list" Group="Privilegeable Peripherals" TabName="TrustZone Security Controller - Privilegeable Peripherals">
+    <Condition Expression="((!($IpInstance=GTZC_S)) &amp; (!ICACHE_GTZC_SECURE))" Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_NPRIV" Comment="not privileged"/>
+    <PossibleValue Value="GTZC_TZSC_PERIPH_PRIV" Comment="privileged"/>
+  </RefParameter>
+  <RefParameter Name="ICACHE_Privilege" Comment="ICACHE" DefaultValue="" Type="list" Group="Privilegeable Peripherals" TabName="TrustZone Security Controller - Privilegeable Peripherals">
+  </RefParameter>
+
+
+  <!-- RefParameters for GTZC - MPCWM Secured -->
+  <RefParameter Name="MPCWM_GTZC_LockConfig" Comment="Lock configuration" DefaultValue="GTZC_TZSC_MPCWM_LOCK_OFF" Type="list">
+    <PossibleValue Value="GTZC_TZSC_MPCWM_LOCK_OFF" Comment="MPCWM settings are not locked"/>
+    <PossibleValue Value="GTZC_TZSC_MPCWM_LOCK_ON" Comment="MPCWM settings are locked until next reset"/>
+  </RefParameter>
+
+  <!-- RefParameters for GTZC - MPCWM4 Secured -->
+
+  <RefParameter Name="MPCWM4_Area_BKPSRAM_BASE" Comment="Area Start BKPSRAM" DefaultValue="0x50036400" Type="hex" Min="0x50036400" Max="0x50036400" Visible="false"/>
+
+  <RefParameter Name="MPCWM4_Area_Desc" Comment="Area Descriptor" DefaultValue="MPCWM4_Area_Desc" Type="string" Visible="false"/>
+  <RefParameter Name="MPCWM4_Area_Max" Comment="Area Max" DefaultValue="0x800" Type="hex" Min="0x800" Max="0x800" Visible="false"/>
+  <RefParameter Name="MPCWM4_Area_Start_Address" Comment="Area Start Address" DefaultValue="=(MPCWM4_Area_BKPSRAM_BASE)" Type="hex" Min="=(MPCWM4_Area_BKPSRAM_BASE)" Max="=(MPCWM4_Area_Max + MPCWM4_Area_BKPSRAM_BASE - MPCWM4_Area_BlockSize)"/>
+  <RefParameter Name="MPCWM4_Area_Start" Comment="Area Start Offset" DefaultValue="=(MPCWM4_Area_Start_Address - MPCWM4_Area_BKPSRAM_BASE)" Type="StringHex" Min="=(MPCWM4_Area_Start_Address - MPCWM4_Area_BKPSRAM_BASE)" Max="=(MPCWM4_Area_Start_Address - MPCWM4_Area_BKPSRAM_BASE)" NoCheckOpt="false" Visible="false"/>
+  <RefParameter Name="MPCWM4_Area_Size" Comment="Area Size" DefaultValue="0x800" Type="hex" Min="0x0" Max="=(MPCWM4_Area_Max - MPCWM4_Area_Start)">
+    <Condition Expression="S_No_MPCWM4_Secured" Diagnostic="pre-selected no MPCWM4 Secured"/>
+    <Description>0x0 : use the default HW configuration (privileged memory)</Description>
+  </RefParameter>
+  <RefParameter Name="MPCWM4_Area_Size" Comment="Area Size" DefaultValue="0x0" Type="hex" Min="0x0" Max="=(MPCWM4_Area_Max - MPCWM4_Area_Start)">
+    <Description>0x0 : use the default HW configuration (privileged memory)</Description>
+  </RefParameter>
+  <RefParameter Name="MPCWM4_Area_BlockSize" Comment="Area Block Size" DefaultValue="0x20" Type="hex" Min="0x20" Max="0x20" Visible="false"/>
+  <RefParameter Name="MPCWM4_Area_Privilege" Comment="Area Privilege Attribute" DefaultValue="privileged" Type="list">
+    <PossibleValue Value="GTZC_TZSC_MPCWM_REGION_PRIV" Comment="privileged"/>
+    <PossibleValue Value="GTZC_TZSC_MPCWM_REGION_NPRIV" Comment="not privileged"/>
+  </RefParameter>
+  <RefParameter Name="MPCWM4_Area_Attribute" Comment="Area Attributes" DefaultValue="+MPCWM4_Area_Privilege+" Type="String" Visible="false"/>
+  <RefParameter Name="MPCWM4_Area_Lock" Comment="Lock the configuration of MPCWM4 Area until next reset" DefaultValue="GTZC_TZSC_MPCWM_LOCK_OFF" Type="list">
+    <PossibleValue Value="GTZC_TZSC_MPCWM_LOCK_OFF" Comment="MPCWM4 Area is not locked"/>
+    <PossibleValue Value="GTZC_TZSC_MPCWM_LOCK_ON" Comment="MPCWM4 Area is locked"/>
+  </RefParameter>
+  <RefParameter Name="MPCWM4_Area_Status" Comment="Status of MPCWM4 Area" DefaultValue="DISABLE" Type="list">
+    <Condition Expression="MPCWM4_Area_Size=0x0" Diagnostic="MPCWM4 Area Size is 0x0"/>
+    <PossibleValue Value="DISABLE" Comment="disabled"/>
+  </RefParameter>
+  <RefParameter Name="MPCWM4_Area_Status" Comment="Status of MPCWM4 Area" DefaultValue="ENABLE" Type="list">
+    <PossibleValue Value="ENABLE" Comment="enabled"/>
+    <PossibleValue Value="DISABLE" Comment="disabled"/>
+  </RefParameter>
+
+
+  <!-- RefParameters for GTZC - MPCBB Common -->
+  <RefParameter Name="MPCBB_PrivilegeAttributeSettings" Comment="Memory Privilege Attributes Settings" DefaultValue="" Type="string" TabName="MPCBB"/>
+  <RefParameter Name="MPCBB_Area_Privilege_Choice" Comment="    Configure Memory" DefaultValue="from full Not Privileged" Type="list">
+    <Condition Expression="($IpInstance=GTZC)" Diagnostic="GTZC"/>
+    <Description>Privilege/UnPrivilege all the memory range in one time until attributes are modified.</Description>
+  </RefParameter>
+  <RefParameter Name="MPCBB_Area_Privilege_Choice" Comment="    Configure Memory" DefaultValue="from full Privileged" Type="list">
+    <Description>Privilege/UnPrivilege all the memory range in one time until attributes are modified.</Description>
+  </RefParameter>
+
+  <RefParameter Name="MPCBB_LockConfig" Comment="Attributes Lock" DefaultValue="UNLOCK" Type="list" TabName="MPCBB">
+    <PossibleValue Value="UNLOCK" Comment="MPCBB memory attribute settings are not locked"/>
+    <PossibleValue Value="LOCK" Comment="MPCBB memory attribute settings are locked until next reset"/>
+    <PossibleValue Value="USER" Comment="MPCBB memory attribute settings lock - customized configuration" />
+  </RefParameter>
+
+
+  <!-- RefParameters for GTZC - MPCBB1 Secured -->
+
+  <RefParameter Name="MPCBB1_Area_SRAM1_BASE_NS" Comment="Area Start SRAM1_BASE_NS" DefaultValue="0x20000000" Type="hex" Min="0x20000000" Max="0x20000000" Visible="false"/>
+
+  <RefParameter Name="MPCBB1_Area_Max" Comment="Area Max" DefaultValue="0x4000" Type="hex" Min="0x4000" Max="0x4000" Visible="false"/>
+  <RefParameter Name="MPCBB1_Area_Start_Address" Comment="Area Start Address" DefaultValue="=MPCBB1_Area_SRAM1_BASE_NS" Type="hex" Min="=(MPCBB1_Area_SRAM1_BASE_NS)" Max="=(MPCBB1_Area_Max + MPCBB1_Area_SRAM1_BASE_NS - MPCBB1_Area_BlockSize)" NoCheckOpt="false" Visible="false"/>
+  <RefParameter Name="MPCBB1_Area_Start" Comment="Area Start Offset" DefaultValue="=(MPCBB1_Area_Start_Address - MPCBB1_Area_SRAM1_BASE_NS)" Type="StringHex" Min="=(MPCBB1_Area_Start_Address - MPCBB1_Area_SRAM1_BASE_NS)" Max="=(MPCBB1_Area_Start_Address - MPCBB1_Area_SRAM1_BASE_NS)" NoCheckOpt="false" Visible="false"/>
+  <RefParameter Name="MPCBB1_Area_Size" Comment="Area Size" DefaultValue="0x0" Type="hex" Min="0x0" Max="=(MPCBB1_Area_Max - MPCBB1_Area_Start)" NoCheckOpt="false" Visible="false"/>
+
+  <RefParameter Name="MPCBB1_Area_BlockSize" Comment="Area Block Size" DefaultValue="0x200" Type="hex" Min="0x200" Max="0x200" Visible="false"/>
+  <RefParameter Name="MPCBB1_Area_SuperBlockSize" Comment="Area Super-Block Size" DefaultValue="0x4000" Type="hex" Min="0x4000" Max="0x4000" Visible="false"/>
+  <RefParameter Name="MPCBB1_Area_NbSuperBlock" Comment="Area Nb Super-Block Size" DefaultValue="=(MPCBB1_Area_Max / MPCBB1_Area_SuperBlockSize)" Type="integer" Min="=(MPCBB1_Area_Max / MPCBB1_Area_SuperBlockSize)" Max="=(MPCBB1_Area_Max / MPCBB1_Area_SuperBlockSize)" Visible="false"/>
+
+  <RefParameter Name="MPCBB1_Area_Privilege_Start_Address" Comment="    Area Start Address" DefaultValue="=MPCBB1_Area_Start_Address" Type="hex" Min="=(MPCBB1_Area_SRAM1_BASE_NS)" Max="=(MPCBB1_Area_Max + MPCBB1_Area_SRAM1_BASE_NS - MPCBB1_Area_BlockSize)" NoCheckOpt="false"/>
+  <RefParameter Name="MPCBB1_Area_Privilege_Start" Comment="    Area Start Offset" DefaultValue="=(MPCBB1_Area_Privilege_Start_Address - MPCBB1_Area_SRAM1_BASE_NS)" Type="StringHex" Min="=(MPCBB1_Area_Privilege_Start_Address - MPCBB1_Area_SRAM1_BASE_NS)" Max="=(MPCBB1_Area_Privilege_Start_Address - MPCBB1_Area_SRAM1_BASE_NS)" NoCheckOpt="false" Visible="false"/>
+  <RefParameter Name="MPCBB1_Area_Privilege_Size" Comment="    Area Size" DefaultValue="0x0" Type="hex" Min="0x0" Max="=(MPCBB1_Area_Max - MPCBB1_Area_Privilege_Start)" NoCheckOpt="false">
+    <Description>0x0 : use the default HW configuration (privileged memory)</Description>
+  </RefParameter>
+  <RefParameter Name="MPCBB1_Area_Privilege_BlockSize" Comment="    Area Block Size" DefaultValue="=(MPCBB1_Area_BlockSize)" Type="hex" Min="=(MPCBB1_Area_BlockSize)" Max="=(MPCBB1_Area_BlockSize)" Visible="false"/>
+  <RefParameter Name="MPCBB1_Area_Privilege_SuperBlockSize" Comment="    Area Super-Block Size" DefaultValue="=(MPCBB1_Area_SuperBlockSize)" Type="hex" Min="=(MPCBB1_Area_SuperBlockSize)" Max="=(MPCBB1_Area_SuperBlockSize)" Visible="false"/>
+  <RefParameter Name="MPCBB1_Area_Privilege_NbSuperBlock" Comment="    Area Nb Super-Block Size" DefaultValue="=(MPCBB1_Area_Max / MPCBB1_Area_Privilege_SuperBlockSize)" Type="integer" Min="=(MPCBB1_Area_Max / MPCBB1_Area_Privilege_SuperBlockSize)" Max="=(MPCBB1_Area_Max / MPCBB1_Area_Privilege_SuperBlockSize)" Visible="false"/>
+
+  <RefParameter Name="MPCBB1_Area_Privilege" Comment="    Area Attribute" DefaultValue="not privileged" Type="list">
+    <Condition Expression="S_All_MPCBB1_Privileged_$IpInstance" Diagnostic="pre-selected all MPCBB1 Privileged"/>
+    <PossibleValue Value="GTZC_MPCBB_REGION_NPRIV" Comment="not privileged"/>
+    <PossibleValue Value="GTZC_MPCBB_REGION_PRIV" Comment="privileged"/>
+  </RefParameter>
+  <RefParameter Name="MPCBB1_Area_Privilege" Comment="    Area Attribute" DefaultValue="privileged" Type="list">
+    <PossibleValue Value="GTZC_MPCBB_REGION_PRIV" Comment="privileged"/>
+    <PossibleValue Value="GTZC_MPCBB_REGION_NPRIV" Comment="not privileged"/>
+  </RefParameter>
+
+  <RefParameter Name="MPCBB1_PrivConfig_array" Comment="Secure configuration array" DefaultValue="FFFFFFFF" Type="Array" ArraySize="1" ArrayTypeElement="uint32_t;16" Separator=":" Visible="false"/>
+
+
+  <!-- RefParameters for GTZC - MPCBB2 Secured -->
+
+  <RefParameter Name="MPCBB2_Area_SRAM2_BASE_NS" Comment="Area Start SRAM2_BASE_NS" DefaultValue="0x20004000" Type="hex" Min="0x20004000" Max="0x20004000" Visible="false"/>
+
+  <RefParameter Name="MPCBB2_Area_Max" Comment="Area Max" DefaultValue="0x4000" Type="hex" Min="0x4000" Max="0x4000" Visible="false"/>
+  <RefParameter Name="MPCBB2_Area_Start_Address" Comment="Area Start Address" DefaultValue="=MPCBB2_Area_SRAM2_BASE_NS" Type="hex" Min="=(MPCBB2_Area_SRAM2_BASE_NS)" Max="=(MPCBB2_Area_Max + MPCBB2_Area_SRAM2_BASE_NS - MPCBB2_Area_BlockSize)" NoCheckOpt="false" Visible="false"/>
+  <RefParameter Name="MPCBB2_Area_Start" Comment="Area Start Offset" DefaultValue="=(MPCBB2_Area_Start_Address - MPCBB2_Area_SRAM2_BASE_NS)" Type="StringHex" Min="=(MPCBB2_Area_Start_Address - MPCBB2_Area_SRAM2_BASE_NS)" Max="=(MPCBB2_Area_Start_Address - MPCBB2_Area_SRAM2_BASE_NS)" NoCheckOpt="false" Visible="false"/>
+  <RefParameter Name="MPCBB2_Area_Size" Comment="Area Size" DefaultValue="0x0" Type="hex" Min="0x0" Max="=(MPCBB2_Area_Max - MPCBB2_Area_Start)" NoCheckOpt="false" Visible="false"/>
+
+  <RefParameter Name="MPCBB2_Area_BlockSize" Comment="Area Block Size" DefaultValue="0x200" Type="hex" Min="0x200" Max="0x200" Visible="false"/>
+  <RefParameter Name="MPCBB2_Area_SuperBlockSize" Comment="Area Super-Block Size" DefaultValue="0x4000" Type="hex" Min="0x4000" Max="0x4000" Visible="false"/>
+  <RefParameter Name="MPCBB2_Area_NbSuperBlock" Comment="Area Nb Super-Block Size" DefaultValue="=(MPCBB2_Area_Max / MPCBB2_Area_SuperBlockSize)" Type="integer" Min="=(MPCBB2_Area_Max / MPCBB2_Area_SuperBlockSize)" Max="=(MPCBB2_Area_Max / MPCBB2_Area_SuperBlockSize)" Visible="false"/>
+
+  <RefParameter Name="MPCBB2_Area_Privilege_Start_Address" Comment="    Area Start Address" DefaultValue="=MPCBB2_Area_Start_Address" Type="hex" Min="=(MPCBB2_Area_SRAM2_BASE_NS)" Max="=(MPCBB2_Area_Max + MPCBB2_Area_SRAM2_BASE_NS - MPCBB2_Area_BlockSize)" NoCheckOpt="false"/>
+  <RefParameter Name="MPCBB2_Area_Privilege_Start" Comment="    Area Start Offset" DefaultValue="=(MPCBB2_Area_Privilege_Start_Address - MPCBB2_Area_SRAM2_BASE_NS)" Type="StringHex" Min="=(MPCBB2_Area_Privilege_Start_Address - MPCBB2_Area_SRAM2_BASE_NS)" Max="=(MPCBB2_Area_Privilege_Start_Address - MPCBB2_Area_SRAM2_BASE_NS)" NoCheckOpt="false" Visible="false"/>
+  <RefParameter Name="MPCBB2_Area_Privilege_Size" Comment="    Area Size" DefaultValue="0x0" Type="hex" Min="0x0" Max="=(MPCBB2_Area_Max - MPCBB2_Area_Privilege_Start)" NoCheckOpt="false">
+    <Description>0x0 : use the default HW configuration (privileged memory)</Description>
+  </RefParameter>
+  <RefParameter Name="MPCBB2_Area_Privilege_BlockSize" Comment="    Area Block Size" DefaultValue="=(MPCBB2_Area_BlockSize)" Type="hex" Min="=(MPCBB2_Area_BlockSize)" Max="=(MPCBB2_Area_BlockSize)" Visible="false"/>
+  <RefParameter Name="MPCBB2_Area_Privilege_SuperBlockSize" Comment="    Area Super-Block Size" DefaultValue="=(MPCBB2_Area_SuperBlockSize)" Type="hex" Min="=(MPCBB2_Area_SuperBlockSize)" Max="=(MPCBB2_Area_SuperBlockSize)" Visible="false"/>
+  <RefParameter Name="MPCBB2_Area_Privilege_NbSuperBlock" Comment="    Area Nb Super-Block Size" DefaultValue="=(MPCBB2_Area_Max / MPCBB2_Area_Privilege_SuperBlockSize)" Type="integer" Min="=(MPCBB2_Area_Max / MPCBB2_Area_Privilege_SuperBlockSize)" Max="=(MPCBB2_Area_Max / MPCBB2_Area_Privilege_SuperBlockSize)" Visible="false"/>
+
+  <RefParameter Name="MPCBB2_Area_Privilege" Comment="    Area Attribute" DefaultValue="not privileged" Type="list">
+    <Condition Expression="S_All_MPCBB2_Privileged_$IpInstance" Diagnostic="pre-selected all MPCBB2 Privileged"/>
+    <PossibleValue Value="GTZC_MPCBB_REGION_NPRIV" Comment="not privileged"/>
+    <PossibleValue Value="GTZC_MPCBB_REGION_PRIV" Comment="privileged"/>
+  </RefParameter>
+  <RefParameter Name="MPCBB2_Area_Privilege" Comment="    Area Attribute" DefaultValue="privileged" Type="list">
+    <PossibleValue Value="GTZC_MPCBB_REGION_PRIV" Comment="privileged"/>
+    <PossibleValue Value="GTZC_MPCBB_REGION_NPRIV" Comment="not privileged"/>
+  </RefParameter>
+
+  <RefParameter Name="MPCBB2_PrivConfig_array" Comment="Secure configuration array" DefaultValue="FFFFFFFF" Type="Array" ArraySize="1" ArrayTypeElement="uint32_t;16" Separator=":" Visible="false"/>
+
+
+  <!-- RefMode for GTZC -->
+
+  <RefMode Name="GTZC_Common" Abstract="true">
+    <ConfigForMode>GTZC_Init</ConfigForMode>
+  </RefMode>
+
+  <RefMode Name="GTZC_Enable" BaseMode="GTZC_Common">
+
+    <!-- Parameters for GTZC - General settings -->
+
+    <!-- Parameters for GTZC - Peripheral Secured -->
+
+    <Parameter Name="CRS_Privilege_Status"></Parameter>
+    <Parameter Name="ICACHE_Privilege_Status"></Parameter>
+
+    <!-- Parameters for GTZC - Peripheral Privileged -->
+    <Parameter Name="TZSC_Privilege_IP_Choice"></Parameter>
+    <Parameter Name="Privilegeable_Peripheral"></Parameter>
+    <Parameter Name="ADC_Privilege" RefParameter="IP_Privilege" Comment="ADC1|2">
+      <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; ADC1_GTZC_SECURE) | (!($IpInstance=GTZC_S) &amp; (!ADC1_GTZC_SECURE))"/>
+      <PossibleValue Comment="privileged" Semaphore="S_IP_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_PRIV</PossibleValue>
+      <PossibleValue Comment="not privileged" Semaphore="S_IP_NOT_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_NPRIV</PossibleValue>
+    </Parameter>
+    <Parameter Name="COMP_Privilege" RefParameter="IP_Privilege" Comment="COMP">
+      <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; COMP_GTZC_SECURE) | (!($IpInstance=GTZC_S) &amp; (!COMP_GTZC_SECURE))"/>
+      <PossibleValue Comment="privileged" Semaphore="S_IP_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_PRIV</PossibleValue>
+      <PossibleValue Comment="not privileged" Semaphore="S_IP_NOT_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_NPRIV</PossibleValue>
+    </Parameter>
+    <Parameter Name="CRC_Privilege" RefParameter="IP_Privilege" Comment="CRC">
+      <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; CRC_GTZC_SECURE) | (!($IpInstance=GTZC_S) &amp; (!CRC_GTZC_SECURE))"/>
+      <PossibleValue Comment="privileged" Semaphore="S_IP_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_PRIV</PossibleValue>
+      <PossibleValue Comment="not privileged" Semaphore="S_IP_NOT_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_NPRIV</PossibleValue>
+    </Parameter>
+    <Parameter Name="CRS_Privilege" RefParameter="CRS_Privilege" Comment="CRS">
+      <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="CRS_Privilege_Status=true"/>
+      <PossibleValue Comment="privileged" Semaphore="S_IP_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_PRIV</PossibleValue>
+      <PossibleValue Comment="not privileged" Semaphore="S_IP_NOT_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_NPRIV</PossibleValue>
+    </Parameter>
+    <Parameter Name="DAC1_Privilege" RefParameter="IP_Privilege" Comment="DAC1">
+      <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; DAC1_GTZC_SECURE) | (!($IpInstance=GTZC_S) &amp; (!DAC1_GTZC_SECURE))"/>
+      <PossibleValue Comment="privileged" Semaphore="S_IP_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_PRIV</PossibleValue>
+      <PossibleValue Comment="not privileged" Semaphore="S_IP_NOT_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_NPRIV</PossibleValue>
+    </Parameter>
+    <Parameter Name="DSIHOST_Privilege" RefParameter="IP_Privilege" Comment="DSI">
+      <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="DSIHOST_Exist &amp; (($IpInstance=GTZC_S &amp; DSIHOST_GTZC_SECURE) | (!($IpInstance=GTZC_S) &amp; (!DSIHOST_GTZC_SECURE)))"/>
+      <PossibleValue Comment="privileged" Semaphore="S_IP_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_PRIV</PossibleValue>
+      <PossibleValue Comment="not privileged" Semaphore="S_IP_NOT_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_NPRIV</PossibleValue>
+    </Parameter>
+    <Parameter Name="DTS_Privilege" RefParameter="IP_Privilege" Comment="DTS">
+      <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; DTS_GTZC_SECURE) | (!($IpInstance=GTZC_S) &amp; (!DTS_GTZC_SECURE))"/>
+      <PossibleValue Comment="privileged" Semaphore="S_IP_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_PRIV</PossibleValue>
+      <PossibleValue Comment="not privileged" Semaphore="S_IP_NOT_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_NPRIV</PossibleValue>
+    </Parameter>
+    <Parameter Name="FDCAN1_Privilege" RefParameter="IP_Privilege" Comment="FDCAN1">
+      <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; FDCAN1_GTZC_SECURE) | (!($IpInstance=GTZC_S) &amp; (!FDCAN1_GTZC_SECURE))"/>
+      <PossibleValue Comment="privileged" Semaphore="S_IP_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_PRIV</PossibleValue>
+      <PossibleValue Comment="not privileged" Semaphore="S_IP_NOT_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_NPRIV</PossibleValue>
+    </Parameter>
+    <Parameter Name="HASH_Privilege" RefParameter="IP_Privilege" Comment="HASH">
+      <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; HASH_GTZC_SECURE) | (!($IpInstance=GTZC_S) &amp; (!HASH_GTZC_SECURE))"/>
+      <PossibleValue Comment="privileged" Semaphore="S_IP_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_PRIV</PossibleValue>
+      <PossibleValue Comment="not privileged" Semaphore="S_IP_NOT_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_NPRIV</PossibleValue>
+    </Parameter>
+    <Parameter Name="I2C1_Privilege" RefParameter="IP_Privilege" Comment="I2C1">
+      <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; I2C1_GTZC_SECURE) | (!($IpInstance=GTZC_S) &amp; (!I2C1_GTZC_SECURE))"/>
+      <PossibleValue Comment="privileged" Semaphore="S_IP_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_PRIV</PossibleValue>
+      <PossibleValue Comment="not privileged" Semaphore="S_IP_NOT_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_NPRIV</PossibleValue>
+    </Parameter>
+    <Parameter Name="I2C2_Privilege" RefParameter="IP_Privilege" Comment="I2C2">
+      <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; I2C2_GTZC_SECURE) | (!($IpInstance=GTZC_S) &amp; (!I2C2_GTZC_SECURE))"/>
+      <PossibleValue Comment="privileged" Semaphore="S_IP_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_PRIV</PossibleValue>
+      <PossibleValue Comment="not privileged" Semaphore="S_IP_NOT_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_NPRIV</PossibleValue>
+    </Parameter>
+    <Parameter Name="I3C1_Privilege" RefParameter="IP_Privilege" Comment="I3C1">
+      <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; I3C1_GTZC_SECURE) | (!($IpInstance=GTZC_S) &amp; (!I3C1_GTZC_SECURE))"/>
+      <PossibleValue Comment="privileged" Semaphore="S_IP_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_PRIV</PossibleValue>
+      <PossibleValue Comment="not privileged" Semaphore="S_IP_NOT_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_NPRIV</PossibleValue>
+    </Parameter>
+    <Parameter Name="I3C2_Privilege" RefParameter="IP_Privilege" Comment="I3C2">
+      <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; I3C2_GTZC_SECURE) | (!($IpInstance=GTZC_S) &amp; (!I3C2_GTZC_SECURE))"/>
+      <PossibleValue Comment="privileged" Semaphore="S_IP_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_PRIV</PossibleValue>
+      <PossibleValue Comment="not privileged" Semaphore="S_IP_NOT_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_NPRIV</PossibleValue>
+    </Parameter>
+    <Parameter Name="ICACHE_Privilege" RefParameter="ICACHE_Privilege" Comment="ICACHE">
+      <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="ICACHE_Privilege_Status=true"/>
+      <PossibleValue Comment="privileged" Semaphore="S_IP_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_PRIV</PossibleValue>
+      <PossibleValue Comment="not privileged" Semaphore="S_IP_NOT_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_NPRIV</PossibleValue>
+    </Parameter>
+    <Parameter Name="IWDG_Privilege" RefParameter="IP_Privilege" Comment="IWDG">
+      <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; IWDG_GTZC_SECURE) | (!($IpInstance=GTZC_S) &amp; (!IWDG_GTZC_SECURE))"/>
+      <PossibleValue Comment="privileged" Semaphore="S_IP_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_PRIV</PossibleValue>
+      <PossibleValue Comment="not privileged" Semaphore="S_IP_NOT_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_NPRIV</PossibleValue>
+    </Parameter>
+    <Parameter Name="LPTIM1_Privilege" RefParameter="IP_Privilege" Comment="LPTIM1">
+      <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; LPTIM1_GTZC_SECURE) | (!($IpInstance=GTZC_S) &amp; (!LPTIM1_GTZC_SECURE))"/>
+      <PossibleValue Comment="privileged" Semaphore="S_IP_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_PRIV</PossibleValue>
+      <PossibleValue Comment="not privileged" Semaphore="S_IP_NOT_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_NPRIV</PossibleValue>
+    </Parameter>
+    <Parameter Name="LPTIM2_Privilege" RefParameter="IP_Privilege" Comment="LPTIM2">
+      <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; LPTIM2_GTZC_SECURE) | (!($IpInstance=GTZC_S) &amp; (!LPTIM2_GTZC_SECURE))"/>
+      <PossibleValue Comment="privileged" Semaphore="S_IP_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_PRIV</PossibleValue>
+      <PossibleValue Comment="not privileged" Semaphore="S_IP_NOT_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_NPRIV</PossibleValue>
+    </Parameter>
+    <Parameter Name="LPUART1_Privilege" RefParameter="IP_Privilege" Comment="LPUART1">
+      <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; LPUART1_GTZC_SECURE) | (!($IpInstance=GTZC_S) &amp; (!LPUART1_GTZC_SECURE))"/>
+      <PossibleValue Comment="privileged" Semaphore="S_IP_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_PRIV</PossibleValue>
+      <PossibleValue Comment="not privileged" Semaphore="S_IP_NOT_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_NPRIV</PossibleValue>
+    </Parameter>
+    <Parameter Name="OPAMP_Privilege" RefParameter="IP_Privilege" Comment="OPAMP">
+      <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; OPAMP_GTZC_SECURE) | (!($IpInstance=GTZC_S) &amp; (!OPAMP_GTZC_SECURE))"/>
+      <PossibleValue Comment="privileged" Semaphore="S_IP_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_PRIV</PossibleValue>
+      <PossibleValue Comment="not privileged" Semaphore="S_IP_NOT_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_NPRIV</PossibleValue>
+    </Parameter>
+    <Parameter Name="RAMCFG_Privilege" RefParameter="IP_Privilege" Comment="RAMCFG">
+      <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; RAMCFG_GTZC_SECURE) | (!($IpInstance=GTZC_S) &amp; (!RAMCFG_GTZC_SECURE))"/>
+      <PossibleValue Comment="privileged" Semaphore="S_IP_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_PRIV</PossibleValue>
+      <PossibleValue Comment="not privileged" Semaphore="S_IP_NOT_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_NPRIV</PossibleValue>
+    </Parameter>
+    <Parameter Name="RNG_Privilege" RefParameter="IP_Privilege" Comment="RNG">
+      <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="RNG_Exist &amp; (($IpInstance=GTZC_S &amp; RNG_GTZC_SECURE) | (!($IpInstance=GTZC_S) &amp; (!RNG_GTZC_SECURE)))"/>
+      <PossibleValue Comment="privileged" Semaphore="S_IP_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_PRIV</PossibleValue>
+      <PossibleValue Comment="not privileged" Semaphore="S_IP_NOT_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_NPRIV</PossibleValue>
+    </Parameter>
+    <Parameter Name="SPI1_Privilege" RefParameter="IP_Privilege" Comment="SPI1">
+      <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; SPI1_GTZC_SECURE) | (!($IpInstance=GTZC_S) &amp; (!SPI1_GTZC_SECURE))"/>
+      <PossibleValue Comment="privileged" Semaphore="S_IP_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_PRIV</PossibleValue>
+      <PossibleValue Comment="not privileged" Semaphore="S_IP_NOT_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_NPRIV</PossibleValue>
+    </Parameter>
+    <Parameter Name="SPI2_Privilege" RefParameter="IP_Privilege" Comment="SPI2">
+      <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; SPI2_GTZC_SECURE) | (!($IpInstance=GTZC_S) &amp; (!SPI2_GTZC_SECURE))"/>
+      <PossibleValue Comment="privileged" Semaphore="S_IP_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_PRIV</PossibleValue>
+      <PossibleValue Comment="not privileged" Semaphore="S_IP_NOT_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_NPRIV</PossibleValue>
+    </Parameter>
+    <Parameter Name="SPI3_Privilege" RefParameter="IP_Privilege" Comment="SPI3">
+      <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; SPI3_GTZC_SECURE) | (!($IpInstance=GTZC_S) &amp; (!SPI3_GTZC_SECURE))"/>
+      <PossibleValue Comment="privileged" Semaphore="S_IP_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_PRIV</PossibleValue>
+      <PossibleValue Comment="not privileged" Semaphore="S_IP_NOT_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_NPRIV</PossibleValue>
+    </Parameter>
+    <Parameter Name="TIM1_Privilege" RefParameter="IP_Privilege" Comment="TIM1">
+      <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; TIM1_GTZC_SECURE) | (!($IpInstance=GTZC_S) &amp; (!TIM1_GTZC_SECURE))"/>
+      <PossibleValue Comment="privileged" Semaphore="S_IP_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_PRIV</PossibleValue>
+      <PossibleValue Comment="not privileged" Semaphore="S_IP_NOT_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_NPRIV</PossibleValue>
+    </Parameter>
+    <Parameter Name="TIM2_Privilege" RefParameter="IP_Privilege" Comment="TIM2">
+      <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; TIM2_GTZC_SECURE) | (!($IpInstance=GTZC_S) &amp; (!TIM2_GTZC_SECURE))"/>
+      <PossibleValue Comment="privileged" Semaphore="S_IP_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_PRIV</PossibleValue>
+      <PossibleValue Comment="not privileged" Semaphore="S_IP_NOT_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_NPRIV</PossibleValue>
+    </Parameter>
+    <Parameter Name="TIM3_Privilege" RefParameter="IP_Privilege" Comment="TIM3">
+      <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; TIM3_GTZC_SECURE) | (!($IpInstance=GTZC_S) &amp; (!TIM3_GTZC_SECURE))"/>
+      <PossibleValue Comment="privileged" Semaphore="S_IP_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_PRIV</PossibleValue>
+      <PossibleValue Comment="not privileged" Semaphore="S_IP_NOT_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_NPRIV</PossibleValue>
+    </Parameter>
+    <Parameter Name="TIM6_Privilege" RefParameter="IP_Privilege" Comment="TIM6">
+      <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; TIM6_GTZC_SECURE) | (!($IpInstance=GTZC_S) &amp; (!TIM6_GTZC_SECURE))"/>
+      <PossibleValue Comment="privileged" Semaphore="S_IP_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_PRIV</PossibleValue>
+      <PossibleValue Comment="not privileged" Semaphore="S_IP_NOT_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_NPRIV</PossibleValue>
+    </Parameter>
+    <Parameter Name="TIM7_Privilege" RefParameter="IP_Privilege" Comment="TIM7">
+      <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; TIM7_GTZC_SECURE) | (!($IpInstance=GTZC_S) &amp; (!TIM7_GTZC_SECURE))"/>
+      <PossibleValue Comment="privileged" Semaphore="S_IP_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_PRIV</PossibleValue>
+      <PossibleValue Comment="not privileged" Semaphore="S_IP_NOT_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_NPRIV</PossibleValue>
+    </Parameter>
+    <Parameter Name="USART1_Privilege" RefParameter="IP_Privilege" Comment="USART1">
+      <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; USART1_GTZC_SECURE) | (!($IpInstance=GTZC_S) &amp; (!USART1_GTZC_SECURE))"/>
+      <PossibleValue Comment="privileged" Semaphore="S_IP_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_PRIV</PossibleValue>
+      <PossibleValue Comment="not privileged" Semaphore="S_IP_NOT_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_NPRIV</PossibleValue>
+    </Parameter>
+    <Parameter Name="USART2_Privilege" RefParameter="IP_Privilege" Comment="USART2">
+      <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; USART2_GTZC_SECURE) | (!($IpInstance=GTZC_S) &amp; (!USART2_GTZC_SECURE))"/>
+      <PossibleValue Comment="privileged" Semaphore="S_IP_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_PRIV</PossibleValue>
+      <PossibleValue Comment="not privileged" Semaphore="S_IP_NOT_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_NPRIV</PossibleValue>
+    </Parameter>
+    <Parameter Name="USART3_Privilege" RefParameter="IP_Privilege" Comment="USART3">
+      <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; USART3_GTZC_SECURE) | (!($IpInstance=GTZC_S) &amp; (!USART3_GTZC_SECURE))"/>
+      <PossibleValue Comment="privileged" Semaphore="S_IP_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_PRIV</PossibleValue>
+      <PossibleValue Comment="not privileged" Semaphore="S_IP_NOT_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_NPRIV</PossibleValue>
+    </Parameter>
+    <Parameter Name="USB_Privilege" RefParameter="IP_Privilege" Comment="USB">
+      <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; USB_GTZC_SECURE) | (!($IpInstance=GTZC_S) &amp; (!USB_GTZC_SECURE))"/>
+      <PossibleValue Comment="privileged" Semaphore="S_IP_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_PRIV</PossibleValue>
+      <PossibleValue Comment="not privileged" Semaphore="S_IP_NOT_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_NPRIV</PossibleValue>
+    </Parameter>
+    <Parameter Name="WWDG_Privilege" RefParameter="IP_Privilege" Comment="WWDG">
+      <Condition Diagnostic="Active on GTZC context (aligned to Secure status for Multi Project)" Expression="($IpInstance=GTZC_S &amp; WWDG_GTZC_SECURE) | (!($IpInstance=GTZC_S) &amp; (!WWDG_GTZC_SECURE))"/>
+      <PossibleValue Comment="privileged" Semaphore="S_IP_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_PRIV</PossibleValue>
+      <PossibleValue Comment="not privileged" Semaphore="S_IP_NOT_PRIVILEGED_$IpInstance">GTZC_TZSC_PERIPH_NPRIV</PossibleValue>
+    </Parameter>
+<!-- LISTIP GTZC1 -->
+    <Parameter Name="GTZC1" RefParameter="GTZC">
+      <Condition Diagnostic="only present with GTZC and GTZC_S" Expression="!($IpInstance=GTZC_NS)"/>
+      <PossibleValue Comment="disable">disable</PossibleValue>
+      <PossibleValue Comment="LPTIM2">LPTIM2</PossibleValue>
+      <PossibleValue Comment="DTS">DTS</PossibleValue>
+      <PossibleValue Comment="DAC1">DAC1</PossibleValue>
+      <PossibleValue Comment="CRS">CRS</PossibleValue>
+      <PossibleValue Comment="I3C1">I3C1</PossibleValue>
+      <PossibleValue Comment="I2C2">I2C2</PossibleValue>
+      <PossibleValue Comment="I2C1">I2C1</PossibleValue>
+      <PossibleValue Comment="USART3">USART3</PossibleValue>
+      <PossibleValue Comment="USART2">USART2</PossibleValue>
+      <PossibleValue Comment="SPI3">SPI3</PossibleValue>
+      <PossibleValue Comment="SPI2">SPI2</PossibleValue>
+      <PossibleValue Comment="IWDG">IWDG</PossibleValue>
+      <PossibleValue Comment="WWDG">WWDG</PossibleValue>
+      <PossibleValue Comment="TIM7">TIM7</PossibleValue>
+      <PossibleValue Comment="TIM6">TIM6</PossibleValue>
+      <PossibleValue Comment="TIM3">TIM3</PossibleValue>
+      <PossibleValue Comment="TIM2">TIM2</PossibleValue>
+      <PossibleValue Comment="LPTIM1">LPTIM1</PossibleValue>
+      <PossibleValue Comment="LPUART">LPUART</PossibleValue>
+      <PossibleValue Comment="USB_OTG_FS">USB_OTG_FS</PossibleValue>
+      <PossibleValue Comment=" USART1"> USART1</PossibleValue>
+      <PossibleValue Comment="SPI1">SPI1</PossibleValue>
+      <PossibleValue Comment="TIM1">TIM1</PossibleValue>
+      <PossibleValue Comment="COMP">COMP</PossibleValue>
+      <PossibleValue Comment="OPAMP">OPAMP</PossibleValue>
+      <PossibleValue Comment="FDCAN1">FDCAN1</PossibleValue>
+      <PossibleValue Comment="RAMSCFG">RAMSCFG</PossibleValue>
+      <PossibleValue Comment="RNG">RNG</PossibleValue>
+      <PossibleValue Comment="HASH">HASH</PossibleValue>
+      <PossibleValue Comment="ADC1">ADC1</PossibleValue>
+      <PossibleValue Comment="ICACHE">ICACHE</PossibleValue>
+      <PossibleValue Comment="CRC">CRC</PossibleValue>
+      <PossibleValue Comment="I3C2">I3C2</PossibleValue>
+    </Parameter>
+    <!-- END LISTIP GTZC1 -->
+
+    <!-- Parameters for GTZC - MPCWM1 Secured -->
+    <Parameter Name="MPCWM4_Area_Desc" Group="MPCWM4 (BKPSRAM)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"/>
+    <Parameter Name="MPCWM4_Area_Start_Address" Group="MPCWM4 (BKPSRAM)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"/>
+    <Parameter Name="MPCWM4_Area_Start" Group="MPCWM4 (BKPSRAM)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"/>
+    <Parameter Name="MPCWM4_Area_Size" Group="MPCWM4 (BKPSRAM)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"/>
+    <Parameter Name="MPCWM4_Area_Privilege" Group="MPCWM4 (BKPSRAM)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"/>
+    <Parameter Name="MPCWM4_Area_Attribute" Group="MPCWM4 (BKPSRAM)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"/>
+    <Parameter Name="MPCWM4_Area_Lock" Group="MPCWM4 (BKPSRAM)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"/>
+    <Parameter Name="MPCWM4_Area_Status" Group="MPCWM4 (BKPSRAM)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"/>
+
+
+    <!-- Parameters for GTZC - MPCBB1 Secured -->
+    <!-- Memory Attribute Settings -->
+    <Parameter Name="MPCBB1_Area_Max" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"/>
+    <Parameter Name="MPCBB1_Area_Start_Address" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"/>
+    <Parameter Name="MPCBB1_Area_Start" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"/>
+    <Parameter Name="MPCBB1_Area_Size" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"/>
+    <Parameter Name="MPCBB1_Area_BlockSize" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"/>
+
+    <Parameter Name="MPCBB1_PrivilegeAttributeSettings" RefParameter="MPCBB_PrivilegeAttributeSettings" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"/>
+    <Parameter Name="MPCBB1_Area_Privilege_Choice" RefParameter="MPCBB_Area_Privilege_Choice" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller">
+      <PossibleValue Comment="from full Privileged" Semaphore="S_All_MPCBB1_Privileged_$IpInstance">from full Privileged</PossibleValue>
+      <PossibleValue Comment="from full Not Privileged" Semaphore="S_No_MPCBB1_Privileged_$IpInstance">from full Not Privileged</PossibleValue>
+    </Parameter>
+    <Parameter Name="MPCBB1_Area_Privilege_Start_Address" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"/>
+    <Parameter Name="MPCBB1_Area_Privilege_Start" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"/>
+    <Parameter Name="MPCBB1_Area_Privilege_Size" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"/>
+    <Parameter Name="MPCBB1_Area_Privilege_BlockSize" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"/>
+    <Parameter Name="MPCBB1_Area_Privilege" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"/>
+
+    <Parameter Name="MPCBB1_PrivConfig_array" Group="MPCBB1 (SRAM1)" TabName="Block-Based Memory Protection Controller"/>
+
+
+    <!-- Parameters for GTZC - MPCBB2 Secured -->
+    <!-- Memory Attribute Settings -->
+    <Parameter Name="MPCBB2_Area_Max" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"/>
+    <Parameter Name="MPCBB2_Area_Start_Address" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"/>
+    <Parameter Name="MPCBB2_Area_Start" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"/>
+    <Parameter Name="MPCBB2_Area_Size" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"/>
+    <Parameter Name="MPCBB2_Area_BlockSize" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"/>
+
+    <Parameter Name="MPCBB2_PrivilegeAttributeSettings" RefParameter="MPCBB_PrivilegeAttributeSettings" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"/>
+    <Parameter Name="MPCBB2_Area_Privilege_Choice" RefParameter="MPCBB_Area_Privilege_Choice" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller">
+      <PossibleValue Comment="from full Privileged" Semaphore="S_All_MPCBB2_Privileged_$IpInstance">from full Privileged</PossibleValue>
+      <PossibleValue Comment="from full Not Privileged" Semaphore="S_No_MPCBB2_Privileged_$IpInstance">from full Not Privileged</PossibleValue>
+    </Parameter>
+    <Parameter Name="MPCBB2_Area_Privilege_Start_Address" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"/>
+    <Parameter Name="MPCBB2_Area_Privilege_Start" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"/>
+    <Parameter Name="MPCBB2_Area_Privilege_Size" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"/>
+    <Parameter Name="MPCBB2_Area_Privilege_BlockSize" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"/>
+    <Parameter Name="MPCBB2_Area_Privilege" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"/>
+
+    <Parameter Name="MPCBB2_PrivConfig_array" Group="MPCBB2 (SRAM2)" TabName="Block-Based Memory Protection Controller"/>
+
+
+  </RefMode>
+
+
+  <!-- ModeLogicOperator for GTZC -->
+  <ModeLogicOperator Name="OR">
+    <Mode Name="GTZC_Enable" UserName="Enable">
+      <ModeLogicOperator Name="XOR">
+        <Mode Name="GTZC_Enable" UserName="Enable">
+          <SignalLogicalOp Name="AND">
+            <Signal IOMode="" Name="VS_GTZC_Enable"/>
+          </SignalLogicalOp>
+          <Semaphore>S_GTZC_Enabled</Semaphore>
+          <Semaphore>$IpInstance</Semaphore>
+        </Mode>
+      </ModeLogicOperator>
+    </Mode>
+  </ModeLogicOperator>
+
+  <!-- RefSignals for GTZC -->
+  <RefSignal Name="VS_GTZC_Enable" Virtual="true"/>
+
+</IP>

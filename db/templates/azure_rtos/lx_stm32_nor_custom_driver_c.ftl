@@ -117,9 +117,9 @@ static UINT lx_nor_driver_write(ULONG *flash_address, ULONG *source, ULONG words
 {
     UINT ret = LX_SUCCESS;
 
-    /* USER CODE BEGIN NOR_WRITE */
+    /* USER CODE BEGIN NOR_DRIVER_WRITE */
 
-    /* USER CODE END  NOR_WRITE */
+    /* USER CODE END  NOR_DRIVER_WRITE */
 
     return ret;
 }
@@ -129,9 +129,9 @@ static UINT lx_nor_driver_block_erase(ULONG block, ULONG erase_count)
 
     UINT ret = LX_SUCCESS;
 
-    /* USER CODE BEGIN NOR_WRITE */
+    /* USER CODE BEGIN NOR_DRIVER_BLOCK */
 
-    /* USER CODE END  NOR_WRITE */
+    /* USER CODE END  NOR_DRIVER_BLOCK */
 
     return ret;
 }
@@ -140,9 +140,9 @@ static UINT lx_nor_driver_block_erased_verify(ULONG block)
 {
     UINT ret = LX_SUCCESS;
 
-    /* USER CODE BEGIN NOR_WRITE */
+    /* USER CODE BEGIN NOR_DRIVER_VERIFY */
 
-    /* USER CODE END  NOR_WRITE */
+    /* USER CODE END  NOR_DRIVER_VERIFY */
 
     return ret;
 }

@@ -1,0 +1,505 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" DBVersion="V4.0" Name="OSPI" Version="STM32Cube_FW_H5_V0.2.0" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
+
+
+    <RefConfig Name="OSPI_Init">
+        <CallLibMethod Name="HAL_XSPI_Init">
+        </CallLibMethod>
+        <ImplementCallBack Name="HAL_XSPI_MspInit"/> 
+        <ImplementCallBack Name="HAL_XSPI_MspDeInit"/>
+    </RefConfig>
+
+    <RefConfig  Name="HyperBus">
+        <IFCondition Expression="MemoryType=HAL_XSPI_MEMTYPE_HYPERBUS">          
+	<CallLibMethod Name="HAL_XSPI_HyperbusCfg">  
+                <MethodArg Name="cfg" ParameterName="sHyperBusCfg"/>
+        </CallLibMethod>        
+        </IFCondition>
+    </RefConfig>
+    
+    <RefConfig  Name="Auto_Polling">
+        <IFCondition Expression="(OperationType = HAL_XSPI_OPTYPE_COMMON_CFG)">
+        <CallLibMethod Name="HAL_XSPI_AutoPolling">
+                <MethodArg Name="cfg" ParameterName="sAutoPollingCfg"/>
+        </CallLibMethod>        
+        <CallLibMethod Name="HAL_XSPI_AutoPolling_IT">
+                <MethodArg Name="cfg" ParameterName="sAutoPollingCfg"/>
+        </CallLibMethod>        
+        </IFCondition>	
+    </RefConfig>
+  
+    <!-- <RefConfig  Name="Command_Config">
+        <CallLibMethod Name="HAL_XSPI_Command_IT">
+        </CallLibMethod>	
+    </RefConfig>-->
+    
+    <RefConfig  Name="Memory_mapped">
+        <IFCondition Expression="(OperationType = HAL_XSPI_OPTYPE_READ_CFG) | (OperationType = HAL_XSPI_OPTYPE_WRITE_CFG) | (OperationType = HAL_XSPI_OPTYPE_WRAP_CFG)">          
+            <CallLibMethod Name="HAL_XSPI_MemoryMapped">             
+                <MethodArg Name="cfg" ParameterName="sMemMappedCfg"/>
+            </CallLibMethod>         
+        </IFCondition>
+    </RefConfig>
+    
+    <!-- <RefConfig  Name="Indirect_Mode">
+        <IFCondition Expression="(OperationType != HAL_XSPI_OPTYPE_READ_CFG) | (OperationType != HAL_XSPI_OPTYPE_WRITE_CFG)  | (OperationType = HAL_XSPI_OPTYPE_WRAP_CFG)">
+            <CallLibMethod Name="HAL_XSPI_Transmit"/>       
+            <CallLibMethod Name="HAL_XSPI_Receive"/>
+        </IFCondition>
+    </RefConfig> -->
+    
+    <RefConfig Name="OSPI_DeInit">
+        <CallLibMethod Name="HAL_XSPI_DeInit"/>
+    </RefConfig>
+
+    <!--DLYB Configuration (LL)-->
+    <RefConfig Name="Dlyb_Config">
+	    <IFCondition Expression="DelayBlockBypass=HAL_XSPI_DELAY_BLOCK_ON">          
+        <CallLibMethod Name="HAL_XSPI_DLYB_SetConfig">
+                <MethodArg Name="cfg" ParameterName="sDlybCfg"/>
+        </CallLibMethod>
+		</IFCondition>
+    </RefConfig>
+
+    <!--DlyB Configuration-->
+    <LibMethod Comment="" Name="HAL_XSPI_DLYB_SetConfig">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hospi" TypeName="XSPI_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="XSPI_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="XSPI_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="FifoThresholdByte" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DualQuad" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemoryType" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DeviceSize" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ChipSelectHighTime" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FreeRunningClock" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WrapSize" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SampleShifting" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DelayHoldQuarterCycle" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ChipSelectBoundary" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClkChipSelectHighTime" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DelayBlockBypass" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MaxTran" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Refresh" OptimizationCondition="equal"/>
+            </Argument>
+        </Argument>
+        <Argument AddressOf="true" GenericType="struct" Name="HAL_OSPI_DLYB_Cfg_Struct" TypeName="HAL_XSPI_DLYB_CfgTypeDef">
+            <Argument AddressOf="false" GenericType="simple" Name="Units" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PhaseSel" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+
+    <LibMethod Comment="" Name="HAL_XSPI_Init">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hospi" TypeName="XSPI_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="XSPI_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="XSPI_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="FifoThresholdByte" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemoryMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemoryType" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemorySize" OptimizationCondition="equal"/>               
+                <Argument AddressOf="false" GenericType="simple" Name="ChipSelectHighTimeCycle" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FreeRunningClock" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WrapSize" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SampleShifting" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DelayHoldQuarterCycle" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ChipSelectBoundary" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DelayBlockBypass" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Refresh" OptimizationCondition="equal"/>
+            </Argument>
+        </Argument>
+    </LibMethod>
+    
+    <LibMethod Comment="" Name="HAL_XSPI_DeInit">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hospi" TypeName="XSPI_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="XSPI_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="XSPI_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="FifoThresholdByte" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemoryMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemoryType" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemorySize" OptimizationCondition="equal"/>               
+                <Argument AddressOf="false" GenericType="simple" Name="ChipSelectHighTimeCycle" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FreeRunningClock" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WrapSize" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SampleShifting" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DelayHoldQuarterCycle" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ChipSelectBoundary" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DelayBlockBypass" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Refresh" OptimizationCondition="equal"/>
+            </Argument>
+        </Argument>
+    </LibMethod>
+
+    <LibMethod Comment="" Name="HAL_XSPI_MspInit">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hospi" TypeName="XSPI_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="XSPI_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="XSPI_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="FifoThresholdByte" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemoryMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemoryType" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemorySize" OptimizationCondition="equal"/>               
+                <Argument AddressOf="false" GenericType="simple" Name="ChipSelectHighTimeCycle" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FreeRunningClock" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WrapSize" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SampleShifting" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DelayHoldQuarterCycle" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ChipSelectBoundary" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DelayBlockBypass" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Refresh" OptimizationCondition="equal"/>
+            </Argument>
+        </Argument>
+    </LibMethod>
+    
+    <LibMethod Comment="" Name="HAL_XSPI_MspDeInit">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hospi" TypeName="XSPI_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="XSPI_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="XSPI_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="FifoThresholdByte" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemoryMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemoryType" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemorySize" OptimizationCondition="equal"/>               
+                <Argument AddressOf="false" GenericType="simple" Name="ChipSelectHighTimeCycle" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FreeRunningClock" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WrapSize" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SampleShifting" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DelayHoldQuarterCycle" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ChipSelectBoundary" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DelayBlockBypass" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Refresh" OptimizationCondition="equal"/>
+            </Argument>
+        </Argument>
+    </LibMethod>
+    
+    <LibMethod Comment="" Name="HAL_XSPI_AutoPolling">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hospi" TypeName="XSPI_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="XSPI_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="XSPI_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="FifoThresholdByte" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemoryMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemoryType" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemorySize" OptimizationCondition="equal"/>               
+                <Argument AddressOf="false" GenericType="simple" Name="ChipSelectHighTimeCycle" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FreeRunningClock" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WrapSize" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SampleShifting" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DelayHoldQuarterCycle" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ChipSelectBoundary" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DelayBlockBypass" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Refresh" OptimizationCondition="equal"/>
+            </Argument>
+        </Argument>
+        <Argument AddressOf="true" GenericType="struct" Name="cfg" TypeName="XSPI_AutoPollingTypeDef">
+            <Argument AddressOf="false" GenericType="simple" Name="Match" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="MatchMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AutomaticStop" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Interval" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="Timeout" OptimizationCondition="equal"/>
+    </LibMethod>
+
+    <LibMethod Comment="" Name="HAL_XSPI_AutoPolling_IT">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hospi" TypeName="XSPI_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="XSPI_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="XSPI_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="FifoThresholdByte" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemoryMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemoryType" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemorySize" OptimizationCondition="equal"/>               
+                <Argument AddressOf="false" GenericType="simple" Name="ChipSelectHighTimeCycle" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FreeRunningClock" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WrapSize" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SampleShifting" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DelayHoldQuarterCycle" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ChipSelectBoundary" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DelayBlockBypass" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Refresh" OptimizationCondition="equal"/>
+            </Argument>
+        </Argument>
+        <Argument AddressOf="true" GenericType="struct" Name="cfg" TypeName="XSPI_AutoPollingTypeDef">
+            <Argument AddressOf="false" GenericType="simple" Name="Match" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="MatchMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AutomaticStop" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Interval" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    
+    <LibMethod Comment="" Name="HAL_XSPI_Command">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hospi" TypeName="XSPI_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="XSPI_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="XSPI_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="FifoThresholdByte" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemoryMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemoryType" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemorySize" OptimizationCondition="equal"/>               
+                <Argument AddressOf="false" GenericType="simple" Name="ChipSelectHighTimeCycle" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FreeRunningClock" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WrapSize" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SampleShifting" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DelayHoldQuarterCycle" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ChipSelectBoundary" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DelayBlockBypass" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Refresh" OptimizationCondition="equal"/>
+            </Argument>
+        </Argument>
+        <Argument AddressOf="true" GenericType="struct" Name="cmd" TypeName="HAL_XSPI_RegularCmdTypeDef">
+            <Argument AddressOf="false" GenericType="simple" Name="OperationType" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FlashId" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Instruction" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InstructionMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InstructionSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InstructionDtrMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Address" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddressMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="MatchMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddressSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddressDtrMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AlternateBytes" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AlternateBytesMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AlternateBytesSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AlternateBytesDtrMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="DataMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="DataDtrMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="DummyCycles" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="DQSMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SIOOMode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="false" GenericType="simple" Name="Timeout" OptimizationCondition="equal"/>
+    </LibMethod>
+        
+    <LibMethod Comment="" Name="HAL_XSPI_Command_IT">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hospi" TypeName="XSPI_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="XSPI_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="XSPI_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="FifoThresholdByte" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemoryMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemoryType" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemorySize" OptimizationCondition="equal"/>               
+                <Argument AddressOf="false" GenericType="simple" Name="ChipSelectHighTimeCycle" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FreeRunningClock" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WrapSize" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SampleShifting" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DelayHoldQuarterCycle" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ChipSelectBoundary" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DelayBlockBypass" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Refresh" OptimizationCondition="equal"/>
+            </Argument>
+        </Argument>
+        <Argument AddressOf="true" GenericType="struct" Name="cmd" TypeName="HAL_XSPI_RegularCmdTypeDef">
+            <Argument AddressOf="false" GenericType="simple" Name="OperationType" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FlashId" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Instruction" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InstructionMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InstructionSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="InstructionDtrMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Address" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddressMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="MatchMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddressSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddressDtrMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AlternateBytes" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AlternateBytesMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AlternateBytesSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AlternateBytesDtrMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="DataMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="DataDtrMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="DummyCycles" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="DQSMode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SIOOMode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+
+    <!--Hyperbus -->
+    <LibMethod Comment="" Name="HAL_XSPI_HyperbusCmd">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hospi" TypeName="XSPI_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="XSPI_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="XSPI_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="FifoThresholdByte" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemoryMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemoryType" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemorySize" OptimizationCondition="equal"/>               
+                <Argument AddressOf="false" GenericType="simple" Name="ChipSelectHighTimeCycle" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FreeRunningClock" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WrapSize" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SampleShifting" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DelayHoldQuarterCycle" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ChipSelectBoundary" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DelayBlockBypass" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Refresh" OptimizationCondition="equal"/>
+            </Argument>
+        </Argument>
+        <Argument AddressOf="true" GenericType="struct" Name="cmd" TypeName="XSPI_HyperbusCmdTypeDef">
+            <Argument AddressOf="false" GenericType="simple" Name="AddressSpace" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Address" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AddressSize" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NbData" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="DQSMode" OptimizationCondition="equal"/>                       
+        </Argument> 
+        <Argument AddressOf="false" GenericType="simple" Name="Timeout" OptimizationCondition="equal"/>
+    </LibMethod>
+    
+    <LibMethod Comment="" Name="HAL_XSPI_HyperbusCfg">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hospi" TypeName="XSPI_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="XSPI_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="XSPI_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="FifoThresholdByte" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemoryMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemoryType" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemorySize" OptimizationCondition="equal"/>               
+                <Argument AddressOf="false" GenericType="simple" Name="ChipSelectHighTimeCycle" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FreeRunningClock" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WrapSize" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SampleShifting" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DelayHoldQuarterCycle" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ChipSelectBoundary" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DelayBlockBypass" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Refresh" OptimizationCondition="equal"/>
+            </Argument>
+        </Argument>
+        <Argument AddressOf="true" GenericType="struct" Name="cfg" TypeName="XSPI_HyperbusCfgTypeDef">
+            <Argument AddressOf="false" GenericType="simple" Name="RWRecoveryTimeCycle" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AccessTimeCycle" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="WriteZeroLatency" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="LatencyMode" OptimizationCondition="equal"/>                       
+        </Argument>
+                <Argument AddressOf="false" GenericType="simple" Name="Timeout" OptimizationCondition="equal"/>
+    </LibMethod>
+
+    <!--OSPI indirect mode functions --> 
+    <LibMethod Comment="" Name="HAL_XSPI_Transmit">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hospi" TypeName="XSPI_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="XSPI_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="XSPI_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="FifoThresholdByte" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemoryMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemoryType" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemorySize" OptimizationCondition="equal"/>               
+                <Argument AddressOf="false" GenericType="simple" Name="ChipSelectHighTimeCycle" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FreeRunningClock" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WrapSize" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SampleShifting" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DelayHoldQuarterCycle" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ChipSelectBoundary" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DelayBlockBypass" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Refresh" OptimizationCondition="equal"/>
+            </Argument>
+        </Argument>
+        <Argument AddressOf="true" GenericType="simple" Name="pData" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timeout" OptimizationCondition="equal"/>
+    </LibMethod>
+        
+    <LibMethod Comment="" Name="HAL_XSPI_Receive">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hospi" TypeName="XSPI_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="XSPI_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="XSPI_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="FifoThresholdByte" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemoryMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemoryType" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemorySize" OptimizationCondition="equal"/>               
+                <Argument AddressOf="false" GenericType="simple" Name="ChipSelectHighTimeCycle" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FreeRunningClock" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WrapSize" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SampleShifting" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DelayHoldQuarterCycle" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ChipSelectBoundary" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DelayBlockBypass" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Refresh" OptimizationCondition="equal"/>
+            </Argument>
+        </Argument>
+        <Argument AddressOf="true" GenericType="simple" Name="pData" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Timeout" OptimizationCondition="equal"/>			                       
+    </LibMethod>
+
+    <!-- OSPI memory-mapped mode functions -->
+    <LibMethod Comment="" Name="HAL_XSPI_MemoryMapped">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hospi" TypeName="XSPI_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="XSPI_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="XSPI_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="FifoThresholdByte" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemoryMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemoryType" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemorySize" OptimizationCondition="equal"/>               
+                <Argument AddressOf="false" GenericType="simple" Name="ChipSelectHighTimeCycle" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FreeRunningClock" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WrapSize" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SampleShifting" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DelayHoldQuarterCycle" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ChipSelectBoundary" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DelayBlockBypass" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Refresh" OptimizationCondition="equal"/>
+            </Argument>
+        </Argument>
+        <Argument AddressOf="true" GenericType="struct" Name="cfg" TypeName="XSPI_MemoryMappedTypeDef">
+            <Argument AddressOf="false" GenericType="simple" Name="TimeOutActivation" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TimeOutPeriod" OptimizationCondition="equal"/>			
+        </Argument>
+    </LibMethod>
+
+    <!--IO Manager Configuration-->
+    <!-- <LibMethod Comment="" Name="HAL_OSPIM_Config">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hospi" TypeName="XSPI_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="XSPI_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="XSPI_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="FifoThresholdByte" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemoryMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemoryType" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="MemorySize" OptimizationCondition="equal"/>               
+                <Argument AddressOf="false" GenericType="simple" Name="ChipSelectHighTimeCycle" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="FreeRunningClock" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockMode" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="WrapSize" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ClockPrescaler" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="SampleShifting" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DelayHoldQuarterCycle" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="ChipSelectBoundary" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DelayBlockBypass" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="Refresh" OptimizationCondition="equal"/>
+            </Argument>
+        </Argument>
+        <Argument AddressOf="true" GenericType="struct" Name="OSPIM_Cfg_Struct" TypeName="OSPIM_CfgTypeDef">
+            <Argument AddressOf="false" GenericType="simple" Name="ClkPort" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="DQSPort" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="NCSPort" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="IOLowPort" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="IOHighPort" OptimizationCondition="equal"/>                       
+        </Argument> 
+        <Argument AddressOf="false" GenericType="simple" Name="Timeout" OptimizationCondition="equal"/>
+    </LibMethod> -->
+
+    <RefComponent Cclass="HAL" Cgroup="OSPI" Cversion="0.2.0">
+        <File Category="header" Name="Drivers/STM32H5xx_HAL_Driver/Inc/stm32h5xx_hal_xspi.h"/>
+        <File Category="source" Name="Drivers/STM32H5xx_HAL_Driver/Src/stm32h5xx_hal_xspi.c"/>
+	<File Category="header" Name="Drivers/STM32H5xx_HAL_Driver/Inc/stm32h5xx_ll_dlyb.h"/>
+        <File Category="source" Name="Drivers/STM32H5xx_HAL_Driver/Src/stm32h5xx_ll_dlyb.c"/>
+    </RefComponent>
+</IP>
+
+
+

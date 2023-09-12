@@ -74,6 +74,9 @@
 <WorkspacePath>${WorkspacePath}</WorkspacePath>
 <underRoot>${underRoot}</underRoot>
 <TrustZone>${TrustZone}</TrustZone>
+[#if Multi_folder == "true"] 
+<ProjectStructure>${ProjectStructure}</ProjectStructure>
+ [/#if]
 <HAL_Driver>${HAL_Driver}</HAL_Driver>[#-- modified to give only the hal driver path --]
 <CMSIS>${CMSISPath}</CMSIS> [#-- modified to give only the relatif path to cmsis folder --]
 [#-- list of toolchains to be generated: EWARM,MDK-ARM,TrueSTUDIO,RIDE: This tag can contain one or more than one toolchain: EWARM,MDK-ARM,TrueSTUDIO,RIDE --]
@@ -92,10 +95,22 @@
 [#if TrustZone=="0"]
 [@generateProject prjSecure="-1"/]
 [#else]
+[#list ProjectConfigs?keys as configName]
+[#assign confdataaaa =  ProjectConfigs[configName]]
+[#assign sec =  confdataaaa["Secure"]]
+[@generateProject  prjSecure=sec/]
+[/#list]
 [#--[#list ProjectConfigs?keys as configName]--]
-[@generateProject  prjSecure="1"/]
-[@generateProject  prjSecure="0"/]
-
+[#if SecureOnly=="1"]
+[#-- [@generateProject  prjSecure="1"/]--]
+[/#if]
+[#if SecureOnly=="2"]
+[#--[@generateProject  prjSecure="0"/]--]
+[/#if]
+[#if SecureOnly=="0"]
+[#-- [@generateProject  prjSecure="1"/]--]
+[#-- [@generateProject  prjSecure="0"/]--]
+[/#if]
 [#--[/#list]--]
 [/#if]
 
@@ -124,6 +139,9 @@
             [/#if]
             [#if dataKey=="cpuCore" || dataKey=="cpucore"]
                [#assign cpuCore =  elem[dataKey]]            
+            [/#if]
+[#if dataKey=="memoriesList"]
+               [#assign memoriesList =  elem[dataKey]]           
             [/#if]
             [#if dataKey=="CdefinesList"]
                [#assign CdefinesList =  elem[dataKey]]
@@ -162,6 +180,9 @@
             [#if dataKey=="StackSize"]
                [#assign StackSize =  elem[dataKey]]
             [/#if]
+            [#if dataKey=="active"]
+               [#assign active =  elem[dataKey]]
+            [/#if]
             [#if dataKey=="threadsafeCore"]
                [#assign threadsafeCore =  elem[dataKey]]
             [/#if]
@@ -182,15 +203,50 @@
     [#if !IdeMode?? && (multiConfig == "true")]
     <bootmode>${bootmode}</bootmode>  [#-- for boot mode could be equals to SRAM or FLASH --]
     [/#if]
-     [#if TrustZone == "1" && prj_ctx=="1"]
+     [#if TrustZone == "1" &&prj_ctx?? && prj_ctx=="1" && SecureOnly=="0"]
     <ExePath>${ExePath}</ExePath>
     [/#if]
-
+   [#if OutputFilesFormat??]
+    <OutputFilesFormat>${OutputFilesFormat}</OutputFilesFormat>
+    [/#if]
+   [#if ReinitLink??]
+    <ReInitLinker>true</ReInitLinker>
+    [/#if]
     <memories>  [#-- add MemoriesList for UC30 --] 
     [#list memoriesList as memory]
         <memory ${memory} />
     [/#list]
-        </memories>
+[#if LinkerFilesUpdate??]
+<BootPathConfig>
+[#------------------------ BootPath Linker Updates ------------------]
+    [#list LinkerFilesUpdate?keys as linkerContext]
+        [#if (Secure=="1" && linkerContext=="Secure") || (Secure=="0" && linkerContext=="NonSecure")]        
+            [#assign ctxData = LinkerFilesUpdate[linkerContext]]
+            [#list ctxData?keys as linkerData]
+                <linkerSymbol name="${linkerData}" value="${ctxData[linkerData]}" />        
+            [/#list]
+        [/#if]
+    [/#list]    
+</BootPathConfig>
+[#if ReInitLinkerFile??]
+<ReInitLinkerFile>true</ReInitLinkerFile>
+[/#if]
+[/#if]
+[#------------------------ BootPath Linker Updates ------------------]
+
+    </memories>
+[#if PostBuildCommand??]
+<BuildAction>
+[#------------------------ BootPath Linker Updates ------------------]
+    [#list PostBuildCommand?keys as postBuildContext]
+        [#if (Secure=="1" && postBuildContext=="Secure") || (Secure=="0" && postBuildContext=="NonSecure")]        
+            [#assign ctxData = PostBuildCommand[postBuildContext]]
+            <PostBuildCmd>${PostBuildCommand[postBuildContext]}</PostBuildCmd>
+        [/#if]
+    [/#list]
+</BuildAction>
+[/#if]
+[#------------------------ BootPath Linker Updates ------------------]
     <startup>${startup}</startup> [#-- add relatif startup path needed for UC30 --]     
 <LinkSettings>
         [#if LinkerFile??]
@@ -202,11 +258,11 @@
         <icfloc>${icfloc}</icfloc>
         [/#if]
 	<LinkAdditionalLibs>
-[#if TrustZone == "1" && prj_ctx=="0"]
+[#if TrustZone == "1" &&prj_ctx?? && prj_ctx=="0"]
 	<lib>${LinkAdditionalLibs}</lib>
 [/#if]
 	</LinkAdditionalLibs>
-[#if TrustZone == "1" && prj_ctx=="1"]
+[#if TrustZone == "1" && prj_ctx?? && prj_ctx=="1" && SecureOnly=="0"]
 	<TrustZoneLibName>${TrustZoneLibName}</TrustZoneLibName>
 [/#if]
 </LinkSettings>
@@ -440,11 +496,17 @@
 [#if dataKey=="prj_ctx"]
                [#assign prj_ctx =  elem[dataKey]]
             [/#if]
+[#if dataKey=="SecureOnly"]
+               [#assign SecureOnly =  elem[dataKey]]
+            [/#if]
             [#if dataKey=="HeapSize"]
                [#assign HeapSize =  elem[dataKey]]
             [/#if]
             [#if dataKey=="StackSize"]
                [#assign StackSize =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="active"]
+               [#assign active =  elem[dataKey]]
             [/#if]
         [/#list]
         [#break]
@@ -455,6 +517,9 @@
 <Project>    
 [#-- <ProjectPath>${ProjectPath}</ProjectPath>  --][#-- added to give project path --]
     <ProjectName>${projectName}[#if TrustZone=="1"][#if prjSecure=="1"]_S[#else]_NS[/#if][/#if]</ProjectName> [#-- modified to give only the project name without path --]
+     [#if active?? && !active]
+    <Excluded>true</Excluded>
+    [/#if]
     <ProjectNature>${ProjectNature}</ProjectNature> [#-- Cpp --]
     [#if CompilerVersionCte??]
     <CompilerVersion>${CompilerVersionCte}</CompilerVersion>
@@ -495,7 +560,7 @@
 </sourceEntriesToRemove>
 [/#if]
     <configs>
-[#if ProjectConfigs?size > 1]
+[#if ProjectConfigs?size > 1  || WorkspaceType=="Multi-project"]
 [#list ProjectConfigs?keys as configName]
 [#assign elemConfig = ProjectConfigs[configName] ]
         [#list elemConfig?keys as dataKey]

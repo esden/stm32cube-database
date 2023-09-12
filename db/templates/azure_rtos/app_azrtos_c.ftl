@@ -23,6 +23,7 @@
 [#assign USBPD_DEVICE_ENABLED = "false"]
 [#assign TOUCHSENSING_ENABLED = "false"]
 [#assign GUI_INTERFACE_ENABLED = "false"]
+[#assign STM32WPAN_ENABLED = "false"]
 [#assign PACK_IN_USE = "false"]
 [#assign AZRTOS_APP_MEM_ALLOCATION_METHOD_VAL = "1"]
 [#compress]
@@ -53,10 +54,13 @@
     [#if name == "GUI_INTERFACE_ENABLED" && value == "true"]
       [#assign GUI_INTERFACE_ENABLED = value]
     [/#if]
+  [#if name == "WPAN_ENABLED" && value == "true"]
+    [#assign STM32WPAN_ENABLED = value]
+  [/#if]
 	 [#if name.contains("AZRTOS_APP_MEM_ALLOCATION_METHOD")]
       [#assign AZRTOS_APP_MEM_ALLOCATION_METHOD_VAL = value]
     [/#if]
-	
+
 	[#if name.contains("THREADX_MEM_POOL_VAR_NAME")]
       [#assign THREADX_MEM_POOL_VAR_NAME_value = value]
     [/#if]
@@ -198,6 +202,15 @@ static TX_BYTE_POOL tsc_app_byte_pool;
 __ALIGN_BEGIN static UCHAR  gui_interface_byte_pool_buffer[GUI_INTERFACE_APP_MEM_POOL_SIZE] __ALIGN_END;
 static TX_BYTE_POOL gui_interface_app_byte_pool;
 [/#if]
+[#if STM32WPAN_ENABLED == "true"]
+/* USER CODE BEGIN STM32WPAN_Pool_Buffer */
+/* USER CODE END STM32WPAN_Pool_Buffer */
+#if defined ( __ICCARM__ ) 
+#pragma data_alignment=4
+#endif
+__ALIGN_BEGIN static UCHAR  wpan_byte_pool_buffer[STM32WPAN_APP_MEM_POOL_SIZE] __ALIGN_END;
+static TX_BYTE_POOL wpan_app_byte_pool;
+[/#if]
 
 [#if packs??]
 [#list packs as variables]
@@ -293,9 +306,9 @@ VOID tx_application_define(VOID *first_unused_memory)
   }
   else
   {
-    /* USER CODE BEGIN TX_Byte_Pool_Success */
+    /* USER CODE BEGIN NX_Byte_Pool_Success */
 
-    /* USER CODE END TX_Byte_Pool_Success */
+    /* USER CODE END NX_Byte_Pool_Success */
 
     memory_ptr = (VOID *)&${NETXDUO_MEM_POOL_VAR_NAME_value};
     status = MX_NetXDuo_Init(memory_ptr);
@@ -316,9 +329,9 @@ VOID tx_application_define(VOID *first_unused_memory)
 [#if UX_HOST_ENABLED == "true"]
   if (tx_byte_pool_create(&${USBX_HOST_MEM_POOL_VAR_NAME_value}, "Ux App memory pool", ux_host_byte_pool_buffer, UX_HOST_APP_MEM_POOL_SIZE) != TX_SUCCESS)
   {
-    /* USER CODE BEGIN TX_Byte_Pool_Error */
+    /* USER CODE BEGIN UX_Byte_Pool_Error */
 
-    /* USER CODE END TX_Byte_Pool_Error */
+    /* USER CODE END UX_Byte_Pool_Error */
   }
   else
   {
@@ -451,6 +464,34 @@ VOID tx_application_define(VOID *first_unused_memory)
     /* USER CODE BEGIN  MX_GUI_INTERFACE_Init */
 
     /* USER CODE END  MX_GUI_INTERFACE_Init */
+  }
+[/#if]
+[#if STM32WPAN_ENABLED == "true"]
+  if (tx_byte_pool_create(&wpan_app_byte_pool, "STM32WPAN App memory pool", wpan_byte_pool_buffer, STM32WPAN_APP_MEM_POOL_SIZE) != TX_SUCCESS)
+  {
+    /* USER CODE BEGIN STM32WPAN_Byte_Pool_Error */
+
+    /* USER CODE END STM32WPAN_Byte_Pool_Error */
+  }
+  else
+  {
+    /* USER CODE BEGIN STM32WPAN_Byte_Pool_Success */
+
+    /* USER CODE END STM32WPAN_Byte_Pool_Success */
+
+    memory_ptr = (VOID *)&wpan_app_byte_pool;
+    status = MX_APPE_Init(memory_ptr);
+    if (status != WPAN_SUCCESS)
+    {
+      /* USER CODE BEGIN  MX_STM32WPAN_Init_Error */
+#t#t#twhile(1)
+#t#t#t{
+#t#t#t}
+      /* USER CODE END  MX_STM32WPAN_Init_Error */
+    }
+    /* USER CODE BEGIN  MX_STM32WPAN_Init */
+      
+    /* USER CODE END  MX_STM32WPAN_Init */
   }
 [/#if]
 [#if packs??]

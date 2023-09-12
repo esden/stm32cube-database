@@ -21,7 +21,8 @@
 /**************************************************************************/
 /**************************************************************************/
 
-
+[#assign familyName=FamilyName?lower_case]
+[#if familyName?starts_with("stm32c0")]
 /**************************************************************************/
 /*                                                                        */
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
@@ -45,9 +46,54 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+/*  05-19-2020      William E. Lamie        Initial Version 6.0           */
 /*                                                                        */
 /**************************************************************************/
+[#else]
+/**************************************************************************/
+/*                                                                        */
+/*  PORT SPECIFIC C INFORMATION                            RELEASE        */
+/*                                                                        */
+/*    tx_user.h                                           PORTABLE C      */
+/*                                                           6.1.11       */
+/*                                                                        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    William E. Lamie, Microsoft Corporation                             */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This file contains user defines for configuring ThreadX in specific */
+/*    ways. This file will have an effect only if the application and     */
+/*    ThreadX library are built with TX_INCLUDE_USER_DEFINE_FILE defined. */
+/*    Note that all the defines in this file may also be made on the      */
+/*    command line when building ThreadX library and application objects. */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  05-19-2020      William E. Lamie        Initial Version 6.0           */
+/*  09-30-2020      Yuxin Zhou              Modified comment(s),          */
+/*                                            resulting in version 6.1    */
+/*  03-02-2021      Scott Larson            Modified comment(s),          */
+/*                                            added option to remove      */
+/*                                            FileX pointer,              */
+/*                                            resulting in version 6.1.5  */
+/*  06-02-2021      Scott Larson            Added options for multiple    */
+/*                                            block pool search & delay,  */
+/*                                            resulting in version 6.1.7  */
+/*  10-15-2021      Yuxin Zhou              Modified comment(s), added    */
+/*                                            user-configurable symbol    */
+/*                                            TX_TIMER_TICKS_PER_SECOND   */
+/*                                            resulting in version 6.1.9  */
+/*  04-25-2022      Wenhui Xie              Modified comment(s),          */
+/*                                            optimized the definition of */
+/*                                            TX_TIMER_TICKS_PER_SECOND,  */
+/*                                            resulting in version 6.1.11 */
+/*                                                                        */
+/**************************************************************************/
+[/#if]
 
 #ifndef TX_USER_H
 #define TX_USER_H
@@ -158,18 +204,6 @@
 	
 	[#if name == "TX_TRACE_TIME_MASK"]
       [#assign TX_TRACE_TIME_MASK_value = value]
-    [/#if]
-	
-	[#if name == "TX_ENABLE_EXECUTION_CHANGE_NOTIFY"]
-      [#assign TX_ENABLE_EXECUTION_CHANGE_NOTIFY_value = value]
-    [/#if]
-	
-	[#if name == "TX_THREAD_GET_SYSTEM_STATE"]
-      [#assign TX_THREAD_GET_SYSTEM_STATE_value = value]
-    [/#if]
-	
-	[#if name == "TX_THREAD_SYSTEM_RETURN_CHECK"]
-      [#assign TX_THREAD_SYSTEM_RETURN_CHECK_value = value]
     [/#if]
 	
 	[#if name == "TX_TIMER_TICKS_PER_SECOND"]
@@ -499,31 +533,6 @@
 [/#if]
 [/#if]
 
-/* Define if the execution change notify is enabled. */
-
-[#if TX_ENABLE_EXECUTION_CHANGE_NOTIFY_value == "1"]
-#define TX_ENABLE_EXECUTION_CHANGE_NOTIFY
-[#else]
-/*#define TX_ENABLE_EXECUTION_CHANGE_NOTIFY*/
-[/#if]
-
-/* Define the get system state macro. */
-
-[#if TX_THREAD_GET_SYSTEM_STATE_value == "_tx_thread_system_state"]
-/*#define TX_THREAD_GET_SYSTEM_STATE() _tx_thread_system_state */
-[#else]
-#define TX_THREAD_GET_SYSTEM_STATE()  ${TX_THREAD_GET_SYSTEM_STATE_value}
-[/#if]
-
-/* Define the check for whether or not to call the
-    _tx_thread_system_return function (TX_THREAD_SYSTEM_RETURN_CHECK(c)). */
-
-[#if TX_THREAD_SYSTEM_RETURN_CHECK_value != "_tx_thread_preempt_disable"]
-#define TX_THREAD_SYSTEM_RETURN_CHECK (c)  ((ULONG) ${TX_THREAD_SYSTEM_RETURN_CHECK_value})
-[#else]
-/*#define TX_THREAD_SYSTEM_RETURN_CHECK (c)  ((ULONG) _tx_thread_preempt_disable)*/
-[/#if]
-
 /* Define the common timer tick reference for use by other middleware components. */
 
 [#if TX_TIMER_TICKS_PER_SECOND_value == "100"]
@@ -599,7 +608,7 @@
 /* Define the LowPower macros and flags */
 
 /* Define a macro that sets up a low power clock and keep track of time */
-[#if TX_LOW_POWER_TIMER_SETUP_value == " " || TX_LOW_POWER_TIMER_SETUP_value == ""]
+[#if TX_LOW_POWER_TIMER_SETUP_value == " " || TX_LOW_POWER_TIMER_SETUP_value == "" || TX_LOW_POWER_TIMER_SETUP_value="valueNotSetted"]
 /*#define TX_LOW_POWER_TIMER_SETUP */
 [#else]
 void ${TX_LOW_POWER_TIMER_SETUP_value}(unsigned long count);
@@ -631,7 +640,7 @@ void ${TX_LOW_POWER_USER_EXIT_value}(void);
 [/#if]
 
 /* User's low-power macro to obtain the amount of time (in ticks) the system has been in low power mode */
-[#if TX_LOW_POWER_USER_TIMER_ADJUST_value == " " || TX_LOW_POWER_USER_TIMER_ADJUST_value == ""]
+[#if TX_LOW_POWER_USER_TIMER_ADJUST_value == " " || TX_LOW_POWER_USER_TIMER_ADJUST_value == "" || TX_LOW_POWER_USER_TIMER_ADJUST_value == "valueNotSetted"]
 /*#define TX_LOW_POWER_USER_TIMER_ADJUST */
 [#else]
 unsigned long ${TX_LOW_POWER_USER_TIMER_ADJUST_value}(void);

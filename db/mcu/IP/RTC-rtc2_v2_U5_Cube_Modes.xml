@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" DBVersion="V4.0" IPType="peripheral" Name="RTC" Version="rtc2_v2_U5_Cube" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu file:///C:/Users/gadachah/Documents/IP_Modes.xsd">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" DBVersion="V4.0" IPType="peripheral" Name="RTC" Version="rtc2_v2_U5_Cube" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu file:///C:/Users/gadachah/Documents/IP_Modes.xsd">
   <About>RTC: Real-Time Clock</About>
 	
 		<!-- Generic RefParameters for RTC --> 
@@ -151,7 +152,9 @@
 
 	<!-- Output Signal for Alarm A, Alarm B, WAKEUP -->
 	
-	
+	<RefParameter Comment="Output Remap" DefaultValue="__NULL" Group="General" Name="OutPutRemap" Type="list" Visible="false">
+		<Condition Diagnostic="" Expression="(STM32WBA50KGUx|STM32WBA50KEUx) "/>
+	</RefParameter>
 	<RefParameter Comment="Output Remap" DefaultValue="RTC_OUTPUT_REMAP_POS1" Group="General" Name="OutPutRemap" Type="list" Visible="false">
 		<Condition Diagnostic="" Expression="(PB2_RTC_OUT2)"/>
 		<PossibleValue Comment="Output Remap on PA4 pin" Value="RTC_OUTPUT_REMAP_POS1"/>
@@ -171,7 +174,10 @@
 		<PossibleValue Comment="Output Polarity High" Value="RTC_OUTPUT_POLARITY_HIGH"/>
 		<!--PossibleValue Comment="Output Polarity Low" Value="RTC_OUTPUT_POLARITY_LOW"/-->
 	</RefParameter>
-	
+        
+	<RefParameter Comment="Output Type" DefaultValue="__NULL" Group="General" Name="OutPutType" Type="list" Visible="false">
+		<Condition Diagnostic="" Expression="(STM32WBA50KGUx|STM32WBA50KEUx) "/>
+	</RefParameter>
 	<RefParameter Comment="Output Type" DefaultValue="RTC_OUTPUT_TYPE_OPENDRAIN" Group="General" Name="OutPutType" Type="list">
 		<Condition Diagnostic="" Expression="WakeUp_Outputed|AlarmA_Outputed|AlarmB_Outputed"/>
 		<PossibleValue Comment="Output Type Opendrain" Value="RTC_OUTPUT_TYPE_OPENDRAIN"/>
@@ -699,6 +705,17 @@
 	<RefParameter Comment="Time Stamp Pin" DefaultValue="RTC_TIMESTAMPPIN_DEFAULT" Group="Time Stamp" Name="TimeStampPin" Type="list" Visible="false">
 		<PossibleValue Comment="PC13 is selected as RTC TimeStamp Pin" Value="RTC_TIMESTAMPPIN_DEFAULT"/>
 	</RefParameter>
+        
+        <RefParameter Comment="Flag AutoClre" DefaultValue="ALARM_FLAG_AUTOCLR_ENABLE" Group="Alarm A" Name="FlagAutoClr_A" Type="list">
+            <Condition Diagnostic="" Expression="DIE474|DIE484"/>
+            <PossibleValue Comment="Enable" Value="ALARM_FLAG_AUTOCLR_ENABLE"/>
+            <PossibleValue Comment="Disable" Value="ALARM_FLAG_AUTOCLR_DISABLE"/>
+        </RefParameter>
+        <RefParameter Comment="Flag AutoClre" DefaultValue="ALARM_FLAG_AUTOCLR_ENABLE" Group="Alarm B" Name="FlagAutoClr_B" Type="list">
+            <Condition Diagnostic="" Expression="DIE474|DIE484"/>
+            <PossibleValue Comment="Enable" Value="ALARM_FLAG_AUTOCLR_ENABLE"/>
+            <PossibleValue Comment="Disable" Value="ALARM_FLAG_AUTOCLR_DISABLE"/>
+        </RefParameter>
 	 <!-- ****************************Secure Backup Register**************************-->
          <RefParameter Name="backupRegisterStartZone2_gS" DefaultValue="__NULL" Group="Backup register" Comment="Start zone 2" Visible="false" TabName="RTC Security"  Type="String" > 
             <Condition Diagnostic="" Expression="S_SECURE &amp; S_LPBAM_CONF"/>
@@ -729,141 +746,146 @@
 
     <!-- ********************************************-->
      <RefParameter Comment=" RTC full secure" DefaultValue="__NULL" Group="Secure RTC" TabName="RTC Security"  Visible="false" Name="rtcSecureFull" Type="list">
-            <Condition Diagnostic="" Expression="S_SECURE &amp; S_LPBAM_CONF"/>
-
-        
+     	<Condition Diagnostic="" Expression="S_SECURE &amp; S_LPBAM_CONF"/>
     </RefParameter>
     <RefParameter Comment=" RTC full secure" DefaultValue="RTC_SECURE_FULL_YES" Group="Secure RTC" TabName="RTC Security"  Name="rtcSecureFull" Type="list">
         <Condition Diagnostic="" Expression="S_SECURE"/>
-
         <PossibleValue Comment="Enable" Value="RTC_SECURE_FULL_YES" />
         <PossibleValue Comment="Disable" Value="RTC_SECURE_FULL_NO" Semaphore="Semaphore_privelege1_$IpInstance" />
-        
     </RefParameter>
     
     <RefParameter  Visible ="false" Comment="UnSecure Features RTC" DefaultValue="__NULL" Group="Features" TabName="RTC Security"  Name="rtcNonSecureFeatures" Type="list">
- 
         <Condition Diagnostic="" Expression="S_SECURE &amp; S_LPBAM_CONF"/>  
+    </RefParameter>
+    <RefParameter  Visible ="false" Comment="UnSecure Features RTC" DefaultValue="/RTC_NONSECURE_FEATURE_ALRB+|+RTC_NONSECURE_FEATURE_WUT+|+RTC_NONSECURE_FEATURE_INIT+|+RTC_NONSECURE_FEATURE_CAL+|+RTC_NONSECURE_FEATURE_ALRA+|+RTC_NONSECURE_FEATURE_TS/\|__NULL//__NULL\|//__NULL&amp;//&amp;__NULL//" Group="Features" TabName="RTC Security"  Name="rtcNonSecureFeatures" Type="list">
+        <Condition Diagnostic="" Expression="(DIE492|DIE484) &amp; Semaphore_privelege1_$IpInstance"/>  
     </RefParameter>
     
     <RefParameter  Visible ="false" Comment="UnSecure Features RTC" DefaultValue="/RTC_NONSECURE_FEATURE_NONE+&amp;+RTC_NONSECURE_FEATURE_ALRB+&amp;+RTC_NONSECURE_FEATURE_WUT+&amp;+RTC_NONSECURE_FEATURE_INIT+&amp;+RTC_NONSECURE_FEATURE_CAL+&amp;+RTC_NONSECURE_FEATURE_ALRA+&amp;+RTC_NONSECURE_FEATURE_TS/\|__NULL//__NULL\|//__NULL&amp;//&amp;__NULL//" Group="Features" TabName="RTC Security"  Name="rtcNonSecureFeatures" Type="list">
- 
-        <Condition Diagnostic="" Expression="Semaphore_privelege1_$IpInstance"/>  
+        <Condition Diagnostic="" Expression=" (STM32U5) &amp; (Semaphore_privelege1_$IpInstance)"/>  
     </RefParameter>
    
     <RefParameter  Visible ="false" Comment="UnSecure Features RTC LL" DefaultValue="__NULL" Group="Features" TabName="RTC Security"   Name="rtcSecure" Type="list">
- 
         <Condition Diagnostic="" Expression="S_SECURE &amp; S_LPBAM_CONF"/>
     </RefParameter>
      <RefParameter  Visible ="false" Comment="UnSecure Features RTC LL" DefaultValue="/+RTC_NONSECURE_FEATURE_ALRB+&amp;+RTC_NONSECURE_FEATURE_WUT+&amp;+RTC_NONSECURE_FEATURE_INIT+&amp;+RTC_NONSECURE_FEATURE_CAL+&amp;+RTC_NONSECURE_FEATURE_ALRA+&amp;+RTC_NONSECURE_FEATURE_TS/\|__NULL//__NULL\|//__NULL&amp;//&amp;__NULL//" Group="Features" TabName="RTC Security"  Name="rtcSecure" Type="list">
- 
         <Condition Diagnostic="" Expression="Semaphore_privelege1_$IpInstance"/>  
     </RefParameter>
+
      <RefParameter Comment="RTC Initialisation" DefaultValue="__NULL" Group="Features" TabName="RTC Security"  Visible="false"  Name="RTC_NONSECURE_FEATURE_INIT" Type="list">
-               <Condition Diagnostic="" Expression="S_SECURE &amp; S_LPBAM_CONF"/>
-  
+     	<Condition Diagnostic="" Expression="S_SECURE &amp; S_LPBAM_CONF"/>
+    </RefParameter>
+    <RefParameter Visible ="false"  Comment="RTC Initialisation" DefaultValue="__NULL" Group="Features" TabName="RTC Security"   Name="RTC_NONSECURE_FEATURE_INIT" Type="list">
+		<Condition Expression="STM32WBA50KGUx|STM32WBA50KEUx"   Diagnostic=" " />             
     </RefParameter>
     <RefParameter Comment="RTC Initialisation" DefaultValue="RTC_NONSECURE_FEATURE_INIT" Group="Features" TabName="RTC Security"   Name="RTC_NONSECURE_FEATURE_INIT" Type="list">
         <Condition Diagnostic="" Expression="S_SECURE &amp; Semaphore_privelege1_$IpInstance"/>
         <PossibleValue Comment="Non-Secure" Value="RTC_NONSECURE_FEATURE_INIT"/>
         <PossibleValue Comment="Secure" Value="__NULL"/>
-
-
         <Description></Description>     
     </RefParameter>
-     <RefParameter Comment="RTC Alarm A" DefaultValue="__NULL" Group="Features" Visible="false"  TabName="RTC Security"   Name="RTC_NONSECURE_FEATURE_ALRA" Type="list">
-                       <Condition Diagnostic="" Expression="S_SECURE &amp; S_LPBAM_CONF"/>
 
+    <RefParameter Comment="RTC Alarm A" DefaultValue="__NULL" Group="Features" Visible="false"  TabName="RTC Security"   Name="RTC_NONSECURE_FEATURE_ALRA" Type="list">
+    	<Condition Diagnostic="" Expression="S_SECURE &amp; S_LPBAM_CONF"/>
+    </RefParameter>
+    <RefParameter Visible ="false"  Comment="RTC Alarm A" DefaultValue="__NULL" Group="Features" TabName="RTC Security"   Name="RTC_NONSECURE_FEATURE_ALRA" Type="list">
+		<Condition Expression="STM32WBA50KGUx|STM32WBA50KEUx"   Diagnostic=" " />             
     </RefParameter>
     <RefParameter Comment="RTC Alarm A" DefaultValue="RTC_NONSECURE_FEATURE_ALRA" Group="Features" TabName="RTC Security"   Name="RTC_NONSECURE_FEATURE_ALRA" Type="list">
         <Condition Diagnostic="" Expression="S_SECURE &amp; Semaphore_privelege1_$IpInstance"/>
         <PossibleValue Comment="Non-Secure" Value="RTC_NONSECURE_FEATURE_ALRA"/> 
         <PossibleValue Comment="Secure" Value="__NULL"/>
-   
         <Description> </Description>     
     </RefParameter>
+
     <RefParameter Comment="RTC Alarm B" DefaultValue="__NULL" Visible="false"  Group="Features" TabName="RTC Security"   Name="RTC_NONSECURE_FEATURE_ALRB" Type="list">
         <Condition Diagnostic="" Expression="S_SECURE &amp; S_LPBAM_CONF"/>
-   
+    </RefParameter>
+     <RefParameter Visible ="false"  Comment="RTC Alarm B" DefaultValue="__NULL" Group="Features" TabName="RTC Security"   Name="RTC_NONSECURE_FEATURE_ALRB" Type="list">
+		<Condition Expression="STM32WBA50KGUx|STM32WBA50KEUx"   Diagnostic=" " />             
     </RefParameter>
     <RefParameter Comment="RTC Alarm B" DefaultValue="RTC_NONSECURE_FEATURE_ALRB" Group="Features" TabName="RTC Security"   Name="RTC_NONSECURE_FEATURE_ALRB" Type="list">
         <Condition Diagnostic="" Expression="S_SECURE &amp; Semaphore_privelege1_$IpInstance"/>
         <PossibleValue Comment="Non-Secure" Value="RTC_NONSECURE_FEATURE_ALRB"/>
         <PossibleValue Comment="Secure" Value="__NULL"/>
-
-
         <Description></Description>     
     </RefParameter>
-    <RefParameter Comment="RTC Calibration" DefaultValue="__NULL" Group="Features" Visible="false"  TabName="RTC Security"   Name="RTC_NONSECURE_FEATURE_CAL" Type="list">
-                  <Condition Diagnostic="" Expression="S_SECURE &amp; S_LPBAM_CONF"/>
 
+    <RefParameter Comment="RTC Calibration" DefaultValue="__NULL" Group="Features" Visible="false"  TabName="RTC Security"   Name="RTC_NONSECURE_FEATURE_CAL" Type="list">
+    	<Condition Diagnostic="" Expression="S_SECURE &amp; S_LPBAM_CONF"/>
+    </RefParameter>
+     <RefParameter Visible ="false"  Comment="RTC Calibration" DefaultValue="__NULL" Group="Features" TabName="RTC Security"   Name="RTC_NONSECURE_FEATURE_CAL" Type="list">
+                <Condition Expression="STM32WBA50KGUx|STM32WBA50KEUx"   Diagnostic=" " />             
     </RefParameter>
     <RefParameter Comment="RTC Calibration" DefaultValue="RTC_NONSECURE_FEATURE_CAL" Group="Features" TabName="RTC Security"   Name="RTC_NONSECURE_FEATURE_CAL" Type="list">
         <Condition Diagnostic="" Expression="S_SECURE &amp; Semaphore_privelege1_$IpInstance"/>
         <PossibleValue Comment="Non-Secure" Value="RTC_NONSECURE_FEATURE_CAL"/>
         <PossibleValue Comment="Secure" Value="__NULL"/>
-
-
         <Description> </Description>     
     </RefParameter>
+
     <RefParameter Comment="RTC TimeStamp" DefaultValue="__NULL" Group="Features" Visible="false"  TabName="RTC Security"   Name="RTC_NONSECURE_FEATURE_TS" Type="list">
         <Condition Diagnostic="" Expression="S_SECURE &amp; S_LPBAM_CONF"/>
-   
     </RefParameter> 
+    <RefParameter Visible ="false"  Comment="RTC TimeStamp" DefaultValue="__NULL" Group="Features" TabName="RTC Security"   Name="RTC_NONSECURE_FEATURE_TS" Type="list">
+		<Condition Expression="STM32WBA50KGUx|STM32WBA50KEUx"   Diagnostic=" " />           
+    </RefParameter>
    <RefParameter Comment="RTC TimeStamp" DefaultValue="RTC_NONSECURE_FEATURE_TS" Group="Features" TabName="RTC Security"   Name="RTC_NONSECURE_FEATURE_TS" Type="list">
         <Condition Diagnostic="" Expression="S_SECURE &amp; Semaphore_privelege1_$IpInstance"/>
         <PossibleValue Comment="Secure" Value="__NULL"/>
         <PossibleValue Comment="Non-secure" Value="RTC_NONSECURE_FEATURE_TS"/>   
         <Description> </Description>     
     </RefParameter> 
+
     <RefParameter Comment="RTC WakeUpTimer" DefaultValue="__NULL" Group="Features" Visible="false"  TabName="RTC Security"   Name="RTC_NONSECURE_FEATURE_WUT" Type="list">
         <Condition Diagnostic="" Expression="S_SECURE &amp; S_LPBAM_CONF"/>
-  
+    </RefParameter>
+    <RefParameter Visible ="false"  Comment="RTC WakeUpTimer" DefaultValue="__NULL" Group="Features" TabName="RTC Security"   Name="RTC_NONSECURE_FEATURE_WUT" Type="list">
+		<Condition Expression="STM32WBA50KGUx|STM32WBA50KEUx"   Diagnostic=" " />                     
     </RefParameter>
     <RefParameter Comment="RTC WakeUpTimer" DefaultValue="RTC_NONSECURE_FEATURE_WUT" Group="Features" TabName="RTC Security"   Name="RTC_NONSECURE_FEATURE_WUT" Type="list">
         <Condition Diagnostic="" Expression="S_SECURE &amp; Semaphore_privelege1_$IpInstance"/>
         <PossibleValue Comment="Non-Secure" Value="RTC_NONSECURE_FEATURE_WUT"/>
         <PossibleValue Comment="Secure" Value="__NULL"/>
-
         <Description> </Description>     
     </RefParameter>
-
         
     <!-- RefParameter for SECURE RTC  -->
     <RefParameter Comment="Start zone 1"  DefaultValue="__NULL" Group="Backup register" Visible="false"   Name="BKP_Start_Zone1"  TabName="RTC Privilege" Type="String">
         <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
-
+    </RefParameter>
+    <RefParameter Visible ="false"  Comment="Start zone 1"  DefaultValue="__NULL" Group="Backup register" Name="BKP_Start_Zone1"  TabName="RTC Privilege" Type="String">
+		<Condition Expression="STM32WBA50KGUx|STM32WBA50KEUx"   Diagnostic="" /> 
     </RefParameter>
     <RefParameter Comment="Start zone 1"  DefaultValue="RTC_BKP_DR0" Group="Backup register" Name="BKP_Start_Zone1"  TabName="RTC Privilege" Type="String">
         <Description> Zone 1 : Read only because shared with TZSC secure Backup Register Zone 1. </Description>
         <PossibleValue Comment="RTC_BKP_DR0" Value="RTC_BKP_DR0"/>
     </RefParameter>
-    
-    
     <RefParameter Comment="Start zone 1" DefaultValue="__NULL" Visible="false"  Group="Backup register" Name="Sec_BKP_Registers1"  TabName="RTC Security" Type="String">
         <Condition Diagnostic="" Expression="S_SECURE &amp; S_LPBAM_CONF"/>
-
     </RefParameter>
     <RefParameter Comment="Start zone 1" DefaultValue="RTC_BKP_DR0" Group="Backup register" Name="Sec_BKP_Registers1"  TabName="RTC Security" Type="String">
         <Condition Expression="S_SECURE"   Diagnostic="Specifies the unsecured features " /> 
-
         <Description> Zone 1 : read secure write secure. </Description>
         <PossibleValue Comment="RTC_BKP_DR0" Value="RTC_BKP_DR0"/>
     </RefParameter>
     
-      <RefParameter Comment="Non-secure feature" DefaultValue="__NULL" Visible="false"  Group="RTC unsecure features" TabName="RTC Security"  Name="RTC_NONSECURE_FEATURE_NONE" Type="list"> 
-               <Condition Diagnostic="" Expression="S_SECURE &amp; S_LPBAM_CONF"/>
+    <RefParameter Comment="Non-secure feature" DefaultValue="__NULL" Visible="false"  Group="RTC unsecure features" TabName="RTC Security"  Name="RTC_NONSECURE_FEATURE_NONE" Type="list"> 
+    	<Condition Diagnostic="" Expression="S_SECURE &amp; S_LPBAM_CONF"/>
     </RefParameter>
     <RefParameter Comment="Non-secure feature" DefaultValue="RTC_NONSECURE_FEATURE_NONE" Group="RTC unsecure features" TabName="RTC Security"  Name="RTC_NONSECURE_FEATURE_NONE" Type="list"> 
         <Condition Expression="Semaphore_privelege_$IpInstance1"   Diagnostic="Specifies the unsecured features " /> 
-
         <PossibleValue Comment="Enable" Value="RTC_NONSECURE_FEATURE_NONE"/>
         <PossibleValue Comment="Disable"  Value=""  />
+    </RefParameter>
+
+    <!-- **************************** Privelegeable parameters RTC **************************************-->
+    <RefParameter Comment="RTC full privilege" DefaultValue="__NULL" Visible="false" Group="Privilege RTC" TabName="RTC Privilege"  Name="rtcPrivilegeFull" Type="list">
+                   <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
 
     </RefParameter>
-    <!-- **************************** Privelegeable parameters RTC **************************************-->
-     <RefParameter Comment="RTC full privilege" DefaultValue="__NULL" Visible="false" Group="Privilege RTC" TabName="RTC Privilege"  Name="rtcPrivilegeFull" Type="list">
-                   <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
+    <RefParameter Visible ="false"  Comment="RTC full privilege" DefaultValue="__NULL" Group="Privilege RTC" TabName="RTC Privilege"  Name="rtcPrivilegeFull" Type="list">
+                <Condition Expression="STM32WBA50KGUx|STM32WBA50KEUx"   Diagnostic="Specifies the unsecured features " /> 
 
     </RefParameter>
     <RefParameter Comment="RTC full privilege" DefaultValue="RTC_PRIVILEGE_FULL_NO" Group="Privilege RTC" TabName="RTC Privilege"  Name="rtcPrivilegeFull" Type="list">
@@ -891,7 +913,9 @@
    
     <RefParameter Comment="RTC Initialisation" Visible ="false" DefaultValue="__NULL" Group="Privilege RTC Feature" TabName="RTC Privilege"   Name="RTC_PRIVILEGE_FEATURE_INIT" Type="list">
         <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
-
+    </RefParameter>
+    <RefParameter Comment="RTC Initialisation" Visible ="false" DefaultValue="__NULL" Group="Privilege RTC Feature" TabName="RTC Privilege"   Name="RTC_PRIVILEGE_FEATURE_INIT" Type="list">
+                <Condition Expression="STM32WBA50KGUx|STM32WBA50KEUx"   Diagnostic=" " /> 
     </RefParameter>
     <RefParameter Comment="RTC Initialisation" DefaultValue="__NULL" Group="Privilege RTC Feature" TabName="RTC Privilege"   Name="RTC_PRIVILEGE_FEATURE_INIT" Type="list">
         <Condition Diagnostic="" Expression="Semaphore_privelege_$IpInstance"/>
@@ -901,69 +925,77 @@
     </RefParameter>
     
      <RefParameter Comment="RTC Alarm A" DefaultValue="__NULL"  Visible ="false" Group="Privilege RTC Feature" TabName="RTC Privilege"   Name="RTC_PRIVILEGE_FEATURE_ALRA" Type="list">
-               <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
-    
+         <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
+    </RefParameter>
+    <RefParameter Visible ="false" Comment="RTC Alarm A" DefaultValue="__NULL" Group="Privilege RTC Feature" TabName="RTC Privilege"   Name="RTC_PRIVILEGE_FEATURE_ALRA" Type="list">
+        <Condition Diagnostic="" Expression="STM32WBA50KGUx|STM32WBA50KEUx"/>
     </RefParameter>
     <RefParameter Comment="RTC Alarm A" DefaultValue="__NULL" Group="Privilege RTC Feature" TabName="RTC Privilege"   Name="RTC_PRIVILEGE_FEATURE_ALRA" Type="list">
         <Condition Diagnostic="" Expression="Semaphore_privelege_$IpInstance"/>
         <PossibleValue Comment="Privilege" Value="RTC_PRIVILEGE_FEATURE_ALRA"/>
         <PossibleValue Comment="Non-Privilege" Value="__NULL"/>
-
-
         <Description></Description>     
     </RefParameter>
+
     <RefParameter Comment="RTC Alarm B" DefaultValue="__NULL" Visible ="false" Group="Privilege RTC Feature" TabName="RTC Privilege"   Name="RTC_PRIVILEGE_FEATURE_ALRB" Type="list">
                <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
-   
+	</RefParameter>
+    <RefParameter Visible ="false" Comment="RTC Alarm B" DefaultValue="__NULL" Group="Privilege RTC Feature" TabName="RTC Privilege"   Name="RTC_PRIVILEGE_FEATURE_ALRB" Type="list">
+        <Condition Diagnostic="" Expression="STM32WBA50KGUx|STM32WBA50KEUx"/>
     </RefParameter>
     <RefParameter Comment="RTC Alarm B" DefaultValue="__NULL" Group="Privilege RTC Feature" TabName="RTC Privilege"   Name="RTC_PRIVILEGE_FEATURE_ALRB" Type="list">
         <Condition Diagnostic="" Expression="Semaphore_privelege_$IpInstance"/>
         <PossibleValue Comment="Privilege" Value="RTC_PRIVILEGE_FEATURE_ALRB"/> 
         <PossibleValue Comment="Non-Privilege" Value="__NULL"/>
-   
         <Description> </Description>     
     </RefParameter>
+
      <RefParameter Comment="RTC Calibration" DefaultValue="__NULL" Visible ="false" Group="Privilege RTC Feature" TabName="RTC Privilege"   Name="RTC_PRIVILEGE_FEATURE_CAL" Type="list">
                      <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
-   
+	</RefParameter>
+    <RefParameter Visible ="false" Comment="RTC Calibration" DefaultValue="__NULL" Group="Privilege RTC Feature" TabName="RTC Privilege"   Name="RTC_PRIVILEGE_FEATURE_CAL" Type="list">
+        <Condition Diagnostic="" Expression="STM32WBA50KGUx|STM32WBA50KEUx"/>
     </RefParameter>
     <RefParameter Comment="RTC Calibration" DefaultValue="__NULL" Group="Privilege RTC Feature" TabName="RTC Privilege"   Name="RTC_PRIVILEGE_FEATURE_CAL" Type="list">
         <Condition Diagnostic="" Expression="Semaphore_privelege_$IpInstance"/>
         <PossibleValue Comment="Privilege" Value="RTC_PRIVILEGE_FEATURE_CAL"/>
         <PossibleValue Comment="Non-Privilege" Value="__NULL"/>
-
-
         <Description></Description>     
     </RefParameter>
+
     <RefParameter Comment="RTC TimeStamp" DefaultValue="__NULL" Visible ="false" Group="Privilege RTC Feature" TabName="RTC Privilege"   Name="RTC_PRIVILEGE_FEATURE_TS" Type="list">
-                            <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
-   
+        <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
+    </RefParameter>
+    <RefParameter Visible ="false" Comment="RTC TimeStamp" DefaultValue="__NULL" Group="Privilege RTC Feature" TabName="RTC Privilege"   Name="RTC_PRIVILEGE_FEATURE_TS" Type="list">
+        <Condition Diagnostic="" Expression="STM32WBA50KGUx|STM32WBA50KEUx"/>
     </RefParameter>
     <RefParameter Comment="RTC TimeStamp" DefaultValue="__NULL" Group="Privilege RTC Feature" TabName="RTC Privilege"   Name="RTC_PRIVILEGE_FEATURE_TS" Type="list">
         <Condition Diagnostic="" Expression="Semaphore_privelege_$IpInstance"/>
         <PossibleValue Comment="Privilege" Value="RTC_PRIVILEGE_FEATURE_TS"/>  
         <PossibleValue Comment="Non-Privilege" Value="__NULL"/>
-  
         <Description> </Description>     
     </RefParameter>
+
     <RefParameter Comment="RTC WakeUpTimer" DefaultValue="__NULL" Visible ="false" Group="Privilege RTC Feature" TabName="RTC Privilege"   Name="RTC_PRIVILEGE_FEATURE_WUT" Type="list">
-                            <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
-     
+        <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
+    </RefParameter>
+    <RefParameter Visible ="false" Comment="RTC WakeUpTimer" DefaultValue="__NULL" Group="Privilege RTC Feature" TabName="RTC Privilege"   Name="RTC_PRIVILEGE_FEATURE_WUT" Type="list">
+        <Condition Diagnostic="" Expression="STM32WBA50KGUx|STM32WBA50KEUx"/>
     </RefParameter>
     <RefParameter Comment="RTC WakeUpTimer" DefaultValue="__NULL" Group="Privilege RTC Feature" TabName="RTC Privilege"   Name="RTC_PRIVILEGE_FEATURE_WUT" Type="list">
         <Condition Diagnostic="" Expression="Semaphore_privelege_$IpInstance"/>
         <PossibleValue Comment="Privilege" Value="RTC_PRIVILEGE_FEATURE_WUT"/>
         <PossibleValue Comment="Non-Privilege" Value="__NULL"/>
-
-
         <Description> </Description>     
     </RefParameter>
     
     
     <!--******************************Backup Register****************************** -->
-<RefParameter Comment="Backup Register PrivZone" DefaultValue="__NULL" Visible ="false" Group="Privilege Backup register "  TabName="RTC Privilege" Name="backupRegisterPrivZone" Type="list">
-                                          <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
-
+	<RefParameter Comment="Backup Register PrivZone" DefaultValue="__NULL" Visible ="false" Group="Privilege Backup register "  TabName="RTC Privilege" Name="backupRegisterPrivZone" Type="list">
+		<Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
+    </RefParameter>
+    <RefParameter Visible ="false" Comment="Backup Register PrivZone" DefaultValue="__NULL" Group="Privilege Backup register "  TabName="RTC Privilege" Name="backupRegisterPrivZone" Type="list">
+                <Condition Expression="STM32WBA50KGUx|STM32WBA50KEUx"   Diagnostic=" " />               
     </RefParameter>
     <RefParameter Comment="Backup Register PrivZone" DefaultValue="RTC_PRIVILEGE_BKUP_ZONE_NONE" Group="Privilege Backup register "  TabName="RTC Privilege" Name="backupRegisterPrivZone" Type="list">
                <Condition Diagnostic="" Expression="RTC_ENABLED"/>
@@ -972,11 +1004,13 @@
                <PossibleValue Comment=" PrivZone1+PrivZone2" Value="RTC_PRIVILEGE_BKUP_ZONE_2"/>
                <PossibleValue Comment=" PrivZone1+PrivZone2+PrivZone3" Value="RTC_PRIVILEGE_BKUP_ZONE_ALL"/>
     </RefParameter>
- 
+
     <RefParameter Name="backupRegisterStartZone2_g" DefaultValue="__NULL" Visible ="false" Group="Backup register" Comment="Start Zone 2" TabName="RTC Privilege" Type="list">  
         <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
-
-    </RefParameter> 
+    </RefParameter>
+    <RefParameter Name="backupRegisterStartZone2_g" Visible ="false"   DefaultValue="__NULL" Group="Backup register" Comment="Start Zone 2" TabName="RTC Privilege" Type="list">  
+    	<Condition Expression="STM32WBA50KGUx|STM32WBA50KEUx"   Diagnostic="" /> 
+    </RefParameter>
     <RefParameter Name="backupRegisterStartZone2_g" DefaultValue="0" Group="Backup register" Comment="Start Zone 2" TabName="RTC Privilege" Type="list">  
  
                                                                  
@@ -1014,12 +1048,12 @@
         <PossibleValue Comment="RTC_BKP_DR31" Value="31" />
 
     </RefParameter>  
-    <RefParameter Name="backupRegisterStartZone3_g" DefaultValue="__NULL" Group="Backup register" Comment="start zone 3" Visible ="false" TabName="RTC Privilege" Type="list">     
-        
-                    <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
-  
+    <RefParameter Name="backupRegisterStartZone3_g" DefaultValue="__NULL" Group="Backup register" Comment="start zone 3" Visible ="false" TabName="RTC Privilege" Type="list">
+        <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
+    </RefParameter> 
+    <RefParameter Visible ="false" Name="backupRegisterStartZone3_g" DefaultValue="__NULL" Group="Backup register" Comment="start zone 3" TabName="RTC Privilege" Type="list">
+    	<Condition Expression="STM32WBA50KGUx|STM32WBA50KEUx"   Diagnostic=" " /> 
     </RefParameter>  
-
     <RefParameter Name="backupRegisterStartZone3_g" DefaultValue="0" Group="Backup register" Comment="start zone 3" TabName="RTC Privilege" Type="list" >     
                                                                         
                                                                   
@@ -1056,26 +1090,25 @@
         <PossibleValue Comment="RTC_BKP_DR30" Value="30"  Diagnostic="Available only when the BKP Start Zone2 is less than or equal to BKP Start Zone3"   Condition="backupRegisterStartZone2_g &gt;30" Action="disable"/>
         <PossibleValue Comment="RTC_BKP_DR31" Value="31" Diagnostic="Available only when the BKP Start Zone2 is less than or equal to BKP Start Zone3"   Condition="backupRegisterStartZone2_g &gt;31" Action="disable"/>
     </RefParameter>
+
     <RefParameter Name="backupRegisterStartZone2" DefaultValue="__NULL" Visible ="false"  Group="Backup register" Comment="Start zone 2" TabName="RTC Privilege" Type="string" >   
         <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
-
-    </RefParameter>  
+    </RefParameter>
+    <RefParameter Visible="false" Name="backupRegisterStartZone2" DefaultValue="__NULL" Group="Backup register" Comment="Start zone 2" TabName="RTC Privilege" Type="string" >   
+    	<Condition Expression="STM32WBA50KGUx|STM32WBA50KEUx"   Diagnostic=" " /> 
+    </RefParameter>
+    <RefParameter Name="backupRegisterStartZone2" DefaultValue="+RTC_BKP_DR+backupRegisterStartZone2_g" Group="Backup register" Comment="Start zone 2" TabName="RTC Privilege" Type="string" Visible="false">   
+       <Description>BKP Start Zone2 is available when BKP  Registers2 equal or less than BKP Backup register3, Specifies the backup register start zone 2.</Description> 
+    </RefParameter>
+ 
     <RefParameter Name="backupRegisterStartZone3" DefaultValue="__NULL" Visible ="false" Group="Backup register" Comment="Start zone 3" TabName="RTC Privilege" Type="string" >     
         <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
-
     </RefParameter>
-    
-     <RefParameter Name="backupRegisterStartZone2" DefaultValue="+RTC_BKP_DR+backupRegisterStartZone2_g" Group="Backup register" Comment="Start zone 2" TabName="RTC Privilege" Type="string" Visible="false">   
-   
-       <Description>
-            BKP Start Zone2 is available when BKP  Registers2 equal or less than BKP Backup register3, Specifies the backup register start zone 2. 
-        </Description> 
-    </RefParameter>  
+    <RefParameter Visible="false" Name="backupRegisterStartZone3" DefaultValue="__NULL" Group="Backup register" Comment="Start zone 3" TabName="RTC Privilege" Type="string" >     
+    	<Condition Expression="STM32WBA50KGUx|STM32WBA50KEUx"   Diagnostic=" " /> 
+    </RefParameter>
     <RefParameter Name="backupRegisterStartZone3" DefaultValue="+RTC_BKP_DR+backupRegisterStartZone3_g" Group="Backup register" Comment="Start zone 3" TabName="RTC Privilege" Type="string" Visible="false">     
-                                                                        
-       <Description> 
-            BKP Start Zone3 is available when BKP  Registers3 great or less than BKP Backup register2, Specifies the backup register start zone 3. 
-        </Description> 
+       <Description>BKP Start Zone3 is available when BKP  Registers3 great or less than BKP Backup register2, Specifies the backup register start zone 3.</Description> 
     </RefParameter>
 
 
@@ -1535,10 +1568,8 @@
         <Parameter Name="Seconds_A"/>
         <Parameter Name="SubSeconds_A"/>
         <Parameter Name="BinaryAutoClr_A"/>
+        <Parameter Name="FlagAutoClr_A"/>
 
-
-                
-		
         <!-- Alarm Mask Parameters -->
         <Parameter Name="AlarmMask"/>
         <!-- Parameter Name="AlarmMaskNone"/-->
@@ -1563,9 +1594,8 @@
         <Parameter Name="Seconds_A"/>
         <Parameter Name="SubSeconds_A"/>
         <Parameter Name="BinaryAutoClr_A"/>
+        <Parameter Name="FlagAutoClr_A"/>
 
-
-		
         <!-- Alarm Mask Parameters -->
         <Parameter Name="AlarmMask"/>
         <!-- Parameter Name="AlarmMaskNone"/-->
@@ -1592,9 +1622,8 @@
         <Parameter Name="Seconds_A"/>
         <Parameter Name="SubSeconds_A"/>
         <Parameter Name="BinaryAutoClr_A"/>
+        <Parameter Name="FlagAutoClr_A"/>
 
-
-		
         <!-- Alarm Mask Parameters -->
         <Parameter Name="AlarmMask"/>
         <!-- Parameter Name="AlarmMaskNone"/-->
@@ -1619,9 +1648,8 @@
         <Parameter Name="Seconds_A"/>
         <Parameter Name="SubSeconds_A"/>
         <Parameter Name="BinaryAutoClr_A"/>
+        <Parameter Name="FlagAutoClr_A"/>
 
-
-		
         <!-- Alarm Mask Parameters -->
         <Parameter Name="AlarmMask"/>
         <!-- Parameter Name="AlarmMaskNone"/-->
@@ -1649,9 +1677,8 @@
         <Parameter Name="Seconds_B"/>
         <Parameter Name="SubSeconds_B"/>
         <Parameter Name="BinaryAutoClr_B"/>
+        <Parameter Name="FlagAutoClr_B"/>
 
-
-		
         <!-- Alarm Mask Parameters -->
         <Parameter Name="AlarmMask_B"/>
         <!-- Parameter Name="AlarmMaskNone_B"/-->
@@ -1676,9 +1703,8 @@
         <Parameter Name="Seconds_B"/>
         <Parameter Name="SubSeconds_B"/>
         <Parameter Name="BinaryAutoClr_B"/>
+        <Parameter Name="FlagAutoClr_B"/>
 
-
-		
         <!-- Alarm Mask Parameters -->
         <Parameter Name="AlarmMask_B"/>
         <!-- Parameter Name="AlarmMaskNone_B"/-->
@@ -1705,9 +1731,8 @@
         <Parameter Name="Seconds_B"/>
         <Parameter Name="SubSeconds_B"/>
         <Parameter Name="BinaryAutoClr_B"/>
+        <Parameter Name="FlagAutoClr_B"/>
 
-
-		
         <!-- Alarm Mask Parameters -->
         <Parameter Name="AlarmMask_B"/>
         <!-- Parameter Name="AlarmMaskNone_B"/-->
@@ -1732,9 +1757,8 @@
         <Parameter Name="Seconds_B"/>
         <Parameter Name="SubSeconds_B"/>
         <Parameter Name="BinaryAutoClr_B"/>
+        <Parameter Name="FlagAutoClr_B"/>
 
-
-		
         <!-- Alarm Mask Parameters -->
         <Parameter Name="AlarmMask_B"/>
         <!-- Parameter Name="AlarmMaskNone_B"/-->

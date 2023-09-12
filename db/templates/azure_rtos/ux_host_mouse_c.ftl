@@ -4,7 +4,7 @@
   ******************************************************************************
   * @file    ux_host_mouse.c
   * @author  MCD Application Team
-  * @brief   USBX host applicative file
+  * @brief   USBX Host Mouse applicative source file
   ******************************************************************************
  [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
@@ -12,7 +12,7 @@
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
-#include "app_usbx_host.h"
+#include "ux_host_mouse.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -41,7 +41,7 @@
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN PFP */
-void  hid_mouse_thread_entry(ULONG arg);
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -50,15 +50,5 @@ void  hid_mouse_thread_entry(ULONG arg);
 /* USER CODE END 0 */
 
 /* USER CODE BEGIN 1 */
-
-/**
-  * @brief  hid_mouse_thread_entry .
-  * @param  ULONG arg
-  * @retval Void
-  */
-void  hid_mouse_thread_entry(ULONG arg)
-{
-
-}
 
 /* USER CODE END 1 */

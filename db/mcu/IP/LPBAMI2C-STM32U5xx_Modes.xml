@@ -150,7 +150,7 @@
 		<PossibleValue Comment="LPTIM1 Channel 1" Value="LPBAM_I2C_GRP2_LPTIM1_CH1_TRG" />
 		<PossibleValue Comment="LPTIM3 Channel 1" Value="LPBAM_I2C_GRP2_LPTIM3_CH1_TRG" />
 		<PossibleValue Comment="COMP1" Value="LPBAM_I2C_GRP2_COMP1_TRG" />
-		<PossibleValue Comment="COMP2" Value="LPBAM_I2C_GRP2_COMP2_TRG" />
+		<PossibleValue Action="Remove" Comment="COMP2" Value="LPBAM_I2C_GRP2_COMP2_TRG" Condition="DIE455"/>
 		<PossibleValue Comment="RTC AlarmA" Value="LPBAM_I2C_GRP2_RTC_ALRA_TRG" />
 		<PossibleValue Comment="RTC Wakeup" Value="LPBAM_I2C_GRP2_RTC_WUT_TRG" />
 	</RefParameter>
@@ -178,22 +178,20 @@
 
 	<RefParameter Name="AddressingMode" Comment="Addressing Mode" DefaultValue="LPBAM_I2C_ADDRESSINGMODE_7BIT" Type="list" Group="I2C Parameters - Basic Parameters">
 		<Description>Specifies if 7-bit or 10-bit addressing mode is selected.</Description>
-		<PossibleValue Semaphore="Semaphore_LPBAM_I2C_ADDRMODE_10BIT" Comment="10-bit" Value="LPBAM_I2C_ADDRESSINGMODE_10BIT"  />
-		<PossibleValue Semaphore="Semaphore_LPBAM_I2C_ADDRMODE_7BIT" Comment="7-bit" Value="LPBAM_I2C_ADDRESSINGMODE_7BIT"  />
+		<PossibleValue Comment="7 bit" Value="LPBAM_I2C_ADDRESSINGMODE_7BIT" />
+		<PossibleValue Comment="10 bit" Value="LPBAM_I2C_ADDRESSINGMODE_10BIT" />
 	</RefParameter>
 
 	<RefParameter Name="SequenceNumber" Comment="Sequence Number" Type="integer" DefaultValue="1" Min="1" Group="I2C Parameters - Basic Parameters">
 		<Description>Specifies the number of frames to be transferred when sequential transfer is activated.</Description>
 	</RefParameter>
 
-
-	<RefParameter Name="DevAddress" Comment="Device Address" DefaultValue="0" Min="0" Max="127" Type="StringRW" Group="I2C Parameters - Basic Parameters">
-		<Condition Expression="Semaphore_LPBAM_I2C_ADDRMODE_7BIT" Diagnostic="Address value from 0 to 127" />
+	<RefParameter Name="DevAddress" Comment="Device Address" DefaultValue="1" Min="1" Max="1023" Type="StringRW" Group="I2C Parameters - Basic Parameters">
+		<Condition Expression="AddressingMode_MTX_DATA=LPBAM_I2C_ADDRESSINGMODE_10BIT | AddressingMode_MRX_DATA=LPBAM_I2C_ADDRESSINGMODE_10BIT | AddressingMode_STX_DATA=LPBAM_I2C_ADDRESSINGMODE_10BIT | AddressingMode_SRX_DATA=LPBAM_I2C_ADDRESSINGMODE_10BIT" Diagnostic="" />
 		<Description>Specifies the target device address.</Description>
 	</RefParameter>
-
-	<RefParameter Name="DevAddress" Comment="Device Address" DefaultValue="0" Min="0" Max="1023" Type="StringRW" Group="I2C Parameters - Basic Parameters">
-		<Condition Expression="Semaphore_LPBAM_I2C_ADDRMODE_10BIT" Diagnostic="Address value from 0 to 1023" />
+	<RefParameter Name="DevAddress" Comment="Device Address" DefaultValue="1" Min="1" Max="127" Type="StringRW" Group="I2C Parameters - Basic Parameters">
+		<Condition Expression="AddressingMode_MTX_DATA=LPBAM_I2C_ADDRESSINGMODE_7BIT | AddressingMode_MRX_DATA=LPBAM_I2C_ADDRESSINGMODE_7BIT | AddressingMode_STX_DATA=LPBAM_I2C_ADDRESSINGMODE_7BIT | AddressingMode_SRX_DATA=LPBAM_I2C_ADDRESSINGMODE_7BIT" Diagnostic="" />
 		<Description>Specifies the target device address.</Description>
 	</RefParameter>
 
@@ -323,7 +321,7 @@
 		<PossibleValue Comment="LPTIM3 CH1" Value="LPBAM_LPDMA1_TRIGGER_LPTIM3_CH1" />
 		<PossibleValue Comment="LPTIM4 OUT" Value="LPBAM_LPDMA1_TRIGGER_LPTIM4_OUT" />
 		<PossibleValue Comment="COMP1 OUT" Value="LPBAM_LPDMA1_TRIGGER_COMP1_OUT" />
-		<PossibleValue Comment="COMP2 OUT" Value="LPBAM_LPDMA1_TRIGGER_COMP2_OUT" />
+		<PossibleValue Action="Remove" Comment="COMP2 OUT" Value="LPBAM_LPDMA1_TRIGGER_COMP2_OUT" Condition="DIE455"/>
 		<PossibleValue Comment="RTC ALRA TRG" Value="LPBAM_LPDMA1_TRIGGER_RTC_ALRA_TRG" />
 		<PossibleValue Comment="RTC ALRB TRG" Value="LPBAM_LPDMA1_TRIGGER_RTC_ALRB_TRG" />
 		<PossibleValue Comment="RTC WUT TRG" Value="LPBAM_LPDMA1_TRIGGER_RTC_WUT_TRG" />
@@ -1675,9 +1673,9 @@
 	<RefMode Name="MASTERRECEIVE_DATA">
 		<ConfigForMode>I2C_MASTERRECEIVE_DATA</ConfigForMode>
 
-	    <Parameter Name="AddressingMode"  Group="Master Receive Data" />
-		<Parameter Name="SequenceNumber"  Group="Master Receive Data" />
-		<Parameter Name="DevAddress"  Group="Master Receive Data" />
+		<Parameter Name="AddressingMode_MRX_DATA" RefParameter="AddressingMode" Group="Master Receive Data" />
+		<Parameter Name="SequenceNumber_MRX_DATA" RefParameter="SequenceNumber" Group="Master Receive Data" />
+		<Parameter Name="DevAddress_MRX_DATA" RefParameter="DevAddress" Group="Master Receive Data" />
 		<!--Parameter Name="Size_MRX_DATA" RefParameter="Size" Group="Master Receive Data"/-->
 
 		<Parameter Name="BufferName" />
@@ -1730,9 +1728,9 @@
 
 		<Parameter Name="TimingCalc" />
 		<Parameter Name="Timing_MRX" RefParameter="TimingValue" Group="Master Receive" />
-		<Parameter Name="AddressingMode"  Group="Master Receive" />
-		<Parameter Name="SequenceNumber" Group="Master Receive" />
-		<Parameter Name="DevAddress" Group="Master Receive" />
+		<Parameter Name="AddressingMode_MRX" RefParameter="AddressingMode" Group="Master Receive" />
+		<Parameter Name="SequenceNumber_MRX" RefParameter="SequenceNumber" Group="Master Receive" />
+		<Parameter Name="DevAddress_MRX" RefParameter="DevAddress" Group="Master Receive" />
 		<!--Parameter Name="Size_MRX" RefParameter="Size" Group="Master Receive"/-->
 
 		<Parameter Name="BufferName" />
@@ -1828,8 +1826,8 @@
 	<RefMode Name="SLAVERECEIVE_DATA">
 		<ConfigForMode>I2C_SLAVERECEIVE_DATA</ConfigForMode>
 
-		<Parameter Name="AddressingMode"  Group="Slave Receive Data" />
-		<Parameter Name="SequenceNumber" Group="Slave Receive Data" />
+		<Parameter Name="AddressingMode_SRX_DATA" RefParameter="AddressingMode" Group="Slave Receive Data" />
+		<Parameter Name="SequenceNumber_SRX_DATA" RefParameter="SequenceNumber" Group="Slave Receive Data" />
 
 		<!--Parameter Name="Size_SRX_DATA" RefParameter="Size" Group="Slave Receive Data"/-->
 
@@ -1884,8 +1882,8 @@
 		<Parameter Name="TimingCalc" />
 		<Parameter Name="Timing_SRX" RefParameter="TimingValue" Group="Slave Receive" />
 
-		<Parameter Name="AddressingMode" Group="Slave Receive" />
-		<Parameter Name="SequenceNumber" Group="Slave Receive" />
+		<Parameter Name="AddressingMode_SRX" RefParameter="AddressingMode" Group="Slave Receive" />
+		<Parameter Name="SequenceNumber_SRX" RefParameter="SequenceNumber" Group="Slave Receive" />
 
 		<!--Parameter Name="Size_SRX" RefParameter="Size" Group="Slave Receive"/-->
 
@@ -1982,9 +1980,9 @@
 	<RefMode Name="MASTERTRANSMIT_DATA">
 		<ConfigForMode>I2C_MASTERTRANSMIT_DATA</ConfigForMode>
 
-		<Parameter Name="AddressingMode" Group="Master Transmit Data" />
-		<Parameter Name="SequenceNumber" Group="Master Transmit Data" />
-		<Parameter Name="DevAddress"  Group="Master Transmit Data" />
+		<Parameter Name="AddressingMode_MTX_DATA" RefParameter="AddressingMode" Group="Master Transmit Data" />
+		<Parameter Name="SequenceNumber_MTX_DATA" RefParameter="SequenceNumber" Group="Master Transmit Data" />
+		<Parameter Name="DevAddress_MTX_DATA" RefParameter="DevAddress" Group="Master Transmit Data" />
 		<!--Parameter Name="Size_MTX_DATA" RefParameter="Size" Group="Master Transmit Data"/-->
 
 		<Parameter Name="BufferName" />
@@ -2037,9 +2035,9 @@
 
 		<Parameter Name="TimingCalc" />
 		<Parameter Name="Timing_MTX" RefParameter="TimingValue" Group="Master Transmit" />
-		<Parameter Name="AddressingMode"  Group="Master Transmit" />
-		<Parameter Name="SequenceNumber" Group="Master Transmit" />
-		<Parameter Name="DevAddress"  Group="Master Transmit" />
+		<Parameter Name="AddressingMode_MTX" RefParameter="AddressingMode" Group="Master Transmit" />
+		<Parameter Name="SequenceNumber_MTX" RefParameter="SequenceNumber" Group="Master Transmit" />
+		<Parameter Name="DevAddress_MTX" RefParameter="DevAddress" Group="Master Transmit" />
 		<!--Parameter Name="Size_MTX" RefParameter="Size" Group="Master Transmit"/-->
 
 		<Parameter Name="BufferName" />
@@ -2134,8 +2132,8 @@
 	<RefMode Name="SLAVETRANSMIT_DATA">
 		<ConfigForMode>I2C_SLAVETRANSMIT_DATA</ConfigForMode>
 
-		<Parameter Name="AddressingMode"  Group="Slave Transmit Data" />
-		<Parameter Name="SequenceNumber" Group="Slave Transmit Data" />
+		<Parameter Name="AddressingMode_STX_DATA" RefParameter="AddressingMode" Group="Slave Transmit Data" />
+		<Parameter Name="SequenceNumber_STX_DATA" RefParameter="SequenceNumber" Group="Slave Transmit Data" />
 
 		<!--Parameter Name="Size_STX_DATA" RefParameter="Size" Group="Slave Transmit Data"/-->
 
@@ -2191,8 +2189,8 @@
 		<Parameter Name="TimingCalc" />
 		<Parameter Name="Timing_STX" RefParameter="TimingValue" Group="Slave Transmit" />
 
-		<Parameter Name="AddressingMode"  Group="Slave Transmit" />
-		<Parameter Name="SequenceNumber" Group="Slave Transmit" />
+		<Parameter Name="AddressingMode_STX" RefParameter="AddressingMode" Group="Slave Transmit" />
+		<Parameter Name="SequenceNumber_STX" RefParameter="SequenceNumber" Group="Slave Transmit" />
 
 		<!--Parameter Name="Size_STX" RefParameter="Size" Group="Slave Transmit"/-->
 

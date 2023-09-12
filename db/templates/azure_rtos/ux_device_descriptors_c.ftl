@@ -12,37 +12,79 @@
 /* USER CODE END Header */
 
 [#assign usbd_builder_enabled = "0"]
+[#assign UX_DEVICE_HID_CORE_ENABLED_Value = "false"]
+[#assign UX_DEVICE_HID_MOUSE_ENABLED_Value = "false"]
+[#assign UX_DEVICE_HID_KEYBOARD_ENABLED_Value = "false"]
+[#assign UX_DEVICE_HID_CUSTOM_ENABLED_Value = "false"]
+[#assign UX_DEVICE_STORAGE_ENABLED_Value = "false"]
+[#assign UX_DEVICE_CDC_ACM_ENABLED_Value = "false"]
+[#assign UX_DEVICE_CDC_ECM_ENABLED_Value = "false"]
+[#assign UX_DEVICE_DFU_ENABLED_Value = "false"]
+[#assign UX_DEVICE_PIMA_MTP_ENABLED_Value = "false"]
+[#assign UX_DEVICE_RNDIS_ENABLED_Value = "false"]
+[#assign HID_ITF_FOUNDED_Value = "false"]
 
 [#compress]
 [#list SWIPdatas as SWIP]
-[#if SWIP.defines??]
-  [#list SWIP.defines as definition]
-
-    [#assign value = definition.value]
-    [#assign name = definition.name]
-
-  [#list SWIPdatas as SWIP]
-  [#if SWIP.variables??]
-  [#list SWIP.variables as define]
-
-		[#assign def_value = define.value]
-		[#assign def_name = define.name]
-	
-    [#if (def_name?contains("UX_DEVICE_HID") && def_value == "1") || (def_name?contains("UX_DEVICE_STORAGE") && def_value == "1") || (def_name?contains("UX_DEVICE_CDC_ACM") && def_value == "1") || (def_name?contains("UX_DEVICE_CDC_ECM") && def_value == "1") || (def_name?contains("UX_DEVICE_DFU") && def_value == "1")]
-    [#if name == "USBD_DEVICE_FRAMEWORK_BUILDER_ENABLED"]
-      [#assign usbd_builder_enabled = value]
-    [/#if]
-    [/#if]
-
-   [/#list]
-   [/#if]
-   [/#list]
-	
-  [/#list]
+  [#if SWIP.defines??]
+    [#list SWIP.defines as definition]
+      [#assign value = definition.value]
+      [#assign name = definition.name]
+      [#if name == "UX_DEVICE_CLASS_HID_INTERRUPT_OUT_SUPPORT"]
+        [#assign UX_DEVICE_CLASS_HID_INTERRUPT_OUT_SUPPORT_value = value]
+      [/#if]
+      [#list SWIPdatas as SWIP]
+      [#if SWIP.variables??]
+      [#list SWIP.variables as define]
+        [#assign def_value = define.value]
+        [#assign def_name = define.name]
+          [#if (def_name?contains("UX_DEVICE_HID_MOUSE") && def_value == "1") || (def_name?contains("UX_DEVICE_HID_KEYBOARD") && def_value == "1") || (def_name?contains("UX_DEVICE_HID_CUSTOM") && def_value == "1") || (def_name?contains("UX_DEVICE_STORAGE") && def_value == "1") || (def_name?contains("UX_DEVICE_CDC_ACM") && def_value == "1") || (def_name?contains("UX_DEVICE_CDC_ECM") && def_value == "1") || (def_name?contains("UX_DEVICE_DFU") && def_value == "1") || (def_name?contains("UX_DEVICE_RNDIS") && def_value == "1") || (def_name?contains("UX_DEVICE_PIMA") && def_value == "1")]
+            [#if name == "USBD_DEVICE_FRAMEWORK_BUILDER_ENABLED"]
+              [#assign usbd_builder_enabled = value]
+            [/#if]
+          [/#if]
+          [#if def_name?contains("UX_DEVICE_DFU") && def_value == "1"]
+            [#assign UX_DEVICE_DFU_ENABLED_Value = "true"]
+          [/#if]
+          [#if def_name?contains("UX_DEVICE_STORAGE") && def_value == "1"]
+            [#assign UX_DEVICE_STORAGE_ENABLED_Value = "true"]
+          [/#if]
+          [#if def_name?contains("UX_DEVICE_HID_CORE") && def_value == "1"]
+            [#assign UX_DEVICE_HID_CORE_ENABLED_Value = "true"]
+          [/#if]
+          [#if def_name?contains("UX_DEVICE_HID_MOUSE") && def_value == "1"]
+            [#assign UX_DEVICE_HID_MOUSE_ENABLED_Value = "true"]
+          [/#if]
+          [#if def_name?contains("UX_DEVICE_HID_KEYBOARD") && def_value == "1"]
+            [#assign UX_DEVICE_HID_KEYBOARD_ENABLED_Value = "true"]
+          [/#if]
+          [#if def_name?contains("UX_DEVICE_HID_CUSTOM") && def_value == "1"]
+            [#assign UX_DEVICE_HID_CUSTOM_ENABLED_Value = "true"]
+          [/#if]
+          [#if def_name?contains("UX_DEVICE_CDC_ACM") && def_value == "1"]
+            [#assign UX_DEVICE_CDC_ACM_ENABLED_Value = "true"]
+          [/#if]
+          [#if def_name?contains("UX_DEVICE_CDC_ECM") && def_value == "1"]
+            [#assign UX_DEVICE_CDC_ECM_ENABLED_Value = "true"]
+          [/#if]
+          [#if def_name?contains("UX_DEVICE_PIMA") && def_value == "1"]
+            [#assign UX_DEVICE_PIMA_MTP_ENABLED_Value = "true"]
+          [/#if]
+          [#if def_name?contains("UX_DEVICE_RNDIS") && def_value == "1"]
+            [#assign UX_DEVICE_RNDIS_ENABLED_Value = "true"]
+          [/#if]
+          [#if ((def_name?contains("UX_DEVICE_HID_MOUSE") && def_value == "1") || (def_name?contains("UX_DEVICE_HID_KEYBOARD") && def_value == "1") || (def_name?contains("UX_DEVICE_HID_CUSTOM") && def_value == "1"))]
+            [#assign HID_ITF_FOUNDED_Value = "true"]
+          [/#if]
+      [/#list]
+      [/#if]
+      [/#list]
+    [/#list]
   [/#if]
-
 [/#list]
 [/#compress]
+
+
 
 /* Includes ------------------------------------------------------------------*/
 #include "ux_device_descriptors.h"
@@ -70,71 +112,55 @@
 /* Private variables ---------------------------------------------------------*/
 [#if usbd_builder_enabled == "1"]
 USBD_DevClassHandleTypeDef  USBD_Device_FS, USBD_Device_HS;
-[/#if]
 
 uint8_t UserClassInstance[USBD_MAX_CLASS_INTERFACES] = {
-[#list SWIPdatas as SWIP]
-[#if SWIP.variables??]
-[#list SWIP.variables as define]
-	[#assign def_value = define.value]
-	[#assign def_name = define.name]
-[#if def_name?contains("UX_DEVICE_DFU") && def_value == "1"]
+[#if UX_DEVICE_DFU_ENABLED_Value == "true"]
   CLASS_TYPE_DFU,
 [/#if]
-[/#list]
-[/#if]
-[/#list]
-
-[#list SWIPdatas as SWIP]
-[#if SWIP.variables??]
-[#list SWIP.variables as define]
-	[#assign def_value = define.value]
-	[#assign def_name = define.name]
-[#if def_name?contains("UX_DEVICE_STORAGE") && def_value == "1"]
+[#if UX_DEVICE_STORAGE_ENABLED_Value == "true"]
   CLASS_TYPE_MSC,
 [/#if]
-[/#list]
-[/#if]
-[/#list]
-
-[#list SWIPdatas as SWIP]
-[#if SWIP.variables??]
-[#list SWIP.variables as define]
-	[#assign def_value = define.value]
-	[#assign def_name = define.name]
-[#if def_name?contains("UX_DEVICE_HID") && def_value == "1"]
+[#if UX_DEVICE_HID_CORE_ENABLED_Value == "true" && HID_ITF_FOUNDED_Value == "true"]
+[#if UX_DEVICE_HID_MOUSE_ENABLED_Value == "true"]
   CLASS_TYPE_HID,
 [/#if]
-[/#list]
+[#if UX_DEVICE_HID_KEYBOARD_ENABLED_Value == "true"]
+  CLASS_TYPE_HID,
 [/#if]
-[/#list]
-
-[#list SWIPdatas as SWIP]
-[#if SWIP.variables??]
-[#list SWIP.variables as define]
-	[#assign def_value = define.value]
-	[#assign def_name = define.name]
-[#if def_name?contains("UX_DEVICE_CDC_ACM") && def_value == "1"]
+[#if UX_DEVICE_HID_CUSTOM_ENABLED_Value == "true"]
+  CLASS_TYPE_HID,
+[/#if]
+[#elseif UX_DEVICE_HID_CORE_ENABLED_Value == "true" && HID_ITF_FOUNDED_Value == "false"]
+  CLASS_TYPE_HID,
+[/#if]
+[#if UX_DEVICE_CDC_ACM_ENABLED_Value == "true"]
   CLASS_TYPE_CDC_ACM,
 [/#if]
-[/#list]
-[/#if]
-[/#list]
-
-[#list SWIPdatas as SWIP]
-[#if SWIP.variables??]
-[#list SWIP.variables as define]
-	[#assign def_value = define.value]
-	[#assign def_name = define.name]
-[#if def_name?contains("UX_DEVICE_CDC_ECM") && def_value == "1"]
+[#if UX_DEVICE_CDC_ECM_ENABLED_Value == "true"]
   CLASS_TYPE_CDC_ECM,
 [/#if]
-[/#list]
+[#if UX_DEVICE_PIMA_MTP_ENABLED_Value == "true"]
+  CLASS_TYPE_PIMA_MTP,
 [/#if]
-[/#list]
+[#if UX_DEVICE_RNDIS_ENABLED_Value == "true"]
+  CLASS_TYPE_RNDIS,
+[/#if]
 };
 
-[#if usbd_builder_enabled == "1"]
+[#if UX_DEVICE_HID_CORE_ENABLED_Value == "true" && HID_ITF_FOUNDED_Value == "true"]
+uint8_t UserHIDInterface[] = {
+[#if UX_DEVICE_HID_MOUSE_ENABLED_Value == "true"]
+  INTERFACE_HID_MOUSE,
+[/#if]
+[#if UX_DEVICE_HID_KEYBOARD_ENABLED_Value == "true"]
+  INTERFACE_HID_KEYBOARD,
+[/#if]
+[#if UX_DEVICE_HID_CUSTOM_ENABLED_Value == "true"]
+  INTERFACE_HID_CUSTOM,
+[/#if]
+};
+[/#if]
+
 /* The generic device descriptor buffer that will be filled by builder
    Size of the buffer is the maximum possible device FS descriptor size. */
 #if defined ( __ICCARM__ ) /* IAR Compiler */
@@ -176,21 +202,24 @@ __ALIGN_END = {0};
 #if defined ( __ICCARM__ ) /* IAR Compiler */
 #pragma data_alignment=4
 #endif /* defined ( __ICCARM__ ) */
-UCHAR USBD_language_id_framework[LANGUAGE_ID_MAX_LENGTH] = {0};
+__ALIGN_BEGIN UCHAR USBD_language_id_framework[LANGUAGE_ID_MAX_LENGTH]
+__ALIGN_END = {0};
 
 [#list SWIPdatas as SWIP]
 [#if SWIP.variables??]
 [#list SWIP.variables as define]
 	[#assign def_value = define.value]
 	[#assign def_name = define.name]
-[#if def_name?contains("UX_DEVICE_HID") && def_value == "1"]
-#if USBD_HID_CLASS_ACTIVATED == 1U
+[#if def_name?contains("UX_DEVICE_HID_MOUSE") && def_value == "1"]
+#if USBD_HID_MOUSE_ACTIVATED == 1U
+
 #if defined ( __ICCARM__ ) /* IAR Compiler */
 #pragma data_alignment=4
 #endif /* defined ( __ICCARM__ ) */
-__ALIGN_BEGIN uint8_t USBD_HID_MOUSE_ReportDesc[USBD_HID_MOUSE_REPORT_DESC_SIZE]
+__ALIGN_BEGIN uint8_t USBD_HID_MOUSE_ReportDesc[]
 __ALIGN_END =
 {
+  /* USER CODE BEGIN USBD_HID_MOUSE_ReportDesc                 */
   0x05, 0x01,        /* Usage Page (Generic Desktop Ctrls)     */
   0x09, 0x02,        /* Usage (Mouse)                          */
   0xA1, 0x01,        /* Collection (Application)               */
@@ -228,21 +257,76 @@ __ALIGN_END =
   0x75, 0x06,        /*   Report Size (6)                      */
   0x95, 0x01,        /*   Report Count (1)                     */
   0xB1, 0x01,        /*   Feature (Const,Array,Abs,NoWrp)      */
+  /* USER CODE END USBD_HID_MOUSE_ReportDesc                   */
   0xC0               /* End Collection                         */
 };
+
+#endif /* USBD_HID_MOUSE_ACTIVATED == 1U */
+
+[/#if]
+[#if def_name?contains("UX_DEVICE_HID_KEYBOARD") && def_value == "1"]
+#if USBD_HID_KEYBOARD_ACTIVATED == 1U
+
+#if defined ( __ICCARM__ ) /* IAR Compiler */
+#pragma data_alignment=4
+#endif /* defined ( __ICCARM__ ) */
+__ALIGN_BEGIN uint8_t USBD_HID_KEYBOARD_ReportDesc[]
+__ALIGN_END =
+{
+  /* USER CODE BEGIN USBD_HID_KEYBOARD_ReportDesc             */
+  0x05, 0x01,        /* Usage Page (Generic Desktop Ctrls)    */
+  0x09, 0x06,        /* Usage (Keyboard)                      */
+  0xa1, 0x01,        /* Collection (Application)              */
+  0x05, 0x07,        /*   Usage (Keyboard)                    */
+  0x19, 0xe0,        /*     Usage Minimum (LeftControl)       */
+  0x29, 0xe7,        /*     Usage Maximum (0x03)              */
+  0x15, 0x00,        /*     Logical Minimum (0)               */
+  0x25, 0x01,        /*     Logical Maximum (1)               */
+  0x75, 0x01,        /*     Report Size  (1)                  */
+  0x95, 0x08,        /*     Report Count (8)                  */
+  0x81, 0x02,        /*     Input (Data,Var,Abs)              */
+  0x95, 0x01,        /*     Report Count (1)                  */
+  0x75, 0x08,        /*     Report Size (8)                   */
+  0x81, 0x03,        /*     Input (Const,Array,Abs)           */
+  0x95, 0x06,        /*     Report Count (6)                  */
+  0x75, 0x08,        /*     Report Size (8)                   */
+  0x15, 0x00,        /*     Logical Minimum (0)               */
+  0x25, 0x65,        /*     Logical Maximum (101)             */
+  0x05, 0x07,        /*     Usage Page (Keyboard)             */
+  0x19, 0x00,        /*     Logical Minimum (Reserved)        */
+  0x29, 0x65,        /*     Logical Maximum (Keyboard)        */
+  0x81, 0x00,        /*     Input (Data,Var,Abs)              */
+  /* USER CODE END USBD_HID_KEYBOARD_ReportDesc               */
+  0xc0               /* End Collection                        */
+};
+
+#endif /* USBD_HID_KEYBOARD_ACTIVATED == 1U */
+[/#if]
+
+[#if def_name?contains("UX_DEVICE_HID_CUSTOM") && def_value == "1"]
+#if USBD_HID_CUSTOM_ACTIVATED == 1U
+
+#if defined ( __ICCARM__ ) /* IAR Compiler */
+#pragma data_alignment=4
+#endif /* defined ( __ICCARM__ ) */
+__ALIGN_BEGIN uint8_t USBD_CustomHID_ReportDesc[]
+__ALIGN_END =
+{
+  /* USER CODE BEGIN USBD_CustomHID_ReportDesc */
+
+  /* USER CODE END USBD_CustomHID_ReportDesc */
+  0xc0                          /* End Collection                       */
+};
+
+#endif /* USBD_HID_CUSTOM_ACTIVATED == 1U */
+[/#if]
+[/#list]
+[/#if]
+[/#list]
 
 /* USER CODE BEGIN PV1 */
 
 /* USER CODE END PV1 */
-#endif /* USBD_HID_CLASS_ACTIVATED == 1U */
-[/#if]
-[/#list]
-[/#if]
-[/#list]
-
-/* USER CODE BEGIN PV2 */
-
-/* USER CODE END PV2 */
 
 /* Private function prototypes -----------------------------------------------*/
 static void USBD_Desc_GetString(uint8_t *desc, uint8_t *Buffer, uint16_t *len);
@@ -270,18 +354,18 @@ static void USBD_FrameWork_AddConfDesc(uint32_t Conf, uint32_t *pSze);
 static void USBD_FrameWork_AssignEp(USBD_DevClassHandleTypeDef *pdev, uint8_t Add,
                                     uint8_t Type, uint32_t Sze);
 
+
+[#if UX_DEVICE_HID_CORE_ENABLED_Value == "true" && HID_ITF_FOUNDED_Value == "true"]
+#if USBD_HID_CLASS_ACTIVATED == 1U
+static void USBD_FrameWork_HID_Desc(USBD_DevClassHandleTypeDef *pdev,
+                                    uint32_t pConf, uint32_t *Sze);
+#endif /* USBD_HID_CLASS_ACTIVATED == 1U */
+[/#if]
 [#list SWIPdatas as SWIP]
 [#if SWIP.variables??]
 [#list SWIP.variables as define]
 	[#assign def_value = define.value]
 	[#assign def_name = define.name]
-[#if def_name?contains("UX_DEVICE_HID") && def_value == "1"]
-#if USBD_HID_CLASS_ACTIVATED == 1U
-static void USBD_FrameWork_HID_Desc(USBD_DevClassHandleTypeDef *pdev,
-                                        uint32_t pConf, uint32_t *Sze);
-#endif /* USBD_HID_CLASS_ACTIVATED == 1U */
-[/#if]
-
 [#if def_name?contains("UX_DEVICE_STORAGE") && def_value == "1"]
 #if USBD_MSC_CLASS_ACTIVATED == 1U
 static void USBD_FrameWork_MSCDesc(USBD_DevClassHandleTypeDef *pdev,
@@ -302,11 +386,25 @@ static void USBD_FrameWork_CDCECMDesc(USBD_DevClassHandleTypeDef *pdev,
 #endif /* USBD_CDC_ECM_CLASS_ACTIVATED == 1U */
 [/#if]
 
+[#if def_name?contains("UX_DEVICE_RNDIS") && def_value == "1"]
+#if USBD_RNDIS_CLASS_ACTIVATED == 1U
+static void USBD_FrameWork_RNDISDesc(USBD_DevClassHandleTypeDef *pdev,
+                                     uint32_t pConf, uint32_t *Sze);
+#endif /* USBD_RNDIS_CLASS_ACTIVATED == 1U */
+[/#if]
+
 [#if def_name?contains("UX_DEVICE_DFU") && def_value == "1"]
 #if USBD_DFU_CLASS_ACTIVATED == 1U
-static void USBD_FrameWork_DFUDesc(USBD_DevClassHandleTypeDef *pdev, uint32_t pConf,
-                                   uint32_t* Sze);
+static void USBD_FrameWork_DFUDesc(USBD_DevClassHandleTypeDef *pdev,
+                                   uint32_t pConf, uint32_t *Sze);
 #endif /* USBD_DFU_CLASS_ACTIVATED == 1U */
+[/#if]
+
+[#if def_name?contains("UX_DEVICE_PIMA") && def_value == "1"]
+#if USBD_PIMA_MTP_CLASS_ACTIVATED == 1U
+static void USBD_FrameWork_MTPDesc(USBD_DevClassHandleTypeDef *pdev,
+                                   uint32_t pConf, uint32_t *Sze);
+#endif /* USBD_PIMA_MTP_CLASS_ACTIVATED == 1U */
 [/#if]
 [/#list]
 [/#if]
@@ -412,7 +510,7 @@ uint8_t *USBD_Get_String_Framework(ULONG *Length)
 	[#assign def_value = define.value]
 	[#assign def_name = define.name]
 [#if def_name?contains("UX_DEVICE_CDC_ECM") && def_value == "1"]
-#if USBD_CDC_ECM_CLASS_ACTIVATED
+#if USBD_CDC_ECM_CLASS_ACTIVATED == 1
 
   /* Set MAC_STRING_INDEX and MAC_STRING in string_framework */
   count += len + 1;
@@ -421,9 +519,24 @@ uint8_t *USBD_Get_String_Framework(ULONG *Length)
   USBD_string_framework[count++] = CDC_ECM_MAC_STRING_INDEX;
 
   /* Set the Mac address in USBD_string_framework */
-  USBD_Desc_GetString((uint8_t *)CDC_ECM_MAC_STR_DESC, USBD_string_framework + count, &len);
+  USBD_Desc_GetString((uint8_t *)CDC_ECM_LOCAL_MAC_STR_DESC, USBD_string_framework + count, &len);
 
 #endif /* USBD_CDC_ECM_CLASS_ACTIVATED */
+
+[/#if]
+[#if def_name?contains("UX_DEVICE_RNDIS") && def_value == "1"]
+#if USBD_RNDIS_CLASS_ACTIVATED == 1
+
+  /* Set MAC_STRING_INDEX and MAC_STRING in string_framework */
+  count += len + 1;
+  USBD_string_framework[count++] = USBD_LANGID_STRING & 0xFF;
+  USBD_string_framework[count++] = USBD_LANGID_STRING >> 8;
+  USBD_string_framework[count++] = RNDIS_MAC_STRING_INDEX;
+
+  /* Set the Mac address in USBD_string_framework */
+  USBD_Desc_GetString((uint8_t *)RNDIS_LOCAL_MAC_STR_DESC, USBD_string_framework + count, &len);
+
+#endif /* USBD_RNDIS_CLASS_ACTIVATED */
 
 [/#if]
 [#if def_name?contains("UX_DEVICE_DFU") && def_value == "1"]
@@ -472,19 +585,79 @@ uint8_t *USBD_Get_Language_Id_Framework(ULONG *Length)
   return USBD_language_id_framework;
 }
 
+/**
+  * @brief  USBD_Get_Interface_Number
+  *         Return interface number
+  * @param  class_type : Device class type
+  * @param  interface_type : Device interface type
+  * @retval interface number
+  */
+uint16_t USBD_Get_Interface_Number(uint8_t class_type, uint8_t interface_type)
+{
+  uint8_t itf_num = 0U;
+[#if usbd_builder_enabled == "1"]
+  uint8_t idx = 0U;
+[/#if]
+
+  /* USER CODE BEGIN USBD_Get_Interface_Number0 */
+
+  /* USER CODE BEGIN USBD_Get_Interface_Number0 */
+[#if usbd_builder_enabled == "1"]
+
+  for(idx = 0; idx < USBD_MAX_SUPPORTED_CLASS; idx++)
+  {
+    if ((USBD_Device_FS.tclasslist[idx].ClassType == class_type) &&
+        (USBD_Device_FS.tclasslist[idx].InterfaceType == interface_type))
+    {
+      itf_num = USBD_Device_FS.tclasslist[idx].Ifs[0];
+    }
+  }
+[/#if]
+
+  /* USER CODE BEGIN USBD_Get_Interface_Number1 */
+
+  /* USER CODE BEGIN USBD_Get_Interface_Number1 */
+
+  return itf_num;
+}
+
+/**
+  * @brief  USBD_Get_Configuration_Number
+  *         Return configuration number
+  * @param  class_type : Device class type
+  * @param  interface_type : Device interface type
+  * @retval configuration number
+  */
+uint16_t USBD_Get_Configuration_Number(uint8_t class_type, uint8_t interface_type)
+{
+  uint8_t cfg_num = 1U;
+
+  /* USER CODE BEGIN USBD_Get_CONFIGURATION_Number0 */
+
+  /* USER CODE BEGIN USBD_Get_CONFIGURATION_Number0 */
+
+  /* USER CODE BEGIN USBD_Get_CONFIGURATION_Number1 */
+
+  /* USER CODE BEGIN USBD_Get_CONFIGURATION_Number1 */
+
+  return cfg_num;
+}
+
 [#list SWIPdatas as SWIP]
 [#if SWIP.variables??]
 [#list SWIP.variables as define]
 	[#assign def_value = define.value]
 	[#assign def_name = define.name]
-[#if def_name?contains("UX_DEVICE_HID") && def_value == "1"]
+[#if def_name?contains("UX_DEVICE_HID_CORE") && def_value == "1"]
+
 #if USBD_HID_CLASS_ACTIVATED == 1U
 /**
-  * @brief  USBD_Get_Device_HID_MOUSE_ReportDesc
-  *         Return the device HID_MOUSE_Report descriptor
-  * @retval Pointer to descriptor buffer
+  * @brief  USBD_HID_ReportDesc
+  *         Return the device HID Report Descriptor
+  * @param  hid_type : HID Device type
+  * @retval Pointer to HID Report Descriptor buffer
   */
-uint8_t *USBD_Get_Device_HID_MOUSE_ReportDesc(void)
+uint8_t *USBD_HID_ReportDesc(uint8_t hid_type)
 {
   uint8_t *pHidReportDesc = NULL;
 
@@ -492,14 +665,122 @@ uint8_t *USBD_Get_Device_HID_MOUSE_ReportDesc(void)
 
   /* USER CODE HidReportDesc0 */
 
-  [#if usbd_builder_enabled == "1"]
-  pHidReportDesc = USBD_HID_MOUSE_ReportDesc;
-  [/#if]
+  switch(hid_type)
+  {
+[#list SWIPdatas as SWIP]
+[#if SWIP.variables??]
+[#list SWIP.variables as define]
+	[#assign def_value = define.value]
+	[#assign def_name = define.name]
+[#if def_name?contains("UX_DEVICE_HID_MOUSE") && def_value == "1"]
+    case INTERFACE_HID_MOUSE:
+      pHidReportDesc = USBD_HID_MOUSE_ReportDesc;
+      break;
+[/#if]
+[/#list]
+[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+[#if SWIP.variables??]
+[#list SWIP.variables as define]
+	[#assign def_value = define.value]
+	[#assign def_name = define.name]
+[#if def_name?contains("UX_DEVICE_HID_KEYBOARD") && def_value == "1"]
+    case INTERFACE_HID_KEYBOARD:
+      pHidReportDesc = USBD_HID_KEYBOARD_ReportDesc;
+      break;
+[/#if]
+[/#list]
+[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+[#if SWIP.variables??]
+[#list SWIP.variables as define]
+	[#assign def_value = define.value]
+	[#assign def_name = define.name]
+[#if def_name?contains("UX_DEVICE_HID_CUSTOM") && def_value == "1"]
+    case INTERFACE_HID_CUSTOM:
+      pHidReportDesc = USBD_CustomHID_ReportDesc;
+      break;
+[/#if]
+[/#list]
+[/#if]
+[/#list]
+    default:
+      break;
+  }
 
   /* USER CODE HidReportDesc1 */
 
   /* USER CODE HidReportDesc1 */
+
   return pHidReportDesc;
+}
+
+/**
+  * @brief  USBD_HID_ReportDesc_length
+  *         Return the device HID Report Descriptor
+  * @param  hid_type : HID Device type
+  * @retval Size of HID Report Descriptor buffer
+  */
+uint16_t USBD_HID_ReportDesc_length(uint8_t hid_type)
+{
+  uint16_t ReportDesc_Size = 0;
+
+  /* USER CODE ReportDesc_Size0 */
+
+  /* USER CODE ReportDesc_Size0 */
+
+  switch(hid_type)
+  {
+[#list SWIPdatas as SWIP]
+[#if SWIP.variables??]
+[#list SWIP.variables as define]
+	[#assign def_value = define.value]
+	[#assign def_name = define.name]
+[#if def_name?contains("UX_DEVICE_HID_MOUSE") && def_value == "1"]
+    case INTERFACE_HID_MOUSE:
+      ReportDesc_Size = sizeof(USBD_HID_MOUSE_ReportDesc);
+      break;
+[/#if]
+[/#list]
+[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+[#if SWIP.variables??]
+[#list SWIP.variables as define]
+	[#assign def_value = define.value]
+	[#assign def_name = define.name]
+[#if def_name?contains("UX_DEVICE_HID_KEYBOARD") && def_value == "1"]
+    case INTERFACE_HID_KEYBOARD:
+      ReportDesc_Size = sizeof(USBD_HID_KEYBOARD_ReportDesc);
+      break;
+[/#if]
+[/#list]
+[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+[#if SWIP.variables??]
+[#list SWIP.variables as define]
+	[#assign def_value = define.value]
+	[#assign def_name = define.name]
+[#if def_name?contains("UX_DEVICE_HID_CUSTOM") && def_value == "1"]
+    case INTERFACE_HID_CUSTOM:
+      ReportDesc_Size = sizeof(USBD_CustomHID_ReportDesc);
+      break;
+[/#if]
+[/#list]
+[/#if]
+[/#list]
+    default:
+      break;
+  }
+
+  /* USER CODE ReportDesc_Size1 */
+
+  /* USER CODE ReportDesc_Size1 */
+
+  return ReportDesc_Size;
 }
 #endif /* USBD_HID_CLASS_ACTIVATED == 1U */
 [/#if]
@@ -572,10 +853,9 @@ static uint8_t *USBD_Device_Framework_Builder(USBD_DevClassHandleTypeDef *pdev,
                                               uint8_t *UserClassInstance,
                                               uint8_t Speed)
 {
-  static USBD_DeviceDescTypedef *pDevDesc;
+  static USBD_DeviceDescTypedef   *pDevDesc;
   static USBD_DevQualiDescTypedef *pDevQualDesc;
   uint8_t Idx_Instance = 0U;
-  uint8_t NumberClass = 1U;
 
   /* Set Dev and conf descriptors size to 0 */
   pdev->CurrConfDescSz = 0U;
@@ -621,27 +901,25 @@ static uint8_t *USBD_Device_Framework_Builder(USBD_DevClassHandleTypeDef *pdev,
   while (Idx_Instance < USBD_MAX_SUPPORTED_CLASS)
   {
     if ((pdev->classId < USBD_MAX_SUPPORTED_CLASS) &&
-        (pdev->NumClasses < USBD_MAX_SUPPORTED_CLASS))
+        (pdev->NumClasses < USBD_MAX_SUPPORTED_CLASS) &&
+        (UserClassInstance[Idx_Instance] != CLASS_TYPE_NONE))
     {
       /* Call the composite class builder */
       (void)USBD_FrameWork_AddClass(pdev,
                                     (USBD_CompositeClassTypeDef)UserClassInstance[Idx_Instance],
-                                    0, Speed, (pDevFrameWorkDesc + pdev->CurrDevDescSz));
+                                    0, Speed,
+                                    (pDevFrameWorkDesc + pdev->CurrDevDescSz));
 
       /* Increment the ClassId for the next occurrence */
       pdev->classId ++;
       pdev->NumClasses ++;
     }
-    Idx_Instance++;
 
-    /* Count the number of Classes different of CLASS_TYPE_NONE */
-    if (UserClassInstance[Idx_Instance] != CLASS_TYPE_NONE)
-    {
-      NumberClass++;
-    }
+    Idx_Instance++;
   }
+
   /* Check if there is a composite class and update device class */
-  if (NumberClass > 1)
+  if (pdev->NumClasses > 1)
   {
     pDevDesc->bDeviceClass = 0xEF;
     pDevDesc->bDeviceSubClass = 0x02;
@@ -666,9 +944,10 @@ static uint8_t *USBD_Device_Framework_Builder(USBD_DevClassHandleTypeDef *pdev,
   * @brief  USBD_FrameWork_AddClass
   *         Register a class in the class builder
   * @param  pdev: device instance
-  * @param  pclass: pointer to the class structure to be added
   * @param  class: type of the class to be added (from USBD_CompositeClassTypeDef)
   * @param  cfgidx: configuration index
+  * @param  speed: device speed
+  * @param  pCmpstConfDesc: to composite device configuration descriptor
   * @retval status
   */
 uint8_t  USBD_FrameWork_AddClass(USBD_DevClassHandleTypeDef *pdev,
@@ -676,6 +955,11 @@ uint8_t  USBD_FrameWork_AddClass(USBD_DevClassHandleTypeDef *pdev,
                                  uint8_t cfgidx, uint8_t Speed,
                                  uint8_t *pCmpstConfDesc)
 {
+
+[#if UX_DEVICE_HID_CORE_ENABLED_Value == "true" && HID_ITF_FOUNDED_Value == "true"]
+  static uint8_t interface_idx = 0U;
+[/#if]
+
   if ((pdev->classId < USBD_MAX_SUPPORTED_CLASS) &&
       (pdev->tclasslist[pdev->classId].Active == 0U))
   {
@@ -683,6 +967,21 @@ uint8_t  USBD_FrameWork_AddClass(USBD_DevClassHandleTypeDef *pdev,
     pdev->tclasslist[pdev->classId].ClassId = pdev->classId;
     pdev->tclasslist[pdev->classId].Active = 1U;
     pdev->tclasslist[pdev->classId].ClassType = class;
+
+[#if UX_DEVICE_HID_CORE_ENABLED_Value == "true" && HID_ITF_FOUNDED_Value == "true"]
+    if (class == CLASS_TYPE_HID)
+    {
+      pdev->tclasslist[pdev->classId].InterfaceType = UserHIDInterface[interface_idx];
+
+      interface_idx++;
+
+      if (interface_idx == sizeof(UserHIDInterface))
+      {
+        interface_idx = 0U;
+      }
+    }
+
+[/#if]
 
     /* Call configuration descriptor builder and endpoint configuration builder */
     if (USBD_FrameWork_AddToConfDesc(pdev, Speed, pCmpstConfDesc) != UX_SUCCESS)
@@ -700,6 +999,8 @@ uint8_t  USBD_FrameWork_AddClass(USBD_DevClassHandleTypeDef *pdev,
   * @brief  USBD_FrameWork_AddToConfDesc
   *         Add a new class to the configuration descriptor
   * @param  pdev: device instance
+  * @param  Speed: device speed
+  * @param  pCmpstConfDesc: to composite device configuration descriptor
   * @retval status
   */
 uint8_t  USBD_FrameWork_AddToConfDesc(USBD_DevClassHandleTypeDef *pdev, uint8_t Speed,
@@ -723,53 +1024,177 @@ uint8_t  USBD_FrameWork_AddToConfDesc(USBD_DevClassHandleTypeDef *pdev, uint8_t 
 
   switch (pdev->tclasslist[pdev->classId].ClassType)
   {
+
 [#list SWIPdatas as SWIP]
 [#if SWIP.variables??]
 [#list SWIP.variables as define]
 	[#assign def_value = define.value]
 	[#assign def_name = define.name]
-[#if def_name?contains("UX_DEVICE_HID") && def_value == "1"]
+[#if (def_name?contains("UX_DEVICE_HID_CORE") && def_value == "1")]
 #if USBD_HID_CLASS_ACTIVATED == 1U
+
     case CLASS_TYPE_HID:
+
+      switch(pdev->tclasslist[pdev->classId].InterfaceType)
+      {
+[#list SWIPdatas as SWIP]
+[#if SWIP.variables??]
+[#list SWIP.variables as define]
+	[#assign def_value = define.value]
+	[#assign def_name = define.name]
+[#if def_name?contains("UX_DEVICE_HID_MOUSE") && def_value == "1"]
+
+#if USBD_HID_MOUSE_ACTIVATED == 1U
+
+        case INTERFACE_HID_MOUSE:
+
+          /* Find the first available interface slot and Assign number of interfaces */
+          interface = USBD_FrameWork_FindFreeIFNbr(pdev);
+          pdev->tclasslist[pdev->classId].NumIf = 1U;
+          pdev->tclasslist[pdev->classId].Ifs[0] = interface;
+
+          /* Assign endpoint numbers */
+          pdev->tclasslist[pdev->classId].NumEps = 1U; /* EP_IN */
+
+          /* Check the current speed to assign endpoint IN */
+          if (pdev->Speed == USBD_HIGH_SPEED)
+          {
+            /* Assign IN Endpoint */
+            USBD_FrameWork_AssignEp(pdev, USBD_HID_MOUSE_EPIN_ADDR,
+                                    USBD_EP_TYPE_INTR, USBD_HID_MOUSE_EPIN_HS_MPS);
+          }
+          else
+          {
+            /* Assign IN Endpoint */
+            USBD_FrameWork_AssignEp(pdev, USBD_HID_MOUSE_EPIN_ADDR,
+                                    USBD_EP_TYPE_INTR, USBD_HID_MOUSE_EPIN_FS_MPS);
+          }
+
+          /* Configure and Append the Descriptor */
+          USBD_FrameWork_HID_Desc(pdev, (uint32_t)pCmpstConfDesc, &pdev->CurrConfDescSz);
+
+          break;
+
+#endif /* USBD_HID_MOUSE_ACTIVATED == 1U */
+[/#if]
+
+[#if def_name?contains("UX_DEVICE_HID_KEYBOARD") && def_value == "1"]
+#if USBD_HID_KEYBOARD_ACTIVATED == 1U
+
+        case INTERFACE_HID_KEYBOARD:
+
+          /* Find the first available interface slot and Assign number of interfaces */
+          interface = USBD_FrameWork_FindFreeIFNbr(pdev);
+          pdev->tclasslist[pdev->classId].NumIf = 1U;
+          pdev->tclasslist[pdev->classId].Ifs[0] = interface;
+
+          /* Assign endpoint numbers */
+          pdev->tclasslist[pdev->classId].NumEps = 1U; /* EP_IN */
+
+          /* Check the current speed to assign endpoint IN */
+          if (pdev->Speed == USBD_HIGH_SPEED)
+          {
+            /* Assign IN Endpoint */
+            USBD_FrameWork_AssignEp(pdev, USBD_HID_KEYBOARD_EPIN_ADDR,
+                                    USBD_EP_TYPE_INTR, USBD_HID_KEYBOARD_EPIN_HS_MPS);
+          }
+          else
+          {
+            /* Assign IN Endpoint */
+            USBD_FrameWork_AssignEp(pdev, USBD_HID_KEYBOARD_EPIN_ADDR,
+                                    USBD_EP_TYPE_INTR, USBD_HID_KEYBOARD_EPIN_FS_MPS);
+          }
+
+          /* Configure and Append the Descriptor */
+          USBD_FrameWork_HID_Desc(pdev, (uint32_t)pCmpstConfDesc, &pdev->CurrConfDescSz);
+
+          break;
+
+#endif /* USBD_HID_KEYBOARD_ACTIVATED == 1U */
+[/#if]
+
+[#if def_name?contains("UX_DEVICE_HID_CUSTOM") && def_value == "1"]
+#if USBD_HID_CUSTOM_ACTIVATED == 1U
+
+        case INTERFACE_HID_CUSTOM:
+
+          /* Find the first available interface slot and Assign number of interfaces */
+          interface = USBD_FrameWork_FindFreeIFNbr(pdev);
+          pdev->tclasslist[pdev->classId].NumIf = 1U;
+          pdev->tclasslist[pdev->classId].Ifs[0] = interface;
+
+          /* Assign endpoint numbers */
+[#if UX_DEVICE_CLASS_HID_INTERRUPT_OUT_SUPPORT_value == "1"]
+          pdev->tclasslist[pdev->classId].NumEps = 2U; /* EP_IN, EP_OUT */
+[#else]
+          pdev->tclasslist[pdev->classId].NumEps = 1U; /* EP_IN */
+[/#if]
+
+          /* Check the current speed to assign endpoints */
+          if (pdev->Speed == USBD_HIGH_SPEED)
+          {
+            /* Assign IN Endpoint */
+            USBD_FrameWork_AssignEp(pdev, USBD_HID_CUSTOM_EPIN_ADDR,
+                                    USBD_EP_TYPE_INTR, USBD_HID_CUSTOM_EPIN_HS_MPS);
+[#if UX_DEVICE_CLASS_HID_INTERRUPT_OUT_SUPPORT_value == "1"]
+
+            /* Assign OUT Endpoint */
+            USBD_FrameWork_AssignEp(pdev, USBD_HID_CUSTOM_EPOUT_ADDR,
+                                    USBD_EP_TYPE_INTR, USBD_HID_CUSTOM_EPOUT_HS_MPS);
+[/#if]
+          }
+          else
+          {
+            /* Assign IN Endpoint */
+            USBD_FrameWork_AssignEp(pdev, USBD_HID_CUSTOM_EPIN_ADDR,
+                                    USBD_EP_TYPE_INTR, USBD_HID_CUSTOM_EPIN_FS_MPS);
+[#if UX_DEVICE_CLASS_HID_INTERRUPT_OUT_SUPPORT_value == "1"]
+
+            /* Assign OUT Endpoint */
+            USBD_FrameWork_AssignEp(pdev, USBD_HID_CUSTOM_EPOUT_ADDR,
+                                    USBD_EP_TYPE_INTR, USBD_HID_CUSTOM_EPOUT_FS_MPS);
+[/#if]
+          }
+
+          /* Configure and Append the Descriptor */
+          USBD_FrameWork_HID_Desc(pdev, (uint32_t)pCmpstConfDesc, &pdev->CurrConfDescSz);
+
+          break;
+
+#endif /* USBD_HID_CUSTOM_ACTIVATED == 1U */
+
+[/#if]
+[/#list]
+[/#if]
+[/#list]
+
+        default:
+          break;
+      }
+
+      break;
+#endif /* USBD_HID_CLASS_ACTIVATED == 1U */
+[/#if]
+[/#list]
+[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+[#if SWIP.variables??]
+[#list SWIP.variables as define]
+	[#assign def_value = define.value]
+	[#assign def_name = define.name]
+[#if def_name?contains("UX_DEVICE_STORAGE") && def_value == "1"]
+#if USBD_MSC_CLASS_ACTIVATED == 1U
+
+    case CLASS_TYPE_MSC:
+
       /* Find the first available interface slot and Assign number of interfaces */
       interface = USBD_FrameWork_FindFreeIFNbr(pdev);
       pdev->tclasslist[pdev->classId].NumIf = 1U;
       pdev->tclasslist[pdev->classId].Ifs[0] = interface;
 
       /* Assign endpoint numbers */
-      pdev->tclasslist[pdev->classId].NumEps = 1U; /* EP1_IN */
-
-      /* Check the current speed to assign endpoint IN */
-      if (pdev->Speed == USBD_HIGH_SPEED)
-      {
-        /* Assign IN Endpoint */
-        USBD_FrameWork_AssignEp(pdev, USBD_HID_EPIN_ADDR, USBD_EP_TYPE_INTR,
-                                USBD_HID_EPIN_HS_MPS);
-      }
-      else
-      {
-        /* Assign IN Endpoint */
-        USBD_FrameWork_AssignEp(pdev, USBD_HID_EPIN_ADDR, USBD_EP_TYPE_INTR,
-                                USBD_HID_EPIN_FS_MPS);
-      }
-
-      /* Configure and Append the Descriptor */
-      USBD_FrameWork_HID_Desc(pdev, (uint32_t)pCmpstConfDesc, &pdev->CurrConfDescSz);
-
-      break;
-#endif /* USBD_HID_CLASS_ACTIVATED */
-[/#if]
-
-[#if def_name?contains("UX_DEVICE_STORAGE") && def_value == "1"]
-#if USBD_MSC_CLASS_ACTIVATED == 1U
-    case CLASS_TYPE_MSC:
-      /* Find the first available interface slot and Assign number of interfaces */
-      interface = USBD_FrameWork_FindFreeIFNbr(pdev);
-      pdev->tclasslist[pdev->classId].NumIf = 1;
-      pdev->tclasslist[pdev->classId].Ifs[0] = interface;
-
-      /* Assign endpoint numbers */
-      pdev->tclasslist[pdev->classId].NumEps = 2; /* EP1_IN, EP1_OUT */
+      pdev->tclasslist[pdev->classId].NumEps = 2; /* EP_IN, EP_OUT */
 
       /* Check the current speed to assign endpoints */
       if (pdev->Speed == USBD_HIGH_SPEED)
@@ -797,11 +1222,20 @@ uint8_t  USBD_FrameWork_AddToConfDesc(USBD_DevClassHandleTypeDef *pdev, uint8_t 
       USBD_FrameWork_MSCDesc(pdev, (uint32_t)pCmpstConfDesc, &pdev->CurrConfDescSz);
 
       break;
+
 #endif /* USBD_MSC_CLASS_ACTIVATED */
 [/#if]
-
+[/#list]
+[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+[#if SWIP.variables??]
+[#list SWIP.variables as define]
+	[#assign def_value = define.value]
+	[#assign def_name = define.name]
 [#if def_name?contains("UX_DEVICE_CDC_ACM") && def_value == "1"]
 #if USBD_CDC_ACM_CLASS_ACTIVATED == 1
+
     case CLASS_TYPE_CDC_ACM:
 
       /* Find the first available interface slot and Assign number of interfaces */
@@ -811,47 +1245,56 @@ uint8_t  USBD_FrameWork_AddToConfDesc(USBD_DevClassHandleTypeDef *pdev, uint8_t 
       pdev->tclasslist[pdev->classId].Ifs[1] = (uint8_t)(interface + 1U);
 
       /* Assign endpoint numbers */
-      pdev->tclasslist[pdev->classId].NumEps = 3U;
+      pdev->tclasslist[pdev->classId].NumEps = 3U;  /* EP_IN, EP_OUT, CMD_EP */
 
       /* Check the current speed to assign endpoints */
       if (Speed == USBD_HIGH_SPEED)
       {
         /* Assign OUT Endpoint */
-        USBD_FrameWork_AssignEp(pdev, USBD_CDCACM_EPOUT_ADDR, USBD_EP_TYPE_BULK,
-                                USBD_CDCACM_EPOUT_HS_MPS);
+        USBD_FrameWork_AssignEp(pdev, USBD_CDCACM_EPOUT_ADDR,
+                                USBD_EP_TYPE_BULK, USBD_CDCACM_EPOUT_HS_MPS);
 
         /* Assign IN Endpoint */
-        USBD_FrameWork_AssignEp(pdev, USBD_CDCACM_EPIN_ADDR, USBD_EP_TYPE_BULK,
-                                USBD_CDCACM_EPIN_HS_MPS);
+        USBD_FrameWork_AssignEp(pdev, USBD_CDCACM_EPIN_ADDR,
+                                USBD_EP_TYPE_BULK, USBD_CDCACM_EPIN_HS_MPS);
 
         /* Assign CMD Endpoint */
-        USBD_FrameWork_AssignEp(pdev, USBD_CDCACM_EPINCMD_ADDR, USBD_EP_TYPE_INTR,
-                                USBD_CDCACM_EPINCMD_HS_MPS);
+        USBD_FrameWork_AssignEp(pdev, USBD_CDCACM_EPINCMD_ADDR,
+                                USBD_EP_TYPE_INTR, USBD_CDCACM_EPINCMD_HS_MPS);
       }
       else
       {
         /* Assign OUT Endpoint */
-        USBD_FrameWork_AssignEp(pdev, USBD_CDCACM_EPOUT_ADDR, USBD_EP_TYPE_BULK,
-                                USBD_CDCACM_EPOUT_FS_MPS);
+        USBD_FrameWork_AssignEp(pdev, USBD_CDCACM_EPOUT_ADDR,
+                                USBD_EP_TYPE_BULK, USBD_CDCACM_EPOUT_FS_MPS);
 
         /* Assign IN Endpoint */
-        USBD_FrameWork_AssignEp(pdev, USBD_CDCACM_EPIN_ADDR, USBD_EP_TYPE_BULK,
-                                USBD_CDCACM_EPIN_FS_MPS);
+        USBD_FrameWork_AssignEp(pdev, USBD_CDCACM_EPIN_ADDR,
+                                USBD_EP_TYPE_BULK, USBD_CDCACM_EPIN_FS_MPS);
 
         /* Assign CMD Endpoint */
-        USBD_FrameWork_AssignEp(pdev, USBD_CDCACM_EPINCMD_ADDR, USBD_EP_TYPE_INTR,
-                                USBD_CDCACM_EPINCMD_FS_MPS);
+        USBD_FrameWork_AssignEp(pdev, USBD_CDCACM_EPINCMD_ADDR,
+                                USBD_EP_TYPE_INTR, USBD_CDCACM_EPINCMD_FS_MPS);
       }
 
       /* Configure and Append the Descriptor */
       USBD_FrameWork_CDCDesc(pdev, (uint32_t)pCmpstConfDesc, &pdev->CurrConfDescSz);
 
       break;
+
 #endif /* USBD_CDC_ACM_CLASS_ACTIVATED */
 [/#if]
-
+[/#list]
+[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+[#if SWIP.variables??]
+[#list SWIP.variables as define]
+	[#assign def_value = define.value]
+	[#assign def_name = define.name]
 [#if def_name?contains("UX_DEVICE_CDC_ECM") && def_value == "1"]
 #if USBD_CDC_ECM_CLASS_ACTIVATED == 1
+
     case CLASS_TYPE_CDC_ECM:
 
       /* Find the first available interface slot and Assign number of interfaces */
@@ -861,62 +1304,189 @@ uint8_t  USBD_FrameWork_AddToConfDesc(USBD_DevClassHandleTypeDef *pdev, uint8_t 
       pdev->tclasslist[pdev->classId].Ifs[1] = (uint8_t)(interface + 1U);
 
       /* Assign endpoint numbers */
-      pdev->tclasslist[pdev->classId].NumEps = 3U; /* EP1_IN, EP1_OUT,CMD_EP2 */
+      pdev->tclasslist[pdev->classId].NumEps = 3U; /* EP_IN, EP_OUT, CMD_EP */
 
       /* Check the current speed to assign endpoints */
       if (Speed == USBD_HIGH_SPEED)
       {
         /* Assign OUT Endpoint */
-        USBD_FrameWork_AssignEp(pdev, USBD_CDCECM_EPOUT_ADDR, USBD_EP_TYPE_BULK,
-                                USBD_CDCECM_EPOUT_HS_MPS);
+        USBD_FrameWork_AssignEp(pdev, USBD_CDCECM_EPOUT_ADDR,
+                                USBD_EP_TYPE_BULK, USBD_CDCECM_EPOUT_HS_MPS);
 
         /* Assign IN Endpoint */
-        USBD_FrameWork_AssignEp(pdev, USBD_CDCECM_EPIN_ADDR, USBD_EP_TYPE_BULK,
-                                USBD_CDCECM_EPIN_HS_MPS);
+        USBD_FrameWork_AssignEp(pdev, USBD_CDCECM_EPIN_ADDR,
+                                USBD_EP_TYPE_BULK, USBD_CDCECM_EPIN_HS_MPS);
 
         /* Assign CMD Endpoint */
-        USBD_FrameWork_AssignEp(pdev, USBD_CDCECM_EPINCMD_ADDR, USBD_EP_TYPE_INTR,
-                                USBD_CDCECM_EPINCMD_HS_MPS);
+        USBD_FrameWork_AssignEp(pdev, USBD_CDCECM_EPINCMD_ADDR,
+                                USBD_EP_TYPE_INTR, USBD_CDCECM_EPINCMD_HS_MPS);
       }
       else
       {
         /* Assign OUT Endpoint */
-        USBD_FrameWork_AssignEp(pdev, USBD_CDCECM_EPOUT_ADDR, USBD_EP_TYPE_BULK,
-                                USBD_CDCECM_EPOUT_FS_MPS);
+        USBD_FrameWork_AssignEp(pdev, USBD_CDCECM_EPOUT_ADDR,
+                                USBD_EP_TYPE_BULK, USBD_CDCECM_EPOUT_FS_MPS);
 
         /* Assign IN Endpoint */
-        USBD_FrameWork_AssignEp(pdev, USBD_CDCECM_EPIN_ADDR, USBD_EP_TYPE_BULK,
-                                USBD_CDCECM_EPIN_FS_MPS);
+        USBD_FrameWork_AssignEp(pdev, USBD_CDCECM_EPIN_ADDR,
+                                USBD_EP_TYPE_BULK, USBD_CDCECM_EPIN_FS_MPS);
 
         /* Assign CMD Endpoint */
-        USBD_FrameWork_AssignEp(pdev, USBD_CDCECM_EPINCMD_ADDR, USBD_EP_TYPE_INTR,
-                                USBD_CDCECM_EPINCMD_FS_MPS);
+        USBD_FrameWork_AssignEp(pdev, USBD_CDCECM_EPINCMD_ADDR,
+                                USBD_EP_TYPE_INTR, USBD_CDCECM_EPINCMD_FS_MPS);
       }
 
       /* Configure and Append the Descriptor */
       USBD_FrameWork_CDCECMDesc(pdev, (uint32_t)pCmpstConfDesc, &pdev->CurrConfDescSz);
 
       break;
+
 #endif /* USBD_CDC_ECM_CLASS_ACTIVATED */
 [/#if]
+[/#list]
+[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+[#if SWIP.variables??]
+[#list SWIP.variables as define]
+	[#assign def_value = define.value]
+	[#assign def_name = define.name]
+[#if def_name?contains("UX_DEVICE_RNDIS") && def_value == "1"]
+#if USBD_RNDIS_CLASS_ACTIVATED == 1
+
+    case CLASS_TYPE_RNDIS:
+
+      /* Find the first available interface slot and Assign number of interfaces */
+      interface = USBD_FrameWork_FindFreeIFNbr(pdev);
+      pdev->tclasslist[pdev->classId].NumIf = 2U;
+      pdev->tclasslist[pdev->classId].Ifs[0] = interface;
+      pdev->tclasslist[pdev->classId].Ifs[1] = (uint8_t)(interface + 1U);
+
+      /* Assign endpoint numbers */
+      pdev->tclasslist[pdev->classId].NumEps = 3U; /* EP_IN, EP_OUT, CMD_EP */
+
+      /* Check the current speed to assign endpoints */
+      if (Speed == USBD_HIGH_SPEED)
+      {
+        /* Assign OUT Endpoint */
+        USBD_FrameWork_AssignEp(pdev, USBD_RNDIS_EPOUT_ADDR,
+                                USBD_EP_TYPE_BULK, USBD_RNDIS_EPOUT_HS_MPS);
+
+        /* Assign IN Endpoint */
+        USBD_FrameWork_AssignEp(pdev, USBD_RNDIS_EPIN_ADDR,
+                                USBD_EP_TYPE_BULK, USBD_RNDIS_EPIN_HS_MPS);
+
+        /* Assign CMD Endpoint */
+        USBD_FrameWork_AssignEp(pdev, USBD_RNDIS_EPINCMD_ADDR,
+                                USBD_EP_TYPE_INTR, USBD_RNDIS_EPINCMD_HS_MPS);
+      }
+      else
+      {
+        /* Assign OUT Endpoint */
+        USBD_FrameWork_AssignEp(pdev, USBD_RNDIS_EPOUT_ADDR,
+                                USBD_EP_TYPE_BULK, USBD_RNDIS_EPOUT_FS_MPS);
+
+        /* Assign IN Endpoint */
+        USBD_FrameWork_AssignEp(pdev, USBD_RNDIS_EPIN_ADDR,
+                                USBD_EP_TYPE_BULK, USBD_RNDIS_EPIN_FS_MPS);
+
+        /* Assign CMD Endpoint */
+        USBD_FrameWork_AssignEp(pdev, USBD_RNDIS_EPINCMD_ADDR,
+                                USBD_EP_TYPE_INTR, USBD_RNDIS_EPINCMD_FS_MPS);
+      }
+
+      /* Configure and Append the Descriptor */
+      USBD_FrameWork_RNDISDesc(pdev, (uint32_t)pCmpstConfDesc, &pdev->CurrConfDescSz);
+
+      break;
+
+#endif /* USBD_RNDIS_CLASS_ACTIVATED */
+[/#if]
+[/#list]
+[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+[#if SWIP.variables??]
+[#list SWIP.variables as define]
+	[#assign def_value = define.value]
+	[#assign def_name = define.name]
 [#if def_name?contains("UX_DEVICE_DFU") && def_value == "1"]
 #if USBD_DFU_CLASS_ACTIVATED == 1
+
     case CLASS_TYPE_DFU:
 
       /* Find the first available interface slot and Assign number of interfaces */
       interface = USBD_FrameWork_FindFreeIFNbr(pdev);
-      pdev->tclasslist[pdev->classId].NumIf  = 1;
+      pdev->tclasslist[pdev->classId].NumIf  = 1U;
       pdev->tclasslist[pdev->classId].Ifs[0] = interface;
 
       /* Assign endpoint numbers */
-      pdev->tclasslist[pdev->classId].NumEps = 0; /* only EP0 is used */
+      pdev->tclasslist[pdev->classId].NumEps = 0U; /* only EP0 is used */
 
       /* Configure and Append the Descriptor */
       USBD_FrameWork_DFUDesc(pdev, (uint32_t)pCmpstConfDesc, &pdev->CurrConfDescSz);
 
+      break;
+
+#endif /* USBD_DFU_CLASS_ACTIVATED */
+[/#if]
+[/#list]
+[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+[#if SWIP.variables??]
+[#list SWIP.variables as define]
+	[#assign def_value = define.value]
+	[#assign def_name = define.name]
+[#if def_name?contains("UX_DEVICE_PIMA") && def_value == "1"]
+#if USBD_PIMA_MTP_CLASS_ACTIVATED == 1U
+
+    case CLASS_TYPE_PIMA_MTP:
+
+      /* Find the first available interface slot and Assign number of interfaces */
+      interface = USBD_FrameWork_FindFreeIFNbr(pdev);
+      pdev->tclasslist[pdev->classId].NumIf = 1U;
+      pdev->tclasslist[pdev->classId].Ifs[0] = interface;
+
+      /* Assign endpoint numbers */
+      pdev->tclasslist[pdev->classId].NumEps = 3U; /* EP_IN, EP_OUT, EP_CMD */
+
+      /* Check the current speed to assign endpoints */
+      if (pdev->Speed == USBD_HIGH_SPEED)
+      {
+        /* Assign IN Endpoint */
+        USBD_FrameWork_AssignEp(pdev, USBD_PIMA_EPIN_ADDR,
+                                USBD_EP_TYPE_BULK, USBD_PIMA_EPIN_HS_MPS);
+
+        /* Assign OUT Endpoint */
+        USBD_FrameWork_AssignEp(pdev, USBD_PIMA_EPOUT_ADDR,
+                                USBD_EP_TYPE_BULK, USBD_PIMA_EPOUT_HS_MPS);
+
+        /* Assign CMD Endpoint */
+        USBD_FrameWork_AssignEp(pdev, USBD_PIMA_EPINCMD_ADDR,
+                                USBD_EP_TYPE_INTR, USBD_PIMA_EPINCMD_HS_MPS);
+      }
+      else
+      {
+        /* Assign IN Endpoint */
+        USBD_FrameWork_AssignEp(pdev, USBD_PIMA_EPIN_ADDR,
+                                USBD_EP_TYPE_BULK, USBD_PIMA_EPIN_FS_MPS);
+
+        /* Assign OUT Endpoint */
+        USBD_FrameWork_AssignEp(pdev, USBD_PIMA_EPOUT_ADDR,
+                                USBD_EP_TYPE_BULK, USBD_PIMA_EPOUT_FS_MPS);
+
+        /* Assign CMD Endpoint */
+        USBD_FrameWork_AssignEp(pdev, USBD_PIMA_EPINCMD_ADDR,
+                                USBD_EP_TYPE_INTR, USBD_PIMA_EPINCMD_FS_MPS);
+      }
+
+      /* Configure and Append the Descriptor */
+      USBD_FrameWork_MTPDesc(pdev, (uint32_t)pCmpstConfDesc, &pdev->CurrConfDescSz);
 
       break;
-#endif /* USBD_DFU_CLASS_ACTIVATED */
+
+#endif /* USBD_PIMA_MTP_CLASS_ACTIVATED */
 [/#if]
 [/#list]
 [/#if]
@@ -961,9 +1531,10 @@ static uint8_t USBD_FrameWork_FindFreeIFNbr(USBD_DevClassHandleTypeDef *pdev)
 }
 
 /**
-  * @brief  USBD_FrameWork_AddToConfDesc
+  * @brief  USBD_FrameWork_AddConfDesc
   *         Add a new class to the configuration descriptor
-  * @param  pdev: device instance
+  * @param  Conf: configuration descriptor
+  * @param  pSze: pointer to the configuration descriptor size
   * @retval none
   */
 static void  USBD_FrameWork_AddConfDesc(uint32_t Conf, uint32_t *pSze)
@@ -971,15 +1542,15 @@ static void  USBD_FrameWork_AddConfDesc(uint32_t Conf, uint32_t *pSze)
   /* Intermediate variable to comply with MISRA-C Rule 11.3 */
   USBD_ConfigDescTypedef *ptr = (USBD_ConfigDescTypedef *)Conf;
 
-  ptr->bLength                = (uint8_t)sizeof(USBD_ConfigDescTypedef);
-  ptr->bDescriptorType        = USB_DESC_TYPE_CONFIGURATION;
-  ptr->wDescriptorLength      = 0U;
-  ptr->bNumInterfaces         = 0U;
-  ptr->bConfigurationValue    = 1U;
-  ptr->iConfiguration         = USBD_CONFIG_STR_DESC_IDX;
-  ptr->bmAttributes           = USBD_CONFIG_BMATTRIBUTES;
-  ptr->bMaxPower              = USBD_CONFIG_MAXPOWER;
-  *pSze                       += sizeof(USBD_ConfigDescTypedef);
+  ptr->bLength = (uint8_t)sizeof(USBD_ConfigDescTypedef);
+  ptr->bDescriptorType = USB_DESC_TYPE_CONFIGURATION;
+  ptr->wDescriptorLength = 0U;
+  ptr->bNumInterfaces = 0U;
+  ptr->bConfigurationValue = 1U;
+  ptr->iConfiguration = USBD_CONFIG_STR_DESC_IDX;
+  ptr->bmAttributes = USBD_CONFIG_BMATTRIBUTES;
+  ptr->bMaxPower = USBD_CONFIG_MAXPOWER;
+  *pSze += sizeof(USBD_ConfigDescTypedef);
 }
 
 /**
@@ -1011,13 +1582,7 @@ static void  USBD_FrameWork_AssignEp(USBD_DevClassHandleTypeDef *pdev,
   pdev->tclasslist[pdev->classId].Eps[idx].is_used = 1U;
 }
 
-
-[#list SWIPdatas as SWIP]
-[#if SWIP.variables??]
-[#list SWIP.variables as define]
-	[#assign def_value = define.value]
-	[#assign def_name = define.name]
-[#if def_name?contains("UX_DEVICE_HID") && def_value == "1"]
+[#if UX_DEVICE_HID_CORE_ENABLED_Value == "true" && HID_ITF_FOUNDED_Value == "true"]
 #if USBD_HID_CLASS_ACTIVATED == 1U
 /**
   * @brief  USBD_FrameWork_HID_Desc
@@ -1028,53 +1593,189 @@ static void  USBD_FrameWork_AssignEp(USBD_DevClassHandleTypeDef *pdev,
   * @retval None
   */
 static void  USBD_FrameWork_HID_Desc(USBD_DevClassHandleTypeDef *pdev,
-                                         uint32_t pConf, uint32_t *Sze)
+                                     uint32_t pConf, uint32_t *Sze)
 {
   static USBD_IfDescTypedef       *pIfDesc;
   static USBD_EpDescTypedef       *pEpDesc;
-  static USBD_HIDDescTypedef      *pHidMouseDesc;
+  static USBD_HIDDescTypedef      *pHidDesc;
 
-  /* Append HID Interface descriptor to Configuration descriptor */
-  __USBD_FRAMEWORK_SET_IF(pdev->tclasslist[pdev->classId].Ifs[0], 0U, \
-                          (uint8_t)(pdev->tclasslist[pdev->classId].NumEps),
-                          0x03U, 0x01U, 0x02U, 0U);
-
-  /* Append HID Functional descriptor to Configuration descriptor */
-  pHidMouseDesc = ((USBD_HIDDescTypedef *)(pConf + *Sze));
-  pHidMouseDesc->bLength = (uint8_t)sizeof(USBD_HIDDescTypedef);
-  pHidMouseDesc->bDescriptorType = HID_DESCRIPTOR_TYPE;
-  pHidMouseDesc->bcdHID = 0x0111U;
-  pHidMouseDesc->bCountryCode = 0x00U;
-  pHidMouseDesc->bNumDescriptors = 0x01U;
-  pHidMouseDesc->bHIDDescriptorType = 0x22U;
-  pHidMouseDesc->wItemLength = USBD_HID_MOUSE_REPORT_DESC_SIZE;
-  *Sze += (uint32_t)sizeof(USBD_HIDDescTypedef);
-
-  if (pdev->Speed == USBD_HIGH_SPEED)
+  switch(pdev->tclasslist[pdev->classId].InterfaceType)
   {
-    /* Append Endpoint descriptor to Configuration descriptor */
-    __USBD_FRAMEWORK_SET_EP(pdev->tclasslist[pdev->classId].Eps[0].add,
-                            USBD_EP_TYPE_INTR, \
-                            (uint16_t)pdev->tclasslist[pdev->classId].Eps[0].size,
-                            USBD_HID_EPIN_HS_BINTERVAL, USBD_HID_EPIN_FS_BINTERVAL);
-  }
-  else
-  {
-    /* Append Endpoint descriptor to Configuration descriptor */
-    __USBD_FRAMEWORK_SET_EP(pdev->tclasslist[pdev->classId].Eps[0].add,
-                            USBD_EP_TYPE_INTR, \
-                            (uint16_t)pdev->tclasslist[pdev->classId].Eps[0].size,
-                            USBD_HID_EPIN_HS_BINTERVAL, USBD_HID_EPIN_FS_BINTERVAL);
+
+[#list SWIPdatas as SWIP]
+[#if SWIP.variables??]
+[#list SWIP.variables as define]
+	[#assign def_value = define.value]
+	[#assign def_name = define.name]
+[#if def_name?contains("UX_DEVICE_HID_MOUSE") && def_value == "1"]
+#if USBD_HID_MOUSE_ACTIVATED == 1U
+    case INTERFACE_HID_MOUSE:
+
+      /* Append HID Interface descriptor to Configuration descriptor */
+      __USBD_FRAMEWORK_SET_IF(pdev->tclasslist[pdev->classId].Ifs[0], 0U,
+                              (uint8_t)(pdev->tclasslist[pdev->classId].NumEps),
+                              UX_DEVICE_CLASS_HID_CLASS,
+                              0x01U, INTERFACE_HID_MOUSE, 0U);
+
+      /* Append HID Functional descriptor to Configuration descriptor */
+      pHidDesc = ((USBD_HIDDescTypedef *)(pConf + *Sze));
+      pHidDesc->bLength = (uint8_t)sizeof(USBD_HIDDescTypedef);
+      pHidDesc->bDescriptorType = UX_DEVICE_CLASS_HID_DESCRIPTOR_HID;
+      pHidDesc->bcdHID = 0x0111U;
+      pHidDesc->bCountryCode = 0x00U;
+      pHidDesc->bNumDescriptors = 0x01U;
+      pHidDesc->bHIDDescriptorType = 0x22U;
+      pHidDesc->wDescriptorLength = USBD_HID_ReportDesc_length(INTERFACE_HID_MOUSE);
+      *Sze += (uint32_t)sizeof(USBD_HIDDescTypedef);
+
+      if (pdev->Speed == USBD_HIGH_SPEED)
+      {
+        /* Append Endpoint descriptor to Configuration descriptor */
+        __USBD_FRAMEWORK_SET_EP(pdev->tclasslist[pdev->classId].Eps[0].add,
+                                USBD_EP_TYPE_INTR,
+                                (uint16_t)pdev->tclasslist[pdev->classId].Eps[0].size,
+                                USBD_HID_MOUSE_EPIN_HS_BINTERVAL,
+                                USBD_HID_MOUSE_EPIN_FS_BINTERVAL);
+      }
+      else
+      {
+        /* Append Endpoint descriptor to Configuration descriptor */
+        __USBD_FRAMEWORK_SET_EP(pdev->tclasslist[pdev->classId].Eps[0].add,
+                                USBD_EP_TYPE_INTR,
+                                (uint16_t)pdev->tclasslist[pdev->classId].Eps[0].size,
+                                USBD_HID_MOUSE_EPIN_HS_BINTERVAL,
+                                USBD_HID_MOUSE_EPIN_FS_BINTERVAL);
+      }
+
+      break;
+#endif /* USBD_HID_MOUSE_ACTIVATED == 1U */
+[/#if]
+
+[#if def_name?contains("UX_DEVICE_HID_KEYBOARD") && def_value == "1"]
+#if USBD_HID_KEYBOARD_ACTIVATED == 1U
+    case INTERFACE_HID_KEYBOARD:
+
+      /* Append HID Interface descriptor to Configuration descriptor */
+      __USBD_FRAMEWORK_SET_IF(pdev->tclasslist[pdev->classId].Ifs[0], 0U,
+                              (uint8_t)(pdev->tclasslist[pdev->classId].NumEps),
+                              UX_DEVICE_CLASS_HID_CLASS,
+                              0x01U, INTERFACE_HID_KEYBOARD, 0U);
+
+      /* Append HID Functional descriptor to Configuration descriptor */
+      pHidDesc = ((USBD_HIDDescTypedef *)(pConf + *Sze));
+      pHidDesc->bLength = (uint8_t)sizeof(USBD_HIDDescTypedef);
+      pHidDesc->bDescriptorType = UX_DEVICE_CLASS_HID_DESCRIPTOR_HID;
+      pHidDesc->bcdHID = 0x0111U;
+      pHidDesc->bCountryCode = 0x00U;
+      pHidDesc->bNumDescriptors = 0x01U;
+      pHidDesc->bHIDDescriptorType = 0x22U;
+      pHidDesc->wDescriptorLength = USBD_HID_ReportDesc_length(INTERFACE_HID_KEYBOARD);
+      *Sze += (uint32_t)sizeof(USBD_HIDDescTypedef);
+
+      if (pdev->Speed == USBD_HIGH_SPEED)
+      {
+        /* Append Endpoint descriptor to Configuration descriptor */
+        __USBD_FRAMEWORK_SET_EP(pdev->tclasslist[pdev->classId].Eps[0].add,
+                                USBD_EP_TYPE_INTR,
+                                (uint16_t)pdev->tclasslist[pdev->classId].Eps[0].size,
+                                USBD_HID_KEYBOARD_EPIN_HS_BINTERVAL,
+                                USBD_HID_KEYBOARD_EPIN_FS_BINTERVAL);
+      }
+      else
+      {
+        /* Append Endpoint descriptor to Configuration descriptor */
+        __USBD_FRAMEWORK_SET_EP(pdev->tclasslist[pdev->classId].Eps[0].add,
+                                USBD_EP_TYPE_INTR,
+                                (uint16_t)pdev->tclasslist[pdev->classId].Eps[0].size,
+                                USBD_HID_KEYBOARD_EPIN_HS_BINTERVAL,
+                                USBD_HID_KEYBOARD_EPIN_FS_BINTERVAL);
+      }
+
+      break;
+
+#endif /* USBD_HID_KEYBOARD_ACTIVATED == 1U */
+[/#if]
+
+[#if def_name?contains("UX_DEVICE_HID_CUSTOM") && def_value == "1"]
+#if USBD_HID_CUSTOM_ACTIVATED == 1U
+    case  INTERFACE_HID_CUSTOM:
+
+      /* Append HID Interface descriptor to Configuration descriptor */
+      __USBD_FRAMEWORK_SET_IF(pdev->tclasslist[pdev->classId].Ifs[0], 0U, \
+                              (uint8_t)(pdev->tclasslist[pdev->classId].NumEps),
+                              UX_DEVICE_CLASS_HID_CLASS,
+                              0x00U, INTERFACE_HID_CUSTOM, 0U);
+
+      /* Append HID Functional descriptor to Configuration descriptor */
+      pHidDesc = ((USBD_HIDDescTypedef *)(pConf + *Sze));
+      pHidDesc->bLength = (uint8_t)sizeof(USBD_HIDDescTypedef);
+      pHidDesc->bDescriptorType = UX_DEVICE_CLASS_HID_DESCRIPTOR_HID;
+      pHidDesc->bcdHID = 0x0111U;
+      pHidDesc->bCountryCode = 0x00U;
+      pHidDesc->bNumDescriptors = 0x01U;
+      pHidDesc->bHIDDescriptorType = 0x22U;
+      pHidDesc->wDescriptorLength = USBD_HID_ReportDesc_length(INTERFACE_HID_CUSTOM);
+      *Sze += (uint32_t)sizeof(USBD_HIDDescTypedef);
+
+      if (pdev->Speed == USBD_HIGH_SPEED)
+      {
+        /* Append Endpoint descriptor to Configuration descriptor */
+        __USBD_FRAMEWORK_SET_EP(pdev->tclasslist[pdev->classId].Eps[0].add,
+                                USBD_EP_TYPE_INTR,
+                                (uint16_t)pdev->tclasslist[pdev->classId].Eps[0].size,
+                                USBD_HID_CUSTOM_EPIN_FS_BINTERVAL,
+                                USBD_HID_CUSTOM_EPIN_HS_BINTERVAL);
+[#if UX_DEVICE_CLASS_HID_INTERRUPT_OUT_SUPPORT_value == "1"]
+
+        __USBD_FRAMEWORK_SET_EP(pdev->tclasslist[pdev->classId].Eps[1].add,
+                                USBD_EP_TYPE_INTR,
+                                (uint16_t)pdev->tclasslist[pdev->classId].Eps[1].size,
+                                USBD_HID_CUSTOM_EPOUT_HS_BINTERVAL,
+                                USBD_HID_CUSTOM_EPOUT_FS_BINTERVAL);
+[/#if]
+      }
+      else
+      {
+        /* Append Endpoint descriptor to Configuration descriptor */
+        __USBD_FRAMEWORK_SET_EP(pdev->tclasslist[pdev->classId].Eps[0].add,
+                                USBD_EP_TYPE_INTR,
+                                (uint16_t)pdev->tclasslist[pdev->classId].Eps[0].size,
+                                USBD_HID_CUSTOM_EPIN_FS_BINTERVAL,
+                                USBD_HID_CUSTOM_EPIN_HS_BINTERVAL);
+[#if UX_DEVICE_CLASS_HID_INTERRUPT_OUT_SUPPORT_value == "1"]
+
+        __USBD_FRAMEWORK_SET_EP(pdev->tclasslist[pdev->classId].Eps[1].add,
+                                USBD_EP_TYPE_INTR,
+                                (uint16_t)pdev->tclasslist[pdev->classId].Eps[1].size,
+                                USBD_HID_CUSTOM_EPOUT_HS_BINTERVAL,
+                                USBD_HID_CUSTOM_EPOUT_FS_BINTERVAL);
+[/#if]
+      }
+
+      break;
+
+#endif /* USBD_HID_CUSTOM_ACTIVATED == 1U */
+[/#if]
+[/#list]
+[/#if]
+[/#list]
+
+    default:
+      break;
   }
 
   /* Update Config Descriptor and IAD descriptor */
   ((USBD_ConfigDescTypedef *)pConf)->bNumInterfaces += 1U;
-  ((USBD_ConfigDescTypedef *)pConf)->wDescriptorLength  = *Sze;
+  ((USBD_ConfigDescTypedef *)pConf)->wDescriptorLength = *Sze;
 
 }
 #endif /* USBD_HID_CLASS_ACTIVATED */
 [/#if]
-
+[#list SWIPdatas as SWIP]
+[#if SWIP.variables??]
+[#list SWIP.variables as define]
+	[#assign def_value = define.value]
+	[#assign def_name = define.name]
 [#if def_name?contains("UX_DEVICE_STORAGE") && def_value == "1"]
 #if USBD_MSC_CLASS_ACTIVATED == 1
 /**
@@ -1110,11 +1811,18 @@ static void  USBD_FrameWork_MSCDesc(USBD_DevClassHandleTypeDef *pdev,
 
   /* Update Config Descriptor and IAD descriptor */
   ((USBD_ConfigDescTypedef *)pConf)->bNumInterfaces += 1U;
-  ((USBD_ConfigDescTypedef *)pConf)->wDescriptorLength  = *Sze;
+  ((USBD_ConfigDescTypedef *)pConf)->wDescriptorLength = *Sze;
 }
 #endif /* USBD_MSC_CLASS_ACTIVATED == 1 */
 [/#if]
-
+[/#list]
+[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+[#if SWIP.variables??]
+[#list SWIP.variables as define]
+	[#assign def_value = define.value]
+	[#assign def_name = define.name]
 [#if def_name?contains("UX_DEVICE_CDC_ACM") && def_value == "1"]
 #if USBD_CDC_ACM_CLASS_ACTIVATED == 1
 /**
@@ -1139,16 +1847,16 @@ static void USBD_FrameWork_CDCDesc(USBD_DevClassHandleTypeDef *pdev,
 #endif /* USBD_COMPOSITE_USE_IAD == 1 */
 
 #if USBD_COMPOSITE_USE_IAD == 1
-  pIadDesc                          = ((USBD_IadDescTypedef *)(pConf + *Sze));
-  pIadDesc->bLength                 = (uint8_t)sizeof(USBD_IadDescTypedef);
-  pIadDesc->bDescriptorType         = USB_DESC_TYPE_IAD; /* IAD descriptor */
-  pIadDesc->bFirstInterface         = pdev->tclasslist[pdev->classId].Ifs[0];
-  pIadDesc->bInterfaceCount         = 2;    /* 2 interfaces */
-  pIadDesc->bFunctionClass          = 0x02;
-  pIadDesc->bFunctionSubClass       = 0x02;
-  pIadDesc->bFunctionProtocol       = 0x01;
-  pIadDesc->iFunction               = 0; /* String Index */
-  *Sze                              += (uint32_t)sizeof(USBD_IadDescTypedef);
+  pIadDesc = ((USBD_IadDescTypedef *)(pConf + *Sze));
+  pIadDesc->bLength = (uint8_t)sizeof(USBD_IadDescTypedef);
+  pIadDesc->bDescriptorType = USB_DESC_TYPE_IAD; /* IAD descriptor */
+  pIadDesc->bFirstInterface = pdev->tclasslist[pdev->classId].Ifs[0];
+  pIadDesc->bInterfaceCount = 2U;    /* 2 interfaces */
+  pIadDesc->bFunctionClass = 0x02U;
+  pIadDesc->bFunctionSubClass = 0x02U;
+  pIadDesc->bFunctionProtocol = 0x01U;
+  pIadDesc->iFunction = 0; /* String Index */
+  *Sze += (uint32_t)sizeof(USBD_IadDescTypedef);
 #endif /* USBD_COMPOSITE_USE_IAD == 1 */
 
   /* Control Interface Descriptor */
@@ -1158,34 +1866,34 @@ static void USBD_FrameWork_CDCDesc(USBD_DevClassHandleTypeDef *pdev,
   /* Control interface headers */
   pHeadDesc = ((USBD_CDCHeaderFuncDescTypedef *)((uint32_t)pConf + *Sze));
   /* Header Functional Descriptor*/
-  pHeadDesc->bLength = 0x05;
-  pHeadDesc->bDescriptorType = 0x24;
-  pHeadDesc->bDescriptorSubtype = 0x00;
+  pHeadDesc->bLength = 0x05U;
+  pHeadDesc->bDescriptorType = 0x24U;
+  pHeadDesc->bDescriptorSubtype = 0x00U;
   pHeadDesc->bcdCDC = 0x0110;
   *Sze += (uint32_t)sizeof(USBD_CDCHeaderFuncDescTypedef);
 
   /* Call Management Functional Descriptor*/
   pCallMgmDesc = ((USBD_CDCCallMgmFuncDescTypedef *)((uint32_t)pConf + *Sze));
-  pCallMgmDesc->bLength = 0x05;
-  pCallMgmDesc->bDescriptorType = 0x24;
-  pCallMgmDesc->bDescriptorSubtype = 0x01;
-  pCallMgmDesc->bmCapabilities = 0x00;
+  pCallMgmDesc->bLength = 0x05U;
+  pCallMgmDesc->bDescriptorType = 0x24U;
+  pCallMgmDesc->bDescriptorSubtype = 0x01U;
+  pCallMgmDesc->bmCapabilities = 0x00U;
   pCallMgmDesc->bDataInterface = pdev->tclasslist[pdev->classId].Ifs[1];
   *Sze += (uint32_t)sizeof(USBD_CDCCallMgmFuncDescTypedef);
 
   /* ACM Functional Descriptor*/
   pACMDesc = ((USBD_CDCACMFuncDescTypedef *)((uint32_t)pConf + *Sze));
-  pACMDesc->bLength = 0x04;
-  pACMDesc->bDescriptorType = 0x24;
-  pACMDesc->bDescriptorSubtype = 0x02;
+  pACMDesc->bLength = 0x04U;
+  pACMDesc->bDescriptorType = 0x24U;
+  pACMDesc->bDescriptorSubtype = 0x02U;
   pACMDesc->bmCapabilities = 0x02;
   *Sze += (uint32_t)sizeof(USBD_CDCACMFuncDescTypedef);
 
   /* Union Functional Descriptor*/
   pUnionDesc = ((USBD_CDCUnionFuncDescTypedef *)((uint32_t)pConf + *Sze));
-  pUnionDesc->bLength = 0x05;
-  pUnionDesc->bDescriptorType = 0x24;
-  pUnionDesc->bDescriptorSubtype = 0x06;
+  pUnionDesc->bLength = 0x05U;
+  pUnionDesc->bDescriptorType = 0x24U;
+  pUnionDesc->bDescriptorSubtype = 0x06U;
   pUnionDesc->bMasterInterface = pdev->tclasslist[pdev->classId].Ifs[0];
   pUnionDesc->bSlaveInterface = pdev->tclasslist[pdev->classId].Ifs[1];
   *Sze += (uint32_t)sizeof(USBD_CDCUnionFuncDescTypedef);
@@ -1205,13 +1913,13 @@ static void USBD_FrameWork_CDCDesc(USBD_DevClassHandleTypeDef *pdev,
   __USBD_FRAMEWORK_SET_EP((pdev->tclasslist[pdev->classId].Eps[0].add), \
                           (USBD_EP_TYPE_BULK),
                           (uint16_t)(pdev->tclasslist[pdev->classId].Eps[0].size),
-                          (0U), (0U));
+                          (0x00U), (0x00U));
 
   /* Append Endpoint descriptor to Configuration descriptor */
   __USBD_FRAMEWORK_SET_EP((pdev->tclasslist[pdev->classId].Eps[1].add), \
                           (USBD_EP_TYPE_BULK),
                           (uint16_t)(pdev->tclasslist[pdev->classId].Eps[1].size),
-                          (0U), (0U));
+                          (0x00U), (0x00U));
 
   /* Update Config Descriptor and IAD descriptor */
   ((USBD_ConfigDescTypedef *)pConf)->bNumInterfaces += 2U;
@@ -1219,7 +1927,14 @@ static void USBD_FrameWork_CDCDesc(USBD_DevClassHandleTypeDef *pdev,
 }
 #endif /* USBD_CDC_ACM_CLASS_ACTIVATED == 1 */
 [/#if]
-
+[/#list]
+[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+[#if SWIP.variables??]
+[#list SWIP.variables as define]
+	[#assign def_value = define.value]
+	[#assign def_name = define.name]
 [#if def_name?contains("UX_DEVICE_CDC_ECM") && def_value == "1"]
 #if USBD_CDC_ECM_CLASS_ACTIVATED
 /**
@@ -1245,16 +1960,16 @@ static void USBD_FrameWork_CDCECMDesc(USBD_DevClassHandleTypeDef *pdev,
 
 #if USBD_COMPOSITE_USE_IAD == 1
   /* IAD descriptor */
-  pIadDesc                          = ((USBD_IadDescTypedef *)(pConf + *Sze));
-  pIadDesc->bLength                 = (uint8_t)sizeof(USBD_IadDescTypedef);
-  pIadDesc->bDescriptorType         = USB_DESC_TYPE_IAD;
-  pIadDesc->bFirstInterface         = pdev->tclasslist[pdev->classId].Ifs[0];
-  pIadDesc->bInterfaceCount         = 2;    /* 2 interfaces */
-  pIadDesc->bFunctionClass          = 0x02;
-  pIadDesc->bFunctionSubClass       = 0x06;
-  pIadDesc->bFunctionProtocol       = 0x00;
-  pIadDesc->iFunction               = 0; /* String Index */
-  *Sze                             += (uint32_t)sizeof(USBD_IadDescTypedef);
+  pIadDesc = ((USBD_IadDescTypedef *)(pConf + *Sze));
+  pIadDesc->bLength = (uint8_t)sizeof(USBD_IadDescTypedef);
+  pIadDesc->bDescriptorType = USB_DESC_TYPE_IAD;
+  pIadDesc->bFirstInterface = pdev->tclasslist[pdev->classId].Ifs[0];
+  pIadDesc->bInterfaceCount = 2U;    /* 2 interfaces */
+  pIadDesc->bFunctionClass = 0x02U;
+  pIadDesc->bFunctionSubClass = 0x06U;
+  pIadDesc->bFunctionProtocol = 0x00U;
+  pIadDesc->iFunction = 0U; /* String Index */
+  *Sze += (uint32_t)sizeof(USBD_IadDescTypedef);
 #endif /* USBD_COMPOSITE_USE_IAD == 1 */
 
   /* Append ECM Interface descriptor */
@@ -1263,34 +1978,34 @@ static void USBD_FrameWork_CDCECMDesc(USBD_DevClassHandleTypeDef *pdev,
 
   /* Append ECM header functional descriptor to Configuration descriptor */
   pHeadDesc = ((USBD_CDCHeaderFuncDescTypedef *)(pConf + *Sze));
-  pHeadDesc->bLength                 = (uint8_t)sizeof(USBD_CDCHeaderFuncDescTypedef);
-  pHeadDesc->bDescriptorType         = 0x24;
-  pHeadDesc->bDescriptorSubtype      = 0x00;
-  pHeadDesc->bcdCDC                  = USBD_DESC_ECM_BCD;
+  pHeadDesc->bLength = (uint8_t)sizeof(USBD_CDCHeaderFuncDescTypedef);
+  pHeadDesc->bDescriptorType = 0x24U;
+  pHeadDesc->bDescriptorSubtype = 0x00U;
+  pHeadDesc->bcdCDC = USBD_DESC_ECM_BCD;
   *Sze += (uint32_t)sizeof(USBD_CDCHeaderFuncDescTypedef);
 
   /* Append ECM functional descriptor to Configuration descriptor */
   pFuncDesc = ((USBD_ECMFuncDescTypedef *)(pConf + *Sze));
-  pFuncDesc->bFunctionLength         = (uint8_t)sizeof(USBD_ECMFuncDescTypedef);
-  pFuncDesc->bDescriptorType         = 0x24;
-  pFuncDesc->bDescriptorSubType      = USBD_DESC_SUBTYPE_ACM;
-  pFuncDesc->iMacAddress             = CDC_ECM_MAC_STRING_INDEX;
-  pFuncDesc->bEthernetStatistics3    = CDC_ECM_ETH_STATS_BYTE3;
-  pFuncDesc->bEthernetStatistics2    = CDC_ECM_ETH_STATS_BYTE2;
-  pFuncDesc->bEthernetStatistics1    = CDC_ECM_ETH_STATS_BYTE1;
-  pFuncDesc->bEthernetStatistics0    = CDC_ECM_ETH_STATS_BYTE0;
-  pFuncDesc->wMaxSegmentSize         = CDC_ECM_ETH_MAX_SEGSZE;
-  pFuncDesc->bNumberMCFiltes         = CDC_ECM_ETH_NBR_MACFILTERS;
-  pFuncDesc->bNumberPowerFiltes      = CDC_ECM_ETH_NBR_PWRFILTERS;
+  pFuncDesc->bFunctionLength = (uint8_t)sizeof(USBD_ECMFuncDescTypedef);
+  pFuncDesc->bDescriptorType = 0x24U;
+  pFuncDesc->bDescriptorSubType = USBD_DESC_SUBTYPE_ACM;
+  pFuncDesc->iMacAddress = CDC_ECM_MAC_STRING_INDEX;
+  pFuncDesc->bEthernetStatistics3 = CDC_ECM_ETH_STATS_BYTE3;
+  pFuncDesc->bEthernetStatistics2 = CDC_ECM_ETH_STATS_BYTE2;
+  pFuncDesc->bEthernetStatistics1 = CDC_ECM_ETH_STATS_BYTE1;
+  pFuncDesc->bEthernetStatistics0 = CDC_ECM_ETH_STATS_BYTE0;
+  pFuncDesc->wMaxSegmentSize = CDC_ECM_ETH_MAX_SEGSZE;
+  pFuncDesc->bNumberMCFiltes = CDC_ECM_ETH_NBR_MACFILTERS;
+  pFuncDesc->bNumberPowerFiltes = CDC_ECM_ETH_NBR_PWRFILTERS;
   *Sze += (uint32_t)sizeof(USBD_ECMFuncDescTypedef);
 
   /* Append ECM Union functional descriptor to Configuration descriptor */
   pUnionDesc = ((USBD_CDCUnionFuncDescTypedef *)((uint32_t)pConf + *Sze));
-  pUnionDesc->bLength             = (uint8_t)sizeof(USBD_CDCUnionFuncDescTypedef);
-  pUnionDesc->bDescriptorType     = 0x24;
-  pUnionDesc->bDescriptorSubtype  = 0x06;
-  pUnionDesc->bMasterInterface    = pdev->tclasslist[pdev->classId].Ifs[0];
-  pUnionDesc->bSlaveInterface     = pdev->tclasslist[pdev->classId].Ifs[1];
+  pUnionDesc->bLength = (uint8_t)sizeof(USBD_CDCUnionFuncDescTypedef);
+  pUnionDesc->bDescriptorType = 0x24U;
+  pUnionDesc->bDescriptorSubtype = 0x06U;
+  pUnionDesc->bMasterInterface = pdev->tclasslist[pdev->classId].Ifs[0];
+  pUnionDesc->bSlaveInterface = pdev->tclasslist[pdev->classId].Ifs[1];
   *Sze += (uint32_t)sizeof(USBD_CDCUnionFuncDescTypedef);
 
   /* Append ECM Communication IN Endpoint Descriptor to Configuration descriptor */
@@ -1308,23 +2023,143 @@ static void USBD_FrameWork_CDCECMDesc(USBD_DevClassHandleTypeDef *pdev,
   __USBD_FRAMEWORK_SET_EP((pdev->tclasslist[pdev->classId].Eps[0].add),
                           (USBD_EP_TYPE_BULK),
                           (uint16_t)(pdev->tclasslist[pdev->classId].Eps[0].size),
-                          USBD_CDCECM_EPINCMD_HS_BINTERVAL,
-                          USBD_CDCECM_EPINCMD_FS_BINTERVAL);
+                          (0x00U), (0x00U));
 
   /* Append ECM IN Endpoint Descriptor to Configuration descriptor */
   __USBD_FRAMEWORK_SET_EP((pdev->tclasslist[pdev->classId].Eps[1].add),
                           (USBD_EP_TYPE_BULK),
                           (uint16_t)(pdev->tclasslist[pdev->classId].Eps[1].size),
-                          USBD_CDCECM_EPINCMD_HS_BINTERVAL,
-                          USBD_CDCECM_EPINCMD_FS_BINTERVAL);
+                          (0x00U), (0x00U));
 
   /* Update Config Descriptor and IAD descriptor */
   ((USBD_ConfigDescTypedef*)pConf)->bNumInterfaces += 2U;
   ((USBD_ConfigDescTypedef*)pConf)->wDescriptorLength = *Sze;
 }
 #endif /* USBD_CDC_ECM_CLASS_ACTIVATED */
-
 [/#if]
+[/#list]
+[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+[#if SWIP.variables??]
+[#list SWIP.variables as define]
+	[#assign def_value = define.value]
+	[#assign def_name = define.name]
+[#if def_name?contains("UX_DEVICE_RNDIS") && def_value == "1"]
+#if USBD_RNDIS_CLASS_ACTIVATED
+/**
+  * @brief  USBD_FrameWork_RNDISDesc
+  *         Configure and Append the RNDIS Descriptor
+  * @param  pdev: device instance
+  * @param  pConf: Configuration descriptor pointer
+  * @param  Sze: pointer to the current configuration descriptor size
+  * @retval None
+  */
+static void USBD_FrameWork_RNDISDesc(USBD_DevClassHandleTypeDef *pdev,
+                                     uint32_t pConf, uint32_t *Sze)
+{
+  static USBD_IfDescTypedef             *pIfDesc;
+  static USBD_EpDescTypedef             *pEpDesc;
+  static USBD_CDCCallMgmFuncDescTypedef *pCallMgmDesc;
+  static USBD_CDCHeaderFuncDescTypedef  *pHeadDesc;
+  static USBD_CDCACMFuncDescTypedef     *pACMDesc;
+  static USBD_CDCUnionFuncDescTypedef   *pUnionDesc;
+
+#if USBD_COMPOSITE_USE_IAD == 1
+  static USBD_IadDescTypedef            *pIadDesc;
+#endif /* USBD_COMPOSITE_USE_IAD == 1 */
+
+#if USBD_COMPOSITE_USE_IAD == 1
+  /* IAD descriptor */
+  pIadDesc = ((USBD_IadDescTypedef *)(pConf + *Sze));
+  pIadDesc->bLength = (uint8_t)sizeof(USBD_IadDescTypedef);
+  pIadDesc->bDescriptorType = USB_DESC_TYPE_IAD;
+  pIadDesc->bFirstInterface = pdev->tclasslist[pdev->classId].Ifs[0];
+  pIadDesc->bInterfaceCount = 2U;
+  pIadDesc->bFunctionClass = 0xE0U;
+  pIadDesc->bFunctionSubClass = 0x01U;
+  pIadDesc->bFunctionProtocol = 0x03U;
+  pIadDesc->iFunction = 0;
+  *Sze += (uint32_t)sizeof(USBD_IadDescTypedef);
+#endif /* USBD_COMPOSITE_USE_IAD == 1 */
+
+  /* Append RNDIS Control Interface descriptor */
+  __USBD_FRAMEWORK_SET_IF(pdev->tclasslist[pdev->classId].Ifs[0], 0x0U, 0x01U,
+                          UX_DEVICE_CLASS_RNDIS_CLASS_COMMUNICATION_CONTROL,
+                          0x02U, 0xFFU, 0U);
+
+  /* Append RNDIS header functional descriptor to Configuration descriptor */
+  pHeadDesc = ((USBD_CDCHeaderFuncDescTypedef *)(pConf + *Sze));
+  pHeadDesc->bLength = (uint8_t)sizeof(USBD_CDCHeaderFuncDescTypedef);
+  pHeadDesc->bDescriptorType = 0x24U;
+  pHeadDesc->bDescriptorSubtype = 0x00U;
+  pHeadDesc->bcdCDC = 0x0110U;
+  *Sze += (uint32_t)sizeof(USBD_CDCHeaderFuncDescTypedef);
+
+  /* Call Management Functional Descriptor*/
+  pCallMgmDesc = ((USBD_CDCCallMgmFuncDescTypedef *)((uint32_t)pConf + *Sze));
+  pCallMgmDesc->bLength = (uint8_t)sizeof(USBD_CDCCallMgmFuncDescTypedef);
+  pCallMgmDesc->bDescriptorType = 0x24U;
+  pCallMgmDesc->bDescriptorSubtype = 0x01U;
+  pCallMgmDesc->bmCapabilities = 0x00U;
+  pCallMgmDesc->bDataInterface = pdev->tclasslist[pdev->classId].Ifs[1];
+  *Sze += (uint32_t)sizeof(USBD_CDCCallMgmFuncDescTypedef);
+
+  /* ACM Functional Descriptor*/
+  pACMDesc = ((USBD_CDCACMFuncDescTypedef *)(pConf + *Sze));
+  pACMDesc->bLength = (uint8_t)sizeof(USBD_CDCACMFuncDescTypedef);
+  pACMDesc->bDescriptorType = 0x24U;
+  pACMDesc->bDescriptorSubtype = 0x02U;
+  pACMDesc->bmCapabilities = 0x00U;
+  *Sze += (uint32_t)sizeof(USBD_CDCACMFuncDescTypedef);
+
+  /* Union Functional Descriptor*/
+  pUnionDesc = ((USBD_CDCUnionFuncDescTypedef *)(pConf + *Sze));
+  pUnionDesc->bLength = (uint8_t)sizeof(USBD_CDCUnionFuncDescTypedef);
+  pUnionDesc->bDescriptorType = 0x24U;
+  pUnionDesc->bDescriptorSubtype = 0x06U;
+  pUnionDesc->bMasterInterface = pdev->tclasslist[pdev->classId].Ifs[0];
+  pUnionDesc->bSlaveInterface = pdev->tclasslist[pdev->classId].Ifs[1];
+  *Sze += (uint32_t)sizeof(USBD_CDCUnionFuncDescTypedef);
+
+  /* Append RNDIS Communication IN Endpoint Descriptor to Configuration descriptor */
+  __USBD_FRAMEWORK_SET_EP(pdev->tclasslist[pdev->classId].Eps[2].add,
+                          USBD_EP_TYPE_INTR,
+                          (uint16_t)pdev->tclasslist[pdev->classId].Eps[2].size,
+                          USBD_RNDIS_EPINCMD_HS_BINTERVAL,
+                          USBD_RNDIS_EPINCMD_FS_BINTERVAL);
+
+  /* Append RNDIS Data class interface descriptor to Configuration descriptor */
+  __USBD_FRAMEWORK_SET_IF(pdev->tclasslist[pdev->classId].Ifs[1], 0x00U, 0x02U,
+                          UX_DEVICE_CLASS_RNDIS_CLASS_COMMUNICATION_DATA,
+                          0x00U, 0x00U, 0x00U);
+
+  /* Append RNDIS OUT Endpoint Descriptor to Configuration descriptor */
+  __USBD_FRAMEWORK_SET_EP((pdev->tclasslist[pdev->classId].Eps[0].add),
+                          (USBD_EP_TYPE_BULK),
+                          (uint16_t)(pdev->tclasslist[pdev->classId].Eps[0].size),
+                          (0x00U), (0x00U));
+
+  /* Append RNDIS IN Endpoint Descriptor to Configuration descriptor */
+  __USBD_FRAMEWORK_SET_EP((pdev->tclasslist[pdev->classId].Eps[1].add),
+                          (USBD_EP_TYPE_BULK),
+                          (uint16_t)(pdev->tclasslist[pdev->classId].Eps[1].size),
+                          (0x00U), (0x00U));
+
+  /* Update Config Descriptor and IAD descriptor */
+  ((USBD_ConfigDescTypedef*)pConf)->bNumInterfaces += 2U;
+  ((USBD_ConfigDescTypedef*)pConf)->wDescriptorLength = *Sze;
+}
+#endif /* USBD_RNDIS_CLASS_ACTIVATED */
+[/#if]
+[/#list]
+[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+[#if SWIP.variables??]
+[#list SWIP.variables as define]
+	[#assign def_value = define.value]
+	[#assign def_name = define.name]
 [#if def_name?contains("UX_DEVICE_DFU") && def_value == "1"]
 #if USBD_DFU_CLASS_ACTIVATED
 /**
@@ -1335,8 +2170,8 @@ static void USBD_FrameWork_CDCECMDesc(USBD_DevClassHandleTypeDef *pdev,
   * @param  Sze: pointer to the current configuration descriptor size
   * @retval None
   */
-static void USBD_FrameWork_DFUDesc(USBD_DevClassHandleTypeDef *pdev, uint32_t pConf,
-                                   uint32_t* Sze)
+static void USBD_FrameWork_DFUDesc(USBD_DevClassHandleTypeDef *pdev,
+                                   uint32_t pConf, uint32_t *Sze)
 {
   static USBD_IfDescTypedef        *pIfDesc;
   static USBD_DFUFuncDescTypedef   *pDFUFuncDesc;
@@ -1347,17 +2182,17 @@ static void USBD_FrameWork_DFUDesc(USBD_DevClassHandleTypeDef *pdev, uint32_t pC
 
   /* Append DFU Functional descriptor to Configuration descriptor */
   pDFUFuncDesc = ((USBD_DFUFuncDescTypedef*)(pConf + *Sze));
-  pDFUFuncDesc->bLength              = (uint8_t)sizeof(USBD_DFUFuncDescTypedef);
-  pDFUFuncDesc->bDescriptorType      = DFU_DESCRIPTOR_TYPE;
-  pDFUFuncDesc->bmAttributes         = USBD_DFU_BM_ATTRIBUTES;
-  pDFUFuncDesc->wDetachTimeout       = USBD_DFU_DetachTimeout;
-  pDFUFuncDesc->wTransferSze         = USBD_DFU_XFER_SIZE;
-  pDFUFuncDesc->bcdDFUVersion        = 0x011AU;
-  *Sze                              += (uint32_t)sizeof(USBD_DFUFuncDescTypedef);
+  pDFUFuncDesc->bLength = (uint8_t)sizeof(USBD_DFUFuncDescTypedef);
+  pDFUFuncDesc->bDescriptorType = DFU_DESCRIPTOR_TYPE;
+  pDFUFuncDesc->bmAttributes = USBD_DFU_BM_ATTRIBUTES;
+  pDFUFuncDesc->wDetachTimeout = USBD_DFU_DetachTimeout;
+  pDFUFuncDesc->wTransferSze = USBD_DFU_XFER_SIZE;
+  pDFUFuncDesc->bcdDFUVersion = 0x011AU;
+  *Sze += (uint32_t)sizeof(USBD_DFUFuncDescTypedef);
 
   /* Update Config Descriptor and IAD descriptor */
-  ((USBD_ConfigDescTypedef*)pConf)->bNumInterfaces             += 1U;
-  ((USBD_ConfigDescTypedef*)pConf)->wDescriptorLength           = *Sze;
+  ((USBD_ConfigDescTypedef*)pConf)->bNumInterfaces += 1U;
+  ((USBD_ConfigDescTypedef*)pConf)->wDescriptorLength = *Sze;
 
   UNUSED(USBD_FrameWork_AssignEp);
 }
@@ -1366,9 +2201,65 @@ static void USBD_FrameWork_DFUDesc(USBD_DevClassHandleTypeDef *pdev, uint32_t pC
 [/#list]
 [/#if]
 [/#list]
+[#list SWIPdatas as SWIP]
+[#if SWIP.variables??]
+[#list SWIP.variables as define]
+	[#assign def_value = define.value]
+	[#assign def_name = define.name]
+[#if def_name?contains("UX_DEVICE_PIMA") && def_value == "1"]
+#if USBD_PIMA_MTP_CLASS_ACTIVATED == 1
+/**
+  * @brief  USBD_FrameWork_MTPDesc
+  *         Configure and Append the MTP Descriptor
+  * @param  pdev: device instance
+  * @param  pConf: Configuration descriptor pointer
+  * @param  Sze: pointer to the current configuration descriptor size
+  * @retval None
+  */
+static void  USBD_FrameWork_MTPDesc(USBD_DevClassHandleTypeDef *pdev,
+                                    uint32_t pConf, uint32_t *Sze)
+{
+  USBD_IfDescTypedef *pIfDesc;
+  USBD_EpDescTypedef *pEpDesc;
+
+  /* Append MTP Interface descriptor */
+  __USBD_FRAMEWORK_SET_IF((pdev->tclasslist[pdev->classId].Ifs[0]), (0U),
+                          (uint8_t)(pdev->tclasslist[pdev->classId].NumEps),
+                          UX_DEVICE_CLASS_PIMA_CLASS,
+                          UX_DEVICE_CLASS_PIMA_SUBCLASS,
+                          UX_DEVICE_CLASS_PIMA_PROTOCOL, (0U));
+
+  /* Append Endpoint descriptor to Configuration descriptor */
+  __USBD_FRAMEWORK_SET_EP((pdev->tclasslist[pdev->classId].Eps[0].add),
+                          (USBD_EP_TYPE_BULK),
+                          (uint16_t)(pdev->tclasslist[pdev->classId].Eps[0].size),
+                          (0x01U), (0x01U));
+
+  /* Append Endpoint descriptor to Configuration descriptor */
+  __USBD_FRAMEWORK_SET_EP((pdev->tclasslist[pdev->classId].Eps[1].add),
+                          (USBD_EP_TYPE_BULK),
+                          (uint16_t)(pdev->tclasslist[pdev->classId].Eps[1].size),
+                          (0x01U), (0x01U));
+
+  /* Append ECM IN Endpoint Descriptor to Configuration descriptor */
+  __USBD_FRAMEWORK_SET_EP((pdev->tclasslist[pdev->classId].Eps[2].add),
+                          (USBD_EP_TYPE_INTR),
+                          (uint16_t)(pdev->tclasslist[pdev->classId].Eps[2].size),
+                          USBD_PIMA_EPINCMD_HS_BINTERVAL,
+                          USBD_PIMA_EPINCMD_FS_BINTERVAL);
+
+  /* Update Config Descriptor and IAD descriptor */
+  ((USBD_ConfigDescTypedef *)pConf)->bNumInterfaces += 1U;
+  ((USBD_ConfigDescTypedef *)pConf)->wDescriptorLength  = *Sze;
+}
+#endif /* USBD_PIMA_MTP_CLASS_ACTIVATED == 1 */
+[/#if]
+
+[/#list]
+[/#if]
+[/#list]
 [/#if]
 
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
-

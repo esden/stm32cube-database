@@ -39,10 +39,13 @@
 
         <!--voltage scaling configuration-->
         <IFCondition Expression ="1=1">
-
             <CallLibMethod Name="LL_PWR_SetRegulVoltageScaling">
-                <MethodArg Name="VoltageScaling" ParameterName="PWR_Regulator_Voltage_Scale"/>
-            
+                <MethodArg Name="VoltageScaling" ParameterName="PWR_Regulator_Voltage_Scale"/>           
+            </CallLibMethod>
+        </IFCondition>
+        <IFCondition Expression ="1=1">
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#twhile (LL_PWR_IsActiveFlag_VOS() == 0)#n#t{#n#t}"/>
             </CallLibMethod>
         </IFCondition>
         <!--IFCondition Expression ="PWR_Regulator_Voltage_Scale=PWR_REGULATOR_VOLTAGE_SCALE1_BOOST">
@@ -300,7 +303,7 @@
 		
         <IFCondition Expression ="(SYSCLKFreq_VALUEArg &gt; 80000000)">
             <CallLibMethod Name="" Type="HardCode">
-                <HardCode Text="#n#t/* Insure 1µs transition state at intermediate medium speed clock*/#n#tfor (__IO uint32_t i = (160 >> 1); i !=0; i--);#n#t"/>
+                <HardCode Text="#n#t/* Insure 1us transition state at intermediate medium speed clock*/#n#tfor (__IO uint32_t i = (160 >> 1); i !=0; i--);#n#t"/>
             </CallLibMethod>
         </IFCondition>
 
@@ -355,16 +358,17 @@
             </CallLibMethod>
         </IFCondition>
 
+        <IFCondition Expression ="RCC_TZ_SEC_PRIV &amp; (RMVF_SEC|MSIRC_TZSEC|LSEOSC_TZSEC|HSEOSC_TZSEC|HSI48RC_TZSEC|PLLSource_TZSEC|AHBPrescaler_TZSEC|PLL2Source_TZSEC|PLL3Source_TZSEC|CK48Mult_TZSEC|SysClkSource_TZSEC|HSIRC_TZSEC|LSIRC_TZSEC)">
+            <CallLibMethod Name="LL_RCC_EnableSecPrivilegedMode"/>
+        </IFCondition>
+
         <IFCondition Expression ="RCC_TZ_SEC_PRIV">
-            <!--CallLibMethod Name="LL_RCC_EnableSecPrivilegedMode"/-->
-            <CallLibMethod Name="LL_RCC_EnablePrivilegedMode"/>
             <CallLibMethod Name="LL_RCC_ConfigSecure">
                 <MethodArg Name="Configuration" ParameterName="ItemSECPRIV"/>
             </CallLibMethod>
         </IFCondition>
         <IFCondition Expression ="RCC_TZ_PRIV|RCC_TZ_NSEC_PRIV">
-            <!--CallLibMethod Name="LL_RCC_EnableNSecPrivilegedMode"/-->
-            <CallLibMethod Name="LL_RCC_EnablePrivilegedMode"/>
+            <CallLibMethod Name="LL_RCC_EnableNSecPrivilegedMode"/>
         </IFCondition>
 
         <IFCondition Expression ="RCC_TZ_SEC_NPRIV">
@@ -1230,7 +1234,8 @@
     <LibMethod Comment="" Name="LL_CRS_SetHSI48SmoothTrimming">
         <Argument AddressOf="false" GenericType="simple" Name="Value"/>
     </LibMethod>
-    <LibMethod Comment="" Name="LL_RCC_EnablePrivilegedMode"/>
+    <LibMethod Comment="" Name="LL_RCC_EnableSecPrivilegedMode"/>
+    <LibMethod Comment="" Name="LL_RCC_EnableNSecPrivilegedMode"/>
     <LibMethod Comment="" Name="LL_RCC_ConfigSecure">
         <Argument AddressOf="false" GenericType="simple" Name="Configuration"/>
     </LibMethod>

@@ -15,6 +15,8 @@
     </RefParameter>
     <RefParameter Name="DESCRIPTOR_NAME_START" Comment="name of the descriptor"   DefaultValue="descriptorx_OPAMP_START"  Type="StringRW" >
     </RefParameter>
+	<RefParameter Name="DESCRIPTOR_NAME_STOP" Comment="name of the descriptor"   DefaultValue="descriptorx_OPAMP_STOP"  Type="StringRW" >
+    </RefParameter>
 
   <!-- tempory parameters to be replaced by names provided by UI/lpbam service-->
 
@@ -27,6 +29,13 @@
     </RefParameter>
  <!-- parameter for circular Mode management for Mode START-->
 
+<!-- parameter for circular Mode management for Mode STOP-->
+    <RefParameter Comment="Circular Node for STOP" DefaultValue="__NULL" Name="CircularNode_STOP" Type="list" Group="Stop" Visible="false">
+        <Description>description</Description>
+        <PossibleValue Comment="DISABLE" Value="__NULL"/>
+        <PossibleValue Comment="Configuration Node" Value="LPBAM_OPAMP_STOP_FULLQ_CONFIG_NODE"/>
+    </RefParameter>
+ <!-- parameter for circular Mode management for Mode STOP-->
 
 
 
@@ -55,7 +64,7 @@
         <PossibleValue Comment="LPTIM3 CH1" Value="LPBAM_LPDMA1_TRIGGER_LPTIM3_CH1" />
         <PossibleValue Comment="LPTIM4 OUT" Value="LPBAM_LPDMA1_TRIGGER_LPTIM4_OUT" />
         <PossibleValue Comment="COMP1 OUT" Value="LPBAM_LPDMA1_TRIGGER_COMP1_OUT"  />
-        <PossibleValue Comment="COMP2 OUT" Value="LPBAM_LPDMA1_TRIGGER_COMP2_OUT"  />
+        <PossibleValue Action="Remove" Comment="COMP2 OUT" Value="LPBAM_LPDMA1_TRIGGER_COMP2_OUT" Condition="DIE455"/>
         <PossibleValue Comment="RTC ALRA TRG" Value="LPBAM_LPDMA1_TRIGGER_RTC_ALRA_TRG" />
         <PossibleValue Comment="RTC ALRB TRG" Value="LPBAM_LPDMA1_TRIGGER_RTC_ALRB_TRG" />
         <PossibleValue Comment="RTC WUT TRG" Value="LPBAM_LPDMA1_TRIGGER_RTC_WUT_TRG" />
@@ -195,7 +204,28 @@
 
 
     </RefMode> 
-  
+ 
+	<RefMode Name="STOP">
+        <ConfigForMode>OPAMP_STOP</ConfigForMode>
+
+         <!--Trigger -->
+        <Parameter Name="TriggerPolarity_STOP" RefParameter="TriggerPolarity"/>
+
+        <Parameter Name="TriggerSelection_STOP" RefParameter="TriggerSelection">
+           <Condition Diagnostic=""  Expression="!(TriggerPolarity_STOP=LPBAM_DMA_TRIG_POLARITY_MASKED)"/>
+        </Parameter>
+
+        <Parameter Name="TriggerMode_STOP" RefParameter="TriggerMode_CONFIG"> 
+           <Condition Diagnostic="" Expression="!(TriggerPolarity_STOP=LPBAM_DMA_TRIG_POLARITY_MASKED)"/>
+        </Parameter>
+
+        <Parameter Name="NodeLevel_STOP" RefParameter="NodeLevel">
+            <PossibleValue>LPBAM_OPAMP_STOP_FULLQ_CONFIG_NODE</PossibleValue>
+        </Parameter>
+        <!--Trigger -->
+		
+         <Parameter Name="CircularNode_STOP"/>
+	</RefMode> 
     
 
     <ModeLogicOperator Name="OR">
@@ -210,12 +240,24 @@
                          </Mode> 
                          </ModeLogicOperator>
                     </Mode>        
-    </ModeLogicOperator>    
+					<Mode Name="STOP" UserName="Stop"> 
+                        <Condition Diagnostic="hardware IP must be selected to be part of LPBAM" Expression="Semaphore_LPBAM_OPAMP$IpNumber_SELECTED"/>  
+                        <ModeLogicOperator Name="XOR">
+                             <Mode Name="STOP" UserName="Stop"> 
+                               <Semaphore>Semaphore_$IpInstance_STOP</Semaphore>
+                               <SignalLogicalOp Name="AND">
+                               <Signal Name="VS_STOP"/>
+                              </SignalLogicalOp>
+                         </Mode> 
+                         </ModeLogicOperator>
+                    </Mode>
+    </ModeLogicOperator>   
 
  
 
 
 <RefSignal Name="VS_START" Virtual="true"/>
+<RefSignal Name="VS_STOP" Virtual="true"/>
 
 
 </IP>

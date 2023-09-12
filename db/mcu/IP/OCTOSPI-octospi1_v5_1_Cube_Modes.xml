@@ -1,0 +1,940 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V4.0" IPType="peripheral" Name="OCTOSPI" Version="octospi1_v5_1_Cube" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd" xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+    <About>OCTOSPI: Octo Serial Peripheral Interface</About>
+    <!-- Instance -->
+    <RefParameter Comment="Instance" DefaultValue="OCTOSPI$Index" Name="Instance" Type="" Visible="false"/>
+
+    <!-- *********************************************** -->
+    <!-- Double Transfer Rate (DTR) -->
+    <!-- <RefParameter Comment="Type" DefaultValue="DTR_DISABLE" Name="TransferRateType" Type="list" Group="Transfer Rate">
+	<PossibleValue Comment="Single (SDR)" Value="MX_DTR_DISABLE" />
+	<PossibleValue Comment="Double (DTR)" Value="MX_DTR_ENABLE" />
+    </RefParameter>
+
+    <RefParameter Comment="Instruction Phase" DefaultValue="HAL_OSPI_INSTRUCTION_DTR_ENABLE" Name="TransferRateInstruction" Type="list" Group="Transfer Rate">
+	<Condition Diagnostic="" Expression="(TransferRateType = MX_DTR_ENABLE)"/>
+	<PossibleValue Comment="Single (SDR)" Value="HAL_OSPI_INSTRUCTION_DTR_DISABLE" />
+	<PossibleValue Comment="Double (DTR)" Value="HAL_OSPI_INSTRUCTION_DTR_ENABLE" />
+    </RefParameter>
+    <RefParameter Comment="Instruction Phase" DefaultValue="HAL_OSPI_INSTRUCTION_DTR_DISABLE" Name="TransferRateInstruction" Type="list" Group="Transfer Rate">
+	<Condition Diagnostic="" Expression="(TransferRateType = MX_DTR_DISABLE)"/>
+	<PossibleValue Comment="Single (SDR)" Value="HAL_OSPI_INSTRUCTION_DTR_DISABLE" />
+    </RefParameter>
+
+    <RefParameter Comment="Address Phase" DefaultValue="HAL_OSPI_ADDRESS_DTR_ENABLE" Name="TransferRateAddress" Type="list" Group="Transfer Rate">
+	<Condition Diagnostic="" Expression="(TransferRateType = MX_DTR_ENABLE)"/>
+	<PossibleValue Comment="Single (SDR)" Value="HAL_OSPI_ADDRESS_DTR_DISABLE" />
+	<PossibleValue Comment="Double (DTR)" Value="HAL_OSPI_ADDRESS_DTR_ENABLE" />
+    </RefParameter>
+    <RefParameter Comment="Address Phase" DefaultValue="HAL_OSPI_ADDRESS_DTR_DISABLE" Name="TransferRateAddress" Type="list" Group="Transfer Rate">
+	<Condition Diagnostic="" Expression="(TransferRateType = MX_DTR_DISABLE)"/>
+	<PossibleValue Comment="Single (SDR)" Value="HAL_OSPI_ADDRESS_DTR_DISABLE" />
+    </RefParameter>
+
+    <RefParameter Comment="Data Phase" DefaultValue="HAL_OSPI_DATA_DTR_ENABLE" Name="TransferRateData" Type="list" Group="Transfer Rate">
+	<Condition Diagnostic="" Expression="(TransferRateType = MX_DTR_ENABLE)"/>
+	<PossibleValue Comment="Single (SDR)" Value="HAL_OSPI_DATA_DTR_DISABLE" />
+	<PossibleValue Comment="Double (DTR)" Value="HAL_OSPI_DATA_DTR_ENABLE" />
+    </RefParameter>
+    <RefParameter Comment="Data Phase" DefaultValue="HAL_OSPI_DATA_DTR_DISABLE" Name="TransferRateData" Type="list" Group="Transfer Rate">
+	<Condition Diagnostic="" Expression="(TransferRateType = MX_DTR_DISABLE)"/>
+	<PossibleValue Comment="Single (SDR)" Value="HAL_OSPI_DATA_DTR_DISABLE" />
+    </RefParameter>
+
+    <RefParameter Comment="Alternate Bytes Phase" DefaultValue="HAL_OSPI_ALTERNATE_BYTES_DTR_ENABLE" Name="TransferRateAltBytes" Type="list" Group="Transfer Rate">
+	<Condition Diagnostic="" Expression="(TransferRateType = MX_DTR_ENABLE)"/>
+	<PossibleValue Comment="Single (SDR)" Value="HAL_OSPI_ALTERNATE_BYTES_DTR_DISABLE" />
+	<PossibleValue Comment="Double (DTR)" Value="HAL_OSPI_ALTERNATE_BYTES_DTR_ENABLE" />
+    </RefParameter>
+    <RefParameter Comment="Alternate Bytes Phase" DefaultValue="HAL_OSPI_ALTERNATE_BYTES_DTR_DISABLE" Name="TransferRateAltBytes" Type="list" Group="Transfer Rate">
+	<Condition Diagnostic="" Expression="(TransferRateType = MX_DTR_DISABLE)"/>
+	<PossibleValue Comment="Single (SDR)" Value="HAL_OSPI_ALTERNATE_BYTES_DTR_DISABLE" />
+    </RefParameter> -->
+
+    <!-- *********************************************** -->
+    <!-- Initialization HAL_OSPI_Init() -->
+    <!-- FifoThresholdByte -->
+    <RefParameter Comment="Fifo Threshold" DefaultValue="1" Max="32" Min="1" Name="FifoThresholdByte" Type="integer" Group="Generic"/>
+
+    <!-- DualQuad (Only) -->
+    <RefParameter Comment="Memory Mode" DefaultValue="HAL_XSPI_DUAL_MEM" Name="MemoryMode" Type="list" Group="Generic">
+	<Condition Diagnostic="" Expression="Sem_$IpInstance_DualQuad | Sem_$IpInstance_DualDual | Sem_$IpInstance_DualSingle"/>
+	<PossibleValue Comment="Dual" Value="HAL_XSPI_DUAL_MEM"/>
+    </RefParameter>
+    <RefParameter Comment="Memory Mode" DefaultValue="HAL_XSPI_SINGLE_MEM" Name="MemoryMode" Type="list" Group="Generic">
+	<Condition Diagnostic="" Expression="!(Sem_$IpInstance_DualQuad) &amp; !(Sem_$IpInstance_DualDual) &amp; !(Sem_$IpInstance_DualSingle)"/>
+	<PossibleValue Comment="Single" Value="HAL_XSPI_SINGLE_MEM"/>
+    </RefParameter>
+
+    <!-- MemoryType -->
+    <RefParameter Comment="Memory Type" DefaultValue="HAL_XSPI_MEMTYPE_MICRON" Name="MemoryType" Type="list" Group="Generic">
+	<Condition Diagnostic="" Expression="!(Sem_$IpInstance_HyperBus)"/>
+	<PossibleValue Comment="Micron" Value="HAL_XSPI_MEMTYPE_MICRON"/>
+	<PossibleValue Comment="Macronix" Value="HAL_XSPI_MEMTYPE_MACRONIX"/>
+	<PossibleValue Comment="Macronix RAM" Value="HAL_XSPI_MEMTYPE_MACRONIX_RAM"/>
+	<PossibleValue Comment="AP Memory" Value="HAL_XSPI_MEMTYPE_APMEM"/>
+	<PossibleValue Comment="AP Memory 16bits" Value="HAL_XSPI_MEMTYPE_APMEM_16BITS"/>
+    </RefParameter>
+    <RefParameter Comment="Memory Type" DefaultValue="HAL_XSPI_MEMTYPE_HYPERBUS" Name="MemoryType" Type="list" Group="Generic">
+	<Condition Diagnostic="" Expression="(Sem_$IpInstance_HyperBus)"/>
+	<PossibleValue Comment="HyperBus(TM)" Value="HAL_XSPI_MEMTYPE_HYPERBUS"/>
+    </RefParameter>
+
+    <!-- MemorySize -->
+    <RefParameter Comment="Memory Size" DefaultValue="HAL_XSPI_SIZE_16B" Name="MemorySize" Type="list" Group="Generic">
+	<PossibleValue Comment="16 Bytes" Value="HAL_XSPI_SIZE_16B"/>
+	<PossibleValue Comment="32 Bytes" Value="HAL_XSPI_SIZE_32B"/>
+	<PossibleValue Comment="64 Bytes" Value="HAL_XSPI_SIZE_64B"/>
+	<PossibleValue Comment="128 Bytes" Value="HAL_XSPI_SIZE_128B"/>
+	<PossibleValue Comment="256 Bytes" Value="HAL_XSPI_SIZE_256B"/>
+	<PossibleValue Comment="512 Bytes" Value="HAL_XSPI_SIZE_512B"/>
+	<PossibleValue Comment="1 KBytes" Value="HAL_XSPI_SIZE_1KB"/>
+	<PossibleValue Comment="2 KBytes" Value="HAL_XSPI_SIZE_2KB"/>
+	<PossibleValue Comment="4 KBytes" Value="HAL_XSPI_SIZE_4KB"/>
+	<PossibleValue Comment="8 KBytes" Value="HAL_XSPI_SIZE_8KB"/>
+	<PossibleValue Comment="16 KBytes" Value="HAL_XSPI_SIZE_16KB"/>
+	<PossibleValue Comment="32 KBytes" Value="HAL_XSPI_SIZE_32KB"/>
+	<PossibleValue Comment="64 KBytes" Value="HAL_XSPI_SIZE_64KB"/>
+	<PossibleValue Comment="128 KBytes" Value="HAL_XSPI_SIZE_128KB"/>
+	<PossibleValue Comment="256 KBytes" Value="HAL_XSPI_SIZE_256KB"/>
+	<PossibleValue Comment="512 KBytes" Value="HAL_XSPI_SIZE_512KB"/>
+	<PossibleValue Comment="1 MBytes" Value="HAL_XSPI_SIZE_1MB"/>
+	<PossibleValue Comment="2 MBytes" Value="HAL_XSPI_SIZE_2MB"/>
+	<PossibleValue Comment="4 MBytes" Value="HAL_XSPI_SIZE_4MB"/>
+	<PossibleValue Comment="8 MBytes" Value="HAL_XSPI_SIZE_8MB"/>
+	<PossibleValue Comment="16 MBytes" Value="HAL_XSPI_SIZE_16MB"/>
+	<PossibleValue Comment="32 MBytes" Value="HAL_XSPI_SIZE_32MB"/>
+	<PossibleValue Comment="64 MBytes" Value="HAL_XSPI_SIZE_64MB"/>
+	<PossibleValue Comment="128 MBytes" Value="HAL_XSPI_SIZE_128MB"/>
+	<PossibleValue Comment="256 MBytes" Value="HAL_XSPI_SIZE_256MB"/>
+	<PossibleValue Comment="512 MBytes" Value="HAL_XSPI_SIZE_512MB"/>
+	<PossibleValue Comment="1 GBytes" Value="HAL_XSPI_SIZE_1GB"/>
+	<PossibleValue Comment="2 GBytes" Value="HAL_XSPI_SIZE_2GB"/>
+	<PossibleValue Comment="4 GBytes" Value="HAL_XSPI_SIZE_4GB"/>
+	<PossibleValue Comment="8 GBytes" Value="HAL_XSPI_SIZE_8GB"/>
+	<PossibleValue Comment="16 GBytes" Value="HAL_XSPI_SIZE_16GB"/>
+	<PossibleValue Comment="32 GBytes" Value="HAL_XSPI_SIZE_32GB"/>
+    </RefParameter>
+
+    <!-- ChipSelectHighTimeCycle -->
+    <RefParameter Comment="Chip Select High Time" DefaultValue="1" Max="64" Min="1" Name="ChipSelectHighTimeCycle" Type="integer" Group="Generic"/>
+
+    <!-- FreeRunningClock -->
+    <RefParameter Comment="Free Running Clock" DefaultValue="HAL_XSPI_FREERUNCLK_DISABLE" Name="FreeRunningClock" Type="list" Group="Generic">
+	<PossibleValue Comment="Disable" Value="HAL_XSPI_FREERUNCLK_DISABLE"/>
+ 	<PossibleValue Comment="Enable" Value="HAL_XSPI_FREERUNCLK_ENABLE"/>
+    </RefParameter>
+
+    <!-- ClockMode -->
+    <RefParameter Comment="Clock Mode" DefaultValue="HAL_XSPI_CLOCK_MODE_0" Name="ClockMode" Type="list" Group="Generic">
+	<PossibleValue Comment="Low" Value="HAL_XSPI_CLOCK_MODE_0"/>
+	<PossibleValue Comment="High" Value="HAL_XSPI_CLOCK_MODE_3"/>
+    </RefParameter>
+
+    <!-- WrapSize -->
+    <RefParameter Comment="Wrap Size" DefaultValue="HAL_XSPI_WRAP_NOT_SUPPORTED" Name="WrapSize" Type="list" Group="Generic">
+	<PossibleValue Comment="Not Supported" Value="HAL_XSPI_WRAP_NOT_SUPPORTED"/>
+	<PossibleValue Comment="16 Bytes" Value="HAL_XSPI_WRAP_16_BYTES"/>
+ 	<PossibleValue Comment="32 Bytes" Value="HAL_XSPI_WRAP_32_BYTES"/>
+ 	<PossibleValue Comment="64 Bytes" Value="HAL_XSPI_WRAP_64_BYTES"/>
+ 	<PossibleValue Comment="128 Bytes" Value="HAL_XSPI_WRAP_128_BYTES"/>
+    </RefParameter>
+
+    <!-- ClockPrescaler -->
+    <RefParameter Comment="Clock Prescaler" DefaultValue="0" Max="255" Min="0" Name="ClockPrescaler" Type="integer" Group="Generic"/>
+
+    <!-- SampleShifting -->
+    <RefParameter Comment="Sample Shifting" DefaultValue="HAL_XSPI_SAMPLE_SHIFTING_NONE" Name="SampleShifting" Type="list" Group="Generic">
+	<PossibleValue Comment="None" Value="HAL_XSPI_SAMPLE_SHIFT_NONE"/>
+ 	<PossibleValue Comment="Half Cycle" Value="HAL_XSPI_SAMPLE_SHIFT_HALFCYCLE"/>
+    </RefParameter>
+
+    <!-- DelayHoldQuarterCycle -->
+    <RefParameter Comment="Delay Hold Quarter Cycle" DefaultValue="HAL_XSPI_DHQC_DISABLE" Name="DelayHoldQuarterCycle" Type="list" Group="Generic">
+	<PossibleValue Comment="Disable" Value="HAL_XSPI_DHQC_DISABLE"/>
+	<PossibleValue Comment="Enable" Value="HAL_XSPI_DHQC_ENABLE"/>
+    </RefParameter>
+
+    <!-- ChipSelectBoundary -->
+    <RefParameter Comment="Chip Select Boundary" DefaultValue="HAL_XSPI_BONDARYOF_NONE" Max="31" Min="0" Name="ChipSelectBoundary" Type="list" Group="Generic">
+	<PossibleValue Comment="Disable" Value="HAL_XSPI_BONDARYOF_NONE"/>
+	<PossibleValue Comment="16 Bytes" Value="HAL_XSPI_BONDARYOF_16B"/>
+	<PossibleValue Comment="32 Bytes" Value="HAL_XSPI_BONDARYOF_32B"/>
+	<PossibleValue Comment="64 Bytes" Value="HAL_XSPI_BONDARYOF_64B"/>
+	<PossibleValue Comment="128 Bytes" Value="HAL_XSPI_BONDARYOF_128B"/>
+	<PossibleValue Comment="256 Bytes" Value="HAL_XSPI_BONDARYOF_256B"/>
+	<PossibleValue Comment="512 Bytes" Value="HAL_XSPI_BONDARYOF_512B"/>
+	<PossibleValue Comment="1 KBytes" Value="HAL_XSPI_BONDARYOF_1KB"/>
+	<PossibleValue Comment="2 KBytes" Value="HAL_XSPI_BONDARYOF_2KB"/>
+	<PossibleValue Comment="4 KBytes" Value="HAL_XSPI_BONDARYOF_4KB"/>
+	<PossibleValue Comment="8 KBytes" Value="HAL_XSPI_BONDARYOF_8KB"/>
+	<PossibleValue Comment="16 KBytes" Value="HAL_XSPI_BONDARYOF_16KB"/>
+	<PossibleValue Comment="32 KBytes" Value="HAL_XSPI_BONDARYOF_32KB"/>
+	<PossibleValue Comment="64 KBytes" Value="HAL_XSPI_BONDARYOF_64KB"/>
+	<PossibleValue Comment="128 KBytes" Value="HAL_XSPI_BONDARYOF_128KB"/>
+	<PossibleValue Comment="256 KBytes" Value="HAL_XSPI_BONDARYOF_256KB"/>
+	<PossibleValue Comment="512 KBytes" Value="HAL_XSPI_BONDARYOF_512KB"/>
+	<PossibleValue Comment="1 MBytes" Value="HAL_XSPI_BONDARYOF_1MB"/>
+	<PossibleValue Comment="2 MBytes" Value="HAL_XSPI_BONDARYOF_2MB"/>
+	<PossibleValue Comment="4 MBytes" Value="HAL_XSPI_BONDARYOF_4MB"/>
+	<PossibleValue Comment="8 MBytes" Value="HAL_XSPI_BONDARYOF_8MB"/>
+	<PossibleValue Comment="16 MBytes" Value="HAL_XSPI_BONDARYOF_16MB"/>
+	<PossibleValue Comment="32 MBytes" Value="HAL_XSPI_BONDARYOF_32MB"/>
+	<PossibleValue Comment="64 MBytes" Value="HAL_XSPI_BONDARYOF_64MB"/>
+	<PossibleValue Comment="128 MBytes" Value="HAL_XSPI_BONDARYOF_128MB"/>
+	<PossibleValue Comment="256 MBytes" Value="HAL_XSPI_BONDARYOF_256MB"/>
+	<PossibleValue Comment="512 MBytes" Value="HAL_XSPI_BONDARYOF_512MB"/>
+	<PossibleValue Comment="1 GBytes" Value="HAL_XSPI_BONDARYOF_1GB"/>
+	<PossibleValue Comment="2 GBytes" Value="HAL_XSPI_BONDARYOF_2GB"/>
+	<PossibleValue Comment="4 GBytes" Value="HAL_XSPI_BONDARYOF_4GB"/>
+	<PossibleValue Comment="8 GBytes" Value="HAL_XSPI_BONDARYOF_8GB"/>
+	<PossibleValue Comment="16 GBytes" Value="HAL_XSPI_BONDARYOF_16GB"/>
+    </RefParameter>
+
+    <!-- DelayBlockBypass -->
+    <RefParameter Comment="Status (DLYB)" DefaultValue="HAL_XSPI_DELAY_BLOCK_BYPASS" Name="DelayBlockBypass" Type="list" Group="Delay Block Settings">
+	    <Condition Diagnostic="" Expression="(Sem_$IpInstance_OctoDs|Sem_$IpInstance_HyperBus)"/>
+	<PossibleValue Comment="Bypassed" Value="HAL_XSPI_DELAY_BLOCK_BYPASS"/>
+	<PossibleValue Comment="Used" Value="HAL_XSPI_DELAY_BLOCK_ON"/>
+    </RefParameter>
+    <RefParameter Comment="Delay Block (DLYB)" DefaultValue="HAL_XSPI_DELAY_BLOCK_BYPASS" Name="DelayBlockBypass" Type="list" Group="Delay Block Settings" Visible="false"/>
+
+    <!-- DlyB Units (LL) -->
+    <RefParameter Comment="Unit Delay Cell" DefaultValue="0" Max="128" Min="0" Name="Units" Type="integer" Group="Delay Block Settings">
+	    <Condition Diagnostic="" Expression="(DelayBlockBypass = HAL_XSPI_DELAY_BLOCK_ON)"/>
+    </RefParameter>
+    <RefParameter Comment="Unit Delay Cell" DefaultValue="0" Max="128" Min="0" Name="Units" Type="integer" Group="Delay Block Settings" Visible="false"/>
+
+    <!-- DlyB PhaseSel (LL) -->
+    <RefParameter Comment="Output Clock Phase" DefaultValue="0" Max="12" Min="0" Name="PhaseSel" Type="integer" Group="Delay Block Settings">
+	    <Condition Diagnostic="" Expression="(DelayBlockBypass = HAL_XSPI_DELAY_BLOCK_ON)"/>
+    </RefParameter>
+    <RefParameter Comment="Output Clock Phase" DefaultValue="0" Max="12" Min="0" Name="PhaseSel" Type="integer" Group="Delay Block Settings" Visible="false"/>
+
+    <!-- Refresh -->
+    <RefParameter Comment="Refresh Rate" DefaultValue="0" Max="0xFFFFFFFF" Min="0" Name="Refresh" Type="integer" Group="Generic"/>
+
+    <!-- *********************************************** -->
+    <!-- HyperBus(TM) HAL_XSPI_HyperbusCfg() -->
+    <!-- RWRecoveryTimeCycle -->
+    <RefParameter Comment="RW Recovery Time" DefaultValue="0"  Max="255" Min="0" Name="RWRecoveryTimeCycle" Type="integer"  Group="HyperBus(TM)">
+	<Condition Diagnostic="" Expression="(Sem_$IpInstance_HyperBus) &amp; (MemoryType = HAL_XSPI_MEMTYPE_HYPERBUS)"/>
+    </RefParameter>
+        
+    <!-- AccessTimeCycle -->
+    <RefParameter Comment="Access Time" DefaultValue="0"  Max="255" Min="0" Name="AccessTimeCycle" Type="integer"  Group="HyperBus(TM)">
+	<Condition Diagnostic="" Expression="(Sem_$IpInstance_HyperBus) &amp; (MemoryType = HAL_XSPI_MEMTYPE_HYPERBUS)"/>
+    </RefParameter>
+
+    <!-- WriteZeroLatency -->
+    <RefParameter Comment="Write Access Latency" DefaultValue="HAL_XSPI_NO_LATENCY_ON_WRITE" Name="WriteZeroLatency" Type="list" Group="HyperBus(TM)">
+	<Condition Diagnostic="" Expression="(Sem_$IpInstance_HyperBus) &amp; (MemoryType = HAL_XSPI_MEMTYPE_HYPERBUS)"/>
+	<PossibleValue Comment="Disable" Value="HAL_XSPI_NO_LATENCY_ON_WRITE" />
+	<PossibleValue Comment="Enable" Value="HAL_XSPI_LATENCY_ON_WRITE" />
+    </RefParameter>
+
+    <!-- LatencyMode -->
+    <RefParameter Comment="Latency Mode" DefaultValue="HAL_XSPI_VARIABLE_LATENCY" Name="LatencyMode" Type="list" Group="HyperBus(TM)">
+	<Condition Diagnostic="" Expression="(Sem_$IpInstance_HyperBus) &amp; (MemoryType = HAL_XSPI_MEMTYPE_HYPERBUS)"/>
+	<PossibleValue Comment="Variable" Value="HAL_XSPI_VARIABLE_LATENCY" />
+	<PossibleValue Comment="Fixed" Value="HAL_XSPI_FIXED_LATENCY" />
+    </RefParameter>
+
+    <!-- *********************************************** -->
+    <!-- Operating modes -->
+    <!-- <RefParameter Comment="Type" DefaultValue="HAL_OSPI_OPTYPE_WRITE_CFG" Name="OperationType" Type="list" Group="Operating Mode">
+        <PossibleValue Comment="Automatic-polling" Value="HAL_OSPI_OPTYPE_COMMON_CFG"/>
+        <PossibleValue Comment="Memory-mapped (Read)" Value="HAL_OSPI_OPTYPE_READ_CFG"/>
+        <PossibleValue Comment="Memory-mapped (Write)" Value="HAL_OSPI_OPTYPE_WRITE_CFG"/>
+        <PossibleValue Comment="Memory-mapped (Wrap)" Value="HAL_OSPI_OPTYPE_WRAP_CFG"/>
+    </RefParameter>a -->
+
+    <!-- Memory-Mapped mode -->
+    <!-- <RefParameter Comment="Time Out Activation" DefaultValue="HAL_OSPI_TIMEOUT_COUNTER_DISABLE" Name="TimeOutActivation" Type="list" Group="Operating Mode">
+        <Condition Diagnostic="" Expression="(OperationType=HAL_OSPI_OPTYPE_READ_CFG)|(OperationType=HAL_OSPI_OPTYPE_WRITE_CFG)|(OperationType=HAL_OSPI_OPTYPE_WRAP_CFG)"/> 
+        <PossibleValue Comment="Disable" Value="HAL_OSPI_TIMEOUT_COUNTER_DISABLE"/>
+        <PossibleValue Comment="Enable" Value="HAL_OSPI_TIMEOUT_COUNTER_ENABLE"/>
+    </RefParameter>
+
+    <RefParameter Comment="Time Out Period" DefaultValue="1" Name="TimeOutPeriod" Max="0xFFFF" Min="1" Type="integer" Group="Operating Mode">
+	<Condition Diagnostic="" Expression="(OperationType=HAL_OSPI_OPTYPE_READ_CFG)|(OperationType=HAL_OSPI_OPTYPE_WRITE_CFG)|(OperationType=HAL_OSPI_OPTYPE_WRAP_CFG)"/>
+    </RefParameter> -->
+
+    <!-- Automatic-Polling (status-flag) mode -->
+    <!-- <RefParameter Comment="Match Value" DefaultValue="0" Max="0xFFFFFFFF" Min="0" Name="Match" Type="integer" Group="Operating Mode">
+	<Condition Diagnostic="" Expression="OperationType=HAL_OSPI_OPTYPE_COMMON_CFG"/>
+    </RefParameter>
+
+    <RefParameter Comment="Mask Value" DefaultValue="0" Max="0xFFFFFFFF" Min="0" Name="Mask" Type="integer" Group="Operating Mode">
+	<Condition Diagnostic="" Expression="OperationType=HAL_OSPI_OPTYPE_COMMON_CFG"/>
+    </RefParameter>
+
+    <RefParameter Comment="Match Mode" DefaultValue="HAL_OSPI_MATCH_MODE_AND" Name="MatchMode" Type="list" Group="Operating Mode">
+	<Condition Diagnostic="" Expression="OperationType=HAL_OSPI_OPTYPE_COMMON_CFG"/>
+	<PossibleValue Comment="AND" Value="HAL_OSPI_MATCH_MODE_AND"/>
+	<PossibleValue Comment="OR" Value="HAL_OSPI_MATCH_MODE_OR"/>
+    </RefParameter>
+
+    <RefParameter Comment="Automatic Stop" DefaultValue="HAL_OSPI_AUTOMATIC_STOP_DISABLE" Name="AutomaticStop" Type="list" Group="Operating Mode">
+	<Condition Diagnostic="" Expression="OperationType=HAL_OSPI_OPTYPE_COMMON_CFG"/>
+	<PossibleValue Comment="Disable" Value="HAL_OSPI_AUTOMATIC_STOP_DISABLE"/>
+	<PossibleValue Comment="Enable" Value="HAL_OSPI_AUTOMATIC_STOP_ENABLE"/>
+    </RefParameter>
+
+    <RefParameter Comment="Interval Value" DefaultValue="0" Max="0xFFFF" Min="0" Name="Interval" Type="integer" Group="Operating Mode">
+	<Condition Diagnostic="" Expression="OperationType=HAL_OSPI_OPTYPE_COMMON_CFG"/>
+    </RefParameter> -->
+
+    <!-- *********************************************** -->
+    <!--Regular Command Mode-->
+    <RefParameter Comment="Flash Id" DefaultValue="HAL_OSPI_FLASH_ID_1" Name="FlashId" Type="list" Group="Regular Command">
+	<PossibleValue Comment="Flash Id 1 " Value="HAL_OSPI_FLASH_ID_1" />
+	<PossibleValue Comment="Flash Id 2" Value="HAL_OSPI_FLASH_ID_2" />
+    </RefParameter>
+        
+    <RefParameter Comment="Instruction" DefaultValue="0" Name="Instruction" Max="4294967295" Min="0" Type="integer" Group="Regular Command">
+    </RefParameter>
+              
+    <RefParameter Comment="Instruction Mode " DefaultValue="HAL_OSPI_INSTRUCTION_NONE" Name="InstructionMode" Type="list" Group="Regular Command">
+	<PossibleValue Comment="Instruction None" Value="HAL_OSPI_INSTRUCTION_NONE" />
+	<PossibleValue Comment="Instruction 1 line" Value="HAL_OSPI_INSTRUCTION_1_LINE" />
+	<PossibleValue Comment="Instruction 2 line" Value="HAL_OSPI_INSTRUCTION_2_LINES" />
+	<PossibleValue Comment="Instruction 4 line" Value="HAL_OSPI_INSTRUCTION_4_LINES" />
+	<PossibleValue Comment="Instruction 8 line" Value="HAL_OSPI_INSTRUCTION_8_LINES" />
+    </RefParameter>  
+          
+    <RefParameter Comment="Instruction Size " DefaultValue="HAL_OSPI_INSTRUCTION_8_BITS" Name="InstructionSize" Type="list" Group="Regular Command">
+	<PossibleValue Comment="Instruction 8 bits " Value="HAL_OSPI_INSTRUCTION_8_BITS" />
+	<PossibleValue Comment="Instruction 16 bits " Value="HAL_OSPI_INSTRUCTION_16_BITS" />
+	<PossibleValue Comment="Instruction 24 bits  " Value="HAL_OSPI_INSTRUCTION_24_BITS" />
+        <PossibleValue Comment="Instruction 32 bits " Value="HAL_OSPI_INSTRUCTION_32_BITS" />
+    </RefParameter>
+         
+    <RefParameter Comment="Instruction Dtr Mode" DefaultValue="HAL_OSPI_INSTRUCTION_DTR_DISABLE" Name="InstructionDtrMode" Type="list" Group="Regular Command">
+	<PossibleValue Comment="Disable " Value="HAL_OSPI_INSTRUCTION_DTR_DISABLE" />
+	<PossibleValue Comment="Enable" Value="HAL_OSPI_INSTRUCTION_DTR_ENABLE" />
+    </RefParameter> 
+
+    <RefParameter Comment="Address" DefaultValue="0" Name="Address" Max="4294967295" Min="0" Type="integer" Group="Regular Command">
+	<Condition Diagnostic="" Expression="(OperationType=HAL_OSPI_OPTYPE_READ_CFG)|(OperationType=HAL_OSPI_OPTYPE_WRITE_CFG)"/>
+    </RefParameter> 
+ 
+    <RefParameter Comment="Address Mode " DefaultValue="HAL_OSPI_ADDRESS_NONE" Name="AddressMode" Type="list" Group="Regular Command">
+	<PossibleValue Comment=" Address None" Value="HAL_OSPI_ADDRESS_NONE" />
+	<PossibleValue Comment="Address 1 Line" Value="HAL_OSPI_ADDRESS_1_LINE" />
+	<PossibleValue Comment="Address 2 Line" Value="HAL_OSPI_ADDRESS_2_LINES" />
+	<PossibleValue Comment="Address 4 Line" Value="HAL_OSPI_ADDRESS_4_LINES" /> 
+	<PossibleValue Comment="Address 8 Line" Value="HAL_OSPI_ADDRESS_8_LINES" />
+    </RefParameter> 
+        
+    <RefParameter Comment="Address Size " DefaultValue="HAL_OSPI_ADDRESS_8_BITS" Name="AddressSize" Type="list" Group="Regular Command">
+        <Condition Diagnostic="" Expression="(OperationType=HAL_OSPI_OPTYPE_READ_CFG)|(OperationType=HAL_OSPI_OPTYPE_WRITE_CFG)"/>
+ 	<PossibleValue Comment=" Address 8 bits" Value="HAL_OSPI_ADDRESS_8_BITS" />
+	<PossibleValue Comment="Address 16 bits" Value="HAL_OSPI_ADDRESS_16_BITS" />
+	<PossibleValue Comment="Address 24 bits" Value="HAL_OSPI_ADDRESS_24_BITS" />
+	<PossibleValue Comment="Address 32 bits" Value="HAL_OSPI_ADDRESS_32_BITS" /> 
+    </RefParameter> 
+      
+    <RefParameter Comment=" Address Dtr Mode" DefaultValue="HAL_OSPI_ADDRESS_DTR_DISABLE" Name="AddressDtrMode" Type="list" Group="Regular Command">
+	<PossibleValue Comment="Disable " Value="HAL_OSPI_ADDRESS_DTR_DISABLE" />
+ 	<PossibleValue Comment="Enable" Value="HAL_OSPI_ADDRESS_DTR_ENABLE" />
+    </RefParameter>  
+      
+    <RefParameter Comment="Alternate Bytes" DefaultValue="0" Name="AlternateBytes" Max="4294967295" Min="0" Type="integer" Group="Regular Command">
+    </RefParameter>  
+            
+    <RefParameter Comment="Alternate Bytes Mode" DefaultValue="HAL_OSPI_ALTERNATE_BYTES_NONE" Name="AlternateBytesMode" Type="list" Group="Regular Command">
+	<PossibleValue Comment="Alternate Byte None" Value="HAL_OSPI_ALTERNATE_BYTES_NONE" />
+	<PossibleValue Comment="Alternate Byte 1 Line" Value="HAL_OSPI_ALTERNATE_BYTES_1_LINE" />
+	<PossibleValue Comment="Alternate Byte 2 Line" Value="HAL_OSPI_ALTERNATE_BYTES_2_LINES" />
+	<PossibleValue Comment="Alternate Byte 4 Line" Value="HAL_OSPI_ALTERNATE_BYTES_4_LINES" /> 
+	<PossibleValue Comment="Alternate Byte 8 Line" Value="HAL_OSPI_ALTERNATE_BYTES_8_LINES" />
+    </RefParameter> 
+      
+    <RefParameter Comment="Alternate Bytes Size" DefaultValue="HAL_OSPI_ALTERNATE_BYTES_8_BITS" Name="AlternateBytesSize" Type="list" Group="Regular Command">
+	<PossibleValue Comment="Alternate Byte 8 bits" Value="HAL_OSPI_ALTERNATE_BYTES_8_BITS" />
+	<PossibleValue Comment="Alternate Byte 16 bits" Value="HAL_OSPI_ALTERNATE_BYTES_16_BITS" />
+	<PossibleValue Comment="Alternate Byte 24 bits" Value="HAL_OSPI_ALTERNATE_BYTES_24_BITS" />
+	<PossibleValue Comment="Alternate Byte 32 bits" Value="HAL_OSPI_ALTERNATE_BYTES_32_BITS" /> 
+    </RefParameter>  
+      
+    <RefParameter Comment="Alternate Bytes Dtr Mode" DefaultValue="HAL_OSPI_ALTERNATE_BYTES_DTR_DISABLE" Name="AlternateBytesDtrMode" Type="list" Group="Regular Command">
+	<PossibleValue Comment="Disable " Value="HAL_OSPI_ALTERNATE_BYTES_DTR_DISABLE" />
+	<PossibleValue Comment="Enable" Value="HAL_OSPI_ALTERNATE_BYTES_DTR_ENABLE" />
+    </RefParameter>   
+       
+    <RefParameter Comment="Data Mode" DefaultValue="HAL_OSPI_DATA_NONE" Name="DataMode" Type="list" Group="Regular Command">
+	<PossibleValue Comment="Data None" Value="HAL_OSPI_DATA_NONE" />
+	<PossibleValue Comment="Data1 Line" Value="HAL_OSPI_DATA_1_LINE" />
+  	<PossibleValue Comment="Data 2 Line" Value="HAL_OSPI_DATA_2_LINES" />
+ 	<PossibleValue Comment="Data 4 Line" Value="HAL_OSPI_DATA_4_LINES" /> 
+	<PossibleValue Comment="Data 8 Line" Value="HAL_OSPI_DATA_8_LINES" />
+    </RefParameter>   
+       
+    <!--Only Used For Direct Mode-->
+    <RefParameter Comment="Data Number" DefaultValue="1" Name="NbData" Max="4294967295" Min="1" Type="integer" Group="Regular Command">
+	<Condition Diagnostic="" Expression="(OperationType=HAL_OSPI_OPTYPE_READ_CFG)|(OperationType=HAL_OSPI_OPTYPE_WRITE_CFG)"/>
+    </RefParameter>
+        
+    <RefParameter Comment="Data Dtr Mode" DefaultValue="HAL_OSPI_DATA_DTR_DISABLE" Name="DataDtrMode" Type="list" Group="Regular Command">
+	<PossibleValue Comment="Disable" Value="HAL_OSPI_DATA_DTR_DISABLE" />
+	<PossibleValue Comment="Enable" Value="HAL_OSPI_DATA_DTR_ENABLE" />
+    </RefParameter>   
+          
+    <RefParameter Comment="Dummy Cycles" DefaultValue="0" Name="DummyCycles" Max="31" Min="0" Type="integer" Group="Regular Command">
+    </RefParameter>  
+        
+    <RefParameter Comment="DQS Mode" DefaultValue="HAL_OSPI_DQS_DISABLE" Name="DQSMode" Type="list" Group="Regular Command">
+	<Condition Diagnostic="" Expression="(OperationType=HAL_OSPI_OPTYPE_READ_CFG)|(OperationType=HAL_OSPI_OPTYPE_WRITE_CFG)"/>
+	<PossibleValue Comment="Disable" Value="HAL_OSPI_DQS_DISABLE" />
+	<PossibleValue Comment="Enable" Value="HAL_OSPI_DQS_ENABLE" />       
+    </RefParameter> 
+        
+    <RefParameter Comment="SIOO Mode" DefaultValue="HAL_OSPI_SIOO_INST_EVERY_CMD" Name="SIOOMode" Type="list" Group="Regular Command">
+	<PossibleValue Comment="SIOO inst every Cmd" Value="HAL_OSPI_SIOO_INST_EVERY_CMD" />
+	<PossibleValue Comment="SIOO inst  Only First Cmd" Value="HAL_OSPI_SIOO_INST_ONLY_FIRST_CMD" />       
+    </RefParameter> 
+
+    <RefParameter Comment="Address Space" DefaultValue="" Name="AddressSpace" Type="list" Group="Regular Command">
+	<Condition Diagnostic="" Expression="(OperationType=HAL_OSPI_OPTYPE_READ_CFG)|(OperationType=HAL_OSPI_OPTYPE_WRITE_CFG)"/>
+	<PossibleValue Comment="Memory Register Space" Value="HAL_OSPI_MEMORY_ADDRESS_SPACE" />
+	<PossibleValue Comment="Register Address Space" Value="HAL_OSPI_REGISTER_ADDRESS_SPACE" /> 
+    </RefParameter> 
+
+    <RefParameter Comment="Timeout" DefaultValue="HAL_XSPI_TIMEOUT_DEFAULT_VALUE" Name="Timeout" Type="list" Visible="false" />
+
+    <!-- *********************************************** -->
+    <!-- Regular Mode -->
+    <RefMode Name="single_mode"  HalMode="" >
+     	<ConfigForMode>OSPI_Init</ConfigForMode>
+        <ConfigForMode>Memory_mapped</ConfigForMode>
+        <ConfigForMode>Auto_Polling</ConfigForMode>
+	<ConfigForMode>Dlyb_Config</ConfigForMode>
+	<!-- Transfer Rate -->
+        <!-- Parameter Name="TransferRateType" />
+        <Parameter Name="TransferRateInstruction" />
+        <Parameter Name="TransferRateAddress" />
+        <Parameter Name="TransferRateData" />
+	<Parameter Name="TransferRateAltBytes" /> -->
+	<!-- Initialization -->
+        <Parameter Name="FifoThresholdByte" />
+        <Parameter Name="MemoryMode" />
+        <Parameter Name="MemoryType" />
+        <Parameter Name="MemorySize" />
+        <Parameter Name="ChipSelectHighTimeCycle" />
+        <Parameter Name="FreeRunningClock" />
+        <Parameter Name="ClockMode" />
+        <Parameter Name="WrapSize" />
+        <Parameter Name="ClockPrescaler" />
+        <Parameter Name="SampleShifting" />
+        <Parameter Name="DelayHoldQuarterCycle" />
+        <Parameter Name="ChipSelectBoundary" />
+        <Parameter Name="DelayBlockBypass" />
+	<Parameter Name="Units" />
+        <Parameter Name="PhaseSel" />
+        <Parameter Name="Refresh" />
+        <!-- Operating Type-->
+	<!-- <Parameter Name="OperationType" />
+        <Parameter Name="Match" />
+        <Parameter Name="Mask" />
+        <Parameter Name="MatchMode" />
+        <Parameter Name="AutomaticStop" />
+        <Parameter Name="Interval" />
+        <Parameter Name="TimeOutActivation" />
+	<Parameter Name="TimeOutPeriod" />-->
+        <!-- Regular Command Struct-->
+        <!--  <Parameter Name="AddressSize" />
+        <Parameter Name="DQSMode" />
+        <Parameter Name="Address" />
+        <Parameter Name="NbData" />
+        <Parameter Name="AddressSpace" />-->
+    </RefMode>
+    
+    <RefMode Name="dual_mode"  HalMode="">
+    	<ConfigForMode>OSPI_Init</ConfigForMode>
+        <ConfigForMode>Memory_mapped</ConfigForMode>
+        <ConfigForMode>Auto_Polling</ConfigForMode>
+	<ConfigForMode>Dlyb_Config</ConfigForMode>
+        <!-- Initialization -->
+        <Parameter Name="FifoThresholdByte" />
+        <Parameter Name="MemoryMode" />
+        <Parameter Name="MemoryType" />
+        <Parameter Name="MemorySize" />
+        <Parameter Name="ChipSelectHighTimeCycle" />
+        <Parameter Name="FreeRunningClock" />
+        <Parameter Name="ClockMode" />
+        <Parameter Name="WrapSize" />
+        <Parameter Name="ClockPrescaler" />
+        <Parameter Name="SampleShifting" />
+        <Parameter Name="DelayHoldQuarterCycle" />
+        <Parameter Name="ChipSelectBoundary" />	
+        <Parameter Name="DelayBlockBypass" />
+	<Parameter Name="Units" />
+        <Parameter Name="PhaseSel" />
+        <Parameter Name="Refresh" />
+        <!-- Operating Type-->
+	<!-- <Parameter Name="OperationType" />
+        <Parameter Name="Match" />
+        <Parameter Name="Mask" />
+        <Parameter Name="MatchMode" />
+        <Parameter Name="AutomaticStop" />
+        <Parameter Name="Interval" />
+        <Parameter Name="TimeOutActivation" />
+	<Parameter Name="TimeOutPeriod" />-->
+        <!-- Regular Command Struct-->
+        <!--  <Parameter Name="AddressSize" />
+        <Parameter Name="DQSMode" />
+        <Parameter Name="Address" />
+        <Parameter Name="NbData" />
+        <Parameter Name="AddressSpace" />-->
+    </RefMode>
+
+    <RefMode Name="quad_mode"  HalMode="">
+	<ConfigForMode>OSPI_Init</ConfigForMode>
+        <ConfigForMode>Memory_mapped</ConfigForMode>
+        <ConfigForMode>Auto_Polling</ConfigForMode>
+	<ConfigForMode>Dlyb_Config</ConfigForMode>
+        <!-- Initialization -->
+        <Parameter Name="FifoThresholdByte" />
+        <Parameter Name="MemoryMode" />
+        <Parameter Name="MemoryType" />
+        <Parameter Name="MemorySize" />
+        <Parameter Name="ChipSelectHighTimeCycle" />
+        <Parameter Name="FreeRunningClock" />
+        <Parameter Name="ClockMode" />
+        <Parameter Name="WrapSize" />
+        <Parameter Name="ClockPrescaler" />
+        <Parameter Name="SampleShifting" />
+        <Parameter Name="DelayHoldQuarterCycle" />
+        <Parameter Name="ChipSelectBoundary" />	
+        <Parameter Name="DelayBlockBypass" />
+	<Parameter Name="Units" />
+        <Parameter Name="PhaseSel" />
+        <Parameter Name="Refresh" />
+        <!-- Operating Type-->
+	<!-- <Parameter Name="OperationType" />
+        <Parameter Name="Match" />
+        <Parameter Name="Mask" />
+        <Parameter Name="MatchMode" />
+        <Parameter Name="AutomaticStop" />
+        <Parameter Name="Interval" />
+        <Parameter Name="TimeOutActivation" />
+	<Parameter Name="TimeOutPeriod" />-->
+        <!-- Regular Command Struct-->
+        <!--  <Parameter Name="AddressSize" />
+        <Parameter Name="DQSMode" />
+        <Parameter Name="Address" />
+        <Parameter Name="NbData" />
+        <Parameter Name="AddressSpace" />-->
+    </RefMode>
+
+    <RefMode Name="dual_single_mode"  HalMode="">
+        <ConfigForMode>OSPI_Init</ConfigForMode>
+        <ConfigForMode>Memory_mapped</ConfigForMode>
+        <ConfigForMode>Auto_Polling</ConfigForMode>
+	<ConfigForMode>Dlyb_Config</ConfigForMode>
+        <!-- Initialization -->
+        <Parameter Name="FifoThresholdByte" />
+        <Parameter Name="MemoryMode" />
+        <Parameter Name="MemoryType" />
+        <Parameter Name="MemorySize" />
+        <Parameter Name="ChipSelectHighTimeCycle" />
+        <Parameter Name="FreeRunningClock" />
+        <Parameter Name="ClockMode" />
+        <Parameter Name="WrapSize" />
+        <Parameter Name="ClockPrescaler" />
+        <Parameter Name="SampleShifting" />
+        <Parameter Name="DelayHoldQuarterCycle" />
+        <Parameter Name="ChipSelectBoundary" />	
+        <Parameter Name="DelayBlockBypass" />
+	<Parameter Name="Units" />
+        <Parameter Name="PhaseSel" />
+        <Parameter Name="Refresh" />
+        <!-- Operating Type-->
+	<!-- <Parameter Name="OperationType" />
+        <Parameter Name="Match" />
+        <Parameter Name="Mask" />
+        <Parameter Name="MatchMode" />
+        <Parameter Name="AutomaticStop" />
+        <Parameter Name="Interval" />
+        <Parameter Name="TimeOutActivation" />
+	<Parameter Name="TimeOutPeriod" />-->
+        <!-- Regular Command Struct-->
+        <!--  <Parameter Name="AddressSize" />
+        <Parameter Name="DQSMode" />
+        <Parameter Name="Address" />
+        <Parameter Name="NbData" />
+        <Parameter Name="AddressSpace" />-->
+    </RefMode>
+
+    <RefMode Name="dual_dual_mode"  HalMode="">
+        <ConfigForMode>OSPI_Init</ConfigForMode>
+        <ConfigForMode>Memory_mapped</ConfigForMode>
+        <ConfigForMode>Auto_Polling</ConfigForMode>
+	<ConfigForMode>Dlyb_Config</ConfigForMode>
+        <!-- Initialization -->
+        <Parameter Name="FifoThresholdByte" />
+        <Parameter Name="MemoryMode" />
+        <Parameter Name="MemoryType" />
+        <Parameter Name="MemorySize" />
+        <Parameter Name="ChipSelectHighTimeCycle" />
+        <Parameter Name="FreeRunningClock" />
+        <Parameter Name="ClockMode" />
+        <Parameter Name="WrapSize" />
+        <Parameter Name="ClockPrescaler" />
+        <Parameter Name="SampleShifting" />
+        <Parameter Name="DelayHoldQuarterCycle" />
+        <Parameter Name="ChipSelectBoundary" />	
+        <Parameter Name="DelayBlockBypass" />
+	<Parameter Name="Units" />
+        <Parameter Name="PhaseSel" />
+        <Parameter Name="Refresh" />
+        <!-- Operating Type-->
+	<!-- <Parameter Name="OperationType" />
+        <Parameter Name="Match" />
+        <Parameter Name="Mask" />
+        <Parameter Name="MatchMode" />
+        <Parameter Name="AutomaticStop" />
+        <Parameter Name="Interval" />
+        <Parameter Name="TimeOutActivation" />
+	<Parameter Name="TimeOutPeriod" />-->
+        <!-- Regular Command Struct-->
+        <!--  <Parameter Name="AddressSize" />
+        <Parameter Name="DQSMode" />
+        <Parameter Name="Address" />
+        <Parameter Name="NbData" />
+        <Parameter Name="AddressSpace" />-->
+    </RefMode>
+
+    <RefMode Name="dual_quad_mode"  HalMode="">
+        <ConfigForMode>OSPI_Init</ConfigForMode>
+        <ConfigForMode>Memory_mapped</ConfigForMode>
+        <ConfigForMode>Auto_Polling</ConfigForMode>
+	<ConfigForMode>Dlyb_Config</ConfigForMode>
+        <!-- Initialization -->
+        <Parameter Name="FifoThresholdByte" />
+        <Parameter Name="MemoryMode" />
+        <Parameter Name="MemoryType" />
+        <Parameter Name="MemorySize" />
+        <Parameter Name="ChipSelectHighTimeCycle" />
+        <Parameter Name="FreeRunningClock" />
+        <Parameter Name="ClockMode" />
+        <Parameter Name="WrapSize" />
+        <Parameter Name="ClockPrescaler" />
+        <Parameter Name="SampleShifting" />
+        <Parameter Name="DelayHoldQuarterCycle" />
+        <Parameter Name="ChipSelectBoundary" />	
+        <Parameter Name="DelayBlockBypass" />
+	<Parameter Name="Units" />
+        <Parameter Name="PhaseSel" />
+        <Parameter Name="Refresh" />
+        <!-- Operating Type-->
+	<!-- <Parameter Name="OperationType" />
+        <Parameter Name="Match" />
+        <Parameter Name="Mask" />
+        <Parameter Name="MatchMode" />
+        <Parameter Name="AutomaticStop" />
+        <Parameter Name="Interval" />
+        <Parameter Name="TimeOutActivation" />
+	<Parameter Name="TimeOutPeriod" />-->
+        <!-- Regular Command Struct-->
+        <!--  <Parameter Name="AddressSize" />
+        <Parameter Name="DQSMode" />
+        <Parameter Name="Address" />
+        <Parameter Name="NbData" />
+        <Parameter Name="AddressSpace" />-->
+    </RefMode>
+
+    <RefMode Name="octo_mode"  HalMode="">
+	<ConfigForMode>OSPI_Init</ConfigForMode>
+        <ConfigForMode>Memory_mapped</ConfigForMode>
+        <ConfigForMode>Auto_Polling</ConfigForMode>
+	<ConfigForMode>Dlyb_Config</ConfigForMode>
+        <!-- Initialization -->
+        <Parameter Name="FifoThresholdByte" />
+        <Parameter Name="MemoryMode" />
+        <Parameter Name="MemoryType" />
+        <Parameter Name="MemorySize" />
+        <Parameter Name="ChipSelectHighTimeCycle" />
+        <Parameter Name="FreeRunningClock" />
+        <Parameter Name="ClockMode" />
+        <Parameter Name="WrapSize" />
+        <Parameter Name="ClockPrescaler" />
+        <Parameter Name="SampleShifting" />
+        <Parameter Name="DelayHoldQuarterCycle" />
+        <Parameter Name="ChipSelectBoundary" />
+        <Parameter Name="DelayBlockBypass" />
+	<Parameter Name="Units" />
+        <Parameter Name="PhaseSel" />
+        <Parameter Name="Refresh" />
+        <!-- Hyperbus -->
+	<Parameter Name="RWRecoveryTimeCycle" />
+	<Parameter Name="AccessTimeCycle" />
+	<Parameter Name="WriteZeroLatency" />
+	<Parameter Name="LatencyMode" />
+        <!-- Operating Type-->
+	<!-- <Parameter Name="OperationType" />
+        <Parameter Name="Match" />
+        <Parameter Name="Mask" />
+        <Parameter Name="MatchMode" />
+        <Parameter Name="AutomaticStop" />
+        <Parameter Name="Interval" />
+        <Parameter Name="TimeOutActivation" />
+	<Parameter Name="TimeOutPeriod" />-->
+        <!-- Regular Command Struct-->
+        <!--  <Parameter Name="AddressSize" />
+        <Parameter Name="DQSMode" />
+        <Parameter Name="Address" />
+        <Parameter Name="NbData" />
+        <Parameter Name="AddressSpace" />-->
+    </RefMode>
+
+    <RefMode Name="octods_mode"  HalMode="">
+	<ConfigForMode>OSPI_Init</ConfigForMode>
+        <ConfigForMode>Memory_mapped</ConfigForMode>
+        <ConfigForMode>Auto_Polling</ConfigForMode>
+	<ConfigForMode>Dlyb_Config</ConfigForMode>
+        <!-- Initialization -->
+        <Parameter Name="FifoThresholdByte" />
+        <Parameter Name="MemoryMode" />
+        <Parameter Name="MemoryType" />
+        <Parameter Name="MemorySize" />
+        <Parameter Name="ChipSelectHighTimeCycle" />
+        <Parameter Name="FreeRunningClock" />
+        <Parameter Name="ClockMode" />
+        <Parameter Name="WrapSize" />
+        <Parameter Name="ClockPrescaler" />
+        <Parameter Name="SampleShifting" />
+        <Parameter Name="DelayHoldQuarterCycle" />
+        <Parameter Name="ChipSelectBoundary" />
+        <Parameter Name="DelayBlockBypass" />
+	<Parameter Name="Units" />
+        <Parameter Name="PhaseSel" />
+        <Parameter Name="Refresh" />
+        <!-- Hyperbus -->
+	<Parameter Name="RWRecoveryTimeCycle" />
+	<Parameter Name="AccessTimeCycle" />
+	<Parameter Name="WriteZeroLatency" />
+	<Parameter Name="LatencyMode" />
+        <!-- Operating Type-->
+	<!--i <Parameter Name="OperationType" />
+        <Parameter Name="Match" />
+        <Parameter Name="Mask" />
+        <Parameter Name="MatchMode" />
+        <Parameter Name="AutomaticStop" />
+        <Parameter Name="Interval" />
+        <Parameter Name="TimeOutActivation" />
+	<Parameter Name="TimeOutPeriod" />-->
+        <!-- Regular Command Struct-->
+        <!--  <Parameter Name="AddressSize" />
+        <Parameter Name="DQSMode" />
+        <Parameter Name="Address" />
+        <Parameter Name="NbData" />
+        <Parameter Name="AddressSpace" />-->
+    </RefMode>
+ 
+    <!-- HyperBus(TM) Mode -->
+    <RefMode Name="hyperbus_mode"  HalMode="">
+        <ConfigForMode>OSPI_Init</ConfigForMode>
+        <ConfigForMode>HyperBus</ConfigForMode>
+        <ConfigForMode>Memory_mapped</ConfigForMode>
+        <ConfigForMode>Auto_Polling</ConfigForMode>
+	<ConfigForMode>Dlyb_Config</ConfigForMode>
+        <!-- Initialization -->
+        <Parameter Name="FifoThresholdByte" />
+        <Parameter Name="MemoryMode" />
+        <Parameter Name="MemoryType" />
+        <Parameter Name="MemorySize" />
+        <Parameter Name="ChipSelectHighTimeCycle" />
+        <Parameter Name="FreeRunningClock" />
+        <Parameter Name="ClockMode" />
+        <Parameter Name="WrapSize" />
+        <Parameter Name="ClockPrescaler" />
+        <Parameter Name="SampleShifting" />
+        <Parameter Name="DelayHoldQuarterCycle" />
+        <Parameter Name="ChipSelectBoundary" />	
+        <Parameter Name="DelayBlockBypass" />
+	<Parameter Name="Units" />
+        <Parameter Name="PhaseSel" />
+        <Parameter Name="Refresh" />
+        <!-- Hyperbus -->
+	<Parameter Name="RWRecoveryTimeCycle" />
+	<Parameter Name="AccessTimeCycle" />
+	<Parameter Name="WriteZeroLatency" />
+	<Parameter Name="LatencyMode" />
+        <!-- Operating Type-->
+	<!-- <Parameter Name="OperationType" />
+        <Parameter Name="Match" />
+        <Parameter Name="Mask" />
+        <Parameter Name="MatchMode" />
+        <Parameter Name="AutomaticStop" />
+        <Parameter Name="Interval" />
+        <Parameter Name="TimeOutActivation" />
+	<Parameter Name="TimeOutPeriod" /> -->
+        <!-- Regular Command Struct-->
+        <!--  <Parameter Name="AddressSize" />
+        <Parameter Name="DQSMode" />
+        <Parameter Name="Address" />
+        <Parameter Name="NbData" />
+        <Parameter Name="AddressSpace" />-->
+    </RefMode>
+
+    <!-- ************************************* Modes ********************************************* -->
+                    <ModeLogicOperator Name="OR">
+                            <Mode Name="OCTOSPI1_Mode" UserName="Mode">           
+                                    <ModeLogicOperator Name="XOR">
+                                            <Mode Name="single_mode" UserName="Single SPI">
+                                                    <SignalLogicalOp Name="AND">
+							    <Signal Name="NCS"/>
+							    <Signal Name="CLK"/>
+							    <Signal Name="IO0"/>
+                                                            <Signal Name="IO1"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_$IpInstance_Single</Semaphore>
+                                            </Mode>
+                                            <Mode Name="dual_mode" UserName="Dual SPI">
+                                                    <SignalLogicalOp Name="AND">
+							    <Signal Name="NCS"/>
+							    <Signal Name="CLK"/>
+							    <Signal Name="IO0"/>
+                                                            <Signal Name="IO1"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_$IpInstance_Dual</Semaphore>
+                                            </Mode>
+                                            <Mode Name="quad_mode" UserName="Quad SPI">
+                                                    <SignalLogicalOp Name="AND">
+							    <Signal Name="NCS"/>
+							    <Signal Name="CLK"/>
+						            <Signal Name="IO0"/>
+                                                            <Signal Name="IO1"/>
+                                                            <Signal Name="IO2"/>
+                                                            <Signal Name="IO3"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_$IpInstance_Quad</Semaphore>
+					    </Mode>
+					    <Mode Name="dual_single_mode" UserName="Dual-Single SPI">
+                                                    <SignalLogicalOp Name="AND">
+							    <Signal Name="NCS"/>
+							    <Signal Name="CLK"/>
+						            <Signal Name="IO0"/>
+                                                            <Signal Name="IO1"/>
+							    <Signal Name="IO4"/>
+							    <Signal Name="IO5"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_$IpInstance_DualSingle</Semaphore>
+                                            </Mode>
+					    <Mode Name="dual_dual_mode" UserName="Dual-Dual SPI">
+                                                    <SignalLogicalOp Name="AND">
+							    <Signal Name="NCS"/>
+							    <Signal Name="CLK"/>
+						            <Signal Name="IO0"/>
+                                                            <Signal Name="IO1"/>
+							    <Signal Name="IO4"/>
+							    <Signal Name="IO5"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_$IpInstance_DualDual</Semaphore>
+                                            </Mode>
+    		                            <Mode Name="dual_quad_mode" UserName="Dual-Quad SPI">
+                                                    <SignalLogicalOp Name="AND">
+							    <Signal Name="NCS"/>
+							    <Signal Name="CLK"/>
+						            <Signal Name="IO0"/>
+                                                            <Signal Name="IO1"/>
+                                                            <Signal Name="IO2"/>
+                                                            <Signal Name="IO3"/>
+							    <Signal Name="IO4"/>
+							    <Signal Name="IO5"/>
+							    <Signal Name="IO6"/>
+							    <Signal Name="IO7"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_$IpInstance_DualQuad</Semaphore>
+                                            </Mode>
+					    <Mode Name="octo_mode" UserName="Octo SPI">
+                                                    <SignalLogicalOp Name="AND">
+							    <Signal Name="NCS"/>
+							    <Signal Name="CLK"/>
+						            <Signal Name="IO0"/>
+                                                            <Signal Name="IO1"/>
+                                                            <Signal Name="IO2"/>
+							    <Signal Name="IO3"/>
+							    <Signal Name="IO4"/>
+							    <Signal Name="IO5"/>
+							    <Signal Name="IO6"/>
+							    <Signal Name="IO7"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_$IpInstance_Octo</Semaphore>
+                                            </Mode>
+					    <Mode Name="octods_mode" UserName="Octo SPI with Data Strobe">
+                                                    <SignalLogicalOp Name="AND">
+							    <Signal Name="NCS"/>
+							    <Signal Name="CLK"/>
+							    <Signal Name="DQS"/>
+						            <Signal Name="IO0"/>
+                                                            <Signal Name="IO1"/>
+                                                            <Signal Name="IO2"/>
+							    <Signal Name="IO3"/>
+							    <Signal Name="IO4"/>
+							    <Signal Name="IO5"/>
+							    <Signal Name="IO6"/>
+							    <Signal Name="IO7"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_$IpInstance_OctoDs</Semaphore>
+                                            </Mode>
+					    <Mode Name="hyperbus_mode" UserName="HyperBus(TM)">
+						    <SignalLogicalOp Name="AND">
+							    <Signal Name="NCS"/>
+							    <Signal Name="CLK"/>
+							    <Signal Name="DQS"/>
+						            <Signal Name="IO0"/>
+                                                            <Signal Name="IO1"/>
+                                                            <Signal Name="IO2"/>
+							    <Signal Name="IO3"/>
+							    <Signal Name="IO4"/>
+							    <Signal Name="IO5"/>
+							    <Signal Name="IO6"/>
+							    <Signal Name="IO7"/> 
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_$IpInstance_HyperBus</Semaphore>
+                                            </Mode>
+                                    </ModeLogicOperator>
+                            </Mode>
+			    <!--Mode Name="OCTOSPI1_DQS" UserName="Data Strobe">
+                                    <ModeLogicOperator Name="XOR">
+                                            <Mode Name="dqs_enable" UserName="DQS">
+						    <Condition Expression="Sem_$IpInstance_Octo|Sem_$IpInstance_HyperBus" Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+							    <Signal Name="DQS"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_$IpInstance_DQS</Semaphore>
+                                            </Mode>
+                                    </ModeLogicOperator>
+			    </Mode> -->
+			    <Mode Name="OCTOSPI1_NCLK" UserName="HyperBus(TM) 1.8V Inverted Clock" RemoveCondition="LQFP48|UFQFPN48">
+                                    <ModeLogicOperator Name="XOR">
+                                            <Mode Name="nclk_enable" UserName="NCLK">
+						    <Condition Expression="Sem_$IpInstance_HyperBus" Diagnostic=""/>
+                                                    <SignalLogicalOp Name="AND">
+							    <Signal Name="NCLK"/>
+                                                    </SignalLogicalOp>
+                                                    <Semaphore>Sem_$IpInstance_NCLK</Semaphore>
+                                            </Mode>
+                                    </ModeLogicOperator>
+                            </Mode>
+                    </ModeLogicOperator>
+
+   <!--*********************************************************************************************-->
+    <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="IO0"/>
+    <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="IO1"/>
+    <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="IO2"/>
+    <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="IO3"/>
+    <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="IO4"/>
+    <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="IO5"/>
+    <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="IO6"/>
+    <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="IO7"/>
+    <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="NCS"/>
+    <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="CLK"/>
+    <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="NCLK"/>
+    <RefSignal IOMode="AlternateFunctionPushPullHighSpeedDefault" Name="DQS"/>
+    <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+   <!--*********************************************************************************************-->
+</IP>

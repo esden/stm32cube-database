@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://mcd.rou.st.com/modules.php?name=mcu"
+    ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
+    DBVersion="V4.0"
+    IPType="service"
+    IpGroup="Security"
+    Name="HASH"
+    Version="hash1_v4_0_Cube">
+
+    <RefParameter Name="Algorithm" Comment="Secure hash algorithm type" DefaultValue="SHA1" Type="list" Group="Algorithm">
+        <Description>Secure hash algorithm type.&lt;br&gt;Default setting is SHA1</Description>
+        <Condition Diagnostic="" Expression="DIE474 | DIE492"/>
+        <PossibleValue Value="HASH_ALGOSELECTION_SHA1" Comment="SHA1" Semaphore="Semaphore_HASH_Algo_SHA1"/>
+        <PossibleValue Value="HASH_ALGOSELECTION_MD5" Comment="MD5" Semaphore="Semaphore_HASH_Algo_MD5"/>
+        <PossibleValue Value="HASH_ALGOSELECTION_SHA224" Comment="SHA224" Semaphore="Semaphore_HASH_Algo_SHA224"/>
+        <PossibleValue Value="HASH_ALGOSELECTION_SHA256" Comment="SHA256" Semaphore="Semaphore_HASH_Algo_SHA256"/>
+    </RefParameter>
+    <RefParameter Name="Algorithm" Comment="Secure hash algorithm type" DefaultValue="SHA1" Type="list" Group="Algorithm">
+        <Description>Secure hash algorithm type.&lt;br&gt;Default setting is SHA1</Description>
+        <PossibleValue Value="HASH_ALGOSELECTION_SHA1" Comment="SHA1" Semaphore="Semaphore_HASH_Algo_SHA1"/>
+        <PossibleValue Value="HASH_ALGOSELECTION_SHA224" Comment="SHA224" Semaphore="Semaphore_HASH_Algo_SHA224"/>
+        <PossibleValue Value="HASH_ALGOSELECTION_SHA256" Comment="SHA256" Semaphore="Semaphore_HASH_Algo_SHA256"/>
+        <PossibleValue Value="HASH_ALGOSELECTION_SHA384" Comment="SHA384" Semaphore="Semaphore_HASH_Algo_SHA384"/>
+        <PossibleValue Value="HASH_ALGOSELECTION_SHA512_224" Comment="SHA512_224" Semaphore="Semaphore_HASH_Algo_SHA512_224"/>
+        <PossibleValue Value="HASH_ALGOSELECTION_SHA512_256" Comment="SHA512_256" Semaphore="Semaphore_HASH_Algo_SHA512_256"/>
+        <PossibleValue Value="HASH_ALGOSELECTION_SHA512" Comment="SHA512" Semaphore="Semaphore_HASH_Algo_SHA512"/>
+    </RefParameter>
+
+    <RefParameter Name="HASHMAC" Comment="HMAC operation" Type="List" Group="Parameters" DefaultValue="No">
+        <Description>HMAC operation</Description>
+        <PossibleValue Value="Yes" Comment="Yes" Semaphore="Semaphore_HASHMAC"/>
+        <PossibleValue Value="No" Comment="No"/>
+    </RefParameter>
+
+    <RefParameter Name="DataType" Comment="Hash data type in bit" DefaultValue="HASH_NO_SWAP" Type="list" Group="Parameters">
+        <Description>This parameter can be a value of @ref HASH_Data_Type:&lt;br&gt;
+        - HASH_NO_SWAP: 32-bit data(No swapping)&lt;br&gt;
+        - HASH_HALFWORD_SWAP: 16-bit data(Each half word is swapped)&lt;br&gt;
+        - HASH_BYTE_SWAP: 8-bit data(All bytes are swapped)&lt;br&gt;
+        - HASH_BIT_SWAP: 1-bit data(In the word all bits are swapped).&lt;br&gt;
+        Default setting is HASH_DATATYPE_32B</Description>
+        <PossibleValue Value="HASH_NO_SWAP" Comment="32-bit data. No swapping"/>
+        <PossibleValue Value="HASH_HALFWORD_SWAP" Comment="16-bit data. Each half word is swapped"/>
+        <PossibleValue Value="HASH_BYTE_SWAP" Comment="8-bit data. All bytes are swapped"/>
+        <PossibleValue Value="HASH_BIT_SWAP" Comment="1-bit data. In the word all bits are swapped"/>
+    </RefParameter>
+
+    <RefParameter Name="pKeyInputType" Comment="pKey input type" Type="list" DefaultValue="HEXA" Group="Parameters">
+        <Description>User can choose between HEXA or ASCII for pKey input type </Description>
+        <Condition Diagnostic="" Expression="Semaphore_HASHMAC"/>
+        <PossibleValue Value="ASCII" Comment="ASCII" Semaphore="Semaphore_pKeyInputType_ASCII"/>
+        <PossibleValue Value="HEXA" Comment="HEXA" Semaphore="Semaphore_pKeyInputType_HEXA"/>
+    </RefParameter>
+    <RefParameter Name="pKeyInputType" Comment="pKey input type" Type="list" DefaultValue="null" Group="Parameters" Visible="false">
+        <Description>Used only in HMAC operation.</Description>
+    </RefParameter>
+
+    <RefParameter Name="pKeyInput" Comment="pKey user input" Type="StringRW" DefaultValue="0" Group="Parameters" >
+        <Description>Used only in HMAC operation. Will be used to generate Encryption/Decryption key in right format.</Description>
+        <Condition Diagnostic="" Expression="(Semaphore_HASHMAC)&amp;(Semaphore_pKeyInputType_ASCII)"/>
+    </RefParameter>
+    <RefParameter Name="pKeyInput" Comment="pKey user input" Type="StringRW" DefaultValue="00" Group="Parameters" >
+        <Description>Used only in HMAC operation. Will be used to generate Encryption/Decryption key in right format.&lt;br&gt;Because of Hexadecimal format an even number of caracters is required (ex: 000102030405060708090A0B0C0D0E0F10)</Description>
+        <Condition Diagnostic="" Expression="(Semaphore_HASHMAC)&amp;(Semaphore_pKeyInputType_HEXA)"/>
+    </RefParameter>
+    <RefParameter Name="pKeyInput" Comment="pKey user input" Type="StringRW" Group="Parameters" DefaultValue="null" Visible="false">
+        <Description>Used only in HMAC operation.</Description>
+    </RefParameter>
+
+    <RefParameter Name="KeySize" Comment="pkey size" DefaultValue="0" Max="4294967295" Min="0" Type="integer" Group="Parameters" Visible="false">
+        <Condition Diagnostic="" Expression="Semaphore_HASHMAC"/>
+        <Description>Used only in HMAC operation.</Description>
+    </RefParameter>
+    <RefParameter Name="KeySize" Comment="pkey size" Type="list" Group="Parameters" DefaultValue="null" Visible="false">
+        <Description>Used only in HMAC operation.</Description>
+    </RefParameter>
+
+    <RefParameter Name="pKey" Comment="pkey formatted in hexadecimal format" ArraySize="1" ArrayTypeElement="uint8_t;16" Type="Array" Separator=" " Group="Parameters" DefaultValue="00" Visible="false">
+        <Description>Used only in HMAC operation.</Description>
+        <Condition Diagnostic="" Expression="Semaphore_HASHMAC"/>
+    </RefParameter>
+    <RefParameter Name="pKey" Comment="pkey formatted in hexadecimal format" Type="List" Group="Parameters" DefaultValue="null" Visible="false">
+        <Description>Used only in HMAC operation.</Description>
+    </RefParameter>
+
+    <RefParameter Name="HASH_SUSPEND_RESUME" Comment="Hash suspend resume" Type="List" Group="Parameters" DefaultValue="HASH_SUSPEND_NONE">
+        <Condition Diagnostic="" Expression="DIE492"/>
+        <PossibleValue Value="HASH_SUSPEND_NONE" Comment="0"/>
+        <PossibleValue Value="HASH_SUSPEND" Comment="1"/>
+    </RefParameter>
+
+
+    <RefMode Name="HASH_Activate" HalMode ="HASH">
+        <ConfigForMode>HASH_Init</ConfigForMode>
+        <Parameter Name="Algorithm"/>
+        <Parameter Name="DataType"/>
+        <Parameter Name="HASHMAC"/>
+        <Parameter Name="pKeyInputType"/>
+        <Parameter Name="pKeyInput"/>
+        <Parameter Name="KeySize"/>
+        <Parameter Name="pKey"/>
+        <Parameter Name="HASH_SUSPEND_RESUME"/>
+    </RefMode>
+
+    <ModeLogicOperator Name="OR">
+        <Mode Name="HASH_State" UserName="Activated">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="HASH_Activate" UserName="Activated">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_HASH" />
+                    </SignalLogicalOp>
+                    <Semaphore>S_HASH</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
+    </ModeLogicOperator>
+
+    <!-- RefSignal for HASH -->
+    <RefSignal Name="VS_HASH" Virtual="true"/>
+    <!-- Semaphore for HASH -->
+    <Semaphore>S_HASH</Semaphore>
+</IP>

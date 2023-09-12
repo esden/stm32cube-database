@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V4.0" 
+    IPType="peripheral"
+    Name="USB"
+    Version="usbfs_v1.0_Cube" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+    ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
+    xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+    <About>USB_FS: Universal Serial Bus Full-Speed</About>
+
+    <!-- Generic RefParameters for USB Full Speed Host & Device Modes -->
+    <RefParameter Name="Instance" DefaultValue="USB_DRD_FS" Comment="Instance" Type="" Visible="false"/>
+    <!-- Virtual Mode Parameter, to define RefParameter in function of RefMode -->
+    <RefParameter Comment="" DefaultValue="Host_Only" Name="VirtualMode" Type="list" Visible="false" Group="Basic Parameters" >
+        <PossibleValue Comment="" Value="Host_Only"/>		
+        <PossibleValue Comment="" Value="Device_Only"/>
+    </RefParameter>
+    
+			
+    <RefParameter Comment="Speed" DefaultValue="USBD_FS_SPEED" Name="DeviceSpeed" Type="List" Group="Basic Parameters">			
+        <PossibleValue Comment="Full Speed 12MBit/s" Value="USBD_FS_SPEED"/>	
+    </RefParameter>
+	
+    <RefParameter Comment="Device endpoints number" DefaultValue="8" Name="dev_endpoints" Min="1" Max="8" Type="integer" Group="" Visible="false">				
+    </RefParameter>				
+	
+    <RefParameter Comment="Host channel number" DefaultValue="8" Name="Host_channels" Min="1" Max="8" Type="integer" Group="" Visible="false">				
+    </RefParameter>	
+	
+    <RefParameter Comment="Physical interface" DefaultValue="PCD_PHY_EMBEDDED" Name="phy_itface" Type="List" Group="Basic Parameters" Visible="true">
+        <PossibleValue Value="PCD_PHY_EMBEDDED" Comment="Internal Phy"/>
+        <PossibleValue Value="HCD_PHY_EMBEDDED" Comment="Internal Phy"/>
+    </RefParameter>
+	
+    <RefParameter Comment="Signal start of frame " DefaultValue="DISABLE" Name="Sof_enable" Type="List" Group="Basic Parameters" Visible="true">
+        <PossibleValue Value="ENABLE" Comment="Enabled"/>
+        <PossibleValue Value="DISABLE" Comment="Disabled"/>			
+        <Condition Expression="!USB_FS_SOF" Diagnostic=""/>
+    </RefParameter>	
+    <RefParameter Comment="Signal start of frame " DefaultValue="ENABLE" Name="Sof_enable" Type="List" Group="Basic Parameters">
+        <PossibleValue Value="ENABLE" Comment="Enabled"/>
+        <Condition Expression="USB_FS_SOF" Diagnostic=""/>		
+    </RefParameter>		
+	
+    <RefParameter Comment="Low Power" DefaultValue="DISABLE" Name="low_power_enable" Type="List" Group="Power Parameters" Visible="true">
+        <PossibleValue Value="ENABLE" Comment="Enabled" Semaphore="$IpInstance_INTERRUPT_WAKEUP_ON"/>
+        <PossibleValue Value="DISABLE" Comment="Disabled"/>	
+        <!--<Description>This mode is not supproted on CubeMx V4.2</Description>-->
+    </RefParameter>
+	
+    <RefParameter Comment="Link Power Management" DefaultValue="DISABLE" Name="lpm_enable" Type="List" Group="Power Parameters" Visible="true">  
+        <Condition Expression="VirtualMode = Device_Only" Diagnostic=""/>  	
+        <PossibleValue Value="ENABLE" Comment="Enabled"/>
+        <PossibleValue Value="DISABLE" Comment="Disabled"/>	
+    </RefParameter>	
+	
+    <RefParameter Comment="Battery Charging" DefaultValue="DISABLE" Name="battery_charging_enable" Type="List" Group="Power Parameters" Visible="true">
+        <Condition Expression="VirtualMode = Device_Only" Diagnostic=""/>
+        <PossibleValue Value="ENABLE" Comment="Enabled" Semaphore="SEM_BCD_ENABLED"/>
+        <PossibleValue Value="DISABLE" Comment="Disabled"/>	
+    </RefParameter>
+	
+    <RefParameter Comment="Battery charging" DefaultValue="DISABLE" Name="battery_charging_enable" Visible="false" Type="List">
+        <Condition Expression="VirtualMode = Device_Only" Diagnostic=""/>		
+        <PossibleValue Value="ENABLE" Comment="Enabled"/>
+        <PossibleValue Value="DISABLE" Comment="Disabled"/>	
+    </RefParameter>
+	
+    <RefParameter Comment="vbus_sensing_enable" DefaultValue="DISABLE" Name="vbus_sensing_enable" Group="Basic Parameters"  Type="List">			
+        <PossibleValue Value="ENABLE" Comment="Enabled"/>
+        <PossibleValue Value="DISABLE" Comment="Disabled"/>	
+    </RefParameter>
+  
+    <RefParameter Comment="Bulk double buffer" DefaultValue="DISABLE" Name="bulk_doublebuffer_enable" Group="EndPoint Parameters" Type="List">			
+        <PossibleValue Value="ENABLE" Comment="Enabled"/>
+        <PossibleValue Value="DISABLE" Comment="Disabled"/>	
+    </RefParameter>
+	
+    <RefParameter Comment="Iso single buffer" DefaultValue="DISABLE" Name="iso_singlebuffer_enable" Group="EndPoint Parameters" Type="List">			
+        <PossibleValue Value="ENABLE" Comment="Enabled"/>
+        <PossibleValue Value="DISABLE" Comment="Disabled"/>	
+    </RefParameter>
+  
+    <RefMode Name="Device" HalMode="PCD">
+        <ConfigForMode>PCD_Init_FS</ConfigForMode>
+        <Parameter Name="VirtualMode">		
+            <PossibleValue>Device_Only</PossibleValue>
+        </Parameter>	
+        <Parameter Name="dev_endpoints"/>	
+        <Parameter Name="DeviceSpeed"/>												
+        <Parameter Name="phy_itface">			
+            <PossibleValue>PCD_PHY_EMBEDDED</PossibleValue>
+        </Parameter>			
+        <Parameter Name="low_power_enable"/>
+        <Parameter Name="lpm_enable"/>
+        <Parameter Name="battery_charging_enable"/>
+        <Parameter Name="Sof_enable">
+            <Condition Expression="!USB_FS_SOF" Diagnostic=""/>
+        </Parameter>
+        <Parameter Name="bulk_doublebuffer_enable"/>
+        <Parameter Name="iso_singlebuffer_enable"/>
+    </RefMode>
+	
+    <RefMode Name="Host" HalMode="HCD">
+        <ConfigForMode>HCD_Init_FS</ConfigForMode>
+        <Parameter Name="VirtualMode">		
+            <PossibleValue>Host_Only</PossibleValue>
+        </Parameter>	
+        <Parameter Name="Sof_enable">
+            <Condition Expression="!USB_FS_SOF" Diagnostic=""/>
+        </Parameter>
+        <Parameter Name="Host_channels"/>	
+        <Parameter Name="DeviceSpeed"/>												
+        <Parameter Name="phy_itface">			
+            <PossibleValue>HCD_PHY_EMBEDDED</PossibleValue>
+        </Parameter>		
+        <Parameter Name="low_power_enable"/>	
+        <Parameter Name="bulk_doublebuffer_enable"/>
+        <Parameter Name="iso_singlebuffer_enable"/>	     
+    </RefMode>
+        
+    <!-- USB Full Speed in Device mode with SOF -->
+    <RefMode Name="Activate_SOF_FS" HalMode="">		
+        <Parameter Name="Sof_enable"/>								
+    </RefMode>
+        
+    <ModeLogicOperator Name="OR">
+        <Mode Name="Mode">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="Device" UserName="Device_Only">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="DM"/>
+                        <Signal Name="DP"/>
+                    </SignalLogicalOp>
+                    <Semaphore>MW_USB_MW_DEVICE</Semaphore>
+					<Semaphore>SEMAOoUSBOoOTGOoFSOoDEVICEOoFOROoUSBX</Semaphore>
+                </Mode>
+                <Mode Name="Host" UserName="Host_Only">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="DM"/>
+                        <Signal Name="DP"/>
+                    </SignalLogicalOp>
+                    <Semaphore>MW_USB_MW_HOST</Semaphore>
+					<Semaphore>SEMAOoUSBOoOTGOoFSOoHOSTOoFOROoUSBX</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
+		
+        <Mode Name="Activate_SOF">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="Activate_SOF_FS" UserName="Activate SOF">
+                    <SignalLogicalOp Name="AND">				
+                        <Signal Name="SOF"/>
+                    </SignalLogicalOp>
+                </Mode>			
+            </ModeLogicOperator>
+            <Semaphore>USB_FS_SOF</Semaphore>
+            <Condition Expression="MW_USB_MW_DEVICE | MW_USB_MW_HOST" Diagnostic="USB Mode must be selected first"/>			
+        </Mode>
+        <Mode Name="Activate_NOE" UserName="Activate NOE">
+            <ModeLogicOperator Name="OR">
+                <Mode Name="Activate_NOE">
+                    <SignalLogicalOp Name="AND">				
+                        <Signal Name="NOE"/>
+                    </SignalLogicalOp>	
+                    <Condition Expression="MW_USB_MW_DEVICE | MW_USB_MW_HOST" Diagnostic="USB Mode must be selected first"/>					
+                </Mode>				
+            </ModeLogicOperator>			
+        </Mode>		
+    </ModeLogicOperator>
+
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="DM"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="DP"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="SOF"/>	
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="NOE"/>
+	
+    <!-- Clock Semaphore for this IP. -->
+    <Semaphore>USBUsed_ForRCC</Semaphore>
+</IP>

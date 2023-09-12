@@ -22,7 +22,7 @@
 [#assign ipvar = IP]
 /* Includes ------------------------------------------------------------------*/
 #include "${name?lower_case}.h"
-[#if name=="ETH" && (F4_ETH_NoLWIP?? || F7_ETH_NoLWIP??)]
+[#if name=="ETH" && (F4_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || H5_ETH_NoLWIP??)]
 #include "string.h"
 [/#if]
 
@@ -110,7 +110,8 @@
 [@common.optincludeFile path=coreDir+"Inc" name="gfxmmu_lut.h"/]
 [/#if]
 [#-- WorkAround for Ticket 30863 --]
-[#if name=="ETH" && (H7_ETH_NoLWIP?? || F7_ETH_NoLWIP??)]
+[#if name=="ETH" && (H7_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || H5_ETH_NoLWIP??)]
+[#if !H5_ETH_NoLWIP??]
 #if defined ( __ICCARM__ ) /*!< IAR Compiler */
 
 #pragma location=[#if RxDescAddress??]${RxDescAddress}[#else]0x30040000[/#if]
@@ -129,7 +130,8 @@ ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT] __attribute__((section(".RxDecr
 ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT] __attribute__((section(".TxDecripSection")));   /* Ethernet Tx DMA Descriptors */
 
 #endif
-
+[/#if]
+ETH_BufferTypeDef Txbuffer[ETH_TX_DESC_CNT * 2U];
 ETH_TxPacketConfig TxConfig; 
 [/#if]
 [#if name=="ETH" && F4_ETH_NoLWIP??]
@@ -1120,24 +1122,23 @@ ETH_TxPacketConfig TxConfig;
 [#-- Section1: Create the void mx_<IpInstance>_<HalMode>_init() function for each ip instance --]
 [#compress]
 [#-- Global variables --]
+[#assign HandleDef = ""]
 [#if IP.variables?? && !LPBAM_AVAILABLE??]
 [#list IP.variables as variable]
-[#-- Tracker 276386 -- GetHandle Start --]
-[#--${variable.value}* MX_${variable.name?substring(1)?upper_case}_GetHandle(void) {--]
-[#--#treturn &${variable.name};--]
-[#--}--]
-[#-- Tracker 276386 -- GetHandle End --]
 [#if name=="TAMP" && SharedHandler?? && SharedHandler?contains(variable.name)]
 [#else]
 ${variable.value} ${variable.name};
+[#assign HandleDef= HandleDef+" " +variable.value+" "+ variable.name]
 [/#if]
-
 [/#list]
 [#-- Add global dma Handler --]
 [#list IP.configModelList as instanceData]
     [#if instanceData.dmaHandel??]
         [#list instanceData.dmaHandel as dHandle]
+         [#if ! HandleDef?contains(dHandle)]
             ${dHandle};
+            [#assign HandleDef= HandleDef+" " + dHandle]
+          [/#if]  
         [/#list]
     [/#if]
 [/#list]
@@ -1185,7 +1186,7 @@ ${variable.value} ${variable.name};
                [/#if]
            [/#list]
     [/#if]
-    [#if  !(instName?starts_with("GPDMA")) && !(instName?starts_with("LPDMA")) && instanceData.initServices?? && instanceData.initServices.dma?? && FamilyName=="STM32U5"]
+    [#if  !(instName?starts_with("GPDMA")) && !(instName?starts_with("LPDMA")) && instanceData.initServices?? && instanceData.initServices.dma?? && (FamilyName=="STM32U5" | FamilyName=="STM32H5")]
         [#assign service=instanceData.initServices.dma]
            [#list service as dmaConfig]
                 [#list dmaConfig.variables as variable] [#-- variables declaration --]

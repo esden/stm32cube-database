@@ -35,6 +35,7 @@ extern "C" {
 [#assign USBPD_DEVICE_APP_MEM_POOL_SIZE_VAL = "0"]
 [#assign TOUCHSENSING_APP_MEM_POOL_SIZE_Val = "0"]
 [#assign GUI_INTERFACE_APP_MEM_POOL_SIZE_VAL = "0"]
+[#assign STM32WPAN_APP_MEM_POOL_SIZE_Val = "0"]
 
 [#assign TX_ENABLED = "true"]
 [#assign FX_ENABLED = "false"]
@@ -44,6 +45,7 @@ extern "C" {
 [#assign USBPD_DEVICE_ENABLED = "false"]
 [#assign TOUCHSENSING_ENABLED = "false"]
 [#assign GUI_INTERFACE_ENABLED = "false"]
+[#assign STM32WPAN_ENABLED = "false"]
 [#compress]
 [#list SWIPdatas as SWIP]
 [#if SWIP.defines??]
@@ -71,6 +73,9 @@ extern "C" {
     [/#if]
     [#if name == "GUI_INTERFACE_ENABLED" && value == "true"]
       [#assign GUI_INTERFACE_ENABLED = value]
+    [/#if]
+  [#if name == "WPAN_ENABLED" && value == "true"]
+      [#assign STM32WPAN_ENABLED = value]
     [/#if]
 	
 	
@@ -101,6 +106,9 @@ extern "C" {
     [#if name.contains("GUI_INTERFACE_APP_MEM_POOL_SIZE")]
       [#assign GUI_INTERFACE_APP_MEM_POOL_SIZE_VAL = value]
     [/#if]
+  [#if name.contains("STM32WPAN_APP_MEM_POOL_SIZE")]
+	  [#assign STM32WPAN_APP_MEM_POOL_SIZE_VAL = value]
+	[/#if]
     [/#list]
 [/#if]
 [/#list]
@@ -152,6 +160,9 @@ extern "C" {
 [#if GUI_INTERFACE_ENABLED == "true" && GUI_INTERFACE_APP_MEM_POOL_SIZE_VAL != "valueNotSetted" ]
 #define GUI_INTERFACE_APP_MEM_POOL_SIZE              ${GUI_INTERFACE_APP_MEM_POOL_SIZE_VAL}
 [/#if]
+[#if STM32WPAN_ENABLED == "true" && STM32WPAN_APP_MEM_POOL_SIZE_VAL != "valueNotSetted"]
+#define STM32WPAN_APP_MEM_POOL_SIZE              ${STM32WPAN_APP_MEM_POOL_SIZE_VAL}
+[/#if]
 
 [#if packs??]
 [#list packs as variables]
@@ -192,6 +203,10 @@ extern "C" {
 
 [#if GUI_INTERFACE_ENABLED == "true"]
 /* #define GUI_INTERFACE_APP_MEM_POOL_SIZE               <Add the GUI_INTERFACE memory pool Size> */
+[/#if]
+
+[#if STM32WPAN_ENABLED == "true"]
+/* #define STM32WPAN_APP_MEM_POOL_SIZE               <Add the STM32WPAN memory pool Size> */
 [/#if]
 
 [/#if]

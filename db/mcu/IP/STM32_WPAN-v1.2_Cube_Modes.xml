@@ -1003,7 +1003,12 @@
     <RefParameter Name="CFG_BLE_NUM_LINK" Comment="CFG_BLE_NUM_LINK" DefaultValue="2" Type="Integer" Min="1" Max="8" TabName="Configuration" Group="Application parameters" Visible="false">
         <Description>Maximum number of simultaneous connections that the device will support</Description>
     </RefParameter>
-
+    <RefParameter Name="CFG_BLE_NUM_GATT_SERVICES" Comment="CFG_BLE_NUM_GATT_SERVICES" DefaultValue="4" Min="2" Type="Integer" TabName="Configuration" Group="Application parameters">
+        <Condition Diagnostic="" Expression="S_BLE_HOST &amp; DIE494"/>
+        <Description>Maximum number of Services that can be stored in the GATT database
+		&lt;br&gt;Maximum value depends on Gatt database size allocated on CPU2
+		&lt;br&gt;Note that the GAP and GATT services are automatically added so this parameter should be 2 plus the number of user services</Description>
+    </RefParameter>
     <RefParameter Name="CFG_BLE_NUM_GATT_SERVICES" Comment="CFG_BLE_NUM_GATT_SERVICES" DefaultValue="8" Min="2" Type="Integer" TabName="Configuration" Group="Application parameters">
         <Condition Diagnostic="" Expression="S_BLE_HOST"/>
         <Description>Maximum number of Services that can be stored in the GATT database
@@ -1015,7 +1020,13 @@
 		&lt;br&gt;Maximum value depends on Gatt database size allocated on CPU2
 		&lt;br&gt;Note that the GAP and GATT services are automatically added so this parameter should be 2 plus the number of user services</Description>
     </RefParameter>
-
+     <RefParameter Name="CFG_BLE_NUM_GATT_ATTRIBUTES" Comment="CFG_BLE_NUM_GATT_ATTRIBUTES" DefaultValue="30" Min="9" Type="Integer" TabName="Configuration" Group="Application parameters">
+        <Condition Diagnostic="" Expression="S_BLE_HOST &amp; DIE494"/>
+        <Description>Maximum number of Attributes (i.e. the number of characteristic + the number of characteristic values + the number of descriptors, excluding the services)		that can be stored in the GATT database.
+		&lt;br&gt;Maximum value depends on Gatt database size allocated on CPU2
+		&lt;br&gt;Note that certain characteristics and relative descriptors are added automatically during device initialization
+		</Description>
+    </RefParameter>
     <RefParameter Name="CFG_BLE_NUM_GATT_ATTRIBUTES" Comment="CFG_BLE_NUM_GATT_ATTRIBUTES" DefaultValue="68" Min="9" Type="Integer" TabName="Configuration" Group="Application parameters">
         <Condition Diagnostic="" Expression="S_BLE_HOST"/>
         <Description>Maximum number of Attributes (i.e. the number of characteristic + the number of characteristic values + the number of descriptors, excluding the services)		that can be stored in the GATT database.
@@ -1030,14 +1041,25 @@
 		</Description>
     </RefParameter>
 
-    <RefParameter Name="CFG_BLE_MAX_ATT_MTU" Comment="CFG_BLE_MAX_ATT_MTU" DefaultValue="156" Min="27" Max="300" Type="Integer" TabName="Configuration" Group="Application parameters">
+    <RefParameter Name="CFG_BLE_MAX_ATT_MTU" Comment="CFG_BLE_MAX_ATT_MTU" DefaultValue="156" Min="23" Max="300" Type="Integer" TabName="Configuration" Group="Application parameters">
         <Condition Diagnostic="" Expression="S_BLE_HOST"/>
         <Description>Maximum supported ATT_MTU size</Description>
     </RefParameter>
-    <RefParameter Name="CFG_BLE_MAX_ATT_MTU" Comment="CFG_BLE_MAX_ATT_MTU" DefaultValue="156" Min="27" Max="300" Type="Integer" TabName="Configuration" Group="Application parameters" Visible="false">
+    <RefParameter Name="CFG_BLE_MAX_ATT_MTU" Comment="CFG_BLE_MAX_ATT_MTU" DefaultValue="156" Min="23" Max="300" Type="Integer" TabName="Configuration" Group="Application parameters" Visible="false">
         <Description>Maximum supported ATT_MTU size</Description>
     </RefParameter>
-
+        <RefParameter Name="CFG_BLE_ATT_VALUE_ARRAY_SIZE" Comment="CFG_BLE_ATT_VALUE_ARRAY_SIZE" DefaultValue="1290" Min="0" Max="65535" Type="Integer" TabName="Configuration" Group="Application parameters">
+        <Condition Diagnostic="" Expression="S_BLE_HOST &amp; DIE494"/>
+        <Description>Size of the storage area for Attribute values
+		&lt;br&gt;This value depends on the number of attributes used by application. In particular the sum of the following quantities (in octets) should be made for each attribute:&lt;br&gt;
+		- attribute value length&lt;br&gt;
+	    - 5, if UUID is 16 bit; 19, if UUID is 128 bit&lt;br&gt;
+		- 2, if server configuration descriptor is used&lt;br&gt;
+		- 2*DTM_NUM_LINK, if client configuration descriptor is used&lt;br&gt;
+		- 2, if extended properties is used&lt;br&gt;
+		The total amount of memory needed is the sum of the above quantities for each attribute.&lt;br&gt;
+		This parameter is ignored by the CPU2 when CFG_BLE_OPTIONS is set to 1</Description>
+    </RefParameter>
     <RefParameter Name="CFG_BLE_ATT_VALUE_ARRAY_SIZE" Comment="CFG_BLE_ATT_VALUE_ARRAY_SIZE" DefaultValue="1344" Min="0" Max="65535" Type="Integer" TabName="Configuration" Group="Application parameters">
         <Condition Diagnostic="" Expression="S_BLE_HOST"/>
         <Description>Size of the storage area for Attribute values
@@ -2539,7 +2561,7 @@
         <PossibleValue Value="GAP_STATIC_RANDOM_ADDR" Comment="GAP_STATIC_RANDOM_ADDR" Semaphore="Semaphore_GAP_STATIC_RANDOM_ADDR"/>
     </RefParameter>
     <RefParameter Name="CFG_IDENTITY_ADDRESS" Comment="CFG_IDENTITY_ADDRESS" DefaultValue="GAP_PUBLIC_ADDR" Type="list" TabName="Configuration" Group="Application parameters">
-        <Condition Diagnostic="" Expression="Semaphore_CUSTOM_P2P_SERVER | Semaphore_BT_SIG_BLOOD_PRESSURE_SENSOR | Semaphore_BT_SIG_HEART_RATE_SENSOR | Semaphore_BT_SIG_HEALTH_THERMOMETER_SENSOR | Semaphore_BLE_ROUTER_PROFILE"/>
+        <Condition Diagnostic="" Expression="Semaphore_CUSTOM_P2P_SERVER | Semaphore_BT_SIG_BLOOD_PRESSURE_SENSOR | Semaphore_BT_SIG_HEART_RATE_SENSOR | Semaphore_BT_SIG_HEALTH_THERMOMETER_SENSOR | Semaphore_BLE_ROUTER_PROFILE|Semaphore_BLE_CLIENT_PROFILE"/>
         <Description></Description>
         <PossibleValue Value="GAP_PUBLIC_ADDR" Comment="GAP_PUBLIC_ADDR" Semaphore="Semaphore_GAP_PUBLIC_ADDR"/>
         <PossibleValue Value="GAP_STATIC_RANDOM_ADDR" Comment="GAP_STATIC_RANDOM_ADDR" Semaphore="Semaphore_GAP_STATIC_RANDOM_ADDR"/>
@@ -2557,7 +2579,7 @@
         <PossibleValue Value="PRIVACY_ENABLED" Comment="Enabled" Semaphore="Semaphore_CFG_PRIVACY"/>
     </RefParameter>
     <RefParameter Name="CFG_PRIVACY" Comment="CFG_PRIVACY" DefaultValue="PRIVACY_DISABLED" Type="list" TabName="Configuration" Group="Application parameters">
-        <Condition Diagnostic="" Expression="Semaphore_CUSTOM_P2P_SERVER | Semaphore_BT_SIG_BLOOD_PRESSURE_SENSOR | Semaphore_BT_SIG_HEART_RATE_SENSOR | Semaphore_BT_SIG_HEALTH_THERMOMETER_SENSOR | Semaphore_BLE_ROUTER_PROFILE"/>
+        <Condition Diagnostic="" Expression="Semaphore_CUSTOM_P2P_SERVER | Semaphore_BT_SIG_BLOOD_PRESSURE_SENSOR | Semaphore_BT_SIG_HEART_RATE_SENSOR | Semaphore_BT_SIG_HEALTH_THERMOMETER_SENSOR | Semaphore_BLE_ROUTER_PROFILE|Semaphore_BLE_CLIENT_PROFILE"/>
         <Description></Description>
         <PossibleValue Value="PRIVACY_DISABLED" Comment="Disabled" />
         <PossibleValue Value="PRIVACY_ENABLED" Comment="Enabled" Semaphore="Semaphore_CFG_PRIVACY"/>
@@ -2606,7 +2628,7 @@
         <!-- <PossibleValue Value="0x01" Comment="GAP_STATIC_RANDOM_ADDR"/> -->
     <!-- </RefParameter> -->
     <RefParameter Name="BLE_ADDR_TYPE" Comment="CFG_BLE_ADDR_TYPE" DefaultValue="GAP_RESOLVABLE_PRIVATE_ADDR" Type="list" TabName="Configuration" Group="Application parameters">
-        <Condition Diagnostic="" Expression="(Semaphore_CUSTOM_P2P_SERVER | Semaphore_BT_SIG_BLOOD_PRESSURE_SENSOR | Semaphore_BT_SIG_HEART_RATE_SENSOR | Semaphore_BT_SIG_HEALTH_THERMOMETER_SENSOR | Semaphore_BLE_ROUTER_PROFILE) &amp; Semaphore_CFG_PRIVACY"/>
+        <Condition Diagnostic="" Expression="(Semaphore_CUSTOM_P2P_SERVER | Semaphore_BT_SIG_BLOOD_PRESSURE_SENSOR | Semaphore_BT_SIG_HEART_RATE_SENSOR | Semaphore_BT_SIG_HEALTH_THERMOMETER_SENSOR | Semaphore_BLE_ROUTER_PROFILE| Semaphore_BLE_CLIENT_PROFILE) &amp; Semaphore_CFG_PRIVACY"/>
         <Description>List of advertising types, can be:
         &lt;br&gt; - Resolvable private address (GAP_RESOLVABLE_PRIVATE_ADDR 2)
         &lt;br&gt; - Non resolvable private address(GAP_NON_RESOLVABLE_PRIVATE_ADDR 3)</Description>

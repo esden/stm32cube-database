@@ -20,7 +20,15 @@
         <PossibleValue Comment="StartECC" Value="START_ECC"/>
         <PossibleValue Comment="StopECC" Value="STOP_ECC"/>
     </RefParameter>
-    
+   	<RefParameter Comment="Error code correction (ECC)" DefaultValue="ECC_DISABLE" Name="ErrorCodeCorrectionSRAM1" Type="list">
+		<Condition Expression="DIE474" Diagnostic="" />
+        <PossibleValue Comment="Disable" Value="ECC_DISABLE"/>
+        <PossibleValue Comment="StartECC" Value="START_ECC"/>
+        <PossibleValue Comment="StopECC" Value="STOP_ECC"/>
+    </RefParameter>
+   	<RefParameter Comment="Error code correction (ECC)" DefaultValue="null" Name="ErrorCodeCorrectionSRAM1" Type="list" Visible="false">
+    </RefParameter>
+
     
     <!-- Write Protection -->
     <!-- I Removed the Write Protection parameter (according to Intropack Owner this parameter should not be initialized, let user define it.) -->
@@ -43,6 +51,7 @@
     
     <!-- Read Access Latency (Wait State)-->
     <RefParameter Comment="Wait State" DefaultValue="WS_DISABLE" Name="WaitState" Type="list">
+        <Condition Diagnostic="" Expression="STM32U5"/>
         <PossibleValue Comment="Disable" Value="WS_DISABLE"/>
         <PossibleValue Comment="0" Value="RAMCFG_WAITSTATE_0"/>
         <PossibleValue Comment="1" Value="RAMCFG_WAITSTATE_1"/>
@@ -52,6 +61,8 @@
         <PossibleValue Comment="5" Value="RAMCFG_WAITSTATE_5"/>
         <PossibleValue Comment="6" Value="RAMCFG_WAITSTATE_6"/>
         <PossibleValue Comment="7" Value="RAMCFG_WAITSTATE_7"/>
+    </RefParameter>
+    <RefParameter Comment="Wait State" DefaultValue="null" Name="WaitState" Type="list" Visible="false">
     </RefParameter>
     
     
@@ -69,7 +80,8 @@
         <Parameter Name="Instance">
             <PossibleValue>RAMCFG_SRAM1</PossibleValue>
 	</Parameter>
-        <Parameter Name="HardwareErase"/>
+		 <Parameter Name="HardwareErase"/>
+		<Parameter Name="ErrorCodeCorrectionSRAM1"/>
         <Parameter Name="WaitState"/>	
     </RefMode>
     
@@ -149,7 +161,7 @@
                     </ModeLogicOperator>					
 		</Mode>                              							
 										
-		<Mode Name="RAMCFG3_Activate" UserName="RAMCFG SRAM3">
+		<Mode Name="RAMCFG3_Activate" UserName="RAMCFG SRAM3" RemoveCondition="DIE474 | DIE455">
                     <ModeLogicOperator Name="XOR">
 			<Mode Name="RAMCFG3_Activate" UserName="Activated">
                             <SignalLogicalOp Name="AND">
@@ -159,7 +171,7 @@
                     </ModeLogicOperator>					
 		</Mode> 
                 						
-		<Mode Name="RAMCFG4_Activate" UserName="RAMCFG SRAM4">
+		<Mode Name="RAMCFG4_Activate" UserName="RAMCFG SRAM4" RemoveCondition="STM32H5">
                     <ModeLogicOperator Name="XOR">
 			<Mode Name="RAMCFG4_Activate" UserName="Activated">
                             <SignalLogicalOp Name="AND">
@@ -169,7 +181,7 @@
                     </ModeLogicOperator>					
 		</Mode>
                 
-                <Mode Name="RAMCFG5_Activate" UserName="RAMCFG SRAM5" RemoveCondition="DIE482">
+                <Mode Name="RAMCFG5_Activate" UserName="RAMCFG SRAM5" RemoveCondition="STM32H5 | DIE482 | DIE455">
                     <ModeLogicOperator Name="XOR">
 			<Mode Name="RAMCFG5_Activate" UserName="Activated">
                             <SignalLogicalOp Name="AND">

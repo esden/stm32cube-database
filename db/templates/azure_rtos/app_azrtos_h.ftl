@@ -20,6 +20,7 @@
 [#assign USBPD_DEVICE_ENABLED = "false"]
 [#assign TOUCHSENSING_ENABLED = "false"]
 [#assign GUI_INTERFACE_ENABLED = "false"]
+[#assign STM32WPAN_ENABLED = "false"]
 [#compress]
 [#list SWIPdatas as SWIP]
 [#if SWIP.defines??]
@@ -47,6 +48,9 @@
     [/#if]
     [#if name == "GUI_INTERFACE_ENABLED" && value == "true"]
       [#assign GUI_INTERFACE_ENABLED = value]
+    [/#if]
+    [#if name == "WPAN_ENABLED" && value == "true"]
+      [#assign STM32WPAN_ENABLED = value]
     [/#if]
 	
     [/#list]
@@ -91,6 +95,9 @@
 [/#if]
 [#if GUI_INTERFACE_ENABLED == "true"]
 #include "gui_api.h"
+[/#if]
+[#if STM32WPAN_ENABLED == "true"]
+#include "app_entry.h"
 [/#if]
 
 /* Private includes ----------------------------------------------------------*/

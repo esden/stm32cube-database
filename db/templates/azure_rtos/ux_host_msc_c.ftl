@@ -12,7 +12,7 @@
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
-#include "app_usbx_host.h"
+#include "ux_host_msc.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -41,7 +41,7 @@
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN PFP */
-void  msc_process_thread_entry(ULONG arg);
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -50,15 +50,5 @@ void  msc_process_thread_entry(ULONG arg);
 /* USER CODE END 0 */
 
 /* USER CODE BEGIN 1 */
-
-/**
-  * @brief  msc_process_thread_entry .
-  * @param  ULONG arg
-  * @retval Void
-  */
-void  msc_process_thread_entry(ULONG arg)
-{
-
-}
 
 /* USER CODE END 1 */

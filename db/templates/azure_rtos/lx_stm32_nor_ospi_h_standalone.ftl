@@ -146,8 +146,6 @@ extern __IO UINT ospi_tx_cplt;
 
 /* Define how to notify about Read completion operation */
 
-/* USER CODE BEGIN LX_STM32_OSPI_READ_CPLT_NOTIFY */
-
 [#if glue_api == "DMA_API" && TRANSFER_NOTIFICATION != "Custom"]
 /* USER CODE BEGIN LX_STM32_OSPI_READ_CPLT_NOTIFY */
 
@@ -200,7 +198,6 @@ extern __IO UINT ospi_tx_cplt;
 
 
 /* Define how to notify about write completion operation */
-/* USER CODE BEGIN LX_STM32_OSPI_WRITE_CPLT_NOTIFY */
 
 [#if glue_api == "DMA_API" && TRANSFER_NOTIFICATION != "Custom"]
 /* USER CODE BEGIN LX_STM32_OSPI_WRITE_CPLT_NOTIFY */

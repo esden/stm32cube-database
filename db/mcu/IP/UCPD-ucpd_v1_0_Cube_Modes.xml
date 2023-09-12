@@ -63,8 +63,6 @@
                         <Signal Name="CC2"/>
                     </SignalLogicalOp>
                     <Semaphore>Source$IpInstance</Semaphore>
-                    <Semaphore>UCPD_Source</Semaphore>
-                    <Semaphore>UCPD_Mode_Selected</Semaphore>
                     <Condition Diagnostic="Board STM32G081B_EVAL only allow Sink on port 2" Expression="!(STM32G081B_EVAL &amp; $Index=2)"/>
                 </Mode>
                 <!-- Source_NoCC2 will be used for all MCUs where CC1 is present and CC2 is not present -->
@@ -73,8 +71,6 @@
                         <Signal Name="CC1"/>
                     </SignalLogicalOp>
                     <Semaphore>Source$IpInstance</Semaphore>
-                    <Semaphore>UCPD_Source</Semaphore>
-                    <Semaphore>UCPD_Mode_Selected</Semaphore>
                     <Condition Diagnostic="Board STM32G081B_EVAL only allow Sink on port 2" Expression="!(STM32G081B_EVAL &amp; $Index=2)"/>
                 </Mode>
                 <!-- Sink_AllSignals will be used for all MCUs where CC1 and CC2 are present -->
@@ -84,8 +80,6 @@
                         <Signal Name="CC2"/>
                     </SignalLogicalOp>
                     <Semaphore>Sink$IpInstance</Semaphore>
-                    <Semaphore>UCPD_Sink</Semaphore>
-                    <Semaphore>UCPD_Mode_Selected</Semaphore>
                 </Mode>
                 <!-- Sink_NoCC2 will be used for all MCUs where CC1 is present and CC2 is not present -->
                 <Mode UserName="Sink" Name="Sink_NoCC2" RemoveCondition="$modeexist_Sink_AllSignals">
@@ -93,8 +87,6 @@
                         <Signal Name="CC1"/>
                     </SignalLogicalOp>
                     <Semaphore>Sink$IpInstance</Semaphore>
-                    <Semaphore>UCPD_Sink</Semaphore>
-                    <Semaphore>UCPD_Mode_Selected</Semaphore>
                 </Mode>
                 <!-- Dual Role_AllSignals will be used for all MCUs where CC1 and CC2 are present -->
                 <Mode UserName="Dual Role" Name="Dual_Role_AllSignals">
@@ -103,8 +95,6 @@
                         <Signal Name="CC2"/>
                     </SignalLogicalOp>
                     <Semaphore>DualRole$IpInstance</Semaphore>
-                    <Semaphore>UCPD_DualRole</Semaphore>
-                    <Semaphore>UCPD_Mode_Selected</Semaphore>
                     <Condition Diagnostic="Board STM32G081B_EVAL only allow Sink on port 2" Expression="!(STM32G081B_EVAL &amp; $Index=2)"/>
                 </Mode>
                 <!-- Dual Role_NoCC2 will be used for all MCUs where CC1 is present and CC2 is not present -->
@@ -113,15 +103,14 @@
                         <Signal Name="CC1"/>
                     </SignalLogicalOp>
                     <Semaphore>DualRole$IpInstance</Semaphore>
-                    <Semaphore>UCPD_DualRole</Semaphore>
-                    <Semaphore>UCPD_Mode_Selected</Semaphore>
                     <Condition Diagnostic="Board STM32G081B_EVAL only allow Sink on port 2" Expression="!(STM32G081B_EVAL &amp; $Index=2)"/>
                 </Mode>
             </ModeLogicOperator>
             <Semaphore>S_UCPD_Mode$IpInstance</Semaphore>
         </Mode>
+        
         <Mode Name="UCPD_DeadBatteryMode" UserName="Dead Battery Signals">
-            <ModeLogicOperator Name="NONE">
+            <ModeLogicOperator Name="XOR">
                 <!-- DeadBattery will be used for all MCUs where DBCC1 and DBCC2 are present -->
                 <Mode UserName="Dead Battery Signals enabled" Name="EnableDeadBattery">
                     <SignalLogicalOp Name="AND">
@@ -130,20 +119,34 @@
                     </SignalLogicalOp>
                     <Semaphore>EnabledDeadBattery$IpInstance</Semaphore>
                 </Mode>
+                <!-- DeadBattery will be used for all MCUs where DB1 and DB2 are present -->
+                <Mode UserName="Dead Battery Signals enabled" Name="EnableDeadBattery">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="DB1"/>
+                        <Signal Name="DB2"/>
+                    </SignalLogicalOp>
+                    <Semaphore>EnabledDeadBattery$IpInstance</Semaphore>
+                </Mode>
             </ModeLogicOperator>
             <Condition Diagnostic="Active only when UCPD Mode selected" Expression="(Source$IpInstance | Sink$IpInstance | DualRole$IpInstance)"/>
         </Mode>
         <Mode Name="UCPD_FRSTX" UserName="Fast Role Swap">
             <ModeLogicOperator Name="XOR">
+                <Mode UserName="Fast Role Swap TX" Name="FRSTX" RemoveCondition="!$modeexist_Dual_Role_AllSignals">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="FRSTX"/>
+                    </SignalLogicalOp>
+                    <Condition Diagnostic="The instance must be activated in dual-role mode" Expression="DualRole$IpInstance"/>
+                </Mode>
                 <!-- CC2 does not exists -->
-                <Mode UserName="FRSTX" Name="FRSTX_NoCC2" RemoveCondition="$modeexist_Dual_Role_AllSignals">
+                <Mode UserName="Fast Role Swap TX" Name="FRSTX_NoCC2" RemoveCondition="$modeexist_Dual_Role_AllSignals">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="FRSTX1"/>
                     </SignalLogicalOp>
                     <Condition Diagnostic="The instance must be activated in dual-role mode" Expression="DualRole$IpInstance"/>
                 </Mode>
                 <!-- CC1 & CC2 exists -->
-                <Mode UserName="FRSTX" Name="FRSTX_CC2" RemoveCondition="!$modeexist_Dual_Role_AllSignals">
+                <Mode UserName="Fast Role Swap TX" Name="FRSTX_CC2" RemoveCondition="!$modeexist_Dual_Role_AllSignals">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="FRSTX1"/>
                         <Signal Name="FRSTX2"/>
@@ -160,8 +163,11 @@
     <RefSignal IOMode="System" Name="DBCC2"/>
     <RefSignal IOMode="System" Name="FRSTX1"/>
     <RefSignal IOMode="System" Name="FRSTX2"/>
+    <RefSignal IOMode="System" Name="DB1"/>
+    <RefSignal IOMode="System" Name="DB2"/>
+    <RefSignal IOMode="System" Name="FRSTX"/>
 
     <!-- UCPD Semaphore for this IP. -->
-    <Semaphore>UCPD_Used$context</Semaphore>
+    <Semaphore>UCPD_Used</Semaphore>
 
 </IP>

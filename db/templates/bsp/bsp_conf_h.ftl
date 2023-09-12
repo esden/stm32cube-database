@@ -95,7 +95,7 @@
 #define BSP_BUTTON_SWx_IT_PRIORITY         BSP_BUTTON_USER_IT_PRIORITY
 [/#if]
 
-/* I2C1 Frequeny in Hz  */
+/* I2C1 Frequency in Hz  */
 #define BUS_I2C1_FREQUENCY                  100000U /* Frequency of I2C1 = 100 KHz*/
 
 /* SPI1 Baud rate in bps  */

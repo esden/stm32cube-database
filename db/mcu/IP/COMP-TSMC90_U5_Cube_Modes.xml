@@ -53,7 +53,11 @@
 		<Condition Diagnostic="" Expression="(PA2_COMP1_INP  &amp; ($IpNumber=1))"/>
 		<PossibleValue Comment="" Value="COMP_INPUT_PLUS_IO3"/>
 	</RefParameter>
+     <RefParameter Comment="Window Mode" DefaultValue="__NULL" Group="Pinout Parameters" Name="WindowMode" Type="list" Visible="true">
+		<Condition Expression="DIE455" Diagnostic="" />
+        <PossibleValue Comment="Window mode disabled (Plus input of comparator 1 connected to PC5/PB2) " Value="__NULL"/>
 
+	</RefParameter>
 	<RefParameter Comment="Window Mode" DefaultValue="COMP_WINDOWMODE_DISABLE" Group="Pinout Parameters" Name="WindowMode" Type="list" Visible="false">
             <PossibleValue Comment="Window mode disabled (Plus input of comparator 1 connected to PC5/PB2) " Value="COMP_WINDOWMODE_DISABLE"/>
             <PossibleValue Comment="Window mode enabled: Plus input of comparator 1 shorted with Plus input of comparator 2 " Value="COMP_WINDOWMODE_COMP1_INPUT_PLUS_COMMON"/>
@@ -110,12 +114,20 @@
         <PossibleValue Comment="COMP output on GPIO is inverted " Value="COMP_OUTPUTPOL_INVERTED"/>
     </RefParameter>
 
+    <RefParameter Comment="Window Output" DefaultValue="__NULL" Group="Output Configuration" Name="WindowOutput" Type="list" Visible="false">
+         <Condition Diagnostic="" Expression="DIE455"/>
+        <PossibleValue Comment="Comparator output is indicating its own state" Value="__NULL" Semaphore="Semaphore_$IpInstance_EACH_COMP"/>
+    </RefParameter>
+
     <RefParameter Comment="Window Output" DefaultValue="COMP_WINDOWOUTPUT_EACH_COMP" Group="Output Configuration" Name="WindowOutput" Type="list">
         <PossibleValue Comment="Comparator output is indicating its own state" Value="COMP_WINDOWOUTPUT_EACH_COMP" Semaphore="Semaphore_$IpInstance_EACH_COMP"/>
         <PossibleValue Comment="COMP1 output is indicating global window mode state: COMP1 XOR COMP2" Value="COMP_WINDOWOUTPUT_COMP1" Semaphore="Semaphore_COMP1"/>
         <PossibleValue Comment="COMP2 output is indicating global window mode state: COMP1 XOR COMP2" Value="COMP_WINDOWOUTPUT_COMP2" Semaphore="Semaphore_COMP2"/>
     </RefParameter>
-
+<RefParameter Comment="Window Output" DefaultValue="COMP_WINDOWOUTPUT_EACH_COMP" Group="Output Configuration" Name="WindowOutput_forcodegen" Type="list" Visible="false">
+	<Condition Diagnostic="" Expression="((Semaphore_$IpInstance_EACH_COMP)&amp;(DIE455))"/>
+        <PossibleValue Comment="Comparator output is indicating its own state" Value="__NULL"/>
+    </RefParameter>
     <RefParameter Comment="Window Output" DefaultValue="COMP_WINDOWOUTPUT_EACH_COMP" Group="Output Configuration" Name="WindowOutput_forcodegen" Type="list" Visible="false">
 	<Condition Diagnostic="" Expression="Semaphore_$IpInstance_EACH_COMP"/>
         <PossibleValue Comment="Comparator output is indicating its own state" Value="COMP_WINDOWOUTPUT_EACH_COMP"/>
@@ -241,13 +253,24 @@
 	                                <Semaphore>Semaphore_$IpInstance_Enable</Semaphore>
 				</Mode>
 			
-				<Mode Name="WindowMode"  UserName="Window Mode">
+				<Mode Name="WindowMode"  UserName="Window Mode" RemoveCondition="DIE455">
+                     
 					<SignalLogicalOp Name="AND">
 						<Signal Name="VS_WindowMode"/>
 					</SignalLogicalOp>
 	                                <Semaphore>Semaphore_$IpInstance_Enable</Semaphore>
 	                                <Semaphore>Semaphore_WindowMode_$IpInstance_Enable</Semaphore>
 					<Condition Diagnostic="Need to have an INP (External Input [+]) on the other Comparator" Expression="(($IpNumber=2) &amp; COMP1_ExternalInputPlus)|(($IpNumber=1) &amp; COMP2_ExternalInputPlus) |(($IpNumber=3) &amp; (COMP2_ExternalInputPlus|Semaphore_WindowMode_COMP2_Enable))"/>
+				</Mode>
+         
+                <Mode Name="WindowMode"  UserName="Window Mode" RemoveCondition="!DIE455">
+                     
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VS_WindowMode"/>
+					</SignalLogicalOp>
+	                                <Semaphore>Semaphore_$IpInstance_Enable</Semaphore>
+	                                <Semaphore>Semaphore_WindowMode_$IpInstance_Enable</Semaphore>
+					<Condition Diagnostic="Window Mode is not available as there is only a single COMP" Expression="1=0"/>
 				</Mode>
 			</ModeLogicOperator>
 			<Semaphore>$IpInstance_InputPlus</Semaphore>

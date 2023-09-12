@@ -22,7 +22,9 @@
     <RefParameter Name="DESCRIPTOR_NAME_PWM" Comment="name of the descriptor"   DefaultValue="descriptorx_LPTIM_PWM"  Type="StringRW" >
     </RefParameter>
      <RefParameter Name="DESCRIPTOR_NAME_UE" Comment="name of the descriptor"   DefaultValue="descriptorx_LPTIM_UE"  Type="StringRW" >
-    </RefParameter>    
+    </RefParameter> 
+     <RefParameter Name="DESCRIPTOR_NAME_GETCOUNTER" Comment="name of the descriptor"   DefaultValue="descriptorx_LPTIM_GETCOUNTER"  Type="StringRW" >
+    </RefParameter>   
      
 
   <!-- tempory parameters to be replaced by names provided by UI/lpbam service-->
@@ -66,6 +68,14 @@
         <PossibleValue Comment="Data" Value="LPBAM_LPTIM_IC_FULLQ_DATA_NODE"/>
     </RefParameter>
  <!-- parameter for circular Mode management for Mode IC-->
+ 
+  <!-- parameter for circular Mode management for Mode GC-->
+    <RefParameter Comment="Circular Node for GETCOUNTER" DefaultValue="__NULL" Name="CircularNode_GETCOUNTER" Type="list" Group="GetCounter" Visible="false">
+        <Description>description</Description>
+        <PossibleValue Comment="DISABLE" Value="__NULL"/>
+        <PossibleValue Comment="Configuration Node" Value="LPBAM_LPTIM_GETCOUNTER_FULLQ_CONFIG_NODE"/>
+    </RefParameter>
+ <!-- parameter for circular Mode management for Mode GC-->
 
 
 <RefParameter Name="MYCHANNEL_START" Comment="Channel"  DefaultValue="CHANNEL1"  Type="list" Group="Start">
@@ -108,7 +118,7 @@
         <PossibleValue Comment="LPTIM3 CH1" Value="LPBAM_LPDMA1_TRIGGER_LPTIM3_CH1" />
         <PossibleValue Comment="LPTIM4 OUT" Value="LPBAM_LPDMA1_TRIGGER_LPTIM4_OUT" />
         <PossibleValue Comment="COMP1 OUT" Value="LPBAM_LPDMA1_TRIGGER_COMP1_OUT"  />
-        <PossibleValue Comment="COMP2 OUT" Value="LPBAM_LPDMA1_TRIGGER_COMP2_OUT"  />
+        <PossibleValue Action="Remove" Comment="COMP2 OUT" Value="LPBAM_LPDMA1_TRIGGER_COMP2_OUT" Condition="DIE455"/>
         <PossibleValue Comment="RTC ALRA TRG" Value="LPBAM_LPDMA1_TRIGGER_RTC_ALRA_TRG" />
         <PossibleValue Comment="RTC ALRB TRG" Value="LPBAM_LPDMA1_TRIGGER_RTC_ALRB_TRG" />
         <PossibleValue Comment="RTC WUT TRG" Value="LPBAM_LPDMA1_TRIGGER_RTC_WUT_TRG" />
@@ -126,14 +136,16 @@
     </RefParameter>
 
 
-     <RefParameter Comment="Node on which the trigger is applied (not visible)" DefaultValue="NONE" Name="NodeLevel" Type="list"  Visible="false" Group="Trigger Configuration">
+    <RefParameter Comment="Node on which the trigger is applied (not visible)" DefaultValue="NONE" Name="NodeLevel" Type="list"  Visible="false" Group="Trigger Configuration">
         <Description>description</Description>
-         <PossibleValue Comment="NONE" Value="NONE"/>
-         <PossibleValue Comment="Config Node" Value="LPBAM_LPTIM_PWM_FULLQ_CONFIG_NODE"/> <!-- ADV_LPBAM_LPTIM_PWM_SetFullQ-->
-         <PossibleValue Comment="Config Node" Value="LPBAM_LPTIM_UE_FULLQ_CONFIG_NODE"/> <!-- ADV_LPBAM_LPTIM_UE_SetFullQ-->
-         <PossibleValue Comment="Config Node" Value="LPBAM_LPTIM_START_FULLQ_CONFIG_NODE"/> <!-- ADV_LPBAM_LPTIM_Start_SetFullQ-->
-         <PossibleValue Comment="Config Node" Value="LPBAM_LPTIM_STOP_FULLQ_CONFIG_NODE"/> <!-- ADV_LPBAM_LPTIM_Stop_SetFullQ-->
-     </RefParameter> 
+        <PossibleValue Comment="NONE" Value="NONE"/>
+        <PossibleValue Comment="Config Node" Value="LPBAM_LPTIM_PWM_FULLQ_CONFIG_NODE"/> <!-- ADV_LPBAM_LPTIM_PWM_SetFullQ-->
+        <PossibleValue Comment="Config Node" Value="LPBAM_LPTIM_UE_FULLQ_CONFIG_NODE"/> <!-- ADV_LPBAM_LPTIM_UE_SetFullQ-->
+        <PossibleValue Comment="Config Node" Value="LPBAM_LPTIM_START_FULLQ_CONFIG_NODE"/> <!-- ADV_LPBAM_LPTIM_Start_SetFullQ-->
+        <PossibleValue Comment="Config Node" Value="LPBAM_LPTIM_STOP_FULLQ_CONFIG_NODE"/> <!-- ADV_LPBAM_LPTIM_Stop_SetFullQ-->
+        <PossibleValue Comment="Config Node" Value="LPBAM_LPTIM_GETCOUNTER_FULLQ_CONFIG_NODE"/> <!-- ADV_LPBAM_LPTIM_GETCOUNTER_SetFullQ-->
+      
+    </RefParameter> 
 
 
 <!-- trigger end -->
@@ -305,9 +317,6 @@
 
 
 <!-- data config IC DATA-->
- 
-
-
 <!--
 /**
   * @brief LPBAM LPTIM start advanced information structure definition.
@@ -368,13 +377,6 @@ typedef struct
 -->
 
 
- 
-   
-
-    
-
-    
-
 <RefParameter Comment="Data Buffer Name" DefaultValue="DataBufferName" Name="BufferName_IC" Type="StringRW"  Group="Input Capture - Data Configuration">
  </RefParameter>
 
@@ -386,8 +388,23 @@ typedef struct
     <Description>uint32 buffer address</Description>
 </RefParameter>
 	
-<RefParameter Name="Size_IC" Comment="Number of Data   "  DefaultValue="myDataSize"  Type="StringRW"  Group="Input Capture - Data Configuration">
+<RefParameter Name="Size_IC" Comment="Number of Data"  DefaultValue="myDataSize"  Type="StringRW"  Group="Input Capture - Data Configuration">
 </RefParameter>
+
+
+<!--<RefParameter Comment="Data Buffer Name" DefaultValue="DataBufferName" Name="BufferName_GETCOUNTER" Type="StringRW"  Group="GetCounter - Data Configuration">
+ </RefParameter>
+
+  <RefParameter Comment="Data Buffer Offset" DefaultValue="DataBufferOffset" Name="BufferOffset_GETCOUNTER" Type="StringRW"  Group="GetCounter - Data Configuration">
+      <Description>uint32 buffer address</Description>
+    </RefParameter>
+
+<RefParameter Comment="Data Buffer Address" DefaultValue="+(uint16_t*)&amp;+BufferName_GETCOUNTER+[+BufferOffset_GETCOUNTER+]" Name="BufferAddress_GETCOUNTER" Type="StringRW"  Group="GetCounter - Data Configuration" Visible="false">
+    <Description>uint32 buffer address</Description>
+</RefParameter>
+	
+<RefParameter Name="Size_GETCOUNTER" Comment="Number of Data"  DefaultValue="myDataSize"  Type="StringRW"  Group="GetCounter">
+</RefParameter>-->
 
 <!--
 /**
@@ -599,7 +616,41 @@ typedef struct
         <Parameter Name="CircularNode_UE"/>
 
     </RefMode>
-
+    
+  <RefMode Name="GETCOUNTER">
+        <ConfigForMode>LPTIM_GETCOUNTER</ConfigForMode>
+        
+        <Parameter Name="UpdateSrcInc_IC"/>
+        <Parameter Name="UpdateDestInc_IC"/>
+        <Parameter Name="UpdateSrcDataWidth_IC"/>
+        <Parameter Name="UpdateDestDataWidth_IC"/>
+        <Parameter Name="UpdateTransferEventMode_IC"/>
+        <Parameter Name="UpdateSrcSecure_IC"/>
+        <Parameter Name="UpdateDestSecure_IC"/>        
+        <Parameter Name="SrcInc_IC"/>
+        <Parameter Name="DestInc_IC"/>
+        <Parameter Name="SrcDataWidth_IC"/>
+        <Parameter Name="DestDataWidth_IC"/>
+        <Parameter Name="TransferEventMode_IC"/>
+        <Parameter Name="SrcSecure_IC"/>
+        <Parameter Name="DestSecure_IC"/> 
+        <Parameter Name="NodeLevel_Data_IC"/>
+  
+              <!--Trigger -->
+        <Parameter Name="TriggerPolarity_GETCOUNTER_CONFIG" RefParameter="TriggerPolarity"  />
+        
+        <Parameter Name="NodeLevel_GETCOUNTER_CONFIG" RefParameter="NodeLevel">
+            <PossibleValue>LPBAM_LPTIM_GETCOUNTER_FULLQ_CONFIG_NODE</PossibleValue>
+        </Parameter>
+        <Parameter Name="TriggerMode_GETCOUNTER_CONFIG" RefParameter="TriggerMode_CONFIG"> 
+           <Condition Diagnostic="" Expression="!(TriggerPolarity_GETCOUNTER_CONFIG=LPBAM_DMA_TRIG_POLARITY_MASKED)"/>
+        </Parameter>
+        <Parameter Name="TriggerSelection_GETCOUNTER_CONFIG" RefParameter="TriggerSelection">
+           <Condition Diagnostic=""  Expression="!(TriggerPolarity_GETCOUNTER_CONFIG=LPBAM_DMA_TRIG_POLARITY_MASKED)"/>
+        </Parameter>
+        <Parameter Name="CircularNode_GETCOUNTER"/> 
+        <!--Trigger -->
+    </RefMode>
 
     
 
@@ -664,6 +715,18 @@ typedef struct
                          </ModeLogicOperator>
                     </Mode>
                     
+                      <Mode Name="GETCOUNTER" UserName="GetCounter"> 
+                        <Condition Diagnostic="hardware IP must be selected to be part of LPBAM" Expression="Semaphore_LPBAM_LPTIM$IpNumber_SELECTED"/>  
+                        <ModeLogicOperator Name="XOR">
+                             <Mode Name="GETCOUNTER" UserName="GetCounter"> 
+                               <Semaphore>Semaphore_$IpInstance_GETCOUNTER</Semaphore>
+                               <SignalLogicalOp Name="AND">
+                               <Signal Name="VS_GETCOUNTER"/>
+                              </SignalLogicalOp>
+                         </Mode> 
+                         </ModeLogicOperator>
+                    </Mode>
+                    
                        
     </ModeLogicOperator>    
 
@@ -675,5 +738,6 @@ typedef struct
 <RefSignal Name="VS_IC" Virtual="true"/>
 <RefSignal Name="VS_UE" Virtual="true"/>
 <RefSignal Name="VS_PWM" Virtual="true"/>
+<RefSignal Name="VS_GETCOUNTER" Virtual="true"/>
 
 </IP>
