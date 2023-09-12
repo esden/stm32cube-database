@@ -45,6 +45,21 @@ extern "C" {
 [#if isHALUsed??]
 #include "${FamilyName?lower_case}xx_hal.h"
 [/#if]
+[#assign RESMGR_UTILITYUsed = false]
+[#list ips as ip]
+[#if ip?contains("LWIP")]
+[#assign LWIPUSed = "true"]
+[/#if]
+[#if ip=="MBEDTLS"]
+[#assign MBEDTLSUSed = "true"]
+[/#if]
+[#if ip=="RESMGR_UTILITY"]
+[#assign RESMGR_UTILITYUsed = true]
+[/#if]
+[/#list]
+[#if RESMGR_UTILITY?? && !RESMGR_UTILITYUsed]
+#include "resmgr_utility.h"
+[/#if]
 [#list ips as ip]
 [#if ip?contains("STM32_WPAN") && !HALCompliant??]
 #include "app_conf.h"
@@ -61,20 +76,6 @@ extern "C" {
         [/#if]
     [/#list]
 [/#if]
-[#-- UCPD LL headers --]
-[#assign inc=""]
-[#if DIE=="DIE460"] [#-- G07 & G08 --]
-    [#assign inc="stm32g0xx_ll_system.h"]
-[#elseif DIE=="DIE469" || DIE=="DIE468"] [#-- G4 --]
-    [#assign inc="stm32g4xx_ll_pwr.h"]
-[/#if]
-[#if inc!=""]
-    [#if !includesList?contains(inc)]
-        [#lt]#include "${inc}"
-        [#assign includesList = includesList+" "+inc]
-    [/#if]
-[/#if]
-[#-- UCPD LL headers --]
 #n
 
 [#-- /#if --]

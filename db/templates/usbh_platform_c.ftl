@@ -89,8 +89,8 @@ extern ${IpNameHS}_HandleTypeDef h${IpInstanceHS?lower_case};
   * @brief  Drive VBUS.
   * @param  state : VBUS state
   *          This parameter can be one of the these values:
-  *           - 0 : VBUS Active
-  *           - 1 : VBUS Inactive
+  *           - 1 : VBUS Active
+  *           - 0 : VBUS Inactive
   */
 void MX_DriverVbusFS(uint8_t state)
 { 
@@ -142,8 +142,8 @@ void MX_DriverVbusFS(uint8_t state)
   * @brief  Drive VBUS.
   * @param  state : VBUS state
   *          This parameter can be one of the these values:
-  *          - 0 : VBUS Active
-  *          - 1 : VBUS Inactive
+  *          - 1 : VBUS Active
+  *          - 0 : VBUS Inactive
   */
 void MX_DriverVbusHS(uint8_t state)
 { 

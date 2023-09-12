@@ -12,11 +12,19 @@
 /* USER CODE END Header */
 
 [#assign USBPD1Used = false]
+[#assign USBPDCORE_LIB_NO_PD = false]
+[#assign USBPD_STATEMACHINE = false]
 
 [#-- SWIPdatas is a list of SWIPconfigModel --]
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
         [#list SWIP.defines as definition]
+            [#if definition.name == "USBPD_CoreLib" && definition.value == "USBPDCORE_LIB_NO_PD"]
+                [#assign USBPDCORE_LIB_NO_PD = true]
+            [/#if]
+            [#if definition.name == "USBPD_StateMachine" && definition.value == "true"]
+                [#assign USBPD_STATEMACHINE = true]
+            [/#if]
             [#if definition.name == "USBPD_PORT0"]
                 [#assign USBPD_PORT0 = definition.value]
             [/#if]
@@ -194,8 +202,10 @@
         [#t]#include "${FamilyName?lower_case}xx_ll_tim.h"
     [/#if]
 [/#if]
+[#if !USBPDCORE_LIB_NO_PD || USBPD_STATEMACHINE]
 #include "usbpd_pwr_user.h"
 #include "usbpd_pwr_if.h"
+[/#if]
 
 /* USER CODE BEGIN Includes */
 

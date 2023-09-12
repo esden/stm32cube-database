@@ -12,9 +12,6 @@
        <CallLibMethod Name="LL_IWDG_SetPrescaler">
            <MethodArg Name="IWDGx" ParameterName="Instance"/>
        </CallLibMethod>
-       <CallLibMethod Name="LL_IWDG_SetWindow">
-           <MethodArg Name="IWDGx" ParameterName="Instance"/>
-       </CallLibMethod>
        <CallLibMethod Name="LL_IWDG_SetReloadCounter">
            <MethodArg Name="IWDGx" ParameterName="Instance"/>
            <MethodArg Name="Counter" ParameterName="Reload"/>
@@ -22,10 +19,18 @@
        <CallLibMethod Name="" Type="HardCode">
            <HardCode Text="#twhile (LL_IWDG_IsReady(IWDG) != 1)#n#t{#n#t}#n"/>
        </CallLibMethod>
-       <!--<CallLibMethod Name="templates/ll_iwdg.ftl" Type="Template"/>-->
-       <CallLibMethod Name="LL_IWDG_ReloadCounter">
-           <MethodArg Name="IWDGx" ParameterName="Instance"/>
-       </CallLibMethod>
+       <!-- Ticket 85919 : BEGIN -->
+       <IFCondition Expression="Window = 4095">
+        <CallLibMethod Name="LL_IWDG_ReloadCounter">
+               <MethodArg Name="IWDGx" ParameterName="Instance"/>
+        </CallLibMethod>   
+        <Else>
+            <CallLibMethod Name="LL_IWDG_SetWindow">
+                <MethodArg Name="IWDGx" ParameterName="Instance"/>
+            </CallLibMethod>
+        </Else>  
+       </IFCondition>
+        <!-- Ticket 85919 : END -->
     </RefConfig>
 
     <RefComponent Cclass="HAL" Cgroup="IWDG" Cversion="0.2.0">

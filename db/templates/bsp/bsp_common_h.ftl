@@ -110,10 +110,10 @@
 /**
  * @brief ${FamilyName?upper_case}XX NUCLEO BSP Driver version number V1.0.0
  */  
-#define __${BoardName?upper_case}_BSP_VERSION_MAIN   (0x01) /*!< [31:24] main version */
-#define __${BoardName?upper_case}_BSP_VERSION_SUB1   (0x00) /*!< [23:16] sub1 version */
-#define __${BoardName?upper_case}_BSP_VERSION_SUB2   (0x00) /*!< [15:8]  sub2 version */
-#define __${BoardName?upper_case}_BSP_VERSION_RC     (0x00) /*!< [7:0]  release candidate */ 
+#define __${BoardName?upper_case}_BSP_VERSION_MAIN   (uint32_t)(0x01) /*!< [31:24] main version */
+#define __${BoardName?upper_case}_BSP_VERSION_SUB1   (uint32_t)(0x00) /*!< [23:16] sub1 version */
+#define __${BoardName?upper_case}_BSP_VERSION_SUB2   (uint32_t)(0x00) /*!< [15:8]  sub2 version */
+#define __${BoardName?upper_case}_BSP_VERSION_RC     (uint32_t)(0x00) /*!< [7:0]  release candidate */ 
 #define __${BoardName?upper_case}_BSP_VERSION        ((__${BoardName?upper_case}_BSP_VERSION_MAIN << 24)\
                                                     |(__${BoardName?upper_case}_BSP_VERSION_SUB1 << 16)\
                                                     |(__${BoardName?upper_case}_BSP_VERSION_SUB2 << 8 )\
@@ -138,11 +138,11 @@
  * @{
  */  
 #define LEDn                              1U
-
+#define LED2_PIN                     	  ${LED2_PIN}
 #define LED2_GPIO_PORT                    ${LED2_PORT}
 #define LED2_GPIO_CLK_ENABLE()            __HAL_RCC_${LED2_PORT}_CLK_ENABLE()
 #define LED2_GPIO_CLK_DISABLE()           __HAL_RCC_${LED2_PORT}_CLK_DISABLE()  
-#define LED2_PIN                     ${LED2_PIN}
+
 [/#if]
 /**
  * @}
@@ -180,6 +180,25 @@
  * @}
  */ 
 [/#if]
+/** @defgroup ${BoardName?upper_case}_LOW_LEVEL_COM ${BoardName?upper_case} LOW LEVEL COM
+ * @{
+ */
+[#if useUSART]
+/**
+ * @brief Definition for COM portx, connected to ${UsartInstance}
+ */
+[@common.optinclude name=mxTmpFolder+"/${UsartInstance?lower_case}_define_h.tmp"/] 
+
+[/#if]
+/**
+ * @}
+ */
+  
+
+
+/** @defgroup ${BoardName?upper_case}_LOW_LEVEL_Exported_Types LOW LEVEL Exported Types
+  * @{
+  */  
 #ifndef USE_BSP_COM
   #define USE_BSP_COM                           0U
 #endif
@@ -275,13 +294,9 @@ typedef struct
  * @}
  */ 
 
-/** @defgroup ${BoardName?upper_case}_LOW_LEVEL_COM ${BoardName?upper_case} LOW LEVEL COM
- * @{
- */
+
 [#if useUSART]
-/**
- * @brief Definition for COM portx, connected to ${UsartInstance}
- */
+
 #define COMn                             1U 
 #define COM1_UART                        ${UsartInstance}
 

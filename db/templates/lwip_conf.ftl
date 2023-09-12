@@ -75,7 +75,7 @@ extern ${variable.value} ${variable.name};
 [#-- Special parameters LWIP_SUPPORT_CUSTOM_PBUF (for H7) >> generate only for h7 --]
 [#-- Special parameters LWIP_RAM_HEAP_POINTER (for H7) >> generate only for h7 --]
 [#-- Special parameters HTTPD_USE_CUSTOM_FSDATA >> limitation to force to 1 when HTTPD is used --]
-[#assign specialList = ["LWIP_DNS_SECURE", "LWIP_DHCP", "CHECKSUM_BY_HARDWARE", "RECV_BUFSIZE_DEFAULT", "TCP_RCV_SCALE", "LWIP_SUPPORT_CUSTOM_PBUF", "LWIP_RAM_HEAP_POINTER", "LWIP_TCP", "HTTPD_USE_CUSTOM_FSDATA"]]
+[#assign specialList = ["LWIP_DNS_SECURE", "LWIP_DHCP", "CHECKSUM_BY_HARDWARE", "LWIP_NETIF_LINK_CALLBACK", "RECV_BUFSIZE_DEFAULT", "TCP_RCV_SCALE", "LWIP_SUPPORT_CUSTOM_PBUF", "LWIP_RAM_HEAP_POINTER", "LWIP_TCP", "HTTPD_USE_CUSTOM_FSDATA"]]
 
 [#-- Checksum parameters enabled (in opt.h) and disabled in CubeMx --]
 [#assign checksumList = ["CHECKSUM_GEN_IP", "CHECKSUM_GEN_UDP", "CHECKSUM_GEN_TCP", "CHECKSUM_GEN_ICMP", "CHECKSUM_GEN_ICMP6", "CHECKSUM_CHECK_IP", "CHECKSUM_CHECK_UDP", "CHECKSUM_CHECK_TCP", "CHECKSUM_CHECK_ICMP", "CHECKSUM_CHECK_ICMP6"]]
@@ -234,6 +234,10 @@ extern ${variable.value} ${variable.name};
             [/#if]     
             [#if (definition.name=="LWIP_TCP") && (definition.value == "0")]
 /*----- Value in opt.h for ${definition.name}: 1 -----*/
+#define ${definition.name}   ${definition.value}
+            [/#if]
+            [#if (definition.name=="LWIP_NETIF_LINK_CALLBACK") && (definition.value == "1")]
+/*----- Value in opt.h for ${definition.name}: 0 -----*/
 #define ${definition.name}   ${definition.value}
             [/#if]
             [#if lwip_httpd == 1]
@@ -593,7 +597,11 @@ extern ${variable.value} ${variable.name};
 /*----- Default Value for H7 devices: 0x30044000 -----*/
 #define ${definition.name}   ${definition.value}
             [/#if]
+            [#if (definition.value != "valueNotSetted") && (definition.name=="ETH_RX_BUFFER_SIZE")]
+/*----- Default value in ETH configuration GUI in CubeMx: 1524 -----*/
+#define ${definition.name}   ${definition.value}
             [/#if]
+            [/#if][#-- stm32h7 --]
 		[/#if][#-- definition.defaultValue --]
 	[/#list][#-- SWIP.defines line 108 --]
 /*-----------------------------------------------------------------------------*/

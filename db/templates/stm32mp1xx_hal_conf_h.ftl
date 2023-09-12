@@ -6,7 +6,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) ${year} STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under BSD 3-Clause license,
@@ -33,7 +33,7 @@
   * @brief This is the list of modules to be used in the HAL driver 
   */
 #define HAL_MODULE_ENABLED  
-  [#assign allModules = ["ADC", "CEC", "CRC", "CRYP", "DAC", "DCMI", "DSI", "DFSDM", "DTS", "ETH", "FDCAN", "HASH", "HCD", "HSEM", "I2C", "I2S", "IPCC", "IWDG", "LPTIM", "LTDC", "NAND", "NOR", "PCD", "QUADSPI", "RNG", "SAI",  "SD", "MMC",  "RTC",  "SMBUS",  "SPDIFRX",  "SPI",  "SRAM",  "TAMP",  "TIM",  "UART",  "USART", "SMARTCARD",  "WWDG"]]
+  [#assign allModules = ["ADC", "CEC", "CRC", "CRYP", "DAC", "DCMI", "DFSDM", "FDCAN", "HASH", "HSEM", "I2C", "I2S", "IPCC", "LPTIM", "QUADSPI", "RNG", "SAI",  "SD", "RTC",  "SMBUS",  "SPDIFRX",  "SPI",  "SRAM", "TIM", "UART", "USART", "WWDG"]]
   [#list allModules as module]
 	[#if isModuleUsed(module)]
 [#compress]#define HAL_${module?replace("QUADSPI","QSPI")?replace("AES","CRYP")?replace("OCTOSPI","OSPI")}_MODULE_ENABLED[/#compress]
@@ -83,6 +83,10 @@
 #define HSE_VALUE    ([#if hse_value??]${hse_value}[#else]24000000[/#if]U) /*!< Value of the External oscillator in Hz : FPGA case fixed to 60MHZ */
 #endif /* HSE_VALUE */
 
+/**
+  * @brief In the following line adjust the External High Speed oscillator (HSE) Startup 
+  *        Timeout value 
+  */
 #if !defined  (HSE_STARTUP_TIMEOUT)
   #define HSE_STARTUP_TIMEOUT    ([#if HSE_Timout??]${HSE_Timout}[#if HSE_Timout?matches("(0x[0-9]*[a-f]*[A-F]*)|([0-9]*)")]U[/#if][#else]100U[/#if])   /*!< Time out for HSE start up, in ms */
 #endif /* HSE_STARTUP_TIMEOUT */
@@ -121,7 +125,9 @@
   #define LSE_VALUE    ((uint32_t)[#if lse_value??]${lse_value}[#else]32768[/#if]U) /*!< Value of the External oscillator in Hz*/
 #endif /* LSE_VALUE */
 
-   
+/**
+  * @brief Time out for LSE start up value in ms.
+  */
 #if !defined  (LSE_STARTUP_TIMEOUT)
   #define LSE_STARTUP_TIMEOUT    ((uint32_t)[#if LSE_Timout??]${LSE_Timout}[#if LSE_Timout?matches("(0x[0-9]*[a-f]*[A-F]*)|([0-9]*)")]U[/#if][#else]5000U[/#if])   /*!< Time out for LSE start up, in ms */
 #endif /* LSE_STARTUP_TIMEOUT */
@@ -227,14 +233,6 @@
  #include "stm32mp1xx_hal_dfsdm.h"
 #endif /* HAL_DFSDM_MODULE_ENABLED */
 
-#ifdef HAL_DSI_MODULE_ENABLED
- #include "stm32mp1xx_hal_dsi.h"
-#endif /* HAL_DSI_MODULE_ENABLED */
-
-#ifdef HAL_ETH_MODULE_ENABLED
- #include "stm32mp1xx_hal_eth.h"
-#endif /* HAL_ETH_MODULE_ENABLED */
-
 #ifdef HAL_FDCAN_MODULE_ENABLED
  #include "stm32mp1xx_hal_fdcan.h"
 #endif /* HAL_FDCAN_MODULE_ENABLED */
@@ -243,49 +241,17 @@
  #include "stm32mp1xx_hal_hash.h"
 #endif /* HAL_HASH_MODULE_ENABLED */
 
-#ifdef HAL_HCD_MODULE_ENABLED
- #include "stm32mp1xx_hal_hcd.h"
-#endif /* HAL_HASH_MODULE_ENABLED */
-
 #ifdef HAL_I2C_MODULE_ENABLED
  #include "stm32mp1xx_hal_i2c.h"
 #endif /* HAL_I2C_MODULE_ENABLED */
-
-#ifdef HAL_I2S_MODULE_ENABLED
- #include "stm32mp1xx_hal_i2s.h"
-#endif /* HAL_I2S_MODULE_ENABLED */
 
 #ifdef HAL_IPCC_MODULE_ENABLED
  #include "stm32mp1xx_hal_ipcc.h"
 #endif /* HAL_IPCC_MODULE_ENABLED */
 
-#ifdef HAL_IWDG_MODULE_ENABLED
- #include "stm32mp1xx_hal_iwdg.h"
-#endif /* HAL_IWDG_MODULE_ENABLED */
-
-#ifdef HAL_IWDG_MODULE_ENABLED
- #include "stm32mp1xx_hal_iwdg.h"
-#endif /* HAL_IWDG_MODULE_ENABLED */
-
 #ifdef HAL_LPTIM_MODULE_ENABLED
  #include "stm32mp1xx_hal_lptim.h"
 #endif /* HAL_LPTIM_MODULE_ENABLED */
-
-#ifdef HAL_LTDC_MODULE_ENABLED
- #include "stm32mp1xx_hal_ltdc.h"
-#endif /* HAL_LTDC_MODULE_ENABLED */
-
-#ifdef HAL_NAND_MODULE_ENABLED
- #include "stm32mp1xx_hal_nand.h"
-#endif /* HAL_NAND_MODULE_ENABLED */
-
-#ifdef HAL_NOR_MODULE_ENABLED
- #include "stm32mp1xx_hal_nor.h"
-#endif /* HAL_NOR_MODULE_ENABLED */
-
-#ifdef HAL_PCD_MODULE_ENABLED
- #include "stm32mp1xx_hal_pcd.h"
-#endif /* HAL_PCD_MODULE_ENABLED */
 
 #ifdef HAL_PWR_MODULE_ENABLED
  #include "stm32mp1xx_hal_pwr.h"
@@ -299,6 +265,10 @@
  #include "stm32mp1xx_hal_rng.h"
 #endif /* HAL_RNG_MODULE_ENABLED */
 
+#ifdef HAL_RTC_MODULE_ENABLED
+ #include "stm32mp1xx_hal_rtc.h"
+#endif /* HAL_RTC_MODULE_ENABLED */
+
 #ifdef HAL_SAI_MODULE_ENABLED
  #include "stm32mp1xx_hal_sai.h"
 #endif /* HAL_SAI_MODULE_ENABLED */
@@ -306,10 +276,6 @@
 #ifdef HAL_SD_MODULE_ENABLED
  #include "stm32mp1xx_hal_sd.h"
 #endif /* HAL_SD_MODULE_ENABLED */
-
-#ifdef HAL_SMARTCARD_MODULE_ENABLED
- #include "stm32mp1xx_hal_smartcard.h"
-#endif /* HAL_SMARTCARD_MODULE_ENABLED */
 
 #ifdef HAL_SMBUS_MODULE_ENABLED
  #include "stm32mp1xx_hal_smbus.h"
@@ -322,18 +288,6 @@
 #ifdef HAL_SPI_MODULE_ENABLED
  #include "stm32mp1xx_hal_spi.h"
 #endif /* HAL_SPI_MODULE_ENABLED */
-
-#ifdef HAL_SRAM_MODULE_ENABLED
- #include "stm32mp1xx_hal_sram.h"
-#endif /* HAL_SRAM_MODULE_ENABLED */
-
-#ifdef HAL_RTC_MODULE_ENABLED
- #include "stm32mp1xx_hal_rtc.h"
-#endif /* HAL_RTC_MODULE_ENABLED */
-
-#ifdef HAL_TAMP_MODULE_ENABLED
- #include "stm32mp1xx_hal_tamp.h"
-#endif /* HAL_TAMP_MODULE_ENABLED */
 
 #ifdef HAL_TIM_MODULE_ENABLED
  #include "stm32mp1xx_hal_tim.h"

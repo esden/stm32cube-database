@@ -7099,11 +7099,11 @@ ${definition.name}: ${definition.value}
 	[/#if]
 [/#list]
 
+/* USER CODE BEGIN 1 */
+
 #if defined(TARGET_LIKE_MBED) && defined(YOTTA_CFG_MBEDTLS_TARGET_CONFIG_FILE)
     #include YOTTA_CFG_MBEDTLS_TARGET_CONFIG_FILE
 #endif
-
-/* USER CODE BEGIN 1 */
 
 /*
  * Allow user to override any previous default.

@@ -1228,20 +1228,26 @@ void Custom_APP_Init(void)
                 SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_NOTIFY] != "" ||
                 SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE]?? &&
                 SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE] != ""]
-void Custom_[@capitalizeServChar service characteristic/]_Update_Char(void) //Property Read
+void Custom_[@capitalizeServChar service characteristic/]_Update_Char(void) /* Property Read */
 { 
   Custom_STM_App_Update_Char([@customServChar service characteristic/], (uint8_t *)UpdateCharData);
+  /* USER CODE BEGIN [@capitalizeServChar service characteristic/]_UC*/
+
+  /* USER CODE END [@capitalizeServChar service characteristic/]_UC*/
   return;
 }
 
             [/#if]
             [#if SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_NOTIFY]?? &&
                 SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_NOTIFY] != ""]
-void Custom_[@capitalizeServChar service characteristic/]_Send_Notification(void) // Property Notification
-{ 
+void Custom_[@capitalizeServChar service characteristic/]_Send_Notification(void) /* Property Notification */
+ { 
   if(Custom_App_Context.[@capitalizeServChar service characteristic/]_Notification_Status)
   {     
     Custom_STM_App_Update_Char([@customServChar service characteristic/], (uint8_t *)NotifyCharData);
+    /* USER CODE BEGIN [@capitalizeServChar service characteristic/]_NS*/
+
+    /* USER CODE END [@capitalizeServChar service characteristic/]_NS*/
   }
   else
   {
@@ -1253,11 +1259,14 @@ void Custom_[@capitalizeServChar service characteristic/]_Send_Notification(void
             [/#if]
             [#if SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE]?? &&
                 SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE] != ""]
-void Custom_[@capitalizeServChar service characteristic/]_Send_Indication(void) // Property Indication
+void Custom_[@capitalizeServChar service characteristic/]_Send_Indication(void) /* Property Indication */
 { 
   if(Custom_App_Context.[@capitalizeServChar service characteristic/]_Indication_Status)
   {     
     Custom_STM_App_Update_Char([@customServChar service characteristic/], (uint8_t *)NotifyCharData);
+    /* USER CODE BEGIN [@capitalizeServChar service characteristic/]_IS*/
+
+    /* USER CODE END [@capitalizeServChar service characteristic/]_IS*/
   }
   else
   {

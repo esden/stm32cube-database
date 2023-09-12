@@ -6,7 +6,7 @@
     IncludeFile="mbedtls_config.h"
     Name="MBEDTLS"
     RootFolder="Middlewares/Third_Party/mbedTLS/"
-    Version="STM32Cube_FW_H7_V1.4.0"
+    Version="STM32Cube_FW_H7_V1.8.0"
     ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
 
     <RefConfig Comment="" Name="MBEDTLS_ENABLE_Init">
@@ -18,16 +18,22 @@
         <ConfigFile Name="CUSTOM_RNG_SOURCE"/>
         <ConfigFile Name="THREADING_ALT_C"/>
         <ConfigFile Name="TIMING_ALT_C"/>
+		<ConfigFile Name="AES_ALT_C"/>
         <ConfigFile Name="THREADING_ALT_H"/>
         <ConfigFile Name="TIMING_ALT_H"/>
+        <ConfigFile Name="AES_ALT_H"/>
         <ConfigFile Name="KEIL_RETARGET_C"/>
+        <ConfigFile Name="CRYP_STM32_C"/>
+        <ConfigFile Name="CRYP_STM32_H"/>
     </RefConfig>
 
     <LibMethod Name="MX_MBEDTLS_Init" Comment="Initialize the mbedTLS stack">
         <Argument Name="MBEDTLS_THREADING_C" GenericType="simple" Context="global"/>
+        <Argument Name="MBEDTLS_SSL_CLI_C" GenericType="simple" Context="global"/>
+        <Argument Name="MBEDTLS_SSL_SRV_C" GenericType="simple" Context="global"/>
     </LibMethod>
 
-    <RefComponent Cclass="Middleware" Cgroup="MBEDTLS" Cversion="2.14.1">
+    <RefComponent Cclass="Middleware" Cgroup="MBEDTLS" Cversion="2.16.2">
         <File Category="header" Name="include/mbedtls/*.h"/>
         <File Category="header" Name="include/*"/>
 <!--        <File Category="source" Name="library/*.c"/> -->
@@ -119,24 +125,40 @@
         <File Category="source" Condition="MBEDTLS_Other_TCP_IP_stack" Name="App/net_sockets.c"/>
 	</RefConfigFile>
 
-    <RefConfigFile Description="KEIL RETARGET C File" Name="KEIL_RETARGET_C" Template="keil_retarget_c.ftl">
+    <RefConfigFile Description="KEIL RETARGET C File" Name="KEIL_RETARGET_C" Template="keil_retarget_c_v5.ftl">
         <File Category="source" Condition="(SIiTideIiMDKAaARMOoV4 | SIiTideIiMDKAaARMOoV5 | SIiTideIiMDKAaARMOoV6)" Name="App/retarget.c"/>
 	</RefConfigFile>
 
-    <RefConfigFile Description="threading_alt  template" Name="THREADING_ALT_C" Template="threading_alt_template_c.ftl">
+    <RefConfigFile Description="threading_alt template" Name="THREADING_ALT_C" Template="threading_alt_template_c.ftl">
         <File Category="source" Condition="S_MBEDTLS_THREADING_C" Name="App/threading_alt.c"/>
 	</RefConfigFile>
 
-    <RefConfigFile Description="threading_alt  template" Name="THREADING_ALT_H" Template="threading_alt_template_h.ftl">
+    <RefConfigFile Description="threading_alt template" Name="THREADING_ALT_H" Template="threading_alt_template_h.ftl">
         <File Category="header" Condition="S_MBEDTLS_THREADING_C" Name="App/threading_alt.h"/>
 	</RefConfigFile>
 
-    <RefConfigFile Description="timing_alt  template" Name="TIMING_ALT_C" Template="timing_alt_template_c.ftl">
+    <RefConfigFile Description="timing_alt template" Name="TIMING_ALT_C" Template="timing_alt_template_c.ftl">
         <File Category="source" Condition="S_MBEDTLS_TIMING_C" Name="App/timing_alt.c"/>
 	</RefConfigFile>
 
-    <RefConfigFile Description="timing_alt  template" Name="TIMING_ALT_H" Template="timing_alt_template_h.ftl">
+    <RefConfigFile Description="timing_alt template" Name="TIMING_ALT_H" Template="timing_alt_template_h.ftl">
         <File Category="header" Condition="S_MBEDTLS_TIMING_C" Name="App/timing_alt.h"/>
+	</RefConfigFile>
+
+    <RefConfigFile Description="aes_alt template" Name="AES_ALT_C" Template="mbedtls_aes_alt_template_c.ftl">
+        <File Category="source" Condition="S_MBEDTLS_AES_ALT &amp; S_CRYP" Name="Target/aes_alt.c"/>
+	</RefConfigFile>
+
+    <RefConfigFile Description="aes_alt template" Name="AES_ALT_H" Template="mbedtls_aes_alt_template_h.ftl">
+        <File Category="header" Condition="S_MBEDTLS_AES_ALT &amp; S_CRYP" Name="Target/aes_alt.h"/>
+	</RefConfigFile>	
+
+    <RefConfigFile Description="cryp_stm32 template" Name="CRYP_STM32_C" Template="mbedtls_cryp_stm32_c.ftl">
+        <File Category="source" Condition="(S_MBEDTLS_AES_ALT | S_MBEDTLS_GCM_ALT | S_MBEDTLS_CCM_ALT) &amp; S_CRYP" Name="Target/cryp_stm32.c"/>
+	</RefConfigFile>
+
+    <RefConfigFile Description="cryp_stm32 template" Name="CRYP_STM32_H" Template="mbedtls_cryp_stm32_h.ftl">
+        <File Category="header" Condition="(S_MBEDTLS_AES_ALT | S_MBEDTLS_GCM_ALT | S_MBEDTLS_CCM_ALT) &amp; S_CRYP " Name="Target/cryp_stm32.h"/>
 	</RefConfigFile>
 
     <RefConfigFile Description="mbedtls_hardware_poll() function based on the HAL_RNG API" Name="HARDWARE_RNG_SOURCE" Template="hardware_rng_c.ftl">
@@ -148,7 +170,7 @@
 	</RefConfigFile>
 
     <RefConfigFile Description="Configuration options that are required to customize the mbed TLS software for a particular system" Name="CONFIG" Template="mbedtls_config.ftl">
-        <File Category="header" Condition="all" Name="App/mbedtls_config.h" Version="2.4.0"/>
+        <File Category="header" Condition="all" Name="App/mbedtls_config.h" Version="2.16.2"/>
     <!-- Parameters for MBEDTLS - Version and modes -->
     <!-- Parameters for MBEDTLS - Version and modes - Modes -->
         <Argument Name="MBEDTLS_SSL_CLI_C" GenericType="Simple" Comment="default value: 1(#define)"/>
@@ -165,6 +187,7 @@
         <Argument Name="MBEDTLS_PLATFORM_NO_STD_FUNCTIONS" GenericType="Simple" Comment="default value: 0(//#define)"/>
         <Argument Name="MBEDTLS_DEPRECATED_WARNING" GenericType="Simple" Comment="default value: 0(//#define)"/>
         <Argument Name="MBEDTLS_DEPRECATED_REMOVED" GenericType="Simple" Comment="default value: 0(//#define)"/>
+        <Argument Name="MBEDTLS_CHECK_PARAMS" GenericType="Simple" Comment="default value: 0(//#define)"/>
     <!-- Parameters for MBEDTLS - Feature support - General -->
         <Argument Name="MBEDTLS_TEST_NULL_ENTROPY" GenericType="Simple" Comment="default value: 0(//#define)"/>
         <Argument Name="MBEDTLS_AES_ROM_TABLES" GenericType="Simple" Comment="default value: 0(//#define)"/>
@@ -206,6 +229,7 @@
         <Argument Name="MBEDTLS_CIPHER_PADDING_ZEROS" GenericType="Simple" Comment="default value: 1(#define)"/>
         <Argument Name="MBEDTLS_ENABLE_WEAK_CIPHERSUITES" GenericType="Simple" Comment="default value: 0(//#define)"/>
         <Argument Name="MBEDTLS_REMOVE_ARC4_CIPHERSUITES" GenericType="Simple" Comment="default value: 1(#define)"/>
+        <Argument Name="MBEDTLS_REMOVE_3DES_CIPHERSUITES" GenericType="Simple" Comment="default value: 1(#define)"/>
     <!-- Parameters for MBEDTLS - Feature support - Elliptic curves -->
         <Argument Name="MBEDTLS_ECP_DP_SECP192R1_ENABLED" GenericType="Simple" Comment="default value: 1(#define)"/>
         <Argument Name="MBEDTLS_ECP_DP_SECP224R1_ENABLED" GenericType="Simple" Comment="default value: 1(#define)"/>
@@ -497,7 +521,9 @@
         <Argument Name="MBEDTLS_PLATFORM_NV_SEED_READ_MACRO" GenericType="Simple" Comment="default value: mbedtls_platform_std_nv_seed_read"/>
         <Argument Name="MBEDTLS_PLATFORM_NV_SEED_WRITE_MACRO_ENABLE" GenericType="Simple" Comment="default value: 0(//#define)"/>
         <Argument Name="MBEDTLS_PLATFORM_NV_SEED_WRITE_MACRO" GenericType="Simple" Comment="default value: mbedtls_platform_std_nv_seed_write"/>
-    <!-- Parameters for MBEDTLS - Module configuration options - SSL Cache options -->
+        <Argument Name="MBEDTLS_PARAM_FAILED_ENABLE" GenericType="Simple" Comment="default value: 0(//#define)"/>
+        <Argument Name="MBEDTLS_PARAM_FAILED" GenericType="Simple" Comment="default value: cond"/>
+		<!-- Parameters for MBEDTLS - Module configuration options - SSL Cache options -->
         <Argument Name="MBEDTLS_SSL_CACHE_DEFAULT_TIMEOUT_ENABLE" GenericType="Simple" Comment="default value: 0(//#define)"/>
         <Argument Name="MBEDTLS_SSL_CACHE_DEFAULT_TIMEOUT" GenericType="Simple" Comment="default value: 86400"/>
         <Argument Name="MBEDTLS_SSL_CACHE_DEFAULT_MAX_ENTRIES_ENABLE" GenericType="Simple" Comment="default value: 0(//#define)"/>

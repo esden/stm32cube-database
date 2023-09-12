@@ -66,13 +66,24 @@
 				
     <RefParameter Comment="I2C Speed Frequency (KHz) " DefaultValue="1000" Group="Timing configuration" Max="1000" Min="1" Name="Speed" Type="integer" Visible="true" NoCheckOpt="false" >													 
 																	 
-    </RefParameter>		
+    </RefParameter>
+    
+   <RefParameter Comment="Custom Timing" DefaultValue="Disabled" Group="Timing configuration" Name="CustomTiming" Type="list">
+        <Condition Diagnostic="" Expression="STM32MP1"/>
+        <PossibleValue Comment="Disabled" Value="Disabled"/>        
+        <PossibleValue Comment="Enabled" Value="Enabled" Semaphore="S_$IpInstance_CustomTiming"/>
+    </RefParameter>			
+    <RefParameter Comment="Custom Timing" DefaultValue="Disabled" Group="Timing configuration" Name="CustomTiming" Type="list" Visible="false">        
+    </RefParameter>             		
 				
 				
 				
 
 
-    <!--Specifies the Rise Time-->				
+    <!--Specifies the Rise Time-->	
+    <RefParameter Comment="Rise Time (ns)" DefaultValue="0" Group="Timing configuration" Name="I2C_Rise_Time" Type="integer" Visible="false">													 
+	<Condition Diagnostic="" Expression="STM32MP1 &amp; S_$IpInstance_CustomTiming"/>											 
+    </RefParameter>			
     <RefParameter Comment="Rise Time (ns)" DefaultValue="0" Group="Timing configuration" Max="1000" Min="0" Name="I2C_Rise_Time" Type="integer" Visible="true" NoCheckOpt="false" >													 
         <Condition Diagnostic="" Expression="I2C_Speed_Mode=I2C_Standard"/>													 
     </RefParameter>	
@@ -85,7 +96,10 @@
 															 
     </RefParameter>
 
-    <!--Specifies the Fall Time-->						
+    <!--Specifies the Fall Time-->
+     <RefParameter Comment="Fall Time (ns)" DefaultValue="0" Group="Timing configuration" Name="I2C_Fall_Time" Type="integer" Visible="false">													 
+	<Condition Diagnostic="" Expression="STM32MP1 &amp; S_$IpInstance_CustomTiming"/>											 
+    </RefParameter>						
     <RefParameter Comment="Fall Time (ns)" DefaultValue="0" Group="Timing configuration" Max="120" Min="0" Name="I2C_Fall_Time" Type="integer" Visible="true" NoCheckOpt="false" >													 
         <Condition Diagnostic="" Expression="I2C_Speed_Mode=I2C_Fast_Plus"/>													 
     </RefParameter>	
@@ -94,6 +108,9 @@
     </RefParameter>	
     <RefParameter Comment="Fall Time (ns)" DefaultValue="0" Group="Timing configuration" Max="300" Min="0" Name="I2C_Fall_Time" Type="integer" Visible="true" NoCheckOpt="false" >													 
 																	 
+    </RefParameter>
+    <RefParameter Comment="Coefficient of Digital Filter" DefaultValue="0" Group="Timing configuration" Name="I2C_Coeff_DF" Type="integer" Visible="false">													 
+	<Condition Diagnostic="" Expression="STM32MP1 &amp; S_$IpInstance_CustomTiming"/>											 
     </RefParameter>	
     <RefParameter Comment="Coefficient of Digital Filter" DefaultValue="0" Group="Timing configuration" Max="15" Min="0" Name="I2C_Coeff_DF" Type="integer" Visible="true" NoCheckOpt="false" >													 
     </RefParameter>	
@@ -108,8 +125,11 @@
     <RefParameter Comment="Timing" DefaultValue="0x00303D5B" Group="Timing configuration" Name="Timing" Type="string">
         <Condition Diagnostic="" Expression="STM32F7"/>
     </RefParameter>
+    <RefParameter Comment="Timing" DefaultValue="0x10707DBC" Group="Timing configuration" Name="Timing" Max="0xDFFFFFFF" Min="0x00000000" Type="hex">
+        <Condition Diagnostic="" Expression="STM32MP1 &amp;S_$IpInstance_CustomTiming"/>
+    </RefParameter>
     <RefParameter Comment="Timing" DefaultValue="0x10707DBC" Group="Timing configuration" Name="Timing" Type="string">
-        <Condition Diagnostic="" Expression="STM32H7|STM32MP1"/>
+        <Condition Diagnostic="" Expression="STM32MP1"/>
     </RefParameter>
     <RefParameter Comment="Timing" DefaultValue="0x00000000" Group="Timing configuration" Name="Timing" Type="string"/>
 
@@ -440,7 +460,8 @@
         <ConfigForMode>I2C_Analogue</ConfigForMode>   
         <ConfigForMode>I2C_DigitalFolter</ConfigForMode>   
         <ConfigForMode>I2CEnableFastModePlus</ConfigForMode>  
-        <ConfigForMode>FASTMODE_Config</ConfigForMode> 
+        <ConfigForMode>FASTMODE_Config</ConfigForMode>
+        <Parameter Name="CustomTiming"/> 
         <Parameter Name="I2C_Speed_Mode"/>
         <Parameter Name="Speed"/>      
         <Parameter Name="I2C_Rise_Time"/>

@@ -1,0 +1,50 @@
+[#ftl]
+
+[#--DMAMUX binding--]
+[#--/////////////--]
+
+[#macro bind_dmamux	pElmt pDtLevel]
+[#compress]
+[#local module = bind_dmamux]
+[#local TABres = dts_get_tabs(pDtLevel)]
+[#local TABnode = TABres.TABN]
+[#local TABprop = TABres.TABP]
+
+	[#local errorLog = ""]
+	[#local dmaMastersList = []]
+	[#local dmaMastersChannelsNber = 0]
+
+	[#local res = srvcmx_getDeviceConfigValueWithStatus(pElmt.deviceName, ["dmaControllerNamesList"])]
+	[#if !res.error?has_content]
+		[#list res.value as dmaMasterName]
+			[#if srvcmx_getDeviceConfigValue(dmaMasterName, ["ctxtAssignmentsNamesList"])?contains("CortexA7NS")]
+				[#local dmaMastersList = dmaMastersList + [dmaMasterName]]
+				[#local dmaMastersChannelsNber = dmaMastersChannelsNber + 8]
+			[/#if]
+		[/#list]
+	[#else]
+		[#local errorLog = "No dma master found"]
+	[/#if]
+
+[/#compress]
+
+	[#if !errorLog?has_content && dmaMastersList?has_content]
+${TABnode}dma-masters = <[#t]
+			[#local dmaMastersNber = 0]
+			[#list dmaMastersList as dmaMaster]
+				[#if dmaMastersNber==0]
+&${dmaMaster}[#t]
+				[#else]
+[#lt] &${dmaMaster}[#t]
+				[/#if]
+				[#local dmaMastersNber = dmaMastersNber + 1]
+			[/#list]
+>;
+${TABnode}dma-channels = <[#t]
+${dmaMastersChannelsNber}[#t]
+>;
+	[#else]
+${TABnode}[@mlog  logMod=module logType="WARN" logMsg="No dma master found"  varsMap={} /]
+	[/#if]
+
+[/#macro]

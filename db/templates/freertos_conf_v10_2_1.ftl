@@ -321,10 +321,10 @@
  * These definitions should be adjusted for your particular hardware and
  * application requirements.
  *
- * THESE PARAMETERS ARE DESCRIBED WITHIN THE 'CONFIGURATION' SECTION OF THE
- * FreeRTOS API DOCUMENTATION AVAILABLE ON THE FreeRTOS.org WEB SITE.
+ * These parameters and more are described within the 'configuration' section of the
+ * FreeRTOS API documentation available on the FreeRTOS.org web site.
  *
- * See http://www.freertos.org/a00110.html.
+ * See http://www.freertos.org/a00110.html
  *----------------------------------------------------------*/
 
 /* USER CODE BEGIN Includes */   	      
@@ -533,7 +533,7 @@ to exclude the API function. */
 #define INCLUDE_xTaskGetHandle               1
 [/#if]
 
-[#if (familyName=="stm32g0") || (familyName=="stm32f0") || (familyName=="stm32l0")] 
+[#if (familyName=="stm32g0") || (familyName=="stm32f0") || (familyName=="stm32l0")]  [#-- BZ 47214 --] 
 [#else]
 /* Cortex-M specific definitions. */
 #ifdef __NVIC_PRIO_BITS

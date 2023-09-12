@@ -670,17 +670,28 @@
 
     <RefParameter Name="USBPD_CoreLib" DefaultValue="USBPDCORE_LIB_PD3_CONFIG_1" Type="list" Comment="USBPD_CoreLib" Visible="false">
         <Condition Expression="USBPD_PD3CFG1" Diagnostic="USBPDCORE_LIB_PD3_CONFIG_1"/>
+        <PossibleValue Value="USBPDCORE_LIB_PD3_CONFIG_1" Comment="USBPDCORE_LIB_PD3_CONFIG_1"/>
     </RefParameter>
     <RefParameter Name="USBPD_CoreLib" DefaultValue="USBPDCORE_LIB_PD3_CONFIG_MINSRC" Type="list" Comment="USBPD_CoreLib" Visible="false">
         <Condition Expression="USBPD_PD3MINSRC" Diagnostic="USBPDCORE_LIB_PD3_CONFIG_MINSRC"/>
+        <PossibleValue Value="USBPDCORE_LIB_PD3_CONFIG_MINSRC" Comment="USBPDCORE_LIB_PD3_CONFIG_MINSRC"/>
     </RefParameter>
     <RefParameter Name="USBPD_CoreLib" DefaultValue="USBPDCORE_LIB_PD3_CONFIG_MINSNK" Type="list" Comment="USBPD_CoreLib" Visible="false">
         <Condition Expression="USBPD_PD3MINSNK" Diagnostic="USBPDCORE_LIB_PD3_CONFIG_MINSNK"/>
+        <PossibleValue Value="USBPDCORE_LIB_PD3_CONFIG_MINSNK" Comment="USBPDCORE_LIB_PD3_CONFIG_MINSNK"/>
     </RefParameter>
     <RefParameter Name="USBPD_CoreLib" DefaultValue="USBPDCORE_LIB_NO_PD" Type="list" Comment="USBPD_CoreLib" Visible="false">
         <Condition Expression="USBPD_PD3TYPEC" Diagnostic="USBPDCORE_LIB_NO_PD"/>
+        <PossibleValue Value="USBPDCORE_LIB_NO_PD" Comment="USBPDCORE_LIB_NO_PD"/>
     </RefParameter>
-    <RefParameter Name="USBPD_CoreLib" DefaultValue="USBPDCORE_LIB_PD3_FULL" Type="string" Comment="USBPD_CoreLib" Visible="false">
+    <RefParameter Name="USBPD_CoreLib" DefaultValue="USBPDCORE_LIB_PD3_FULL" Type="list" Comment="USBPD_CoreLib" Visible="false">
+        <PossibleValue Value="USBPDCORE_LIB_PD3_FULL" Comment="USBPDCORE_LIB_PD3_FULL"/>
+    </RefParameter>
+
+    <RefParameter Name="USBPD_StateMachine" DefaultValue="true" Type="bool" Comment="USBPD_StateMachine" Visible="false">
+        <Condition Expression="USBPD_STATEMACHINE" Diagnostic="USBPD_StateMachine"/>
+    </RefParameter>
+    <RefParameter Name="USBPD_StateMachine" DefaultValue="false" Type="bool" Comment="USBPD_StateMachine" Visible="false">
     </RefParameter>
 
     <!-- RefModes for USBPD -->
@@ -706,6 +717,7 @@
         <Parameter Name="SNK"/>
 
         <Parameter Name="USBPD_CoreLib"/>
+        <Parameter Name="USBPD_StateMachine"/>
 
         <Parameter Name="USBPDenableClock"/>
 
@@ -836,14 +848,15 @@
                         <Signal Name="VS_PD3TYPEC_STATEMACHINE"/>
                     </SignalLogicalOp>
                     <Semaphore>USBPD_PD3TYPEC</Semaphore>
-                    <Semaphore>USBPD_TYPEC_STATEMACHINE</Semaphore>
+                    <Semaphore>USBPD_STATEMACHINE</Semaphore>
                 </Mode>
                 <Mode Name="PD3_TypeC" UserName="Type C only">
                     <Condition Expression="(SourceUCPD1|SinkUCPD1)" Diagnostic="UCPD1 should be Source or Sink"/>
                     <SignalLogicalOp Name="AND">
-                        <Signal Name="VS_PD3TYPEC"/>
+                        <Signal Name="VS_PD3TYPEC_ONLY"/>
                     </SignalLogicalOp>
                     <Semaphore>USBPD_PD3TYPEC</Semaphore>
+                    <Semaphore>USBPD_TYPECONLY</Semaphore>
                 </Mode>
             </ModeLogicOperator>
         </Mode>
@@ -1038,7 +1051,6 @@
             <Condition Expression="TRACEREMB" Diagnostic="please select a TRACER_EMB Configuration"/>
             <ModeLogicOperator Name="XOR">
                 <Mode Name="TRACER_EMB">
-                    <Condition Expression="TRACEREMB" Diagnostic="for now, the only configuration!"/>
                     <SignalLogicalOp Name="AND">
                         <Signal Name="VS_usbpd_traceremb"/>
                     </SignalLogicalOp>
@@ -1058,7 +1070,7 @@
     <RefSignal Name="VS_PD3MINSRC" Virtual="true"/>
     <RefSignal Name="VS_PD3MINSNK" Virtual="true"/>
     <RefSignal Name="VS_PD3TYPEC_STATEMACHINE" Virtual="true"/>
-    <RefSignal Name="VS_PD3TYPEC" Virtual="true"/>
+    <RefSignal Name="VS_PD3TYPEC_ONLY" Virtual="true"/>
 
     <RefSignal Name="VS_usbpd_tim1" Virtual="true"/>
     <RefSignal Name="VS_usbpd_tim2" Virtual="true"/>

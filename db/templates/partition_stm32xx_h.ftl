@@ -1,9 +1,9 @@
 [#ftl]
 /**
   ******************************************************************************
- * @file     partition_[#if McuName?starts_with("STM32L562")]stm32l562xx.h[#else]stm32l552xx.h[/#if]
+  * @file    partition_[#if McuName?starts_with("STM32L562")]stm32l562xx.h[#else]stm32l552xx.h[/#if]
   * @author  MCD Application Team
-  * @brief   CMSIS STM32L552xx Device Initial Setup for Secure / Non-Secure Zones
+  * @brief   CMSIS [#if McuName?starts_with("STM32L562")]STM32L562xx[#else]STM32L552xx[/#if] Device Initial Setup for Secure / Non-Secure Zones
   *          for ARMCM33 based on CMSIS CORE V5.3.1 partition_ARMCM33.h Template.
   *
   *          This file contains:

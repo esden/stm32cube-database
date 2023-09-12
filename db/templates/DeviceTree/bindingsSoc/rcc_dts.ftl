@@ -100,6 +100,8 @@
 			[/#list]
 						[#if (PLLUsed! = 1) ]
 			[#lt]${T1}pll${PLLnb}:st,pll@${PLLnb?number -1} {
+				[#lt]${T2}compatible = "st,stm32mp1-pll";
+				[#lt]${T2}reg = <${PLLnb?number -1}>;
 				[#lt]${T2}cfg = < ${DIVM} ${DIVN} ${DIVP} ${DIVQ} ${DIVR} ${PQR} >;
 								[#if PLLMODE == "RCC_PLL_FRACTIONAL"]
 [#if PLLFRAC?starts_with("0x")]

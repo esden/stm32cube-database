@@ -24,15 +24,18 @@
 ${TABN}clocks {
 [#if srvcmx_isTargetedFw_inDTS("U-BOOT")]
 		[#lt]${TABP}u-boot,dm-pre-reloc;
-#n
 [/#if]
+#n
 ${TABP}/* USER CODE BEGIN clocks */
 ${TABP}/* USER CODE END clocks */
+#n
 [#t]
+[#if !srvcmx_isTargetedFw_inDTS("TF-A")]
+#ifndef CONFIG_STM32MP1_TRUSTED
+[/#if]
 		[#list RCCClockSourceParam.get("Source").entrySet() as paramEntry]
 [#t]
 [#if srvcmx_isTargetedFw_inDTS("LINUX") || srvcmx_isTargetedFw_inDTS("U-BOOT")]
-#n
 			[#lt]${TABP}${paramEntry.key} {
 [#if srvcmx_isTargetedFw_inDTS("LINUX")]
 				[#--lt--][#--${TABN1}#clock-cells = <0>;--]
@@ -145,6 +148,9 @@ ${TABN1}/* USER CODE END ${nodeLabel} */
 [/#if]
 [/#if]
 		[/#list]
+[#if !srvcmx_isTargetedFw_inDTS("TF-A")]
+#endif	/*CONFIG_STM32MP1_TRUSTED*/
+[/#if]
 ${TABN}};
 #n
 [/#list]

@@ -21,8 +21,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "usbpd_core.h"
 #include "usbpd_dpm_core.h"
-#include "usbpd_dpm_user.h"
+#include "usbpd_dpm_conf.h"
+[#if USBPD_CORELIB != "USBPDCORE_LIB_NO_PD"]
 #include "usbpd_hw_if.h"
+[/#if]
 
 /* USER CODE BEGIN 0 */
 /* USER CODE END 0 */

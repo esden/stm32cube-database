@@ -277,8 +277,13 @@
     <!-- Possible values of DMAContinuousRequests parameter -->
     <RefParameter Comment="DMA Continuous Requests" DefaultValue="DISABLE" Group="ADCgroup" Name="DMAContinuousRequests" Type="list">
         <PossibleValue Comment="Disabled" Value="DISABLE"/>
-        <PossibleValue Comment="Enabled" Value="ENABLE"/>
-        <Description>Enable/Disable DMA Continuous Requests</Description>
+        <PossibleValue Comment="Enabled" Value="ENABLE" Action="Disable" Condition="!DMARequest_$IpInstance" Diagnostic="A DMA Request in Circular Mode must be configured in DMA Settings Tab for this ADC instance" />
+        <Description>This parameter is used only when a DMA Request is configured. Else it is not relevant.&lt;br&gt;
+            When the DMA Request for this ADC instance this parameter specifies whether 
+            the DMA requests are performed in one shot mode (DMA transfer stops when number of conversions is reached)
+            or are performed in continuous mode (DMA transfer unlimited, whatever number of conversions).&lt;br&gt;
+            Note: In continuous mode, DMA must be configured in circular mode. Otherwise an overrun will be triggered when DMA buffer maximum pointer is reached.
+        </Description>
     </RefParameter>
 	    
     <!-- Possible values of EOCSelection parameter -->
@@ -457,6 +462,7 @@
         <Parameter Name="Channel"/>
         <Parameter Name="SingleDiff"/>
         <Parameter Name="SamplingTime"/>
+        <Parameter Name="SamplingTimeOPAMP"/>
         <Parameter Name="OffsetNumber"/>
         <Parameter Name="Offset"/>
         <Parameter Name="RegHighThreshold"/>
@@ -593,6 +599,23 @@
     </RefParameter>
 			    
     <!-- Possible Value of SamplingTime parameters  -->
+    <RefParameter Name="FHzSyncCLK" Comment="Sync Clock AHB value" Type="" DefaultValue="=RCC:AHBFreq_Value" Visible="false"/>
+    <RefParameter Name="FHzAsyncCLK" Comment="Async Clock ADC value" Type="" DefaultValue="=RCC:ADC12outputFreq_Value" Visible="false"/>
+    <RefParameter Name="FHzADCClock" Comment="" Type="" DefaultValue="=FHzAsyncCLK" Visible="false">
+        <Condition Expression="ClockPrescaler=ADC_CLOCK_ASYNC_DIV1" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Name="FHzADCClock" Comment="" Type="" DefaultValue="=FHzSyncCLK" Visible="false">
+        <Condition Expression="ClockPrescaler=ADC_CLOCK_SYNC_PCLK_DIV1" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Name="FHzADCClock" Comment="" Type="" DefaultValue="=FHzSyncCLK/2" Visible="false">
+        <Condition Expression="ClockPrescaler=ADC_CLOCK_SYNC_PCLK_DIV2" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Name="FHzADCClock" Comment="" Type="" DefaultValue="=FHzSyncCLK/4" Visible="false">
+        <Condition Expression="ClockPrescaler=ADC_CLOCK_SYNC_PCLK_DIV4" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Name="FHzADCClock" Comment="" Type="" DefaultValue="=FHzAsyncCLK" Visible="false"/>
+
+
     <RefParameter Comment="Sampling Time" DefaultValue="ADC_SAMPLETIME_1CYCLE_5" Group="ADCChannel" Name="SamplingTime" Type="list">
         <PossibleValue Comment="1.5 Cycles" Value="ADC_SAMPLETIME_1CYCLE_5"/>
         <PossibleValue Comment="2.5 Cycles" Value="ADC_SAMPLETIME_2CYCLES_5"/>
@@ -603,6 +626,17 @@
         <PossibleValue Comment="181.5 Cycles" Value="ADC_SAMPLETIME_181CYCLES_5"/>
         <PossibleValue Comment="601.5 Cycles" Value="ADC_SAMPLETIME_601CYCLES_5"/>
         <Description>Regular Channel x sampling time selection</Description>
+    </RefParameter>
+    <RefParameter Comment="Sampling Time" DefaultValue="ADC_SAMPLETIME_1CYCLE_5" Group="ADCChannel" Name="SamplingTimeOPAMP" Type="list">
+        <PossibleValue Comment="1.5 Cycles" Value="ADC_SAMPLETIME_1CYCLE_5" Condition="((FHzADCClock/1.5)&gt;2500000)"   Diagnostic="ADC sampling time when reading the OPAMP output cannot be faster as 400ns" />
+        <PossibleValue Comment="2.5 Cycles" Value="ADC_SAMPLETIME_2CYCLES_5" Condition="((FHzADCClock/2.5)&gt;2500000)"   Diagnostic="ADC sampling time when reading the OPAMP output cannot be faster as 400ns" />
+        <PossibleValue Comment="4.5 Cycles" Value="ADC_SAMPLETIME_4CYCLES_5" Condition="((FHzADCClock/4.5)&gt;2500000)"   Diagnostic="ADC sampling time when reading the OPAMP output cannot be faster as 400ns" />
+        <PossibleValue Comment="7.5 Cycles" Value="ADC_SAMPLETIME_7CYCLES_5" Condition="((FHzADCClock/7.5)&gt;2500000)"   Diagnostic="ADC sampling time when reading the OPAMP output cannot be faster as 400ns" />
+        <PossibleValue Comment="19.5 Cycles" Value="ADC_SAMPLETIME_19CYCLES_5" Condition="((FHzADCClock/19.5)&gt;2500000)"   Diagnostic="ADC sampling time when reading the OPAMP output cannot be faster as 400ns" />
+        <PossibleValue Comment="61.5 Cycles" Value="ADC_SAMPLETIME_61CYCLES_5" Condition="((FHzADCClock/61.5)&gt;2500000)"   Diagnostic="ADC sampling time when reading the OPAMP output cannot be faster as 400ns" />
+        <PossibleValue Comment="181.5 Cycles" Value="ADC_SAMPLETIME_181CYCLES_5" Condition="((FHzADCClock/181.5)&gt;2500000)"   Diagnostic="ADC sampling time when reading the OPAMP output cannot be faster as 400ns" />
+        <PossibleValue Comment="601.5 Cycles" Value="ADC_SAMPLETIME_601CYCLES_5" Condition="((FHzADCClock/601.5)&gt;2500000)"   Diagnostic="ADC sampling time when reading the OPAMP output cannot be faster as 400ns" />
+        <Description>Regular Channel x sampling time selection with contrainst on OPAMP connection</Description>
     </RefParameter>
 			    
     <RefParameter Comment="Single-ended or differential" DefaultValue="ADC_SINGLE_ENDED" Group="ADCgroup" Name="SingleDiff" Type="list" Visible="false">
@@ -835,6 +869,7 @@
         <Parameter Name="InjectedRank"/>
         <Parameter Name="InjectedChannel"/>
         <Parameter Name="InjectedSamplingTime"/>
+        <Parameter Name="InjectedSamplingTimeOPAMP"/>
         <Parameter Name="InjectedSingleDiff"/>
         <Parameter Name="InjectedOffsetNumber"/>
         <Parameter Name="InjectedOffset"/>
@@ -850,6 +885,7 @@
         <Parameter Name="InjectedRank"/>
         <Parameter Name="InjectedChannel"/>
         <Parameter Name="InjectedSamplingTime"/>
+        <Parameter Name="InjectedSamplingTimeOPAMP"/>
         <Parameter Name="InjectedSingleDiff"/>
         <Parameter Name="InjectedOffsetNumber"/>
         <Parameter Name="InjHighThreshold"/>
@@ -915,6 +951,18 @@
         <PossibleValue Comment="601.5 Cycles" Value="ADC_SAMPLETIME_601CYCLES_5"/>
         <Description>Regular Channel x sampling time selection</Description>
     </RefParameter>
+    <RefParameter Comment="Sampling Time" DefaultValue="ADC_SAMPLETIME_1CYCLE_5" Group="ADCChannel" Name="InjectedSamplingTimeOPAMP" Type="list">
+        <PossibleValue Comment="1.5 Cycles" Value="ADC_SAMPLETIME_1CYCLE_5" Condition="((FHzADCClock/1.5)&gt;2500000)"   Diagnostic="ADC sampling time when reading the OPAMP output cannot be faster as 400ns" />
+        <PossibleValue Comment="2.5 Cycles" Value="ADC_SAMPLETIME_2CYCLES_5" Condition="((FHzADCClock/2.5)&gt;2500000)"   Diagnostic="ADC sampling time when reading the OPAMP output cannot be faster as 400ns" />
+        <PossibleValue Comment="4.5 Cycles" Value="ADC_SAMPLETIME_4CYCLES_5" Condition="((FHzADCClock/4.5)&gt;2500000)"   Diagnostic="ADC sampling time when reading the OPAMP output cannot be faster as 400ns" />
+        <PossibleValue Comment="7.5 Cycles" Value="ADC_SAMPLETIME_7CYCLES_5" Condition="((FHzADCClock/7.5)&gt;2500000)"   Diagnostic="ADC sampling time when reading the OPAMP output cannot be faster as 400ns" />
+        <PossibleValue Comment="19.5 Cycles" Value="ADC_SAMPLETIME_19CYCLES_5" Condition="((FHzADCClock/19.5)&gt;2500000)"   Diagnostic="ADC sampling time when reading the OPAMP output cannot be faster as 400ns" />
+        <PossibleValue Comment="61.5 Cycles" Value="ADC_SAMPLETIME_61CYCLES_5" Condition="((FHzADCClock/61.5)&gt;2500000)"   Diagnostic="ADC sampling time when reading the OPAMP output cannot be faster as 400ns" />
+        <PossibleValue Comment="181.5 Cycles" Value="ADC_SAMPLETIME_181CYCLES_5" Condition="((FHzADCClock/181.5)&gt;2500000)"   Diagnostic="ADC sampling time when reading the OPAMP output cannot be faster as 400ns" />
+        <PossibleValue Comment="601.5 Cycles" Value="ADC_SAMPLETIME_601CYCLES_5" Condition="((FHzADCClock/601.5)&gt;2500000)"   Diagnostic="ADC sampling time when reading the OPAMP output cannot be faster as 400ns" />
+        <Description>Regular Channel x sampling time selection with contrainst on OPAMP connection</Description>
+    </RefParameter>
+
 			    
     <RefParameter Comment="Single-ended or differential" DefaultValue="null" Group="ADCgroup" Name="InjectedSingleDiff" Type="list" Visible="false">
         <Condition Diagnostic="In case of usage of channels on injected group, ADC frequency should be low than AHB clock frequency /4 for resolution 12 or 10 bits, AHB clock frequency /3 for resolution 8 bits, AHB clock frequency /2 for resolution 6 bits." Expression="EnableInjectedConversion=DISABLE"/>
@@ -2261,7 +2309,7 @@
         </Mode>
 		
         <!-- Triggers Mode -->
-        <Mode Name="Conversion-Trigger" UserName="Conversion Trigger" >
+        <Mode Name="Conversion-Trigger" UserName="EXTI Conversion Trigger" >
             <ModeLogicOperator Name="XOR">
                 <Mode Name="Injected-Conversion-Trigger" UserName="Injected Conversion Trigger"  RemoveCondition="($IpNumber=3) | ($IpNumber=4)">
                     <SignalLogicalOp Name="AND">

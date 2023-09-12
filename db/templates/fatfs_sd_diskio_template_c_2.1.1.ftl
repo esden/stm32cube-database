@@ -119,7 +119,7 @@ See BSP_SD_ErrorCallback() and BSP_SD_AbortCallback() below
  */
 /* USER CODE BEGIN enableSDDmaCacheMaintenance */
 /* #define ENABLE_SD_DMA_CACHE_MAINTENANCE  1 */
-/* USER CODE BEGIN enableSDDmaCacheMaintenance */
+/* USER CODE END enableSDDmaCacheMaintenance */
 [/#if]
 
 [#if use_dma = 1]  [#--Added to support v2.1.0 template --]

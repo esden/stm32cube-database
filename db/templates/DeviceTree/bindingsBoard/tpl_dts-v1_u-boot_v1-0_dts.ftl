@@ -27,8 +27,8 @@
 	[/#if]
 [/#if]
 
-[#if mx_socFtRPNSuperset?has_content && mxDtDM.dts_fileNameSuffix?has_content]
-#include "${mx_socFtRPNSuperset}${mxDtDM.dts_fileNameSuffix}.dtsi"
+[#if mx_socDtRPN?has_content && mxDtDM.dts_fileNameSuffix?has_content]
+#include "${mx_socDtRPN}${mxDtDM.dts_fileNameSuffix}.dtsi"
 [#else]
 	[@mlog  logMod=module logType="ERR" logMsg="unknown 'U-BOOT' dtsi" varsMap={} /]
 /*#include "???.dtsi"*/
@@ -63,12 +63,20 @@
 [#--pinctrl--]
 [@DTBindedDtsElmtDMsList_print  pParentElmt="" pElmtsList=srvcmx_getElmtsMatchingBindedHwName(mxDtDM.dts_bindedElmtsList, "pinctrl") pDtLevel=0 pOrdering=true/]
 
+[#--basic boot devices--]
+[#local basicBootDevicesList = ["rcc_cfg", "i2c4", "quadspi", "sdmmc1", "sdmmc2", "sai2", "sai4"]]
 
-[#--RCC node--]
-[@DTBindedDtsElmtDMsList_print  pParentElmt="" pElmtsList=srvcmx_getElmtsMatchingBindedHwName(mxDtDM.dts_bindedElmtsList, "rcc_cfg") pDtLevel=0 pOrdering=true/]
+#ifndef CONFIG_STM32MP1_TRUSTED
+
+[#list basicBootDevicesList as deviceName]
+[@DTBindedDtsElmtDMsList_print  pParentElmt="" pElmtsList=srvcmx_getElmtsMatchingBindedHwName(mxDtDM.dts_bindedElmtsList, deviceName) pDtLevel=0 pOrdering=true/]
+[/#list]
+
+#endif	/*CONFIG_STM32MP1_TRUSTED*/
 
 [#--dts level elmts--]
-[@DTBindedDtsElmtDMsList_print  pParentElmt="" pElmtsList=srvcmx_getDeviceElmtsByPath(mxDtDM.dts_bindedElmtsList, "") pDtLevel=0 pOrdering=true/][#--get only "dts" level elmts--]
+[#local basicBootDevicesList = basicBootDevicesList + ["rcc"]]
+[@DTBindedDtsElmtDMsList_print  pParentElmt="" pElmtsList=srvcmx_getDeviceElmtsByPathExcludingSome(mxDtDM.dts_bindedElmtsList, "", basicBootDevicesList) pDtLevel=0 pOrdering=true/][#--get only "dts" level elmts--]
 
 
 /* USER CODE BEGIN addons */

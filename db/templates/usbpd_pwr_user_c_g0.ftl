@@ -106,10 +106,10 @@
  *         @arg TYPE_C_PORT_2
  * @retval PD controller status
  */
-PWR_StatusTypeDef BSP_PWR_VBUSInit(uint32_t               PortId)
+__weak PWR_StatusTypeDef BSP_PWR_VBUSInit(uint32_t               PortId)
 {
 /* USER CODE BEGIN BSP_PWR_VBUSInit */
-  PWR_DEBUG_TRACE(PortId, "HELP: Update BSP_PWR_VBUSInit");
+  PWR_DEBUG_TRACE(PortId, "ADVICE: Update BSP_PWR_VBUSInit");
   return PWR_ERROR;
 /* USER CODE END BSP_PWR_VBUSInit */
 }
@@ -123,7 +123,7 @@ PWR_StatusTypeDef BSP_PWR_VBUSInit(uint32_t               PortId)
  *         @arg TYPE_C_PORT_2
  * @retval PD controller status
  */
-PWR_StatusTypeDef BSP_PWR_VBUSDeInit(uint32_t PortId)
+__weak PWR_StatusTypeDef BSP_PWR_VBUSDeInit(uint32_t PortId)
 {
 /* USER CODE BEGIN BSP_PWR_VBUSDeInit */
   return PWR_ERROR;
@@ -137,10 +137,10 @@ PWR_StatusTypeDef BSP_PWR_VBUSDeInit(uint32_t PortId)
  *         @arg TYPE_C_PORT_1
  * @retval PD controller status
  */
-PWR_StatusTypeDef BSP_PWR_VBUSOn(uint32_t PortId)
+__weak PWR_StatusTypeDef BSP_PWR_VBUSOn(uint32_t PortId)
 {
 /* USER CODE BEGIN BSP_PWR_VBUSOn */
-  PWR_DEBUG_TRACE(PortId, "HELP: Update BSP_PWR_VBUSOn");
+  PWR_DEBUG_TRACE(PortId, "ADVICE: Update BSP_PWR_VBUSOn");
   return PWR_ERROR;
 /* USER CODE END BSP_PWR_VBUSOn */
 }
@@ -152,10 +152,10 @@ PWR_StatusTypeDef BSP_PWR_VBUSOn(uint32_t PortId)
  *         @arg TYPE_C_PORT_1
  * @retval PD controller status
  */
-PWR_StatusTypeDef BSP_PWR_VBUSOff(uint32_t PortId)
+__weak PWR_StatusTypeDef BSP_PWR_VBUSOff(uint32_t PortId)
 {
 /* USER CODE BEGIN BSP_PWR_VBUSOff */
-  PWR_DEBUG_TRACE(PortId, "HELP: Update BSP_PWR_VBUSOff");
+  PWR_DEBUG_TRACE(PortId, "ADVICE: Update BSP_PWR_VBUSOff");
   return PWR_ERROR;
 /* USER CODE END BSP_PWR_VBUSOff */
 }
@@ -170,7 +170,7 @@ PWR_StatusTypeDef BSP_PWR_VBUSOff(uint32_t PortId)
  * @param  MaxOperatingCurrent the Max Operating Current (in mA)
  * @retval PD controller status
  */
-PWR_StatusTypeDef BSP_PWR_VBUSSetVoltage_Fixed(uint32_t PortId,
+__weak PWR_StatusTypeDef BSP_PWR_VBUSSetVoltage_Fixed(uint32_t PortId,
                                                uint32_t VbusTargetInmv,
                                                uint32_t OperatingCurrent,
                                                uint32_t MaxOperatingCurrent)
@@ -191,7 +191,7 @@ PWR_StatusTypeDef BSP_PWR_VBUSSetVoltage_Fixed(uint32_t PortId,
  * @param  MaxOperatingCurrent the Max Operating Current (in mA)
  * @retval PD controller status
  */
-PWR_StatusTypeDef BSP_PWR_VBUSSetVoltage_Variable(uint32_t PortId,
+__weak PWR_StatusTypeDef BSP_PWR_VBUSSetVoltage_Variable(uint32_t PortId,
                                                   uint32_t VbusTargetMinInmv,
                                                   uint32_t VbusTargetMaxInmv,
                                                   uint32_t OperatingCurrent,
@@ -213,7 +213,7 @@ PWR_StatusTypeDef BSP_PWR_VBUSSetVoltage_Variable(uint32_t PortId,
  * @param  MaxOperatingPower the Max Operating Power (in mW)
  * @retval PD controller status
  */
-PWR_StatusTypeDef BSP_PWR_VBUSSetVoltage_Battery(uint32_t PortId,
+__weak PWR_StatusTypeDef BSP_PWR_VBUSSetVoltage_Battery(uint32_t PortId,
                                                  uint32_t VbusTargetMin,
                                                  uint32_t VbusTargetMax,
                                                  uint32_t OperatingPower,
@@ -234,7 +234,7 @@ PWR_StatusTypeDef BSP_PWR_VBUSSetVoltage_Battery(uint32_t PortId,
 * @param  Delta Delta between with previous APDO (in mV), 0 means APDO start
 * @retval PD controller status
 */
-PWR_StatusTypeDef BSP_PWR_VBUSSetVoltage_APDO(uint32_t PortId,
+__weak PWR_StatusTypeDef BSP_PWR_VBUSSetVoltage_APDO(uint32_t PortId,
                                               uint32_t VbusTargetInmv,
                                               uint32_t OperatingCurrent,
                                               int32_t Delta)
@@ -252,10 +252,10 @@ PWR_StatusTypeDef BSP_PWR_VBUSSetVoltage_APDO(uint32_t PortId,
  *         @arg TYPE_C_PORT_2
  * @retval Voltage measured voltage level (in mV)
  */
-uint32_t  BSP_PWR_VBUSGetVoltage(uint32_t PortId)
+__weak uint32_t  BSP_PWR_VBUSGetVoltage(uint32_t PortId)
 {
 /* USER CODE BEGIN BSP_PWR_VBUSGetVoltage */
-  PWR_DEBUG_TRACE(PortId, "HELP: Update BSP_PWR_VBUSGetVoltage");
+  PWR_DEBUG_TRACE(PortId, "ADVICE: Update BSP_PWR_VBUSGetVoltage");
   return 0;
 /* USER CODE END BSP_PWR_VBUSGetVoltage */
 }
@@ -268,7 +268,7 @@ uint32_t  BSP_PWR_VBUSGetVoltage(uint32_t PortId)
  *         @arg TYPE_C_PORT_2
  * @retval Current measured current level (in mA)
  */
-int32_t BSP_PWR_VBUSGetCurrent(uint32_t PortId)
+__weak int32_t BSP_PWR_VBUSGetCurrent(uint32_t PortId)
 {
 /* USER CODE BEGIN BSP_PWR_VBUSGetCurrent */
   return 0;
@@ -287,7 +287,7 @@ int32_t BSP_PWR_VBUSGetCurrent(uint32_t PortId)
  *         @arg TYPE_C_CC2
  * @retval PD controller status
  */
-PWR_StatusTypeDef BSP_PWR_VCONNInit(uint32_t PortId,
+__weak PWR_StatusTypeDef BSP_PWR_VCONNInit(uint32_t PortId,
                                     uint32_t CCPinId)
 {
 /* USER CODE BEGIN BSP_PWR_VCONNInit */
@@ -307,7 +307,7 @@ PWR_StatusTypeDef BSP_PWR_VCONNInit(uint32_t PortId,
  *         @arg TYPE_C_CC2
  * @retval PD controller status
  */
-PWR_StatusTypeDef BSP_PWR_VCONNDeInit(uint32_t PortId,
+__weak PWR_StatusTypeDef BSP_PWR_VCONNDeInit(uint32_t PortId,
                                       uint32_t CCPinId)
 {
 /* USER CODE BEGIN BSP_PWR_VCONNDeInit */
@@ -327,7 +327,7 @@ PWR_StatusTypeDef BSP_PWR_VCONNDeInit(uint32_t PortId,
  *         @arg TYPE_C_CC2
  * @retval PD controller status
  */
-PWR_StatusTypeDef BSP_PWR_VCONNOn(uint32_t PortId,
+__weak PWR_StatusTypeDef BSP_PWR_VCONNOn(uint32_t PortId,
                                   uint32_t CCPinId)
 {
 /* USER CODE BEGIN BSP_PWR_VCONNOn */
@@ -347,7 +347,7 @@ PWR_StatusTypeDef BSP_PWR_VCONNOn(uint32_t PortId,
  *         @arg TYPE_C_CC2
  * @retval PD controller status
  */
-PWR_StatusTypeDef BSP_PWR_VCONNOff(uint32_t PortId,
+__weak PWR_StatusTypeDef BSP_PWR_VCONNOff(uint32_t PortId,
                                    uint32_t CCPinId)
 {
 /* USER CODE BEGIN BSP_PWR_VCONNOff */
@@ -388,7 +388,7 @@ void BSP_PWR_SetVBUSDisconnectionThreshold(uint32_t PortId,
  * @param  pfnVBUSDetectCallback callback function pointer
 * @retval 0 success else fail
  */
-PWR_StatusTypeDef BSP_PWR_RegisterVBUSDetectCallback(uint32_t                       PortId,
+__weak PWR_StatusTypeDef BSP_PWR_RegisterVBUSDetectCallback(uint32_t                       PortId,
                                                      PWR_VBUSDetectCallbackFunc *   pfnVBUSDetectCallback)
 {
 /* USER CODE BEGIN BSP_PWR_RegisterVBUSDetectCallback */
@@ -406,7 +406,7 @@ PWR_StatusTypeDef BSP_PWR_RegisterVBUSDetectCallback(uint32_t                   
 uint8_t BSP_PWR_VBUSIsOn(uint32_t PortId)
 {
 /* USER CODE BEGIN BSP_PWR_VBUSIsOn */
-  PWR_DEBUG_TRACE(PortId, "HELP: Update BSP_PWR_VBUSIsOn");
+  PWR_DEBUG_TRACE(PortId, "ADVICE: Update BSP_PWR_VBUSIsOn");
   return 0;
 /* USER CODE END BSP_PWR_VBUSIsOn */
 }

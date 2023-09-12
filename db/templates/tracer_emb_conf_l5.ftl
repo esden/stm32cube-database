@@ -124,8 +124,8 @@ extern "C" {
 #include "${FamilyName?lower_case}xx_ll_rcc.h"
 #include "${FamilyName?lower_case}xx_ll_usart.h"
 [#if UARTinstance??]
-    [#if UARTinstance?starts_with("LPUART")][#t]
-        [#t]#include "${FamilyName?lower_case}xx_ll_lpuart.h"
+    [#if UARTinstance?starts_with("LPUART")]
+        [#lt]#include "${FamilyName?lower_case}xx_ll_lpuart.h"
     [/#if]
 [/#if]
 /* Private typedef -----------------------------------------------------------*/

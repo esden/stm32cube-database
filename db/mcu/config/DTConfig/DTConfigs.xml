@@ -8,6 +8,7 @@
 	<DbFeaturesList>
 		<!--Feature Name="extraNode"/-->	<!-- MX DB >=5.3 && <5.4 -->
 		<Feature Name="extraNode2"/>	<!-- MX DB >=5.4 -->
+		<Feature Name="dmaEnabling"/>	<!-- MX DB >=6.0 -->
 	</DbFeaturesList>
 
 	<Configs MatcherSocPN="STM32MP1.+">
@@ -19,16 +20,12 @@
 
 		<Device MatcherMxDM="DFSDM1" MatchToName="DFSDM"/>
 
-		<Device MatcherMxDM="DMA" Condition="DMA1ForA7NS" MatchToName="DMA1" SetterMatcherCtxt="(^CortexA7NS$)" />
-		<Device MatcherMxDM="DMA" Condition="DMA1ForM4" MatchToName="DMA1" SetterMatcherCtxt="(^CortexM4$)" />
-		<Device MatcherMxDM="DMA" Condition="DMA2ForA7NS" MatchToName="DMA2" SetterMatcherCtxt="(^CortexA7NS$)" />
-		<Device MatcherMxDM="DMA" Condition="DMA2ForM4" MatchToName="DMA2" SetterMatcherCtxt="(^CortexM4$)" />
-
-		<Device MatcherMxDM="DMA" MatchToName="DMAMUX" SetterMatcherCtxt="(^CortexA7NS|CortexM4$)" />
+		<Device MatcherMxDM="DMA" MatchToName="DMAMUX1" SetterMatcherCtxt="(^CortexA7NS)" />
 
 		<Device MatcherMxDM="(ETZPC)" MatchToName="$1" FilterMatcherCtxt="(^CortexA7S$)" />
 
-		<Device MatcherMxDM="(MDMA)" MatchToName="$1" SetterMatcherCtxt="(^CortexA7NS$)" />
+		<!--forgot MDMA_A7S-->
+		<Device MatcherMxDM="(MDMA_A7NS)" MatchToName="MDMA1" SetterMatcherCtxt="(^CortexA7NS$)" />
 
 		<Device MatcherMxDM="(GPIO)" MatchToName="$1" SetterMatcherCtxt="(^CortexA7S|CortexA7NS$)" />
 
@@ -45,7 +42,8 @@
 
 
 		<!--Remaining Data Models (default case)-->
-		<Device MatcherMxDM="(?!^(ADC1|ADC2|DEBUG|SYS)$)(^.+$)" MatchToName="$2"/>
+		<!--Device MatcherMxDM="(?!^(ADC1|ADC2|MDMA_A7S|DEBUG|SYS)$)(^.+$)" MatchToName="$2"/-->
+		<Device MatcherMxDM="(?!^(MDMA_A7S|DEBUG|SYS)$)(^.+$)" MatchToName="$2"/>
 
 
 		<!--DTGenCfg-->
@@ -83,8 +81,13 @@
 			<Bind MatcherFw="(^.+$)" />
 		</DTGenCfg>
 
-		<DTGenCfg  MatcherDevice="M4_COPRO" MatchToName="">
-			<Binding MatcherFw="(^.+$)" Name="stm32-rproc_v1.0_Binding">
+		<DTGenCfg  MatcherDevice="DMA(\w)" MatchToName="">
+			<Bind MatcherFw="(^.+$)" />
+			<Bind MatcherFw="" MatcherDeviceAssignableCtxt="(^CortexA7NS$)" />
+		</DTGenCfg>
+
+		<DTGenCfg  MatcherDevice="DMAMUX1" MatchToName="">
+			<Binding MatcherFw="(^.+$)" Name="st-stm32-dmamux_v1.0_Binding">
 			</Binding>
 
 			<Bind MatcherFw="(^.+$)" />
@@ -134,7 +137,7 @@
 			<Binding MatcherFw="(^.+$)" Name="st-stm32-etzpc_v1.0_Binding">
 			</Binding>
 
-			<Bind MatcherFw="(^.+$)" />
+			<Bind MatcherFw="(^SP_MIN$)" />
 		</DTGenCfg>
 
 		<DTGenCfg  MatcherDevice="FDCAN(.+)" MatchToName="">
@@ -178,7 +181,17 @@
 			<Bind MatcherFw="(^.+$)" />
 		</DTGenCfg>
 
+		<DTGenCfg  MatcherDevice="M4_COPRO" MatchToName="">
+			<Binding MatcherFw="(^.+$)" Name="stm32-rproc_v1.0_Binding">
+			</Binding>
+
+			<Bind MatcherFw="(^.+$)" />
+		</DTGenCfg>
+
 		<DTGenCfg  MatcherDevice="PWR" MatchToName="">
+			<Binding MatcherFw="(^.+$)" Name="default_v1.0_Binding">
+				<NodeDef 	MatcherNode="" 				MatchToLabel=""			MatchToNodeName="pwr_regulators" 	MatchToUnitAddress=""/>
+			</Binding>
 			<Bind MatcherFw="(?!^(CUBE)$)(^.+$)" />
 		</DTGenCfg>
 
@@ -268,7 +281,7 @@
 		</DTGenCfg>
 
 		<!--Remaining Devices-->
-		<DTGenCfg  MatcherDevice="(?!^(DDR|DMA1|DMA2|DMAMUX|GIC|GPIO|MDMA|NVIC|FREERTOS|OPENAMP|RESMGR_UTILITY)$)(^.+$)" MatchToName="">
+		<DTGenCfg  MatcherDevice="(?!^(DDR|GIC|GPIO|NVIC|FREERTOS|OPENAMP|RESMGR_UTILITY)$)(^.+$)" MatchToName="">
 			<Bind MatcherFw="(^.+$)" />
 		</DTGenCfg>
 

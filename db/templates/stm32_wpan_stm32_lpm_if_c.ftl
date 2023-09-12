@@ -18,7 +18,8 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
-  
+[#assign WB_LINE = Line]
+
 /* Includes ------------------------------------------------------------------*/  
 #include "stm32_lpm_if.h"
 #include "stm32_lpm.h"
@@ -154,7 +155,9 @@ static void Switch_On_HSI( void )
   LL_RCC_HSI_Enable( );
   while(!LL_RCC_HSI_IsReady( ));
   LL_RCC_SetSysClkSource( LL_RCC_SYS_CLKSOURCE_HSI );
+[#if (WB_LINE != "STM32WBx0 Value Line")]
   LL_RCC_SetSMPSClockSource(LL_RCC_SMPS_CLKSOURCE_HSI);
+[/#if]
   while (LL_RCC_GetSysClkSource( ) != LL_RCC_SYS_CLKSOURCE_STATUS_HSI);
 }
 

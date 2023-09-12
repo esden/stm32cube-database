@@ -44,7 +44,7 @@
 <ScratchFile FileVersion="${FileVersion}">
 <FileVersion>${FileVersion}</FileVersion> [#-- add file version for UC30 --]
 <Workspace>
-<WorkspaceType>${WorkspaceType}</WorkspaceType>
+<WorkspaceType>[#if (IdeMode?? || ide=="STM32CubeIDE") && family=="STM32MP1xx"]Multi-project[#else]${WorkspaceType}[/#if]</WorkspaceType>
 <WorkspacePath>${WorkspacePath}</WorkspacePath>
 <underRoot>${underRoot}</underRoot>
 <TrustZone>${TrustZone}</TrustZone>
@@ -68,6 +68,14 @@
 [@generateProject  prjSecure="0"/]
 
 [#--[/#list]--]
+[/#if]
+[#if (IdeMode?? || ide=="STM32CubeIDE") && family=="STM32MP1xx"]
+<Project>    
+    <ProjectName>${projectName}_DTS</ProjectName>
+    <ProjectNature>DTS</ProjectNature>
+    <DeviceTree>${DeviceTree}</DeviceTree>
+    <ManifestVersion>${ManifestVersion}</ManifestVersion>
+</Project>
 [/#if]
 </Workspace>
 </ScratchFile>
@@ -209,12 +217,12 @@
         [/#list]
 	   [#-- <define>__weak=__attribute__((weak))</define> --]
         </Ldefines>
-        <Cincludes>
+        <Cincludes>		
 	 [#-- required includes for all generated projects --]
-        [#list mxIncludePaths as mxIncludePath]
+        [#list mxIncludePaths as mxIncludePath]		
         <include>${mxIncludePath}</include>
         [/#list]     
-	[#list halIncludePaths as halIncludePath]
+	[#list halIncludePaths as halIncludePath]	
         <include>${halIncludePath}</include>
         [/#list]
         </Cincludes>
@@ -297,12 +305,17 @@
         [#assign selectedConfig =  configName]
 
         [#list elem?keys as dataKey]
-            [#if dataKey=="ApplicationGroups"]
+            [#if dataKey=="ApplicationGroups"]            
                [#assign ApplicationGroups =  elem[dataKey]]
             [/#if]       
-            [#if dataKey=="bspComponentGroups"]
+            [#if dataKey=="bspComponentGroups"]            
                [#assign bspComponentGroups =  elem[dataKey]]
             [/#if] 
+            [#--  BZ 81835 -- --]
+            [#if dataKey=="docGroups"]            
+               [#assign docGroups =  elem[dataKey]]
+            [/#if] 
+
             [#if dataKey=="atLeastOneBspComponentIsUsed"]
                [#assign atLeastOneBspComponentIsUsed =  elem[dataKey]]
             [/#if]
@@ -505,13 +518,8 @@
             [/#if]
         [/#list]
         [/#if]
-	[#-- MZA Bug41441 --]			
-	[#--if atLeastOneCmsisPackIsUsed]
-            <sourceEntry>
-            <name>Packs</name>
-            </sourceEntry>
-	[/#if--]
-        [#if ResMgr_Utility?? || UtilitiesGroup??]
+	
+        [#if ResMgr_Utility?? || (UtilitiesGroup?? && UtilitiesGroup.sourceFilesNameList?size>0)]
             <sourceEntry>
                 <name>Utilities</name>
             </sourceEntry>
@@ -564,33 +572,33 @@
                     [#if group.subGroups??]
                         [#list group.subGroups as sgroup]
                             [#if sgroup.sourceFilesNameList??]
-            <group>
-                <name>${sgroup.name!''}</name>
+                            <group>
+                                <name>${sgroup.name!''}</name>
                                 [#list sgroup.sourceFilesNameList as filesName]
-[#-- selectedConfig --]
-[#assign removeFromConfig = "0"]
-[#if multiConfigurationProject?? && ConfigsAndFiles?? && TrustZone=="1"]
-[#if !ConfigsAndFiles[selectedConfig]?seq_contains(filesName?replace("/","\\"))]
-                [#assign removeFromConfig = "1"]
-[/#if]
-[/#if]
-[#if removeFromConfig == "0"]
-                <file>
-                    <name>${filesName!''}</name>
-[#if  multiConfigurationProject?? && ConfigsAndFiles??]
-    [#list ConfigsAndFiles?keys as configKey]
-[#if !ConfigsAndFiles[configKey]?seq_contains(filesName?replace("/","\\")) && TrustZone=="0"]
-                    <excluded>
-                        <configuration>${Configuration}_${configKey?replace("CortexM", "CM")}</configuration>
-                        </excluded>
-[/#if]
-[/#list]
-[/#if]
-                    </file>
-[/#if]
+                                    [#-- selectedConfig --]
+                                    [#assign removeFromConfig = "0"]
+                                    [#if multiConfigurationProject?? && ConfigsAndFiles?? && TrustZone=="1"]
+                                        [#if !ConfigsAndFiles[selectedConfig]?seq_contains(filesName?replace("/","\\"))]
+                                                        [#assign removeFromConfig = "1"]
+                                        [/#if]
+                                    [/#if]
+                                    [#if removeFromConfig == "0"]
+                                                    <file>
+                                                        <name>${filesName!''}</name>
+                                        [#if  multiConfigurationProject?? && ConfigsAndFiles??]
+                                            [#list ConfigsAndFiles?keys as configKey]
+                                                [#if !ConfigsAndFiles[configKey]?seq_contains(filesName?replace("/","\\")) && TrustZone=="0"]
+                                                    <excluded>
+                                                        <configuration>${Configuration}_${configKey?replace("CortexM", "CM")}</configuration>
+                                                    </excluded>
+                                                [/#if]
+                                            [/#list]
+                                        [/#if]
+                                                    </file>
+                                    [/#if]
                                 [/#list]
                             [/#if]
-                </group>
+                            </group>
                         [/#list]
                     [/#if]
             </group>
@@ -604,7 +612,7 @@
     <group>
         <name>Drivers</name> 
          
-        [#if atLeastDeviceDriverIsUsed]
+        [#if atLeastDeviceDriverIsUsed]        
         <group>					
             [#if deviceDriverGroups??]	
             	[#list deviceDriverGroups as grp]
@@ -621,7 +629,7 @@
             </group>
         [/#if]
         
-        [#if atLeastOneBspComponentIsUsed]
+        [#if atLeastOneBspComponentIsUsed]		        
         <group>					
             [#if bspComponentGroups??]						
                  [#list bspComponentGroups as grp]
@@ -633,14 +641,37 @@
                                 [#if subGrp.sourceFilesNameList??]
                                         [#list subGrp.sourceFilesNameList as filesName]
                 <file>
-                    <name>${filesName!''}</name>
-                    </file>
-                                        [/#list]
-                                [/#if]
+                    <name>${filesName!''}</name>											
+                </file>
+							[/#list]
+						[/#if]
                 </group>
-                           [/#list]	
-                      [/#if]
-                 [/#list]
+                [/#list]	
+            [/#if]
+            [/#list]
+            [/#if]						
+            </group>
+        [/#if]
+        [#if atLeastOneDocIsPresent]		
+        <group>					
+            [#if docGroups??]						
+                 [#list docGroups as grp]
+            <name>${grp.name!''}</name>
+                      [#if grp.subGroups??]
+                           [#list grp.subGroups as subGrp]	
+            <group>
+                <name>${subGrp.name!''}</name>
+                                [#if subGrp.sourceFilesNameList??]
+                                        [#list subGrp.sourceFilesNameList as filesName]
+                <file>
+                    <name>${filesName!''}</name>											
+                </file>
+							[/#list]
+						[/#if]
+                </group>
+                [/#list]	
+            [/#if]
+            [/#list]
             [/#if]						
             </group>
         [/#if]
@@ -677,7 +708,7 @@
     [/#if]
             </group>		    
         </group>   
-        [#if UtilitiesGroup??]
+        [#if UtilitiesGroup?? && UtilitiesGroup.sourceFilesNameList?size>0]
     <group>
         <name>${UtilitiesGroup.name!''}</name>
             [#if UtilitiesGroup.sourceFilesNameList??]
@@ -804,10 +835,11 @@
                 </sourceEntry>
         [#else]
         [#if  TrustZone=="1"]    
+            [#assign usedMw =  usedMWPerCore[selectedConfig]]
+            [#if usedMw?? && usedMw?size>0 ]
               <sourceEntry>
                     <name>Middlewares</name> 
-                        [#--list usedMWPerCore?keys as mwcore--]
-                        [#assign usedMw =  usedMWPerCore[selectedConfig]]
+                        [#--list usedMWPerCore?keys as mwcore--]                        
                         [#list usedMWandRootFolder?keys as middName]
                         [#assign exclude = true]
                         [#assign used = false] 
@@ -828,7 +860,8 @@
                              
                                     [/#list]  
               </sourceEntry>                                       
-                    [#--[/#list] --]         
+                    [#--[/#list] --]    
+            [/#if] [#-- usedMw is not empty --]
         [#else]
             <sourceEntry>
             <name>Middlewares</name>
@@ -836,12 +869,7 @@
             
         [/#if]       
         [/#if]
-        [#if ResMgr_Utility?? || UtilitiesGroup??]
-            <sourceEntry>
-                <name>Utilities</name>
-            </sourceEntry>
-        [/#if]
-
+        
         [#list MiddlewareList as Middleware] 
             [#if TrustZone == "0"]
                     <sourceEntry>
@@ -874,6 +902,11 @@
         [/#list]
         [#-- ************************* --]
 	[/#if]
+        [#if ResMgr_Utility?? || (UtilitiesGroup?? && UtilitiesGroup.sourceFilesNameList?size>0)]
+            <sourceEntry>
+                <name>Utilities</name>
+            </sourceEntry>
+        [/#if]
         [#if ThirdPartyPackList??]
             [#list ThirdPartyPackList as pack]
      [#if pack !=  ""]
@@ -883,12 +916,7 @@
 [/#if]
             [/#list]
         [/#if]
-	[#-- MZA Bug41441 --]			
-        [#if atLeastOneCmsisPackIsUsed]
-        <sourceEntry>
-            <name>Packs</name>
-            </sourceEntry>
-	[/#if]        
+	  
         </sourceEntries>
 [#-- add lib path --]   
 <Groups>
@@ -972,6 +1000,38 @@
         </group> 
             [/#if]
         [/#if]
+[#-- add utility group if contains lib--]
+    [#if UtilitiesGroup?? && UtilitiesGroup.sourceFilesNameList?size>0]
+        <group>
+            <name>${UtilitiesGroup.name!''}</name>
+        [#if UtilitiesGroup.sourceFilesNameList??]
+            [#list UtilitiesGroup.sourceFilesNameList as filesName]
+                [#-- selectedConfig --]
+                [#assign removeFromConfig = "0"]
+                [#if multiConfigurationProject?? && ConfigsAndFiles?? && TrustZone=="1"]
+                    [#if !ConfigsAndFiles[selectedConfig]?seq_contains(filesName?replace("/","\\"))]
+                                    [#assign removeFromConfig = "1"]
+                    [/#if]
+                [/#if]
+                [#if removeFromConfig == "0" && (filesName?ends_with(".a")||filesName?ends_with(".lib"))]
+                    <file>
+                        <name>${filesName!''}</name>
+                    [#if ConfigsAndFiles??]
+                        [#list ConfigsAndFiles?keys as configKey]
+                            [#if  multiConfigurationProject?? && !ConfigsAndFiles[configKey]?seq_contains(filesName?replace("/","\\")) && TrustZone=="0"]
+                        <excluded>
+                        <configuration>${Configuration}_${configKey?replace("CortexM", "CM")}</configuration>
+                        </excluded>
+                            [/#if]
+                        [/#list]
+                    [/#if]
+                    </file>
+                [/#if]
+            [/#list]
+        [/#if]
+        </group>
+    [/#if]
+[#-- End utilities --]
         [#list externalGroups as grp]
             [@getGroups groupArg=grp/]
         [/#list]
@@ -993,16 +1053,15 @@
                     [#--list usedMWPerCore?keys as mwcore--]
                         [#assign exclude = true]
                         [#assign usedMw =  usedMWPerCore[selectedConfig]]  
-                        [#if usedMw?? && usedMw?size>0]  
-
+                        [#if usedMw?? && usedMw?size>0]  							
                             [#assign isMWUsed = "true"]
-
                         [/#if]                                
                     [#--[/#list] --]
                 [/#if]
 [/#list]
 [#-- End search excluded groups --]
 [#if isMWUsed == "true" || TrustZone=="0"]
+
     <group>
         <name>Middlewares</name> 
         [#assign grpList = []]
@@ -1010,122 +1069,132 @@
 [#-- search excluded groups --] 
                 [#assign excludedGroup = "false"]
                 [#if multiConfigurationProject?? && usedMWPerCore?? && TrustZone=="0"]                    
-                                        [#assign exclude = true]
-                                        [#assign usedMw =  usedMWPerCore[selectedConfig]]
-                                        [#if usedMw??]  
-                                            [#list usedMw as mw][#assign n = group.name]
-                                                [#assign used = false]
-                                                [#assign mwName= mw?replace("_M7","")?replace("_M4","")]
-                                                [#if n?starts_with("USB_DEVICE") && mwName?starts_with("USB_DEVICE")]
-                                                    [#assign used = true]
-                                                [/#if]
-                                                [#if n?starts_with("USB_Host") && mwName?starts_with("USB_HOST")]
-                                                    [#assign used = true]
-                                                [/#if]
-                                                [#if n?starts_with("PDMFilter") && mwName?starts_with("PDM2PCM")]
-                                                    [#assign used = true]
-                                                [/#if]                                                
-                                                [#if (mw?lower_case == n?lower_case) || used]
-                                                [#assign exclude = false] 
-                                                [/#if]
-                                            [/#list]
-                                        [/#if]      
-                                        [#if TrustZone=="1" && exclude] 
-                                            [#assign excludedGroup = "true"]
-                                        [/#if]                                
-                                    
-                                [/#if]
+					[#assign exclude = true]										
+                    [#assign usedMw =  usedMWPerCore[selectedConfig]]
+                    [#if usedMw??]  
+						[#list usedMw as mw]
+							[#assign n = group.name]
+                            [#assign used = false]
+                            [#assign mwName= mw?replace("_M7","")?replace("_M4","")]
+                            [#if n?starts_with("USB_DEVICE") && mwName?starts_with("USB_DEVICE")]
+                                [#assign used = true]
+                            [/#if]
+                            [#if n?starts_with("USB_Host") && mwName?starts_with("USB_HOST")]
+                                [#assign used = true]
+                            [/#if]
+                            [#if n?starts_with("PDMFilter") && mwName?starts_with("PDM2PCM")]
+                                [#assign used = true]
+                            [/#if]  																						
+                            [#if (mw?lower_case == n?lower_case) || used]													
+								[#assign exclude = false] 
+                            [/#if]
+                        [/#list]
+                    [/#if]      
+                    [#if TrustZone=="1" && exclude] 
+                        [#assign excludedGroup = "true"]
+                    [/#if]                                                                    
+                [/#if]
 [#-- End search excluded groups --]
-                    [#if !grpList?seq_contains(group.name) && excludedGroup=="false"]
-
-            [#assign grpList = grpList + [group.name]]
-            [#if group.name!="App" && group.name!="Target" && group.name!="target"]
+                [#if !grpList?seq_contains(group.name) && excludedGroup=="false"]					
+					[#assign grpList = grpList + [group.name]]
+					[#if group.name!="App" && group.name!="Target" && group.name!="target"]
         <group>
-            <name>${group.name!''}</name>[#assign nnnnn = group.name]
+            <name>${group.name!''}</name>
+			[#assign nnnnn = group.name]
             [#-- ************************* --]
-           [#if  multiConfigurationProject?? && usedMWPerCore?? && TrustZone=="0"]                    
+            [#if  multiConfigurationProject?? && usedMWPerCore?? && TrustZone=="0"]  						   
+					[#-- Ici on test pour chaque core les groupes a ajouter --]
                     [#list usedMWPerCore?keys as mwcore]
                         [#assign exclude = true]
                         [#assign used = false]
                         [#assign usedMw =  usedMWPerCore[mwcore]]
-                        [#if usedMw??] 
-                            [#list usedMw as mw][#assign n = group.name]
+                        [#if usedMw??] 							 						
+                            [#list usedMw as mw][#assign n = group.name]								
                                 [#assign used = false]
                                 [#assign mwName= mw?replace("_M7","")?replace("_M7","")]
                                 [#if n?starts_with("USB_Device") && mwName?starts_with("USB_DEVICE")]
-                                                    [#assign used = true]
-                                                [/#if]
-                                                [#if n?starts_with("USB_HOST") && mwName?starts_with("USB_HOST")]
-                                                    [#assign used = true]
-                                                [/#if]
+									[#assign used = true]
+                                [/#if]
+                                [#if n?starts_with("USB_HOST") && mwName?starts_with("USB_HOST")]
+                                    [#assign used = true]
+                                [/#if]
                                 [#if n?starts_with("PDMFilter") && mwName?starts_with("PDM2PCM")]
                                     [#assign used = true]
-                                [/#if]                
-                                [#if (n?lower_case?starts_with(mw?lower_case)) || used]
-                                [#assign exclude = false] 
+                                [/#if]									
+                                [#if (n?lower_case?starts_with(mw?lower_case)) || used]											
+									[#assign exclude = false]
                                 [/#if]
+								
+								[#-- CR 60625 --]								
+								[#if group.includedFrom??]								  
+									[#assign coreInclude = group.includedFrom] 
+									[#assign currentCore = mwcore] 
+									[#if coreInclude == currentCore]										
+										[#assign exclude = false] 
+									[/#if]								 
+								[/#if]
                             [/#list]
                         [/#if]  
     
-                        [#if exclude && TrustZone=="0"]
+                        [#if exclude && TrustZone=="0"]						
             <excluded>
                 <configuration>${Configuration}_${mwcore?replace("CortexM", "CM")}</configuration>
             </excluded>
                         [/#if]                       
                     [/#list]  
                 [/#if]
-                [#if group.sourceFilesNameList??]
+                [#if group.sourceFilesNameList??]				
                     [#list group.sourceFilesNameList as filesName]
 [#-- selectedConfig --]
 [#assign removeFromConfig = "0"]
-[#if multiConfigurationProject?? && ConfigsAndFiles?? && TrustZone=="1"]
-[#if !ConfigsAndFiles[selectedConfig]?seq_contains(filesName?replace("/","\\"))]
-                [#assign removeFromConfig = "1"]
-[/#if]
-[/#if]
-[#if removeFromConfig == "0"]
+						[#if multiConfigurationProject?? && ConfigsAndFiles?? && TrustZone=="1"]
+							[#if !ConfigsAndFiles[selectedConfig]?seq_contains(filesName?replace("/","\\"))]
+								[#assign removeFromConfig = "1"]
+							[/#if]
+						[/#if]
+						[#if removeFromConfig == "0"]						
             <file>
                 <name>${filesName!''}</name>
-[#if  multiConfigurationProject?? && ConfigsAndFiles??]
-    [#list ConfigsAndFiles?keys as configKey]
-[#if !ConfigsAndFiles[configKey]?seq_contains(filesName?replace("/","\\")) && TrustZone=="0"]
+							[#if  multiConfigurationProject?? && ConfigsAndFiles??]
+								[#list ConfigsAndFiles?keys as configKey]
+									[#if !ConfigsAndFiles[configKey]?seq_contains(filesName?replace("/","\\")) && TrustZone=="0"]
                     <excluded>
                         <configuration>${Configuration}_${configKey?replace("CortexM", "CM")}</configuration>
                         </excluded>
-[/#if]
-[/#list]
-[/#if]
+									[/#if]
+								[/#list]
+							[/#if]
                 </file>
-[/#if]
-		    [/#list]
-		[/#if]
-		[#if group.subGroups??]
+						[/#if]
+					[/#list]
+				[/#if]
+				[#if group.subGroups??]				
                     [#list group.subGroups as sgroup]
-			[#if sgroup.sourceFilesNameList??]
+						[#if sgroup.sourceFilesNameList??]
             <group>
-                <name>${sgroup.name!''}</name>
-			    [#list sgroup.sourceFilesNameList as filesName]
-[#-- selectedConfig --]
-[#assign removeFromConfig = "0"]
-[#if multiConfigurationProject?? && ConfigsAndFiles?? && TrustZone=="1"]
-[#if !ConfigsAndFiles[selectedConfig]?seq_contains(filesName?replace("/","\\"))]
-                [#assign removeFromConfig = "1"]
-[/#if]
-[/#if]
-[#if removeFromConfig == "0"]
+                <name>${sgroup.name!''}</name>							
+							[#list sgroup.sourceFilesNameList as filesName]
+								[#-- selectedConfig --]
+								[#assign removeFromConfig = "0"]
+									[#if multiConfigurationProject?? && ConfigsAndFiles?? && TrustZone=="1"]
+										[#if !ConfigsAndFiles[selectedConfig]?seq_contains(filesName?replace("/","\\"))]
+											[#assign removeFromConfig = "1"]
+										[/#if]
+									[/#if]
+									[#if removeFromConfig == "0"]
                 <file>
                     <name>${filesName!''}</name>
-[#if  multiConfigurationProject?? && ConfigsAndFiles??]
-    [#list ConfigsAndFiles?keys as configKey]
-[#if !ConfigsAndFiles[configKey]?seq_contains(filesName?replace("/","\\"))]
+										[#if  multiConfigurationProject?? && ConfigsAndFiles??]										
+											[#list ConfigsAndFiles?keys as configKey]													
+												[#if !ConfigsAndFiles[configKey]?seq_contains(filesName?replace("/","\\"))]
                     <excluded>
                         <configuration>${Configuration}_${configKey?replace("CortexM", "CM")}</configuration>
                         </excluded>
-[/#if]
-[/#list]
-[/#if]
+												[/#if]
+											[/#list]
+										[/#if]
                     </file>
-[/#if]
+									[/#if]
                             [/#list]
                         [/#if]
                 </group>
@@ -1143,9 +1212,27 @@
 
         [@getGroups groupArg=grp/]
     [/#list]
+    [#--  BZ 81835 Start --] 
+    [#if atLeastOneDocIsPresent]		
+    <group>					
+        [#if docGroups??]						
+                 [#list docGroups as grp]
+            <name>${grp.name!''}</name>
+                      [#if grp.sourceFilesNameList??]                          
+                           [#list grp.sourceFilesNameList as filesName]
+                <file>
+                    <name>${filesName!''}</name>											
+                </file>
+							[/#list]
+						[/#if]               
+                [/#list]	
+            [/#if]                        				
+        </group>
+    [/#if]
+    [#--  BZ 81835 End --] 
     <group>
         <name>Drivers</name>         
-        [#if atLeastDeviceDriverIsUsed]
+        [#if atLeastDeviceDriverIsUsed]        
         <group>					
             [#if deviceDriverGroups??]	
             	[#list deviceDriverGroups as grp]
@@ -1162,19 +1249,28 @@
             </group>
         [/#if]
         
-    [#if atLeastOneBspComponentIsUsed]
+    [#if atLeastOneBspComponentIsUsed]	
         <group>					
         [#if bspComponentGroups??]						
-            [#list bspComponentGroups as grp]
+            [#list bspComponentGroups as grp]			
             <name>${grp.name!''}</name>
                 [#if grp.subGroups??]
                     [#list grp.subGroups as subGrp]	
-            <group>
+            <group>			
                 <name>${subGrp.name!''}</name>
                         [#if subGrp.sourceFilesNameList??]
                             [#list subGrp.sourceFilesNameList as filesName]
                 <file>
-                    <name>${filesName!''}</name>
+                    <name>${filesName!''}</name>						
+					[#if  multiConfigurationProject?? && ConfigsAndFiles??]
+												[#list ConfigsAndFiles?keys as configKey]
+													[#if !ConfigsAndFiles[configKey]?seq_contains(filesName?replace("/","\\")) && TrustZone=="0"]
+                    <excluded>
+                        <configuration>${Configuration}_${configKey?replace("CortexM", "CM")}</configuration>
+                        </excluded>
+													[/#if]
+												[/#list]
+											[/#if]
                     </file>
                             [/#list]
                         [/#if]
@@ -1185,6 +1281,7 @@
         [/#if]						
             </group>
     [/#if]
+    
         <group>
             <name>${HALGroup.name!''}</name>
     [#if HALGroup.sourceFilesNameList??]
@@ -1229,7 +1326,7 @@
     [/#list]
             </group>
         </group>   
-    [#if UtilitiesGroup??]
+    [#if UtilitiesGroup?? && UtilitiesGroup.sourceFilesNameList?size>0]
     <group>
         <name>${UtilitiesGroup.name!''}</name>
         [#if UtilitiesGroup.sourceFilesNameList??]
@@ -1284,7 +1381,7 @@
 
 
 [#-- App Group Case of Graphics--]
-    [#list ApplicationGroups as grp]
+    [#list ApplicationGroups as grp]    
     [#if grp.name!="Remoteproc"] 
 [@getGroups groupArg=grp/]
     [/#if]

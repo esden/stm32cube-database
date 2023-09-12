@@ -80,7 +80,11 @@ unsigned long mbedtls_timing_get_timer( struct mbedtls_timing_hr_time *val, int 
   uint32_t offset;
   struct _hr_time *t = (struct _hr_time *) val;
 
-  offset = osKernelSysTick();
+#if (osCMSIS < 0x20000)
+   offset = osKernelSysTick();
+#else
+  offset = osKernelGetTickCount();
+#endif
 
   if( reset )
   {

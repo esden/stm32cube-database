@@ -36,6 +36,25 @@
 [/#compress]
 [/#list]
 
+[#--  BZ 74391 REJECTED --]
+[#assign RX_DATA_SIZE = 4]
+[#assign TX_DATA_SIZE = 4]
+[#list SWIPdatas as SWIP]
+[#compress]
+[#if SWIP.defines??]
+	[#list SWIP.defines as definition]		
+    [#if definition.name?contains("APP_RX_DATA_SIZE")]	    
+[#assign RX_DATA_SIZE = definition.value]
+    [/#if]
+	[#if definition.name?contains("APP_TX_DATA_SIZE")]
+[#assign TX_DATA_SIZE = definition.value]
+    [/#if]
+	[/#list]
+[/#if]
+[/#compress]
+[/#list]
+
+
 #ifdef __cplusplus
  extern "C" {
 #endif
@@ -62,6 +81,11 @@
   * @{
   */
 /* USER CODE BEGIN EXPORTED_DEFINES */
+[#--  BZ 74391 --]
+/* Define size for the receive and transmit buffer over CDC */
+/* It's up to user to redefine and/or remove those define */
+#define APP_RX_DATA_SIZE  ${RX_DATA_SIZE}
+#define APP_TX_DATA_SIZE  ${TX_DATA_SIZE}
 
 /* USER CODE END EXPORTED_DEFINES */
 

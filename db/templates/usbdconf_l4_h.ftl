@@ -121,17 +121,18 @@ extern ${variable.value} ${variable.name};
 
 /* Memory management macros */
 
+[#--  Ticket 82086 --]
 /** Alias for memory allocation. */
-#define USBD_malloc         (uint32_t *)USBD_static_malloc
+#define USBD_malloc         malloc
 
 /** Alias for memory release. */
-#define USBD_free           USBD_static_free
+#define USBD_free          free
 
 /** Alias for memory set. */
-#define USBD_memset         /* Not used */
+#define USBD_memset         memset
 
 /** Alias for memory copy. */
-#define USBD_memcpy         /* Not used */
+#define USBD_memcpy         memcpy
 
 /** Alias for delay. */
 #define USBD_Delay          HAL_Delay
@@ -186,8 +187,6 @@ extern ${variable.value} ${variable.name};
   */
 
 /* Exported functions -------------------------------------------------------*/
-void *USBD_static_malloc(uint32_t size);
-void USBD_static_free(void *p);
 
 /**
   * @}

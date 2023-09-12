@@ -14,16 +14,23 @@
         <PossibleValue Comment="Master" Value="I2S_MODE_MASTER"/>
         <PossibleValue Comment="Slave" Value="I2S_MODE_SLAVE"/>
     </RefParameter>
-		
+
     <RefParameter Comment="Transmission Mode" DefaultValue="I2S_MODE_MASTER_TX" Name="Mode" Type="list" Group="Generic Parameters">
-        <Condition Expression="$IpInstance_Master" Diagnostic=""/>
+        <Condition Expression="$IpInstance_Master &amp; !$IpInstance_I2S_FULL_DUPLEX" Diagnostic=""/>
         <PossibleValue Comment="Mode Master Transmit" Value="I2S_MODE_MASTER_TX" Semaphore="$IpInstance_TX"/>
         <PossibleValue Comment="Mode Master Receive" Value="I2S_MODE_MASTER_RX" Semaphore="$IpInstance_RX"/>
     </RefParameter>
     <RefParameter Comment="Transmission Mode" DefaultValue="I2S_MODE_SLAVE_TX" Name="Mode" Type="list" Group="Generic Parameters">
-        <Condition Expression="$IpInstance_Slave" Diagnostic=""/>
+        <Condition Expression="$IpInstance_Slave &amp; !$IpInstance_I2S_FULL_DUPLEX" Diagnostic=""/>
         <PossibleValue Comment="Mode Slave Transmit" Value="I2S_MODE_SLAVE_TX" Semaphore="$IpInstance_TX"/>
         <PossibleValue Comment="Mode Slave Receive" Value="I2S_MODE_SLAVE_RX" Semaphore="$IpInstance_RX"/>
+    </RefParameter>
+
+    <RefParameter Comment="Mode" DefaultValue="I2S_MODE_MASTER_FULLDUPLEX" Name="Mode" Type="string" Group="Generic Parameters" Visible="false">
+        <Condition Expression="$IpInstance_Master &amp; $IpInstance_I2S_FULL_DUPLEX" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Comment="Mode" DefaultValue="I2S_MODE_SLAVE_FULLDUPLEX" Name="Mode" Type="string" Group="Generic Parameters" Visible="false">
+        <Condition Expression="$IpInstance_Slave &amp; $IpInstance_I2S_FULL_DUPLEX" Diagnostic=""/>
     </RefParameter>
     <RefParameter Comment="Mode" DefaultValue="I2S_MODE_SLAVE_TX" Name="Mode" Type="string" Group="Generic Parameters" Visible="false"/>
 	
@@ -40,13 +47,19 @@
         <PossibleValue Comment="PCM with Long Synchro Frame" Value="I2S_STANDARD_PCM_LONG" Semaphore="PCM"/>
     </RefParameter>
 	
-	 <RefParameter Comment="Data and Frame Format" DefaultValue="I2S_DATAFORMAT_16B" Name="DataFormat" Type="list" Group="Generic Parameters">
-	 	<Condition Expression="PCM" Diagnostic=""/>
+    <RefParameter Comment="Data and Frame Format" DefaultValue="I2S_DATAFORMAT_16B" Name="DataFormat" Type="list" Group="Generic Parameters">
+	<Condition Expression="PCM" Diagnostic=""/>
         <PossibleValue Comment="16 Bits Data on 16 Bits Frame" Value="I2S_DATAFORMAT_16B"/>
         <PossibleValue Comment="16 Bits Data on 32 Bits Frame" Value="I2S_DATAFORMAT_16B_EXTENDED"/>
         <PossibleValue Comment="24 Bits Data on 32 Bits Frame" Value="I2S_DATAFORMAT_24B"/>
     </RefParameter>
 	
+    <RefParameter Comment="Data and Frame Format" DefaultValue="I2S_DATAFORMAT_16B" Name="DataFormat" Type="list" Group="Generic Parameters">
+	<Condition Expression="$IpNumber = 6" Diagnostic=""/>
+        <PossibleValue Comment="16 Bits Data on 16 Bits Frame" Value="I2S_DATAFORMAT_16B"/>
+        <PossibleValue Comment="16 Bits Data on 32 Bits Frame" Value="I2S_DATAFORMAT_16B_EXTENDED"/>
+    </RefParameter>
+
     <RefParameter Comment="Data and Frame Format" DefaultValue="I2S_DATAFORMAT_16B" Name="DataFormat" Type="list" Group="Generic Parameters">
         <PossibleValue Comment="16 Bits Data on 16 Bits Frame" Value="I2S_DATAFORMAT_16B"/>
         <PossibleValue Comment="16 Bits Data on 32 Bits Frame" Value="I2S_DATAFORMAT_16B_EXTENDED"/>
@@ -186,9 +199,7 @@
         <Parameter Name="WSInversion" />
         <Parameter Name="IOSwap" />
         <Parameter Name="Data24BitAlignment" />
-        <Parameter Name="FifoThreshold" />
         <Parameter Name="MasterKeepIOState" />
-        <Parameter Name="SlaveExtendFREDetection" />
     </RefMode>
 	
     <!-- RefModes for 'Full-Duplex Slave' I2S -->
@@ -219,9 +230,7 @@
         <Parameter Name="WSInversion" />
         <Parameter Name="IOSwap" />
         <Parameter Name="Data24BitAlignment" />
-        <Parameter Name="FifoThreshold" />
         <Parameter Name="MasterKeepIOState" />
-        <Parameter Name="SlaveExtendFREDetection" />
     </RefMode>
 	
 	
@@ -253,9 +262,7 @@
         <Parameter Name="WSInversion" />
         <Parameter Name="IOSwap" />
         <Parameter Name="Data24BitAlignment" />
-        <Parameter Name="FifoThreshold" />
         <Parameter Name="MasterKeepIOState" />
-        <Parameter Name="SlaveExtendFREDetection" />
     </RefMode>
 	
 	
@@ -287,9 +294,7 @@
         <Parameter Name="WSInversion" />
         <Parameter Name="IOSwap" />
         <Parameter Name="Data24BitAlignment" />
-        <Parameter Name="FifoThreshold" />
         <Parameter Name="MasterKeepIOState" />
-        <Parameter Name="SlaveExtendFREDetection" />
     </RefMode>
 	
 	
@@ -315,6 +320,8 @@
                     </SignalLogicalOp>
                     <Semaphore>$IpInstance_I2S_FULL_DUPLEX</Semaphore>
                     <Semaphore>$IpInstance_Master</Semaphore>
+                    <Semaphore>$IpInstance_RX</Semaphore>
+                    <Semaphore>$IpInstance_TX</Semaphore>
                 </Mode>
                 <Mode Name="Full_Duplex_Slave" UserName="Full-Duplex Slave">
                     <SignalLogicalOp Name="AND">
@@ -325,6 +332,8 @@
                     </SignalLogicalOp>
                     <Semaphore>$IpInstance_I2S_FULL_DUPLEX</Semaphore>
                     <Semaphore>$IpInstance_Slave</Semaphore>
+                    <Semaphore>$IpInstance_RX</Semaphore>
+                    <Semaphore>$IpInstance_TX</Semaphore>
                 </Mode>
                 <Mode Name="Half_Duplex_Master" UserName="Half-Duplex Master">
                     <SignalLogicalOp Name="AND">

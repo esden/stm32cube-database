@@ -10,9 +10,13 @@
 			<MethodArg Name="SynchPrescaler" ParameterName="SynchPrediv"/>
            
 		</CallLibMethod>
+               
      
 	</RefConfig>
 	<RefConfig Name="RTC_Init" Comment="Initialize RTC and set the Time and Date">
+             <CallLibMethod Name="LL_RTC_BKP_GetRegister" Type="HardCode" >
+            <HardCode Text="#tif(LL_RTC_BKP_GetRegister(RTC,LL_RTC_BKP_DR0) != 0x32F2){#n#t "/>
+        </CallLibMethod>
 		<CallLibMethod Name="LL_RTC_Init">
 			<MethodArg Name="RTCx" ParameterName="Instance"/>
 			<MethodArg Name="HourFormat" ParameterName="HourFormat"/>
@@ -20,9 +24,6 @@
 			<MethodArg Name="SynchPrescaler" ParameterName="SynchPrediv"/>
 		</CallLibMethod>
                 
-              
-        
-		
 		<CallLibMethod Name="LL_RTC_TIME_Init">
 			<MethodArg Name="RTCx" ParameterName="Instance"/>
 			<MethodArg Name="RTC_Format" ParameterName="Format" />
@@ -31,7 +32,7 @@
 			<MethodArg Name="Minutes" ParameterName="MinutesARG" />
 			<MethodArg Name="Seconds" ParameterName="SecondsARG" />
 		</CallLibMethod>
-                
+               
                 <CallLibMethod Name="LL_RTC_DATE_Init">
                     <MethodArg Name="RTCx" ParameterName="Instance"/>
                     <MethodArg Name="RTC_Format" ParameterName="Format" />
@@ -41,9 +42,11 @@
                     <MethodArg Name="Day" ParameterName="DateARG" />
                     <MethodArg Name="Year" ParameterName="YearARG" />
                 </CallLibMethod>
-              
+               <CallLibMethod Name="LL_RTC_BKP_SetRegister" Type="HardCode" >                   
+			<HardCode Text="#t#tLL_RTC_BKP_SetRegister(RTC,LL_RTC_BKP_DR0,0x32F2);#n#t}"/>
+		</CallLibMethod>
 		
-                
+                  
 	</RefConfig>
         
         
@@ -65,13 +68,13 @@
                 <CallLibMethod Name="LL_RTC_SetOutputPolarity">
                     
                     <MethodArg Name="RTCx" ParameterName="Instance"/>
-                    <MethodArg Name="OutPutPolarity" ParameterName="OutPutPolarity"/>
+                    <MethodArg Name="Polarity" ParameterName="OutPutPolarity"/>
                 </CallLibMethod>
 
                 <CallLibMethod Name="LL_RTC_SetAlarmOutputType">
                     
                     <MethodArg Name="RTCx" ParameterName="Instance"/>
-                    <MethodArg Name="OutPutType" ParameterName="OutPutType"/>
+                    <MethodArg Name="Output" ParameterName="OutPutType"/>
                 </CallLibMethod>
                 <!-- RTC_OUTPUT_PULLUP_ON -->
                     <IFCondition Expression=" OutPutPullUp = RTC_OUTPUT_PULLUP_ON">
@@ -87,22 +90,15 @@
 			</CallLibMethod>
 		</IFCondition>
      
-                <IFCondition Expression="OutPut1 = RTC_OUTPUT_ALARMA">
-			<CallLibMethod Name="LL_RTC_SetAlarmOutEvent">
+                <IFCondition Expression="AlarmA_Outputed  &amp; OutPut1 =RTC_OUTPUT_ALARMA ">
+			<CallLibMethod Name="LL_RTC_SetAlarmOutEvent" >
                     
 			<MethodArg Name="RTCx" ParameterName="Instance"/>
 			<MethodArg Name="AlarmOutput" ParameterName="OutPut1"/>
                         
 		</CallLibMethod>
 		</IFCondition>
-                <IFCondition Expression="OutPut1 = !RTC_OUTPUT_ALARMA">
-			<CallLibMethod Name="LL_RTC_SetAlarmOutEvent">
-                    
-			<MethodArg Name="RTCx" ParameterName="Instance"/>
-			<MethodArg Name="AlarmOutput" ParameterName="OutPut"/>
-                        
-		</CallLibMethod>
-		</IFCondition>
+                
                 
               </RefConfig>      
 
@@ -122,13 +118,13 @@
                 <CallLibMethod Name="LL_RTC_SetOutputPolarity">
                     
                     <MethodArg Name="RTCx" ParameterName="Instance"/>
-                    <MethodArg Name="OutPutPolarity" ParameterName="OutPutPolarity"/>
+                    <MethodArg Name="Polarity" ParameterName="OutPutPolarity"/>
                 </CallLibMethod>
 
                 <CallLibMethod Name="LL_RTC_SetAlarmOutputType">
                     
                     <MethodArg Name="RTCx" ParameterName="Instance"/>
-                    <MethodArg Name="OutPutType" ParameterName="OutPutType"/>
+                    <MethodArg Name="Output" ParameterName="OutPutType"/>
                 </CallLibMethod>
                 <!-- RTC_OUTPUT_PULLUP_ON -->
                     <IFCondition Expression=" OutPutPullUp = RTC_OUTPUT_PULLUP_ON">
@@ -144,22 +140,15 @@
 			</CallLibMethod>
 		</IFCondition>
      
-                <IFCondition Expression="OutPut1 = RTC_OUTPUT_ALARMA">
-			<CallLibMethod Name="LL_RTC_SetAlarmOutEvent">
+                <IFCondition Expression="AlarmA_Outputed  &amp; OutPut1 =RTC_OUTPUT_ALARMA ">
+			<CallLibMethod Name="LL_RTC_SetAlarmOutEvent" >
                     
 			<MethodArg Name="RTCx" ParameterName="Instance"/>
 			<MethodArg Name="AlarmOutput" ParameterName="OutPut1"/>
                         
 		</CallLibMethod>
 		</IFCondition>
-                <IFCondition Expression="OutPut1 = !RTC_OUTPUT_ALARMA">
-			<CallLibMethod Name="LL_RTC_SetAlarmOutEvent">
-                    
-			<MethodArg Name="RTCx" ParameterName="Instance"/>
-			<MethodArg Name="AlarmOutput" ParameterName="OutPut"/>
-                        
-		</CallLibMethod>
-		</IFCondition>
+               
 	 	<CallLibMethod Name="LL_RTC_EnableIT_ALRA">
 			<MethodArg Name="RTCx" ParameterName="Instance"/>
 		</CallLibMethod>
@@ -173,13 +162,13 @@
             <CallLibMethod Name="LL_RTC_SetOutputPolarity">
                     
                 <MethodArg Name="RTCx" ParameterName="Instance"/>
-                <MethodArg Name="OutPutPolarity" ParameterName="OutPutPolarity"/>
+                    <MethodArg Name="Polarity" ParameterName="OutPutPolarity"/>
             </CallLibMethod>
 
             <CallLibMethod Name="LL_RTC_SetAlarmOutputType">
                     
                 <MethodArg Name="RTCx" ParameterName="Instance"/>
-                <MethodArg Name="OutPutType" ParameterName="OutPutType"/>
+                <MethodArg Name="Output" ParameterName="OutPutType"/>
             </CallLibMethod>
              <IFCondition Expression=" OutPutPullUp = RTC_OUTPUT_PULLUP_ON">
 			<CallLibMethod Name="LL_RTC_EnableAlarmPullUp">
@@ -202,14 +191,7 @@
                         
 		</CallLibMethod>
 		</IFCondition>
-                <IFCondition Expression=" !AlarmB_Outputed  &amp; OutPut2 = !RTC_OUTPUT_ALARMB ">
-			<CallLibMethod Name="LL_RTC_SetAlarmOutEvent" >
-                    
-			<MethodArg Name="RTCx" ParameterName="Instance"/>
-			<MethodArg Name="AlarmOutput" ParameterName="OutPut"/>
-                        
-		</CallLibMethod>
-		</IFCondition>
+                
             
 		<CallLibMethod Name="LL_RTC_ALMB_Init">
 			<MethodArg Name="RTCx" ParameterName="Instance"/>
@@ -250,13 +232,13 @@
                 <CallLibMethod Name="LL_RTC_SetOutputPolarity">
                     
                 <MethodArg Name="RTCx" ParameterName="Instance"/>
-                <MethodArg Name="OutPutPolarity" ParameterName="OutPutPolarity"/>
+                    <MethodArg Name="Polarity" ParameterName="OutPutPolarity"/>
             </CallLibMethod>
 
             <CallLibMethod Name="LL_RTC_SetAlarmOutputType">
                     
                 <MethodArg Name="RTCx" ParameterName="Instance"/>
-                <MethodArg Name="OutPutType" ParameterName="OutPutType"/>
+                <MethodArg Name="Output" ParameterName="OutPutType"/>
             </CallLibMethod>
              <IFCondition Expression=" OutPutPullUp = RTC_OUTPUT_PULLUP_ON">
 			<CallLibMethod Name="LL_RTC_EnableAlarmPullUp">
@@ -279,14 +261,7 @@
                         
 		</CallLibMethod>
 		</IFCondition>
-                <IFCondition Expression=" !AlarmB_Outputed  &amp; OutPut2 = !RTC_OUTPUT_ALARMB ">
-			<CallLibMethod Name="LL_RTC_SetAlarmOutEvent" >
-                    
-			<MethodArg Name="RTCx" ParameterName="Instance"/>
-			<MethodArg Name="AlarmOutput" ParameterName="OutPut"/>
-                        
-		</CallLibMethod>
-		</IFCondition>
+                
 	</RefConfig>
 
 	
@@ -319,6 +294,13 @@
             <CallLibMethod Name="LL_RTC_TAMPER_DisableMask">
                 <MethodArg Name="RTCx" ParameterName="Instance"/>
                 <MethodArg Name="Mask" ParameterName="MaskFlag_1"/>
+            </CallLibMethod>
+        </IFCondition>
+        
+        <IFCondition Expression="OutPut = RTC_OUTPUT_TAMPER">
+	
+            <CallLibMethod Name="LL_RTC_EnableTamperOutput">
+                <MethodArg Name="RTCx" ParameterName="Instance"/>
             </CallLibMethod>
         </IFCondition>
         
@@ -367,12 +349,19 @@
             </CallLibMethod>
         </IFCondition>
 	
-	
-		
-        <CallLibMethod Name="LL_RTC_TAMPER_EnableActiveLevel">
-            <MethodArg Name="RTCx" ParameterName="Instance"/>
-            <MethodArg Name="Trigger" ParameterName="Trigger_1"/>
-        </CallLibMethod>
+	<IFCondition Expression="(Trigger_1 = RTC_TAMPERTRIGGER_FALLINGEDGE)">
+			<CallLibMethod Name="LL_RTC_TAMPER_EnableActiveLevel">
+				<MethodArg Name="RTCx" ParameterName="Instance"/>
+                                <MethodArg Name="Trigger" ParameterName="Trigger_1"/>
+			</CallLibMethod>
+		</IFCondition>
+                
+                <IFCondition Expression="(Trigger_1 = RTC_TAMPERTRIGGER_HIGHLEVEL)">
+			<CallLibMethod Name="LL_RTC_TAMPER_EnableActiveLevel">
+				<MethodArg Name="RTCx" ParameterName="Instance"/>
+                                <MethodArg Name="Trigger" ParameterName="Trigger_1"/>
+			</CallLibMethod>
+		</IFCondition>
     </RefConfig>
 	
 	
@@ -397,6 +386,12 @@
             <MethodArg Name="RTCx" ParameterName="Instance"/>
             <MethodArg Name="SamplingFrequency" ParameterName="SamplingFrequency"/>
         </CallLibMethod>
+        <IFCondition Expression="OutPut = RTC_OUTPUT_TAMPER">
+	
+            <CallLibMethod Name="LL_RTC_EnableTamperOutput">
+                <MethodArg Name="RTCx" ParameterName="Instance"/>
+            </CallLibMethod>
+        </IFCondition>
 		
         <IFCondition Expression="(TamperPullUp = RTC_TAMPER_PULLUP_ENABLE)">
             <CallLibMethod Name="LL_RTC_TAMPER_EnablePullUp">
@@ -411,11 +406,20 @@
         </IFCondition>
 
 	
+           <IFCondition Expression="MaskFlag_1 = RTC_TAMPERMASK_FLAG_ENABLE">
+	
+            <CallLibMethod Name="LL_RTC_TAMPER_EnableMask">
+                <MethodArg Name="RTCx" ParameterName="Instance"/>
+                <MethodArg Name="Mask" ParameterName="MaskFlag_1"/>
+            </CallLibMethod>
+        </IFCondition>
+          <IFCondition Expression="MaskFlag_1 = RTC_TAMPERMASK_FLAG_DISABLE">
+	
             <CallLibMethod Name="LL_RTC_TAMPER_DisableMask">
                 <MethodArg Name="RTCx" ParameterName="Instance"/>
                 <MethodArg Name="Mask" ParameterName="MaskFlag_1"/>
             </CallLibMethod>
-       
+        </IFCondition>
         
         
           <IFCondition Expression="NoErase_1 = RTC_TAMPER_ERASE_BACKUP_ENABLE">
@@ -434,10 +438,19 @@
             </CallLibMethod>
         </IFCondition>
 		
-        <CallLibMethod Name="LL_RTC_TAMPER_EnableActiveLevel">
-            <MethodArg Name="RTCx" ParameterName="Instance"/>
-            <MethodArg Name="Trigger" ParameterName="Trigger_1"/>
-        </CallLibMethod>
+        <IFCondition Expression="(Trigger_1 = RTC_TAMPERTRIGGER_FALLINGEDGE)">
+			<CallLibMethod Name="LL_RTC_TAMPER_EnableActiveLevel">
+				<MethodArg Name="RTCx" ParameterName="Instance"/>
+                                <MethodArg Name="Trigger" ParameterName="Trigger_1"/>
+			</CallLibMethod>
+		</IFCondition>
+                
+                <IFCondition Expression="(Trigger_1 = RTC_TAMPERTRIGGER_HIGHLEVEL)">
+			<CallLibMethod Name="LL_RTC_TAMPER_EnableActiveLevel">
+				<MethodArg Name="RTCx" ParameterName="Instance"/>
+                                <MethodArg Name="Trigger" ParameterName="Trigger_1"/>
+			</CallLibMethod>
+		</IFCondition>
 		
         <CallLibMethod Name="LL_RTC_EnableIT_TAMP1">
             <MethodArg Name="RTCx" ParameterName="Instance"/>
@@ -468,7 +481,12 @@
             </CallLibMethod>
         </IFCondition>
         
-        
+        <IFCondition Expression="OutPut = RTC_OUTPUT_TAMPER">
+	
+            <CallLibMethod Name="LL_RTC_EnableTamperOutput">
+                <MethodArg Name="RTCx" ParameterName="Instance"/>
+            </CallLibMethod>
+        </IFCondition>
           <IFCondition Expression="NoErase_2 = RTC_TAMPER_ERASE_BACKUP_ENABLE">
 	
             <CallLibMethod Name="LL_RTC_TAMPER_EnableEraseBKP">
@@ -512,12 +530,19 @@
             </CallLibMethod>
         </IFCondition>
 		
-      
-	
-        <CallLibMethod Name="LL_RTC_TAMPER_EnableActiveLevel">
-            <MethodArg Name="RTCx" ParameterName="Instance"/>
-            <MethodArg Name="Trigger" ParameterName="Trigger_2"/>
-        </CallLibMethod>
+      <IFCondition Expression="(Trigger_2 = RTC_TAMPERTRIGGER_FALLINGEDGE)">
+			<CallLibMethod Name="LL_RTC_TAMPER_EnableActiveLevel">
+				<MethodArg Name="RTCx" ParameterName="Instance"/>
+                                <MethodArg Name="Trigger" ParameterName="Trigger_2"/>
+			</CallLibMethod>
+		</IFCondition>
+                
+                <IFCondition Expression="(Trigger_2 = RTC_TAMPERTRIGGER_HIGHLEVEL)">
+			<CallLibMethod Name="LL_RTC_TAMPER_EnableActiveLevel">
+				<MethodArg Name="RTCx" ParameterName="Instance"/>
+                                <MethodArg Name="Trigger" ParameterName="Trigger_2"/>
+			</CallLibMethod>
+		</IFCondition>
     </RefConfig>
 	
     <RefConfig Name="RTC_SetTamper_2_IT" Comment="Enable the RTC Tamper 2">
@@ -528,12 +553,27 @@
 		
          
 	
+             <IFCondition Expression="MaskFlag_2 = RTC_TAMPERMASK_FLAG_ENABLE">
+	
+            <CallLibMethod Name="LL_RTC_TAMPER_EnableMask">
+                <MethodArg Name="RTCx" ParameterName="Instance"/>
+                <MethodArg Name="Mask" ParameterName="MaskFlag_2"/>
+            </CallLibMethod>
+        </IFCondition>
+          <IFCondition Expression="MaskFlag_2 = RTC_TAMPERMASK_FLAG_DISABLE">
+	
             <CallLibMethod Name="LL_RTC_TAMPER_DisableMask">
                 <MethodArg Name="RTCx" ParameterName="Instance"/>
                 <MethodArg Name="Mask" ParameterName="MaskFlag_2"/>
             </CallLibMethod>
+        </IFCondition>
        
-        
+        <IFCondition Expression="OutPut = RTC_OUTPUT_TAMPER">
+	
+            <CallLibMethod Name="LL_RTC_EnableTamperOutput">
+                <MethodArg Name="RTCx" ParameterName="Instance"/>
+            </CallLibMethod>
+        </IFCondition>
         
           <IFCondition Expression="NoErase_2 = RTC_TAMPER_ERASE_BACKUP_ENABLE">
 	
@@ -578,11 +618,19 @@
             </CallLibMethod>
         </IFCondition>
 	
-		
-        <CallLibMethod Name="LL_RTC_TAMPER_EnableActiveLevel">
-            <MethodArg Name="RTCx" ParameterName="Instance"/>
-            <MethodArg Name="Trigger" ParameterName="Trigger_2"/>
-        </CallLibMethod>
+	<IFCondition Expression="(Trigger_2 = RTC_TAMPERTRIGGER_FALLINGEDGE)">
+			<CallLibMethod Name="LL_RTC_TAMPER_EnableActiveLevel">
+				<MethodArg Name="RTCx" ParameterName="Instance"/>
+                                <MethodArg Name="Trigger" ParameterName="Trigger_2"/>
+			</CallLibMethod>
+		</IFCondition>
+                
+                <IFCondition Expression="(Trigger_2 = RTC_TAMPERTRIGGER_HIGHLEVEL)">
+			<CallLibMethod Name="LL_RTC_TAMPER_EnableActiveLevel">
+				<MethodArg Name="RTCx" ParameterName="Instance"/>
+                                <MethodArg Name="Trigger" ParameterName="Trigger_2"/>
+			</CallLibMethod>
+		</IFCondition>
 		
         <CallLibMethod Name="LL_RTC_EnableIT_TAMP2">
             <MethodArg Name="RTCx" ParameterName="Instance"/>
@@ -620,7 +668,12 @@
                 <MethodArg Name="Tamper" ParameterName="NoErase_3"/>
             </CallLibMethod>
         </IFCondition>
-        
+        <IFCondition Expression="OutPut = RTC_OUTPUT_TAMPER">
+	
+            <CallLibMethod Name="LL_RTC_EnableTamperOutput">
+                <MethodArg Name="RTCx" ParameterName="Instance"/>
+            </CallLibMethod>
+        </IFCondition>
         <IFCondition Expression="NoErase_3 = RTC_TAMPER_ERASE_BACKUP_DISABLE">
 	
             <CallLibMethod Name="LL_RTC_TAMPER_DisableEraseBKP">
@@ -656,11 +709,19 @@
             </CallLibMethod>
         </IFCondition>
 	
-		
-        <CallLibMethod Name="LL_RTC_TAMPER_EnableActiveLevel">
-            <MethodArg Name="RTCx" ParameterName="Instance"/>
-            <MethodArg Name="Trigger" ParameterName="Trigger_3"/>
-        </CallLibMethod>
+	<IFCondition Expression="(Trigger_3 = RTC_TAMPERTRIGGER_FALLINGEDGE)">
+			<CallLibMethod Name="LL_RTC_TAMPER_EnableActiveLevel">
+				<MethodArg Name="RTCx" ParameterName="Instance"/>
+                                <MethodArg Name="Trigger" ParameterName="Trigger_3"/>
+			</CallLibMethod>
+		</IFCondition>
+                
+                <IFCondition Expression="(Trigger_3 = RTC_TAMPERTRIGGER_HIGHLEVEL)">
+			<CallLibMethod Name="LL_RTC_TAMPER_EnableActiveLevel">
+				<MethodArg Name="RTCx" ParameterName="Instance"/>
+                                <MethodArg Name="Trigger" ParameterName="Trigger_3"/>
+			</CallLibMethod>
+		</IFCondition>
 		
     </RefConfig>
 
@@ -670,12 +731,27 @@
             <MethodArg Name="Tamper" ParameterName="Tamper_3"/>
         </CallLibMethod>
 		
-              
+              <IFCondition Expression="OutPut = RTC_OUTPUT_TAMPER">
+	
+            <CallLibMethod Name="LL_RTC_EnableTamperOutput">
+                <MethodArg Name="RTCx" ParameterName="Instance"/>
+            </CallLibMethod>
+        </IFCondition>
+	
+            <IFCondition Expression="MaskFlag_3 = RTC_TAMPERMASK_FLAG_ENABLE">
+	
+            <CallLibMethod Name="LL_RTC_TAMPER_EnableMask">
+                <MethodArg Name="RTCx" ParameterName="Instance"/>
+                <MethodArg Name="Mask" ParameterName="MaskFlag_3"/>
+            </CallLibMethod>
+        </IFCondition>
+          <IFCondition Expression="MaskFlag_3 = RTC_TAMPERMASK_FLAG_DISABLE">
 	
             <CallLibMethod Name="LL_RTC_TAMPER_DisableMask">
                 <MethodArg Name="RTCx" ParameterName="Instance"/>
                 <MethodArg Name="Mask" ParameterName="MaskFlag_3"/>
             </CallLibMethod>
+        </IFCondition>
        
         
         
@@ -722,12 +798,19 @@
             </CallLibMethod>
         </IFCondition>
 	
-	
-		
-        <CallLibMethod Name="LL_RTC_TAMPER_EnableActiveLevel">
-            <MethodArg Name="RTCx" ParameterName="Instance"/>
-            <MethodArg Name="Trigger" ParameterName="Trigger_3"/>
-        </CallLibMethod>
+	<IFCondition Expression="(Trigger_3 = RTC_TAMPERTRIGGER_FALLINGEDGE)">
+			<CallLibMethod Name="LL_RTC_TAMPER_EnableActiveLevel">
+				<MethodArg Name="RTCx" ParameterName="Instance"/>
+                                <MethodArg Name="Trigger" ParameterName="Trigger_3"/>
+			</CallLibMethod>
+		</IFCondition>
+                
+                <IFCondition Expression="(Trigger_3 = RTC_TAMPERTRIGGER_HIGHLEVEL)">
+			<CallLibMethod Name="LL_RTC_TAMPER_EnableActiveLevel">
+				<MethodArg Name="RTCx" ParameterName="Instance"/>
+                                <MethodArg Name="Trigger" ParameterName="Trigger_3"/>
+			</CallLibMethod>
+		</IFCondition>
 		
         <CallLibMethod Name="LL_RTC_EnableIT_TAMP3">
             <MethodArg Name="RTCx" ParameterName="Instance"/>
@@ -785,13 +868,13 @@
         <CallLibMethod Name="LL_RTC_SetOutputPolarity">
                     
             <MethodArg Name="RTCx" ParameterName="Instance"/>
-            <MethodArg Name="OutPutPolarity" ParameterName="OutPutPolarity"/>
+                    <MethodArg Name="Polarity" ParameterName="OutPutPolarity"/>
         </CallLibMethod>
      
         <CallLibMethod Name="LL_RTC_SetAlarmOutputType">
                     
             <MethodArg Name="RTCx" ParameterName="Instance"/>
-            <MethodArg Name="OutPutType" ParameterName="OutPutType"/>
+            <MethodArg Name="Output" ParameterName="OutPutType"/>
         </CallLibMethod>
          <IFCondition Expression=" OutPutPullUp = RTC_OUTPUT_PULLUP_ON">
 			<CallLibMethod Name="LL_RTC_EnableAlarmPullUp">
@@ -834,10 +917,33 @@
     </RefConfig>
 	
     <RefConfig Name="RTC_WakeUp_IT" Comment="Enable the WakeUp">
+         <CallLibMethod Name="LL_RTC_EnableIT_WUT">
+            <MethodArg Name="RTCx" ParameterName="Instance"/>
+
+        </CallLibMethod>
         <CallLibMethod Name="LL_RTC_WAKEUP_SetClock">
+                    
             <MethodArg Name="RTCx" ParameterName="Instance"/>
             <MethodArg Name="WakeUpClock" ParameterName="WakeUpClock"/>
         </CallLibMethod>
+                
+        <CallLibMethod Name="LL_RTC_WAKEUP_SetAutoReload">
+                    
+            <MethodArg Name="RTCx" ParameterName="Instance"/>
+            <MethodArg Name="Tamper" ParameterName="WakeUpCounter"/>
+                        
+        </CallLibMethod>
+        
+        <IFCondition Expression="WakeUp_Outputed  &amp; OutPut3 = RTC_OUTPUT_WAKEUP ">
+             <CallLibMethod Name="LL_RTC_SetAlarmOutEvent" >
+                    
+                 <MethodArg Name="RTCx" ParameterName="Instance"/>
+                 <MethodArg Name="AlarmOutput" ParameterName="OutPut3"/>
+                        
+             </CallLibMethod>
+        </IFCondition>
+        
+        
 
     </RefConfig>      
 	
@@ -861,17 +967,22 @@
     
 
     <!-- Lib Methods -->
+ <LibMethod Comment="" Name="LL_RTC_EnableIT_WUT">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="RTCx" TypeName="RTC_TypeDef"/>
+    </LibMethod>  
     <LibMethod Comment="" Name="LL_RTC_ALMA_Enable">
         <Argument AddressOf="false" GenericType="baseaddress" Name="RTCx" TypeName="RTC_TypeDef"/>
     </LibMethod>
-    <LibMethod Comment="" Name="LL_RTC_ALMA_Disable">
+    
+    <LibMethod Comment="" Name="LL_RTC_EnableTamperOutput" Optimizable="true">
         <Argument AddressOf="false" GenericType="baseaddress" Name="RTCx" TypeName="RTC_TypeDef"/>
     </LibMethod>
+    
     <LibMethod Comment="" Name="LL_RTC_ALMA_SetMask">
         <Argument AddressOf="false" GenericType="baseaddress" Name="RTCx" TypeName="RTC_TypeDef"/>
         <Argument AddressOf="false" GenericType="simple" Name="Mask" OptimizationCondition="equal"/>
     </LibMethod>
-    <LibMethod Comment="" Name="LL_RTC_SetAlarmOutEvent">
+    <LibMethod Comment="" Name="LL_RTC_SetAlarmOutEvent" Optimizable="true">
         <Argument AddressOf="false" GenericType="baseaddress" Name="RTCx" TypeName="RTC_TypeDef"/>
         <Argument AddressOf="false" GenericType="simple" Name="AlarmOutput" OptimizationCondition="equal"/>
     </LibMethod>
@@ -1078,12 +1189,12 @@
    
     <LibMethod Comment="" Name="LL_RTC_SetOutputPolarity" Optimizable="true">
         <Argument AddressOf="false" GenericType="baseaddress" Name="RTCx" TypeName="RTC_TypeDef"/>
-        <Argument AddressOf="false" GenericType="simple" Name="OutPutPolarity" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Polarity" OptimizationCondition="equal"/>
     </LibMethod>
    
     <LibMethod Comment="" Name="LL_RTC_SetAlarmOutputType" Optimizable="true">
         <Argument AddressOf="false" GenericType="baseaddress" Name="RTCx" TypeName="RTC_TypeDef"/>
-        <Argument AddressOf="false" GenericType="simple" Name="OutPutType" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="Output" OptimizationCondition="equal"/>
     </LibMethod>
    
     <LibMethod Comment="" Name="LL_RTC_GetHourFormat">
@@ -1101,10 +1212,6 @@
     </LibMethod>
    
   
-    <LibMethod Comment="" Name="LL_RTC_SetAlarmOutputType" Optimizable="true">
-        <Argument AddressOf="false" GenericType="baseaddress" Name="RTCx" TypeName="RTC_TypeDef"/>
-        <Argument AddressOf="false" GenericType="simple" Name="AlarmOutput" OptimizationCondition="equal"/>
-    </LibMethod>
     <LibMethod Comment="" Name="LL_RTC_GetOutputPolarity">
         <Argument AddressOf="false" GenericType="baseaddress" Name="RTCx" TypeName="RTC_TypeDef"/>
     </LibMethod>
@@ -1406,6 +1513,10 @@
 
         <Argument AddressOf="false" GenericType="Simple" Name="BackupRegister"/>
     </LibMethod>
+    <LibMethod Comment="" Name="LL_RTC_BKP_SetRegister">
+        <Argument AddressOf="false" GenericType="baseaddress" Name="RTCx" TypeName="RTC_TypeDef"/>
+        <Argument AddressOf="false" GenericType="simple" Name="BackupRegister" OptimizationCondition="equal"/>
+    </LibMethod>
     <LibMethod Comment="" Name="LL_RTC_BKP_SetRegister" Optimizable="true">
         <Argument AddressOf="false" GenericType="baseaddress" Name="RTCx" TypeName="RTC_TypeDef"/>
         <Argument AddressOf="false" GenericType="Simple" Name="BackupRegister"/>
@@ -1503,7 +1614,7 @@
     </LibMethod>
 
     
-    <LibMethod Comment="" Name="LL_RTC_TAMPER_DisablePullUp">
+    <LibMethod Comment="" Name="LL_RTC_TAMPER_DisablePullUp" Optimizable="true">
         <Argument AddressOf="false" GenericType="baseaddress" Name="RTCx" TypeName="RTC_TypeDef"/>
 
     </LibMethod>
@@ -1577,7 +1688,7 @@
     <LibMethod Comment="" Name="LL_RTC_CALIB_OUTPUT_512HZ">
         <Argument AddressOf="false" GenericType="baseaddress" Name="RTCx" TypeName="RTC_TypeDef"/>
     </LibMethod>
-    <LibMethod Comment="" Name="LL_RTC_DisableAlarmPullUp">
+    <LibMethod Comment="" Name="LL_RTC_DisableAlarmPullUp" Optimizable="true">
         <Argument AddressOf="false" GenericType="baseaddress" Name="RTCx" TypeName="RTC_TypeDef"/>
     </LibMethod>
     

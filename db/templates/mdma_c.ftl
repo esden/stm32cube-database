@@ -249,12 +249,6 @@ struct_variables=${struct_variables}
                 [#list func_argument.argument as argument1]
                   [#if argument1.genericType != "struct"]
                     [#if argument1.mandatory && argument1.value??]
-                      [#if method_commented && argument1.name=="SrcAddress"]
-                        [#assign start_commenting = true]
-  /* Template to be copied and modified in the user code section below */
-  /* Please give a value to the following parameters set by default to 0 */
-  /*
-                      [/#if]
   ${request}.${argument1.name} = ${argument1.value};
                     [/#if]
                   [#else]
@@ -282,8 +276,7 @@ struct_variables=${struct_variables}
   {
     Error_Handler();
   }
-            [#if start_commenting && method_commented]
-  */
+            [#if method_commented]
   /* USER CODE BEGIN ${configModel.dmaRequestName?lower_case} */
 
   /* USER CODE END ${configModel.dmaRequestName?lower_case} */

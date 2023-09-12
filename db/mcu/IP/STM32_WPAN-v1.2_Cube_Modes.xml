@@ -837,13 +837,12 @@
     </RefParameter>
 
     <RefParameter Name="CFG_DEBUGGER_SUPPORTED" Comment="CFG_DEBUGGER_SUPPORTED" DefaultValue="1" Type="list" Group="Generic parameters" TabName="Configuration" Visible="true">
-        <Condition Diagnostic="" Expression="S_BLE_HOST | (S_THREAD &amp; !Semaphore_CFG_FULL_LOW_POWER)"/>
-        <Description> Enable or disable debugger, default value set to 1</Description>
-        <PossibleValue Value="0" Comment="Disabled" />
+        <Condition Diagnostic="" Expression="(S_BLE_HOST | (S_THREAD &amp; !Semaphore_CFG_FULL_LOW_POWER)) &amp;(SWD | JTAG)"/>
+        <Description> Debugger enabled.</Description>
         <PossibleValue Value="1" Comment="Enabled" Semaphore="Semaphore_CFG_DEBUGGER_SUPPORTED"/>
     </RefParameter>
     <RefParameter Name="CFG_DEBUGGER_SUPPORTED" Comment="CFG_DEBUGGER_SUPPORTED" DefaultValue="0" Type="list" Group="Generic parameters" TabName="Configuration" Visible="true">
-        <Description> Enable or disable debugger, disabled because CFG_FULL_LOW_POWER is enabled</Description>
+        <Description> Enable or disable debugger, disabled because CFG_FULL_LOW_POWER is enabled. Needs Sys Debug to be enabled as well.</Description>
         <PossibleValue Value="0" Comment="Disabled" />
     </RefParameter>
 
@@ -1697,7 +1696,7 @@
         <Description>Device name; default value is TEMPLATE</Description>
         <Condition Diagnostic="" Expression="Semaphore_CUSTOM_TEMPLATE"/>
     </RefParameter>
-    <RefParameter Name="CFG_GAP_DEVICE_NAME" Comment="CFG_GAP_DEVICE_NAME" DefaultValue="" Type="String" TabName="BLE Advertising" Group="Advertising configuration" Visible="false">
+    <RefParameter Name="CFG_GAP_DEVICE_NAME" Comment="CFG_GAP_DEVICE_NAME" DefaultValue="TEMPLATE" Type="String" TabName="BLE Advertising" Group="Advertising configuration" Visible="false">
         <Description></Description>
     </RefParameter>
 
@@ -1705,7 +1704,7 @@
         <Description>Device name lenght; max value is 48bytes, default value is 8 (TEMPLATE length)</Description>
         <Condition Diagnostic="" Expression="Semaphore_CUSTOM_TEMPLATE"/>
     </RefParameter>
-    <RefParameter Name="CFG_GAP_DEVICE_NAME_LENGTH" Comment="CFG_GAP_DEVICE_NAME_LENGTH" DefaultValue="0" Type="integerReadOnly" Min = "0" Max = "0" TabName="BLE Advertising" Group="Advertising configuration" Visible="false">
+    <RefParameter Name="CFG_GAP_DEVICE_NAME_LENGTH" Comment="CFG_GAP_DEVICE_NAME_LENGTH" DefaultValue="8" Type="integerReadOnly" Min = "8" Max = "8" TabName="BLE Advertising" Group="Advertising configuration" Visible="false">
         <Description></Description>
     </RefParameter>
 
@@ -1737,43 +1736,342 @@
         <Description></Description>
     </RefParameter>
 
-    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL" Comment="      AD_TYPE_TX_POWER_LEVEL" DefaultValue="0x18 /* -0.15dBm */" Type="list" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+    <RefParameter Name="CFG_TX_POWER" Comment="CFG_TX_POWER" DefaultValue="(0x18) /* -0.15dBm */" Type="list" TabName="Configuration" Group="Application parameters" Visible="true">
         <Description> </Description>
-        <PossibleValue Value="0x00 /* -40dBm */" Comment="-40dBm (0x00)"/>
-        <PossibleValue Value="0x01 /* -20.85dBm */" Comment="-20.85dBm (0x01)"/>
-        <PossibleValue Value="0x02 /* -19.75dBm  */" Comment="-19.75dBm (0x02)"/>
-        <PossibleValue Value="0x03 /* -18.85dBm */" Comment="-18.85dBm (0x03)"/>
-        <PossibleValue Value="0x04 /* -17.6dBm */" Comment="-17.6dBm (0x04)"/>
-        <PossibleValue Value="0x05 /* -19.5dBm */" Comment="-19.5dBm (0x05)"/>
-        <PossibleValue Value="0x06 /* -15.25dBm */" Comment="-15.25dBm (0x06)"/>
-        <PossibleValue Value="0x07 /* -14.1dBm */" Comment="-14.1dBm (0x07)"/>
-        <PossibleValue Value="0x08 /* -13.15dBm */" Comment="-13.15dBm (0x08)"/>
-        <PossibleValue Value="0x09 /* -12.05dBm */" Comment="-12.05dBm (0x09)"/>
-        <PossibleValue Value="0x0A /* -10.9dBm */" Comment="-10.9dBm (0x0A)"/>
-        <PossibleValue Value="0x0B /* -9.9dBm */" Comment="-9.9dBm (0x0B)"/>
-        <PossibleValue Value="0x0C /* -8.85dBm */" Comment="-8.85dBm (0x0C)"/>
-        <PossibleValue Value="0x0D /* -7.8dBm */" Comment="-7.8dBm (0x0D)"/>
-        <PossibleValue Value="0x0E /* -6.9dBm */" Comment="-6.9dBm (0x0E)"/>
-        <PossibleValue Value="0x0F /* -5.9dBm */" Comment="-5.9dBm (0x0F)"/>
-        <PossibleValue Value="0x10 /* -4.95dBm */" Comment="-4.95dBm (0x10)"/>
-        <PossibleValue Value="0x11 /* -4dBm */" Comment="-4dBm (0x11)"/>
-        <PossibleValue Value="0x12 /* -3.15dBm */" Comment="-3.15dBm (0x12)"/>
-        <PossibleValue Value="0x13 /* -2.45Bm */" Comment="-2.45Bm (0x13)"/>
-        <PossibleValue Value="0x14 /* -1.8dBm */" Comment="-1.8dBm (0x14)"/>
-        <PossibleValue Value="0x15 /* -1.8dBm */" Comment="-1.3dBm (0x15)"/>
-        <PossibleValue Value="0x16 /* -0.85dBm */" Comment="-0.85dBm (0x16)"/>
-        <PossibleValue Value="0x17 /* -0.5dBm */" Comment="-0.5dBm (0x17)"/>
-        <PossibleValue Value="0x18 /* -0.15dBm */" Comment="-0.15dBm (0x18)"/>
-		<PossibleValue Value="0x19 /* 0dBm */"  Comment="0dBm (0x19)"/>
-		<PossibleValue Value="0x1A /* 1dBm */"  Comment="1dBm (0x1A)"/>
-		<PossibleValue Value="0x1B /* 2dBm */"  Comment="2dBm (0x1B)"/>
-		<PossibleValue Value="0x1C /* 3dBm */"  Comment="3dBm (0x1C)"/>
-		<PossibleValue Value="0x1D /* 4dBm */"  Comment="4dBm (0x1D)"/>
-		<PossibleValue Value="0x1E /* 5dBm */"  Comment="5dBm (0x1E)"/>
-		<PossibleValue Value="0x1F /* 6dBm */"  Comment="6dBm (0x1F)"/>
-        <Condition Diagnostic="" Expression="Semaphore_INCLUDE_AD_TYPE_TX_POWER_LEVEL"/>
+        <PossibleValue Value="(0x00) /* -40dBm */" Comment="-40dBm (0x00)" Semaphore="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x00"/>
+        <PossibleValue Value="(0x01) /* -20.85dBm */" Comment="-20.85dBm (0x01)" Semaphore="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x01"/>
+        <PossibleValue Value="(0x02) /* -19.75dBm  */" Comment="-19.75dBm (0x02)" Semaphore="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x02"/>
+        <PossibleValue Value="(0x03) /* -18.85dBm */" Comment="-18.85dBm (0x03)" Semaphore="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x03"/>
+        <PossibleValue Value="(0x04) /* -17.6dBm */" Comment="-17.6dBm (0x04)" Semaphore="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x04"/>
+        <PossibleValue Value="(0x05) /* -19.5dBm */" Comment="-19.5dBm (0x05)" Semaphore="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x05"/>
+        <PossibleValue Value="(0x06) /* -15.25dBm */" Comment="-15.25dBm (0x06)" Semaphore="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x06"/>
+        <PossibleValue Value="(0x07) /* -14.1dBm */" Comment="-14.1dBm (0x07)" Semaphore="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x07"/>
+        <PossibleValue Value="(0x08) /* -13.15dBm */" Comment="-13.15dBm (0x08)" Semaphore="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x08"/>
+        <PossibleValue Value="(0x09) /* -12.05dBm */" Comment="-12.05dBm (0x09)" Semaphore="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x09"/>
+        <PossibleValue Value="(0x0A) /* -10.9dBm */" Comment="-10.9dBm (0x0A)" Semaphore="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x0A"/>
+        <PossibleValue Value="(0x0B) /* -9.9dBm */" Comment="-9.9dBm (0x0B)" Semaphore="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x0B"/>
+        <PossibleValue Value="(0x0C) /* -8.85dBm */" Comment="-8.85dBm (0x0C)" Semaphore="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x0C"/>
+        <PossibleValue Value="(0x0D) /* -7.8dBm */" Comment="-7.8dBm (0x0D)" Semaphore="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x0D"/>
+        <PossibleValue Value="(0x0E) /* -6.9dBm */" Comment="-6.9dBm (0x0E)" Semaphore="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x0E"/>
+        <PossibleValue Value="(0x0F) /* -5.9dBm */" Comment="-5.9dBm (0x0F)" Semaphore="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x0F"/>
+        <PossibleValue Value="(0x10) /* -4.95dBm */" Comment="-4.95dBm (0x10)" Semaphore="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x10"/>
+        <PossibleValue Value="(0x11) /* -4dBm */" Comment="-4dBm (0x11)" Semaphore="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x11"/>
+        <PossibleValue Value="(0x12) /* -3.15dBm */" Comment="-3.15dBm (0x12)" Semaphore="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x12"/>
+        <PossibleValue Value="(0x13) /* -2.45Bm */" Comment="-2.45Bm (0x13)" Semaphore="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x13"/>
+        <PossibleValue Value="(0x14) /* -1.8dBm */" Comment="-1.8dBm (0x14)" Semaphore="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x14"/>
+        <PossibleValue Value="(0x15) /* -1.8dBm */" Comment="-1.3dBm (0x15)" Semaphore="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x15"/>
+        <PossibleValue Value="(0x16) /* -0.85dBm */" Comment="-0.85dBm (0x16)" Semaphore="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x16"/>
+        <PossibleValue Value="(0x17) /* -0.5dBm */" Comment="-0.5dBm (0x17)" Semaphore="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x17"/>
+        <PossibleValue Value="(0x18) /* -0.15dBm */" Comment="-0.15dBm (0x18)" Semaphore="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x18"/>
+		<PossibleValue Value="(0x19) /* 0dBm */"  Comment="0dBm (0x19)" Semaphore="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x19"/>
+		<PossibleValue Value="(0x1A) /* 1dBm */"  Comment="1dBm (0x1A)" Semaphore="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x1A"/>
+		<PossibleValue Value="(0x1B) /* 2dBm */"  Comment="2dBm (0x1B)" Semaphore="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x1B"/>
+		<PossibleValue Value="(0x1C) /* 3dBm */"  Comment="3dBm (0x1C)" Semaphore="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x1C"/>
+		<PossibleValue Value="(0x1D) /* 4dBm */"  Comment="4dBm (0x1D)" Semaphore="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x1D"/>
+		<PossibleValue Value="(0x1E) /* 5dBm */"  Comment="5dBm (0x1E)" Semaphore="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x1E"/>
+		<PossibleValue Value="(0x1F) /* 6dBm */"  Comment="6dBm (0x1F)" Semaphore="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x1F"/>
+        <Condition Diagnostic="" Expression="S_BLE_HOST &amp; !Semaphore_BLE_TRANSPARENT_MODE"/>
     </RefParameter>
-    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL" Comment="      AD_TYPE_TX_POWER_LEVEL" DefaultValue="" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+    <RefParameter Name="CFG_TX_POWER" Comment="CFG_TX_POWER" DefaultValue="" Type="String" TabName="Configuration" Group="Application parameters" Visible="false">
+        <Description> </Description>
+    </RefParameter>
+
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL" Comment="      AD_TYPE_TX_POWER_LEVEL" DefaultValue="(0x00) /* -40dBm */" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+        <Description> </Description>
+        <Condition Diagnostic="" Expression="Semaphore_INCLUDE_AD_TYPE_TX_POWER_LEVEL &amp; Semaphore_AD_TYPE_TX_POWER_LEVEL_0x00"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL" Comment="      AD_TYPE_TX_POWER_LEVEL" DefaultValue="(0x01) /* -20.85dBm */" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+        <Description> </Description>
+        <Condition Diagnostic="" Expression="Semaphore_INCLUDE_AD_TYPE_TX_POWER_LEVEL &amp; Semaphore_AD_TYPE_TX_POWER_LEVEL_0x01"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL" Comment="      AD_TYPE_TX_POWER_LEVEL" DefaultValue="(0x02) /* -19.75dBm  */" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+        <Description> </Description>
+        <Condition Diagnostic="" Expression="Semaphore_INCLUDE_AD_TYPE_TX_POWER_LEVEL &amp; Semaphore_AD_TYPE_TX_POWER_LEVEL_0x02"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL" Comment="      AD_TYPE_TX_POWER_LEVEL" DefaultValue="(0x03) /* -18.85dBm */" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+        <Description> </Description>
+        <Condition Diagnostic="" Expression="Semaphore_INCLUDE_AD_TYPE_TX_POWER_LEVEL &amp; Semaphore_AD_TYPE_TX_POWER_LEVEL_0x03"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL" Comment="      AD_TYPE_TX_POWER_LEVEL" DefaultValue="(0x04) /* -17.6dBm */" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+        <Description> </Description>
+        <Condition Diagnostic="" Expression="Semaphore_INCLUDE_AD_TYPE_TX_POWER_LEVEL &amp; Semaphore_AD_TYPE_TX_POWER_LEVEL_0x04"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL" Comment="      AD_TYPE_TX_POWER_LEVEL" DefaultValue="(0x05) /* -19.5dBm */" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+        <Description> </Description>
+        <Condition Diagnostic="" Expression="Semaphore_INCLUDE_AD_TYPE_TX_POWER_LEVEL &amp; Semaphore_AD_TYPE_TX_POWER_LEVEL_0x05"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL" Comment="      AD_TYPE_TX_POWER_LEVEL" DefaultValue="(0x06) /* -15.25dBm */v" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+        <Description> </Description>
+        <Condition Diagnostic="" Expression="Semaphore_INCLUDE_AD_TYPE_TX_POWER_LEVEL &amp; Semaphore_AD_TYPE_TX_POWER_LEVEL_0x06"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL" Comment="      AD_TYPE_TX_POWER_LEVEL" DefaultValue="(0x07) /* -14.1dBm */" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+        <Description> </Description>
+        <Condition Diagnostic="" Expression="Semaphore_INCLUDE_AD_TYPE_TX_POWER_LEVEL &amp; Semaphore_AD_TYPE_TX_POWER_LEVEL_0x07"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL" Comment="      AD_TYPE_TX_POWER_LEVEL" DefaultValue="(0x08) /* -13.15dBm */" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+        <Description> </Description>
+        <Condition Diagnostic="" Expression="Semaphore_INCLUDE_AD_TYPE_TX_POWER_LEVEL &amp; Semaphore_AD_TYPE_TX_POWER_LEVEL_0x08"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL" Comment="      AD_TYPE_TX_POWER_LEVEL" DefaultValue="(0x09) /* -12.05dBm */" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+        <Description> </Description>
+        <Condition Diagnostic="" Expression="Semaphore_INCLUDE_AD_TYPE_TX_POWER_LEVEL &amp; Semaphore_AD_TYPE_TX_POWER_LEVEL_0x09"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL" Comment="      AD_TYPE_TX_POWER_LEVEL" DefaultValue="(0x0A) /* -10.9dBm */" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+        <Description> </Description>
+        <Condition Diagnostic="" Expression="Semaphore_INCLUDE_AD_TYPE_TX_POWER_LEVEL &amp; Semaphore_AD_TYPE_TX_POWER_LEVEL_0x0A"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL" Comment="      AD_TYPE_TX_POWER_LEVEL" DefaultValue="(0x0B) /* -9.9dBm */" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+        <Description> </Description>
+        <Condition Diagnostic="" Expression="Semaphore_INCLUDE_AD_TYPE_TX_POWER_LEVEL &amp; Semaphore_AD_TYPE_TX_POWER_LEVEL_0x0B"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL" Comment="      AD_TYPE_TX_POWER_LEVEL" DefaultValue="(0x0C) /* -8.85dBm */" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+        <Description> </Description>
+        <Condition Diagnostic="" Expression="Semaphore_INCLUDE_AD_TYPE_TX_POWER_LEVEL &amp; Semaphore_AD_TYPE_TX_POWER_LEVEL_0x0C"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL" Comment="      AD_TYPE_TX_POWER_LEVEL" DefaultValue="(0x0D) /* -7.8dBm */" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+        <Description> </Description>
+        <Condition Diagnostic="" Expression="Semaphore_INCLUDE_AD_TYPE_TX_POWER_LEVEL &amp; Semaphore_AD_TYPE_TX_POWER_LEVEL_0x0D"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL" Comment="      AD_TYPE_TX_POWER_LEVEL" DefaultValue="(0x0E) /* -6.9dBm */" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+        <Description> </Description>
+        <Condition Diagnostic="" Expression="Semaphore_INCLUDE_AD_TYPE_TX_POWER_LEVEL &amp; Semaphore_AD_TYPE_TX_POWER_LEVEL_0x0E"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL" Comment="      AD_TYPE_TX_POWER_LEVEL" DefaultValue="(0x0F) /* -5.9dBm */" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+        <Description> </Description>
+        <Condition Diagnostic="" Expression="Semaphore_INCLUDE_AD_TYPE_TX_POWER_LEVEL &amp; Semaphore_AD_TYPE_TX_POWER_LEVEL_0x0F"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL" Comment="      AD_TYPE_TX_POWER_LEVEL" DefaultValue="(0x10) /* -4.95dBm */" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+        <Description> </Description>
+        <Condition Diagnostic="" Expression="Semaphore_INCLUDE_AD_TYPE_TX_POWER_LEVEL &amp; Semaphore_AD_TYPE_TX_POWER_LEVEL_0x10"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL" Comment="      AD_TYPE_TX_POWER_LEVEL" DefaultValue="(0x11) /* -4dBm */" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+        <Description> </Description>
+        <Condition Diagnostic="" Expression="Semaphore_INCLUDE_AD_TYPE_TX_POWER_LEVEL &amp; Semaphore_AD_TYPE_TX_POWER_LEVEL_0x11"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL" Comment="      AD_TYPE_TX_POWER_LEVEL" DefaultValue="(0x12) /* -3.15dBm */" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+        <Description> </Description>
+        <Condition Diagnostic="" Expression="Semaphore_INCLUDE_AD_TYPE_TX_POWER_LEVEL &amp; Semaphore_AD_TYPE_TX_POWER_LEVEL_0x12"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL" Comment="      AD_TYPE_TX_POWER_LEVEL" DefaultValue="(0x13) /* -2.45Bm */" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+        <Description> </Description>
+        <Condition Diagnostic="" Expression="Semaphore_INCLUDE_AD_TYPE_TX_POWER_LEVEL &amp; Semaphore_AD_TYPE_TX_POWER_LEVEL_0x13"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL" Comment="      AD_TYPE_TX_POWER_LEVEL" DefaultValue="(0x14) /* -1.8dBm */" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+        <Description> </Description>
+        <Condition Diagnostic="" Expression="Semaphore_INCLUDE_AD_TYPE_TX_POWER_LEVEL &amp; Semaphore_AD_TYPE_TX_POWER_LEVEL_0x14"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL" Comment="      AD_TYPE_TX_POWER_LEVEL" DefaultValue="(0x15) /* -1.8dBm */" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+        <Description> </Description>
+        <Condition Diagnostic="" Expression="Semaphore_INCLUDE_AD_TYPE_TX_POWER_LEVEL &amp; Semaphore_AD_TYPE_TX_POWER_LEVEL_0x15"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL" Comment="      AD_TYPE_TX_POWER_LEVEL" DefaultValue="(0x16) /* -0.85dBm */" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+        <Description> </Description>
+        <Condition Diagnostic="" Expression="Semaphore_INCLUDE_AD_TYPE_TX_POWER_LEVEL &amp; Semaphore_AD_TYPE_TX_POWER_LEVEL_0x16"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL" Comment="      AD_TYPE_TX_POWER_LEVEL" DefaultValue="(0x17) /* -0.5dBm */" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+        <Description> </Description>
+        <Condition Diagnostic="" Expression="Semaphore_INCLUDE_AD_TYPE_TX_POWER_LEVEL &amp; Semaphore_AD_TYPE_TX_POWER_LEVEL_0x17"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL" Comment="      AD_TYPE_TX_POWER_LEVEL" DefaultValue="(0x18) /* -0.15dBm */" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+        <Description> </Description>
+        <Condition Diagnostic="" Expression="Semaphore_INCLUDE_AD_TYPE_TX_POWER_LEVEL &amp; Semaphore_AD_TYPE_TX_POWER_LEVEL_0x18"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL" Comment="      AD_TYPE_TX_POWER_LEVEL" DefaultValue="(0x19) /* 0dBm */" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+        <Description> </Description>
+        <Condition Diagnostic="" Expression="Semaphore_INCLUDE_AD_TYPE_TX_POWER_LEVEL &amp; Semaphore_AD_TYPE_TX_POWER_LEVEL_0x19"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL" Comment="      AD_TYPE_TX_POWER_LEVEL" DefaultValue="(0x1A) /* 1dBm */" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+        <Description> </Description>
+        <Condition Diagnostic="" Expression="Semaphore_INCLUDE_AD_TYPE_TX_POWER_LEVEL &amp; Semaphore_AD_TYPE_TX_POWER_LEVEL_0x1A"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL" Comment="      AD_TYPE_TX_POWER_LEVEL" DefaultValue="(0x1B) /* 2dBm */" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+        <Description> </Description>
+        <Condition Diagnostic="" Expression="Semaphore_INCLUDE_AD_TYPE_TX_POWER_LEVEL &amp; Semaphore_AD_TYPE_TX_POWER_LEVEL_0x1B"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL" Comment="      AD_TYPE_TX_POWER_LEVEL" DefaultValue="(0x1C) /* 3dBm */" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+        <Description> </Description>
+        <Condition Diagnostic="" Expression="Semaphore_INCLUDE_AD_TYPE_TX_POWER_LEVEL &amp; Semaphore_AD_TYPE_TX_POWER_LEVEL_0x1C"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL" Comment="      AD_TYPE_TX_POWER_LEVEL" DefaultValue="(0x1D) /* 4dBm */" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+        <Description> </Description>
+        <Condition Diagnostic="" Expression="Semaphore_INCLUDE_AD_TYPE_TX_POWER_LEVEL &amp; Semaphore_AD_TYPE_TX_POWER_LEVEL_0x1D"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL" Comment="      AD_TYPE_TX_POWER_LEVEL" DefaultValue="(0x1E) /* 5dBm */" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+        <Description> </Description>
+        <Condition Diagnostic="" Expression="Semaphore_INCLUDE_AD_TYPE_TX_POWER_LEVEL &amp; Semaphore_AD_TYPE_TX_POWER_LEVEL_0x1E"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL" Comment="      AD_TYPE_TX_POWER_LEVEL" DefaultValue="(0x1F) /* 6dBm */" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+        <Description> </Description>
+        <Condition Diagnostic="" Expression="Semaphore_INCLUDE_AD_TYPE_TX_POWER_LEVEL &amp; Semaphore_AD_TYPE_TX_POWER_LEVEL_0x1F"/>
+    </RefParameter>
+
+
+
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL" Comment="      AD_TYPE_TX_POWER_LEVEL" DefaultValue="(0x18) /* -0.15dBm */" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+        <Description></Description>
+    </RefParameter>
+
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL_DBM" Comment="      AD_TYPE_TX_POWER_LEVEL_DBM" DefaultValue="-40 /* -40dBm */" Type="list" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+        <Description> </Description>
+		<PossibleValue Value="-40 /* -40dBm */" Comment="-40dBm (0x00)"/>
+		<Condition Diagnostic="" Expression="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x00"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL_DBM" Comment="      AD_TYPE_TX_POWER_LEVEL_DBM" DefaultValue="-21 /* -20.85dBm */" Type="list" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+        <Description> </Description>
+        <PossibleValue Value="-21 /* -20.85dBm */" Comment="-20.85dBm (0x01)"/>
+		<Condition Diagnostic="" Expression="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x01"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL_DBM" Comment="      AD_TYPE_TX_POWER_LEVEL_DBM" DefaultValue="-20 /* -19.75dBm  */" Type="list" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+        <Description> </Description>
+        <PossibleValue Value="-20 /* -19.75dBm  */" Comment="-19.75dBm (0x02)"/>
+		<Condition Diagnostic="" Expression="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x02"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL_DBM" Comment="      AD_TYPE_TX_POWER_LEVEL_DBM" DefaultValue="-19 /* -18.85dBm */" Type="list" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+        <Description> </Description>
+        <PossibleValue Value="-19 /* -18.85dBm */" Comment="-18.85dBm (0x03)"/>
+		<Condition Diagnostic="" Expression="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x03"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL_DBM" Comment="      AD_TYPE_TX_POWER_LEVEL_DBM" DefaultValue="-18 /* -17.6dBm */" Type="list" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+        <Description> </Description>
+        <PossibleValue Value="-18 /* -17.6dBm */" Comment="-17.6dBm (0x04)"/>
+		<Condition Diagnostic="" Expression="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x04"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL_DBM" Comment="      AD_TYPE_TX_POWER_LEVEL_DBM" DefaultValue="-16 /* -16.5dBm */" Type="list" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+        <Description> </Description>
+        <PossibleValue Value="-16 /* -16.5dBm */" Comment="-16.5dBm (0x05)"/>
+		<Condition Diagnostic="" Expression="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x05"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL_DBM" Comment="      AD_TYPE_TX_POWER_LEVEL_DBM" DefaultValue="-15 /* -15.25dBm */" Type="list" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+        <Description> </Description>
+        <PossibleValue Value="-15 /* -15.25dBm */" Comment="-15.25dBm (0x06)"/>
+		<Condition Diagnostic="" Expression="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x06"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL_DBM" Comment="      AD_TYPE_TX_POWER_LEVEL_DBM" DefaultValue="-14 /* -14.1dBm */" Type="list" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+        <Description> </Description>
+        <PossibleValue Value="-14 /* -14.1dBm */" Comment="-14.1dBm (0x07)"/>
+		<Condition Diagnostic="" Expression="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x07"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL_DBM" Comment="      AD_TYPE_TX_POWER_LEVEL_DBM" DefaultValue="-13 /* -13.15dBm */" Type="list" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+        <Description> </Description>
+        <PossibleValue Value="-13 /* -13.15dBm */" Comment="-13.15dBm (0x08)"/>
+		<Condition Diagnostic="" Expression="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x08"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL_DBM" Comment="      AD_TYPE_TX_POWER_LEVEL_DBM" DefaultValue="-12 /* -12.05dBm */" Type="list" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+        <Description> </Description>
+        <PossibleValue Value="-12 /* -12.05dBm */" Comment="-12.05dBm (0x09)"/>
+		<Condition Diagnostic="" Expression="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x09"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL_DBM" Comment="      AD_TYPE_TX_POWER_LEVEL_DBM" DefaultValue="-11 /* -10.9dBm */" Type="list" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+        <Description> </Description>
+        <PossibleValue Value="-11 /* -10.9dBm */" Comment="-10.9dBm (0x0A)"/>
+		<Condition Diagnostic="" Expression="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x0A"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL_DBM" Comment="      AD_TYPE_TX_POWER_LEVEL_DBM" DefaultValue="-10 /* -9.9dBm */" Type="list" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+        <Description> </Description>
+        <PossibleValue Value="-10 /* -9.9dBm */" Comment="-9.9dBm (0x0B)"/>
+		<Condition Diagnostic="" Expression="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x0B"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL_DBM" Comment="      AD_TYPE_TX_POWER_LEVEL_DBM" DefaultValue="-8 /* -8.85dBm */" Type="list" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+        <Description> </Description>
+        <PossibleValue Value="-8 /* -8.85dBm */" Comment="-8.85dBm (0x0C)"/>
+		<Condition Diagnostic="" Expression="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x0C"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL_DBM" Comment="      AD_TYPE_TX_POWER_LEVEL_DBM" DefaultValue="-8 /* -7.8dBm */" Type="list" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+        <Description> </Description>
+        <PossibleValue Value="-8 /* -7.8dBm */" Comment="-7.8dBm (0x0D)"/>
+		<Condition Diagnostic="" Expression="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x0D"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL_DBM" Comment="      AD_TYPE_TX_POWER_LEVEL_DBM" DefaultValue="-7 /* -6.9dBm */" Type="list" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+        <Description> </Description>
+        <PossibleValue Value="-7 /* -6.9dBm */" Comment="-6.9dBm (0x0E)"/>
+		<Condition Diagnostic="" Expression="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x0E"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL_DBM" Comment="      AD_TYPE_TX_POWER_LEVEL_DBM" DefaultValue="-6 /* -5.9dBm */" Type="list" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+        <Description> </Description>
+        <PossibleValue Value="-6 /* -5.9dBm */" Comment="-5.9dBm (0x0F)"/>
+		<Condition Diagnostic="" Expression="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x0F"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL_DBM" Comment="      AD_TYPE_TX_POWER_LEVEL_DBM" DefaultValue="-5 /* -4.95dBm */" Type="list" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+        <Description> </Description>
+        <PossibleValue Value="-5 /* -4.95dBm */" Comment="-4.95dBm (0x10)"/>
+		<Condition Diagnostic="" Expression="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x10"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL_DBM" Comment="      AD_TYPE_TX_POWER_LEVEL_DBM" DefaultValue="-4 /* -4dBm */" Type="list" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+        <Description> </Description>
+        <PossibleValue Value="-4 /* -4dBm */" Comment="-4dBm (0x11)"/>
+		<Condition Diagnostic="" Expression="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x11"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL_DBM" Comment="      AD_TYPE_TX_POWER_LEVEL_DBM" DefaultValue="-3 /* -3.15dBm */" Type="list" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+        <Description> </Description>
+        <PossibleValue Value="-3 /* -3.15dBm */" Comment="-3.15dBm (0x12)"/>
+		<Condition Diagnostic="" Expression="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x12"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL_DBM" Comment="      AD_TYPE_TX_POWER_LEVEL_DBM" DefaultValue="-2 /* -2.45Bm */" Type="list" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+        <Description> </Description>
+        <PossibleValue Value="-2 /* -2.45Bm */" Comment="-2.45Bm (0x13)"/>
+		<Condition Diagnostic="" Expression="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x13"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL_DBM" Comment="      AD_TYPE_TX_POWER_LEVEL_DBM" DefaultValue="-2 /* -1.8dBm */" Type="list" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+        <Description> </Description>
+        <PossibleValue Value="-2 /* -1.8dBm */" Comment="-1.8dBm (0x14)"/>
+		<Condition Diagnostic="" Expression="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x14"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL_DBM" Comment="      AD_TYPE_TX_POWER_LEVEL_DBM" DefaultValue="-1 /* -1.3dBm */" Type="list" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+        <Description> </Description>
+        <PossibleValue Value="-1 /* -1.3dBm */" Comment="-1.3dBm (0x15)"/>
+		<Condition Diagnostic="" Expression="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x15"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL_DBM" Comment="      AD_TYPE_TX_POWER_LEVEL_DBM" DefaultValue="-1 /* -0.85dBm */" Type="list" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+        <Description> </Description>
+        <PossibleValue Value="-1 /* -0.85dBm */" Comment="-0.85dBm (0x16)"/>
+		<Condition Diagnostic="" Expression="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x16"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL_DBM" Comment="      AD_TYPE_TX_POWER_LEVEL_DBM" DefaultValue="0 /* -0.5dBm */" Type="list" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+        <Description> </Description>
+        <PossibleValue Value="0 /* -0.5dBm */" Comment="-0.5dBm (0x17)"/>
+		<Condition Diagnostic="" Expression="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x17"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL_DBM" Comment="      AD_TYPE_TX_POWER_LEVEL_DBM" DefaultValue="0 /* -0.15dBm */" Type="list" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+        <Description> </Description>
+        <PossibleValue Value="0 /* -0.15dBm */" Comment="-0.15dBm (0x18)"/>
+		<Condition Diagnostic="" Expression="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x18"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL_DBM" Comment="      AD_TYPE_TX_POWER_LEVEL_DBM" DefaultValue="0 /* 0dBm */" Type="list" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+        <Description> </Description>
+		<PossibleValue Value="0 /* 0dBm */"  Comment="0dBm (0x19)"/>
+		<Condition Diagnostic="" Expression="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x19"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL_DBM" Comment="      AD_TYPE_TX_POWER_LEVEL_DBM" DefaultValue="1 /* 1dBm */" Type="list" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+        <Description> </Description>
+		<PossibleValue Value="1 /* 1dBm */"  Comment="1dBm (0x1A)"/>
+		<Condition Diagnostic="" Expression="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x1A"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL_DBM" Comment="      AD_TYPE_TX_POWER_LEVEL_DBM" DefaultValue="2 /* 2dBm */" Type="list" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+        <Description> </Description>
+		<PossibleValue Value="2 /* 2dBm */"  Comment="2dBm (0x1B)"/>
+		<Condition Diagnostic="" Expression="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x1B"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL_DBM" Comment="      AD_TYPE_TX_POWER_LEVEL_DBM" DefaultValue="3 /* 3dBm */" Type="list" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+        <Description> </Description>
+		<PossibleValue Value="3 /* 3dBm */"  Comment="3dBm (0x1C)"/>
+		<Condition Diagnostic="" Expression="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x1C"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL_DBM" Comment="      AD_TYPE_TX_POWER_LEVEL_DBM" DefaultValue="4 /* 4dBm */" Type="list" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+        <Description> </Description>
+		<PossibleValue Value="4 /* 4dBm */"  Comment="4dBm (0x1D)"/>
+		<Condition Diagnostic="" Expression="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x1D"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL_DBM" Comment="      AD_TYPE_TX_POWER_LEVEL_DBM" DefaultValue="5 /* 5dBm */" Type="list" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+        <Description> </Description>
+		<PossibleValue Value="5 /* 5dBm */"  Comment="5dBm (0x1E)"/>
+		<Condition Diagnostic="" Expression="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x1E"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL_DBM" Comment="      AD_TYPE_TX_POWER_LEVEL_DBM" DefaultValue="6 /* 6dBm */" Type="list" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+        <Description> </Description>
+		<PossibleValue Value="6 /* 6dBm */"  Comment="6dBm (0x1F)"/>
+		<Condition Diagnostic="" Expression="Semaphore_AD_TYPE_TX_POWER_LEVEL_0x1F"/>
+    </RefParameter>
+    <RefParameter Name="AD_TYPE_TX_POWER_LEVEL_DBM" Comment="      AD_TYPE_TX_POWER_LEVEL_DBM" DefaultValue="" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
         <Description></Description>
     </RefParameter>
 
@@ -1811,29 +2109,29 @@
         <Description></Description>
     </RefParameter>
 
-    <RefParameter Name="INCLUDE_AD_TYPE_SHORTENED_LOCAL_NAME " Comment="Include AD_TYPE_SHORTENED_LOCAL_NAME  element" DefaultValue="0" Type="list" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+    <RefParameter Name="INCLUDE_AD_TYPE_SHORTENED_LOCAL_NAME" Comment="Include AD_TYPE_SHORTENED_LOCAL_NAME  element" DefaultValue="0" Type="list" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
         <Description></Description>
         <PossibleValue Value="0" Comment="No"/>
 		<PossibleValue Value="1" Comment="Yes" Semaphore="Semaphore_INCLUDE_AD_TYPE_SHORTENED_LOCAL_NAME"/>
         <Condition Diagnostic="" Expression="Semaphore_CUSTOM_TEMPLATE"/>
     </RefParameter>
-    <RefParameter Name="INCLUDE_AD_TYPE_SHORTENED_LOCAL_NAME " Comment="Include AD_TYPE_SHORTENED_LOCAL_NAME  element" DefaultValue="0" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+    <RefParameter Name="INCLUDE_AD_TYPE_SHORTENED_LOCAL_NAME" Comment="Include AD_TYPE_SHORTENED_LOCAL_NAME  element" DefaultValue="0" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
         <Description></Description>
     </RefParameter>
 
-    <RefParameter Name="AD_TYPE_SHORTENED_LOCAL_NAME " Comment="      AD_TYPE_SHORTENED_LOCAL_NAME " DefaultValue="01ST" Type="StringRW" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+    <RefParameter Name="AD_TYPE_SHORTENED_LOCAL_NAME" Comment="      AD_TYPE_SHORTENED_LOCAL_NAME" DefaultValue="01ST" Type="StringRW" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
         <Description> </Description>
         <Condition Diagnostic="" Expression="Semaphore_INCLUDE_AD_TYPE_SHORTENED_LOCAL_NAME"/>
     </RefParameter>
-    <RefParameter Name="AD_TYPE_SHORTENED_LOCAL_NAME " Comment="      AD_TYPE_SHORTENED_LOCAL_NAME " DefaultValue="" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+    <RefParameter Name="AD_TYPE_SHORTENED_LOCAL_NAME" Comment="      AD_TYPE_SHORTENED_LOCAL_NAME" DefaultValue="" Type="String" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
         <Description></Description>
     </RefParameter>
 
-    <RefParameter Name="AD_TYPE_SHORTENED_LOCAL_NAME _LENGTH" Comment="      AD_TYPE_SHORTENED_LOCAL_NAME _LENGTH" DefaultValue="5" Min="1" Max="6" Type="integerReadOnly" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
+    <RefParameter Name="AD_TYPE_SHORTENED_LOCAL_NAME_LENGTH" Comment="      AD_TYPE_SHORTENED_LOCAL_NAME_LENGTH" DefaultValue="5" Min="1" Max="6" Type="integerReadOnly" TabName="BLE Advertising" Group="Advertising elements" Visible="true">
         <Description> </Description>
         <Condition Diagnostic="" Expression="Semaphore_INCLUDE_AD_TYPE_SHORTENED_LOCAL_NAME"/>
     </RefParameter>
-    <RefParameter Name="AD_TYPE_SHORTENED_LOCAL_NAME _LENGTH" Comment="      AD_TYPE_SHORTENED_LOCAL_NAME _LENGTH" DefaultValue="0" Type="integerReadOnly" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
+    <RefParameter Name="AD_TYPE_SHORTENED_LOCAL_NAME_LENGTH" Comment="      AD_TYPE_SHORTENED_LOCAL_NAME_LENGTH" DefaultValue="0" Type="integerReadOnly" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
         <Description></Description>
     </RefParameter>
 
@@ -3586,6 +3884,9 @@
         <Parameter Name="CFG_LPM_SUPPORTED"/>
         <Parameter Name="CFG_FULL_LOW_POWER"/>
         <Parameter Name="CFG_DEBUGGER_SUPPORTED"/>
+        <!-- BLE specific -->
+        <Parameter Name="CFG_TX_POWER"/>
+        <!-- Ble Thread Common -->
         <Parameter Name="CFG_DEBUG_TRACE_UART"/>
         <!-- BLE specific -->
         <Parameter Name="CFG_CONSOLE_MENU"/>
@@ -3627,12 +3928,13 @@
         <Parameter Name="INCLUDE_AD_TYPE_TX_POWER_LEVEL"/>
         <Parameter Name="AD_TYPE_TX_POWER_LEVEL_LENGTH"/>
         <Parameter Name="AD_TYPE_TX_POWER_LEVEL"/>
+        <Parameter Name="AD_TYPE_TX_POWER_LEVEL_DBM"/>
         <Parameter Name="INCLUDE_AD_TYPE_COMPLETE_LOCAL_NAME"/>
         <Parameter Name="AD_TYPE_COMPLETE_LOCAL_NAME_LENGTH"/>
         <Parameter Name="AD_TYPE_COMPLETE_LOCAL_NAME"/>
-        <Parameter Name="INCLUDE_AD_TYPE_SHORTENED_LOCAL_NAME "/>
-        <Parameter Name="AD_TYPE_SHORTENED_LOCAL_NAME _LENGTH"/>
-        <Parameter Name="AD_TYPE_SHORTENED_LOCAL_NAME "/>
+        <Parameter Name="INCLUDE_AD_TYPE_SHORTENED_LOCAL_NAME"/>
+        <Parameter Name="AD_TYPE_SHORTENED_LOCAL_NAME_LENGTH"/>
+        <Parameter Name="AD_TYPE_SHORTENED_LOCAL_NAME"/>
         <Parameter Name="INCLUDE_AD_TYPE_APPEARANCE"/>
         <Parameter Name="AD_TYPE_APPEARANCE_LENGTH"/>
         <Parameter Name="AD_TYPE_APPEARANCE"/>

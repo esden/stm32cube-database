@@ -116,7 +116,7 @@ void HAL_MspInit(void)
 #n
 [#if clock??]
     [#list clock as clk]
-        [#if clk!=""]#t${clk}();[/#if]
+        [#if clk!=""]#t${clk}[#if !clk?contains('(')]()[/#if];[/#if]
     [/#list]
 [/#if]
 #n
@@ -405,7 +405,7 @@ void HAL_MspInit(void)
 [#macro generateConfigModelCode configModel inst nTab index mode]
 [#if configModel.clockEnableMacro?? && mode=="Init"] [#-- Enable Port clock --]
     [#list configModel.clockEnableMacro as clkmacroList]	
-            [#if clkmacroList?trim!=""][#if nTab==2]#t#t[#else]#t[/#if]${clkmacroList}();[/#if]
+            [#if clkmacroList?trim!=""][#if nTab==2]#t#t[#else]#t[/#if]${clkmacroList}[#if !clkmacroList?contains('(')]()[/#if];[/#if]
     [/#list]
 [/#if] 
 [#if configModel.methods??] [#-- if the pin configuration contains a list of LibMethods--]
@@ -708,7 +708,8 @@ void HAL_MspInit(void)
 [#--workAround DFSDM--]
  [#assign ind="" ]
 [#if dmaCurrentRequest?contains("dfsdm")]
-    [#assign ind=dmaconfig.dmaRequestName?substring(dmaconfig.dmaRequestName?length-1)]
+    [#assign reqName  = dmaconfig.dmaRequestName?replace("_ON_BDMA1","")]
+    [#assign ind=reqName?substring(reqName?length-1)]
 #tif(${instHandler}->Instance == ${ipName}_Filter${ind}){
 [/#if]
      [@generateConfigModelCode configModel=dmaconfig inst=ipName  nTab=tabN index="" mode=type/]
@@ -819,10 +820,10 @@ void HAL_MspInit(void)
                 [#list initService.clock?split(';') as clock][#-- debug ${ipvar.clkCommonResource}--]
                     [#if ipvar.usedDriver?contains("HAL") && ipvar.clkCommonResource.entrySet()?contains(clock?trim)]#t#t${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED++;
                     #t#tif(${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED==1){          
-                        #t#t#t${clock?trim}();
+                        #t#t#t${clock?trim}[#if !clock?contains('(')]()[/#if];
                     [#if ipvar.usedDriver?contains("HAL") && ipvar.clkCommonResource.entrySet()?contains(clock?trim)]#t#t}[/#if]  
                     [#else]
-                        #t#t${clock?trim}();
+                        #t#t${clock?trim}[#if !clock?contains('(')]()[/#if];
                     [/#if]        
                 [/#list]
             [/#if]
@@ -883,10 +884,10 @@ void HAL_MspInit(void)
                 [#list initService.clock?split(';') as clock]
                     [#if ipvar.usedDriver?contains("HAL") &&  ipvar.clkCommonResource.entrySet()?contains(clock?trim)]#t#t${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED++;
                     #t#tif(${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED==1){          
-                        #t#t#t${clock?trim}();
+                        #t#t#t${clock?trim}[#if !clock?contains('(')]()[/#if];
                     [#if ipvar.usedDriver?contains("HAL") &&  ipvar.clkCommonResource.entrySet()?contains(clock?trim)]#t#t}[/#if]  
                     [#else]
-                        #t#t${clock?trim}();
+                        #t#t${clock?trim}[#if !clock?contains('(')]()[/#if];
                     [/#if]        
                 [/#list]
             [/#if]
@@ -1346,7 +1347,7 @@ static uint32_t ${entry.value}=0;
   
     [#if  words[0].contains("DFSDM")]
         [#assign word0 = words[0]]  
-            [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4"]
+            [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4"]
                 #tif(${words[0]}_Init == 0)             
             [#else]
             #tif([#if word0.contains("DFSDM1")&& mode=="DFSDM_Channel"](IS_DFSDM1_CHANNEL_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Channel"]!(IS_DFSDM1_CHANNEL_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM1")&& mode=="DFSDM_Filter"](IS_DFSDM1_FILTER_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Filter"]!(IS_DFSDM1_FILTER_INSTANCE(h${mode?lower_case}->Instance))&&[/#if](${words[0]}_Init == 0))   
@@ -1401,7 +1402,7 @@ static uint32_t ${entry.value}=0;
     [#if i>0]    
     [#if  inst.contains("DFSDM")]
     [#assign word0 = inst]  
-        [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4"]
+        [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4"]
             #tif(${inst}_Init == 0)             
         [#else]
              #telse if([#if word0.contains("DFSDM1")&& mode=="DFSDM_Channel"](IS_DFSDM1_CHANNEL_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Channel"]!(IS_DFSDM1_CHANNEL_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM1")&& mode=="DFSDM_Filter"](IS_DFSDM1_FILTER_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Filter"]!(IS_DFSDM1_FILTER_INSTANCE(h${mode?lower_case}->Instance))&&[/#if](${inst}_Init == 0))
@@ -1559,7 +1560,7 @@ uint32_t DFSDM_Init = 0;
 
 [#if  words[0]?contains("DFSDM")]
     [#assign word0 = words[0]]  
-    [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4"]
+    [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4"]
         #tif(${inst}_Init == 0)             
     [#else]
          #tif([#if word0.contains("DFSDM1")&& mode=="DFSDM_Channel"](IS_DFSDM1_CHANNEL_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Channel"]!(IS_DFSDM1_CHANNEL_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM1")&& mode=="DFSDM_Filter"](IS_DFSDM1_FILTER_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Filter"]!(IS_DFSDM1_FILTER_INSTANCE(h${mode?lower_case}->Instance))&&[/#if](${words[0]}_Init == 0))
@@ -1589,7 +1590,7 @@ uint32_t DFSDM_Init = 0;
         [#if i>0]   
             [#if  words[i]?contains("DFSDM")]
                 [#assign word0 = words[i]] 
-                [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4"]
+                [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4"]
                     #tif(${words[i]}_Init == 0)             
                 [#else]
                      #tif([#if word0.contains("DFSDM1")&& mode=="DFSDM_Channel"](IS_DFSDM1_CHANNEL_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Channel"]!(IS_DFSDM1_CHANNEL_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM1")&& mode=="DFSDM_Filter"](IS_DFSDM1_FILTER_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Filter"]!(IS_DFSDM1_FILTER_INSTANCE(h${mode?lower_case}->Instance))&&[/#if](${words[i]}_Init == 0))
@@ -1661,7 +1662,7 @@ uint32_t DFSDM_Init = 0;
 [#assign words = instanceList]
 [#if words[0]?contains("DFSDM")]
 [#assign word0 = words[0]]  
-    [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4"]
+    [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4"]
         #t${words[0]}_Init-- ;
         #tif(${words[0]}_Init == 0)           
     [#else]
@@ -1691,7 +1692,7 @@ uint32_t DFSDM_Init = 0;
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspDeInit 1 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspDeInit 1 */
-[#if words[0]?contains("DFSDM")&&!(DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4")]
+[#if words[0]?contains("DFSDM")&&!(DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4")]
  
    #t#t}
 
@@ -1705,7 +1706,7 @@ uint32_t DFSDM_Init = 0;
         [#if i>0]
 [#if words[i]?contains("DFSDM")]
 [#assign word0 = words[i]]  
-    [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4"]
+    [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4"]
         #t${words[i]}_Init-- ;
         #tif(${words[i]}_Init == 0)           
     [#else]
@@ -1717,7 +1718,7 @@ uint32_t DFSDM_Init = 0;
 [#else]
 #telse if(h${mode?lower_case}->Instance==${words[i]?replace("I2S","SPI")})
 [/#if]
-[#if words[i]?contains("DFSDM")&&!(DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4")]
+[#if words[i]?contains("DFSDM")&&!(DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4")]
 #t#t{
 [#else]
 #t{
@@ -1732,7 +1733,7 @@ uint32_t DFSDM_Init = 0;
 #t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspDeInit 1 */
 
 #n#t/* USER CODE END ${words[i]?replace("I2S","SPI")}_MspDeInit 1 */
-[#if words[i]?contains("DFSDM")&&!(DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4")]
+[#if words[i]?contains("DFSDM")&&!(DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4")]
 
 #t#t}
 
@@ -1758,7 +1759,7 @@ uint32_t DFSDM_Init = 0;
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspDeInit 1 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspDeInit 1 */
-[#if words[0]?contains("DFSDM")&&!(DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4")]
+[#if words[0]?contains("DFSDM")&&!(DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4")]
 
 #t#t}
 

@@ -254,6 +254,10 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
         case EVT_LE_CONN_COMPLETE:
           break; /* HCI_EVT_LE_CONN_COMPLETE */
 
+        /* USER CODE BEGIN META_EVT */
+
+        /* USER CODE END META_EVT */
+
         default:
           break;
       }
@@ -267,6 +271,10 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
               break; /* EVT_BLUE_GAP_PROCEDURE_COMPLETE */
           }
           break; /* EVT_VENDOR */
+
+        /* USER CODE BEGIN EVENT_PCKT */
+
+        /* USER CODE END EVENT_PCKT */
 
             default:
               break;

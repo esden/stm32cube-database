@@ -11,7 +11,7 @@
 		<diagnostic><font size="3" color="red">This GPIO offers a reduced touch sensing sensitivity. You should use it as sampling capacitor I/O</font></diagnostic>
 		<result type="type">windows-warning.png</result> <- type integer, boolean, default is string
     </rule>
-	 
+
 	All items are optional
 	If you write a condition but no match only the condition is evaluated
 	If you pass a match the number of match item must match the number of parameters passed in the code
@@ -58,6 +58,24 @@
 		<match>GTZC.Enable</match>
 		<diagnostic>"Enable" mode mandatory for TZEN=1</diagnostic>
 	</rule>
+    <rule cache="true">
+        <condition>S_SECURE</condition>
+        <match>STM32L5.*</match>
+        <match>ICACHE_REG Secure Attribute.Not Secured</match>
+        <diagnostic>Warning: In order that cache operations are possible in non secure<br/>application, it is recommended that the secure attribute<br/>is kept not secured in the secure application</diagnostic>
+    </rule>
+    <rule cache="true">
+        <condition>S_SECURE</condition>
+        <match>STM32L5.*</match>
+        <match>ICACHE_REG Secure Attribute.Secured</match>
+        <diagnostic>Warning: In order that cache operations are possible in non secure<br/>application, it is recommended that the secure attribute<br/>is kept not secured in the secure application</diagnostic>
+    </rule>
+    <rule cache="true">
+        <condition>S_SECURE</condition>
+        <match>STM32L5.*</match>
+        <match>root.ICACHE_REG Secure Attribute</match>
+        <diagnostic>Warning: In order that cache operations are possible in non secure<br/>application, it is recommended that the secure attribute<br/>is kept not secured in the secure application</diagnostic>
+    </rule>
 
 	<rule cache="true">
 		<match>STM32.*</match>
@@ -82,13 +100,37 @@
 	<rule cache="true">
 		<match>STM32.*</match>
 		<match>Stack Configuration.Type C with State Machine</match>
-		<diagnostic>No PD available but the state machine Type-C is enabled (select the 'USBPDCORE_NO_PD_CMx_xxx.x lib' and USBPDCORE_LIB_NO_PD and USBPD_TYPE_STATE_MACHINE switches should be enabled)</diagnostic>
+		<diagnostic>No PD available but the state machine Type-C is enabled (select the 'USBPDCORE_NO_PD_CMx_xxx.x lib' and USBPDCORE_LIB_NO_PD and USBPD_STATE_MACHINE switches should be enabled)</diagnostic>
 	</rule>
 	<rule cache="true">
 		<match>STM32.*</match>
 		<match>Stack Configuration.Type C only</match>
 		<diagnostic>No PD available but the state machine Type-C is disabled (select the 'USBPDCORE_NO_PD_CMx_xxx.x lib' and USBPDCORE_LIB_NO_PD switch should be enabled)</diagnostic>
 	</rule>
+
+    <!-- 3 following rules to add warning at UART4 mode level for MP1 when UART4 is selected on Cortx-M4 -->
+    <rule cache="true">
+		<condition>UART4_CUBE  &amp; PA13_UART4_TX</condition>
+		<match>STM32MP1.*</match>
+		<match>root.Mode</match>
+		<diagnostic>This mode requires Pin PA13 (UART_TX) also used in Boot ROM (hardcoded) and as default debug console in OpenSTLinux.<br></br>Consequently the signal may be disturbed in case of Linux reboot</diagnostic>
+		<result>warning.png</result>
+	</rule>
+	<!-- rule to clean root warning-->
+    <rule cache="true">
+		<condition>UART4_CUBE  &amp; !PA13_UART4_TX</condition>
+		<match>STM32MP1.*</match>
+		<match>root.Mode</match>
+		<diagnostic></diagnostic>
+	</rule>
+    <rule cache="true">
+		<condition>UART4_CUBE  &amp; PA13_UART4_TX</condition>
+		<match>STM32MP1.*</match>
+		<match>Mode.*</match>
+		<diagnostic>This mode requires Pin PA13 (UART_TX) also used in Boot ROM (hardcoded) and as default debug console in OpenSTLinux.<br></br>Consequently the signal may be disturbed in case of Linux reboot</diagnostic>
+		<result>warning.png</result>
+	</rule>
+
 
 </rules>
 

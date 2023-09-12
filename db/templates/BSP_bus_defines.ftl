@@ -1,0 +1,12 @@
+[#ftl]
+[#assign coreDir=""]
+[#assign coreDir=sourceDir]
+[#if cpucore!="" && (contextFolder=="" || contextFolder=="/")]
+[#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")+"/"]
+[/#if]
+[#if IoList??]
+    [#list IoList as io]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/"+io?lower_case+"_define.tmp"/][#--include io configuration --]
+#n
+    [/#list]
+[/#if]

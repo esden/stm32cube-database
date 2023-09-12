@@ -2906,6 +2906,10 @@
 #include "common_blesvc.h"
 #include "custom_stm.h"
 
+/* USER CODE BEGIN Includes */
+
+/* USER CODE END Includes */
+
 /* Private typedef -----------------------------------------------------------*/
 typedef struct{
 [#if NUMBER_OF_SERVICES != "0"]
@@ -2918,6 +2922,10 @@ typedef struct{
 [/#if]
 }CustomContext_t;
 
+/* USER CODE BEGIN PTD */
+
+/* USER CODE END PTD */
+
 /* Private defines -----------------------------------------------------------*/
 #define UUID_128_SUPPORTED  1
 
@@ -2929,8 +2937,14 @@ typedef struct{
 
 #define BM_REQ_CHAR_SIZE    (3)
 
+/* USER CODE BEGIN PD */
+
+/* USER CODE END PD */
 
 /* Private macros ------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
 [#if NUMBER_OF_SERVICES != "0"]
@@ -2948,11 +2962,23 @@ PLACE_IN_SECTION("BLE_DRIVER_CONTEXT") static CustomContext_t CustomContext;
 /**
  * END of Section BLE_DRIVER_CONTEXT
  */
+
+/* USER CODE BEGIN PV */
+
+/* USER CODE END PV */
+
 /* Private function prototypes -----------------------------------------------*/
 static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *pckt);
 
+/* USER CODE BEGIN PFP */
+
+/* USER CODE END PFP */
 
 /* Functions Definition ------------------------------------------------------*/
+/* USER CODE BEGIN PFD */
+
+/* USER CODE END PFD */
+
 /* Private functions ----------------------------------------------------------*/
 
 #define COPY_UUID_128(uuid_struct, uuid_15, uuid_14, uuid_13, uuid_12, uuid_11, uuid_10, uuid_9, uuid_8, uuid_7, uuid_6, uuid_5, uuid_4, uuid_3, uuid_2, uuid_1, uuid_0) \
@@ -2984,6 +3010,10 @@ do {\
     [/#list]
 [/#if]
 
+/* USER CODE BEGIN PF */
+
+/* USER CODE END PF */
+
 /**
  * @brief  Event handler
  * @param  Event: Address of the buffer holding the Event
@@ -2994,9 +3024,9 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *Event)
   SVCCTL_EvtAckStatus_t return_value;
   hci_event_pckt *event_pckt;
   evt_blue_aci *blue_evt;
-  aci_gatt_attribute_modified_event_rp0    * attribute_modified;
-  aci_gatt_read_permit_req_event_rp0       * read_req;
-  Custom_STM_App_Notification_evt_t Notification;
+/* USER CODE BEGIN Custom_STM_Event_Handler_1 */
+
+/* USER CODE END Custom_STM_Event_Handler_1 */
 
   return_value = SVCCTL_EvtNotAck;
   event_pckt = (hci_event_pckt *)(((hci_uart_pckt*)Event)->data);
@@ -3088,6 +3118,10 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *Event)
       break;
   }
 
+/* USER CODE BEGIN Custom_STM_Event_Handler_2 */
+
+/* USER CODE END Custom_STM_Event_Handler_2 */
+
   return(return_value);
 }/* end Custom_STM_Event_Handler */
 
@@ -3103,6 +3137,9 @@ void SVCCTL_InitCustomSvc(void)
 {
  
   Char_UUID_t  uuid;
+/* USER CODE BEGIN SVCCTL_InitCustomSvc_1 */
+
+/* USER CODE END SVCCTL_InitCustomSvc_1 */
 
   /**
    *	Register the event handler to the BLE controller
@@ -3211,6 +3248,11 @@ void SVCCTL_InitCustomSvc(void)
 
     [/#list]
 [/#if]
+
+/* USER CODE BEGIN SVCCTL_InitCustomSvc_2 */
+
+/* USER CODE END SVCCTL_InitCustomSvc_2 */
+
   return;
 }
 
@@ -3223,6 +3265,9 @@ void SVCCTL_InitCustomSvc(void)
 tBleStatus Custom_STM_App_Update_Char(Custom_STM_Char_Opcode_t CharOpcode, uint8_t *pPayload) 
 {
   tBleStatus result = BLE_STATUS_INVALID_PARAMS;
+/* USER CODE BEGIN Custom_STM_App_Update_Char_1 */
+
+/* USER CODE END Custom_STM_App_Update_Char_1 */
 
   switch(CharOpcode)
   {
@@ -3231,7 +3276,7 @@ tBleStatus Custom_STM_App_Update_Char(Custom_STM_Char_Opcode_t CharOpcode, uint8
     [#list 1..NUMBER_OF_SERVICES?number as service]
         [#list 1..SERVICES_NUMBER_OF_CHARACTERISTICS[service?string]?number as characteristic]
     case [@customServChar service characteristic/]:
-      result = aci_gatt_update_char_value(CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle,
+      result = aci_gatt_update_char_value(CustomContext.Custom[@serviceShortNameCapitalized service/]Hdle,
                             CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle,
                             ${SERVICES_CHARS_VALUE_OFFSET[service?string][characteristic?string]}, /* charValOffset */
                             Size[@characteristicShortNameCapitalized service characteristic/], /* charValueLen */
@@ -3248,6 +3293,10 @@ tBleStatus Custom_STM_App_Update_Char(Custom_STM_Char_Opcode_t CharOpcode, uint8
     default:
       break;
   }
+
+/* USER CODE BEGIN Custom_STM_App_Update_Char_2 */
+
+/* USER CODE END Custom_STM_App_Update_Char_2 */
 
   return result;
 }

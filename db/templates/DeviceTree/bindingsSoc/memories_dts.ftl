@@ -14,6 +14,7 @@
 	[#--Std memory--]
 	[#if mx_ddrConfigs["general"]?? && mx_ddrConfigs["general"]["ddrBaseAddress"]?? && mx_ddrConfigs["general"]["ddrSize"]??]
 ${TABnode}memory@${mx_ddrConfigs["general"]["ddrBaseAddress"]?replace("0x", "")} {
+${TABprop}device_type = "memory";
 ${TABprop}reg = <${mx_ddrConfigs["general"]["ddrBaseAddress"]} ${mx_ddrConfigs["general"]["ddrSize"]}>;
 #n
 ${TABprop}/* USER CODE BEGIN memory */
@@ -37,54 +38,6 @@ ${TABprop}ranges;
 #n
 ${TABprop}/* USER CODE BEGIN reserved-memory */
 ${TABprop}/* USER CODE END reserved-memory */
-#n
-[#compress]
-
-	[#--GPU memory binding--]
-	[#local errorLog = ""]
-	[#if mx_ddrConfigs["general"]?? && mx_ddrConfigs["general"]["ddrDecBaseAddress"]?? && mx_ddrConfigs["general"]["ddrDecSize"]??]
-		[#local ddrDecBaseAddress = mx_ddrConfigs["general"]["ddrDecBaseAddress"]?number]
-
-		[#local ddrDecSize = mx_ddrConfigs["general"]["ddrDecSize"]?number]
-
-		[#local gpuDecSize = ddrDecSize / 8]
-
-		[#local bootDecOffset = ddrDecSize / 4]
-		[#if (bootDecOffset < 71303168)][#--FIX: temporary--][#--0x4400000: Wildcat specific !--]
-			[#local bootDecOffset = 71303168]
-		[/#if]
-
-		[#local gpuBaseDecAdd = (ddrDecBaseAddress + ddrDecSize) - (gpuDecSize + bootDecOffset)]
-
-		[#local gpuBaseHexAddRes = srvc_convertNberDecToHexaString(gpuBaseDecAdd)]
-		[#local errorLog = gpuBaseHexAddRes.errors]
-
-		[#if !errorLog?has_content]
-			[#local gpuHexSize = srvc_convertNberDecToHexaString(gpuDecSize)]
-			[#local errorLog = gpuHexSize.errors]
-		[/#if]
-	[#else]
-		[#local errorLog = "no DDR config found"]
-	[/#if]
-
-[/#compress]
-[#local TABres = dts_get_tabs(pDtLevel+1)]
-[#local TABsubnode = TABres.TABN]
-[#local TABsubprop = TABres.TABP]
-	[#if !errorLog?has_content]
-${TABsubnode}gpu_reserved: gpu@${gpuBaseHexAddRes.res} {
-${TABsubprop}reg = <0x${gpuBaseHexAddRes.res} 0x${gpuHexSize.res}>;
-${TABsubprop}no-map;
-${TABsubnode}};
-	[#else]
-${TABsubnode}[@mlog  logMod=module logType="WARN" logMsg=errorLog + ": 'gpu_reserved' node not generated"  varsMap={} /]
-${TABsubnode}/*
-${TABsubnode}gpu_reserved: gpu@??? {
-${TABsubprop}reg = <??? ???}>;
-${TABsubprop}no-map;
-${TABsubnode}};
-${TABsubnode}*/
-	[/#if]
 ${TABnode}};
 
 [/#macro]

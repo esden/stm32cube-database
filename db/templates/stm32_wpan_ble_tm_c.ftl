@@ -36,6 +36,7 @@
 #include "stm32_lpm.h"
 #include "shci_tl.h"
 #include "stm32_seq.h"
+#include "ble_bufsize.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -81,7 +82,7 @@ PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static uint8_t HciAclDataBuffer[sizeof(TL_P
 
 static uint8_t RxHostData[5];
 static HciReceiveStatus_t HciReceiveStatus;
-static TL_CmdPacket_t SysLocalCmd;
+ALIGN(4) static TL_CmdPacket_t SysLocalCmd;
 static uint8_t *pHostRx;
 static tListNode  HostTxQueue;
 static TL_EvtPacket_t *pTxToHostPacket;

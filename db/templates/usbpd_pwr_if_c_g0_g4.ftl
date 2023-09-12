@@ -141,6 +141,7 @@ USBPD_StatusTypeDef USBPD_PWR_IF_Init(void)
 /* USER CODE END USBPD_PWR_IF_Init */
 }
 
+[#if SRC || DRP]
 /**
   * @brief  Sets the required power profile, now it works only with Fixed ones
   * @param  PortNum Port number
@@ -150,18 +151,17 @@ USBPD_StatusTypeDef USBPD_PWR_IF_SetProfile(uint8_t PortNum)
 {
 /* USER CODE BEGIN USBPD_PWR_IF_SetProfile */
   USBPD_StatusTypeDef      _status = USBPD_ERROR;
-[#if SRC || DRP]
-  PWR_IF_DEBUG_TRACE(PortNum, "HELP: update USBPD_PWR_IF_SetProfile");
+  PWR_IF_DEBUG_TRACE(PortNum, "ADVICE: update USBPD_PWR_IF_SetProfile");
 /*   if (BSP_ERROR_NONE == BSP_USBPD_PWR_VBUSSetVoltage_Fixed(PortNum, 5000, 3000, 3000))
   {
      _status = USBPD_OK;
   }
  */
-[/#if]
   return _status;
 /* USER CODE END USBPD_PWR_IF_SetProfile */
 }
 
+[/#if]
 /**
   * @brief  Checks if the power on a specified port is ready
   * @param  PortNum Port number
@@ -175,6 +175,7 @@ USBPD_StatusTypeDef USBPD_PWR_IF_SupplyReady(uint8_t PortNum, USBPD_VSAFE_Status
 /* USER CODE END USBPD_PWR_IF_SupplyReady */
 }
 
+[#if SRC || DRP]
 /**
   * @brief  Enables VBUS power on a specified port
   * @param  PortNum Port number
@@ -183,12 +184,8 @@ USBPD_StatusTypeDef USBPD_PWR_IF_SupplyReady(uint8_t PortNum, USBPD_VSAFE_Status
 USBPD_StatusTypeDef USBPD_PWR_IF_VBUSEnable(uint8_t PortNum)
 {
 /* USER CODE BEGIN USBPD_PWR_IF_VBUSEnable */
-[#if SRC || DRP]
   USBPD_StatusTypeDef _status = (USBPD_StatusTypeDef)HW_IF_PWR_Enable(PortNum, USBPD_ENABLE, CCNONE, USBPD_FALSE, USBPD_PORTPOWERROLE_SRC);
   return _status;
-[#else]
-  return USBPD_ERROR;
-[/#if]
 /* USER CODE END USBPD_PWR_IF_VBUSEnable */
 }
 
@@ -200,12 +197,8 @@ USBPD_StatusTypeDef USBPD_PWR_IF_VBUSEnable(uint8_t PortNum)
 USBPD_StatusTypeDef USBPD_PWR_IF_VBUSDisable(uint8_t PortNum)
 {
 /* USER CODE BEGIN USBPD_PWR_IF_VBUSDisable */
-[#if SRC || DRP]
   USBPD_StatusTypeDef _status = (USBPD_StatusTypeDef)HW_IF_PWR_Enable(PortNum, USBPD_DISABLE, CCNONE, USBPD_FALSE, USBPD_PORTPOWERROLE_SRC);
   return _status;
-[#else]
-  return USBPD_ERROR;
-[/#if]
 /* USER CODE END USBPD_PWR_IF_VBUSDisable */
 }
 
@@ -220,6 +213,7 @@ USBPD_FunctionalState USBPD_PWR_IF_VBUSIsEnabled(uint8_t PortNum)
   return USBPD_PORT_IsValid(PortNum) ? (USBPD_FunctionalState)HW_IF_PWR_VBUSIsEnabled(PortNum) : USBPD_DISABLE;
 }
 
+[/#if]
 /**
   * @brief  Reads the voltage and the current on a specified port
   * @param  PortNum Port number

@@ -19,14 +19,12 @@
   */ 
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM32H7xx_HAL_CONF_H
-#define __STM32H7xx_HAL_CONF_H
+#ifndef STM32H7xx_HAL_CONF_H
+#define STM32H7xx_HAL_CONF_H
 
 #ifdef __cplusplus
  extern "C" {
 #endif
-
-
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
@@ -37,7 +35,7 @@
   */
 #define HAL_MODULE_ENABLED  
 
-  [#assign allModules = ["ADC","FDCAN","CEC", "COMP", "CRC","CRYP","DAC","DCMI","DMA2D","ETH","NAND","NOR","OTFDEC","SRAM","SDRAM","HASH", "HRTIM", "HSEM", "GFXMMU", "JPEG", "OPAMP", "OSPI", "OCTOSPI", "I2S", "SMBUS","IWDG","LPTIM","LTDC","QUADSPI","RNG","RTC","SAI","SD","MMC","SPDIFRX","SPI", "SWPMI","TIM","UART","USART","IRDA","SMARTCARD","WWDG","PCD","HCD", "DFSDM", "DSI","JPEG", "MDIOS","PSSI","DTS"]]
+  [#assign allModules = ["ADC","FDCAN","FMAC","CEC", "COMP", "CORDIC", "CRC","CRYP","DAC","DCMI","DMA2D","ETH","NAND","NOR","OTFDEC","SRAM","SDRAM","HASH", "HRTIM", "HSEM", "GFXMMU", "JPEG", "OPAMP", "OSPI", "OCTOSPI", "I2S", "SMBUS","IWDG","LPTIM","LTDC","QUADSPI","RNG","RTC","SAI","SD","MMC","SPDIFRX","SPI", "SWPMI","TIM","UART","USART","IRDA","SMARTCARD","WWDG","PCD","HCD", "DFSDM", "DSI","JPEG", "MDIOS","PSSI","DTS"]]
   [#list allModules as module]
 	[#if isModuleUsed(module)]
 [#compress]#define HAL_${module?replace("QUADSPI","QSPI")?replace("AES","CRYP")?replace("OCTOSPI","OSPI")}_MODULE_ENABLED[/#compress]
@@ -110,6 +108,12 @@
   #define LSE_STARTUP_TIMEOUT    ((uint32_t)[#if LSE_Timout??]${LSE_Timout}[#if LSE_Timout?matches("(0x[0-9]*[a-f]*[A-F]*)|([0-9]*)")]U[/#if][#else]5000U[/#if])   /*!< Time out for LSE start up, in ms */
 #endif /* LSE_STARTUP_TIMEOUT */
 
+#if !defined  (LSI_VALUE)
+  #define LSI_VALUE  (32000UL)              /*!< LSI Typical Value in Hz*/
+#endif /* LSI_VALUE */                      /*!< Value of the Internal Low Speed oscillator in Hz
+                                              The real value may vary depending on the variations
+                                              in voltage and temperature.*/
+
 /**
   * @brief External clock source for I2S peripheral
   *        This value is used by the I2S HAL module to compute the I2S clock source 
@@ -130,10 +134,12 @@
 #define  TICK_INT_PRIORITY            ((uint32_t)[#if TICK_INT_PRIORITY??]${TICK_INT_PRIORITY}[#else]0x0F[/#if]U) /*!< tick interrupt priority */
 #define  USE_RTOS                     [#if advancedSettings?? && advancedSettings.USE_RTOS??]${advancedSettings.USE_RTOS}[#else]0[/#if]U
 #define  USE_SD_TRANSCEIVER           [#if USE_SD_TRANSCEIVER??]${USE_SD_TRANSCEIVER}[#else]0U[/#if]               /*!< use uSD Transceiver */
+#define  USE_SPI_CRC	              [#if CRC_SPI??]${CRC_SPI}[#else]1U[/#if]               /*!< use CRC in SPI */
 
 #define  USE_HAL_ADC_REGISTER_CALLBACKS     0U /* ADC register callback disabled     */
 #define  USE_HAL_CEC_REGISTER_CALLBACKS     0U /* CEC register callback disabled     */
 #define  USE_HAL_COMP_REGISTER_CALLBACKS    0U /* COMP register callback disabled    */
+#define  USE_HAL_CORDIC_REGISTER_CALLBACKS  0U /* CORDIC register callback disabled  */ 
 #define  USE_HAL_CRYP_REGISTER_CALLBACKS    0U /* CRYP register callback disabled    */
 #define  USE_HAL_DAC_REGISTER_CALLBACKS     0U /* DAC register callback disabled     */
 #define  USE_HAL_DCMI_REGISTER_CALLBACKS    0U /* DCMI register callback disabled    */
@@ -143,6 +149,7 @@
 #define  USE_HAL_DTS_REGISTER_CALLBACKS     0U /* DTS register callback disabled     */
 #define  USE_HAL_ETH_REGISTER_CALLBACKS     0U /* ETH register callback disabled     */
 #define  USE_HAL_FDCAN_REGISTER_CALLBACKS   0U /* FDCAN register callback disabled   */
+#define  USE_HAL_FMAC_REGISTER_CALLBACKS    0U /* FMAC register callback disabled  */ 
 #define  USE_HAL_NAND_REGISTER_CALLBACKS    0U /* NAND register callback disabled    */
 #define  USE_HAL_NOR_REGISTER_CALLBACKS     0U /* NOR register callback disabled     */
 #define  USE_HAL_SDRAM_REGISTER_CALLBACKS   0U /* SDRAM register callback disabled   */
@@ -265,6 +272,10 @@
   #include "stm32h7xx_hal_comp.h"
 #endif /* HAL_COMP_MODULE_ENABLED */
 
+#ifdef HAL_CORDIC_MODULE_ENABLED
+   #include "stm32h7xx_hal_cordic.h"
+#endif /* HAL_CORDIC_MODULE_ENABLED */
+
 #ifdef HAL_CRC_MODULE_ENABLED
   #include "stm32h7xx_hal_crc.h"
 #endif /* HAL_CRC_MODULE_ENABLED */
@@ -280,6 +291,10 @@
 #ifdef HAL_FLASH_MODULE_ENABLED
   #include "stm32h7xx_hal_flash.h"
 #endif /* HAL_FLASH_MODULE_ENABLED */
+
+#ifdef HAL_FMAC_MODULE_ENABLED
+  #include "stm32h7xx_hal_fmac.h"
+#endif /* HAL_FMAC_MODULE_ENABLED */
 
 #ifdef HAL_GFXMMU_MODULE_ENABLED
   #include "stm32h7xx_hal_gfxmmu.h"

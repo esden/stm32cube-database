@@ -4,6 +4,10 @@
   * @file    log.h
   * @author  MCD Application Team
   * @brief   logging services
+
+
+
+
   ******************************************************************************
   *
   * @attention

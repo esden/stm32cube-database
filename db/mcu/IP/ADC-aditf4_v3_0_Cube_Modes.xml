@@ -21,6 +21,10 @@
         <Parameter Name="RightBitShift"/>
         <Parameter Name="Ratio"/>
         <Parameter Name="TriggeredMode"/>
+        <!--Parameter Name="commmn"/-->
+        <Parameter Name="ChannelVREF"/>
+        <Parameter Name="ChannelVBAT"/>
+        <Parameter Name="ChannelTS"/>
     </RefMode>
     
     <!-- ADC Instance parameter needed in ADC_HandleTypeDef structure in the HAL -->
@@ -112,14 +116,8 @@
         <PossibleValue Action="Disable" Comment="Enabled" Condition="ContinuousConvMode = ENABLE" Diagnostic="Continuous and Discontinuous modes could not be used at the same time" Value="ENABLE"/>
         <Description>Enable or Disable the Discontinuous Conversion Mode</Description>
     </RefParameter>
-	    
-    <!-- Possible values of DMAContinuousRequests parameter -->
-    <!--RefParameter Comment="DMA Continuous Requests" DefaultValue="ENABLE" Name="DMAContinuousRequests" Type="list" Group="ADCgroup">
-      <Condition Diagnostic="" Expression="DMARequest_$IpInstance"/>
-            <PossibleValue Comment="Enabled" Value="ENABLE" Semaphore="Semaphore_DMAContinuousRequests_Enable"/>
-            <Description>Enable/Disable DMA Continuous Requests</Description>
-    </RefParameter-->
-       <RefParameter Comment="DMA Continuous Requests" DefaultValue="LIMITED" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
+
+    <RefParameter Comment="DMA Continuous Requests" DefaultValue="LIMITED" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
          <Condition Diagnostic="" Expression="$IpNumber=1 &amp; DMARequest_ADC1 &amp; DMAContinuousRequests=DISABLE"/>
         <PossibleValue Comment="LIMITED" Value="LIMITED"/>
         <Description>Enable/Disable DMA Continuous Requests</Description>
@@ -138,10 +136,16 @@
         <PossibleValue Comment="none" Value="NONE"/>
         <Description>Enable/Disable DMA Continuous Requests</Description>
     </RefParameter>
+    <!-- Possible values of DMAContinuousRequests parameter -->
     <RefParameter Comment="DMA Continuous Requests" DefaultValue="DISABLE" Group="ADCgroup" Name="DMAContinuousRequests" Type="list">
         <PossibleValue Comment="Disabled" Value="DISABLE"/>
-        <PossibleValue Comment="Enabled" Semaphore="Semaphore_DMAContinuousRequests_Enable" Value="ENABLE" Action="Remove" Condition="!DMARequest_ADC1" Diagnostic="The DMAContinuousRequests parameter can be set to enable only if DMA request is active in DMA settings tab"/>
-        <Description>Enable/Disable DMA Continuous Requests</Description>
+        <PossibleValue Comment="Enabled" Value="ENABLE" Action="Disable" Condition="!DMARequest_$IpInstance" Diagnostic="A DMA Request in Circular Mode must be configured in DMA Settings Tab for this ADC instance" />
+        <Description>This parameter is used only when a DMA Request is configured. Else it is not relevant.&lt;br&gt;
+            When the DMA Request for this ADC instance this parameter specifies whether 
+            the DMA requests are performed in one shot mode (DMA transfer stops when number of conversions is reached)
+            or are performed in continuous mode (DMA transfer unlimited, whatever number of conversions).&lt;br&gt;
+            Note: In continuous mode, DMA must be configured in circular mode. Otherwise an overrun will be triggered when DMA buffer maximum pointer is reached.
+        </Description>
     </RefParameter>
 	    
     <!-- Possible values of EOCSelection parameter -->
@@ -176,7 +180,6 @@
     </RefParameter>
     <RefParameter Comment="Number Of Conversion" DefaultValue="0" Group="ADCgroup"  Name="NbrOfConversion" Type="list" Visible="false">
         <Condition Diagnostic="" Expression="Sequencer=NOT_FULLY_CONFIGURABLE"/>
-        <Description>Number of regular channels to be converted</Description>
     </RefParameter>
     
         
@@ -248,7 +251,10 @@
         <Parameter Name="ExternalTrigConvEdge"/>
         <Parameter Name="TriggerFrequencyMode"/>
     </RefMode>
-	        
+    
+    <!-- ADC selected channels through mode list -->
+    <RefParameter Comment="ADC selected channels through mode list" DefaultValue="null" Group="ADCgroup" Name="SelectedChannel" Type="String"/>
+
     <!-- Possible Value of SamplingTime parameters  -->
     <RefParameter Comment="Sampling Time" DefaultValue="__NULL" Group="ADCChannel" Name="SamplingTime" Type="list">
          <Condition  Expression="Sequencer = NOT_FULLY_CONFIGURABLE " Diagnostic=""/>        
@@ -370,36 +376,6 @@
        
     </RefParameter>
     
-        
-    
-    <!-- Possible Value of Channel parameter -->
-    <!--RefParameter Comment="Channel" DefaultValue="" Group="ADCChannel" Name="Channel" Type="list" Visible="false">
-        <Condition Diagnostic="" Expression="Sequencer=not_fully_configurable"/>
-        <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"/>
-        <PossibleValue Comment="Channel 1" Value="ADC_CHANNEL_1"/>
-        <PossibleValue Comment="Channel 2" Value="ADC_CHANNEL_2"/>
-        <PossibleValue Comment="Channel 3" Value="ADC_CHANNEL_3"/>
-        <PossibleValue Comment="Channel 4" Value="ADC_CHANNEL_4"/>
-        <PossibleValue Comment="Channel 5" Value="ADC_CHANNEL_5"/>
-        <PossibleValue Comment="Channel 6" Value="ADC_CHANNEL_6"/>
-        <PossibleValue Comment="Channel 7" Value="ADC_CHANNEL_7"/>
-        <PossibleValue Comment="Channel 8" Value="ADC_CHANNEL_8"/>
-        <PossibleValue Comment="Channel 9" Value="ADC_CHANNEL_9"/>
-        <PossibleValue Comment="Channel 10" Value="ADC_CHANNEL_10"/>
-        <PossibleValue Comment="Channel 11" Value="ADC_CHANNEL_11"/>
-        <PossibleValue Comment="Channel 12" Value="ADC_CHANNEL_12"/>
-        <PossibleValue Comment="Channel 13" Value="ADC_CHANNEL_13"/>
-        <PossibleValue Comment="Channel 14" Value="ADC_CHANNEL_14"/>
-        <PossibleValue Comment="Channel 15" Value="ADC_CHANNEL_15"/>
-        <PossibleValue Comment="Channel 15" Value="ADC_CHANNEL_16"/>
-        <PossibleValue Comment="Channel 15" Value="ADC_CHANNEL_17"/>
-        <PossibleValue Comment="Channel 15" Value="ADC_CHANNEL_18"/>
-        <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT"/>
-        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT"/>
-        <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
-      
-    </RefParameter-->
-    
     <!-- List of all available channel used to -->
     <RefParameter Comment="Rank" DefaultValue="ADC_RANK_CHANNEL_NUMBER" Group="ADCChannel" Name="Rank" Type="list" Visible="false"> 
         <Condition Diagnostic="" Expression="Sequencer=NOT_FULLY_CONFIGURABLE"/>
@@ -415,47 +391,50 @@
 	   
       
    
-
     <!-- ScanconvMode -->
-    <RefParameter Comment="Scan Conversion Mode" DefaultValue="ENABLE" Group="ADCgroup" Name="ScanConvMode" Type="list">
+    <RefParameter Name="ScanConvMode" Comment="Scan Conversion Mode" DefaultValue="ADC_SCAN_ENABLE" Group="ADCgroup" Type="list">
         <Condition Diagnostic="" Expression="(NbrOfConversion&gt;1) &amp; (Sequencer=FULLY_CONFIGURABLE)"/>
         <PossibleValue Comment="Enabled" Value="ADC_SCAN_ENABLE"/>
-         <PossibleValue Comment="Disabled" Value="ADC_SCAN_DISABLE"/>
-        <Description>Enable or Disable the Scan Conversion Mode ,
-                     To enable Scan conversion Mode : the number of Conversion should be  > 1</Description>
+        <PossibleValue Comment="Disabled" Value="ADC_SCAN_DISABLE"/>
+        <Description>In Disabled, only the channel with the rank 1 is converted</Description>
     </RefParameter>
-    <RefParameter Comment="Scan Conversion Mode" DefaultValue="DISABLE" Group="ADCgroup" Name="ScanConvMode" Type="list">
+    <RefParameter Name="ScanConvMode" Comment="Scan Conversion Mode" DefaultValue="ADC_SCAN_DISABLE" Group="ADCgroup" Type="list">
         <Condition Diagnostic="" Expression="!(NbrOfConversion&gt;1) &amp; (Sequencer=FULLY_CONFIGURABLE)"/>
         <PossibleValue Comment="Disabled" Value="ADC_SCAN_DISABLE"/>
-        <Description>Enable or Disable the Scan Conversion Mode ,
-                     To enable Scan conversion Mode : the number of Conversion should be  > 1</Description>
+        <Description>To have the Enabled choice in the Scan Conversion Mode : the Number Of Conversion has to be  > 1</Description>
     </RefParameter>
-   
-	    <RefParameter Visible="false" Comment="comm" DefaultValue="+ChannelVREF+|ChannelTS+|ChannelVBAT" Name="commmn" Type="list"/>
-
-    
-     <RefParameter Comment="ChannelVREF" DefaultValue="ADC_CHANNEL_VREFINT" Name="ChannelVREF" Type="list" Visible="false">
-             <Condition Expression="VrefTSelected$IpInstance" Diagnostic=""/>
-
-        <PossibleValue Comment="ADC_CHANNEL_VREFINT" Value="ADC_CHANNEL_VREFINT"/>
-    </RefParameter>
-    <RefParameter Comment="ChannelTS" DefaultValue="ADC_CHANNEL_TEMPSENSOR" Name="ChannelTS" Type="list" Visible="false">
-                <Condition Expression="VtsATSelected$IpInstance" Diagnostic=""/>
-
-        <PossibleValue Comment="ADC_CHANNEL_TEMPSENSOR" Value="ADC_CHANNEL_TEMPSENSOR"/>
-    </RefParameter>
-    <RefParameter Comment="Channelvbat" DefaultValue="ADC_CHANNEL_VBAT" Name="ChannelVBAT" Type="list" Visible="false">
-        <Condition Expression="VbatfTSelected$IpInstance" Diagnostic=""/>
-        <PossibleValue Comment="ADC_CHANNEL_VBAT" Value="ADC_CHANNEL_VBAT"/>
-    </RefParameter>
-    <!-- Possible Value of SamplingTime parameters  -->
-    <RefParameter Comment="Scan Conversion Mode" DefaultValue="ADC_SCAN_SEQ_FIXED" Group="ADCChannel" Name="ScanConvMode" Type="list"><!-- aligned with HAL v1.2.0-->
+    <RefParameter Name="ScanConvMode" Comment="Scan Conversion Mode" DefaultValue="ADC_SCAN_SEQ_FIXED" Group="ADCChannel" Type="list"><!-- aligned with HAL v1.2.0-->
         <Condition Diagnostic="" Expression="(Sequencer=NOT_FULLY_CONFIGURABLE)"/>
         <PossibleValue Comment="Forward" Value="ADC_SCAN_SEQ_FIXED"/><!-- aligned with HAL v1.2.0-->
         <PossibleValue Comment="Backward" Value="ADC_SCAN_SEQ_FIXED_BACKWARD"/>
-        <Description>Parameter Description: Configurable scan direction (Forward from channel 0 to 18 or Backward from channel 18 to channel 0)</Description>
+        <Description>
+            Configurable scan direction (Forward from channel 0 to 18 or Backward from channel 18 to channel 0) &lt;br&gt;
+            Vbat = channel 14 &lt;br&gt;
+            Vrefint = channel 13 &lt;br&gt;
+            TempSensor = channel 12
+        </Description>
     </RefParameter>
     
+    <!--RefParameter Visible="false" Comment="comm" DefaultValue="ChannelVREF|ChannelTS|ChannelVBAT" Name="commmn" Type="list"/-->
+    
+    <RefParameter Comment="ChannelVREF" DefaultValue="ADC_CHANNEL_VREFINT" Name="ChannelVREF" Type="list" Visible="false">
+        <Condition Expression="VrefTSelected$IpInstance &amp; (Sequencer=NOT_FULLY_CONFIGURABLE)" Diagnostic=""/>
+        <PossibleValue Comment="ADC_CHANNEL_VREFINT" Value="ADC_CHANNEL_VREFINT"/>
+    </RefParameter>
+    <RefParameter Comment="ChannelVREF" DefaultValue="null" Name="ChannelVREF" Type="list" Visible="false"/>
+    
+    <RefParameter Comment="ChannelTS" DefaultValue="ADC_CHANNEL_TEMPSENSOR" Name="ChannelTS" Type="list" Visible="false">
+        <Condition Expression="VtsATSelected$IpInstance &amp; (Sequencer=NOT_FULLY_CONFIGURABLE)" Diagnostic=""/>
+        <PossibleValue Comment="ADC_CHANNEL_TEMPSENSOR" Value="ADC_CHANNEL_TEMPSENSOR"/>
+    </RefParameter>
+    <RefParameter Comment="ChannelTS" DefaultValue="null" Name="ChannelTS" Type="list" Visible="false"/>
+    
+    <RefParameter Comment="Channelvbat" DefaultValue="ADC_CHANNEL_VBAT" Name="ChannelVBAT" Type="list" Visible="false">
+        <Condition Expression="VbatfTSelected$IpInstance &amp; (Sequencer=NOT_FULLY_CONFIGURABLE)" Diagnostic=""/>
+        <PossibleValue Comment="ADC_CHANNEL_VBAT" Value="ADC_CHANNEL_VBAT"/>
+    </RefParameter>
+    <RefParameter Comment="Channelvbat" DefaultValue="null" Name="ChannelVBAT" Type="list" Visible="false"/>
+    <!-- Possible Value of SamplingTime parameters  -->
     
     <RefMode BaseMode="ADC_Regular_ConversionMode" Comment="Regular Channel Settings" Group="ADC_Regular_ConversionMode" Name="ChannelRegularConversion">
         <ConfigForMode>ADC_RegularChannelRankConfig</ConfigForMode>
@@ -463,25 +442,27 @@
         <Parameter Name="Rank"/>
         <Parameter Name="Channel"/>
         <Parameter Name="SamplingTime"/>
-        <Parameter Name="MonitoredBy"/>
         <Parameter Name="RegHighThreshold"/>
         <Parameter Name="RegLowThreshold"/>	
         <Parameter Name="RegITMode"/>
         <Parameter Name="MonitoredBy"/>
         <Parameter Name="AWDChannel"/>
+        <!--Parameter Name="ChannelVREF"/>
+        <Parameter Name="ChannelVBAT"/>
+        <Parameter Name="ChannelTS"/-->
     </RefMode>
     <RefMode Comment="Regular Channel Settings" Name="ChannelRegularConversionCopy">
-        <ConfigForMode>ADC_RegularChannelRankConfig</ConfigForMode>
-        <ConfigForMode>ADC_RegularChannelConfigForWD</ConfigForMode>
         <Parameter Name="Rank"/>
         <Parameter Name="Channel"/>
         <Parameter Name="SamplingTime"/>
-        <Parameter Name="MonitoredBy"/>
         <Parameter Name="RegHighThreshold"/>
         <Parameter Name="RegLowThreshold"/>	
         <Parameter Name="RegITMode"/>
         <Parameter Name="MonitoredBy"/>
         <Parameter Name="AWDChannel"/>
+        <!--Parameter Name="ChannelVREF"/>
+        <Parameter Name="ChannelVBAT"/>
+        <Parameter Name="ChannelTS"/-->
     </RefMode>
     <!-- WatchDog parameters 
     <RefMode Comment="" Group="WatchDog" Name="WatchDog">
@@ -921,6 +902,91 @@
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT"/>
         <PossibleValue Comment="Channel Vlcd" Value="ADC_CHANNEL_VLCD"/> -->
     </RefParameter>
+    <!--  ########################################################################################Regular channel WatchDog parameters######################################################################################## -->
+    <RefParameter Comment="WDG3ChannelR1" DefaultValue="null" Group="ADCgroup" Name="WDG3ChannelR1" Type="" Visible="false"/>
+    <RefParameter Comment="WDG3ChannelR2" DefaultValue="null" Group="ADCgroup" Name="WDG3ChannelR2" Type="" Visible="false"/>
+    <RefParameter Comment="WDG3ChannelR3" DefaultValue="null" Group="ADCgroup" Name="WDG3ChannelR3" Type="" Visible="false"/>
+    <RefParameter Comment="WDG3ChannelR4" DefaultValue="null" Group="ADCgroup" Name="WDG3ChannelR4" Type="" Visible="false"/>
+    <RefParameter Comment="WDG3ChannelR5" DefaultValue="null" Group="ADCgroup" Name="WDG3ChannelR5" Type="" Visible="false"/>
+    <RefParameter Comment="WDG3ChannelR6" DefaultValue="null" Group="ADCgroup" Name="WDG3ChannelR6" Type="" Visible="false"/>
+    <RefParameter Comment="WDG3ChannelR7" DefaultValue="null" Group="ADCgroup" Name="WDG3ChannelR7" Type="" Visible="false"/>
+    <RefParameter Comment="WDG3ChannelR8" DefaultValue="null" Group="ADCgroup" Name="WDG3ChannelR8" Type="" Visible="false"/>
+    
+    <RefParameter Comment="WDG2ChannelR1" DefaultValue="null" Group="ADCgroup" Name="WDG2ChannelR1" Type="" Visible="false"/>
+    <RefParameter Comment="WDG2ChannelR2" DefaultValue="null" Group="ADCgroup" Name="WDG2ChannelR2" Type="" Visible="false"/>
+    <RefParameter Comment="WDG2ChannelR3" DefaultValue="null" Group="ADCgroup" Name="WDG2ChannelR3" Type="" Visible="false"/>
+    <RefParameter Comment="WDG2ChannelR4" DefaultValue="null" Group="ADCgroup" Name="WDG2ChannelR4" Type="" Visible="false"/>
+    <RefParameter Comment="WDG2ChannelR5" DefaultValue="null" Group="ADCgroup" Name="WDG2ChannelR5" Type="" Visible="false"/>
+    <RefParameter Comment="WDG2ChannelR6" DefaultValue="null" Group="ADCgroup" Name="WDG2ChannelR6" Type="" Visible="false"/>
+    <RefParameter Comment="WDG2ChannelR7" DefaultValue="null" Group="ADCgroup" Name="WDG2ChannelR7" Type="" Visible="false"/>
+    <RefParameter Comment="WDG2ChannelR8" DefaultValue="null" Group="ADCgroup" Name="WDG2ChannelR8" Type="" Visible="false"/>
+    
+     <RefParameter Comment="InjWDG3ChannelR1" DefaultValue="null" Group="ADCgroup" Name="InjWDG3ChannelR1" Type="" Visible="false"/>
+    <RefParameter Comment="InjWDG3ChannelR2" DefaultValue="null" Group="ADCgroup" Name="InjWDG3ChannelR2" Type="" Visible="false"/>
+    <RefParameter Comment="InjWDG3ChannelR3" DefaultValue="null" Group="ADCgroup" Name="InjWDG3ChannelR3" Type="" Visible="false"/>
+    <RefParameter Comment="InjWDG3ChannelR4" DefaultValue="null" Group="ADCgroup" Name="InjWDG3ChannelR4" Type="" Visible="false"/>
+    <RefParameter Comment="InjWDG3ChannelR5" DefaultValue="null" Group="ADCgroup" Name="InjWDG3ChannelR5" Type="" Visible="false"/>
+    <RefParameter Comment="InjWDG3ChannelR6" DefaultValue="null" Group="ADCgroup" Name="InjWDG3ChannelR6" Type="" Visible="false"/>
+    <RefParameter Comment="InjWDG3ChannelR7" DefaultValue="null" Group="ADCgroup" Name="InjWDG3ChannelR7" Type="" Visible="false"/>
+    <RefParameter Comment="InjWDG3ChannelR8" DefaultValue="null" Group="ADCgroup" Name="InjWDG3ChannelR8" Type="" Visible="false"/>
+    
+    <RefParameter Comment="InjWDG2ChannelR1" DefaultValue="null" Group="ADCgroup" Name="InjWDG2ChannelR1" Type="" Visible="false"/>
+    <RefParameter Comment="InjWDG2ChannelR2" DefaultValue="null" Group="ADCgroup" Name="InjWDG2ChannelR2" Type="" Visible="false"/>
+    <RefParameter Comment="InjWDG2ChannelR3" DefaultValue="null" Group="ADCgroup" Name="InjWDG2ChannelR3" Type="" Visible="false"/>
+    <RefParameter Comment="InjWDG2ChannelR4" DefaultValue="null" Group="ADCgroup" Name="InjWDG2ChannelR4" Type="" Visible="false"/>
+    <RefParameter Comment="InjWDG2ChannelR5" DefaultValue="null" Group="ADCgroup" Name="InjWDG2ChannelR5" Type="" Visible="false"/>
+    <RefParameter Comment="InjWDG2ChannelR6" DefaultValue="null" Group="ADCgroup" Name="InjWDG2ChannelR6" Type="" Visible="false"/>
+    <RefParameter Comment="InjWDG2ChannelR7" DefaultValue="null" Group="ADCgroup" Name="InjWDG2ChannelR7" Type="" Visible="false"/>
+    <RefParameter Comment="InjWDG2ChannelR8" DefaultValue="null" Group="ADCgroup" Name="InjWDG2ChannelR8" Type="" Visible="false"/>
+    
+    <RefParameter Comment="WDG3MonitoredChannels" DefaultValue="NONE" Group="ADCgroup" Name="WDG3MonitoredChannels" Type="String" Visible="false">
+           <Condition Expression="WDG3ChannelR1=null &amp;WDG3ChannelR2=null &amp;WDG3ChannelR3=null &amp;WDG3ChannelR4=null &amp;WDG3ChannelR5=null &amp;WDG3ChannelR6=null &amp;WDG3ChannelR7=null &amp;WDG3ChannelR8=null" Diagnostic=""/>
+           <PossibleValue Value="NONE" Comment="NONE"/>
+       </RefParameter>
+       <RefParameter Comment="WDG3MonitoredChannels" DefaultValue="ENABLED" Group="ADCgroup" Name="WDG3MonitoredChannels" Type="String" Visible="false">
+           <PossibleValue Value="ENABLED" Comment="ENABLED"/>
+       </RefParameter>
+       <RefParameter Comment="WDG2MonitoredChannels" DefaultValue="NONE" Group="ADCgroup" Name="WDG2MonitoredChannels" Type="String" Visible="false">
+           <Condition Expression="WDG2ChannelR1=null &amp;WDG2ChannelR2=null &amp;WDG2ChannelR3=null &amp;WDG2ChannelR4=null &amp;WDG2ChannelR5=null &amp;WDG2ChannelR6=null &amp;WDG2ChannelR7=null &amp;WDG2ChannelR8=null" Diagnostic=""/>
+           <PossibleValue Value="NONE" Comment="NONE"/>
+       </RefParameter>
+       <RefParameter Comment="WDG2MonitoredChannels" DefaultValue="ENABLED" Group="ADCgroup" Name="WDG2MonitoredChannels" Type="String" Visible="false">
+           <PossibleValue Value="ENABLED" Comment="ENABLED"/>
+       </RefParameter>
+     
+    <!--  ########################################################################################Injected channel WatchDog parameters######################################################################################## -->
+ <RefParameter Comment="injWDG3MonitoredChannels" DefaultValue="NONE" Group="ADCgroup" Name="injWDG3MonitoredChannels" Type="String" Visible="false">
+           <Condition Expression="InjWDG3ChannelR1=null &amp;InjWDG3ChannelR2=null &amp;InjWDG3ChannelR3=null &amp;InjWDG3ChannelR4=null &amp;InjWDG3ChannelR5=null &amp;InjWDG3ChannelR6=null &amp;InjWDG3ChannelR7=null &amp;InjWDG3ChannelR8=null" Diagnostic=""/>
+           <PossibleValue Value="NONE" Comment="NONE"/>
+       </RefParameter>
+       <RefParameter Comment="injWDG3MonitoredChannels" DefaultValue="ENABLED" Group="ADCgroup" Name="WDG3MonitoredChannels" Type="String" Visible="false">
+           <PossibleValue Value="ENABLED" Comment="ENABLED"/>
+       </RefParameter>
+
+       <!--RefParameter Comment="InjWDG3ChannelR1" DefaultValue="null" Group="ADCgroup" Name="InjWDG3ChannelR1" Type="" Visible="false"/>
+       <RefParameter Comment="InjWDG3ChannelR2" DefaultValue="null" Group="ADCgroup" Name="InjWDG3ChannelR2" Type="" Visible="false"/>
+       <RefParameter Comment="InjWDG3ChannelR3" DefaultValue="null" Group="ADCgroup" Name="InjWDG3ChannelR3" Type="" Visible="false"/>
+       <RefParameter Comment="InjWDG3ChannelR4" DefaultValue="null" Group="ADCgroup" Name="InjWDG3ChannelR4" Type="" Visible="false"/>
+       <RefParameter Comment="InjWDG3ChannelR5" DefaultValue="null" Group="ADCgroup" Name="InjWDG3ChannelR5" Type="" Visible="false"/>
+       <RefParameter Comment="InjWDG3ChannelR6" DefaultValue="null" Group="ADCgroup" Name="InjWDG3ChannelR6" Type="" Visible="false"/>
+       <RefParameter Comment="InjWDG3ChannelR7" DefaultValue="null" Group="ADCgroup" Name="InjWDG3ChannelR7" Type="" Visible="false"/>
+       <RefParameter Comment="InjWDG3ChannelR8" DefaultValue="null" Group="ADCgroup" Name="InjWDG3ChannelR8" Type="" Visible="false"/-->
+    
+       <RefParameter Comment="injWDG2MonitoredChannels" DefaultValue="NONE" Group="ADCgroup" Name="injWDG2MonitoredChannels" Type="String" Visible="false">
+           <Condition Expression="InjWDG2ChannelR1=null &amp;InjWDG2ChannelR2=null &amp;InjWDG2ChannelR3=null &amp;InjWDG2ChannelR4=null &amp;InjWDG2ChannelR5=null &amp;InjWDG2ChannelR6=null &amp;InjWDG2ChannelR7=null &amp;InjWDG2ChannelR8=null" Diagnostic=""/>
+           <PossibleValue Value="NONE" Comment="NONE"/>
+       </RefParameter>
+       <RefParameter Comment="WDG2MonitoredChannels" DefaultValue="ENABLED" Group="ADCgroup" Name="WDG2MonitoredChannels" Type="String" Visible="false">
+           <PossibleValue Value="ENABLED" Comment="ENABLED"/>
+       </RefParameter>
+       <!--RefParameter Comment="InjWDG2ChannelR1" DefaultValue="null" Group="ADCgroup" Name="InjWDG2ChannelR1" Type="" Visible="false"/>
+       <RefParameter Comment="InjWDG2ChannelR2" DefaultValue="null" Group="ADCgroup" Name="InjWDG2ChannelR2" Type="" Visible="false"/>
+       <RefParameter Comment="InjWDG2ChannelR3" DefaultValue="null" Group="ADCgroup" Name="InjWDG2ChannelR3" Type="" Visible="false"/>
+       <RefParameter Comment="InjWDG2ChannelR4" DefaultValue="null" Group="ADCgroup" Name="InjWDG2ChannelR4" Type="" Visible="false"/>
+       <RefParameter Comment="InjWDG2ChannelR5" DefaultValue="null" Group="ADCgroup" Name="InjWDG2ChannelR5" Type="" Visible="false"/>
+       <RefParameter Comment="InjWDG2ChannelR6" DefaultValue="null" Group="ADCgroup" Name="InjWDG2ChannelR6" Type="" Visible="false"/>
+       <RefParameter Comment="InjWDG2ChannelR7" DefaultValue="null" Group="ADCgroup" Name="InjWDG2ChannelR7" Type="" Visible="false"/>
+       <RefParameter Comment="InjWDG2ChannelR8" DefaultValue="null" Group="ADCgroup" Name="InjWDG2ChannelR8" Type="" Visible="false"/-->
 
     
     <!-- Possible Value of AnalogWDChannel parameters -->
@@ -1344,7 +1410,7 @@
             <Semaphore>channelSelected</Semaphore>
         </Mode>
         <!-- Trigger -->
-        <Mode Name="External-Trigger-for-Regular-conversion" UserName="Regular Conversion Trigger">
+        <Mode Name="External-Trigger-for-Regular-conversion" UserName="Regular EXTI Conversion Trigger">
             <ModeLogicOperator Name="OR">
                 <Mode Name="External-Trigger-for-Regular-conversion" UserName="Regular Conversion Trigger">
                     <SignalLogicalOp Name="AND">

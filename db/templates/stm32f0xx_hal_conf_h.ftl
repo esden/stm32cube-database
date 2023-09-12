@@ -15,7 +15,7 @@
   *                        opensource.org/licenses/BSD-3-Clause
   *
   ******************************************************************************
-  */ 
+  */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __STM32F0xx_HAL_CONF_H
@@ -110,7 +110,7 @@
   * @brief Internal High Speed oscillator for USB (HSI48) value.
   */
 #if !defined  (HSI48_VALUE) 
-#define HSI48_VALUE ((uint32_t)48000000) /*!< Value of the Internal High Speed oscillator for USB in Hz.
+  #define HSI48_VALUE ((uint32_t)48000000) /*!< Value of the Internal High Speed oscillator for USB in Hz.
                                              The real value may vary depending on the variations
                                              in voltage and temperature.  */
 #endif /* HSI48_VALUE */
@@ -119,7 +119,7 @@
   * @brief Internal Low Speed oscillator (LSI) value.
   */
 #if !defined  (LSI_VALUE) 
- #define LSI_VALUE  ((uint32_t)[#if lsi_value??]${lsi_value}[#else]40000[/#if])    
+  #define LSI_VALUE  ((uint32_t)[#if lsi_value??]${lsi_value}[#else]40000[/#if])
 #endif /* LSI_VALUE */                      /*!< Value of the Internal Low Speed oscillator in Hz
                                              The real value may vary depending on the variations
                                              in voltage and temperature.  */
@@ -127,9 +127,12 @@
   * @brief External Low Speed oscillator (LSI) value.
   */
 #if !defined  (LSE_VALUE)
- #define LSE_VALUE  ((uint32_t)[#if lse_value??]${lse_value}[#else]32768[/#if])    /*!< Value of the External Low Speed oscillator in Hz */
+  #define LSE_VALUE  ((uint32_t)[#if lse_value??]${lse_value}[#else]32768[/#if])    /*!< Value of the External Low Speed oscillator in Hz */
 #endif /* LSE_VALUE */     
 
+/**
+  * @brief Time out for LSE start up value in ms.
+  */
 #if !defined  (LSE_STARTUP_TIMEOUT)
   #define LSE_STARTUP_TIMEOUT    ((uint32_t)[#if LSE_Timout??]${LSE_Timout}[#else]5000[/#if])   /*!< Time out for LSE start up, in ms */
 #endif /* LSE_STARTUP_TIMEOUT */

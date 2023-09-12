@@ -321,14 +321,14 @@
       [#if  family?upper_case == "STM32L0"]
         <file category="header" name="${sourceRepository}Drivers\CMSIS\Include\core_cm0plus.h"/>
       [/#if]
-      [#if  family?upper_case == "STM32F2" || family?upper_case ==  "STM32L1" || family?upper_case ==  "STM32L1"]
+      [#if  family?upper_case == "STM32F2" || family?upper_case ==  "STM32L1" || family?upper_case ==  "STM32F1"]
         <file category="header" name="${sourceRepository}Drivers\CMSIS\Include\core_cm3.h"/>
       [/#if]
-      [#if  family?upper_case == "STM32F4" || family?upper_case ==  "STM32L4" || family?upper_case ==  "STM32F3" || family?upper_case ==  "STM32G4"]
+      [#if  family?upper_case == "STM32F4" || family?upper_case ==  "STM32L4" || family?upper_case ==  "STM32F3" || family?upper_case ==  "STM32G4" || family?upper_case ==  "STM32WB"]
         <file category="header" name="${sourceRepository}Drivers\CMSIS\Include\core_cm4.h"/>
       [/#if]
-      [#if  family?upper_case == "STM32F7"]
-        <file category="header" name="${sourceRepository}Drivers\CMSIS\Include\core_cm7.h"/>
+      [#if  family?upper_case == "STM32F7" || family?upper_case ==  "STM32H7"]
+        <file category="header" name="${sourceRepository}Drivers/CMSIS/Include/core_cm7.h"/>
       [/#if]
       </files>
     </component>

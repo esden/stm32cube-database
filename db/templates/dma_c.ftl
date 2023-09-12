@@ -69,7 +69,7 @@ ${variable.value} ${variable.name};
   [/#list]
 [/#list]
 
-/** 
+/**
   * Enable DMA controller clock
 [#if variables?? && variables?size > 0]
   * Configure DMA for memory to memory transfers
@@ -78,7 +78,7 @@ ${variable.value} ${variable.name};
 [/#list]
 [/#if]
   */
-void MX_${ipName}_Init(void) 
+void MX_${ipName}_Init(void)
 {
 
 [#if RESMGR_UTILITY??]

@@ -4,7 +4,7 @@
 [#--///////////////////--]
 
 [#--FIX: remove links w M4--]
-[#macro bind_stm32_rproc	pDtLevel]
+[#macro bind_stm32_rproc	pElmt pDtLevel]
 [#compress]
 [#local TABres = dts_get_tabs(pDtLevel)]
 [#local TABnode = TABres.TABN]
@@ -32,14 +32,13 @@ ${TABsubnode}mbox-names = [#t]
 "shutdown";
 	[/#if]
 [#t]
-${TABsubnode}recovery;
 ${TABsubnode}status = "okay";
 #n
 ${TABsubnode}/* USER CODE BEGIN m4_rproc */
 ${TABsubnode}/* USER CODE END m4_rproc */
 [#t]
 	[#--binding for "Documentation/bindings/remoteproc/rproc-srm.txt"--]
-	[#if srvcmx_getRuntimeCtxtBindedEnableIPDeviceNber("CortexM4")>0][#--"m4_rproc" exist but not of SOC type--]
+	[#if srvcmx_getRuntimeCtxtBindedEnableIPDeviceNber("CortexM4")>0][#--this service can be called as at this stage CortexM4 has been binded--]
 #n
 ${TABsubnode}m4_system_resources{
 ${TABsubprop}status = "okay";

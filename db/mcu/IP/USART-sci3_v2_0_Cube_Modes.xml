@@ -344,7 +344,7 @@
         <PossibleValue Comment="16 Samples" Value="UART_OVERSAMPLING_16"/>
         <PossibleValue Comment="8 Samples" Value="UART_OVERSAMPLING_8"/>
     </RefParameter>
-    <RefParameter Comment="Over Sampling" DefaultValue="UART_OVERSAMPLING_16" Group="Advanced Parameters" Name="OverSampling" Type="list">
+    <RefParameter Comment="Over Sampling" DefaultValue="UART_OVERSAMPLING_16" Group="Advanced Parameters" Name="OverSampling" Type="uniqueElementList">
         <Condition Diagnostic="" Expression="VirtualMode = VM_LIN"/>
         <PossibleValue Comment="16 Samples" Value="UART_OVERSAMPLING_16"/>
     </RefParameter>
@@ -667,10 +667,28 @@
     </RefParameter>
 	
     <!-- Address for MultiProcessor --> 
+    <RefParameter Comment="Wake-Up Address" DefaultValue="0" Group="Advanced Parameters" Max="63" Min="0" Name="Address" Type="integer">
+        <Condition Diagnostic="" Expression="WakeUpMethod=UART_WAKEUPMETHOD_ADDRESSMARK &amp; AddressLength = UART_ADDRESS_DETECT_7B &amp; WordLength=WORDLENGTH_7B"/>
+    </RefParameter>
+    <RefParameter Comment="Wake-Up Address" DefaultValue="0" Group="Advanced Parameters" Max="127" Min="0" Name="Address" Type="integer">
+        <Condition Diagnostic="" Expression="WakeUpMethod=UART_WAKEUPMETHOD_ADDRESSMARK &amp; AddressLength = UART_ADDRESS_DETECT_7B &amp; WordLength=WORDLENGTH_8B"/>
+    </RefParameter>
+    <RefParameter Comment="Wake-Up Address" DefaultValue="0" Group="Advanced Parameters" Max="255" Min="0" Name="Address" Type="integer">
+        <Condition Diagnostic="" Expression="WakeUpMethod=UART_WAKEUPMETHOD_ADDRESSMARK &amp; AddressLength = UART_ADDRESS_DETECT_7B &amp; WordLength=WORDLENGTH_9B"/>
+    </RefParameter>
     <RefParameter Comment="Wake-Up Address" DefaultValue="0" Group="Advanced Parameters" Max="15" Min="0" Name="Address" Type="integer">
         <Condition Diagnostic="" Expression="WakeUpMethod = UART_WAKEUPMETHOD_ADDRESSMARK"/>
     </RefParameter>
     <RefParameter Comment="Wake-Up Address" DefaultValue="0" Group="Advanced Parameters" Max="0" Min="0" Name="Address" Type="integer" Visible="false"/>
+    
+    
+    <!-- Specifics RefParameters for MultiProcessor Only. Adress length -->
+    <RefParameter Comment="Wake-Up Method" DefaultValue="UART_ADDRESS_DETECT_4B" Group="Advanced Parameters" Name="AddressLength" Type="list">
+        <Condition Diagnostic="" Expression="WakeUpMethod=UART_WAKEUPMETHOD_ADDRESSMARK"/>
+        <PossibleValue Comment="4 Bits" Value="UART_ADDRESS_DETECT_4B"/>
+        <PossibleValue Comment="7 Bits" Value="UART_ADDRESS_DETECT_7B"/>
+    </RefParameter>
+    <RefParameter Comment="Wake-Up Method" DefaultValue="null" Group="Advanced Parameters" Name="AddressLength" Type="list" Visible="false"/>
 	
 	
 	
@@ -1514,6 +1532,7 @@
 		
     <!-- RefMode for 'MultiProcessor Communication' UART -->
     <RefMode BaseMode="usartBasic" HalMode="UART" Name="Multiprocessor_communication">
+        <Condition Diagnostic="" Expression="WakeUpMethod=UART_WAKEUPMETHOD_IDLELINE"/>
         <ConfigForMode>Uart_MultiProcessor_Init</ConfigForMode>
         <Parameter Name="VirtualMode">
             <PossibleValue>VM_ASYNC</PossibleValue>
@@ -1529,6 +1548,42 @@
         <Parameter Name="OneBitSampling"/>
         <Parameter Name="WakeUpMethod"/>
         <Parameter Name="Address"/>
+        <Parameter Name="AddressLength"/>
+        <Parameter Name="ClockPrescaler"/>
+        <Parameter Name="FIFOMode"/>
+        <Parameter Name="TXFIFOThreshold"/>
+        <Parameter Name="RXFIFOThreshold"/>
+		
+        <!-- Advanced Features -->
+        <Parameter Name="AutoBaudRateEnableParam"/>
+        <Parameter Name="AutoBaudRateMode"/>
+        <Parameter Name="TxPinLevelInvertParam"/>
+        <Parameter Name="RxPinLevelInvertParam"/>
+        <Parameter Name="DataInvertParam"/>
+        <Parameter Name="SwapParam"/>
+        <Parameter Name="OverrunDisableParam"/>
+        <Parameter Name="DMADisableonRxErrorParam"/>
+        <Parameter Name="MSBFirstParam"/>
+    </RefMode>
+    
+    <RefMode BaseMode="usartBasic" HalMode="UART" Name="Multiprocessor_communication">
+        <Condition Diagnostic="" Expression="WakeUpMethod=UART_WAKEUPMETHOD_ADDRESSMARK"/>
+        <ConfigForMode>Uart_MultiProcessor_Ex_Init</ConfigForMode>
+        <Parameter Name="VirtualMode">
+            <PossibleValue>VM_ASYNC</PossibleValue>
+        </Parameter>
+        <!-- Basic Parameters -->
+		
+        <Parameter Name="WordLength"/>
+        <Parameter Name="Parity"/>
+        <Parameter Name="StopBits"/>
+        <!--  Advanced Parameters -->
+        <Parameter Name="Mode"/>
+        <Parameter Name="OverSampling"/>
+        <Parameter Name="OneBitSampling"/>
+        <Parameter Name="WakeUpMethod"/>
+        <Parameter Name="Address"/>
+        <Parameter Name="AddressLength"/>
         <Parameter Name="ClockPrescaler"/>
         <Parameter Name="FIFOMode"/>
         <Parameter Name="TXFIFOThreshold"/>

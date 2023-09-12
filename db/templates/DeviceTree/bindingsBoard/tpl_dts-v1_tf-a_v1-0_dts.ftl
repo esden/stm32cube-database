@@ -18,7 +18,11 @@
  */
 
 /dts-v1/;
+#include <dt-bindings/pinctrl/stm32-pinfunc.h>
 #include <dt-bindings/clock/stm32mp1-clksrc.h>
+[#if srvcmx_isDeviceEnabled("etzpc")]
+#include <dt-bindings/soc/st,stm32-etzpc.h>
+[/#if]
 [#if mx_ddrConfigs["general"]?? && mx_ddrConfigs["general"]["isConfigured"]?? && mx_ddrConfigs["general"]["isConfigured"]=="true" ]
 	[#if mxDtDM.dts_ddrConfigFileName??]
 #include "${mxDtDM.dts_ddrConfigFileName}"
@@ -28,16 +32,22 @@
 	[/#if]
 [/#if]
 
-[#if mx_socRPNSuperset?has_content]
-#include "${mx_socRPNSuperset}.dtsi"
+[#if mx_socFtRPN?has_content]
+#include "${mx_socFtRPN}.dtsi"
 [#else]
 	[@mlog  logMod=module logType="ERR" logMsg="unknown SOC dtsi" varsMap={} /]
 /*#include "???.dtsi"*/
 [/#if]
-[#if mx_socRPNSuperset?has_content]
-#include "${mx_socRPNSuperset}${mx_socPackageType}-pinctrl.dtsi"
+[#if mx_socRPN?has_content]
+#include "${mx_socRPN?substring(0,9) + "x" + mx_socRPN?substring(10)}.dtsi"
 [#else]
-	[@mlog  logMod=module logType="ERR" logMsg="unknown SOC pinCtrl dtsi" varsMap={} /]
+	[@mlog  logMod=module logType="ERR" logMsg="unknown SOC package dtsi" varsMap={} /]
+/*#include "???.dtsi"*/
+[/#if]
+[#if mx_socPtCPN?has_content]
+#include "${mx_socPtCPN?substring(0,9) + "xx" + mx_socPtCPN?substring(11)}-pinctrl.dtsi"
+[#else]
+	[@mlog  logMod=module logType="ERR" logMsg="unknown SOC pinCtrl package dtsi" varsMap={} /]
 /*#include "???-pinctrl.dtsi"*/
 [/#if]
 [#if mx_ddrConfigs["general"]?? && mx_ddrConfigs["general"]["isConfigured"]?? && mx_ddrConfigs["general"]["isConfigured"]=="true" ]
@@ -50,12 +60,6 @@
 [#else]
 	[@mlog  logMod=module logType="WARN" logMsg="DDR not configured: unknown DDR dtsi" varsMap={} /]
 /*#include "???-ddr.dtsi"*/
-[/#if]
-[#if mx_socRPNSuperset?has_content]
-#include "${mx_socRPNSuperset}-security.dtsi"
-[#else]
-	[@mlog  logMod=module logType="ERR" logMsg="unknown SOC security dtsi" varsMap={} /]
-/*#include "???-security.dtsi"*/
 [/#if]
 
 /* USER CODE BEGIN includes */

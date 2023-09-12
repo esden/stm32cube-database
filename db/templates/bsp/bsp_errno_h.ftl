@@ -44,7 +44,9 @@
 #define BSP_ERROR_BUS_CRC_ERROR              -106
 #define BSP_ERROR_BUS_DMA_FAILURE            -107
 
- 
+#ifdef __cplusplus
+}
+#endif  
 #endif /*${BoardName?upper_case}_ERRNO_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

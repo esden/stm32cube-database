@@ -22,6 +22,13 @@
         <PossibleValue Comment="Disabled" Value="0"/>
         <Description>When this parameter is enabled, DHCP (Dynamic Host Configuration Protocol) module is enabled.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use LWIP_DHCP requires both LWIP_UDP and LWIP_IPV4 enabled.</Description>
     </RefParameter>
+    <RefParameter Name="ETH_RX_BUFFER_SIZE" Comment="ETH_RX_BUFFER_SIZE (ETH Rx Buffer Size)" Type="Integer" Group="ETH Options" DefaultValue="=ETH:RxBuffLen" TabName="General Settings" Visible="false">
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: STM32H7." Expression="STM32H7"/>
+        <Description>Ethernet Rx buffer size</Description>
+    </RefParameter>
+    <RefParameter Name="ETH_RX_BUFFER_SIZE" Comment="ETH_RX_BUFFER_SIZE (ETH Rx Buffer Size)" Type="Integer" Group="ETH Options" DefaultValue="1524" TabName="General Settings" Visible="false">
+        <Description>Ethernet Rx buffer size</Description>
+    </RefParameter>
     <RefParameter Name="IP_ADDRESS" Comment="IP_ADDRESS (IP Address)" Type="Array" Separator="." ArrayTypeElement="uint8_t;10" ArraySize="4" Group="IP Address Settings" DefaultValue="000.000.000.000" TabName="General Settings" Mode="Basic" Max="255" Visible="true">
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: If DHCP is disabled, the IP address is mandatory." Expression="!LWIP_DHCP"/>
     </RefParameter>
@@ -839,10 +846,10 @@
         <PossibleValue Comment="Enabled" Value="1"/>
         <Description>Set parameter allow to support an extended callback function for several netif related event that supports multiple subscribers.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
-    <RefParameter Name="LWIP_NETIF_LINK_CALLBACK" Comment="LWIP_NETIF_LINK_CALLBACK (Callback Function on Interface Link Changes)" Type="list" Group="Network Interfaces Options" DefaultValue="0" TabName="Key Options" Mode="Basic" >
+    <RefParameter Name="LWIP_NETIF_LINK_CALLBACK" Comment="LWIP_NETIF_LINK_CALLBACK (Callback Function on Interface Link Changes)" Type="list" Group="Network Interfaces Options" DefaultValue="1" TabName="Key Options" Mode="Basic" >
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Set parameter allow to support a callback function from an interface whenever the link changes (i.e., link down).&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
+        <Description>Set parameter allow to support a callback function from an interface whenever the link changes (i.e., link down).&lt;br&gt;Since CubeMx 6.0.0 release, It is enabled like in LwIP Cube FW applications.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
     <RefParameter Name="LWIP_NETIF_REMOVE_CALLBACK" Comment="LWIP_NETIF_REMOVE_CALLBACK (Callback Function on Interface Removal)" Type="list" Group="Network Interfaces Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" >
         <PossibleValue Comment="Disabled" Value="0"/>
@@ -2062,7 +2069,7 @@
     <RefParameter Name="HTTPD_USE_CUSTOM_FSDATA" Comment="HTTPD_USE_CUSTOM_FSDATA (Custom FS Data)" Type="list" Group="HTTPD - File System Options" DefaultValue="0" TabName="HTTPD" Mode="Advanced" >
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: HTTPD_USE_CUSTOM_FSDATA requires LWIP_HTTPD enabled." Expression="LWIP_HTTPD"/>
         <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>&lt;b&gt;Warnings:&lt;/b&gt;&lt;br&gt;- HTTPD_USE_CUSTOM_FSDATA enabled requires once code has been generated to have in your project folder within Middlewares\Third_Party\LwIP\src\apps\httpd folder "fsdata_custom.c" instead of "fsdata.c".&lt;br&gt;- Adding "fsdata_custom.c" can be done by renaming existing "fsdata.c" file in "fsdata_custom.c".&lt;br&gt;- If "fsdata.c" has not been copied in your project, it can be taken from the Firmware Repository (Menu Help &gt; Updater Settings...) Software Package folder within Middlewares\Third_Party\LwIP\src\apps\httpd folder.&lt;br&gt;- Depending on project settings and IDE used, "fsdata_custom.c" or "fsdata.c" can be removed after each code generation. Please take care of this!&lt;br&gt;&lt;b&gt;Limitations&lt;/b&gt;:&lt;br&gt; It is not supported by STM32CubeMX to disable HTTPD_USE_CUSTOM_FSDATA.</Description>
+        <Description>&lt;b&gt;Warnings:&lt;/b&gt;&lt;br&gt;- HTTPD_USE_CUSTOM_FSDATA enabled requires once code has been generated to have in your project folder within Middlewares\Third_Party\LwIP\src\apps\http folder "fsdata_custom.c" instead of "fsdata.c".&lt;br&gt;- Adding "fsdata_custom.c" can be done by renaming existing "fsdata.c" file in "fsdata_custom.c".&lt;br&gt;- If "fsdata.c" has not been copied in your project, it can be taken from the Firmware Repository (Menu Help &gt; Updater Settings...) Software Package folder within Middlewares\Third_Party\LwIP\src\apps\http folder.&lt;br&gt;- Depending on project settings and IDE used, "fsdata_custom.c" or "fsdata.c" can be removed after each code generation. Please take care of this!&lt;br&gt;&lt;b&gt;Limitations&lt;/b&gt;:&lt;br&gt; It is not supported by STM32CubeMX to disable HTTPD_USE_CUSTOM_FSDATA.</Description>
     </RefParameter>
     <RefParameter Name="HTTPD_USE_CUSTOM_FSDATA" Comment="HTTPD_USE_CUSTOM_FSDATA (Custom FS Data)" Type="list" Group="HTTPD - File System Options" DefaultValue="null" TabName="HTTPD" Mode="Advanced" Visible="false">
         <Description>Set this to 1 to include "fsdata_custom.c" instead of "fsdata.c" for the file system (to prevent changing the file included in CVS).&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: HTTPD_USE_CUSTOM_FSDATA requires LWIP_HTTPD enabled.</Description>
@@ -2707,10 +2714,10 @@
         <PossibleValue Comment="Disabled" Value="0"/>
         <Description>Disable SNMP MIB2 statistics.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: MIB2_STATS requires LWIP_STATS enabled, otherwise MIB2_STATS is disabled.</Description>
     </RefParameter>
-    <RefParameter Name="CHECKSUM_BY_HARDWARE" Comment="CHECKSUM_BY_HARDWARE (Hardware Checksum ** CubeMX specific **)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="0" TabName="Checksum" Mode="Basic" >
+    <RefParameter Name="CHECKSUM_BY_HARDWARE" Comment="CHECKSUM_BY_HARDWARE (Hardware Checksum ** CubeMX specific **)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="1" TabName="Checksum" Mode="Basic" >
         <PossibleValue Comment="Disabled" Value="0"/>
         <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>Enabling Hardware Checksum will disable software checksum parameters and&lt;br&gt;allow to compute and verify the IP, UDP, TCP and ICMP checksums by Hardware.&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: This parameter introduced by CubeMX is not part of LwIP stack.</Description>
+        <Description>Enabling Hardware Checksum will disable software checksum parameters and&lt;br&gt;allow to compute and verify the IP, UDP, TCP and ICMP checksums by Hardware.&lt;br&gt;Since CubeMx 6.0.0 release, It is enabled like in LwIP Cube FW applications.&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: This parameter introduced by CubeMX is not part of LwIP stack.</Description>
     </RefParameter>
     <RefParameter Name="LWIP_CHECKSUM_CTRL_PER_NETIF" Comment="LWIP_CHECKSUM_CTRL_PER_NETIF (Generate/Check Checksum per Netif)" Type="list" Group="Infrastructure - Checksum Options" DefaultValue="0" TabName="Checksum" Mode="Basic" >
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Set LWIP_CHECKSUM_CTRL_PER_NETIF requires CHECKSUM_BY_HARDWARE disabled." Expression="!CHECKSUM_BY_HARDWARE"/>
@@ -3069,6 +3076,7 @@
         <ConfigForMode>LWIP_Init</ConfigForMode>
         <Parameter Name="LwIP Version"/>
         <Parameter Name="LWIP_DHCP"/>
+        <Parameter Name="ETH_RX_BUFFER_SIZE"/>
         <Parameter Name="IP_ADDRESS"/>
         <Parameter Name="NETMASK_ADDRESS"/>
         <Parameter Name="GATEWAY_ADDRESS"/>
@@ -3562,6 +3570,7 @@
         <Parameter Name="TFTP_DEBUG"/>
         <Parameter Name="LWIP_PROVIDE_ERRNO"/>
         <Parameter Name="LWIP_TESTMODE"/>
+        <BspDependency Name="Driver_PHY" Comment="&lt;html&gt;PHY Driver can be set either to Choose or to LAN8742:&lt;br&gt;&lt;b&gt;Choose&lt;/b&gt;:&lt;br&gt;- BSP PHY Driver components provided by ST are not used and up to user to implement&lt;br&gt; his own driver with same architecture and constraints than LAN8742&lt;br&gt; - ST specification will be published soon to explain how user can develop his own&lt;br&gt; BSP driver component.&lt;br&gt;&lt;b&gt;LAN8742&lt;/b&gt;:&lt;br&gt;- LAN8742 BSP PHY Driver component is used and STM32CubeMX copies lan8742.c/.h files&lt;br&gt; from ST Firmware Package to the user's project Drivers/BSP/Components directory.&lt;/ul&gt;&lt;br&gt;&lt;i&gt;Note&lt;/i&gt;: BSP files cannot be updated or they will be overwritten at each project generation.&lt;/html&gt;" BspIpName="" BspModeName="" Api="BSP_COMPONENT_DRIVER" Component="LAN8742"/>
     </RefMode>
     <ModeLogicOperator Name="OR">
         <Mode Name="Enabled" RemoveCondition="STM32H7">
@@ -3574,6 +3583,28 @@
                 </Mode>
             </ModeLogicOperator>
             <Condition Expression="IF(MW_ETH_MW, IF(!S_MBEDTLS | (S_MBEDTLS &amp; S_FREERTOS),1,0),0)" Diagnostic="Active only if: ETH IP configured / FREERTOS is enabled when MBEDTLS is enabled."/>
+        </Mode>
+        <Mode Name="Enabled" RemoveCondition="!(STM32H7 &amp; (STM32H745_755|STM32H747_757))">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="Enabled">
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="" Name="VS_Enabled"/>
+                    </SignalLogicalOp>
+                    <Semaphore>S_LWIP</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+            <Condition Expression="IF(MW_ETH_MW &amp; ((S_M7_DCACHE_ENABLED &amp; $IpInstance_Cortex_M7) | $IpInstance_Cortex_M4), IF(!S_MBEDTLS | (S_MBEDTLS &amp; S_FREERTOS$context),1,0),0)" Diagnostic="Active only if: ETH IP configured / FREERTOS is enabled when MBEDTLS is enabled.&lt;br&gt;&lt;font color=&quot;red&quot;&gt;For STM32H7 using Cortex M7, CORTEX_M7 CPU DCache parameter must be Enabled (Configuration tab) to allow LwIP activation."/>
+        </Mode>
+        <Mode Name="Enabled" RemoveCondition="!(STM32H7 &amp; !(STM32H745_755|STM32H747_757))">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="Enabled">
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="" Name="VS_Enabled"/>
+                    </SignalLogicalOp>
+                    <Semaphore>S_LWIP</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+            <Condition Expression="IF(MW_ETH_MW &amp; S_M7_DCACHE_ENABLED, IF(!S_MBEDTLS | (S_MBEDTLS &amp; S_FREERTOS$context),1,0),0)" Diagnostic="Active only if: ETH IP configured / FREERTOS is enabled when MBEDTLS is enabled.&lt;br&gt;&lt;font color=&quot;red&quot;&gt;For STM32H7, CORTEX_M7 CPU DCache parameter must be Enabled (Configuration tab) to allow LwIP activation."/>
         </Mode>
     </ModeLogicOperator>
 <RefSignal Name="VS_Enabled" Virtual="true"/>

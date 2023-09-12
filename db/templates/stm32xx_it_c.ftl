@@ -21,8 +21,10 @@
 [#if FREERTOS?? && (Secure == "false" || Secure == "-1")] [#-- If FreeRtos is used --]
 [#-- [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_inc.tmp"/] --] [#--include freertos includes --]
 [#-- cf BZ 64089 --]
+[#if timeBaseSource?? && timeBaseSource=="SysTick"] [#-- BZ 74529 --]
 #include "FreeRTOS.h"
 #include "task.h"
+[/#if]
 [/#if]
 [#if TOUCHSENSING??] [#-- If TouchSensing is used --]
 #include "tsl_time.h"

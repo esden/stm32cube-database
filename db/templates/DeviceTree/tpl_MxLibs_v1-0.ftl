@@ -174,7 +174,8 @@ NB: all the string lists should be re-ordered to insure DTS ordering.
 
 
 [#--return list of binded IP devices name for a given RUNTIME context in the system.
-	 empty list if no device--]
+	 Empty list if no device.
+	 NB: the pRuntimeContextName should have been binded before to call this service.--]
 [#function srvcmx_getRuntimeCtxtBindedEnableIPDeviceNamesList	pRuntimeContextName]
 
 	[#local devicesList = srvc_map_getValue(mxDtDM.dt_bindedEnabledDevicesPerRuntimeCtxtMap, pRuntimeContextName) ]
@@ -206,21 +207,6 @@ NB: all the string lists should be re-ordered to insure DTS ordering.
 [#return false]
 [/#function]
 
-[#--true if device is enabled and "non secured".
-else false.
-NB: it is supposed that the device checked is enabled (for "dt_enabledDevicesMap" is used)
---]
-[#function srvcmx_isEnabledDeviceNonSecure		pDeviceName]
-
-	[#local device = srvc_map_getValue(mxDtDM.dt_enabledDevicesMap, pDeviceName)]
-	[#if  device?? && device.isNonSecure]
-		[#return true]
-	[/#if]
-
-[#return false]
-[/#function]
-
-
 [#--return the nber of runtime ctxts the device is assigned to, covering all the DT.
 NB: independently to its state--]
 [#function srvcmx_getDeviceRtCtxtNber		pDeviceName]
@@ -229,8 +215,45 @@ NB: independently to its state--]
 	[#if  device??]
 		[#return device.rtCtxtAssignmentNber]
 	[/#if]
-r
+
 [#return 0]
+[/#function]
+
+[#--return the configuration value of a device with a status.
+The value to search is identified by its path in (string) nodes list format.--]
+[#function srvcmx_getDeviceConfigValueWithStatus	pDeviceName pConfigNodesList]
+	[#local module = "srvcmx_getDeviceConfigValue"]
+	[#local traces =  ftrace("", "module="+module+"\n") ]
+	[#local errors = ""]
+
+	[#local mapRes = srvc_map_getValueWithStatus(mxDtDM.dt_enabledDevicesMap, pDeviceName)]
+	[#local nodesNber = 0]
+	[#if mapRes.keyFound && mapRes.value?has_content]
+		[#list pConfigNodesList as node]
+
+			[#local mapRes = srvc_map_getValueWithStatus(mapRes.value, node)]
+			[#if mapRes.keyFound && (mapRes.value?has_content || (nodesNber >= (pConfigNodesList?size - 1)))]
+				[#local nodesNber = nodesNber + 1]
+			[#else]
+				[#local errors = "value not found - device= " + device.name + - "searching failed on node= " + node]
+				[#return {"errors":errors!, "value":mapRes.value!, "traces":traces!} ]
+			[/#if]
+		[/#list]
+
+		[#return {"errors":errors!, "value":mapRes.value!, "traces":traces!} ]
+	[#else]
+		[#local errors = "unknown device or no config found - device= " + pDeviceName]
+		[#return {"errors":errors!, "value":mapRes.value!, "traces":traces!} ]
+	[/#if]
+
+[#return {"errors":errors!, "value":mapRes.value!, "traces":traces!} ]
+[/#function]
+
+[#--return the configuration value of a device with no status (empty value returned if value not found).
+The value to search is identified by its path in (string) nodes list format.--]
+[#function srvcmx_getDeviceConfigValue	pDeviceName pConfigNodesList]
+
+	[#return srvcmx_getDeviceConfigValueWithStatus(pDeviceName, pConfigNodesList).value!]
 [/#function]
 
 
@@ -318,6 +341,23 @@ Returns the 1st found "bindedHwName" as a "String".
 	[#return elmtsList]
 [/#function]
 
+[#--get the list of elmts "issued from a Device" with "Path" matching the absolute path "pPath"
+but excluding the elmts that configure the provided devices--]
+[#function srvcmx_getDeviceElmtsByPathExcludingSome  pElmtsList pPath pExcludedDeviceNamesList]
+	[#local elmtsList = []]
+	[#list pElmtsList as elmt]
+		[#--mandatory attributes--]
+		[#--optional attributes--]
+		[#local path = elmt.path!]
+
+		[#if (path==pPath)&&srvcmx_isBindedHwADevice(elmt)&&!pExcludedDeviceNamesList?seq_contains(srvcmx_getBindedHwName(elmt))]
+			[#local elmtsList = elmtsList + [elmt]]
+		[/#if]
+	[/#list]
+
+	[#return elmtsList]
+[/#function]
+
 
 [#--get the list of elmts issued from "bindedHwName"--]
 [#function srvcmx_getElmtsMatchingBindedHwName  pElmtsList pBindedHwNameRegexp]
@@ -365,7 +405,6 @@ Returns the 1st found "bindedHwName" as a "String".
 	[/#if]
 [/#function]
 
-
 [#--Check if the device configured by the elmt is Bootable--]
 [#function srvcmx_isBindedDeviceBootable	pElmt]
 [#return pElmt.isBootableDevice]
@@ -380,6 +419,12 @@ Returns the 1st found "bindedHwName" as a "String".
 [#function srvcmx_isBindedDeviceSecure	pElmt]
 [#return pElmt.isSecureDevice]
 [/#function]
+
+[#--Check if the device configured by the elmt is assigned to the targeted ctxt--]
+[#function srvcmx_isDeviceAssignedToTargetedCtxt	pElmt]
+[#return pElmt.isDeviceAssignedToTargetedCtxt]
+[/#function]
+
 
 [#--Check if the elmt targets the provided FW--]
 [#function srvcmx_isElmtTargetsFw	pElmt pFwName]
@@ -410,6 +455,10 @@ Returns the 1st found "bindedHwName" as a "String".
 [#return true]
 [/#function]
 
+[#--return the binded HW name associated to the pElmt--]
+[#function srvcmx_getBindedHwName	pElmt]
+[#return pElmt.bindedHwName]
+[/#function]
 
 
 [#--------------------------------------------------------------------------------------------------------------------------------]

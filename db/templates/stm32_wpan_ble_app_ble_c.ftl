@@ -41,6 +41,7 @@
 [#assign INCLUDE_AD_TYPE_TX_POWER_LEVEL = ""]
 [#assign AD_TYPE_TX_POWER_LEVEL_LENGTH = ""]
 [#assign AD_TYPE_TX_POWER_LEVEL = ""]
+[#assign AD_TYPE_TX_POWER_LEVEL_DBM = ""]
 [#assign INCLUDE_AD_TYPE_COMPLETE_LOCAL_NAME = ""]
 [#assign AD_TYPE_COMPLETE_LOCAL_NAME_LENGTH = ""]
 [#assign AD_TYPE_COMPLETE_LOCAL_NAME = ""]
@@ -246,6 +247,9 @@
             [#if definition.name == "AD_TYPE_TX_POWER_LEVEL"]
                 [#assign AD_TYPE_TX_POWER_LEVEL = definition.value]
             [/#if]
+            [#if definition.name == "AD_TYPE_TX_POWER_LEVEL_DBM"]
+                [#assign AD_TYPE_TX_POWER_LEVEL_DBM = definition.value]
+            [/#if]
             [#if definition.name == "INCLUDE_AD_TYPE_COMPLETE_LOCAL_NAME"]
                 [#assign INCLUDE_AD_TYPE_COMPLETE_LOCAL_NAME = definition.value]
             [/#if]
@@ -255,13 +259,13 @@
             [#if definition.name == "AD_TYPE_COMPLETE_LOCAL_NAME"]
                 [#assign AD_TYPE_COMPLETE_LOCAL_NAME = definition.value]
             [/#if]
-            [#if definition.name == "INCLUDE_AD_TYPE_SHORTENED_LOCAL_NAME "]
+            [#if definition.name == "INCLUDE_AD_TYPE_SHORTENED_LOCAL_NAME"]
                 [#assign INCLUDE_AD_TYPE_SHORTENED_LOCAL_NAME  = definition.value]
             [/#if]
             [#if definition.name == "AD_TYPE_SHORTENED_LOCAL_NAME_LENGTH"]
                 [#assign AD_TYPE_SHORTENED_LOCAL_NAME_LENGTH = definition.value]
             [/#if]
-            [#if definition.name == "AD_TYPE_SHORTENED_LOCAL_NAME "]
+            [#if definition.name == "AD_TYPE_SHORTENED_LOCAL_NAME"]
                 [#assign AD_TYPE_SHORTENED_LOCAL_NAME  = definition.value]
             [/#if]
             [#if definition.name == "INCLUDE_AD_TYPE_APPEARANCE"]
@@ -766,13 +770,16 @@ typedef struct _tBLEProfileGlobalContext
 typedef struct
 {
   BleGlobalContext_t BleApplicationContext_legacy;
-   APP_BLE_ConnStatus_t Device_Connection_Status;
-   /**
+  APP_BLE_ConnStatus_t Device_Connection_Status;
+
+[#if (BT_SIG_BEACON = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)]
+  /**
    * ID of the Advertising Timeout
    */
-   uint8_t Advertising_mgr_timer_Id;
+  uint8_t Advertising_mgr_timer_Id;
+[/#if]
 
-[#if  (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
+[#if  (CUSTOM_P2P_SERVER = 1)]
   uint8_t SwitchOffGPIO_timer_Id;
 [/#if]
 }BleApplicationContext_t;
@@ -881,19 +888,19 @@ uint8_t index_con_int, mutex;
  */
 uint8_t ad_data[${AD_DATA_LENGTH}] = {
 [#if  (INCLUDE_AD_TYPE_TX_POWER_LEVEL = "1")]
-    ${AD_TYPE_TX_POWER_LEVEL_LENGTH}, AD_TYPE_TX_POWER_LEVEL, ${AD_TYPE_TX_POWER_LEVEL}, //Transmission Power
+    ${AD_TYPE_TX_POWER_LEVEL_LENGTH}, AD_TYPE_TX_POWER_LEVEL, ${AD_TYPE_TX_POWER_LEVEL_DBM}, /* Transmission Power */
 [/#if]
 [#if  (INCLUDE_AD_TYPE_COMPLETE_LOCAL_NAME = "1")]
     ${AD_TYPE_COMPLETE_LOCAL_NAME_LENGTH}, AD_TYPE_COMPLETE_LOCAL_NAME, [#rt]
     [#list AD_TYPE_COMPLETE_LOCAL_NAME?split("(?!^)", "r") as char][#t]
         [#lt]'${char}', [#rt]
-    [/#list][#lt] //Complete name
+    [/#list][#lt] /* Complete name */
 [/#if]
 [#if  (INCLUDE_AD_TYPE_SHORTENED_LOCAL_NAME  = "1")]
     ${AD_TYPE_SHORTENED_LOCAL_NAME_LENGTH}, AD_TYPE_SHORTENED_LOCAL_NAME , [#rt]
     [#list AD_TYPE_SHORTENED_LOCAL_NAME ?split("(?!^)", "r") as char][#t]
         [#lt]'${char}', [#rt]
-    [/#list][#lt] //Shortened name
+    [/#list][#lt] /* Shortened name */
 [/#if]
 [#if  (INCLUDE_AD_TYPE_APPEARANCE = "1")]
     ${AD_TYPE_APPEARANCE_LENGTH}, AD_TYPE_APPEARANCE, ${AD_TYPE_APPEARANCE},
@@ -1143,8 +1150,10 @@ static void Adv_Update( void );
 [/#if]
 [#if  (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
 static void Adv_Cancel( void );
+[#if  (CUSTOM_P2P_SERVER = 1)]
 static void Adv_Cancel_Req( void );
 static void Switch_OFF_GPIO( void );
+[/#if]
 #if(L2CAP_REQUEST_NEW_CONN_PARAM != 0)  
 static void BLE_SVC_L2CAP_Conn_Update(uint16_t Connection_Handle);
 static void Connection_Interval_Update_Req( void );
@@ -1315,18 +1324,10 @@ void APP_BLE_Init( void )
   mutex = 1; 
 #endif
   /**
-   * Initialize P2P Server Application
+   * Initialize Custom Template Application
    */
   Custom_APP_Init();
 
-  /**
-   * Create timer to handle the Advertising Stop
-   */
-  HW_TS_Create(CFG_TIM_PROC_ID_ISR, &(BleApplicationContext.Advertising_mgr_timer_Id), hw_ts_SingleShot, Adv_Cancel_Req);
-  /**
-   * Create timer to handle the Led Switch OFF
-   */
-  HW_TS_Create(CFG_TIM_PROC_ID_ISR, &(BleApplicationContext.SwitchOffGPIO_timer_Id), hw_ts_SingleShot, Switch_OFF_GPIO);
 [/#if]
 
 [#if  (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1)]
@@ -1403,9 +1404,14 @@ void APP_BLE_Init( void )
   * Start to Advertise to be connected by Collector
    */
 [/#if]
-[#if  (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)] 
+[#if  (CUSTOM_P2P_SERVER = 1)] 
   /**
    * Start to Advertise to be connected by P2P Client
+   */
+[/#if]
+[#if  (CUSTOM_TEMPLATE = 1)] 
+  /**
+   * Start to Advertise to be connected by a Client
    */
 [/#if]
    Adv_Request(APP_BLE_FAST_ADV);
@@ -1440,6 +1446,10 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
   /* PAIRING */
 [/#if]
 
+  /* USER CODE BEGIN SVCCTL_App_Notification */
+
+  /* USER CODE END SVCCTL_App_Notification */
+
   switch (event_pckt->evt)
   {
     case EVT_DISCONN_COMPLETE:
@@ -1459,17 +1469,19 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
 
       /* restart advertising */
       Adv_Request(APP_BLE_FAST_ADV);
-[#if  (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
- /*
-* SPECIFIC to P2P Server APP
-*/
-[/#if]
+
 [#if (CUSTOM_TEMPLATE = 1)]
+      /**
+       * SPECIFIC to Custom Template APP
+       */
       handleNotification.Custom_Evt_Opcode = CUSTOM_DISCON_HANDLE_EVT;
       handleNotification.ConnectionHandle = BleApplicationContext.BleApplicationContext_legacy.connectionHandle;
       Custom_APP_Notification(&handleNotification);
 [#else]
 [#if  (CUSTOM_P2P_SERVER = 1)]
+      /**
+       * SPECIFIC to P2P Server APP
+       */
       handleNotification.P2P_Evt_Opcode = PEER_DISCON_HANDLE_EVT;
       handleNotification.ConnectionHandle = BleApplicationContext.BleApplicationContext_legacy.connectionHandle;
       P2PS_APP_Notification(&handleNotification);
@@ -1549,7 +1561,9 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
            */
           connection_complete_event = (hci_le_connection_complete_event_rp0 *) meta_evt->data;
 
+[#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1)]
           HW_TS_Stop(BleApplicationContext.Advertising_mgr_timer_Id);
+[/#if]
 
           APP_DBG_MSG("EVT_LE_CONN_COMPLETE for connection handle 0x%x\n", connection_complete_event->Connection_Handle);
           if (BleApplicationContext.Device_Connection_Status == APP_BLE_LP_CONNECTING)
@@ -1563,17 +1577,18 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
             BleApplicationContext.Device_Connection_Status = APP_BLE_CONNECTED_SERVER;
           }
           BleApplicationContext.BleApplicationContext_legacy.connectionHandle = connection_complete_event->Connection_Handle;
-[#if  (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)] 
-/*
-* SPECIFIC to P2P Server APP
-*/
-[/#if]
 [#if  (CUSTOM_TEMPLATE = 1)]
+          /**
+           * SPECIFIC to Custom Template APP
+           */
           handleNotification.Custom_Evt_Opcode = CUSTOM_CONN_HANDLE_EVT;
           handleNotification.ConnectionHandle = BleApplicationContext.BleApplicationContext_legacy.connectionHandle;
           Custom_APP_Notification(&handleNotification);
 [#else]
 [#if  (CUSTOM_P2P_SERVER = 1)] 
+          /**
+           * SPECIFIC to P2P Server APP
+           */
           handleNotification.P2P_Evt_Opcode = PEER_CONN_HANDLE_EVT;
           handleNotification.ConnectionHandle = BleApplicationContext.BleApplicationContext_legacy.connectionHandle;
           P2PS_APP_Notification(&handleNotification);
@@ -1585,6 +1600,10 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
         }
 [/#if]
         break; /* HCI_EVT_LE_CONN_COMPLETE */
+
+        /* USER CODE BEGIN META_EVT */
+
+        /* USER CODE END META_EVT */
 
         default:
           /* USER CODE BEGIN SUBEVENT_DEFAULT */
@@ -1608,10 +1627,17 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
       /* USER CODE BEGIN ecode */
 
       /* USER CODE END ecode */
+[#if (CUSTOM_P2P_SERVER = 1)]
+      /**
+       * SPECIFIC to P2P Server APP
+       */
+[/#if]
+[#if (CUSTOM_TEMPLATE = 1)]
+      /**
+       * SPECIFIC to Custom Template APP
+       */
+[/#if]
 [#if (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
-/*
-* SPECIFIC to P2P Server APP
-*/
         case EVT_BLUE_L2CAP_CONNECTION_UPDATE_RESP:
 #if (L2CAP_REQUEST_NEW_CONN_PARAM != 0 )
           mutex = 1;
@@ -1662,10 +1688,17 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
             APP_DBG_MSG("BLE_CTRL_App_Notification: EVT_BLUE_GAP_PAIRING_CMPLT, pairing_complete->Status = %d\n",pairing_complete->Status);
         break;
         /* PAIRING */
-        
 [/#if]
+
+      /* USER CODE BEGIN BLUE_EVT */
+
+      /* USER CODE END BLUE_EVT */
       }
       break; /* EVT_VENDOR */
+
+      /* USER CODE BEGIN EVENT_PCKT */
+
+      /* USER CODE END EVENT_PCKT */
 
       default:
       /* USER CODE BEGIN ECODE_DEFAULT*/
@@ -1858,7 +1891,7 @@ static void Ble_Hci_Gap_Gatt_Init(void){
     BLE_DBG_SVCCTL_MSG("Appearance aci_gatt_update_char_value failed.\n");
   }
 [#if (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
-/**
+  /**
    * Initialize Default PHY
    */
   hci_le_set_default_phy(ALL_PHYS_PREFERENCE,TX_2M_PREFERRED,RX_2M_PREFERRED); 
@@ -1967,13 +2000,13 @@ static void Adv_Request(APP_BLE_ConnStatus_t New_Status)
     Min_Inter = CFG_LP_CONN_ADV_INTERVAL_MIN;
     Max_Inter = CFG_LP_CONN_ADV_INTERVAL_MAX;
   }
-[/#if]
 
     /**
      * Stop the timer, it will be restarted for a new shot
      * It does not hurt if the timer was not running
      */
     HW_TS_Stop(BleApplicationContext.Advertising_mgr_timer_Id);
+[/#if]
 
 [#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)
  || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1)]
@@ -2038,9 +2071,14 @@ static void Adv_Request(APP_BLE_ConnStatus_t New_Status)
 [/#if]
     if (ret == BLE_STATUS_SUCCESS)
     {
+[#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)
+ || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1)]
       if (New_Status == APP_BLE_FAST_ADV)
       {
+[/#if]
         APP_DBG_MSG("Successfully Start Fast Advertising \n" );
+[#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)
+ || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1)]
         /* Start Timer to STOP ADV - TIMEOUT */
         HW_TS_Start(BleApplicationContext.Advertising_mgr_timer_Id, INITIAL_ADV_TIMEOUT);
       }
@@ -2048,17 +2086,24 @@ static void Adv_Request(APP_BLE_ConnStatus_t New_Status)
       {
         APP_DBG_MSG("Successfully Start Low Power Advertising \n");
       }
+[/#if]
     }
     else
     {
+[#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)
+ || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1)]
       if (New_Status == APP_BLE_FAST_ADV)
       {
+[/#if]
         APP_DBG_MSG("Start Fast Advertising Failed , result: %d \n", ret);
+[#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)
+ || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1)]
       }
       else
       {
         APP_DBG_MSG("Start Low Power Advertising Failed , result: %d \n", ret);
       }
+[/#if]
     }
 
   return;
@@ -2234,6 +2279,7 @@ static void Adv_Cancel( void )
   return;
 }
 
+[#if (BT_SIG_BEACON = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)]
 static void Adv_Cancel_Req( void )
 {
 /* USER CODE BEGIN Adv_Cancel_Req_1 */
@@ -2251,7 +2297,7 @@ static void Switch_OFF_GPIO(){
 
 /* USER CODE END Switch_OFF_GPIO */
 }
-
+[/#if]
 
 #if(L2CAP_REQUEST_NEW_CONN_PARAM != 0)  
 void BLE_SVC_L2CAP_Conn_Update(uint16_t Connection_Handle)

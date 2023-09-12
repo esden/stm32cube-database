@@ -461,6 +461,11 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
         }
         break; 
 #endif 
+
+        /* USER CODE BEGIN BLUE_EVT */
+
+        /* USER CODE END BLUE_EVT */
+
         default:
           /* USER CODE BEGIN ecode_default */
 
@@ -619,6 +624,10 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
 
           break;
 
+        /* USER CODE BEGIN META_EVT */
+
+        /* USER CODE END META_EVT */
+
         default:
           /* USER CODE BEGIN subevent_default */
 
@@ -628,6 +637,10 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
       }
     }
     break; /* HCI_EVT_LE_META_EVENT */
+
+    /* USER CODE BEGIN EVENT_PCKT */
+
+    /* USER CODE END EVENT_PCKT */
 
     default:
       /* USER CODE BEGIN evt_default */

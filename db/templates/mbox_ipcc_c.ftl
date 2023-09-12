@@ -36,12 +36,10 @@
 #include "stm32mp1xx_hal.h"
 #include "openamp_conf.h"
 
-/* Within 'USER CODE' section, code will be kept by default at each generation */
-/* USER CODE BEGIN 0 */
-
-/* USER CODE END 0 */
-
 /* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN Define */
+
+/* USER CODE END Define */
 [#list SWIPdatas as SWIP]  
 	[#if SWIP.defines??]
 		[#list SWIP.defines as definition]
@@ -71,6 +69,10 @@
 [/#list]
 
 /* Private variables ---------------------------------------------------------*/
+/* USER CODE BEGIN PFP */
+
+/* USER CODE END PFP */
+
 extern IPCC_HandleTypeDef hipcc;
 int msg_received_ch1 = RX_NO_MSG;
 int msg_received_ch2 = RX_NO_MSG;
@@ -78,6 +80,10 @@ uint32_t vring0_id = 0; /* used for channel 1 */
 uint32_t vring1_id = 1; /* used for channel 2 */
 
 /* Private function prototypes -----------------------------------------------*/
+/* USER CODE BEGIN PFP */
+
+/* USER CODE END PFP */
+
 void IPCC_channel1_callback(IPCC_HandleTypeDef * hipcc, uint32_t ChannelIndex, IPCC_CHANNELDirTypeDef ChannelDir);
 void IPCC_channel2_callback(IPCC_HandleTypeDef * hipcc, uint32_t ChannelIndex, IPCC_CHANNELDirTypeDef ChannelDir);
 
@@ -89,6 +95,10 @@ void IPCC_channel2_callback(IPCC_HandleTypeDef * hipcc, uint32_t ChannelIndex, I
   */
 int MAILBOX_Init(void)
 {
+
+   /* USER CODE BEGIN PRE_MAILBOX_INIT */
+
+   /* USER CODE END  PRE_MAILBOX_INIT */
 
   if (HAL_IPCC_ActivateNotification(&hipcc, IPCC_CHANNEL_1, IPCC_CHANNEL_DIR_RX,
           IPCC_channel1_callback) != HAL_OK) {
@@ -102,6 +112,10 @@ int MAILBOX_Init(void)
     return -1;
   }
 
+
+  /* USER CODE BEGIN POST_MAILBOX_INIT */
+
+  /* USER CODE END  POST_MAILBOX_INIT */
   return 0;
 }
 
@@ -113,25 +127,46 @@ int MAILBOX_Init(void)
 int MAILBOX_Poll(struct virtio_device *vdev)
 {
   /* If we got an interrupt, ask for the corresponding virtqueue processing */
+  int ret = -1;
+
+   /* USER CODE BEGIN PRE_MAILBOX_POLL */
+
+   /* USER CODE END  PRE_MAILBOX_POLL */
 
   if (msg_received_ch1 == RX_BUF_FREE) {
+
+   /* USER CODE BEGIN MSG_CHANNEL1 */
+
+   /* USER CODE END  MSG_CHANNEL1 */
+
     OPENAMP_log_dbg("Running virt0 (ch_1 buf free)\r\n");
     rproc_virtio_notified(vdev, VRING0_ID);
     msg_received_ch1 = RX_NO_MSG;
-    return 0;
+    ret = 0;
+
   }
 
   if (msg_received_ch2 == RX_NEW_MSG) {
+
+   /* USER CODE BEGIN MSG_CHANNEL2 */
+
+   /* USER CODE END  MSG_CHANNEL2 */
+
     OPENAMP_log_dbg("Running virt1 (ch_2 new msg)\r\n");
     rproc_virtio_notified(vdev, VRING1_ID);
     msg_received_ch2 = RX_NO_MSG;
 
     /* The OpenAMP framework does not notify for free buf: do it here */
       rproc_virtio_notified(NULL, VRING1_ID);
-    return 0;
+    ret = 0;
+
   }
 
-  return -1;
+  /* USER CODE BEGIN POST_MAILBOX_POLL */
+
+  /* USER CODE END  POST_MAILBOX_POLL */
+
+  return ret;
 }
 
 
@@ -144,6 +179,10 @@ int MAILBOX_Notify(void *priv, uint32_t id)
 {
   uint32_t channel;
   (void)priv;
+
+   /* USER CODE BEGIN PRE_MAILBOX_NOTIFY */
+
+   /* USER CODE END  PRE_MAILBOX_NOTIFY */
 
   /* Called after virtqueue processing: time to inform the remote */
   if (id == VRING0_ID) {
@@ -169,15 +208,28 @@ int MAILBOX_Notify(void *priv, uint32_t id)
 
   /* Inform A7 (either new message, or buf free) */
   HAL_IPCC_NotifyCPU(&hipcc, channel, IPCC_CHANNEL_DIR_TX);
-  
+
+ /* USER CODE BEGIN POST_MAILBOX_NOTIFY */
+
+ /* USER CODE END  POST_MAILBOX_NOTIFY */
+
+
   return 0;
 }
 
 /* Private function  ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
+
+/* USER CODE END 0 */
 /* Callback from IPCC Interrupt Handler: Master Processor informs that there are some free buffers */
 void IPCC_channel1_callback(IPCC_HandleTypeDef * hipcc,
          uint32_t ChannelIndex, IPCC_CHANNELDirTypeDef ChannelDir)
 {
+
+  /* USER CODE BEGIN PRE_MAILBOX_CHANNEL1_CALLBACK */
+
+  /* USER CODE END  PRE_MAILBOX_CHANNEL1_CALLBACK */
+
   if (msg_received_ch1 != RX_NO_MSG)
     OPENAMP_log_dbg("IPCC_channel1_callback: previous IRQ not treated (status = %d)\r\n", msg_received_ch1);
 
@@ -186,12 +238,21 @@ void IPCC_channel1_callback(IPCC_HandleTypeDef * hipcc,
   /* Inform A7 that we have received the 'buff free' msg */
   OPENAMP_log_dbg("Ack 'buff free' message on ch1\r\n");
   HAL_IPCC_NotifyCPU(hipcc, ChannelIndex, IPCC_CHANNEL_DIR_RX);
+
+  /* USER CODE BEGIN POST_MAILBOX_CHANNEL1_CALLBACK */
+
+  /* USER CODE END  POST_MAILBOX_CHANNEL1_CALLBACK */
 }
 
 /* Callback from IPCC Interrupt Handler: new message received from Master Processor */
 void IPCC_channel2_callback(IPCC_HandleTypeDef * hipcc,
          uint32_t ChannelIndex, IPCC_CHANNELDirTypeDef ChannelDir)
 {
+
+  /* USER CODE BEGIN PRE_MAILBOX_CHANNEL2_CALLBACK */
+
+  /* USER CODE END  PRE_MAILBOX_CHANNEL2_CALLBACK */
+
   if (msg_received_ch2 != RX_NO_MSG)
     OPENAMP_log_dbg("IPCC_channel2_callback: previous IRQ not treated (status = %d)\r\n", msg_received_ch2);
 
@@ -200,6 +261,10 @@ void IPCC_channel2_callback(IPCC_HandleTypeDef * hipcc,
   /* Inform A7 that we have received the new msg */
   OPENAMP_log_dbg("Ack new message on ch2\r\n");
   HAL_IPCC_NotifyCPU(hipcc, ChannelIndex, IPCC_CHANNEL_DIR_RX);
+
+  /* USER CODE BEGIN POST_MAILBOX_CHANNEL2_CALLBACK */
+
+  /* USER CODE END  POST_MAILBOX_CHANNEL2_CALLBACK */
 }
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

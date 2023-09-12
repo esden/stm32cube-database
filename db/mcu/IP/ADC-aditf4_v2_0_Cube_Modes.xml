@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" DBVersion="V3.0" IPType="peripheral" Name="ADC" Version="aditf4_v2_0_Cube" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../db/IP_Modes_V3_0.xsd">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" DBVersion="V3.0" IPType="peripheral" Name="ADC" Version="aditf4_v2_0_Cube" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd">
     <About>ADC: Analog to Digital Converter</About>
-	<RefParameter Comment="Master List" DefaultValue="" Name="MasterList" Type="list" Visible="false"/>
+    <RefParameter Comment="Master List" DefaultValue="" Name="MasterList" Type="list" Visible="false"/>
     <!-- ADC_Settings parameters -->    
     <RefMode Comment="ADCx Settings" Group="ADC_Settings" Name="ADC_Settings">
         <ConfigForMode>ADC_RegularConfig</ConfigForMode>
         <Parameter Name="ClockPrescaler"/>
-        <Parameter Name="CommonClock"/>
         <Parameter Name="Resolution"/>
         <Parameter Name="DataAlign"/>
         <Parameter Name="ScanConvMode"/> <!-- aligned with HAL v1.2.0-->
@@ -27,23 +27,16 @@
     <RefParameter Comment="ADC instance" DefaultValue="ADC1" Group="ADCgroup" Name="Instance" Type="list" Visible="false"/>
         
 		
-	<RefParameter Comment="Fadc Constraint" DefaultValue="4000000" Max="4000000" Min="140000" Name="FadcConstraint" Type="double" Visible="false">
-	<Condition Diagnostic="" Expression="(RCC:PWR_Regulator_Voltage_Scale = PWR_REGULATOR_VOLTAGE_SCALE3)"/>
-	</RefParameter>
-	<RefParameter Comment="Fadc Constraint" DefaultValue="8000000" Max="8000000" Min="140000" Name="FadcConstraint" Type="double" Visible="false">
-	<Condition Diagnostic="" Expression="(RCC:PWR_Regulator_Voltage_Scale = PWR_REGULATOR_VOLTAGE_SCALE2)"/>
-	</RefParameter>
+    <RefParameter Comment="Fadc Constraint" DefaultValue="4000000" Max="4000000" Min="140000" Name="FadcConstraint" Type="double" Visible="false">
+        <Condition Diagnostic="" Expression="(RCC:PWR_Regulator_Voltage_Scale = PWR_REGULATOR_VOLTAGE_SCALE3)"/>
+    </RefParameter>
+    <RefParameter Comment="Fadc Constraint" DefaultValue="8000000" Max="8000000" Min="140000" Name="FadcConstraint" Type="double" Visible="false">
+        <Condition Diagnostic="" Expression="(RCC:PWR_Regulator_Voltage_Scale = PWR_REGULATOR_VOLTAGE_SCALE2)"/>
+    </RefParameter>
     <RefParameter Comment="Fadc Constraint" DefaultValue="16000000" Max="16000000" Min="140000" Name="FadcConstraint" Type="double" Visible="false"/>
 	
     <!-- Possible value of Prescaler parameter -->
-    
-    
-      <RefParameter Comment="Common Clock" DefaultValue="+ClockPrescaler" Group="ADCgroup" Name="CommonClock" Type="list" Visible="false"  />
-       
-    
-    
-   
-  
+    <!-- Condition used in PossibleValue choice is a semaphore built by java which manage the FadcConstraint check -->
     <RefParameter Comment="Clock Prescaler" DefaultValue="ADC_CLOCK_SYNC_PCLK_DIV1" Group="ADCgroup" Name="ClockPrescaler" Type="list">
         <Condition Diagnostic="" Expression="((!AHBCLKDivider1 | !APB2CLKDivider1) &amp; !(HSEscale | (PLLscale &amp; PLLHSE) ))"/>
         <PossibleValue Action="DISABLE" Comment="Synchronous clock mode divided by 1" Condition="((!AHBCLKDivider1 | !APB2CLKDivider1) &amp; !(HSEscale | (PLLscale &amp; PLLHSE) ))" Diagnostic="Internal source clock selected, this implies only that thec AHB and APB prescalers do not divide the clock to ensure that PCLK has a 50% duty cycle ." Value="ADC_CLOCK_SYNC_PCLK_DIV1"/>
@@ -103,7 +96,7 @@
     <!-- possible value of DataAlign parameter -->
     <RefParameter Comment="Data Alignment" DefaultValue="ADC_DATAALIGN_RIGHT" Group="ADCgroup" Name="DataAlign" Type="list">
         <PossibleValue Comment="Right alignment" Value="ADC_DATAALIGN_RIGHT"/>
-         <PossibleValue Action="Disable" Comment="Left alignment" Condition="OversamplingMode_Enabled_$IpInstance" Diagnostic="The alignment mode is not available when working with oversampling: the data are always provided right-aligned" Value="ADC_DATAALIGN_LEFT"/>
+        <PossibleValue Action="Disable" Comment="Left alignment" Condition="OversamplingMode_Enabled_$IpInstance" Diagnostic="The alignment mode is not available when working with oversampling: the data are always provided right-aligned" Value="ADC_DATAALIGN_LEFT"/>
         <Description>Select the alignment of the data stored after conversion.</Description>
     </RefParameter>
 	    
@@ -128,17 +121,17 @@
             <Description>Enable/Disable DMA Continuous Requests</Description>
     </RefParameter-->
     <RefParameter Comment="DMA Continuous Requests" DefaultValue="LIMITED" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
-         <Condition Diagnostic="" Expression="$IpNumber=1 &amp; DMARequest_ADC &amp; DMAContinuousRequests=DISABLE"/>
+        <Condition Diagnostic="" Expression="$IpNumber=1 &amp; DMARequest_ADC &amp; DMAContinuousRequests=DISABLE"/>
         <PossibleValue Comment="LIMITED" Value="LIMITED"/>
         <Description>Enable/Disable DMA Continuous Requests</Description>
     </RefParameter>
     <RefParameter Comment="DMA Continuous Requests" DefaultValue="UNLIMITED" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
-         <Condition Diagnostic="" Expression="$IpNumber=1 &amp; DMARequest_ADC &amp; DMAContinuousRequests=ENABLE"/>
+        <Condition Diagnostic="" Expression="$IpNumber=1 &amp; DMARequest_ADC &amp; DMAContinuousRequests=ENABLE"/>
         <PossibleValue Comment="LIMITED" Value="UNLIMITED"/>
         <Description>Enable/Disable DMA Continuous Requests</Description>
     </RefParameter>
     <RefParameter Comment="DMA Continuous Requests" DefaultValue="NONE" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
-         <Condition Diagnostic="" Expression="$IpNumber=1 &amp; !DMARequest_ADC &amp; DMAContinuousRequests=DISABLE"/>
+        <Condition Diagnostic="" Expression="$IpNumber=1 &amp; !DMARequest_ADC &amp; DMAContinuousRequests=DISABLE"/>
         <PossibleValue Comment="none" Value="NONE"/>
         <Description>Enable/Disable DMA Continuous Requests</Description>
     </RefParameter>
@@ -146,10 +139,17 @@
         <PossibleValue Comment="none" Value="NONE"/>
         <Description>Enable/Disable DMA Continuous Requests</Description>
     </RefParameter>
+
+    <!-- Possible values of DMAContinuousRequests parameter -->
     <RefParameter Comment="DMA Continuous Requests" DefaultValue="DISABLE" Group="ADCgroup" Name="DMAContinuousRequests" Type="list">
         <PossibleValue Comment="Disabled" Value="DISABLE"/>
-        <PossibleValue Comment="Enabled" Semaphore="Semaphore_DMAContinuousRequests_Enable" Value="ENABLE" Action="Remove" Condition="!DMARequest_ADC" Diagnostic="The DMAContinuousRequests parameter can be set to enable only if DMA request is active in DMA settings tab"/>
-        <Description>Enable/Disable DMA Continuous Requests</Description>
+        <PossibleValue Comment="Enabled" Value="ENABLE" Action="Disable" Condition="!DMARequest_$IpInstance" Diagnostic="A DMA Request in Circular Mode must be configured in DMA Settings Tab for this ADC instance" />
+        <Description>This parameter is used only when a DMA Request is configured. Else it is not relevant.&lt;br&gt;
+            When the DMA Request for this ADC instance this parameter specifies whether 
+            the DMA requests are performed in one shot mode (DMA transfer stops when number of conversions is reached)
+            or are performed in continuous mode (DMA transfer unlimited, whatever number of conversions).&lt;br&gt;
+            Note: In continuous mode, DMA must be configured in circular mode. Otherwise an overrun will be triggered when DMA buffer maximum pointer is reached.
+        </Description>
     </RefParameter>
 	    
     <!-- Possible values of EOCSelection parameter -->
@@ -175,17 +175,22 @@
     </RefParameter>
         
     <!-- LowFrequencyMode -->
-    <RefParameter Comment="Low Frequency Mode" DefaultValue="DISABLE" Name="LowPowerFrequencyMode" Type="list">
-         <Condition Diagnostic="" Expression="STM32L0x1"/>   
-        <PossibleValue Comment="Disabled" Value="DISABLE"/>
+
+    <!-- Semaphore SEM_ADC_LOW_FREQ_3_5MHZ and SEM_ADC_LOW_FREQ_2_8MHZ are created thanks to checkLowFrequencyMode() method in Java ADC -->
+
+    <RefParameter Comment="Low Frequency Mode" DefaultValue="ENABLE" Name="LowPowerFrequencyMode" Type="list">
+        <Condition Diagnostic="" Expression="STM32L0x1&amp;SEM_ADC_LOW_FREQ_3_5MHZ"/>
         <PossibleValue Comment="Enabled" Value="ENABLE"/>
-        <Description>When selecting an analog ADC clock frequency lower than 3.5MHz, it is mandatory to first enable the Low Frequency Mode.</Description>
+        <Description>When selecting an analog ADC clock frequency lower than 3.5MHz, the Low Frequency Mode is forced to enable.</Description>
     </RefParameter>
-    
+    <RefParameter Comment="Low Frequency Mode" DefaultValue="ENABLE" Name="LowPowerFrequencyMode" Type="list">
+        <Condition Diagnostic="" Expression="SEM_ADC_LOW_FREQ_2_8MHZ"/>
+        <PossibleValue Comment="Enabled" Value="ENABLE"/>
+        <Description>When selecting an analog ADC clock frequency lower than 2.8MHz, the Low Frequency Mode is forced to enable.</Description>
+    </RefParameter>
     <RefParameter Comment="Low Frequency Mode" DefaultValue="DISABLE" Name="LowPowerFrequencyMode" Type="list">
         <PossibleValue Comment="Disabled" Value="DISABLE"/>
         <PossibleValue Comment="Enabled" Value="ENABLE"/>
-        <Description>When selecting an analog ADC clock frequency lower than 2.8MHz, it is mandatory to first enable the Low Frequency Mode.</Description>
     </RefParameter>
     
         
@@ -280,9 +285,9 @@
         <Description>Select the external event used to trigger the start of conversion of a regular group</Description>
     </RefParameter>
 
-   <!-- ExternalTrigConvEdge -->
+    <!-- ExternalTrigConvEdge -->
     <RefParameter Comment="External Trigger Conversion Edge" DefaultValue="ADC_EXTERNALTRIGCONVEDGE_NONE" Group="ADCgroup" Name="ExternalTrigConvEdge" Type="list">
-         <Condition Diagnostic="" Expression="ExternalTrigConv = ADC_SOFTWARE_START"/>
+        <Condition Diagnostic="" Expression="ExternalTrigConv = ADC_SOFTWARE_START"/>
         <PossibleValue Comment="None" Value="ADC_EXTERNALTRIGCONVEDGE_NONE"/>
         <Description>Select the external trigger polarity and enable the trigger of a regular group: When an external trigger is selected for ADC regular conversion, only the rising edge of the signal can start the conversion.</Description>
     </RefParameter>
@@ -317,7 +322,7 @@
         <PossibleValue Comment="Channel Vlcd" Value="ADC_CHANNEL_VLCD"/>
     </RefParameter>
     
-           <!-- List of all available channel used to -->
+    <!-- List of all available channel used to -->
     <RefParameter Comment="Rank" DefaultValue="ADC_RANK_CHANNEL_NUMBER" Group="ADCChannel" Name="Rank" Type="list" Visible="false"/>
    
 	    
@@ -506,7 +511,7 @@
         <Parameter Name="Channel" RefParameter="Channel">
             <PossibleValue>ADC_CHANNEL_0</PossibleValue>
         </Parameter>
-         <Parameter Name="Rank"/>
+        <Parameter Name="Rank"/>
     </RefMode>
     <RefMode Comment="" Name="IN1">
         <ConfigForMode>ADC_RegularChannelConfig</ConfigForMode>
@@ -830,7 +835,7 @@
             <Semaphore>channelSelected</Semaphore>
         </Mode>
         <!-- Trigger -->
-        <Mode Name="External-Trigger-for-Regular-conversion" UserName="Regular Conversion Trigger">
+        <Mode Name="External-Trigger-for-Regular-conversion" UserName="Regular EXTI Conversion Trigger">
             <ModeLogicOperator Name="OR">
                 <Mode Name="External-Trigger-for-Regular-conversion" UserName="Regular Conversion Trigger">
                     <SignalLogicalOp Name="AND">

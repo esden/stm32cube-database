@@ -18,15 +18,17 @@ value will be applied.
 	,"cryp(.+)":""
 	,"dac1":"DAC"
 	,"dcmi":""
+	,"ddr":"DDRCTRL" [#--special case--]
 	,"dfsdm":"DFSDM"
-	[#--,"dmax":""--]
+	,"dma(\\w)":""
+	,"dmamux1":"DMAMUX"
 	,"eth1":"ETH"
 	,"fdcan1":"TT_FDCAN" [#--only fdcan1 is managed--]
 	,"hdmi_cec":"CEC"
 	,"fmc":""
 	,"hash(.+)":""
 	,"i2c(.+)":""
-	,"i2s(.+)":"spi$1"
+	,"i2s(.+)":"SPI$1"
 	,"iwdg1":""
 	,"lptim(.+)":""
 	,"mdios":""
@@ -45,7 +47,7 @@ value will be applied.
 }]
 
 
-[#macro bind_etzpc	pDtLevel]
+[#macro bind_etzpc	pElmt pDtLevel]
 [#compress]
 [#local TABres = dts_get_tabs(pDtLevel)]
 [#local TABnode = TABres.TABN]
@@ -80,12 +82,14 @@ ${res.errors} - deviceName=${deviceName}*/
 					[#local newPeriphIdsList = newPeriphIdsList + ["DLYBQ"]]
 				[#elseif (deviceName=="sdmmc3")]
 					[#local newPeriphIdsList = newPeriphIdsList + ["DLYBSD3"]]
+				[#elseif (deviceName=="ddr")]
+					[#local newPeriphIdsList = newPeriphIdsList + ["DDRPHYC"]]
 				[/#if]
 
 				[#local deviceRtCtxtNber = srvcmx_getDeviceRtCtxtNber(deviceName)]
 				[#if (deviceRtCtxtNber==1)]
 					[#if isCtxtSecure]
-						[#if !(deviceName=="tim15")][#--HW restriction (Wildcat specific): TIM15 cannot be declared secured--]
+						[#if deviceName!="tim15"][#--HW restriction (Wildcat specific): TIM15 cannot be declared Secured--]
 							[#local periphIdsMap = srvc_map_putElmtsList(periphIdsMap, "Secured", newPeriphIdsList)]
 						[/#if]
 					[#else]
@@ -96,10 +100,15 @@ ${res.errors} - deviceName=${deviceName}*/
 						[/#if]
 					[/#if]
 				[#elseif (deviceRtCtxtNber>1)]
-					[#--multi-assignments => DECPROT_NS_RW--]
-					[#local periphIdsList = srvc_map_getValue(periphIdsMap, "Non Secured")]
-					[#if !periphIdsList?? || !periphIdsList?seq_contains(newPeriphId)]
-						[#local periphIdsMap = srvc_map_putElmtsList(periphIdsMap, "Non Secured", newPeriphIdsList)]
+					[#if deviceName!="ddr"]
+						[#--multi-assignments => DECPROT_NS_RW--]
+						[#local periphIdsList = srvc_map_getValue(periphIdsMap, "Non Secured")]
+						[#if !periphIdsList?? || !periphIdsList?seq_contains(newPeriphId)]
+							[#local periphIdsMap = srvc_map_putElmtsList(periphIdsMap, "Non Secured", newPeriphIdsList)]
+						[/#if]
+					[#elseif isCtxtSecure]
+						[#--Specific DDR: multi-assigned but declared as Secured only--]
+						[#local periphIdsMap = srvc_map_putElmtsList(periphIdsMap, "Secured", newPeriphIdsList)]
 					[/#if]
 				[#else]
 /*ERR : bind_etzpc() returns errors. The DTS may be incomplete. Reason:
@@ -108,13 +117,18 @@ device has no context*/
 			[#--else: no match, skip peripheral--]
 			[/#if]
 		[/#list]
+
+		[#--Specific Secured--]
+		[#if isCtxtSecure]
+			[#local periphIdsMap = srvc_map_putElmtsList(periphIdsMap, "Secured", ["STGENC"])]
+		[/#if]
 	[/#list]
 
 
 [/#compress]
 ${TABnode}st,decprot = <
 	[#if periphIdsMap?has_content]
-	[#local securityAreasList = periphIdsMap?keys]
+		[#local securityAreasList = periphIdsMap?keys]
 		[#list securityAreasList as securityArea]
 ${TABnode}/*"${securityArea}" peripherals*/
 			[#local periphIdsList = srvc_map_getValue(periphIdsMap, securityArea)]
@@ -130,8 +144,7 @@ ${TABnode}DECPROT(${mx_family?upper_case}_ETZPC_${periphId}_ID, DECPROT_NS_RW, D
 		[/#list]
 #n
 ${TABnode}/*Restriction: following IDs are not managed  - please to use User-Section if needed:
-${TABnode}	STM32MP1_ETZPC_DMA1_ID, STM32MP1_ETZPC_DMA2_ID, STM32MP1_ETZPC_DMAMUX_ID,
-${TABnode}	STM32MP1_ETZPC_SRAMx_ID, STM32MP1_ETZPC_RETRAM_ID, STM32MP1_ETZPC_BKPSRAM_ID*/
+${TABnode}	${mx_family?upper_case}_ETZPC_SRAMx_ID, ${mx_family?upper_case}_ETZPC_RETRAM_ID, ${mx_family?upper_case}_ETZPC_BKPSRAM_ID*/
 #n
 ${TABnode}/* USER CODE BEGIN etzpc_decprot */
 ${TABnode}	/*STM32CubeMX generates a basic and standard configuration for ETZPC.

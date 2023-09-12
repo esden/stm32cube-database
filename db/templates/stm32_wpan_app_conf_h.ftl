@@ -48,8 +48,11 @@
 [#assign CFG_SC_SUPPORT = 0]
 [#assign CFG_KEYPRESS_NOTIFICATION_SUPPORT = 0]
 [#assign ADV_TYPE = 0]
+[#assign CFG_TX_POWER = 0]
 [#assign BLE_ADDR_TYPE = 0]
 [#assign ADV_FILTER = 0]
+[#assign CFG_GAP_DEVICE_NAME = ""]
+[#assign CFG_GAP_DEVICE_NAME_LENGTH = 0]
 [#--
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
@@ -192,13 +195,22 @@
             [#if (definition.name == "ADV_TYPE")]
                 [#assign ADV_TYPE = definition.value]
             [/#if]
+            [#if (definition.name == "CFG_TX_POWER")]
+                [#assign CFG_TX_POWER = definition.value]
+            [/#if]
             [#if (definition.name == "BLE_ADDR_TYPE")]
                 [#assign BLE_ADDR_TYPE = definition.value]
             [/#if]
             [#if (definition.name == "ADV_FILTER")]
                 [#assign ADV_FILTER = definition.value]
             [/#if]
-        [/#list]
+            [#if (definition.name == "CFG_GAP_DEVICE_NAME")]
+                [#assign CFG_GAP_DEVICE_NAME = definition.value]
+            [/#if]
+            [#if (definition.name == "CFG_GAP_DEVICE_NAME_LENGTH")]
+                [#assign CFG_GAP_DEVICE_NAME_LENGTH = definition.value]
+            [/#if]
+		[/#list]
 	[/#if]
 [/#list]
 
@@ -220,8 +232,8 @@
 
 /**
  * Define Tx Power
- */   
-#define CFG_TX_POWER                      (0x18) /**< 0dbm */
+ */
+#define CFG_TX_POWER                      ${CFG_TX_POWER}
 
 /**
  * Define Advertising parameters
@@ -249,7 +261,11 @@
 /**
  * Define IO Authentication
  */
+[#if (BT_SIG_HEART_RATE_SENSOR = 1)]
+#define CFG_BONDING_MODE                 (1)
+[#else]
 #define CFG_BONDING_MODE                 (${CFG_BONDING_MODE})
+[/#if]
 #define CFG_FIXED_PIN                    (${CFG_FIXED_PIN})
 #define CFG_USED_FIXED_PIN               (${CFG_USED_FIXED_PIN})
 #define CFG_ENCRYPTION_KEY_SIZE_MAX      (${CFG_ENCRYPTION_KEY_SIZE_MAX})
@@ -301,8 +317,8 @@
 /**
  * Device name configuration for Generic Access Service
  */
-#define CFG_GAP_DEVICE_NAME             "TEMPLATE"
-#define CFG_GAP_DEVICE_NAME_LENGTH      (8)
+#define CFG_GAP_DEVICE_NAME             "${CFG_GAP_DEVICE_NAME}"
+#define CFG_GAP_DEVICE_NAME_LENGTH      (${CFG_GAP_DEVICE_NAME_LENGTH})
 
 [#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)
  || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
@@ -547,7 +563,7 @@
 #define CONN_L(x) ((int)((x)/0.625f))
 #define CONN_P(x) ((int)((x)/1.25f))
 #define SCAN_P (0x320)
-#define SCAN_L (0x640)
+#define SCAN_L (0x320)
 #define CONN_P1		(CONN_P(200)) 
 #define CONN_P2		(CONN_P(1000)) 
 #define SUPERV_TIMEOUT (400)
@@ -616,15 +632,17 @@
  */
 #define CFG_BLE_ATT_VALUE_ARRAY_SIZE    (1344)
 
+[#if (BT_SIG_BEACON = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_P2P_CLIENT = 1)|| (CUSTOM_P2P_ROUTER = 1)|| ( BLE_TRANSPARENT_MODE_UART = 1 )|| ( BLE_TRANSPARENT_MODE_VCP = 1)|| (CUSTOM_TEMPLATE = 1)]
 /**
- * Prepare Write List size in terms of number of packet with ATT_MTU=23 bytes
+ * Prepare Write List size in terms of number of packet
  */
-#define CFG_BLE_PREPARE_WRITE_LIST_SIZE         ( 0x3A )
+#define CFG_BLE_PREPARE_WRITE_LIST_SIZE         BLE_PREP_WRITE_X_ATT(CFG_BLE_MAX_ATT_MTU)
 
 /**
  * Number of allocated memory blocks
  */
-#define CFG_BLE_MBLOCK_COUNT            ( 0x79 )
+#define CFG_BLE_MBLOCK_COUNT            (BLE_MBLOCKS_CALC(CFG_BLE_PREPARE_WRITE_LIST_SIZE, CFG_BLE_MAX_ATT_MTU, CFG_BLE_NUM_LINK))
+[/#if]
 
 /**
  * Enable or disable the Extended Packet length feature. Valid values are 0 or 1.

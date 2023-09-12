@@ -51,7 +51,7 @@
   */
 
 #define HAL_MODULE_ENABLED  
-[#assign allModules = ["ADC", "AES", "COMP", "CRC", "CRYP", "DAC", "I2C", "I2S", "IRDA", "IWDG", "LCD", "NOR", "OPAMP", "PCD", "RTC", "SD", "SMARTCARD", "SPI", "SRAM", "TIM", "UART", "USART", "WWDG", "EXTI"]]
+[#assign allModules = ["ADC", "AES", "COMP", "CRC", "CRYP", "DAC", "I2C", "I2S", "IRDA", "IWDG", "LCD", "NOR", "OPAMP", "PCD", "RTC", "SD", "SMARTCARD", "SPI", "SRAM", "TIM", "UART", "USART", "WWDG"]]
   [#list allModules as module]
 	[#if isModuleUsed(module)]
 [#compress]#define HAL_${module?replace("AES","CRYP")}_MODULE_ENABLED[/#compress]
@@ -70,6 +70,7 @@
 	[#return used]
   [/#function]
 #define HAL_GPIO_MODULE_ENABLED
+#define HAL_EXTI_MODULE_ENABLED
 #define HAL_DMA_MODULE_ENABLED
 #define HAL_RCC_MODULE_ENABLED
 #define HAL_FLASH_MODULE_ENABLED

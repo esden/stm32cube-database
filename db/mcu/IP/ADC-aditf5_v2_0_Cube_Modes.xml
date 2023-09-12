@@ -229,10 +229,10 @@
         <Description>The alignment mode is available only on for Regular conversion. &lt;br/&gt; Injected conversion working with oversampling: the data are always provided right-aligned.</Description>
     </RefParameter-->
     
-    <RefParameter Comment="Data Alignment" DefaultValue="ADC_DATAALIGN_RIGHT" Group="ADCGroup" Name="DataAlign" Type="list">
-        <Condition Diagnostic="The alignment mode is available only on for Injected conversion. &lt;br/&gt; Regular conversion working with oversampling: the data are always provided right-aligned." Expression="((InjNumberOfConversion &gt; 0) &amp; Injected_OversamplingMode_Enabled_$IpInstance) | ((EnableRegularConversion=ENABLE) &amp; Regular_OversamplingMode_Enabled_$IpInstance)"/>
+     <RefParameter Comment="Data Alignment" DefaultValue="ADC_DATAALIGN_RIGHT" Group="ADCgroup" Name="DataAlign" Type="list">
+        <Condition Diagnostic="" Expression="EnableRegularConversion=ENABLE &amp; InjNumberOfConversion &gt; 0 &amp; (Regular_OversamplingMode_Enabled_$IpInstance | Injected_OversamplingMode_Enabled_$IpInstance)"/>
         <PossibleValue Comment="Right alignment" Value="ADC_DATAALIGN_RIGHT"/>
-        <PossibleValue Action="Disable" Comment="Left alignment" Condition="Injected_OversamplingMode_Enabled_$IpInstance | Regular_OversamplingMode_Enabled_$IpInstance" Diagnostic="The alignment mode is not available when working with oversampling: the data are always provided right-aligned" Value="ADC_DATAALIGN_LEFT"/>
+        <PossibleValue Action="Disable" Comment="Left alignment" Condition="Regular_OversamplingMode_Enabled_$IpInstance | Injected_OversamplingMode_Enabled_$IpInstance" Diagnostic="The alignment mode is not available when working with oversampling: the data are always provided right-aligned" Value="ADC_DATAALIGN_LEFT"/>
         <Description>Select the alignment of the data stored after conversion.</Description>
     </RefParameter>
     <RefParameter Comment="Data Alignment" DefaultValue="ADC_DATAALIGN_RIGHT" Group="ADCGroup" Name="DataAlign" Type="list">
@@ -243,12 +243,12 @@
     
 	    
     <!-- ScanconvMode -->
-    <RefParameter Comment="Scan Conversion Mode" DefaultValue="ENABLE" Group="ADCGroup" Name="ScanConvMode" Type="list">
+    <RefParameter Comment="Scan Conversion Mode" DefaultValue="ADC_SCAN_ENABLE" Group="ADCGroup" Name="ScanConvMode" Type="list">
         <Condition Diagnostic="" Expression="(NbrOfConversion&gt;1&amp;EnableRegularConversion=ENABLE)|(InjNumberOfConversion&gt;1&amp;EnableInjectedConversion=ENABLE)"/>
         <PossibleValue Comment="Enabled" Value="ADC_SCAN_ENABLE" Semaphore="ScanConvMode_$IpInstance"/>
         <Description>Enable or Disable the Scan Conversion Mode</Description>
     </RefParameter>
-    <RefParameter Comment="Scan Conversion Mode" DefaultValue="DISABLE" Group="ADCGroup" Name="ScanConvMode" Type="list">
+    <RefParameter Comment="Scan Conversion Mode" DefaultValue="ADC_SCAN_DISABLE" Group="ADCGroup" Name="ScanConvMode" Type="list">
         <PossibleValue Comment="Disabled" Value="ADC_SCAN_DISABLE"/>
         <Description>Enable or Disable the Scan Conversion Mode</Description>
     </RefParameter>
@@ -284,50 +284,22 @@
     </RefParameter>
   		
     <!-- Possible values of NbrOfDiscConversion parameter -->
-    <RefParameter Comment="Number Of Discontinuous Conversions" DefaultValue="1" Max="1" Min="1" Name="NbrOfDiscConversion" Type="integer" Visible="false">
+    <RefParameter Comment="Number Of Discontinuous Conversions" DefaultValue="null" Max="1" Min="1" Name="NbrOfDiscConversion" Type="integer" Visible="false">
         <Condition Diagnostic="" Expression="DiscontinuousConvMode=DISABLE"/>
     </RefParameter>
-    <RefParameter Comment="Number Of Discontinuous Conversions" DefaultValue="1" Group="ADCGroup" Max="8" Min="1" Name="NbrOfDiscConversion" Type="integer"/>
+    <RefParameter Comment="Number Of Discontinuous Conversions" DefaultValue="1" Group="ADCgroup" Max="8" Min="1" Name="NbrOfDiscConversion" Type="integer"/>
 		
     <!-- Possible values of DMAContinuousRequests parameter -->
-    <RefParameter Comment="DMA Continuous Requests" DefaultValue="DISABLE" Group="ADCGroup" Name="DMAContinuousRequests" Type="list">
-        <Condition Diagnostic="" Expression="$IpNumber=1"/>
+    <RefParameter Comment="DMA Continuous Requests" DefaultValue="DISABLE" Group="ADCgroup" Name="DMAContinuousRequests" Type="list">
         <PossibleValue Comment="Disabled" Value="DISABLE"/>
-        <PossibleValue Comment="Enabled" Value="ENABLE" Action="Disable" Condition=" !DMARequest_ADC1" Diagnostic="A DMA request must be configured in DMA Settings Tab" />
-        <Description>Enable/Disable DMA Continuous Requests</Description>
+        <PossibleValue Comment="Enabled" Value="ENABLE" Action="Disable" Condition="!DMARequest_$IpInstance" Diagnostic="A DMA Request in Circular Mode must be configured in DMA Settings Tab for this ADC instance" />
+        <Description>This parameter is used only when a DMA Request is configured. Else it is not relevant.&lt;br&gt;
+            When the DMA Request for this ADC instance this parameter specifies whether 
+            the DMA requests are performed in one shot mode (DMA transfer stops when number of conversions is reached)
+            or are performed in continuous mode (DMA transfer unlimited, whatever number of conversions).&lt;br&gt;
+            Note: In continuous mode, DMA must be configured in circular mode. Otherwise an overrun will be triggered when DMA buffer maximum pointer is reached.
+        </Description>
     </RefParameter>
-    <RefParameter Comment="DMA Continuous Requests" DefaultValue="DISABLE" Group="ADCGroup" Name="DMAContinuousRequests" Type="list">
-        <Condition Diagnostic="" Expression="$IpNumber=2"/>
-        <PossibleValue Comment="Disabled" Value="DISABLE"/>
-        <PossibleValue Comment="Enabled" Value="ENABLE" Action="Disable" Condition=" !DMARequest_ADC2" Diagnostic="A DMA request must be configured in DMA Settings Tab" />
-        <Description>Enable/Disable DMA Continuous Requests</Description>
-    </RefParameter>
-    <RefParameter Comment="DMA Continuous Requests" DefaultValue="DISABLE" Group="ADCGroup" Name="DMAContinuousRequests" Type="list">
-        <Condition Diagnostic="" Expression="$IpNumber=3"/>
-        <PossibleValue Comment="Disabled" Value="DISABLE"/>
-        <PossibleValue Comment="Enabled" Value="ENABLE" Action="Disable" Condition=" !DMARequest_ADC3" Diagnostic="A DMA request must be configured in DMA Settings Tab" />
-        <Description>Enable/Disable DMA Continuous Requests</Description>
-    </RefParameter>
-    <RefParameter Comment="DMA Continuous Requests" DefaultValue="DISABLE" Group="ADCGroup" Name="DMAContinuousRequests" Type="list">
-        <Condition Diagnostic="" Expression="$IpNumber=4"/>
-        <PossibleValue Comment="Disabled" Value="DISABLE"/>
-        <PossibleValue Comment="Enabled" Value="ENABLE" Action="Disable" Condition=" !DMARequest_ADC4" Diagnostic="A DMA request must be configured in DMA Settings Tab" />
-        <Description>Enable/Disable DMA Continuous Requests</Description>
-    </RefParameter>
-    <RefParameter Comment="DMA Continuous Requests" DefaultValue="DISABLE" Group="ADCGroup" Name="DMAContinuousRequests" Type="list">
-        <Condition Diagnostic="" Expression="$IpNumber=5"/>
-        <PossibleValue Comment="Disabled" Value="DISABLE"/>
-        <PossibleValue Comment="Enabled" Value="ENABLE" Action="Disable" Condition=" !DMARequest_ADC5" Diagnostic="A DMA request must be configured in DMA Settings Tab" />
-        <Description>Enable/Disable DMA Continuous Requests</Description>
-    </RefParameter>
-    
-    <RefParameter Comment="DMA Continuous Requests" DefaultValue="DISABLE" Group="ADCGroup" Name="DMAContinuousRequests" Type="list">
-      
-        <PossibleValue Comment="Disabled" Value="DISABLE"/>
-        <PossibleValue Comment="Enabled" Value="ENABLE"  />
-        <Description>Enable/Disable DMA Continuous Requests</Description>
-    </RefParameter>
-    
    
     <RefParameter Comment="DMA Continuous Requests" DefaultValue="LIMITED" Group="ADCGroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
          <Condition Diagnostic="" Expression="$IpNumber=1 &amp; DMARequest_ADC1 &amp; DMAContinuousRequests=DISABLE"/>
@@ -464,7 +436,7 @@
         <PossibleValue Action="Disable" Comment="Oversampling ratio 256x " Condition="REG_RIGHTBITSHIFT_NONE_$IpInstance |REG_RIGHTBITSHIFT1_$IpInstance | REG_RIGHTBITSHIFT2_$IpInstance | REG_RIGHTBITSHIFT3_$IpInstance" Diagnostic="Shift for oversampling should be equal or greater than 4" Value="ADC_OVERSAMPLING_RATIO_256"/>
     </RefParameter>	
    
-   <RefParameter Comment="Regular Oversampling Mode" DefaultValue="null" Group="ADCgroup" Name="OversamplingStopReset" Type="list" Visible="false">
+    <RefParameter Comment="Regular Oversampling Mode" DefaultValue="null" Group="ADCgroup" Name="OversamplingStopReset" Type="list" Visible="false">
         <Condition Diagnostic="" Expression="OversamplingMode=DISABLE | EnableRegularConversion=DISABLE"/>
     </RefParameter>
     <RefParameter Comment="Regular Oversampling Mode" DefaultValue="ADC_REGOVERSAMPLING_CONTINUED_MODE" Group="ADCgroup" Name="OversamplingStopReset" Type="list">
@@ -501,16 +473,18 @@
 
         <PossibleValue Comment="ADC_CHANNEL_VREFINT" Value="ADC_CHANNEL_VREFINT"/>
     </RefParameter>
+    <RefParameter Comment="ChannelVREF" DefaultValue="null" Name="ChannelVREF" Type="list" Visible="false"></RefParameter>
     <RefParameter Comment="ChannelTS" DefaultValue="ADC_CHANNEL_TEMPSENSOR" Name="ChannelTS" Type="list" Visible="false">
                 <Condition Expression="VtsATSelected$IpInstance" Diagnostic=""/>
 
         <PossibleValue Comment="ADC_CHANNEL_TEMPSENSOR" Value="ADC_CHANNEL_TEMPSENSOR"/>
     </RefParameter>
+    <RefParameter Comment="ChannelTS" DefaultValue="null" Name="ChannelTS" Type="list" Visible="false"></RefParameter>
     <RefParameter Comment="Channelvbat" DefaultValue="ADC_CHANNEL_VBAT" Name="ChannelVBAT" Type="list" Visible="false">
         <Condition Expression="VbatfTSelected$IpInstance" Diagnostic=""/>
         <PossibleValue Comment="ADC_CHANNEL_VBAT" Value="ADC_CHANNEL_VBAT"/>
     </RefParameter>
-    
+    <RefParameter Comment="Channelvbat" DefaultValue="null" Name="ChannelVBAT" Type="list" Visible="false"></RefParameter> 
         
     <!-- ExternalTrigConv -->
     <RefParameter Comment="External Trigger Conversion Source" DefaultValue="null" Group="ADCGroup" Name="ExternalTrigConv" Type="list" Visible="false">
@@ -588,8 +562,8 @@
     </RefParameter>
 	
     <!-- Possible Value of OffsetNumber parameters  -->
-    <RefParameter Comment="Offset Number" DefaultValue="ADC_OFFSET_NONE" Group="ADCChannel" Name="OffsetNumber" Type="list">
-        <Condition Diagnostic="" Expression="Regular_OversamplingMode_Enabled_$IpInstance | Injected_OversamplingMode_Enabled_$IpInstance "/>
+   <RefParameter Comment="Offset Number" DefaultValue="ADC_OFFSET_NONE" Group="ADCChannel" Name="OffsetNumber" Type="list">
+        <Condition Diagnostic="" Expression="Regular_OversamplingMode_Enabled_$IpInstance"/>
         <PossibleValue Comment="No offset" Value="ADC_OFFSET_NONE"/>
         <Description>Offset correction is not supported in oversampling mode</Description>
     </RefParameter>
@@ -631,6 +605,19 @@
     <!-- Possible Value of SamplingTime parameters  -->     
     <RefParameter Comment="Sampling Time" DefaultValue="null" Group="ADCChannel" Name="SamplingTime" Type="list" Visible="false">
         <Condition Diagnostic="" Expression="EnableRegularConversion=DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Sampling Time" DefaultValue="ADC_SAMPLETIME_2CYCLES_5" Group="ADCChannel" Name="SamplingTime" Type="list">
+        <Condition Diagnostic="" Expression="DIE464 &amp; ($IpNumber=2) |($IpNumber=1)"/>
+        <PossibleValue Comment="2.5 Cycles" Value="ADC_SAMPLETIME_2CYCLES_5" Semaphore="S_ADC_SAMPLETIME_2CYCLES_5"/>
+        <PossibleValue Comment="3.5 Cycles" Diagnostic="This sampling time cannot be used simultaneously with the sampling time 2.5 Cycles" Condition="S_ADC_SAMPLETIME_2CYCLES_5"  Value="ADC_SAMPLETIME_3CYCLES_5"/>
+        <PossibleValue Comment="6.5 Cycles" Value="ADC_SAMPLETIME_6CYCLES_5"/>
+        <PossibleValue Comment="12.5 Cycles" Value="ADC_SAMPLETIME_12CYCLES_5"/>
+        <PossibleValue Comment="24.5 Cycles" Value="ADC_SAMPLETIME_24CYCLES_5"/>
+        <PossibleValue Comment="47.5 Cycles" Value="ADC_SAMPLETIME_47CYCLES_5"/>
+        <PossibleValue Comment="92.5 Cycles" Value="ADC_SAMPLETIME_92CYCLES_5"/>
+        <PossibleValue Comment="247.5 Cycles" Value="ADC_SAMPLETIME_247CYCLES_5"/>
+        <PossibleValue Comment="640.5 Cycles" Value="ADC_SAMPLETIME_640CYCLES_5"/>
+        <Description>Regular Channel x sampling time selection</Description>
     </RefParameter>
     <RefParameter Comment="Sampling Time" DefaultValue="ADC_SAMPLETIME_2CYCLES_5" Group="ADCChannel" Name="SamplingTime" Type="list">
         <PossibleValue Comment="2.5 Cycles" Value="ADC_SAMPLETIME_2CYCLES_5"/>
@@ -722,6 +709,7 @@
 	
     <RefParameter Comment="Enable Injected Oversampling" DefaultValue="DISABLE" Group="ADC_Injected_ConversionMode" Name="EnableInjectedOversampling" Type="list" Visible="false">
         <Condition Diagnostic="" Expression="EnableInjectedConversion=DISABLE"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
     </RefParameter>
     <RefParameter Comment="Enable Injected Oversampling" DefaultValue="DISABLE" Group="ADC_Injected_ConversionMode" Name="EnableInjectedOversampling" Type="list">
         <Condition Diagnostic="" Expression="EnableInjectedConversion=ENABLE"/>
@@ -905,16 +893,16 @@
     </RefParameter>
 			 			    
     <!-- Possible Value of OffsetNumber parameters  -->
-    <RefParameter Comment="Offset Number" DefaultValue="ADC_OFFSET_NONE" Group="ADCGroup" Name="InjectedOffsetNumber" Type="list" Visible="false">
+    <RefParameter Comment="Offset Number" DefaultValue="ADC_OFFSET_NONE" Group="ADCChannel" Name="InjectedOffsetNumber" Type="list" Visible="false">
         <Condition Diagnostic="In case of usage of channels on injected group, ADC frequency should be low than AHB clock frequency /4 for resolution 12 or 10 bits, AHB clock frequency /3 for resolution 8 bits, AHB clock frequency /2 for resolution 6 bits." Expression="EnableInjectedConversion=DISABLE"/>
     </RefParameter>
 
-    <RefParameter Comment="Offset Number" DefaultValue="ADC_OFFSET_NONE" Group="ADCGroup" Name="InjectedOffsetNumber" Type="list">
+    <RefParameter Comment="Offset Number" DefaultValue="ADC_OFFSET_NONE" Group="ADCChannel" Name="InjectedOffsetNumber" Type="list">
         <Condition Diagnostic="" Expression="Injected_OversamplingMode_Enabled_$IpInstance"/>
         <PossibleValue Comment="No offset" Value="ADC_OFFSET_NONE"/>
         <Description>Offset correction is not supported in oversampling mode</Description>
     </RefParameter>
-    <RefParameter Comment="Offset Number" DefaultValue="ADC_OFFSET_NONE" Group="ADCGroup" Name="InjectedOffsetNumber" Type="list">
+    <RefParameter Comment="Offset Number" DefaultValue="ADC_OFFSET_NONE" Group="ADCChannel" Name="InjectedOffsetNumber" Type="list">
         <PossibleValue Comment="No offset" Value="ADC_OFFSET_NONE"/>
         <PossibleValue Comment="1 offset" Value="ADC_OFFSET_1"/>
         <PossibleValue Comment="2 offsets" Value="ADC_OFFSET_2"/>
@@ -924,32 +912,45 @@
     </RefParameter>
 			     
     <!-- Possible Value of InjectedOffset parameters: Min and Max of this parameter depend on ADC resolution -->
-    <RefParameter Comment="Injected Offset" DefaultValue="0" Group="ADCGroup" Max="4095" Min="0" Name="InjectedOffset" Type="integer" Visible="false">
-        <Condition Diagnostic="In case of usage of channels on injected group, ADC frequency should be low than AHB clock frequency /4 for resolution 12 or 10 bits, AHB clock frequency /3 for resolution 8 bits, AHB clock frequency /2 for resolution 6 bits." Expression="EnableInjectedConversion=DISABLE | Injected_OversamplingMode_Enabled_$IpInstance | InjectedOffsetNumber = ADC_OFFSET_NONE"/>  
+    <RefParameter Comment="Injected Offset" DefaultValue="0" Group="ADCChannel" Max="4095" Min="0" Name="InjectedOffset" Type="integer" Visible="false">
+        <Condition Diagnostic="" Expression="EnableInjectedConversion=DISABLE | Injected_OversamplingMode_Enabled_$IpInstance | InjectedOffsetNumber = ADC_OFFSET_NONE"/>  
     </RefParameter>
-    <RefParameter Comment="Injected Offset" DefaultValue="0" Group="ADCGroup" Max="4095" Min="0" Name="InjectedOffset" Type="integer">
+    <RefParameter Comment="Injected Offset" DefaultValue="0" Group="ADCChannel" Max="4095" Min="0" Name="InjectedOffset" Type="integer">
         <Condition Diagnostic="" Expression="ADC_RESOLUTION12b_$IpInstance"/>
         <Description>Data offset for Injected channel</Description>
     </RefParameter>
-    <RefParameter Comment="Injected Offset" DefaultValue="0" Group="ADCGroup" Max="1023" Min="0" Name="InjectedOffset" Type="integer">
+    <RefParameter Comment="Injected Offset" DefaultValue="0" Group="ADCChannel" Max="1023" Min="0" Name="InjectedOffset" Type="integer">
         <Condition Diagnostic="" Expression="ADC_RESOLUTION10b_$IpInstance"/>
         <Description>Data offset for Injected channel</Description>
     </RefParameter>
-    <RefParameter Comment="Injected Offset" DefaultValue="0" Group="ADCGroup" Max="255" Min="0" Name="InjectedOffset" Type="integer">
+    <RefParameter Comment="Injected Offset" DefaultValue="0" Group="ADCChannel" Max="255" Min="0" Name="InjectedOffset" Type="integer">
         <Condition Diagnostic="" Expression="ADC_RESOLUTION8b_$IpInstance"/>
         <Description>Data offset for Injected channel</Description>
     </RefParameter>
-    <RefParameter Comment="Injected Offset" DefaultValue="0" Group="ADCGroup" Max="63" Min="0" Name="InjectedOffset" Type="integer">
+    <RefParameter Comment="Injected Offset" DefaultValue="0" Group="ADCChannel" Max="63" Min="0" Name="InjectedOffset" Type="integer">
         <Condition Diagnostic="" Expression="ADC_RESOLUTION6b_$IpInstance"/>
         <Description>Data offset for Injected channel</Description>
     </RefParameter>
-    <RefParameter Comment="Injected Offset" DefaultValue="0" Group="ADCGroup" Max="4095" Min="0" Name="InjectedOffset" Type="integer">
+    <RefParameter Comment="Injected Offset" DefaultValue="0" Group="ADCChannel" Max="4095" Min="0" Name="InjectedOffset" Type="integer">
         <Description>Data offset for injected channel </Description>
     </RefParameter>
   
     <!-- Possible Value of SamplingTime parameters  -->
     <RefParameter Comment="Sampling Time" DefaultValue="null" Group="ADCChannel" Name="InjectedSamplingTime" Type="list" Visible="false">
         <Condition Diagnostic="In case of usage of channels on injected group, ADC frequency should be low than AHB clock frequency /4 for resolution 12 or 10 bits, AHB clock frequency /3 for resolution 8 bits, AHB clock frequency /2 for resolution 6 bits." Expression="EnableInjectedConversion=DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Sampling Time" DefaultValue="ADC_SAMPLETIME_2CYCLES_5" Group="ADCChannel" Name="InjectedSamplingTime" Type="list">
+         <Condition Diagnostic="" Expression="DIE464 &amp; ($IpNumber=2) |($IpNumber=1)"/>
+        <PossibleValue Comment="2.5 Cycles" Value="ADC_SAMPLETIME_2CYCLES_5"/>
+         <PossibleValue Comment="3.5 Cycles" Diagnostic="This sampling time cannot be used simultaneously with the sampling time 2.5 Cycles" Condition="S_ADC_SAMPLETIME_2CYCLES_5"  Value="ADC_SAMPLETIME_3CYCLES_5"/>
+        <PossibleValue Comment="6.5 Cycles" Value="ADC_SAMPLETIME_6CYCLES_5"/>
+        <PossibleValue Comment="12.5 Cycles" Value="ADC_SAMPLETIME_12CYCLES_5"/>
+        <PossibleValue Comment="24.5 Cycles" Value="ADC_SAMPLETIME_24CYCLES_5"/>
+        <PossibleValue Comment="47.5 Cycles" Value="ADC_SAMPLETIME_47CYCLES_5"/>
+        <PossibleValue Comment="92.5 Cycles" Value="ADC_SAMPLETIME_92CYCLES_5"/>
+        <PossibleValue Comment="247.5 Cycles" Value="ADC_SAMPLETIME_247CYCLES_5"/>
+        <PossibleValue Comment="640.5 Cycles" Value="ADC_SAMPLETIME_640CYCLES_5"/>
+        <Description>Injected Channel x sampling time selection</Description>
     </RefParameter>
     <RefParameter Comment="Sampling Time" DefaultValue="ADC_SAMPLETIME_2CYCLES_5" Group="ADCChannel" Name="InjectedSamplingTime" Type="list">
         <PossibleValue Comment="2.5 Cycles" Value="ADC_SAMPLETIME_2CYCLES_5"/>
@@ -1147,10 +1148,10 @@
         <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT"/>
         <Description>ADC channel for the analog watchdog</Description>  
     </RefParameter>
-    <RefParameter Comment="Channel_Rank1" DefaultValue="ADC_CHANNEL_0" Group="ADCChannel" Name="Rank1_Channel" Type="String" Visible="false"/>
-    <RefParameter Comment="Channel_Rank2" DefaultValue="ADC_CHANNEL_0" Group="ADCChannel" Name="Rank2_Channel" Type="String" Visible="false"/>
-    <RefParameter Comment="Channel_Rank3" DefaultValue="ADC_CHANNEL_0" Group="ADCChannel" Name="Rank3_Channel" Type="String" Visible="false"/>
-    <RefParameter Comment="Channel_Rank4" DefaultValue="ADC_CHANNEL_0" Group="ADCChannel" Name="Rank4_Channel" Type="String" Visible="false"/>
+    <RefParameter Comment="Channel_Rank1" DefaultValue="0x0000" Group="ADCChannel" Name="Rank1_Channel" Type="String" Visible="false"/>
+    <RefParameter Comment="Channel_Rank2" DefaultValue="0x0000" Group="ADCChannel" Name="Rank2_Channel" Type="String" Visible="false"/>
+    <RefParameter Comment="Channel_Rank3" DefaultValue="0x0000" Group="ADCChannel" Name="Rank3_Channel" Type="String" Visible="false"/>
+    <RefParameter Comment="Channel_Rank4" DefaultValue="0x0000" Group="ADCChannel" Name="Rank4_Channel" Type="String" Visible="false"/>
 
 
     <!--  ########################################################################################Common WatchDog parameters######################################################################################## -->
@@ -1697,6 +1698,7 @@
     <!-- ADC settings -->
     <RefMode Comment="ADCx Settings" Group="ADC_Settings" Name="ADC_Settings">
         <ConfigForMode>ADC_RegularConfig</ConfigForMode>
+        <ConfigForMode>ADC_InternalChannelConfig</ConfigForMode>
         <Parameter Name="ClockPrescaler"/>
         <Parameter Name="Resolution"/>
         <Parameter Name="DataAlign"/>
@@ -1709,6 +1711,9 @@
         <Parameter Name="EOCSelection"/>
         <Parameter Name="Overrun"/>
         <Parameter Name="LowPowerAutoWait"/>
+        <Parameter Name="ChannelVREF"/>
+        <Parameter Name="ChannelVBAT"/>
+        <Parameter Name="ChannelTS"/>
     </RefMode>
 	
     <!-- RefMode of ADC_Regular_ConversionMode -->
@@ -1742,9 +1747,7 @@
         <Parameter Name="InjectedDiscontinuousConvMode"/>
     </RefMode>
   
-    <RefMode Comment="Regular Channel Settings" Name="CpChannelRegularConversion">
-        <ConfigForMode>ADC_RegularChannelConfig</ConfigForMode>
-        <ConfigForMode>ADC_RegularChannelConfigForWD</ConfigForMode>
+    <RefMode Comment="Regular Channel Settings" Name="CpChannelRegularConversion">        
         <Parameter Name="Rank"/>
         <Parameter Name="Channel"/>
         <Parameter Name="SingleDiff"/>
@@ -1758,8 +1761,7 @@
         <Parameter Name="AWDChannel"/>
     </RefMode>				
     <RefMode BaseMode="ADC_Regular_ConversionMode" Comment="Regular Channel Settings" Group="ADC_Regular_ConversionMode" Name="ChannelRegularConversion">
-        <ConfigForMode>ADC_RegularChannelConfig</ConfigForMode>
-        <ConfigForMode>ADC_InternalChannelConfig</ConfigForMode>
+        <ConfigForMode>ADC_RegularChannelConfig</ConfigForMode>        
         <ConfigForMode>ADC_RegularChannelConfigForWD</ConfigForMode>
         <Parameter Name="Rank"/>
         <Parameter Name="Channel"/>
@@ -1778,7 +1780,6 @@
         <ConfigForMode>ADC_InjectedChannelConfig</ConfigForMode>
         <ConfigForMode>ADC_InjectedChannelConfigForWD</ConfigForMode>
         
-        <Parameter Name="InjectedOffsetNumber"/>
         <Parameter Name="InjectedRank"/>
         <Parameter Name="InjectedChannel"/>
         <Parameter Name="InjectedSamplingTime"/>
@@ -1814,7 +1815,7 @@
     
     <RefMode Abstract="true" Comment="Injected Queue Disable" Group="ADC_Injected_ConversionMode" Name="ADC_Injected_Queue_Disable">
         <Condition Diagnostic="" Expression="QueueDisable$IpInstance &amp; !(InjNumberOfConversion = 0)"/>
-        <!--ConfigForMode>ADC_InjectedQueueDisable</ConfigForMode-->
+        <ConfigForMode>ADC_InjectedQueueDisable</ConfigForMode>
     </RefMode>
 		
 								
@@ -2253,7 +2254,7 @@
                     </SignalLogicalOp>
                     <Semaphore>IN7Used_$IpInstance</Semaphore>
                 </Mode>
-                <Mode Name="IN7-Differential" RemoveCondition=" ($IpNumber=3) | !(OPAMP1_Exist )" UserName="IN7 Differential with OPAMP1 Output">
+                <Mode Name="IN7-Differential" RemoveCondition="(DIE472) | ($IpNumber=3) | !(OPAMP1_Exist )" UserName="IN7 Differential with OPAMP1 Output">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="OPAMP1_OUT"/>
                         <Signal Name="IN7"/>
@@ -2620,7 +2621,7 @@
         </Mode>
       
         <!-- Triggers Mode -->
-        <Mode Name="Conversion-Trigger" UserName="Conversion Trigger">
+        <Mode Name="Conversion-Trigger" UserName="EXTI Conversion Trigger">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="Injected-Conversion-Trigger" UserName="Injected Conversion Trigger">
                     <SignalLogicalOp Name="AND">

@@ -99,7 +99,7 @@
  */
 /* USER CODE BEGIN enableSDDmaCacheMaintenance */
 /* #define ENABLE_SD_DMA_CACHE_MAINTENANCE  1 */
-/* USER CODE BEGIN enableSDDmaCacheMaintenance */
+/* USER CODE END enableSDDmaCacheMaintenance */
 [/#if]
 
 /* Private variables ---------------------------------------------------------*/

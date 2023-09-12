@@ -326,7 +326,7 @@
 	<RefParameter Comment="MDMA chaining" DefaultValue="DISABLE" Group="" Name="MDMA_Chaining" Type="list">
 		<PossibleValue Comment="Disable" Value="DISABLE"/>
 		<PossibleValue Comment="Enable" Value="ENABLE"/>
-		<Condition Diagnostic="" Expression="(TEMP_SPDIF_RX_CS_REQUEST_SEM|TEMP_UART4_IP_SEM|TEMP_UART5_IP_SEM|TEMP_UART7_IP_SEM|TEMP_UART8_IP_SEM|TEMP_USART2_IP_SEM|TEMP_USART3_IP_SEM|TEMP_USART6_IP_SEM)"/>
+		<Condition Diagnostic="" Expression="(TEMP_SPDIF_RX_CS_REQUEST_SEM|TEMP_UART4_IP_SEM|TEMP_UART5_IP_SEM|TEMP_UART7_IP_SEM|TEMP_UART8_IP_SEM|TEMP_USART2_IP_SEM|TEMP_USART3_IP_SEM|TEMP_USART6_IP_SEM|TEMP_DMA_GENERATOR0_REQUEST_SEM|TEMP_DMA_GENERATOR1_REQUEST_SEM|TEMP_DMA_GENERATOR2_REQUEST_SEM|TEMP_DMA_GENERATOR3_REQUEST_SEM|TEMP_DMA_GENERATOR4_REQUEST_SEM|TEMP_DMA_GENERATOR5_REQUEST_SEM|TEMP_DMA_GENERATOR6_REQUEST_SEM|TEMP_DMA_GENERATOR7_REQUEST_SEM|TEMP_MEMTOMEM_REQUEST_SEM|CURRENTIP_CUBE)"/>
 	</RefParameter>
 	<RefParameter Comment="MDMA chaining" DefaultValue="ENABLE" Group="" Name="MDMA_Chaining" Type="list">
 		<PossibleValue Comment="Disable" Value="DISABLE"/>
@@ -2740,7 +2740,7 @@
 					<SignalLogicalOp Name="AND">
 						<Signal Name="VS_DMA1_M4"/>
 					</SignalLogicalOp>
-					<Condition Diagnostic="Can't switch context as requests are allocated on the current associated context. Please remove requests first to be able to switch context" Expression="NbRequestsDMA1_A7NS=0"/>
+					<Condition Diagnostic="Can't switch context as requests are allocated on the current associated context or DMA2 is already assigned to M4. Please remove requests first to be able to switch context" Expression="(NbRequestsDMA1_A7NS=0) &amp; !DMA2ForM4"/>
 					<Semaphore>DMA1ForM4</Semaphore>
 				</Mode>
 			</ModeLogicOperator>
@@ -2751,7 +2751,7 @@
 					<SignalLogicalOp Name="AND">
 						<Signal Name="VS_DMA2_M4"/>
 					</SignalLogicalOp>
-					<Condition Diagnostic="Can't switch context as requests are allocated on the current associated context. Please remove requests first to be able to switch context" Expression="NbRequestsDMA2_A7NS=0"/>
+					<Condition Diagnostic="Can't switch context as requests are allocated on the current associated context  or DMA1 is already assigned to M4. Please remove requests first to be able to switch context" Expression="(NbRequestsDMA2_A7NS=0)  &amp; !DMA1ForM4"/>
 					<Semaphore>DMA2ForM4</Semaphore>
 				</Mode>
 				<Mode Name="CortexA7NS" UserName="A7NS">
@@ -2776,8 +2776,12 @@
 						<Mode Name="DMA_GENERATOR5"/>
 						<Mode Name="DMA_GENERATOR6"/>
 						<Mode Name="DMA_GENERATOR7"/>
-						<Mode Name="ADC1"/>
-						<Mode Name="ADC2"/>
+						<Mode Name="ADC1">
+							<Semaphore>DMARequest_ADC1</Semaphore>
+						</Mode>
+						<Mode Name="ADC2">
+							<Semaphore>DMARequest_ADC2</Semaphore>
+						</Mode>
 						<Mode Name="TIM1_CH1">
 							<Condition Diagnostic="" Expression="Semaphore_CaptureCompare_1_DMA_EnableTIM1"/>
 						</Mode>

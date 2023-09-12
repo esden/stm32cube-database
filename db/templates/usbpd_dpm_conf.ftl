@@ -19,18 +19,23 @@
 #endif 
 [#assign nbPorts = "1"]
 [#assign USBPD_CoreLib = ""]
+[#assign USBPD_STATEMACHINE = false]
 [#assign SRC = false]
 [#assign SNK = false]
 [#assign DRP = false]
 [#assign BATT_FEATURE = false]
 [#assign DR_SWAP_TO_XFP_FEATURE = false]
 [#assign GUI_V1_8_0_OR_NEWER = false]
+
 [#-- SWIPdatas is a list of SWIPconfigModel --]  
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
         [#list SWIP.defines as definition]
             [#if definition.name == "USBPD_CoreLib" && definition.value != ""]
                 [#assign USBPD_CoreLib = definition.value]
+            [/#if]
+            [#if definition.name == "USBPD_StateMachine" && definition.value == "true"]
+                [#assign USBPD_STATEMACHINE = true]
             [/#if]
             [#if definition.name == "SRC" && definition.value == "true"]
                 [#assign SRC = true]
@@ -299,7 +304,9 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usbpd_pdo_defs.h"
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD" || USBPD_STATEMACHINE]
 #include "usbpd_dpm_user.h"
+[/#if]
 [#if USBPD_CoreLib == "USBPDCORE_LIB_PD3_FULL" | USBPD_CoreLib == "USBPDCORE_LIB_PD3_CONFIG_1"]
 #include "usbpd_vdm_user.h"
 [/#if]
@@ -334,9 +341,11 @@
 /* Private variables ---------------------------------------------------------*/
 #ifndef __USBPD_DPM_CORE_C
 extern USBPD_SettingsTypeDef            DPM_Settings[USBPD_PORT_COUNT];
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD" || USBPD_STATEMACHINE]
 [#if !GUI_INTERFACE?? || GUI_V1_8_0_OR_NEWER]
 extern USBPD_IdSettingsTypeDef          DPM_ID_Settings[USBPD_PORT_COUNT];
 extern USBPD_USER_SettingsTypeDef       DPM_USER_Settings[USBPD_PORT_COUNT];
+[/#if]
 [/#if]
 #else /* __USBPD_DPM_CORE_C */
 USBPD_SettingsTypeDef       DPM_Settings[USBPD_PORT_COUNT] =
@@ -431,6 +440,7 @@ USBPD_SettingsTypeDef       DPM_Settings[USBPD_PORT_COUNT] =
   }
 };
 
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
 [#if !GUI_INTERFACE?? || GUI_V1_8_0_OR_NEWER]
 USBPD_IdSettingsTypeDef          DPM_ID_Settings[USBPD_PORT_COUNT] =
 {
@@ -493,6 +503,7 @@ USBPD_USER_SettingsTypeDef       DPM_USER_Settings[USBPD_PORT_COUNT] =
 #endif /* USBPD_PORT_COUNT >= 2 */
 [/#if]
 };
+[/#if]
 [/#if]
 
 #endif /* !__USBPD_DPM_CORE_C */

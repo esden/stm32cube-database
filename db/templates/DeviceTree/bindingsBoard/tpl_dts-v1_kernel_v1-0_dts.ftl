@@ -18,22 +18,30 @@
  */
 
 /dts-v1/;
-[#if mx_socRPNSuperset?has_content]
-#include "${mx_socRPNSuperset}.dtsi"
+#include <dt-bindings/pinctrl/stm32-pinfunc.h>
+
+[#if mx_socFtRPN?has_content]
+#include "${mx_socFtRPN}.dtsi"
 [#else]
 	[@mlog  logMod=module logType="ERR" logMsg="unknown SOC dtsi" varsMap={} /]
 /*#include "???.dtsi"*/
 [/#if]
-[#if mx_socRPNSuperset?has_content]
-#include "${mx_socRPNSuperset}${mx_socPackageType}-pinctrl.dtsi"
+[#if mx_socRPN?has_content]
+#include "${mx_socRPN?substring(0,9) + "x" + mx_socRPN?substring(10)}.dtsi"
 [#else]
-	[@mlog  logMod=module logType="ERR" logMsg="unknown SOC pinCtrl dtsi" varsMap={} /]
+	[@mlog  logMod=module logType="ERR" logMsg="unknown SOC package dtsi" varsMap={} /]
+/*#include "???.dtsi"*/
+[/#if]
+[#if mx_socPtCPN?has_content]
+#include "${mx_socPtCPN?substring(0,9) + "xx" + mx_socPtCPN?substring(11)}-pinctrl.dtsi"
+[#else]
+	[@mlog  logMod=module logType="ERR" logMsg="unknown SOC pinCtrl package dtsi" varsMap={} /]
 /*#include "???-pinctrl.dtsi"*/
 [/#if]
 [#local coproDeviceName = srvcmx_getMatchingBindedHwName_inDTS(".+_copro")]
 [#if coproDeviceName?has_content][#--at least 1 IP should be assigned--]
 	[#local coproName = coproDeviceName?replace("_copro", "")]
-#include "${mx_socRPNSuperset}-${coproName}-srm.dtsi"
+#include "${mx_socRPNSuperset?substring(0,10)}-${coproName}-srm.dtsi"
 [/#if]
 
 /* USER CODE BEGIN includes */

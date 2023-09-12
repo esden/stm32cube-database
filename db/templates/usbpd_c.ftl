@@ -42,11 +42,13 @@ static const uint8_t*          GetPDTypeName(void);
 void MX_USBPD_Init(void)
 {
 
+[#if USBPD_CORELIB != "USBPDCORE_LIB_NO_PD"]
   /* Global Init of USBPD HW */
   USBPD_HW_IF_GlobalHwInit();
+[/#if]
 
   /* Initialize the Device Policy Manager */
-  if(USBPD_OK != USBPD_DPM_InitCore())
+  if (USBPD_OK != USBPD_DPM_InitCore())
   {
     while(1);
   }
@@ -56,16 +58,18 @@ void MX_USBPD_Init(void)
   GUI_Init(GetHWBoardVersionName, GetPDTypeName, HW_IF_PWR_GetVoltage, HW_IF_PWR_GetCurrent);
 [/#if]
 
+[#if USBPD_CORELIB != "USBPDCORE_LIB_NO_PD"]
   /* Initialise the DPM application */
   if (USBPD_OK != USBPD_DPM_UserInit())
   {
     while(1);
   }
+[/#if]
 
   /* USER CODE BEGIN 3 */
   /* USER CODE END 3 */
 
-  if(USBPD_OK != USBPD_DPM_InitOS())
+  if (USBPD_OK != USBPD_DPM_InitOS())
   {
     while(1);
   }

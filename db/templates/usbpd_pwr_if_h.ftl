@@ -10,6 +10,28 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
+[#assign SRC = false]
+[#assign SNK = false]
+[#assign DRP = false]
+[#-- SWIPdatas is a list of SWIPconfigModel --]
+[#list SWIPdatas as SWIP]
+    [#if SWIP.defines??]
+        [#list SWIP.defines as definition]
+            [#if definition.name == "SRC" && definition.value == "true"]
+                [#assign SRC = true]
+            [/#if]
+            [#if definition.name == "SNK" && definition.value == "true"]
+                [#assign SNK = true]
+            [/#if]
+            [#if definition.name == "DRP" && definition.value == "true"]
+                [#assign DRP = true]
+            [/#if]
+        [/#list]
+    [/#if]
+    [#assign instName = SWIP.ipName]
+    [#assign fileName = SWIP.fileName]
+    [#assign version = SWIP.version]
+[/#list]
 
 #ifndef __USBPD_PW_IF_H_
 #define __USBPD_PW_IF_H_
@@ -78,6 +100,7 @@ typedef enum{
   */
 USBPD_StatusTypeDef USBPD_PWR_IF_Init(void);
 
+[#if SRC || DRP]
 /**
   * @brief  Sets the required power profile
   * @param  PortNum Port number
@@ -85,6 +108,7 @@ USBPD_StatusTypeDef USBPD_PWR_IF_Init(void);
   */
 USBPD_StatusTypeDef USBPD_PWR_IF_SetProfile(uint8_t PortNum);
 
+[/#if]
 /**
   * @brief  Checks if the power on a specified port is ready
   * @param  PortNum Port number
@@ -93,6 +117,7 @@ USBPD_StatusTypeDef USBPD_PWR_IF_SetProfile(uint8_t PortNum);
   */
 USBPD_StatusTypeDef USBPD_PWR_IF_SupplyReady(uint8_t PortNum, USBPD_VSAFE_StatusTypeDef Vsafe);
 
+[#if SRC || DRP]
 /**
   * @brief  Enable VBUS power on a specified port
   * @param  PortNum Port number
@@ -114,6 +139,7 @@ USBPD_StatusTypeDef USBPD_PWR_IF_VBUSDisable(uint8_t PortNum);
   */
 USBPD_FunctionalState USBPD_PWR_IF_VBUSIsEnabled(uint8_t PortNum);
 
+[/#if]
 /**
   * @brief  Reads the voltage and the current on a specified port
   * @param  PortNum Port number

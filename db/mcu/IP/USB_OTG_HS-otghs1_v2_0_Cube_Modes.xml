@@ -19,13 +19,13 @@
 		<Condition Expression="DIE434 | DIE449" Diagnostic=""/>		
 	</RefParameter>
 	<RefParameter Comment="Device endpoints number" DefaultValue="9" Name="dev_endpoints" Min="1" Max="9" Type="integer" Group="" Visible="false">
-		<Condition Expression="DIE450 | DIE480" Diagnostic=""/>		
+		<Condition Expression="DIE450 | DIE480 | DIE483" Diagnostic=""/>		
 	</RefParameter>
 	<RefParameter Comment="Device endpoints number" DefaultValue="7" Name="dev_endpoints" Min="1" Max="7" Type="integer" Group="" Visible="false">				
 	</RefParameter>	
 	
 	<RefParameter Comment="Host Channels" DefaultValue="16" Name="Host_channels"  Min="1" Max="16" Type="integer"  Visible="false">	
-		<Condition Expression="(DIE450 | DIE480) &amp; ((VirtualMode = Host_HS) | (VirtualMode = Host_FS))" Diagnostic=""/>		
+		<Condition Expression="(DIE450 | DIE480 | DIE483) &amp; ((VirtualMode = Host_HS) | (VirtualMode = Host_FS))" Diagnostic=""/>		
 	</RefParameter>
 	<RefParameter Comment="Host Channels" DefaultValue="12" Name="Host_channels"  Min="1" Max="15" Type="integer" Visible="false">	
 		<Condition Expression="(VirtualMode = Host_HS) | (VirtualMode = Host_FS)" Diagnostic=""/>		
@@ -140,11 +140,11 @@
 	
 	<!-- Add Battery charging functionality for Shark (STM32H7)-->
 	<RefParameter Comment="Battery charging" DefaultValue="ENABLE" Name="battery_charging_enable" Type="List">		
-		<Condition Expression="VBUS_USED_FOR_BCD &amp; (DIE450 | DIE480)" Diagnostic=""/>
+		<Condition Expression="VBUS_USED_FOR_BCD &amp; (DIE450 | DIE480 | DIE483)" Diagnostic=""/>
 		<PossibleValue Value="ENABLE" Comment="Enabled"/>		
 	</RefParameter>
 	<RefParameter Comment="Battery charging" DefaultValue="ENABLE" Name="battery_charging_enable" Type="List">	
-		<Condition Expression="VBUS_SENSING_ON &amp; (DIE450 | DIE480)" Diagnostic=""/>
+		<Condition Expression="VBUS_SENSING_ON &amp; (DIE450 | DIE480 | DIE483)" Diagnostic=""/>
 		<PossibleValue Value="ENABLE" Comment="Enabled"/>
 		<PossibleValue Value="DISABLE" Comment="Disabled"/>	
 	</RefParameter>	
@@ -362,12 +362,12 @@
 				</Mode>	    
 			</ModeLogicOperator>	
 			<Semaphore>$IpInstanceHS</Semaphore>
-                        <Semaphore>External_Phy</Semaphore>
+            <Semaphore>External_Phy</Semaphore>
 			<Condition Expression="!$IpInstanceFS" Diagnostic=""/>
 		</Mode>
 		<!-- ModeLogicOperator for FS -->
 		<!-- Tracker 232811 -->
-		<Mode Name="Internal FS Phy">			
+		<Mode Name="Internal FS Phy" RemoveCondition="DIE483">			
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="OTG/Dual-Role-Device-FS" UserName="OTG/Dual_Role_Device">
 					<SignalLogicalOp Name="AND">
@@ -407,7 +407,37 @@
 				</Mode>
 			</ModeLogicOperator>	
 			<Semaphore>$IpInstanceFS</Semaphore>
-                        <Semaphore>USB_OTG_HSEmbeddedPHYUsed_ForRCC</Semaphore>
+            <Semaphore>USB_OTG_HSEmbeddedPHYUsed_ForRCC</Semaphore>
+			<Condition Expression="!$IpInstanceHS" Diagnostic=""/>			
+		</Mode>	
+		<!-- Use IO Mode to be able to duplicate pin settings (A/F or System) -->
+		<Mode Name="Internal FS Phy" RemoveCondition="!DIE483">			
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="OTG/Dual-Role-Device-FS" UserName="OTG/Dual_Role_Device">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="DM" IOMode="System"/>
+						<Signal Name="DP" IOMode="System"/>
+						<Signal Name="ID"/>					
+					</SignalLogicalOp>
+					<Semaphore>OTG_DUAL_ROL_DEVICE_HS_FS</Semaphore>						
+				</Mode>				
+				<Mode Name="Host_FS" UserName="Host_Only">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="DM" IOMode="System"/>
+						<Signal Name="DP" IOMode="System"/>					
+					</SignalLogicalOp>	
+					<Semaphore>MW_USB_OTG_HS_MW_FS_HOST</Semaphore>				
+				</Mode>				
+				<Mode Name="Device_Only_FS" UserName="Device_Only">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="DM" IOMode="System"/>
+						<Signal Name="DP" IOMode="System"/>						
+					</SignalLogicalOp>	
+					<Semaphore>MW_USB_OTG_HS_MW_FS_DEVICE</Semaphore>
+				</Mode>
+			</ModeLogicOperator>	
+			<Semaphore>$IpInstanceFS</Semaphore>
+			<Semaphore>USB_OTG_HSEmbeddedPHYUsed_ForRCC</Semaphore>
 			<Condition Expression="!$IpInstanceHS" Diagnostic=""/>			
 		</Mode>	
 		<Mode Name="Activate_SOF">
@@ -437,7 +467,7 @@
 					<Condition Expression="MW_USB_OTG_HS_MW_FS_DEVICE | MW_USB_OTG_HS_MW_FS_HOST | OTG_DUAL_ROL_DEVICE_HS_FS" Diagnostic="USB Internal Phy Mode must be selected first"/>	
 				</Mode>	
 				<!-- Thicket 33380, The STM32H7 support the mode BCD -->
-				<Mode Name="Activate_VBUS_BCD" UserName="BCD (Battery Charging Detection)" RemoveCondition="!DIE450 &amp; !DIE480">
+				<Mode Name="Activate_VBUS_BCD" UserName="BCD (Battery Charging Detection)" RemoveCondition="!DIE450 &amp; !DIE480 &amp; !DIE483">
 					<SignalLogicalOp Name="AND">				
 						<Signal Name="VBUS"  IOMode="EXTIRisingFalling"/>								
 					</SignalLogicalOp>

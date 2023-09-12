@@ -40,7 +40,7 @@
   [/#list]
 [/#list]
 
-/** 
+/**
   * Enable DMA controller clock
 [#if variables?? && variables?size > 0]
   * Configure DMA for memory to memory transfers
@@ -53,9 +53,9 @@
     [#assign fctname = "MX_"+ipName+"_Init"]
         [#if void.functionName == fctname]
             [#if void.isStatic]
-static void MX_${ipName}_Init(void) 
+static void MX_${ipName}_Init(void)
             [#else]
-void MX_${ipName}_Init(void) 
+void MX_${ipName}_Init(void)
             [/#if]
         [/#if]
 [/#list]

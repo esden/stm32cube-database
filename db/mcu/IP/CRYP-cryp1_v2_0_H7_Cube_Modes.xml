@@ -57,7 +57,7 @@
     </RefParameter>
     
     <RefParameter Name="pInitVect" Comment="Initialization vector" Type="Array" ArraySize="2" ArrayTypeElement="uint32_t;16" Separator=" " Group="Parameters" DefaultValue="00000000 00000000">
-        <Condition Diagnostic="" Expression="((Semaphore_CRYP_Coding_AESCTR)|(Semaphore_CRYP_Coding_DESCBC)|(Semaphore_CRYP_Coding_TDESCBC))"/>
+        <Condition Diagnostic="" Expression="((Semaphore_CRYP_Coding_DESCBC)|(Semaphore_CRYP_Coding_TDESCBC))"/>
         <Description>Initialization vector (IV) is an arbitrary number that can be used along with a secret key for data encryption.&lt;br&gt;It is used also as initialization counter in CTR mode</Description>
     </RefParameter>
     <RefParameter Name="pInitVect" Comment="Initial Counter Block (ICB)" Type="Array" ArraySize="4" ArrayTypeElement="uint32_t;16" Separator=" " Group="Parameters" DefaultValue="00000000 00000000 00000000 00000002">
@@ -65,7 +65,7 @@
         <Description>A 16-byte Initial Counter Block (ICB), composed of two distinct fields:&lt;br&gt; – The initialization vector (IV): a 96-bit value that must be unique for each execution of the mode under a given key. Note that the GCM standard supports IV that are shorter than 96-bit, but in this case strict rules apply.&lt;br&gt;– The counter: a 32-bit big-endian integer that is incremented each time a block has been processed. According to NIST specification, the counter value is 0x2 when processing the first block of payload.</Description>
     </RefParameter>
     <RefParameter Name="pInitVect" Comment="Initialization vector" Type="Array" ArraySize="4" ArrayTypeElement="uint32_t;16" Separator=" " Group="Parameters" DefaultValue="00000000 00000000 00000000 00000000">
-        <Condition Diagnostic="" Expression="(Semaphore_CRYP_Coding_AESCBC)"/>
+        <Condition Diagnostic="" Expression="(Semaphore_CRYP_Coding_AESCTR)|(Semaphore_CRYP_Coding_AESCBC)"/>
         <Description>Initialization vector (IV) is an arbitrary number that can be used along with a secret key for data encryption.&lt;br&gt;It is used also as initialization counter in CTR mode</Description>
     </RefParameter>
     <RefParameter Name="pInitVect" Comment="Initialization vector" Type="list" Group="Parameters" DefaultValue="null" Visible="false">
@@ -135,16 +135,17 @@
     </RefMode>
 
     <ModeLogicOperator Name="OR">
-          <Mode Name="CRYP_State" UserName="Activated">
-              <ModeLogicOperator Name="XOR">
-                  <Mode Name="CRYP_Activate" UserName="Activated">
-                      <SignalLogicalOp Name="AND">
-                          <Signal Name="VS_CRYP" />
-                      </SignalLogicalOp>
-                  </Mode>
-              </ModeLogicOperator>
-          </Mode>
-      </ModeLogicOperator>
+		<Mode Name="CRYP_State" UserName="Activated">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="CRYP_Activate" UserName="Activated">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="VS_CRYP" />
+					</SignalLogicalOp>
+				<Semaphore>S_CRYP</Semaphore>				  
+				</Mode>
+			</ModeLogicOperator>
+		</Mode>
+	</ModeLogicOperator>
     
     <!-- RefSignal for CRYP -->
     <RefSignal Name="VS_CRYP" Virtual="true"/>

@@ -11,18 +11,20 @@
   */
 /* USER CODE END Header */
 
-[#assign USBPD_TCPM_MODULE_ENABLED = false]
+[#assign USBPDCORE_LIB_NO_PD = false]
 
 [#-- SWIPdatas is a list of SWIPconfigModel --]
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
         [#list SWIP.defines as definition]
-            [#if definition.name == "USBPD_TCPM_MODULE_ENABLED"]
-                [#assign USBPD_TCPM_MODULE_ENABLED = true]
+            [#if definition.name == "USBPD_CoreLib" && definition.value == "USBPDCORE_LIB_NO_PD"]
+                [#assign USBPDCORE_LIB_NO_PD = true]
             [/#if]
         [/#list]
     [/#if]
 [/#list]
+
+
 #ifndef __USBPD_DPM_CORE_H_
 #define __USBPD_DPM_CORE_H_
 
@@ -41,11 +43,7 @@ extern "C" {
 /* USER CODE END typedef */
 
 /* Exported define -----------------------------------------------------------*/
-[#if FREERTOS?? && Secure!="true"]
-[#if USBPD_TCPM_MODULE_ENABLED]
-#define TCPM_ALARMBOX_MESSAGES_MAX      (2U * USBPD_PORT_COUNT)
-[/#if]
-[/#if]
+
 /* USER CODE BEGIN define */
 
 /* USER CODE END define */
@@ -70,7 +68,9 @@ extern USBPD_ParamsTypeDef DPM_Params[USBPD_PORT_COUNT];
 USBPD_StatusTypeDef USBPD_DPM_InitCore(void);
 USBPD_StatusTypeDef USBPD_DPM_InitOS(void);
 void USBPD_DPM_Run(void);
+[#if !USBPDCORE_LIB_NO_PD]
 void                USBPD_DPM_TimerCounter(void);
+[/#if]
 /* USER CODE BEGIN functions */
 
 /* USER CODE END functions */

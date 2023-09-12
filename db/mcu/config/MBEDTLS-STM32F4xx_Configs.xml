@@ -18,16 +18,22 @@
         <ConfigFile Name="CUSTOM_RNG_SOURCE"/>
         <ConfigFile Name="THREADING_ALT_C"/>
         <ConfigFile Name="TIMING_ALT_C"/>
+		<ConfigFile Name="AES_ALT_C"/>
         <ConfigFile Name="THREADING_ALT_H"/>
         <ConfigFile Name="TIMING_ALT_H"/>
+        <ConfigFile Name="AES_ALT_H"/>
         <ConfigFile Name="KEIL_RETARGET_C"/>
+        <ConfigFile Name="CRYP_STM32_C"/>
+        <ConfigFile Name="CRYP_STM32_H"/>
     </RefConfig>
 
     <LibMethod Name="MX_MBEDTLS_Init" Comment="Initialize the mbedTLS stack">
         <Argument Name="MBEDTLS_THREADING_C" GenericType="simple" Context="global"/>
+        <Argument Name="MBEDTLS_SSL_CLI_C" GenericType="simple" Context="global"/>
+        <Argument Name="MBEDTLS_SSL_SRV_C" GenericType="simple" Context="global"/>
     </LibMethod>
 
-    <RefComponent Cclass="Middleware" Cgroup="MBEDTLS" Cversion="2.11.0">
+    <RefComponent Cclass="Middleware" Cgroup="MBEDTLS" Cversion="2.16.2">
         <File Category="header" Name="include/mbedtls/*.h"/>
         <File Category="header" Name="include/*"/>
 <!--        <File Category="source" Name="library/*.c"/> -->
@@ -123,20 +129,36 @@
         <File Category="source" Condition="(SIiTideIiMDKAaARMOoV4 | SIiTideIiMDKAaARMOoV5 | SIiTideIiMDKAaARMOoV6)" Name="App/retarget.c"/>
 	</RefConfigFile>
 
-    <RefConfigFile Description="threading_alt  template" Name="THREADING_ALT_C" Template="threading_alt_template_c.ftl">
+    <RefConfigFile Description="threading_alt template" Name="THREADING_ALT_C" Template="threading_alt_template_c.ftl">
         <File Category="source" Condition="S_MBEDTLS_THREADING_C" Name="App/threading_alt.c"/>
 	</RefConfigFile>
 
-    <RefConfigFile Description="threading_alt  template" Name="THREADING_ALT_H" Template="threading_alt_template_h.ftl">
+    <RefConfigFile Description="threading_alt template" Name="THREADING_ALT_H" Template="threading_alt_template_h.ftl">
         <File Category="header" Condition="S_MBEDTLS_THREADING_C" Name="App/threading_alt.h"/>
 	</RefConfigFile>
 
-    <RefConfigFile Description="timing_alt  template" Name="TIMING_ALT_C" Template="timing_alt_template_c.ftl">
+    <RefConfigFile Description="timing_alt template" Name="TIMING_ALT_C" Template="timing_alt_template_c.ftl">
         <File Category="source" Condition="S_MBEDTLS_TIMING_C" Name="App/timing_alt.c"/>
 	</RefConfigFile>
 
-    <RefConfigFile Description="timing_alt  template" Name="TIMING_ALT_H" Template="timing_alt_template_h.ftl">
+    <RefConfigFile Description="timing_alt template" Name="TIMING_ALT_H" Template="timing_alt_template_h.ftl">
         <File Category="header" Condition="S_MBEDTLS_TIMING_C" Name="App/timing_alt.h"/>
+	</RefConfigFile>
+
+    <RefConfigFile Description="aes_alt template" Name="AES_ALT_C" Template="mbedtls_aes_alt_template_c.ftl">
+        <File Category="source" Condition="S_MBEDTLS_AES_ALT &amp; (S_AES | S_CRYP)" Name="Target/aes_alt.c"/>
+	</RefConfigFile>
+
+    <RefConfigFile Description="aes_alt template" Name="AES_ALT_H" Template="mbedtls_aes_alt_template_h.ftl">
+        <File Category="header" Condition="S_MBEDTLS_AES_ALT &amp; (S_AES | S_CRYP)" Name="Target/aes_alt.h"/>
+	</RefConfigFile>	
+
+    <RefConfigFile Description="cryp_stm32 template" Name="CRYP_STM32_C" Template="mbedtls_cryp_stm32_c.ftl">
+        <File Category="source" Condition="(S_MBEDTLS_AES_ALT | S_MBEDTLS_GCM_ALT | S_MBEDTLS_CCM_ALT) &amp; (S_AES | S_CRYP)" Name="Target/cryp_stm32.c"/>
+	</RefConfigFile>
+
+    <RefConfigFile Description="cryp_stm32 template" Name="CRYP_STM32_H" Template="mbedtls_cryp_stm32_h.ftl">
+        <File Category="header" Condition="(S_MBEDTLS_AES_ALT | S_MBEDTLS_GCM_ALT | S_MBEDTLS_CCM_ALT) &amp; (S_AES | S_CRYP) " Name="Target/cryp_stm32.h"/>
 	</RefConfigFile>
 
     <RefConfigFile Description="mbedtls_hardware_poll() function based on the HAL_RNG API" Name="HARDWARE_RNG_SOURCE" Template="hardware_rng_c.ftl">
@@ -157,7 +179,7 @@
     <!-- Parameters for MBEDTLS - Feature support - System support -->
         <Argument Name="MBEDTLS_HAVE_ASM" GenericType="Simple" Comment="default value: 1(#define)"/>
         <Argument Name="MBEDTLS_NO_UDBL_DIVISION" GenericType="Simple" Comment="default value: 1(#define)"/>
-		<Argument Name="MBEDTLS_NO_64BIT_MULTIPLICATION" GenericType="Simple" Comment="default value: 0(//#define)"/>
+        <Argument Name="MBEDTLS_NO_64BIT_MULTIPLICATION" GenericType="Simple" Comment="default value: 0(//#define)"/>
         <Argument Name="MBEDTLS_HAVE_SSE2" GenericType="Simple" Comment="default value: 0(//#define)"/>
         <Argument Name="MBEDTLS_HAVE_TIME" GenericType="Simple" Comment="default value: 1(#define)"/>
         <Argument Name="MBEDTLS_HAVE_TIME_DATE" GenericType="Simple" Comment="default value: 1(#define)"/>
@@ -425,7 +447,7 @@
         <Argument Name="MBEDTLS_CTR_DRBG_MAX_SEED_INPUT_ENABLE" GenericType="Simple" Comment="default value: 0(//#define)"/>
         <Argument Name="MBEDTLS_CTR_DRBG_MAX_SEED_INPUT" GenericType="Simple" Comment="default value: 384"/>
         <Argument Name="MBEDTLS_CTR_DRBG_USE_128_BIT_KEY_ENABLE" GenericType="Simple" Comment="default value: 0(//#define)"/>
-        <Argument Name="MBEDTLS_CTR_DRBG_USE_128_BIT_KEY" GenericType="Simple" Comment="default value:  "/>
+        <Argument Name="MBEDTLS_CTR_DRBG_USE_128_BIT_KEY" GenericType="Simple" Comment=""/>
     <!-- Parameters for MBEDTLS - Module configuration options - HMAC_DRBG options -->
         <Argument Name="MBEDTLS_HMAC_DRBG_RESEED_INTERVAL_ENABLE" GenericType="Simple" Comment="default value: 0(//#define)"/>
         <Argument Name="MBEDTLS_HMAC_DRBG_RESEED_INTERVAL" GenericType="Simple" Comment="default value: 0"/>

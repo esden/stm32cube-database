@@ -254,7 +254,7 @@
         <PossibleValue Comment="SAI1 Clksource Pclk1"  Value="RCC_SAI1CLKSOURCE_SYSCLK"  Semaphore="SAI1SourcePCLK1"/>
         <PossibleValue Comment="SAI1 Clksource Pll"    Value="RCC_SAI1CLKSOURCE_PLL" Semaphore="SAI1SourcePll"/>
         <PossibleValue Comment="SAI1 Clksource Ext"    Value="RCC_SAI1CLKSOURCE_EXT"    Semaphore="SAI1SourceEXT"/>
-        <PossibleValue Comment="SAI1 Clksource Hse"    Value="RCC_SAI1CLKSOURCE_HSE"    Semaphore="SAI1SourceHSE"/>
+        <PossibleValue Comment="SAI1 Clksource Hse"    Value="RCC_SAI1CLKSOURCE_HSI"    Semaphore="SAI1SourceHSI"/>
     </RefParameter>
     
     
@@ -380,7 +380,13 @@
     <RefParameter Visible="false" Comment="Cortex System Timer"   Name="CortexFreq_Value"     DefaultValue="4000000"  Type="double" Max="170000000" Display="value/1000000" Unit="MHz"/>
 	
 	<!--main sysclock Freq value-->
-	<RefParameter Visible="false" Comment="System Clock"   Name="SYSCLKFreq_VALUE" DefaultValue="4000000" Max="170000000" Type="double" Display="value/1000000" Unit="MHz">
+	<RefParameter Visible="false" Comment="System Clock"   Name="SYSCLKFreq_VALUE" DefaultValue="4000000" Max="26000000" Type="double" Display="value/1000000" Unit="MHz">
+        <Condition Diagnostic="overDrive activated" Expression="((VDD_VALUE&lt; 1.8)|(VDD_VALUE&gt; 2.1)) &amp;scale2"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="System Clock"   Name="SYSCLKFreq_VALUE" DefaultValue="4000000" Max="150000000" Type="double" Display="value/1000000" Unit="MHz">
+        <Condition Diagnostic="overDrive activated" Expression="((VDD_VALUE&lt; 1.8)|(VDD_VALUE&gt; 2.1)) &amp;scale1"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="System Clock"   Name="SYSCLKFreq_VALUE" DefaultValue="4000000" Max="170000000" Type="double" Display="value/1000000" Unit="MHz">
         <Condition Diagnostic="overDrive activated" Expression="(VDD_VALUE&lt; 1.8)|(VDD_VALUE&gt; 2.1)"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="System clock"   Name="SYSCLKFreq_VALUE"  DefaultValue="4000000"   Type="double"  Display="value/1000000" Unit="MHz"/>
@@ -450,34 +456,52 @@
 	<!--PLLs Freq value-->
 
 	<!--PLLQ output-->
+    <RefParameter Visible="false" Comment="PLLQ"     Name="PLLQoutputFreq_Value" Min="8000000" Max="26000000"     DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz">
+        <Condition Expression="scale2 &amp; (((CK48SourcePLLCLK &amp; RNGUsed_ForRCC ) | (I2SSourcePll &amp; (I2S2Used_ForRCC | I2S3Used_ForRCC)) | (SAI1SourcePll &amp; (SAI_SAIBUsed_ForRCC | SAI_SAIAUsed_ForRCC|SAIBUsed_ForRCC|SAIAUsed_ForRCC))))" Diagnostic=" "/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="PLLQ"     Name="PLLQoutputFreq_Value" Min="8000000" Max="150000000"     DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz">
+        <Condition Expression="scale1 &amp; (((CK48SourcePLLCLK &amp; RNGUsed_ForRCC ) | (I2SSourcePll &amp; (I2S2Used_ForRCC | I2S3Used_ForRCC)) | (SAI1SourcePll &amp; (SAI_SAIBUsed_ForRCC | SAI_SAIAUsed_ForRCC|SAIBUsed_ForRCC|SAIAUsed_ForRCC))))" Diagnostic=" "/>
+    </RefParameter>
     <RefParameter Visible="false" Comment="PLLQ"     Name="PLLQoutputFreq_Value" Min="8000000" Max="170000000"     DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz">
         <Condition Expression="((CK48SourcePLLCLK &amp; RNGUsed_ForRCC ) | (I2SSourcePll &amp; (I2S2Used_ForRCC | I2S3Used_ForRCC)) | (SAI1SourcePll &amp; (SAI_SAIBUsed_ForRCC | SAI_SAIAUsed_ForRCC|SAIBUsed_ForRCC|SAIAUsed_ForRCC)))" Diagnostic=" "/>
     </RefParameter>
     <RefParameter Visible="false" Comment="PLLQ"     Name="PLLQoutputFreq_Value"     DefaultValue="4000000"   Type="double" Display="value/1000000" Unit="MHz"/>
 	<!--PLLP output-->
-    <RefParameter Visible="false" Comment="PLLP"     Name="PLLPoutputFreq_Value" Min="2064000" Max="170000000"    DefaultValue="4571429"   Type="double" Display="value/1000000" Unit="MHz">
+    <RefParameter Visible="false" Comment="PLLP"     Name="PLLPoutputFreq_Value" Min="2064500" Max="26000000"    DefaultValue="4571429"   Type="double" Display="value/1000000" Unit="MHz">
+        <Condition Expression=" scale2 &amp; ((USE_ADC1 | USE_ADC2) &amp; ADC12SourcePllp) " Diagnostic=" "/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="PLLP"     Name="PLLPoutputFreq_Value" Min="2064500" Max="150000000"    DefaultValue="4571429"   Type="double" Display="value/1000000" Unit="MHz">
+        <Condition Expression=" scale1 &amp; (((USE_ADC1 | USE_ADC2) &amp; ADC12SourcePllp)) " Diagnostic=" "/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="PLLP"     Name="PLLPoutputFreq_Value" Min="2064500" Max="170000000"    DefaultValue="4571429"   Type="double" Display="value/1000000" Unit="MHz">
         <Condition Expression=" ((USE_ADC1 | USE_ADC2) &amp; ADC12SourcePllp) " Diagnostic=" "/>
     </RefParameter>
     <RefParameter Visible="false" Comment="PLLP"     Name="PLLPoutputFreq_Value"     DefaultValue="4000000"   Type="double" Display="value/1000000" Unit="MHz"/>
 		
    <!--Divisor constraint-->
 	<!--VCOInput output ==> PLLM frequency range -->
-    <RefParameter Visible="false" Comment="VCOInput"     Name="VCOInputFreq_Value" Min="2660000" Max="8000000"     DefaultValue="4000000"   Type="double" Display="value/1000000" Unit="MHz">
+    <RefParameter Visible="false" Comment="VCOInput"     Name="VCOInputFreq_Value" Min="2660000" Max="16000000"     DefaultValue="4000000"   Type="double" Display="value/1000000" Unit="MHz">
 		<Condition Expression="(PLLUsed=1) " Diagnostic=" PLLUsed=1"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="VCOInput"     Name="VCOInputFreq_Value"     DefaultValue="4000000"   Type="double" Display="value/1000000" Unit="MHz"/>
 	
 
-    <RefParameter Visible="false" Comment="VCOOutput"     Name="VCOOutputFreq_Value"  Min="64000000" Max="344000000"    DefaultValue="32000000"   Type="double" Display="value/1000000" Unit="MHz">
+    <RefParameter Visible="false" Comment="VCOOutput"     Name="VCOOutputFreq_Value"  Min="96000000" Max="128000000"    DefaultValue="32000000"   Type="double" Display="value/1000000" Unit="MHz">
+		<Condition Expression="PLLUsed=1 &amp; scale2" Diagnostic="PLLUsed=1 "/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="VCOOutput"     Name="VCOOutputFreq_Value"  Min="96000000" Max="344000000"    DefaultValue="32000000"   Type="double" Display="value/1000000" Unit="MHz">
 		<Condition Expression="PLLUsed=1" Diagnostic="PLLUsed=1 "/>
     </RefParameter>
     <RefParameter Visible="false" Comment="VCOOutput"     Name="VCOOutputFreq_Value"     DefaultValue="4000000"   Type="double" Display="value/1000000" Unit="MHz"/>
 		 
-	 <RefParameter Visible="false" Comment="" Name="VCOOutputFreq_ValueConstraintsText" DefaultValue="&quot;PLL VCO&quot; Frequency must be >= 64MHz and =&lt;344MHz " Type="string" Display="value/1000000" Unit="MHz" >
-		<Condition Diagnostic="" Expression="PLLUsed=1"/>
-      </RefParameter>  
-      <RefParameter Visible="false" Comment="" Name="VCOOutputFreq_ValueConstraintsText" DefaultValue="" Type="string" Display="value/1000000" Unit="MHz"/>
+	 
 	<!--PLLRCLK output ==> PLLCLK -->
+    <RefParameter Visible="false" Comment="PLLCLK"     Name="PLLRCLKFreq_Value"   Min="8000000" Max="26000000"     DefaultValue="16000000"   Type="double" Display="value/1000000" Unit="MHz">
+		<Condition Expression="scale2 &amp; ((PLLUsed=1 &amp; SysSourcePLL) | (MCOSourcePLL &amp; MCOConfig)) " Diagnostic=" "/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="PLLCLK"     Name="PLLRCLKFreq_Value"   Min="8000000" Max="150000000"     DefaultValue="16000000"   Type="double" Display="value/1000000" Unit="MHz">
+		<Condition Expression="scale1 &amp;((PLLUsed=1 &amp; SysSourcePLL) | (MCOSourcePLL &amp; MCOConfig)) " Diagnostic=" "/>
+    </RefParameter>
     <RefParameter Visible="false" Comment="PLLCLK"     Name="PLLRCLKFreq_Value"   Min="8000000" Max="170000000"     DefaultValue="16000000"   Type="double" Display="value/1000000" Unit="MHz">
 		<Condition Expression="(PLLUsed=1 &amp; SysSourcePLL) | (MCOSourcePLL &amp; MCOConfig) " Diagnostic=" "/>
     </RefParameter>
@@ -769,7 +793,7 @@
 	
     <!-- HSE used -->	
     <RefParameter Visible="false" Comment="HSE used flag" DefaultValue="1" Name="HSEUsed" Type="integer" Min="1" Max="1">
-        <Condition Expression="(FDCANSourceHSE &amp; (FDCAN1Used_ForRCC)) | (SAI1SourceHSE &amp; (SAI_SAIBUsed_ForRCC | SAI_SAIAUsed_ForRCC|SAIBUsed_ForRCC|SAIAUsed_ForRCC)) | (SEM2RCC_HSE_REQUIRED_TIM17 &amp; TIM17 &amp;Semaphore_input_Channel1TIM17)|(RTCUsed_ForRCC&amp;!((RTCClockSelection=RCC_RTCCLKSOURCE_LSE)|(RTCClockSelection=RCC_RTCCLKSOURCE_LSI)))|((PLLSourceHSE) &amp; (PLLUsed=1))|(SYSCLKSource=RCC_SYSCLKSOURCE_HSE)|((RCC_MCO1Source=RCC_MCO1SOURCE_HSE)&amp;(((Semaphore_input_Channel1TIM17 &amp; TIM17 &amp; SEM2RCC_MCO_REQUIRED_TIM17)|MCOConfig))) | (I2SSourceHSE &amp;(I2S2Used_ForRCC | I2S3Used_ForRCC))" Diagnostic="SYSCLK source OR PLL source OR RTC source OR MCO1 source OR MCO2 source"/>
+        <Condition Expression="(FDCANSourceHSE &amp; (FDCAN1Used_ForRCC)) | (SEM2RCC_HSE_REQUIRED_TIM17 &amp; TIM17 &amp;Semaphore_input_Channel1TIM17)|(RTCUsed_ForRCC&amp;!((RTCClockSelection=RCC_RTCCLKSOURCE_LSE)|(RTCClockSelection=RCC_RTCCLKSOURCE_LSI)))|((PLLSourceHSE) &amp; (PLLUsed=1))|(SYSCLKSource=RCC_SYSCLKSOURCE_HSE)|((RCC_MCO1Source=RCC_MCO1SOURCE_HSE)&amp;(((Semaphore_input_Channel1TIM17 &amp; TIM17 &amp; SEM2RCC_MCO_REQUIRED_TIM17)|MCOConfig))) | (I2SSourceHSE &amp;(I2S2Used_ForRCC | I2S3Used_ForRCC))" Diagnostic="SYSCLK source OR PLL source OR RTC source OR MCO1 source OR MCO2 source"/>
     </RefParameter>	
     <RefParameter Visible="false" Comment="HSE Is Used" DefaultValue="0" Name="HSEUsed" Min="0" Type="integer"/>
 	
@@ -871,7 +895,7 @@
 	
     <!-- HSI used -->
     <RefParameter Visible="false" Comment="HSI Is Used" DefaultValue="1" Name="HSIUsed" Min="1" Type="integer">
-        <Condition Expression=" (ADC12SourceHsi &amp; (USE_ADC1 | USE_ADC2))|(USART1SourceHSI&amp; USART1Used_ForRCC)|(USART2SourceHSI&amp; USART2Used_ForRCC)|(USART3SourceHSI&amp; USART3Used_ForRCC)|(UART4SourceHSI&amp; UART4Used_ForRCC) | (USART3SourceHSI&amp; USART3Used_ForRCC) | (LPUART1SourceHSI&amp; LPUARTUsed_ForRCC)|(LPTIM1SOURCEHSI&amp; LPTIM1Used_ForRCC)|(I2C1SourceHSI&amp; I2C1Used_ForRCC)|(I2C2SourceHSI&amp; I2C2Used_ForRCC)|(I2C3SourceHSI&amp; I2C3Used_ForRCC) | ((PLLSourceHSI)&amp; (PLLUsed=1))|(SYSCLKSource=RCC_SYSCLKSOURCE_HSI)|((RCC_MCO1Source=RCC_MCO1SOURCE_HSI)&amp;((((Semaphore_input_Channel1TIM17 &amp; TIM17 &amp; SEM2RCC_MCO_REQUIRED_TIM17)|MCOConfig))))" Diagnostic="LSE is used if "/>
+        <Condition Expression=" UCPD_Used| (SAI1SourceHSI &amp; (SAI_SAIBUsed_ForRCC | SAI_SAIAUsed_ForRCC|SAIBUsed_ForRCC|SAIAUsed_ForRCC)) |(ADC12SourceHsi &amp; (USE_ADC1 | USE_ADC2))|(USART1SourceHSI&amp; USART1Used_ForRCC)|(USART2SourceHSI&amp; USART2Used_ForRCC)|(USART3SourceHSI&amp; USART3Used_ForRCC)|(UART4SourceHSI&amp; UART4Used_ForRCC) | (USART3SourceHSI&amp; USART3Used_ForRCC) | (LPUART1SourceHSI&amp; LPUARTUsed_ForRCC)|(LPTIM1SOURCEHSI&amp; LPTIM1Used_ForRCC)|(I2C1SourceHSI&amp; I2C1Used_ForRCC)|(I2C2SourceHSI&amp; I2C2Used_ForRCC)|(I2C3SourceHSI&amp; I2C3Used_ForRCC) | ((PLLSourceHSI)&amp; (PLLUsed=1))|(SYSCLKSource=RCC_SYSCLKSOURCE_HSI)|((RCC_MCO1Source=RCC_MCO1SOURCE_HSI)&amp;((((Semaphore_input_Channel1TIM17 &amp; TIM17 &amp; SEM2RCC_MCO_REQUIRED_TIM17)|MCOConfig))))" Diagnostic="LSE is used if "/>
     </RefParameter>
     <RefParameter Visible="false" Comment="HSI is Used" DefaultValue="0" Name="HSIUsed" Min="0" Type="integer"/>
 	
@@ -1415,56 +1439,51 @@
 
   
     <RefParameter Name="FLatency" Comment="Flash Latency(WS)" Type="uniqueElementList" DefaultValue="FLASH_LATENCY_0" Group="System Parameters">
-        <Condition Diagnostic="" Expression="((scale1 | scale1boost) &amp; ((HCLKFreq_Value &lt; 20000000)|(HCLKFreq_Value= 20000000 )))|(scale2 &amp; ((HCLKFreq_Value &lt; 8000000)|(HCLKFreq_Value= 8000000 )))" />
+        <Condition Diagnostic="" Expression="(scale1 &amp; ((HCLKFreq_Value &lt; 30000000)|(HCLKFreq_Value= 30000000 )))|(scale2 &amp; ((HCLKFreq_Value &lt; 12000000)|(HCLKFreq_Value= 12000000 )))" />
+        <PossibleValue Value="FLASH_LATENCY_0" Comment="0 WS (1 CPU cycle)"/>
+    </RefParameter>
+    <RefParameter Name="FLatency" Comment="Flash Latency(WS)" Type="uniqueElementList" DefaultValue="FLASH_LATENCY_0" Group="System Parameters">
+        <Condition Diagnostic="" Expression="(scale1boost &amp; ((HCLKFreq_Value &lt; 34000000)|(HCLKFreq_Value= 34000000 )))" />
         <PossibleValue Value="FLASH_LATENCY_0" Comment="0 WS (1 CPU cycle)"/>
     </RefParameter>
 	
     <RefParameter Name="FLatency" Comment="Flash Latency(WS)" Type="uniqueElementList" DefaultValue="FLASH_LATENCY_1" Group="System Parameters">
-        <Condition Diagnostic="" Expression="((scale1 | scale1boost) &amp; ((HCLKFreq_Value &lt; 40000000)|(HCLKFreq_Value= 40000000 )))|(scale2 &amp; ((HCLKFreq_Value &lt; 16000000)|(HCLKFreq_Value= 16000000 )))" />
+        <Condition Diagnostic="" Expression="(scale1 &amp; ((HCLKFreq_Value &lt; 60000000)|(HCLKFreq_Value= 60000000 )))|(scale2 &amp; ((HCLKFreq_Value &lt; 24000000)|(HCLKFreq_Value= 24000000 )))" />
         <PossibleValue Value="FLASH_LATENCY_1" Comment="1 WS (2 CPU cycle)"/>
     </RefParameter>
+    <RefParameter Name="FLatency" Comment="Flash Latency(WS)" Type="uniqueElementList" DefaultValue="FLASH_LATENCY_1" Group="System Parameters">
+        <Condition Diagnostic="" Expression="(scale1boost &amp; ((HCLKFreq_Value &lt; 68000000)|(HCLKFreq_Value= 68000000 )))" />
+        <PossibleValue Value="FLASH_LATENCY_1" Comment="1 WS (2 CPU cycle)"/>
+    </RefParameter>
+    
     <RefParameter Name="FLatency" Comment="Flash Latency(WS)" Type="uniqueElementList" DefaultValue="FLASH_LATENCY_2" Group="System Parameters">
-        <Condition Diagnostic="" Expression="((scale1 | scale1boost) &amp; ((HCLKFreq_Value &lt; 60000000)|(HCLKFreq_Value= 60000000 )))|(scale2 &amp; ((HCLKFreq_Value &lt; 26000000)|(HCLKFreq_Value= 26000000 )))" />
+        <Condition Diagnostic="" Expression="(scale1 &amp; ((HCLKFreq_Value &lt; 90000000)|(HCLKFreq_Value= 90000000 )))|(scale2 &amp; ((HCLKFreq_Value &lt; 26000000)|(HCLKFreq_Value= 26000000 )))" />
         <PossibleValue Value="FLASH_LATENCY_2" Comment="2 WS (3 CPU cycle)"/>
     </RefParameter>
+    <RefParameter Name="FLatency" Comment="Flash Latency(WS)" Type="uniqueElementList" DefaultValue="FLASH_LATENCY_2" Group="System Parameters">
+        <Condition Diagnostic="" Expression="(scale1boost &amp; ((HCLKFreq_Value &lt; 102000000)|(HCLKFreq_Value= 102000000 )))" />
+        <PossibleValue Value="FLASH_LATENCY_2" Comment="2 WS (3 CPU cycle)"/>
+    </RefParameter>
+    
     <RefParameter Name="FLatency" Comment="Flash Latency(WS)" Type="uniqueElementList" DefaultValue="FLASH_LATENCY_3" Group="System Parameters">
-        <Condition Diagnostic="" Expression="((scale1 | scale1boost) &amp; ((HCLKFreq_Value &lt; 80000000)|(HCLKFreq_Value= 80000000 )))" />
+        <Condition Diagnostic="" Expression="(scale1 &amp; ((HCLKFreq_Value &lt; 120000000)|(HCLKFreq_Value= 120000000 )))" />
+        <PossibleValue Value="FLASH_LATENCY_3" Comment="3 WS (4 CPU cycle)"/>
+    </RefParameter>
+    <RefParameter Name="FLatency" Comment="Flash Latency(WS)" Type="uniqueElementList" DefaultValue="FLASH_LATENCY_3" Group="System Parameters">
+        <Condition Diagnostic="" Expression="(scale1boost &amp; ((HCLKFreq_Value &lt; 136000000)|(HCLKFreq_Value= 136000000 )))" />
         <PossibleValue Value="FLASH_LATENCY_3" Comment="3 WS (4 CPU cycle)"/>
     </RefParameter>
 	
     <RefParameter Name="FLatency" Comment="Flash Latency(WS)" Type="uniqueElementList" DefaultValue="FLASH_LATENCY_4" Group="System Parameters">
-        <Condition Diagnostic="" Expression="((scale1 | scale1boost) &amp; ((HCLKFreq_Value &lt; 100000000)|(HCLKFreq_Value= 100000000 )))" />
+        <Condition Diagnostic="" Expression="(scale1 &amp; ((HCLKFreq_Value &lt; 150000000)|(HCLKFreq_Value= 150000000 )))" />
         <PossibleValue Value="FLASH_LATENCY_4" Comment="4 WS (5 CPU cycle)"/>
     </RefParameter>
-    <RefParameter Name="FLatency" Comment="Flash Latency(WS)" Type="uniqueElementList" DefaultValue="FLASH_LATENCY_5" Group="System Parameters">
-        <Condition Diagnostic="" Expression="((scale1 | scale1boost) &amp; ((HCLKFreq_Value &lt; 120000000)|(HCLKFreq_Value= 120000000 )))" />
-        <PossibleValue Value="FLASH_LATENCY_5" Comment="5 WS (6 CPU cycle)"/>
+    <RefParameter Name="FLatency" Comment="Flash Latency(WS)" Type="uniqueElementList" DefaultValue="FLASH_LATENCY_4" Group="System Parameters">
+        <Condition Diagnostic="" Expression="(scale1boost &amp; ((HCLKFreq_Value &lt; 170000000)|(HCLKFreq_Value= 170000000 )))" />
+        <PossibleValue Value="FLASH_LATENCY_4" Comment="4 WS (5 CPU cycle)"/>
     </RefParameter>
-    
-    <RefParameter Name="FLatency" Comment="Flash Latency(WS)" Type="uniqueElementList" DefaultValue="FLASH_LATENCY_6" Group="System Parameters">
-        <Condition Diagnostic="" Expression="((scale1 | scale1boost) &amp; ((HCLKFreq_Value &lt; 140000000)|(HCLKFreq_Value= 140000000 )))" />
-        <PossibleValue Value="FLASH_LATENCY_6" Comment="6WS (7 CPU cycle)"/>
-    </RefParameter>
-    <RefParameter Name="FLatency" Comment="Flash Latency(WS)" Type="uniqueElementList" DefaultValue="FLASH_LATENCY_7" Group="System Parameters">
-        <Condition Diagnostic="" Expression="((scale1 | scale1boost) &amp; ((HCLKFreq_Value &lt; 160000000)|(HCLKFreq_Value= 160000000 )))" />
-        <PossibleValue Value="FLASH_LATENCY_7" Comment="7WS (7 CPU cycle)"/>
-    </RefParameter>
-    <RefParameter Name="FLatency" Comment="Flash Latency(WS)" Type="uniqueElementList" DefaultValue="FLASH_LATENCY_8" Group="System Parameters">
-        <Condition Diagnostic="" Expression="((scale1 | scale1boost) &amp; ((HCLKFreq_Value &lt; 170000000)|(HCLKFreq_Value= 170000000 )))" />
-        <PossibleValue Value="FLASH_LATENCY_8" Comment="8WS (7 CPU cycle)"/>
-    </RefParameter>
-
-
     <RefParameter Name="FLatency" Comment="Flash Latency(WS)" Type="uniqueElementList" DefaultValue="FLASH_LATENCY_0" Group="System Parameters">
         <PossibleValue Value="FLASH_LATENCY_0" Comment="0 WS (1 CPU cycle)"/>
-        <PossibleValue Value="FLASH_LATENCY_1" Comment="1 WS (2 CPU cycles)" Semaphore="FLASH_LATENCY1"/>
-        <PossibleValue Value="FLASH_LATENCY_2" Comment="2 WS (3 CPU cycles)" Semaphore="FLASH_LATENCY2"/>
-        <PossibleValue Value="FLASH_LATENCY_3" Comment="3 WS (4 CPU cycles)" Semaphore="FLASH_LATENCY3"/>
-        <PossibleValue Value="FLASH_LATENCY_4" Comment="4 WS (5 CPU cycles)" Semaphore="FLASH_LATENCY4"/>
-        <PossibleValue Value="FLASH_LATENCY_5" Comment="5 WS (6 CPU cycles)" Semaphore="FLASH_LATENCY5"/>
-        <PossibleValue Value="FLASH_LATENCY_6" Comment="6 WS (7 CPU cycles)" Semaphore="FLASH_LATENCY6"/>
-        <PossibleValue Value="FLASH_LATENCY_7" Comment="7 WS (7 CPU cycles)" Semaphore="FLASH_LATENCY7"/>
-        <PossibleValue Value="FLASH_LATENCY_8" Comment="8 WS (7 CPU cycles)" Semaphore="FLASH_LATENCY8"/>
     </RefParameter>
 
     <RefParameter Name="INSTRUCTION_CACHE_ENABLE" Comment="Instruction Cache" Type="list" DefaultValue="1" Group="System Parameters">

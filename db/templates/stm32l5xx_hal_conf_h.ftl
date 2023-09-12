@@ -3,9 +3,7 @@
   ******************************************************************************
   * @file    stm32l5xx_hal_conf.h
   * @author  MCD Application Team
-  * @brief   HAL configuration template file.
-  *          This file should be copied to the application folder and renamed
-  *          to stm32l5xx_hal_conf.h.
+  * @brief   HAL configuration file.
   ******************************************************************************
   * @attention
   *
@@ -62,7 +60,6 @@
 #define HAL_FLASH_MODULE_ENABLED
 #define HAL_PWR_MODULE_ENABLED
 #define HAL_CORTEX_MODULE_ENABLED
-
 #define HAL_ICACHE_MODULE_ENABLED
 
 /* ########################## Oscillator Values adaptation ####################*/

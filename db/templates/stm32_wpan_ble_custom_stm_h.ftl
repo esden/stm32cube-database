@@ -1024,9 +1024,10 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
 
- 
-  
+/* USER CODE END Includes */
+
 /* Exported types ------------------------------------------------------------*/
 typedef enum
 {
@@ -1062,7 +1063,7 @@ typedef enum
 typedef struct
 {
   uint8_t * pPayload;
-  uint8_t     Length;
+  uint8_t   Length;
 } Custom_STM_Data_t;
 
 typedef struct
@@ -1073,18 +1074,33 @@ typedef struct
   uint8_t                       ServiceInstance;
 } Custom_STM_App_Notification_evt_t;
 
+/* USER CODE BEGIN ET */
+
+/* USER CODE END ET */
 
 
 /* Exported constants --------------------------------------------------------*/
+/* USER CODE BEGIN EC */
+
+/* USER CODE END EC */
 
 /* External variables --------------------------------------------------------*/
+/* USER CODE BEGIN EV */
+
+/* USER CODE END EV */
 
 /* Exported macros -----------------------------------------------------------*/
+/* USER CODE BEGIN EM */
+
+/* USER CODE END EM */
 
 /* Exported functions ------------------------------------------------------- */
 void SVCCTL_InitCustomSvc( void );
 void Custom_STM_App_Notification(Custom_STM_App_Notification_evt_t *pNotification);
 tBleStatus Custom_STM_App_Update_Char(Custom_STM_Char_Opcode_t CharOpcode,  uint8_t *pPayload);
+/* USER CODE BEGIN EF */
+
+/* USER CODE END EF */
 
 
 #ifdef __cplusplus
