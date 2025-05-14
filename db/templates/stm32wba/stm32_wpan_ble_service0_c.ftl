@@ -1,15 +1,4 @@
 [#ftl]
-/* USER CODE BEGIN Header */
-/**
-  ******************************************************************************
-  * @file    ${name?remove_beginning("App/%")?remove_ending("%.c")}.c
-  * @author  MCD Application Team
-  * @brief   ${name?remove_beginning("App/%")?remove_ending("%.c")} definition.
-  ******************************************************************************
-[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
-  ******************************************************************************
-  */
-/* USER CODE END Header */
 [#assign SvcNbr = "0"]
 [#assign myHash = {}]
 [#list SWIPdatas as SWIP]
@@ -28,6 +17,17 @@ Key & Value:
 Key: ${key}; Value: ${myHash[key]}
 [/#list]
 --]
+/* USER CODE BEGIN Header */
+/**
+  ******************************************************************************
+  * @file    ${myHash["SERVICE"+SvcNbr+"_SHORT_NAME"]}.c
+  * @author  MCD Application Team
+  * @brief   ${myHash["SERVICE"+SvcNbr+"_SHORT_NAME"]} definition.
+  ******************************************************************************
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
+  ******************************************************************************
+  */
+/* USER CODE END Header */
 [#assign SERVICE_SHORT_NAME = ""]
 [#assign SERVICE_SHORT_NAME_UpperCase = ""]
 [#assign SERVICE_CHAR_PROP_NONE = ""]
@@ -208,6 +208,7 @@ SERVICE_NUMBER_OF_CHARACTERISTICS: ${SERVICE_NUMBER_OF_CHARACTERISTICS}
 [/#macro]
 
 /* Includes ------------------------------------------------------------------*/
+#include "log_module.h"
 #include "common_blesvc.h"
 [#if SERVICE_SHORT_NAME != ""]
 #include "${SERVICE_SHORT_NAME?lower_case}.h"
@@ -936,7 +937,7 @@ void ${SERVICE_SHORT_NAME_UpperCase}_Init(void)
 /**
  * @brief  Characteristic update
  * @param  CharOpcode: Characteristic identifier
- * @param  Service_Instance: Instance of the service to which the characteristic belongs
+ * @param  pData: Structure holding data to update
  *
  */
 tBleStatus ${SERVICE_SHORT_NAME_UpperCase}_UpdateValue(${SERVICE_SHORT_NAME_UpperCase}_CharOpcode_t CharOpcode, ${SERVICE_SHORT_NAME_UpperCase}_Data_t *pData)
@@ -982,3 +983,59 @@ tBleStatus ${SERVICE_SHORT_NAME_UpperCase}_UpdateValue(${SERVICE_SHORT_NAME_Uppe
 
   return ret;
 }
+[#if (myHash["BLE_OPTIONS_ENHANCED_ATT"] == "BLE_OPTIONS_ENHANCED_ATT")]
+/**
+ * @brief  Characteristic update per connection handle to notify
+ * @param  CharOpcode: Characteristic identifier
+ * @param  pData: Structure holding data to update
+ * @param  EATT_Channel: Channel for EATT 
+ *
+ */
+tBleStatus ${SERVICE_SHORT_NAME_UpperCase}_UpdateValue_Ext(${SERVICE_SHORT_NAME_UpperCase}_CharOpcode_t CharOpcode, ${SERVICE_SHORT_NAME_UpperCase}_Data_t *pData, uint16_t EATT_Channel)
+{
+  tBleStatus ret = BLE_STATUS_INVALID_PARAMS;
+  uint8_t update_type = 0x01;
+  /* USER CODE BEGIN Service${SvcNbr}_App_Update_Char_Ext_1 */
+
+  /* USER CODE END Service${SvcNbr}_App_Update_Char_Ext_1 */
+
+  switch(CharOpcode)
+  {
+      [#if SERVICE_NUMBER_OF_CHARACTERISTICS != "0"]
+        [#list 1..SERVICE_NUMBER_OF_CHARACTERISTICS?number as characteristic]
+    case [@customServChar characteristic/]:
+      ret = aci_gatt_update_char_value_ext(EATT_Channel,
+										${SERVICE_SHORT_NAME_UpperCase}_Context.${SERVICE_SHORT_NAME?capitalize}SvcHdle,
+										${SERVICE_SHORT_NAME_UpperCase}_Context.[@characteristicShortNameCapitalized characteristic/]CharHdle,
+										update_type, 
+										pData->Length, /* charValueLen */
+										${SERVICES_CHARS_VALUE_OFFSET[characteristic?string]}, /* charValOffset */
+										pData->Length, /* charValueLen */
+										(uint8_t *)pData->p_Payload);
+      if (ret != BLE_STATUS_SUCCESS)
+      {
+        LOG_DEBUG_APP("  Fail   : aci_gatt_update_char_value_ext [@characteristicShortName characteristic/] command, error code: 0x%2X\n", ret);
+      }
+      else
+      {
+        LOG_DEBUG_APP("  Success: aci_gatt_update_char_value_ext [@characteristicShortName characteristic/] command\n");
+      }
+      /* USER CODE BEGIN Service${SvcNbr}_Char_Value_Ext${characteristic?string}*/
+
+      /* USER CODE END Service${SvcNbr}_Char_Value_Ext${characteristic?string}*/
+      break;
+
+        [/#list]
+      [/#if]
+
+    default:
+      break;
+  }
+
+  /* USER CODE BEGIN Service${SvcNbr}_App_Update_Char_Ext_2 */
+
+  /* USER CODE END Service${SvcNbr}_App_Update_Char_Ext_2 */
+
+  return ret;
+}
+[/#if]

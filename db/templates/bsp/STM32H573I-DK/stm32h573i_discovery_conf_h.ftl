@@ -83,14 +83,13 @@ extern "C" {
 #define BSP_SD_TX_IT_PRIORITY             15U
 #define BSP_TS_IT_PRIORITY                15U
 
-/* User button EXTI handle */
-#define H_EXTI_13                         hpb_exti[BUTTON_USER]
 
 /* I2C4 Frequencies in Hz  */
 #define BUS_I2C4_FREQUENCY                100000UL /* Frequency of I2C4 = 100 KHz*/
 
 /* Usage of USBPD PWR TRACE system */
 #define USE_BSP_USBPD_PWR_TRACE           0U /* USBPD BSP trace system is disabled */
+
 
 /**
   * @}

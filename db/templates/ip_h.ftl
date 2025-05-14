@@ -26,12 +26,14 @@ extern "C" {
 #include "${main_h}"
 [/#if]
 
-[#if H7_ETH_NoLWIP?? && !HALCompliant??]
+[#if (H7_ETH_NoLWIP?? || MP13_ETH_NoLWIP?? || MP2_ETH_NoLWIP??) && !HALCompliant??]
 #include "string.h"
 [/#if]
 
 [#if RESMGR_UTILITY??]
+[#if  FamilyName=="STM32H7" ||  FamilyName=="STM32MP1"]
 #include "res_mgr_conf.h"
+[/#if]
 #include "res_mgr.h"
 [/#if]
 [/#compress]

@@ -216,6 +216,7 @@ extern "C" {
 [/#if]
 
 /* defined used to configure function : USBPD_HW_Init_DMARxInstance,USBPD_HW_DeInit_DMARxInstance */
+
 #define UCPDDMA_INSTANCE0_CLOCKENABLE_RX  ${USBPDenableClock}
 [#if USBPD1Used]
 #define UCPDDMA_INSTANCE1_CLOCKENABLE_RX  ${USBPDenableClock}

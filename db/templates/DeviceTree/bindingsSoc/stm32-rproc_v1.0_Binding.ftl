@@ -11,7 +11,6 @@
 [#local TABres = dts_get_tabs(pDtLevel+1)]
 [#local TABsubnode = TABres.TABN]
 [#local TABsubprop = TABres.TABP]
-
 [/#compress]
 ${TABnode}&m4_rproc{
 [#t]

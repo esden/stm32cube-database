@@ -49,6 +49,16 @@
 /*  06-02-2021     Bhupendra Naphade        Modified comment(s), and      */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.7  */
+[#if FamilyName?lower_case?starts_with("stm32c0")]
+/*  03-08-2023     Xiuwen Cai               Modified comment(s), and      */
+/*                                            added new NAND options,     */
+/*                                            resulting in version 6.2.1  */
+/*  10-31-2023     Xiuwen Cai               Modified comment(s),          */
+/*                                            added options for mapping , */
+/*                                            bitmap cache and obsolete   */
+/*                                            count cache,                */
+/*                                            resulting in version 6.3.0  */
+[/#if]
 /*                                                                        */
 /**************************************************************************/
 
@@ -92,14 +102,6 @@
       [#assign LX_FREE_SECTOR_DATA_VERIFY_value = value]
     [/#if]
 
-    [#if name == "LX_NAND_SECTOR_MAPPING_CACHE_SIZE"]
-      [#assign LX_NAND_SECTOR_MAPPING_CACHE_SIZE_value = value]
-    [/#if]
-
-    [#if name == "LX_NAND_FLASH_DIRECT_MAPPING_CACHE"]
-      [#assign LX_NAND_FLASH_DIRECT_MAPPING_CACHE_value = value]
-    [/#if]
-
     [#if name == "LX_NOR_DISABLE_EXTENDED_CACHE"]
       [#assign LX_NOR_DISABLE_EXTENDED_CACHE_value = value]
     [/#if]    
@@ -122,6 +124,22 @@
 	
     [#if name == "LX_STANDALONE_ENABLE"]
       [#assign LX_STANDALONE_ENABLE_value = value]
+    [/#if]
+
+	[#if name == "LX_NOR_ENABLE_MAPPING_BITMAP"]
+      [#assign LX_NOR_ENABLE_MAPPING_BITMAP_value = value]
+    [/#if]
+
+	[#if name == "LX_NOR_ENABLE_OBSOLETE_COUNT_CACHE"]
+      [#assign LX_NOR_ENABLE_OBSOLETE_COUNT_CACHE_value = value]
+    [/#if]
+
+	[#if name == "LX_NOR_OBSOLETE_COUNT_CACHE_TYPE"]
+      [#assign LX_NOR_OBSOLETE_COUNT_CACHE_TYPE_value = value]
+    [/#if]
+
+	[#if name == "LX_NOR_SECTOR_SIZE"]
+      [#assign LX_NOR_SECTOR_SIZE_value = value]
     [/#if]
 
     [/#list]
@@ -177,20 +195,6 @@
 [/#if]
 [/#if]
 
-[#if LX_NAND_ENABLED_Value == "true"]
-[#if LX_NAND_SECTOR_MAPPING_CACHE_SIZE_value == "128"]
-/* #define LX_NAND_SECTOR_MAPPING_CACHE_SIZE         128 */
-[#else]
-#define LX_NAND_SECTOR_MAPPING_CACHE_SIZE         ${LX_NAND_SECTOR_MAPPING_CACHE_SIZE_value}
-[/#if]
-
-[#if LX_NAND_FLASH_DIRECT_MAPPING_CACHE_value == "1"]
-#define LX_NAND_FLASH_DIRECT_MAPPING_CACHE
-[#else]
-/* #define LX_NAND_FLASH_DIRECT_MAPPING_CACHE */
-[/#if]
-[/#if]
-
 /* Configure the LevelX in Standalone mode. */
 
 
@@ -207,6 +211,58 @@
 #define LX_THREAD_SAFE_ENABLE
 [#else]
 /* #define LX_THREAD_SAFE_ENABLE */
+[/#if]
+
+[#if FamilyName?lower_case?starts_with("stm32c0")]
+/* Determine if logical sector mapping bitmap should be enabled in extended cache.
+   Cache memory will be allocated to sector mapping bitmap first. One bit can be allocated for each physical sector.
+*/
+
+[#if LX_NOR_ENABLE_MAPPING_BITMAP_value == "1"]
+#define LX_NOR_ENABLE_MAPPING_BITMAP
+[#else]
+/* #define LX_NOR_ENABLE_MAPPING_BITMAP */
+[/#if]
+
+/* Determine if obsolete count cache should be enabled in extended cache.
+   Cache memory will be allocated to obsolete count cache after the mapping bitmap if enabled,
+   and the rest of the cache memory is allocated to sector cache.
+*/
+
+[#if LX_NOR_ENABLE_OBSOLETE_COUNT_CACHE_value == "1"]
+#define LX_NOR_ENABLE_OBSOLETE_COUNT_CACHE
+[#else]
+/* #define LX_NOR_ENABLE_OBSOLETE_COUNT_CACHE */
+[/#if]
+
+/* Defines obsolete count cache element size. If number of sectors per block is greater than 256, use USHORT instead of UCHAR. */
+
+[#if LX_NOR_OBSOLETE_COUNT_CACHE_TYPE_value == "UCHAR"]
+/* #define LX_NOR_OBSOLETE_COUNT_CACHE_TYPE            UCHAR */
+[#else]
+#define LX_NOR_OBSOLETE_COUNT_CACHE_TYPE            USHORT
+[/#if]
+
+
+/* Define the logical sector size for NOR flash. The sector size is in units of 32-bit words.
+   This sector size should match the sector size used in file system.  */
+
+[#if LX_NOR_SECTOR_SIZE_value == "512"]
+/* #define LX_NOR_SECTOR_SIZE         (512/sizeof(ULONG)) */
+[#else]
+#define LX_NOR_SECTOR_SIZE         (${LX_NOR_SECTOR_SIZE_value}/sizeof(ULONG))
+
+[/#if]
+[/#if]
+[#if FamilyName?lower_case == "stm32c0"]
+/* By default this value is 4, which represents a maximum of 4 blocks that 
+   can be allocated for metadata.
+*/
+[#if LX_NAND_FLASH_MAX_METADATA_BLOCKS_value == "4"]
+/* #define LX_NAND_FLASH_MAX_METADATA_BLOCKS         4 */
+[#else]
+#define LX_NAND_FLASH_MAX_METADATA_BLOCKS         ${LX_NAND_FLASH_MAX_METADATA_BLOCKS_value}
+[/#if]
 [/#if]
 
 /* USER CODE BEGIN 2 */

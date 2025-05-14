@@ -22,7 +22,7 @@
 [#assign ipvar = IP]
 /* Includes ------------------------------------------------------------------*/
 #include "${name?lower_case}.h"
-[#if name=="ETH" && (F4_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || H5_ETH_NoLWIP?? || MP13_ETH_NoLWIP?? || H7RS_ETH_NoLWIP??)]
+[#if name=="ETH" && (F4_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || H5_ETH_NoLWIP?? || MP13_ETH_NoLWIP?? || H7RS_ETH_NoLWIP?? || MP2_ETH_NoLWIP??)]
 #include "string.h"
 [/#if]
 
@@ -31,6 +31,7 @@
 [#assign useDma = false]
 [#assign useMdma = false]
 [#assign useNvic = false]
+[#global Pin = ""]
 
 [#-- Tracker 276386 -- GetHandle Start --]
 [#compress]
@@ -110,7 +111,7 @@
 [@common.optincludeFile path=coreDir+"Inc" name="gfxmmu_lut.h"/]
 [/#if]
 [#-- WorkAround for Ticket 30863 --]
-[#if name=="ETH" && (H7_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || H5_ETH_NoLWIP?? || MP13_ETH_NoLWIP?? || H7RS_ETH_NoLWIP??)]
+[#if name=="ETH" && (H7_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || H5_ETH_NoLWIP?? || MP13_ETH_NoLWIP?? || H7RS_ETH_NoLWIP?? || MP2_ETH_NoLWIP??)]
 [#if !H5_ETH_NoLWIP??]
 #if defined ( __ICCARM__ ) /*!< IAR Compiler */
 
@@ -139,7 +140,7 @@ ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT] __attribute__((section(".TxDecr
 #endif
 [/#if]
 ETH_BufferTypeDef Txbuffer[ETH_TX_DESC_CNT * 2U];
-[#if FamilyName=="STM32H5" || FamilyName=="STM32MP13" || FamilyName=="STM32H7RS"]
+[#if FamilyName=="STM32H5" || FamilyName=="STM32MP13" || FamilyName=="STM32H7RS" || FamilyName=="STM32MP2"]
 ETH_TxPacketConfigTypeDef TxConfig;
 [#else]
 ETH_TxPacketConfig TxConfig;
@@ -594,6 +595,9 @@ ETH_TxPacketConfig TxConfig;
                                             [#if argIndex??]
                                                 [#assign argValue=fargument.value?replace("$Index",argIndex)]
                                                 [#assign arg = "" + adr + argValue]
+                                                [#if  argValue?matches("GPIO[A-Z]")]
+                                                [#assign RESMGR_ID=argValue]
+                                                [/#if]
                                             [#else]
                                                 [#assign arg = "" + adr + fargument.value]
                                             [/#if]
@@ -940,6 +944,19 @@ ETH_TxPacketConfig TxConfig;
     [/#if]
 [#-- if I2C clk_enable should be after GPIO Init Begin --]
     [#if serviceType=="Init" && (ipName?contains("I2C")||ipName?contains("USB"))]
+    [#if ipName?contains("USB") && DIE=="DIE455"]
+	#t#t/* Enable VDDUSB */
+	#t#tif(__HAL_RCC_PWR_IS_CLK_DISABLED())
+	#t#t{
+	#t#t__HAL_RCC_PWR_CLK_ENABLE();
+	#t#tHAL_PWREx_EnableVddUSB();
+	#t#t__HAL_RCC_PWR_CLK_DISABLE();
+	#t#t}
+	#t#telse
+	#t#t{
+	#t#tHAL_PWREx_EnableVddUSB();
+	#t#t}
+	[/#if]
            [#if initService.clock??]
             [#if initService.clock!="none"]
                #t#t/* ${ipName} clock enable */
@@ -1574,7 +1591,10 @@ static uint32_t ${entry.value}=0;
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 0 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 0 */
-
+    [#if RESMGR_UTILITY?? && FamilyName=="STM32MP2"]
+     [@common.optinclude name=contextFolder+mxTmpFolder+"/resmgrutilityrequest_"+ words[0]+".tmp"/][#-- ADD RESMGR_UTILITY Code--]
+     [@common.optinclude name=contextFolder+mxTmpFolder+"/resmgrutilityrelease_"+ words[0]+".tmp"/][#-- ADD RESMGR_UTILITY Code--]
+    [/#if]
 [#list IP.configModelList as instanceData]
 [#if instanceData.initServices??]
     [#if instanceData.initServices.pclockConfig??]

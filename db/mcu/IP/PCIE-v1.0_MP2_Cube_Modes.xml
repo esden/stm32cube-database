@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V4.0" IPType="peripheral" IpGroup="Connectivity" Name="PCIE" Version="v1_0_MP2_Cube" 
+    xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+     ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
+     xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+  <About>PCIE: Software error robustness collector </About>
+
+    <!-- Generic RefParameters for PCIE --> 
+    <RefParameter Name="Instance" DefaultValue="PCIE" Comment="Instance" Type="" Visible="false"/>
+
+    <RefMode Name="PCIE_Activate" HalMode ="PCIE">
+        <ConfigForMode>PCIE_Init</ConfigForMode>
+    </RefMode>
+
+	<ModeLogicOperator Name="OR">
+		<Mode Name="PCIE_State" UserName="Root_Complex">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="Root_Complex_External" UserName="Root Complex External 100MHZ">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="CLKINN" />
+						<Signal Name="CLKINP" />
+						<Signal Name="$SingleInstanceCOMBOPHY_REXT" />
+						<Signal Name="$SingleInstanceCOMBOPHY_RX1N" />
+						<Signal Name="$SingleInstanceCOMBOPHY_RX1P" />
+						<Signal Name="$SingleInstanceCOMBOPHY_TX1N" />
+						<Signal Name="$SingleInstanceCOMBOPHY_TX1P" />
+					</SignalLogicalOp>
+				</Mode>
+				<Mode Name="Root_Complex_Internal" UserName="Root Complex Internal 100MHZ">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="CLKOUTN" />
+						<Signal Name="CLKOUTP" />
+						<Signal Name="$SingleInstanceCOMBOPHY_REXT" />
+						<Signal Name="$SingleInstanceCOMBOPHY_RX1N" />
+						<Signal Name="$SingleInstanceCOMBOPHY_RX1P" />
+						<Signal Name="$SingleInstanceCOMBOPHY_TX1N" />
+						<Signal Name="$SingleInstanceCOMBOPHY_TX1P" />
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+			<Semaphore>Root_Complex</Semaphore>
+			<Condition Expression="!EndPoint" Diagnostic="EndPoint Internal is activated" />
+		</Mode>
+
+		<Mode Name="EndPoint_External" UserName="EndPoint_External" >
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="Enable" UserName="Enable">
+				<SignalLogicalOp Name="AND">
+					<Signal Name="CLKOUTN" />
+					<Signal Name="CLKOUTP" />
+					<Signal Name="$SingleInstanceCOMBOPHY_REXT" />
+					<Signal Name="$SingleInstanceCOMBOPHY_RX1N" />
+					<Signal Name="$SingleInstanceCOMBOPHY_RX1P" />
+					<Signal Name="$SingleInstanceCOMBOPHY_TX1N" />
+					<Signal Name="$SingleInstanceCOMBOPHY_TX1P" />
+				</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+			<Semaphore>EndPoint</Semaphore>
+			<Condition Expression="!Root_Complex" Diagnostic="Root_Complex is activated" />
+		</Mode>
+		<Mode Name="CLKREQN" UserName="L1.1" >
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="Enable" UserName="Enable">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="CLKREQN"/>
+					</SignalLogicalOp>
+				</Mode>
+			</ModeLogicOperator>
+			<Condition Expression="$IpInstance_LINUX" Diagnostic="CLKREQN is required in the A35NS OS context" />
+		</Mode>
+	</ModeLogicOperator>
+    <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+	<Semaphore>SEMPCIeActivatedJjPCIeCore</Semaphore>
+	<Condition Expression="!SEMUSB3DRCcActivatedJjSuperSpeedCore" Diagnostic="USB3DR is activated" />
+
+    <!-- RefSignal for PCIE -->
+    <RefSignal IOMode="Analog" Name="CLKINN" />
+    <RefSignal IOMode="Analog" Name="CLKINP" />
+    <RefSignal IOMode="Analog" Name="CLKOUTN" />
+    <RefSignal IOMode="Analog" Name="CLKOUTP" />
+    <RefSignal IOMode="AlternateFunctionPushPullUp" Name="CLKREQN" />
+    
+	<!-- RefSignal for COMBOPHY -->
+	<RefSignal IOMode="Analog" Name="$SingleInstanceCOMBOPHY_REXT" />
+	<RefSignal IOMode="Analog" Name="$SingleInstanceCOMBOPHY_RX1N" />
+	<RefSignal IOMode="Analog" Name="$SingleInstanceCOMBOPHY_RX1P" />
+	<RefSignal IOMode="Analog" Name="$SingleInstanceCOMBOPHY_TX1N" />
+	<RefSignal IOMode="Analog" Name="$SingleInstanceCOMBOPHY_TX1P" />
+</IP>

@@ -1,15 +1,4 @@
 [#ftl]
-/* USER CODE BEGIN Header */
-/**
-  ******************************************************************************
-  * @file    ${name?remove_beginning("App/%")?replace("%_app.h", "_app.h")}
-  * @author  MCD Application Team
-  * @brief   Header for ${name?remove_beginning("App/%")?replace("%_app.h", "_app.c")}
-  ******************************************************************************
-[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
-  ******************************************************************************
-  */
-/* USER CODE END Header */
 [#assign SvcNbr = "0"]
 [#assign myHash = {}]
 [#list SWIPdatas as SWIP]
@@ -28,6 +17,17 @@ Key & Value:
 Key: ${key}; Value: ${myHash[key]}
 [/#list]
 --]
+/* USER CODE BEGIN Header */
+/**
+  ******************************************************************************
+  * @file    ${myHash["SERVICE"+SvcNbr+"_SHORT_NAME"]}_app.h
+  * @author  MCD Application Team
+  * @brief   Header for ${myHash["SERVICE"+SvcNbr+"_SHORT_NAME"]}_app.c
+  ******************************************************************************
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
+  ******************************************************************************
+  */
+/* USER CODE END Header */
 
 [#assign SERVICE_SHORT_NAME_UpperCase = myHash["SERVICE"+SvcNbr+"_SHORT_NAME"]?upper_case]
 

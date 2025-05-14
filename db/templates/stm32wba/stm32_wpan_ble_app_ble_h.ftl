@@ -184,6 +184,50 @@ typedef enum
 }ProcGapPeripheralId_t;
 [/#if]
 
+[#if ((myHash["BLE_OPTIONS_ENHANCED_ATT"] == "BLE_OPTIONS_ENHANCED_ATT") && (myHash["BLE_MODE_PERIPHERAL"] == "Enabled"))]
+typedef struct
+{
+  uint16_t Conn_Handle;
+  uint16_t Max_Transmission_Unit;
+  uint16_t Max_Payload_Size;
+  uint16_t Initial_Credits;
+  uint16_t SPSM;
+  uint8_t Channel_Number;
+  uint8_t Channel_Index_List;
+  uint16_t EATT_Bearer_connHdl[6];
+  /* USER CODE BEGIN BleCoCEATTContext_t */
+
+  /* USER CODE END BleCoCEATTContext_t */
+}BleCoCEATTContext_t;
+
+[/#if]
+[#if ((myHash["BLE_OPTIONS_ENHANCED_ATT"] == "BLE_OPTIONS_ENHANCED_ATT") && (myHash["BLE_MODE_CENTRAL"] == "Enabled"))]
+typedef enum
+{
+  BLE_CONN_HANDLE_EVT,
+  BLE_DISCON_HANDLE_EVT,
+  BLE_CONN_UPDATE_EVT,
+  BLE_PAIRING_COMPLETE_EVT,
+  EXCHANGE_ATT_MTU,
+  BLE_SEND_DATA,
+} CoC_EATT_APP_Opcode_Notification_evt_t;
+
+typedef struct
+{
+  uint8_t *pPayload;
+  uint32_t pPayload_n_1;
+  uint32_t pPayload_n;
+} CoC_Payload_t;
+
+typedef struct
+{
+  CoC_EATT_APP_Opcode_Notification_evt_t     CoC_EATT_Evt_Opcode;
+  CoC_Payload_t                         DataTransfered;
+  uint16_t                              ConnectionHandle;
+  uint8_t                               DataLength;
+} COC_EATT_APP_ConnHandle_Not_evt_t;
+[/#if]
+
 [#if ((myHash["BLE_MODE_PERIPHERAL"] == "Enabled") || (myHash["BLE_MODE_CENTRAL"] == "Enabled"))]
 typedef enum
 {
@@ -276,18 +320,12 @@ typedef __PACKED_STRUCT
 /* External variables --------------------------------------------------------*/
 
 [#if myHash["THREADX_STATUS"]?number == 1 ]
-/* BLE_HOST_TASK related resources */
-extern TX_SEMAPHORE BLE_HOST_Thread_Sem;
-
-/* PROC_GAP_COMPLETE related resources */
-extern TX_SEMAPHORE PROC_GAP_COMPLETE_Sem;
+extern TX_SEMAPHORE       BleHostSemaphore;
+extern TX_SEMAPHORE       GapProcCompleteSemaphore;
 
 [#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
-/* BLE_STACK_TASK related resources */
-extern osSemaphoreId_t         BleStackSemaphore;
-
-/* HCI_ASYNC_EVT_TASK related resources */
-extern osSemaphoreId_t         HCIasyncEvtSemaphore;
+extern osSemaphoreId_t    BleHostSemaphore;
+extern osSemaphoreId_t    GapProcCompleteSemaphore;
 
 [/#if]
 /* USER CODE BEGIN EV */
@@ -301,6 +339,12 @@ extern osSemaphoreId_t         HCIasyncEvtSemaphore;
 #define CONN_INT_MS(x) ((uint16_t)((x)/1.25f))
 #define CONN_SUP_TIMEOUT_MS(x) ((uint16_t)((x)/10.0f))
 #define CONN_CE_LENGTH_MS(x) ((uint16_t)((x)/0.625f))
+
+#define HCI_LE_ADVERTISING_REPORT_RSSI(p) \
+        (*(int8_t*)((&((hci_le_advertising_report_event_rp0*)(p))-> \
+                      Advertising_Report[0].Length_Data) + 1 + \
+                    ((hci_le_advertising_report_event_rp0*)(p))-> \
+                    Advertising_Report[0].Length_Data))
 [/#if]
 /* USER CODE BEGIN EM */
 
@@ -325,6 +369,12 @@ void APP_BLE_Procedure_Gap_Central(ProcGapCentralId_t ProcGapCentralId);
 [/#if]
 [#if (myHash["BLE_OPTIONS_LL_ONLY"] == "BLE_OPTIONS_LL_ONLY")]
 const uint8_t* BleGetBdAddress(void);
+[/#if]
+[#if ((myHash["BLE_OPTIONS_ENHANCED_ATT"] == "BLE_OPTIONS_ENHANCED_ATT") && (myHash["BLE_MODE_CENTRAL"] == "Enabled"))]
+void COC_EATT_CENTRAL_APP_Notification(COC_EATT_APP_ConnHandle_Not_evt_t *pNotification);
+[/#if]
+[#if ((myHash["BLE_OPTIONS_ENHANCED_ATT"] == "BLE_OPTIONS_ENHANCED_ATT") && (myHash["BLE_MODE_PERIPHERAL"] == "Enabled"))]
+extern BleCoCEATTContext_t BleCoCEATTContext;
 [/#if]
 /* USER CODE BEGIN EFP */
 

@@ -1326,11 +1326,11 @@
 		</Description>
     </RefParameter>
 
-    <RefParameter Name="CFG_BLE_MAX_ATT_MTU" Comment="CFG_BLE_MAX_ATT_MTU" DefaultValue="156" Min="23" Max="300" Type="Integer" TabName="Configuration" Group="Application parameters">
+    <RefParameter Name="CFG_BLE_MAX_ATT_MTU" Comment="CFG_BLE_MAX_ATT_MTU" DefaultValue="156" Min="23" Max="512" Type="Integer" TabName="Configuration" Group="Application parameters">
         <Condition Diagnostic="" Expression="S_BLE_HOST"/>
         <Description>Maximum supported ATT_MTU size</Description>
     </RefParameter>
-    <RefParameter Name="CFG_BLE_MAX_ATT_MTU" Comment="CFG_BLE_MAX_ATT_MTU" DefaultValue="156" Min="23" Max="300" Type="Integer" TabName="Configuration" Group="Application parameters" Visible="false">
+    <RefParameter Name="CFG_BLE_MAX_ATT_MTU" Comment="CFG_BLE_MAX_ATT_MTU" DefaultValue="156" Min="23" Max="512" Type="Integer" TabName="Configuration" Group="Application parameters" Visible="false">
         <Description>Maximum supported ATT_MTU size</Description>
     </RefParameter>
         <RefParameter Name="CFG_BLE_ATT_VALUE_ARRAY_SIZE" Comment="CFG_BLE_ATT_VALUE_ARRAY_SIZE" DefaultValue="1290" Min="0" Max="65535" Type="Integer" TabName="Configuration" Group="Application parameters">
@@ -2950,6 +2950,7 @@
         &lt;br&gt; - Static, Random Address is fixed for lifetime of the device
         &lt;br&gt; - Dynamic, Random Address is generated with the RNG at each bootup.</Description>
         <Condition Diagnostic="" Expression="S_RNG &amp; Semaphore_GAP_STATIC_RANDOM_ADDR &amp; Semaphore_CUSTOM_TEMPLATE"/>
+        <PossibleValue Value="2" Comment="Static unique" Semaphore="Semaphore_STATIC_UNIQUE_RANDOM_ADDR"/>
         <PossibleValue Value="1" Comment="Static" Semaphore="Semaphore_STATIC_RANDOM_ADDR"/>
         <PossibleValue Value="0" Comment="Dynamic"/>
     </RefParameter>
@@ -2958,6 +2959,7 @@
         &lt;br&gt; - Static, Random Address is fixed for lifetime of the device
         &lt;br&gt; - Dynamic, Random Address is generated with the RNG at each bootup.</Description>
         <Condition Diagnostic="" Expression="S_RNG &amp; Semaphore_GAP_STATIC_RANDOM_ADDR"/>
+        <PossibleValue Value="2" Comment="Static unique" Semaphore="Semaphore_STATIC_UNIQUE_RANDOM_ADDR"/>
         <PossibleValue Value="1" Comment="Static" Semaphore="Semaphore_STATIC_RANDOM_ADDR"/>
         <PossibleValue Value="0" Comment="Dynamic"/>
     </RefParameter>
@@ -2996,6 +2998,22 @@
     </RefParameter>
     <RefParameter Name="STATIC_RANDOM_ADDRESS" Comment="STATIC_RANDOM_ADDRESS" DefaultValue="0x000000000000" Type="hex" Min="0x000000000000" Max="0xFFFFFFFFFFFF" TabName="Configuration" Group="Application parameters" Visible="false">
         <Description>ex: 0xf257acd87a6c</Description>
+    </RefParameter>
+
+    <RefParameter Name="CFG_STATIC_UNIQUE_RANDOM_ADDR_LSB" Comment="CFG_STATIC_UNIQUE_RANDOM_ADDR_LSB" DefaultValue="0x0000" Type="hex" Min="0x0000" Max="0xFFFF" TabName="BLE Advertising" Group="Advertising configuration">
+        <Condition Diagnostic="" Expression="Semaphore_STATIC_UNIQUE_RANDOM_ADDR &amp; Semaphore_CUSTOM_TEMPLATE"/>
+        <Description></Description>
+    </RefParameter>
+    <RefParameter Name="CFG_STATIC_UNIQUE_RANDOM_ADDR_LSB" Comment="CFG_STATIC_UNIQUE_RANDOM_ADDR_LSB" DefaultValue="0x0000" Type="hex" Min="0x0000" Max="0xFFFF" TabName="Configuration" Group="Application parameters">
+        <Condition Diagnostic="" Expression="Semaphore_STATIC_UNIQUE_RANDOM_ADDR &amp; Semaphore_BLE_SERVER_PROFILE &amp; S_BLE_HOST"/>
+        <Description></Description>
+    </RefParameter>
+    <RefParameter Name="CFG_STATIC_UNIQUE_RANDOM_ADDR_LSB" Comment="CFG_STATIC_UNIQUE_RANDOM_ADDR_LSB" DefaultValue="0x0000" Type="hex" Min="0x0000" Max="0xFFFF" TabName="Configuration" Group="Application parameters">
+        <Condition Diagnostic="" Expression="Semaphore_STATIC_UNIQUE_RANDOM_ADDR &amp; (Semaphore_BLE_CLIENT_PROFILE | Semaphore_BLE_ROUTER_PROFILE) &amp; S_BLE_HOST" />
+        <Description></Description>
+    </RefParameter>
+    <RefParameter Name="CFG_STATIC_UNIQUE_RANDOM_ADDR_LSB" Comment="CFG_STATIC_UNIQUE_RANDOM_ADDR_LSB" DefaultValue="0x0000" Type="hex" Min="0x0000" Max="0xFFFF" TabName="Configuration" Group="Application parameters" Visible="false">
+        <Description></Description>
     </RefParameter>
 
     <RefParameter Name="CFG_RNG" Comment="RNG status" DefaultValue="1" Type="UniqueElementList" TabName="BLE Advertising" Group="Advertising configuration" Visible="false">
@@ -5557,8 +5575,8 @@
         <Description>Contains the UUID (only 2 bytes are defined by the user for 16 or 128 bits UUID)</Description>
     </RefParameter>
 
-    <RefParameter Name="SERVICE_CHAR_VALUE_LENGTH" Comment="Value length" DefaultValue="1" Type="integer" Min = "1" Max = "247">
-        <Description>Number of bytes to be written or to notify (1 to 247)</Description>
+    <RefParameter Name="SERVICE_CHAR_VALUE_LENGTH" Comment="Value length" DefaultValue="1" Type="integer" Min = "1" Max = "512">
+        <Description>Number of bytes to be written or to notify (1 to 512)</Description>
     </RefParameter>
 
     <RefParameter Name="SERVICE_CHAR_PROP_NONE" Comment="CHAR_PROP_NONE" DefaultValue="CHAR_PROP_NONE" Type="list" Visible="false">
@@ -8691,6 +8709,7 @@
         <Parameter Name="ADV_TYPE"/>
         <Parameter Name="CFG_IDENTITY_ADDRESS"/>
         <Parameter Name="CFG_STATIC_RANDOM_ADDRESS"/>
+        <Parameter Name="CFG_STATIC_UNIQUE_RANDOM_ADDR_LSB"/>
         <Parameter Name="STATIC_RANDOM_ADDRESS"/>
         <Parameter Name="CFG_PRIVACY"/>
         <Parameter Name="BLE_ADDR_TYPE"/>
@@ -8987,13 +9006,13 @@
 
         <Parameter Name="SERVICE1_CHAR1_PROP_WRITE_WITHOUT_RESP" RefParameter="SERVICE_CHAR_PROP_WRITE_WITHOUT_RESP" TabName="Service1" Group="Characteristic1 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE1_CHAR1"/>
-                <PossibleValue Condition="SERVICE1_CHAR1_PROP_WRITE=CHAR_PROP_WRITE" Diagnostic="not available when SERVICE1_CHAR1_PROP_WRITE=Yes" Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
         <Parameter Name="SERVICE1_CHAR1_PROP_WRITE" RefParameter="SERVICE_CHAR_PROP_WRITE" TabName="Service1" Group="Characteristic1 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE1_CHAR1"/>
-                <PossibleValue Condition="SERVICE1_CHAR1_PROP_WRITE_WITHOUT_RESP=CHAR_PROP_WRITE_WITHOUT_RESP" Diagnostic="not available when SERVICE1_CHAR1_PROP_WRITE_WITHOUT_RESP=Yes" Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
@@ -9100,13 +9119,13 @@
 
         <Parameter Name="SERVICE1_CHAR2_PROP_WRITE_WITHOUT_RESP" RefParameter="SERVICE_CHAR_PROP_WRITE_WITHOUT_RESP" TabName="Service1" Group="Characteristic2 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE1_CHAR2"/>
-                <PossibleValue Condition="SERVICE1_CHAR2_PROP_WRITE=CHAR_PROP_WRITE" Diagnostic="not available when SERVICE1_CHAR2_PROP_WRITE=Yes" Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
         <Parameter Name="SERVICE1_CHAR2_PROP_WRITE" RefParameter="SERVICE_CHAR_PROP_WRITE" TabName="Service1" Group="Characteristic2 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE1_CHAR2"/>
-                <PossibleValue Condition="SERVICE1_CHAR2_PROP_WRITE_WITHOUT_RESP=CHAR_PROP_WRITE_WITHOUT_RESP" Diagnostic="not available when SERVICE1_CHAR2_PROP_WRITE_WITHOUT_RESP=Yes" Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
@@ -9213,13 +9232,13 @@
 
         <Parameter Name="SERVICE1_CHAR3_PROP_WRITE_WITHOUT_RESP" RefParameter="SERVICE_CHAR_PROP_WRITE_WITHOUT_RESP" TabName="Service1" Group="Characteristic3 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE1_CHAR3"/>
-                <PossibleValue Condition="SERVICE1_CHAR3_PROP_WRITE=CHAR_PROP_WRITE" Diagnostic="not available when SERVICE1_CHAR3_PROP_WRITE=Yes" Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
         <Parameter Name="SERVICE1_CHAR3_PROP_WRITE" RefParameter="SERVICE_CHAR_PROP_WRITE" TabName="Service1" Group="Characteristic3 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE1_CHAR3"/>
-                <PossibleValue Condition="SERVICE1_CHAR3_PROP_WRITE_WITHOUT_RESP=CHAR_PROP_WRITE_WITHOUT_RESP" Diagnostic="not available when SERVICE1_CHAR3_PROP_WRITE_WITHOUT_RESP=Yes" Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
@@ -9326,13 +9345,13 @@
 
         <Parameter Name="SERVICE1_CHAR4_PROP_WRITE_WITHOUT_RESP" RefParameter="SERVICE_CHAR_PROP_WRITE_WITHOUT_RESP" TabName="Service1" Group="Characteristic4 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE1_CHAR4"/>
-                <PossibleValue Condition="SERVICE1_CHAR4_PROP_WRITE=CHAR_PROP_WRITE" Diagnostic="not available when SERVICE1_CHAR4_PROP_WRITE=Yes" Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
         <Parameter Name="SERVICE1_CHAR4_PROP_WRITE" RefParameter="SERVICE_CHAR_PROP_WRITE" TabName="Service1" Group="Characteristic4 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE1_CHAR4"/>
-                <PossibleValue Condition="SERVICE1_CHAR4_PROP_WRITE_WITHOUT_RESP=CHAR_PROP_WRITE_WITHOUT_RESP" Diagnostic="not available when SERVICE1_CHAR4_PROP_WRITE_WITHOUT_RESP=Yes" Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
@@ -9440,13 +9459,13 @@
 
         <Parameter Name="SERVICE1_CHAR5_PROP_WRITE_WITHOUT_RESP" RefParameter="SERVICE_CHAR_PROP_WRITE_WITHOUT_RESP" TabName="Service1" Group="Characteristic5 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE1_CHAR5"/>
-                <PossibleValue Condition="SERVICE1_CHAR5_PROP_WRITE=CHAR_PROP_WRITE" Diagnostic="not available when SERVICE1_CHAR5_PROP_WRITE=Yes" Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
         <Parameter Name="SERVICE1_CHAR5_PROP_WRITE" RefParameter="SERVICE_CHAR_PROP_WRITE" TabName="Service1" Group="Characteristic5 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE1_CHAR5"/>
-                <PossibleValue Condition="SERVICE1_CHAR5_PROP_WRITE_WITHOUT_RESP=CHAR_PROP_WRITE_WITHOUT_RESP" Diagnostic="not available when SERVICE1_CHAR5_PROP_WRITE_WITHOUT_RESP=Yes" Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
@@ -9573,13 +9592,13 @@
 
         <Parameter Name="SERVICE2_CHAR1_PROP_WRITE_WITHOUT_RESP" RefParameter="SERVICE_CHAR_PROP_WRITE_WITHOUT_RESP" TabName="Service2" Group="Characteristic1 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE2_CHAR1"/>
-                <PossibleValue Condition="SERVICE2_CHAR1_PROP_WRITE=CHAR_PROP_WRITE" Diagnostic="not available when SERVICE2_CHAR1_PROP_WRITE=Yes" Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
         <Parameter Name="SERVICE2_CHAR1_PROP_WRITE" RefParameter="SERVICE_CHAR_PROP_WRITE" TabName="Service2" Group="Characteristic1 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE2_CHAR1"/>
-                <PossibleValue Condition="SERVICE2_CHAR1_PROP_WRITE_WITHOUT_RESP=CHAR_PROP_WRITE_WITHOUT_RESP" Diagnostic="not available when SERVICE2_CHAR1_PROP_WRITE_WITHOUT_RESP=Yes" Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
@@ -9686,13 +9705,13 @@
 
         <Parameter Name="SERVICE2_CHAR2_PROP_WRITE_WITHOUT_RESP" RefParameter="SERVICE_CHAR_PROP_WRITE_WITHOUT_RESP" TabName="Service2" Group="Characteristic2 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE2_CHAR2"/>
-                <PossibleValue Condition="SERVICE2_CHAR2_PROP_WRITE=CHAR_PROP_WRITE" Diagnostic="not available when SERVICE2_CHAR2_PROP_WRITE=Yes" Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
         <Parameter Name="SERVICE2_CHAR2_PROP_WRITE" RefParameter="SERVICE_CHAR_PROP_WRITE" TabName="Service2" Group="Characteristic2 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE2_CHAR2"/>
-                <PossibleValue Condition="SERVICE2_CHAR2_PROP_WRITE_WITHOUT_RESP=CHAR_PROP_WRITE_WITHOUT_RESP" Diagnostic="not available when SERVICE2_CHAR2_PROP_WRITE_WITHOUT_RESP=Yes" Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
@@ -9799,13 +9818,13 @@
 
         <Parameter Name="SERVICE2_CHAR3_PROP_WRITE_WITHOUT_RESP" RefParameter="SERVICE_CHAR_PROP_WRITE_WITHOUT_RESP" TabName="Service2" Group="Characteristic3 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE2_CHAR3"/>
-                <PossibleValue Condition="SERVICE2_CHAR3_PROP_WRITE=CHAR_PROP_WRITE" Diagnostic="not available when SERVICE2_CHAR3_PROP_WRITE=Yes" Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
         <Parameter Name="SERVICE2_CHAR3_PROP_WRITE" RefParameter="SERVICE_CHAR_PROP_WRITE" TabName="Service2" Group="Characteristic3 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE2_CHAR3"/>
-                <PossibleValue Condition="SERVICE2_CHAR3_PROP_WRITE_WITHOUT_RESP=CHAR_PROP_WRITE_WITHOUT_RESP" Diagnostic="not available when SERVICE2_CHAR3_PROP_WRITE_WITHOUT_RESP=Yes" Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
@@ -9912,13 +9931,13 @@
 
         <Parameter Name="SERVICE2_CHAR4_PROP_WRITE_WITHOUT_RESP" RefParameter="SERVICE_CHAR_PROP_WRITE_WITHOUT_RESP" TabName="Service2" Group="Characteristic4 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE2_CHAR4"/>
-                <PossibleValue Condition="SERVICE2_CHAR4_PROP_WRITE=CHAR_PROP_WRITE" Diagnostic="not available when SERVICE2_CHAR4_PROP_WRITE=Yes" Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
         <Parameter Name="SERVICE2_CHAR4_PROP_WRITE" RefParameter="SERVICE_CHAR_PROP_WRITE" TabName="Service2" Group="Characteristic4 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE2_CHAR4"/>
-                <PossibleValue Condition="SERVICE2_CHAR4_PROP_WRITE_WITHOUT_RESP=CHAR_PROP_WRITE_WITHOUT_RESP" Diagnostic="not available when SERVICE2_CHAR4_PROP_WRITE_WITHOUT_RESP=Yes" Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
@@ -10026,13 +10045,13 @@
 
         <Parameter Name="SERVICE2_CHAR5_PROP_WRITE_WITHOUT_RESP" RefParameter="SERVICE_CHAR_PROP_WRITE_WITHOUT_RESP" TabName="Service2" Group="Characteristic5 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE2_CHAR5"/>
-                <PossibleValue Condition="SERVICE2_CHAR5_PROP_WRITE=CHAR_PROP_WRITE" Diagnostic="not available when SERVICE2_CHAR5_PROP_WRITE=Yes" Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
         <Parameter Name="SERVICE2_CHAR5_PROP_WRITE" RefParameter="SERVICE_CHAR_PROP_WRITE" TabName="Service2" Group="Characteristic5 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE2_CHAR5"/>
-                <PossibleValue Condition="SERVICE2_CHAR5_PROP_WRITE_WITHOUT_RESP=CHAR_PROP_WRITE_WITHOUT_RESP" Diagnostic="not available when SERVICE2_CHAR5_PROP_WRITE_WITHOUT_RESP=Yes" Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
@@ -10159,13 +10178,13 @@
 
         <Parameter Name="SERVICE3_CHAR1_PROP_WRITE_WITHOUT_RESP" RefParameter="SERVICE_CHAR_PROP_WRITE_WITHOUT_RESP" TabName="Service3" Group="Characteristic1 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE3_CHAR1"/>
-                <PossibleValue Condition="SERVICE3_CHAR1_PROP_WRITE=CHAR_PROP_WRITE" Diagnostic="not available when SERVICE3_CHAR1_PROP_WRITE=Yes" Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
         <Parameter Name="SERVICE3_CHAR1_PROP_WRITE" RefParameter="SERVICE_CHAR_PROP_WRITE" TabName="Service3" Group="Characteristic1 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE3_CHAR1"/>
-                <PossibleValue Condition="SERVICE3_CHAR1_PROP_WRITE_WITHOUT_RESP=CHAR_PROP_WRITE_WITHOUT_RESP" Diagnostic="not available when SERVICE3_CHAR1_PROP_WRITE_WITHOUT_RESP=Yes" Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
@@ -10272,13 +10291,13 @@
 
         <Parameter Name="SERVICE3_CHAR2_PROP_WRITE_WITHOUT_RESP" RefParameter="SERVICE_CHAR_PROP_WRITE_WITHOUT_RESP" TabName="Service3" Group="Characteristic2 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE3_CHAR2"/>
-                <PossibleValue Condition="SERVICE3_CHAR2_PROP_WRITE=CHAR_PROP_WRITE" Diagnostic="not available when SERVICE3_CHAR2_PROP_WRITE=Yes" Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
         <Parameter Name="SERVICE3_CHAR2_PROP_WRITE" RefParameter="SERVICE_CHAR_PROP_WRITE" TabName="Service3" Group="Characteristic2 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE3_CHAR2"/>
-                <PossibleValue Condition="SERVICE3_CHAR2_PROP_WRITE_WITHOUT_RESP=CHAR_PROP_WRITE_WITHOUT_RESP" Diagnostic="not available when SERVICE3_CHAR2_PROP_WRITE_WITHOUT_RESP=Yes" Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
@@ -10385,13 +10404,13 @@
 
         <Parameter Name="SERVICE3_CHAR3_PROP_WRITE_WITHOUT_RESP" RefParameter="SERVICE_CHAR_PROP_WRITE_WITHOUT_RESP" TabName="Service3" Group="Characteristic3 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE3_CHAR3"/>
-                <PossibleValue Condition="SERVICE3_CHAR3_PROP_WRITE=CHAR_PROP_WRITE" Diagnostic="not available when SERVICE3_CHAR3_PROP_WRITE=Yes" Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
         <Parameter Name="SERVICE3_CHAR3_PROP_WRITE" RefParameter="SERVICE_CHAR_PROP_WRITE" TabName="Service3" Group="Characteristic3 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE3_CHAR3"/>
-                <PossibleValue Condition="SERVICE3_CHAR3_PROP_WRITE_WITHOUT_RESP=CHAR_PROP_WRITE_WITHOUT_RESP" Diagnostic="not available when SERVICE3_CHAR3_PROP_WRITE_WITHOUT_RESP=Yes" Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
@@ -10498,13 +10517,13 @@
 
         <Parameter Name="SERVICE3_CHAR4_PROP_WRITE_WITHOUT_RESP" RefParameter="SERVICE_CHAR_PROP_WRITE_WITHOUT_RESP" TabName="Service3" Group="Characteristic4 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE3_CHAR4"/>
-                <PossibleValue Condition="SERVICE3_CHAR4_PROP_WRITE=CHAR_PROP_WRITE" Diagnostic="not available when SERVICE3_CHAR4_PROP_WRITE=Yes" Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
         <Parameter Name="SERVICE3_CHAR4_PROP_WRITE" RefParameter="SERVICE_CHAR_PROP_WRITE" TabName="Service3" Group="Characteristic4 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE3_CHAR4"/>
-                <PossibleValue Condition="SERVICE3_CHAR4_PROP_WRITE_WITHOUT_RESP=CHAR_PROP_WRITE_WITHOUT_RESP" Diagnostic="not available when SERVICE3_CHAR4_PROP_WRITE_WITHOUT_RESP=Yes" Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
@@ -10611,13 +10630,13 @@
 
         <Parameter Name="SERVICE3_CHAR5_PROP_WRITE_WITHOUT_RESP" RefParameter="SERVICE_CHAR_PROP_WRITE_WITHOUT_RESP" TabName="Service3" Group="Characteristic5 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE3_CHAR5"/>
-                <PossibleValue Condition="SERVICE3_CHAR5_PROP_WRITE=CHAR_PROP_WRITE" Diagnostic="not available when SERVICE3_CHAR5_PROP_WRITE=Yes" Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
         <Parameter Name="SERVICE3_CHAR5_PROP_WRITE" RefParameter="SERVICE_CHAR_PROP_WRITE" TabName="Service3" Group="Characteristic5 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE3_CHAR5"/>
-                <PossibleValue Condition="SERVICE3_CHAR5_PROP_WRITE_WITHOUT_RESP=CHAR_PROP_WRITE_WITHOUT_RESP" Diagnostic="not available when SERVICE3_CHAR5_PROP_WRITE_WITHOUT_RESP=Yes" Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
@@ -10744,13 +10763,13 @@
 
         <Parameter Name="SERVICE4_CHAR1_PROP_WRITE_WITHOUT_RESP" RefParameter="SERVICE_CHAR_PROP_WRITE_WITHOUT_RESP" TabName="Service4" Group="Characteristic1 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE4_CHAR1"/>
-                <PossibleValue Condition="SERVICE4_CHAR1_PROP_WRITE=CHAR_PROP_WRITE" Diagnostic="not available when SERVICE4_CHAR1_PROP_WRITE=Yes" Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
         <Parameter Name="SERVICE4_CHAR1_PROP_WRITE" RefParameter="SERVICE_CHAR_PROP_WRITE" TabName="Service4" Group="Characteristic1 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE4_CHAR1"/>
-                <PossibleValue Condition="SERVICE4_CHAR1_PROP_WRITE_WITHOUT_RESP=CHAR_PROP_WRITE_WITHOUT_RESP" Diagnostic="not available when SERVICE4_CHAR1_PROP_WRITE_WITHOUT_RESP=Yes" Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
@@ -10857,13 +10876,13 @@
 
         <Parameter Name="SERVICE4_CHAR2_PROP_WRITE_WITHOUT_RESP" RefParameter="SERVICE_CHAR_PROP_WRITE_WITHOUT_RESP" TabName="Service4" Group="Characteristic2 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE4_CHAR2"/>
-                <PossibleValue Condition="SERVICE4_CHAR2_PROP_WRITE=CHAR_PROP_WRITE" Diagnostic="not available when SERVICE4_CHAR2_PROP_WRITE=Yes" Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
         <Parameter Name="SERVICE4_CHAR2_PROP_WRITE" RefParameter="SERVICE_CHAR_PROP_WRITE" TabName="Service4" Group="Characteristic2 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE4_CHAR2"/>
-                <PossibleValue Condition="SERVICE4_CHAR2_PROP_WRITE_WITHOUT_RESP=CHAR_PROP_WRITE_WITHOUT_RESP" Diagnostic="not available when SERVICE4_CHAR2_PROP_WRITE_WITHOUT_RESP=Yes" Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
@@ -10970,13 +10989,13 @@
 
         <Parameter Name="SERVICE4_CHAR3_PROP_WRITE_WITHOUT_RESP" RefParameter="SERVICE_CHAR_PROP_WRITE_WITHOUT_RESP" TabName="Service4" Group="Characteristic3 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE4_CHAR3"/>
-                <PossibleValue Condition="SERVICE4_CHAR3_PROP_WRITE=CHAR_PROP_WRITE" Diagnostic="not available when SERVICE4_CHAR3_PROP_WRITE=Yes" Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
         <Parameter Name="SERVICE4_CHAR3_PROP_WRITE" RefParameter="SERVICE_CHAR_PROP_WRITE" TabName="Service4" Group="Characteristic3 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE4_CHAR3"/>
-                <PossibleValue Condition="SERVICE4_CHAR3_PROP_WRITE_WITHOUT_RESP=CHAR_PROP_WRITE_WITHOUT_RESP" Diagnostic="not available when SERVICE4_CHAR3_PROP_WRITE_WITHOUT_RESP=Yes" Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
@@ -11083,13 +11102,13 @@
 
         <Parameter Name="SERVICE4_CHAR4_PROP_WRITE_WITHOUT_RESP" RefParameter="SERVICE_CHAR_PROP_WRITE_WITHOUT_RESP" TabName="Service4" Group="Characteristic4 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE4_CHAR4"/>
-                <PossibleValue Condition="SERVICE4_CHAR4_PROP_WRITE=CHAR_PROP_WRITE" Diagnostic="not available when SERVICE4_CHAR4_PROP_WRITE=Yes" Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
         <Parameter Name="SERVICE4_CHAR4_PROP_WRITE" RefParameter="SERVICE_CHAR_PROP_WRITE" TabName="Service4" Group="Characteristic4 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE4_CHAR4"/>
-                <PossibleValue Condition="SERVICE4_CHAR4_PROP_WRITE_WITHOUT_RESP=CHAR_PROP_WRITE_WITHOUT_RESP" Diagnostic="not available when SERVICE4_CHAR4_PROP_WRITE_WITHOUT_RESP=Yes" Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
@@ -11197,13 +11216,13 @@
 
         <Parameter Name="SERVICE4_CHAR5_PROP_WRITE_WITHOUT_RESP" RefParameter="SERVICE_CHAR_PROP_WRITE_WITHOUT_RESP" TabName="Service4" Group="Characteristic5 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE4_CHAR5"/>
-                <PossibleValue Condition="SERVICE4_CHAR5_PROP_WRITE=CHAR_PROP_WRITE" Diagnostic="not available when SERVICE4_CHAR5_PROP_WRITE=Yes" Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
         <Parameter Name="SERVICE4_CHAR5_PROP_WRITE" RefParameter="SERVICE_CHAR_PROP_WRITE" TabName="Service4" Group="Characteristic5 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE4_CHAR5"/>
-                <PossibleValue Condition="SERVICE4_CHAR5_PROP_WRITE_WITHOUT_RESP=CHAR_PROP_WRITE_WITHOUT_RESP" Diagnostic="not available when SERVICE4_CHAR5_PROP_WRITE_WITHOUT_RESP=Yes" Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
@@ -11330,13 +11349,13 @@
 
         <Parameter Name="SERVICE5_CHAR1_PROP_WRITE_WITHOUT_RESP" RefParameter="SERVICE_CHAR_PROP_WRITE_WITHOUT_RESP" TabName="Service5" Group="Characteristic1 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE5_CHAR1"/>
-                <PossibleValue Condition="SERVICE5_CHAR1_PROP_WRITE=CHAR_PROP_WRITE" Diagnostic="not available when SERVICE5_CHAR1_PROP_WRITE=Yes" Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
         <Parameter Name="SERVICE5_CHAR1_PROP_WRITE" RefParameter="SERVICE_CHAR_PROP_WRITE" TabName="Service5" Group="Characteristic1 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE5_CHAR1"/>
-                <PossibleValue Condition="SERVICE5_CHAR1_PROP_WRITE_WITHOUT_RESP=CHAR_PROP_WRITE_WITHOUT_RESP" Diagnostic="not available when SERVICE5_CHAR1_PROP_WRITE_WITHOUT_RESP=Yes" Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
@@ -11443,13 +11462,13 @@
 
         <Parameter Name="SERVICE5_CHAR2_PROP_WRITE_WITHOUT_RESP" RefParameter="SERVICE_CHAR_PROP_WRITE_WITHOUT_RESP" TabName="Service5" Group="Characteristic2 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE5_CHAR2"/>
-                <PossibleValue Condition="SERVICE5_CHAR2_PROP_WRITE=CHAR_PROP_WRITE" Diagnostic="not available when SERVICE5_CHAR2_PROP_WRITE=Yes" Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
         <Parameter Name="SERVICE5_CHAR2_PROP_WRITE" RefParameter="SERVICE_CHAR_PROP_WRITE" TabName="Service5" Group="Characteristic2 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE5_CHAR2"/>
-                <PossibleValue Condition="SERVICE5_CHAR2_PROP_WRITE_WITHOUT_RESP=CHAR_PROP_WRITE_WITHOUT_RESP" Diagnostic="not available when SERVICE5_CHAR2_PROP_WRITE_WITHOUT_RESP=Yes" Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
@@ -11556,13 +11575,13 @@
 
         <Parameter Name="SERVICE5_CHAR3_PROP_WRITE_WITHOUT_RESP" RefParameter="SERVICE_CHAR_PROP_WRITE_WITHOUT_RESP" TabName="Service5" Group="Characteristic3 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE5_CHAR3"/>
-                <PossibleValue Condition="SERVICE5_CHAR3_PROP_WRITE=CHAR_PROP_WRITE" Diagnostic="not available when SERVICE5_CHAR3_PROP_WRITE=Yes" Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
         <Parameter Name="SERVICE5_CHAR3_PROP_WRITE" RefParameter="SERVICE_CHAR_PROP_WRITE" TabName="Service5" Group="Characteristic3 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE5_CHAR3"/>
-                <PossibleValue Condition="SERVICE5_CHAR3_PROP_WRITE_WITHOUT_RESP=CHAR_PROP_WRITE_WITHOUT_RESP" Diagnostic="not available when SERVICE5_CHAR3_PROP_WRITE_WITHOUT_RESP=Yes" Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
@@ -11669,13 +11688,13 @@
 
         <Parameter Name="SERVICE5_CHAR4_PROP_WRITE_WITHOUT_RESP" RefParameter="SERVICE_CHAR_PROP_WRITE_WITHOUT_RESP" TabName="Service5" Group="Characteristic4 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE5_CHAR4"/>
-                <PossibleValue Condition="SERVICE5_CHAR4_PROP_WRITE=CHAR_PROP_WRITE" Diagnostic="not available when SERVICE5_CHAR4_PROP_WRITE=Yes" Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
         <Parameter Name="SERVICE5_CHAR4_PROP_WRITE" RefParameter="SERVICE_CHAR_PROP_WRITE" TabName="Service5" Group="Characteristic4 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE5_CHAR4"/>
-                <PossibleValue Condition="SERVICE5_CHAR4_PROP_WRITE_WITHOUT_RESP=CHAR_PROP_WRITE_WITHOUT_RESP" Diagnostic="not available when SERVICE5_CHAR4_PROP_WRITE_WITHOUT_RESP=Yes" Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
@@ -11783,13 +11802,13 @@
 
         <Parameter Name="SERVICE5_CHAR5_PROP_WRITE_WITHOUT_RESP" RefParameter="SERVICE_CHAR_PROP_WRITE_WITHOUT_RESP" TabName="Service5" Group="Characteristic5 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE5_CHAR5"/>
-                <PossibleValue Condition="SERVICE5_CHAR5_PROP_WRITE=CHAR_PROP_WRITE" Diagnostic="not available when SERVICE5_CHAR5_PROP_WRITE=Yes" Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE_WITHOUT_RESP</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 
         <Parameter Name="SERVICE5_CHAR5_PROP_WRITE" RefParameter="SERVICE_CHAR_PROP_WRITE" TabName="Service5" Group="Characteristic5 properties">
                 <Condition Diagnostic="" Expression="Semaphore_SERVICE5_CHAR5"/>
-                <PossibleValue Condition="SERVICE5_CHAR5_PROP_WRITE_WITHOUT_RESP=CHAR_PROP_WRITE_WITHOUT_RESP" Diagnostic="not available when SERVICE5_CHAR5_PROP_WRITE_WITHOUT_RESP=Yes" Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
+                <PossibleValue Comment="Yes">CHAR_PROP_WRITE</PossibleValue>
                 <PossibleValue Comment="No"></PossibleValue>
         </Parameter>
 

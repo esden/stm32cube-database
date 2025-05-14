@@ -26,7 +26,11 @@ NB: all the string lists should be re-ordered to insure DTS ordering.
 		[#assign mx_projectName = mxMcuDataModel.projectName?lower_case]
 		[#assign mx_boardName_lowercase = mxMcuDataModel.boardName?lower_case]
 		[#assign mx_boardName_uppercase = mxMcuDataModel.boardName]
+		[#assign mx_RIF_Params = mxMcuDataModel.peripheralRIFParams]
 		[#assign mx_isCustomBoard= mxMcuDataModel.isCustomBoard]
+		[#if mxMcuDataModel.contextTDCID??]
+			[#assign mx_tdcidContext= mxMcuDataModel.contextTDCID]
+		[/#if]
 		[#--MCU info --]
 		[#assign mx_family = mxMcuDataModel.family?lower_case]
 		[#assign mx_socRPN = mxMcuDataModel.mcuParams.socRPN?lower_case]
@@ -153,6 +157,16 @@ NB: all the string lists should be re-ordered to insure DTS ordering.
 [/#function]
 
 
+[#--get family name.--]
+[#function srvcmx_getFamilyName]
+
+	[#if !mx_family??]
+		[#return ""]
+	[/#if]
+
+[#return mx_family]
+[/#function]
+
 [#--returns the list of devices assigned to "BootLoader" context and enabled--]
 [#function srvcmx_getBootloadersEnabledDevicesList]
 
@@ -163,14 +177,14 @@ NB: all the string lists should be re-ordered to insure DTS ordering.
 [#--return list of IP devices name.
 	Empty list if no device.--]
 [#function srvcmx_getIPDeviceNamesList	 pDevicesList]
-	
+
 	[#local devicesNamesList = []]
 	[#list pDevicesList as device]
 		[#if device.typeName=="IP"]
 			[#local devicesNamesList = devicesNamesList + [device.name] ]
 		[/#if]
 	[/#list]
-	
+
 [#return devicesNamesList?sort]
 [/#function]
 
@@ -508,7 +522,6 @@ but excluding the elmts that configure the provided devices--]
 	[#return DTBindedDtsElmtDM_new("Property", "", "", pValueItemsList) + {"name":pName}]
 [/#function]
 
-
 [#--Create PROPERTY Api: single ValueItem and single ArrayItem:
 	ex.: prop = <x>;
 	ex.: prop = "x";
@@ -535,7 +548,7 @@ but excluding the elmts that configure the provided devices--]
 		-today only the mandatory and minimum set of attributes are implemented
 --]
 
-[#function DTInfoElmtDM_new  pPinctrlElmtType pPinCtrlConfigName pPinCtrlConfigNodesList]
+[#function DTPinctrlElmtDM_new  pPinctrlElmtType pPinCtrlConfigName pPinCtrlConfigNodesList]
 	[#return {"pinctrlElmtType":pPinctrlElmtType, "pinCtrlConfigName":pPinCtrlConfigName, "pinCtrlConfigNodesList":pPinCtrlConfigNodesList}]
 [/#function]
 

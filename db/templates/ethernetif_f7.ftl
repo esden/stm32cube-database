@@ -24,6 +24,8 @@
 [#assign lwip_ipv6 = 0]
 [#assign BspComponent = ""]
 [#assign lwip_netif_hostname = "lwip"]
+[#assign eth_it = "true"]
+[#assign eth_rx_buff_cnt = 12]
 [#if SWIP.defines??]
 	[#list SWIP.defines as definition] 	
         [#if (definition.name == "WITH_RTOS")]
@@ -67,6 +69,9 @@
         [#if (definition.name == "LWIP_NETIF_HOSTNAME_NAME") && (definition.value != "valueNotSetted")]
             [#assign lwip_netif_hostname = definition.value]
         [/#if]  
+        [#if (definition.name == "ETH_RX_BUFFER_CNT") && (definition.value != "valueNotSetted")]
+            [#assign eth_rx_buff_cnt = definition.value]
+        [/#if]
 	[/#list]
 [/#if][#-- SWIP.defines --]
 [/#list][/#compress]
@@ -87,6 +92,9 @@
 [/#if][#-- end "BspComponent.variables??" --]
 [/#list]
 [/#if][#-- end "BspComponentDatas??" --]
+[#if EthIT??]
+    [#assign eth_it = EthIT]
+[/#if]
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
@@ -145,9 +153,9 @@
 /* Private variables ---------------------------------------------------------*/
 /* 
 @Note: This interface is implemented to operate in zero-copy mode only:
-        - Rx buffers will be allocated from LwIP stack memory heap,
+        - Rx Buffers will be allocated from LwIP stack Rx memory pool,
           then passed to ETH HAL driver.
-        - Tx buffers will be allocated from LwIP stack memory heap, 
+        - Tx Buffers will be allocated from LwIP stack memory heap, 
           then passed to ETH HAL driver.
 
 @Notes: 
@@ -179,7 +187,7 @@ typedef struct
 } RxBuff_t;
 
 /* Memory Pool Declaration */
-#define ETH_RX_BUFFER_CNT             12U
+#define ETH_RX_BUFFER_CNT             ${eth_rx_buff_cnt}U
 LWIP_MEMPOOL_DECLARE(RX_POOL, ETH_RX_BUFFER_CNT, sizeof(RxBuff_t), "Zero-copy RX PBUF pool");
 
 /* Variable Definitions */
@@ -403,7 +411,12 @@ static void low_level_init(struct netif *netif)
   ${BspComponent}_RegisterBusIO(&${BspComponent}, &${BspComponent}_IOCtx);
 
   /* Initialize the ${BspComponent} ETH PHY */
-  ${BspComponent}_Init(&${BspComponent});
+  if(${BspComponent}_Init(&${BspComponent}) != ${BspComponent}_STATUS_OK)
+  {
+    netif_set_link_down(netif);
+    netif_set_down(netif);
+    return;
+  }
 [#else]
 /* USER CODE BEGIN low_level_init Code 1 for User BSP */ 
     
@@ -892,7 +905,7 @@ void ethernet_link_check_state(struct netif *netif)
   
   if(netif_is_link_up(netif) && (PHYLinkState <= ${BspComponent}_STATUS_LINK_DOWN))
   {
-[#if with_rtos == 1]
+[#if with_rtos == 1 || eth_it = "true"]
     HAL_ETH_Stop_IT(&heth);
 [#else]
     HAL_ETH_Stop(&heth);
@@ -935,7 +948,7 @@ void ethernet_link_check_state(struct netif *netif)
       MACConf.DuplexMode = duplex;
       MACConf.Speed = speed;
       HAL_ETH_SetMACConfig(&heth, &MACConf);
-    [#if with_rtos == 1]
+    [#if with_rtos == 1 || eth_it = "true"]
       HAL_ETH_Start_IT(&heth);
     [#else]
       HAL_ETH_Start(&heth);

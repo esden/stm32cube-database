@@ -33,8 +33,10 @@ Key: ${key}; Value: ${myHash[key]}
 [/#list]
 --]
 
-#include "app_conf.h"
 #include "main.h"
+#include "app_common.h"
+#include "app_conf.h"
+#include "log_module.h"
 #include "app_zigbee.h"
 #include "stm32_rtos.h"
 
@@ -103,7 +105,7 @@ void ZigbeeSys_Init(void)
 [#if myHash["SEQUENCER_STATUS"]?number == 1 ]
   /* Register tasks */
   UTIL_SEQ_RegTask( TASK_ZIGBEE_LAYER, UTIL_SEQ_RFU, ZigbeeSys_Process);
-  UTIL_SEQ_SetTask( TASK_ZIGBEE_LAYER, CFG_TASK_PRIO_ZIGBEE_LAYER );
+  UTIL_SEQ_SetTask( TASK_ZIGBEE_LAYER, TASK_PRIO_ZIGBEE_LAYER );
 [/#if]
 [#if myHash["THREADX_STATUS"]?number == 1 ]
   UINT    lThreadXStatus;
@@ -118,11 +120,11 @@ void ZigbeeSys_Init(void)
   }
 
   /* Create the ZigBee Layer Thread and this Stack */
-  lThreadXStatus = tx_byte_allocate( pBytePool, (VOID**) &pStack, TASK_ZIGBEE_LAYER_STACK_SIZE, TX_NO_WAIT);
+  lThreadXStatus = tx_byte_allocate( pBytePool, (void **)&pStack, TASK_STACK_SIZE_ZIGBEE_LAYER, TX_NO_WAIT);
   if ( lThreadXStatus == TX_SUCCESS )
   {
     lThreadXStatus = tx_thread_create( &stZigbeeLayerThread, "ZigbeeLayerTaskId", ZigbeeSys_Process, 0, pStack,
-                                        TASK_ZIGBEE_LAYER_STACK_SIZE, CFG_TASK_PRIO_ZIGBEE_LAYER, CFG_TASK_PREEMP_ZIGBEE_LAYER,
+                                        TASK_STACK_SIZE_ZIGBEE_LAYER, TASK_PRIO_ZIGBEE_LAYER, TASK_PREEMP_ZIGBEE_LAYER,
                                         TX_NO_TIME_SLICE, TX_AUTO_START);
   }
   if ( lThreadXStatus != TX_SUCCESS )
@@ -158,7 +160,7 @@ void ZigbeeSys_Resume(void)
 void ZigbeeSys_SemaphoreSet(void)
 {
 [#if myHash["SEQUENCER_STATUS"]?number == 1 ]
-  UTIL_SEQ_SetTask( TASK_ZIGBEE_LAYER, CFG_TASK_PRIO_ZIGBEE_LAYER );
+  UTIL_SEQ_SetTask( TASK_ZIGBEE_LAYER, TASK_PRIO_ZIGBEE_LAYER );
 [/#if]
 [#if myHash["THREADX_STATUS"]?number == 1 ]
   if ( stZigbeeLayerSemaphore.tx_semaphore_count == 0 )

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://mcd.rou.st.com/modules.php?name=mcu"
+    ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
+    DBVersion="V4.0"
+    IPType="peripheral"
+    Name="RADIO_TIMER"
+    Version="radio_timer1_v1_0">
+    <About>RADIO_TIMER : Timer to synchronize the radio task's</About>
+
+    <RefParameter Name="XTAL_StartupTime" Comment="XTAL_StartupTime" DefaultValue="320" Min="1" Type="integer" TabName="Configuration" Group="Application configuration">
+        <Description>XTAL startup time</Description>
+    </RefParameter>
+
+    <RefParameter Name="enableInitialCalibration" Comment="enableInitialCalibration" DefaultValue="TRUE" Type="list" Group="Application configuration" TabName="Configuration">
+        <PossibleValue Value="TRUE" Comment="Yes"/>
+        <PossibleValue Value="FALSE" Comment="No"/>
+        <Description>Enable initial estimation of the frequency of the Low Speed Oscillator
+         &lt;br&gt; otherwise it is assumed fixed at 32.768 kHz.</Description>
+        <Condition Diagnostic="" Expression="!(LSEByPass|LSEOscillator)"/>
+    </RefParameter>
+    <RefParameter Name="enableInitialCalibration" Comment="enableInitialCalibration" DefaultValue="FALSE" Type="list" Group="Application configuration" TabName="Configuration">
+        <PossibleValue Value="TRUE" Comment="Yes"/>
+        <PossibleValue Value="FALSE" Comment="No"/>
+        <Description>Enable initial estimation of the frequency of the Low Speed Oscillator
+         &lt;br&gt; otherwise it is assumed fixed at 32.768 kHz.</Description>
+    </RefParameter>
+
+    <RefParameter Name="periodicCalibrationInterval" Comment="periodicCalibrationInterval" DefaultValue="10000" Type="integer" Min="0" Max="10000" Group="Application configuration" TabName="Configuration">
+        <Description>Periodic calibration interval in ms (if 0 no calibration is done)
+		&lt;br&gt;Default value:
+		&lt;br&gt;0 if RCC LSE clock is enabled;
+		&lt;br&gt;10000 if RCC LSE clock is not enabled;
+		</Description>
+        <Condition Diagnostic="" Expression="!(LSEByPass|LSEOscillator)"/>
+    </RefParameter>
+    <RefParameter Name="periodicCalibrationInterval" Comment="periodicCalibrationInterval" DefaultValue="0" Type="integer" Min="0" Max="10000" Group="Application configuration" TabName="Configuration">
+        <Description>Periodic calibration interval in ms (if 0 no calibration is done)
+		&lt;br&gt;Default value:
+		&lt;br&gt;0 if RCC LSE clock is enabled;
+		&lt;br&gt;10000 if RCC LSE clock is not enabled;
+		</Description>
+    </RefParameter>
+
+	<RefMode Name="RADIO_Activate" >
+        <ConfigForMode>Radio_Timer_Init</ConfigForMode>
+           <Parameter Name="XTAL_StartupTime"/>
+           <Parameter Name="enableInitialCalibration"/>
+           <Parameter Name="periodicCalibrationInterval"/>
+    </RefMode>
+
+    <ModeLogicOperator Name="OR">
+        <Mode Name="RADIO_Activate" UserName="Activated">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="RADIO_Activate" UserName="Activated">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_RADIO" />
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>MW_RADIO_MW</Semaphore>
+            <Condition Diagnostic="Active only if RCC HSE is activated and PLL64M is activated in MUX RC64MPLL." Expression="HSEOscillator &amp; !RCCLSCOSOURCEHSI"/>
+        </Mode>
+    </ModeLogicOperator>
+
+    <RefSignal Name="VS_RADIO" Virtual="true"/>
+</IP>

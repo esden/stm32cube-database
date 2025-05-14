@@ -1,3 +1,4 @@
+
 [#ftl]
 
 [#---------------------------]
@@ -16,7 +17,6 @@
 /* For more information on Device Tree configuration, please refer to
  * https://wiki.st.com/stm32mpu/wiki/Category:Device_tree_configuration
  */
-
 [#if !srvcmx_isDbFeatureEnabled("noUBootSplSupport")]
 #include <dt-bindings/clock/stm32mp1-clksrc.h>
 	[#if mx_ddrConfigs["general"]?? && mx_ddrConfigs["general"]["isConfigured"]?? && mx_ddrConfigs["general"]["isConfigured"]=="true" ]
@@ -29,12 +29,12 @@
 	[/#if]
 [/#if]
 
-[#--if mx_socDtRPN?has_content && mxDtDM.dts_fileNameSuffix?has_content]
+[#if mx_socDtRPN?starts_with("stm32mp2") && mx_socDtRPN?has_content && mxDtDM.dts_fileNameSuffix?has_content]
 #include "${mx_socDtRPN}${mxDtDM.dts_fileNameSuffix}.dtsi"
 [#else]
 	[@mlog  logMod=module logType="ERR" logMsg="unknown 'U-BOOT' dtsi" varsMap={} /]
 /*#include "???.dtsi"*/
-[/#if--]
+[/#if]
 [#if !srvcmx_isDbFeatureEnabled("noUBootSplSupport")]
 	[#if mx_ddrConfigs["general"]?? && mx_ddrConfigs["general"]["isConfigured"]?? && mx_ddrConfigs["general"]["isConfigured"]=="true" ]
 		[#if mx_socDtRPN?has_content]
@@ -64,9 +64,10 @@
 }; /*root*/
 
 
-[#--pinctrl--]
+[#-- pinctrl --]
+[#if srvcmx_getFamilyName()?? && srvcmx_getFamilyName()=="stm32mp1"]
 [@DTBindedDtsElmtDMsList_print  pParentElmt="" pElmtsList=srvcmx_getElmtsMatchingBindedHwName(mxDtDM.dts_bindedElmtsList, "pinctrl") pDtLevel=0 pOrdering=true/]
-
+[/#if]
 [#if !srvcmx_isDbFeatureEnabled("noUBootSplSupport")][#--noUBootSplSupport--]
 [#--basic boot devices--]
 [#local basicBootDevicesList = ["rcc", "i2c4", "quadspi", "sdmmc1", "sdmmc2", "sai2", "sai4"]]
@@ -85,9 +86,14 @@
 
 [#else][#--noUBootSplSupport--]
 
-[#--dts level elmts--]
-[@DTBindedDtsElmtDMsList_print  pParentElmt="" pElmtsList=srvcmx_getDeviceElmtsByPath(mxDtDM.dts_bindedElmtsList, "") pDtLevel=0 pOrdering=true/][#--get only "dts" level elmts--]
 
+[#if srvcmx_getFamilyName()?? && srvcmx_getFamilyName()=="stm32mp2"]
+	[#assign excludedDevicesList = ["rcc"]]
+	[@DTBindedDtsElmtDMsList_print  pParentElmt="" pElmtsList=srvcmx_getDeviceElmtsByPathExcludingSome(mxDtDM.dts_bindedElmtsList, "", excludedDevicesList) pDtLevel=0 pOrdering=true/][#--get only "dts" level elmts--]
+[#else]
+	[#--dts level elmts--]
+	[@DTBindedDtsElmtDMsList_print  pParentElmt="" pElmtsList=srvcmx_getDeviceElmtsByPath(mxDtDM.dts_bindedElmtsList, "") pDtLevel=0 pOrdering=true/][#--get only "dts" level elmts--]
+[/#if]
 [/#if][#--noUBootSplSupport--]
 
 

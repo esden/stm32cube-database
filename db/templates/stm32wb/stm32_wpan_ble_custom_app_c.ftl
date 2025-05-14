@@ -134,6 +134,32 @@
 [#assign SERVICE5_CHAR4_PROP_READ = ""]
 [#assign SERVICE5_CHAR5_PROP_READ = ""]
 
+[#assign SERVICE1_CHAR1_VALUE_LENGTH = 0]
+[#assign SERVICE1_CHAR2_VALUE_LENGTH = 0]
+[#assign SERVICE1_CHAR3_VALUE_LENGTH = 0]
+[#assign SERVICE1_CHAR4_VALUE_LENGTH = 0]
+[#assign SERVICE1_CHAR5_VALUE_LENGTH = 0]
+[#assign SERVICE2_CHAR1_VALUE_LENGTH = 0]
+[#assign SERVICE2_CHAR2_VALUE_LENGTH = 0]
+[#assign SERVICE2_CHAR3_VALUE_LENGTH = 0]
+[#assign SERVICE2_CHAR4_VALUE_LENGTH = 0]
+[#assign SERVICE2_CHAR5_VALUE_LENGTH = 0]
+[#assign SERVICE3_CHAR1_VALUE_LENGTH = 0]
+[#assign SERVICE3_CHAR2_VALUE_LENGTH = 0]
+[#assign SERVICE3_CHAR3_VALUE_LENGTH = 0]
+[#assign SERVICE3_CHAR4_VALUE_LENGTH = 0]
+[#assign SERVICE3_CHAR5_VALUE_LENGTH = 0]
+[#assign SERVICE4_CHAR1_VALUE_LENGTH = 0]
+[#assign SERVICE4_CHAR2_VALUE_LENGTH = 0]
+[#assign SERVICE4_CHAR3_VALUE_LENGTH = 0]
+[#assign SERVICE4_CHAR4_VALUE_LENGTH = 0]
+[#assign SERVICE4_CHAR5_VALUE_LENGTH = 0]
+[#assign SERVICE5_CHAR1_VALUE_LENGTH = 0]
+[#assign SERVICE5_CHAR2_VALUE_LENGTH = 0]
+[#assign SERVICE5_CHAR3_VALUE_LENGTH = 0]
+[#assign SERVICE5_CHAR4_VALUE_LENGTH = 0]
+[#assign SERVICE5_CHAR5_VALUE_LENGTH = 0]
+
 [#assign SERVICE1_CHAR1_PROP_WRITE_WITHOUT_RESP = ""]
 [#assign SERVICE1_CHAR2_PROP_WRITE_WITHOUT_RESP = ""]
 [#assign SERVICE1_CHAR3_PROP_WRITE_WITHOUT_RESP = ""]
@@ -442,6 +468,81 @@
             [/#if]
             [#if (definition.name == "SERVICE5_CHAR5_SHORT_NAME")]
                 [#assign SERVICE5_CHAR5_SHORT_NAME = definition.value]
+            [/#if]
+			[#if (definition.name == "SERVICE1_CHAR1_VALUE_LENGTH")]
+                [#assign SERVICE1_CHAR1_VALUE_LENGTH = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE1_CHAR2_VALUE_LENGTH")]
+                [#assign SERVICE1_CHAR2_VALUE_LENGTH = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE1_CHAR3_VALUE_LENGTH")]
+                [#assign SERVICE1_CHAR3_VALUE_LENGTH = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE1_CHAR4_VALUE_LENGTH")]
+                [#assign SERVICE1_CHAR4_VALUE_LENGTH = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE1_CHAR5_VALUE_LENGTH")]
+                [#assign SERVICE1_CHAR5_VALUE_LENGTH = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE2_CHAR1_VALUE_LENGTH")]
+                [#assign SERVICE2_CHAR1_VALUE_LENGTH = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE2_CHAR2_VALUE_LENGTH")]
+                [#assign SERVICE2_CHAR2_VALUE_LENGTH = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE2_CHAR3_VALUE_LENGTH")]
+                [#assign SERVICE2_CHAR3_VALUE_LENGTH = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE2_CHAR4_VALUE_LENGTH")]
+                [#assign SERVICE2_CHAR4_VALUE_LENGTH = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE2_CHAR5_VALUE_LENGTH")]
+                [#assign SERVICE2_CHAR5_VALUE_LENGTH = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE3_CHAR1_VALUE_LENGTH")]
+                [#assign SERVICE3_CHAR1_VALUE_LENGTH = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE3_CHAR2_VALUE_LENGTH")]
+                [#assign SERVICE3_CHAR2_VALUE_LENGTH = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE3_CHAR3_VALUE_LENGTH")]
+                [#assign SERVICE3_CHAR3_VALUE_LENGTH = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE3_CHAR4_VALUE_LENGTH")]
+                [#assign SERVICE3_CHAR4_VALUE_LENGTH = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE3_CHAR5_VALUE_LENGTH")]
+                [#assign SERVICE3_CHAR5_VALUE_LENGTH = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE4_CHAR1_VALUE_LENGTH")]
+                [#assign SERVICE4_CHAR1_VALUE_LENGTH = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE4_CHAR2_VALUE_LENGTH")]
+                [#assign SERVICE4_CHAR2_VALUE_LENGTH = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE4_CHAR3_VALUE_LENGTH")]
+                [#assign SERVICE4_CHAR3_VALUE_LENGTH = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE4_CHAR4_VALUE_LENGTH")]
+                [#assign SERVICE4_CHAR4_VALUE_LENGTH = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE4_CHAR5_VALUE_LENGTH")]
+                [#assign SERVICE4_CHAR5_VALUE_LENGTH = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE5_CHAR1_VALUE_LENGTH")]
+                [#assign SERVICE5_CHAR1_VALUE_LENGTH = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE5_CHAR2_VALUE_LENGTH")]
+                [#assign SERVICE5_CHAR2_VALUE_LENGTH = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE5_CHAR3_VALUE_LENGTH")]
+                [#assign SERVICE5_CHAR3_VALUE_LENGTH = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE5_CHAR4_VALUE_LENGTH")]
+                [#assign SERVICE5_CHAR4_VALUE_LENGTH = definition.value]
+            [/#if]
+            [#if (definition.name == "SERVICE5_CHAR5_VALUE_LENGTH")]
+                [#assign SERVICE5_CHAR5_VALUE_LENGTH = definition.value]
             [/#if]
 
             [#if definition.value != ""]
@@ -958,6 +1059,34 @@
        "5":[SERVICE5_CHAR5_LONG_NAME, SERVICE5_CHAR5_SHORT_NAME]}
 }]
 
+[#assign SERVICES_CHARS_VALUE_LENGTH = {
+  "1":{"1":SERVICE1_CHAR1_VALUE_LENGTH,
+       "2":SERVICE1_CHAR2_VALUE_LENGTH,
+       "3":SERVICE1_CHAR3_VALUE_LENGTH,
+       "4":SERVICE1_CHAR4_VALUE_LENGTH,
+       "5":SERVICE1_CHAR5_VALUE_LENGTH},
+  "2":{"1":SERVICE2_CHAR1_VALUE_LENGTH,
+       "2":SERVICE2_CHAR2_VALUE_LENGTH,
+       "3":SERVICE2_CHAR3_VALUE_LENGTH,
+       "4":SERVICE2_CHAR4_VALUE_LENGTH,
+       "5":SERVICE2_CHAR5_VALUE_LENGTH},
+  "3":{"1":SERVICE3_CHAR1_VALUE_LENGTH,
+       "2":SERVICE3_CHAR2_VALUE_LENGTH,
+       "3":SERVICE3_CHAR3_VALUE_LENGTH,
+       "4":SERVICE3_CHAR4_VALUE_LENGTH,
+       "5":SERVICE3_CHAR5_VALUE_LENGTH},
+  "4":{"1":SERVICE4_CHAR1_VALUE_LENGTH,
+       "2":SERVICE4_CHAR2_VALUE_LENGTH,
+       "3":SERVICE4_CHAR3_VALUE_LENGTH,
+       "4":SERVICE4_CHAR4_VALUE_LENGTH,
+       "5":SERVICE4_CHAR5_VALUE_LENGTH},
+  "5":{"1":SERVICE5_CHAR1_VALUE_LENGTH,
+       "2":SERVICE5_CHAR2_VALUE_LENGTH,
+       "3":SERVICE5_CHAR3_VALUE_LENGTH,
+       "4":SERVICE5_CHAR4_VALUE_LENGTH,
+       "5":SERVICE5_CHAR5_VALUE_LENGTH}
+}]
+
 [#assign item = 0]
 [#assign item_PROP_START = item]
 [#-- assign item_PROP_NONE = item][#assign item = item + 1--]
@@ -1102,9 +1231,9 @@ static Custom_App_Context_t Custom_App_Context;
  * END of Section BLE_APP_CONTEXT
  */
 
-uint8_t UpdateCharData[247];
-uint8_t NotifyCharData[247];
-
+uint8_t UpdateCharData[512];
+uint8_t NotifyCharData[512];
+uint16_t Connection_Handle;
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -1242,7 +1371,7 @@ void Custom_APP_Init(void)
                 SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_NOTIFY] != "" ||
                 SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE]?? &&
                 SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE] != ""]
-void Custom_[@capitalizeServChar service characteristic/]_Update_Char(void) /* Property Read */
+__USED void Custom_[@capitalizeServChar service characteristic/]_Update_Char(void) /* Property Read */
 { 
   uint8_t updateflag = 0;
 
@@ -1252,7 +1381,11 @@ void Custom_[@capitalizeServChar service characteristic/]_Update_Char(void) /* P
 
   if (updateflag != 0)
   {
+    [#if SERVICES_CHARS_VALUE_LENGTH[service?string][characteristic?string]?number > 243]
+	Custom_STM_App_Update_Char_Ext(Connection_Handle, [@customServChar service characteristic/], (uint8_t *)UpdateCharData);
+	[#else]
     Custom_STM_App_Update_Char([@customServChar service characteristic/], (uint8_t *)UpdateCharData);
+	[/#if]
   }
   
   /* USER CODE BEGIN [@capitalizeServChar service characteristic/]_UC_Last*/
@@ -1274,7 +1407,11 @@ void Custom_[@capitalizeServChar service characteristic/]_Send_Notification(void
 
   if (updateflag != 0)
   {
+    [#if SERVICES_CHARS_VALUE_LENGTH[service?string][characteristic?string]?number > 243]
+	Custom_STM_App_Update_Char_Ext(Connection_Handle, [@customServChar service characteristic/], (uint8_t *)NotifyCharData);
+	[#else]
     Custom_STM_App_Update_Char([@customServChar service characteristic/], (uint8_t *)NotifyCharData);
+	[/#if]
   }
   
   /* USER CODE BEGIN [@capitalizeServChar service characteristic/]_NS_Last*/
@@ -1297,7 +1434,11 @@ void Custom_[@capitalizeServChar service characteristic/]_Send_Indication(void) 
 
   if (updateflag != 0)
   {
-    Custom_STM_App_Update_Char([@customServChar service characteristic/], (uint8_t *)NotifyCharData);
+	[#if SERVICES_CHARS_VALUE_LENGTH[service?string][characteristic?string]?number > 243]
+    Custom_STM_App_Update_Char_Ext(Connection_Handle, [@customServChar service characteristic/], (uint8_t *)NotifyCharData);
+	[#else]
+	Custom_STM_App_Update_Char([@customServChar service characteristic/], (uint8_t *)NotifyCharData);
+	[/#if]
   }
   
   /* USER CODE BEGIN [@capitalizeServChar service characteristic/]_IS_Last*/

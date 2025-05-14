@@ -911,8 +911,16 @@
 /* USER CODE END Includes */
 
 /* Define   ------------------------------------------------------------------*/
-#define PORT0_NB_SOURCEPDO         ${PORT0_NB_SOURCEPDO}U   /* Number of Source PDOs (applicable for port 0)   */
-#define PORT0_NB_SINKPDO           ${PORT0_NB_SINKPDO}U   /* Number of Sink PDOs (applicable for port 0)     */
+[#if (PORT0_UCPD_MODE=="Source_UCPD1") || (PORT0_UCPD_MODE=="DualRole_UCPD1")]
+#define PORT0_NB_SOURCEPDO         ${USBPD_PORT0_PDO_SRC_NB}U   /* Number of Source PDOs (applicable for port 0)   */
+[#else]
+#define PORT0_NB_SOURCEPDO         0U   /* Number of Source PDOs (applicable for port 0)   */
+[/#if]
+[#if PORT0_UCPD_MODE=="Sink_UCPD1" || PORT0_UCPD_MODE=="DualRole_UCPD1"]
+#define PORT0_NB_SINKPDO           ${USBPD_PORT0_PDO_SNK_NB}U   /* Number of Sink PDOs (applicable for port 0)     */
+[#else]
+#define PORT0_NB_SINKPDO           0U   /* Number of Sink PDOs (applicable for port 0)     */
+[/#if]
 [#if nbPorts=="2"]
 #define PORT1_NB_SOURCEPDO         ${PORT1_NB_SOURCEPDO}U   /* Number of Source PDOs (applicable for port 1)   */
 #define PORT1_NB_SINKPDO           ${PORT1_NB_SINKPDO}U   /* Number of Sink PDOs (applicable for port 1)     */

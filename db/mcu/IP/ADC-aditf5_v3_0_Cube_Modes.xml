@@ -506,22 +506,23 @@
         <PossibleValue Comment="11 bit shift for oversampling" Semaphore="REG_RIGHTBITSHIFT11_$IpInstance" Value="ADC_RIGHTBITSHIFT_11"/>
 		 
     </RefParameter>		
-			
-    <RefParameter Comment="Oversampling Ratio" DefaultValue="null" Group="ADCgroup" Name="Ratio" Type="list" Visible="false">
-        <Condition Diagnostic="" Expression="OversamplingMode=DISABLE | EnableRegularConversion=DISABLE"/>
-    </RefParameter>
-    	<RefParameter Comment="Oversampling Ratio" DefaultValue="ADC3_OVERSAMPLING_RATIO_2" Group="ADCgroup" Name="Ratio" Type="list">
-		<PossibleValue Comment="Oversampling ratio 2x" Value="ADC3_OVERSAMPLING_RATIO_2"/>
-		<PossibleValue Comment="Oversampling ratio 4x" Value="ADC3_OVERSAMPLING_RATIO_4"/>
-		<PossibleValue Comment="Oversampling ratio 8x" Value="ADC3_OVERSAMPLING_RATIO_8"/>
-		<PossibleValue Comment="Oversampling ratio 16x" Value="ADC3_OVERSAMPLING_RATIO_16"/>
-		<PossibleValue Action="Disable" Comment="Oversampling ratio 32x" Value="ADC3_OVERSAMPLING_RATIO_32"/>
-		<PossibleValue Action="Disable" Comment="Oversampling ratio 64x" Value="ADC3_OVERSAMPLING_RATIO_64"/>
-		<PossibleValue Action="Disable" Comment="Oversampling ratio 128x" Value="ADC3_OVERSAMPLING_RATIO_128"/>
-		<PossibleValue Action="Disable" Comment="Oversampling ratio 256x" Value="ADC3_OVERSAMPLING_RATIO_256"/>
 
-		<Description>Configure the Oversampling ratio</Description>
+	<RefParameter Comment="Oversampling Ratio" DefaultValue="1" Group="ADCgroup" Max="1024" Min="1" Name="Ratio" Type="integer">
+		<Condition Diagnostic="" Expression="!(DIE483 &amp;$IpNumber=3)" />
 	</RefParameter>
+	<RefParameter Comment="Oversampling Ratio" DefaultValue="ADC3_OVERSAMPLING_RATIO_2" Group="ADCgroup" Name="Ratio" Type="list">
+		<PossibleValue Comment="Oversampling ratio 2x " Value="ADC3_OVERSAMPLING_RATIO_2" />
+		<PossibleValue Comment="Oversampling ratio 4x " Value="ADC3_OVERSAMPLING_RATIO_4" />
+		<PossibleValue Comment="Oversampling ratio 8x " Value="ADC3_OVERSAMPLING_RATIO_8" />
+		<PossibleValue Comment="Oversampling ratio 16x " Value="ADC3_OVERSAMPLING_RATIO_16" />
+		<PossibleValue Comment="Oversampling ratio 32x " Value="ADC3_OVERSAMPLING_RATIO_32" />
+		<PossibleValue Comment="Oversampling ratio 64x " Value="ADC3_OVERSAMPLING_RATIO_64" />
+		<PossibleValue Comment="Oversampling ratio 128x " Value="ADC3_OVERSAMPLING_RATIO_128" />
+		<PossibleValue Comment="Oversampling ratio 256x " Value="ADC3_OVERSAMPLING_RATIO_256" />
+		<PossibleValue Comment="Oversampling ratio 512x " Value="ADC3_OVERSAMPLING_RATIO_512" />
+		<PossibleValue Comment="Oversampling ratio 1024x " Value="ADC3_OVERSAMPLING_RATIO_1024" />
+	</RefParameter>
+
     <!-- Sampling mode to be used for ADC group regular conversion ,On devices STM32H72xx and STM32H73xx, this parameter is specific to ADC3 only--> 
     
     <RefParameter Comment="Sampling Mode" DefaultValue="ADC_SAMPLING_MODE_NORMAL" Group="ADCgroup" Name="SamplingMode" Type="list" >
@@ -2710,22 +2711,21 @@
             <PossibleValue>ADC_CHANNEL_15</PossibleValue>
         </Parameter>
     </RefMode>
-    <RefMode Comment="" Name="VDAC1_OUT1 Channel">
+    <RefMode Comment="" Name="VDAC1-OUT1 Channel">
         <ConfigForMode>ADC_RegularChannelConfig</ConfigForMode>
         <Parameter Name="Channel">
             <PossibleValue>ADC_CHANNEL_DAC1CH1_ADC2</PossibleValue>
         </Parameter>
     </RefMode>
 	
-    <RefMode Comment="" Name="VDAC1_OUT2 Channel">
+    <RefMode Comment="" Name="VDAC1-OUT2 Channel">
         <ConfigForMode>ADC_RegularChannelConfig</ConfigForMode>
         <Parameter Name="Channel">
             <PossibleValue>ADC_CHANNEL_DAC1CH2_ADC2</PossibleValue>
         </Parameter>
     </RefMode>
     <RefMode Comment="" Name="IN16">
-        <Condition Diagnostic="" Expression="($IpNumber=2 &amp; DIE483)"/>
-	 
+        <Condition Diagnostic="" Expression="($IpNumber=2 &amp; DIE483)"/>	 
         <Parameter Name="Channel">
             <PossibleValue>ADC_CHANNEL_VBAT</PossibleValue>
             <PossibleValue>ADC_CHANNEL_DAC1CH2_ADC2</PossibleValue>
@@ -3138,9 +3138,9 @@
 
         </Mode>
         
-        <Mode Name="IN16" RemoveCondition="($IpNumber=1 &amp; (DIE450|DIE483|DIE480|DIE485)) |($IpNumber=3 &amp; (DIE450|DIE483|DIE480))|($IpNumber=2 &amp; (DIE483|DIE480|DIE485))">
+        <Mode Name="IN16" RemoveCondition="($IpNumber=1 &amp; (DIE450|DIE483|DIE480|DIE485)) |($IpNumber=3 &amp; (DIE450|DIE483|DIE480))|($IpNumber=2 &amp; (DIE480|DIE485))">
             <ModeLogicOperator Name="XOR">
-                <Mode Name="VDAC1_OUT1 Channel" UserName="VDAC1_OUT1 Channel">
+                <Mode Name="VDAC1-OUT1 Channel" UserName="VDAC1-OUT1 Channel">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="VS_DAC1_OUT1_L4"/>
                     </SignalLogicalOp>
@@ -3158,7 +3158,7 @@
         </Mode>
         <Mode Name="IN17" RemoveCondition="(DIE450) | (DIE480)|(DIE485)| ($IpNumber=1)| ($IpNumber=3)|($IpNumber=2 &amp; (DIE485))">
             <ModeLogicOperator Name="XOR">
-                <Mode Name="VDAC1_OUT2 Channel" UserName="VDAC1_OUT2 Channel">
+                <Mode Name="VDAC1-OUT2 Channel" UserName="VDAC1-OUT2 Channel">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="VS_DAC1_OUT2_L4"/>
                     </SignalLogicalOp>

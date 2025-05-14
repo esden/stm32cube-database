@@ -30,8 +30,9 @@ ZigBeeMode : ${ZigBeeMode}
 #include <assert.h>
 #include <stdint.h>
 
-#include "app_conf.h"
 #include "app_common.h"
+#include "app_conf.h"
+#include "log_module.h"
 #include "app_entry.h"
 #include "app_zigbee.h"
 #include "app_zigbee_endpoint.h"
@@ -58,7 +59,7 @@ ZigbeeAppInfo_t    	              stZigbeeAppInfo;
 
 /* USER CODE BEGIN PV */
 
-/* USER CODE BEGIN PV */
+/* USER CODE END PV */
 
 /* Private defines -----------------------------------------------------------*/
 #define APP_ZIGBEE_STARTUP_FAIL_DELAY               500u        // Time (in ms) between two tentative to Join a Coord/Router.
@@ -77,12 +78,12 @@ ZigbeeAppInfo_t    	              stZigbeeAppInfo;
 
 /* USER CODE BEGIN PD */
 
-/* USER CODE BEGIN PD */
+/* USER CODE END PD */
 
 /* Private constants ---------------------------------------------------------*/
 /* USER CODE BEGIN PC */
 
-/* USER CODE BEGIN PC */
+/* USER CODE END PC */
 
 /* Private function prototypes -----------------------------------------------*/
 static enum ZbStatusCodeT ZbStartupWait       ( struct ZigBeeT * zb, struct ZbStartupT * pstConfig );
@@ -101,7 +102,7 @@ static void APP_ZIGBEE_NwkFormOrJoinTask      ( ULONG lArgument );
 [/#if]
 /* USER CODE BEGIN PFP */
 
-/* USER CODE BEGIN PFP */
+/* USER CODE END PFP */
 
 /* Private variabless -----------------------------------------------*/
 static enum ZbStatusCodeT       eZbStartupWaitStatus;
@@ -116,7 +117,7 @@ TX_THREAD                       NwkFormThread;
 [/#if]
 /* USER CODE BEGIN PV */
 
-/* USER CODE BEGIN PV */
+/* USER CODE END PV */
 
 /* Functions Definition ------------------------------------------------------*/
 
@@ -160,12 +161,12 @@ void APP_ZIGBEE_NwkFormOrJoinTaskInit( void )
   /* Create the Network Form Thread with this stack */
   if ( ThreadXStatus == TX_SUCCESS )
   { 
-    ThreadXStatus |= tx_byte_allocate( pBytePool, (VOID**) &pStack, TASK_ZIGBEE_NETWORK_FORM_STACK_SIZE, TX_NO_WAIT );
+    ThreadXStatus |= tx_byte_allocate( pBytePool, (void **)&pStack, TASK_STACK_SIZE_ZIGBEE_NETWORK_FORM, TX_NO_WAIT );
   }
   if ( ThreadXStatus == TX_SUCCESS )
   {
     ThreadXStatus |= tx_thread_create(  &NwkFormThread, "NwkFormThread", APP_ZIGBEE_NwkFormOrJoinTask, 0, pStack,
-                                        TASK_ZIGBEE_NETWORK_FORM_STACK_SIZE, CFG_TASK_PRIO_ZIGBEE_NETWORK_FORM, CFG_TASK_PRIO_ZIGBEE_NETWORK_FORM,
+                                        TASK_STACK_SIZE_ZIGBEE_NETWORK_FORM, TASK_PRIO_ZIGBEE_NETWORK_FORM, TASK_PRIO_ZIGBEE_NETWORK_FORM,
                                         TX_NO_TIME_SLICE, TX_AUTO_START );
   }
 
@@ -184,7 +185,7 @@ void APP_ZIGBEE_NwkFormOrJoinTaskInit( void )
   UTIL_SEQ_RegTask( 1U << CFG_TASK_ZIGBEE_NETWORK_FORM, UTIL_SEQ_RFU, APP_ZIGBEE_NwkFormOrJoin );
 
   /* launch the startup of the mesh network setup */
-  UTIL_SEQ_SetTask( 1U << CFG_TASK_ZIGBEE_NETWORK_FORM, CFG_TASK_PRIO_ZIGBEE_NETWORK_FORM );
+  UTIL_SEQ_SetTask( 1U << CFG_TASK_ZIGBEE_NETWORK_FORM, TASK_PRIO_ZIGBEE_NETWORK_FORM );
 [/#if]
 }
 
@@ -300,7 +301,7 @@ static void APP_ZIGBEE_NwkFormWaitElapsed( void * arg )
   tx_semaphore_put( &NwkFormWaitEndSemaphore );
 [/#if]
 [#if myHash["SEQUENCER_STATUS"]?number == 1 ]
-  UTIL_SEQ_SetTask( 1U << CFG_TASK_ZIGBEE_NETWORK_FORM, CFG_TASK_PRIO_ZIGBEE_NETWORK_FORM );
+  UTIL_SEQ_SetTask( 1U << CFG_TASK_ZIGBEE_NETWORK_FORM, TASK_PRIO_ZIGBEE_NETWORK_FORM );
 [/#if]
 }
 
@@ -553,6 +554,48 @@ static enum zb_msg_filter_rc APP_ZIGBEE_DeviceJointCallback( struct ZigBeeT * zb
  *************************************************************/
 
 /**
+ * @brief  Callback that indicate if a 'Permit to Join' the network can be done
+ * @param  None
+ * @retval None
+ */
+static void APP_ZIGBEE_ZbZdoPermitJoinReqCallback( struct ZbZdoPermitJoinRspT * pstJoinResponse, void * arg )
+{
+  UNUSED( arg );
+  
+  if ( pstJoinResponse->status != ZB_STATUS_SUCCESS )
+  {
+    LOG_ERROR_APP( "Error, cannot set Permit Join duration (%d)", pstJoinResponse->status );
+  } 
+  else 
+  {
+    LOG_INFO_APP( "Permit Join duration successfully changed." );
+  }
+}
+
+/**
+ * @brief  Send the request to NWK layer a Permit to Join the network
+ * @param  cPermitJoinDelay   Delay in second during the new Permit to Join is available
+ * @retval None
+ */
+void APP_ZIGBEE_PermitJoin( uint8_t cPermitJoinDelay )
+{
+  struct ZbZdoPermitJoinReqT  stJoinRequest;
+  enum ZbStatusCodeT          eStatus;
+
+  memset( &stJoinRequest, 0, sizeof( stJoinRequest ) );
+  stJoinRequest.destAddr = ZB_NWK_ADDR_UNDEFINED;
+  stJoinRequest.tcSignificance = true;
+  stJoinRequest.duration = cPermitJoinDelay;
+
+  LOG_INFO_APP( "Send command Permit Join during %ds", cPermitJoinDelay );
+  eStatus = ZbZdoPermitJoinReq( stZigbeeAppInfo.pstZigbee, &stJoinRequest, APP_ZIGBEE_ZbZdoPermitJoinReqCallback, NULL);
+  if ( eStatus != ZB_STATUS_SUCCESS )
+  {
+    LOG_ERROR_APP( "Error during command Permit Join (%d)", eStatus );
+  }
+}
+
+/**
  * @brief  Indicate if Application as already join the network
  * @param  None
  * @retval True if Join OK, else False
@@ -647,7 +690,7 @@ void APP_ZIGBEE_PrintGenericInfo( void )
 #else // ( CONFIG_ZB_ZCL_SE == 1 )
   LOG_INFO_APP( "Zigbee Stack version : R%02d", CONFIG_ZB_REV );
 #endif // ( CONFIG_ZB_ZCL_SE == 1 )
-  LOG_INFO_APP( "Zigbee Extended Address : 0x%016" PRIX64, ZbExtendedAddress( stZigbeeAppInfo.pstZigbee ) );
+  LOG_INFO_APP( "Zigbee Extended Address : " LOG_DISPLAY64(), LOG_NUMBER64( ZbExtendedAddress( stZigbeeAppInfo.pstZigbee ) ) );
 
   /* Obtains Link Key */
 [#if ZigBeeMode == "DISTRIBUTED"]

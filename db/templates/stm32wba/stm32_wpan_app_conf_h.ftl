@@ -57,9 +57,10 @@ Key: ${key}; Value: ${myHash[key]}
 #define APP_CONF_H
 
 /* Includes ------------------------------------------------------------------*/
+[#if (myHash["BLE_MODE_SIMPLEST_BLE"] != "Enabled")]
 #include "hw_if.h"
+[/#if]
 #include "utilities_conf.h"
-#include "log_module.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -86,12 +87,18 @@ Key: ${key}; Value: ${myHash[key]}
 /**
  * Define BD_ADDR type: define proper address. Can only be GAP_PUBLIC_ADDR (0x00) or GAP_STATIC_RANDOM_ADDR (0x01)
  */
-#define CFG_BD_ADDRESS_TYPE               (${myHash["CFG_BD_ADDRESS_TYPE"]})
-[#if ((myHash["CFG_STATIC_RANDOM_ADDRESS"]?number == 1) && (myHash["CFG_BD_ADDRESS_TYPE"] == "GAP_STATIC_RANDOM_ADDR"))]
+#define CFG_BD_ADDRESS_DEVICE             (${myHash["CFG_BD_ADDRESS_DEVICE"]})
+[#if ((myHash["CFG_STATIC_RANDOM_ADDRESS"]?number == 1) && (myHash["CFG_BD_ADDRESS_DEVICE"] == "GAP_STATIC_RANDOM_ADDR"))]
 /**
  * Define Static Random Address fixed for lifetime of the device
  */
 #define CFG_STATIC_RANDOM_ADDRESS         (${myHash["STATIC_RANDOM_ADDRESS"]})
+[/#if]
+[#if ((myHash["CFG_STATIC_RANDOM_ADDRESS"]?number == 2) && (myHash["CFG_BD_ADDRESS_DEVICE"] == "GAP_STATIC_RANDOM_ADDR"))]
+/**
+ * Define Static Unique Random Address LSB fixed for lifetime of the device
+ */
+#define CFG_STATIC_UNIQUE_RANDOM_ADDR_LSB (${myHash["CFG_STATIC_UNIQUE_RANDOM_ADDR_LSB"]})
 [/#if]
 
 /**
@@ -105,10 +112,10 @@ Key: ${key}; Value: ${myHash[key]}
  * if CFG_PRIVACY equals PRIVACY_DISABLED, CFG_BLE_ADDRESS_TYPE has 2 allowed values: GAP_PUBLIC_ADDR or GAP_STATIC_RANDOM_ADDR
  * if CFG_PRIVACY equals PRIVACY_ENABLED, CFG_BLE_ADDRESS_TYPE has 2 allowed values: GAP_RESOLVABLE_PRIVATE_ADDR or GAP_NON_RESOLVABLE_PRIVATE_ADDR
  */
-[#if (myHash["CFG_PRIVACY"] == "PRIVACY_DISABLED")]
-#define CFG_BLE_ADDRESS_TYPE              (${myHash["CFG_BD_ADDRESS_TYPE"]})
+[#if (myHash["CFG_PRIVACY"] == "PRIVACY_ENABLED")]
+#define CFG_BD_ADDRESS_TYPE               (${myHash["CFG_BD_ADDRESS_TYPE"]})
 [#else]
-#define CFG_BLE_ADDRESS_TYPE              (${myHash["CFG_BLE_ADDR_TYPE"]})
+#define CFG_BD_ADDRESS_TYPE               (${myHash["CFG_BD_ADDRESS_DEVICE"]})
 [/#if]
 [/#if]
 
@@ -126,38 +133,38 @@ Key: ${key}; Value: ${myHash[key]}
  * Define IO Authentication
  */
 [#if (myHash["BLE_MODE_CENTRAL"] == "Enabled") || (myHash["BLE_MODE_PERIPHERAL_CENTRAL"] == "Enabled")]
-#define CFG_BONDING_MODE                 (1)
+#define CFG_BONDING_MODE                  (1)
 [#else]
-#define CFG_BONDING_MODE                 (${myHash["CFG_BONDING_MODE"]})
+#define CFG_BONDING_MODE                  (${myHash["CFG_BONDING_MODE"]})
 [/#if]
 [#if (myHash["BLE_MODE_CENTRAL"] == "Enabled") || (myHash["BLE_MODE_PERIPHERAL_CENTRAL"] == "Enabled")]
-#define CFG_USED_FIXED_PIN               (1)                               /* 0->fixed pin is used ; 1->No fixed pin used*/
+#define CFG_USED_FIXED_PIN                (1)                               /* 0->fixed pin is used ; 1->No fixed pin used*/
 [#else]
-#define CFG_USED_FIXED_PIN               (${myHash["CFG_USED_FIXED_PIN"]}) /* 0->fixed pin is used ; 1->No fixed pin used*/
+#define CFG_USED_FIXED_PIN                (${myHash["CFG_USED_FIXED_PIN"]}) /* 0->fixed pin is used ; 1->No fixed pin used*/
 [/#if]
-#define CFG_FIXED_PIN                    (${myHash["CFG_FIXED_PIN"]})
-#define CFG_ENCRYPTION_KEY_SIZE_MAX      (${myHash["CFG_ENCRYPTION_KEY_SIZE_MAX"]})
-#define CFG_ENCRYPTION_KEY_SIZE_MIN      (${myHash["CFG_ENCRYPTION_KEY_SIZE_MIN"]})
+#define CFG_FIXED_PIN                     (${myHash["CFG_FIXED_PIN"]})
+#define CFG_ENCRYPTION_KEY_SIZE_MAX       (${myHash["CFG_ENCRYPTION_KEY_SIZE_MAX"]})
+#define CFG_ENCRYPTION_KEY_SIZE_MIN       (${myHash["CFG_ENCRYPTION_KEY_SIZE_MIN"]})
 
 /**
  * Define Input Output capabilities
  */
-#define CFG_IO_CAPABILITY                (${myHash["CFG_IO_CAPABILITY"]})
+#define CFG_IO_CAPABILITY                 (${myHash["CFG_IO_CAPABILITY"]})
 
 /**
  * Define Man In The Middle modes
  */
-#define CFG_MITM_PROTECTION              (${myHash["CFG_MITM_PROTECTION"]})
+#define CFG_MITM_PROTECTION               (${myHash["CFG_MITM_PROTECTION"]})
 
 /**
  * Define Secure Connections Support
  */
-#define CFG_SC_SUPPORT                   (${myHash["CFG_SC_SUPPORT"]})
+#define CFG_SC_SUPPORT                    (${myHash["CFG_SC_SUPPORT"]})
 
 /**
  * Define Keypress Notification Support
  */
-#define CFG_KEYPRESS_NOTIFICATION_SUPPORT     (${myHash["CFG_KEYPRESS_NOTIFICATION_SUPPORT"]})
+#define CFG_KEYPRESS_NOTIFICATION_SUPPORT (${myHash["CFG_KEYPRESS_NOTIFICATION_SUPPORT"]})
 
 [/#if]
 /**
@@ -198,7 +205,7 @@ Key: ${key}; Value: ${myHash[key]}
 
 /* USER CODE END Specific_Parameters */
 
-[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled")]
+[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled") || (myHash["BLE_MODE_SIMPLEST_BLE"] == "Enabled")]
 /******************************************************************************
  * BLE Stack
  ******************************************************************************/
@@ -310,6 +317,9 @@ Key: ${key}; Value: ${myHash[key]}
 #define CFG_LPM_LEVEL            (${myHash["CFG_LPM_LEVEL"]})
 #define CFG_LPM_STDBY_SUPPORTED  (${myHash["CFG_LPM_STDBY_SUPPORTED"]})
 
+/* Defines time to wake up from standby before radio event to meet timings */
+#define CFG_LPM_STDBY_WAKEUP_TIME (${myHash["CFG_LPM_STDBY_WAKEUP_TIME"]})
+
 /* USER CODE BEGIN Low_Power 0 */
 
 [#if (myHash["BLE_MODE_TRANSPARENT_UART"] == "Enabled")]
@@ -327,11 +337,14 @@ typedef enum
 {
   CFG_LPM_APP,
   CFG_LPM_LOG,
+  CFG_LPM_LL_DEEPSLEEP,
+  CFG_LPM_LL_HW_RCO_CLBR,
 [#if (myHash["BLE_MODE_TRANSPARENT_UART"] == "Enabled")]
   CFG_LPM_APP_BLE,
 [/#if]
-[#if (myHash["ZIGBEE"] == "Enabled") || (myHash["ZIGBEE_SKELETON"] == "Enabled") || (myHash["mac_802_15_4_SKELETON"] == "Enabled")|| (myHash["THREAD_SKELETON"] == "Enabled")|| (myHash["THREAD"] == "Enabled")]
+[#if (myHash["THREAD_SKELETON"] == "Enabled") || (myHash["THREAD"] == "Enabled")]
   CFG_LPM_APP_THREAD,
+  CFG_LPM_PKA,
 [/#if]
   /* USER CODE BEGIN CFG_LPM_Id_t */
 
@@ -375,7 +388,8 @@ typedef enum
 #define CFG_LOG_INSERT_TIME_STAMP_INSIDE_THE_TRACE  (${myHash["CFG_LOG_INSERT_TIME_STAMP_INSIDE_THE_TRACE"]}U)
 #define CFG_LOG_INSERT_EOL_INSIDE_THE_TRACE         (${myHash["CFG_LOG_INSERT_EOL_INSIDE_THE_TRACE"]}U)
 
-
+#define CFG_LOG_TRACE_FIFO_SIZE     (${myHash["CFG_LOG_TRACE_FIFO_SIZE"]}U)
+#define CFG_LOG_TRACE_BUF_SIZE      (${myHash["CFG_LOG_TRACE_BUF_SIZE"]}U)
 
 /* macro ensuring retrocompatibility with old applications */
 #define APP_DBG                     LOG_INFO_APP
@@ -434,8 +448,8 @@ extern UART_HandleTypeDef           h${myHashCli["IpInstance"+i]?lower_case?repl
  */
 typedef enum
 {
-  CFG_TASK_HW_RNG,                /* Task linked to chip internal peripheral. */
-  CFG_TASK_LINK_LAYER,            /* Tasks linked to Communications Layers. */
+  CFG_TASK_HW_RNG,
+  CFG_TASK_LINK_LAYER,
 [#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled")]
 [#if myHash["BLE_MODE_CENTRAL"] == "Enabled"]
   CFG_TASK_DISCOVER_SERVICES_ID,
@@ -448,32 +462,29 @@ typedef enum
   CFG_TASK_HCI_ACL_DATA_ID,
   CFG_TASK_SYS_LOCAL_CMD_ID,
   CFG_TASK_TX_TO_HOST_ID,
+  CFG_TASK_NOTIFY_EVENT_ID,
 [/#if]
 [/#if]
 [#if (myHash["USE_TEMPERATURE_BASED_RADIO_CALIBRATION"]?number == 1)]
-  CFG_TASK_LINK_LAYER_TEMP_MEAS,
+  CFG_TASK_TEMP_MEAS,
 [/#if]
 [#if (myHash["BLE"] == "Enabled")]
   CFG_TASK_BLE_HOST,
 [/#if]
+[#if (myHash["CFG_MM_TYPE"]?number == 2)]
+  CFG_TASK_AMM,
+[/#if]
 [#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled")]
   CFG_TASK_BPKA,
-[/#if]
-[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled")]
-  CFG_TASK_AMM_BCKGND,
-[#if (myHash["USE_SNVMA_NVM"]?number != 0)]
-  CFG_TASK_FLASH_MANAGER_BCKGND,
-[/#if]
-[/#if]
-[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled")]
+  CFG_TASK_FLASH_MANAGER,
   CFG_TASK_BLE_TIMER_BCKGND,
 [/#if]
 [#if (myHash["ZIGBEE"] == "Enabled") || (myHash["ZIGBEE_SKELETON"] == "Enabled") || (myHash["mac_802_15_4_SKELETON"] == "Enabled")]
   CFG_TASK_MAC_LAYER,
-[#if (myHash["CFG_AMM_VIRTUAL_MEMORY_NUMBER"]?number != 0)]
-  CFG_TASK_AMM_BCKGND,            /* AMM background task */
-[/#if]  
 [#if (myHash["ZIGBEE"] == "Enabled")]
+[#if (myHash["USE_SNVMA_NVM"]?number != 0)]
+  CFG_TASK_FLASH_MANAGER,
+[/#if]
   CFG_TASK_ZIGBEE_LAYER,
   CFG_TASK_ZIGBEE_NETWORK_FORM,   /* Tasks linked to Zigbee Start. */
   CFG_TASK_ZIGBEE_APP_START,
@@ -487,10 +498,9 @@ typedef enum
   CFG_TASK_OT_UART,
   CFG_TASK_OT_ALARM,
   CFG_TASK_OT_US_ALARM,
-
-  /* APPLI TASKS */
   CFG_TASK_OT_TASKLETS,
   CFG_TASK_SET_THREAD_MODE,
+  CFG_TASK_PKA,
 [/#if]
   /* USER CODE BEGIN CFG_Task_Id_t */
 [#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled")]
@@ -547,6 +557,9 @@ typedef enum
   CFG_SEQ_PRIO_NBR /* Shall be LAST in the list */
 } CFG_SEQ_Prio_Id_t;
 
+/* Sequencer configuration */
+#define UTIL_SEQ_CONF_PRIO_NBR              CFG_SEQ_PRIO_NBR
+
 [#if (myHash["BLE_MODE_PERIPHERAL"] == "Enabled")||(myHash["BLE_MODE_CENTRAL"] == "Enabled")]
 /**
  * This is a bit mapping over 32bits listing all events id supported in the application
@@ -588,6 +601,9 @@ typedef enum
 #define TASK_MAC_LAYER                      ( 1u << CFG_TASK_MAC_LAYER )
 [/#if]
 [#if (myHash["ZIGBEE"] == "Enabled")]
+[#if (myHash["USE_SNVMA_NVM"]?number != 0)]
+#define TASK_FLASH_MNGR                     ( 1u << CFG_TASK_FLASH_MANAGER )
+[/#if]
 #define TASK_ZIGBEE_LAYER                   ( 1u << CFG_TASK_ZIGBEE_LAYER )
 #define TASK_ZIGBEE_NETWORK_FORM            ( 1u << CFG_TASK_ZIGBEE_NETWORK_FORM )
 #define TASK_ZIGBEE_APP_START               ( 1u << CFG_TASK_ZIGBEE_APP_START )
@@ -601,17 +617,6 @@ typedef enum
 /* USER CODE END TASK_ID_Define */
 
 [/#if]
-[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled")]
-/* Sequencer priorities by default  */
-#define CFG_TASK_PRIO_HW_RNG                CFG_SEQ_PRIO_0
-#define CFG_TASK_PRIO_LINK_LAYER            CFG_SEQ_PRIO_0
-/* USER CODE BEGIN TASK_Priority_Define */
-
-/* USER CODE END TASK_Priority_Define */
-
-[/#if]
-/* Used by Sequencer */
-#define UTIL_SEQ_CONF_PRIO_NBR              CFG_SEQ_PRIO_NBR
 
 /**
  * These are the lists of events id registered to the sequencer
@@ -630,6 +635,9 @@ typedef enum
   CFG_EVENT_ZIGBEE_APP3,
   CFG_EVENT_ZIGBEE_APP4,
 [/#if]
+[/#if]
+[#if (myHash["THREAD"] == "Enabled") || (myHash["THREAD_SKELETON"] == "Enabled")]
+  CFG_EVENT_PKA_COMPLETED,
 [/#if]
   /* USER CODE BEGIN CFG_Event_Id_t */
 
@@ -650,7 +658,9 @@ typedef enum
 #define EVENT_ZIGBEE_APP4               ( 1U << CFG_EVENT_ZIGBEE_APP4 )
 [/#if]
 [/#if]
+/* USER CODE BEGIN EVENT_ID_Define */
 
+/* USER CODE END EVENT_ID_Define */
 [/#if]
 
 [#if (myHash["USE_SNVMA_NVM"]?number != 0)]
@@ -712,11 +722,13 @@ typedef enum
 #define CFG_RT_DEBUG_GPIO_MODULE         (${myHash["CFG_RT_DEBUG_GPIO_MODULE"]})
 #define CFG_RT_DEBUG_DTB                 (0)
 
+[#if (myHash["BLE_MODE_SIMPLEST_BLE"] != "Enabled")]
 /******************************************************************************
  * System Clock Manager module configuration
  ******************************************************************************/
 
 #define CFG_SCM_SUPPORTED            (1)
+[/#if]
 
 /******************************************************************************
  * HW RADIO configuration
@@ -752,6 +764,12 @@ typedef enum
  */
 #define CFG_RF_TX_POWER_TABLE_ID            (${myHash["CFG_RF_TX_POWER_TABLE_ID"]})
 
+/* Custom LSE sleep clock accuracy to use if both conditions are met: 
+ * - LSE is selected as Link Layer sleep clock source
+ * - the LSE used is different from the default one.
+ */
+#define CFG_RADIO_LSE_SLEEP_TIMER_CUSTOM_SCA_RANGE (0)
+
 /* USER CODE BEGIN Radio_Configuration */
 
 /* USER CODE END Radio_Configuration */
@@ -767,12 +785,13 @@ typedef enum
 
 /* USER CODE END HW_RNG_Configuration */
 
-[#if (myHash["CFG_AMM_VIRTUAL_MEMORY_NUMBER"]?number != 0)]
+[#if (myHash["CFG_MM_TYPE"]?number != 0)]
 /******************************************************************************
  * MEMORY MANAGER
  ******************************************************************************/
 
 #define CFG_MM_POOL_SIZE                                  (${myHash["CFG_MM_POOL_SIZE"]}U)  /* bytes */
+[#if (myHash["CFG_AMM_VIRTUAL_MEMORY_NUMBER"]?number != 0)]
 #define CFG_AMM_VIRTUAL_MEMORY_NUMBER                     (${myHash["CFG_AMM_VIRTUAL_MEMORY_NUMBER"]}U)
 [#if PG_SKIP_LIST == "False"]
 [#assign i = 0]
@@ -788,6 +807,7 @@ typedef enum
 [/#if]
 #define CFG_AMM_POOL_SIZE                                 DIVC(CFG_MM_POOL_SIZE, sizeof (uint32_t)) \
                                                           + (AMM_VIRTUAL_INFO_ELEMENT_SIZE * CFG_AMM_VIRTUAL_MEMORY_NUMBER)
+[/#if]
 
 /* USER CODE BEGIN MEMORY_MANAGER_Configuration */
 

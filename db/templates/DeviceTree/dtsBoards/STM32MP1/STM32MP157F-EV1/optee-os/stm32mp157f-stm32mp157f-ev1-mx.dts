@@ -9,10 +9,12 @@
 /* USER CODE BEGIN includes */
 #include <dt-bindings/mfd/st,stpmic1.h>
 #include <dt-bindings/power/stm32mp1-power.h>
+#include "stm32mp15-pinctrl.dtsi"
+#include <dt-bindings/soc/stm32mp-provisioning.h>
 /* USER CODE END includes */
 
 /{
-	model = "STMicroelectronics STM32MP157F-EV1 STM32CubeMX board - openstlinux-5.15-yocto-kirkstone-mp1-v22.11.23";
+	model = "STMicroelectronics STM32MP157F-EV1 STM32CubeMX board - openstlinux-6.1-yocto-mickledore-mp1-v23.06.21";
 	compatible = "st,stm32mp157f-board_157f-ev1-mx", "st,stm32mp157f-ev1", "st,stm32mp157";
 
 	/* USER CODE BEGIN root */
@@ -24,6 +26,16 @@
 	aliases{
 		serial0 = &uart4;
 		serial1 = &usart3;
+	};
+
+	shadow-prov{
+		compatible = "st,provisioning";
+
+		hw2_prov{
+			nvmem-cells = <&hw2_otp>;
+			st,shadow-value = <0x000001E0>;
+			st,shadow-lock = <STICKY_LOCK_SR>;
+		};
 	};
 
 	vin:vin{
@@ -65,7 +77,18 @@
 };
 
 &pinctrl{
-    /* USER CODE BEGIN pinctrl */
+
+	rcc_pins_mx:rcc_mx-0{
+
+		pins{
+			pinmux = <STM32_PINMUX('C', 14, ANALOG)>,
+					<STM32_PINMUX('C', 15, ANALOG)>,
+					<STM32_PINMUX('H', 0, ANALOG)>,
+					<STM32_PINMUX('H', 1, ANALOG)>;
+		};
+	};
+
+	/* USER CODE BEGIN pinctrl */
 	/* USER CODE END pinctrl */
 };
 
@@ -81,6 +104,9 @@
 			slew-rate = <0>;
 		};
 	};
+
+	/* USER CODE BEGIN pinctrl_z */
+	/* USER CODE END pinctrl_z */
 };
 
 &bsec{
@@ -129,6 +155,7 @@
 	DECPROT(STM32MP1_ETZPC_DDRCTRL_ID, DECPROT_NS_R_S_W, DECPROT_LOCK)
 	DECPROT(STM32MP1_ETZPC_DDRPHYC_ID, DECPROT_NS_R_S_W, DECPROT_LOCK)
 	
+	DECPROT(STM32MP1_ETZPC_IWDG1_ID, DECPROT_S_RW, DECPROT_UNLOCK)
 	DECPROT(STM32MP1_ETZPC_RNG1_ID, DECPROT_S_RW, DECPROT_UNLOCK)
 	DECPROT(STM32MP1_ETZPC_STGENC_ID, DECPROT_S_RW, DECPROT_UNLOCK)
 
@@ -408,6 +435,14 @@
 	/* USER CODE END i2c4 */
 };
 
+&iwdg1{
+	status = "okay";
+
+	/* USER CODE BEGIN iwdg1 */
+	timeout-sec = <32>;
+	/* USER CODE END iwdg1 */
+};
+
 &pwr_regulators{
 	status = "okay";
 
@@ -425,9 +460,9 @@
 };
 
 &rcc{
+	pinctrl-names = "default";
+	pinctrl-0 = <&rcc_pins_mx>;
 	status = "okay";
-	clocks = <&clk_hse>, <&clk_hsi>, <&clk_lse>, <&clk_lsi>, <&clk_csi>;
-	clock-names = "clk-hse", "clk-hsi", "clk-lse", "clk-lsi", "clk-csi";
 	st,clksrc = <
 		CLK_CKPER_DISABLED
 		CLK_FMC_ACLK
@@ -469,10 +504,6 @@
 	>;
 
 	st,pll_vco{
-
-		/* USER CODE BEGIN rcc_st-pll_vco */
-
-		/* USER CODE END rcc_st-pll_vco */
 
 		pll2_vco_1066Mhz:pll2-vco-1066Mhz{
 			src = < CLK_PLL12_HSE >;
@@ -557,11 +588,6 @@
 
 &cpu1{
 	cpu-supply = <&vddcore>;
-};
-
-&iwdg1{
-	timeout-sec = <32>;
-	status = "okay";
 };
 
 &osc_calibration{

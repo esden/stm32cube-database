@@ -7,13 +7,16 @@
 #include "stm32mp15xxac-pinctrl.dtsi"
 
 /* USER CODE BEGIN includes */
+#include "stm32mp15-pinctrl.dtsi"
 #include <dt-bindings/gpio/stm32mp_gpio.h>
 #include <dt-bindings/power/stm32mp1-power.h>
 #include <dt-bindings/mfd/st,stpmic1.h>
+#include <dt-bindings/soc/stm32mp-provisioning.h>
+#include <dt-bindings/tamper/st,stm32-tamp.h>
 /* USER CODE END includes */
 
 /{
-	model = "STMicroelectronics STM32MP157D-DK1 STM32CubeMX board - openstlinux-5.15-yocto-kirkstone-mp1-v22.11.23";
+	model = "STMicroelectronics STM32MP157D-DK1 STM32CubeMX board - openstlinux-6.1-yocto-mickledore-mp1-v23.06.21";
 	compatible = "st,stm32mp157d-board_157d-dk1-mx", "st,stm32mp157d-dk1", "st,stm32mp157";
 
 	/* USER CODE BEGIN root */
@@ -32,6 +35,16 @@
 			gpios = <&gpiod 11 GPIO_ACTIVE_HIGH>;
 			linux,default-trigger = "heartbeat";
 			default-state = "off";
+		};
+	};
+
+	shadow-prov{
+		compatible = "st,provisioning";
+
+		hw2_prov{
+			nvmem-cells = <&hw2_otp>;
+			st,shadow-value = <0x000001E0>;
+			st,shadow-lock = <STICKY_LOCK_SR>;
 		};
 	};
 
@@ -60,33 +73,21 @@
 
 		/* USER CODE BEGIN reserved-memory */
 
-		mcuram2:mcuram2@10000000{
+		mcusram1:mcuram@10000000{
 			compatible = "shared-dma-pool";
-			reg = <0x10000000 0x40000>;
+			reg = <0x10000000 0x20000>;
 			no-map;
 		};
 
-		vdev0vring0:vdev0vring0@10040000{
+		mcusram2:mcuram@10020000{
 			compatible = "shared-dma-pool";
-			reg = <0x10040000 0x1000>;
+			reg = <0x10020000 0x20000>;
 			no-map;
 		};
 
-		vdev0vring1:vdev0vring1@10041000{
+		mcusram3:mcuram@10040000{
 			compatible = "shared-dma-pool";
-			reg = <0x10041000 0x1000>;
-			no-map;
-		};
-
-		vdev0buffer:vdev0buffer@10042000{
-			compatible = "shared-dma-pool";
-			reg = <0x10042000 0x4000>;
-			no-map;
-		};
-
-		mcuram:mcuram@30000000{
-			compatible = "shared-dma-pool";
-			reg = <0x30000000 0x40000>;
+			reg = <0x10040000 0x10000>;
 			no-map;
 		};
 
@@ -122,6 +123,17 @@
 };
 
 &pinctrl{
+
+	rcc_pins_mx:rcc_mx-0{
+
+		pins{
+			pinmux = <STM32_PINMUX('C', 14, ANALOG)>,
+					<STM32_PINMUX('C', 15, ANALOG)>,
+					<STM32_PINMUX('H', 0, ANALOG)>,
+					<STM32_PINMUX('H', 1, ANALOG)>;
+		};
+	};
+
 	/* USER CODE BEGIN pinctrl */
 	/* USER CODE END pinctrl */
 };
@@ -138,6 +150,9 @@
 			slew-rate = <0>;
 		};
 	};
+
+	/* USER CODE BEGIN pinctrl_z */
+	/* USER CODE END pinctrl_z */
 };
 
 &bsec{
@@ -476,9 +491,9 @@
 };
 
 &rcc{
+	pinctrl-names = "default";
+	pinctrl-0 = <&rcc_pins_mx>;
 	status = "okay";
-	clocks = <&clk_hse>, <&clk_hsi>, <&clk_lse>, <&clk_lsi>, <&clk_csi>;
-	clock-names = "clk-hse", "clk-hsi", "clk-lse", "clk-lsi", "clk-csi";
 	st,clksrc = <
 		CLK_CKPER_HSE
 		CLK_ETH_PLL4P
@@ -515,14 +530,6 @@
 	>;
 
 	st,pll_vco{
-
-		/* USER CODE BEGIN rcc_st-pll_vco */
-
-		pll4_vco_600Mhz:pll2-vco-600Mhz{
-			src = <CLK_PLL4_HSE>;
-			divmn = <3 98>;
-		};
-		/* USER CODE END rcc_st-pll_vco */
 
 		pll2_vco_1066Mhz:pll2-vco-1066Mhz{
 			src = < CLK_PLL12_HSE >;
@@ -586,6 +593,22 @@
 
 &tamp{
 	status = "okay";
+
+	/* USER CODE BEGIN tamp */
+	st,tamp-passive-nb-sample = <4>;
+	st,tamp-passive-sample-clk-div = <16384>;
+	/* USER CODE END tamp */
+};
+
+&timers15{
+	status = "okay";
+
+	/* USER CODE BEGIN timers15 */
+
+	counter{
+		status = "okay";
+	};
+	/* USER CODE END timers15 */
 };
 
 /* USER CODE BEGIN addons */
@@ -609,14 +632,6 @@
 	};
 
 	hsi-calibration{
-		status = "okay";
-	};
-};
-
-&timers15{
-	status = "okay";
-
-	counter{
 		status = "okay";
 	};
 };

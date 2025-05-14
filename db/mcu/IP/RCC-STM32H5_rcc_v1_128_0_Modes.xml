@@ -347,7 +347,10 @@
         <PossibleValue Comment="MCO1SRC PLLCLK" Value="RCC_MCO1SOURCE_PLL1Q" Semaphore="MCO1_PLL1QCLK"/>
         <PossibleValue Comment="MCO1SRC HSI48"  Value="RCC_MCO1SOURCE_HSI48"/>
     </RefParameter>
-    
+    <RefParameter Visible="false" Comment="MCO1 Clock Source" DefaultValue="RCC_PLL1_DIVQ" Name="PLL1ClkOut" Type="list">
+        <Condition Expression="(MCOConfig &amp; MCO1_PLL1QCLK)" Diagnostic=""/>
+	</RefParameter>
+    <RefParameter Visible="false" Comment="MCO1 Clock Source" DefaultValue="null" Name="PLL1ClkOut" Type="list"/>   
     <!--RCC_MCO2Source-->
     <RefParameter Visible="false"  Comment="MCO2 Clock Source" DefaultValue="RCC_MCO2SOURCE_SYSCLK" Name="RCC_MCO2Source" Type="list">
         <PossibleValue Comment="MCO2SRC LSI"  Value="RCC_MCO2SOURCE_LSI" Semaphore="MCO2_LSI"/>
@@ -356,7 +359,14 @@
         <PossibleValue Comment="MCO2SRC PLL1PCLK"  Value="RCC_MCO2SOURCE_PLL1P" Semaphore="MCO2_PLL1PCLK"/>
         <PossibleValue Comment="MCO2SRC PLLCLK" Value="RCC_MCO2SOURCE_PLL2P" Semaphore="MCO2_PLL2PCLK"/>
 		<PossibleValue Comment="MCO2SRC SYSCLK"    Value="RCC_MCO2SOURCE_SYSCLK"/>
-    </RefParameter>    
+    </RefParameter>
+    <RefParameter Visible="false" Comment="MCO2 Clock Source" DefaultValue="RCC_PLL1_DIVP" Name="PLL2ClkOut" Type="list">
+        <Condition Expression="(MCO2Config &amp; MCO2_PLL1PCLK)" Diagnostic=""/>
+	</RefParameter>
+    <RefParameter Visible="false" Comment="MCO2 Clock Source" DefaultValue="RCC_PLL2_DIVP" Name="PLL2ClkOut" Type="list">
+        <Condition Expression="(MCO2Config &amp; MCO2_PLL2PCLK)" Diagnostic=""/>
+	</RefParameter>
+    <RefParameter Visible="false" Comment="MCO1 Clock Source" DefaultValue="null" Name="PLL2ClkOut" Type="list"/>	
     <!--CKPERSourceSelection-->
     <RefParameter Visible="false" Comment="PLL Source" DefaultValue="RCC_CLKPSOURCE_HSI" Name="CKPERSourceSelection" Type="list">
         <PossibleValue Comment="Pllsource Hsi" Value="RCC_CLKPSOURCE_HSI" Semaphore="CKPER_HSI"/>
@@ -862,16 +872,28 @@
     </RefParameter>
     <RefParameter Visible="false" Comment="RNG clock"           Name="RNGFreq_Value" DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="RNG"/>
 
-    <RefParameter Visible="false" Comment="ADC clock"           Name="ADCFreq_Value" Max="100000000" DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="ADC1">
+    <RefParameter Visible="false" Comment="ADC clock"           Name="ADCFreq_Value" Max="200000000" DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="ADC1,ADC2">
+        <Condition Diagnostic="" Expression="scale1 &amp; DAC1_Used &amp; !ADC1_Used &amp; !ADC2_Used"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="ADC clock"           Name="ADCFreq_Value" Max="150000000" DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="ADC1,ADC2">
+        <Condition Diagnostic="" Expression="scale2 &amp; DAC1_Used &amp; !ADC1_Used &amp; !ADC2_Used"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="ADC clock"           Name="ADCFreq_Value" Max="100000000" DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="ADC1,ADC2">
+        <Condition Diagnostic="" Expression="scale3 &amp; DAC1_Used &amp; !ADC1_Used &amp; !ADC2_Used"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="ADC clock"           Name="ADCFreq_Value" Max="250000000" DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="ADC1,ADC2">
+        <Condition Diagnostic="" Expression="scale0 &amp; DAC1_Used &amp; !ADC1_Used &amp; !ADC2_Used"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="ADC clock"           Name="ADCFreq_Value" Max="100000000" DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="ADC1,ADC2">
         <Condition Diagnostic="" Expression="scale1"/>
     </RefParameter>
-    <RefParameter Visible="false" Comment="ADC clock"           Name="ADCFreq_Value" Max="75000000" DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="ADC1">
+    <RefParameter Visible="false" Comment="ADC clock"           Name="ADCFreq_Value" Max="75000000" DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="ADC1,ADC2">
         <Condition Diagnostic="" Expression="scale2"/>
     </RefParameter>
-    <RefParameter Visible="false" Comment="ADC clock"           Name="ADCFreq_Value" Max="50000000" DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="ADC1">
+    <RefParameter Visible="false" Comment="ADC clock"           Name="ADCFreq_Value" Max="50000000" DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="ADC1,ADC2">
         <Condition Diagnostic="" Expression="scale3"/>
     </RefParameter>
-    <RefParameter Visible="false" Comment="ADC clock"           Name="ADCFreq_Value" Max="125000000" DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="ADC1">
+    <RefParameter Visible="false" Comment="ADC clock"           Name="ADCFreq_Value" Max="125000000" DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="ADC1,ADC2">
         <Condition Diagnostic="" Expression="scale0"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="ADC clock"           Name="ADCFreq_Value" DefaultValue="4000000" Type="double" Display="value/1000000" Unit="MHz" IP="ADC1"/>
@@ -4057,7 +4079,20 @@
     <RefParameter Name="FLatency" Comment="Flash Latency(WS)" Type="List" DefaultValue="FLASH_LATENCY_0" Group="System Parameters">   
         <PossibleValue Value="FLASH_LATENCY_0" Comment="0 WS (1 CPU cycle)"/>   
     </RefParameter>
-    
+
+    <RefParameter Name="Flash_Delay" Comment="Flash Programming Delay" Type="List" DefaultValue="FLASH_PROGRAMMING_DELAY_0" Group="System Parameters">
+        <Condition Diagnostic="" Expression="(FLatency=FLASH_LATENCY_0)|(FLatency=FLASH_LATENCY_1)" />
+        <PossibleValue Value="FLASH_PROGRAMMING_DELAY_0" Comment="0"/>
+    </RefParameter>
+    <RefParameter Name="Flash_Delay" Comment="Flash Programming Delay" Type="List" DefaultValue="FLASH_PROGRAMMING_DELAY_1" Group="System Parameters">
+        <Condition Diagnostic="" Expression="(FLatency=FLASH_LATENCY_2)|(FLatency=FLASH_LATENCY_3)" />
+        <PossibleValue Value="FLASH_PROGRAMMING_DELAY_1" Comment="1"/>
+    </RefParameter>
+    <RefParameter Name="Flash_Delay" Comment="Flash Programming Delay" Type="List" DefaultValue="FLASH_PROGRAMMING_DELAY_2" Group="System Parameters">
+        <Condition Diagnostic="" Expression="(FLatency=FLASH_LATENCY_4)|(FLatency=FLASH_LATENCY_5)" />
+        <PossibleValue Value="FLASH_PROGRAMMING_DELAY_2" Comment="2"/>
+    </RefParameter>
+    <RefParameter Name="Flash_Delay" Comment="Flash Programming Delay" Type="List" DefaultValue="null" Group="System Parameters"/>  
  
     <RefParameter Visible="false" Comment="PLL2 out clock " Name="PLL2ClockOutARG" DefaultValue="+PLL2outclock" Type="list">
         <Condition Expression="PLL2Used=1 &amp; (PLL2NbUsed &gt; 1)" Diagnostic=" "/>
@@ -4660,6 +4695,7 @@
         <ConfigForMode>ConfigAttributesSECPRIV</ConfigForMode> 
         <ConfigForMode>ConfigAttributesSEC</ConfigForMode>
         <ConfigForMode>ConfigAttributesPRIV</ConfigForMode>
+		<ConfigForMode>RCC_SetProgramDelay</ConfigForMode>
 
         <Parameter Name="OscillatorType"/>
         <Parameter Name="APB1TimCLKDivider"/>
@@ -4761,6 +4797,7 @@
     <RefMode Name="AdvancedSettings">
         <Parameter Name="VDD_VALUE"/>
         <Parameter Name="FLatency"/>
+        <Parameter Name="Flash_Delay"/>
         <Parameter Name="HSICalibrationValue"/>
         <Parameter Name="CSICalibrationValue"/>
         <Parameter Name="PWR_Regulator_Voltage_Scale"/>

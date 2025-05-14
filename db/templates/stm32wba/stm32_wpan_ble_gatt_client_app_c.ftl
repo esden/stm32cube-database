@@ -29,6 +29,7 @@ Key: ${key}; Value: ${myHash[key]}
 /* Includes ------------------------------------------------------------------*/
 
 #include "main.h"
+#include "log_module.h"
 #include "app_common.h"
 #include "dbg_trace.h"
 #include "ble.h"
@@ -94,6 +95,30 @@ typedef struct
   GATT_CLIENT_APP_Data_t   DataTransfered;
 }GATT_CLIENT_APP_Notification_evt_t;
 
+[#if (myHash["BLE_OPTIONS_ENHANCED_ATT"] == "BLE_OPTIONS_ENHANCED_ATT")]
+typedef struct
+{
+  EATTC_STM_Payload_t TxData;
+  EATTC_App_Transfer_Req_Status_t NotificationTransferReq;
+  EATTC_App_Transfer_Req_Status_t ButtonTransferReq;
+  EATTC_App_Flow_Status_t DtFlowStatus;
+  uint8_t connectionstatus;
+} EATTC_Context_t;
+
+typedef struct
+{
+  EATTC_STM_Payload_t     DataTransfered;
+  uint16_t                ConnectionHandle;
+  uint8_t                 ServiceInstance;
+
+  /* USER CODE BEGIN Service1_NotificationEvt_t */
+  GATT_CLIENT_APP_Opcode_t       EvtOpcode;
+  /* USER CODE END Service1_NotificationEvt_t */
+
+} EATT_CLI_NotificationEvt_t;
+
+[/#if]
+
 typedef struct
 {
   GATT_CLIENT_APP_State_t state;
@@ -115,7 +140,25 @@ typedef struct
   uint16_t ServiceChangedCharDescHdl;
   uint16_t ServiceChangedCharEndHdl;
   uint8_t ServiceChangedCharProperties;
+[#if (myHash["BLE_OPTIONS_ENHANCED_ATT"] == "BLE_OPTIONS_ENHANCED_ATT")]
+  /* EATT bearer */
+  uint16_t EATT_Bearer_connHdl[6];
+  /* handles of the P2P service */
+  uint16_t EATTServiceHdl;
+  uint16_t EATTServiceEndHdl;
 
+  /* handles of the Tx characteristic - Write To Server */
+  uint16_t EATTChar1CharHdl;
+  uint16_t EATTChar1ValueHdl;
+  uint16_t EATTChar1DescHdl;
+
+  /* handles of the Rx characteristic - Notification From Server */
+  uint16_t EATTChar2CharHdl;
+  uint16_t EATTChar2ValueHdl;
+  uint16_t EATTChar2DescHdl;
+  uint16_t MTUSizeValue;
+
+[/#if]
   /* USER CODE BEGIN BleClientAppContext_t */
 [#if PG_FILL_UCS == "True"]
 [#if (RF_APPLICATION == "P2PCLIENT")]
@@ -145,16 +188,8 @@ typedef struct
 }BleClientAppContext_t;
 
 /* Private defines ------------------------------------------------------------*/
-[#if myHash["THREADX_STATUS"]?number == 1 ]
-/* CLIENT_DISCOVER_TASK related defines */
-#define CLIENT_DISCOVER_TASK_STACK_SIZE    (256*7)
-#define CLIENT_DISCOVER_TASK_PRIO          (10)
-#define CLIENT_DISCOVER_TASK_PREEM_TRES    (9)
-
-[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
-/* CLIENT_DISCOVER_TASK related defines */
-#define CLIENT_DISCOVER_TASK_STACK_SIZE     (128 * 4)
-#define CLIENT_DISCOVER_TASK_PRIO           (osPriorityNormal)
+[#if (myHash["BLE_OPTIONS_ENHANCED_ATT"] == "BLE_OPTIONS_ENHANCED_ATT")]
+#define GATT_EAB_PREFIX                         0xEAU
 
 [/#if]
 /* USER CODE BEGIN PD */
@@ -174,6 +209,28 @@ typedef struct
 static BleClientAppContext_t a_ClientContext[BLE_CFG_CLT_MAX_NBR_CB];
 static uint16_t gattCharStartHdl = 0;
 static uint16_t gattCharValueHdl = 0;
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+
+static osThreadId_t     ClientDiscoverTaskHandle;
+static osSemaphoreId_t  ClientDiscoverSemaphore;
+
+const osThreadAttr_t ClientDiscoverTask_attributes = {
+  .name         = "Client Discover Task",
+  .priority     = TASK_PRIO_CLIENT_DISCOVER,
+  .stack_size   = TASK_STACK_SIZE_CLIENT_DISCOVER,
+  .attr_bits    = TASK_DEFAULT_ATTR_BITS,
+  .cb_mem       = TASK_DEFAULT_CB_MEM,
+  .cb_size      = TASK_DEFAULT_CB_SIZE,
+  .stack_mem    = TASK_DEFAULT_STACK_MEM
+};
+
+const osSemaphoreAttr_t ClientDiscoverSemaphore_attributes = {
+  .name         = "Client Discover Semaphore",
+  .attr_bits    = TASK_DEFAULT_ATTR_BITS,
+  .cb_mem       = TASK_DEFAULT_CB_MEM,
+  .cb_size      = TASK_DEFAULT_CB_SIZE
+};
+[/#if]
 
 /* USER CODE BEGIN PV */
 [#if PG_FILL_UCS == "True"]
@@ -257,45 +314,44 @@ void GATT_CLIENT_APP_Init(void)
 [#if myHash["SEQUENCER_STATUS"]?number == 1 ]
   /* Register a task allowing to discover all services and characteristics and enable all notifications */
   UTIL_SEQ_RegTask(1U << CFG_TASK_DISCOVER_SERVICES_ID, UTIL_SEQ_RFU, client_discover_all);
-[#elseif myHash["THREADX_STATUS"]?number == 1 ]
-  CHAR * pStack;
+[/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+  /* Create Gatt Client Discover FreeRTOS objects */
 
-  if (tx_byte_allocate(pBytePool, (void **) &pStack, CLIENT_DISCOVER_TASK_STACK_SIZE, TX_NO_WAIT) != TX_SUCCESS)
-  {
-    Error_Handler();
-  }
-  if (tx_semaphore_create(&client_discover_Thread_Sem, "CLIENT_DISCOVER_Thread_Sem", 0) != TX_SUCCESS )
-  {
-    Error_Handler();
-  }
-  if (tx_thread_create(&CLIENT_DISCOVER_Thread, "CLIENT_DISCOVER_Thread", client_discover_all_Entry, 0,
-                         pStack, CLIENT_DISCOVER_TASK_STACK_SIZE,
-                         CLIENT_DISCOVER_TASK_PRIO, CLIENT_DISCOVER_TASK_PREEM_TRES,
-                         TX_NO_TIME_SLICE, TX_AUTO_START) != TX_SUCCESS)
-  {
-    Error_Handler();
-  }
-[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
-  const osSemaphoreAttr_t ClientDiscoverSemaphore_attributes = {
-    .name = "Client discover Semaphore"
-  };
+  ClientDiscoverTaskHandle = osThreadNew(ClientDiscover_Task_Entry, NULL, &ClientDiscoverTask_attributes);
+
   ClientDiscoverSemaphore = osSemaphoreNew(1U, 0U, &ClientDiscoverSemaphore_attributes);
-  if (ClientDiscoverSemaphore == NULL)
+  
+  if((ClientDiscoverTaskHandle == NULL) || (ClientDiscoverSemaphore == NULL) )
   {
+    LOG_ERROR_APP( "Client Discover FreeRTOS objects creation FAILED");
     Error_Handler();
   }
 
-  const osThreadAttr_t ClientDiscoverTask_attributes = {
-    .name = "Client discover Thread",
-    .priority = (osPriority_t)CLIENT_DISCOVER_TASK_PRIO,
-    .stack_size = CLIENT_DISCOVER_TASK_STACK_SIZE
-  };
-  ClientDiscoverThread = osThreadNew(ClientDiscover_Task_Entry, NULL, &ClientDiscoverTask_attributes);
-  if (ClientDiscoverThread == NULL)
+[/#if]
+[#if myHash["THREADX_STATUS"]?number == 1 ]
+  UINT TXstatus;
+  CHAR *pStack;
+  
+  /* Create Gatt Client Discover ThreadX objects */
+
+  TXstatus = tx_byte_allocate(pBytePool, (void **)&pStack, CLIENT_DISCOVER_TASK_STACK_SIZE, TX_NO_WAIT);
+
+  if( TXstatus == TX_SUCCESS )
   {
-    Error_Handler();
+    TXstatus = tx_thread_create(&ClientDiscoverTaskHandle, "Client Discover  Task", BLE_TIMER_Task_Entry, 0,
+                                 pStack, TASK_STACK_SIZE_CLIENT_DISCOVER,
+                                 TASK_PRIO_CLIENT_DISCOVER, TASK_PREEMP_CLIENT_DISCOVER,
+                                 TX_NO_TIME_SLICE, TX_AUTO_START);
+                                 
+    TXstatus |= tx_semaphore_create(&ClientDiscoverSemaphore, "BLE Timer Semaphore", 0);
   }
 
+  if( TXstatus != TX_SUCCESS )
+  {
+    LOG_ERROR_APP( "Client Discover ThreadX objects creation FAILED, status: %d", TXstatus);
+    Error_Handler();
+  }
 [/#if]
 
   /* USER CODE BEGIN GATT_CLIENT_APP_Init_2 */
@@ -391,7 +447,12 @@ void GATT_CLIENT_APP_Discover_services(uint8_t index)
   GATT_CLIENT_APP_Procedure_Gatt(index, PROC_GATT_DISC_ALL_CHARS);
   GATT_CLIENT_APP_Procedure_Gatt(index, PROC_GATT_DISC_ALL_DESCS);
   GATT_CLIENT_APP_Procedure_Gatt(index, PROC_GATT_PROPERTIES_ENABLE_ALL);
+  
+[#if (myHash["BLE_OPTIONS_GATT_CACHING"] == "BLE_OPTIONS_GATT_CACHING")]
+  GATT_CLIENT_APP_Procedure_Gatt(index, PROC_GATT_ENABLE_ROBUST_CACHING);
+  GATT_CLIENT_APP_Procedure_Gatt(index, PROC_GATT_READ_USING_CHAR_UUID);
 
+[/#if]
   return;
 }
 
@@ -525,6 +586,44 @@ uint8_t GATT_CLIENT_APP_Procedure_Gatt(uint8_t index, ProcGattId_t GattProcId)
         }
       }
       break; /* PROC_GATT_PROPERTIES_ENABLE_ALL */
+	  
+[#if (myHash["BLE_OPTIONS_GATT_CACHING"] == "BLE_OPTIONS_GATT_CACHING")]
+	  case PROC_GATT_READ_USING_CHAR_UUID:
+      {
+        a_ClientContext[index].state = GATT_CLIENT_READ_USING_CHAR_UUID;
+        UTIL_SEQ_SetTask(1U << CFG_TASK_READ_CHAR_UUID_ID, CFG_SEQ_PRIO_0);        
+        /* USER CODE BEGIN PROC_GATT_READ_USING_CHAR_UUID */
+
+        /* USER CODE END PROC_GATT_READ_USING_CHAR_UUID */
+      }
+      break;
+      case PROC_GATT_ENABLE_ROBUST_CACHING:
+      {
+        uint16_t enable_robust_caching =0x01;
+        a_ClientContext[index].state = GATT_CLIENT_ENABLE_ROBUST_CACHING;
+        if (a_ClientContext[index].ClientSupportedFeatureCharStartHdl != 0x0000)
+        {
+          result = aci_gatt_write_char_value(a_ClientContext[index].connHdl,
+                                            a_ClientContext[index].ClientSupportedFeatureCharValueHdl,
+                                            1,
+                                            (uint8_t *) &enable_robust_caching);
+          gatt_cmd_resp_wait();
+          APP_DBG_MSG(" ClientSupportedFeatureCharValueHdl =0x%04X\n",a_ClientContext[index].ClientSupportedFeatureCharValueHdl);
+        }
+
+        if (result == BLE_STATUS_SUCCESS)
+        {
+          LOG_INFO_APP("Robust caching feature enabled Successfully\n\n");
+        }
+        else
+        {
+          LOG_INFO_APP("Robust caching feature enabled Failed, status =0x%02X\n\n", result);
+        }
+        
+      }
+      break;
+[/#if]
+
     default:
       break;
     }
@@ -611,6 +710,15 @@ static SVCCTL_EvtAckStatus_t Event_Handler(void *Event)
               break;
             }
           }
+[#if (myHash["BLE_OPTIONS_GATT_CACHING"] == "BLE_OPTIONS_GATT_CACHING")]
+		/* if GATT DB has changed */
+          if (DBHashModified == 1) 
+          {
+            LOG_INFO_APP("  GATT Database has changed, need to restart discovery of service/charac \r\n");
+            DBHashModified = 0;
+            UTIL_SEQ_SetTask(1U << CFG_TASK_DISCOVER_SERVICES_ID, CFG_SEQ_PRIO_0);
+          }
+[/#if]
         }
         break;/* ACI_GATT_PROC_COMPLETE_VSEVT_CODE */
         case ACI_GATT_TX_POOL_AVAILABLE_VSEVT_CODE:
@@ -634,6 +742,105 @@ static SVCCTL_EvtAckStatus_t Event_Handler(void *Event)
           /* USER CODE END ACI_ATT_EXCHANGE_MTU_RESP_VSEVT_CODE */
         }
         break;
+		
+[#if (myHash["BLE_OPTIONS_GATT_CACHING"] == "BLE_OPTIONS_GATT_CACHING")]
+		case ACI_ATT_READ_RESP_VSEVT_CODE:
+        {
+          aci_att_read_resp_event_rp0 *aci_att_read_resp;
+          aci_att_read_resp = (aci_att_read_resp_event_rp0 *)p_blecore_evt->data;
+          UNUSED(aci_att_read_resp);
+          LOG_INFO_APP("  ACI_ATT_READ_RESP_VSEVT_CODE: 0x%x \n\r", aci_att_read_resp->Attribute_Value[0]);
+        }
+        break;
+        case ACI_GATT_READ_EXT_VSEVT_CODE:
+        {
+          aci_gatt_read_ext_event_rp0 *aci_att_read_ext;
+          aci_att_read_ext = (aci_gatt_read_ext_event_rp0 *)p_blecore_evt->data;
+          UNUSED(aci_att_read_ext);
+          LOG_INFO_APP("  ACI_GATT_READ_EXT_VSEVT_CODE \n\r");
+        }
+        break;
+        case ACI_GATT_ERROR_RESP_VSEVT_CODE:
+        {
+          aci_gatt_error_resp_event_rp0 *aci_gatt_error_resp;
+          aci_gatt_error_resp = (aci_gatt_error_resp_event_rp0 *)p_blecore_evt->data;
+          UNUSED(aci_gatt_error_resp);
+          LOG_INFO_APP("  ACI_GATT_ERROR_RESP_VSEVT_CODE: 0x%x \n\r", aci_gatt_error_resp->Error_Code);
+          
+        }
+        break;
+        case ACI_GATT_DISC_READ_CHAR_BY_UUID_RESP_VSEVT_CODE:
+        {
+          aci_gatt_disc_read_char_by_uuid_resp_event_rp0 * aci_gatt_disc_read_char_by_uuid_resp;
+          aci_gatt_disc_read_char_by_uuid_resp = (aci_gatt_disc_read_char_by_uuid_resp_event_rp0 *)p_blecore_evt->data;
+          UNUSED(aci_gatt_disc_read_char_by_uuid_resp);
+          /* USER CODE BEGIN ACI_GATT_DISC_READ_CHAR_BY_UUID_RESP_VSEVT_CODE */
+          uint8_t i;
+          LOG_INFO_APP("  GATT disc read char by uuid length = 0x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x \n", 
+                                                                        aci_gatt_disc_read_char_by_uuid_resp->Attribute_Value[15],aci_gatt_disc_read_char_by_uuid_resp->Attribute_Value[14],
+                                                                        aci_gatt_disc_read_char_by_uuid_resp->Attribute_Value[13],aci_gatt_disc_read_char_by_uuid_resp->Attribute_Value[12],
+                                                                        aci_gatt_disc_read_char_by_uuid_resp->Attribute_Value[11],aci_gatt_disc_read_char_by_uuid_resp->Attribute_Value[10],
+                                                                        aci_gatt_disc_read_char_by_uuid_resp->Attribute_Value[9],aci_gatt_disc_read_char_by_uuid_resp->Attribute_Value[8],
+                                                                        aci_gatt_disc_read_char_by_uuid_resp->Attribute_Value[7],aci_gatt_disc_read_char_by_uuid_resp->Attribute_Value[6],
+                                                                        aci_gatt_disc_read_char_by_uuid_resp->Attribute_Value[5],aci_gatt_disc_read_char_by_uuid_resp->Attribute_Value[4],
+                                                                        aci_gatt_disc_read_char_by_uuid_resp->Attribute_Value[3],aci_gatt_disc_read_char_by_uuid_resp->Attribute_Value[2],
+                                                                        aci_gatt_disc_read_char_by_uuid_resp->Attribute_Value[1],aci_gatt_disc_read_char_by_uuid_resp->Attribute_Value[0]);
+          
+          if (ConnectionFlag == 1)
+          {
+            /* Compare actual databaseHash with stored one */
+            for (i=0;i<16;i++)
+            {
+              if (a_ClientContext[0].DatabaseHashCharValue[i] != aci_gatt_disc_read_char_by_uuid_resp->Attribute_Value[i])
+              {
+                ConnectionFlag = 0;
+                DBHashModified = 1;
+                break;
+              }
+            }
+          }
+          else
+          {
+            /* Database discovered */
+            ConnectionFlag = 1;
+            /* Store databaseHash value */
+            for (i=0;i<16;i++)
+            {
+              a_ClientContext[0].DatabaseHashCharValue[i] = aci_gatt_disc_read_char_by_uuid_resp->Attribute_Value[i];
+            }
+          }
+          UTIL_SEQ_SetTask(1U << CFG_TASK_CONN_UPDATE_ID, CFG_SEQ_PRIO_0);
+          
+          /* USER CODE END ACI_GATT_DISC_READ_CHAR_BY_UUID_RESP_VSEVT_CODE */
+          
+        } /*ACI_GATT_DISC_READ_CHAR_BY_UUID_RESP_VSEVT_CODE */
+        break;
+[/#if]
+[#if (myHash["BLE_OPTIONS_ENHANCED_ATT"] == "BLE_OPTIONS_ENHANCED_ATT")]
+        case (ACI_GATT_EATT_BEARER_VSEVT_CODE):
+        {
+          aci_gatt_eatt_bearer_event_rp0 *eatt_bearer_event;
+		  uint8_t index;
+
+          eatt_bearer_event = (aci_gatt_eatt_bearer_event_rp0*)p_blecore_evt->data;
+          APP_DBG_MSG(">>== ACI_GATT_EATT_BEARER_VSEVT_CODE\n");
+          APP_DBG_MSG(">>== Channel_Index = %d\n",eatt_bearer_event->Channel_Index );
+
+          /* USER CODE BEGIN ACI_GATT_EATT_BEARER_VSEVT_CODE_1 */
+
+          /* USER CODE END ACI_GATT_EATT_BEARER_VSEVT_CODE_1 */
+		  for(index = 0; index < BLE_CFG_CLT_MAX_NBR_CB; index++)
+          {
+            a_ClientContext[index].EATT_Bearer_connHdl[eatt_bearer_event->Channel_Index] = (GATT_EAB_PREFIX << 8) | eatt_bearer_event->Channel_Index;
+          }
+		  
+		  /* USER CODE BEGIN ACI_GATT_EATT_BEARER_VSEVT_CODE_2 */
+
+          /* USER CODE END ACI_GATT_EATT_BEARER_VSEVT_CODE_2 */
+        } 
+        break;
+		
+[/#if]
         default:
           break;
       }/* end switch (p_blecore_evt->ecode) */
@@ -1063,6 +1270,7 @@ static void gatt_parse_descs(aci_att_find_info_resp_event_rp0 *p_evt)
         {
           LOG_INFO_APP("\n");
         }
+        UNUSED(gattCharStartHdl);
       }
       else
       {
@@ -1119,7 +1327,7 @@ static void gatt_parse_descs(aci_att_find_info_resp_event_rp0 *p_evt)
 
 static void gatt_parse_notification(aci_gatt_notification_event_rp0 *p_evt)
 {
-  LOG_INFO_APP("ACI_GATT_NOTIFICATION_VSEVT_CODE - ConnHdl=0x%04X, Attribute_Handle=0x%04X\n",
+  LOG_DEBUG_APP("ACI_GATT_NOTIFICATION_VSEVT_CODE - ConnHdl=0x%04X, Attribute_Handle=0x%04X\n",
                 p_evt->Connection_Handle,
                 p_evt->Attribute_Handle);
 /* USER CODE BEGIN gatt_parse_notification_1 */

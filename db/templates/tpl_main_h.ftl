@@ -48,7 +48,21 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 [#assign includesList = ""]
 [#if isHALUsed??]
+		[#if FamilyName=="STM32WB0"]
+#include "${FamilyName?lower_case}x_hal.h"
+		[#else]
 #include "${FamilyName?lower_case}xx_hal.h"
+		[/#if]
+[#if FamilyName=="STM32WB0"]
+[#list ips as ip]
+[#if ip?contains("STM32_BLE")]
+#include "app_entry.h"
+#include "app_common.h"
+#include "app_debug.h"
+#include "compiler.h"
+[/#if]
+[/#list]
+[/#if]
 [#assign includesList = includesList+" "+"${FamilyName?lower_case}xx_hal.h"]
 [/#if]
 [#compress]
@@ -97,7 +111,6 @@ extern "C" {
 [/#list]
 [#compress]
 [#--include "mxconstants.h"--]
-
 [#if LLincludes??] [#-- Include LL headers --]
     [#list LLincludes as inc]
         [#if !includesList?contains(inc)]
@@ -109,7 +122,7 @@ extern "C" {
 #n
 
 [#-- /#if --]
-[#if TZEN=="1" && Secure=="false" && !(FamilyName=="STM32MP13")]
+[#if TZEN=="1" && Secure=="false" && !(FamilyName=="STM32MP13") && !(FamilyName=="STM32MP2")]
 [#if (Structure?? && Structure=="FullNonSecure")]
 [#else]
 #include "secure_nsc.h"    /* For export Non-secure callable APIs */
@@ -119,48 +132,81 @@ extern "C" {
 [#if isLLUsed??] [#-- Include LL headers --]
     [#-- Include common LL driver that should be always included--]
     [#-- include "${FamilyName?lower_case}xx_ll_bus.h" --]
-    [#if !includesList?contains(FamilyName?lower_case+"xx_ll_bus.h")]
+    [#if (!includesList?contains(FamilyName?lower_case+"xx_ll_bus.h")) && FamilyName!="STM32WB0"]
     #include "${FamilyName?lower_case}xx_ll_bus.h"
         [#assign includesList = includesList+" "+FamilyName?lower_case+"xx_ll_bus.h"]
     [/#if]
+    [#if (!includesList?contains(FamilyName?lower_case+"x_ll_bus.h")) && FamilyName="STM32WB0"]
+    #include "${FamilyName?lower_case}x_ll_bus.h"
+        [#assign includesList = includesList+" "+FamilyName?lower_case+"x_ll_bus.h"]
+    [/#if]
     [#-- include "${FamilyName?lower_case}xx_ll_cortex.h" --]
-    [#if !includesList?contains(FamilyName?lower_case+"xx_ll_cortex.h") && FamilyName!="STM32MP1"]
+    [#if !includesList?contains(FamilyName?lower_case+"xx_ll_cortex.h") && FamilyName!="STM32MP1" && FamilyName!="STM32MP2" && (FamilyName!="STM32WB0")]
     #include "${FamilyName?lower_case}xx_ll_cortex.h"
         [#assign includesList = includesList+" "+FamilyName?lower_case+"xx_ll_cortex.h"]
     [/#if]
+    [#if !includesList?contains(FamilyName?lower_case+"x_ll_cortex.h") && FamilyName="STM32WB0"]
+    #include "${FamilyName?lower_case}x_ll_cortex.h"
+        [#assign includesList = includesList+" "+FamilyName?lower_case+"x_ll_cortex.h"]
+    [/#if]
     [#-- include "${FamilyName?lower_case}xx_ll_rcc.h" --]
-    [#if !includesList?contains(FamilyName?lower_case+"xx_ll_rcc.h")]
+    [#if !includesList?contains(FamilyName?lower_case+"xx_ll_rcc.h") && FamilyName!="STM32WB0"]
     #include "${FamilyName?lower_case}xx_ll_rcc.h"
         [#assign includesList = includesList+" "+FamilyName?lower_case+"xx_ll_rcc.h"]
     [/#if]
+    [#if !includesList?contains(FamilyName?lower_case+"x_ll_rcc.h") && FamilyName="STM32WB0"]
+    #include "${FamilyName?lower_case}x_ll_rcc.h"
+        [#assign includesList = includesList+" "+FamilyName?lower_case+"x_ll_rcc.h"]
+    [/#if]
     [#-- include "${FamilyName?lower_case}xx_ll_system.h" --]
-    [#if !includesList?contains(FamilyName?lower_case+"xx_ll_system.h")]
+    [#if !includesList?contains(FamilyName?lower_case+"xx_ll_system.h") && FamilyName!="STM32WB0"]
     #include "${FamilyName?lower_case}xx_ll_system.h"
         [#assign includesList = includesList+" "+FamilyName?lower_case+"xx_ll_system.h"]
     [/#if]
+    [#if !includesList?contains(FamilyName?lower_case+"x_ll_system.h") && FamilyName="STM32WB0"]
+    #include "${FamilyName?lower_case}x_ll_system.h"
+        [#assign includesList = includesList+" "+FamilyName?lower_case+"x_ll_system.h"]
+    [/#if]
     [#-- include "${FamilyName?lower_case}xx_ll_utils.h" --]
-    [#if !includesList?contains(FamilyName?lower_case+"xx_ll_utils.h")]
+    [#if !includesList?contains(FamilyName?lower_case+"xx_ll_utils.h") && FamilyName!="STM32MP2" && FamilyName!="STM32WB0"]
     #include "${FamilyName?lower_case}xx_ll_utils.h"
         [#assign includesList = includesList+" "+FamilyName?lower_case+"xx_ll_utils.h"]
     [/#if]
+    [#if !includesList?contains(FamilyName?lower_case+"x_ll_utils.h") && FamilyName="STM32WB0"]
+    #include "${FamilyName?lower_case}x_ll_utils.h"
+        [#assign includesList = includesList+" "+FamilyName?lower_case+"x_ll_utils.h"]
+    [/#if]
     [#-- include "${FamilyName?lower_case}xx_ll_gpio.h" --]
-    [#if !includesList?contains(FamilyName?lower_case+"xx_ll_gpio.h")]
+    [#if !includesList?contains(FamilyName?lower_case+"xx_ll_gpio.h") && FamilyName!="STM32WB0"]
     #include "${FamilyName?lower_case}xx_ll_gpio.h"
         [#assign includesList = includesList+" "+FamilyName?lower_case+"xx_ll_gpio.h"]
     [/#if]
+    [#-- include "${FamilyName?lower_case}xx_ll_gpio.h" --]
+    [#if !includesList?contains(FamilyName?lower_case+"x_ll_gpio.h") && FamilyName="STM32WB0"]
+    #include "${FamilyName?lower_case}x_ll_gpio.h"
+        [#assign includesList = includesList+" "+FamilyName?lower_case+"x_ll_gpio.h"]
+    [/#if]
     [#-- include "${FamilyName?lower_case}xx_ll_exti.h" --]
-    [#if !includesList?contains(FamilyName?lower_case+"xx_ll_exti.h")]
+    [#if !includesList?contains(FamilyName?lower_case+"xx_ll_exti.h") && FamilyName!="STM32WB0"]
     #include "${FamilyName?lower_case}xx_ll_exti.h"
         [#assign includesList = includesList+" "+FamilyName?lower_case+"xx_ll_exti.h"]
     [/#if]
     [#-- include "${FamilyName?lower_case}xx_ll_pwr.h"     --]
-    [#if !includesList?contains(FamilyName?lower_case+"xx_ll_pwr.h")]
+    [#if !includesList?contains(FamilyName?lower_case+"xx_ll_pwr.h") && FamilyName!="STM32WB0"]
     #include "${FamilyName?lower_case}xx_ll_pwr.h"
         [#assign includesList = includesList+" "+FamilyName?lower_case+"xx_ll_pwr.h"]
     [/#if]
-    [#if !includesList?contains(FamilyName?lower_case+"xx_ll_dma.h")]
+    [#if !includesList?contains(FamilyName?lower_case+"x_ll_pwr.h") && FamilyName="STM32WB0"]
+    #include "${FamilyName?lower_case}x_ll_pwr.h"
+        [#assign includesList = includesList+" "+FamilyName?lower_case+"x_ll_pwr.h"]
+    [/#if]
+    [#if !includesList?contains(FamilyName?lower_case+"xx_ll_dma.h") && FamilyName!="STM32WB0"]
     #include "${FamilyName?lower_case}xx_ll_dma.h"
         [#assign includesList = includesList+" "+FamilyName?lower_case+"xx_ll_dma.h"]
+    [/#if]
+    [#if !includesList?contains(FamilyName?lower_case+"x_ll_dma.h") && FamilyName="STM32WB0"]
+    #include "${FamilyName?lower_case}x_ll_dma.h"
+        [#assign includesList = includesList+" "+FamilyName?lower_case+"x_ll_dma.h"]
     [/#if]
 
 [#if !isHALUsed??]

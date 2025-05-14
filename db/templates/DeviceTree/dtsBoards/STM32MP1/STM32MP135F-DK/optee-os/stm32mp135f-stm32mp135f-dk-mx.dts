@@ -6,15 +6,19 @@
 #include "stm32mp13xf.dtsi"
 
 /* USER CODE BEGIN includes */
+#include <dt-bindings/mfd/st,stpmic1.h>
 #include <dt-bindings/power/stm32mp1-power.h>
 #include <dt-bindings/random/stm32mp-rng.h>
 #include <dt-bindings/regulator/st,stm32mp13-regulator.h>
+#include <dt-bindings/soc/stm32mp-provisioning.h>
 #include <dt-bindings/soc/stm32mp-tzc400-macro.h>
 #include <dt-bindings/soc/stm32mp13-tzc400.h>
+#include <dt-bindings/tamper/st,stm32mp13-tamp.h>
+#include "stm32mp13-pinctrl.dtsi"
 /* USER CODE END includes */
 
 /{
-	model = "STMicroelectronics STM32MP135F-DK STM32CubeMX board - openstlinux-5.15-yocto-kirkstone-mp1-v22.11.23";
+	model = "STMicroelectronics STM32MP135F-DK STM32CubeMX board - openstlinux-6.1-yocto-mickledore-mp1-v23.06.21";
 	compatible = "st,stm32mp135f-board_135f-dk-mx", "st,stm32mp135f-dk", "st,stm32mp135";
 
 	/* USER CODE BEGIN root */
@@ -29,9 +33,20 @@
 	};
 
 	magic_wol:magic_wol{
-		compatible = "st,stm32mp1,pwr-irq-user";
+		compatible = "st,stm32mp1-pwr-irq-user";
+		wakeup-parent = <&pwr_irq>;
 		st,wakeup-pin-number = <2>;
 		status = "okay";
+	};
+
+	shadow-prov{
+		compatible = "st,provisioning";
+
+		hw2_prov{
+			nvmem-cells = <&hw2_otp>;
+			st,shadow-value = <0x000001E0>;
+			st,shadow-lock = <STICKY_LOCK_SR>;
+		};
 	};
 
 	vin:vin{
@@ -51,7 +66,8 @@
 	};
 
 	typec_wakeup:typec_wakeup{
-		compatible = "st,stm32mp1,pwr-irq-user";
+		compatible = "st,stm32mp1-pwr-irq-user";
+		wakeup-parent = <&pwr_irq>;
 		st,wakeup-pin-number = <5>;
 		st,notif-it-id = <1>;
 		status = "okay";
@@ -144,7 +160,14 @@
 
 	rcc_pins_mx:rcc_mx-0{
 
-		pins{
+		pins1{
+			pinmux = <STM32_PINMUX('C', 14, ANALOG)>,
+					<STM32_PINMUX('C', 15, ANALOG)>,
+					<STM32_PINMUX('H', 0, ANALOG)>,
+					<STM32_PINMUX('H', 1, ANALOG)>;
+		};
+
+		pins2{
 			pinmux = <STM32_PINMUX('D', 7, AF0)>;
 			bias-disable;
 			drive-push-pull;
@@ -158,8 +181,9 @@
 			pinmux = <STM32_PINMUX('I', 1, ANALOG)>;
 		};
 	};
-	  /* USER CODE BEGIN pinctrl */
-	  /* USER CODE END pinctrl */
+	
+	/* USER CODE BEGIN pinctrl */
+	/* USER CODE END pinctrl */
 };
 
 &adc_2{
@@ -247,8 +271,10 @@
 		compatible = "st,stpmic1";
 		reg = <0x33>;
 		status = "okay";
+		wakeup-parent = <&pwr_irq>;
 		st,wakeup-pin-number = <1>;
-		st,notif-it-id = <0>;
+		st,pmic-it-id = <IT_PONKEY_F IT_PONKEY_R>;
+		st,notif-it-id = <0 2>;
 
 		regulators{
 			compatible = "st,stpmic1-regulators";
@@ -477,8 +503,6 @@
 };
 
 &rcc{
-	pinctrl-names = "default";
-	pinctrl-0 = <&rcc_pins_mx>;
 	status = "okay";
 	clocks = <&clk_hse>, <&clk_hsi>, <&clk_lse>, <&clk_lsi>, <&clk_csi>;
 	clock-names = "clk-hse", "clk-hsi", "clk-lse", "clk-lsi", "clk-csi";
@@ -523,10 +547,6 @@
 		DIV(DIV_MCO1, 0)
 		DIV(DIV_MCO2, 0)
 	>;
-
-	/* USER CODE BEGIN rcc */
-	compatible = "st,stm32mp13-rcc", "syscon", "st,stm32mp13-rcc-mco";
-	/* USER CODE END rcc */
 
 	st,pll_vco{
 
@@ -624,7 +644,13 @@
 				st,clksrc = < CLK_MPU_PLL1P >;
 				st,pll = < &pll1_cfg1 >;
 			};
+
 			/* USER CODE BEGIN rcc_st-ck_mpu */
+			cfg_2 {
+				hz = < 1000000000 >;
+				st,clksrc = < CLK_MPU_PLL1P >;
+				st,pll = < &pll1_cfg2 >;
+			};
 			/* USER CODE END rcc_st-ck_mpu */
 		};
 
@@ -648,6 +674,16 @@
 			};
 		};
 	};
+
+	st,rcc{
+		pinctrl-names = "default";
+		pinctrl-0 = <&rcc_pins_mx>;
+		status = "okay";
+
+		/* USER CODE BEGIN rcc_st-rcc */
+		compatible = "st,rcc";
+		/* USER CODE END rcc_st-rcc */
+	};
 };
 
 &rng{
@@ -655,7 +691,6 @@
 
 	/* USER CODE BEGIN rng */
 	clock-error-detect;
-	st,rng-config = <RNG_CONFIG_NIST_B_ID>;
 	/* USER CODE END rng */
 };
 
@@ -673,12 +708,23 @@
 	status = "okay";
 
 	/* USER CODE BEGIN tamp */
-	st,tamp_passive_nb_sample = <4>;
-	st,tamp_passive_sample_clk_div = <16384>;
+	st,tamp-passive-nb-sample = <4>;
+	st,tamp-passive-sample-clk-div = <16384>;
+	wakeup-source;
+	wakeup-parent = <&exti>;
 
-	tamp_passive@2{
-		pinctrl-0 = <&tamp0_in2_pin_a>;
+	tamp_button:tamp-passive@2{
 		status = "okay";
+		reg = <EXT_TAMPER_2 0>;
+		pinctrl-0 = <&tamp0_in2_pin_a>;
+		st,tamp-mode = <TAMPER_CONFIRMED_MODE>;
+	};
+
+	tamp-active@3{
+		pinctrl-0 = <&tamp0_in3_pin_a &tamp0_out1_pin_a>;
+		reg = <EXT_TAMPER_3 0>;
+		st,tamp-mode = <TAMPER_POTENTIAL_MODE>;
+		status = "disabled";
 	};
 	/* USER CODE END tamp */
 };
@@ -782,6 +828,14 @@
 		reg = <VOLTD_SCMI_STPMIC1_PWR_SW2>;
 		voltd-supply = <&v3v3_sw>;
 	};
+};
+
+&sdmmc1_io{
+	vddsd1-supply = <&vdd>;
+};
+
+&sdmmc2_io{
+	vddsd2-supply = <&vdd>;
 };
 
 &tzc400{

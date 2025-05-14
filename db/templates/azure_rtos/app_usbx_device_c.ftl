@@ -381,7 +381,11 @@ UINT MX_USBX_Device_Init(VOID *memory_ptr)
   hid_mouse_parameter.ux_slave_class_hid_instance_deactivate       = USBD_HID_Mouse_Deactivate;
   hid_mouse_parameter.ux_device_class_hid_parameter_report_address = USBD_HID_ReportDesc(INTERFACE_HID_MOUSE);
   hid_mouse_parameter.ux_device_class_hid_parameter_report_length  = USBD_HID_ReportDesc_length(INTERFACE_HID_MOUSE);
+  [#if FamilyName?lower_case?starts_with("stm32c0")]
+  hid_mouse_parameter.ux_device_class_hid_parameter_report_id      = UX_FALSE;
+  [#else]
   hid_mouse_parameter.ux_device_class_hid_parameter_report_id      = UX_TRUE;
+  [/#if]
   hid_mouse_parameter.ux_device_class_hid_parameter_callback       = USBD_HID_Mouse_SetReport;
   hid_mouse_parameter.ux_device_class_hid_parameter_get_callback   = USBD_HID_Mouse_GetReport;
 
@@ -447,7 +451,11 @@ UINT MX_USBX_Device_Init(VOID *memory_ptr)
   custom_hid_parameter.ux_slave_class_hid_instance_deactivate       = USBD_Custom_HID_Deactivate;
   custom_hid_parameter.ux_device_class_hid_parameter_report_address = USBD_HID_ReportDesc(INTERFACE_HID_CUSTOM);
   custom_hid_parameter.ux_device_class_hid_parameter_report_length  = USBD_HID_ReportDesc_length(INTERFACE_HID_CUSTOM);
+  [#if FamilyName?lower_case?starts_with("stm32c0")]
+  custom_hid_parameter.ux_device_class_hid_parameter_report_id      = UX_FALSE;
+  [#else]
   custom_hid_parameter.ux_device_class_hid_parameter_report_id      = UX_TRUE;
+  [/#if]
   custom_hid_parameter.ux_device_class_hid_parameter_callback       = USBD_Custom_HID_SetFeature;
   custom_hid_parameter.ux_device_class_hid_parameter_get_callback   = USBD_Custom_HID_GetReport;
 #ifdef UX_DEVICE_CLASS_HID_INTERRUPT_OUT_SUPPORT
@@ -839,9 +847,9 @@ UINT MX_USBX_Device_Init(VOID *memory_ptr)
                                      video_interface_number,
                                      (VOID *)&video_parameter) != UX_SUCCESS)
   {
-    /* USER CODE BEGIN USBX_DEVICE_VIDEO_REGISTER_ERORR */
+    /* USER CODE BEGIN USBX_DEVICE_VIDEO_REGISTER_ERROR */
     return UX_ERROR;
-    /* USER CODE END USBX_DEVICE_VIDEO_REGISTER_ERORR */
+    /* USER CODE END USBX_DEVICE_VIDEO_REGISTER_ERROR */
   }
 
 [/#if]
@@ -876,9 +884,9 @@ UINT MX_USBX_Device_Init(VOID *memory_ptr)
                                      ccid_interface_number,
                                      &ccid_parameter) != UX_SUCCESS)
   {
-    /* USER CODE BEGIN USBX_DEVICE_CCID_REGISTER_ERORR */
+    /* USER CODE BEGIN USBX_DEVICE_CCID_REGISTER_ERROR */
     return UX_ERROR;
-    /* USER CODE END USBX_DEVICE_CCID_REGISTER_ERORR */
+    /* USER CODE END USBX_DEVICE_CCID_REGISTER_ERROR */
   }
 [/#if]
 
@@ -906,9 +914,9 @@ UINT MX_USBX_Device_Init(VOID *memory_ptr)
                                      printer_interface_number,
                                      &printer_parameter) != UX_SUCCESS)
   {
-    /* USER CODE BEGIN USBX_DEVICE_PRINTER_REGISTER_ERORR */
+    /* USER CODE BEGIN USBX_DEVICE_PRINTER_REGISTER_ERROR */
     return UX_ERROR;
-    /* USER CODE END USBX_DEVICE_PRINTER_REGISTER_ERORR */
+    /* USER CODE END USBX_DEVICE_PRINTER_REGISTER_ERROR */
   }
 [/#if]
 

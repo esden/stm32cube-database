@@ -4,14 +4,14 @@
 	<RefMode Abstract="false" Name="Activate_FlashIP">
 		<ConfigForMode>Activate_FlashIP</ConfigForMode>
 
-		<Parameter Name="advanced_settings" />
-		
+		<Parameter Name="advanced_settings"/>
+		<Parameter Name="UserConfigCondition"></Parameter>
 		<Parameter Name="OB_Read_Out_Protection_active" />
 		<Parameter Name="RDPLevel">
-			<Condition Expression="OB_Read_Out_Protection_active=true" Diagnostic="" />
+			<Condition Expression="OB_Read_Out_Protection_active=true" Diagnostic=""/>
 		</Parameter>
 
-		<Parameter Name="OB_BOR_Level_active" />
+		<Parameter Name="OB_BOR_Level_active"/>
 		<Parameter Name="OB_BOR_level">
 			<Condition Expression="OB_BOR_Level_active=true" Diagnostic="" />
 		</Parameter>
@@ -994,7 +994,6 @@ This bit can be set only with VDDIO2 below 2.5V.&lt;br&gt;
 		| !SEM_OB_DUALBANK_DUAL_NULL | !SEM_OB_SRAM2_RST_NULL | !SEM_OB_BOOT0_FROM_NULL| !SEM_OB_NBOOT0_NULL | !SEM_OB_PA15_PUP_NULL 
 		| !SEM_OB_BKPRAM_ECC_NULL | (!SEM_OB_SRAM3_ECC_NULL  &amp; !DIE455)	
 		| (!SEM_OB_SRAM2_ECC_NULL  &amp; !DIE455)| !SEM_OB_IO_VDD_HSLV_NULL | !SEM_OB_IO_VDDIO2_HSLV_NULL)" Diagnostic=""/>
-	
 	</RefParameter>
 	<RefParameter Visible="false" Comment="Option Type" Name="USERType" DefaultValue="+OB_USER_BOR_LEV+|OB_USER_NRST_STOP+|OB_USER_NRST_STDBY+|OB_USER_NRST_SHDW+|OB_USER_SRAM134_RST+|OB_USER_IWDG_SW+|OB_USER_IWDG_STOP+|OB_USER_IWDG_STDBY+|OB_USER_WWDG_SW+|OB_USER_SWAP_BANK+|OB_USER_DUALBANK+|OB_USER_BKPRAM_ECC+|OB_USER_SRAM3_ECC+|OB_USER_SRAM2_ECC+|OB_USER_SRAM2_RST+|OB_USER_NSWBOOT0+|OB_USER_NBOOT0+|OB_USER_PA15_PUPEN+|OB_USER_IO_VDD_HSLV+|OB_USER_IO_VDDIO2_HSLV" Type="list">
 		<Condition Expression="OB_BOR_Level_active=true &amp; (!SEM_OB_NRST_STOP_NULL | !SEM_OB_NRST_STDBY_NULL | !SEM_OB_NRST_SHDW_NULL 
@@ -1106,9 +1105,175 @@ This bit can be set only with VDDIO2 below 2.5V.&lt;br&gt;
 	</RefParameter>	
 	<RefParameter Comment="          IO_VDDIO2_HSLV" DefaultValue="" TabName="HAL Option Bytes Settings" Name="OB_USER_IO_VDDIO2_HSLV" Type="string" Visible="false" />
 
-
-	
 	<!-- END USERType RefParameter -->
+
+<!--CR DEUXIEME SOLUTION \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\-->
+
+	<RefParameter Visible="false" Comment="UserConfig_condition" Name="UserConfigCondition" DefaultValue="+NRST_STOP+|NRST_STDBY+|NRST_SHDW+|SRAM134_RST+|IWDG_SW+|IWDG_STOP+|IWDG_STDBY+|WWDG_SW+|SWAP_BANK+|DUALBANK+|BKPRAM_ECC+|SRAM3_ECC+|SRAM2_ECC+|SRAM2_RST+|NSWBOOT0+|NBOOT0+|PA15_PUPEN+|IO_VDD_HSLV+|IO_VDDIO2_HSLV" Type="list">
+		<Condition Expression="(!SEM_OB_NRST_STOP_NULL | !SEM_OB_NRST_STDBY_NULL | !SEM_OB_NRST_SHDW_NULL 
+		| !SEM_OB_SRAM134_RST_NULL | !SEM_OB_IWDGSW_NULL | !SEM_OB_IWDG_STOP_NULL | !SEM_OB_IWDG_STDBY_NULL | !SEM_OB_WWDGSW_NULL 
+		| (!SEM_OB_SWAP_BANK_NULL &amp; OB_Boot_Configuration_active_BOOT_LOCK=true &amp; BootLock=OB_BOOT_LOCK_DISABLE &amp; OB_TZEN=OB_TZEN_DISABLE) 
+		| !SEM_OB_DUALBANK_DUAL_NULL | !SEM_OB_SRAM2_RST_NULL | !SEM_OB_BOOT0_FROM_NULL| !SEM_OB_NBOOT0_NULL | !SEM_OB_PA15_PUP_NULL 
+		| !SEM_OB_BKPRAM_ECC_NULL | (!SEM_OB_SRAM3_ECC_NULL  &amp; !DIE455)
+		| (!SEM_OB_SRAM2_ECC_NULL  &amp; !DIE455)| !SEM_OB_IO_VDD_HSLV_NULL | !SEM_OB_IO_VDDIO2_HSLV_NULL)" Diagnostic=""/>
+	</RefParameter>
+
+    <RefParameter Comment="          NRST_STOP" DefaultValue="(pOBInit.USERConfig &amp; OB_STOP_NORST) != OB_STOP_NORST" Name="NRST_STOP" Type="String" Visible="false">
+	<Condition Expression="OB_NRST_STOP_UI=OB_STOP_NORST" Diagnostic="" />
+	</RefParameter>    
+	<RefParameter Comment="          NRST_STOP" DefaultValue="(pOBInit.USERConfig &amp; OB_STOP_NORST) != OB_STOP_RST" Name="NRST_STOP" Type="String" Visible="false">
+		<Condition Expression="OB_NRST_STOP_UI=OB_STOP_RST" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          NRST_STOP" DefaultValue="" Name="NRST_STOP" Type="String" Visible="false"/>
+
+	<RefParameter Comment="          NRST_STDBY" DefaultValue="(pOBInit.USERConfig &amp; OB_STANDBY_NORST) != OB_STANDBY_NORST" Name="NRST_STDBY" Type="String" Visible="false">
+		<Condition Expression="OB_NRST_STDBY_UI=OB_STANDBY_NORST" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          NRST_STDBY" DefaultValue="(pOBInit.USERConfig &amp; OB_STANDBY_NORST) != OB_STANDBY_RST" Name="NRST_STDBY" Type="String" Visible="false">
+		<Condition Expression="OB_NRST_STDBY_UI=OB_STANDBY_RST" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          NRST_STDBY" DefaultValue="" Name="NRST_STDBY" Type="String" Visible="false"/>
+
+	<RefParameter Comment="          NRST_SHDW" DefaultValue="(pOBInit.USERConfig &amp; OB_SHUTDOWN_NORST) != OB_SHUTDOWN_NORST" Name="NRST_SHDW" Type="String" Visible="false">
+		<Condition Expression="OB_NRST_SHDW_UI=OB_SHUTDOWN_NORST" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          NRST_SHDW" DefaultValue="(pOBInit.USERConfig &amp; OB_SHUTDOWN_NORST) != OB_SHUTDOWN_RST" Name="NRST_SHDW" Type="String" Visible="false">
+		<Condition Expression="OB_NRST_SHDW_UI=OB_SHUTDOWN_RST" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          NRST_SHDW" DefaultValue="" Name="NRST_SHDW"  Type="String" Visible="false"/>
+
+	<RefParameter Comment="          SRAM1345_RST" DefaultValue="(pOBInit.USERConfig &amp; OB_SRAM134_RST_NOT_ERASE) != OB_SRAM134_RST_NOT_ERASE" Name="SRAM134_RST" Type="String" Visible="false">
+		<Condition Expression="OB_SRAM134_RST_UI=OB_SRAM134_RST_NOT_ERASE" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          SRAM1345_RST" DefaultValue="(pOBInit.USERConfig &amp; OB_SRAM134_RST_NOT_ERASE) != OB_SRAM134_RST_ERASE" Name="SRAM134_RST" Type="String" Visible="false">
+		<Condition Expression="OB_SRAM134_RST_UI=OB_SRAM134_RST_ERASE" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          SRAM1345_RST" DefaultValue="" Name="SRAM134_RST"  Type="String" Visible="false"/>
+
+	<RefParameter Comment="          IWDG_SW" DefaultValue="(pOBInit.USERConfig &amp; OB_IWDG_SW) != OB_IWDG_SW" Name="IWDG_SW" Type="String" Visible="false">
+		<Condition Expression="OB_IWDG_SW_UI=OB_IWDG_SW" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          IWDG_SW" DefaultValue="(pOBInit.USERConfig &amp; OB_IWDG_SW) != OB_IWDG_HW" Name="IWDG_SW" Type="String" Visible="false">
+		<Condition Expression="OB_IWDG_SW_UI=OB_IWDG_HW" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          IWDG_SW" DefaultValue="" Name="IWDG_SW"  Type="String" Visible="false"/>
+
+	<RefParameter Comment="          IWDG_STOP" DefaultValue="(pOBInit.USERConfig &amp; OB_IWDG_STOP_RUN) != OB_IWDG_STOP_RUN" Name="IWDG_STOP" Type="String" Visible="false">
+		<Condition Expression="OB_IWDG_STOP_UI=OB_IWDG_STOP_RUN" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          IWDG_STOP" DefaultValue="(pOBInit.USERConfig &amp; OB_IWDG_STOP_RUN) != OB_IWDG_STOP_FREEZE" Name="IWDG_STOP" Type="String" Visible="false">
+		<Condition Expression="OB_IWDG_STOP_UI=OB_IWDG_STOP_FREEZE" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          IWDG_STOP" DefaultValue="" Name="IWDG_STOP" Type="String" Visible="false"/>
+
+	<RefParameter Comment="          IWDG_STDBY" DefaultValue="(pOBInit.USERConfig &amp; OB_IWDG_STDBY_RUN) != OB_IWDG_STDBY_RUN" Name="IWDG_STDBY" Type="String" Visible="false">
+		<Condition Expression="OB_IWDG_STDBY_UI=OB_IWDG_STDBY_RUN" Diagnostic="" />
+	</RefParameter>	
+	<RefParameter Comment="          IWDG_STDBY" DefaultValue="(pOBInit.USERConfig &amp; OB_IWDG_STDBY_RUN) != OB_IWDG_STDBY_FREEZE" Name="IWDG_STDBY" Type="String" Visible="false">
+		<Condition Expression="OB_IWDG_STDBY_UI=OB_IWDG_STDBY_FREEZE" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          IWDG_STDBY" DefaultValue="" Name="IWDG_STDBY" Type="String" Visible="false"/>
+
+	<RefParameter Comment="          WWDG_SW" DefaultValue="(pOBInit.USERConfig &amp; OB_WWDG_SW) != OB_WWDG_SW" Name="WWDG_SW" Type="String" Visible="false">
+		<Condition Expression="OB_WWDG_SW_UI=OB_WWDG_SW" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          WWDG_SW" DefaultValue="(pOBInit.USERConfig &amp; OB_WWDG_SW) != OB_WWDG_HW" Name="WWDG_SW" Type="String" Visible="false">
+		<Condition Expression="OB_WWDG_SW_UI=OB_WWDG_HW" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          WWDG_SW" DefaultValue="" Name="WWDG_SW" Type="String" Visible="false"/>
+
+	<RefParameter Comment="          SWAP_BANK" DefaultValue="(pOBInit.USERConfig &amp; OB_SWAP_BANK_ENABLE) != OB_SWAP_BANK_ENABLE" Name="SWAP_BANK" Type="String" Visible="false">
+		<Condition Expression="(OB_SWAP_BANK_UI=OB_SWAP_BANK_ENABLE) &amp; OB_Boot_Configuration_active_BOOT_LOCK=true &amp; BootLock=OB_BOOT_LOCK_DISABLE &amp; OB_TZEN=OB_TZEN_DISABLE" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          SWAP_BANK" DefaultValue="(pOBInit.USERConfig &amp; OB_SWAP_BANK_ENABLE) != OB_SWAP_BANK_DISABLE" Name="SWAP_BANK" Type="String" Visible="false">
+		<Condition Expression="(OB_SWAP_BANK_UI=OB_SWAP_BANK_DISABLE) &amp; OB_Boot_Configuration_active_BOOT_LOCK=true &amp; BootLock=OB_BOOT_LOCK_DISABLE &amp; OB_TZEN=OB_TZEN_DISABLE" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          SWAP_BANK" DefaultValue="" Name="SWAP_BANK" Type="string" Visible="false" />
+
+	<RefParameter Comment="          DBANK" DefaultValue="(pOBInit.USERConfig &amp; OB_DUALBANK_DUAL) != OB_DUALBANK_DUAL" Name="DUALBANK" Type="String" Visible="false">
+		<Condition Expression="OB_DBANK_UI=OB_DUALBANK_DUAL" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          DBANK" DefaultValue="(pOBInit.USERConfig &amp; OB_DUALBANK_DUAL) != OB_DUALBANK_SINGLE" Name="DUALBANK" Type="String" Visible="false">
+		<Condition Expression="OB_DBANK_UI=OB_DUALBANK_SINGLE" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          DBANK" DefaultValue="" Name="DUALBANK" Type="String" Visible="false" />
+
+	<RefParameter Comment="          SRAM2_RST" DefaultValue="(pOBInit.USERConfig &amp; OB_SRAM2_RST_NOT_ERASE) != OB_SRAM2_RST_NOT_ERASE" Name="SRAM2_RST" Type="String" Visible="false">
+		<Condition Expression="OB_SRAM2_RST_UI=OB_SRAM2_RST_NOT_ERASE" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          SRAM2_RST" DefaultValue="(pOBInit.USERConfig &amp; OB_SRAM2_RST_NOT_ERASE) != OB_SRAM2_RST_ERASE" Name="SRAM2_RST" Type="String" Visible="false">
+		<Condition Expression="OB_SRAM2_RST_UI=OB_SRAM2_RST_ERASE" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          SRAM2_RST" DefaultValue="" Name="SRAM2_RST" Type="string" Visible="false" />
+
+	<RefParameter Comment="          nSWBOOT0" DefaultValue="(pOBInit.USERConfig &amp; OB_BOOT0_FROM_PIN) != OB_BOOT0_FROM_PIN" Name="NSWBOOT0" Type="String" Visible="false">
+		<Condition Expression="OB_nSWBOOT0_UI=OB_BOOT0_FROM_PIN" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          nSWBOOT0" DefaultValue="(pOBInit.USERConfig &amp; OB_BOOT0_FROM_PIN) != OB_BOOT0_FROM_OB" Name="NSWBOOT0" Type="String" Visible="false">
+		<Condition Expression="OB_nSWBOOT0_UI=OB_BOOT0_FROM_OB" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          nSWBOOT0" DefaultValue="" Name="NSWBOOT0" Type="string" Visible="false" />
+
+	<RefParameter Comment="          nBOOT0" DefaultValue="(pOBInit.USERConfig &amp; OB_NBOOT0_SET) != OB_NBOOT0_SET" Name="NBOOT0" Type="String" Visible="false">
+		<Condition Expression="OB_nBOOT0_UI=OB_NBOOT0_SET" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          nBOOT0" DefaultValue="(pOBInit.USERConfig &amp; OB_NBOOT0_SET) != OB_NBOOT0_RESET" Name="NBOOT0" Type="String" Visible="false">
+		<Condition Expression="OB_nBOOT0_UI=OB_NBOOT0_RESET" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          nBOOT0" DefaultValue="" Name="NBOOT0" Type="string" Visible="false" />
+
+	<RefParameter Comment="          PA15_PUPEN" DefaultValue="(pOBInit.USERConfig &amp; OB_PA15_PUP_ENABLE) != OB_PA15_PUP_ENABLE" Name="PA15_PUPEN" Type="String" Visible="false">
+		<Condition Expression="OB_PA15_PUPEN_UI=OB_PA15_PUP_ENABLE" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          PA15_PUPEN" DefaultValue="(pOBInit.USERConfig &amp; OB_PA15_PUP_ENABLE) != OB_PA15_PUP_DISABLE" Name="PA15_PUPEN" Type="String" Visible="false">
+		<Condition Expression="OB_PA15_PUPEN_UI=OB_PA15_PUP_DISABLE" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          PA15_PUPEN" DefaultValue="" Name="PA15_PUPEN" Type="string" Visible="false" />
+
+	<RefParameter Comment="          BKPRAM_ECC" DefaultValue="(pOBInit.USERConfig &amp; OB_BKPRAM_ECC_ENABLE) != OB_BKPRAM_ECC_ENABLE" Name="BKPRAM_ECC" Type="String" Visible="false">
+		<Condition Expression="OB_BKPRAM_ECC_UI=OB_BKPRAM_ECC_ENABLE" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          BKPRAM_ECC" DefaultValue="(pOBInit.USERConfig &amp; OB_BKPRAM_ECC_ENABLE) != OB_BKPRAM_ECC_DISABLE" Name="BKPRAM_ECC" Type="String" Visible="false">
+		<Condition Expression="OB_BKPRAM_ECC_UI=OB_BKPRAM_ECC_DISABLE" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          BKPRAM_ECC" DefaultValue="" Name="BKPRAM_ECC" Type="string" Visible="false" />
+
+	<RefParameter Comment="          SRAM3_ECC" DefaultValue="(pOBInit.USERConfig &amp; OB_SRAM3_ECC_ENABLE) != OB_SRAM3_ECC_ENABLE" Name="SRAM3_ECC" Type="String" Visible="false">
+		<Condition Expression="OB_SRAM3_ECC_UI=OB_SRAM3_ECC_ENABLE &amp; !DIE455" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          SRAM3_ECC" DefaultValue="(pOBInit.USERConfig &amp; OB_SRAM3_ECC_ENABLE) != OB_SRAM3_ECC_DISABLE" Name="SRAM3_ECC" Type="String" Visible="false">
+		<Condition Expression="OB_SRAM3_ECC_UI=OB_SRAM3_ECC_DISABLE &amp; !DIE455" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          SRAM3_ECC" DefaultValue="" Name="SRAM3_ECC" Type="string" Visible="false" />
+
+	<RefParameter Comment="          SRAM2_ECC" DefaultValue="(pOBInit.USERConfig &amp; OB_SRAM2_ECC_ENABLE) != OB_SRAM2_ECC_ENABLE" Name="SRAM2_ECC" Type="String" Visible="false">
+		<Condition Expression="OB_SRAM2_ECC_UI=OB_SRAM2_ECC_ENABLE &amp; !DIE455" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          SRAM2_ECC" DefaultValue="(pOBInit.USERConfig &amp; OB_SRAM2_ECC_ENABLE) != OB_SRAM2_ECC_DISABLE" Name="SRAM2_ECC" Type="String" Visible="false">
+		<Condition Expression="OB_SRAM2_ECC_UI=OB_SRAM2_ECC_DISABLE &amp; !DIE455" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          SRAM2_ECC" DefaultValue="" Name="SRAM2_ECC" Type="string" Visible="false" />
+	
+	<RefParameter Comment="          IO_VDD_HSLV" DefaultValue="(pOBInit.USERConfig &amp; OB_IO_VDD_HSLV_ENABLE) != OB_IO_VDD_HSLV_ENABLE" Name="IO_VDD_HSLV" Type="String" Visible="false">
+		<Condition Expression="OB_IO_VDD_HSLV_UI=OB_IO_VDD_HSLV_ENABLE" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          IO_VDD_HSLV" DefaultValue="(pOBInit.USERConfig &amp; OB_IO_VDD_HSLV_ENABLE) != OB_IO_VDD_HSLV_DISABLE" Name="IO_VDD_HSLV" Type="String" Visible="false">
+		<Condition Expression="OB_IO_VDD_HSLV_UI=OB_IO_VDD_HSLV_DISABLE" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          IO_VDD_HSLV" DefaultValue="" Name="IO_VDD_HSLV" Type="string" Visible="false" />
+
+	<RefParameter Comment="          IO_VDDIO2_HSLV" DefaultValue="(pOBInit.USERConfig &amp; OB_IO_VDDIO2_HSLV_ENABLE) != OB_IO_VDDIO2_HSLV_ENABLE" Name="IO_VDDIO2_HSLV" Type="String" Visible="false">
+		<Condition Expression="OB_IO_VDDIO2_HSLV_UI=OB_IO_VDDIO2_HSLV_ENABLE" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          IO_VDDIO2_HSLV" DefaultValue="(pOBInit.USERConfig &amp; OB_IO_VDDIO2_HSLV_ENABLE) != OB_IO_VDDIO2_HSLV_DISABLE" Name="IO_VDDIO2_HSLV" Type="String" Visible="false">
+		<Condition Expression="OB_IO_VDDIO2_HSLV_UI=OB_IO_VDDIO2_HSLV_DISABLE" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          IO_VDDIO2_HSLV" DefaultValue="" Name="IO_VDDIO2_HSLV" Type="string" Visible="false" />
+
+
+
+<!--CR\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\-->
+
 
 	<!-- BEGIN WRPArea RefParameter -->
 	<RefParameter Comment="" DefaultValue="OB_WRPAREA_BANK1_AREAA" Group="Option Bytes" Name="OB_WRPAREA_BANK1_AREAA" Type="string" Visible="false">
@@ -1182,7 +1347,7 @@ This bit can be set only with VDDIO2 below 2.5V.&lt;br&gt;
 	</RefParameter>
 	<RefParameter Comment="          Bank" DefaultValue="FLASH_BANK_1" Group="AREA1" TabName="Block-based page protection" Name="B1_Bank" Type="string" Visible="true">
 		<Description>FLASH Bank &lt;br&gt; FLASH_BANK_2 is available only if the option byte DBANK is enabled.</Description>
-		<Condition Expression="B1_BLOCK_active=true &amp; OB_DBANK=OB_DUALBANK_SINGLE" Diagnostic="" />
+		<Condition Expression="B1_BLOCK_active=true &amp; OB_DBANK_UI=OB_DUALBANK_SINGLE" Diagnostic="" />
 	</RefParameter>
 	<RefParameter Comment="          Bank" DefaultValue="FLASH_BANK_1" Group="AREA1" TabName="Block-based page protection" Name="B1_Bank" Type="list">
 		<Description>FLASH Bank</Description>
@@ -2839,7 +3004,7 @@ This bit can be set only with VDDIO2 below 2.5V.&lt;br&gt;
 	</RefParameter>
 	<RefParameter Comment="          Bank" DefaultValue="FLASH_BANK_1" Group="AREA2" TabName="Block-based page protection" Name="B2_Bank" Type="string" Visible="true">
 		<Description>FLASH Bank</Description>
-		<Condition Expression="B2_BLOCK_active=true &amp; OB_DBANK=OB_DUALBANK_SINGLE" Diagnostic="" />
+		<Condition Expression="B2_BLOCK_active=true &amp; OB_DBANK_UI=OB_DUALBANK_SINGLE" Diagnostic="" />
 	</RefParameter>
 	<RefParameter Comment="          Bank" DefaultValue="FLASH_BANK_1" Group="AREA2" TabName="Block-based page protection" Name="B2_Bank" Type="list">
 		<Description>FLASH Bank</Description>
@@ -4496,7 +4661,7 @@ This bit can be set only with VDDIO2 below 2.5V.&lt;br&gt;
 	</RefParameter>
 	<RefParameter Comment="          Bank" DefaultValue="FLASH_BANK_1" Group="AREA3" TabName="Block-based page protection" Name="B3_Bank" Type="string" Visible="true">
 		<Description>FLASH Bank</Description>
-		<Condition Expression="B3_BLOCK_active=true &amp; OB_DBANK=OB_DUALBANK_SINGLE" Diagnostic="" />
+		<Condition Expression="B3_BLOCK_active=true &amp; OB_DBANK_UI=OB_DUALBANK_SINGLE" Diagnostic="" />
 	</RefParameter>
 	<RefParameter Comment="          Bank" DefaultValue="FLASH_BANK_1" Group="AREA3" TabName="Block-based page protection" Name="B3_Bank" Type="list">
 		<Description>FLASH Bank</Description>
@@ -6153,7 +6318,7 @@ This bit can be set only with VDDIO2 below 2.5V.&lt;br&gt;
 	</RefParameter>
 	<RefParameter Comment="          Bank" DefaultValue="FLASH_BANK_1" Group="AREA4" TabName="Block-based page protection" Name="B4_Bank" Type="string" Visible="true">
 		<Description>FLASH Bank</Description>
-		<Condition Expression="B4_BLOCK_active=true &amp; OB_DBANK=OB_DUALBANK_SINGLE" Diagnostic="" />
+		<Condition Expression="B4_BLOCK_active=true &amp; OB_DBANK_UI=OB_DUALBANK_SINGLE" Diagnostic="" />
 	</RefParameter>
 	<RefParameter Comment="          Bank" DefaultValue="FLASH_BANK_1" Group="AREA4" TabName="Block-based page protection" Name="B4_Bank" Type="list">
 		<Description>FLASH Bank</Description>
@@ -7809,7 +7974,7 @@ This bit can be set only with VDDIO2 below 2.5V.&lt;br&gt;
 	</RefParameter>
 	<RefParameter Comment="          Bank" DefaultValue="FLASH_BANK_1" Group="AREA5" TabName="Block-based page protection" Name="B5_Bank" Type="string" Visible="true">
 		<Description>FLASH Bank</Description>
-		<Condition Expression="B5_BLOCK_active=true &amp; OB_DBANK=OB_DUALBANK_SINGLE" Diagnostic="" />
+		<Condition Expression="B5_BLOCK_active=true &amp; OB_DBANK_UI=OB_DUALBANK_SINGLE" Diagnostic="" />
 	</RefParameter>
 	<RefParameter Comment="          Bank" DefaultValue="FLASH_BANK_1" Group="AREA5" TabName="Block-based page protection" Name="B5_Bank" Type="list">
 		<Description>FLASH Bank</Description>
@@ -9465,7 +9630,7 @@ This bit can be set only with VDDIO2 below 2.5V.&lt;br&gt;
 	</RefParameter>
 	<RefParameter Comment="          Bank" DefaultValue="FLASH_BANK_1" Group="AREA6" TabName="Block-based page protection" Name="B6_Bank" Type="string" Visible="true">
 		<Description>FLASH Bank</Description>
-		<Condition Expression="B6_BLOCK_active=true &amp; OB_DBANK=OB_DUALBANK_SINGLE" Diagnostic="" />
+		<Condition Expression="B6_BLOCK_active=true &amp; OB_DBANK_UI=OB_DUALBANK_SINGLE" Diagnostic="" />
 	</RefParameter>
 	<RefParameter Comment="          Bank" DefaultValue="FLASH_BANK_1" Group="AREA6" TabName="Block-based page protection" Name="B6_Bank" Type="list">
 		<Description>FLASH Bank</Description>
@@ -11121,7 +11286,7 @@ This bit can be set only with VDDIO2 below 2.5V.&lt;br&gt;
 	</RefParameter>
 	<RefParameter Comment="          Bank" DefaultValue="FLASH_BANK_1" Group="AREA7" TabName="Block-based page protection" Name="B7_Bank" Type="string" Visible="true">
 		<Description>FLASH Bank</Description>
-		<Condition Expression="B7_BLOCK_active=true &amp; OB_DBANK=OB_DUALBANK_SINGLE" Diagnostic="" />
+		<Condition Expression="B7_BLOCK_active=true &amp; OB_DBANK_UI=OB_DUALBANK_SINGLE" Diagnostic="" />
 	</RefParameter>
 	<RefParameter Comment="          Bank" DefaultValue="FLASH_BANK_1" Group="AREA7" TabName="Block-based page protection" Name="B7_Bank" Type="list">
 		<Description>FLASH Bank</Description>
@@ -12776,7 +12941,7 @@ This bit can be set only with VDDIO2 below 2.5V.&lt;br&gt;
 	</RefParameter>
 	<RefParameter Comment="          Bank" DefaultValue="FLASH_BANK_1" Group="AREA8" TabName="Block-based page protection" Name="B8_Bank" Type="string" Visible="true">
 		<Description>FLASH Bank</Description>
-		<Condition Expression="B8_BLOCK_active=true  &amp; OB_DBANK=OB_DUALBANK_SINGLE" Diagnostic="" />
+		<Condition Expression="B8_BLOCK_active=true  &amp; OB_DBANK_UI=OB_DUALBANK_SINGLE" Diagnostic="" />
 	</RefParameter>
 	<RefParameter Comment="          Bank" DefaultValue="FLASH_BANK_1" Group="AREA8" TabName="Block-based page protection" Name="B8_Bank" Type="list">
 		<Description>FLASH Bank</Description>

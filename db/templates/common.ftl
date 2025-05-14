@@ -114,10 +114,10 @@
                                                 [/#if]
                                           [#else]
                                               [#if argument.status=="KO"]
-                                                   [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]//${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name} = ${argument.value};                                        
+                                                   [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]//${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name} = ${argument.value};
                                               [/#if]
                                               [#if argument.value?? && argument.value!="__NULL"]
-                                                   [#if argument.value!="N/A"][#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name} = ${argument.value};  [/#if]
+                                                   [#if argument.value!="N/A"][#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name} = ${argument.value}; [/#if]
                                               [/#if]                                    
                                           [/#if][#-- if argument=Instance--]                                
                                       [/#if]    
@@ -146,7 +146,7 @@
                                     [#if argument2.genericType=="Array" && (argument2.context=="globalConst" || argument2.context=="globalInit")][#-- if genericType=Array and gloabl--]                                        
                                         [#assign argValue="("+argument2.typeName +" *)"+argument2.name]
                                     [/#if]
-                                    [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name}.${argument2.name} = ${argValue};                                    
+                                    [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name}.${argument2.name} = ${argValue};
                                     [/#if]
                                [#else] [#-- !argument.mandatory --]
                                     [#if argument2.status=="KO"]
@@ -179,7 +179,7 @@
                                     [#if argument3.genericType=="Array" && (argument3.context=="globalConst" || argument3.context=="globalInit")][#-- if genericType=Array and gloabl--]                                        
                                         [#assign argValue="("+argument3.typeName +" *)"+argument3.name]
                                     [/#if]
-                                    [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name}.${argument2.name}.${argument3.name} = ${argValue};                                    
+                                    [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name}.${argument2.name}.${argument3.name} = ${argValue};
                                     [/#if]
                                [#else] [#-- !argument.mandatory --]
                                     [#if argument3.status=="KO"]
@@ -314,7 +314,60 @@
  [#-- else there is no LibMethod to call--]
 [/#macro]
 [#-- End macro generateConfigModelCode --]
-
+    [#if RESMGR_UTILITY?? && FamilyName=="STM32MP2"]
+    [#macro generateResMgr ipName  CHANNEL REQUEST]
+    [#list configs as mxMcuDataModel]
+    [#assign index = 0]
+    [#assign FeatureIDUIIndex = index][#assign index += 1]
+    [#assign mx_RIF_Params = mxMcuDataModel.peripheralRIFParams]
+    [#assign RifAwarePrefix = "RIFAware_"]
+    [#assign RifAwareIPName=""]
+    [#list mx_RIF_Params.entrySet() as RIF_Params]
+    [#if (RIF_Params.key)?? && RIF_Params.key?matches("^"+RifAwarePrefix+".+")]
+    [#compress]
+    [#assign RifAwareIPName=RIF_Params.key?keep_after(RifAwarePrefix)]
+    [#assign RifAwareIPFeatures = RIF_Params.value]
+    [#assign FeatureNamesList=[]]
+    [#assign FeatureIDList=[]]
+    [/#compress]
+    [#list RifAwareIPFeatures.entrySet() as RifAwareIPFeatureList]
+    [#-- Populate FeatureNamesList --]
+    [#assign FeatureNamesList+=[RifAwareIPFeatureList.key]]
+    [#-- Populate FeatureIDList --]
+    [#assign FeatureIDList+=[(RifAwareIPFeatureList.value[FeatureIDUIIndex])?matches("[0-9]\\d{0,9}")?then("("+RifAwareIPFeatureList.value[FeatureIDUIIndex]+")","_"+RifAwareIPFeatureList.value[FeatureIDUIIndex]?substring(0, 3)+"("+RifAwareIPFeatureList.value[FeatureIDUIIndex]?substring(3)+")")]]
+    [#list FeatureNamesList as FeatureName]
+    [#if RifAwareIPName?starts_with("HPDMA") && !RifAwareIPFeatureList.value[1]?matches("-")]
+   	[#assign ParamPrefix="_CHANNEL"]
+    [#assign RESMGR_IP=RifAwareIPName]
+   	[#assign val= RifAwareIPFeatureList.value[0]]
+   	[#if  FeatureIDList[FeatureName?index]?contains(val) && (FeatureName?keep_after_last(" "))==(CHANNEL) && (FeatureName?keep_before("_"))?contains(REQUEST) ]
+    #t/* ${FeatureName} */
+    #tif (ResMgr_Request(RESMGR_RESOURCE_RIF_${RESMGR_IP},RESMGR_HPDMA${ParamPrefix}${FeatureIDList[FeatureName?index]}) != RESMGR_STATUS_ACCESS_OK)
+    #t{
+    #t#tError_Handler();
+    #t}
+   	[/#if]
+    [/#if]
+   	[#if RifAwareIPName?starts_with("RCC") && !RifAwareIPFeatureList.value[1]?matches("-")]
+   	[#assign ParamPrefix="_RESOURCE"]
+    [#if RifAwareIPName?matches("RCC")]
+    [#assign RESMGR_IP=RifAwareIPName]
+   	[/#if]
+   	[#assign val= RifAwareIPFeatureList.value[0]]
+   	[#if FeatureIDList[FeatureName?index]?contains(val) && (FeatureName?keep_before("_"))?matches(ipName)]
+    #n
+    #t/* ${FeatureName} Clock enable */
+    #tif (ResMgr_Request(RESMGR_RESOURCE_RIF_${RESMGR_IP}, RESMGR_${RifAwareIPName?upper_case}${ParamPrefix}${FeatureIDList[FeatureName?index]}) != RESMGR_STATUS_ACCESS_OK)
+    #t{
+    #t#tError_Handler();
+    #t}
+   	[/#if]	[/#if]
+    [/#list]
+   	[/#list]
+   	[/#if]
+    [/#list]
+    [/#list]
+    [/#macro] [/#if]
 
 [#-- macro getLocalVariable of a config Start--]
 [#macro getLocalVariable configModel1 listOfLocalVariables resultList]
@@ -428,8 +481,16 @@
 [#if config.methods??] [#-- if the pin configuration contains a list of LibMethods--]
     [#assign methodList = config.methods]
 [#else] [#assign methodList = config.libMethod]
-
 [/#if]
+
+[#if (config.ipName?contains("flash") || config.ipName?contains("Flash")) && isHALUsed?? && UserConfigCondition?? ]
+    [#list UserConfigCondition as ARG]
+        #tHAL_FLASHEx_OBGetConfig(&pOBInit);
+        #tif (${ARG}) #n#t{
+    [/#list]
+    [#assign lock = "true" ]
+[/#if]
+
 [#assign writeConfigComments=false]
 [#list methodList as method]
     [#if method.status=="OK"][#assign writeConfigComments=true][/#if]
@@ -499,8 +560,9 @@
                         [#-- MDF : if ((!(fargument.context=="global"))||(fargument.optional=="output"))--]
                         [#else]
                             [#assign index1 =1] [#-- index of argument struct level1 --]
-                        [#list fargument.argument as argument]	
 
+
+                        [#list fargument.argument as argument]
                             [#if argument.genericType != "struct"]
                                 [#if argument.mandatory && !argument.refMethod??] 
                                 [#if argument.value?? && argument.value!="__NULL"]
@@ -568,7 +630,10 @@
 [#if instanceIndex??&&fargument.context=="global"&& fargument.optional!="output"][#assign varName=fargument.name+instanceIndex][#else][#assign varName=fargument.name][/#if] [#if argument.value?? && argument.value!="__NULL"][#assign argv =argument.value][#else][#assign argv=inst][/#if]
                                                    [#assign indicator = varName+link+argument.name+" = "+argv+" "]
                                                    [#if !listofDeclaration?contains(indicator)] [#-- if not repeted --]
-                                                    [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if]${link}${argument.name} = [#if argument.value?? && argument.value!="__NULL"]${argument.value};[#else]${inst};[/#if]
+                                                      [#if fargument.name?contains("handle_HPDMA")]          [#assign R=argument.value]   [#assign Channel=R?keep_after_last("l")] [#assign Req=R?keep_before("_")]
+                                                     [#if RESMGR_UTILITY?? && FamilyName=="STM32MP2"]
+                                                   [@generateResMgr ipName="  " CHANNEL=Channel  REQUEST=Req /] [/#if]  [/#if]
+                                                [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if]${link}${argument.name} = [#if argument.value?? && argument.value!="__NULL"]${argument.value};[#else]${inst};[/#if]
                                                             [#assign listofDeclaration = listofDeclaration +", "+ indicator]
 
                                                             [#if index1 == fargument.argument?size]
@@ -588,7 +653,7 @@
                                                 [/#if]
                                           [#else]
                                               [#if argument.status=="KO"]
-                                                   [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"&& fargument.optional!="output"]//${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if]${link}${argument.name} = ${argument.value};                                        
+                                                   [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"&& fargument.optional!="output"]//${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if]${link}${argument.name} = ${argument.value};
                                               [/#if]
                                               [#if argument.value?? && argument.value!="__NULL"]
 
@@ -639,7 +704,7 @@
                                         [/#list]
                                         [#assign argValue="&"+argument2.name+"[0]"]
                                     [/#if] [#-- if genericType=Array --]
-                                    [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if]${link}${argument.name}.${argument2.name} = ${argValue};                                    
+                                    [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if]${link}${argument.name}.${argument2.name} = ${argValue};
                                     [/#if]
                                [#else] [#-- !argument.mandatory --]
                                     [#if argument2.status=="KO"]
@@ -699,7 +764,7 @@
                                                     [#assign indicatorName = varName+link+argument.name+"."+argument2.name]
                                                     [#assign indicator = varName+link+argument.name+"."+argument2.name+" = "+argValue+" "]
                                                     [#if !listofDeclaration?contains(indicator)]  [#-- if not repeted --]
-                                                        [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"&& fargument.optional!="output"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if]${link}${argument.name}.${argument2.name} = ${argValue};                                    
+                                                        [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"&& fargument.optional!="output"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if]${link}${argument.name}.${argument2.name} = ${argValue};
 
                                                         [#if index2 == argument.argument?size]
                                                             #n [#-- add space line at the end of argument setting --] 
@@ -890,8 +955,19 @@
             [#if argument.returnValue=="true"]
                 [#assign retval=argument.name]
             [/#if]
+
             [/#list]
 [#if !(method.callMethod) || (S_FATFS_SDIO?? && (inst=="SDIO" || inst?starts_with("SDMMC")) && !(method.name=="HAL_RCCEx_PeriphCLKConfig"))] [#-- if HAL_SD_Init  and SDIO is used with FATFS--]
+	[#if ((method.name)?starts_with("HAL_SD_") && DIE=="DIE485")]
+		[#if method.returnHAL=="false"]
+    		[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
+	    [#else]
+	        [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != [#if method.returnHAL == "true"]${errorCode}[#else]${method.returnHAL}[/#if])
+	        [#if nTab==2]#t#t[#else]#t[/#if]{
+	        [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+	        [#if nTab==2]#t#t[#else]#t[/#if]}
+	    [/#if]
+	[/#if]
 [#else]		    
                 [#if inst?contains("ETH")]
                     #n
@@ -1035,8 +1111,11 @@
     #t/* USER CODE END Check_RTC_BKUP */
     #n
 [/#if]
+[#if lock?? && lock == "true" ]
+    #t}
+    [#assign lock = "false" ]
+[/#if]
 [/#list]
-
 
 
 [/#macro]
@@ -1884,7 +1963,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
             [#if IPData.initServices.clock??]
                 [#if IPData.initServices.clock!="none"]
                     [#if FamilyName=="STM32F1" && ipName=="RTC"]
-[#if usedDriverFlag?? && !usedDriverFlag?contains("LL")]
+                       [#if usedDriverFlag?? && !usedDriverFlag?contains("LL")]
                         #t#tHAL_PWR_EnableBkUpAccess();
                         #t#t/* Enable BKP CLK enable for backup registers */
                         #t#t__HAL_RCC_BKP_CLK_ENABLE();    
@@ -1894,13 +1973,55 @@ ${bufferType} ${bufferName}[${bufferSize}];
                         #t#tLL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_BKP);
                         [/#if]                   
                     [/#if]
-[#if tabN == 2]#t[/#if]#t/* Peripheral clock enable */ 
+[#if tabN == 2]#t[/#if]#t/* Peripheral clock enable */
                     [#list IPData.initServices.clock?split(';') as clock]
                         [#--[#if ipvar.clkCommonResource.entrySet()?contains(clock?trim)]#t#t${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED++;
                             #t#tif(${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED==1){          
                             #t#t#t${clock?trim}();
                             [#if ipvar.clkCommonResource.entrySet()?contains(clock?trim)]#t#t}[/#if]  
                         [#else]--]
+                         [#if RESMGR_UTILITY?? && FamilyName=="STM32MP2"]
+                           [#list configs as mxMcuDataModel]
+                           [#assign index = 0]
+                           [#assign FeatureIDUIIndex = index][#assign index += 1]
+                           [#assign mx_RIF_Params = mxMcuDataModel.peripheralRIFParams]
+                           [#assign RifAwarePrefix = "RIFAware_"]
+                           [#assign RifAwareIPName=""]
+                             [#list mx_RIF_Params.entrySet() as RIF_Params]
+                               [#if (RIF_Params.key)?? && RIF_Params.key?matches("^"+RifAwarePrefix+".+")]
+                                 [#compress]
+                                [#assign RifAwareIPName=RIF_Params.key?keep_after(RifAwarePrefix)]
+                                [#assign RifAwareIPFeatures = RIF_Params.value]
+                                [#assign FeatureNamesList=[]]
+                                [#assign FeatureIDList=[]]
+                                 [/#compress]
+                                [#list RifAwareIPFeatures.entrySet() as RifAwareIPFeatureList]
+                                [#-- Populate FeatureNamesList --]
+                                [#assign FeatureNamesList+=[RifAwareIPFeatureList.key]]
+                                [#-- Populate FeatureIDList --]
+                                [#assign FeatureIDList+=[(RifAwareIPFeatureList.value[FeatureIDUIIndex])?matches("[0-9]\\d{0,9}")?then("("+RifAwareIPFeatureList.value[FeatureIDUIIndex]+")","_"+RifAwareIPFeatureList.value[FeatureIDUIIndex]?substring(0, 3)+"("+RifAwareIPFeatureList.value[FeatureIDUIIndex]?substring(3)+")")]]
+                                  [#list FeatureNamesList as FeatureName]
+                                 [#assign ParamPrefix="_RESOURCE"]
+                                 [#if RifAwareIPName?starts_with("RCC") && !RifAwareIPFeatureList.value[1]?matches("-")]
+                                 [#assign ParamPrefix="_RESOURCE"]
+                                 [#if RifAwareIPName?matches("RCC")]
+                                   [#assign RESMGR_IP=RifAwareIPName]
+                                  [/#if]
+                                 [#assign RifAwareIPName="RCC"]
+                                 [#assign val= RifAwareIPFeatureList.value[0]]
+                                 [#if  FeatureIDList[FeatureName?index]?contains(val) && FeatureName?contains(ipName)]
+        #n
+        #t/* ${FeatureName} Clock enable */
+        #tif (ResMgr_Request(RESMGR_RESOURCE_RIF_${RESMGR_IP}, RESMGR_${RifAwareIPName?upper_case}${ParamPrefix}${FeatureIDList[FeatureName?index]}) != RESMGR_STATUS_ACCESS_OK)
+        #t{
+        #t#tError_Handler();
+        #t}
+        [/#if]	[/#if]
+        [/#list]
+        [/#list]
+        [/#if]
+        [/#list]
+        [/#list] 	[/#if]
 [#if tabN == 2]#t[/#if]#t${clock?trim}[#if !clock?contains('(')]()[/#if];
                         [#--[/#if]--][#-- remove control on common clock for sevral IP instances--]
                     [/#list]

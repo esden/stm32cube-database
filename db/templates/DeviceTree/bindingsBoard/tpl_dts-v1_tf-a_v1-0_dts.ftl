@@ -18,10 +18,11 @@
  */
 
 /dts-v1/;
+
 #include <dt-bindings/pinctrl/stm32-pinfunc.h>
 [#if (mx_socDtRPN == "stm32mp15")]
 #include <dt-bindings/clock/stm32mp1-clksrc.h>
-[#else]
+	[#else]
 #include <dt-bindings/clock/${mx_socDtRPN}-clksrc.h>
 [/#if]
 [#if srvcmx_isDeviceEnabled("etzpc") && srvcmx_getMatchingBindedHwName_inDTS("etzpc")?has_content]
@@ -43,15 +44,27 @@
 /*#include "???.dtsi"*/
 [/#if]
 [#if mx_socRPN?has_content]
-#include "${mx_socRPN?substring(0,9) + "x" + mx_socRPN?substring(10)}.dtsi"
+[#local mxSocRPN = mx_socRPN?substring(0,9) + "x" + mx_socRPN?substring(10)]
+[#if (mx_socDtRPN == "stm32mp15")]
+#include "${mxSocRPN}.dtsi"
+[#else]
+[#if ((!mxSocRPN?starts_with("stm32mp25xd")) && (!mxSocRPN?starts_with("stm32mp25xa"))) && ((!mxSocRPN?starts_with("stm32mp13xd")) && (!mxSocRPN?starts_with("stm32mp13xa")))]
+#include "${mxSocRPN}.dtsi"
+[/#if]
+[/#if]
 [#else]
 	[@mlog  logMod=module logType="ERR" logMsg="unknown SOC package dtsi" varsMap={} /]
 /*#include "???.dtsi"*/
 [/#if]
-[#if mx_socDtRPN?has_content]
-#include "${mx_socDtRPN}-pinctrl.dtsi"
+[#if mx_socDtRPN?starts_with("stm32mp2") ]
+	[#if mx_socPtCPN?has_content]
+#include "${mx_socRPN}-${mx_projectName}-mx-rcc.dtsi"
+	[#else]
+	[@mlog  logMod=module logType="ERR" logMsg="unknown SOC pinCtrl package dtsi" varsMap={} /]
+/*#include "???-pinctrl.dtsi"*/
+	[/#if]
 [/#if]
-[#if (mx_socDtRPN == "stm32mp15")]
+[#if (mx_socDtRPN == "stm32mp15")||mx_socDtRPN?starts_with("stm32mp2")]
 	[#if mx_socPtCPN?has_content]
 #include "${mx_socPtCPN?substring(0,9) + "xx" + mx_socPtCPN?substring(11)}-pinctrl.dtsi"
 	[#else]
@@ -104,10 +117,10 @@
 
 	/* USER CODE BEGIN root */
 	/* USER CODE END root */
-
+	[#if  srvcmx_getFamilyName()=="stm32mp1"]
 	[#--clock Tree--]
 	[@DTBindedDtsElmtDMsList_print  pParentElmt="" pElmtsList=srvcmx_getElmtsMatchingBindedHwName(mxDtDM.dts_bindedElmtsList, "clocks") pDtLevel=0 pOrdering=true/]
-
+	[/#if]
 	[#--other root subnodes--]
 	[@DTBindedDtsElmtDMsList_print  pParentElmt="" pElmtsList=srvcmx_getElmtsByPath(mxDtDM.dts_bindedElmtsList, "/") pDtLevel=1 pOrdering=true/]	[#--get only "root" level elmts--]
 
@@ -117,10 +130,8 @@
 [#--pinctrl--]
 [@DTBindedDtsElmtDMsList_print  pParentElmt="" pElmtsList=srvcmx_getElmtsMatchingBindedHwName(mxDtDM.dts_bindedElmtsList, "pinctrl") pDtLevel=0 pOrdering=true/]
 
-
 [#--dts level elmts--]
 [@DTBindedDtsElmtDMsList_print  pParentElmt="" pElmtsList=srvcmx_getDeviceElmtsByPath(mxDtDM.dts_bindedElmtsList, "") pDtLevel=0 pOrdering=true/][#--get only "dts" level elmts--]
-
 
 /* USER CODE BEGIN addons */
 /* USER CODE END addons */

@@ -10,6 +10,23 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
+[#assign PG_FILL_UCS = "False"]
+[#assign PG_BSP_NUCLEO_WBA52CG = 0]
+[#assign PG_SKIP_LIST = "False"]
+[#assign myHash = {}]
+[#list SWIPdatas as SWIP]
+    [#if SWIP.defines??]
+        [#list SWIP.defines as definition]
+            [#assign myHash = {definition.name:definition.value} + myHash]
+        [/#list]
+    [/#if]
+[/#list]
+[#--
+Key & Value:
+[#list myHash?keys as key]
+Key: ${key}; Value: ${myHash[key]}
+[/#list]
+--]
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef APP_COMMON_H
 #define APP_COMMON_H
@@ -25,7 +42,11 @@ extern "C"{
 #include <stdarg.h>
 
 #include "app_conf.h"
+[#if (myHash["BLE_MODE_SIMPLEST_BLE"] != "Enabled")]
 #include "hw.h"
+[#else]
+#include "stm32wbaxx.h"
+[/#if]
 #include "ll_sys.h"
 
 /* -------------------------------- *

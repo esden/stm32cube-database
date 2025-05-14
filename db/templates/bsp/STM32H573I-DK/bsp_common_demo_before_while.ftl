@@ -44,7 +44,15 @@
   /* -- Sample board code to switch on leds ---- */
   BSP_LED_On(LED_GREEN);
   [/#if]
-  
+  [#if LED2?? && LED2 == "true"]
+  BSP_LED_On(LED_ORANGE);
+  [/#if]
+  [#if LED3?? && LED3 == "true"]
+  BSP_LED_On(LED_RED);
+  [/#if]
+  [#if LED3?? && LED3 == "true"]
+  BSP_LED_On(LED_BLUE);
+  [/#if]
   /* USER CODE END BSP */
   
 [/#if]

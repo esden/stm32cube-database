@@ -2052,6 +2052,9 @@ static void Ble_Hci_Gap_Gatt_Init(void)
 [#if ((CFG_IDENTITY_ADDRESS = "GAP_STATIC_RANDOM_ADDR") && ((BT_SIG_HEART_RATE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)))]
   uint32_t a_srd_bd_addr[2] = {0,0};
 [/#if]
+[#if ((CFG_IDENTITY_ADDRESS = "GAP_STATIC_RANDOM_ADDR")&& (CFG_STATIC_RANDOM_ADDRESS = "2") && ((BT_SIG_HEART_RATE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)))]
+  uint32_t a_BdAddrUdn[6]   = {0,0};
+[/#if]
   uint16_t a_appearance[1] = {BLE_CFG_GAP_APPEARANCE}; 
   tBleStatus ret = BLE_STATUS_INVALID_PARAMS;
   /* USER CODE BEGIN Ble_Hci_Gap_Gatt_Init*/
@@ -2116,12 +2119,16 @@ static void Ble_Hci_Gap_Gatt_Init(void)
    */
 [#if (CFG_IDENTITY_ADDRESS == "GAP_PUBLIC_ADDR") && (BLE_ADDR_TYPE == "GAP_RESOLVABLE_PRIVATE_ADDR")]
 [#else]
+[#if (CFG_IDENTITY_ADDRESS == "GAP_STATIC_RANDOM_ADDR") && (CFG_STATIC_RANDOM_ADDRESS == "1")]
 #if (CFG_IDENTITY_ADDRESS == GAP_STATIC_RANDOM_ADDR)
 #if defined(CFG_STATIC_RANDOM_ADDRESS)
   a_srd_bd_addr[0] = CFG_STATIC_RANDOM_ADDRESS & 0xFFFFFFFF;
   a_srd_bd_addr[1] = (uint32_t)((uint64_t)CFG_STATIC_RANDOM_ADDRESS >> 32);
   a_srd_bd_addr[1] |= 0xC000; /* The two upper bits shall be set to 1 */
-#else
+#endif /* CFG_STATIC_RANDOM_ADDRESS */
+#endif
+[/#if]
+[#if (CFG_IDENTITY_ADDRESS == "GAP_STATIC_RANDOM_ADDR") && (CFG_STATIC_RANDOM_ADDRESS == "0")]
   /* Get RNG semaphore */
   while(LL_HSEM_1StepLock(HSEM, CFG_HW_RNG_SEMID));
 
@@ -2157,9 +2164,25 @@ static void Ble_Hci_Gap_Gatt_Init(void)
   
   /* Release RNG semaphore */
   LL_HSEM_ReleaseLock(HSEM, CFG_HW_RNG_SEMID, 0);
-#endif /* CFG_STATIC_RANDOM_ADDRESS */
-#endif
+[/#if]
+[#if (CFG_IDENTITY_ADDRESS == "GAP_STATIC_RANDOM_ADDR") && (CFG_STATIC_RANDOM_ADDRESS == "2")]
+  uint32_t company_id;
+  uint32_t device_id;
+  a_BdAddrUdn[0] = (uint8_t)LL_FLASH_GetUDN();
 
+  company_id = LL_FLASH_GetSTCompanyID();
+  device_id = LL_FLASH_GetDeviceID();
+  a_BdAddrUdn[1] = (uint8_t)((CFG_STATIC_UNIQUE_RANDOM_ADDR_LSB & 0x0000FF00) >> 8);
+  a_BdAddrUdn[2] = (uint8_t)device_id;
+  a_BdAddrUdn[3] = (uint8_t)(company_id & 0x000000FF);
+
+  a_srd_bd_addr [0] = (a_BdAddrUdn[3] << 24 | a_BdAddrUdn[2] << 16 | a_BdAddrUdn[1] << 8 | a_BdAddrUdn[0]);
+
+  a_BdAddrUdn[4] = (uint8_t)((company_id & 0x0000FF00) >> 8);
+  a_BdAddrUdn[5] = (uint8_t)((company_id & 0x00FF0000) >> 16);
+  a_srd_bd_addr [1] = (a_BdAddrUdn[5] << 8) | (a_BdAddrUdn[4]);
+  a_srd_bd_addr [1] |= 0xC000; /* The two upper bits shall be set to 1 */
+[/#if]
 [#if (BT_SIG_HEART_RATE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
 [#if CFG_IDENTITY_ADDRESS =="GAP_STATIC_RANDOM_ADDR"]
 #if (CFG_BLE_ADDRESS_TYPE == GAP_STATIC_RANDOM_ADDR)

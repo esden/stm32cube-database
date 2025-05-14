@@ -1,0 +1,491 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V4.0" IPType="peripheral" Name="ETH" Version="STM32MP_ethermac1G_v1_1_rc1" 
+    xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" 
+    ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd" 
+    xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+  <About>ETH: Ethernet MAC interface</About>
+
+    <!-- IO context assignment is based on defined semaphores (e.g RIFSerivice)  -->
+    <RefParameter Comment="IO Semaphore Assignement" DefaultValue="true" Name="IOSemaphoreAssignement" Type="bool" Visible="false"/>
+
+    <!-- Generic RefParameters for ETH MII/RMII Modes -->
+	<!-- Generic RefParameters for ETH MII/RMII Modes Extracted from HAL Library with LibExtractor-->
+	<!-- Generic RefParameters for ETH MII/RMII Modes -->
+	<!-- Generic RefParameters for ETH MII/RMII Modes Extracted from HAL Library with LibExtractor-->
+	<RefParameter Name="hal_eth_init_status" DefaultValue="1" Comment="" Type="" Visible="false"/>
+	<RefParameter Name="Instance" DefaultValue="ETH$Index" Comment="Instance" Type="" Visible="false"/>
+	
+	<RefParameter Comment="Warning" DefaultValue="The ETH can work only when RAM is pointing at 0x24000000"  Name="Warning" Group="General : Ethernet Configuration" Type="string">
+		<Condition Expression="!STM32H5" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="Note" DefaultValue="PHY Driver must be configured from the LwIP 'Platform Settings' top right tab"  Name="Note" Group="General : Ethernet Configuration" Type="string">
+		<Condition Diagnostic="" Expression="S_LWIP"/>
+	</RefParameter>
+	<RefParameter Comment="Note" DefaultValue="N/A" Name="Note" Group="General : Ethernet Configuration" Type="string" Visible="false"/>
+
+    <!-- ST MicroElectronics prefixe Adress -->
+    <RefParameter Comment="Ethernet MAC Address" ArraySize="6" ArrayTypeElement="uint8_t;16" Name="MACAddr" Type="Array" Separator=":" Group="General : Ethernet Configuration" DefaultValue="00:80:E1:00:00:00"/>
+    <RefParameter Comment="Rx Mode" DefaultValue="ETH_RXINTERRUPT_MODE" Name="RxMode" Type="list" Group="General : Ethernet Configuration">
+        <Condition Diagnostic="" Expression="$Index=1 &amp; S_FREERTOS &amp; S_LWIP"/>
+        <PossibleValue Comment="Interrupt Mode" Value="ETH_RXINTERRUPT_MODE" Semaphore="ETH1_RX_INTERRUPT_ON"/>
+        <Description>Polling mode is supported without FreeRTOS.&lt;br&gt;Interrupt mode is supported with FreeRTOS.&lt;br&gt;Tx mode is the same as Rx mode.</Description>
+    </RefParameter>
+    <RefParameter Name="RxMode" Comment="Rx Mode" Type="list" Group="General : Ethernet Configuration" DefaultValue="ETH_RXPOLLING_MODE">
+        <Condition Diagnostic="" Expression="$Index=1 &amp; S_LWIP"/>
+        <PossibleValue Comment="Polling Mode" Value="ETH_RXPOLLING_MODE"/>
+        <Description>Polling mode is supported without FreeRTOS.&lt;br&gt;Interrupt mode is supported with FreeRTOS.&lt;br&gt;Tx mode is the same as Rx mode.</Description>
+    </RefParameter>
+    <RefParameter Name="RxMode" Comment="Rx Mode" Type="list" Group="General : Ethernet Configuration" DefaultValue="ETH_RXPOLLING_MODE">
+        <Condition Diagnostic="" Expression="$Index=1"/>
+        <PossibleValue Comment="Interrupt Mode" Value="ETH_RXINTERRUPT_MODE" Semaphore="ETH1_RX_INTERRUPT_ON"/>
+        <PossibleValue Comment="Polling Mode" Value="ETH_RXPOLLING_MODE"/>
+        <Description>Polling mode is supported without FreeRTOS.&lt;br&gt;Interrupt mode is supported with FreeRTOS.&lt;br&gt;Tx mode is the same as Rx mode.</Description>
+    </RefParameter>
+	
+    <RefParameter Comment="Rx Mode" DefaultValue="ETH_RXINTERRUPT_MODE" Name="RxMode" Type="list" Group="General : Ethernet Configuration">
+        <Condition Diagnostic="" Expression="$Index=2 &amp; S_FREERTOS &amp; S_LWIP"/>
+        <PossibleValue Comment="Interrupt Mode" Value="ETH_RXINTERRUPT_MODE" Semaphore="ETH2_RX_INTERRUPT_ON"/>
+        <Description>Polling mode is supported without FreeRTOS.&lt;br&gt;Interrupt mode is supported with FreeRTOS.&lt;br&gt;Tx mode is the same as Rx mode.</Description>
+    </RefParameter>
+    <RefParameter Name="RxMode" Comment="Rx Mode" Type="list" Group="General : Ethernet Configuration" DefaultValue="ETH_RXPOLLING_MODE">
+        <Condition Diagnostic="" Expression="$Index=2 &amp; S_LWIP"/>
+        <PossibleValue Comment="Polling Mode" Value="ETH_RXPOLLING_MODE"/>
+        <Description>Polling mode is supported without FreeRTOS.&lt;br&gt;Interrupt mode is supported with FreeRTOS.&lt;br&gt;Tx mode is the same as Rx mode.</Description>
+    </RefParameter>
+    <RefParameter Name="RxMode" Comment="Rx Mode" Type="list" Group="General : Ethernet Configuration" DefaultValue="ETH_RXPOLLING_MODE">
+        <Condition Diagnostic="" Expression="$Index=2"/>
+        <PossibleValue Comment="Interrupt Mode" Value="ETH_RXINTERRUPT_MODE" Semaphore="ETH2_RX_INTERRUPT_ON"/>
+        <PossibleValue Comment="Polling Mode" Value="ETH_RXPOLLING_MODE"/>
+        <Description>Polling mode is supported without FreeRTOS.&lt;br&gt;Interrupt mode is supported with FreeRTOS.&lt;br&gt;Tx mode is the same as Rx mode.</Description>
+    </RefParameter>
+    <RefParameter Name="RxMode" Comment="Rx Mode" Type="list" Group="General : Ethernet Configuration" DefaultValue="ETH_RXPOLLING_MODE" Visible="false">
+        <PossibleValue Comment="Polling Mode" Value="ETH_RXPOLLING_MODE"/>
+        <Description>Polling mode is supported without FreeRTOS.&lt;br&gt;Interrupt mode is supported with FreeRTOS.&lt;br&gt;Tx mode is the same as Rx mode.</Description>
+    </RefParameter>
+	
+    <RefParameter Comment="Rx Descriptor Length" DefaultValue="4" Max="256" Min="0" Type="integer" Name="ETH_RX_DESC_CNT" Group="General : Ethernet Configuration">
+        <Description>Rx Descriptor Length value must be modulo 4. Rx descriptor length must be set in a way that Rx descriptor contents must not exceed max value and must not overlap with Rx buffer and Tx descriptor.</Description>
+        <ValueCondition Diagnostic="Value must be modulo 4" Expression="MOD(Value,4) = 0"/>
+    </RefParameter>
+    <RefParameter Comment="First Rx Descriptor Address" DefaultValue="=IF(STM32H7,0x30000000,IF(STM32F7x2|STM32F7x3, 0x2003C000, IF(STM32F7x6|STM32F7x0_Value_line|(STM32F7x5 &amp; !CAN3_Exist), 0x2004C000, IF(STM32F7x7|STM32F7x9|(STM32F7x5 &amp; CAN3_Exist), 0x2007C000, 0x2007FFFF))))" Max="=IF(STM32H723_733|STM32H725_735|STM32H730_Value_line,0x30007FFF,IF(STM32F7x2|STM32F7x3, 0x2003FFFF,IF(STM32F7x6|STM32F7x0_Value_line|(STM32F7x5 &amp; !CAN3_Exist), 0x2004FFFF, IF(STM32F7x7|STM32F7x9|(STM32F7x5 &amp; CAN3_Exist), 0x2007FFFF, 0x30047FFF))))" Min="=IF(STM32H7,0x24000000,0x20000000)" Type="hex" Name="RxDescAddress" Group="General : Ethernet Configuration">
+        <Condition Expression="!STM32H5" Diagnostic=""/>
+        <Description>Fisrt Rx Descriptor address must be only in the D2 Domain AHB SRAM. Rx descriptor address must not exceed Max value and must no overlap with Tx descriptor and Rx buffer. These areas must not be cacheable.</Description>
+    </RefParameter>
+    <RefParameter Name="TxDesc" Comment="Tx Desc" Type="string" Group="General : Ethernet Configuration" DefaultValue="DMATxDscrTab"  Visible="false"/>
+
+    <RefParameter Comment="Tx Descriptor Length" DefaultValue="4" Max="256" Min="0" Type="integer" Name="ETH_TX_DESC_CNT" Group="General : Ethernet Configuration">
+        <Description>Tx Descriptor Length value must be modulo 4. Tx descriptor length must be set in a way that Tx descriptor contents must not exceed max value and must not overlap with Rx descriptor and buffer.</Description>
+        <ValueCondition Diagnostic="Value must be modulo 4" Expression="MOD(Value,4) = 0"/>
+    </RefParameter>
+    <RefParameter Comment="First Tx Descriptor Address" DefaultValue="=IF(STM32H7,0x30000200,IF(STM32F7x2|STM32F7x3, 0x2003C0A0, IF(STM32F7x6|STM32F7x0_Value_line|(STM32F7x5 &amp; !CAN3_Exist), 0x2004C0A0, IF(STM32F7x7|STM32F7x9|(STM32F7x5 &amp; CAN3_Exist), 0x2007C0A0, 0x2007FFFF))))" Max="=IF(STM32H7,IF(STM32H723_733|STM32H725_735|STM32H730_Value_line, 0x30007FFF, 0x30047FFF),IF(STM32F7x2|STM32F7x3, 0x2003FFFF, IF(STM32F7x6|STM32F7x0_Value_line|(STM32F7x5 &amp; !CAN3_Exist), 0x2004FFFF, IF(STM32F7x7|STM32F7x9|(STM32F7x5 &amp; CAN3_Exist), 0x2007FFFF, 0x30047FFF))))" Min="=IF(STM32H7,0x24000000,0x20000000)" Type="hex" Name="TxDescAddress" Group="General : Ethernet Configuration">
+        <Condition Expression="!STM32H5" Diagnostic=""/>
+        <Description>First Tx Descriptor address must be only in the D2 Domain AHB SRAM. Tx descriptor address must not exceed Max value and must no overlap with Rx descriptor and buffer. These areas must not be cacheable.</Description>
+    </RefParameter>
+    <RefParameter Name="RxDesc" Comment="Rx Desc" Type="string" Group="General : Ethernet Configuration" DefaultValue="DMARxDscrTab"  Visible="false"/>
+    <RefParameter Comment="Rx Buffers Length" DefaultValue="1536" Max="1536" Min="4" Type="integer" Name="RxBuffLen" Group="General : Ethernet Configuration" Visible="true">
+        <Condition Expression="S_AzureRTOS | S_LWIP" Diagnostic="Enable only when one AzureRTOS (ThreadX,FileX,..) is enabled"/>
+        <ValueCondition Diagnostic="Value must be modulo 4" Expression="MOD(Value,4) = 0"/>
+        <Description>Rx buffers Length must be set in a way that Rx buffer contents must not exceed max value and must not overlap with Rx and Tx descriptors. Rx Buffer is declared into the NetXDuo Mw. Length for the HAL is set to 0 for this buffer to avoid allocating unnecessary memory space.&lt;br&gt;Value must be modulo 4.</Description>
+    </RefParameter>
+    <RefParameter Comment="Rx Buffers Length" DefaultValue="1524" Max="1536" Min="0" Type="integer" Name="RxBuffLen" Group="General : Ethernet Configuration">
+        <Description>Rx buffers Length must be set in a way that Rx buffer contents not exceed max value and must not overlap with Rx and Tx descriptors. To ensure the zero copy capabilities, a received frame can't be divided into more than one buffer greater than the Rx Buffers Length. That is why we recommend to set this parameter to Ethernet Maximum Transfert Unit(MTU).&lt;br&gt;Value must be modulo 4.</Description>
+        <ValueCondition Diagnostic="Value must be modulo 4" Expression="MOD(Value,4) = 0"/>
+    </RefParameter>
+    <!-- BZ 97589 End -->
+    
+    <RefParameter Comment="Media Interface" DefaultValue="HAL_ETH_MII_MODE" Name="MediaInterface" Type="list" Group="General : Ethernet Configuration" Visible="false">
+        <PossibleValue Value="HAL_ETH_MII_MODE" Comment=""/>
+        <PossibleValue Value="HAL_ETH_RMII_MODE" Comment=""/>
+    </RefParameter>
+
+    <!-- RefMode for ETH -->
+    <RefMode Name="MII (Media Independent Interface)" HalMode="ETH">
+        <ConfigForMode>Init</ConfigForMode>   
+        <Parameter Name="Warning"/>
+        <Parameter Name="Note"/>
+        <Parameter Name="MACAddr"/>
+        <Parameter Name="ETH_TX_DESC_CNT"/>
+        <Parameter Name="TxDescAddress"/>
+        <Parameter Name="TxDesc"/>
+        <Parameter Name="ETH_RX_DESC_CNT"/>
+        <Parameter Name="RxDescAddress"/>
+         <Parameter Name="RxDesc"/> 					
+        <Parameter Name="RxBuffLen"/>
+        <Parameter Name="RxMode"/>
+        <Parameter Name="MediaInterface">
+            <PossibleValue>HAL_ETH_MII_MODE</PossibleValue>
+        </Parameter>
+        <Parameter Name="Instance"/>
+    </RefMode>
+    <RefMode Name="MII Half Duplex Only" HalMode="ETH">
+        <ConfigForMode>Init</ConfigForMode>   
+        <Parameter Name="Warning"/>
+        <Parameter Name="Note"/>
+        <Parameter Name="MACAddr"/>
+        <Parameter Name="ETH_TX_DESC_CNT"/>
+        <Parameter Name="TxDescAddress"/>
+        <Parameter Name="TxDesc"/>
+        <Parameter Name="ETH_RX_DESC_CNT"/>
+        <Parameter Name="RxDescAddress"/>
+         <Parameter Name="RxDesc"/> 					
+        <Parameter Name="RxBuffLen"/>
+        <Parameter Name="RxMode"/>
+        <Parameter Name="MediaInterface">
+            <PossibleValue>HAL_ETH_MII_MODE</PossibleValue>
+        </Parameter>
+        <Parameter Name="Instance"/>
+    </RefMode>
+    <RefMode Name="MII Full Duplex Only" HalMode="ETH">
+        <ConfigForMode>Init</ConfigForMode>   
+        <Parameter Name="Warning"/>
+        <Parameter Name="Note"/>
+        <Parameter Name="MACAddr"/>
+        <Parameter Name="ETH_TX_DESC_CNT"/>
+        <Parameter Name="TxDescAddress"/>
+        <Parameter Name="TxDesc"/>
+        <Parameter Name="ETH_RX_DESC_CNT"/>
+        <Parameter Name="RxDescAddress"/>
+         <Parameter Name="RxDesc"/> 					
+        <Parameter Name="RxBuffLen"/>
+        <Parameter Name="RxMode"/>
+        <Parameter Name="MediaInterface">
+            <PossibleValue>HAL_ETH_MII_MODE</PossibleValue>
+        </Parameter>
+        <Parameter Name="Instance"/>
+    </RefMode>
+    <RefMode Name="MII_PTP_Synchro" HalMode="ETH">
+        <ConfigForMode>Init</ConfigForMode>
+        <Parameter Name="MACAddr"/>
+        <Parameter Name="TxDescAddress"/>
+        <Parameter Name="RxDescAddress"/>
+        <Parameter Name="RxBuffLen"/>
+        <Parameter Name="MediaInterface">
+            <PossibleValue>HAL_ETH_MII_MODE</PossibleValue>
+        </Parameter>
+        <Parameter Name="Instance"/>
+    </RefMode>
+    <RefMode Name="MII Half Duplex Only_PTP_Synchro" HalMode="ETH">
+        <ConfigForMode>Init</ConfigForMode>
+        <Parameter Name="MACAddr"/>
+        <Parameter Name="TxDescAddress"/>
+        <Parameter Name="RxDescAddress"/>
+        <Parameter Name="RxBuffLen"/>
+		<Parameter Name="RxMode"/>
+		<Parameter Name="MediaInterface">
+			<PossibleValue>HAL_ETH_RGMII_MODE</PossibleValue>
+		</Parameter>
+		<Parameter Name="Instance"/>
+	</RefMode>	
+	<RefMode Name="RGMII_ID" HalMode="ETH">
+		<ConfigForMode>Init</ConfigForMode>   
+		<Parameter Name="Warning"/>
+		<Parameter Name="Note"/>
+		<Parameter Name="MACAddr"/>
+		<Parameter Name="ETH_TX_DESC_CNT"/>
+		<Parameter Name="TxDescAddress"/>
+		<Parameter Name="TxDesc"/>
+		<Parameter Name="ETH_RX_DESC_CNT"/>
+		<Parameter Name="RxDescAddress"/>
+		<Parameter Name="RxDesc"/>				
+        <Parameter Name="RxBuffLen"/>
+		<Parameter Name="RxMode"/>
+		<Parameter Name="MediaInterface">
+			<PossibleValue>HAL_ETH_RGMII_MODE</PossibleValue>
+		</Parameter>
+		<Parameter Name="Instance"/>
+	</RefMode>	
+	<RefMode Name="RMII_PTP_Synchro" HalMode="ETH">
+		<ConfigForMode>Init</ConfigForMode>   
+		<Parameter Name="Warning"/>
+		<Parameter Name="Note"/>
+		<Parameter Name="MACAddr"/>
+		<Parameter Name="ETH_TX_DESC_CNT"/>
+		<Parameter Name="TxDescAddress"/>
+		<Parameter Name="TxDesc"/>
+		<Parameter Name="ETH_RX_DESC_CNT"/>
+		<Parameter Name="RxDescAddress"/>
+		<Parameter Name="RxDesc"/>				
+        <Parameter Name="RxBuffLen"/>
+        <Parameter Name="RxMode"/>
+        <Parameter Name="MediaInterface">
+            <PossibleValue>HAL_ETH_RMII_MODE</PossibleValue>
+        </Parameter>
+        <Parameter Name="Instance"/>
+    </RefMode>	
+    <RefMode Name="RGMII (Reduced GMII)" HalMode="ETH">
+        <ConfigForMode>Init</ConfigForMode>   
+        <Parameter Name="Warning"/>
+        <Parameter Name="Note"/>
+        <Parameter Name="MACAddr"/>
+        <Parameter Name="ETH_TX_DESC_CNT"/>
+        <Parameter Name="TxDescAddress"/>
+        <Parameter Name="TxDesc"/>
+        <Parameter Name="ETH_RX_DESC_CNT"/>
+        <Parameter Name="RxDescAddress"/>
+        <Parameter Name="RxDesc"/>				
+        <Parameter Name="RxBuffLen"/>
+        <Parameter Name="RxMode"/>
+        <Parameter Name="MediaInterface">
+            <PossibleValue>HAL_ETH_RMII_MODE</PossibleValue>
+        </Parameter>
+        <Parameter Name="Instance"/>
+    </RefMode>	
+    <RefMode Name="RGMII_ID" HalMode="ETH">
+        <ConfigForMode>Init</ConfigForMode>   
+        <Parameter Name="Warning"/>
+        <Parameter Name="Note"/>
+        <Parameter Name="MACAddr"/>
+        <Parameter Name="ETH_TX_DESC_CNT"/>
+        <Parameter Name="TxDescAddress"/>
+        <Parameter Name="TxDesc"/>
+        <Parameter Name="ETH_RX_DESC_CNT"/>
+        <Parameter Name="RxDescAddress"/>
+        <Parameter Name="RxDesc"/>				
+        <Parameter Name="RxBuffLen"/>
+        <Parameter Name="RxMode"/>
+        <Parameter Name="MediaInterface">
+            <PossibleValue>HAL_ETH_RMII_MODE</PossibleValue>
+        </Parameter>
+        <Parameter Name="Instance"/>
+    </RefMode>	
+    <RefMode Name="RMII_PTP_Synchro" HalMode="ETH">
+        <ConfigForMode>Init</ConfigForMode>   
+        <Parameter Name="Warning"/>
+        <Parameter Name="Note"/>
+        <Parameter Name="MACAddr"/>
+        <Parameter Name="ETH_TX_DESC_CNT"/>
+        <Parameter Name="TxDescAddress"/>
+        <Parameter Name="TxDesc"/>
+        <Parameter Name="ETH_RX_DESC_CNT"/>
+        <Parameter Name="RxDescAddress"/>
+        <Parameter Name="RxDesc"/>				
+        <Parameter Name="RxBuffLen"/>
+        <Parameter Name="RxMode"/>
+        <Parameter Name="MediaInterface">
+            <PossibleValue>HAL_ETH_RMII_MODE</PossibleValue>
+        </Parameter>
+        <Parameter Name="Instance"/>
+    </RefMode>
+
+    <ModeLogicOperator Name="OR">
+        <Mode Name="Mode">
+            <Condition Expression="(!S_ETHSW &amp; $IpNumber=1) | $IpNumber=2" Diagnostic="Enabling ETH1 requires ETHSW to be disabled." />
+            <ModeLogicOperator Name="XOR">
+                <!-- MII: Media Independent Interface (Small packages: ex. TFBGA257/LFBGA354 no ref to ETH 125MHz Clock Input in tooltip) -->
+                <Mode Name="MII (Media Independent Interface)">
+                    <Semaphore>$IpInstance_Semaphore_No_Ref_Clock</Semaphore>
+                    <Semaphore>$IpInstance_Semaphore_No_125MHz_Clock</Semaphore>
+                    <Semaphore>$IpInstance_Semaphore_PPS_OUT_and_PHY_INTN</Semaphore> <!-- Optional signals: PHY_INTN, PPS_OUT -->
+                    <Semaphore>$IpInstance_Semaphore_MII</Semaphore>
+                    <Condition Diagnostic="&lt;font color=&quot;red&quot;&gt;Warning: Not yet supported on ST boards&lt;/font&gt;&lt;br&gt;Available only if &lt;b&gt;ETH Ref Clock Input&lt;/b&gt; is disabled&lt;br&gt;&lt;i&gt;Set ETH Mode to Disable or unset/set Runtime context to release constraints." Expression="!$IpInstance_Semaphore_Ref_Clock"/>
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="MDC"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="MDIO"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="MII_COL"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="MII_CRS"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="MII_RX_CLK"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="MII_TX_CLK"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="MII_RX_DV"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="MII_RX_ER"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="MII_RXD0"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="MII_RXD1"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="MII_RXD2"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="MII_RXD3"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="MII_TX_EN"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="MII_TXD0"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="MII_TXD1"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="MII_TXD2"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="MII_TXD3"/>
+                    </SignalLogicalOp>
+                </Mode>
+                <!-- RMII: Reduced Media Independent Interface (Big packages: ex. LFBGA448/TFBGA361) -->
+                <Mode Name="RMII (Reduced MII)">
+                    <Condition Diagnostic="Available only if &lt;b&gt;ETH Clock Output&lt;/b&gt; or &lt;b&gt;ETH Ref Clock Input&lt;/b&gt; is enabled and &lt;b&gt;ETH 125 MHz Clock Input&lt;/b&gt; is disabled&lt;br&gt;&lt;i&gt;Set ETH Mode to Disable or unset/set Runtime context to release constraints." Expression="($IpInstance_Semaphore_Internal_Clock|$IpInstance_Semaphore_Ref_Clock) &amp; !$IpInstance_Semaphore_125MHz_Clock"/>
+                    <Semaphore>$IpInstance_Semaphore_No_125MHz_Clock</Semaphore>
+                    <Semaphore>$IpInstance_Semaphore_PPS_OUT_and_PHY_INTN</Semaphore> <!-- Optional signals: PHY_INTN, PPS_OUT -->
+                    <Semaphore>$IpInstance_Semaphore_No_TX_ER</Semaphore>
+                    <Semaphore>$IpInstance_Semaphore_RMII</Semaphore>
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="MDC"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="MDIO"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="RMII_CRS_DV"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="RMII_RXD0"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="RMII_RXD1"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="RMII_TX_EN"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="RMII_TXD0"/>
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="RMII_TXD1"/>
+                    </SignalLogicalOp>
+                </Mode>
+                <!-- RGMII: Reduced Gigabit Media Independent Interface (Big packages: ex. LFBGA448/TFBGA361) -->
+                <Mode Name="RGMII (Reduced GMII)">
+                    <Semaphore>$IpInstance_Semaphore_Allow_Internal_Clock</Semaphore>
+                    <Semaphore>$IpInstance_Semaphore_No_Ref_Clock</Semaphore>
+                    <Semaphore>$IpInstance_Semaphore_PPS_OUT_and_PHY_INTN</Semaphore> <!-- Optional signals: PHY_INTN, PPS_OUT -->
+                    <Semaphore>$IpInstance_Semaphore_No_TX_ER</Semaphore>
+                    <Semaphore>$IpInstance_Semaphore_RGMII</Semaphore>
+                    <Condition Diagnostic="Available only if &lt;b&gt;ETH Ref Clock Input&lt;/b&gt; is disabled&lt;br&gt;&lt;i&gt;Set ETH Mode to Disable or unset/set Runtime context to release constraints." Expression="!$IpInstance_Semaphore_Ref_Clock"/>
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="AlternateFunctionPushPullHighSpeedByDefaultIORetimingRGMIIETHx" Name="MDC"/>
+                        <Signal IOMode="AlternateFunctionPushPullIORetimingETHRGMII" Name="MDIO"/>
+                        <Signal IOMode="AlternateFunctionPushPullHighSpeedDefaultIORetimingRGMIIOthers" Name="RGMII_GTX_CLK"/>
+                        <Signal IOMode="AlternateFunctionPushPullIORetimingETHRGMII" Name="RGMII_RX_CLK"/>
+                        <Signal IOMode="AlternateFunctionPuPdOnlyIORetimingRGMII" Name="RGMII_RX_CTL"/>
+                        <Signal IOMode="AlternateFunctionPuPdOnlyIORetimingRGMII" Name="RGMII_RXD0"/>
+                        <Signal IOMode="AlternateFunctionPuPdOnlyIORetimingRGMII" Name="RGMII_RXD1"/>
+                        <Signal IOMode="AlternateFunctionPuPdOnlyIORetimingRGMII" Name="RGMII_RXD2"/>
+                        <Signal IOMode="AlternateFunctionPuPdOnlyIORetimingRGMII" Name="RGMII_RXD3"/>
+                        <Signal IOMode="AlternateFunctionPushPullHighSpeedByDefaultIORetimingRGMII" Name="RGMII_TX_CTL"/>
+                        <Signal IOMode="AlternateFunctionPushPullHighSpeedByDefaultIORetimingRGMII" Name="RGMII_TXD0"/> 
+                        <Signal IOMode="AlternateFunctionPushPullHighSpeedByDefaultIORetimingRGMII" Name="RGMII_TXD1"/>
+                        <Signal IOMode="AlternateFunctionPushPullHighSpeedByDefaultIORetimingRGMII" Name="RGMII_TXD2"/>
+                        <Signal IOMode="AlternateFunctionPushPullHighSpeedByDefaultIORetimingRGMII" Name="RGMII_TXD3"/>
+                    </SignalLogicalOp>
+                </Mode>
+                <!-- RGMII: Reduced Gigabit Media Independent Interface (Big packages: ex. LFBGA448/TFBGA361) -->
+                <Mode Name="RGMII_ID">
+                    <Semaphore>$IpInstance_Semaphore_Allow_Internal_Clock</Semaphore>
+                    <Semaphore>$IpInstance_Semaphore_No_Ref_Clock</Semaphore>
+                    <Semaphore>$IpInstance_Semaphore_PPS_OUT_and_PHY_INTN</Semaphore> <!-- Optional signals: PHY_INTN, PPS_OUT -->
+                    <Semaphore>$IpInstance_Semaphore_No_TX_ER</Semaphore>
+                    <Semaphore>$IpInstance_Semaphore_RGMII</Semaphore>
+                    <Condition Diagnostic="Available only if &lt;b&gt;ETH Ref Clock Input&lt;/b&gt; is disabled&lt;br&gt;&lt;i&gt;Set ETH Mode to Disable or unset/set Runtime context to release constraints." Expression="!$IpInstance_Semaphore_Ref_Clock"/>
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="AlternateFunctionPushPullHighSpeedDefaultIORetimingRGMIIOthers" Name="MDC"/>
+                        <Signal IOMode="AlternateFunctionPushPullHighSpeedDefaultIORetimingRGMIIOthers" Name="MDIO"/>
+                        <Signal IOMode="AlternateFunctionPuPdOnlyIORetimingRGMII_ID_GTX_CLK" Name="RGMII_GTX_CLK"/>
+                        <Signal IOMode="AlternateFunctionPuPdOnlyIORetimingRGMII_ID" Name="RGMII_RX_CLK"/>
+                        <Signal IOMode="AlternateFunctionPuPdOnlyIORetimingRGMII_ID_RX_CTL" Name="RGMII_RX_CTL"/>
+                        <Signal IOMode="AlternateFunctionPuPdOnlyIORetimingRGMII_ID_RX_CTL" Name="RGMII_RXD0"/>
+                        <Signal IOMode="AlternateFunctionPuPdOnlyIORetimingRGMII_ID_RX_CTL" Name="RGMII_RXD1"/>
+                        <Signal IOMode="AlternateFunctionPuPdOnlyIORetimingRGMII_ID_RX_CTL" Name="RGMII_RXD2"/>
+                        <Signal IOMode="AlternateFunctionPuPdOnlyIORetimingRGMII_ID_RX_CTL" Name="RGMII_RXD3"/>
+                        <Signal IOMode="AlternateFunctionPushPullHighSpeedByDefaultIORetimingRGMII_ID" Name="RGMII_TX_CTL"/>
+                        <Signal IOMode="AlternateFunctionPushPullHighSpeedByDefaultIORetimingRGMII_ID" Name="RGMII_TXD0"/> 
+                        <Signal IOMode="AlternateFunctionPushPullHighSpeedByDefaultIORetimingRGMII_ID" Name="RGMII_TXD1"/>
+                        <Signal IOMode="AlternateFunctionPushPullHighSpeedByDefaultIORetimingRGMII_ID" Name="RGMII_TXD2"/>
+                        <Signal IOMode="AlternateFunctionPushPullHighSpeedByDefaultIORetimingRGMII_ID" Name="RGMII_TXD3"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>            
+            <Semaphore>MW_ETH_MW</Semaphore>
+            <Semaphore>MW_$IpInstance_MW</Semaphore>
+        </Mode>
+        <Mode Name="ETH Ref Clock Input">
+            <Condition Expression="(!S_ETHSW &amp; $IpNumber=1) | $IpNumber=2" Diagnostic="Enabling ETH1 requires ETHSW to be disabled." />
+            <ModeLogicOperator Name="XOR">    
+                <Mode Name="ETH Ref Clock Input">
+                    <Condition Diagnostic="Available only if ETH Mode is set to &lt;b&gt;Disable&lt;/b&gt; or &lt;b&gt;RMII&lt;/b&gt;" Expression="!$IpInstance_Semaphore_No_Ref_Clock &amp; !$IpInstance_Semaphore_125MHz_Clock"/>
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="RMII_REF_CLK"/>
+                    </SignalLogicalOp>
+                    <Semaphore>MW_ETH_MW</Semaphore>
+                    <Semaphore>MW_$IpInstance_MW</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>$IpInstance_Semaphore_Ref_Clock</Semaphore>
+        </Mode>
+        <Mode Name="ETH 125MHz Clock Input"> <!-- Mode not applicable to small packages of MP157x devices -->
+            <Condition Expression="(!S_ETHSW &amp; $IpNumber=1) | $IpNumber=2" Diagnostic="Enabling ETH1 requires ETHSW to be disabled." />
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="ETH 125MHz Clock Input">
+                    <Condition Diagnostic="Available only if ETH Mode is set to &lt;b&gt;Disable&lt;/b&gt; or &lt;b&gt;RGMII&lt;/b&gt;" Expression="!$IpInstance_Semaphore_Ref_Clock &amp; !$IpInstance_Semaphore_No_125MHz_Clock"/>
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="AlternateFunctionPushPullHighSpeedByDefault" Name="RGMII_CLK125"/>
+                    </SignalLogicalOp>
+                    <Semaphore>MW_ETH_MW</Semaphore>
+                    <Semaphore>MW_$IpInstance_MW</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>$IpInstance_Semaphore_125MHz_Clock</Semaphore>
+        </Mode>
+        <Mode Name="ETH Clock Output (PHY without Quartz)">
+            <Condition Expression="(!S_ETHSW &amp; $IpNumber=1) | $IpNumber=2" Diagnostic="Enabling ETH1 requires ETHSW to be disabled." />
+            <ModeLogicOperator Name="XOR">    
+                <Mode Name="ETH Clock Output (PHY without Quartz)">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="CLK"/>
+                    </SignalLogicalOp>
+                    <Semaphore>MW_ETH_MW</Semaphore>
+                    <Semaphore>MW_$IpInstance_MW</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>$IpInstance_Semaphore_Internal_Clock</Semaphore>
+        </Mode>
+        <Mode Name="ETH PTP_Synchro PPS_OUT">
+            <Condition Expression="$IpNumber=1 | $IpNumber=2" Diagnostic="Enabling ETH1 requires ETHSW to be disabled." />
+            <ModeLogicOperator Name="XOR"> <!-- PTP: Precision Time Protocol -->
+                <Mode Name="ETH PPS Output">
+                    <Condition Diagnostic="Available only if one ETH Mode is enabled and if TIM2 or TIM3 is enabled with Slave Mode enabled and ETR as Trigger Source or if FDCAN is enabled" Expression="$IpInstance_Semaphore_PPS_OUT_and_PHY_INTN  &amp; ((Semaphore_TriggerSourceETRTIM2 &amp; Semaphore_ETH_ControllerModeTIM2) | (Semaphore_TriggerSourceETRTIM3 &amp; Semaphore_ETH_ControllerModeTIM3) | (FDCAN1_Used | FDCAN2_Used | FDCAN3_Used))"/>
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="PPS_OUT"/>
+                        <Signal Name="PTP_AUX_TS"/>
+                    </SignalLogicalOp>
+                    <Semaphore>MW_ETH_MW</Semaphore>
+                    <Semaphore>MW_$IpInstance_MW</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
+        <Mode Name="ETH PHY_INTN">
+            <Condition Expression="(!S_ETHSW &amp; $IpNumber=1) | $IpNumber=2" Diagnostic="Enabling ETH1 requires ETHSW to be disabled." />
+            <ModeLogicOperator Name="XOR">    
+                <Mode Name="ETH PHY_INTN">
+                    <Condition Diagnostic="Available only if one ETH Mode is enabled" Expression="$IpInstance_Semaphore_PPS_OUT_and_PHY_INTN"/>
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="PHY_INTN"/> <!-- Input only -->
+                    </SignalLogicalOp>
+                    <Semaphore>MW_ETH_MW</Semaphore>
+                    <Semaphore>MW_$IpInstance_MW</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
+        <Mode Name="ETH MDIO" RemoveCondition="$IpNumber=2">
+            <Condition Expression="S_ETHSW &amp; $IpNumber=1" Diagnostic="Enabling ETH MDIO requires ETHSW to be enabled." />
+            <ModeLogicOperator Name="XOR">   
+                <Mode Name="ETH MDIO">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="MDIO"/> <!-- Input only -->
+                        <Signal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="MDC"/> <!-- Input only -->
+                        <Signal Name="PPS_OUT"/>
+                        <Signal Name="PTP_AUX_TS"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
+    </ModeLogicOperator>
+    <Semaphore>ETHUsed_ForRCC</Semaphore>
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="CRS_DV"/> <!-- Input only -->
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="RXD0"/> <!-- Input only -->
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="RXD1"/> <!-- Input only -->
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="RXD2"/> <!-- Input only -->
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="RXD3"/> <!-- Input only -->
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="RX_CLK"/> <!-- Input only -->
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="RX_CTL"/> <!-- Input only -->
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="PHY_INTN"/> <!-- Input only / Optional signals: PHY_INTN -->
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="COL"/> <!-- Input only -->
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="CRS"/> <!-- Input only -->
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="RX_DV"/> <!-- Input only -->
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="RX_ER"/> <!-- Input only -->
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="TX_CLK"/> <!-- Input only -->
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="RXD4"/> <!-- Input only -->
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="RXD5"/> <!-- Input only -->
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="RXD6"/> <!-- Input only -->
+    <RefSignal IOMode="AlternateFunctionPuPdOnly" Name="RXD7"/> <!-- Input only -->
+    <RefSignal IOMode="AlternateFunctionPushPullHighSpeedByDefault" Name="CLK125"/> <!-- only for RGMII and GMII -->
+    <RefSignal IOMode="AlternateFunctionPushPullHighSpeedByDefault" Name="GTX_CLK"/> <!-- only for RGMII and GMII -->
+    <RefSignal IOMode="AlternateFunctionPushPullHighSpeedByDefault" Name="TX_CTL"/> <!-- only for RGMII -->
+    <RefSignal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="TXD4"/> <!-- only for GMII -->
+    <RefSignal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="TXD5"/> <!-- only for GMII -->
+    <RefSignal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="TXD6"/> <!-- only for GMII -->
+    <RefSignal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="TXD7"/> <!-- only for GMII -->
+    <RefSignal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="REF_CLK"/> <!-- only for RMII -->
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="MDIO"/>
+    <RefSignal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="TX_EN"/>
+    <RefSignal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="PPS_OUT"/> <!-- Limitation: Medium to avoid disturbing other interfaces -->
+    <RefSignal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="PTP_AUX_TS"/>
+    <RefSignal IOMode="AlternateFunctionPushPullMediumSpeedDefault" Name="CLK"/> <!-- Limitation: Medium to avoid disturbing other interfaces -->
+    <RefSignal Name="MDC"/> <!-- variable speed depending on ETH mode -->
+    <RefSignal Name="TXD0"/> <!-- variable speed depending on ETH mode -->
+    <RefSignal Name="TXD1"/> <!-- variable speed depending on ETH mode -->
+    <RefSignal Name="TXD2"/> <!-- variable speed depending on ETH mode -->
+    <RefSignal Name="TXD3"/> <!-- variable speed depending on ETH mode -->
+</IP>

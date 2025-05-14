@@ -6,6 +6,7 @@
 		<Parameter Name="TX_MINIMUM_STACK"/>
 		<Parameter Name="TX_THREAD_USER_EXTENSION"/>
 		<Parameter Name="TX_DISABLE_STACK_FILLING"/>
+		<Parameter Name="TX_ENABLE_STACK_CHECKING"/>
 		<Parameter Name="TX_DISABLE_PREEMPTION_THRESHOLD"/>
 		<Parameter Name="TX_DISABLE_REDUNDANT_CLEARING"/>
 		<Parameter Name="TX_DISABLE_NOTIFY_CALLBACKS"/>
@@ -13,6 +14,7 @@
 		<Parameter Name="TX_NOT_INTERRUPTABLE"/>
 		<Parameter Name="TX_MAX_PRIORITIES"/>
 		<Parameter Name="TX_TIMER_TICKS_PER_SECOND"/>
+		<Parameter Name="TX_ENABLE_RANDOM_NUMBER_STACK_FILLING"/>
 		<Parameter Name="TX_SAFETY_CRITICAL"/>
 		<Parameter Name="TX_TIMER_PROCESS_IN_ISR"/>
 		<Parameter Name="TX_REACTIVATE_INLINE"/>
@@ -177,8 +179,13 @@
 	</RefParameter>
 	<RefParameter Comment="TX_DISABLE_STACK_FILLING" DefaultValue="0" Group="Core" Name="TX_DISABLE_STACK_FILLING" TabName="ThreadX" Type="list">
         <Description>Determine if stack filling is enabled</Description>
-        <PossibleValue Comment="Disabled" Value="0"/>
-        <PossibleValue Comment="Enabled" Value="1"/>
+        <PossibleValue Comment="Disabled" Value="0" />
+        <PossibleValue Action="0" Comment="Enabled" Condition="TX_ENABLE_STACK_CHECKING=1" Diagnostic="TX_DISABLE_STACK_FILLING cant be enabled if TX_ENABLE_STACK_CHECKING is enabled" Value="1" />
+    </RefParameter>
+    <RefParameter Comment="TX_ENABLE_STACK_CHECKING" DefaultValue="0" Group="Core" Name="TX_ENABLE_STACK_CHECKING" TabName="ThreadX" Type="list">
+        <Description>Determine whether or not stack checking is enabled</Description>
+        <PossibleValue Comment="Disabled" Value="0" />
+        <PossibleValue Action="0" Comment="Enabled" Condition="TX_DISABLE_STACK_FILLING=1" Diagnostic="TX_ENABLE_STACK_CHECKING can't be enabled if TX_DISABLE_STACK_FILLING is enabled" Value="1" />
 	</RefParameter>
 	<RefParameter Comment="TX_DISABLE_PREEMPTION_THRESHOLD" DefaultValue="1" Group="Core" Name="TX_DISABLE_PREEMPTION_THRESHOLD" TabName="ThreadX" Type="list">
 		<Description>Determine if preemption-threshold should be disabled.</Description>
@@ -313,7 +320,16 @@ TX_TIMER_ENABLE_PERFORMANCE_INFO must not be defined.</Description>
 		<Condition Diagnostic="" Expression="USBPD_P0U1 &amp; !USBPD_TYPECONLY"/>
 		<Description>Define the common timer tick reference for use by other middleware components. This is forced to 1000 for USBPD stack constraints</Description>
 	</RefParameter>
-	<RefParameter Added="true" Comment="ThreadX version" DefaultValue="6.2.0" Group="Version" Name="ThreadX_Version" TabName="ThreadX" Type="string">
+	<RefParameter Added="true" Comment="TX_ENABLE_RANDOM_NUMBER_STACK_FILLING" DefaultValue="0" Group="Core" Name="TX_ENABLE_RANDOM_NUMBER_STACK_FILLING" TabName="ThreadX" Type="list">
+        <Condition Diagnostic="" Expression="(TX_ENABLE_STACK_CHECKING  = 1)"/>
+        <Description>Determine if random number is used for stack filling. &lt;br&gt;
+By default, ThreadX uses a fixed pattern for stack filling.&lt;br&gt;
+When the following is defined,  ThreadX uses a random number for stack filling.&lt;br&gt;
+This is effective only when  TX_ENABLE_STACK_CHECKING is defined.</Description>
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="ThreadX version" DefaultValue="6.4.0" Group="Version" Name="ThreadX_Version" TabName="ThreadX" Type="string">
         <Description>Current ThreadX version</Description>
     </RefParameter>
     <RefParameter Added="true" Comment="Enable LowPower Support" DefaultValue="0" Group="Low Power" Name="TX_LOW_POWER" TabName="ThreadX" Type="list">

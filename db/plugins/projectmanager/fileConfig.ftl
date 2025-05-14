@@ -1,6 +1,17 @@
 [#ftl]
 [#compress]
 <?xml version="1.0" encoding="UTF-8"?>
+[#function fileExist name]    
+  [#assign result = "false"]
+  [#assign objectConstructor = "freemarker.template.utility.ObjectConstructor"?new()]
+  [#assign file = objectConstructor("java.io.File", name)]
+  [#assign exist = file.exists()]  
+  [#if exist]  	
+    [#return "true"]
+  [#else]
+  	[#return "false"]
+  [/#if]
+[/#function]
 [#macro getGroups groupArg prtGrpexcluded isApplicationGroup]
 [#assign grouplibExist = "0"]
 [#if  multiConfigurationProject?? && groupArg.excludedFrom!="" && TrustZone=="1" && groupArg.excludedFrom==selectedConfig]
@@ -71,7 +82,7 @@
 <FileVersion>${FileVersion}</FileVersion> [#-- add file version for UC30 --]
 <Workspace>
 [/#compress]
-<WorkspaceType>[#if (IdeMode?? || ide=="STM32CubeIDE") && family=="STM32MP1xx"]Multi-project[#else]${WorkspaceType}[/#if]</WorkspaceType>
+<WorkspaceType>[#if (IdeMode?? || ide=="STM32CubeIDE") && (family=="STM32MP1xx" || family=="STM32MP2xx") ]Multi-project[#else]${WorkspaceType}[/#if]</WorkspaceType>
 <WorkspacePath>${WorkspacePath}</WorkspacePath>
 [#compress]
 <underRoot>${underRoot}</underRoot>
@@ -121,7 +132,7 @@
 [#--[/#list]--]
 [/#if]
 
-[#if (IdeMode?? || ide=="STM32CubeIDE") && family=="STM32MP1xx"]
+[#if (IdeMode?? || ide=="STM32CubeIDE") && (family=="STM32MP1xx" ||family=="STM32MP2xx") ]
 <Project>    
     <ProjectName>${projectName}_DTS</ProjectName>
     <ProjectNature>DTS</ProjectNature>
@@ -217,7 +228,7 @@
     [/#if]
 [/#if]
 <config>
-    <name>${Configuration}[#if (multiConfig == "true")][#if Secure!="-1"][#if Secure=="1"]_S[#else]_NS[/#if][#else]_${cpuCore?replace("ARM Cortex-", "C")}[/#if][#else][/#if]</name>	 [#-- project configuration name. Ex: STM32F407_EVAL --]
+    <name>${Configuration}[#if (multiConfig == "true")][#if Secure!="-1"][#if family=="STM32MP2xx"]_${cpuCore?replace("ARM Cortex-", "C")}[/#if][#if Secure=="1"]_S[#else]_NS[/#if][#else]_${cpuCore?replace("ARM Cortex-", "C")}[/#if][#else][/#if]</name>	 [#-- project configuration name. Ex: STM32F407_EVAL --]
 <mainSourceRepo>[#if mainSourceRepo??]${mainSourceRepo}[/#if]</mainSourceRepo>   
 <sourceStructure>[#if sourceStructure??]${sourceStructure}[/#if]</sourceStructure>
 [#if Context??]<Context>${Context}</Context>[/#if]
@@ -587,7 +598,7 @@
 [/#list]
 <Project>    
 [#-- <ProjectPath>${ProjectPath}</ProjectPath>  --][#-- added to give project path --]
-    <ProjectName>${projectName}[#if TrustZone=="1"][#if prjSecure=="1"]_S[#else]_NS[/#if][/#if]</ProjectName> [#-- modified to give only the project name without path --]
+    <ProjectName>${projectName}[#if TrustZone=="1"][#if family=="STM32MP2xx"]_${cpuCore?replace("ARM Cortex-", "C")}[/#if][#if prjSecure=="1"]_S[#else]_NS[/#if][/#if]</ProjectName> [#-- modified to give only the project name without path --]
      [#if active?? && !active]
     <Excluded>true</Excluded>
     [/#if]
@@ -1174,9 +1185,12 @@
         [#if ThirdPartyPackList??]        
             [#list ThirdPartyPackList as pack]
      [#if pack !=  "" && !AppSourceEntries?seq_contains(pack)]
+     [#assign exist = fileExist(WorkspacePath+"/"+pack)]
+        [#if exist?contains("true")] 
         <sourceEntry>
             <name>${pack}</name>
             </sourceEntry>
+        [/#if]
 [/#if]
             [/#list]
         [/#if]
@@ -1642,7 +1656,7 @@
                 <name>Core</name>  
         [/#if]
         [#list mxSourceFilesNameList as mxCFiles]
-            [#if mxCFiles?contains("Src")]
+            [#if mxCFiles?contains("Src") && mxCFiles?contains("System\\Modules") == false]
 [#if !isExcludedFromBuild(mxCFiles)]
                 <file>
                     <name>${mxCFiles}</name>

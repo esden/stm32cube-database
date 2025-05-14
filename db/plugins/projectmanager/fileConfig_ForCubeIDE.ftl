@@ -5,6 +5,17 @@
     [#assign MultiProject = "1"]
 [/#if]
 <?xml version="1.0" encoding="UTF-8"?>
+[#function fileExist name]    
+  [#assign result = "false"]
+  [#assign objectConstructor = "freemarker.template.utility.ObjectConstructor"?new()]
+  [#assign file = objectConstructor("java.io.File", name)]
+  [#assign exist = file.exists()]  
+  [#if exist]  	
+    [#return "true"]
+  [#else]
+  	[#return "false"]
+  [/#if]
+[/#function]
 [#macro getGroups groupArg]
 [#assign grouplibExist = "0"]
 [#if  multiConfigurationProject?? && groupArg.excludedFrom!="" && TrustZone=="1" && groupArg.excludedFrom==selectedConfig]
@@ -56,7 +67,7 @@
 <ScratchFile FileVersion="${FileVersion}">
 <FileVersion>${FileVersion}</FileVersion> [#-- add file version for UC30 --]
 <Workspace>
-[#if (IdeMode?? || ide=="STM32CubeIDE") && family=="STM32MP1xx"]
+[#if (IdeMode?? || ide=="STM32CubeIDE") && (family=="STM32MP1xx" || family=="STM32MP2xx")]
     [#assign WorkspaceType = "Multi-project"]
 [/#if]
 [/#compress]
@@ -85,7 +96,7 @@
     [#--<Version>${version}</Version>--]
 [/#compress]
 <IocFile>${projectName}.ioc</IocFile>
-[#if MultiProject=="0" || family=="STM32MP1xx" &&  DeviceTree??]
+[#if MultiProject=="0" || family=="STM32MP1xx" &&  DeviceTree?? || family=="STM32MP2xx"  && TrustZone=="0"]
 [@generateProject prjSecure="-1" Prjconfig="null" configName=""/]
 [#else]
 [#list ProjectConfigs?keys as _configName]
@@ -95,7 +106,7 @@
 
 [#--[/#list]--]
 [/#if]
-[#if (IdeMode?? || ide=="STM32CubeIDE") && family=="STM32MP1xx" && DeviceTree?? ]
+[#if (IdeMode?? || ide=="STM32CubeIDE") && (family=="STM32MP1xx" ||family=="STM32MP2xx") && DeviceTree?? ]
 <Project>    
     <ProjectName>${projectName}_DTS</ProjectName>
     <ProjectNature>DTS</ProjectNature>
@@ -195,7 +206,7 @@
 [/#if]
 <config>
 [#if family!="STM32H7RSxx"]
-<name>${Configuration}[#if (multiConfig == "true")][#if Secure!="-1"][#if Secure=="1" && family!="STM32WLxx"]_S[/#if][#if Secure=="0" && family!="STM32WLxx"]_NS[/#if][#if Secure=="1" && family=="STM32WLxx"]_${cpuCore?replace("ARM Cortex-", "C")?replace("+", "PLUS")}[#else]_${cpuCore?replace("ARM Cortex-", "C")?replace("+", "PLUS")}[/#if][/#if][/#if]</name>	 [#-- project configuration name. Ex: STM32F407_EVAL --]
+<name>${Configuration}[#if (multiConfig == "true")][#if Secure!="-1"][#if family=="STM32MP2xx"]_${cpuCore?replace("ARM Cortex-", "C")}[/#if][#if Secure=="1" && family!="STM32WLxx"]_S[/#if][#if Secure=="0" && family!="STM32WLxx"]_NS[/#if][#if Secure=="1" && family=="STM32WLxx"]_${cpuCore?replace("ARM Cortex-", "C")?replace("+", "PLUS")}[#else][#if family !="STM32MP2xx"]_${cpuCore?replace("ARM Cortex-", "C")?replace("+", "PLUS")}[/#if][/#if][/#if][/#if]</name>	 [#-- project configuration name. Ex: STM32F407_EVAL --]
 [#else] 
 <name>${Configuration}</name>
 [/#if]
@@ -209,13 +220,13 @@
         <cpucore>[#if ((multiConfig == "true") && TrustZone=="0")|| multiToSingleCore=="true"]${cpuCore?replace("ARM Cortex-", "C")}[#else][/#if]</cpucore>
     [/#if]
     <fpu>${fpu}</fpu>  [#--add FPU for UC30 --]
-    [#if (multiConfig == "true")]
+    [#if bootmode?? && (multiConfig == "true")]
     <bootmode>${bootmode}</bootmode>  [#-- for boot mode could be equals to SRAM or FLASH --]
     [/#if]
     [#if flasher?? && !IdeMode?? && (multiConfig == "true") && mainSourceRepo = "Appli"]
     <flasher>${flasher}</flasher>  [#-- for appli project, set the flashloader --]
     [/#if]
-     [#if TrustZone == "1" && prj_ctx=="1"]
+     [#if TrustZone == "1" && prj_ctx?? && prj_ctx=="1"]
     <ExePath>${ExePath}</ExePath>
     [/#if]
     [#if OutputFilesFormat?? && (family!="STM32H7RSxx" || family=="STM32H7RSxx" && Context=="App")]
@@ -560,7 +571,7 @@
 <Project>    
 [#-- <ProjectPath>${ProjectPath}</ProjectPath>  --][#-- added to give project path --]
 [#if family!="STM32H7RSxx"]
-    <ProjectName>${Configuration}[#if TrustZone=="1"][#if ConfigSecure=="1"]_S[#else]_NS[/#if][/#if][#if (MultiProject == "1")][#if MultiProject=="1" && cpuCore??]_${cpuCore?replace("ARM Cortex-", "C")?replace("+", "PLUS")}[#else]_CM4[/#if][/#if]</ProjectName> [#-- modified to give only the project name without path --]
+    <ProjectName>${Configuration}[#if TrustZone=="1"][#if family=="STM32MP2xx"]_${cpuCore?replace("ARM Cortex-", "C")}[/#if][#if ConfigSecure=="1"]_S[#else]_NS[/#if][/#if][#if (MultiProject == "1") && family !="STM32MP2xx"][#if MultiProject=="1" && cpuCore??]_${cpuCore?replace("ARM Cortex-", "C")?replace("+", "PLUS")}[#else]_CM4[/#if][/#if]</ProjectName> [#-- modified to give only the project name without path --]
 [#else]
     <ProjectName>${Configuration}</ProjectName>
 [/#if]
@@ -621,7 +632,7 @@
     [#-- UnderRoot_AsRefernce.ftl--]
 <sourceEntries>
     	[#if src??]
-            [#if !multiConfigurationProject??]
+            [#if !multiConfigurationProject??  || family=="STM32MP2xx"]
                 <sourceEntry>
                 <name>${src}</name>
                 </sourceEntry>
@@ -737,10 +748,13 @@
         [#if ThirdPartyPackList??]
             [#list ThirdPartyPackList as pack]
                 [#if pack !=  ""]
+                 [#assign exist = fileExist(WorkspacePath+"/"+pack)]
+                  [#if exist?contains("true")] 
                     <sourceEntry>
                         <name>${pack}</name>
                         </sourceEntry>
                 [/#if]
+                 [/#if]
             [/#list]
         [/#if]
 	  
@@ -827,7 +841,7 @@
                 [#-- selectedConfig --]
                 [#assign removeFromConfig = "0"]
                 [#assign excludeFromConfig = "0"]
-                [#if multiConfigurationProject?? && ConfigsAndFiles??]
+                [#if multiConfigurationProject?? && ConfigsAndFiles?? && selectedConfig??]
                     [#if !ConfigsAndFiles[selectedConfig]?seq_contains(filesName?replace("/","\\"))]
                         [#assign removeFromConfig = "1"]
                     [/#if]
@@ -962,7 +976,7 @@
     [#else] [#-- Copy All/Needed option --]
     <sourceEntries>
        	[#if src??]
-            [#if !multiConfigurationProject??]
+            [#if !multiConfigurationProject??  || family=="STM32MP2xx"]
                 [#list AppSourceEntries as SrcEntry] [#-- add application Groups --]
                     [#if !SrcEntry?ends_with("FREERTOS") && !SrcEntry?ends_with("ThreadX")]
             <sourceEntry>
@@ -1043,7 +1057,7 @@
                 [/#list]
                 </sourceEntry>
             [#else]
-                [#if  MultiProject=="0" | (MultiProject=="1" && usedMWPerCore[selectedConfig]?size>0 && (!localMwDriver?? ||(localMwDriver?? && localMwDriver=="true")))]    
+                [#if  MultiProject=="0" | (MultiProject=="1" && selectedConfig?? && usedMWPerCore[selectedConfig]?has_content && usedMWPerCore[selectedConfig]?size>0 && (!localMwDriver?? ||(localMwDriver?? && localMwDriver=="true")))]    
                     <sourceEntry>
                        <name>Middlewares</name>
                     </sourceEntry>                   
@@ -1087,9 +1101,13 @@
         [#if ThirdPartyPackList??]
             [#list ThirdPartyPackList as pack]
                 [#if pack !=  ""]
+                [#assign exist = fileExist(WorkspacePath+"/"+pack)]
+                  [#if exist?contains("true")] 
+                  exist here is true
                    [#-- <sourceEntry>
                         <name>${pack}</name>
                         </sourceEntry>--]
+                [/#if]
                 [/#if]
             [/#list]
         [/#if]
@@ -1213,12 +1231,12 @@
 [/#if] [#-- if WorkspaceType=="Multi-project" End --]
 [#-- HAL Drivers End --]
 [#-- MW drivers --]
-        [#if atLeastOneMiddlewareIsUsed && (WorkspaceType!="Multi-project" || (family=="STM32MP1xx") || (usedMWPerCore?? && selectedConfig?? && usedMWPerCore[selectedConfig]?size>0))]
+        [#if atLeastOneMiddlewareIsUsed && (WorkspaceType!="Multi-project" || (family=="STM32MP1xx")|| family=="STM32MP2xx" || (usedMWPerCore?? && selectedConfig?? && usedMWPerCore[selectedConfig]?has_content && usedMWPerCore[selectedConfig]?size>0))]
             [#if WorkspaceType=="Multi-project"]
             <group>
                 <name>Middlewares</name> 
                 [#--list usedMWPerCore?keys as mwcore--]
-                [#if selectedConfig??]
+                [#if selectedConfig?? && usedMWPerCore[selectedConfig]?has_content]
                     [#assign usedMw =  usedMWPerCore[selectedConfig]]
                 [#else] [#-- case of MP1 multi-projrct but no slectedConfig --]
                     [#list usedMWPerCore?keys as mwKey]         
@@ -1464,12 +1482,12 @@
 [#--/#if--] [#-- if WorkspaceType=="Multi-project" End --]
 [#-- HAL Drivers End --]
 [#-- MW drivers --]
-        [#if atLeastOneMiddlewareIsUsed && (WorkspaceType!="Multi-project" || (family=="STM32MP1xx") || (usedMWPerCore?? && selectedConfig?? && usedMWPerCore[selectedConfig]?size>0))]
+        [#if atLeastOneMiddlewareIsUsed && (WorkspaceType!="Multi-project" || (family=="STM32MP1xx") || family=="STM32MP2xx" ||(usedMWPerCore?? && selectedConfig?? && usedMWPerCore[selectedConfig]?has_content && usedMWPerCore[selectedConfig]?size>0))]
             [#--if WorkspaceType=="Multi-project"--]
             <group>
                 <name>Middlewares</name> 
                 [#--list usedMWPerCore?keys as mwcore--]
-                [#if selectedConfig??]
+                [#if selectedConfig?? && usedMWPerCore[selectedConfig]?has_content]
                     [#assign usedMw =  usedMWPerCore[selectedConfig]]
                 [#else] [#-- case of MP1 multi-projrct but no slectedConfig --]
                     [#list usedMWPerCore?keys as mwKey]                        
@@ -1593,7 +1611,7 @@
         <name>Application</name>
         <group>
             <name>User</name>
-    [#if !multiConfigurationProject?? && family!="STM32MP1xx"] [#-- if not a multi config project --] 
+    [#if !multiConfigurationProject?? && family!="STM32MP1xx" && family!="STM32MP2xx"] [#-- if not a multi config project --] 
         [#if mxSourceDir?replace("\\","/") == "Core/Src"]
             <group>
                 <name>Core</name>  

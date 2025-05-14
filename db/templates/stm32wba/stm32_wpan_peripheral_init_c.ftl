@@ -10,6 +10,8 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
+[#assign PG_FILL_UCS = "False"]
+[#assign PG_BSP_NUCLEO_WBA52CG = 0]
 [#assign PG_SKIP_LIST = "False"]
 [#assign myHash = {}]
 [#list SWIPdatas as SWIP]
@@ -69,11 +71,7 @@ void MX_StandbyExit_NVICPeripharalInit(void)
 		  && (ipHandler.handler != "huart1")
 		]
             [#if ipHandler.handler != PreviousHandler]
-				[#if (ipHandler.handler == "hadc4")]
-#if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)	
-extern ${ipHandler.handlerType} ${ipHandler.handler};
-#endif /* USE_TEMPERATURE_BASED_RADIO_CALIBRATION */
-				[#else]
+				[#if ((ipHandler.handler != "hadc4") && (ipHandler.handler != "hcrc"))]
 extern ${ipHandler.handlerType} ${ipHandler.handler};
 				[/#if]
                 [#assign PreviousHandler = ipHandler.handler]
@@ -98,14 +96,20 @@ extern ${ipHandler.handlerType} ${ipHandler.handler};
   */
 void MX_StandbyExit_PeripharalInit(void)
 {
+  HAL_StatusTypeDef hal_status;
   /* USER CODE BEGIN MX_STANDBY_EXIT_PERIPHERAL_INIT_1 */
 
   /* USER CODE END MX_STANDBY_EXIT_PERIPHERAL_INIT_1 */
 
   /* Select SysTick source clock */
   HAL_SYSTICK_CLKSourceConfig(${myHash["SYSTICK_SOURCE_CLOCK_SELECTION"]});
+
   /* Re-Initialize Tick with new clock source */
-  HAL_InitTick(TICK_INT_PRIORITY);
+  hal_status = HAL_InitTick(TICK_INT_PRIORITY);
+  if (hal_status != HAL_OK)
+  {
+    assert_param(0);
+  }
 
 [#assign PreviousIpHandler = ""]
 [#if handlersList??]
@@ -118,11 +122,7 @@ void MX_StandbyExit_PeripharalInit(void)
 		  && (ipHandler.handler != "huart1")
 		]
 			[#if ipHandler.handler != PreviousIpHandler]
-				[#if (ipHandler.handler == "hadc4")]
-#if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)
-${""?right_pad(2)}memset(&${ipHandler.handler}, 0, sizeof(${ipHandler.handler}));
-#endif /* USE_TEMPERATURE_BASED_RADIO_CALIBRATION */
-				[#else]
+				[#if ((ipHandler.handler != "hadc4") && (ipHandler.handler != "hcrc"))]
 ${""?right_pad(2)}memset(&${ipHandler.handler}, 0, sizeof(${ipHandler.handler}));
                 [/#if]
 				[#assign PreviousIpHandler = ipHandler.handler]
@@ -147,15 +147,10 @@ ${""?right_pad(2)}memset(&${ipHandler.handler}, 0, sizeof(${ipHandler.handler}))
 		  && (void.functionName != "MX_USART1_UART_Init")
 		  && (void.functionName != "MX_USART2_UART_Init")
 		  && (void.functionName != "MX_HSEM_Init")
+      && (void.functionName != "MX_ADC4_Init")
+      && (void.functionName != "MX_CRC_Init")
 		]
-			[#if (void.functionName == "MX_ADC4_Init")]
-#if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)
 ${""?right_pad(2)}${void.functionName}();
-
-#endif /* USE_TEMPERATURE_BASED_RADIO_CALIBRATION */
-			[#else]
-${""?right_pad(2)}${void.functionName}();
-			[/#if]
 		[/#if]
 	[/#if]
   [/#list]
@@ -184,6 +179,14 @@ ${""?right_pad(2)}${void.functionName}();
   HAL_GPIO_Init(GPIOB, &DbgIOsInit);
 #endif /* CFG_DEBUGGER_LEVEL */
   /* USER CODE BEGIN MX_STANDBY_EXIT_PERIPHERAL_INIT_2 */
-
+[#if PG_FILL_UCS == "True"]
+[#if PG_BSP_NUCLEO_WBA52CG == 1]
+#if (CFG_BUTTON_SUPPORTED == 1)
+  BSP_PB_Init(B1, BUTTON_MODE_EXTI);
+  BSP_PB_Init(B2, BUTTON_MODE_EXTI);
+  BSP_PB_Init(B3, BUTTON_MODE_EXTI);
+#endif
+[/#if]
+[/#if]
   /* USER CODE END MX_STANDBY_EXIT_PERIPHERAL_INIT_2 */
 }

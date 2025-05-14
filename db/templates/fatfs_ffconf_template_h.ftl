@@ -178,7 +178,11 @@
 / Additional user header to be used
 /-----------------------------------------------------------------------------*/
 #include "main.h"
+[#if familyName == "stm32wb0" ]
+#include "${familyName}x_hal.h"
+[#else]
 #include "${familyName}xx_hal.h"
+[/#if]
 
 /*---------------------------------------------------------------------------/
 / Function Configurations

@@ -17,6 +17,9 @@
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __${name?lower_case}_H
 #define __${name?lower_case}_H
+[#if FamilyName == "STM32MP2"]
+#define STM32MP25xx
+[/#if]
 #ifdef __cplusplus
   extern "C" {
 #endif

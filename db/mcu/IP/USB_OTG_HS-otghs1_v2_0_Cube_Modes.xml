@@ -503,7 +503,7 @@
 			<Semaphore>USB_OTG_HSEmbeddedPHYUsed_ForRCC</Semaphore>
 			<Condition Expression="!$IpInstanceHS" Diagnostic=""/>			
 		</Mode>
-        <Mode Name="Internal HS Phy" RemoveCondition="!(DIE481 | DIE476 | DIE485)">
+        <Mode Name="Internal HS Phy" RemoveCondition="!DIE485">
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="OTG/Dual-Role-Device-HS" UserName="OTG/Dual_Role_Device">
 					<SignalLogicalOp Name="AND">
@@ -515,7 +515,7 @@
 					<Semaphore>SEMAOoUSBOoOTGOoHSOoDRDOoFOROoUSBX</Semaphore>
 				</Mode>
 				<!-- Tracker 333854 -->
-				<Mode Name="Internal_Phy_Host" UserName="Host_Only" RemoveCondition="!(DIE481 | DIE476 | DIE485)">
+				<Mode Name="Internal_Phy_Host" UserName="Host_Only">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="DM" IOMode="System"/>
 						<Signal Name="DP" IOMode="System"/>
@@ -523,25 +523,8 @@
 					<Semaphore>MW_USB_OTG_HS_MW_FS_HOST</Semaphore>
 					<Semaphore>SEMAOoUSBOoOTGOoHSOoHOSTOoFOROoUSBX</Semaphore>
 				</Mode>
-				<Mode Name="Internal_Phy_Host" UserName="Host_Only" RemoveCondition="DIE481 | DIE476 | DIE485">
-					<SignalLogicalOp Name="AND">
-						<Signal Name="DM"/>
-						<Signal Name="DP"/>
-					</SignalLogicalOp>
-					<Semaphore>MW_USB_OTG_HS_MW_FS_HOST</Semaphore>
-					<Semaphore>SEMAOoUSBOoOTGOoHSOoHOSTOoFOROoUSBX</Semaphore>
-				</Mode>
 				<!-- Tracker 333854 -->
-				<Mode Name="Internal_Phy_Device" UserName="Device_Only" RemoveCondition="DIE481 | DIE476 | DIE485">
-					<SignalLogicalOp Name="AND">
-						<Signal Name="DM"/>
-						<Signal Name="DP"/>
-					</SignalLogicalOp>
-					<Semaphore>MW_USB_OTG_HS_MW_FS_DEVICE</Semaphore>
-					<Semaphore>SEMAOoUSBOoOTGOoHSOoDEVICEOoFOROoUSBX</Semaphore>
-				</Mode>
-				
-				<Mode Name="Internal_Phy_Device" UserName="Device_Only" RemoveCondition="!(DIE481 | DIE476 | DIE485)">
+				<Mode Name="Internal_Phy_Device" UserName="Device_Only">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="DM" IOMode="System"/>
 						<Signal Name="DP" IOMode="System"/>
@@ -552,6 +535,39 @@
 			</ModeLogicOperator>
 			<Semaphore>$IpInstanceFS</Semaphore>
 			<Condition Expression="!$IpInstanceHS" Diagnostic=""/>
+		</Mode>
+		<Mode Name="Internal HS Phy" RemoveCondition="!(DIE481 | DIE476)">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="OTG/Dual-Role-Device-HS" UserName="OTG/Dual_Role_Device">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="DM"/>
+						<Signal Name="DP"/>
+						<Signal Name="ID"/>
+					</SignalLogicalOp>
+					<Semaphore>OTG_DUAL_ROL_DEVICE_HS_FS</Semaphore>
+					<Semaphore>SEMAOoUSBOoOTGOoHSOoDRDOoFOROoUSBX</Semaphore>
+				</Mode>
+				<!-- Tracker 333854 -->
+				<Mode Name="Internal_Phy_Host" UserName="Host_Only">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="DM" IOMode="System"/>
+						<Signal Name="DP" IOMode="System"/>
+					</SignalLogicalOp>
+					<Semaphore>MW_USB_OTG_HS_MW_FS_HOST</Semaphore>
+					<Semaphore>SEMAOoUSBOoOTGOoHSOoHOSTOoFOROoUSBX</Semaphore>
+				</Mode>
+				<!-- Tracker 333854 -->
+				<Mode Name="Internal_Phy_Device" UserName="Device_Only">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="DM" IOMode="System"/>
+						<Signal Name="DP" IOMode="System"/>
+					</SignalLogicalOp>
+					<Semaphore>MW_USB_OTG_HS_MW_FS_DEVICE</Semaphore>
+					<Semaphore>SEMAOoUSBOoOTGOoHSOoDEVICEOoFOROoUSBX</Semaphore>
+				</Mode>
+			</ModeLogicOperator>
+			<Semaphore>$IpInstanceFS</Semaphore>
+			<Condition Expression="!$IpInstanceHS &amp; (HSEByPass|HSEDIGByPass|HSEOscillator) " Diagnostic="HSE Clock Source must be enabled"/>
 		</Mode>
 		<Mode Name="Activate_SOF">
 			<ModeLogicOperator Name="XOR">

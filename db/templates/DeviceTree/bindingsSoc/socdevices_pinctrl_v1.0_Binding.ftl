@@ -26,7 +26,7 @@ Pinctrl nodes maybe in random order (NoZ, Z, NoZ, ...).
 	[/#if]
 
 	[#--filter nodes per FW--]
-	[#if (pFwName=="TF-A")||(pFwName=="SP_MIN")||(pFwName=="OP-TEE")][#--Contextualize--]
+	[#if (pFwName=="TF-A")||(pFwName=="SP_MIN")||(pFwName=="OP-TEE") ||(pFwName=="TF-M")][#--Contextualize--]
 		[#--generate only the "default" config--]
 		[#local pinCtrlConfigNodesList = [] ]
 		[#list pPinctrlConfigsList as pinctrlConfig]
@@ -35,7 +35,7 @@ Pinctrl nodes maybe in random order (NoZ, Z, NoZ, ...).
 			[/#if]
 		[/#list]
 
-		[#local pinctrlConfigsList = [DTInfoElmtDM_new("DEFAULT", "default", pinCtrlConfigNodesList)] ][#--use default as config name--]
+		[#local pinctrlConfigsList = [DTPinctrlElmtDM_new("DEFAULT", "default", pinCtrlConfigNodesList)] ][#--use default as config name--]
 	[#elseif (pFwName=="CUBE")][#--Contextualize--]
 		[#--generate only the "copro" config--]
 		[#local pinCtrlConfigNodesList = [] ]
@@ -45,7 +45,7 @@ Pinctrl nodes maybe in random order (NoZ, Z, NoZ, ...).
 			[/#if]
 		[/#list]
 
-		[#local pinctrlConfigsList = [DTInfoElmtDM_new("DEFAULT", "default", pinCtrlConfigNodesList)] ][#--use default as config name--]
+		[#local pinctrlConfigsList = [DTPinctrlElmtDM_new("DEFAULT", "default", pinCtrlConfigNodesList)] ][#--use default as config name--]
 	[#else][#--LINUX, U-BOOT--]
 		[#--generate all configs excepted "copro" config--]
 		[#local filteredPinCtrlConfigList = [] ]

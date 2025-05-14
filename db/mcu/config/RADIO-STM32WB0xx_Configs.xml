@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<IP DBVersion="V3.0"
+    Name="RADIO"
+    Version="STM32Cube_FW_WB0_V0.4.0"
+    xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://mcd.rou.st.com/modules.php?name=mcu"
+    ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu file:///C:/MicroXplorer/MicroXplorer/doc/V4/Development/Specifications/db/IP_Configs.xsd">
+
+    <RefComponent Cclass="HAL" Cgroup="RADIO" Cversion="0.4.0">
+        <File Category="header" Name="Drivers/STM32WB0x_HAL_Driver/Inc/stm32wb0x_hal_radio.h"/>
+        <File Category="source" Name="Drivers/STM32WB0x_HAL_Driver/Src/stm32wb0x_hal_radio.c"/>
+        <File Category="source" Name="Drivers/STM32WB0x_HAL_Driver/Inc/stm32wb0x_ll_radio.h"/>
+    </RefComponent>
+
+    <RefConfigFile Description="" Name="WB0_BLUE_UNIT_CONVERSION_S" Template="stm32wb0/stm32_ble_blue_unit_conversion_radio_s.ftl">
+      <File Category="source" Condition="!S_STM32_BLE" Name="blue_unit_conversion.s" Version="1.0"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="WB0_ASM_H" Template="stm32wb0/stm32_ble_asm_h.ftl">
+      <File Category="header" Condition="!S_STM32_BLE" Name="asm.h" Version="1.0"/>
+    </RefConfigFile>
+
+    <RefConfig Name="Radio_Init">
+        <ConfigFile Name="WB0_ASM_H"/>
+        <ConfigFile Name="WB0_BLUE_UNIT_CONVERSION_S"/>
+
+        <IFCondition Expression="!S_STM32_BLE">
+            <CallLibMethod Name="HAL_RADIO_Init" ReturnHAL="false"/>
+        </IFCondition>
+        <IFCondition Expression="S_STM32_BLE">
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="
+                    #n#tif (__HAL_RCC_RADIO_IS_CLK_DISABLED())
+                    #n#t{
+                    #n#t#t/* Radio Peripheral reset */
+                    #n#t#t__HAL_RCC_RADIO_FORCE_RESET();
+                    #n#t#t__HAL_RCC_RADIO_RELEASE_RESET();
+                    #n
+                    #n#t#t/* Enable Radio peripheral clock */
+                    #n#t#t__HAL_RCC_RADIO_CLK_ENABLE();
+                    #n#t}
+                    "/>
+            </CallLibMethod>
+            <CallLibMethod Name="HAL_RADIO_Init" ReturnHAL="false"/>
+        </IFCondition>
+        <ImplementCallBack Name="HAL_RADIO_MspInit"/>
+        <ImplementCallBack Name="HAL_RADIO_MspDeInit"/>
+    </RefConfig>
+
+    <LibMethod Comment="" Name="HAL_RADIO_Init">
+         <Argument AddressOf="true" GenericType="struct" Name="hradio" TypeName="RADIO_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="BLUE_TypeDef"/>
+         </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RADIO_MspInit">
+         <Argument AddressOf="true" GenericType="struct" Name="hradio" TypeName="RADIO_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="BLUE_TypeDef"/>
+         </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RADIO_MspDeInit">
+         <Argument AddressOf="true" GenericType="struct" Name="hradio" TypeName="RADIO_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="BLUE_TypeDef"/>
+         </Argument>
+    </LibMethod>
+
+</IP>

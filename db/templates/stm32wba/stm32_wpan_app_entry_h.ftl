@@ -72,7 +72,7 @@ extern "C" {
 #define CFG_FW_BUILD              (0)
 #define CFG_FW_BRANCH             (0)
 #define CFG_FW_SUBVERSION         (0)
-#define CFG_FW_MINOR_VERSION      (3)
+#define CFG_FW_MINOR_VERSION      (4)
 #define CFG_FW_MAJOR_VERSION      (1)
 
 [/#if]
@@ -98,10 +98,11 @@ extern TX_BYTE_POOL *pBytePool; /* ThreadX byte pool pointer for whole WPAN midd
 /* Exported functions prototypes ---------------------------------------------*/
 void MX_APPE_Config(void);
 uint32_t MX_APPE_Init(void *p_param);
-[#if myHash["SEQUENCER_STATUS"]?number == 1 ]
+[#if (myHash["OTHER_THAN_BLE"]?number == 1)]
+void MX_APPE_LinkLayerInit(void);
+[/#if]
+[#if myHash["SEQUENCER_STATUS"]?number == 1 || (myHash["BLE_MODE_SIMPLEST_BLE"] == "Enabled")]
 void MX_APPE_Process(void);
-[#elseif myHash["THREADX_STATUS"]?number == 1 ]
-[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
 [/#if]
 
 /* USER CODE BEGIN EFP */

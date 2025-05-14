@@ -36,7 +36,11 @@ extern "C" {
   * @brief This is the list of modules to be used in the HAL driver
   */
 #define HAL_MODULE_ENABLED
+[#if DIE=="DIE493"]
+[#assign allModules = ["ADC", "CRC","AES","I2C","I2S","IWDG","IRDA","PCD","HCD","RNG","RTC","SMARTCARD","SMBUS","SPI","TIM","UART","USART","WWDG"]]
+[#else]
 [#assign allModules = ["ADC", "CRC","AES","I2C","I2S","IWDG","IRDA","PCD","RNG","RTC","SMARTCARD","SMBUS","SPI","TIM","UART","USART","WWDG"]]
+[/#if]
 [#list allModules as module]
 [#if isModuleUsed(module)]#define HAL_${module?replace("QUADSPI","QSPI")?replace("AES","CRYP")}_MODULE_ENABLED
 [#else]
@@ -250,6 +254,16 @@ in voltage and temperature.*/
 #ifdef HAL_WWDG_MODULE_ENABLED
  #include "stm32c0xx_hal_wwdg.h"
 #endif /* HAL_WWDG_MODULE_ENABLED */
+
+[#if DIE=="DIE493"]
+#ifdef HAL_PCD_MODULE_ENABLED
+ #include "stm32c0xx_hal_pcd.h"
+#endif /* HAL_PCD_MODULE_ENABLED */
+
+#ifdef HAL_HCD_MODULE_ENABLED
+ #include "stm32c0xx_hal_hcd.h"
+#endif /* HAL_HCD_MODULE_ENABLED */
+[/#if]
 
 /* Exported macro ------------------------------------------------------------*/
 #ifdef  USE_FULL_ASSERT

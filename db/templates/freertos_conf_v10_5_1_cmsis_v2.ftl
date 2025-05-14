@@ -385,7 +385,7 @@
    [#assign prototypeNeeded = "true"]
 [/#if]
 /* Ensure definitions are only used by the compiler, and not by the assembler. */
-[#if (familyName=="stm32h7rs")]
+[#if (familyName=="stm32h7rs") || (familyName=="stm32wb0")]
 #if defined(__ICCARM__) || defined(__CC_ARM) || defined(__ARMCC_VERSION) || defined(__GNUC__)
 [#else]
 #if defined(__ICCARM__) || defined(__CC_ARM) || defined(__GNUC__)
@@ -407,11 +407,16 @@ extern uint32_t ${valueCpuClock};
 [/#compress]
 
 #ifndef CMSIS_device_header
+[#if ((familyName=="stm32wb0") || (familyName=="stm32wl33")) ]
+#define CMSIS_device_header "${familyName}x.h"
+[#else]
 #define CMSIS_device_header "${familyName}xx.h"
+[/#if]
 #endif /* CMSIS_device_header */
 [#-- Added for 10.2.1 support --]
-[#if (familyName=="stm32l5") ]
-/*-------------------- STM32L5 specific defines -------------------*/
+
+[#if (familyName=="stm32l5") || (familyName=="stm32mp2") ]
+/*-------------------- ${familyName?upper_case} specific defines -------------------*/
 #define configENABLE_TRUSTZONE                   ${configENABLE_TRUSTZONE}
 #define configRUN_FREERTOS_SECURE_ONLY           ${configRUN_FREERTOS_SECURE_ONLY}
 [/#if]
@@ -637,14 +642,14 @@ header file. */
 #define configASSERT( x ) ${valueAssert}
 /* USER CODE END 1 */
 
-[#if (familyName=="stm32l5") ]
+[#if (familyName=="stm32l5") || (familyName=="stm32mp2") ]
 #define SysTick_Handler xPortSysTickHandler [#-- required by 10.3.1 update --]
 [#else]
+
 /* Definitions that map the FreeRTOS port interrupt handlers to their CMSIS
 standard names. */
 #define vPortSVCHandler    SVC_Handler
 #define xPortPendSVHandler PendSV_Handler
-
 /* IMPORTANT: After 10.3.1 update, Systick_Handler comes from NVIC (if SYS timebase = systick), otherwise from cmsis_os2.c */
 [#if (familyName=="stm32h7")] [#-- for dual core, need to check the right timebase (for others, keep previous check --]
  [#assign timeBaseTreated = "0"]
@@ -700,14 +705,14 @@ standard names. */
 /* USER CODE END Defines */
 
 [#if configUSE_TICKLESS_IDLE=="1"]
-[#if (familyName=="stm32h7rs")]
+[#if (familyName=="stm32h7rs")  || (familyName=="stm32wb0")]
 #if defined(__ICCARM__) || defined(__CC_ARM) || defined(__ARMCC_VERSION) || defined(__GNUC__)
 [#else]
 #if defined(__ICCARM__) || defined(__CC_ARM) || defined(__GNUC__)
 [/#if]
 void PreSleepProcessing(uint32_t ulExpectedIdleTime);
 void PostSleepProcessing(uint32_t ulExpectedIdleTime);
-[#if (familyName=="stm32h7rs")]
+[#if (familyName=="stm32h7rs")  || (familyName=="stm32wb0")]
 #endif /* defined(__ICCARM__) || defined(__CC_ARM) || defined(__ARMCC_VERSION) || defined(__GNUC__) */
 [#else]
 #endif /* defined(__ICCARM__) || defined(__CC_ARM) || defined(__GNUC__) */

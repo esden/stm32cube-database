@@ -5,7 +5,6 @@
 	[#assign data = dt]
 	[#assign dtPinCtrlDataModelNoZ = dt.dtPinCtrlDataModelNoZ][#-- DataModel for &pinctrl node --]
 	[#assign dtPinCtrlDataModelZ = dt.dtPinCtrlDataModelZ][#-- DataModel for &pinctrl_z node --]
-
 	[#assign ipInstanceListExtraNodeNoZ = dt.ipInstanceListExtraNodeNoZ][#-- List of pinCtrl nodes for &pinctrl --]
 	[#assign ipInstanceListExtraNodeZ = dt.ipInstanceListExtraNodeZ][#-- List of pinCtrl nodes for &pinctrl with extra nodes --]
 	[#assign ipInstanceListNoZ = dt.ipInstanceListNoZ][#-- List of pinCtrl nodes for &pinctrl_z --]
@@ -13,7 +12,7 @@
 
 	[#assign ipPinCtrlNodesNoZ = dt.ipPinCtrlNodesNoZ][#-- map ipIstance -> pinCtrl nodes list for &pinctrl --]
 	[#assign ipPinCtrlNodesZ = dt.ipPinCtrlNodesZ][#-- map ipIstance -> pinCtrl nodes list for &pinctrl_z --]
-
+	[#assign ipPinCtrlNodesMatcherFws = dt.ipPinCtrlNodesMatcherFws] [#-- map ipIstance -> Supported Firmwares separated by "|" --]
 	[#assign pinCtrlBankZ = dt.pinCtrlBankZ][#-- boolean for specific &pinctrl_z handling --]
 
 	[#assign GPIOMode = { "GPIO_MODE_AF_OD": "drive-open-drain", "GPIO_MODE_AF_PP": "drive-push-pull" }]
@@ -71,16 +70,18 @@
 	[/#if]
 
 [/#compress]
-	[#if !uBootDt]
+	[#if !uBootDt || (uBootDt && mx_socDtRPN?starts_with("stm32mp2"))]
 		[#if generateNode][#--to not generate empty nodes for atf DT & not pinCtrl for uBoot DT--]
 &pinctrl {
-			[#if kernelDt][#--no 'u-boot,dm-pre-reloc' tags for atf DT--]
+			[#if kernelDt || (uBootDt && mx_socDtRPN?starts_with("stm32mp2"))][#--no 'u-boot,dm-pre-reloc' tags for atf DT--]
 				[#if !srvcmx_isDbFeatureEnabled("noUBootSplSupport")]
 ${T1}u-boot,dm-pre-reloc;
 				[/#if]
 #n
+				[#assign ipInstanceListExtraNodeNoZ =getFiltredPinctrlIpInstanceNames(ipInstanceListExtraNodeNoZ,ipPinCtrlNodesMatcherFws)]
 				[@pinctrlPrint dtPinCtrlDataModel=dtPinCtrlDataModelNoZ ipInstanceList=ipInstanceListExtraNodeNoZ bankZ=false/]
 			[#else]
+				[#assign ipInstanceListNoZ =getFiltredPinctrlIpInstanceNames(ipInstanceListNoZ,ipPinCtrlNodesMatcherFws)]
 				[@pinctrlPrint dtPinCtrlDataModel=dtPinCtrlDataModelNoZ ipInstanceList=ipInstanceListNoZ bankZ=false/]
 			[/#if]
 ${T1}/* USER CODE BEGIN pinctrl */
@@ -91,15 +92,17 @@ ${T1}/* USER CODE END pinctrl */
 		[#if pinCtrlBankZ]
 			[#if generateNodeZ][#--to not generate empty nodes for atf DT & not pinCtrl for uBoot DT--]
 #n
-				[#if (mx_socDtRPN == "stm32mp15")]
+				[#if (mx_socDtRPN == "stm32mp15"|| mx_socDtRPN?starts_with("stm32mp2"))]
 &pinctrl_z {
 					[#if kernelDt][#--no 'u-boot,dm-pre-reloc' tags for atf DT--]
 						[#if !srvcmx_isDbFeatureEnabled("noUBootSplSupport")]
 ${T1}u-boot,dm-pre-reloc;
 						[/#if]
 #n
+						[#assign ipInstanceListExtraNodeZ =getFiltredPinctrlIpInstanceNames(ipInstanceListExtraNodeZ,ipPinCtrlNodesMatcherFws)]
 						[@pinctrlPrint dtPinCtrlDataModel=dtPinCtrlDataModelZ ipInstanceList=ipInstanceListExtraNodeZ bankZ=true/]
 					[#else]
+						[#assign ipInstanceListZ =getFiltredPinctrlIpInstanceNames(ipInstanceListZ,ipPinCtrlNodesMatcherFws)]
 						[@pinctrlPrint dtPinCtrlDataModel=dtPinCtrlDataModelZ ipInstanceList=ipInstanceListZ bankZ=true/]
 					[/#if]
 ${T1}/* USER CODE BEGIN pinctrl_z */
@@ -122,7 +125,28 @@ ${T1}/* USER CODE END pinctrl_z */
 	[#return true]
 [/#function]
 
-
+[#-- function getFiltredIpInstanceNames --]
+[#function getFiltredPinctrlIpInstanceNames PinctrlIpInstanceList ipPinCtrlNodesMatcherFws]
+	[#assign filtredipInstanceListNotAllowed=[]]
+	[#assign newfiltredipInstanceList=[]]
+	[#list ipPinCtrlNodesMatcherFws.entrySet() as MapIpFw]
+		[#if MapIpFw.value!=".*"]
+			[#assign IpSuportedFws=MapIpFw.value?split("|")]
+		[/#if]
+		[#list PinctrlIpInstanceList as ip]
+			[#list mxDtDM.dts_fwsList as FwName]
+				[#if  ip?matches(MapIpFw.key) && IpSuportedFws?? && !IpSuportedFws?seq_contains(FwName)]
+					[#assign filtredipInstanceListNotAllowed= filtredipInstanceListNotAllowed+[ip]]
+					[#break]
+				[/#if]
+			[/#list]
+		[/#list]
+	[/#list ]
+	[#list PinctrlIpInstanceList?filter(IPInstance ->!filtredipInstanceListNotAllowed?seq_contains(IPInstance)) as IPInstance]
+		[#assign newfiltredipInstanceList += [IPInstance]]
+	[/#list]
+	[#return newfiltredipInstanceList]
+[/#function]
 
 [#-- macro pinctrlPrint --]
 [#macro pinctrlPrint dtPinCtrlDataModel ipInstanceList bankZ]
@@ -217,12 +241,26 @@ ${T2}u-boot,dm-pre-reloc;
 				[#-- # pinmux with same gpio config for printing									  # --]
 				[#list dtPinCtrlDataModel.get(nodeRule).entrySet() as gpioparamEntry][#--For all signals of the IP--]
 					[#assign gpioConfig = ""]
-
-					[#-- Retrieve key pin & pin mux config--]
-					[#assign dtKey = gpioparamEntry.key][#-- ex: <STM32_PINMUX('A',6,ANALOG)>&/* ADC1_IN3 */ --]
-
+					[#assign dtkey=""]
+					[#assign isPinAllowedFWsContainsTargetedFW=false]
+					[#assign PinAllowedFWsList=[]]
+					[#list gpioparamEntry.value?keys as key]
+						[#if key=="pinFwName" && gpioparamEntry.value.get(key)?length>0]
+							[#assign PinAllowedFWsList =gpioparamEntry.value.get(key)?split(",")]
+						[/#if]
+					[/#list]
+					[#list mxDtDM.dts_fwsList as fw]
+						[#assign isPinAllowedFWsContainsTargetedFW=(PinAllowedFWsList?seq_contains(fw)||PinAllowedFWsList?seq_contains(".*"))?then(true,false)]
+						[#if isPinAllowedFWsContainsTargetedFW]
+							[#break]
+						[/#if]
+					[/#list]
+					[#if (PinAllowedFWsList?size==0) ||  isPinAllowedFWsContainsTargetedFW]
+						[#assign dtKey = gpioparamEntry.key][#-- ex: <STM32_PINMUX('A',6,ANALOG)>&/* ADC1_IN3 */ --]
+					[#else]
+						[#continue][#-- don't generate dtkey --]
+					[/#if]
 					[#-- Save gpio configuration >> concatenated in gpioConfig --]
-
 					[#--biasprop--]
 					[#if gpioparamEntry.value.containsKey("GPIO_PuPd")]
 						[#list GPIOPuPd?keys as key]
@@ -299,7 +337,38 @@ ${T2}u-boot,dm-pre-reloc;
 						[/#if]
 					[/#list]
 
+					[#--Double Edge--]
+					[#if gpioparamEntry.value.containsKey(ip+"_DE")]
+					[#assign clkEdgeValue =gpioparamEntry.value.get(ip+"_DE")]
+					[#assign gpioConfig= gpioConfig +"&"+"st,io-clk-edge = <"+clkEdgeValue+">"]
+					[/#if]
+
+					[#--Retime--]
+					[#if gpioparamEntry.value.containsKey(ip+"_RET")]
+					[#assign retimeValue =gpioparamEntry.value.get(ip+"_RET")]
+					[#assign gpioConfig= gpioConfig+"&"+"st,io-retime = <"+retimeValue+">"]
+					[/#if]
+
+					[#--Delay Path--]
+					[#if gpioparamEntry.value.containsKey(ip+"_DLYPATH")]
+					[#assign dlyPathValue =gpioparamEntry.value.get(ip+"_DLYPATH")]
+					[#assign gpioConfig= gpioConfig+"&"+"st,io-delay-path = <"+dlyPathValue+">"]
+					[/#if]
+
+					[#--Invert Clock--]
+					[#if gpioparamEntry.value.containsKey(ip+"_INVCLK_DT")]
+					[#assign invClkValue =gpioparamEntry.value.get(ip+"_INVCLK_DT")]
+					[#assign gpioConfig= gpioConfig+"&"+"st,io-clk-type = <"+invClkValue+">"]
+					[/#if]
+
+					[#--Delay Field--]
+					[#if gpioparamEntry.value.containsKey(ip+"_DLY[3:0]")]
+					[#assign dlyValue =gpioparamEntry.value.get(ip+"_DLY[3:0]")]
+					[#assign gpioConfig= gpioConfig+"&"+"st,io-delay = <0x"+dlyValue+">"]
+					[/#if]
+					[#if dtkey??]
 					[#assign gpioParam = gpioParam+{dtKey:gpioConfig}][#--gpioParam will contain the list of all "pinmux:gpioConfig" of the ip ex: <STM32_PINMUX('A',6,ANALOG)>:[gpioConfig]--]
+					[/#if]
 				[/#list]
 
 				[#-- check and save if pinmuxs with different config or no (multiConfig flag) --]

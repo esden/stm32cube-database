@@ -1,5 +1,6 @@
 [#ftl]
 [#compress]
+[#assign familyName=FamilyName?lower_case]
 [#assign threadControlBlock = "NULL"]
 [#assign nbThreads = 0]
 [#assign nbM = 0]
@@ -100,6 +101,9 @@
           [#if index == 2]
             [#assign semaphoreControl = i]
           [/#if]
+          [#if index == 3]
+            [#assign initialState = i]
+          [/#if]
           [#assign index = index + 1]
         [/#list]
         [#if semaphoreName != "0"]
@@ -108,7 +112,20 @@
             #n#t/* Create the semaphores(s) */
           [/#if]
           #t/* creation of ${semaphoreName} */
-          #t${semaphoreName}Handle = osSemaphoreNew(1, 0, &${semaphoreName}_attributes);
+          [#-- When initial state was set by user or in ioc file --]
+          [#if initialState??]
+	          [#if initialState == "Available"]
+	          #t${semaphoreName}Handle = osSemaphoreNew(1, 1, &${semaphoreName}_attributes);
+	          [#else][#-- "Depleted" or any other dummy word --]
+	          #t${semaphoreName}Handle = osSemaphoreNew(1, 0, &${semaphoreName}_attributes);
+	          [/#if]
+          [#else] [#-- When initial state was not defined, use default --]
+	          [#if (familyName=="stm32wl")]
+	          #t${semaphoreName}Handle = osSemaphoreNew(1, 1, &${semaphoreName}_attributes);
+	          [#else]
+	          #t${semaphoreName}Handle = osSemaphoreNew(1, 0, &${semaphoreName}_attributes);
+	          [/#if]
+          [/#if]
           #n
         [/#if]
       [/#if]
@@ -135,6 +152,9 @@
           [#if index == 3]
             [#assign semaphoreControl = i]
           [/#if]
+          [#if index == 4]
+            [#assign initialCount = i]
+          [/#if]
           [#assign index = index + 1]
         [/#list]
         [#if semaphoreName != "0"] 
@@ -143,7 +163,7 @@
             #n#t/* Create the semaphores(s) */
           [/#if]
           #t/* creation of ${semaphoreName} */
-          #t${semaphoreName}Handle = osSemaphoreNew(${semaphoreCount}, ${semaphoreCount}, &${semaphoreName}_attributes);
+          #t${semaphoreName}Handle = osSemaphoreNew(${semaphoreCount}, ${initialCount}, &${semaphoreName}_attributes);
           #n
         [/#if]
       [/#if]

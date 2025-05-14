@@ -2,10 +2,18 @@
 [#if cpucore!="" && (contextFolder=="" || contextFolder=="/")]    
 [#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")+"/"]
 [/#if]
+
+[#if  cpucore!="" &&FamilyName=="STM32MP2"&& contextFolder?contains("NonSecure") ]
+[#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")+"/"+contextFolder]
+[/#if]
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
+[#if FamilyName=="STM32WB0" || FamilyName=="STM32WL3"]
+  * @file         ${FamilyName?lower_case}x_hal_msp.c
+[#else]
   * @file         ${FamilyName?lower_case}xx_hal_msp.c
+[/#if]
   * @brief        This file provides code for the MSP Initialization 
   *               and de-Initialization codes.
   ******************************************************************************
@@ -53,7 +61,7 @@
 [/#compress]
 #n
 
-
+[#global GPIO_PORT=""]
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN TD */
 
@@ -95,6 +103,9 @@
 #t*/
 void HAL_MspInit(void)
 {
+[#if !isSBSLL?? && (isSBS_XSPIM1_Used?? || isSBS_XSPIM2_Used?? || isSBS_IO_Used??)]
+RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+[/#if]
 [#if !(contextFolder?? && contextFolder=="Appli/" && FamilyName=="STM32H7RS")]
 [#if FamilyName == "STM32H7RS"]
 [#if ValuePWRSUPPLY??]
@@ -146,8 +157,12 @@ void HAL_MspInit(void)
 [#if isSBS_XSPIM1_Used?? || isSBS_XSPIM2_Used?? || isSBS_IO_Used??]
 #t__HAL_RCC_SBS_CLK_ENABLE();
 [/#if]
-[#if VDDA_ISOLATION??]
-#tHAL_PWREx_EnableVddA();
+[#if FamilyName == "STM32U5"]
+[#list IPdatas as IP]
+    [#if IP.ipName?? && IP.ipName?starts_with("ADC") && VDDA_ISOLATION??]
+    #tHAL_PWREx_EnableVddA();
+    [/#if]
+[/#list]
 [/#if]
 #n
 
@@ -317,6 +332,12 @@ void HAL_MspInit(void)
 #t/* Enable the XSPIM_P2 interface */
 #tHAL_PWREx_EnableXSPIM2();
 [/#if]
+[#if isSBS_VDDIO22_Used??]
+#tHAL_SBS_EnableVddIO2CompensationCell();
+[/#if]
+[#if isSBS_VDDIO1_Used??]
+#tHAL_SBS_EnableVddIO1CompensationCell();
+[/#if]
 #n
 [#if isUSBVoltageDetector_Used??]
 #t/* Enable USB Voltage detector */
@@ -335,22 +356,114 @@ void HAL_MspInit(void)
 [/#if]
 #n
 [#if isSBSLL??]
-[#if isSBS_XSPIM1_Used??]
+[#if isSBS_XSPIM1_Used?? || isSBS_XSPIM2_Used??]
+#t/* Configure the compensation cell */
+[/#if]
+[#if isSBS_XSPIM1_Used?? && isXSPIM_P1_Used??]
+#tLL_SBS_SetXSPI1CompCellCode(LL_SBS_XSPI1_CODE_CELL);
+[/#if]
+[#if isSBS_XSPIM2_Used?? && isXSPIM_P2_Used??]
+#tLL_SBS_SetXSPI2CompCellCode(LL_SBS_XSPI2_CODE_CELL);
+[/#if]
+[#if isSBS_IO_Used??]
+#tLL_SBS_SetIOCompCellCode(LL_SBS_IO_CODE_CELL);
+[/#if]
+#n
+[#if isSBS_XSPIM1_Used?? || isSBS_XSPIM2_Used??]
+#t/* Enable compensation cell */
+[/#if]
+[#if isSBS_XSPIM1_Used?? && isXSPIM_P1_Used??]
+#tLL_SBS_EnableXSPI1CompCell();
+[/#if]
+[#if isSBS_XSPIM2_Used?? && isXSPIM_P2_Used??]
+#tLL_SBS_EnableXSPI2CompCell();
+[/#if]
+[#if isSBS_IO_Used??]
+#tLL_SBS_EnableIOCompCell();
+[/#if]
+#n
+[#if isSBS_XSPIM1_Used?? || isSBS_XSPIM2_Used??]
+#t/* wait ready before enabled IO */
+[/#if]
+[#if isSBS_XSPIM1_Used?? && isXSPIM_P1_Used??]
+#twhile(LL_SBS_IsReadyXSPI1CompCell() != 1U);
+[/#if]
+[#if isSBS_XSPIM2_Used?? && isXSPIM_P2_Used??]
+#twhile(LL_SBS_IsReadyXSPI2CompCell() != 1U);
+[/#if]
+[#if isSBS_IO_Used??]
+#twhile(LL_SBS_IsReadyIOCompCell() != 1U);
+[/#if]
+#n
+[#if isSBS_XSPIM1_Used?? || isSBS_XSPIM2_Used??]
 #t/* high speed low voltage config */
+[/#if]
+[#if isSBS_XSPIM1_Used?? && isXSPIM_P1_Used??]
 #tLL_SBS_EnableXSPI1SpeedOptim();
 [/#if]
-[#if isSBS_XSPIM2_Used??]
+[#if isSBS_XSPIM2_Used?? && isXSPIM_P2_Used??]
 #tLL_SBS_EnableXSPI2SpeedOptim();
 [/#if]
 [#if isSBS_IO_Used??]
 #tLL_SBS_EnableIOSpeedOptim();
 [/#if]
 [#else]
-[#if isSBS_XSPIM1_Used??]
+[#if isSBS_XSPIM1_Used?? || isSBS_XSPIM2_Used?? || isSBS_IO_Used??]
+#t/* The CSI is used by the compensation cells and must be enabled before enabling the
+#t#t compensation cells.
+#t#t For more details refer to RM0477 [SBS I/O compensation cell management] chapter.
+#t*/
+#tRCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_CSI;
+#tRCC_OscInitStruct.CSIState = RCC_CSI_ON;
+#tif (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)#n#t{
+#t#tError_Handler();#n#t}#n
+[/#if]
+[#if isSBS_XSPIM1_Used?? || isSBS_XSPIM2_Used??]
+#t/* Configure the compensation cell */
+[/#if]
+[#if isSBS_XSPIM1_Used?? && isXSPIM_P1_Used??]
+#tHAL_SBS_ConfigCompensationCell(SBS_IO_XSPI1_CELL, SBS_IO_CELL_CODE, 0U, 0U);
+[/#if]
+[#if isSBS_XSPIM2_Used?? && isXSPIM_P2_Used??]
+#tHAL_SBS_ConfigCompensationCell(SBS_IO_XSPI2_CELL, SBS_IO_CELL_CODE, 0U, 0U);
+[/#if]
+[#if isSBS_IO_Used??]
+#tHAL_SBS_ConfigCompensationCell(SBS_IO_ANALOG_CELL, SBS_IO_CELL_CODE, 0U, 0U);
+[/#if]
+#n
+[#if isSBS_XSPIM1_Used?? || isSBS_XSPIM2_Used??]
+#t/* Enable compensation cell */
+[/#if]
+[#if isSBS_XSPIM1_Used?? && isXSPIM_P1_Used??]
+#tHAL_SBS_EnableCompensationCell(SBS_IO_XSPI1_CELL);
+[/#if]
+[#if isSBS_XSPIM2_Used?? && isXSPIM_P2_Used??]
+#tHAL_SBS_EnableCompensationCell(SBS_IO_XSPI2_CELL);
+[/#if]
+[#if isSBS_IO_Used??]
+#tHAL_SBS_EnableCompensationCell(SBS_IO_ANALOG_CELL);
+[/#if]
+#n
+[#if isSBS_XSPIM1_Used?? || isSBS_XSPIM2_Used??]
+#t/* wait ready before enabled IO */
+[/#if]
+[#if isSBS_XSPIM1_Used?? && isXSPIM_P1_Used??]
+#twhile(HAL_SBS_GetCompensationCellReadyStatus(SBS_IO_XSPI1_CELL_READY) != 1U);
+[/#if]
+[#if isSBS_XSPIM2_Used?? && isXSPIM_P2_Used??]
+#twhile(HAL_SBS_GetCompensationCellReadyStatus(SBS_IO_XSPI2_CELL_READY) != 1U);
+[/#if]
+[#if isSBS_IO_Used??]
+#twhile(HAL_SBS_GetCompensationCellReadyStatus(SBS_IO_ANALOG_CELL_READY) != 1U);
+[/#if]
+#n
+[#if isSBS_XSPIM1_Used?? || isSBS_XSPIM2_Used??]
 #t/* high speed low voltage config */
+[/#if]
+[#if isSBS_XSPIM1_Used?? && isXSPIM_P1_Used??]
 #tHAL_SBS_EnableIOSpeedOptimize(SBS_IO_XSPI1_HSLV);
 [/#if]
-[#if isSBS_XSPIM2_Used??]
+[#if isSBS_XSPIM2_Used?? && isXSPIM_P2_Used??]
 #tHAL_SBS_EnableIOSpeedOptimize(SBS_IO_XSPI2_HSLV);
 [/#if]
 [#if isSBS_IO_Used??]
@@ -653,7 +766,10 @@ void HAL_MspInit(void)
 [#-- macro generateConfigModelCode --]
 [#macro generateConfigModelCode configModel inst nTab index mode]
 [#if configModel.clockEnableMacro?? && mode=="Init"] [#-- Enable Port clock --]
-    [#list configModel.clockEnableMacro as clkmacroList]	
+    [#list configModel.clockEnableMacro as clkmacroList]
+     [#if RESMGR_UTILITY?? && FamilyName=="STM32MP2"]
+          [#assign Gpio = clkmacroList][#assign V=Gpio?remove_ending("_CLK_ENABLE")?remove_beginning("__HAL_RCC_")]
+         [@generateResMgr ipName=V serviceType="Init" /] [#-- Enable ResMgr for RCC clock--] [/#if]
             [#if clkmacroList?trim!=""][#if nTab==2]#t#t[#else]#t[/#if]${clkmacroList}[#if !clkmacroList?contains('(')]()[/#if];[/#if]
     [/#list]
 [/#if] 
@@ -713,6 +829,19 @@ void HAL_MspInit(void)
                                         [/#list]
                                         [#assign argValue="&"+argument1.name]
                                     [/#if] [#-- if genericType=Array --]
+                                      [#if RESMGR_UTILITY?? && FamilyName=="STM32MP2"]
+                                                                        [#if argument.name?contains("Pin")]
+                                                                        [#if argValue?? &&  argValue?contains("GPIO_PIN_")]
+                                                                        [#assign  seq=argValue]
+                                                                        [#list seq?split("|") as Pins]
+                                                                        [#assign Pin=Pins?replace("GPIO_PIN_","")]
+                                                                        #n
+                                                                        #tif (ResMgr_Request(RESMGR_RESOURCE_RIF_${GPIO_PORT},RESMGR_GPIO_PIN(${Pin})) != RESMGR_STATUS_ACCESS_OK)
+                                                                        #t{
+                                                                        #t#tError_Handler();
+                                                                        #t}
+                                                                        [/#list]
+                                                                        [/#if]  [/#if] [/#if]
                                     [#if argument.value!="" && argument.value!="N/A"]
                                     [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name} = ${argValue};
                                     [#else]
@@ -723,6 +852,14 @@ void HAL_MspInit(void)
                                       [#if fargument.name!="GPIO_InitStruct" && fargument.name!="GPIO_Init"]
                                             [#if argument.name=="Instance"][#-- if argument=Instance--]
                                               [#-- calculate the value of Instance argument if contains $Index --]
+                                               [#assign HPDMA_CHANNEL= argument.value]
+                                                [#if RESMGR_UTILITY?? && FamilyName=="STM32MP2"]
+                                                #n
+                                                #tif (ResMgr_Request(RESMGR_RESOURCE_RIF_${HPDMA_CHANNEL?keep_before("_")},RESMGR_HPDMA_CHANNEL(${HPDMA_CHANNEL?keep_after("l")})) != RESMGR_STATUS_ACCESS_OK)
+                                                #t{
+                                                #t#tError_Handler();
+                                                #t}
+                                                [/#if]
                                                 [#if  (argument.value??) && (argument.value?contains("$Index"))]
                                                     [#assign instanceValue=argument.value?replace("$Index",index)]
                                                 [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name} = ${instanceValue};
@@ -731,10 +868,10 @@ void HAL_MspInit(void)
                                                 [/#if]
                                           [#else]
                                               [#if argument.status=="KO"]
-                                                   [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]//${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name} = ${argument.value};                                        
+                                                   [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]//${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name} = ${argument.value};
                                               [/#if]
                                               [#if argument.value??]
-                                                   [#if argument.value!="N/A"][#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name} = ${argument.value};  [/#if]
+                                                   [#if argument.value!="N/A"][#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name} = ${argument.value}; [/#if]
                                               [/#if]                                    
                                           [/#if][#-- if argument=Instance--]                                
                                       [/#if]    
@@ -756,7 +893,7 @@ void HAL_MspInit(void)
                                         [/#list]
                                         [#assign argValue="&"+argument2.name+"[0]"]
                                     [/#if] [#-- if genericType=Array --]
-                                    [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name}.${argument2.name} = ${argValue};                                    
+                                    [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name}.${argument2.name} = ${argValue};
                                     [/#if]
                                [#else] [#-- !argument.mandatory --]
                                     [#if argument2.status=="KO"]
@@ -781,7 +918,7 @@ void HAL_MspInit(void)
                                         [/#list]
                                         [#assign argValue="&"+argument3.name+"[0]"]
                                     [/#if] [#-- if genericType=Array --]
-                                    [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name}.${argument2.name}.${argument3.name} = ${argValue};                                    
+                                    [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name}.${argument2.name}.${argument3.name} = ${argValue};
                                     [/#if]
                                [#else] [#-- !argument.mandatory --]
                                     [#if argument3.status=="KO"]
@@ -806,6 +943,9 @@ void HAL_MspInit(void)
                                             [#if argIndex??]
                                                 [#assign argValue=fargument.value?replace("$Index",argIndex)]
                                                 [#assign arg = "" + adr + argValue]
+                                                [#if  argValue?matches("GPIO[A-Z]")]
+                                                  [#assign GPIO_PORT=argValue]
+                                                [/#if]
                                             [#else]
                                                 [#assign arg = "" + adr + fargument.value]                                                
                                             [/#if]
@@ -926,7 +1066,8 @@ void HAL_MspInit(void)
  [#assign service = getDeInitServiceMode(ipName)]
 [/#if]
 [#if serviceName=="gpio"]
-    [#if service.gpio??][#assign gpioService = service.gpio][#else][#assign gpioService = ""][/#if]
+    [#if service.gpio??][#assign gpioService = service.gpio]
+    [#else][#assign gpioService = ""][/#if]
 [/#if]
 [#if serviceName=="gpioOut"]
     [#if service.gpioOut??][#assign gpioOutService = service.gpioOut][#else][#assign gpioOutService = "empty"][/#if]
@@ -957,8 +1098,12 @@ void HAL_MspInit(void)
     [#if dmaconfig.dmaRequestName=""]
             [#assign dmaCurrentRequest = dmaconfig.instanceName?lower_case]
         [#else]
+            [#if dmaconfig.dmaRequestName?upper_case?contains("_PSSIRX") || dmaconfig.dmaRequestName?upper_case?contains("_PSSITX")]
+              [#assign dmaCurrentRequest = dmaconfig.dmaRequestName?replace("_PSSITX","")?replace("_PSSIRX","")?lower_case]
+            [#else]
             [#assign dmaCurrentRequest = dmaconfig.dmaRequestName?lower_case]
-        [/#if]
+			[/#if] 
+		[/#if]
 #t#t/* ${dmaCurrentRequest?upper_case} Init */
 [#--workAround DFSDM--]
  [#assign ind="" ]
@@ -1074,13 +1219,24 @@ void HAL_MspInit(void)
 #t#t__HAL_RCC_BKP_CLK_ENABLE();                    
 
                 [/#if]
+
+				[#if !(FamilyName=="STM32MP2" && ipName=="DCACHE")]
                 #t#t/* Peripheral clock enable */
+
                 [#list initService.clock?split(';') as clock][#-- debug ${ipvar.clkCommonResource}--]
                     [#if ipvar.usedDriver?contains("HAL") && ipvar.clkCommonResource.entrySet()?contains(clock?trim)]#t#t${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED++;
                     #t#tif(${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED==1){          
                         #t#t#t${clock?trim}[#if !clock?contains('(')]()[/#if];
                     [#if ipvar.usedDriver?contains("HAL") && ipvar.clkCommonResource.entrySet()?contains(clock?trim)]#t#t}[/#if]  
                     [#else]
+						[#if FamilyName=="STM32WB0" && ipName=="RADIO"]
+							#t#tif (__HAL_RCC_RADIO_IS_CLK_DISABLED())#n#t#t{
+								#t#t#t/* Radio  reset */
+								#t#t#t__HAL_RCC_RADIO_FORCE_RESET();
+								#t#t#t__HAL_RCC_RADIO_RELEASE_RESET();
+								#n#t#t#t/* Enable Radio peripheral clock */
+							    #t#t#t${clock?trim}[#if !clock?contains('(')]()[/#if];#n#t#t}#n
+						[#else]
                         #t#t${clock?trim}[#if !clock?contains('(')]()[/#if];
                         [#-- For ExtMemLoader project, the XSPI clock should be reset --]
                         [#if (contextFolder?? && contextFolder=="ExtMemLoader/") && (ipName?lower_case)?matches("xspi[0-9]") && (clock?lower_case)?matches(".*xspi[0-9].*")]
@@ -1088,12 +1244,14 @@ void HAL_MspInit(void)
                           #t#t__HAL_RCC_${ipName}_RELEASE_RESET();
                           #n
                         [/#if]
+                        [/#if]
                     [/#if]        
                 [/#list]
+				[/#if]
             [/#if]
             [#else]
                  #t#t/* Peripheral clock enable */
-                 #t#t__HAL_RCC_${ipName}_CLK_ENABLE(); 
+                 #t#t__HAL_RCC_${ipName}_CLK_ENABLE();
            [/#if]
       [/#if] [#-- not I2C --]
    [#else] 
@@ -1105,17 +1263,17 @@ void HAL_MspInit(void)
                         [#if (ipvar.usedDriver == "HAL")]
                             #t#t${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED--;
                             #t#tif(${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED==0){                                    
-                            #t#t#t${clock?replace("ENABLE","DISABLE")?trim}(); 
-                            [#if (ipvar.usedDriver == "HAL") && ipvar.clkCommonResource.entrySet()?contains(clock?trim)]#t#t}[/#if]          
+                            #t#t#t${clock?replace("ENABLE","DISABLE")?trim}();
+                            [#if (ipvar.usedDriver == "HAL") && ipvar.clkCommonResource.entrySet()?contains(clock?trim)]#t#t}[/#if]
                             [#else]
                              #t#t/* Be sure that all peripheral instances that share the same clock need to be disabled */
                              #t#t/**#t${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED--;
                              #t#t*#tif(${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED==0){                                    
-                             #t#t*#t#t${clock?replace("ENABLE","DISABLE")?trim}(); 
+                             #t#t*#t#t${clock?replace("ENABLE","DISABLE")?trim}();
                              #t#t**/
                         [/#if]
                     [#else]                    
-                            #t#t${clock?replace("ENABLE","DISABLE")?trim}(); 
+                            #t#t${clock?replace("ENABLE","DISABLE")?trim}();
                     [/#if]
                [/#list]
             [/#if]
@@ -1123,10 +1281,20 @@ void HAL_MspInit(void)
             [#if ipName?contains("WWDG") && (DIE=="DIE415" || DIE=="DIE435")]
             [#-- Orca and LittleOrca window watchdog clock disable don't work --]
             [#else]
+
+				[#if !(FamilyName=="STM32MP2" && ipName=="DCACHE")]
+
+   [#if RESMGR_UTILITY?? && FamilyName=="STM32MP2"]
+ [@generateResMgr ipName=ipName serviceType="DeInit" /]  [#-- Disable ResMgr for RCC clock--] [/#if]
                  #t#t/* Peripheral clock disable */
-                 #t#t__HAL_RCC_${ipName}_CLK_DISABLE(); 
+                 #t#t__HAL_RCC_${ipName}_CLK_DISABLE();
+				[/#if]
             [/#if]
          [/#if]
+		 [#if FamilyName=="STM32WB0" && ipName=="RADIO"]
+								#t#t__HAL_RCC_RADIO_FORCE_RESET();
+								#t#t__HAL_RCC_RADIO_RELEASE_RESET();#n
+         [/#if]				
     [/#if]
     
 [#if gpioExist]
@@ -1197,7 +1365,7 @@ void HAL_MspInit(void)
             [/#if]
             [#else]
                  #t#t/* Peripheral clock enable */
-                 #t#t__HAL_RCC_${ipName}_CLK_ENABLE(); 
+                 #t#t__HAL_RCC_${ipName}_CLK_ENABLE();
            [/#if]
 [/#if]
 [#-- if I2C clk_enable should be after GPIO Init End --]
@@ -1745,8 +1913,10 @@ static uint32_t ${entry.value}=0;
 [#if words?size > 1] [#-- Check if there is more than one ip instance--]    
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 0 */
 
-#n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 0 */   
-
+#n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 0 */
+[#if RESMGR_UTILITY?? && FamilyName=="STM32MP2"]
+ [@common.optinclude name=contextFolder+mxTmpFolder+"/resmgrutilityrequest_"+ words[0]+".tmp"/][#-- ADD RESMGR_UTILITY Code--]
+[/#if]
 
 [#list IP.configModelList as instanceData]
 [#if instanceData.initServices??]
@@ -1800,6 +1970,9 @@ static uint32_t ${entry.value}=0;
 #t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspInit 0 */
 
 #n#t/* USER CODE END ${words[i]?replace("I2S","SPI")}_MspInit 0 */
+[#if RESMGR_UTILITY?? && FamilyName=="STM32MP2"]
+ [@common.optinclude name=contextFolder+mxTmpFolder+"/resmgrutilityrequest_"+ words[i]+".tmp"/][#-- ADD RESMGR_UTILITY Code--]
+[/#if]
 [#list IP.configModelList as instanceData]
 [#if instanceData.initServices??]
     [#if instanceData.initServices.pclockConfig??]
@@ -1836,8 +2009,13 @@ static uint32_t ${entry.value}=0;
 [#else]
     [#if words[0]??]
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 0 */
-
+[#if (words[0].contains("USB")) && ( DIE == "DIE476" ||  DIE == "DIE481")] 
+#n#t#t__HAL_RCC_SYSCFG_CLK_ENABLE(); 
+[/#if]
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 0 */
+[#if RESMGR_UTILITY?? && FamilyName=="STM32MP2"]
+ [@common.optinclude name=contextFolder+mxTmpFolder+"/resmgrutilityrequest_"+ words[0]+".tmp"/][#-- ADD RESMGR_UTILITY Code--]
+[/#if]
 [#list IP.configModelList as instanceData]
 [#if instanceData.initServices??]
     [#if instanceData.initServices.pclockConfig??]
@@ -1875,6 +2053,77 @@ static uint32_t ${entry.value}=0;
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 1 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 1 */
+
+#n
+[#if RESMGR_UTILITY?? && FamilyName=="STM32MP2"]
+[#macro generateResMgr ipName serviceType]
+   [#if ipName?? && FamilyName=="STM32MP2"]
+            [#list configs as mxMcuDataModel]
+             [#assign index = 0]
+             [#assign FeatureIDUIIndex = index][#assign index += 1]
+             [#assign mx_RIF_Params = mxMcuDataModel.peripheralRIFParams]
+             [#assign RifAwarePrefix = "RIFAware_"]
+             [#assign RifAwareIPName=""]
+              [#list mx_RIF_Params.entrySet() as RIF_Params]
+              [#if (RIF_Params.key)?? && RIF_Params.key?matches("^"+RifAwarePrefix+".+")]
+              [#compress]
+              [#assign RifAwareIPName=RIF_Params.key?keep_after(RifAwarePrefix)]
+              [#assign RifAwareIPFeatures = RIF_Params.value]
+              [#assign FeatureNamesList=[]]
+              [#assign FeatureIDList=[]]
+              [/#compress]
+              [#list RifAwareIPFeatures.entrySet() as RifAwareIPFeatureList]
+              [#-- Populate FeatureNamesList --]
+              [#assign FeatureNamesList+=[RifAwareIPFeatureList.key]]
+              [#-- Populate FeatureIDList --]
+              [#assign FeatureIDList+=[(RifAwareIPFeatureList.value[FeatureIDUIIndex])?matches("[0-9]\\d{0,9}")?then("("+RifAwareIPFeatureList.value[FeatureIDUIIndex]+")","_"+RifAwareIPFeatureList.value[FeatureIDUIIndex]?substring(0, 3)+"("+RifAwareIPFeatureList.value[FeatureIDUIIndex]?substring(3)+")")]]
+              [#list FeatureNamesList as FeatureName]
+              [#assign ParamPrefix="_RESOURCE"]
+                 [#if RifAwareIPName?starts_with("RCC") && !RifAwareIPFeatureList.value[1]?matches("-")]
+                 [#assign ParamPrefix="_RESOURCE"]
+                 [#assign RESMGR_IP=RifAwareIPName]
+                 [#assign RifAwareIPName="RCC"]
+                 [#assign val= RifAwareIPFeatureList.value[0]]
+                 [#if FeatureIDList[FeatureName?index]?contains(val) && FeatureName?contains(ipName)]
+                 #n
+                 #t /* ${FeatureName} Clock enable */
+                 #tif (ResMgr_Request(RESMGR_RESOURCE_RIF_${RESMGR_IP}, RESMGR_${RifAwareIPName?upper_case}${ParamPrefix}${FeatureIDList[FeatureName?index]}) != RESMGR_STATUS_ACCESS_OK)
+                 #t{
+                 #t#tError_Handler();
+                 #t}
+                [/#if]
+                [/#if]
+              [#if RifAwareIPName?starts_with("HPDMA") && !RifAwareIPFeatureList.value[1]?matches("-")]
+              [#assign ParamPrefix="_CHANNEL"]
+              [#if RifAwareIPName?matches("HPDMA[0-9]\\d{0,9}")]
+              [#assign RESMGR_IP=RifAwareIPName]
+              [/#if]
+              [#assign RifAwareIPName="HPDMA"]
+              [#assign val= RifAwareIPFeatureList.value[0]]
+              [#if  FeatureIDList[FeatureName?index]?contains(val) && instName==RESMGR_IP]
+              [#if serviceType=="Init"]
+              #n#t/* Acquire ${FeatureName} using Resource manager */
+              #n#tif (ResMgr_Request(RESMGR_RESOURCE_RIF_${RESMGR_IP}, RESMGR_${RifAwareIPName?upper_case}${ParamPrefix}${FeatureIDList[FeatureName?index]}) != RESMGR_STATUS_ACCESS_OK)
+              #t{
+              #t#tError_Handler();
+              #t}
+              [#else]
+              #t/* Release ${FeatureName} using Resource manager */
+              #n#tif (ResMgr_Release(RESMGR_RESOURCE_RIF_${RESMGR_IP}, RESMGR_${RifAwareIPName?upper_case}${ParamPrefix}${FeatureIDList[FeatureName?index]}) != RESMGR_STATUS_ACCESS_OK)
+              #t{
+              #t#tError_Handler();
+              #t}
+              [/#if]
+              [/#if]
+              [/#if]
+              [/#list]
+              [/#list]
+              [/#if]
+              [/#list]
+              [/#list]
+              [/#if]
+              [/#macro]
+              [/#if]
 [#if  words[0]?starts_with("DFSDM")]
 #t${words[0]}_Init++;
 [/#if]
@@ -2117,6 +2366,9 @@ uint32_t DFSDM_Init = 0;
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspDeInit 1 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspDeInit 1 */
+  [#if RESMGR_UTILITY?? && FamilyName=="STM32MP2"]
+ [@common.optinclude name=contextFolder+mxTmpFolder+"/resmgrutilityrelease_"+ words[0]+".tmp"/][#-- ADD RESMGR_UTILITY Code--]
+ [/#if]
 [#if words[0]?contains("DFSDM")&&!(DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE501" || DIE == "DIE472" || FamilyName == "STM32L4")]
  
    #t#t}
@@ -2163,6 +2415,9 @@ uint32_t DFSDM_Init = 0;
 #t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspDeInit 1 */
 
 #n#t/* USER CODE END ${words[i]?replace("I2S","SPI")}_MspDeInit 1 */
+  [#if RESMGR_UTILITY?? && FamilyName=="STM32MP2"]
+ [@common.optinclude name=contextFolder+mxTmpFolder+"/resmgrutilityrelease_"+ words[i]+".tmp"/][#-- ADD RESMGR_UTILITY Code--]
+ [/#if]
 [#if words[i]?contains("DFSDM")&&!(DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE501" || DIE == "DIE472" || FamilyName == "STM32L4")]
 
 #t#t}
@@ -2189,6 +2444,9 @@ uint32_t DFSDM_Init = 0;
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspDeInit 1 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspDeInit 1 */
+  [#if RESMGR_UTILITY?? && FamilyName=="STM32MP2"]
+ [@common.optinclude name=contextFolder+mxTmpFolder+"/resmgrutilityrelease_"+ words[0]+".tmp"/][#-- ADD RESMGR_UTILITY Code--]
+ [/#if]
 [#if words[0]?contains("DFSDM")&&!(DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE501" || DIE == "DIE472" || FamilyName == "STM32L4")]
 
 #t#t}

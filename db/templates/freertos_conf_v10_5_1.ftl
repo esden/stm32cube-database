@@ -341,7 +341,7 @@
    [#assign prototypeNeeded = "true"]
 [/#if]
 /* Ensure definitions are only used by the compiler, and not by the assembler. */
-#if defined(__ICCARM__) || defined(__CC_ARM) || defined(__GNUC__)
+#if defined(__ICCARM__) || defined(__CC_ARM) || defined(__ARMCC_VERSION) || defined(__GNUC__)
 #t#include <stdint.h>
 #t#include "cmsis_os2.h"
 [#-- BZ 74309 --]

@@ -5,7 +5,7 @@
 		<ConfigForMode>Activate_FlashIP</ConfigForMode>
 
 		<Parameter Name="advanced_settings" />
-		
+		<Parameter Name="UserConfigCondition"/>
 		<Parameter Name="OB_Read_Out_Protection_active" />
 		<Parameter Name="RDPLevel">
 			<Condition Expression="OB_Read_Out_Protection_active=true" Diagnostic="" />
@@ -94,7 +94,7 @@
 		<Parameter Name="OptionType_USER" />
 		<Parameter Name="OptionType_HDP" />
 		<Parameter Name="USERType">
-			<Condition Expression="SEM_FLASH_OB_USER" Diagnostic="" />
+			<Condition Expression="SEM_FLASH_OB_USER | SEM_FLASH_BOR" Diagnostic="" />
 		</Parameter>
 
 
@@ -154,7 +154,7 @@
 	<RefParameter Comment="Activate" DefaultValue="false" Group="BOR Level" TabName="HAL Option Bytes Settings" Name="OB_BOR_Level_active" Type="boolean">
 		<Description></Description>
 		<PossibleValue Comment="false" Value="false" />
-		<PossibleValue Semaphore="SEM_FLASH_OB_USER" Comment="true" Value="true" />
+		<PossibleValue Semaphore="SEM_FLASH_BOR" Comment="true" Value="true" />
 	</RefParameter>
 	<RefParameter Comment="          BOR_EN" DefaultValue="OB_BOR_ENABLE" Group="BOR Level" TabName="HAL Option Bytes Settings" Name="OB_BOR_EN" Type="list">
 		<Description>&lt;font color=&quot;green&quot;&gt;Bit 8 &lt;/font&gt; &lt;b&gt;BOR_EN:&lt;/b&gt; Brown out reset enable. &lt;br&gt;
@@ -445,7 +445,7 @@ Together with the BOOT0 pin or option bit NBOOT0 (depending on NBOOT_SEL option 
 
 	<!-- BEGIN OptionType RefParameter -->
 	<RefParameter Visible="false" Comment="Option Type" Name="OptionType" DefaultValue="OPTIONBYTE_ALL" Type="list">
-		<Condition Diagnostic="" Expression="SEM_FLASH_OB_RDP &amp; SEM_FLASH_OB_USER &amp; SEM_FLASH_OB_FLASH_SECURITY &amp; SEM_FLASH_OB_PCROP &amp; SEM_FLASH_OB_WRP1A &amp; SEM_FLASH_OB_WRP1B &amp; SEM_FLASH_OB_RDPKEY" />
+		<Condition Diagnostic="" Expression="SEM_FLASH_OB_RDP &amp; (SEM_FLASH_OB_USER | SEM_FLASH_BOR) &amp; SEM_FLASH_OB_FLASH_SECURITY &amp; SEM_FLASH_OB_PCROP &amp; SEM_FLASH_OB_WRP1A &amp; SEM_FLASH_OB_WRP1B &amp; SEM_FLASH_OB_RDPKEY" />
 	</RefParameter>
 	<RefParameter Visible="false" Comment="Option Type" Name="OptionType" DefaultValue="+OptionType_WRP+|OptionType_RDP+|OptionType_USER+|OptionType_HDP" Type="list">
 		<Condition Diagnostic="" Expression="SEM_FLASH_OB_RDP|!SEM_OB_NRST_STOP_NULL | !SEM_OB_NRST_STDBY_NULL | !SEM_OB_NRST_SHDW_NULL 
@@ -506,7 +506,7 @@ Together with the BOOT0 pin or option bit NBOOT0 (depending on NBOOT_SEL option 
 	<RefParameter Comment="          NRST_STOP" DefaultValue="" TabName="HAL Option Bytes Settings" Name="OB_USER_nRST_STOP" Type="String" Visible="false"/>	
 
 	<RefParameter Comment="          nRST_STDBY" DefaultValue="OB_USER_nRST_STDBY" TabName="HAL Option Bytes Settings" Name="OB_USER_nRST_STDBY" Type="String" Visible="false">
-		<Condition Expression="OB_WWDG_SW_UI=OB_WWDG_SW | OB_IWDG_STDBY_UI=OB_WWDG_HW" Diagnostic="" />
+		<Condition Expression="OB_NRST_STDBY_UI=OB_STANDBY_NORST | OB_NRST_STDBY_UI=OB_STANDBY_RST" Diagnostic="" />
 	</RefParameter>
 	<RefParameter Comment="          nRST_STDBY" DefaultValue="" TabName="HAL Option Bytes Settings" Name="OB_USER_nRST_STDBY" Type="String" Visible="false"/>
 
@@ -565,9 +565,125 @@ Together with the BOOT0 pin or option bit NBOOT0 (depending on NBOOT_SEL option 
 	</RefParameter>
 	<RefParameter Comment="          IRHEN" DefaultValue="" TabName="HAL Option Bytes Settings" Name="OB_USER_INPUT_RESET_HOLDER" Type="String" Visible="false"/>
 
-
-
 	<!-- END USERType RefParameter -->
+
+	<!-- BEGIN User Config Condition-->
+	<RefParameter Visible="false" Comment="UserConfig_condition" Name="UserConfigCondition" DefaultValue="+nRST_STOP+|nRST_STDBY+|nRST_SHDW+|IWDG_SW+|IWDG_STOP+|IWDG_STDBY+|WWDG_SW+|RAM_PARITY_CHECK+|nBOOT_SEL+|nBOOT1+|nBOOT0+|NRST_MODE+|INPUT_RESET_HOLDER" Type="list">
+		<Condition Expression="(!SEM_OB_NRST_STOP_NULL | !SEM_OB_NRST_STDBY_NULL | !SEM_OB_NRST_SHDW_NULL 
+		| !SEM_OB_IWDGSW_NULL | !SEM_OB_IWDG_STOP_NULL | !SEM_OB_IWDG_STDBY_NULL | !SEM_OB_WWDGSW_NULL 
+		| !SEM_OB_RAM_PARITY_CHECK_NULL | !SEM_OB_nBOOT_SEL_NULL | !SEM_OB_NBOOT1_NULL | !SEM_OB_NBOOT0_NULL 
+		| !SEM_OB_NRST_MODE_NULL | !SEM_OB_INPUT_RESET_HOLDER_NULL)" Diagnostic="" />
+	</RefParameter>
+
+	<RefParameter Comment="          NRST_STOP" DefaultValue="(pOBInit.USERConfig &amp; OB_STOP_NORST) != OB_STOP_NORST" Name="nRST_STOP" Type="String" Visible="false">
+	<Condition Expression="OB_NRST_STOP_UI=OB_STOP_NORST" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          NRST_STOP" DefaultValue="(pOBInit.USERConfig &amp; OB_STOP_NORST) != OB_STOP_RST" Name="nRST_STOP" Type="String" Visible="false">
+	<Condition Expression="OB_NRST_STOP_UI=OB_STOP_RST" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          NRST_STOP" DefaultValue="" Name="nRST_STOP" Type="String" Visible="false"/>
+
+	<RefParameter Comment="          nRST_STDBY" DefaultValue="(pOBInit.USERConfig &amp; OB_STANDBY_NORST) != OB_STANDBY_NORST" Name="nRST_STDBY" Type="String" Visible="false">
+		<Condition Expression="OB_NRST_STDBY_UI=OB_STANDBY_NORST" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          nRST_STDBY" DefaultValue="(pOBInit.USERConfig &amp; OB_STANDBY_NORST) != OB_STANDBY_RST" Name="nRST_STDBY" Type="String" Visible="false">
+		<Condition Expression="OB_NRST_STDBY_UI=OB_STANDBY_RST" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          nRST_STDBY" DefaultValue="" Name="nRST_STDBY" Type="String" Visible="false"/>
+
+	<RefParameter Comment="          nRST_SHDW" DefaultValue="(pOBInit.USERConfig &amp; OB_SHUTDOWN_NORST) != OB_SHUTDOWN_NORST" Name="nRST_SHDW" Type="String" Visible="false">
+		<Condition Expression="OB_NRST_SHDW_UI=OB_SHUTDOWN_NORST" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          nRST_SHDW" DefaultValue="(pOBInit.USERConfig &amp; OB_SHUTDOWN_NORST) != OB_SHUTDOWN_RST" Name="nRST_SHDW" Type="String" Visible="false">
+		<Condition Expression="OB_NRST_SHDW_UI=OB_SHUTDOWN_RST" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          nRST_SHDW" DefaultValue="" Name="nRST_SHDW"  Type="String" Visible="false"/>
+
+	<RefParameter Comment="          IWDG_SW" DefaultValue="(pOBInit.USERConfig &amp; OB_IWDG_SW) != OB_IWDG_SW" Name="IWDG_SW" Type="String" Visible="false">
+		<Condition Expression="OB_IWDG_SW_UI=OB_IWDG_SW" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          IWDG_SW" DefaultValue="(pOBInit.USERConfig &amp; OB_IWDG_SW) != OB_IWDG_HW" Name="IWDG_SW" Type="String" Visible="false">
+		<Condition Expression="OB_IWDG_SW_UI=OB_IWDG_HW" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          IWDG_SW" DefaultValue="" Name="IWDG_SW"  Type="String" Visible="false"/> 
+
+	<RefParameter Comment="          IWDG_STOP" DefaultValue="(pOBInit.USERConfig &amp; OB_IWDG_STOP_RUN) != OB_IWDG_STOP_RUN" Name="IWDG_STOP" Type="String" Visible="false">
+		<Condition Expression="OB_IWDG_STOP_UI=OB_IWDG_STOP_RUN" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          IWDG_STOP" DefaultValue="(pOBInit.USERConfig &amp; OB_IWDG_STOP_RUN) != OB_IWDG_STOP_FREEZE" Name="IWDG_STOP" Type="String" Visible="false">
+		<Condition Expression="OB_IWDG_STOP_UI=OB_IWDG_STOP_FREEZE" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          IWDG_STOP" DefaultValue="" Name="IWDG_STOP" Type="String" Visible="false"/>
+
+	<RefParameter Comment="          IWDG_STDBY" DefaultValue="(pOBInit.USERConfig &amp; OB_IWDG_STDBY_RUN) != OB_IWDG_STDBY_RUN" Name="IWDG_STDBY" Type="String" Visible="false">
+		<Condition Expression="OB_IWDG_STDBY_UI=OB_IWDG_STDBY_RUN" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          IWDG_STDBY" DefaultValue="(pOBInit.USERConfig &amp; OB_IWDG_STDBY_RUN) != OB_IWDG_STDBY_FREEZE" Name="IWDG_STDBY" Type="String" Visible="false">
+		<Condition Expression="OB_IWDG_STDBY_UI=OB_IWDG_STDBY_FREEZE" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          IWDG_STDBY" DefaultValue="" Name="IWDG_STDBY" Type="String" Visible="false"/>
+
+	<RefParameter Comment="          WWDG_SW" DefaultValue="(pOBInit.USERConfig &amp; OB_WWDG_SW) != OB_WWDG_SW" Name="WWDG_SW" Type="String" Visible="false">
+		<Condition Expression="OB_WWDG_SW_UI=OB_WWDG_SW" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          WWDG_SW" DefaultValue="(pOBInit.USERConfig &amp; OB_WWDG_SW) != OB_WWDG_HW" Name="WWDG_SW" Type="String" Visible="false">
+		<Condition Expression="OB_WWDG_SW_UI=OB_WWDG_HW" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          WWDG_SW" DefaultValue="" Name="WWDG_SW" Type="String" Visible="false"/>
+
+	<RefParameter Comment="          RAM_PARITY_CHECK" DefaultValue="(pOBInit.USERConfig &amp; OB_SRAM_PARITY_ENABLE) != OB_SRAM_PARITY_ENABLE" Name="RAM_PARITY_CHECK" Type="String" Visible="false">
+		<Condition Expression="OB_RAM_PARITY_CHECK_UI=OB_SRAM_PARITY_ENABLE" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          RAM_PARITY_CHECK" DefaultValue="(pOBInit.USERConfig &amp; OB_SRAM_PARITY_ENABLE) != OB_SRAM_PARITY_DISABLE" Name="RAM_PARITY_CHECK" Type="String" Visible="false">
+		<Condition Expression="OB_RAM_PARITY_CHECK_UI=OB_SRAM_PARITY_DISABLE" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          RAM_PARITY_CHECK" DefaultValue="" Name="RAM_PARITY_CHECK" Type="String"  Visible="false"/>
+
+	<RefParameter Comment="          NBOOT_SEL" DefaultValue="(pOBInit.USERConfig &amp; OB_BOOT0_FROM_OB) != OB_BOOT0_FROM_OB" Name="nBOOT_SEL" Type="String"  Visible="false">
+		<Condition Expression="OB_nBOOT_SEL_UI=OB_BOOT0_FROM_OB" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          NBOOT_SEL" DefaultValue="(pOBInit.USERConfig &amp; OB_BOOT0_FROM_OB) != OB_BOOT0_FROM_PIN" Name="nBOOT_SEL" Type="String"  Visible="false">
+		<Condition Expression="OB_nBOOT_SEL_UI=OB_BOOT0_FROM_PIN" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          NBOOT_SEL" DefaultValue="" Name="nBOOT_SEL" Type="String"  Visible="false"/>
+
+	<RefParameter Comment="          NBOOT1" DefaultValue="(pOBInit.USERConfig &amp; OB_BOOT1_SRAM) != OB_BOOT1_SRAM" Name="nBOOT1" Type="String"  Visible="false">
+		<Condition Expression="OB_NBOOT1_UI=OB_BOOT1_SRAM" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          NBOOT1" DefaultValue="(pOBInit.USERConfig &amp; OB_BOOT1_SRAM) != OB_BOOT1_SYSTEM" Name="nBOOT1" Type="String"  Visible="false">
+		<Condition Expression="OB_NBOOT1_UI=OB_BOOT1_SYSTEM" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          NBOOT1" DefaultValue="" Name="nBOOT1" Type="String" Visible="false"/>
+
+	<RefParameter Comment="          NBOOT0" DefaultValue="(pOBInit.USERConfig &amp; OB_nBOOT0_SET) != OB_nBOOT0_SET" Name="nBOOT0" Type="String" Visible="false">
+		<Condition Expression="OB_NBOOT0_UI=OB_nBOOT0_SET" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          NBOOT0" DefaultValue="(pOBInit.USERConfig &amp; OB_nBOOT0_SET) != OB_nBOOT0_RESET" Name="nBOOT0" Type="String" Visible="false">
+		<Condition Expression="OB_NBOOT0_UI=OB_nBOOT0_RESET" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          NBOOT0" DefaultValue="" Name="nBOOT0" Type="String" Visible="false"/>
+
+	<RefParameter Comment="          NRST_MODE" DefaultValue="(pOBInit.USERConfig &amp; OB_RESET_MODE_INPUT_ONLY) != OB_RESET_MODE_INPUT_ONLY" Name="NRST_MODE" Type="String" Visible="false">
+		<Condition Expression="OB_NRST_MODE_UI=OB_RESET_MODE_INPUT_ONLY" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          NRST_MODE" DefaultValue="(pOBInit.USERConfig &amp; OB_RESET_MODE_INPUT_ONLY) != OB_RESET_MODE_GPIO" Name="NRST_MODE" Type="String" Visible="false">
+		<Condition Expression="OB_NRST_MODE_UI=OB_RESET_MODE_GPIO" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          NRST_MODE" DefaultValue="(pOBInit.USERConfig &amp; OB_RESET_MODE_INPUT_ONLY) != OB_RESET_MODE_INPUT_OUTPUT" Name="NRST_MODE" Type="String" Visible="false">
+		<Condition Expression="OB_NRST_MODE_UI=OB_RESET_MODE_INPUT_OUTPUT" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          NRST_MODE" DefaultValue="" Name="NRST_MODE" Type="String" Visible="false"/>
+
+	<RefParameter Comment="          IRHEN" DefaultValue="(pOBInit.USERConfig &amp; OB_IRH_ENABLE) != OB_IRH_ENABLE" Name="INPUT_RESET_HOLDER" Type="String" Visible="false">
+		<Condition Expression="OB_INPUT_RESET_HOLDER_UI=OB_IRH_ENABLE" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          IRHEN" DefaultValue="(pOBInit.USERConfig &amp; OB_IRH_ENABLE) != OB_IRH_DISABLE" Name="INPUT_RESET_HOLDER" Type="String" Visible="false">
+		<Condition Expression="OB_INPUT_RESET_HOLDER_UI=OB_IRH_DISABLE" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          IRHEN" DefaultValue="" Name="INPUT_RESET_HOLDER" Type="String" Visible="false"/>
+
+
+	<!-- END User Config Condition -->
 
 	<!-- BEGIN WRPArea RefParameter -->
 	<RefParameter Comment="" DefaultValue="OB_WRPAREA_ZONE_A" Group="Option Bytes" Name="OB_WRPAREA_ZoneA" Type="string" Visible="false">

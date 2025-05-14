@@ -43,6 +43,7 @@
 [#assign CFG_PRIVACY = "PRIVACY_DISABLED"]
 [#assign CFG_STATIC_RANDOM_ADDRESS = 0]
 [#assign STATIC_RANDOM_ADDRESS = 0]
+[#assign CFG_STATIC_UNIQUE_RANDOM_ADDR_LSB = 0]
 [#assign CFG_FAST_CONN_ADV_INTERVAL_MAX_HEXA = 0]
 [#assign CFG_FAST_CONN_ADV_INTERVAL_MIN_HEXA = 0]
 [#assign CFG_LP_CONN_ADV_INTERVAL_MAX_HEXA = 0]
@@ -247,6 +248,9 @@
             [/#if]
             [#if (definition.name == "CFG_STATIC_RANDOM_ADDRESS")]
                 [#assign CFG_STATIC_RANDOM_ADDRESS = definition.value]
+            [/#if]
+			[#if (definition.name == "CFG_STATIC_UNIQUE_RANDOM_ADDR_LSB")]
+                [#assign CFG_STATIC_UNIQUE_RANDOM_ADDR_LSB = definition.value]
             [/#if]
             [#if (definition.name == "STATIC_RANDOM_ADDRESS")]
                 [#assign STATIC_RANDOM_ADDRESS = definition.value]
@@ -502,7 +506,13 @@
  */
 #define CFG_STATIC_RANDOM_ADDRESS         (${STATIC_RANDOM_ADDRESS})
 [/#if]
+[#if ((CFG_STATIC_RANDOM_ADDRESS = "2") && (CFG_IDENTITY_ADDRESS = "GAP_STATIC_RANDOM_ADDR"))]
 
+/**
+ * Define Static Unique Random Address LSB fixed for lifetime of the device
+ */
+#define CFG_STATIC_UNIQUE_RANDOM_ADDR_LSB         (${CFG_STATIC_UNIQUE_RANDOM_ADDR_LSB})
+[/#if]
 /**
  * Define privacy: PRIVACY_DISABLED or PRIVACY_ENABLED
  */

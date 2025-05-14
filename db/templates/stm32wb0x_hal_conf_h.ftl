@@ -1,0 +1,312 @@
+[#ftl]
+/* USER CODE BEGIN Header */
+/**
+  ******************************************************************************
+  * @file    stm32wb0x_hal_conf.h
+  * @author  MCD Application Team
+  * @brief   HAL configuration file.
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2024 STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+  */
+/* USER CODE END Header */
+
+/* Define to prevent recursive inclusion -------------------------------------*/
+#ifndef STM32WB0x_HAL_CONF_H
+#define STM32WB0x_HAL_CONF_H
+
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
+/* Exported types ------------------------------------------------------------*/
+/* Exported constants --------------------------------------------------------*/
+
+/* ########################## Module Selection ############################## */
+/**
+  * @brief This is the list of modules to be used in the HAL driver
+  */
+#define HAL_MODULE_ENABLED  
+[#assign allModules = ["ADC","CRC","I2C","I2S","IRDA","IWDG","PKA","RADIO","RADIO_TIMER","RNG","RTC","SMARTCARD","SMBUS","SPI","TIM","UART","USART"]]
+  [#list allModules as module]
+	[#if isModuleUsed(module)]
+[#compress]#define HAL_${module?replace("QUADSPI","QSPI")?replace("AES","CRYP")}_MODULE_ENABLED[/#compress]
+	[#else]
+/*#define HAL_${module?replace("QUADSPI","QSPI")?replace("AES","CRYP")}_MODULE_ENABLED   */
+	[/#if]	
+  [/#list]
+  [#function isModuleUsed moduleName]
+	[#assign used=false]
+	[#list modules as usedModule]
+		[#if usedModule==moduleName]
+			[#assign used=true]
+			[#return true]
+		[/#if]
+	[/#list]
+	[#return used]
+  [/#function]
+#define HAL_CORTEX_MODULE_ENABLED
+#define HAL_DMA_MODULE_ENABLED
+#define HAL_FLASH_MODULE_ENABLED
+#define HAL_GPIO_MODULE_ENABLED
+#define HAL_PWR_MODULE_ENABLED
+#define HAL_RCC_MODULE_ENABLED
+
+
+#define USE_HAL_ADC_REGISTER_CALLBACKS       0u
+#define USE_HAL_I2C_REGISTER_CALLBACKS       0u
+#define USE_HAL_IRDA_REGISTER_CALLBACKS      0u
+#define USE_HAL_PKA_REGISTER_CALLBACKS       0u
+#define USE_HAL_RNG_REGISTER_CALLBACKS       0u
+#define USE_HAL_RTC_REGISTER_CALLBACKS       0u
+#define USE_HAL_SMARTCARD_REGISTER_CALLBACKS 0u
+#define USE_HAL_SMBUS_REGISTER_CALLBACKS     0u
+#define USE_HAL_SPI_REGISTER_CALLBACKS       0u
+#define USE_HAL_TIM_REGISTER_CALLBACKS       0u
+#define USE_HAL_UART_REGISTER_CALLBACKS      0u
+#define USE_HAL_USART_REGISTER_CALLBACKS     0u
+
+/* ########################## Oscillator Values adaptation ####################*/
+/**
+  * @brief Adjust the value of External High Speed oscillator (HSE) used in your application.
+  *        This value is used by the RCC HAL module to compute the system frequency
+  *        (when HSE is used as system clock source, directly or through the PLL).
+  */
+
+#if !defined  (HSE_VALUE) 
+  #define HSE_VALUE    ([#if hse_value??]${hse_value}[#else]8000000[/#if]UL) /*!< Value of the External oscillator in Hz */
+#endif /* HSE_VALUE */
+
+#if !defined  (HSE_STARTUP_TIMEOUT)
+  #define HSE_STARTUP_TIMEOUT    ([#if HSE_Timout??]${HSE_Timout}[#if HSE_Timout?matches("(0x[0-9]*[a-f]*[A-F]*)|([0-9]*)")][/#if][#else]100[/#if]UL)   /*!< Time out for HSE start up, in ms */
+#endif /* HSE_STARTUP_TIMEOUT */
+
+/* Tip: To avoid modifying this file each time you need to use different HSE,
+   ===  you can define the HSE value in your toolchain compiler preprocessor. */
+
+/**
+  * @brief Internal High Speed oscillator (HSI) value.
+  *        This value is used by the RCC HAL module to compute the system frequency
+  *        (when HSI is used as system clock source, directly or through the PLL).
+  */
+#if !defined  (HSI_VALUE)
+  #define HSI_VALUE    (64000000UL) /*!< Value of the Internal oscillator in Hz*/
+#endif /* HSI_VALUE */
+
+/**
+  * @brief Internal Low Speed oscillator (LSI) value.
+  */
+#if !defined  (LSI_VALUE) 
+ #define LSI_VALUE  (32000UL)       /*!< LSI Typical Value in Hz*/
+#endif /* LSI_VALUE */                      /*!< Value of the Internal Low Speed oscillator in Hz
+                                             The real value may vary depending on the variations
+                                             in voltage and temperature.*/
+/**
+  * @brief External Low Speed oscillator (LSE) value.
+  *        This value is used by the UART, RTC HAL module to compute the system frequency
+  */
+#if !defined  (LSE_VALUE)
+  #define LSE_VALUE    ([#if lse_value??]${lse_value}[#else]32768[/#if]UL) /*!< Value of the External oscillator in Hz*/
+#endif /* LSE_VALUE */
+
+/**
+  * @brief 64 MHz PLL clock default value.
+  *        This value is the default RC64M_PLL value after Reset.
+  */
+#if !defined (RC64MPLL_VALUE)
+  #define RC64MPLL_VALUE    (64000000UL) /*!< Value of the Internal oscillator in Hz*/
+#endif /* RC64MPLL_VALUE */
+   
+#if !defined (LSE_STARTUP_TIMEOUT)
+  #define LSE_STARTUP_TIMEOUT    ([#if LSE_Timout??]${LSE_Timout}[#if LSE_Timout?matches("(0x[0-9]*[a-f]*[A-F]*)|([0-9]*)")]UL[/#if][#else]5000UL[/#if])   /*!< Time out for LSE start up, in ms */
+#endif /* LSE_STARTUP_TIMEOUT */
+
+#if !defined  (LSE_DRIVE_LEVEL)
+#define LSE_DRIVE_LEVEL    [#if lse_drive_level??]${lse_drive_level}[#else]RCC_LSEDRIVE_MEDIUMLOW[/#if]     /*!< Drive level for LSE oscillator. */
+#endif /* LSE_DRIVE_LEVEL */
+
+/* ########################### System Configuration ######################### */
+/**
+  * @brief This is the HAL system configuration section
+  */     
+[#if advancedSettings??][#assign advancedSettings = advancedSettings[0]][/#if]  
+#define  VDD_VALUE                    ([#if vdd_value??]${vdd_value}UL[#else]3300UL[/#if]) /*!< Value of VDD in mv */           
+#define  TICK_INT_PRIORITY            ([#if TICK_INT_PRIORITY??]${TICK_INT_PRIORITY}[#else]0x0F[/#if]UL) /*!< tick interrupt priority */            
+#define  USE_RTOS                     [#if advancedSettings?? && advancedSettings.USE_RTOS??]${advancedSettings.USE_RTOS}[#else]0[/#if]U     
+
+/* ########################## Assert Selection ############################## */
+/**
+  * @brief Uncomment the line below to expanse the "assert_param" macro in the
+  *        HAL drivers code
+  */
+[#if !fullAssert??]/*[/#if] #define USE_FULL_ASSERT    1U [#if !fullAssert??]*/[/#if]
+
+/* ################## SPI peripheral configuration ########################## */
+
+/* CRC FEATURE: Use to activate CRC feature inside HAL SPI Driver
+ * Activated: CRC code is present inside driver
+ * Deactivated: CRC code cleaned from driver
+ */
+
+#define USE_SPI_CRC                   [#if CRC_SPI??]${CRC_SPI}[#else]1U[/#if]
+
+/* ################ HSE Capacitor tuning configuration ###################### */
+/**
+  * @brief Default value of the HSE capacitor tuning.
+  */
+#if !defined(CFG_HW_RCC_HSE_CAPACITOR_TUNE)
+#define CFG_HW_RCC_HSE_CAPACITOR_TUNE ${hse_capacitor_tuning}
+#endif
+
+/* #################### BLE number of link Configuration #################### */
+/**
+  * @brief This is the BLE number of link configuration section
+  * Maximum number of simultaneous radio tasks. Radio controller supports up to
+  * 128 simultaneous radio tasks, but actual usable max value depends on the
+  * available RAM.
+  */
+#if !defined (CFG_NUM_RADIO_TASKS)
+#define  CFG_NUM_RADIO_TASKS ([#if CFG_NUM_RADIO_TASKS??]${CFG_NUM_RADIO_TASKS}[#else]2[/#if])
+#endif /* CFG_NUM_RADIO_TASKS */
+
+/* ########################### Radio Configuration ######################### */
+/**
+  * @brief This macro must be set to 0 when BLE stack is used. Set to 1 to use
+  * radio proprietary protocol with action packets.
+  */
+[#if isModuleUsed("RADIO") & !isModuleUsed("STM32_BLE")]
+#if !defined (USE_RADIO_PROPRIETARY_DRIVER)
+#define USE_RADIO_PROPRIETARY_DRIVER  1U
+#endif /* USE_RADIO_PROPRIETARY_DRIVER */
+[#elseif isModuleUsed("RADIO") & isModuleUsed("STM32_BLE")]
+#if !defined (USE_RADIO_PROPRIETARY_DRIVER)
+#define USE_RADIO_PROPRIETARY_DRIVER  0U
+#endif /* USE_RADIO_PROPRIETARY_DRIVER */
+[/#if]
+
+/* Includes ------------------------------------------------------------------*/
+/**
+  * @brief Include module's header file
+  */
+#ifdef HAL_DMA_MODULE_ENABLED
+  #include "stm32wb0x_hal_dma.h"
+#endif /* HAL_DMA_MODULE_ENABLED */
+
+#ifdef HAL_ADC_MODULE_ENABLED
+  #include "stm32wb0x_hal_adc.h"
+#endif /* HAL_ADC_MODULE_ENABLED */
+
+#ifdef HAL_CORTEX_MODULE_ENABLED
+  #include "stm32wb0x_hal_cortex.h"
+#endif /* HAL_CORTEX_MODULE_ENABLED */
+
+#ifdef HAL_CRC_MODULE_ENABLED
+  #include "stm32wb0x_hal_crc.h"
+#endif /* HAL_CRC_MODULE_ENABLED */
+
+#ifdef HAL_FLASH_MODULE_ENABLED
+  #include "stm32wb0x_hal_flash.h"
+#endif /* HAL_FLASH_MODULE_ENABLED */
+
+#ifdef HAL_GPIO_MODULE_ENABLED
+  #include "stm32wb0x_hal_gpio.h"
+#endif /* HAL_GPIO_MODULE_ENABLED */
+
+#ifdef HAL_I2C_MODULE_ENABLED
+ #include "stm32wb0x_hal_i2c.h"
+#endif /* HAL_I2C_MODULE_ENABLED */
+
+#ifdef HAL_I2S_MODULE_ENABLED
+ #include "stm32wb0x_hal_i2s.h"
+#endif /* HAL_I2S_MODULE_ENABLED */
+
+#ifdef HAL_IRDA_MODULE_ENABLED
+ #include "stm32wb0x_hal_irda.h"
+#endif /* HAL_IRDA_MODULE_ENABLED */
+
+#ifdef HAL_IWDG_MODULE_ENABLED
+ #include "stm32wb0x_hal_iwdg.h"
+#endif /* HAL_IWDG_MODULE_ENABLED */
+
+#ifdef HAL_PKA_MODULE_ENABLED
+  #include "stm32wb0x_hal_pka.h"
+#endif /* HAL_PKA_MODULE_ENABLED */
+
+#ifdef HAL_PWR_MODULE_ENABLED
+ #include "stm32wb0x_hal_pwr.h"
+#endif /* HAL_PWR_MODULE_ENABLED */
+
+#ifdef HAL_RADIO_MODULE_ENABLED
+ #include "stm32wb0x_hal_radio.h"
+#endif /* HAL_RADIO_MODULE_ENABLED */
+
+#ifdef HAL_RADIO_TIMER_MODULE_ENABLED
+ #include "stm32wb0x_hal_radio_timer.h"
+#endif /* HAL_RADIO_TIMER_MODULE_ENABLED */
+
+#ifdef HAL_RCC_MODULE_ENABLED
+  #include "stm32wb0x_hal_rcc.h"
+#endif /* HAL_RCC_MODULE_ENABLED */
+
+#ifdef HAL_RNG_MODULE_ENABLED
+  #include "stm32wb0x_hal_rng.h"
+#endif /* HAL_RNG_MODULE_ENABLED */
+    
+#ifdef HAL_RTC_MODULE_ENABLED
+ #include "stm32wb0x_hal_rtc.h"
+#endif /* HAL_RTC_MODULE_ENABLED */
+
+#ifdef HAL_SMARTCARD_MODULE_ENABLED
+ #include "stm32wb0x_hal_smartcard.h"
+#endif /* HAL_SMARTCARD_MODULE_ENABLED */
+
+#ifdef HAL_SMBUS_MODULE_ENABLED
+ #include "stm32wb0x_hal_smbus.h"
+#endif /* HAL_SMBUS_MODULE_ENABLED */
+
+#ifdef HAL_SPI_MODULE_ENABLED
+ #include "stm32wb0x_hal_spi.h"
+#endif /* HAL_SPI_MODULE_ENABLED */
+
+#ifdef HAL_TIM_MODULE_ENABLED
+ #include "stm32wb0x_hal_tim.h"
+#endif /* HAL_TIM_MODULE_ENABLED */
+
+#ifdef HAL_UART_MODULE_ENABLED
+ #include "stm32wb0x_hal_uart.h"
+#endif /* HAL_UART_MODULE_ENABLED */
+
+#ifdef HAL_USART_MODULE_ENABLED
+ #include "stm32wb0x_hal_usart.h"
+#endif /* HAL_USART_MODULE_ENABLED */
+
+/* Exported macro ------------------------------------------------------------*/
+#ifdef  USE_FULL_ASSERT
+/**
+  * @brief  The assert_param macro is used for function's parameters check.
+  * @param expr If expr is false, it calls assert_failed function
+  *         which reports the name of the source file and the source
+  *         line number of the call that failed.
+  *         If expr is true, it returns no value.
+  * @retval None
+  */
+  #define assert_param(expr) ((expr) ? (void)0U : assert_failed((uint8_t *)__FILE__, __LINE__))
+/* Exported functions ------------------------------------------------------- */
+  void assert_failed(uint8_t* file, uint32_t line);
+#else
+  #define assert_param(expr) ((void)0U)
+#endif /* USE_FULL_ASSERT */
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* STM32WB0x_HAL_CONF_H */

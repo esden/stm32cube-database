@@ -186,7 +186,11 @@
         <PossibleValue Comment="MCO1SRC PLLCLK" Value="RCC_MCO1SOURCE_PLLCLK" Semaphore="MCOSourcePLL"/>
         <PossibleValue Comment="MCO1SRC SYSCLK" Value="RCC_MCO1SOURCE_SYSCLK" Semaphore="MCOSourcesys"/>
         <PossibleValue Comment="MCO1SRC LSI"    Value="RCC_MCO1SOURCE_HSI48"    Semaphore="MCOSourceHSI48"/>
-    </RefParameter>   
+    </RefParameter>
+    <RefParameter Visible="false" Comment="MCO Clock Source" DefaultValue="RCC_PLL_SYSCLK" Name="PLLClkOut" Type="list">
+        <Condition Expression="(MCOConfig &amp; MCOSourcePLL)" Diagnostic=""/>
+	</RefParameter>
+    <RefParameter Visible="false" Comment="MCO Clock Source" DefaultValue="null" Name="PLLClkOut" Type="list"/>
     <!--LSCOSource-->
     <RefParameter Visible="false" Comment="LSCOS Clock Source" DefaultValue="RCC_LSCOSOURCE_LSI" Name="LSCOSource1" Type="list">
         <PossibleValue Comment="LSI"    Value="RCC_LSCOSOURCE_LSI"       Semaphore="LSCOSSourceLSI"/>
@@ -381,15 +385,6 @@
 	
     <!--main sysclock Freq value-->
     <RefParameter Visible="false" Comment="System Clock"   Name="SYSCLKFreq_VALUE" DefaultValue="4000000" Max="170000000" Type="double" Display="value/1000000" Unit="MHz">
-        <Condition Diagnostic="overDrive activated" Expression="((VDD_VALUE&lt; 1.8)|(VDD_VALUE&gt; 2.1)) &amp;scale1boost"/>
-    </RefParameter>
-    <RefParameter Visible="false" Comment="System Clock"   Name="SYSCLKFreq_VALUE" DefaultValue="4000000" Max="26000000" Type="double" Display="value/1000000" Unit="MHz">
-        <Condition Diagnostic="overDrive activated" Expression="((VDD_VALUE&lt; 1.8)|(VDD_VALUE&gt; 2.1)) &amp;scale2"/>
-    </RefParameter>
-    <RefParameter Visible="false" Comment="System Clock"   Name="SYSCLKFreq_VALUE" DefaultValue="4000000" Max="150000000" Type="double" Display="value/1000000" Unit="MHz">
-        <Condition Diagnostic="overDrive activated" Expression="((VDD_VALUE&lt; 1.8)|(VDD_VALUE&gt; 2.1)) &amp;scale1"/>
-    </RefParameter>
-    <RefParameter Visible="false" Comment="System Clock"   Name="SYSCLKFreq_VALUE" DefaultValue="4000000" Max="170000000" Type="double" Display="value/1000000" Unit="MHz">
         <Condition Diagnostic="overDrive activated" Expression="(VDD_VALUE&lt; 1.8)|(VDD_VALUE&gt; 2.1)"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="System clock"   Name="SYSCLKFreq_VALUE"  DefaultValue="4000000"   Type="double"  Display="value/1000000" Unit="MHz"/>
@@ -425,12 +420,12 @@
 
 
 	
-    <RefParameter Visible="false" Comment="USB clock Source"   Name="USBFreq_Value"   DefaultValue="16000000" Min="47880000" Max="48120000"  Type="double" Display="value/1000000" Unit="MHz" IP="USB">
+    <RefParameter Visible="false" Comment="USB clock Source"   Name="USBFreq_Value"   DefaultValue="48000000" Min="48000000" Max="48000000"  Type="double" Display="value/1000000" Unit="MHz" IP="USB">
         <Condition Diagnostic="HSE in bypass Mode" Expression="USB"/>
     </RefParameter> 
-    <RefParameter Visible="false" Comment="USB clock Source"   Name="USBFreq_Value"   DefaultValue="16000000" Min="47880000" Max="48120000"  Type="double" Display="value/1000000" Unit="MHz" IP="USB"/>
+    <RefParameter Visible="false" Comment="USB clock Source"   Name="USBFreq_Value"   DefaultValue="48000000" Min="48000000" Max="48000000"  Type="double" Display="value/1000000" Unit="MHz" IP="USB"/>
     
-    <RefParameter Visible="false" Comment="RNG clock Source"   Name="RNGFreq_Value"   DefaultValue="16000000" Max="48000000" Type="double" Display="value/1000000" Unit="MHz" IP="RNG"/>
+    <RefParameter Visible="false" Comment="RNG clock Source"   Name="RNGFreq_Value"   DefaultValue="48000000" Min="48000000" Max="48000000" Type="double" Display="value/1000000" Unit="MHz" IP="RNG"/>
    
     <RefParameter Visible="false" Comment="ADC1,2 clock Source"    Name="ADC12Freq_Value" Min="140000"   Max="170000000"  DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz" />
     <RefParameter Visible="false" Comment="ADC synchr"  Name="synchADCFreq_Value"  DefaultValue="=HCLKFreq_Value" Type="double" Display="value/1000000" Unit="MHz" IP="ADC1,ADC2"/>
@@ -460,28 +455,10 @@
 
     <!--PLLQ output-->
     <RefParameter Visible="false" Comment="PLLQ"     Name="PLLQoutputFreq_Value" Min="8000000" Max="170000000"     DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz">
-        <Condition Expression="scale1boost &amp; (((CK48SourcePLLCLK &amp; RNGUsed_ForRCC ) | (I2SSourcePll &amp; (I2S2Used_ForRCC | I2S3Used_ForRCC)) | (SAI1SourcePll &amp; (SAIBUsed_ForRCC|SAIAUsed_ForRCC))))" Diagnostic=" "/>
-    </RefParameter>
-    <RefParameter Visible="false" Comment="PLLQ"     Name="PLLQoutputFreq_Value" Min="8000000" Max="26000000"     DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz">
-        <Condition Expression="scale2 &amp; (((CK48SourcePLLCLK &amp; RNGUsed_ForRCC ) | (I2SSourcePll &amp; (I2S2Used_ForRCC | I2S3Used_ForRCC)) | (SAI1SourcePll &amp; (SAIBUsed_ForRCC|SAIAUsed_ForRCC))))" Diagnostic=" "/>
-    </RefParameter>
-    <RefParameter Visible="false" Comment="PLLQ"     Name="PLLQoutputFreq_Value" Min="8000000" Max="150000000"     DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz">
-        <Condition Expression="scale1 &amp; (((CK48SourcePLLCLK &amp; RNGUsed_ForRCC ) | (I2SSourcePll &amp; (I2S2Used_ForRCC | I2S3Used_ForRCC)) | (SAI1SourcePll &amp; (SAIBUsed_ForRCC|SAIAUsed_ForRCC))))" Diagnostic=" "/>
-    </RefParameter>
-    <RefParameter Visible="false" Comment="PLLQ"     Name="PLLQoutputFreq_Value" Min="8000000" Max="170000000"     DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz">
         <Condition Expression="((CK48SourcePLLCLK &amp; RNGUsed_ForRCC ) | (I2SSourcePll &amp; (I2S2Used_ForRCC | I2S3Used_ForRCC)) | (SAI1SourcePll &amp; (SAIBUsed_ForRCC|SAIAUsed_ForRCC)))" Diagnostic=" "/>
     </RefParameter>
     <RefParameter Visible="false" Comment="PLLQ"     Name="PLLQoutputFreq_Value"     DefaultValue="4000000"   Type="double" Display="value/1000000" Unit="MHz"/>
     <!--PLLP output-->
-    <RefParameter Visible="false" Comment="PLLP"     Name="PLLPoutputFreq_Value" Min="2064500" Max="170000000"    DefaultValue="4571429"   Type="double" Display="value/1000000" Unit="MHz">
-        <Condition Expression=" scale1boost &amp; (((USE_ADC1 | USE_ADC2) &amp; ADC12SourcePllp)) " Diagnostic=" "/>
-    </RefParameter>
-    <RefParameter Visible="false" Comment="PLLP"     Name="PLLPoutputFreq_Value" Min="2064500" Max="26000000"    DefaultValue="4571429"   Type="double" Display="value/1000000" Unit="MHz">
-        <Condition Expression=" scale2 &amp; ((USE_ADC1 | USE_ADC2) &amp; ADC12SourcePllp) " Diagnostic=" "/>
-    </RefParameter>
-    <RefParameter Visible="false" Comment="PLLP"     Name="PLLPoutputFreq_Value" Min="2064500" Max="150000000"    DefaultValue="4571429"   Type="double" Display="value/1000000" Unit="MHz">
-        <Condition Expression=" scale1 &amp; (((USE_ADC1 | USE_ADC2) &amp; ADC12SourcePllp)) " Diagnostic=" "/>
-    </RefParameter>
     <RefParameter Visible="false" Comment="PLLP"     Name="PLLPoutputFreq_Value" Min="2064500" Max="170000000"    DefaultValue="4571429"   Type="double" Display="value/1000000" Unit="MHz">
         <Condition Expression=" ((USE_ADC1 | USE_ADC2) &amp; ADC12SourcePllp) " Diagnostic=" "/>
     </RefParameter>
@@ -493,11 +470,7 @@
         <Condition Expression="(PLLUsed=1) " Diagnostic=" PLLUsed=1"/>
     </RefParameter>
     <RefParameter Visible="false" Comment="VCOInput"     Name="VCOInputFreq_Value"     DefaultValue="4000000"   Type="double" Display="value/1000000" Unit="MHz"/>
-	
 
-    <RefParameter Visible="false" Comment="VCOOutput"     Name="VCOOutputFreq_Value"  Min="96000000" Max="128000000"    DefaultValue="32000000"   Type="double" Display="value/1000000" Unit="MHz">
-        <Condition Expression="PLLUsed=1 &amp; scale2" Diagnostic="PLLUsed=1 "/>
-    </RefParameter>
     <RefParameter Visible="false" Comment="VCOOutput"     Name="VCOOutputFreq_Value"  Min="96000000" Max="344000000"    DefaultValue="32000000"   Type="double" Display="value/1000000" Unit="MHz">
         <Condition Expression="PLLUsed=1" Diagnostic="PLLUsed=1 "/>
     </RefParameter>
@@ -505,15 +478,6 @@
 		 
 	 
     <!--PLLRCLK output ==> PLLCLK -->
-    <RefParameter Visible="false" Comment="PLLCLK"     Name="PLLRCLKFreq_Value"   Min="8000000" Max="170000000"     DefaultValue="16000000"   Type="double" Display="value/1000000" Unit="MHz">
-        <Condition Expression="scale1boost &amp;((PLLUsed=1 &amp; SysSourcePLL) | (MCOSourcePLL &amp; MCOConfig)) " Diagnostic=" "/>
-    </RefParameter>
-    <RefParameter Visible="false" Comment="PLLCLK"     Name="PLLRCLKFreq_Value"   Min="8000000" Max="26000000"     DefaultValue="16000000"   Type="double" Display="value/1000000" Unit="MHz">
-        <Condition Expression="scale2 &amp; ((PLLUsed=1 &amp; SysSourcePLL) | (MCOSourcePLL &amp; MCOConfig)) " Diagnostic=" "/>
-    </RefParameter>
-    <RefParameter Visible="false" Comment="PLLCLK"     Name="PLLRCLKFreq_Value"   Min="8000000" Max="150000000"     DefaultValue="16000000"   Type="double" Display="value/1000000" Unit="MHz">
-        <Condition Expression="scale1 &amp;((PLLUsed=1 &amp; SysSourcePLL) | (MCOSourcePLL &amp; MCOConfig)) " Diagnostic=" "/>
-    </RefParameter>
     <RefParameter Visible="false" Comment="PLLCLK"     Name="PLLRCLKFreq_Value"   Min="8000000" Max="170000000"     DefaultValue="16000000"   Type="double" Display="value/1000000" Unit="MHz">
         <Condition Expression="(PLLUsed=1 &amp; SysSourcePLL) | (MCOSourcePLL &amp; MCOConfig) " Diagnostic=" "/>
     </RefParameter>
@@ -714,11 +678,11 @@
     </RefParameter>
     
     <!--SAI1 Enable-->
-    <RefParameter Visible="false" Name="SAI1Enable" Comment="SAI" Type="list" DefaultValue="true">
+    <RefParameter Visible="false" Name="SAI1Enable" Comment="SAI" Type="list" DefaultValue="true" IP="SAI1">
         <Condition Expression="(SAIBUsed_ForRCC|SAIAUsed_ForRCC) &amp; (CodegenConfigPeriph=true)" Diagnostic="SAI is activated"/>
         <PossibleValue Value="true" Comment="true"/>
     </RefParameter>	
-    <RefParameter Visible="false" Name="SAI1Enable" Comment="SAI" Type="list" DefaultValue="false">
+    <RefParameter Visible="false" Name="SAI1Enable" Comment="SAI" Type="list" DefaultValue="false" IP="SAI1">
         <PossibleValue Value="false" Comment="false"/>
     </RefParameter>
     
@@ -785,11 +749,11 @@
     </RefParameter>
     
     <!--I2C3 Enable-->
-    <RefParameter Visible="false" Name="I2C3Enable" Comment="I2C3" Type="list" DefaultValue="true">
+    <RefParameter Visible="false" Name="I2C3Enable" Comment="I2C3" Type="list" DefaultValue="true" IP="I2C3">
         <Condition Expression="I2C3Used_ForRCC &amp; (CodegenConfigPeriph=true)" Diagnostic="I2C3 is activated"/>
         <PossibleValue Value="true" Comment="true"/>
     </RefParameter>	
-    <RefParameter Visible="false" Name="I2C3Enable" Comment="I2C3" Type="list" DefaultValue="false">
+    <RefParameter Visible="false" Name="I2C3Enable" Comment="I2C3" Type="list" DefaultValue="false" IP="I2C3">
         <PossibleValue Value="false" Comment="false"/>
     </RefParameter>
 

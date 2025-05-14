@@ -9,11 +9,12 @@
 /* USER CODE BEGIN includes */
 #include <dt-bindings/mfd/st,stpmic1.h>
 #include <dt-bindings/power/stm32mp1-power.h>
+#include <dt-bindings/soc/stm32mp-provisioning.h>
 #include "stm32mp15-pinctrl.dtsi"
 /* USER CODE END includes */
 
 /{
-	model = "STMicroelectronics STM32MP157D-EV1 STM32CubeMX board - openstlinux-5.15-yocto-kirkstone-mp1-v22.11.23";
+	model = "STMicroelectronics STM32MP157D-EV1 STM32CubeMX board - openstlinux-6.1-yocto-mickledore-mp1-v23.06.21";
 	compatible = "st,stm32mp157d-board_157d-ev1-mx", "st,stm32mp157d-ev1", "st,stm32mp157";
 
 	/* USER CODE BEGIN root */
@@ -25,6 +26,16 @@
 
 	chosen{
 		stdout-path = "serial0:115200n8";
+	};
+
+	shadow-prov{
+		compatible = "st,provisioning";
+
+		hw2_prov{
+			nvmem-cells = <&hw2_otp>;
+			st,shadow-value = <0x000001E0>;
+			st,shadow-lock = <STICKY_LOCK_SR>;
+		};
 	};
 
 	vin:vin{
@@ -66,6 +77,17 @@
 };
 
 &pinctrl{
+
+	rcc_pins_mx:rcc_mx-0{
+
+		pins{
+			pinmux = <STM32_PINMUX('C', 14, ANALOG)>,
+					<STM32_PINMUX('C', 15, ANALOG)>,
+					<STM32_PINMUX('H', 0, ANALOG)>,
+					<STM32_PINMUX('H', 1, ANALOG)>;
+		};
+	};
+
 	/* USER CODE BEGIN pinctrl */
 	/* USER CODE END pinctrl */
 };
@@ -82,6 +104,9 @@
 			slew-rate = <0>;
 		};
 	};
+
+	/* USER CODE BEGIN pinctrl_z */
+	/* USER CODE END pinctrl_z */
 };
 
 &bsec{
@@ -434,6 +459,8 @@
 };
 
 &rcc{
+	pinctrl-names = "default";
+	pinctrl-0 = <&rcc_pins_mx>;
 	status = "okay";
 	st,clksrc = <
 		CLK_CKPER_DISABLED

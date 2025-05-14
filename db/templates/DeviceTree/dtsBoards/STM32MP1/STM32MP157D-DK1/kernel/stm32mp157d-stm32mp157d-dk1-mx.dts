@@ -12,7 +12,7 @@
 /* USER CODE END includes */
 
 /{
-	model = "STMicroelectronics STM32MP157D-DK1 STM32CubeMX board - openstlinux-5.15-yocto-kirkstone-mp1-v22.11.23";
+	model = "STMicroelectronics STM32MP157D-DK1 STM32CubeMX board - openstlinux-6.1-yocto-mickledore-mp1-v23.06.21";
 	compatible = "st,stm32mp157d-board_157d-dk1-mx", "st,stm32mp157d-dk1", "st,stm32mp157";
 
 	/* USER CODE BEGIN root */
@@ -22,6 +22,19 @@
 		serial0 = &uart4;
 		serial1 = &usart3;
 		serial2 = &uart7;
+	};
+
+	hdmi:connector{
+		compatible = "hdmi-connector";
+		label = "hdmi";
+		type = "a";
+
+		port{
+
+			hdmi_connector_in:endpoint{
+				remote-endpoint = <&sii9022_out>;
+			};
+		};
 	};
 
 	led{
@@ -458,6 +471,9 @@
 					<STM32_PINMUX('G', 11, ANALOG)>;
 		};
 	};
+
+	/* USER CODE BEGIN pinctrl */
+	/* USER CODE END pinctrl */
 };
 
 &pinctrl_z{
@@ -480,6 +496,9 @@
 					<STM32_PINMUX('Z', 5, ANALOG)>;
 		};
 	};
+
+	/* USER CODE BEGIN pinctrl_z */
+	/* USER CODE END pinctrl_z */
 };
 
 &m4_rproc{
@@ -583,7 +602,7 @@
 	nvmem-cells = <&ethernet_mac_address>;
 	nvmem-cell-names = "mac-address";
 
-	mdio0{
+	mdio{
 		#address-cells = <1>;
 		#size-cells = <0>;
 		compatible = "snps,dwmac-mdio";
@@ -643,6 +662,14 @@
 
 				sii9022_in:endpoint{
 					remote-endpoint = <&ltdc_ep0_out>;
+				};
+			};
+
+			port@1{
+				reg = <1>;
+
+				sii9022_out:endpoint{
+					remote-endpoint = <&hdmi_connector_in>;
 				};
 			};
 
@@ -865,11 +892,6 @@
 			power-off-time-sec = <10>;
 			status = "okay";
 		};
-
-		watchdog{
-			compatible = "st,stpmic1-wdt";
-			status = "disabled";
-		};
 	};
 	/* USER CODE END i2c4 */
 };
@@ -888,7 +910,7 @@
 
 		i2s2_endpoint:endpoint{
 			remote-endpoint = <&sii9022_tx_endpoint>;
-			format = "i2s";
+			dai-format = "i2s";
 			mclk-fs = <256>;
 		};
 	};

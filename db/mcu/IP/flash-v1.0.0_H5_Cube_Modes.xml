@@ -5,6 +5,7 @@
 		<ConfigForMode>Activate_FlashIP</ConfigForMode>
 
 		<Parameter Name="advanced_settings"/>
+		<Parameter Name="UserConfigCondition"/>
 		<Parameter Name="OB_Product_State_active" />
 		<Parameter Name="OB_ProductState" />
 		<Parameter Name="USERType" />
@@ -622,23 +623,31 @@
 	<!-- END HAL OB BOR Level REFPARAMETERS-->
 
 	<!-- BEGIN HAL OB User Configuration REFPARAMETERS-->
-	<RefParameter Visible="false" Comment="USERConfig1" Name="USERConfig" DefaultValue="+OB_BOR_level+|OB_BORH" Type="list">
-		<Condition Expression="OB_BOR_Level_active=true &amp; OB_User_Configuration_active = false" Diagnostic="" />
-	</RefParameter>
-	<RefParameter Visible="false" Comment="USERConfig1" Name="USERConfig" DefaultValue="+OB_IWDGSW+|OB_WWDGSW+|OB_nRST_STOP+|OB_nRST_STDBY+|OB_IO_VDD_HSLV+|OB_IO_VDDIO2_HSLV+|OB_IWDG_STOP+|OB_IWDG_STDBY+|OB_BOOT_UBE+|OB_SWAP_BANK" Type="list">
-		<Condition Expression="OB_BOR_Level_active=false &amp;
-		(!SEM_OB_IO_VDD_HSLV_NULL | !SEM_OB_IO_VDDIO2_HSLV_NULL | !SEM_OB_IWDG_STOP_NULL 
-		| !SEM_OB_IWDG_STDBY_NULL | !SEM_OB_UBE_ST_NULL | !SEM_OB_SWAP_BANK_NULL | !SEM_OB_IWDGSW_NULL | !SEM_OB_WWDGSW_NULL 
-		| !SEM_OB_NRST_STOP_NULL | !SEM_OB_NRST_STDBY_NULL)" Diagnostic="" />
-	</RefParameter>
-	<RefParameter Visible="false" Comment="USERConfig1" Name="USERConfig" DefaultValue="+OB_BOR_level+|OB_BORH+|OB_IWDGSW+|OB_WWDGSW+|OB_nRST_STOP+|OB_nRST_STDBY+|OB_IO_VDD_HSLV+|OB_IO_VDDIO2_HSLV+|OB_IWDG_STOP+|OB_IWDG_STDBY+|OB_SWAP_BANK" Type="list">
-		<Condition Expression="OB_BOR_Level_active=true &amp; OB_User_Configuration_active = true" Diagnostic="" />
-	</RefParameter>
 	
 	<RefParameter Comment="Activate" DefaultValue="false" Group="User Configuration" TabName="HAL Option Bytes Settings" Name="OB_User_Configuration_active" Type="boolean">
 		<Description></Description>
 		<PossibleValue Comment="false" Value="false" />
 		<PossibleValue Semaphore="SEM_FLASH_OB_USER" Comment="true" Value="true" />
+	</RefParameter>
+	<RefParameter Visible="false" Comment="USERConfig1" Name="USERConfig" DefaultValue="+OB_BOR_level+|OB_BORH" Type="list">
+		<Condition Expression="OB_BOR_Level_active=true &amp; OB_User_Configuration_active = false" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Visible="false" Comment="USERConfig1" Name="USERConfig" DefaultValue="+OB_IWDGSW+|OB_WWDGSW+|OB_nRST_STOP+|OB_nRST_STDBY+|OB_IO_VDD_HSLV+|OB_IO_VDDIO2_HSLV+|OB_IWDG_STOP+|OB_IWDG_STDBY+|OB_BOOT_UBE+|OB_SWAP_BANK" Type="list">
+		<Condition Expression="OB_BOR_Level_active=false 
+		&amp; (OB_User_Configuration_active = true 
+		&amp; (!SEM_OB_IO_VDD_HSLV_NULL | !SEM_OB_IO_VDDIO2_HSLV_NULL | !SEM_OB_IWDG_STOP_NULL | !SEM_OB_IWDG_STDBY_NULL 
+			| !SEM_OB_UBE_ST_NULL &amp; (OB_ProductState=OB_PROD_STATE_OPEN | OB_ProductState=OB_PROD_STATE_PROVISIONING | OB_ProductState=OB_PROD_STATE_IROT_PROVISIONED) &amp; OB_SECBootLock=OB_BOOT_LOCK_DISABLE
+			| !SEM_OB_SWAP_BANK_NULL &amp; (OB_SECBootLock=OB_BOOT_LOCK_DISABLE | OB_NSBootLock=OB_BOOT_LOCK_DISABLE)
+			| !SEM_OB_IWDGSW_NULL | !SEM_OB_WWDGSW_NULL | !SEM_OB_NRST_STOP_NULL | !SEM_OB_NRST_STDBY_NULL))" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Visible="false" Comment="USERConfig1" Name="USERConfig" DefaultValue="+OB_BOR_level+|OB_BORH+|OB_IWDGSW+|OB_WWDGSW+|OB_nRST_STOP+|OB_nRST_STDBY+|OB_IO_VDD_HSLV+|OB_IO_VDDIO2_HSLV+|OB_IWDG_STOP+|OB_IWDG_STDBY+|OB_SWAP_BANK" Type="list">
+		<Condition Expression="OB_BOR_Level_active=true 
+		&amp; 
+		(OB_User_Configuration_active = true 
+		&amp; (!SEM_OB_IO_VDD_HSLV_NULL | !SEM_OB_IO_VDDIO2_HSLV_NULL | !SEM_OB_IWDG_STOP_NULL | !SEM_OB_IWDG_STDBY_NULL 
+			| !SEM_OB_UBE_ST_NULL &amp; (OB_ProductState=OB_PROD_STATE_OPEN | OB_ProductState=OB_PROD_STATE_PROVISIONING | OB_ProductState=OB_PROD_STATE_IROT_PROVISIONED) &amp; OB_SECBootLock=OB_BOOT_LOCK_DISABLE
+			| !SEM_OB_SWAP_BANK_NULL &amp; (OB_SECBootLock=OB_BOOT_LOCK_DISABLE | OB_NSBootLock=OB_BOOT_LOCK_DISABLE)
+			| !SEM_OB_IWDGSW_NULL | !SEM_OB_WWDGSW_NULL | !SEM_OB_NRST_STOP_NULL | !SEM_OB_NRST_STDBY_NULL))" Diagnostic="" />
 	</RefParameter>
 
 	<RefParameter Comment="          IO_VDD_HSLV" DefaultValue="OB_IO_VDD_HSLV_NOUPD" Group="User Configuration" TabName="HAL Option Bytes Settings" Name="OB_IO_VDD_HSLV_UI" Type="list">
@@ -787,10 +796,15 @@ Enable: No reset generated when entering Standby mode on core domain.</Descripti
 	
 	<!-- BEGIN HAL OB User Configuration 2 REFPARAMETERS-->
 	<RefParameter Visible="false" Comment="USERConfig2" Name="USERConfig2" DefaultValue="+OB_SRAM1_ECC+|OB_SRAM1_RST+|OB_SRAM2_ECC+|OB_SRAM2_RST+|OB_BKPRAM_ECC" Type="list">
-		<Condition Expression="OB_User_Configuration2_active = true &amp; DIE474" Diagnostic="" />
+		<Condition Expression="(OB_User_Configuration2_active = true &amp; ((!SEM_OB_SRAM1_ECC_NULL &amp;  DIE474) | ( !SEM_OB_SRAM1_RST_NULL &amp;  DIE474) | (!SEM_OB_SRAM2_ECC_NULL  &amp; !S_BOOTPATH) 
+								| ( !SEM_OB_SRAM2_RST_NULL  &amp; !S_BOOTPATH) | (!SEM_OB_SRAM3_ECC_NULL &amp; (DIE484 | DIE478)) | ( !SEM_OB_SRAM1_3_RST_NULL &amp; (DIE484 | DIE478)) 
+								| !SEM_OB_BKPRAM_ECC_NULL))
+								&amp; DIE474" Diagnostic="" />
 	</RefParameter>
 	<RefParameter Visible="false" Comment="USERConfig2" Name="USERConfig2" DefaultValue="+OB_SRAM2_ECC+|OB_SRAM2_RST+|OB_SRAM3_ECC+|OB_SRAM13_RST+|OB_BKPRAM_ECC" Type="list">
-		<Condition Expression="OB_User_Configuration2_active = true" Diagnostic="" />
+		<Condition Expression="(OB_User_Configuration2_active = true &amp; ((!SEM_OB_SRAM1_ECC_NULL &amp;  DIE474) | ( !SEM_OB_SRAM1_RST_NULL &amp;  DIE474) | (!SEM_OB_SRAM2_ECC_NULL  &amp; !S_BOOTPATH) 
+								| ( !SEM_OB_SRAM2_RST_NULL  &amp; !S_BOOTPATH) | (!SEM_OB_SRAM3_ECC_NULL &amp; (DIE484 | DIE478)) | ( !SEM_OB_SRAM1_3_RST_NULL &amp; (DIE484 | DIE478)) 
+								| !SEM_OB_BKPRAM_ECC_NULL))" Diagnostic="" />
 	</RefParameter>
 	
 	<RefParameter Comment="Activate" DefaultValue="false" Group="User Configuration 2" TabName="HAL Option Bytes Settings" Name="OB_User_Configuration2_active" Type="boolean">
@@ -822,12 +836,12 @@ Enable: No reset generated when entering Standby mode on core domain.</Descripti
 Disable: SRAM2 ECC check enabled.&lt;br&gt;
 Enable: SRAM2 ECC check disabled.</Description>
 		<PossibleValue Comment="no update" Value="OB_SRAM1_ECC_NOUPD"  Semaphore="SEM_OB_SRAM1_ECC_NULL"/>
-		<PossibleValue Comment="enable" Value="OB_SRAM1_ECC_NOT_ERASE" />
-		<PossibleValue Comment="disable" Value="OB_SRAM1_ECC_ERASE" />
+		<PossibleValue Comment="enable" Value="OB_SRAM1_ECC_ENABLE" />
+		<PossibleValue Comment="disable" Value="OB_SRAM1_ECC_DISABLE" />
 		<Condition Expression="DIE474" Diagnostic="" />
 	</RefParameter>
 	<RefParameter Comment="          SRAM1_ECC" DefaultValue="+OB_SRAM1_ECC_UI" Group="User Configuration 2" TabName="HAL Option Bytes Settings" Name="OB_SRAM1_ECC" Type="String" Visible="false">
-		<Condition Expression="(OB_SRAM1_ECC_UI=OB_SRAM1_ECC_NOT_ERASE | OB_SRAM1_ECC_UI=OB_SRAM1_ECC_ERASE) &amp; DIE474" Diagnostic="" />
+		<Condition Expression="(OB_SRAM1_ECC_UI=OB_SRAM1_ECC_ENABLE | OB_SRAM1_ECC_UI=OB_SRAM1_ECC_DISABLE) &amp; DIE474" Diagnostic="" />
 	</RefParameter>	
 	<RefParameter Comment="          SRAM1_ECC" DefaultValue="" Group="User Configuration 2" TabName="HAL Option Bytes Settings" Name="OB_SRAM1_ECC" Type="string" Visible="false" />
 
@@ -851,8 +865,8 @@ Enable: SRAM1 not erased when a system reset occurs.</Description>
 Disable: SRAM2 ECC check enabled.&lt;br&gt;
 Enable: SRAM2 ECC check disabled.</Description>
 		<PossibleValue Comment="no update" Value="OB_SRAM2_ECC_NOUPD"  Semaphore="SEM_OB_SRAM2_ECC_NULL"/>
-		<PossibleValue Comment="enable" Value="OB_SRAM2_ECC_DISABLE" />
-		<PossibleValue Comment="disable" Value="OB_SRAM2_ECC_ENABLE" />
+		<PossibleValue Comment="enable" Value="OB_SRAM2_ECC_ENABLE" />
+		<PossibleValue Comment="disable" Value="OB_SRAM2_ECC_DISABLE" />
 		<Condition Expression="!S_BOOTPATH" Diagnostic="" />
 	</RefParameter>
 	<RefParameter Comment="          SRAM2_ECC" DefaultValue="+OB_SRAM2_ECC_UI" Group="User Configuration 2" TabName="HAL Option Bytes Settings" Name="OB_SRAM2_ECC" Type="String" Visible="false">
@@ -880,8 +894,8 @@ Enable: SRAM2 not erased when a system reset occurs.</Description>
 Disable: SRAM3 ECC check enabled.&lt;br&gt;
 Enable: SRAM3 ECC check disabled.</Description>
 		<PossibleValue Comment="no update" Value="OB_SRAM3_ECC_NOUPD"  Semaphore="SEM_OB_SRAM3_ECC_NULL"/>
-		<PossibleValue Comment="enable" Value="OB_SRAM3_ECC_DISABLE" />
-		<PossibleValue Comment="disable" Value="OB_SRAM3_ECC_ENABLE" />
+		<PossibleValue Comment="enable" Value="OB_SRAM3_ECC_ENABLE" />
+		<PossibleValue Comment="disable" Value="OB_SRAM3_ECC_DISABLE" />
 		<Condition Expression="DIE484 | DIE478" Diagnostic="" />
 	</RefParameter>
 	<RefParameter Comment="          SRAM3_ECC" DefaultValue="+OB_SRAM3_ECC_UI" Group="User Configuration 2" TabName="HAL Option Bytes Settings" Name="OB_SRAM3_ECC" Type="String" Visible="false">
@@ -908,8 +922,8 @@ Enable: SRAM1 and SRAM3 not erased when a system reset occurs.</Description>
 Disable: BKPRAM ECC check enabled.&lt;br&gt;
 Enable: BKPRAM ECC check disabled.</Description>
 		<PossibleValue Comment="no update" Value="OB_BKPRAM_ECC_NOUPD"  Semaphore="SEM_OB_BKPRAM_ECC_NULL"/>
-		<PossibleValue Comment="enable" Value="OB_BKPRAM_ECC_DISABLE" />
-		<PossibleValue Comment="disable" Value="OB_BKPRAM_ECC_ENABLE" />
+		<PossibleValue Comment="enable" Value="OB_BKPRAM_ECC_ENABLE" />
+		<PossibleValue Comment="disable" Value="OB_BKPRAM_ECC_DISABLE" />
 	</RefParameter>
 	<RefParameter Comment="          BKPRAM_ECC" DefaultValue="+OB_BKPRAM_ECC_UI" Group="User Configuration 2" TabName="HAL Option Bytes Settings" Name="OB_BKPRAM_ECC" Type="String" Visible="false">
 		<Condition Expression="OB_BKPRAM_ECC_UI=OB_BKPRAM_ECC_DISABLE | OB_BKPRAM_ECC_UI=OB_BKPRAM_ECC_ENABLE" Diagnostic="" />
@@ -919,6 +933,164 @@ Enable: BKPRAM ECC check disabled.</Description>
 	
 	<!-- END HAL OB User Configuration 2 REFPARAMETERS-->
 	
+	<!-- BEGIN User Config Condition -->
+
+	<RefParameter Comment="UserConfig_Condition" DefaultValue="+IO_VDD_HSLV+|IO_VDDIO2_HSLV+|IWDG_STOP+|IWDG_STDBY+|BOOT_UBE+|SWAP_BANK+|IWDGSW+|WWDGSW+|nRST_STOP+|nRST_STDBY+|SRAM1_ECC+|SRAM1_RST+|SRAM2_ECC+|SRAM2_RST+|SRAM3_ECC+|SRAM13_RST+|BKPRAM_ECC"	
+		Name="UserConfigCondition" Type="String" Visible="true">
+		<Condition Diagnostic="" Expression="(OB_User_Configuration_active = true 
+			&amp; (!SEM_OB_IO_VDD_HSLV_NULL | !SEM_OB_IO_VDDIO2_HSLV_NULL | !SEM_OB_IWDG_STOP_NULL | !SEM_OB_IWDG_STDBY_NULL 
+				| !SEM_OB_UBE_ST_NULL &amp; (OB_ProductState=OB_PROD_STATE_OPEN | OB_ProductState=OB_PROD_STATE_PROVISIONING | OB_ProductState=OB_PROD_STATE_IROT_PROVISIONED) &amp; OB_SECBootLock=OB_BOOT_LOCK_DISABLE
+				| !SEM_OB_SWAP_BANK_NULL &amp; (OB_SECBootLock=OB_BOOT_LOCK_DISABLE | OB_NSBootLock=OB_BOOT_LOCK_DISABLE)
+				| !SEM_OB_IWDGSW_NULL | !SEM_OB_WWDGSW_NULL | !SEM_OB_NRST_STOP_NULL | !SEM_OB_NRST_STDBY_NULL))
+			| (OB_User_Configuration2_active = true 
+			&amp; ((DIE484 |DIE478) &amp; (!SEM_OB_SRAM3_ECC_NULL | !SEM_OB_SRAM1_3_RST_NULL | !SEM_OB_BKPRAM_ECC_NULL) 
+				| (DIE484 |DIE478) &amp; (!SEM_OB_SRAM2_ECC_NULL | !SEM_OB_SRAM2_RST_NULL  | !SEM_OB_SRAM3_ECC_NULL | !SEM_OB_SRAM1_3_RST_NULL | !SEM_OB_BKPRAM_ECC_NULL) &amp; !S_BOOTPATH 
+				| DIE474 &amp; (!SEM_OB_SRAM1_ECC_NULL | !SEM_OB_SRAM1_RST_NULL | !SEM_OB_BKPRAM_ECC_NULL) 
+				| !S_BOOTPATH &amp; DIE474 &amp; (!SEM_OB_SRAM1_ECC_NULL | !SEM_OB_SRAM1_RST_NULL |!SEM_OB_SRAM2_ECC_NULL| !SEM_OB_SRAM2_RST_NULL | !SEM_OB_BKPRAM_ECC_NULL)))" />
+	</RefParameter>
+
+	<RefParameter Comment="          IO_VDDHSLV" DefaultValue="(pOBInit.USERConfig &amp; OB_IO_VDD_HSLV_ENABLE) != OB_IO_VDD_HSLV_ENABLE" Name="IO_VDD_HSLV" Type="String" Visible="false">
+		<Condition Expression="OB_IO_VDD_HSLV_UI=OB_IO_VDD_HSLV_ENABLE" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          IO_VDDHSLV" DefaultValue="(pOBInit.USERConfig &amp; OB_IO_VDD_HSLV_ENABLE) != OB_IO_VDD_HSLV_DISABLE" Name="IO_VDD_HSLV" Type="String" Visible="false">
+		<Condition Expression="OB_IO_VDD_HSLV_UI=OB_IO_VDD_HSLV_DISABLE" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          IO_VDDHSLV" DefaultValue="" Name="IO_VDD_HSLV" Type="string" Visible="false" />
+	
+	<RefParameter Comment="          IO_VDDIO2HSLV" DefaultValue="(pOBInit.USERConfig &amp; OB_IO_VDDIO2_HSLV_ENABLE) != OB_IO_VDDIO2_HSLV_ENABLE" Name="IO_VDDIO2_HSLV" Type="String" Visible="false">
+		<Condition Expression="OB_IO_VDDIO2_HSLV_UI=OB_IO_VDDIO2_HSLV_ENABLE" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          IO_VDDIO2HSLV" DefaultValue="(pOBInit.USERConfig &amp; OB_IO_VDDIO2_HSLV_ENABLE) != OB_IO_VDDIO2_HSLV_DISABLE" Name="IO_VDDIO2_HSLV" Type="String" Visible="false">
+		<Condition Expression="OB_IO_VDDIO2_HSLV_UI=OB_IO_VDDIO2_HSLV_DISABLE" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          IO_VDDIO2HSLV" DefaultValue="" Name="IO_VDDIO2_HSLV" Type="string" Visible="false" />
+
+	<RefParameter Comment="          IWDGSTOP" DefaultValue="(pOBInit.USERConfig &amp; OB_IWDG_STOP_ACTIVE) != OB_IWDG_STOP_ACTIVE" Name="IWDG_STOP" Type="String" Visible="false">
+		<Condition Expression="OB_IWDG_STOP_UI=OB_IWDG_STOP_ACTIVE" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          IWDGSTOP" DefaultValue="(pOBInit.USERConfig &amp; OB_IWDG_STOP_ACTIVE) != OB_IWDG_STOP_FREEZE" Name="IWDG_STOP" Type="String" Visible="false">
+		<Condition Expression="OB_IWDG_STOP_UI=OB_IWDG_STOP_FREEZE" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          IWDGSTOP" DefaultValue="" Name="IWDG_STOP" Type="String" Visible="false"/>
+
+	<RefParameter Comment="          IWDGSTDBY" DefaultValue="(pOBInit.USERConfig &amp; OB_IWDG_STDBY_ACTIVE) != OB_IWDG_STDBY_ACTIVE" Name="IWDG_STDBY" Type="String" Visible="false">
+		<Condition Expression="OB_IWDG_STDBY_UI=OB_IWDG_STDBY_ACTIVE" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          IWDGSTDBY" DefaultValue="(pOBInit.USERConfig &amp; OB_IWDG_STDBY_ACTIVE) != OB_IWDG_STDBY_FREEZE" Name="IWDG_STDBY" Type="String" Visible="false">
+		<Condition Expression="OB_IWDG_STDBY_UI=OB_IWDG_STDBY_FREEZE" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          IWDGSTDBY" DefaultValue="" Name="IWDG_STDBY" Type="String" Visible="false"/>
+
+	<RefParameter Comment="          BOOTUBE" DefaultValue="(pOBInit.USERConfig &amp; OB_UBE_OEM_IROT) != OB_UBE_OEM_IROT" Name="BOOT_UBE" Type="String" Visible="false">
+		<Condition Expression="(OB_BOOT_UBE_UI=OB_UBE_OEM_IROT)
+			&amp; ((OB_ProductState=OB_PROD_STATE_OPEN | OB_ProductState=OB_PROD_STATE_PROVISIONING | OB_ProductState=OB_PROD_STATE_IROT_PROVISIONED)
+			&amp; OB_SECBootLock=OB_BOOT_LOCK_DISABLE)" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="          BOOTUBE" DefaultValue="(pOBInit.USERConfig &amp; OB_UBE_OEM_IROT) != OB_UBE_ST_IROT" Name="BOOT_UBE" Type="String" Visible="false">
+		<Condition Expression="(OB_BOOT_UBE_UI=OB_UBE_ST_IROT)
+			&amp; ((OB_ProductState=OB_PROD_STATE_OPEN | OB_ProductState=OB_PROD_STATE_PROVISIONING | OB_ProductState=OB_PROD_STATE_IROT_PROVISIONED)
+			&amp; OB_SECBootLock=OB_BOOT_LOCK_DISABLE)" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Comment="          BOOTUBE" DefaultValue="" Name="BOOT_UBE" Type="String" Visible="false"/>
+
+    <RefParameter Comment="          SWAPBANK" DefaultValue="(pOBInit.USERConfig &amp; OB_SWAP_BANK_ENABLE) != OB_SWAP_BANK_ENABLE" Name="SWAP_BANK" Type="String" Visible="false">
+		<Condition Expression="(OB_SWAP_BANK_UI=OB_SWAP_BANK_ENABLE) &amp; OB_SECBootLock=OB_BOOT_LOCK_DISABLE | OB_NSBootLock=OB_BOOT_LOCK_DISABLE" Diagnostic="" />
+	</RefParameter>
+    <RefParameter Comment="          SWAPBANK" DefaultValue="(pOBInit.USERConfig &amp; OB_SWAP_BANK_ENABLE) != OB_SWAP_BANK_DISABLE" Name="SWAP_BANK" Type="String" Visible="false">
+		<Condition Expression="(OB_SWAP_BANK_UI=OB_SWAP_BANK_DISABLE) &amp; OB_SECBootLock=OB_BOOT_LOCK_DISABLE | OB_NSBootLock=OB_BOOT_LOCK_DISABLE" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          SWAPBANK" DefaultValue="" Name="SWAP_BANK" Type="string" Visible="false" />
+    
+    <RefParameter Comment="          IWDG_SW" DefaultValue="(pOBInit.USERConfig &amp; OB_IWDG_SW) != OB_IWDG_SW" Name="IWDGSW" Type="String" Visible="false">
+		<Condition Expression="OB_IWDG_SW_UI=OB_IWDG_SW" Diagnostic="" />
+	</RefParameter>
+    <RefParameter Comment="          IWDG_SW" DefaultValue="(pOBInit.USERConfig &amp; OB_IWDG_SW) != OB_IWDG_HW" Name="IWDGSW" Type="String" Visible="false">
+		<Condition Expression="OB_IWDG_SW_UI=OB_IWDG_HW" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          IWDG_SW" DefaultValue="" Name="IWDGSW"  Type="String" Visible="false"/> 
+
+    <RefParameter Comment="          WWDG_SW" DefaultValue="(pOBInit.USERConfig &amp; OB_WWDG_SW) != OB_WWDG_SW" Name="WWDGSW" Type="String" Visible="false">
+		<Condition Expression="OB_WWDG_SW_UI=OB_WWDG_SW" Diagnostic="" />
+	</RefParameter>
+    <RefParameter Comment="          WWDG_SW" DefaultValue="(pOBInit.USERConfig &amp; OB_WWDG_SW) != OB_WWDG_HW" Name="WWDGSW" Type="String" Visible="false">
+		<Condition Expression="OB_WWDG_SW_UI=OB_WWDG_HW" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          WWDG_SW" DefaultValue="" Name="WWDGSW" Type="String" Visible="false"/>
+
+    <RefParameter Comment="          nRSTSTOP" DefaultValue="(pOBInit.USERConfig &amp; OB_STOP_NORST) != OB_STOP_NORST" Name="nRST_STOP" Type="String" Visible="false">
+	<Condition Expression="OB_NRST_STOP_UI=OB_STOP_NORST" Diagnostic="" />
+	</RefParameter>
+    <RefParameter Comment="          nRSTSTOP" DefaultValue="(pOBInit.USERConfig &amp; OB_STOP_NORST) != OB_STOP_RST" Name="nRST_STOP" Type="String" Visible="false">
+	<Condition Expression="OB_NRST_STOP_UI=OB_STOP_RST" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          nRSTSTOP" DefaultValue="" Name="nRST_STOP" Type="String" Visible="false"/>
+	
+    <RefParameter Comment="          nRSTSTDBY" DefaultValue="(pOBInit.USERConfig &amp; OB_STANDBY_NORST) != OB_STANDBY_NORST" Name="nRST_STDBY" Type="String" Visible="false">
+		<Condition Expression="OB_NRST_STDBY_UI=OB_STANDBY_NORST" Diagnostic="" />
+	</RefParameter>
+    <RefParameter Comment="          nRSTSTDBY" DefaultValue="(pOBInit.USERConfig &amp; OB_STANDBY_NORST) != OB_STANDBY_RST" Name="nRST_STDBY" Type="String" Visible="false">
+		<Condition Expression="OB_NRST_STDBY_UI=OB_STANDBY_RST" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          nRSTSTDBY" DefaultValue="" Name="nRST_STDBY" Type="String" Visible="false"/>
+	
+    <RefParameter Comment="          SRAM1ECC" DefaultValue="(pOBInit.USERConfig2 &amp; OB_SRAM1_ECC_ENABLE) != OB_SRAM1_ECC_ENABLE" Name="SRAM1_ECC" Type="String" Visible="false">
+		<Condition Expression="OB_SRAM1_ECC_UI=OB_SRAM1_ECC_ENABLE &amp; DIE474" Diagnostic="" />
+	</RefParameter>
+    <RefParameter Comment="          SRAM1ECC" DefaultValue="(pOBInit.USERConfig2 &amp; OB_SRAM1_ECC_ENABLE) != OB_SRAM1_ECC_DISABLE" Name="SRAM1_ECC" Type="String" Visible="false">
+		<Condition Expression="OB_SRAM1_ECC_UI=OB_SRAM1_ECC_DISABLE &amp; DIE474" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          SRAM1ECC" DefaultValue="" Name="SRAM1_ECC" Type="string" Visible="false" />
+
+    <RefParameter Comment="          SRAM1RST" DefaultValue="(pOBInit.USERConfig2 &amp; OB_SRAM1_RST_NOT_ERASE) != OB_SRAM1_RST_NOT_ERASE" Name="SRAM1_RST" Type="String" Visible="false">
+		<Condition Expression="OB_SRAM1_RST_UI=OB_SRAM1_RST_NOT_ERASE &amp; DIE474" Diagnostic="" />
+	</RefParameter>
+    <RefParameter Comment="          SRAM1RST" DefaultValue="(pOBInit.USERConfig2 &amp; OB_SRAM1_RST_NOT_ERASE) != OB_SRAM1_RST_ERASE" Name="SRAM1_RST" Type="String" Visible="false">
+		<Condition Expression="OB_SRAM1_RST_UI=OB_SRAM1_RST_ERASE &amp; DIE474" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          SRAM1RST" DefaultValue="" Name="SRAM1_RST" Type="string" Visible="false" />
+
+    <RefParameter Comment="          SRAM2ECC" DefaultValue="(pOBInit.USERConfig2 &amp; OB_SRAM2_ECC_DISABLE) != OB_SRAM2_ECC_DISABLE" Name="SRAM2_ECC" Type="String" Visible="false">
+		<Condition Expression="OB_SRAM2_ECC_UI=OB_SRAM2_ECC_DISABLE &amp; !S_BOOTPATH" Diagnostic="" />
+	</RefParameter>
+    <RefParameter Comment="          SRAM2ECC" DefaultValue="(pOBInit.USERConfig2 &amp; OB_SRAM2_ECC_DISABLE) != OB_SRAM2_ECC_ENABLE" Name="SRAM2_ECC" Type="String" Visible="false">
+		<Condition Expression="OB_SRAM2_ECC_UI=OB_SRAM2_ECC_ENABLE &amp; !S_BOOTPATH" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          SRAM2ECC" DefaultValue="" Name="SRAM2_ECC" Type="string" Visible="false"/>
+
+    <RefParameter Comment="          SRAM2RST" DefaultValue="(pOBInit.USERConfig2 &amp; OB_SRAM2_RST_NOT_ERASE) != OB_SRAM2_RST_NOT_ERASE" Name="SRAM2_RST" Type="String" Visible="false">
+		<Condition Expression="OB_SRAM2_RST_UI=OB_SRAM2_RST_NOT_ERASE &amp; !S_BOOTPATH" Diagnostic="" />
+	</RefParameter>
+    <RefParameter Comment="          SRAM2RST" DefaultValue="(pOBInit.USERConfig2 &amp; OB_SRAM2_RST_NOT_ERASE) != OB_SRAM2_RST_ERASE" Name="SRAM2_RST" Type="String" Visible="false">
+		<Condition Expression="OB_SRAM2_RST_UI=OB_SRAM2_RST_ERASE &amp; !S_BOOTPATH" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          SRAM2RST" DefaultValue="" Name="SRAM2_RST" Type="string" Visible="false" />
+
+    <RefParameter Comment="          SRAM3ECC" DefaultValue="(pOBInit.USERConfig2 &amp; OB_SRAM3_ECC_DISABLE) != OB_SRAM3_ECC_DISABLE" Name="SRAM3_ECC" Type="String" Visible="false">
+		<Condition Expression="OB_SRAM3_ECC_UI=OB_SRAM3_ECC_DISABLE &amp; (DIE484 | DIE478)" Diagnostic="" />
+	</RefParameter>
+    <RefParameter Comment="          SRAM3ECC" DefaultValue="(pOBInit.USERConfig2 &amp; OB_SRAM3_ECC_DISABLE) != OB_SRAM3_ECC_ENABLE" Name="SRAM3_ECC" Type="String" Visible="false">
+		<Condition Expression="OB_SRAM3_ECC_UI=OB_SRAM3_ECC_ENABLE &amp; (DIE484 | DIE478)" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          SRAM3ECC" DefaultValue="" Name="SRAM3_ECC" Type="string" Visible="false"/>
+
+    <RefParameter Comment="          SRAM13RST" DefaultValue="(pOBInit.USERConfig2 &amp; OB_SRAM1_3_RST_NOT_ERASE) != OB_SRAM1_3_RST_NOT_ERASE" Name="SRAM13_RST" Type="String" Visible="false">
+		<Condition Expression="OB_SRAM1_3_RST_UI=OB_SRAM1_3_RST_NOT_ERASE &amp; (DIE484 | DIE478)" Diagnostic="" />
+	</RefParameter>
+    <RefParameter Comment="          SRAM13RST" DefaultValue="(pOBInit.USERConfig2 &amp; OB_SRAM1_3_RST_NOT_ERASE) != OB_SRAM1_3_RST_ERASE" Name="SRAM13_RST" Type="String" Visible="false">
+		<Condition Expression="OB_SRAM1_3_RST_UI=OB_SRAM1_3_RST_ERASE &amp; (DIE484 | DIE478)" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          SRAM13RST" DefaultValue="" Name="SRAM13_RST" Type="string" Visible="false" />
+
+    <RefParameter Comment="          BKPRAMECC" DefaultValue="(pOBInit.USERConfig2 &amp; OB_BKPRAM_ECC_DISABLE) != OB_BKPRAM_ECC_DISABLE" Name="BKPRAM_ECC" Type="String" Visible="false">
+		<Condition Expression="OB_BKPRAM_ECC_UI=OB_BKPRAM_ECC_DISABLE" Diagnostic="" />
+	</RefParameter>
+    <RefParameter Comment="          BKPRAMECC" DefaultValue="(pOBInit.USERConfig2 &amp; OB_BKPRAM_ECC_DISABLE) != OB_BKPRAM_ECC_ENABLE" Name="BKPRAM_ECC" Type="String" Visible="false">
+		<Condition Expression="OB_BKPRAM_ECC_UI=OB_BKPRAM_ECC_ENABLE" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          BKPRAMECC" DefaultValue="" Name="BKPRAM_ECC" Type="string" Visible="false"/>
+
+	<!-- END User Config Condition -->
+
 	<!-- BEGIN HAL OB Boot Configuration REFPARAMETERS-->
 	
 	<RefParameter Comment="Activate NS BOOT ADDRESS" DefaultValue="false" Group="Boot Configuration" TabName="HAL Option Bytes Settings" Name="OB_Boot_Configuration_active_NS_ADDR" Type="boolean">
@@ -3192,7 +3364,20 @@ Note: Bit 2 is reserved on 512-Kbyte product configuration&lt;br&gt;</Descriptio
 		|(!S_SECURE &amp; DIE474 &amp; SEM_FLASH_OB_ProductState &amp; SEM_FLASH_OB_USER &amp; SEM_FLASH_OB_NSBOOTADDR &amp; SEM_FLASH_OB_NSBOOTLOCK &amp; (SEM_FLASH_OB_WRP1|SEM_FLASH_OB_WRP2) &amp; SEM_FLASH_OB_OTP_LOCK &amp; (SEM_FLASH_OB_HDP1|SEM_FLASH_OB_HDP2))" />
 	</RefParameter>
 	<RefParameter Visible="false" Comment="Option Type" Name="OptionType" Group="Option Type" DefaultValue="+OptionType_PROD_STATE+|OptionType_USER+|OptionType_BOOTADDR+|OptionType_BOOT_LOCK+|OptionType_WMSEC+|OptionType_WRP+|OptionType_OTP_LOCK+|OptionType_EDATA+|OptionType_HDP" Type="string">
-		<Condition Diagnostic="" Expression="SEM_FLASH_OB_ProductState|SEM_FLASH_OB_USER|SEM_FLASH_OB_NSBOOTADDR|SEM_FLASH_OB_SECBOOTADDR|SEM_FLASH_OB_NSBOOTLOCK|SEM_FLASH_OB_SECBOOTLOCK|SEM_FLASH_OB_WMSEC1|SEM_FLASH_OB_WMSEC2|SEM_FLASH_OB_WRP1|SEM_FLASH_OB_WRP2|SEM_FLASH_OB_OTP_LOCK|SEM_FLASH_OB_EDATA1|SEM_FLASH_OB_EDATA2|SEM_FLASH_OB_HDP1|SEM_FLASH_OB_HDP2" />
+		<Condition Diagnostic="" Expression="SEM_FLASH_OB_ProductState|SEM_FLASH_OB_NSBOOTADDR
+		|SEM_FLASH_OB_SECBOOTADDR|SEM_FLASH_OB_NSBOOTLOCK|SEM_FLASH_OB_SECBOOTLOCK|SEM_FLASH_OB_WMSEC1|SEM_FLASH_OB_WMSEC2
+		|SEM_FLASH_OB_WRP1|SEM_FLASH_OB_WRP2|SEM_FLASH_OB_OTP_LOCK|SEM_FLASH_OB_EDATA1|SEM_FLASH_OB_EDATA2|SEM_FLASH_OB_HDP1|SEM_FLASH_OB_HDP2
+		|OB_BOR_Level_active=true 
+		| (OB_User_Configuration_active = true 
+		&amp; (!SEM_OB_IO_VDD_HSLV_NULL | !SEM_OB_IO_VDDIO2_HSLV_NULL | !SEM_OB_IWDG_STOP_NULL | !SEM_OB_IWDG_STDBY_NULL 
+			| !SEM_OB_UBE_ST_NULL &amp; (OB_ProductState=OB_PROD_STATE_OPEN | OB_ProductState=OB_PROD_STATE_PROVISIONING | OB_ProductState=OB_PROD_STATE_IROT_PROVISIONED) &amp; OB_SECBootLock=OB_BOOT_LOCK_DISABLE
+			| !SEM_OB_SWAP_BANK_NULL &amp; (OB_SECBootLock=OB_BOOT_LOCK_DISABLE | OB_NSBootLock=OB_BOOT_LOCK_DISABLE)
+			| !SEM_OB_IWDGSW_NULL | !SEM_OB_WWDGSW_NULL | !SEM_OB_NRST_STOP_NULL | !SEM_OB_NRST_STDBY_NULL))
+		| (OB_User_Configuration2_active = true 
+		&amp; ((DIE484 |DIE478) &amp; (!SEM_OB_SRAM3_ECC_NULL | !SEM_OB_SRAM1_3_RST_NULL | !SEM_OB_BKPRAM_ECC_NULL) 
+			| (DIE484 |DIE478) &amp; (!SEM_OB_SRAM2_ECC_NULL | !SEM_OB_SRAM2_RST_NULL  | !SEM_OB_SRAM3_ECC_NULL | !SEM_OB_SRAM1_3_RST_NULL | !SEM_OB_BKPRAM_ECC_NULL) &amp; !S_BOOTPATH 
+			| DIE474 &amp; (!SEM_OB_SRAM1_ECC_NULL | !SEM_OB_SRAM1_RST_NULL | !SEM_OB_BKPRAM_ECC_NULL) 
+			| !S_BOOTPATH &amp; DIE474 &amp; (!SEM_OB_SRAM1_ECC_NULL | !SEM_OB_SRAM1_RST_NULL |!SEM_OB_SRAM2_ECC_NULL| !SEM_OB_SRAM2_RST_NULL | !SEM_OB_BKPRAM_ECC_NULL)))" />
 	</RefParameter>
 	
 	<RefParameter Comment="OptionType_PROD_STATE" DefaultValue="OPTIONBYTE_PROD_STATE" Group="Option Bytes" Name="OptionType_PROD_STATE" Type="string" Visible="false">
@@ -3203,10 +3388,17 @@ Note: Bit 2 is reserved on 512-Kbyte product configuration&lt;br&gt;</Descriptio
 	
 	<RefParameter Comment="OptionType_USER" DefaultValue="OPTIONBYTE_USER" Group="Option Bytes" Name="OptionType_USER" Type="string" Visible="false">
 		<Description></Description>
-		<Condition Diagnostic="" Expression="!SEM_OB_IO_VDD_HSLV_NULL | !SEM_OB_IO_VDDIO2_HSLV_NULL | !SEM_OB_IWDG_STOP_NULL 
-		| !SEM_OB_IWDG_STDBY_NULL | !SEM_OB_SWAP_BANK_NULL | !SEM_OB_IWDGSW_NULL | !SEM_OB_WWDGSW_NULL 
-		| !SEM_OB_NRST_STOP_NULL | !SEM_OB_NRST_STDBY_NULL | !SEM_OB_SRAM2_ECC_NULL 
-		| !SEM_OB_SRAM2_RST_NULL | !SEM_OB_SRAM3_ECC_NULL | !SEM_OB_SRAM1_3_RST_NULL | !SEM_OB_BKPRAM_ECC_NULL | OB_BOR_Level_active=true" />
+		<Condition Diagnostic="" Expression="OB_BOR_Level_active=true 
+		| (OB_User_Configuration_active = true 
+		&amp; (!SEM_OB_IO_VDD_HSLV_NULL | !SEM_OB_IO_VDDIO2_HSLV_NULL | !SEM_OB_IWDG_STOP_NULL | !SEM_OB_IWDG_STDBY_NULL 
+			| !SEM_OB_UBE_ST_NULL &amp; (OB_ProductState=OB_PROD_STATE_OPEN | OB_ProductState=OB_PROD_STATE_PROVISIONING | OB_ProductState=OB_PROD_STATE_IROT_PROVISIONED) &amp; OB_SECBootLock=OB_BOOT_LOCK_DISABLE
+			| !SEM_OB_SWAP_BANK_NULL &amp; (OB_SECBootLock=OB_BOOT_LOCK_DISABLE | OB_NSBootLock=OB_BOOT_LOCK_DISABLE)
+			| !SEM_OB_IWDGSW_NULL | !SEM_OB_WWDGSW_NULL | !SEM_OB_NRST_STOP_NULL | !SEM_OB_NRST_STDBY_NULL))
+		| (OB_User_Configuration2_active = true 
+		&amp; ((DIE484 |DIE478) &amp; (!SEM_OB_SRAM3_ECC_NULL | !SEM_OB_SRAM1_3_RST_NULL | !SEM_OB_BKPRAM_ECC_NULL) 
+			| (DIE484 |DIE478) &amp; (!SEM_OB_SRAM2_ECC_NULL | !SEM_OB_SRAM2_RST_NULL  | !SEM_OB_SRAM3_ECC_NULL | !SEM_OB_SRAM1_3_RST_NULL | !SEM_OB_BKPRAM_ECC_NULL) &amp; !S_BOOTPATH 
+			| DIE474 &amp; (!SEM_OB_SRAM1_ECC_NULL | !SEM_OB_SRAM1_RST_NULL | !SEM_OB_BKPRAM_ECC_NULL) 
+			| !S_BOOTPATH &amp; DIE474 &amp; (!SEM_OB_SRAM1_ECC_NULL | !SEM_OB_SRAM1_RST_NULL |!SEM_OB_SRAM2_ECC_NULL| !SEM_OB_SRAM2_RST_NULL | !SEM_OB_BKPRAM_ECC_NULL)))" />
 	</RefParameter>
 	<RefParameter Comment="OptionType_USER" DefaultValue="" Group="Option Bytes" Name="OptionType_USER" Type="string" Visible="false" />
 	
@@ -3262,10 +3454,17 @@ Note: Bit 2 is reserved on 512-Kbyte product configuration&lt;br&gt;</Descriptio
 	
 	<!-- BEGIN USERType RefParameter -->
 	<RefParameter Visible="false" Comment="User Type" Name="USERType" DefaultValue="+USERType_BOR+|USERType_Config1+|USERType_Config2" Type="list">
-		<Condition Expression="OB_BOR_Level_active=true | (!SEM_OB_IO_VDD_HSLV_NULL | !SEM_OB_IO_VDDIO2_HSLV_NULL | !SEM_OB_IWDG_STOP_NULL 
-		| !SEM_OB_IWDG_STDBY_NULL | !SEM_OB_UBE_ST_NULL | !SEM_OB_SWAP_BANK_NULL | !SEM_OB_IWDGSW_NULL | !SEM_OB_WWDGSW_NULL 
-		| !SEM_OB_NRST_STOP_NULL | !SEM_OB_NRST_STDBY_NULL) | (!SEM_OB_SRAM1_ECC_NULL | !SEM_OB_SRAM1_RST_NULL | !SEM_OB_SRAM2_ECC_NULL | !SEM_OB_SRAM2_RST_NULL | !SEM_OB_SRAM3_ECC_NULL | !SEM_OB_SRAM1_3_RST_NULL 
-        | !SEM_OB_BKPRAM_ECC_NULL)" Diagnostic="" />
+		<Condition Expression="OB_BOR_Level_active=true 
+		| (OB_User_Configuration_active = true 
+		&amp; (!SEM_OB_IO_VDD_HSLV_NULL | !SEM_OB_IO_VDDIO2_HSLV_NULL | !SEM_OB_IWDG_STOP_NULL | !SEM_OB_IWDG_STDBY_NULL 
+			| !SEM_OB_UBE_ST_NULL &amp; (OB_ProductState=OB_PROD_STATE_OPEN | OB_ProductState=OB_PROD_STATE_PROVISIONING | OB_ProductState=OB_PROD_STATE_IROT_PROVISIONED) &amp; OB_SECBootLock=OB_BOOT_LOCK_DISABLE
+			| !SEM_OB_SWAP_BANK_NULL &amp; (OB_SECBootLock=OB_BOOT_LOCK_DISABLE | OB_NSBootLock=OB_BOOT_LOCK_DISABLE)
+			| !SEM_OB_IWDGSW_NULL | !SEM_OB_WWDGSW_NULL | !SEM_OB_NRST_STOP_NULL | !SEM_OB_NRST_STDBY_NULL))
+		| (OB_User_Configuration2_active = true 
+		&amp; ((DIE484 |DIE478) &amp; (!SEM_OB_SRAM3_ECC_NULL | !SEM_OB_SRAM1_3_RST_NULL | !SEM_OB_BKPRAM_ECC_NULL) 
+			| (DIE484 |DIE478) &amp; (!SEM_OB_SRAM2_ECC_NULL | !SEM_OB_SRAM2_RST_NULL  | !SEM_OB_SRAM3_ECC_NULL | !SEM_OB_SRAM1_3_RST_NULL | !SEM_OB_BKPRAM_ECC_NULL) &amp; !S_BOOTPATH 
+			| DIE474 &amp; (!SEM_OB_SRAM1_ECC_NULL | !SEM_OB_SRAM1_RST_NULL | !SEM_OB_BKPRAM_ECC_NULL) 
+			| !S_BOOTPATH &amp; DIE474 &amp; (!SEM_OB_SRAM1_ECC_NULL | !SEM_OB_SRAM1_RST_NULL |!SEM_OB_SRAM2_ECC_NULL| !SEM_OB_SRAM2_RST_NULL | !SEM_OB_BKPRAM_ECC_NULL)))" Diagnostic="" />
 	</RefParameter>	
 
 	<RefParameter Visible="false" Comment="User Type" Name="USERType_BOR" DefaultValue="OB_USER_BOR_LEV|OB_USER_BORH_EN" Type="list">
@@ -3347,25 +3546,26 @@ Note: Bit 2 is reserved on 512-Kbyte product configuration&lt;br&gt;</Descriptio
 	
 	
 	<RefParameter Visible="false" Comment="User Type" Name="USERType_Config2" DefaultValue="+OB_USER_SRAM1_ECC+|OB_USER_SRAM1_RST+|OB_USER_SRAM2_ECC+|OB_USER_SRAM2_RST+|OB_USER_BKPRAM_ECC" Type="list">
-		<Condition Expression="DIE474 &amp; !SEM_OB_SRAM1_ECC_NULL | !SEM_OB_SRAM1_RST_NULL | !SEM_OB_SRAM2_ECC_NULL | !SEM_OB_SRAM2_RST_NULL
-											| !SEM_OB_SRAM3_ECC_NULL | !SEM_OB_SRAM1_3_RST_NULL | !SEM_OB_BKPRAM_ECC_NULL
-											&amp; !S_BOOTPATH" Diagnostic="" />
+		<Condition Expression="!S_BOOTPATH &amp; DIE474 &amp; (OB_User_Configuration2_active = true &amp; (!SEM_OB_SRAM1_ECC_NULL | !SEM_OB_SRAM1_RST_NULL 
+		|!SEM_OB_SRAM2_ECC_NULL| !SEM_OB_SRAM2_RST_NULL | !SEM_OB_BKPRAM_ECC_NULL))" Diagnostic="" />
 	</RefParameter>
 	<RefParameter Visible="false" Comment="User Type" Name="USERType_Config2" DefaultValue="+OB_USER_SRAM1_ECC+|OB_USER_SRAM1_RST+|OB_USER_BKPRAM_ECC" Type="list">
-		<Condition Expression="DIE474 &amp; !SEM_OB_SRAM1_ECC_NULL | !SEM_OB_SRAM1_RST_NULL | !SEM_OB_SRAM2_ECC_NULL | !SEM_OB_SRAM2_RST_NULL
-											| !SEM_OB_SRAM3_ECC_NULL | !SEM_OB_SRAM1_3_RST_NULL | !SEM_OB_BKPRAM_ECC_NULL" Diagnostic="" />
+		<Condition Expression="DIE474 &amp; (OB_User_Configuration2_active = true &amp; (!SEM_OB_SRAM1_ECC_NULL | !SEM_OB_SRAM1_RST_NULL | !SEM_OB_BKPRAM_ECC_NULL)) " Diagnostic="" />
 	</RefParameter>
 	<RefParameter Visible="false" Comment="User Type" Name="USERType_Config2" DefaultValue="+OB_USER_SRAM2_ECC+|OB_USER_SRAM2_RST+|OB_USER_SRAM3_ECC+|OB_USER_SRAM1_3_RST+|OB_USER_BKPRAM_ECC" Type="list">
-		<Condition Expression="(DIE484 |DIE478) &amp; !SEM_OB_SRAM1_ECC_NULL | !SEM_OB_SRAM1_RST_NULL | !SEM_OB_SRAM2_ECC_NULL | !SEM_OB_SRAM2_RST_NULL
-											| !SEM_OB_SRAM3_ECC_NULL | !SEM_OB_SRAM1_3_RST_NULL | !SEM_OB_BKPRAM_ECC_NULL &amp; !S_BOOTPATH" Diagnostic="" />
+		<Condition Expression="(DIE484 |DIE478) 
+			&amp; (OB_User_Configuration2_active = true &amp; (!SEM_OB_SRAM2_ECC_NULL | !SEM_OB_SRAM2_RST_NULL  | !SEM_OB_SRAM3_ECC_NULL | !SEM_OB_SRAM1_3_RST_NULL | !SEM_OB_BKPRAM_ECC_NULL))
+			&amp; !S_BOOTPATH" Diagnostic="" />
 	</RefParameter>
 	<RefParameter Visible="false" Comment="User Type" Name="USERType_Config2" DefaultValue="+OB_USER_SRAM3_ECC+|OB_USER_SRAM1_3_RST+|OB_USER_BKPRAM_ECC" Type="list">
-		<Condition Expression="(DIE484 |DIE478) &amp; !SEM_OB_SRAM1_ECC_NULL | !SEM_OB_SRAM1_RST_NULL | !SEM_OB_SRAM2_ECC_NULL | !SEM_OB_SRAM2_RST_NULL
-											| !SEM_OB_SRAM3_ECC_NULL | !SEM_OB_SRAM1_3_RST_NULL | !SEM_OB_BKPRAM_ECC_NULL" Diagnostic="" />
+		<Condition Expression="(DIE484 |DIE478) 
+			&amp; (OB_User_Configuration2_active = true &amp; (!SEM_OB_SRAM3_ECC_NULL | !SEM_OB_SRAM1_3_RST_NULL | !SEM_OB_BKPRAM_ECC_NULL))" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Visible="false" Comment="User Type" Name="USERType_Config2" DefaultValue="" Type="list">
 	</RefParameter>
 	
-		<RefParameter Comment="          SRAM1_ECC" DefaultValue="OB_USER_SRAM1_ECC"  TabName="HAL Option Bytes Settings" Name="OB_USER_SRAM1_ECC" Type="String" Visible="false">
-		<Condition Expression="(OB_SRAM1_ECC_UI=OB_SRAM1_ECC_NOT_ERASE | OB_SRAM1_ECC_UI=OB_SRAM1_ECC_ERASE) &amp; DIE474" Diagnostic="" />
+	<RefParameter Comment="          SRAM1_ECC" DefaultValue="OB_USER_SRAM1_ECC"  TabName="HAL Option Bytes Settings" Name="OB_USER_SRAM1_ECC" Type="String" Visible="false">
+		<Condition Expression="(OB_SRAM1_ECC_UI=OB_SRAM1_ECC_ENABLE | OB_SRAM1_ECC_UI=OB_SRAM1_ECC_DISABLE) &amp; DIE474" Diagnostic="" />
 	</RefParameter>	
 	<RefParameter Comment="          SRAM1_ECC" DefaultValue="" TabName="HAL Option Bytes Settings" Name="OB_USER_SRAM1_ECC" Type="string" Visible="false" />
 

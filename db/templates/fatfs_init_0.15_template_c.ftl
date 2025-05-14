@@ -15,7 +15,6 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "fatfs.h"
-#include "main.h"
 
 [@common.optinclude name=contextFolder+mxTmpFolder+"/fatfs_vars.tmp"/]
 

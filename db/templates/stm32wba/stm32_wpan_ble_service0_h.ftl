@@ -1,15 +1,4 @@
 [#ftl]
-/* USER CODE BEGIN Header */
-/**
-  ******************************************************************************
-  * @file    ${name?remove_beginning("App/%")?replace("%.h", ".h")}
-  * @author  MCD Application Team
-  * @brief   Header for ${name?remove_beginning("App/%")?replace("%.h", ".c")}
-  ******************************************************************************
-[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
-  ******************************************************************************
-  */
-/* USER CODE END Header */
 
 [#assign SvcNbr = "0"]
 [#assign myHash = {}]
@@ -29,6 +18,17 @@ Key & Value:
 Key: ${key}; Value: ${myHash[key]}
 [/#list]
 --]
+/* USER CODE BEGIN Header */
+/**
+  ******************************************************************************
+  * @file    ${myHash["SERVICE"+SvcNbr+"_SHORT_NAME"]}.h
+  * @author  MCD Application Team
+  * @brief   Header for ${myHash["SERVICE"+SvcNbr+"_SHORT_NAME"]}.c
+  ******************************************************************************
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
+  ******************************************************************************
+  */
+/* USER CODE END Header */
 
 [#assign SERVICE_SHORT_NAME_UpperCase = myHash["SERVICE"+SvcNbr+"_SHORT_NAME"]?upper_case]
 [#assign SERVICE_NUMBER_OF_CHARACTERISTICS = myHash["SERVICE"+SvcNbr+"_NUMBER_OF_CHARACTERISTICS"]]
@@ -171,6 +171,9 @@ typedef struct
 void ${SERVICE_SHORT_NAME_UpperCase}_Init(void);
 void ${SERVICE_SHORT_NAME_UpperCase}_Notification(${SERVICE_SHORT_NAME_UpperCase}_NotificationEvt_t *p_Notification);
 tBleStatus ${SERVICE_SHORT_NAME_UpperCase}_UpdateValue(${SERVICE_SHORT_NAME_UpperCase}_CharOpcode_t CharOpcode, ${SERVICE_SHORT_NAME_UpperCase}_Data_t *pData);
+[#if (myHash["BLE_OPTIONS_ENHANCED_ATT"] == "BLE_OPTIONS_ENHANCED_ATT")]
+tBleStatus ${SERVICE_SHORT_NAME_UpperCase}_UpdateValue_Ext(${SERVICE_SHORT_NAME_UpperCase}_CharOpcode_t CharOpcode, ${SERVICE_SHORT_NAME_UpperCase}_Data_t *pData, uint16_t EATT_Channel);
+[/#if]
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */

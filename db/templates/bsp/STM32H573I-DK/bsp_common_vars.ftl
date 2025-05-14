@@ -28,6 +28,18 @@
       [#if definition.name=="Bsp_Common_DEMO"]
           [#assign Bsp_Common_DEMO = definition.value]
       [/#if]
+      [#if definition.name=="LCD_TC_ON"]
+          [#assign LCD_TC_ON = definition.value]
+      [/#if]
+      [#if definition.name=="AUDIO_IN"]
+          [#assign AUDIO_IN = definition.value]
+      [/#if]
+      [#if definition.name=="AUDIO_OUT"]
+          [#assign AUDIO_OUT = definition.value]
+      [/#if]
+      [#if definition.name=="OCTOSPI_DEMO"]
+          [#assign OCTOSPI_DEMO = definition.value]
+      [/#if]
     [/#list]
   [/#if]
 [/#list]
@@ -37,4 +49,16 @@ COM_InitTypeDef BspCOMInit;
 [/#if]
 [#if Bsp_Common_DEMO?? && Bsp_Common_DEMO == "true"]
 __IO uint32_t BspButtonState = BUTTON_RELEASED;
+[/#if]
+[#if (LCD_TC_ON?? && LCD_TC_ON == "true")]
+TS_Init_t   BspTSInit;
+[/#if]
+[#if AUDIO_IN == "true"]
+BSP_AUDIO_Init_t BspAudioInInit;
+[/#if]
+[#if AUDIO_OUT == "true"]
+BSP_AUDIO_Init_t BspAudioOutInit;
+[/#if]
+[#if OCTOSPI_DEMO == "true"]
+BSP_OSPI_NOR_Init_t BspOSPINORInit;
 [/#if]

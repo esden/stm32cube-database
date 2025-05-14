@@ -6,7 +6,11 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
+[#if FamilyName=="STM32WB0" || FamilyName=="STM32WL3"]
+  * @file    ${FamilyName?lower_case}x_it.c
+[#else]
   * @file    ${FamilyName?lower_case}xx_it.c
+[/#if]
   * @brief   Interrupt Service Routines.
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
@@ -17,8 +21,20 @@
 [#compress]
 /* Includes ------------------------------------------------------------------*/
 #include "${main_h}"
+[#if FamilyName=="STM32WB0" || FamilyName=="STM32WL3"]
+#include "${FamilyName?lower_case}x_it.h"
+[#else]
 #include "${FamilyName?lower_case}xx_it.h"
-
+[/#if]
+[#if FamilyName=="STM32WB0"]
+[#if STM32_BLE??]
+#include "hw_pka.h"
+#include "ble_stack.h"
+#include "miscutil.h"
+#include "stm32wb0x_ll_usart.h"
+[/#if]
+[/#if]
+[@common.optinclude name=contextFolder+"/Core/Src/bsp_inc.tmp"/][#-- BSP includes --]
 
 [#if cpucore!="" && cpucore?replace("ARM_CORTEX_","")=="M4"]
     [#if  timeBaseSource_M4??]
@@ -289,10 +305,10 @@ void ${vector.irqHandler}(void)
 [/#function]
 
 /******************************************************************************/
-/* ${FamilyName}xx Peripheral Interrupt Handlers                                    */
+/* ${FamilyName}[#if FamilyName=="STM32WB0" || FamilyName=="STM32WL3"]x[#else]xx[/#if] Peripheral Interrupt Handlers                                    */
 /* Add here the Interrupt Handlers for the used peripherals.                  */
 /* For the available peripheral interrupt handler names,                      */
-/* please refer to the startup file (startup_${FamilyName?lower_case}xx.s).                    */
+/* please refer to the startup file (startup_${FamilyName?lower_case}[#if FamilyName=="STM32WB0" || FamilyName=="STM32WL3"]x[#else]xx[/#if].s).                    */
 /******************************************************************************/
 
 [#compress]
@@ -316,10 +332,10 @@ void ${vector.irqHandler}(void)
 [#if vector.halHandler?? && (vector.halHandler == "NONE" || !vector.halHandlerNeeded)]
 [#elseif vector.ipName=="" || vector.irregular=="true"]
   #t${vector.halHandler}
-[#elseif vector.name=="FMC_IRQn" || vector.name=="FSMC_IRQn" || vector.name=="HASH_RNG_IRQn" || vector.name=="TIM6_DAC_IRQn"]
+[#elseif vector.name=="FMC_IRQn" || vector.name=="FSMC_IRQn" || vector.name=="HASH_RNG_IRQn" || vector.name=="TIM6_DAC_IRQn" || vector.name=="GPIOA_IRQn" || vector.name=="GPIOB_IRQn" || vector.bspIpsharedInterrupt]
   #t${vector.halHandler}
 [#elseif vector.ipHandle != "" && vector.halUsed]
-  #t${vector.halHandler}[#if timeBaseSource?? && timeBaseSource==vector.ipName && (FamilyName=="STM32MP1" || DIE == "DIE501")][#else](&${vector.ipHandle});[/#if]
+  #t${vector.halHandler}[#if timeBaseSource?? && timeBaseSource==vector.ipName && (FamilyName=="STM32MP1" || FamilyName=="STM32MP2"|| DIE == "DIE501")][#else](&${vector.ipHandle});[/#if]
 [#elseif vector.halUsed]
   #t${vector.halHandler}();
 [/#if]

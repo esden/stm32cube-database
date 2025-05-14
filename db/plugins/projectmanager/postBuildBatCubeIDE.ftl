@@ -77,6 +77,9 @@ set ns_code_xml="%provisioningdir%\${ProvisioningFolderName}\Images\${NonSecure_
 	[#if NonSecure_Bin_Code_Image??]
 set ns_code_bin_xml="%provisioningdir%\${ProvisioningFolderName}\Images\${NonSecure_Bin_Code_Image}"
 	[/#if]
+set updateXmlImage=%provisioningdir%\${ProvisioningFolderName}\PyHelper\update_xml_image.py
+set imageXml=--image-xml
+set isOta=--is-ota
 [/#if]
 
 
@@ -143,6 +146,8 @@ goto :noerror
 :nonsecure
 echo Creating nonsecure image  >> "%projectdir%"\postbuild.log 2>&1
 [#if BootPathType?? && (BootPathType=="ST_IROT_UROT_SECURE_MANAGER")]
+%python%%updateXmlImage% %imageXml% %ns_code_xml% >> ""%projectdir%""\postbuild.log 2>&1
+%python%%updateXmlImage% %imageXml% %ns_code_bin_xml% %isOta% >> ""%projectdir%""\postbuild.log 2>&1
 %stm32tpccli% -pb %ns_code_xml% >> ""%projectdir%""\postbuild.log 2>&1
 %stm32tpccli% -pb %ns_code_bin_xml% >> ""%projectdir%""\postbuild.log 2>&1
 [#else]

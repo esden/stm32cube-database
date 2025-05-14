@@ -47,6 +47,12 @@
                         [#if definition.name="IPCC_CPU_M4"]
                         [#lt]#define IPCC_CPU_M4      ${definition.value}
 			[/#if]
+                        [#if definition.name="IPCC_CPU_A35"]
+                        [#lt]#define IPCC_CPU_A35      ${definition.value}
+            [/#if]
+                        [#if definition.name="IPCC_CPU_M33"]
+                        [#lt]#define IPCC_CPU_M33      ${definition.value}
+            [/#if]
                         [#if definition.name="MBOX_NO_MSG"]
                         [#lt]#define MBOX_NO_MSG       ${definition.value}
 			[/#if]

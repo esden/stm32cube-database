@@ -5,7 +5,7 @@
 :: ==============================================================================
 [#--  set stm32programmercli="C:\Program Files\STMicroelectronics\STM32Cube\STM32CubeProgrammer\bin\STM32_Programmer_CLI.exe"--]
 set stm32programmercli="${STM32CubeProgrammerPath}"
-[#if BootPathType?? && (BootPathType=="ST_IROT_UROT_SECURE_MANAGER" || isAppliOnly??)]
+[#if BootPathType?? && ((BootPathType=="ST_IROT_UROT_SECURE_MANAGER") || (isAppliOnly?? && !IDE?contains("STM32CubeIDE")))]
 set stm32tpccli="${tpcPath}"
 [#else]
 set stm32tpccli=${tpcPath}

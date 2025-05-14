@@ -31,7 +31,7 @@ extern "C" {
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
-[#if FamilyName?lower_case == "stm32u0"]
+[#if FamilyName?lower_case == "stm32u0" || FamilyName?lower_case == "stm32c0"]
 /* Define the flag for format and erase NAND flash memory */
 /* #define LX_DRIVER_ERASES_FLASH_AFTER_INIT */
 

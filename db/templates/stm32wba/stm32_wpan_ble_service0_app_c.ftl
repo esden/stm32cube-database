@@ -1,15 +1,4 @@
 [#ftl]
-/* USER CODE BEGIN Header */
-/**
-  ******************************************************************************
-  * @file    ${name?remove_beginning("App/%")?replace("%_app.c", "_app.c")}
-  * @author  MCD Application Team
-  * @brief   ${name?remove_beginning("App/%")?replace("%_app.c", "_app")} application definition.
-  ******************************************************************************
-[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
-  ******************************************************************************
-  */
-/* USER CODE END Header */
 
 [#assign SvcNbr = "0"]
 [#assign myHash = {}]
@@ -29,6 +18,17 @@ Key & Value:
 Key: ${key}; Value: ${myHash[key]}
 [/#list]
 --]
+/* USER CODE BEGIN Header */
+/**
+  ******************************************************************************
+  * @file    ${myHash["SERVICE"+SvcNbr+"_SHORT_NAME"]}_app.c
+  * @author  MCD Application Team
+  * @brief   ${myHash["SERVICE"+SvcNbr+"_SHORT_NAME"]}_app application definition.
+  ******************************************************************************
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
+  ******************************************************************************
+  */
+/* USER CODE END Header */
 [#assign SERVICE_NUMBER_OF_CHARACTERISTICS = myHash["SERVICE"+SvcNbr+"_NUMBER_OF_CHARACTERISTICS"]]
 [#assign SERVICE_SHORT_NAME = myHash["SERVICE"+SvcNbr+"_SHORT_NAME"]]
 [#assign SERVICE_SHORT_NAME_UpperCase = myHash["SERVICE"+SvcNbr+"_SHORT_NAME"]?upper_case]
@@ -115,6 +115,7 @@ ${definition.name}: "${definition.value}"
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "app_common.h"
+#include "log_module.h"
 #include "app_ble.h"
 #include "ll_sys_if.h"
 #include "dbg_trace.h"

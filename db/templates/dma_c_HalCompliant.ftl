@@ -271,8 +271,13 @@ void MX_${ipName}_Init(void)
             [/#if]
           #tNVIC_EnableIRQ(${initVector.vector});
           [#else]
+           [#if FamilyName=="STM32MP13"]
+           #tIRQ_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
+           #tIRQ_Enable(${initVector.vector});
+           [#else]
           #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
           #tHAL_NVIC_EnableIRQ(${initVector.vector});
+           [/#if]
           [/#if]
         [/#if]
       [/#list]

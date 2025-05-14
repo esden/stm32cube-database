@@ -1,0 +1,2084 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V4.0" IPType="peripheral" Name="TAMP" Version="TAMP-STM32MP2_rtc3_v1_2_rc1"
+    xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+    ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
+    xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+    <About>TAMP: Tamp</About>
+
+    <!-- IO context assignment is based on defined semaphores (e.g RIFSerivice)  -->
+    <RefParameter Comment="IO Semaphore Assignement" DefaultValue="true" Name="IOSemaphoreAssignement" Type="bool" Visible="false"/>
+
+    <!-- ################################## Tamper parameters ##################################################-->
+    <RefParameter Comment="RTC instance" DefaultValue="RTC"  Name="Instance" Type="list" Visible="false">
+    </RefParameter>
+    <RefParameter Comment="Tamper" DefaultValue="RTC_TAMPER_1" Group="Tamper1" Name="Tamper_1" Type="list" Visible="false">
+        <PossibleValue Comment="Tamper 1" Value="RTC_TAMPER_1"/>
+    </RefParameter>
+    <RefParameter Comment="Filter" DefaultValue="RTC_TAMPERFILTER_DISABLE" Group="Passive tamper signals" Name="Filter" Type="list">
+        <Condition Expression="Semaphore_PassiveTamper1|Semaphore_PassiveTamper2|Semaphore_PassiveTamper3|Semaphore_PassiveTamper4|Semaphore_PassiveTamper5|Semaphore_PassiveTamper6|Semaphore_PassiveTamper7|Semaphore_PassiveTamper8"   Diagnostic="" /> 
+
+        <PossibleValue Comment="Disabled" Value="RTC_TAMPERFILTER_DISABLE"/>
+        <PossibleValue Comment="Tamper activated after 2 consecutive samples" Value="RTC_TAMPERFILTER_2SAMPLE"/>
+        <PossibleValue Comment="Tamper activated after 4 consecutive samples" Value="RTC_TAMPERFILTER_4SAMPLE"/>
+        <PossibleValue Comment="Tamper activated after 8 consecutive samples" Value="RTC_TAMPERFILTER_8SAMPLE"/>
+    </RefParameter>
+
+    <RefParameter Comment="Tamper1" DefaultValue="RTC_ATAMP_ENABLE" Group="Tamper1" Name="Enable1" Type="String" >
+        <Condition Diagnostic="" Expression="Semaphore_ActiveTamper1"/>
+        <PossibleValue Comment="Active Input" Value="RTC_ATAMP_ENABLE" />
+    </RefParameter>
+    <RefParameter Comment="Tamper1" DefaultValue="RTC_ATAMP_DISABLE" Group="Tamper1" Name="Enable1" Type="String">
+        <Condition Diagnostic="" Expression="Semaphore_PassiveTamper1"/>
+        <PossibleValue Comment="Passive Input" Value="RTC_ATAMP_DISABLE" />
+    </RefParameter>
+    <RefParameter Comment="Enable10" DefaultValue="RTC_ATAMP_ENABLE" Group="Tamper1" Name="Enable10" Type="list">
+        <Condition Expression="Tamper1_ON &amp; Semaphore_ActiveTamper1" Diagnostic="" />
+        <PossibleValue Comment="Active Input" Value="RTC_ATAMP_ENABLE"  />
+    </RefParameter>
+    
+    
+    
+    <RefParameter Comment="Tamper1" DefaultValue="__NULL" Group="Enable11" Name="Enable1" Type="list">
+        <Condition Expression="Semaphore_PassiveTamper1" Diagnostic="" />
+        <PossibleValue Value="__NULL" Comment="__NULL"/>
+    </RefParameter>
+    
+    <RefParameter Comment="Sampling Frequency" DefaultValue="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV32768" Group="Passive tamper signals" Name="SamplingFrequency" Type="list">
+        <Condition Expression="Semaphore_PassiveTamper1" Diagnostic="" />
+
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 32768" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV32768"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 16384" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV16384"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 8192" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV8192"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 4096" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV4096"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 2048" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV2048"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 1024" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV1024"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 512" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV512"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 256" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV256"/>
+    </RefParameter>
+    <RefParameter Comment="Precharge Duration" DefaultValue="RTC_TAMPERPRECHARGEDURATION_1RTCCLK" Group="Passive tamper signals" Name="PrechargeDuration" Type="list">
+        <Condition Expression="Semaphore_PassiveTamper1" Diagnostic="" />
+
+        <PossibleValue Comment="Precharge Duration = 1 RTCCLK cycle" Value="RTC_TAMPERPRECHARGEDURATION_1RTCCLK"/>
+        <PossibleValue Comment="Precharge Duration = 2 RTCCLK cycles" Value="RTC_TAMPERPRECHARGEDURATION_2RTCCLK"/>
+        <PossibleValue Comment="Precharge Duration = 4 RTCCLK cycles" Value="RTC_TAMPERPRECHARGEDURATION_4RTCCLK"/>
+        <PossibleValue Comment="Precharge Duration = 8 RTCCLK cycles" Value="RTC_TAMPERPRECHARGEDURATION_8RTCCLK"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper_PullUp" DefaultValue="RTC_TAMPER_PULLUP_ENABLE" Group="Passive tamper signals" Name="TamperPullUp" Type="list">
+        <Condition Expression="Semaphore_PassiveTamper1" Diagnostic="" />
+
+        <PossibleValue Comment="Enabled " Value="RTC_TAMPER_PULLUP_ENABLE"/>
+        <PossibleValue Comment="Disabled " Value="RTC_TAMPER_PULLUP_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="TimeStamp_On_Tamper_ Detection" DefaultValue="RTC_TIMESTAMPONTAMPERDETECTION_ENABLE" Group="Time Stamp" Name="TimeStampOnTamperDetection" Type="list">
+        <PossibleValue Comment="Saved " Value="RTC_TIMESTAMPONTAMPERDETECTION_ENABLE"/>
+        <PossibleValue Comment="Not saved " Value="RTC_TIMESTAMPONTAMPERDETECTION_DISABLE"/>
+    </RefParameter>
+	
+    <RefParameter Comment="Tamper1_Trigger" DefaultValue="RTC_TAMPERTRIGGER_RISINGEDGE" Group="Tamper1" Name="Trigger_1" Type="list">
+        <Condition Diagnostic="" Expression="(Semaphore_PassiveTamper1)&amp; Filter=RTC_TAMPERFILTER_DISABLE"/>
+        <PossibleValue Comment="Rising Edge" Value="RTC_TAMPERTRIGGER_RISINGEDGE"/>
+        <PossibleValue Comment="Falling Edge" Value="RTC_TAMPERTRIGGER_FALLINGEDGE"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper1_Trigger" DefaultValue="RTC_TAMPERTRIGGER_LOWLEVEL" Group="Tamper1" Name="Trigger_1" Type="list">
+        <Condition Diagnostic="" Expression="(Semaphore_PassiveTamper1) "/>
+        <PossibleValue Comment="Low Level" Value="RTC_TAMPERTRIGGER_LOWLEVEL"/>
+        <PossibleValue Comment="High Level" Value="RTC_TAMPERTRIGGER_HIGHLEVEL"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper1_Trigger" DefaultValue="null" Group="Tamper1" Name="Trigger_1" Type="list" Visible="false"/>
+    
+    <RefParameter Comment="Tamper1_NoErase" DefaultValue="RTC_TAMPER_ERASE_BACKUP_ENABLE" Group="Tamper1" Name="NoErase_1" Type="list">
+        <Condition Expression="Tamper1_ON" Diagnostic="" />
+        <PossibleValue Comment="Erase Enabled" Value="RTC_TAMPER_ERASE_BACKUP_ENABLE"/>
+        <PossibleValue Comment="Erase Disabled" Value="RTC_TAMPER_ERASE_BACKUP_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper1_NoErase" DefaultValue="null" Group="Tamper1" Name="NoErase_1" Type="list" Visible="false">
+        <Condition Expression="Tamper1_ON " Diagnostic="" />
+    </RefParameter>
+    
+    <RefParameter Comment="Tamper1_NoErase" DefaultValue="RTC_TAMPER_ERASE_BACKUP_ENABLE" Group="Tamper1" Name="NoErase_10" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper1" Diagnostic="" />
+        <PossibleValue Comment="Erase Enabled" Value="RTC_TAMPER_ERASE_BACKUP_ENABLE"/>
+        <PossibleValue Comment="Erase Disabled" Value="RTC_TAMPER_ERASE_BACKUP_DISABLE"/>
+    </RefParameter>
+    
+
+   
+    <!--RefParameter Comment="Tamper1_Mask_Flag" DefaultValue="RTC_TAMPERMASK_FLAG_DISABLE" Group="Tamper1" Name="MaskFlag_1" Type="list">
+        <Condition Diagnostic="" Expression="Tamper1_ON &amp;(RTC_IRQn | TAMP_STAMP_IRQn | (TAMP_IRQn)) &amp;  !Semaphore_ActiveTamper1"/>
+        <PossibleValue Comment="Mask Flag Disabled" Value="RTC_TAMPERMASK_FLAG_DISABLE"/>
+    </RefParameter-->
+	
+    <RefParameter Comment="Tamper1_Mask_Flag" DefaultValue="RTC_TAMPERMASK_FLAG_DISABLE" Group="Tamper1" Name="MaskFlag_1" Type="list">
+        <Condition Diagnostic="" Expression="Tamper1_ON &amp;(RTC_IRQn | TAMP_STAMP_IRQn | (TAMP_IRQn)) &amp; (!Semaphore_ActiveTamper1)"/>
+        <PossibleValue Comment="Mask Flag Disabled" Value="RTC_TAMPERMASK_FLAG_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper1_Mask_Flag" DefaultValue="RTC_TAMPERMASK_FLAG_DISABLE" Group="Tamper1" Name="MaskFlag_10" Type="list">
+        <Condition Diagnostic="" Expression="Semaphore_ActiveTamper1"/>
+        <PossibleValue Comment="Mask Flag Disabled" Value="RTC_TAMPERMASK_FLAG_DISABLE"/>
+        <PossibleValue Comment="Mask Flag Enabled" Value="RTC_TAMPERMASK_FLAG_ENABLE"/>
+    </RefParameter>
+    
+	
+    <RefParameter Comment="Tamper1_Mask_Flag" DefaultValue="RTC_TAMPERMASK_FLAG_DISABLE" Group="Tamper1" Name="MaskFlag_1" Type="list">
+        <Condition Diagnostic="" Expression="Tamper1_ON &amp; (!Semaphore_ActiveTamper1)"/>
+        <PossibleValue Comment="Mask Flag Disabled" Value="RTC_TAMPERMASK_FLAG_DISABLE"/>
+        <PossibleValue Comment="Mask Flag Enabled" Value="RTC_TAMPERMASK_FLAG_ENABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper1_Mask_Flag" DefaultValue="null" Group="Tamper1" Name="MaskFlag_1" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="Tamper1_ON "/>
+
+    </RefParameter>
+   
+    <RefParameter Comment="Active AsyncPrescaler" DefaultValue="RTC_ATAMP_ASYNCPRES_RTCCLK" Group="Active tamper signals" Name="ActiveAsyncPrescaler" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+
+        <PossibleValue Comment="RTC ATAMP ASYNCPRES RTCCLK" Value="RTC_ATAMP_ASYNCPRES_RTCCLK"/>
+        <PossibleValue Comment="RTC ATAMP ASYNCPRES RTCCLK 2" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_2"/>
+        <PossibleValue Comment="RTC ATAMP ASYNCPRES RTCCLK 4" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_4"/>
+        <PossibleValue Comment="RTC ATAMP ASYNCPRES RTCCLK 8" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_8"/>
+        <PossibleValue Comment="RTC ATAMP ASYNCPRES RTCCLK 16" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_16"/>
+        <PossibleValue Comment="RTC ATAMP ASYNCPRES RTCCLK 32" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_32"/>
+        <PossibleValue Comment="RTC ATAMP ASYNCPRES RTCCLK 64" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_64"/>
+        <PossibleValue Comment="RTC ATAMP ASYNCPRES RTCCLK 128" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_128"/>
+        <PossibleValue Comment="RTC_ATAMP_ASYNCPRES_RTCCLK_2048 " Value="RTC_ATAMP_ASYNCPRES_RTCCLK_2048" Condition="DIE481 | DIE455" Action="Remove"/>
+    </RefParameter>
+    
+    <RefParameter Comment="Active Filter" DefaultValue="RTC_ATAMP_FILTER_DISABLE" Group="Active tamper signals" Name="ActiveFilter" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+
+        <PossibleValue Comment="Enable" Value="RTC_ATAMP_FILTER_ENABLE"/>
+        <PossibleValue Comment="Disable" Value="RTC_ATAMP_FILTER_DISABLE"/>
+       
+    </RefParameter>
+
+   
+    <RefParameter Comment="Time Stamp OnTamper Detection" DefaultValue="RTC_TIMESTAMPONTAMPERDETECTION_DISABLE" Group="Tamper1" Name="TimeStampOnTamperDetection" Type="list">
+        <PossibleValue Comment=" Disabled " Value="RTC_TIMESTAMPONTAMPERDETECTION_DISABLE"/>
+        <PossibleValue Comment=" Enabled" Value="RTC_TIMESTAMPONTAMPERDETECTION_ENABLE"/>
+    </RefParameter>
+    
+        
+    <RefParameter Name="ActiveOutputChangePeriod" Comment="Active Output Change Period" DefaultValue="0" Max="7" Min="0" Type="integer"  Group="Active tamper signals" >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+
+    </RefParameter>
+     
+   
+    <RefParameter Name="Seed_Size0" Comment="Seed[0]" DefaultValue="0x00000000" Min="0x00000000" Max="0xFFFFFFFF"  Type="hex"  Group="Active tamper signals"   >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+    </RefParameter>
+    <RefParameter Name="Seed_Size1" Comment="Seed[1]" DefaultValue="0x00000000" Min="0x00000000" Max="0xFFFFFFFF"  Type="hex"  Group="Active tamper signals"  >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+    </RefParameter>
+   
+    <RefParameter Name="Seed_Size2" Comment="Seed[2]" DefaultValue="0x00000000" Min="0x00000000" Max="0xFFFFFFFF"  Type="hex"  Group="Active tamper signals"   >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+    </RefParameter>  
+    <RefParameter Name="Seed_Size3" Comment="Seed[3]" DefaultValue="0x00000000" Min="0x00000000" Max="0xFFFFFFFF"  Type="hex" Group="Active tamper signals"   >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+    </RefParameter>
+   
+    <RefParameter Comment="Tamper1_Interrupt_mode" DefaultValue="RTC_ATAMP_INTERRUPT_DISABLE" Group="Tamper1" Name="Interrupt1" Type="list">
+        <Condition Expression="Tamper1_ON &amp; Semaphore_ActiveTamper1" Diagnostic="" />
+        <PossibleValue Comment="Enable" Value="RTC_ATAMP_INTERRUPT_ENABLE"/>
+        <PossibleValue Comment="Disable" Value="RTC_ATAMP_INTERRUPT_DISABLE"/>
+    </RefParameter>
+    
+    <RefParameter Comment="Interrupt1" DefaultValue="__NULL" Group="Tamper1" Name="Interrupt1" Type="list">
+        <Condition Expression="!Tamper1_ON &amp; Semaphore_ActiveTamper1" Diagnostic="" />
+        <PossibleValue Value="__NULL" Comment="__NULL"/>
+    </RefParameter>
+   
+    <RefParameter Comment="Tamper1_Active_Input_Output" DefaultValue="__NULL" Group="Tamper1" Name="Output1" Type="list" Visible="false">
+        <PossibleValue Value="__NULL" Comment="__NULL"/>
+        <Condition Expression="!Tamper1_ON |!Semaphore_ActiveTamper1" Diagnostic="" />
+    </RefParameter>
+
+    <RefParameter Comment="Tamper1_Active_Input_Output" DefaultValue="RTC_ATAMP_1" Group="Tamper1" Name="Output1" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper1" Diagnostic="" />
+        <PossibleValue Comment="Tamper 1" Value="RTC_ATAMP_1" Condition="!Tamper1_OUTPUT" Diagnostic="Available when Active Output1 is enabled" />  
+        <PossibleValue Comment="Tamper 2" Value="RTC_ATAMP_2" Condition="!Tamper2_OUTPUT" Diagnostic="Available when Active Output2 is enabled"/> 
+        <PossibleValue Comment="Tamper 3" Value="RTC_ATAMP_3" Condition="!Tamper3_OUTPUT"  Diagnostic="Available when Active Output3 is enabled"/>  
+        <PossibleValue Comment="Tamper 4" Value="RTC_ATAMP_4" Condition="!Tamper4_OUTPUT" Diagnostic="Available when Active Output4 is enabled"/> 
+        <PossibleValue Comment="Tamper 5" Value="RTC_ATAMP_5" Condition="!Tamper5_OUTPUT"  Diagnostic="Available when Active Output5 is enabled"/>  
+        <PossibleValue Comment="Tamper 6" Value="RTC_ATAMP_6" Condition="!Tamper6_OUTPUT" Diagnostic="Available when Active Output6 is enabled"/> 
+        <PossibleValue Comment="Tamper 7" Value="RTC_ATAMP_7" Condition="!Tamper7_OUTPUT"  Diagnostic="Available when Active Output7 is enabled"/>  
+        <PossibleValue Comment="Tamper 8" Value="RTC_ATAMP_8" Condition="!Tamper8_OUTPUT" Diagnostic="Available when Active Output8 is enabled"/>       
+    </RefParameter>
+
+    <RefParameter Comment="Tamper1_Active_Input_Output" DefaultValue="null" Group="Tamper1" Name="Output1" Type="list" Visible="false"/>
+    <!-- ################################## Tamper 2 ##################################################-->
+   
+    <RefParameter Comment="Tamper" DefaultValue="RTC_TAMPER_2" Group="Tamper2" Name="Tamper_2" Type="list" Visible="false">
+        <PossibleValue Comment="Tamper 2" Value="RTC_TAMPER_2"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper2" DefaultValue="RTC_ATAMP_ENABLE" Group="Tamper2" Name="Enable2" Type="String">
+        <Condition Expression="Semaphore_ActiveTamper2" Diagnostic="" />
+        <PossibleValue Comment="Active Input" Value="RTC_ATAMP_ENABLE" />   
+    </RefParameter>
+    <RefParameter Comment="Tamper2" DefaultValue="RTC_ATAMP_DISABLE" Group="Tamper2" Name="Enable2" Type="String">
+        <Condition Expression="Semaphore_PassiveTamper2" Diagnostic="" />
+        <PossibleValue Comment="Passive Input" Value="RTC_ATAMP_DISABLE"/>    
+    </RefParameter>
+    <RefParameter Comment="Tamper2" DefaultValue="__NULL" Group="Tamper2" Name="Enable20" Type="list" Visible="false">
+        <Condition Expression="Tamper2_ON &amp; (Semaphore_ActiveTamper2) " Diagnostic="" />
+        <PossibleValue Comment="Active Input" Value="RTC_ATAMP_ENABLE" />
+    </RefParameter>
+    
+    <RefParameter Comment="Tamper2" DefaultValue="null" Group="Tamper2" Name="Enable2" Type="list" Visible="false"/>
+    <RefParameter Comment="Filter" DefaultValue="RTC_TAMPERFILTER_DISABLE" Group="Passive tamper signals" Name="Filter" Type="list">
+        <Condition Expression="Semaphore_PassiveTamper2" Diagnostic="" />
+        <PossibleValue Comment="Disabled" Value="RTC_TAMPERFILTER_DISABLE"/>
+        <PossibleValue Comment="Tamper activated after 2 consecutive samples" Value="RTC_TAMPERFILTER_2SAMPLE"/>
+        <PossibleValue Comment="Tamper activated after 4 consecutive samples" Value="RTC_TAMPERFILTER_4SAMPLE"/>
+        <PossibleValue Comment="Tamper activated after 8 consecutive samples" Value="RTC_TAMPERFILTER_8SAMPLE"/>
+    </RefParameter>
+    <RefParameter Comment="Sampling Frequency" DefaultValue="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV32768" Group="Passive tamper signals" Name="SamplingFrequency" Type="list">
+        <Condition Expression="Semaphore_PassiveTamper2" Diagnostic="" />
+
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 32768" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV32768"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 16384" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV16384"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 8192" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV8192"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 4096" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV4096"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 2048" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV2048"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 1024" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV1024"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 512" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV512"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 256" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV256"/>
+    </RefParameter>
+    <RefParameter Comment="Precharge Duration" DefaultValue="RTC_TAMPERPRECHARGEDURATION_1RTCCLK" Group="Passive tamper signals" Name="PrechargeDuration" Type="list">
+        <Condition Expression="Semaphore_PassiveTamper2" Diagnostic="" />
+
+        <PossibleValue Comment="Precharge Duration = 1 RTCCLK cycle" Value="RTC_TAMPERPRECHARGEDURATION_1RTCCLK"/>
+        <PossibleValue Comment="Precharge Duration = 2 RTCCLK cycles" Value="RTC_TAMPERPRECHARGEDURATION_2RTCCLK"/>
+        <PossibleValue Comment="Precharge Duration = 4 RTCCLK cycles" Value="RTC_TAMPERPRECHARGEDURATION_4RTCCLK"/>
+        <PossibleValue Comment="Precharge Duration = 8 RTCCLK cycles" Value="RTC_TAMPERPRECHARGEDURATION_8RTCCLK"/>
+    </RefParameter>
+     
+    <RefParameter Comment="Tamper_PullUp" DefaultValue="RTC_TAMPER_PULLUP_ENABLE" Group="Passive tamper signals" Name="TamperPullUp" Type="list">
+        <Condition Expression="Semaphore_PassiveTamper2" Diagnostic="" />
+
+        <PossibleValue Comment="Enabled " Value="RTC_TAMPER_PULLUP_ENABLE"/>
+        <PossibleValue Comment="Disabled " Value="RTC_TAMPER_PULLUP_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="TimeStamp_On_Tamper_ Detection" DefaultValue="RTC_TIMESTAMPONTAMPERDETECTION_ENABLE" Group="Time Stamp" Name="TimeStampOnTamperDetection" Type="list">
+        <PossibleValue Comment="Saved " Value="RTC_TIMESTAMPONTAMPERDETECTION_ENABLE"/>
+        <PossibleValue Comment="Not saved " Value="RTC_TIMESTAMPONTAMPERDETECTION_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper2_Trigger" DefaultValue="RTC_TAMPERTRIGGER_RISINGEDGE" Group="Tamper2" Name="Trigger_2" Type="list">
+        <Condition Diagnostic="" Expression="Semaphore_PassiveTamper2 &amp;Filter=RTC_TAMPERFILTER_DISABLE "/>
+        <PossibleValue Comment="Rising Edge" Value="RTC_TAMPERTRIGGER_RISINGEDGE"/>
+        <PossibleValue Comment="Falling Edge" Value="RTC_TAMPERTRIGGER_FALLINGEDGE"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper2_Trigger" DefaultValue="RTC_TAMPERTRIGGER_LOWLEVEL" Group="Tamper2" Name="Trigger_2" Type="list">
+        <Condition Diagnostic="" Expression="Semaphore_PassiveTamper2"/>
+
+        <PossibleValue Comment="Low Level" Value="RTC_TAMPERTRIGGER_LOWLEVEL"/>
+        <PossibleValue Comment="High Level" Value="RTC_TAMPERTRIGGER_HIGHLEVEL"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper2_Trigger" DefaultValue="null" Group="Tamper2" Name="Trigger_2" Type="list" Visible="false"/>
+
+    <RefParameter Comment="Tamper2_NoErase" DefaultValue="RTC_TAMPER_ERASE_BACKUP_ENABLE" Group="Tamper2" Name="NoErase_2" Type="list">
+        <Condition Expression="Tamper2_ON" Diagnostic=""/>
+        <PossibleValue Comment="Erase Enabled" Value="RTC_TAMPER_ERASE_BACKUP_ENABLE"/>
+        <PossibleValue Comment="Erase Disabled" Value="RTC_TAMPER_ERASE_BACKUP_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper2_NoErase" DefaultValue="RTC_TAMPER_ERASE_BACKUP_ENABLE" Group="Tamper2" Name="NoErase_20" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper2" Diagnostic=""/>
+        <PossibleValue Comment="Erase Enabled" Value="RTC_TAMPER_ERASE_BACKUP_ENABLE"/>
+        <PossibleValue Comment="Erase Disabled" Value="RTC_TAMPER_ERASE_BACKUP_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper2_NoErase" DefaultValue="null" Group="Tamper2" Name="NoErase_2" Type="list" Visible="false"/>
+	
+    
+    <RefParameter Comment="Tamper2_Mask_Flag" DefaultValue="RTC_TAMPERMASK_FLAG_DISABLE" Group="Tamper2" Name="MaskFlag_2" Type="list">
+        <Condition Diagnostic="" Expression="Tamper2_ON &amp;(RTC_IRQn | TAMP_STAMP_IRQn | (TAMP_IRQn)) &amp; (!Semaphore_ActiveTamper2)"/>
+        <PossibleValue Comment="Mask Flag Disabled" Value="RTC_TAMPERMASK_FLAG_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper2_Mask_Flag" DefaultValue="RTC_TAMPERMASK_FLAG_DISABLE" Group="Tamper2" Name="MaskFlag_20" Type="list">
+        <Condition Diagnostic="" Expression="Semaphore_ActiveTamper2"/>
+        <PossibleValue Comment="Mask Flag Disabled" Value="RTC_TAMPERMASK_FLAG_DISABLE"/>
+        <PossibleValue Comment="Mask Flag Enabled" Value="RTC_TAMPERMASK_FLAG_ENABLE"/>
+    </RefParameter>
+	
+    <RefParameter Comment="Tamper2_Mask_Flag" DefaultValue="RTC_TAMPERMASK_FLAG_DISABLE" Group="Tamper2" Name="MaskFlag_2" Type="list">
+        <Condition Diagnostic="" Expression="Tamper2_ON &amp; (!Semaphore_ActiveTamper2)"/>
+        <PossibleValue Comment="Mask Flag Disabled" Value="RTC_TAMPERMASK_FLAG_DISABLE"/>
+        <PossibleValue Comment="Mask Flag Enabled" Value="RTC_TAMPERMASK_FLAG_ENABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper2_Mask_Flag" DefaultValue="null" Group="Tamper2" Name="MaskFlag_2" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="Tamper2_ON "/>
+
+    </RefParameter>
+   
+    <RefParameter Comment="Active AsyncPrescaler" DefaultValue="RTC_ATAMP_ASYNCPRES_RTCCLK" Group="Active tamper signals" Name="ActiveAsyncPrescaler" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK" Value="RTC_ATAMP_ASYNCPRES_RTCCLK"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_2" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_2"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_4" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_4"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_8" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_8"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_16" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_16"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_32" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_32"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_64" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_64"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_128" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_128"/>
+        <PossibleValue Comment="RTC_ATAMP_ASYNCPRES_RTCCLK_2048 " Value="RTC_ATAMP_ASYNCPRES_RTCCLK_2048" Condition="DIE481 | DIE455" Action="Remove"/>
+    </RefParameter>
+    <RefParameter Comment="Time Stamp OnTamper Detection" DefaultValue="RTC_TIMESTAMPONTAMPERDETECTION_DISABLE" Group="Tamper2" Name="TimeStampOnTamperDetection" Type="list">
+        <PossibleValue Comment=" Disabled " Value="RTC_TIMESTAMPONTAMPERDETECTION_DISABLE"/>
+        <PossibleValue Comment=" Enabled" Value="RTC_TIMESTAMPONTAMPERDETECTION_ENABLE"/>
+    </RefParameter>
+    
+    
+    <RefParameter Name="ActiveOutputChangePeriod" Comment="Active Output Change Period" DefaultValue="0" Max="7" Min="0" Type="integer"  Group="Active tamper signals" >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+    </RefParameter>
+    
+    <RefParameter Name="Seed_Size0" Comment="Seed[0]" DefaultValue="0x00000000" Min="0x00000000" Max="0xFFFFFFFF"  Type="hex"  Group="Active tamper signals"   >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+    </RefParameter>
+    <RefParameter Name="Seed_Size1" Comment="Seed[1]" DefaultValue="0x00000000" Min="0x00000000" Max="0xFFFFFFFF"  Type="hex"  Group="Active tamper signals"  >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+    </RefParameter>
+   
+    <RefParameter Name="Seed_Size2" Comment="Seed[2]" DefaultValue="0x00000000" Min="0x00000000" Max="0xFFFFFFFF"  Type="hex"  Group="Active tamper signals"   >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+    </RefParameter>  
+    <RefParameter Name="Seed_Size3" Comment="Seed[3]" DefaultValue="0x00000000" Min="0x00000000" Max="0xFFFFFFFF"  Type="hex" Group="Active tamper signals"   >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+    </RefParameter>
+  
+    <RefParameter Comment="Tamper2_Interrupt_mode" DefaultValue="RTC_ATAMP_INTERRUPT_DISABLE" Group="Tamper2" Name="Interrupt2" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper2" Diagnostic="" />
+        <PossibleValue Comment="Enable" Value="RTC_ATAMP_INTERRUPT_ENABLE"/>
+        <PossibleValue Comment="Disable" Value="RTC_ATAMP_INTERRUPT_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Interrupt2" DefaultValue="__NULL" Group="Tamper2" Name="Interrupt2" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper2" Diagnostic="" />
+
+        <PossibleValue Value="__NULL" Comment="__NULL"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper2_Active_Input_Output" DefaultValue="__NULL" Group="Tamper2" Name="Output2" Type="list" Visible="false">
+        <PossibleValue Value="__NULL" Comment="__NULL"/>
+        <Condition Expression="!Tamper2_ON|!Semaphore_ActiveTamper2" Diagnostic="" />
+    </RefParameter>
+    
+    <RefParameter Comment="Tamper2_Active_Input_Output" DefaultValue="RTC_ATAMP_2" Group="Tamper2" Name="Output2" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper2" Diagnostic="" />
+
+        <PossibleValue Comment="Tamper 1" Value="RTC_ATAMP_1" Condition="!Tamper1_OUTPUT" Diagnostic="Available when Active Output1 is enabled" />  
+        <PossibleValue Comment="Tamper 2" Value="RTC_ATAMP_2" Condition="!Tamper2_OUTPUT" Diagnostic="Available when Active Output2 is enabled"/> 
+        <PossibleValue Comment="Tamper 3" Value="RTC_ATAMP_3" Condition="!Tamper3_OUTPUT"  Diagnostic="Available when Active Output3 is enabled"/>  
+        <PossibleValue Comment="Tamper 4" Value="RTC_ATAMP_4" Condition="!Tamper4_OUTPUT" Diagnostic="Available when Active Output4 is enabled"/> 
+        <PossibleValue Comment="Tamper 5" Value="RTC_ATAMP_5" Condition="!Tamper5_OUTPUT"  Diagnostic="Available when Active Output5 is enabled"/>  
+        <PossibleValue Comment="Tamper 6" Value="RTC_ATAMP_6" Condition="!Tamper6_OUTPUT" Diagnostic="Available when Active Output6 is enabled"/> 
+        <PossibleValue Comment="Tamper 7" Value="RTC_ATAMP_7" Condition="!Tamper7_OUTPUT"  Diagnostic="Available when Active Output7 is enabled"/>  
+        <PossibleValue Comment="Tamper 8" Value="RTC_ATAMP_8" Condition="!Tamper8_OUTPUT" Diagnostic="Available when Active Output8 is enabled"/>
+       
+    </RefParameter>
+    
+    <!-- ################################## Tamper 3 ##################################################-->
+  
+    <RefParameter Comment="Tamper" DefaultValue="RTC_TAMPER_3" Group="Tamper3" Name="Tamper_3" Type="list" Visible="false">
+        <PossibleValue Comment="Tamper 3" Value="RTC_TAMPER_3"/>
+    </RefParameter>
+    <RefParameter Comment="Filter" DefaultValue="RTC_TAMPERFILTER_DISABLE" Group="Passive tamper signals" Name="Filter" Type="list">
+        <Condition Expression="Semaphore_PassiveTamper3" Diagnostic="" />
+
+        <PossibleValue Comment="Disabled" Value="RTC_TAMPERFILTER_DISABLE"/>
+        <PossibleValue Comment="Tamper activated after 2 consecutive samples" Value="RTC_TAMPERFILTER_2SAMPLE"/>
+        <PossibleValue Comment="Tamper activated after 4 consecutive samples" Value="RTC_TAMPERFILTER_4SAMPLE"/>
+        <PossibleValue Comment="Tamper activated after 8 consecutive samples" Value="RTC_TAMPERFILTER_8SAMPLE"/>
+    </RefParameter>
+    <RefParameter Comment="Sampling Frequency" DefaultValue="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV32768" Group="Passive tamper signals" Name="SamplingFrequency" Type="list">
+        <Condition Expression="Semaphore_PassiveTamper3" Diagnostic="" />
+
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 32768" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV32768"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 16384" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV16384"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 8192" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV8192"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 4096" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV4096"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 2048" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV2048"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 1024" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV1024"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 512" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV512"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 256" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV256"/>
+    </RefParameter>
+    <RefParameter Comment="Precharge Duration" DefaultValue="RTC_TAMPERPRECHARGEDURATION_1RTCCLK" Group="Passive tamper signals" Name="PrechargeDuration" Type="list">
+        <Condition Expression="Semaphore_PassiveTamper3" Diagnostic="" />
+
+        <PossibleValue Comment="Precharge Duration = 1 RTCCLK cycle" Value="RTC_TAMPERPRECHARGEDURATION_1RTCCLK"/>
+        <PossibleValue Comment="Precharge Duration = 2 RTCCLK cycles" Value="RTC_TAMPERPRECHARGEDURATION_2RTCCLK"/>
+        <PossibleValue Comment="Precharge Duration = 4 RTCCLK cycles" Value="RTC_TAMPERPRECHARGEDURATION_4RTCCLK"/>
+        <PossibleValue Comment="Precharge Duration = 8 RTCCLK cycles" Value="RTC_TAMPERPRECHARGEDURATION_8RTCCLK"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper_PullUp" DefaultValue="RTC_TAMPER_PULLUP_ENABLE" Group="Passive tamper signals" Name="TamperPullUp" Type="list">
+        <Condition Expression="Semaphore_PassiveTamper3" Diagnostic="" />
+
+        <PossibleValue Comment="Enabled " Value="RTC_TAMPER_PULLUP_ENABLE"/>
+        <PossibleValue Comment="Disabled " Value="RTC_TAMPER_PULLUP_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="TimeStamp_On_Tamper_ Detection" DefaultValue="RTC_TIMESTAMPONTAMPERDETECTION_ENABLE" Group="Time Stamp" Name="TimeStampOnTamperDetection" Type="list">
+        <PossibleValue Comment="Saved " Value="RTC_TIMESTAMPONTAMPERDETECTION_ENABLE"/>
+        <PossibleValue Comment="Not saved " Value="RTC_TIMESTAMPONTAMPERDETECTION_DISABLE"/>
+    </RefParameter>
+	
+    <RefParameter Comment="Tamper3_Trigger" DefaultValue="RTC_TAMPERTRIGGER_RISINGEDGE" Group="Tamper3" Name="Trigger_3" Type="list">
+        <Condition Diagnostic="" Expression="Semaphore_PassiveTamper3 &amp;Filter=RTC_TAMPERFILTER_DISABLE "/>
+        <PossibleValue Comment="Rising Edge" Value="RTC_TAMPERTRIGGER_RISINGEDGE"/>
+        <PossibleValue Comment="Falling Edge" Value="RTC_TAMPERTRIGGER_FALLINGEDGE"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper3_Trigger" DefaultValue="RTC_TAMPERTRIGGER_LOWLEVEL" Group="Tamper3" Name="Trigger_3" Type="list">
+        <Condition Diagnostic="" Expression="Semaphore_PassiveTamper3"/>
+
+        <PossibleValue Comment="Low Level" Value="RTC_TAMPERTRIGGER_LOWLEVEL"/>
+        <PossibleValue Comment="High Level" Value="RTC_TAMPERTRIGGER_HIGHLEVEL"/>
+    </RefParameter>
+
+    <RefParameter Comment="Tamper3_NoErase" DefaultValue="RTC_TAMPER_ERASE_BACKUP_ENABLE" Group="Tamper3" Name="NoErase_3" Type="list">
+        <Condition Expression="Tamper3_ON" Diagnostic=""/>
+        <PossibleValue Comment="Erase Enabled" Value="RTC_TAMPER_ERASE_BACKUP_ENABLE"/>
+        <PossibleValue Comment="Erase Disabled" Value="RTC_TAMPER_ERASE_BACKUP_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper2_NoErase" DefaultValue="RTC_TAMPER_ERASE_BACKUP_ENABLE" Group="Tamper3" Name="NoErase_30" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper3" Diagnostic=""/>
+        <PossibleValue Comment="Erase Enabled" Value="RTC_TAMPER_ERASE_BACKUP_ENABLE"/>
+        <PossibleValue Comment="Erase Disabled" Value="RTC_TAMPER_ERASE_BACKUP_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper3_NoErase" DefaultValue="null" Group="Tamper3" Name="NoErase_3" Type="list" Visible="false">
+        <Condition Expression="Tamper3_ON" Diagnostic=""/>
+    </RefParameter>
+
+    
+    <RefParameter Comment="Tamper3" DefaultValue="RTC_ATAMP_ENABLE" Group="Tamper3" Name="Enable3" Type="String" >
+        <Condition Expression="Semaphore_ActiveTamper3" Diagnostic="" />
+        <PossibleValue Comment="Active Input" Value="RTC_ATAMP_ENABLE" />   
+    </RefParameter>
+    <RefParameter Comment="Tamper3" DefaultValue="RTC_ATAMP_DISABLE" Group="Tamper3" Name="Enable3" Type="String" >
+        <Condition Expression="Semaphore_PassiveTamper3" Diagnostic="" />
+        <PossibleValue Comment="Passive Input" Value="RTC_ATAMP_DISABLE"/>    
+    </RefParameter>
+    <RefParameter Comment="Tamper3" DefaultValue="RTC_ATAMP_ENABLE" Group="Tamper3" Name="Enable30" Type="list">
+        <Condition Expression="Tamper3_ON &amp; Semaphore_ActiveTamper3" Diagnostic="" />
+        <PossibleValue Comment="Active Input" Value="RTC_ATAMP_ENABLE"  />
+    </RefParameter>    
+    <RefParameter Comment="Tamper3_Mask_Flag" DefaultValue="RTC_TAMPERMASK_FLAG_DISABLE" Group="Tamper3" Name="MaskFlag_3" Type="list">
+        <Condition Diagnostic="" Expression="Tamper3_ON &amp; RTC_IRQn | TAMP_STAMP_IRQn | (TAMP_IRQn) &amp; (!Semaphore_ActiveTamper3)"/>
+        <PossibleValue Comment="Mask Flag Disabled" Value="RTC_TAMPERMASK_FLAG_DISABLE"/>
+    </RefParameter>
+
+    <RefParameter Comment="Tamper3_Mask_Flag" DefaultValue="RTC_TAMPERMASK_FLAG_DISABLE" Group="Tamper3" Name="MaskFlag_3" Type="list">
+        <Condition Diagnostic="" Expression="Tamper3_ON &amp; (!Semaphore_ActiveTamper3)"/>
+        <PossibleValue Comment="Mask Flag Disabled" Value="RTC_TAMPERMASK_FLAG_DISABLE"/>
+        <PossibleValue Comment="Mask Flag Enabled" Value="RTC_TAMPERMASK_FLAG_ENABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper3_Mask_Flag" DefaultValue="null" Group="Tamper3" Name="MaskFlag_3" Type="list" Visible="false">
+                <Condition Diagnostic="" Expression="Tamper3_ON "/>
+
+    </RefParameter>
+
+    
+    <RefParameter Comment="Active AsyncPrescaler" DefaultValue="RTC_ATAMP_ASYNCPRES_RTCCLK" Group="Active tamper signals" Name="ActiveAsyncPrescaler" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK" Value="RTC_ATAMP_ASYNCPRES_RTCCLK"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_2" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_2"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_4" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_4"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_8" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_8"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_16" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_16"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_32" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_32"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_64" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_64"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_128" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_128"/>
+        <PossibleValue Comment="RTC_ATAMP_ASYNCPRES_RTCCLK_2048 " Value="RTC_ATAMP_ASYNCPRES_RTCCLK_2048" Condition="DIE481 | DIE455" Action="Remove"/>
+    </RefParameter>
+    <RefParameter Comment="Time Stamp OnTamper Detection" DefaultValue="RTC_TIMESTAMPONTAMPERDETECTION_DISABLE" Group="Tamper3" Name="TimeStampOnTamperDetection" Type="list">
+        <PossibleValue Comment=" Disabled " Value="RTC_TIMESTAMPONTAMPERDETECTION_DISABLE"/>
+        <PossibleValue Comment=" Enabled" Value="RTC_TIMESTAMPONTAMPERDETECTION_ENABLE"/>
+    </RefParameter>
+    
+    
+    <RefParameter Name="ActiveOutputChangePeriod" Comment="Active Output Change Period" DefaultValue="0" Max="7" Min="0" Type="integer"  Group="Active tamper signals" >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+
+    </RefParameter>
+    
+    <RefParameter Name="Seed_Size0" Comment="Seed[0]" DefaultValue="0x00000000" Min="0x00000000" Max="0xFFFFFFFF"  Type="hex"  Group="Active tamper signals"   >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+    </RefParameter>
+    <RefParameter Name="Seed_Size1" Comment="Seed[1]" DefaultValue="0x00000000" Min="0x00000000" Max="0xFFFFFFFF"  Type="hex"  Group="Active tamper signals"  >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+    </RefParameter>
+   
+    <RefParameter Name="Seed_Size2" Comment="Seed[2]" DefaultValue="0x00000000" Min="0x00000000" Max="0xFFFFFFFF"  Type="hex"  Group="Active tamper signals"   >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+    </RefParameter>  
+    <RefParameter Name="Seed_Size3" Comment="Seed[3]" DefaultValue="0x00000000" Min="0x00000000" Max="0xFFFFFFFF"  Type="hex" Group="Active tamper signals"   >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+    </RefParameter>
+    
+    <RefParameter Comment="Tamper3_Interrupt_mode" DefaultValue="RTC_ATAMP_INTERRUPT_DISABLE" Group="Tamper3" Name="Interrupt3" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper3" Diagnostic="" />
+        <PossibleValue Comment="Enable" Value="RTC_ATAMP_INTERRUPT_ENABLE"/>
+        <PossibleValue Comment="Disable" Value="RTC_ATAMP_INTERRUPT_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Interrupt3" DefaultValue="__NULL" Group="Tamper3" Name="Interrupt3" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper3" Diagnostic="" />
+        <PossibleValue Value="__NULL" Comment="__NULL"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper3_Active_Input_Output" DefaultValue="__NULL" Group="Tamper3" Name="Output3" Type="list" Visible="false">
+        <PossibleValue Value="__NULL" Comment="__NULL"/>
+        <Condition Expression="!Tamper3_ON|!Semaphore_ActiveTamper3" Diagnostic="" />
+    </RefParameter>
+    
+    <RefParameter Comment="Tamper3_Active_Input_Output" DefaultValue="RTC_ATAMP_1" Group="Tamper3" Name="Output3" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper3" Diagnostic="" />
+
+        <PossibleValue Comment="Tamper 1" Value="RTC_ATAMP_1" Condition="!Tamper1_OUTPUT" Diagnostic="Available when Active Output1 is enabled" />  
+        <PossibleValue Comment="Tamper 2" Value="RTC_ATAMP_2" Condition="!Tamper2_OUTPUT" Diagnostic="Available when Active Output2 is enabled"/> 
+        <PossibleValue Comment="Tamper 3" Value="RTC_ATAMP_3" Condition="!Tamper3_OUTPUT"  Diagnostic="Available when Active Output3 is enabled"/>  
+        <PossibleValue Comment="Tamper 4" Value="RTC_ATAMP_4" Condition="!Tamper4_OUTPUT" Diagnostic="Available when Active Output4 is enabled"/> 
+        <PossibleValue Comment="Tamper 5" Value="RTC_ATAMP_5" Condition="!Tamper5_OUTPUT"  Diagnostic="Available when Active Output5 is enabled"/>  
+        <PossibleValue Comment="Tamper 6" Value="RTC_ATAMP_6" Condition="!Tamper6_OUTPUT" Diagnostic="Available when Active Output6 is enabled"/> 
+        <PossibleValue Comment="Tamper 7" Value="RTC_ATAMP_7" Condition="!Tamper7_OUTPUT"  Diagnostic="Available when Active Output7 is enabled"/>  
+        <PossibleValue Comment="Tamper 8" Value="RTC_ATAMP_8" Condition="!Tamper8_OUTPUT" Diagnostic="Available when Active Output8 is enabled"/>
+       
+    </RefParameter>
+    
+    <!-- ################################## Tamper 4 ##################################################-->
+    
+  
+    <RefParameter Comment="Tamper" DefaultValue="RTC_TAMPER_4" Group="Tamper4" Name="Tamper_4" Type="list" Visible="false">
+        <PossibleValue Comment="Tamper 4" Value="RTC_TAMPER_4"/>
+    </RefParameter>
+    <RefParameter Comment="Filter" DefaultValue="RTC_TAMPERFILTER_DISABLE" Group="Passive tamper signals" Name="Filter" Type="list">
+        <Condition Expression="Semaphore_PassiveTamper4" Diagnostic="" />
+
+        <PossibleValue Comment="Disabled" Value="RTC_TAMPERFILTER_DISABLE"/>
+        <PossibleValue Comment="Tamper activated after 2 consecutive samples" Value="RTC_TAMPERFILTER_2SAMPLE"/>
+        <PossibleValue Comment="Tamper activated after 4 consecutive samples" Value="RTC_TAMPERFILTER_4SAMPLE"/>
+        <PossibleValue Comment="Tamper activated after 8 consecutive samples" Value="RTC_TAMPERFILTER_8SAMPLE"/>
+    </RefParameter>
+    <RefParameter Comment="Sampling Frequency" DefaultValue="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV32768" Group="Passive tamper signals" Name="SamplingFrequency" Type="list">
+        <Condition Expression="Semaphore_PassiveTamper4" Diagnostic="" />
+
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 32768" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV32768"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 16384" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV16384"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 8192" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV8192"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 4096" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV4096"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 2048" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV2048"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 1024" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV1024"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 512" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV512"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 256" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV256"/>
+    </RefParameter>
+    <RefParameter Comment="Precharge Duration" DefaultValue="RTC_TAMPERPRECHARGEDURATION_1RTCCLK" Group="Passive tamper signals" Name="PrechargeDuration" Type="list">
+        <Condition Expression="Semaphore_PassiveTamper4" Diagnostic="" />
+
+        <PossibleValue Comment="Precharge Duration = 1 RTCCLK cycle" Value="RTC_TAMPERPRECHARGEDURATION_1RTCCLK"/>
+        <PossibleValue Comment="Precharge Duration = 2 RTCCLK cycles" Value="RTC_TAMPERPRECHARGEDURATION_2RTCCLK"/>
+        <PossibleValue Comment="Precharge Duration = 4 RTCCLK cycles" Value="RTC_TAMPERPRECHARGEDURATION_4RTCCLK"/>
+        <PossibleValue Comment="Precharge Duration = 8 RTCCLK cycles" Value="RTC_TAMPERPRECHARGEDURATION_8RTCCLK"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper_PullUp" DefaultValue="RTC_TAMPER_PULLUP_ENABLE" Group="Passive tamper signals" Name="TamperPullUp" Type="list">
+        <Condition Expression="Semaphore_PassiveTamper4" Diagnostic="" />
+
+        <PossibleValue Comment="Enabled " Value="RTC_TAMPER_PULLUP_ENABLE"/>
+        <PossibleValue Comment="Disabled " Value="RTC_TAMPER_PULLUP_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="TimeStamp_On_Tamper_ Detection" DefaultValue="RTC_TIMESTAMPONTAMPERDETECTION_ENABLE" Group="Time Stamp" Name="TimeStampOnTamperDetection" Type="list">
+        <PossibleValue Comment="Saved " Value="RTC_TIMESTAMPONTAMPERDETECTION_ENABLE"/>
+        <PossibleValue Comment="Not saved " Value="RTC_TIMESTAMPONTAMPERDETECTION_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper4_Trigger" DefaultValue="RTC_TAMPERTRIGGER_RISINGEDGE" Group="Tamper4" Name="Trigger_4" Type="list">
+        <Condition Diagnostic="" Expression="Semaphore_PassiveTamper4 &amp; Filter=RTC_TAMPERFILTER_DISABLE "/>
+        <PossibleValue Comment="Rising Edge" Value="RTC_TAMPERTRIGGER_RISINGEDGE"/>
+        <PossibleValue Comment="Falling Edge" Value="RTC_TAMPERTRIGGER_FALLINGEDGE"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper4_Trigger" DefaultValue="RTC_TAMPERTRIGGER_LOWLEVEL" Group="Tamper4" Name="Trigger_4" Type="list">
+        <Condition Diagnostic="" Expression="Semaphore_PassiveTamper4"/>
+        <PossibleValue Comment="Low Level" Value="RTC_TAMPERTRIGGER_LOWLEVEL"/>
+        <PossibleValue Comment="High Level" Value="RTC_TAMPERTRIGGER_HIGHLEVEL"/>
+    </RefParameter>
+    
+   
+    <RefParameter Comment="Tamper4" DefaultValue="RTC_ATAMP_ENABLE" Group="Tamper4" Name="Enable4" Type="String" >
+        <Condition Expression="Semaphore_ActiveTamper4" Diagnostic="" />
+        <PossibleValue Comment="Active Input" Value="RTC_ATAMP_ENABLE" />   
+    </RefParameter>
+    <RefParameter Comment="Tamper4" DefaultValue="RTC_ATAMP_DISABLE" Group="Tamper4" Name="Enable4" Type="String" >
+        <Condition Expression="Semaphore_PassiveTamper4" Diagnostic="" />
+        <PossibleValue Comment="Passive Input" Value="RTC_ATAMP_DISABLE"/>    
+    </RefParameter>
+    <RefParameter Comment="Tamper4" DefaultValue="RTC_ATAMP_ENABLE" Group="Tamper4" Name="Enable40" Type="list">
+        <Condition Expression="Tamper4_ON &amp; Semaphore_ActiveTamper4" Diagnostic="" />
+        <PossibleValue Comment="Active Input" Value="RTC_ATAMP_ENABLE"  />
+    </RefParameter>  
+    <RefParameter Comment="Tamper4_NoErase" DefaultValue="RTC_TAMPER_ERASE_BACKUP_ENABLE" Group="Tamper4" Name="NoErase_4" Type="list">
+        <Condition Expression="Tamper4_ON" Diagnostic="" />
+        <PossibleValue Comment="Erase Enabled" Value="RTC_TAMPER_ERASE_BACKUP_ENABLE"/>
+        <PossibleValue Comment="Erase Disabled" Value="RTC_TAMPER_ERASE_BACKUP_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper4_NoErase" DefaultValue="null" Group="Tamper4" Name="NoErase_4" Type="list" Visible="false">
+        <Condition Expression="Tamper4_ON" Diagnostic="" />
+    </RefParameter>
+    
+    <RefParameter Comment="Tamper4_NoErase" DefaultValue="RTC_TAMPER_ERASE_BACKUP_ENABLE" Group="Tamper4" Name="NoErase_40" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper4" Diagnostic="" />
+        <PossibleValue Comment="Erase Enabled" Value="RTC_TAMPER_ERASE_BACKUP_ENABLE"/>
+        <PossibleValue Comment="Erase Disabled" Value="RTC_TAMPER_ERASE_BACKUP_DISABLE"/>
+    </RefParameter>
+
+    
+
+    <RefParameter Comment="Active AsyncPrescaler" DefaultValue="RTC_ATAMP_ASYNCPRES_RTCCLK" Group="Active tamper signals" Name="ActiveAsyncPrescaler" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK" Value="RTC_ATAMP_ASYNCPRES_RTCCLK"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_2" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_2"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_4" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_4"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_8" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_8"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_16" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_16"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_32" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_32"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_64" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_64"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_128" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_128"/>
+       <PossibleValue Comment="RTC_ATAMP_ASYNCPRES_RTCCLK_2048 " Value="RTC_ATAMP_ASYNCPRES_RTCCLK_2048" Condition="DIE481 | DIE455" Action="Remove"/>
+    </RefParameter>
+    <RefParameter Comment="Time Stamp OnTamper Detection" DefaultValue="RTC_TIMESTAMPONTAMPERDETECTION_DISABLE" Group="Tamper4" Name="TimeStampOnTamperDetection" Type="list">
+        <PossibleValue Comment=" Disabled " Value="RTC_TIMESTAMPONTAMPERDETECTION_DISABLE"/>
+        <PossibleValue Comment=" Enabled" Value="RTC_TIMESTAMPONTAMPERDETECTION_ENABLE"/>
+    </RefParameter>
+    
+    
+    <RefParameter Name="ActiveOutputChangePeriod" Comment="Active Output Change Period" DefaultValue="0" Max="7" Min="0" Type="integer"  Group="Active tamper signals" >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+
+    </RefParameter>
+  
+    <RefParameter Name="Seed_Size0" Comment="Seed[0]" DefaultValue="0x00000000" Min="0x00000000" Max="0xFFFFFFFF"  Type="hex"  Group="Active tamper signals"   >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+    </RefParameter>
+    <RefParameter Name="Seed_Size1" Comment="Seed[1]" DefaultValue="0x00000000" Min="0x00000000" Max="0xFFFFFFFF"  Type="hex"  Group="Active tamper signals"  >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+    </RefParameter>
+   
+    <RefParameter Name="Seed_Size2" Comment="Seed[2]" DefaultValue="0x00000000" Min="0x00000000" Max="0xFFFFFFFF"  Type="hex"  Group="Active tamper signals"   >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+    </RefParameter>  
+    <RefParameter Name="Seed_Size3" Comment="Seed[3]" DefaultValue="0x00000000" Min="0x00000000" Max="0xFFFFFFFF"  Type="hex" Group="Active tamper signals"   >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+    </RefParameter>
+  
+    
+    <RefParameter Comment="Tamper4_Interrupt_mode" DefaultValue="RTC_ATAMP_INTERRUPT_DISABLE" Group="Tamper4" Name="Interrupt4" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper4" Diagnostic="" />
+        <PossibleValue Comment="Enable" Value="RTC_ATAMP_INTERRUPT_ENABLE"/>
+        <PossibleValue Comment="Disable" Value="RTC_ATAMP_INTERRUPT_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Interrupt4" DefaultValue="__NULL" Group="Tamper4" Name="Interrupt4" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper4" Diagnostic="" />
+
+        <PossibleValue Value="__NULL" Comment="__NULL"/>
+    </RefParameter>
+    
+    <RefParameter Comment="Tamper4_Active_Input_Output" DefaultValue="__NULL" Group="Tamper4" Name="Output4" Type="list" Visible="false">
+        <PossibleValue Value="__NULL" Comment="__NULL"/>
+        <Condition Expression="!Tamper4_ON|!Semaphore_ActiveTamper4" Diagnostic="" />
+    </RefParameter>
+   
+    <RefParameter Comment="Tamper4_Active_Input_Output" DefaultValue="RTC_ATAMP_4" Group="Tamper4" Name="Output4" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper4" Diagnostic="" />
+
+        <PossibleValue Comment="Tamper 1" Value="RTC_ATAMP_1" Condition="!Tamper1_OUTPUT" Diagnostic="Available when Active Output1 is enabled" />  
+        <PossibleValue Comment="Tamper 2" Value="RTC_ATAMP_2" Condition="!Tamper2_OUTPUT" Diagnostic="Available when Active Output2 is enabled"/> 
+        <PossibleValue Comment="Tamper 3" Value="RTC_ATAMP_3" Condition="!Tamper3_OUTPUT"  Diagnostic="Available when Active Output3 is enabled"/>  
+        <PossibleValue Comment="Tamper 4" Value="RTC_ATAMP_4" Condition="!Tamper4_OUTPUT" Diagnostic="Available when Active Output4 is enabled"/> 
+        <PossibleValue Comment="Tamper 5" Value="RTC_ATAMP_5" Condition="!Tamper5_OUTPUT"  Diagnostic="Available when Active Output5 is enabled"/>  
+        <PossibleValue Comment="Tamper 6" Value="RTC_ATAMP_6" Condition="!Tamper6_OUTPUT" Diagnostic="Available when Active Output6 is enabled"/> 
+        <PossibleValue Comment="Tamper 7" Value="RTC_ATAMP_7" Condition="!Tamper7_OUTPUT"  Diagnostic="Available when Active Output7 is enabled"/>  
+        <PossibleValue Comment="Tamper 8" Value="RTC_ATAMP_8" Condition="!Tamper8_OUTPUT" Diagnostic="Available when Active Output8 is enabled"/>
+       
+    </RefParameter>
+       
+    <!-- ################################## Tamper 5 ##################################################-->
+ 
+    <RefParameter Comment="Tamper" DefaultValue="RTC_TAMPER_5" Group="Tamper5" Name="Tamper_5" Type="list" Visible="false">
+        <PossibleValue Comment="Tamper 5" Value="RTC_TAMPER_5"/>
+    </RefParameter>
+    <RefParameter Comment="Filter" DefaultValue="RTC_TAMPERFILTER_DISABLE" Group="Passive tamper signals" Name="Filter" Type="list">
+        <Condition Expression="Semaphore_PassiveTamper5" Diagnostic="" />
+
+        <PossibleValue Comment="Disabled" Value="RTC_TAMPERFILTER_DISABLE"/>
+        <PossibleValue Comment="Tamper activated after 2 consecutive samples" Value="RTC_TAMPERFILTER_2SAMPLE"/>
+        <PossibleValue Comment="Tamper activated after 4 consecutive samples" Value="RTC_TAMPERFILTER_4SAMPLE"/>
+        <PossibleValue Comment="Tamper activated after 8 consecutive samples" Value="RTC_TAMPERFILTER_8SAMPLE"/>
+    </RefParameter>
+    <RefParameter Comment="Sampling Frequency" DefaultValue="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV32768" Group="Passive tamper signals" Name="SamplingFrequency" Type="list">
+        <Condition Expression="Semaphore_PassiveTamper5" Diagnostic="" />
+
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 32768" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV32768"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 16384" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV16384"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 8192" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV8192"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 4096" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV4096"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 2048" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV2048"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 1024" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV1024"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 512" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV512"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 256" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV256"/>
+    </RefParameter>
+    <RefParameter Comment="Precharge Duration" DefaultValue="RTC_TAMPERPRECHARGEDURATION_1RTCCLK" Group="Passive tamper signals" Name="PrechargeDuration" Type="list">
+        <Condition Expression="Semaphore_PassiveTamper5" Diagnostic="" />
+
+        <PossibleValue Comment="Precharge Duration = 1 RTCCLK cycle" Value="RTC_TAMPERPRECHARGEDURATION_1RTCCLK"/>
+        <PossibleValue Comment="Precharge Duration = 2 RTCCLK cycles" Value="RTC_TAMPERPRECHARGEDURATION_2RTCCLK"/>
+        <PossibleValue Comment="Precharge Duration = 4 RTCCLK cycles" Value="RTC_TAMPERPRECHARGEDURATION_4RTCCLK"/>
+        <PossibleValue Comment="Precharge Duration = 8 RTCCLK cycles" Value="RTC_TAMPERPRECHARGEDURATION_8RTCCLK"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper_PullUp" DefaultValue="RTC_TAMPER_PULLUP_ENABLE" Group="Passive tamper signals" Name="TamperPullUp" Type="list">
+        <Condition Expression="Semaphore_PassiveTamper5" Diagnostic="" />
+
+        <PossibleValue Comment="Enabled " Value="RTC_TAMPER_PULLUP_ENABLE"/>
+        <PossibleValue Comment="Disabled " Value="RTC_TAMPER_PULLUP_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="TimeStamp_On_Tamper_ Detection" DefaultValue="RTC_TIMESTAMPONTAMPERDETECTION_ENABLE" Group="Time Stamp" Name="TimeStampOnTamperDetection" Type="list">
+        <PossibleValue Comment="Saved " Value="RTC_TIMESTAMPONTAMPERDETECTION_ENABLE"/>
+        <PossibleValue Comment="Not saved " Value="RTC_TIMESTAMPONTAMPERDETECTION_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper5_Trigger" DefaultValue="RTC_TAMPERTRIGGER_RISINGEDGE" Group="Tamper5" Name="Trigger_5" Type="list">
+        <Condition Diagnostic="" Expression="Semaphore_PassiveTamper5 &amp; Filter=RTC_TAMPERFILTER_DISABLE "/>
+        <PossibleValue Comment="Rising Edge" Value="RTC_TAMPERTRIGGER_RISINGEDGE"/>
+        <PossibleValue Comment="Falling Edge" Value="RTC_TAMPERTRIGGER_FALLINGEDGE"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper5_Trigger" DefaultValue="RTC_TAMPERTRIGGER_LOWLEVEL" Group="Tamper5" Name="Trigger_5" Type="list">
+        <Condition Diagnostic="" Expression="Semaphore_PassiveTamper5"/>
+
+        <PossibleValue Comment="Low Level" Value="RTC_TAMPERTRIGGER_LOWLEVEL"/>
+        <PossibleValue Comment="High Level" Value="RTC_TAMPERTRIGGER_HIGHLEVEL"/>
+    </RefParameter>
+	
+    <RefParameter Comment="Tamper5_NoErase" DefaultValue="RTC_TAMPER_ERASE_BACKUP_ENABLE" Group="Tamper5" Name="NoErase_5" Type="list">
+        <Condition Expression="Tamper5_ON" Diagnostic=""/>
+        <PossibleValue Comment="Erase Enabled" Value="RTC_TAMPER_ERASE_BACKUP_ENABLE"/>
+        <PossibleValue Comment="Erase Disabled" Value="RTC_TAMPER_ERASE_BACKUP_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="NoErase_50" DefaultValue="RTC_TAMPER_ERASE_BACKUP_ENABLE" Group="Tamper5" Name="NoErase_50" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper5" Diagnostic=""/>
+        <PossibleValue Comment="Erase Enabled" Value="RTC_TAMPER_ERASE_BACKUP_ENABLE"/>
+        <PossibleValue Comment="Erase Disabled" Value="RTC_TAMPER_ERASE_BACKUP_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper5_NoErase" DefaultValue="null" Group="Tamper5" Name="NoErase_5" Type="list" Visible="false">
+        <Condition Expression="Tamper5_ON" Diagnostic=""/>
+
+    </RefParameter>
+
+    <RefParameter Comment="Active AsyncPrescaler" DefaultValue="RTC_ATAMP_ASYNCPRES_RTCCLK" Group="Active tamper signals" Name="ActiveAsyncPrescaler" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK" Value="RTC_ATAMP_ASYNCPRES_RTCCLK"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_2" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_2"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_4" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_4"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_8" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_8"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_16" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_16"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_32" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_32"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_64" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_64"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_128" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_128"/>
+       <PossibleValue Comment="RTC_ATAMP_ASYNCPRES_RTCCLK_2048 " Value="RTC_ATAMP_ASYNCPRES_RTCCLK_2048" Condition="DIE481 | DIE455" Action="Remove"/>
+    </RefParameter>
+    <RefParameter Comment="Time Stamp OnTamper Detection" DefaultValue="RTC_TIMESTAMPONTAMPERDETECTION_DISABLE" Group="Tamper5" Name="TimeStampOnTamperDetection" Type="list">
+        <PossibleValue Comment=" Disabled " Value="RTC_TIMESTAMPONTAMPERDETECTION_DISABLE"/>
+        <PossibleValue Comment=" Enabled" Value="RTC_TIMESTAMPONTAMPERDETECTION_ENABLE"/>
+    </RefParameter>
+    
+    
+    <RefParameter Comment="Tamper5" DefaultValue="RTC_ATAMP_ENABLE" Group="Tamper5" Name="Enable5" Type="String" >
+        <Condition Expression="Semaphore_ActiveTamper5" Diagnostic="" />
+        <PossibleValue Comment="Active Input" Value="RTC_ATAMP_ENABLE" />   
+    </RefParameter>
+    <RefParameter Comment="Tamper5" DefaultValue="RTC_ATAMP_DISABLE" Group="Tamper5" Name="Enable5" Type="String">
+        <Condition Expression="Semaphore_PassiveTamper5" Diagnostic="" />
+        <PossibleValue Comment="Passive Input" Value="RTC_ATAMP_DISABLE"/>    
+    </RefParameter>
+    <RefParameter Comment="Tamper5" DefaultValue="RTC_ATAMP_ENABLE" Group="Tamper5" Name="Enable50" Type="list">
+        <Condition Expression="Tamper5_ON &amp; Semaphore_ActiveTamper5" Diagnostic="" />
+        <PossibleValue Comment="Active Input" Value="RTC_ATAMP_ENABLE"  />
+    </RefParameter>    
+    <RefParameter Name="ActiveOutputChangePeriod" Comment="Active Output Change Period" DefaultValue="0" Max="7" Min="0" Type="integer"  Group="Active tamper signals" >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+
+    </RefParameter>
+        
+   
+    <RefParameter Name="Seed_Size0" Comment="Seed[0]" DefaultValue="0x00000000" Min="0x00000000" Max="0xFFFFFFFF"  Type="hex"  Group="Active tamper signals"   >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+    </RefParameter>
+    <RefParameter Name="Seed_Size1" Comment="Seed[1]" DefaultValue="0x00000000" Min="0x00000000" Max="0xFFFFFFFF"  Type="hex"  Group="Active tamper signals"  >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+    </RefParameter>
+   
+    <RefParameter Name="Seed_Size2" Comment="Seed[2]" DefaultValue="0x00000000" Min="0x00000000" Max="0xFFFFFFFF"  Type="hex"  Group="Active tamper signals"   >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+    </RefParameter>  
+    <RefParameter Name="Seed_Size3" Comment="Seed[3]" DefaultValue="0x00000000" Min="0x00000000" Max="0xFFFFFFFF"  Type="hex" Group="Active tamper signals"   >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+    </RefParameter>
+    
+    <RefParameter Comment="Tamper5_Interrupt_mode" DefaultValue="RTC_ATAMP_INTERRUPT_DISABLE" Group="Tamper5" Name="Interrupt5" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper5" Diagnostic="" />
+        <PossibleValue Comment="Enable" Value="RTC_ATAMP_INTERRUPT_ENABLE"/>
+        <PossibleValue Comment="Disable" Value="RTC_ATAMP_INTERRUPT_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Interrupt5" DefaultValue="__NULL" Group="Tamper5" Name="Interrupt5" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper5" Diagnostic="" />
+
+        <PossibleValue Value="__NULL" Comment="__NULL"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper5_Active_Input_Output" DefaultValue="__NULL" Group="Tamper5" Name="Output5" Type="list" Visible="false">
+        <PossibleValue Value="__NULL" Comment="__NULL"/>
+        <Condition Expression="!Tamper5_ON|!Semaphore_ActiveTamper5" Diagnostic="" />
+    </RefParameter>
+    
+    <RefParameter Comment="Tamper5_Active_Input_Output" DefaultValue="RTC_ATAMP_5" Group="Tamper5" Name="Output5" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper5" Diagnostic="" />
+
+        <PossibleValue Comment="Tamper 1" Value="RTC_ATAMP_1" Condition="!Tamper1_OUTPUT" Diagnostic="Available when Active Output1 is enabled" />  
+        <PossibleValue Comment="Tamper 2" Value="RTC_ATAMP_2" Condition="!Tamper2_OUTPUT" Diagnostic="Available when Active Output2 is enabled"/> 
+        <PossibleValue Comment="Tamper 3" Value="RTC_ATAMP_3" Condition="!Tamper3_OUTPUT"  Diagnostic="Available when Active Output3 is enabled"/>  
+        <PossibleValue Comment="Tamper 4" Value="RTC_ATAMP_4" Condition="!Tamper4_OUTPUT" Diagnostic="Available when Active Output4 is enabled"/> 
+        <PossibleValue Comment="Tamper 5" Value="RTC_ATAMP_5" Condition="!Tamper5_OUTPUT"  Diagnostic="Available when Active Output5 is enabled"/>  
+        <PossibleValue Comment="Tamper 6" Value="RTC_ATAMP_6" Condition="!Tamper6_OUTPUT" Diagnostic="Available when Active Output6 is enabled"/> 
+        <PossibleValue Comment="Tamper 7" Value="RTC_ATAMP_7" Condition="!Tamper7_OUTPUT"  Diagnostic="Available when Active Output7 is enabled"/>  
+        <PossibleValue Comment="Tamper 8" Value="RTC_ATAMP_8" Condition="!Tamper8_OUTPUT" Diagnostic="Available when Active Output8 is enabled"/>
+       
+    </RefParameter>
+    
+    <!-- ################################## Tamper 6 ##################################################-->
+ 
+    <RefParameter Comment="Tamper" DefaultValue="RTC_TAMPER_6" Group="Tamper6" Name="Tamper_6" Type="list" Visible="false">
+        <PossibleValue Comment="Tamper 6" Value="RTC_TAMPER_6"/>
+    </RefParameter>
+    <RefParameter Comment="Filter" DefaultValue="RTC_TAMPERFILTER_DISABLE" Group="Passive tamper signals" Name="Filter" Type="list">
+        <Condition Expression="Semaphore_PassiveTamper6" Diagnostic="" />
+
+        <PossibleValue Comment="Disabled" Value="RTC_TAMPERFILTER_DISABLE"/>
+        <PossibleValue Comment="Tamper activated after 2 consecutive samples" Value="RTC_TAMPERFILTER_2SAMPLE"/>
+        <PossibleValue Comment="Tamper activated after 4 consecutive samples" Value="RTC_TAMPERFILTER_4SAMPLE"/>
+        <PossibleValue Comment="Tamper activated after 8 consecutive samples" Value="RTC_TAMPERFILTER_8SAMPLE"/>
+    </RefParameter>
+    <RefParameter Comment="Sampling Frequency" DefaultValue="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV32768" Group="Passive tamper signals" Name="SamplingFrequency" Type="list">
+        <Condition Expression="Semaphore_PassiveTamper6" Diagnostic="" />
+
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 32768" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV32768"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 16384" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV16384"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 8192" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV8192"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 4096" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV4096"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 2048" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV2048"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 1024" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV1024"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 512" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV512"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 256" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV256"/>
+    </RefParameter>
+    <RefParameter Comment="Precharge Duration" DefaultValue="RTC_TAMPERPRECHARGEDURATION_1RTCCLK" Group="Passive tamper signals" Name="PrechargeDuration" Type="list">
+        <Condition Expression="Semaphore_PassiveTamper6" Diagnostic="" />
+
+        <PossibleValue Comment="Precharge Duration = 1 RTCCLK cycle" Value="RTC_TAMPERPRECHARGEDURATION_1RTCCLK"/>
+        <PossibleValue Comment="Precharge Duration = 2 RTCCLK cycles" Value="RTC_TAMPERPRECHARGEDURATION_2RTCCLK"/>
+        <PossibleValue Comment="Precharge Duration = 4 RTCCLK cycles" Value="RTC_TAMPERPRECHARGEDURATION_4RTCCLK"/>
+        <PossibleValue Comment="Precharge Duration = 8 RTCCLK cycles" Value="RTC_TAMPERPRECHARGEDURATION_8RTCCLK"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper_PullUp" DefaultValue="RTC_TAMPER_PULLUP_ENABLE" Group="Passive tamper signals" Name="TamperPullUp" Type="list">
+        <Condition Expression="Semaphore_PassiveTamper6" Diagnostic="" />
+
+        <PossibleValue Comment="Enabled " Value="RTC_TAMPER_PULLUP_ENABLE"/>
+        <PossibleValue Comment="Disabled " Value="RTC_TAMPER_PULLUP_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="TimeStamp_On_Tamper_ Detection" DefaultValue="RTC_TIMESTAMPONTAMPERDETECTION_ENABLE" Group="Time Stamp" Name="TimeStampOnTamperDetection" Type="list">
+        <PossibleValue Comment="Saved " Value="RTC_TIMESTAMPONTAMPERDETECTION_ENABLE"/>
+        <PossibleValue Comment="Not saved " Value="RTC_TIMESTAMPONTAMPERDETECTION_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper6_Trigger" DefaultValue="RTC_TAMPERTRIGGER_RISINGEDGE" Group="Tamper6" Name="Trigger_6" Type="list">
+        <Condition Diagnostic="" Expression="Semaphore_PassiveTamper6 &amp;Filter=RTC_TAMPERFILTER_DISABLE  "/>
+        <PossibleValue Comment="Rising Edge" Value="RTC_TAMPERTRIGGER_RISINGEDGE"/>
+        <PossibleValue Comment="Falling Edge" Value="RTC_TAMPERTRIGGER_FALLINGEDGE"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper6_Trigger" DefaultValue="RTC_TAMPERTRIGGER_LOWLEVEL" Group="Tamper6" Name="Trigger_6" Type="list">
+        <Condition Diagnostic="" Expression="Semaphore_PassiveTamper6"/>
+
+        <PossibleValue Comment="Low Level" Value="RTC_TAMPERTRIGGER_LOWLEVEL"/>
+        <PossibleValue Comment="High Level" Value="RTC_TAMPERTRIGGER_HIGHLEVEL"/>
+    </RefParameter>
+	
+    <RefParameter Comment="Tamper6_NoErase" DefaultValue="RTC_TAMPER_ERASE_BACKUP_ENABLE" Group="Tamper6" Name="NoErase_6" Type="list">
+        <Condition Expression="Tamper6_ON" Diagnostic=""/>
+        <PossibleValue Comment="Erase Enabled" Value="RTC_TAMPER_ERASE_BACKUP_ENABLE"/>
+        <PossibleValue Comment="Erase Disabled" Value="RTC_TAMPER_ERASE_BACKUP_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="NoErase_60" DefaultValue="RTC_TAMPER_ERASE_BACKUP_ENABLE" Group="Tamper6" Name="NoErase_60" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper6" Diagnostic=""/>
+        <PossibleValue Comment="Erase Enabled" Value="RTC_TAMPER_ERASE_BACKUP_ENABLE"/>
+        <PossibleValue Comment="Erase Disabled" Value="RTC_TAMPER_ERASE_BACKUP_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper6_NoErase" DefaultValue="null" Group="Tamper6" Name="NoErase_6" Type="list" Visible="false">
+        <Condition Expression="Tamper6_ON" Diagnostic=""/>
+      
+    </RefParameter>
+    <RefParameter Comment="Active AsyncPrescaler" DefaultValue="RTC_ATAMP_ASYNCPRES_RTCCLK" Group="Active tamper signals" Name="ActiveAsyncPrescaler" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK" Value="RTC_ATAMP_ASYNCPRES_RTCCLK"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_2" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_2"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_4" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_4"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_8" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_8"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_16" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_16"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_32" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_32"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_64" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_64"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_128" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_128"/>
+        <PossibleValue Comment="RTC_ATAMP_ASYNCPRES_RTCCLK_2048 " Value="RTC_ATAMP_ASYNCPRES_RTCCLK_2048" Condition="DIE481 | DIE455" Action="Remove"/>
+    </RefParameter>
+    <RefParameter Comment="Time Stamp OnTamper Detection" DefaultValue="RTC_TIMESTAMPONTAMPERDETECTION_DISABLE" Group="Tamper6" Name="TimeStampOnTamperDetection" Type="list">
+        <PossibleValue Comment=" Disabled " Value="RTC_TIMESTAMPONTAMPERDETECTION_DISABLE"/>
+        <PossibleValue Comment=" Enabled" Value="RTC_TIMESTAMPONTAMPERDETECTION_ENABLE"/>
+    </RefParameter>
+    <RefParameter Name="ActiveOutputChangePeriod" Comment="Active Output Change Period" DefaultValue="0" Max="7" Min="0" Type="integer"  Group="Active tamper signals" >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+
+    </RefParameter>
+    
+   
+    <RefParameter Comment="Tamper6" DefaultValue="RTC_ATAMP_ENABLE" Group="Tamper6" Name="Enable6" Type="String">
+        <Condition Expression="Semaphore_ActiveTamper6" Diagnostic="" />
+        <PossibleValue Comment="Active Input" Value="RTC_ATAMP_ENABLE" />   
+    </RefParameter>
+    <RefParameter Comment="Tamper6" DefaultValue="RTC_ATAMP_DISABLE" Group="Tamper6" Name="Enable6" Type="String">
+        <Condition Expression="Semaphore_PassiveTamper6" Diagnostic="" />
+        <PossibleValue Comment="Passive Input" Value="RTC_ATAMP_DISABLE"/>    
+    </RefParameter>
+    <RefParameter Comment="Tamper6" DefaultValue="RTC_ATAMP_ENABLE" Group="Tamper6" Name="Enable60" Type="list">
+        <Condition Expression="Tamper6_ON &amp; Semaphore_ActiveTamper6" Diagnostic="" />
+        <PossibleValue Comment="Active Input" Value="RTC_ATAMP_ENABLE"  />
+    </RefParameter>
+     
+    <RefParameter Name="Seed_Size0" Comment="Seed[0]" DefaultValue="0x00000000" Min="0x00000000" Max="0xFFFFFFFF"  Type="hex"  Group="Active tamper signals"   >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+    </RefParameter>
+    <RefParameter Name="Seed_Size1" Comment="Seed[1]" DefaultValue="0x00000000" Min="0x00000000" Max="0xFFFFFFFF"  Type="hex"  Group="Active tamper signals"  >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+    </RefParameter>
+   
+    <RefParameter Name="Seed_Size2" Comment="Seed[2]" DefaultValue="0x00000000" Min="0x00000000" Max="0xFFFFFFFF"  Type="hex"  Group="Active tamper signals"   >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+    </RefParameter>  
+    <RefParameter Name="Seed_Size3" Comment="Seed[3]" DefaultValue="0x00000000" Min="0x00000000" Max="0xFFFFFFFF"  Type="hex" Group="Active tamper signals"   >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+    </RefParameter>
+  
+    <RefParameter Comment="Tamper6 Interrupt mode" DefaultValue="RTC_ATAMP_INTERRUPT_DISABLE" Group="Tamper6" Name="Interrupt6" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper6" Diagnostic="" />
+        <PossibleValue Comment="Enable" Value="RTC_ATAMP_INTERRUPT_ENABLE"/>
+        <PossibleValue Comment="Disable" Value="RTC_ATAMP_INTERRUPT_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Interrupt6" DefaultValue="__NULL" Group="Tamper6" Name="Interrupt6" Type="list"> 
+        <Condition Expression="Semaphore_ActiveTamper6" Diagnostic="" />
+        <PossibleValue Value="__NULL" Comment="__NULL"/>
+    </RefParameter>
+   
+    <RefParameter Comment="Tamper6_Active_Input_Output" DefaultValue="__NULL" Group="Tamper6" Name="Output6" Type="list" Visible="false">
+        <PossibleValue Value="__NULL" Comment="__NULL"/>
+        <Condition Expression="!Tamper6_ON|!Semaphore_ActiveTamper6" Diagnostic="" />
+    </RefParameter>
+    
+    <RefParameter Comment="Tamper6_Active_Input_Output" DefaultValue="RTC_ATAMP_6" Group="Tamper6" Name="Output6" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper6" Diagnostic="" />
+
+        <PossibleValue Comment="Tamper 1" Value="RTC_ATAMP_1" Condition="!Tamper1_OUTPUT" Diagnostic="Available when Active Output1 is enabled" />  
+        <PossibleValue Comment="Tamper 2" Value="RTC_ATAMP_2" Condition="!Tamper2_OUTPUT" Diagnostic="Available when Active Output2 is enabled"/> 
+        <PossibleValue Comment="Tamper 3" Value="RTC_ATAMP_3" Condition="!Tamper3_OUTPUT"  Diagnostic="Available when Active Output3 is enabled"/>  
+        <PossibleValue Comment="Tamper 4" Value="RTC_ATAMP_4" Condition="!Tamper4_OUTPUT" Diagnostic="Available when Active Output4 is enabled"/> 
+        <PossibleValue Comment="Tamper 5" Value="RTC_ATAMP_5" Condition="!Tamper5_OUTPUT"  Diagnostic="Available when Active Output5 is enabled"/>  
+        <PossibleValue Comment="Tamper 6" Value="RTC_ATAMP_6" Condition="!Tamper6_OUTPUT" Diagnostic="Available when Active Output6 is enabled"/> 
+        <PossibleValue Comment="Tamper 7" Value="RTC_ATAMP_7" Condition="!Tamper7_OUTPUT"  Diagnostic="Available when Active Output7 is enabled"/>  
+        <PossibleValue Comment="Tamper 8" Value="RTC_ATAMP_8" Condition="!Tamper8_OUTPUT" Diagnostic="Available when Active Output8 is enabled"/>
+       
+    </RefParameter>
+    
+    <!-- ################################## Tamper 7 ##################################################-->
+  
+    <RefParameter Comment="Tamper" DefaultValue="RTC_TAMPER_7" Group="Tamper7" Name="Tamper_7" Type="list" Visible="false">
+        <PossibleValue Comment="Tamper 7" Value="RTC_TAMPER_7"/>
+    </RefParameter>
+    <RefParameter Comment="Filter" DefaultValue="RTC_TAMPERFILTER_DISABLE" Group="Passive tamper signals" Name="Filter" Type="list">
+        <Condition Expression="Semaphore_PassiveTamper7" Diagnostic="" />
+
+        <PossibleValue Comment="Disabled" Value="RTC_TAMPERFILTER_DISABLE"/>
+        <PossibleValue Comment="Tamper activated after 2 consecutive samples" Value="RTC_TAMPERFILTER_2SAMPLE"/>
+        <PossibleValue Comment="Tamper activated after 4 consecutive samples" Value="RTC_TAMPERFILTER_4SAMPLE"/>
+        <PossibleValue Comment="Tamper activated after 8 consecutive samples" Value="RTC_TAMPERFILTER_8SAMPLE"/>
+    </RefParameter>
+    <RefParameter Comment="Sampling Frequency" DefaultValue="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV32768" Group="Passive tamper signals" Name="SamplingFrequency" Type="list">
+        <Condition Expression="Semaphore_PassiveTamper7" Diagnostic="" />
+
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 32768" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV32768"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 16384" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV16384"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 8192" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV8192"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 4096" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV4096"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 2048" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV2048"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 1024" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV1024"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 512" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV512"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 256" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV256"/>
+    </RefParameter>
+    <RefParameter Comment="Precharge Duration" DefaultValue="RTC_TAMPERPRECHARGEDURATION_1RTCCLK" Group="Passive tamper signals" Name="PrechargeDuration" Type="list">
+        <Condition Expression="Semaphore_PassiveTamper7" Diagnostic="" />
+
+        <PossibleValue Comment="Precharge Duration = 1 RTCCLK cycle" Value="RTC_TAMPERPRECHARGEDURATION_1RTCCLK"/>
+        <PossibleValue Comment="Precharge Duration = 2 RTCCLK cycles" Value="RTC_TAMPERPRECHARGEDURATION_2RTCCLK"/>
+        <PossibleValue Comment="Precharge Duration = 4 RTCCLK cycles" Value="RTC_TAMPERPRECHARGEDURATION_4RTCCLK"/>
+        <PossibleValue Comment="Precharge Duration = 8 RTCCLK cycles" Value="RTC_TAMPERPRECHARGEDURATION_8RTCCLK"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper_PullUp" DefaultValue="RTC_TAMPER_PULLUP_ENABLE" Group="Passive tamper signals" Name="TamperPullUp" Type="list">
+        <Condition Expression="Semaphore_PassiveTamper7" Diagnostic="" />
+
+        <PossibleValue Comment="Enabled " Value="RTC_TAMPER_PULLUP_ENABLE"/>
+        <PossibleValue Comment="Disabled " Value="RTC_TAMPER_PULLUP_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="TimeStamp_On_Tamper_ Detection" DefaultValue="RTC_TIMESTAMPONTAMPERDETECTION_ENABLE" Group="Time Stamp" Name="TimeStampOnTamperDetection" Type="list">
+        <PossibleValue Comment="Saved " Value="RTC_TIMESTAMPONTAMPERDETECTION_ENABLE"/>
+        <PossibleValue Comment="Not saved " Value="RTC_TIMESTAMPONTAMPERDETECTION_DISABLE"/>
+    </RefParameter>
+	    
+
+    <RefParameter Comment="Tamper7_Trigger" DefaultValue="RTC_TAMPERTRIGGER_RISINGEDGE" Group="Tamper7" Name="Trigger_7" Type="list">
+        <Condition Diagnostic="" Expression="Semaphore_PassiveTamper7 &amp; Filter=RTC_TAMPERFILTER_DISABLE  "/>
+        <PossibleValue Comment="Rising Edge" Value="RTC_TAMPERTRIGGER_RISINGEDGE"/>
+        <PossibleValue Comment="Falling Edge" Value="RTC_TAMPERTRIGGER_FALLINGEDGE"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper7_Trigger" DefaultValue="RTC_TAMPERTRIGGER_LOWLEVEL" Group="Tamper7" Name="Trigger_7" Type="list">
+        <Condition Diagnostic="" Expression="Semaphore_PassiveTamper7"/>
+
+        <PossibleValue Comment="Low Level" Value="RTC_TAMPERTRIGGER_LOWLEVEL"/>
+        <PossibleValue Comment="High Level" Value="RTC_TAMPERTRIGGER_HIGHLEVEL"/>
+    </RefParameter>
+
+    <RefParameter Comment="Tamper7_NoErase" DefaultValue="RTC_TAMPER_ERASE_BACKUP_ENABLE" Group="Tamper7" Name="NoErase_7" Type="list">
+        <Condition Expression="Tamper7_ON" Diagnostic=""/>        
+        <PossibleValue Comment="Erase Enabled" Value="RTC_TAMPER_ERASE_BACKUP_ENABLE"/>
+        <PossibleValue Comment="Erase Disabled" Value="RTC_TAMPER_ERASE_BACKUP_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="NoErase_60" DefaultValue="RTC_TAMPER_ERASE_BACKUP_ENABLE" Group="Tamper6" Name="NoErase_70" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper7" Diagnostic=""/>
+        <PossibleValue Comment="Erase Enabled" Value="RTC_TAMPER_ERASE_BACKUP_ENABLE"/>
+        <PossibleValue Comment="Erase Disabled" Value="RTC_TAMPER_ERASE_BACKUP_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper7_NoErase" DefaultValue="null" Group="Tamper7" Name="NoErase_7" Type="list" Visible="false">
+        <Condition Expression="Tamper7_ON " Diagnostic=""/>        
+    </RefParameter>
+
+   
+    <RefParameter Comment="Active AsyncPrescaler" DefaultValue="RTC_ATAMP_ASYNCPRES_RTCCLK" Group="Active tamper signals" Name="ActiveAsyncPrescaler" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK" Value="RTC_ATAMP_ASYNCPRES_RTCCLK"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_2" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_2"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_4" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_4"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_8" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_8"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_16" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_16"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_32" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_32"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_64" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_64"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_128" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_128"/>
+       <PossibleValue Comment="RTC_ATAMP_ASYNCPRES_RTCCLK_2048 " Value="RTC_ATAMP_ASYNCPRES_RTCCLK_2048" Condition="DIE481 | DIE455" Action="Remove"/>
+    </RefParameter>
+    <RefParameter Comment="Time Stamp OnTamper Detection" DefaultValue="RTC_TIMESTAMPONTAMPERDETECTION_DISABLE" Group="Tamper7" Name="TimeStampOnTamperDetection" Type="list">
+        <PossibleValue Comment=" Disabled " Value="RTC_TIMESTAMPONTAMPERDETECTION_DISABLE"/>
+        <PossibleValue Comment=" Enabled" Value="RTC_TIMESTAMPONTAMPERDETECTION_ENABLE"/>
+    </RefParameter>
+    
+    <RefParameter Name="ActiveOutputChangePeriod" Comment="Active Output Change Period" DefaultValue="0" Max="7" Min="0" Type="integer"  Group="Active tamper signals" >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+
+    </RefParameter>
+    
+    <RefParameter Comment="Tamper7" DefaultValue="RTC_ATAMP_ENABLE" Group="Tamper7" Name="Enable7" Type="String">
+        <Condition Expression="Semaphore_ActiveTamper7" Diagnostic="" />
+        <PossibleValue Comment="Active Input" Value="RTC_ATAMP_ENABLE" />   
+    </RefParameter>
+    <RefParameter Comment="Tamper7" DefaultValue="RTC_ATAMP_DISABLE" Group="Tamper7" Name="Enable7" Type="String">
+        <Condition Expression="Semaphore_PassiveTamper7" Diagnostic="" />
+        <PossibleValue Comment="Passive Input" Value="RTC_ATAMP_DISABLE"/>    
+    </RefParameter>
+    
+    <RefParameter Comment="Tamper7" DefaultValue="RTC_ATAMP_ENABLE" Group="Tamper7" Name="Enable70" Type="list">
+        <Condition Expression="Tamper7_ON &amp; Semaphore_ActiveTamper7" Diagnostic="" />
+        <PossibleValue Comment="Active Input" Value="RTC_ATAMP_ENABLE"  />
+    </RefParameter>
+    <RefParameter Name="Seed_Size0" Comment="Seed[0]" DefaultValue="0x00000000" Min="0x00000000" Max="0xFFFFFFFF"  Type="hex"  Group="Active tamper signals"   >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+    </RefParameter>
+    <RefParameter Name="Seed_Size1" Comment="Seed[1]" DefaultValue="0x00000000" Min="0x00000000" Max="0xFFFFFFFF"  Type="hex"  Group="Active tamper signals"  >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+    </RefParameter>
+   
+    <RefParameter Name="Seed_Size2" Comment="Seed[2]" DefaultValue="0x00000000" Min="0x00000000" Max="0xFFFFFFFF"  Type="hex"  Group="Active tamper signals"   >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+    </RefParameter>  
+    <RefParameter Name="Seed_Size3" Comment="Seed[3]" DefaultValue="0x00000000" Min="0x00000000" Max="0xFFFFFFFF"  Type="hex" Group="Active tamper signals"   >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+    </RefParameter>
+    <RefParameter Comment="Tamper7_Interrupt_mode" DefaultValue="RTC_ATAMP_INTERRUPT_DISABLE" Group="Tamper7" Name="Interrupt7" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper7" Diagnostic="" />
+        <PossibleValue Comment="Enable" Value="RTC_ATAMP_INTERRUPT_ENABLE"/>
+        <PossibleValue Comment="Disable" Value="RTC_ATAMP_INTERRUPT_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Interrupt7" DefaultValue="__NULL" Group="Tamper7" Name="Interrupt7" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper7" Diagnostic="" />
+
+        <PossibleValue Value="__NULL" Comment="__NULL"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper7_Active_Input_Output" DefaultValue="__NULL" Group="Tamper7" Name="Output7" Type="list" Visible="false">
+        <PossibleValue Value="__NULL" Comment="__NULL"/>
+        <Condition Expression="!Tamper7_ON|!Semaphore_ActiveTamper7" Diagnostic="" />
+    </RefParameter>
+    
+    <RefParameter Comment="Tamper7_Active_Input_Output" DefaultValue="RTC_ATAMP_7" Group="Tamper7" Name="Output7" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper7" Diagnostic="" />
+
+        <PossibleValue Comment="Tamper 1" Value="RTC_ATAMP_1" Condition="!Tamper1_OUTPUT" Diagnostic="Available when Active Output1 is enabled" />  
+        <PossibleValue Comment="Tamper 2" Value="RTC_ATAMP_2" Condition="!Tamper2_OUTPUT" Diagnostic="Available when Active Output2 is enabled"/> 
+        <PossibleValue Comment="Tamper 3" Value="RTC_ATAMP_3" Condition="!Tamper3_OUTPUT"  Diagnostic="Available when Active Output3 is enabled"/>  
+        <PossibleValue Comment="Tamper 4" Value="RTC_ATAMP_4" Condition="!Tamper4_OUTPUT" Diagnostic="Available when Active Output4 is enabled"/> 
+        <PossibleValue Comment="Tamper 5" Value="RTC_ATAMP_5" Condition="!Tamper5_OUTPUT"  Diagnostic="Available when Active Output5 is enabled"/>  
+        <PossibleValue Comment="Tamper 6" Value="RTC_ATAMP_6" Condition="!Tamper6_OUTPUT" Diagnostic="Available when Active Output6 is enabled"/> 
+        <PossibleValue Comment="Tamper 7" Value="RTC_ATAMP_7" Condition="!Tamper7_OUTPUT"  Diagnostic="Available when Active Output7 is enabled"/>  
+        <PossibleValue Comment="Tamper 8" Value="RTC_ATAMP_8" Condition="!Tamper8_OUTPUT" Diagnostic="Available when Active Output8 is enabled"/>
+       
+    </RefParameter>
+    
+    <!-- ################################## Tamper 8 ##################################################-->
+ 
+    <RefParameter Comment="Tamper" DefaultValue="RTC_TAMPER_8" Group="Tamper8" Name="Tamper_8" Type="list" Visible="false">
+        <PossibleValue Comment="Tamper 8" Value="RTC_TAMPER_8"/>
+    </RefParameter>
+    <RefParameter Comment="Filter" DefaultValue="RTC_TAMPERFILTER_DISABLE" Group="Passive tamper signals" Name="Filter" Type="list">
+        <Condition Expression="Semaphore_PassiveTamper8" Diagnostic="" />
+
+        <PossibleValue Comment="Disabled" Value="RTC_TAMPERFILTER_DISABLE"/>
+        <PossibleValue Comment="Tamper activated after 2 consecutive samples" Value="RTC_TAMPERFILTER_2SAMPLE"/>
+        <PossibleValue Comment="Tamper activated after 4 consecutive samples" Value="RTC_TAMPERFILTER_4SAMPLE"/>
+        <PossibleValue Comment="Tamper activated after 8 consecutive samples" Value="RTC_TAMPERFILTER_8SAMPLE"/>
+    </RefParameter>
+    
+    <RefParameter Comment="Tamper8" DefaultValue="RTC_ATAMP_ENABLE" Group="Tamper8" Name="Enable8" Type="String">
+        <Condition Expression="Semaphore_ActiveTamper8" Diagnostic="" />
+        <PossibleValue Comment="Active Input" Value="RTC_ATAMP_ENABLE" />   
+    </RefParameter>
+    <RefParameter Comment="Tamper8" DefaultValue="RTC_ATAMP_DISABLE" Group="Tamper8" Name="Enable8" Type="String">
+        <Condition Expression="Semaphore_PassiveTamper8" Diagnostic="" />
+        <PossibleValue Comment="Passive Input" Value="RTC_ATAMP_DISABLE"/>    
+    </RefParameter>
+    
+    <RefParameter Comment="Tamper8" DefaultValue="RTC_ATAMP_ENABLE" Group="Tamper8" Name="Enable80" Type="list">
+        <Condition Expression="Tamper8_ON &amp; Semaphore_ActiveTamper8" Diagnostic="" />
+        <PossibleValue Comment="Active Input" Value="RTC_ATAMP_ENABLE"  />
+    </RefParameter>    
+    <RefParameter Comment="Tamper8_Interrupt_mode" DefaultValue="RTC_ATAMP_INTERRUPT_DISABLE" Group="Tamper8" Name="Interrupt8" Type="list">
+        <Condition Expression="Tamper8_ON &amp;  Semaphore_ActiveTamper8" Diagnostic="" />
+        <PossibleValue Comment="Enable" Value="RTC_ATAMP_INTERRUPT_ENABLE"/>
+        <PossibleValue Comment="Disable" Value="RTC_ATAMP_INTERRUPT_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Interrupt8" DefaultValue="__NULL" Group="Tamper8" Name="Interrupt8" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper8" Diagnostic="" />
+        <PossibleValue Value="__NULL" Comment="__NULL"/>
+    </RefParameter>
+    
+    <RefParameter Comment="Sampling Frequency" DefaultValue="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV32768" Group="Passive tamper signals" Name="SamplingFrequency" Type="list">
+        <Condition Expression="Semaphore_PassiveTamper8" Diagnostic="" />
+
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 32768" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV32768"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 16384" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV16384"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 8192" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV8192"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 4096" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV4096"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 2048" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV2048"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 1024" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV1024"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 512" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV512"/>
+        <PossibleValue Comment="Sampling Frequency = RTCCLK / 256" Value="RTC_TAMPERSAMPLINGFREQ_RTCCLK_DIV256"/>
+    </RefParameter>
+    <RefParameter Comment="Precharge Duration" DefaultValue="RTC_TAMPERPRECHARGEDURATION_1RTCCLK" Group="Passive tamper signals" Name="PrechargeDuration" Type="list">
+        <Condition Expression="Semaphore_PassiveTamper8" Diagnostic="" />
+
+        <PossibleValue Comment="Precharge Duration = 1 RTCCLK cycle" Value="RTC_TAMPERPRECHARGEDURATION_1RTCCLK"/>
+        <PossibleValue Comment="Precharge Duration = 2 RTCCLK cycles" Value="RTC_TAMPERPRECHARGEDURATION_2RTCCLK"/>
+        <PossibleValue Comment="Precharge Duration = 4 RTCCLK cycles" Value="RTC_TAMPERPRECHARGEDURATION_4RTCCLK"/>
+        <PossibleValue Comment="Precharge Duration = 8 RTCCLK cycles" Value="RTC_TAMPERPRECHARGEDURATION_8RTCCLK"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper_PullUp" DefaultValue="RTC_TAMPER_PULLUP_ENABLE" Group="Passive tamper signals" Name="TamperPullUp" Type="list">
+        <Condition Expression="Semaphore_PassiveTamper8" Diagnostic="" />
+
+        <PossibleValue Comment="Enabled " Value="RTC_TAMPER_PULLUP_ENABLE"/>
+        <PossibleValue Comment="Disabled " Value="RTC_TAMPER_PULLUP_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="TimeStamp_On_Tamper_ Detection" DefaultValue="RTC_TIMESTAMPONTAMPERDETECTION_ENABLE" Group="Time Stamp" Name="TimeStampOnTamperDetection" Type="list">
+        <PossibleValue Comment="Saved " Value="RTC_TIMESTAMPONTAMPERDETECTION_ENABLE"/>
+        <PossibleValue Comment="Not saved " Value="RTC_TIMESTAMPONTAMPERDETECTION_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper8_Trigger" DefaultValue="RTC_TAMPERTRIGGER_RISINGEDGE" Group="Tamper8" Name="Trigger_8" Type="list">
+        <Condition Diagnostic="" Expression="Semaphore_PassiveTamper8 &amp; Filter=RTC_TAMPERFILTER_DISABLE  "/>
+        <PossibleValue Comment="Rising Edge" Value="RTC_TAMPERTRIGGER_RISINGEDGE"/>
+        <PossibleValue Comment="Falling Edge" Value="RTC_TAMPERTRIGGER_FALLINGEDGE"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper8_Trigger" DefaultValue="RTC_TAMPERTRIGGER_LOWLEVEL" Group="Tamper8" Name="Trigger_8" Type="list">
+        <Condition Diagnostic="" Expression="Semaphore_PassiveTamper8"/>
+
+        <PossibleValue Comment="Low Level" Value="RTC_TAMPERTRIGGER_LOWLEVEL"/>
+        <PossibleValue Comment="High Level" Value="RTC_TAMPERTRIGGER_HIGHLEVEL"/>
+    </RefParameter>
+	
+    <RefParameter Comment="Tamper8_NoErase" DefaultValue="RTC_TAMPER_ERASE_BACKUP_ENABLE" Group="Tamper8" Name="NoErase_8" Type="list">
+        <Condition Expression="Tamper8_ON" Diagnostic=""/>
+        <PossibleValue Comment="Erase Enabled" Value="RTC_TAMPER_ERASE_BACKUP_ENABLE"/>
+        <PossibleValue Comment="Erase Disabled" Value="RTC_TAMPER_ERASE_BACKUP_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper8_NoErase" DefaultValue="RTC_TAMPER_ERASE_BACKUP_ENABLE" Group="Tamper8" Name="NoErase_80" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper8" Diagnostic=""/>
+        <PossibleValue Comment="Erase Enabled" Value="RTC_TAMPER_ERASE_BACKUP_ENABLE"/>
+        <PossibleValue Comment="Erase Disabled" Value="RTC_TAMPER_ERASE_BACKUP_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Tamper8_NoErase" DefaultValue="null" Group="Tamper8" Name="NoErase_8" Type="list" Visible="false">
+        <Condition Expression="Tamper8_ON" Diagnostic=""/>
+    </RefParameter>
+   
+    <RefParameter Comment="Active AsyncPrescaler" DefaultValue="RTC_ATAMP_ASYNCPRES_RTCCLK" Group="Active tamper signals" Name="ActiveAsyncPrescaler" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK" Value="RTC_ATAMP_ASYNCPRES_RTCCLK"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_2" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_2"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_4" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_4"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_8" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_8"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_16" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_16"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_32" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_32"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_64" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_64"/>
+        <PossibleValue Comment=" RTC_ATAMP_ASYNCPRES_RTCCLK_128" Value="RTC_ATAMP_ASYNCPRES_RTCCLK_128"/>
+        <PossibleValue Comment="RTC_ATAMP_ASYNCPRES_RTCCLK_2048 " Value="RTC_ATAMP_ASYNCPRES_RTCCLK_2048" Condition="DIE481 | DIE455" Action="Remove"/>
+    </RefParameter>
+    <!--RefParameter Comment="Time Stamp OnTamper Detection" DefaultValue="RTC_TIMESTAMPONTAMPERDETECTION_DISABLE" Group="Active tamper" Name="TimeStampOnTamperDetection" Type="list">
+        <PossibleValue Comment=" Disabled " Value="RTC_TIMESTAMPONTAMPERDETECTION_DISABLE"/>
+        <PossibleValue Comment=" Enabled" Value="RTC_TIMESTAMPONTAMPERDETECTION_ENABLE"/>
+    </RefParameter-->
+    
+    <RefParameter Name="ActiveOutputChangePeriod" Comment="Active Output Change Period" DefaultValue="0" Max="7" Min="0" Type="integer"  Group="Active tamper signals" >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+
+    </RefParameter>
+     
+    <RefParameter Name="Seed_Size0" Comment="Seed[0]" DefaultValue="0x00000000" Min="0x00000000" Max="0xFFFFFFFF"  Type="hex"  Group="Active tamper signals"   >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+    </RefParameter>
+    <RefParameter Name="Seed_Size1" Comment="Seed[1]" DefaultValue="0x00000000" Min="0x00000000" Max="0xFFFFFFFF"  Type="hex"  Group="Active tamper signals"  >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+    </RefParameter>
+   
+    <RefParameter Name="Seed_Size2" Comment="Seed[2]" DefaultValue="0x00000000" Min="0x00000000" Max="0xFFFFFFFF"  Type="hex"  Group="Active tamper signals"   >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+    </RefParameter>  
+    <RefParameter Name="Seed_Size3" Comment="Seed[3]" DefaultValue="0x00000000" Min="0x00000000" Max="0xFFFFFFFF"  Type="hex" Group="Active tamper signals"   >
+        <Condition Expression="Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8"   Diagnostic="" /> 
+    </RefParameter>
+    <RefParameter Comment="Tamper8_Active_Input_Output" DefaultValue="RTC_ATAMP_8" Group="Tamper8" Name="Output8" Type="list" Visible="false">
+        <PossibleValue Value="__NULL" Comment="__NULL"/>
+        <Condition Expression="!Tamper8_ON|!Semaphore_ActiveTamper8" Diagnostic="" />
+    </RefParameter>
+
+    <RefParameter Comment="Tamper8_Active_Input_Output" DefaultValue="RTC_ATAMP_8" Group="Tamper8" Name="Output8" Type="list">
+        <Condition Expression="Semaphore_ActiveTamper8" Diagnostic="" />
+
+        <PossibleValue Comment="Tamper 1" Value="RTC_ATAMP_1" Condition="!Tamper1_OUTPUT" Diagnostic="Available when Active Output1 is enabled" />  
+        <PossibleValue Comment="Tamper 2" Value="RTC_ATAMP_2" Condition="!Tamper2_OUTPUT" Diagnostic="Available when Active Output2 is enabled"/> 
+        <PossibleValue Comment="Tamper 3" Value="RTC_ATAMP_3" Condition="!Tamper3_OUTPUT"  Diagnostic="Available when Active Output3 is enabled"/>  
+        <PossibleValue Comment="Tamper 4" Value="RTC_ATAMP_4" Condition="!Tamper4_OUTPUT" Diagnostic="Available when Active Output4 is enabled"/> 
+        <PossibleValue Comment="Tamper 5" Value="RTC_ATAMP_5" Condition="!Tamper5_OUTPUT"  Diagnostic="Available when Active Output5 is enabled"/>  
+        <PossibleValue Comment="Tamper 6" Value="RTC_ATAMP_6" Condition="!Tamper6_OUTPUT" Diagnostic="Available when Active Output6 is enabled"/> 
+        <PossibleValue Comment="Tamper 7" Value="RTC_ATAMP_7" Condition="!Tamper7_OUTPUT"  Diagnostic="Available when Active Output7 is enabled"/>  
+        <PossibleValue Comment="Tamper 8" Value="RTC_ATAMP_8" Condition="!Tamper8_OUTPUT" Diagnostic="Available when Active Output8 is enabled"/>
+       
+    </RefParameter>
+    
+    <!-- ################################## Tamper REF MODE ##################################################-->
+    <RefMode Abstract="true" HalMode="RTC" Name="Tamper">
+        <ConfigForMode>TAMP_SetActiveTamper</ConfigForMode> 
+        <ConfigForMode>TAMP_Init</ConfigForMode> 
+        <Parameter Name="Filter"/>
+        <Parameter Name="SamplingFrequency"/>
+        <Parameter Name="PrechargeDuration"/>
+        <Parameter Name="TamperPullUp"/>
+        <Parameter Name="TimeStampOnTamperDetection"/>
+        <Parameter Name="ActiveAsyncPrescaler"/>
+        <Parameter Name="ActiveOutputChangePeriod"/>
+        <Parameter Name="ActiveFilter"/>
+        <Parameter Name="Seed_Size0"/>
+        <Parameter Name="Seed_Size1"/>
+        <Parameter Name="Seed_Size2"/>
+        <Parameter Name="Seed_Size3"/>
+   </RefMode>
+   
+    <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_1_enabled">
+        <Condition Diagnostic="" Expression="(TAMP_STAMP_IRQn| (TAMP_IRQn) | (TAMP_S_IRQn))"/>
+        <ConfigForMode>RTC_SetTamper_1_IT</ConfigForMode>
+        <Parameter Name="Tamper_1">
+            <PossibleValue>RTC_TAMPER_1</PossibleValue>
+        </Parameter>
+        <Parameter Name="Enable1"/>
+        <Parameter Name="Output1"/>
+        <Parameter Name="Trigger_1"/>
+        <Parameter Name="NoErase_1"/>
+        <Parameter Name="MaskFlag_10"/>
+        <Parameter Name="MaskFlag_1"/>
+        <Parameter Name="MaskFlag_10"/>
+        <Parameter Name="Interrupt1"/>     
+    </RefMode>
+    
+    <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_1_enabled0">
+        <Condition Diagnostic="" Expression="(TAMP_STAMP_IRQn| (TAMP_IRQn) | (TAMP_S_IRQn))"/>
+        <ConfigForMode>RTC_SetTamper_1_IT</ConfigForMode>
+        <Parameter Name="Tamper_1">
+            <PossibleValue>RTC_TAMPER_1</PossibleValue>
+        </Parameter>
+        <Parameter Name="Enable1"/>
+        <Parameter Name="Output1"/>
+        <Parameter Name="Trigger_1"/>
+        <Parameter Name="NoErase_1"/>
+        <Parameter Name="MaskFlag_1"/>
+        <Parameter Name="Interrupt1"/>    
+    </RefMode>
+    
+    <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_1_enabled">
+        <ConfigForMode>RTC_SetTamper_1</ConfigForMode>
+        <Parameter Name="Tamper_1">
+            <PossibleValue>RTC_TAMPER_1</PossibleValue>
+        </Parameter>
+        <Parameter Name="Enable1"/>
+        <Parameter Name="Output1"/>
+        <Parameter Name="Trigger_1"/>
+        <Parameter Name="NoErase_1"/>
+        <Parameter Name="MaskFlag_1"/>
+        <Parameter Name="MaskFlag_10"/>
+        <Parameter Name="Interrupt1"/>
+    </RefMode>
+    
+    <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_1_enabled0">
+        <ConfigForMode>RTC_SetTamper_1</ConfigForMode>
+        <Parameter Name="Tamper_1">
+            <PossibleValue>RTC_TAMPER_1</PossibleValue>
+        </Parameter>
+        <Parameter Name="Enable1"/>
+        <Parameter Name="Output1"/>
+        <Parameter Name="Trigger_1"/>
+        <Parameter Name="NoErase_1"/>
+        <Parameter Name="MaskFlag_1"/>
+        <Parameter Name="Interrupt1"/>
+    </RefMode>
+	
+    <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_2_enabled">
+        <Condition Diagnostic="" Expression="(TAMP_STAMP_IRQn| (TAMP_IRQn) | (TAMP_S_IRQn))"/>
+        <ConfigForMode>RTC_SetTamper_2_IT</ConfigForMode>
+        <Parameter Name="Tamper_2">
+            <PossibleValue>RTC_TAMPER_2</PossibleValue>
+        </Parameter>
+        <Parameter Name="Enable2"/>
+        <Parameter Name="Output2"/>
+        <Parameter Name="Trigger_2"/>
+        <Parameter Name="NoErase_2"/>
+        <Parameter Name="MaskFlag_2"/>
+        <Parameter Name="MaskFlag_20"/>
+        <Parameter Name="Interrupt2"/>
+    </RefMode>
+    
+    <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_2_enabled">
+        <ConfigForMode>RTC_SetTamper_2</ConfigForMode>
+        <Parameter Name="Tamper_2">
+            <PossibleValue>RTC_TAMPER_2</PossibleValue>
+        </Parameter>
+        <Parameter Name="Enable2"/>
+        <Parameter Name="Output2"/>
+        <Parameter Name="Trigger_2"/>
+        <Parameter Name="NoErase_2"/>
+        <Parameter Name="MaskFlag_2"/>
+        <Parameter Name="MaskFlag_20"/>
+        <Parameter Name="Interrupt2"/>
+    </RefMode>
+    
+    <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_2_enabled0">
+        <Condition Diagnostic="" Expression="(TAMP_STAMP_IRQn| (TAMP_IRQn) | (TAMP_S_IRQn))"/>
+        <ConfigForMode>RTC_SetTamper_2_IT</ConfigForMode>
+        <Parameter Name="Tamper_2">
+            <PossibleValue>RTC_TAMPER_2</PossibleValue>
+        </Parameter>
+        <Parameter Name="Enable2"/>
+        <Parameter Name="Output2"/>
+        <Parameter Name="Trigger_2"/>
+        <Parameter Name="NoErase_2"/>
+        <Parameter Name="MaskFlag_2"/>
+        <Parameter Name="Interrupt2"/>
+    </RefMode>
+    
+    <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_2_enabled0">
+        <ConfigForMode>RTC_SetTamper_2</ConfigForMode>
+        <Parameter Name="Tamper_2">
+            <PossibleValue>RTC_TAMPER_2</PossibleValue>
+        </Parameter>
+        <Parameter Name="Enable2"/>
+        <Parameter Name="Output2"/>
+        <Parameter Name="Trigger_2"/>
+        <Parameter Name="NoErase_2"/>
+        <Parameter Name="MaskFlag_2"/>
+        <Parameter Name="Interrupt2"/>
+    </RefMode>
+    
+    <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_3_enabled">
+        <Condition Diagnostic="" Expression="(TAMP_STAMP_IRQn| (TAMP_IRQn) | (TAMP_S_IRQn))"/>
+        <ConfigForMode>RTC_SetTamper_3_IT</ConfigForMode>
+        <Parameter Name="Tamper_3">
+            <PossibleValue>RTC_TAMPER_3</PossibleValue>
+        </Parameter>
+        <Parameter Name="Enable3"/>
+        <Parameter Name="Output3"/>
+        <Parameter Name="Trigger_3"/>
+        <Parameter Name="NoErase_3"/>
+        <Parameter Name="MaskFlag_3"/>
+        <Parameter Name="Interrupt3"/>
+    </RefMode>
+    
+    <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_3_enabled">
+        <ConfigForMode>RTC_SetTamper_3</ConfigForMode>
+        <Parameter Name="Tamper_3">
+            <PossibleValue>RTC_TAMPER_3</PossibleValue>
+        </Parameter>
+        <Parameter Name="Enable3"/>
+        <Parameter Name="Output3"/>
+        <Parameter Name="Trigger_3"/>
+        <Parameter Name="NoErase_3"/>
+        <Parameter Name="MaskFlag_3"/>
+        <Parameter Name="Interrupt3"/>
+
+    </RefMode>
+    <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_3_enabled0">
+        <Condition Diagnostic="" Expression="(TAMP_STAMP_IRQn| (TAMP_IRQn) | (TAMP_S_IRQn))"/>
+        <ConfigForMode>RTC_SetTamper_3_IT</ConfigForMode>
+        <Parameter Name="Tamper_3">
+            <PossibleValue>RTC_TAMPER_3</PossibleValue>
+        </Parameter>
+        <Parameter Name="Enable3"/>
+        <Parameter Name="Output3"/>
+        <Parameter Name="Trigger_3"/>
+        <Parameter Name="NoErase_3"/>
+        <Parameter Name="MaskFlag_3"/>
+        <Parameter Name="Interrupt3"/>
+
+     </RefMode>
+    
+    <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_3_enabled0">
+        <ConfigForMode>RTC_SetTamper_3</ConfigForMode>
+        <Parameter Name="Tamper_3">
+            <PossibleValue>RTC_TAMPER_3</PossibleValue>
+        </Parameter>
+        <Parameter Name="Enable3"/>
+        <Parameter Name="Output3"/>
+        <Parameter Name="Trigger_3"/>
+        <Parameter Name="NoErase_3"/>
+        <Parameter Name="MaskFlag_3"/>
+        <Parameter Name="Interrupt3"/>
+
+    </RefMode>
+    
+    <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_4_enabled">
+        <Condition Diagnostic="" Expression="(TAMP_STAMP_IRQn| (TAMP_IRQn) | (TAMP_S_IRQn))"/>
+        <ConfigForMode>RTC_SetTamper_4_IT</ConfigForMode>
+        <Parameter Name="Tamper_4">
+            <PossibleValue>RTC_TAMPER_4</PossibleValue>
+        </Parameter>
+        <Parameter Name="Enable4"/>
+        <Parameter Name="Output4"/>       
+        <Parameter Name="Trigger_4"/>
+        <Parameter Name="NoErase_4"/>
+        <Parameter Name="Interrupt4"/>
+    </RefMode>
+    
+    <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_4_enabled">
+        <ConfigForMode>RTC_SetTamper_4</ConfigForMode>
+        <Parameter Name="Tamper_4">
+            <PossibleValue>RTC_TAMPER_4</PossibleValue>
+        </Parameter>
+        <Parameter Name="Enable4"/>
+        <Parameter Name="Output4"/>        
+        <Parameter Name="Trigger_4"/>
+        <Parameter Name="NoErase_4"/>
+        <Parameter Name="Enable4"/>
+        <Parameter Name="Interrupt4"/>
+    </RefMode>
+    
+    <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_4_enabled0">
+        <Condition Diagnostic="" Expression="(TAMP_STAMP_IRQn| (TAMP_IRQn) | (TAMP_S_IRQn))"/>
+        <ConfigForMode>RTC_SetTamper_4_IT</ConfigForMode>
+        <Parameter Name="Tamper_4">
+            <PossibleValue>RTC_TAMPER_4</PossibleValue>
+        </Parameter>
+        <Parameter Name="Enable4"/>
+        <Parameter Name="Output4"/>       
+        <Parameter Name="Trigger_4"/>
+        <Parameter Name="NoErase_4"/>
+        <Parameter Name="Interrupt4"/>
+    </RefMode>
+    
+    <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_4_enabled0">
+        <ConfigForMode>RTC_SetTamper_4</ConfigForMode>
+        <Parameter Name="Tamper_4">
+            <PossibleValue>RTC_TAMPER_4</PossibleValue>
+        </Parameter>
+        <Parameter Name="Enable4"/>
+        <Parameter Name="Output4"/>        
+        <Parameter Name="Trigger_4"/>
+        <Parameter Name="NoErase_4"/>
+        <Parameter Name="Enable4"/>
+        <Parameter Name="Interrupt4"/>
+    </RefMode>
+    
+    <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_5_enabled">
+        <ConfigForMode>RTC_SetTamper_5</ConfigForMode>
+        <Parameter Name="Tamper_5">
+            <PossibleValue>RTC_TAMPER_5</PossibleValue>
+        </Parameter>
+        <Parameter Name="Enable5"/>
+        <Parameter Name="Output5"/>        
+        <Parameter Name="Trigger_5"/>
+        <Parameter Name="NoErase_5"/>
+        <Parameter Name="Enable5"/>
+        <Parameter Name="Interrupt5"/>
+    </RefMode>
+    
+    <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_5_enabled">
+        <Condition Diagnostic="" Expression="(TAMP_STAMP_IRQn| (TAMP_IRQn) | (TAMP_S_IRQn))"/>
+        <ConfigForMode>RTC_SetTamper_5_IT</ConfigForMode>
+        <Parameter Name="Tamper_5">
+            <PossibleValue>RTC_TAMPER_5</PossibleValue>
+        </Parameter>
+        <Parameter Name="Enable5"/>
+        <Parameter Name="Output5"/>
+        <Parameter Name="Trigger_5"/>
+        <Parameter Name="NoErase_5"/>
+        <Parameter Name="Interrupt5"/>
+    </RefMode>
+    
+    <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_4_enabled0">
+        <ConfigForMode>RTC_SetTamper_4</ConfigForMode>
+        <Parameter Name="Tamper_4">
+            <PossibleValue>RTC_TAMPER_4</PossibleValue>
+        </Parameter>
+        <Parameter Name="Enable4"/>
+        <Parameter Name="Output4"/>        
+        <Parameter Name="Trigger_4"/>
+        <Parameter Name="NoErase_4"/>
+        <Parameter Name="Enable4"/>
+        <Parameter Name="Interrupt4"/>
+    </RefMode>
+    
+    <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_5_enabled0">
+        <Condition Diagnostic="" Expression="(TAMP_STAMP_IRQn| (TAMP_IRQn) | (TAMP_S_IRQn))"/>
+        <ConfigForMode>RTC_SetTamper_5_IT</ConfigForMode>
+        <Parameter Name="Tamper_5">
+            <PossibleValue>RTC_TAMPER_5</PossibleValue>
+        </Parameter>
+        <Parameter Name="Enable5"/>
+        <Parameter Name="Output5"/>
+        <Parameter Name="Trigger_5"/>
+        <Parameter Name="NoErase_5"/>
+        <Parameter Name="Interrupt5"/>   
+    </RefMode>
+    
+    <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_5_enabled0">
+        <ConfigForMode>RTC_SetTamper_5</ConfigForMode>
+        <Parameter Name="Tamper_5">
+            <PossibleValue>RTC_TAMPER_5</PossibleValue>
+        </Parameter>
+        <Parameter Name="Enable5"/>
+        <Parameter Name="Output5"/>
+        <Parameter Name="Trigger_5"/>
+        <Parameter Name="NoErase_5"/>
+        <Parameter Name="Interrupt5"/>  
+    </RefMode>
+    
+    <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_6_enabled">
+        <Condition Diagnostic="" Expression="(TAMP_STAMP_IRQn| (TAMP_IRQn) | (TAMP_S_IRQn))"/>
+        <ConfigForMode>RTC_SetTamper_6_IT</ConfigForMode>
+        <Parameter Name="Tamper_6">
+            <PossibleValue>RTC_TAMPER_6</PossibleValue>
+        </Parameter>
+        <Parameter Name="Enable6"/>
+        <Parameter Name="Output6"/>
+        <Parameter Name="Trigger_6"/>
+        <Parameter Name="NoErase_6"/>
+        <Parameter Name="Trigger_6"/>
+        <Parameter Name="Interrupt6"/>
+    </RefMode>
+    
+    <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_6_enabled">
+        <ConfigForMode>RTC_SetTamper_6</ConfigForMode>
+        <Parameter Name="Tamper_6">
+            <PossibleValue>RTC_TAMPER_6</PossibleValue>
+        </Parameter>
+        <Parameter Name="Enable6"/>
+        <Parameter Name="Output6"/>
+        <Parameter Name="Trigger_6"/>
+        <Parameter Name="NoErase_6"/>
+        <Parameter Name="Interrupt6"/>
+    </RefMode>
+    <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_6_enabled0">
+        <Condition Diagnostic="" Expression="(TAMP_STAMP_IRQn| (TAMP_IRQn) | (TAMP_S_IRQn))"/>
+        <ConfigForMode>RTC_SetTamper_6_IT</ConfigForMode>
+        <Parameter Name="Tamper_6">
+            <PossibleValue>RTC_TAMPER_6</PossibleValue>
+        </Parameter>
+        <Parameter Name="Enable6"/>
+        <Parameter Name="Output6"/>
+        <Parameter Name="Trigger_6"/>
+        <Parameter Name="NoErase_6"/>
+        <Parameter Name="Trigger_6"/>
+        <Parameter Name="Interrupt6"/>   
+    </RefMode>
+    
+    <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_6_enabled0">
+        <ConfigForMode>RTC_SetTamper_6</ConfigForMode>
+        <Parameter Name="Tamper_6">
+            <PossibleValue>RTC_TAMPER_6</PossibleValue>
+        </Parameter>
+        <Parameter Name="Enable6"/>
+        <Parameter Name="Output6"/>
+        <Parameter Name="Trigger_6"/>
+        <Parameter Name="NoErase_6"/>
+        <Parameter Name="Interrupt6"/>
+    </RefMode>
+    
+    <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_7_enabled">
+        <Condition Diagnostic="" Expression="TAMP_STAMP_IRQn | TAMP_IRQn | TAMP_S_IRQn"/>
+        <ConfigForMode>RTC_SetTamper_7_IT</ConfigForMode>
+        <Parameter Name="Tamper_7">
+            <PossibleValue>RTC_TAMPER_7</PossibleValue>
+        </Parameter>
+        <Parameter Name="Enable7"/>
+        <Parameter Name="Output7"/>
+        <Parameter Name="Trigger_7"/>
+        <Parameter Name="NoErase_7"/>
+        <Parameter Name="Interrupt7"/>
+    </RefMode>
+    
+    <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_7_enabled">
+        <ConfigForMode>RTC_SetTamper_7</ConfigForMode>
+        <Parameter Name="Tamper_7">
+            <PossibleValue>RTC_TAMPER_7</PossibleValue>
+        </Parameter>
+        <Parameter Name="Enable7"/>
+        <Parameter Name="Output7"/>
+        <Parameter Name="Trigger_7"/>
+        <Parameter Name="NoErase_7"/>
+        <Parameter Name="Interrupt7"/>
+    </RefMode>
+    
+    <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_7_enabled0">
+        <Condition Diagnostic="" Expression="TAMP_STAMP_IRQn | TAMP_IRQn | TAMP_S_IRQn"/>
+        <ConfigForMode>RTC_SetTamper_7_IT</ConfigForMode>
+        <Parameter Name="Tamper_7">
+            <PossibleValue>RTC_TAMPER_7</PossibleValue>
+        </Parameter>
+        <Parameter Name="Enable7"/>
+        <Parameter Name="Output7"/>
+        <Parameter Name="Trigger_7"/>
+        <Parameter Name="NoErase_7"/>
+        <Parameter Name="Interrupt7"/>
+    </RefMode>
+    
+    <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_7_enabled0">
+        <ConfigForMode>RTC_SetTamper_7</ConfigForMode>
+        <Parameter Name="Tamper_7">
+            <PossibleValue>RTC_TAMPER_7</PossibleValue>
+        </Parameter>
+        <Parameter Name="Enable7"/>
+        <Parameter Name="Output7"/>
+        <Parameter Name="Trigger_7"/>
+        <Parameter Name="NoErase_7"/>
+        <Parameter Name="Interrupt7"/>
+    </RefMode>
+	
+    <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_8_enabled">
+        <Condition Diagnostic="" Expression="(TAMP_STAMP_IRQn| (TAMP_IRQn) | (TAMP_S_IRQn))"/>
+        <ConfigForMode>RTC_SetTamper_8_IT</ConfigForMode>
+        <Parameter Name="Tamper_8">
+            <PossibleValue>RTC_TAMPER_8</PossibleValue>
+        </Parameter>
+        <Parameter Name="Enable8"/>
+        <Parameter Name="Output8"/>
+        <Parameter Name="Trigger_8"/>
+        <Parameter Name="NoErase_8"/>
+        <Parameter Name="Trigger_8"/>
+        <Parameter Name="Interrupt8"/>
+    </RefMode>
+    
+    <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_8_enabled">
+        <ConfigForMode>RTC_SetTamper_8</ConfigForMode>
+        <Parameter Name="Tamper_8">
+            <PossibleValue>RTC_TAMPER_8</PossibleValue>
+        </Parameter>
+        <Parameter Name="Enable8"/>
+        <Parameter Name="Output8"/>
+        <Parameter Name="Trigger_8"/>
+        <Parameter Name="NoErase_8"/>
+        <Parameter Name="Trigger_8"/>
+        <Parameter Name="Interrupt8"/>
+    </RefMode>
+    
+    <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_8_enabled0">
+        <Condition Diagnostic="" Expression="(TAMP_STAMP_IRQn| (TAMP_IRQn) | (TAMP_S_IRQn))"/>
+        <ConfigForMode>RTC_SetTamper_8_IT</ConfigForMode>
+        <Parameter Name="Tamper_8">
+            <PossibleValue>RTC_TAMPER_8</PossibleValue>
+        </Parameter>
+        <Parameter Name="Enable8"/>
+        <Parameter Name="Output8"/>
+        <Parameter Name="Trigger_8"/>
+        <Parameter Name="NoErase_8"/>
+        <Parameter Name="Trigger_8"/>
+        <Parameter Name="Interrupt8"/>
+    </RefMode>
+    
+    <RefMode Abstract="true" BaseMode="Tamper" HalMode="RTC" Name="Tamper_8_enabled0">
+        <ConfigForMode>RTC_SetTamper_8</ConfigForMode>
+        <Parameter Name="Tamper_8">
+            <PossibleValue>RTC_TAMPER_8</PossibleValue>
+        </Parameter>
+        <Parameter Name="Enable8"/>
+        <Parameter Name="Output8"/>
+        <Parameter Name="Trigger_8"/>
+        <Parameter Name="NoErase_8"/>
+        <Parameter Name="Trigger_8"/>
+        <Parameter Name="Interrupt8"/>
+    </RefMode>
+    
+    
+    <!-- ################################## Tamper Mode ##################################################-->
+    <ModeLogicOperator Name="OR">
+          
+        <Mode Name="Tamper_1" UserName="Tamper 1" >
+            <Condition Diagnostic="Tamper 1 is available when RTC is activated" Expression="RTC_ENABLED"/>
+                    
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="Tamper_1_enabled" UserName="Active Input" >
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="IN1"/>
+                    </SignalLogicalOp>
+                    <Semaphore>Semaphore_ActiveTamper1</Semaphore>
+
+                </Mode>
+                <Mode Name="Tamper_1_enabled0" UserName="Passive Input" >
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="IN1"/>
+                    </SignalLogicalOp>
+                    <Semaphore>Semaphore_PassiveTamper1</Semaphore>
+
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>Tamper1_ON</Semaphore>
+            <Semaphore>RTC_TAMPER_INTERRUPT</Semaphore>
+        </Mode>
+                
+        <Mode Name="Tamper_2" UserName="Tamper 2">
+            <Condition Diagnostic="Tamper 2 is available when RTC is activated" Expression="RTC_ENABLED"/>
+                    
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="Tamper_2_enabled" UserName="Active Input">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="IN2"/>
+                    </SignalLogicalOp>
+                    <Semaphore>Semaphore_ActiveTamper2</Semaphore>
+
+                </Mode>
+                <Mode Name="Tamper_2_enabled0" UserName="Passive Input">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="IN2"/>
+                    </SignalLogicalOp>
+                    <Semaphore>Semaphore_PassiveTamper2</Semaphore>
+
+                </Mode>
+
+            </ModeLogicOperator>
+            <Semaphore>Tamper2_ON</Semaphore>
+            <Semaphore>RTC_TAMPER_INTERRUPT</Semaphore>
+        </Mode>
+        <Mode Name="Tamper_3" UserName="Tamper 3">
+            <Condition Diagnostic="Tamper 3 is available when RTC is activated" Expression="RTC_ENABLED"/>
+                    
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="Tamper_3_enabled" UserName="Active Input">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="IN3"/>
+                    </SignalLogicalOp>
+                    <Semaphore>Semaphore_ActiveTamper3</Semaphore>
+
+                </Mode>
+                <Mode Name="Tamper_3_enabled0" UserName="Passive Input">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="IN3"/>
+                    </SignalLogicalOp>
+                    <Semaphore>Semaphore_PassiveTamper3</Semaphore>
+
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>Tamper3_ON</Semaphore>
+            <Semaphore>RTC_TAMPER_INTERRUPT</Semaphore>
+        </Mode>
+	
+        <Mode Name="Tamper_4" UserName="Tamper 4">
+            <Condition Diagnostic="Tamper 4 is available when RTC is activated" Expression="RTC_ENABLED"/>
+                    
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="Tamper_4_enabled" UserName="Active Input">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="IN4"/>
+                    </SignalLogicalOp>
+                    <Semaphore>Semaphore_ActiveTamper4</Semaphore>
+
+                </Mode>
+                <Mode Name="Tamper_4_enabled0" UserName="Passive Input">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="IN4"/>
+                    </SignalLogicalOp>
+                    <Semaphore>Semaphore_PassiveTamper4</Semaphore>
+
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>Tamper4_ON</Semaphore>
+            <Semaphore>RTC_TAMPER_INTERRUPT</Semaphore>
+        </Mode>
+        <Mode Name="Tamper_5" UserName="Tamper 5">
+            <Condition Diagnostic="Tamper 5 is available when RTC is activated" Expression="RTC_ENABLED"/>
+                    
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="Tamper_5_enabled" UserName="Active Input">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="IN5"/>
+                    </SignalLogicalOp>
+                    <Semaphore>Semaphore_ActiveTamper5</Semaphore>
+
+                </Mode>
+                <Mode Name="Tamper_5_enabled0" UserName="Passive Input">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="IN5"/>
+                    </SignalLogicalOp>
+                    <Semaphore>Semaphore_PassiveTamper5</Semaphore>
+
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>Tamper5_ON</Semaphore>
+            <Semaphore>RTC_TAMPER_INTERRUPT</Semaphore>
+        </Mode>
+        <Mode Name="Tamper_6" UserName="Tamper 6">
+            <Condition Diagnostic="Tamper 6 is available when RTC is activated" Expression="RTC_ENABLED"/>
+                    
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="Tamper_6_enabled" UserName="Active Input">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="IN6"/>
+                    </SignalLogicalOp>
+                    <Semaphore>Semaphore_ActiveTamper6</Semaphore>
+
+                </Mode>
+                <Mode Name="Tamper_6_enabled0" UserName="Passive Input">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="IN6"/>
+                    </SignalLogicalOp>
+                    <Semaphore>Semaphore_PassiveTamper6</Semaphore>
+
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>Tamper6_ON</Semaphore>
+            <Semaphore>RTC_TAMPER_INTERRUPT</Semaphore>
+        </Mode>
+        <Mode Name="Tamper_7" UserName="Tamper 7">
+            <Condition Diagnostic="Tamper 7 is available when RTC is activated" Expression="RTC_ENABLED"/>
+                    
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="Tamper_7_enabled" UserName="Active Input">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="IN7"/>
+                    </SignalLogicalOp>
+                    <Semaphore>Semaphore_ActiveTamper7</Semaphore>
+
+                </Mode>
+                <Mode Name="Tamper_7_enabled0" UserName="Passive Input">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="IN7"/>
+                    </SignalLogicalOp>
+                    <Semaphore>Semaphore_PassiveTamper7</Semaphore>
+
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>Tamper7_ON</Semaphore>
+            <Semaphore>RTC_TAMPER_INTERRUPT</Semaphore>
+        </Mode>
+        <Mode Name="Tamper_8" UserName="Tamper 8">
+            <Condition Diagnostic="Tamper 8 is available when RTC is activated" Expression="RTC_ENABLED"/>
+                    
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="Tamper_8_enabled" UserName="Active Input">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="IN8"/>
+                    </SignalLogicalOp>
+                    <Semaphore>Semaphore_ActiveTamper8</Semaphore>
+
+                </Mode>
+                <Mode Name="Tamper_8_enabled0" UserName="Passive Input">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="IN8"/>
+                    </SignalLogicalOp>
+                    <Semaphore>Semaphore_PassiveTamper8</Semaphore>
+
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>Tamper8_ON</Semaphore>
+            <Semaphore>RTC_TAMPER_INTERRUPT</Semaphore>
+        </Mode>
+        <!-- goal is to have access to TAMP1/TAMP2 IN4/OUT4/IN5/TAMP_OUT5 -->
+        <Mode UserName="Active Output1" Name="Tamper 1_OUT" >
+            <Condition Diagnostic="Active Output1 is available when at least one Tamper is activated in  Active Input Mode" Expression="RTC_ENABLED &amp; (Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8)"/>
+       
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="Tamper 1 OUT enabled" UserName="Tamper1 Routed to TAMP_OUT1" >
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="OUT1"/>
+                    </SignalLogicalOp>
+                    <Semaphore>Tamper1_OUTPUT</Semaphore>
+
+                </Mode>
+            </ModeLogicOperator>
+            
+            
+            <Semaphore>Tamper1_ON</Semaphore>
+            <Semaphore>RTC_TAMPER_INTERRUPT</Semaphore>
+        </Mode>
+        <Mode UserName="Active Output2" Name="Tamper 2_OUT">
+            <Condition Diagnostic="Active Output2 is available when at least one Tamper is activated in  Active Input Mode" Expression="RTC_ENABLED &amp; (Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8)"/>                    
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="Tamper 2 OUT enabled" UserName="Tamper2 Routed to TAMP_OUT2">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="OUT2"/>
+                    </SignalLogicalOp>
+                    <Semaphore>Tamper2_OUTPUT</Semaphore>
+
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>Tamper2_ON</Semaphore>
+            <Semaphore>RTC_TAMPER_INTERRUPT</Semaphore>
+        </Mode>
+        <Mode UserName="Active Output3" Name="Tamper 3_OUT">
+            <Condition Diagnostic="Active Output3 is available when at least one Tamper is activated in  Active Input Mode" Expression="RTC_ENABLED &amp; (Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8)"/>
+                    
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="Tamper 3 OUT enabled" UserName="Tamper3 Routed to TAMP_OUT3">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="OUT3"/>
+                    </SignalLogicalOp>
+                    <Semaphore>Tamper3_OUTPUT</Semaphore>
+
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>Tamper3_ON</Semaphore>
+            <Semaphore>RTC_TAMPER_INTERRUPT</Semaphore>
+        </Mode>
+        <Mode UserName="Active Output4" Name="Tamper 4_OUT">
+            <Condition Diagnostic="Active Output4 is available when at least one Tamper is activated in  Active Input Mode" Expression="RTC_ENABLED &amp; (Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8)"/>
+                    
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="Tamper 4 OUT enabled" UserName="Tamper4 Routed to TAMP_OUT4">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="OUT4"/>
+                    </SignalLogicalOp>
+                    <Semaphore>Tamper4_OUTPUT</Semaphore>
+
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>Tamper4_ON</Semaphore>
+            <Semaphore>RTC_TAMPER_INTERRUPT</Semaphore>
+        </Mode>
+        <Mode UserName="Active Output5" Name="Tamper 5_OUT">
+            <Condition Diagnostic="Active Output5 is available when at least one Tamper is activated in  Active Input Mode" Expression="RTC_ENABLED &amp; (Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8)"/>
+                    
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="Tamper 5 OUT enabled" UserName="Tamper5 Routed to TAMP_OUT5">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="OUT5"/>
+                    </SignalLogicalOp>
+                    <Semaphore>Tamper5_OUTPUT</Semaphore>
+
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>Tamper5_ON</Semaphore>
+            <Semaphore>RTC_TAMPER_INTERRUPT</Semaphore>
+        </Mode>
+        <Mode UserName="Active Output6" Name="Tamper 6_OUT">
+            <Condition Diagnostic="Active Output6 is available when at least one Tamper is activated in  Active Input Mode" Expression="RTC_ENABLED  &amp; (Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8)"/>
+                    
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="Tamper 6 OUT enabled" UserName="Tamper6 Routed to TAMP_OUT6">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="OUT6"/>
+                    </SignalLogicalOp>
+                    <Semaphore>Tamper6_OUTPUT</Semaphore>
+
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>Tamper6_ON</Semaphore>
+            <Semaphore>RTC_TAMPER_INTERRUPT</Semaphore>
+        </Mode>
+        <Mode UserName="Active Output7" Name="Tamper 7_OUT">
+            <Condition Diagnostic="Active Output7 is available when at least one Tamper is activated in  Active Input Mode" Expression="RTC_ENABLED  &amp; (Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8)"/>
+                    
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="Tamper 7 OUT enabled" UserName="Tamper7 Routed to TAMP_OUT7">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="OUT7"/>
+                    </SignalLogicalOp>
+                    <Semaphore>Tamper7_OUTPUT</Semaphore>
+
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>Tamper7_ON</Semaphore>
+            <Semaphore>RTC_TAMPER_INTERRUPT</Semaphore>
+        </Mode>
+        <Mode UserName="Active Output8" Name="Tamper 8_OUT">
+            <Condition Diagnostic="Active Output8 is available when at least one Tamper is activated in  Active Input Mode" Expression="RTC_ENABLED   &amp; (Semaphore_ActiveTamper1|Semaphore_ActiveTamper2|Semaphore_ActiveTamper3|Semaphore_ActiveTamper4|Semaphore_ActiveTamper5|Semaphore_ActiveTamper6|Semaphore_ActiveTamper7|Semaphore_ActiveTamper8)"/>
+                    
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="Tamper 8 OUT enabled" UserName="Tamper8 Routed to TAMP_OUT8">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="OUT8"/>
+                    </SignalLogicalOp>
+                    <Semaphore>Tamper8_OUTPUT</Semaphore>
+
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>Tamper8_ON</Semaphore>
+            <Semaphore>RTC_TAMPER_INTERRUPT</Semaphore>
+        </Mode>
+       
+
+    </ModeLogicOperator>
+    <!-- RefSignal for System  Tamper INPUT-->
+    <RefSignal IOMode="System" Name="IN1" />
+    <RefSignal IOMode="System" Name="IN2" />
+    <RefSignal IOMode="System" Name="IN3" />
+    <RefSignal IOMode="System" Name="IN4"/>
+    <RefSignal IOMode="System" Name="IN5"/>
+    <RefSignal IOMode="System" Name="IN6" />
+    <RefSignal IOMode="System" Name="IN7"/>
+    <RefSignal IOMode="System" Name="IN8"/>
+    <!-- RefSignal for System Tamper OUTPUT-->
+    <RefSignal IOMode="System" Name="OUT1"/>
+    <RefSignal IOMode="System" Name="OUT2" />
+    <RefSignal IOMode="System" Name="OUT3" />
+    <RefSignal IOMode="System" Name="OUT4"/>
+    <RefSignal IOMode="System" Name="OUT5"/>
+    <RefSignal IOMode="System" Name="OUT6" />
+    <RefSignal IOMode="System" Name="OUT7" />
+    <RefSignal IOMode="System" Name="OUT8"/>
+
+    
+    
+       
+	
+        
+</IP>

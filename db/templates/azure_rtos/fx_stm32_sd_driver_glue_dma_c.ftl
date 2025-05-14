@@ -93,10 +93,12 @@ INT fx_stm32_sd_deinit(UINT instance)
   UNUSED(instance);
   /* USER CODE END PRE_FX_SD_DEINIT */
 
+#if (FX_STM32_SD_INIT == 1)
   if(HAL_SD_DeInit(&hsd${sd_instance+1}) != HAL_OK)
   {
     ret = 1;
   }
+#endif
 
   /* USER CODE BEGIN POST_FX_SD_DEINIT */
 

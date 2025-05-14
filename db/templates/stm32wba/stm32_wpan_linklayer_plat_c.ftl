@@ -25,13 +25,20 @@ Key: ${key}; Value: ${myHash[key]}
 [/#list]
 --]
 
-#include "app_common.h"
 #include "stm32wbaxx_hal.h"
-#include "linklayer_plat.h"
 #include "stm32wbaxx_hal_conf.h"
 #include "stm32wbaxx_ll_rcc.h"
+
+#include "app_common.h"
 #include "app_conf.h"
+#include "linklayer_plat.h"
+[#if (myHash["BLE_MODE_SIMPLEST_BLE"] != "Enabled")]
 #include "scm.h"
+#include "log_module.h"
+[#else]
+#include "stm32wbaxx_ll_rng.h"
+#include "stm32wbaxx_ll_bus.h"
+[/#if]
 [#if (myHash["USE_TEMPERATURE_BASED_RADIO_CALIBRATION"]?number == 1)]
 #if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)
 #include "adc_ctrl.h"
@@ -51,8 +58,10 @@ Key: ${key}; Value: ${myHash[key]}
 void (*radio_callback)(void) = NULL;
 void (*low_isr_callback)(void) = NULL;
 
+[#if (myHash["BLE_MODE_SIMPLEST_BLE"] != "Enabled")]
 /* RNG handle */
 extern RNG_HandleTypeDef hrng;
+[/#if]
 
 [#if (myHash["USE_TEMPERATURE_BASED_RADIO_CALIBRATION"]?number == 1)]
 #if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)
@@ -82,7 +91,7 @@ void LINKLAYER_PLAT_ClockInit()
 {
 [#if (myHash["BLE"] == "Enabled") ]
   uint32_t linklayer_slp_clk_src = LL_RCC_RADIOSLEEPSOURCE_NONE;
-  
+
   /* Get the Link Layer sleep timer clock source */
   linklayer_slp_clk_src = LL_RCC_RADIO_GetSleepTimerClockSource();
   if(linklayer_slp_clk_src == LL_RCC_RADIOSLEEPSOURCE_NONE)
@@ -91,8 +100,8 @@ void LINKLAYER_PLAT_ClockInit()
     assert_param(0);
   }
 [#else]
-  /* Select LSE as Sleep CLK */
-  __HAL_RCC_RADIOSLPTIM_CONFIG(RCC_RADIOSTCLKSOURCE_LSE);
+  /* Select ${myHash["HAL_RCC_RADIOSLPTIM_CONFIG"]?substring(21)} as Sleep CLK */
+  __HAL_RCC_RADIOSLPTIM_CONFIG(${myHash["HAL_RCC_RADIOSLPTIM_CONFIG"]});
 [/#if]
 
   /* Enable AHB5ENR peripheral clock (bus CLK) */
@@ -168,6 +177,7 @@ void LINKLAYER_PLAT_GetRNG(uint8_t *ptr_rnd, uint32_t len)
   uint32_t nb_remaining_rng = len;
   uint32_t generated_rng;
 
+[#if (myHash["BLE_MODE_SIMPLEST_BLE"] != "Enabled")]
   /* Get the requested RNGs (4 bytes by 4bytes) */
   while(nb_remaining_rng >= 4)
   {
@@ -183,6 +193,25 @@ void LINKLAYER_PLAT_GetRNG(uint8_t *ptr_rnd, uint32_t len)
     HW_RNG_Get(1, &generated_rng);
     memcpy((ptr_rnd+(len-nb_remaining_rng)), &generated_rng, nb_remaining_rng);
   }
+[#else]
+  LL_AHB2_GRP1_EnableClock( LL_AHB2_GRP1_PERIPH_RNG );         
+  LL_RNG_Enable( RNG );
+  
+  // Get the requested RNGs (4 bytes by 4bytes) 
+  while(nb_remaining_rng >= 4)
+  {
+    generated_rng = LL_RNG_ReadRandData32( RNG );
+    memcpy((ptr_rnd+(len-nb_remaining_rng)), &generated_rng, 4);
+    nb_remaining_rng -=4;
+  }
+
+  // Get the remaining number of RNGs 
+  if(nb_remaining_rng>0){
+    generated_rng = LL_RNG_ReadRandData32( RNG );
+    memcpy((ptr_rnd+(len-nb_remaining_rng)), &generated_rng, nb_remaining_rng);
+  }
+
+[/#if]
 }
 
 /**
@@ -453,11 +482,11 @@ void LINKLAYER_PLAT_RCOStartClbr(void)
 #if (CFG_SCM_SUPPORTED == 1)
 #if (CFG_LPM_LEVEL != 0)
 #if (CFG_LPM_STDBY_SUPPORTED == 1)
-  UTIL_LPM_SetOffMode(1U << CFG_LPM_APP, UTIL_LPM_DISABLE);
+  UTIL_LPM_SetOffMode(1U << CFG_LPM_LL_HW_RCO_CLBR, UTIL_LPM_DISABLE);
 #endif /* (CFG_LPM_STDBY_SUPPORTED == 1) */
-  UTIL_LPM_SetStopMode(1U << CFG_LPM_APP, UTIL_LPM_DISABLE);
+  UTIL_LPM_SetStopMode(1U << CFG_LPM_LL_HW_RCO_CLBR, UTIL_LPM_DISABLE);
 #endif /* (CFG_LPM_LEVEL != 0) */
-  scm_setsystemclock(SCM_USER_LL_HW_RCO_CLBR, HSE_32MHZ); 
+  scm_setsystemclock(SCM_USER_LL_HW_RCO_CLBR, HSE_32MHZ);
   while (LL_PWR_IsActiveFlag_VOS() == 0);
 #endif /* CFG_SCM_SUPPORTED */
 }
@@ -472,11 +501,11 @@ void LINKLAYER_PLAT_RCOStopClbr(void)
 #if (CFG_SCM_SUPPORTED == 1)
 #if (CFG_LPM_LEVEL != 0)
 #if (CFG_LPM_STDBY_SUPPORTED == 1)
-  UTIL_LPM_SetOffMode(1U << CFG_LPM_APP, UTIL_LPM_ENABLE);
+  UTIL_LPM_SetOffMode(1U << CFG_LPM_LL_HW_RCO_CLBR, UTIL_LPM_ENABLE);
 #endif /* (CFG_LPM_STDBY_SUPPORTED == 1) */
-  UTIL_LPM_SetStopMode(1U << CFG_LPM_APP, UTIL_LPM_ENABLE);
+  UTIL_LPM_SetStopMode(1U << CFG_LPM_LL_HW_RCO_CLBR, UTIL_LPM_ENABLE);
 #endif /* (CFG_LPM_LEVEL != 0) */
-  scm_setsystemclock(SCM_USER_LL_HW_RCO_CLBR, HSE_16MHZ); 
+  scm_setsystemclock(SCM_USER_LL_HW_RCO_CLBR, HSE_16MHZ);
   while (LL_PWR_IsActiveFlag_VOS() == 0);
 #endif /* CFG_SCM_SUPPORTED */
 }
@@ -526,4 +555,33 @@ void LINKLAYER_PLAT_DisableOSContextSwitch(void)
  */
 void LINKLAYER_PLAT_SCHLDR_TIMING_UPDATE_NOT(Evnt_timing_t * p_evnt_timing)
 {
+  /* USER CODE BEGIN LINKLAYER_PLAT_SCHLDR_TIMING_UPDATE_NOT_0 */
+
+  /* USER CODE END LINKLAYER_PLAT_SCHLDR_TIMING_UPDATE_NOT_0 */
 }
+
+[#if (myHash["BLE_MODE_SIMPLEST_BLE"] != "Enabled")]
+/**
+  * @brief  Get the ST company ID.
+  * @param  None
+  * @retval Company ID
+  */
+uint32_t LINKLAYER_PLAT_GetSTCompanyID(void)
+{
+  return LL_FLASH_GetSTCompanyID();
+}
+
+/**
+  * @brief  Get the Unique Device Number (UDN).
+  * @param  None
+  * @retval UDN
+  */
+uint32_t LINKLAYER_PLAT_GetUDN(void)
+{
+  return LL_FLASH_GetUDN();
+}
+[/#if]
+
+/* USER CODE BEGIN LINKLAYER_PLAT 0 */
+
+/* USER CODE END LINKLAYER_PLAT 0 */

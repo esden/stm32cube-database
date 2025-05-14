@@ -51,7 +51,13 @@
 
     <!-- This parameter tells if the region is a default region mandatory for the linked file and cannot be deleted by the user (only move or resize allowed) -->
     <RefParameter Comment="Default Data Region" DefaultValue="false" Group="Current application region attributes"  Name="DefaultDataRegion" Type="boolean">
-	    <Condition Diagnostic="" Expression="S_MMT_CurReg_DefaultData"/>
+        <Condition Diagnostic="" Expression="S_MMT_CurReg_DefaultData &amp;!(DIE480|DIE450|DIE483)"/>
+        <PossibleValue Comment="true" Value="true" Semaphore="S_MMT_CurReg_DefaultData"/>
+        <PossibleValue Comment="false" Value="false"/>
+        <Description>This region will contain default linker sections (eg: heap and stack)</Description>
+    </RefParameter>
+    <RefParameter Comment="Default Data Region" DefaultValue="false" Group="Current application region attributes"  Name="DefaultDataRegion" Type="boolean">
+       <Condition Diagnostic="" Expression="S_MMT_CurReg_RAM &amp;(DIE480|DIE450|DIE483)"/>
         <PossibleValue Comment="true" Value="true" Semaphore="S_MMT_CurReg_DefaultData"/>
         <PossibleValue Comment="false" Value="false"/>
         <Description>This region will contain default linker sections (eg: heap and stack)</Description>
@@ -69,7 +75,7 @@
     </RefParameter>
 
     <RefParameter Comment="ISR vector"  DefaultValue="true" Group="Current application region attributes"  Name="ISRRegion" Type="boolean">
-        <Condition Diagnostic="" Expression="S_MMT_CurReg_DefaultCode"/>
+        <Condition Diagnostic="" Expression="S_MMT_CurReg_DefaultCode &amp;S_MMT_CurReg_InFlash"/>
         <PossibleValue Comment="true" Value="true" Semaphore="S_MMT_CurReg_ISRVectorPresent"/>
         <PossibleValue Comment="false" Value="false"/>
         <Description>Define if ISR vector is present on this region</Description>
@@ -79,7 +85,7 @@
     </RefParameter>
 
     <RefParameter Comment="Root Boot"  DefaultValue="true" Group="Current application region attributes"  Name="RootBootRegion" Type="boolean">
-        <Condition Diagnostic="" Expression="S_MMT_CurReg_DefaultCode&amp;(!S_SECURE|!S_MMT_CurReg_NS)"/>
+        <Condition Diagnostic="" Expression="S_MMT_CurReg_InFlash &amp; S_MMT_CurReg_DefaultCode&amp;(!S_SECURE|!S_MMT_CurReg_NS)"/>
         <PossibleValue Comment="true" Value="true" Semaphore = "S_MMT_CurReg_RootBoot"/>
         <PossibleValue Comment="false" Value="false"/>
         <Description>Define if this application is the first one to run after reset</Description>
@@ -103,13 +109,21 @@
         <Description>Define if this region should be secured by FLASH watermark in option bytes</Description>
     </RefParameter>
 
-	<!-- This parameter indicates if need to generated OTA sections in default code region. And this parameter is available only for WB and for Application, i.e. not BootLoader (rootboot is disabled) -->
+    <!-- This parameter indicates if need to generated OTA sections in default code region. And this parameter is available only for WB and for Application, i.e. not BootLoader (rootboot is disabled) -->
     <RefParameter Comment="OTA tags"  DefaultValue="false" Group="Current application region attributes"  Name="OTATagsRegion" Type="boolean">
         <Condition Diagnostic="" Expression="S_MMT_CurReg_DefaultCode&amp;!S_MMT_CurReg_RootBoot&amp;(DIE495|DIE496|DIE494)"/>
         <PossibleValue Comment="true" Value="true"/>
         <PossibleValue Comment="false" Value="false"/>
         <Description>Define if this region contains OTA start tag and OTA end tag</Description>
     </RefParameter>
+
+    <RefParameter Comment="OTA tags"  DefaultValue="false" Group="Current application region attributes"  Name="OTATagsRegion" Type="boolean">
+        <Condition Diagnostic="" Expression="S_MMT_CurReg_DefaultCode&amp;S_MMT_CurReg_OTATags"/>
+        <PossibleValue Comment="true" Value="true"/>
+        <PossibleValue Comment="false" Value="false"/>
+        <Description>Define if this region contains OTA start tag and OTA end tag</Description>
+    </RefParameter>
+
     <RefParameter Comment="OTA tags"  DefaultValue="false" Group="Current application region attributes"  Name="OTATagsRegion" Type="boolean" Visible="false">
         <PossibleValue Comment="false" Value="false"/>
     </RefParameter>
@@ -119,7 +133,7 @@
         <Condition Diagnostic="" Expression="S_MMT_CurReg_DefaultCode&amp;S_MMT_CurReg_RootBoot&amp;(DIE495|DIE496|DIE494)"/>
         <PossibleValue Comment="true" Value="true"/>
         <PossibleValue Comment="false" Value="false"/>
-        <Description>Define if this region contains the boot info section</Description>
+        <Description>&lt;html&gt;Define if this region contains the boot info section. &lt;br&gt; Not needed for MDK-ARM and EWARM project. &lt;/html&gt;</Description>
     </RefParameter>
     <RefParameter Comment="Generate boot info section"  DefaultValue="false" Group="Current application region attributes"  Name="BootInfoRegion" Type="boolean" Visible="false">
         <PossibleValue Comment="false" Value="false"/>
@@ -131,7 +145,7 @@
         <PossibleValue Comment="true" Value="true"/>
         <PossibleValue Comment="false" Value="false"/>
         <Description>&lt;html&gt;Define if this region is used as ThreadX Heap section.&lt;br&gt;
-		             Grayed if already set in another Application Region &lt;/html&gt;</Description>
+		             Grayed if already set in another Application Region. &lt;br&gt; Not needed for MDK-ARM project &lt;/html&gt;</Description>
     </RefParameter>
     <RefParameter Comment="ThreadX Heap section"  DefaultValue="false" Group="Current application region attributes"  Name="ThreadXHeapRegion" Type="boolean" Visible="false">
         <PossibleValue Comment="false" Value="false"/>
@@ -215,10 +229,10 @@
     3) "Trensient" is only available for MPU armv8 -->
    <RefParameter Comment="Cacheability" DefaultValue="WBRAWA" Group="Current application region attributes" Name="Cacheability" Type="list">
         <!-- allow user to turn back to the default value for the zones [0x4000 0000 : 0x6000 0000] and [0xA000 0000 : 0xC000 0000](HSPI) -->
-        <PossibleValue Comment="Device, Non-Cacheable" Value="Device_NGNRE" Condition="!(StartAddress&gt;=0x40000000&amp;StartAddress&lt;=0x60000000|StartAddress&gt;=0xA0000000&amp;StartAddress&lt;=0xC0000000)" Action="Remove"/>
-        <PossibleValue Comment="Non-Cacheable (recommended for multimaster/DMA)" Value="NonCacheable"/>
-        <PossibleValue Comment="Write-Through Read Allocate for ROM/Flash (not recommened for multimaster/DMA)" Value="WTRA"/>
-        <PossibleValue Comment="Write-Back Read Write Allocate for RAM (not recommended for multimaster/DMA)" Value="WBRAWA"/>
+        <PossibleValue Comment="Device, Non-Cacheable" Value="Device_NGNRE" Condition="!(StartAddress&gt;=0x40000000&amp;StartAddress&lt;0x60000000|StartAddress&gt;=0xA0000000&amp;StartAddress&lt;0xE0000000)" Action="Remove"/>
+        <PossibleValue Comment="Non-Cacheable (recommended for multimaster/DMA and for not-remapped external memories)" Value="NonCacheable"/>
+        <PossibleValue Comment="Write-Through Read Allocate for code or RO data (not recommened for multimaster/DMA)" Value="WTRA"/>
+        <PossibleValue Comment="Write-Back Read Write Allocate for RW data (not recommended for multimaster/DMA)" Value="WBRAWA"/>
         <PossibleValue Comment="Advanced Settings" Value="Advanced" Semaphore="S_MMT_CurReg_AdvancedSettings"/>
         <Description>Configure the cacheability of this region</Description>
     </RefParameter>

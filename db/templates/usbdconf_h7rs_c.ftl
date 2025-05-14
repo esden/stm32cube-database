@@ -34,7 +34,7 @@
 [#if SWIP.variables??]
 	[#list SWIP.variables as variable]
 		[#-- extern ${variable.type} --][#if variable.value??][#--${variable.value};--]
-                [#if variable.value == "MSC"][#assign className = "MSC"][/#if]
+        [#if variable.value == "MSC"][#assign className = "MSC"][/#if]
 		[#if variable.value == "DFU"][#assign className = "DFU"][/#if]
 		[#if variable.value == "HID"][#assign className = "HID"][/#if]
 		[#if variable.value == "AUDIO"][#assign className = "AUDIO"][/#if]
@@ -297,7 +297,6 @@ void HAL_PCD_SuspendCallback(PCD_HandleTypeDef *hpcd)
 
   /* Inform USB library that core enters in suspend Mode. */
   USBD_LL_Suspend((USBD_HandleTypeDef*)hpcd->pData);
-  __HAL_PCD_GATE_PHYCLOCK(hpcd);
   /* Enter in STOP mode. */
   /* USER CODE BEGIN 2 */  
   if (hpcd->Init.low_power_enable)

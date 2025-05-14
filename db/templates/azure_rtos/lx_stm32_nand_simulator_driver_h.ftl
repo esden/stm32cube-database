@@ -70,7 +70,7 @@ extern "C" {
 
 /* Exported constants --------------------------------------------------------*/
 
-[#if FamilyName?lower_case == "stm32u0"]
+[#if FamilyName?lower_case == "stm32u0" || FamilyName?lower_case == "stm32c0"]
 /* Number of blocks of the simulated NAND memory */
 #define TOTAL_BLOCKS                        ${nand_sim_total_blocks}
 /* Number of pages in each block */

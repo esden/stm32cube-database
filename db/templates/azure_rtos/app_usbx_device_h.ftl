@@ -111,7 +111,7 @@ extern "C" {
 [/#compress]
 /* Includes ------------------------------------------------------------------*/
 #include "ux_api.h"
-[#if UX_DEVICE_HID_CORE_value == "1"]
+[#if UX_DEVICE_HID_CORE_value == "1" && !FamilyName?lower_case?starts_with("stm32c0")]
 #include "ux_device_class_hid.h"
 [/#if]
 [#if UX_Device_CoreStack_value  == "1"]
@@ -167,7 +167,7 @@ extern "C" {
 #include "ux_device_descriptors.h"
 [/#if]
 [/#if]
-[#if UX_STANDALONE_ENABLED_Value == "0"]
+[#if UX_STANDALONE_ENABLED_Value == "0"  && !FamilyName?lower_case?starts_with("stm32c0")]
 #include "app_azure_rtos_config.h"
 [/#if]
 #include "ux_dcd_stm32.h"

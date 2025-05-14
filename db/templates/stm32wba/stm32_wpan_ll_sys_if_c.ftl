@@ -25,81 +25,35 @@ Key: ${key}; Value: ${myHash[key]}
 [/#list]
 --]
 
-#include "app_common.h"
 #include "main.h"
-#include "ll_intf.h"
+#include "app_common.h"
+#include "app_conf.h"
+[#if (myHash["BLE_MODE_SIMPLEST_BLE"] != "Enabled")]
+#include "log_module.h"
+[/#if]
+#include "ll_intf_cmn.h"
 #include "ll_sys.h"
 #include "ll_sys_if.h"
-[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled")]
-[#if myHash["SEQUENCER_STATUS"]?number == 1 ]
-#include "stm32_seq.h"
-[#elseif myHash["THREADX_STATUS"]?number == 1 ]
-#include "app_threadx.h"
-[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
-#include "cmsis_os2.h"
-[/#if]
-[#else]
+[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["ZIGBEE"] == "Enabled") || (myHash["ZIGBEE_SKELETON"] == "Enabled") || (myHash["THREAD"] == "Enabled") || (myHash["THREAD_SKELETON"] == "Enabled") || (myHash["mac_802_15_4_SKELETON"] == "Enabled")]
 #include "stm32_rtos.h"
 [/#if]
+#include "utilities_common.h"
 [#if (myHash["USE_TEMPERATURE_BASED_RADIO_CALIBRATION"]?number == 1)]
 #if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)
 #include "temp_measurement.h"
 #endif /* (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1) */
 [/#if]
+[#if myHash["BLE_MODE_SIMPLEST_BLE"] == "Enabled"]
+#include "skel_ble.h"
+[/#if]
 
 /* Private defines -----------------------------------------------------------*/
-[#if (myHash["BLE"] == "Enabled") ]
 
-[#if myHash["THREADX_STATUS"]?number == 1 ]
-/* LINK_LAYER_TASK related defines */
-#define TASK_LINK_LAYER_STACK_SIZE          (1024)
-#define CFG_TASK_PRIO_LINK_LAYER            (15)
-#define CFG_TASK_PREEMP_LINK_LAYER          (0)
-[#if (myHash["USE_TEMPERATURE_BASED_RADIO_CALIBRATION"]?number == 1)]
-
-/* LINK_LAYER_TEMP_MEAS_TASK related defines */
-#define TASK_LINK_LAYER_TEMP_STACK_SIZE     (256)
-#define CFG_TASK_PRIO_LINK_LAYER_TEMP       (15)
-#define CFG_TASK_PREEMP_LINK_LAYER_TEMP     (0)
-[/#if]
-[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
-/* LINK_LAYER_TASK related defines */
-#define LINK_LAYER_TASK_STACK_SIZE              (512 * 4)
-#define LINK_LAYER_TASK_PRIO                    (osPriorityNormal)
-[#if (myHash["USE_TEMPERATURE_BASED_RADIO_CALIBRATION"]?number == 1)]
-
-/* LINK_LAYER_TEMP_MEAS_TASK related defines */
-#define LINK_LAYER_TEMP_MEAS_TASK_STACK_SIZE    (128 * 4)
-#define LINK_LAYER_TEMP_MEAS_TASK_PRIO          (osPriorityNormal)
-[/#if]
-[/#if]
-
-[/#if]
 /* USER CODE BEGIN PD */
 
 /* USER CODE END PD */
 
 /* Private macros ------------------------------------------------------------*/
-[#if myHash["OTHER_THAN_BLE"]?number == 1 ]
-
-/* Redefine access to Low Level API to maintain compatibility */
-extern uint32_t llhwc_cmn_sys_configure_ll_ctx          (uint8_t param1, uint8_t param2);
-extern uint8_t  ll_tx_pwr_if_select_tx_power_mode       (uint8_t param1);
-
-#define ll_intf_config_ll_ctx_params(A, B)              llhwc_cmn_sys_configure_ll_ctx(A, B)
-#define ll_intf_select_tx_power_table(A)                ll_tx_pwr_if_select_tx_power_mode(A)
-[#if (myHash["USE_TEMPERATURE_BASED_RADIO_CALIBRATION"]?number == 1)]
-
-#if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)
-extern uint8_t  llhwc_cmn_set_temperature_value         (uint16_t param1);
-extern void     llhwc_cmn_set_temperature_sensor_state  (void);
-
-#define ll_intf_set_temperature_value(A)                llhwc_cmn_set_temperature_value(A)
-#define ll_intf_set_temperature_sensor_state()          llhwc_cmn_set_temperature_sensor_state()
-#endif /* (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1) */
-[/#if]
-
-[/#if]
 /* USER CODE BEGIN PM */
 
 /* USER CODE END PM */
@@ -110,27 +64,63 @@ extern void     llhwc_cmn_set_temperature_sensor_state  (void);
 /* USER CODE END PC */
 
 /* Private variables ---------------------------------------------------------*/
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+/* FreeRTOS objects declaration */
+
+static osThreadId_t     LinkLayerTaskHandle;
+static osSemaphoreId_t  LinkLayerSemaphore;
+
+const osThreadAttr_t LinkLayerTask_attributes = {
+  .name         = "Link Layer Task",
+  .priority     = TASK_PRIO_LINK_LAYER,
+  .stack_size   = TASK_STACK_SIZE_LINK_LAYER,
+  .attr_bits    = TASK_DEFAULT_ATTR_BITS,
+  .cb_mem       = TASK_DEFAULT_CB_MEM,
+  .cb_size      = TASK_DEFAULT_CB_SIZE,
+  .stack_mem    = TASK_DEFAULT_STACK_MEM
+};
+
+const osSemaphoreAttr_t LinkLayerSemaphore_attributes = {
+  .name         = "Link Layer Semaphore",
+  .attr_bits    = TASK_DEFAULT_ATTR_BITS,
+  .cb_mem       = TASK_DEFAULT_CB_MEM,
+  .cb_size      = TASK_DEFAULT_CB_SIZE
+};
+
+[#if (myHash["USE_TEMPERATURE_BASED_RADIO_CALIBRATION"]?number == 1)]
+static osThreadId_t     TempMeasLLTaskHandle;
+static osSemaphoreId_t  TempMeasLLSemaphore;
+
+const osThreadAttr_t TempMeasLLTask_attributes = {
+  .name         = "Temperature Measurement LL Task",
+  .priority     = TASK_PRIO_TEMP_MEAS_LL,
+  .stack_size   = TASK_STACK_SIZE_TEMP_MEAS_LL,
+  .attr_bits    = TASK_DEFAULT_ATTR_BITS,
+  .cb_mem       = TASK_DEFAULT_CB_MEM,
+  .cb_size      = TASK_DEFAULT_CB_SIZE,
+  .stack_mem    = TASK_DEFAULT_STACK_MEM
+};
+
+const osSemaphoreAttr_t TempMeasLLSemaphore_attributes = {
+  .name         = "Temperature Measurement LL Semaphore",
+  .attr_bits    = TASK_DEFAULT_ATTR_BITS,
+  .cb_mem       = TASK_DEFAULT_CB_MEM,
+  .cb_size      = TASK_DEFAULT_CB_SIZE
+};
+
+[/#if]
+[/#if]
 [#if myHash["THREADX_STATUS"]?number == 1 ]
-[#if (myHash["USE_TEMPERATURE_BASED_RADIO_CALIBRATION"]?number == 1)]
-/* LINK_LAYER_TEMP_MEAS_TASK related resources */
-static TX_SEMAPHORE     LinkLayerMeasSemaphore;
-static TX_THREAD        LinkLayerMeasThread;
+/* ThreadX objects declaration */
 
-[/#if]
-/* Link Layer Task related resources */
+static TX_THREAD        LinkLayerTaskHandle;
 static TX_SEMAPHORE     LinkLayerSemaphore;
-static TX_THREAD        LinkLayerThread;
 
-[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
 [#if (myHash["USE_TEMPERATURE_BASED_RADIO_CALIBRATION"]?number == 1)]
-/* LINK_LAYER_TEMP_MEAS_TASK related resources */
-osSemaphoreId_t         LinkLayerMeasSemaphore;
-osThreadId_t            LinkLayerMeasThread;
+static TX_THREAD        TempMeasLLTaskHandle;
+static TX_SEMAPHORE     TempMeasLLSemaphore;
 
 [/#if]
-/* LINK_LAYER_TASK related resources */
-osSemaphoreId_t         LinkLayerSemaphore;
-osThreadId_t            LinkLayerThread;
 
 [/#if]
 /* USER CODE BEGIN PV */
@@ -138,16 +128,21 @@ osThreadId_t            LinkLayerThread;
 /* USER CODE END PV */
 
 /* Global variables ----------------------------------------------------------*/
+
 [#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled")]
-[#if myHash["THREADX_STATUS"]?number == 1 ]
-
-/* Link Layer Task related resources */
-TX_MUTEX                LinkLayerMutex;
-
-[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
-
-/* LINK_LAYER_TASK related resources */
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
 osMutexId_t             LinkLayerMutex;
+
+const osMutexAttr_t LinkLayerMutex_attributes = {
+  .name         = "Link Layer Mutex",
+  .attr_bits    = TASK_DEFAULT_ATTR_BITS,
+  .cb_mem       = TASK_DEFAULT_CB_MEM,
+  .cb_size      = TASK_DEFAULT_CB_SIZE
+};
+
+[/#if]
+[#if myHash["THREADX_STATUS"]?number == 1 ]
+TX_MUTEX                LinkLayerMutex;
 
 [/#if]
 [/#if]
@@ -161,6 +156,15 @@ osMutexId_t             LinkLayerMutex;
 static void ll_sys_bg_temperature_measurement_init(void);
 #endif /* USE_TEMPERATURE_BASED_RADIO_CALIBRATION */
 [/#if]
+static void ll_sys_sleep_clock_source_selection(void);
+[#if (myHash["BLE"] == "Enabled")]
+#if (CFG_RADIO_LSE_SLEEP_TIMER_CUSTOM_SCA_RANGE == 0)
+static uint8_t ll_sys_BLE_sleep_clock_accuracy_selection(void);
+#endif /* CFG_RADIO_LSE_SLEEP_TIMER_CUSTOM_SCA_RANGE */
+[/#if]
+[#if !((myHash["ZIGBEE"] == "Enabled") || (myHash["ZIGBEE_SKELETON"] == "Enabled"))]
+void ll_sys_reset(void);
+[/#if]
 
 /* USER CODE BEGIN PFP */
 
@@ -173,17 +177,41 @@ static void ll_sys_bg_temperature_measurement_init(void);
 /* USER CODE END EV */
 
 /* Functions Definition ------------------------------------------------------*/
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+/**
+ * @brief  Link Layer Task for FreeRTOS
+ * @param  void *argument
+ * @retval None
+ */
+static void LinkLayer_Task_Entry(void *argument)
+{
+  UNUSED(argument);
 
+  for(;;)
+  {
+[#if (myHash["BLE"] == "Enabled")]
+    osSemaphoreAcquire(LinkLayerSemaphore, osWaitForever);
+    osMutexAcquire(LinkLayerMutex, osWaitForever);
+    ll_sys_bg_process();
+    osMutexRelease(LinkLayerMutex);
+    osThreadYield();
+[#else]
+    osSemaphoreAcquire(LinkLayerSemaphore, osWaitForever);
+    ll_sys_bg_process();
+[/#if]
+  }
+}
+[/#if]
 [#if myHash["THREADX_STATUS"]?number == 1 ]
 /**
  * @brief  Link Layer Task for ThreadX
- * @param  ULONG thread_input
+ * @param  ULONG lArgument
  * @retval None
  */
-static void ll_sys_bg_process_task( ULONG thread_input )
+static void LinkLayer_Task_Entry( ULONG lArgument )
 {
-  UNUSED( thread_input );
-  
+  UNUSED(lArgument);
+
   for(;;)
   {
 [#if (myHash["BLE"] == "Enabled")]
@@ -199,33 +227,8 @@ static void ll_sys_bg_process_task( ULONG thread_input )
 [/#if]
   }
 }
-
-[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
-/**
- * @brief  Link Layer Task for FreeRTOS
- * @param  void *argument
- * @retval None
- */
-static void LinkLayerSys_Task_Entry(void *argument)
-{
-  UNUSED( argument );
-  
-  for(;;)
-  {
-[#if (myHash["BLE"] == "Enabled")]
-    osSemaphoreAcquire(LinkLayerSemaphore, osWaitForever);
-    osMutexAcquire(LinkLayerMutex, osWaitForever);
-    ll_sys_bg_process();
-    osMutexRelease(LinkLayerMutex);
-    osThreadYield();
-[#else]
-    osSemaphoreAcquire(LinkLayerSemaphore, osWaitForever);
-    ll_sys_bg_process();
 [/#if]
-  }
-}
 
-[/#if]
 /**
   * @brief  Link Layer background process initialization
   * @param  None
@@ -234,69 +237,49 @@ static void LinkLayerSys_Task_Entry(void *argument)
 void ll_sys_bg_process_init(void)
 {
 [#if myHash["SEQUENCER_STATUS"]?number == 1 ]
-  /* Tasks creation */
+  /* Register Link Layer task */
   UTIL_SEQ_RegTask(1U << CFG_TASK_LINK_LAYER, UTIL_SEQ_RFU, ll_sys_bg_process);
-[#elseif myHash["THREADX_STATUS"]?number == 1 ]
-  UINT  ThreadXStatus;
-  CHAR  * pStack = TX_NULL;
-
-  /* Register LinkLayer Semaphore */
-  ThreadXStatus = tx_semaphore_create( &LinkLayerSemaphore, "LinkLayerSem", 0 );
-  if ( ThreadXStatus != TX_SUCCESS )
-  { 
-    LOG_ERROR_APP( "ERROR THREADX : LINK LAYER SEMAPHORE CREATION FAILED (%d)", ThreadXStatus );
-    Error_Handler();
-  }
-
-[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled")]
-  /* Register LinkLayer Mutex */
-  ThreadXStatus = tx_mutex_create( &LinkLayerMutex, "LinkLayerMutex", 0 ); 
-  if ( ThreadXStatus != TX_SUCCESS )
-  { 
-    LOG_ERROR_APP( "ERROR FREERTOS : LINK LAYER MUTEX CREATION FAILED." );
-    Error_Handler();
-  }
-
 [/#if]
-  /* Thread associated with LinkLayer Task */
-  ThreadXStatus = tx_byte_allocate( pBytePool, (VOID**) &pStack, TASK_LINK_LAYER_STACK_SIZE, TX_NO_WAIT );
-  if ( ThreadXStatus == TX_SUCCESS )
-  {
-    ThreadXStatus = tx_thread_create( &LinkLayerThread, "LinkLayerThread", ll_sys_bg_process_task, 0, pStack, 
-                                      TASK_LINK_LAYER_STACK_SIZE, CFG_TASK_PRIO_LINK_LAYER, CFG_TASK_PREEMP_LINK_LAYER, 
-                                      TX_NO_TIME_SLICE, TX_AUTO_START );
-  }
-  if ( ThreadXStatus != TX_SUCCESS )
-  { 
-    LOG_ERROR_APP( "ERROR THREADX : LINK LAYER THREAD CREATION FAILED (%d)", ThreadXStatus );
-    Error_Handler();
-  }
-[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
-  /* Tasks creation */
-  const osSemaphoreAttr_t LinkLayerSemaphore_attributes = {
-    .name = "LinkLayerSemaphore"
-  };
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+  /* Create Link Layer FreeRTOS objects */
+
+  LinkLayerTaskHandle = osThreadNew(LinkLayer_Task_Entry, NULL, &LinkLayerTask_attributes);
+
   LinkLayerSemaphore = osSemaphoreNew(1U, 0U, &LinkLayerSemaphore_attributes);
-  if (LinkLayerSemaphore == NULL)
-  {
-    Error_Handler();
-  }
-  const osMutexAttr_t LinkLayerMutex_attributes = {
-    .name = "LinkLayer Mutex"
-  };
+
   LinkLayerMutex = osMutexNew(&LinkLayerMutex_attributes);
-  if (LinkLayerMutex == NULL)
+
+  if((LinkLayerTaskHandle == NULL) || (LinkLayerSemaphore == NULL) || (LinkLayerMutex == NULL))
   {
+    LOG_ERROR_APP( "Link Layer FreeRTOS objects creation FAILED");
     Error_Handler();
   }
-  const osThreadAttr_t LinkLayerTask_attributes = {
-    .name = "Link Layer Task",
-    .priority = (osPriority_t) LINK_LAYER_TASK_PRIO,
-    .stack_size = LINK_LAYER_TASK_STACK_SIZE
-  };
-  LinkLayerThread = osThreadNew(LinkLayerSys_Task_Entry, NULL, &LinkLayerTask_attributes);
-  if (LinkLayerThread == NULL)
+[/#if]
+[#if myHash["THREADX_STATUS"]?number == 1 ]
+  UINT TXstatus;
+  CHAR *pStack;
+
+  /* Create Link Layer ThreadX objects */
+
+  TXstatus = tx_byte_allocate(pBytePool, (void **)&pStack, TASK_STACK_SIZE_LINK_LAYER, TX_NO_WAIT);
+
+  if( TXstatus == TX_SUCCESS )
   {
+    TXstatus = tx_thread_create(&LinkLayerTaskHandle, "Link Layer  Task", LinkLayer_Task_Entry, 0,
+                                 pStack, TASK_STACK_SIZE_LINK_LAYER,
+                                 TASK_PRIO_LINK_LAYER, TASK_PREEMP_LINK_LAYER,
+                                 TX_NO_TIME_SLICE, TX_AUTO_START);
+                                 
+    TXstatus |= tx_semaphore_create(&LinkLayerSemaphore, "Link Layer Semaphore", 0);
+[#if (myHash["BLE"] == "Enabled") ]
+
+    TXstatus |= tx_mutex_create(&LinkLayerMutex, "Link Layer Mutex", 0 );
+[/#if]
+  }
+
+  if( TXstatus != TX_SUCCESS )
+  {
+    LOG_ERROR_APP( "Link Layer ThreadX objects creation FAILED, status: %d", TXstatus);
     Error_Handler();
   }
 [/#if]
@@ -309,22 +292,25 @@ void ll_sys_bg_process_init(void)
   */
 void ll_sys_schedule_bg_process(void)
 {
+[#if myHash["BLE_MODE_SIMPLEST_BLE"] != "Enabled"]
 [#if myHash["SEQUENCER_STATUS"]?number == 1 ]
-  UTIL_SEQ_SetTask(1U << CFG_TASK_LINK_LAYER, CFG_TASK_PRIO_LINK_LAYER);
+  UTIL_SEQ_SetTask(1U << CFG_TASK_LINK_LAYER, TASK_PRIO_LINK_LAYER);
 [/#if]
-[#if (myHash["BLE"] == "Enabled")]
-[#if myHash["THREADX_STATUS"]?number == 1 ]
-  tx_semaphore_put( &LinkLayerSemaphore );
-[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
   osSemaphoreRelease(LinkLayerSemaphore);
 [/#if]
-[#else]
 [#if myHash["THREADX_STATUS"]?number == 1 ]
+[#if (myHash["BLE"] == "Enabled")]
+  tx_semaphore_put( &LinkLayerSemaphore );
+[#else]
   if ( LinkLayerSemaphore.tx_semaphore_count == 0 )
   {
     tx_semaphore_put( &LinkLayerSemaphore );
   }
 [/#if]
+[/#if]
+[#else]
+  ll_process();
 [/#if]
 }
 
@@ -335,22 +321,25 @@ void ll_sys_schedule_bg_process(void)
   */
 void ll_sys_schedule_bg_process_isr(void)
 {
+[#if myHash["BLE_MODE_SIMPLEST_BLE"] != "Enabled"]
 [#if myHash["SEQUENCER_STATUS"]?number == 1 ]
-  UTIL_SEQ_SetTask(1U << CFG_TASK_LINK_LAYER, CFG_TASK_PRIO_LINK_LAYER);
+  UTIL_SEQ_SetTask(1U << CFG_TASK_LINK_LAYER, TASK_PRIO_LINK_LAYER);
 [/#if]
-[#if (myHash["BLE"] == "Enabled")]
-[#if myHash["THREADX_STATUS"]?number == 1 ]
-  tx_semaphore_put( &LinkLayerSemaphore );
-[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
   osSemaphoreRelease(LinkLayerSemaphore);
 [/#if]
-[#else]
 [#if myHash["THREADX_STATUS"]?number == 1 ]
+[#if (myHash["BLE"] == "Enabled")]
+  tx_semaphore_put( &LinkLayerSemaphore );
+[#else]
   if ( LinkLayerSemaphore.tx_semaphore_count == 0 )
   {
     tx_semaphore_put( &LinkLayerSemaphore );
   }
 [/#if]
+[/#if]
+[#else]
+  ll_process();
 [/#if]
 }
 
@@ -361,40 +350,13 @@ void ll_sys_schedule_bg_process_isr(void)
   */
 void ll_sys_config_params(void)
 {
-[#if (myHash["BLE"] == "Enabled") ]
-  uint16_t freq_value = 0;
-  uint32_t linklayer_slp_clk_src = LL_RCC_RADIOSLEEPSOURCE_NONE;
-
-[/#if]  
   /* Configure link layer behavior for low ISR use and next event scheduling method:
    * - SW low ISR is used.
    * - Next event is scheduled from ISR.
    */
-  ll_intf_config_ll_ctx_params(USE_RADIO_LOW_ISR, NEXT_EVENT_SCHEDULING_FROM_ISR);
-[#if (myHash["BLE"] == "Enabled") ]
-
-  linklayer_slp_clk_src = LL_RCC_RADIO_GetSleepTimerClockSource();
-  switch(linklayer_slp_clk_src)
-  {
-    case LL_RCC_RADIOSLEEPSOURCE_LSE:
-      linklayer_slp_clk_src = RTC_SLPTMR;
-      break;
-      
-    case LL_RCC_RADIOSLEEPSOURCE_LSI:
-      linklayer_slp_clk_src = RCO_SLPTMR;
-      break;
-      
-    case LL_RCC_RADIOSLEEPSOURCE_HSE_DIV1000:
-      linklayer_slp_clk_src = CRYSTAL_OSCILLATOR_SLPTMR;
-      break;
-      
-    case LL_RCC_RADIOSLEEPSOURCE_NONE:
-      /* No Link Layer sleep clock source selected */
-      assert_param(0);
-      break;
-  }
-  ll_intf_le_select_slp_clk_src((uint8_t)linklayer_slp_clk_src, &freq_value);
-[/#if]
+  ll_intf_cmn_config_ll_ctx_params(USE_RADIO_LOW_ISR, NEXT_EVENT_SCHEDULING_FROM_ISR);
+  /* Apply the selected link layer sleep timer source */
+  ll_sys_sleep_clock_source_selection();
 [#if (myHash["USE_TEMPERATURE_BASED_RADIO_CALIBRATION"]?number == 1)]
 
 #if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)
@@ -402,67 +364,68 @@ void ll_sys_config_params(void)
   ll_sys_bg_temperature_measurement_init();
 
   /* Link layer IP uses temperature based calibration instead of periodic one */
-  ll_intf_set_temperature_sensor_state();
+  ll_intf_cmn_set_temperature_sensor_state();
 #endif /* USE_TEMPERATURE_BASED_RADIO_CALIBRATION */
 [/#if]
 
   /* Link Layer power table */
-  ll_intf_select_tx_power_table(CFG_RF_TX_POWER_TABLE_ID);
+  ll_intf_cmn_select_tx_power_table(CFG_RF_TX_POWER_TABLE_ID);
 }
 
 [#if (myHash["USE_TEMPERATURE_BASED_RADIO_CALIBRATION"]?number == 1)]
 #if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)
-[#if myHash["THREADX_STATUS"]?number == 1 ]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
 /**
- * @brief  Link Layer Temperature Measurement Task for ThreadX
- * @param  thread_input   Argument passed the first time.
+ * @brief  Temperature Measurement Task for FreeRTOS
+ * @param
  * @retval None
  */
-static void TEMPMEAS_RequestTemperatureMeasurement_task( ULONG thread_input )
+ static void TempMeasureLL_Task_Entry( void *argument )
 {
-  UNUSED( thread_input );
+  UNUSED(argument);
 
   for(;;)
   {
 [#if (myHash["BLE"] == "Enabled")]
-    tx_semaphore_get(&LinkLayerMeasSemaphore, TX_WAIT_FOREVER);
-    tx_mutex_get(&LinkLayerMutex, TX_WAIT_FOREVER);
-    TEMPMEAS_RequestTemperatureMeasurement();
-    tx_mutex_put(&LinkLayerMutex);
-    tx_thread_relinquish();
-[#else]
-    tx_semaphore_get( &LinkLayerMeasSemaphore, TX_WAIT_FOREVER );
-    TEMPMEAS_RequestTemperatureMeasurement();
-[/#if]
-  }
-}
-
-[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
-/**
- * @brief  Link Layer Temperature Measurement Task for FreeRTOS 
- * @param  
- * @retval None
- */
- static void LinkLayerTempMeasure_Task_Entry( void *argument )
-{
-  UNUSED( argument );
-  
-  for(;;)
-  {
-[#if (myHash["BLE"] == "Enabled")]
-    osSemaphoreAcquire(LinkLayerMeasSemaphore, osWaitForever);
+    osSemaphoreAcquire(TempMeasLLSemaphore, osWaitForever);
     osMutexAcquire(LinkLayerMutex, osWaitForever);
     TEMPMEAS_RequestTemperatureMeasurement();
     osMutexRelease(LinkLayerMutex);
     osThreadYield();
 [#else]
-    osSemaphoreAcquire(LinkLayerMeasSemaphore, osWaitForever);
+    osSemaphoreAcquire(TempMeasLLSemaphore, osWaitForever);
     TEMPMEAS_RequestTemperatureMeasurement();
 [/#if]
   }
 }
 
 [/#if]
+[#if myHash["THREADX_STATUS"]?number == 1 ]
+/**
+ * @brief  Temperature Measurement Task for ThreadX
+ * @param  lArgument   Argument passed the first time.
+ * @retval None
+ */
+static void TempMeasureLL_Task_Entry( ULONG lArgument )
+{
+  UNUSED(lArgument);
+
+  for(;;)
+  {
+[#if (myHash["BLE"] == "Enabled")]
+    tx_semaphore_get(&TempMeasLLSemaphore, TX_WAIT_FOREVER);
+    tx_mutex_get(&LinkLayerMutex, TX_WAIT_FOREVER);
+    TEMPMEAS_RequestTemperatureMeasurement();
+    tx_mutex_put(&LinkLayerMutex);
+    tx_thread_relinquish();
+[#else]
+    tx_semaphore_get( &TempMeasLLSemaphore, TX_WAIT_FOREVER );
+    TEMPMEAS_RequestTemperatureMeasurement();
+[/#if]
+  }
+}
+[/#if]
+
 /**
   * @brief  Link Layer temperature request background process initialization
   * @param  None
@@ -471,52 +434,44 @@ static void TEMPMEAS_RequestTemperatureMeasurement_task( ULONG thread_input )
 void ll_sys_bg_temperature_measurement_init(void)
 {
 [#if myHash["SEQUENCER_STATUS"]?number == 1 ]
-  /* Tasks creation */
-  UTIL_SEQ_RegTask(1U << CFG_TASK_LINK_LAYER_TEMP_MEAS, UTIL_SEQ_RFU, TEMPMEAS_RequestTemperatureMeasurement);
-[#elseif myHash["THREADX_STATUS"]?number == 1 ]
-  UINT  ThreadXStatus;
-  CHAR  * pStack = TX_NULL;
+  /* Register Temperature Measurement task */
+  UTIL_SEQ_RegTask(1U << CFG_TASK_TEMP_MEAS, UTIL_SEQ_RFU, TEMPMEAS_RequestTemperatureMeasurement);
+[/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+  /* Create Temperature Measurement Link Layer FreeRTOS objects */
+
+  TempMeasLLTaskHandle = osThreadNew(TempMeasureLL_Task_Entry, NULL, &TempMeasLLTask_attributes);
   
-  /* Register Temp Semaphore */
-  ThreadXStatus = tx_semaphore_create( &LinkLayerMeasSemaphore, "LinkLayerTempSem", 0 );
-  if ( ThreadXStatus != TX_SUCCESS )
-  { 
-    LOG_ERROR_APP( "ERROR THREADX : LINK LAYER MEAS SEMAPHORE CREATION FAILED (%d)", ThreadXStatus );
-    Error_Handler();
-  }
-  
-  /* Thread associated with LinkLayer Temp Task */
-  ThreadXStatus = tx_byte_allocate( pBytePool, (VOID**) &pStack, TASK_LINK_LAYER_TEMP_STACK_SIZE, TX_NO_WAIT );
-  if ( ThreadXStatus == TX_SUCCESS )
+  TempMeasLLSemaphore = osSemaphoreNew(1U, 0U, &TempMeasLLSemaphore_attributes);
+
+  if ((TempMeasLLTaskHandle == NULL) || (TempMeasLLSemaphore == NULL))
   {
-    ThreadXStatus = tx_thread_create( &LinkLayerMeasThread, "LinkLayerMeasThread", TEMPMEAS_RequestTemperatureMeasurement_task, 0, pStack, 
-                                      TASK_LINK_LAYER_TEMP_STACK_SIZE, CFG_TASK_PRIO_LINK_LAYER_TEMP, CFG_TASK_PREEMP_LINK_LAYER_TEMP, 
-                                      TX_NO_TIME_SLICE, TX_AUTO_START );
-  }
-  if ( ThreadXStatus != TX_SUCCESS )
-  { 
-    LOG_ERROR_APP( "ERROR THREADX : LINK LAYER MEAS THREAD CREATION FAILED (%d)", ThreadXStatus );
-    Error_Handler();
-  }
-[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
-  
-  const osSemaphoreAttr_t LinkLayerMeasSemaphore_attributes = {
-    .name = "LinkLayerMeasSemaphore"
-  };
-  LinkLayerMeasSemaphore = osSemaphoreNew(1U, 0U, &LinkLayerMeasSemaphore_attributes);
-  if (LinkLayerMeasSemaphore == NULL)
-  {
+    LOG_ERROR_APP( "Temperature Measurement Link Layer FreeRTOS objects creation FAILED");
     Error_Handler();
   }
 
-  const osThreadAttr_t LinkLayerMeasTask_attributes = {
-    .name = "LinkLayer Temp Measurement Task",
-    .priority = (osPriority_t) LINK_LAYER_TEMP_MEAS_TASK_PRIO,
-    .stack_size = LINK_LAYER_TEMP_MEAS_TASK_STACK_SIZE
-  };
-  LinkLayerMeasThread = osThreadNew(LinkLayerTempMeasure_Task_Entry, NULL, &LinkLayerMeasTask_attributes);
-  if (LinkLayerMeasThread == NULL)
+[/#if]
+[#if myHash["THREADX_STATUS"]?number == 1 ]
+  UINT TXstatus;
+  CHAR *pStack;
+
+  /* Create Temperature Measurement Link Layer ThreadX objects */
+
+  TXstatus = tx_byte_allocate(pBytePool, (void **)&pStack, TASK_STACK_SIZE_TEMP_MEAS_LL, TX_NO_WAIT);
+
+  if( TXstatus == TX_SUCCESS )
   {
+    TXstatus = tx_thread_create(&TempMeasLLTaskHandle, "Temperature Measurement LL Task", TempMeasureLL_Task_Entry, 0,
+                                 pStack, TASK_STACK_SIZE_TEMP_MEAS_LL,
+                                 TASK_PRIO_TEMP_MEAS_LL, TASK_PREEMP_TEMP_MEAS_LL,
+                                 TX_NO_TIME_SLICE, TX_AUTO_START);
+                                 
+    TXstatus |= tx_semaphore_create(&TempMeasLLSemaphore, "Temperature Measurement LL Semaphore", 0);
+  }
+
+  if( TXstatus != TX_SUCCESS )
+  {
+    LOG_ERROR_APP( "Temperature Measurement Link Layer ThreadX objects creation FAILED, status: %d", TXstatus);
     Error_Handler();
   }
 [/#if]
@@ -530,7 +485,7 @@ void ll_sys_bg_temperature_measurement_init(void)
 void ll_sys_bg_temperature_measurement(void)
 {
   static uint8_t initial_temperature_acquisition = 0;
-  
+
   if(initial_temperature_acquisition == 0)
   {
     TEMPMEAS_RequestTemperatureMeasurement();
@@ -539,14 +494,109 @@ void ll_sys_bg_temperature_measurement(void)
   else
   {
 [#if myHash["SEQUENCER_STATUS"]?number == 1 ]
-    UTIL_SEQ_SetTask(1U << CFG_TASK_LINK_LAYER_TEMP_MEAS, CFG_SEQ_PRIO_0);
+    UTIL_SEQ_SetTask(1U << CFG_TASK_TEMP_MEAS, CFG_SEQ_PRIO_0);
 [#elseif myHash["THREADX_STATUS"]?number == 1 ]
-    tx_semaphore_put(&LinkLayerMeasSemaphore);
+    tx_semaphore_put(&TempMeasLLSemaphore);
 [#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
-    osSemaphoreRelease(LinkLayerMeasSemaphore);
+    osSemaphoreRelease(TempMeasLLSemaphore);
 [/#if]
   }
 }
 
 #endif /* USE_TEMPERATURE_BASED_RADIO_CALIBRATION */
+[/#if]
+
+[#if (myHash["BLE"] == "Enabled")]
+#if (CFG_RADIO_LSE_SLEEP_TIMER_CUSTOM_SCA_RANGE == 0)
+uint8_t ll_sys_BLE_sleep_clock_accuracy_selection(void)
+{
+  uint8_t BLE_sleep_clock_accuracy = 0;
+  uint32_t RevID = LL_DBGMCU_GetRevisionID();
+  uint32_t linklayer_slp_clk_src = LL_RCC_RADIO_GetSleepTimerClockSource();
+  
+  if(linklayer_slp_clk_src == LL_RCC_RADIOSLEEPSOURCE_LSE)
+  {
+    /* LSE selected as Link Layer sleep clock source. 
+       Sleep clock accuracy is different regarding the WBA device ID and revision 
+     */
+#if defined(STM32WBA52xx) || defined(STM32WBA54xx) || defined(STM32WBA55xx)
+    if(RevID == REV_ID_A)
+    {
+      BLE_sleep_clock_accuracy = STM32WBA5x_REV_ID_A_SCA_RANGE;
+    } 
+    else if(RevID == REV_ID_B)
+    {
+      BLE_sleep_clock_accuracy = STM32WBA5x_REV_ID_B_SCA_RANGE;
+    } 
+    else
+    {
+      /* Revision ID not supported, default value of 500ppm applied */
+      BLE_sleep_clock_accuracy = STM32WBA5x_DEFAULT_SCA_RANGE;
+    }
+#else
+    UNUSED(RevID);
+#endif /* defined(STM32WBA52xx) || defined(STM32WBA54xx) || defined(STM32WBA55xx) */
+  }
+  else
+  {
+    /* LSE is not the Link Layer sleep clock source, sleep clock accurcay default value is 500 ppm */
+    BLE_sleep_clock_accuracy = STM32WBA5x_DEFAULT_SCA_RANGE;
+  }
+  
+  return BLE_sleep_clock_accuracy;
+}
+#endif /* CFG_RADIO_LSE_SLEEP_TIMER_CUSTOM_SCA_RANGE */
+[/#if]
+
+void ll_sys_sleep_clock_source_selection(void)
+{
+  uint16_t freq_value = 0;
+  uint32_t linklayer_slp_clk_src = LL_RCC_RADIOSLEEPSOURCE_NONE;
+  
+  linklayer_slp_clk_src = LL_RCC_RADIO_GetSleepTimerClockSource();
+  switch(linklayer_slp_clk_src)
+  {
+    case LL_RCC_RADIOSLEEPSOURCE_LSE:
+      linklayer_slp_clk_src = RTC_SLPTMR;
+      break;
+
+    case LL_RCC_RADIOSLEEPSOURCE_LSI:
+      linklayer_slp_clk_src = RCO_SLPTMR;
+      break;
+
+    case LL_RCC_RADIOSLEEPSOURCE_HSE_DIV1000:
+      linklayer_slp_clk_src = CRYSTAL_OSCILLATOR_SLPTMR;
+      break;
+
+    case LL_RCC_RADIOSLEEPSOURCE_NONE:
+      /* No Link Layer sleep clock source selected */
+      assert_param(0);
+      break;
+  }
+  ll_intf_cmn_le_select_slp_clk_src((uint8_t)linklayer_slp_clk_src, &freq_value);
+}
+
+[#if !((myHash["ZIGBEE"] == "Enabled") || (myHash["ZIGBEE_SKELETON"] == "Enabled"))]
+void ll_sys_reset(void)
+{
+#if (CFG_RADIO_LSE_SLEEP_TIMER_CUSTOM_SCA_RANGE == 0)
+  uint8_t bsca = 0;
+#endif /* CFG_RADIO_LSE_SLEEP_TIMER_CUSTOM_SCA_RANGE */  
+  
+  /* Apply the selected link layer sleep timer source */
+  ll_sys_sleep_clock_source_selection();
+  
+  /* Configure the link layer sleep clock accuracy if different from the default one */
+#if (CFG_RADIO_LSE_SLEEP_TIMER_CUSTOM_SCA_RANGE != 0)
+  ll_intf_le_set_sleep_clock_accuracy(CFG_RADIO_LSE_SLEEP_TIMER_CUSTOM_SCA_RANGE);
+#else
+[#if (myHash["BLE"] == "Enabled")]
+  bsca = ll_sys_BLE_sleep_clock_accuracy_selection();
+[/#if]  
+  if(bsca != STM32WBA5x_DEFAULT_SCA_RANGE)
+  {
+    ll_intf_le_set_sleep_clock_accuracy(bsca);
+  }
+#endif /* CFG_RADIO_LSE_SLEEP_TIMER_CUSTOM_SCA_RANGE */
+}
 [/#if]

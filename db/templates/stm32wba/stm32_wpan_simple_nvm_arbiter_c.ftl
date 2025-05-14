@@ -40,8 +40,8 @@ Key: ${key}; Value: ${myHash[key]}
 #include "stm32wbaxx_hal.h"
 
 /* Needed modules */
+#include "flash_driver.h"
 #include "flash_manager.h"
-#include "stm32wbaxx_hal_flash_ex.h"
 #include "crc_ctrl.h"
 #include "crc_ctrl_conf.h"
 
@@ -275,7 +275,7 @@ SNVMA_Cmd_Status_t SNVMA_Init (const uint32_t * p_NvmStartAddress)
     /* Init the crc handle */
     crcCtrlStatus = CRCCTRL_RegisterHandle(&SNVMA_Handle);
 
-    if ((CRCCTRL_OK != crcCtrlStatus) && 
+    if ((CRCCTRL_OK != crcCtrlStatus) &&
         (CRCCTRL_HANDLE_ALREADY_REGISTERED != crcCtrlStatus))
     {
       error = SNVMA_ERROR_CRC_INIT;
@@ -1540,7 +1540,7 @@ uint8_t IsCrcOk (const uint32_t * const p_BankStartAddress)
   uint32_t crcComputedValue = 0x00;
   uint32_t * payloadAddr = (uint32_t *)((uint32_t)(p_BankStartAddress) + sizeof (SNVMA_BankHeader_t));
   uint32_t offSet = 0x00;
-  uint32_t cnt = 0x00;    
+  uint32_t cnt = 0x00;
   CRCCTRL_Cmd_Status_t eReturn;
 
   LOG_INFO_SYSTEM("\r\nStart of CRC computation");
@@ -1558,10 +1558,10 @@ uint8_t IsCrcOk (const uint32_t * const p_BankStartAddress)
                                        payloadAddr,
                                        ((SNVMA_BankHeader_t *)p_BankStartAddress)->SizeId1,
                                        &crcComputedValue);
-          
+
           if (CRCCTRL_OK == eReturn)
           {
-            offSet = SNVMA_ALIGN_128(((SNVMA_BankHeader_t *)p_BankStartAddress)->SizeId1 * sizeof (uint32_t));         
+            offSet = SNVMA_ALIGN_128(((SNVMA_BankHeader_t *)p_BankStartAddress)->SizeId1 * sizeof (uint32_t));
 
             cnt++;
           }
@@ -1577,7 +1577,7 @@ uint8_t IsCrcOk (const uint32_t * const p_BankStartAddress)
         else
         {
           cnt++;
-        }        
+        }
         break;
       }
 
@@ -1589,10 +1589,10 @@ uint8_t IsCrcOk (const uint32_t * const p_BankStartAddress)
                                         (uint32_t *)((uint32_t)payloadAddr + offSet),
                                         ((SNVMA_BankHeader_t *)p_BankStartAddress)->SizeId2,
                                         &crcComputedValue);
-          
+
           if (CRCCTRL_OK == eReturn)
           {
-            offSet += SNVMA_ALIGN_128(((SNVMA_BankHeader_t *)p_BankStartAddress)->SizeId2 * sizeof (uint32_t));         
+            offSet += SNVMA_ALIGN_128(((SNVMA_BankHeader_t *)p_BankStartAddress)->SizeId2 * sizeof (uint32_t));
 
             cnt++;
           }
@@ -1603,7 +1603,7 @@ uint8_t IsCrcOk (const uint32_t * const p_BankStartAddress)
           else
           {
             Error_Handler();
-          }          
+          }
         }
         else
         {
@@ -1620,10 +1620,10 @@ uint8_t IsCrcOk (const uint32_t * const p_BankStartAddress)
                                         (uint32_t *)((uint32_t)payloadAddr + offSet),
                                         ((SNVMA_BankHeader_t *)p_BankStartAddress)->SizeId3,
                                         &crcComputedValue);
-          
+
           if (CRCCTRL_OK == eReturn)
           {
-            offSet += SNVMA_ALIGN_128(((SNVMA_BankHeader_t *)p_BankStartAddress)->SizeId3 * sizeof (uint32_t));         
+            offSet += SNVMA_ALIGN_128(((SNVMA_BankHeader_t *)p_BankStartAddress)->SizeId3 * sizeof (uint32_t));
 
             cnt++;
           }
@@ -1639,7 +1639,7 @@ uint8_t IsCrcOk (const uint32_t * const p_BankStartAddress)
         else
         {
           cnt++;
-        }        
+        }
         break;
       }
 
@@ -1651,10 +1651,10 @@ uint8_t IsCrcOk (const uint32_t * const p_BankStartAddress)
                                         (uint32_t *)((uint32_t)payloadAddr + offSet),
                                         ((SNVMA_BankHeader_t *)p_BankStartAddress)->SizeId4,
                                         &crcComputedValue);
-          
+
           if (CRCCTRL_OK == eReturn)
           {
-            offSet += SNVMA_ALIGN_128(((SNVMA_BankHeader_t *)p_BankStartAddress)->SizeId4 * sizeof (uint32_t));         
+            offSet += SNVMA_ALIGN_128(((SNVMA_BankHeader_t *)p_BankStartAddress)->SizeId4 * sizeof (uint32_t));
 
             cnt++;
           }
@@ -1670,7 +1670,7 @@ uint8_t IsCrcOk (const uint32_t * const p_BankStartAddress)
         else
         {
           cnt++;
-        }        
+        }
         break;
       }
 
@@ -1681,7 +1681,7 @@ uint8_t IsCrcOk (const uint32_t * const p_BankStartAddress)
       }
     }
   }
-  
+
   /* Compare the CRC values */
   if (crcComputedValue == ((SNVMA_BankHeader_t *)p_BankStartAddress)->Crc)
   {
@@ -1737,31 +1737,32 @@ uint8_t EraseSector (const uint32_t SectorId, const uint32_t SectorNumber)
 {
   uint8_t error = FALSE;
 
-  uint32_t pageError = 0x00;
+  uint32_t sectorIdx = 0x00;
 
-  FLASH_EraseInitTypeDef eraseInit =
+  FD_FlashOp_Status_t funcError = FD_FLASHOP_SUCCESS;
+
+  if (0u != SectorNumber)
   {
-    .TypeErase = FLASH_TYPEERASE_PAGES,
-    .Page = SectorId,
-    .NbPages = SectorNumber,
-  };
+    /* Setup erase index */
+    sectorIdx = (SectorNumber - 1u);
 
-  HAL_FLASH_Unlock();
+    while ((SectorNumber > sectorIdx) && (FD_FLASHOP_SUCCESS == funcError))
+    {
+      funcError = FD_EraseSectors ((SectorId + sectorIdx));
 
-  if (HAL_FLASHEx_Erase(&eraseInit, &pageError) != HAL_OK)
-  {
-    error = FALSE;
+      if (FD_FLASHOP_SUCCESS == funcError)
+      {
+        sectorIdx++;
+      }
+    }
+
+    /* Check if operation OK */
+    if ((SectorNumber <= sectorIdx) && 
+        (FD_FLASHOP_SUCCESS == funcError))
+    {
+      error = TRUE;
+    }
   }
-  else if (pageError != 0xFFFFFFFFu)
-  {
-    error = FALSE;
-  }
-  else
-  {
-    error = TRUE;
-  }
-
-  HAL_FLASH_Lock();
 
   return error;
 }
@@ -1771,7 +1772,7 @@ FM_Cmd_Status_t StartFlashWrite (const uint8_t NvmId)
   FM_Cmd_Status_t error = FM_ERROR;
 
   uint32_t crcValue = 0x00;
-  uint32_t cnt = 0x00;    
+  uint32_t cnt = 0x00;
   CRCCTRL_Cmd_Status_t eReturn;
 
   /* Reset value of SNVMA_BankHeader */
@@ -1791,9 +1792,9 @@ FM_Cmd_Status_t StartFlashWrite (const uint8_t NvmId)
                                       SNVMA_NvmConfiguration[NvmId].a_Buffers[cnt].p_Addr,
                                       SNVMA_NvmConfiguration[NvmId].a_Buffers[cnt].Size,
                                       &crcValue);
-        
+
         if (CRCCTRL_OK == eReturn)
-        {            
+        {
           cnt++;
         }
         else if (CRCCTRL_BUSY == eReturn)
@@ -1811,9 +1812,9 @@ FM_Cmd_Status_t StartFlashWrite (const uint8_t NvmId)
                                       SNVMA_NvmConfiguration[NvmId].a_Buffers[cnt].p_Addr,
                                       SNVMA_NvmConfiguration[NvmId].a_Buffers[cnt].Size,
                                       &crcValue);
-        
+
         if (CRCCTRL_OK == eReturn)
-        {            
+        {
           cnt++;
         }
         else if (CRCCTRL_BUSY == eReturn)

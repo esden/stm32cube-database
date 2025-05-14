@@ -111,7 +111,7 @@
     <RefMode Name="Activate_SOF_FS" HalMode=""/>
 
 	<ModeLogicOperator Name="OR">
-		<Mode Name="Mode">
+		<Mode Name="Mode" RemoveCondition="STM32G0B0KETx">
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="Device" UserName="Device_Only_FS" RemoveCondition="DIE489">
 					<SignalLogicalOp Name="AND">
@@ -148,6 +148,43 @@
 			</ModeLogicOperator>
 		</Mode>
 		
+		<Mode Name="Mode" RemoveCondition="!STM32G0B0KETx">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="Device" UserName="Device_Only_FS" RemoveCondition="DIE489">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="$SingleInstanceUSB_DM"/>
+						<Signal Name="$SingleInstanceUSB_DP"/>
+					</SignalLogicalOp>
+					<Semaphore>MW_USB_DRD_FS_MW_DEVICE</Semaphore>
+					<Semaphore>SEMAOoUSBOoDRDOoFSOoDEVICEOoFOROoUSBX</Semaphore>
+				</Mode>
+				<Mode Name="Host" UserName="Host_Only_FS" RemoveCondition="DIE489">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="$SingleInstanceUSB_DM"/>
+						<Signal Name="$SingleInstanceUSB_DP"/>
+					</SignalLogicalOp>
+					<Semaphore>MW_USB_DRD_FS_MW_HOST</Semaphore>
+					<Semaphore>SEMAOoUSBOoDRDOoFSOoHOSTOoFOROoUSBX</Semaphore>
+				</Mode>
+				<Mode Name="Device" UserName="Device_Only_FS" RemoveCondition="!DIE489">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="$SingleInstanceUSB_DM" IOMode="AlternateFunctionPushPull"/>
+						<Signal Name="$SingleInstanceUSB_DP" IOMode="AlternateFunctionPushPull"/>
+					</SignalLogicalOp>
+					<Semaphore>MW_USB_DRD_FS_MW_DEVICE</Semaphore>
+					<Semaphore>SEMAOoUSBOoDRDOoFSOoDEVICEOoFOROoUSBX</Semaphore>
+				</Mode>
+				<Mode Name="Host" UserName="Host_Only_FS" RemoveCondition="!DIE489">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="$SingleInstanceUSB_DM" IOMode="AlternateFunctionPushPull"/>
+						<Signal Name="$SingleInstanceUSB_DP" IOMode="AlternateFunctionPushPull"/>
+					</SignalLogicalOp>
+					<Semaphore>MW_USB_DRD_FS_MW_HOST</Semaphore>
+					<Semaphore>SEMAOoUSBOoDRDOoFSOoHOSTOoFOROoUSBX</Semaphore>
+				</Mode>
+			</ModeLogicOperator>
+			<Condition Expression="HSEByPass" Diagnostic="BYPASS Clock Source must be enabled"/>
+		</Mode>
         <Mode Name="Activate_SOF">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="Activate_SOF_FS" UserName="Activate SOF">

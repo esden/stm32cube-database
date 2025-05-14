@@ -14,7 +14,7 @@
 /* USER CODE END includes */
 
 /{
-	model = "STMicroelectronics STM32MP157D-EV1 STM32CubeMX board - openstlinux-5.15-yocto-kirkstone-mp1-v22.11.23";
+	model = "STMicroelectronics STM32MP157D-EV1 STM32CubeMX board - openstlinux-6.1-yocto-mickledore-mp1-v23.06.21";
 	compatible = "st,stm32mp157d-board_157d-ev1-mx", "st,stm32mp157d-ev1", "st,stm32mp157";
 
 	/* USER CODE BEGIN root */
@@ -215,14 +215,6 @@
 
 		/* USER CODE BEGIN reserved-memory */
 
-		linux,cma{
-			compatible = "shared-dma-pool";
-			reusable;
-			size = <0x8000000>;
-			alignment = <0x2000>;
-			linux,cma-default;
-		};
-
 		mcuram2:mcuram2@10000000{
 			compatible = "shared-dma-pool";
 			reg = <0x10000000 0x40000>;
@@ -269,9 +261,8 @@
 			reg = <0xe8000000 0x8000000>;
 			no-map;
 		};
-		
-		/* global autoconfigured region for contiguous allocations */
-		linux,cma {
+
+		linux,cma{
 			compatible = "shared-dma-pool";
 			reusable;
 			size = <0x8000000>;
@@ -935,6 +926,9 @@
 	status = "okay";
 
 	/* USER CODE BEGIN dcmi */
+	sram = <&dcmi_pool>;
+	dmas = <&dmamux1 75 0x400 0x01>, <&mdma1 0 0x3 0x1200000a 0 0>;
+	dma-names = "tx", "mdma_tx";
 
 	port{
 
@@ -945,6 +939,7 @@
 			hsync-active = <0>;
 			vsync-active = <0>;
 			pclk-sample = <1>;
+			pclk-max-frequency = <77000000>;
 		};
 	};
 	/* USER CODE END dcmi */
@@ -1159,7 +1154,7 @@
 	nand-controller@4,0{
 		status = "okay";
 
-		nand: nand@0{
+		nand@0{
 			reg = <0>;
 			nand-on-flash-bbt;
 			#address-cells = <1>;
@@ -1256,6 +1251,7 @@
 				hsync-active = <0>;
 				vsync-active = <0>;
 				pclk-sample = <1>;
+				pclk-max-frequency = <77000000>;
 			};
 		};
 	};
@@ -1293,8 +1289,10 @@
 		panel = <&panel_dsi>;
 		pinctrl-0 = <&goodix_pins>;
 		pinctrl-names = "default";
+		AVDD28-supply = <&v3v3>;
+		VDDIO-supply = <&v3v3>;
 		status = "okay";
-		interrupts = <14 IRQ_TYPE_EDGE_RISING>;
+		interrupts = <14 IRQ_TYPE_NONE>;
 		interrupt-parent = <&stmfx_pinctrl>;
 	};
 	/* USER CODE END i2c2 */
@@ -1446,11 +1444,6 @@
 			interrupt-names = "onkey-falling", "onkey-rising";
 			power-off-time-sec = <10>;
 			status = "okay";
-		};
-
-		watchdog{
-			compatible = "st,stpmic1-wdt";
-			status = "disabled";
 		};
 	};
 	/* USER CODE END i2c4 */
@@ -1799,5 +1792,13 @@
 
 &cpu1{
 	cpu-supply = <&vddcore>;
+};
+
+&sram4{
+
+	dcmi_pool:dcmi-pool@0{
+		reg = <0x0 0x8000>;
+		pool;
+	};
 };
 /* USER CODE END addons */

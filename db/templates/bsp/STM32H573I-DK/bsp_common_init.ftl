@@ -24,9 +24,23 @@
       [#if definition.name=="VCP"]
           [#assign VCP = definition.value]
       [/#if]
-
       [#if definition.name=="Bsp_Common_DEMO"]
           [#assign Bsp_Common_DEMO = definition.value]
+      [/#if]
+      [#if definition.name=="LCD_TC_ON"]
+          [#assign LCD_TC_ON = definition.value]
+      [/#if]
+      [#if definition.name=="AUDIO_IN"]
+          [#assign AUDIO_IN = definition.value]
+      [/#if]
+      [#if definition.name=="AUDIO_OUT"]
+          [#assign AUDIO_OUT = definition.value]
+      [/#if]
+      [#if definition.name=="OCTOSPI_DEMO"]
+          [#assign OCTOSPI_DEMO = definition.value]
+      [/#if]
+      [#if definition.name=="SD_CARD_DEMO"]
+          [#assign SD_CARD_DEMO = definition.value]
       [/#if]
     [/#list]
   [/#if]
@@ -71,4 +85,65 @@
   {
     Error_Handler();
   }
+[/#if]
+
+[#if (LCD_TC_ON?? && LCD_TC_ON == "true")]
+  /* Initialize LCD to black */
+  if (BSP_LCD_Init(0, LCD_ORIENTATION_LANDSCAPE) != BSP_ERROR_NONE)
+  {
+    Error_Handler();
+  }
+
+  /* Initialize Touch screen with interrupts */
+  BspTSInit.Orientation = TS_ORIENTATION_LANDSCAPE;
+  BspTSInit.Accuracy = 5;
+  BspTSInit.Width = FT6X06_MAX_X_LENGTH;
+  BspTSInit.Height = FT6X06_MAX_Y_LENGTH;
+  if (BSP_TS_Init(0, &BspTSInit) != BSP_ERROR_NONE)
+  {
+    Error_Handler();
+  }
+  BSP_TS_EnableIT(0);
+[/#if]
+
+[#if AUDIO_IN == "true"]
+  /* Initialize AUDIO IN (Analog) */
+  BspAudioInInit.Device = AUDIO_IN_DEVICE_DIGITAL_MIC;
+  BspAudioInInit.ChannelsNbr = 2;
+  BspAudioInInit.SampleRate = AUDIO_FREQUENCY_16K;
+  BspAudioInInit.BitsPerSample = AUDIO_RESOLUTION_16B;
+  BspAudioInInit.Volume = 80;
+  if (BSP_AUDIO_IN_Init(AUDIO_IN_DEVICE_DIGITAL_MIC, &BspAudioInInit) != BSP_ERROR_NONE)
+  {
+    Error_Handler();
+  }
+[/#if]
+
+[#if AUDIO_OUT == "true"]
+  /* Initialize AUDIO OUT (Headset) */
+  BspAudioOutInit.Device = AUDIO_OUT_DEVICE_HEADPHONE;
+  BspAudioOutInit.ChannelsNbr = 2;
+  BspAudioOutInit.SampleRate = 16000;
+  BspAudioOutInit.BitsPerSample = AUDIO_RESOLUTION_16B;
+  BspAudioOutInit.Volume = 60;
+  if(BSP_AUDIO_OUT_Init(0, &BspAudioOutInit) != BSP_ERROR_NONE)
+  {
+    Error_Handler();
+  }
+[/#if]
+
+[#if OCTOSPI_DEMO == "true"]
+  /* Initialize OCTAL NOR memory */
+  BspOSPINORInit.InterfaceMode = BSP_OSPI_NOR_OPI_MODE;
+  BspOSPINORInit.TransferRate = BSP_OSPI_NOR_DTR_TRANSFER;
+  if (BSP_OSPI_NOR_Init(0, &BspOSPINORInit) != BSP_ERROR_NONE)
+  {
+    Error_Handler();
+  }
+[/#if]
+
+[#if SD_CARD_DEMO == "true"]
+  /* Initialize SD with detection under interrupt */
+  BSP_SD_Init(0);
+  BSP_SD_DetectITConfig(0);
 [/#if]

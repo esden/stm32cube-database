@@ -75,6 +75,9 @@
         </IFCondition>
     </RefConfig>
     <RefConfig Name="RCC_MCO1Config">
+        <CallLibMethod Name="__HAL_RCC_PLLCLKOUT_ENABLE" ReturnHAL="false">
+            <MethodArg Name="__RCC_PLL1ClockOut__" ParameterName="PLL1ClkOut"/>
+        </CallLibMethod>
         <CallLibMethod Name="HAL_RCC_MCOConfig" ReturnHAL="false">
             <MethodArg Name="RCC_MCOx" ParameterName="RCC_MCO1"/>
             <MethodArg Name="RCC_MCOSource" ParameterName="RCC_MCO1Source"/>
@@ -82,11 +85,23 @@
         </CallLibMethod>
     </RefConfig>
     <RefConfig Name="RCC_MCO2Config">
+	<IFCondition Expression="MCO2SOURCE_PLLCLK">
+        <CallLibMethod Name="__HAL_RCC_PLLCLKOUT_ENABLE" ReturnHAL="false">
+            <MethodArg Name="__RCC_PLL1ClockOut__" ParameterName="PLL2ClkOut"/>
+        </CallLibMethod>
+	</IFCondition>
+	<IFCondition Expression="MCO2SOURCE_PLL2PCLK">
+        <CallLibMethod Name="__HAL_RCC_PLL2CLKOUT_ENABLE" ReturnHAL="false">
+            <MethodArg Name="__RCC_PLL2ClockOut__" ParameterName="PLL2ClkOut"/>
+        </CallLibMethod>
+	</IFCondition>
+	<IFCondition Expression="MCO2Config">
         <CallLibMethod Name="HAL_RCC_MCOConfig" ReturnHAL="false">
             <MethodArg Name="RCC_MCOSource" ParameterName="RCC_MCO2Source"/>
             <MethodArg Name="RCC_MCOx" ParameterName="RCC_MCO2"/>
             <MethodArg Name="RCC_MCODiv" ParameterName="RCC_MCODiv2"/>
         </CallLibMethod>
+	</IFCondition>
     </RefConfig>
     <RefConfig Name="AXI_CLOCK_GATING">        
         <CallLibMethod Name="" Type="HardCode">
@@ -272,9 +287,6 @@
             <CallLibMethod Name="__HAL_RCC_PLL2_VCORANGE" ReturnHAL="false">
                 <MethodArg Name="__RCC_PLL2VCORange__" ParameterName="PLL2VCOSELargMCO"/>
             </CallLibMethod>
-            <CallLibMethod Name="__HAL_RCC_PLL2CLKOUT_ENABLE" ReturnHAL="false">
-                <MethodArg Name="PLL2CLKOUT"/>
-            </CallLibMethod>
             <CallLibMethod Name="__HAL_RCC_PLL2_ENABLE" ReturnHAL="false">
                 <MethodArg Name="PLL2CLKOUT"/>
             </CallLibMethod>
@@ -292,9 +304,6 @@
             <Argument AddressOf="false" GenericType="simple" Name="ErrorLimitValue" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="HSI48CalibrationValue" OptimizationCondition="equal"/>
         </Argument>
-    </LibMethod>
-    <LibMethod Comment="" Name="__HAL_RCC_PLL2CLKOUT_ENABLE">
-        <Argument AddressOf="false" GenericType="simple" Name="PLL2CLKOUT" OptimizationCondition="equal"/>
     </LibMethod>
     <LibMethod Comment="" Name="__HAL_RCC_PLL2_CONFIG">
         <Argument AddressOf="false" GenericType="simple" Name="__PLL2M__" OptimizationCondition="equal"/>
@@ -387,6 +396,12 @@
         <Argument AddressOf="false" GenericType="simple" Name="RCC_MCOx" OptimizationCondition="equal"/>
         <Argument AddressOf="false" GenericType="simple" Name="RCC_MCOSource" OptimizationCondition="equal"/>
         <Argument AddressOf="false" GenericType="simple" Name="RCC_MCODiv" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="__HAL_RCC_PLLCLKOUT_ENABLE">
+        <Argument AddressOf="false" GenericType="simple" Name="__RCC_PLL1ClockOut__" OptimizationCondition="equal"/>      
+    </LibMethod>
+    <LibMethod Comment="" Name="__HAL_RCC_PLL2CLKOUT_ENABLE">
+        <Argument AddressOf="false" GenericType="simple" Name="__RCC_PLL2ClockOut__" OptimizationCondition="equal"/>      
     </LibMethod>
     <LibMethod Comment="" Name="HAL_RCCEx_PeriphCLKConfig">
         <Argument AddressOf="true" GenericType="struct" Name="PeriphClkInitStruct" TypeName="RCC_PeriphCLKInitTypeDef">

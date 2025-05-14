@@ -62,6 +62,12 @@
 /*                                            optimized the definition of */
 /*                                            TX_TIMER_TICKS_PER_SECOND,  */
 /*                                            resulting in version 6.1.11 */
+[#if FamilyName?lower_case?starts_with("stm32c0")]
+/*  10-31-2023      Xiuwen Cai              Modified comment(s),          */
+/*                                            added option for random     */
+/*                                            number stack filling,       */
+/*                                            resulting in version 6.3.0  */
+[/#if]
 /*                                                                        */
 /**************************************************************************/
 
@@ -86,11 +92,11 @@
 	[#if name == "TX_MAX_PRIORITIES"]
       [#assign TX_MAX_PRIORITIES_value = value]
     [/#if]
-	
-	[#if name == "TX_THREAD_USER_EXTENSION"]
-      [#assign TX_THREAD_USER_EXTENSION_value = value]
+
+    [#if name == "TX_THREAD_USER_EXTENSION"]
+        [#assign TX_THREAD_USER_EXTENSION_value = value]
     [/#if]
-	
+
 	[#if name == "TX_TIMER_THREAD_STACK_SIZE"]
       [#assign TX_TIMER_THREAD_STACK_SIZE_value = value]
     [/#if]
@@ -109,6 +115,14 @@
 	
 	[#if name == "TX_DISABLE_STACK_FILLING"]
       [#assign TX_DISABLE_STACK_FILLING_value = value]
+    [/#if]
+	
+	[#if name == "TX_ENABLE_STACK_CHECKING"]
+      [#assign TX_DISABLE_STACK_FILLING_value = value]
+    [/#if]
+
+    [#if name == "TX_ENABLE_RANDOM_NUMBER_STACK_FILLING"]
+      [#assign TX_ENABLE_RANDOM_NUMBER_STACK_FILLING_value = value]
     [/#if]
 	
 	[#if name == "TX_DISABLE_PREEMPTION_THRESHOLD"]
@@ -247,6 +261,9 @@
         TX_REACTIVATE_INLINE
         TX_DISABLE_STACK_FILLING
         TX_INLINE_THREAD_RESUME_SUSPEND
+	[#if FamilyName?lower_case?starts_with("stm32c0")]
+        TX_DISABLE_ERROR_CHECKING
+	[/#if]
 
    For minimum size, the following should be defined:
 
@@ -273,10 +290,12 @@
 [#else]
 #define TX_MAX_PRIORITIES                ${TX_MAX_PRIORITIES_value}
 [/#if]
+[#if !FamilyName?lower_case?starts_with("stm32mp2")]
 [#if TX_THREAD_USER_EXTENSION_value == " " || TX_THREAD_USER_EXTENSION_value == ""]
 /*#define TX_THREAD_USER_EXTENSION                ????*/
 [#else]
 #define TX_THREAD_USER_EXTENSION                ${TX_THREAD_USER_EXTENSION_value}
+[/#if]
 [/#if]
 [#if TX_TIMER_THREAD_STACK_SIZE_value == "1024"]
 /*#define TX_TIMER_THREAD_STACK_SIZE                1024*/
@@ -328,6 +347,7 @@
 /*#define TX_DISABLE_STACK_FILLING*/
 [/#if]
 
+[#if FamilyName?lower_case?starts_with("stm32c0")]
 [#if TX_ENABLE_STACK_CHECKING_value != "not defined"]
 /* Determine whether or not stack checking is enabled. By default, ThreadX stack checking is
    disabled. When the following is defined, ThreadX thread stack checking is enabled.  If stack
@@ -339,6 +359,19 @@
 #define TX_ENABLE_STACK_CHECKING
 [#else]
 /*#define TX_ENABLE_STACK_CHECKING*/
+[/#if]
+
+/* Determine if random number is used for stack filling. By default, ThreadX uses a fixed
+   pattern for stack filling. When the following is defined, ThreadX uses a random number
+   for stack filling. This is effective only when TX_ENABLE_STACK_CHECKING is defined.  */
+
+[#if TX_ENABLE_STACK_CHECKING_value == "1"]
+[#if TX_ENABLE_RANDOM_NUMBER_STACK_FILLING_value == "0"]
+/*#define TX_ENABLE_RANDOM_NUMBER_STACK_FILLING*/
+[#else]
+#define TX_ENABLE_RANDOM_NUMBER_STACK_FILLING
+[/#if]
+[/#if]
 [/#if]
 [/#if]
 
@@ -499,6 +532,7 @@
 #define TX_TIMER_TICKS_PER_SECOND                ${TX_TIMER_TICKS_PER_SECOND_value}
 [/#if]
 
+
 /* Defined, the basic parameter error checking is disabled. */
 
 [#if TX_DISABLE_ERROR_CHECKING_value == "1"]
@@ -614,6 +648,10 @@ unsigned long ${TX_LOW_POWER_USER_TIMER_ADJUST_value}(void);
 [/#if]
 
 /* USER CODE BEGIN 2 */
+[#if FamilyName?lower_case?starts_with("stm32mp2")]
+/* Define the user extension field of the thread control block.*/
+/*#define TX_THREAD_USER_EXTENSION                ????*/
+[/#if]
 
 /* USER CODE END 2 */
 

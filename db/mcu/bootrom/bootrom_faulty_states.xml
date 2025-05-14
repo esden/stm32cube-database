@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Families>
+    <Family name="STM32MP2">
+        <Scopes>
+            <Scope name="A35 Master" id="A35TD_TZEN">
+                <BootDevices>
+                    <BootDevice instanceName="USB3DR" name="USB3DR" type="alone"/>
+                </BootDevices>
+            </Scope>
+            <Scope name="A35 Master" id="A35TD_TZDIS">
+                <BootDevices>
+                    <BootDevice instanceName="USB3DR" name="USB3DR" type="alone"/>
+                </BootDevices>
+            </Scope>
+
+            <Scope name="M33 Master" id="m33master">
+                <BootDevices/>
+            </Scope>
+            <Scope name="All" id="all">
+                <BootDevices>
+                    <BootDevice instanceName="FMC" name="FMC" type="secondary"/>
+                    <BootDevice instanceName="SDMMC1" name="SDMMC1" type="secondary"/>
+                    <BootDevice instanceName="SDMMC2" name="SDMMC2" type="secondary"/>
+                    <BootDevice instanceName="OCTOSPI1" name="OCTOSPI1" type="secondary"/>
+                    <BootDevice instanceName="OCTOSPI2" name="OCTOSPI2" type="primary"/>
+                </BootDevices>
+            </Scope>
+        </Scopes>
+        <Contexts>
+            <Context name="BootROM" id="bootrom"/>
+            <Context name="FSBL-A" id="fsbla"/>
+            <Context name="FSBL-M" id="fsblm"/>
+        </Contexts>
+        <FaultyStates>
+            <FaultyState name="NoFSBLAAssignmentsPossible" scope="all" >
+                <OuterLoop bootDeviceType="all">
+                    <Condition diagnostic="" expression="($IpInstance_BOOTLOADER_FSBLA)"/>
+                    <InnerLoop bootDeviceType="all">
+                        <Condition diagnostic="" expression="($IpInstanceOuter=$IpInstanceInner) &amp; (!($IpInstanceInner_BOOTROM))"/>
+                        <Diagnostic>Faulty state detected for %s : FSBL-A assignments possible only if assigned in BootRom</Diagnostic>
+                    </InnerLoop>
+                </OuterLoop>
+            </FaultyState>
+            <FaultyState name="NoFSBLMAssignmentsPossible" scope="m33master" >
+                <OuterLoop bootDeviceType="all">
+                    <Condition diagnostic="" expression="($IpInstance_BOOTLOADER_FSBLM)"/>
+                    <InnerLoop bootDeviceType="all">
+                        <Condition diagnostic="" expression="($IpInstanceOuter=$IpInstanceInner) &amp; (!($IpInstanceInner_BOOTROM))"/>
+                        <Diagnostic>Faulty state detected for $IpInstanceOuter: FSBL-M assignments possible only if assigned in BootRom</Diagnostic>
+                    </InnerLoop>
+                </OuterLoop>
+            </FaultyState>
+            <FaultyState name="OnlyOneMemoryBootDeviceFSBL" scope="all" >
+                <OuterLoop bootDeviceType="all">
+                    <Condition diagnostic="" expression="($IpInstance_BOOTLOADER_FSBLA)"/>
+                    <InnerLoop bootDeviceType="all">
+                        <Condition diagnostic="" expression="(!($IpInstanceOuter=$IpInstanceInner)) &amp; ($IpInstanceInner_BOOTLOADER_FSBLA)"/>
+                        <Diagnostic>Faulty state detected for %s : Only one Memory Boot Device can be assigned to FSBL-A simultaneously.</Diagnostic>
+                    </InnerLoop>
+                </OuterLoop>
+            </FaultyState>
+            <FaultyState name="FSBLMAssignmentForcesFSBLAAssignmentInSecondaryBootDeviceList" scope="m33master" >
+                <OuterLoop bootDeviceType="secondary">
+                    <Condition diagnostic="" expression="($IpInstance_BOOTLOADER_FSBLM)"/>
+                    <InnerLoop bootDeviceType="secondary">
+                        <Condition diagnostic="" expression="($IpInstanceOuter=$IpInstanceInner) &amp; (!($IpInstanceInner_BOOTLOADER_FSBLA))"/>
+                        <Diagnostic>Faulty state detected for $IpInstanceOuter: Device of Secondary Boot Device list assigned to FSBL-M forces assignment of same Device to FSBL-A</Diagnostic>
+                    </InnerLoop>
+                </OuterLoop>
+            </FaultyState>
+            <FaultyState name="FSBLAAssignmentForcesFSBLMAssignmentInPrimaryBootDeviceList" scope="m33master" >
+                <OuterLoop bootDeviceType="primary">
+                    <Condition diagnostic="" expression="($IpInstance_BOOTLOADER_FSBLA)"/>
+                    <InnerLoop bootDeviceType="primary">
+                        <Condition diagnostic="" expression="($IpInstanceOuter=$IpInstanceInner) &amp; (!($IpInstanceInner_BOOTLOADER_FSBLM))"/>
+                        <Diagnostic>Faulty state detected for $IpInstanceOuter: Primary Boot Device list assigned to FSBL-A should be assigned to FSBL-M too</Diagnostic>
+                    </InnerLoop>
+                </OuterLoop>
+            </FaultyState>
+            <FaultyState name="FSBLAAssignmentConstraintsFSBLMAssignmentsInPrimaryBootDeviceList" scope="m33master" >
+                <OuterLoop bootDeviceType="primary">
+                    <Condition diagnostic="" expression="($IpInstance_BOOTLOADER_FSBLM)"/>
+                    <InnerLoop bootDeviceType="primary">
+                        <Condition diagnostic="" expression="(!($IpInstanceOuter=$IpInstanceInner)) &amp; ($IpInstanceInner_BOOTLOADER_FSBLA)"/>
+                        <Diagnostic>Faulty state detected for $IpInstanceOuter and $IpInstanceInner: Primary Boot Device ($IpInstanceOuter) assigned to FSBL-M, whereas another primary bootdevice ($IpInstanceInner) is already assigned to FSBL-A</Diagnostic>
+                    </InnerLoop>
+                </OuterLoop>
+            </FaultyState>
+            <FaultyState name="FSBLMAssignmentConstraintsFSBLAAssignmentsInSecondaryBootDeviceList" scope="m33master" >
+                <OuterLoop bootDeviceType="secondary">
+                    <Condition diagnostic="" expression="($IpInstance_BOOTLOADER_FSBLA)"/>
+                    <InnerLoop bootDeviceType="secondary">
+                        <Condition diagnostic="" expression="(!($IpInstanceOuter=$IpInstanceInner)) &amp; (($IpInstanceInner_BOOTLOADER_FSBLM))"/>
+                        <Diagnostic>Faulty state detected for $IpInstanceOuter and $IpInstanceInner: Secondary Boot Device ($IpInstanceInner) assigned to FSBL-M, whereas another secondary Boot Device ($IpInstanceOuter) is already assigned to FSBL-A</Diagnostic>
+                    </InnerLoop>
+                </OuterLoop>
+            </FaultyState>
+        </FaultyStates>
+    </Family>
+</Families>

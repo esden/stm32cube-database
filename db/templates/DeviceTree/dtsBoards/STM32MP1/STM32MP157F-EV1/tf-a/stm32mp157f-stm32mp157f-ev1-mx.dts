@@ -8,10 +8,11 @@
 #include "stm32mp15-ddr.dtsi"
 
 /* USER CODE BEGIN includes */
+#include "stm32mp15-pinctrl.dtsi"
 /* USER CODE END includes */
 
 /{
-	model = "STMicroelectronics STM32MP157F-EV1 STM32CubeMX board - openstlinux-5.15-yocto-kirkstone-mp1-v22.11.23";
+	model = "STMicroelectronics STM32MP157F-EV1 STM32CubeMX board - openstlinux-6.1-yocto-mickledore-mp1-v23.06.21";
 	compatible = "st,stm32mp157f-board_157f-ev1-mx", "st,stm32mp157f-ev1", "st,stm32mp157";
 
 	/* USER CODE BEGIN root */
@@ -184,6 +185,16 @@
 			slew-rate = <0>;
 		};
 	};
+
+	usb_otg_hs_pins_mx:usb_otg_hs_mx-0{
+
+		pins{
+			pinmux = <STM32_PINMUX('A', 10, ANALOG)>;
+		};
+	};
+
+	/* USER CODE BEGIN pinctrl */
+	/* USER CODE END pinctrl */
 };
 
 &pinctrl_z{
@@ -198,6 +209,9 @@
 			slew-rate = <0>;
 		};
 	};
+
+	/* USER CODE BEGIN pinctrl_z */
+	/* USER CODE END pinctrl_z */
 };
 
 &cryp1{
@@ -353,6 +367,14 @@
 	/* USER CODE END i2c4 */
 };
 
+&iwdg1{
+	status = "okay";
+
+	/* USER CODE BEGIN iwdg1 */
+	timeout-sec = <32>;
+	/* USER CODE END iwdg1 */
+};
+
 &qspi{
 	pinctrl-names = "default";
 	pinctrl-0 = <&quadspi_pins_mx>;
@@ -384,6 +406,7 @@
 		CLK_SDMMC12_PLL4P
 		CLK_STGEN_HSE
 		CLK_I2C46_HSI
+		CLK_USBO_USBPHY
 		CLK_UART24_HSI
 		CLK_MPU_PLL1P
 		CLK_AXI_PLL2P
@@ -408,16 +431,6 @@
 	/* USER CODE END rcc */
 
 	st,pll_vco{
-
-		/* USER CODE BEGIN rcc_st-pll_vco */
-
-		pll1_vco_1300Mhz:pll1-vco-1300Mhz{
-			src = < CLK_PLL12_HSE >;
-			divmn = < 2 80 >;
-			frac = < 0x800 >;
-		};
-
-		/* USER CODE END rcc_st-pll_vco */
 
 		pll2_vco_1066Mhz:pll2-vco-1066Mhz{
 			src = < CLK_PLL12_HSE >;
@@ -513,6 +526,24 @@
 	status = "okay";
 };
 
+&usbotg_hs{
+	pinctrl-names = "default";
+	pinctrl-0 = <&usb_otg_hs_pins_mx>;
+	status = "okay";
+};
+
+&usbphyc{
+	status = "okay";
+};
+
+&usbphyc_port0{
+	status = "okay";
+};
+
+&usbphyc_port1{
+	status = "okay";
+};
+
 /* USER CODE BEGIN addons */
 
 &bsec{
@@ -529,11 +560,6 @@
 
 &cpu1{
 	cpu-supply = <&vddcore>;
-};
-
-&iwdg1{
-	timeout-sec = <32>;
-	status = "okay";
 };
 
 &pwr_regulators{

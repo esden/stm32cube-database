@@ -22,6 +22,9 @@
 [#assign staticVoids =""]
 [#assign includeList =""]
 [#assign generatePWR ="0"]
+[#if FamilyName=="STM32MP2" && TZEN=="1"]
+[#assign contextFolder = "CM33/"+contextFolder]
+[/#if]
 [#compress]
 [#assign usb_device = false]
 /* Includes ------------------------------------------------------------------*/
@@ -30,7 +33,7 @@
     #include "app_threadx.h"
 [/#if]
 #include "${main_h}"
-[#if (H7_ETH_NoLWIP?? || F4_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || H5_ETH_NoLWIP?? || MP13_ETH_NoLWIP?? || H7RS_ETH_NoLWIP??) && HALCompliant??]
+[#if (H7_ETH_NoLWIP?? || F4_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || H5_ETH_NoLWIP?? || MP13_ETH_NoLWIP?? || H7RS_ETH_NoLWIP?? || MP2_ETH_NoLWIP??) && HALCompliant??]
 #include "string.h"
 [/#if]
 [#if jpeg_utils_conf_h??]
@@ -80,7 +83,7 @@
 [#if ip?contains("LoRaWAN")]
 #include "app_lorawan.h"
 [/#if]
-[#if ((!ip?contains("LWIP")&& !ip?contains("STM32_WPAN")&& !ip?contains("LoRaWAN")&& !ip?contains("SubGHz_Phy")&& !ip?contains("Sigfox") && !ip?contains("KMS") && !ip?contains("MotorControl") && (!ip?lower_case?starts_with("nucleo-") && !ip?lower_case?ends_with("-dk"))) || (ip?contains("LWIP") && (MBEDTLSUSed=="false")))]
+[#if ((!ip?contains("LWIP")&& !ip?contains("STM32_WPAN")&& !ip?contains("STM32_BLE")&& !ip?contains("LoRaWAN")&& !ip?contains("SubGHz_Phy")&& !ip?contains("Sigfox") && !ip?contains("KMS") && !ip?contains("MotorControl") && (!ip?lower_case?starts_with("nucleo-") && !ip?lower_case?ends_with("-dk"))) || (ip?contains("LWIP") && (MBEDTLSUSed=="false")))]
     [#assign ipExistsIntoreducevoids=false]
     [#if reducevoids??]
         [#list reducevoids as voidr]
@@ -106,10 +109,14 @@
 					[/#if]	
                                 [#else]
                                         [#if !existsInList(includeList?split(" "),ip?lower_case+".h")]
+                                        [#if ip?lower_case?contains("extmem_manager_appli")]
+                    #include "extmem_manager.h"
+                                        [#else]
 					#include "${ip?lower_case}.h"
+					                    [/#if]
                                         [#assign includeList =includeList + " "+ '${ip?lower_case}.h']
                                         [/#if]
-				[/#if]	
+				[/#if]
                 [#break]
             [/#if]
         [/#list]
@@ -269,10 +276,11 @@ extern PCD_HandleTypeDef ${handleName};
     [/#if]
   [/#if]
 [/#if]
+
 /* Private variables ---------------------------------------------------------*/
 [#-- WorkAround for Ticket 30863 --]
-[#if (H7_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || F4_ETH_NoLWIP??  || H5_ETH_NoLWIP?? || MP13_ETH_NoLWIP?? || H7RS_ETH_NoLWIP??) && HALCompliant??]
-[#if H7_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || MP13_ETH_NoLWIP?? || H7RS_ETH_NoLWIP??]
+[#if (H7_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || F4_ETH_NoLWIP??  || H5_ETH_NoLWIP?? || MP13_ETH_NoLWIP?? || H7RS_ETH_NoLWIP?? || MP2_ETH_NoLWIP??) && HALCompliant??]
+[#if H7_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || MP13_ETH_NoLWIP?? || H7RS_ETH_NoLWIP?? || MP2_ETH_NoLWIP??]
 #if defined ( __ICCARM__ ) /*!< IAR Compiler */
 #pragma location=[#if RxDescAddress??]${RxDescAddress}[#else]0x30040000[/#if]
 ETH_DMADescTypeDef  DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
@@ -297,7 +305,7 @@ ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT] __attribute__((section(".TxDecr
 [/#if]
 #endif
 [/#if] [#-- end if (H7_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || F4_ETH_NoLWIP??) --]
-[#if FamilyName=="STM32H5" || FamilyName=="STM32MP13" || FamilyName=="STM32H7RS"]
+[#if FamilyName=="STM32H5" || FamilyName=="STM32MP13" || FamilyName=="STM32H7RS" || FamilyName=="STM32MP2"]
 ETH_TxPacketConfigTypeDef TxConfig;
 [#else]
 ETH_TxPacketConfig TxConfig;
@@ -744,7 +752,7 @@ int main(void)
 [/#if]
 [/#if]
 [#list voids as void]
-[#if void.functionName?? && void.functionName?contains("APPE_Init")]
+[#if void.functionName?? && void.functionName?contains("APPE_Init") && (FamilyName=="STM32WBA" | FamilyName=="STM32WB")]
 #t/* Config code for STM32_WPAN (HSE Tuning must be done before system clock configuration) */
 #tMX_APPE_Config();
 [/#if]
@@ -850,7 +858,7 @@ int main(void)
 [/#if]
 [#if commonClockConfig??]
 #t
-/* Configure the peripherals common clocks */
+#t/* Configure the peripherals common clocks */
 #tPeriphCommonClock_Config();
 [/#if]
 [/#if]
@@ -913,6 +921,10 @@ int main(void)
 [#if !OPENAMP??]
 #t}
 [/#if]
+[#elseif FamilyName=="STM32MP2"] 
+#n
+ #t/* IPCC initialisation */
+	#tMX_IPCC1_Init();
 [#else] [#--Ticket 99342  --]
 #n
  #t/* IPCC initialisation */
@@ -983,7 +995,7 @@ int main(void)
   - Lwip with FreeRTOS
   - USBD and USBH when FreeRTOS (still generated in default task as temporary patch) 
  --]
-  [#if void.functionName?contains("MBEDTLS") && void.genCode][#-- special comment generated here --]
+  [#if void.functionName?contains("MBEDTLS") && void.genCode && !(FREERTOS??)][#-- special comment generated here --]
     #tMX_MBEDTLS_Init();
   [/#if]
  [#else] [#-- must generate a call in all other cases --]
@@ -1003,7 +1015,11 @@ int main(void)
    #tMX_USBX_Device_Init();
    [/#if]
    [#else]
+   [#if void.functionName?contains("EXTMEM_MANAGER_APPLI")]
+  #tMX_EXTMEM_MANAGER_Init();
+   [#else]
   #t${void.functionName}();
+   [/#if]
   [/#if]
      [/#if]
    [/#if]
@@ -1080,12 +1096,16 @@ int main(void)
 [#-- BSP init --]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/bsp_common_init.tmp"/]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/bsp_common_demo_before_while.tmp"/][#list voids as void]
-    [#if FamilyName="STM32WBA"]
+    [#if FamilyName="STM32WBA" || FamilyName="STM32WB0"]
         [#if void.functionName?? && void.functionName?contains("APPE_Init")]
 [#-- BZ 114099 --]
             [#if !void.isNotGenerated && void.genCode]
 
+[#if FamilyName="STM32WBA"]
 #t/* Init code for STM32_WPAN */
+[#else]
+#t/* Init code for STM32_BLE */
+[/#if]
 #tMX_APPE_Init(NULL);
             [/#if]
         [/#if]
@@ -1563,7 +1583,56 @@ static void MX_NVIC_Init(void)
 #t* @retval None
 #t*/
             [#if halMode!=ipName&&!ipName?contains("TIM")&&!ipName?contains("CEC")][#if staticVoids?contains('MX_${instName}_${halMode}_Init')]static[/#if] void MX_${instName}_${halMode}_Init(void)[#else][#if staticVoids?contains('MX_${instName}_Init')]static[/#if] void MX_${instName}_Init(void)[/#if]
-            {     
+            {
+             [#if RESMGR_UTILITY?? && FamilyName=="STM32MP2"]
+             [#list configs as mxMcuDataModel]
+               [#assign index = 0]
+               [#assign FeatureIDUIIndex = index][#assign index += 1]
+               [#assign mx_RIF_Params = mxMcuDataModel.peripheralRIFParams]
+               [#assign RifAwarePrefix = "RIFAware_"]
+               [#assign RifAwareIPName=""]
+               [#list mx_RIF_Params.entrySet() as RIF_Params]
+            [#if (RIF_Params.key)?? && RIF_Params.key?matches("^"+RifAwarePrefix+".+")]
+            [#compress]
+            [#assign RifAwareIPName=RIF_Params.key?keep_after(RifAwarePrefix)]
+            [#assign RifAwareIPFeatures = RIF_Params.value]
+            [#assign FeatureNamesList=[]]
+            [#assign FeatureIDList=[]]
+           [/#compress]
+            [#list RifAwareIPFeatures.entrySet() as RifAwareIPFeatureList]
+            [#-- Populate FeatureNamesList --]
+            [#assign FeatureNamesList+=[RifAwareIPFeatureList.key]]
+            [#-- Populate FeatureIDList --]
+            [#assign FeatureIDList+=[(RifAwareIPFeatureList.value[FeatureIDUIIndex])?matches("[0-9]\\d{0,9}")?then("("+RifAwareIPFeatureList.value[FeatureIDUIIndex]+")","_"+RifAwareIPFeatureList.value[FeatureIDUIIndex]?substring(0, 3)+"("+RifAwareIPFeatureList.value[FeatureIDUIIndex]?substring(3)+")")]]
+            [#list FeatureNamesList as FeatureName]
+            [#assign RESMGR_IP=RifAwareIPName]
+               [#if RifAwareIPName?starts_with("HPDMA") && !RifAwareIPFeatureList.value[1]?matches("-")]
+               [#assign ParamPrefix="_CHANNEL"]
+               [#assign val= RifAwareIPFeatureList.value[0]]
+                [#if  FeatureIDList[FeatureName?index]?contains(val) && instName==RESMGR_IP ]
+                #t/*${FeatureName} */
+                #tif (ResMgr_Request(RESMGR_RESOURCE_RIF_${RESMGR_IP}, RESMGR_${RifAwareIPName?upper_case}${ParamPrefix}${FeatureIDList[FeatureName?index]}) != RESMGR_STATUS_ACCESS_OK)
+                #t{
+                #t#tError_Handler();
+                #t}
+                [/#if]
+                [/#if]
+               [#if RifAwareIPName?starts_with("PWR") && !RifAwareIPFeatureList.value[1]?matches("-")]
+                [#assign ParamPrefix="_RESOURCE"]
+                [#assign val= RifAwareIPFeatureList.value[0]]
+                [#if  FeatureIDList[FeatureName?index]?contains(val) && instName==RESMGR_IP]
+                #tif (ResMgr_Request(RESMGR_RESOURCE_RIF_${RifAwareIPName}, RESMGR_${RifAwareIPName?upper_case}${ParamPrefix}${FeatureIDList[FeatureName?index]}) != RESMGR_STATUS_ACCESS_OK) /* ${FeatureName} */
+                #t{
+                #t#tError_Handler();
+                #t}
+               [/#if]
+               [/#if]
+               [/#list]
+               [/#list]
+               [/#if]
+               [/#list]
+               [/#list]
+               [/#if]
 #n
 [#if RESMGR_UTILITY??]
     [@common.optinclude name=contextFolder+mxTmpFolder+"/resmgrutility_"+instName+".tmp"/][#-- ADD RESMGR_UTILITY Code--]
@@ -1675,8 +1744,16 @@ static void MX_NVIC_Init(void)
 #t/* ${instName}   parameter configuration*/
 [/#if]
 
-[#if instanceData.instIndex??][@common.generateConfigModelListCode configModel=instanceData inst=instName  nTab=1 index=instanceData.instIndex/][#else][@common.generateConfigModelListCode configModel=instanceData inst=instName  nTab=1 index=""/][/#if]
+[#if instanceData.instIndex??]
+[#assign instanceIndex1 = ""]
+[#if (instName?starts_with("GPDMA") || instName?starts_with("LPDMA")) && FamilyName=="STM32MP2"]
+ [#assign instanceIndex1 = ""]
+ [#else]
+ [#assign instanceIndex1 = instanceData.instIndex]
+[/#if]
+[/#if]
 
+[#if instanceData.instIndex??][@common.generateConfigModelListCode configModel=instanceData inst=instName  nTab=1 index=instanceIndex1/][#else][@common.generateConfigModelListCode configModel=instanceData inst=instName  nTab=1 index=""/][/#if]
 [#list ips as ip]
 [#if ip?contains("PDM2PCM") && instName?contains("CRC")]
 #t__HAL_CRC_DR_RESET(&h${instName?lower_case});
@@ -1717,6 +1794,7 @@ static void MX_NVIC_Init(void)
 [/#compress]
 [/#list][/#if]
 [/#list]
+
 
 [@common.optinclude name=contextFolder+mxTmpFolder+"/bdma.tmp"/][#-- ADD BDMA Code--]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/bdma1.tmp"/][#-- ADD BDMA1 Code--]
@@ -1873,7 +1951,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   * @note   This function is called  when ${timeBaseSource} interrupt took place, inside
   * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
   * a global variable "uwTick" used as application time base.
-  * @param  htim : TIM handle
+  * @param  htim TIM handle
   * @retval None
   */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)

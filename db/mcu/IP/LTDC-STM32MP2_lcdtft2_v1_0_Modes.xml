@@ -1,0 +1,1400 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V4.0" IPType="peripheral" IpGroup="Multimedia" Name="LTDC" Version="STM32MP2_lcdtft2_v1_0" 
+    xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+    ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
+    xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+    <About>LTDC: LCD-TFT controller</About>
+
+    <!-- IO context assignment is based on defined semaphores (e.g RIFSerivice)  -->
+    <RefParameter Comment="IO Semaphore Assignement" DefaultValue="true" Name="IOSemaphoreAssignement" Type="bool" Visible="false"/>
+
+    <!-- Remark: implementation is copied from lcdtft1_v1_1. Covers STM32H7 -->
+    <!-- Generic RefParameters for LTDC --> 
+    <RefParameter Name="Instance" DefaultValue="LTDC$Index" Comment="Instance" Type="" Visible="false"/>
+	
+	
+	
+    <!-- Synchronization RefParameters for LTDC -->
+    <!-- Width Synchronization RefParameters for LTDC. Default is for 640 x 480 screen. Maximum is for 800 x 600 screen -->
+    <RefParameter Comment="Horizontal Synchronization Width" DefaultValue="8" Max="4095" Min="1" Name="HSync" Type="integer" Unit="pixels" Group="Synchronization for Width">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_CMN_CortexM33NS"/>
+    </RefParameter>
+    <RefParameter Comment="Horizontal Back Porch" DefaultValue="7" Max="4095" Min="0" Name="HBP" Type="integer" Unit="pixels" Group="Synchronization for Width">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_CMN_CortexM33NS"/>
+    </RefParameter>
+    <RefParameter Comment="Active Width" DefaultValue="640" Max="1024" Min="0" Name="ActiveW" Type="integer" Unit="pixels" Group="Synchronization for Width">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_CMN_CortexM33NS"/>
+    </RefParameter>
+    <RefParameter Comment="Horizontal Front Porch" DefaultValue="6" Max="4095" Min="0" Name="HFP" Type="integer" Unit="pixels" Group="Synchronization for Width">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_CMN_CortexM33NS"/>
+    </RefParameter>
+	
+    <!-- Calculated Values. Normally, Read Only -->
+    <RefParameter Comment="HSync Width" DefaultValue="=HSync-1" Max="4095" Name="HorizontalSync" Type="string" Group="Synchronization for Width">
+         <Condition Diagnostic="" Expression="LTDC_LTDC_CMN_CortexM33NS"/>
+        <Description> This register value is equal to (Horizontal Synchronization Width - 1)</Description>
+    </RefParameter>
+    <RefParameter Comment="Accumulated Horizontal Back Porch Width" DefaultValue="=HorizontalSync+HBP" Max="4095" Name="AccumulatedHBP" Type="string" Group="Synchronization for Width">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_CMN_CortexM33NS"/>
+        <Description> This register value is equal to the (Horizontal Synchronization Width + Horizontal Back Porch - 1)</Description>
+    </RefParameter>
+	
+    <RefParameter Comment="Accumulated Active Width" DefaultValue="=AccumulatedHBP+ActiveW" Max="4095" Name="AccumulatedActiveW" Type="string" Group="Synchronization for Width">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_CMN_CortexM33NS"/>
+        <Description> This register value is equal to (Horizontal Synchronization Width + Horizontal Back Porch + Active Width - 1)  </Description>
+    </RefParameter>
+    <RefParameter Comment="Total Width" DefaultValue="=AccumulatedActiveW+HFP" Max="4095" Name="TotalWidth" Type="string" Group="Synchronization for Width">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_CMN_CortexM33NS"/>
+        <Description> This register value is equal to (Horizontal Synchronization Width + Horizontal Back Porch + Active Width + Horizontal Front Porch - 1) </Description>
+    </RefParameter>
+	
+    <!-- Height Synchronization RefParameters for LTDC -->
+    <RefParameter Comment="Vertical Synchronization Height" DefaultValue="4" Max="2047" Min="1" Name="VSync" Type="integer" Unit="lines" Group="Synchronization for Height">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_CMN_CortexM33NS"/>
+    </RefParameter>
+    <RefParameter Comment="Vertical Back Porch" DefaultValue="2" Max="2047" Min="0" Name="VBP" Type="integer" Unit="lines" Group="Synchronization for Height">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_CMN_CortexM33NS"/>
+    </RefParameter>
+    <RefParameter Comment="Active Height" DefaultValue="480" Max="768" Min="0" Name="ActiveH" Type="integer" Unit="lines" Group="Synchronization for Height">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_CMN_CortexM33NS"/>
+    </RefParameter>
+    <RefParameter Comment="Vertical Front Porch" DefaultValue="2" Max="2047" Min="0" Name="VFP" Type="integer" Unit="lines" Group="Synchronization for Height">
+	  <Condition Diagnostic="" Expression="LTDC_LTDC_CMN_CortexM33NS"/>
+    </RefParameter>
+    <!-- Calculated Values. Normally, Read Only -->
+    <RefParameter Comment="VSync Height" DefaultValue="=VSync-1" Max="2047" Name="VerticalSync" Type="string" Group="Synchronization for Height">
+       <Condition Diagnostic="" Expression="LTDC_LTDC_CMN_CortexM33NS"/>
+        <Description> This register value is equal to (Vertical Synchronization Height - 1)  </Description>
+    </RefParameter>
+    <RefParameter Comment="Accumulated Vertical Back Porch Height" DefaultValue="=VerticalSync+VBP" Max="2047" Name="AccumulatedVBP" Type="string" Group="Synchronization for Height">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_CMN_CortexM33NS"/>
+        <Description> This register value is equal to the (Vertical Synchronization Height + Vertical Back Porch - 1) </Description>
+    </RefParameter>
+    <RefParameter Comment="Accumulated Active Height" DefaultValue="=AccumulatedVBP+ActiveH" Max="2047" Name="AccumulatedActiveH" Type="string" Group="Synchronization for Height">
+         <Condition Diagnostic="" Expression="LTDC_LTDC_CMN_CortexM33NS"/>
+        <Description> This register value is equal to the (Vertical Synchronization Height + Vertical Back Porch + Active Height - 1) </Description>
+    </RefParameter>
+    <RefParameter Comment="Total Height" DefaultValue="=AccumulatedActiveH+VFP" Max="2047" Name="TotalHeigh" Type="string" Group="Synchronization for Height">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_CMN_CortexM33NS"/>
+        <Description> This register value is equal to the (Vertical Synchronization Height + Vertical Back Porch + Active Height + Vertical Front Porch - 1) </Description>
+    </RefParameter>
+
+
+    <!-- Polarity RefParameters for LTDC -->
+    <RefParameter Comment="Horizontal Synchronization Polarity" DefaultValue="LTDC_HSPOLARITY_AL" Name="HSPolarity" Type="list" Group="Signal Polarity">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_CMN_CortexM33NS"/>
+        <PossibleValue Comment="Active Low" Value="LTDC_HSPOLARITY_AL"/>
+        <PossibleValue Comment="Active High" Value="LTDC_HSPOLARITY_AH"/>
+    </RefParameter>
+	
+    <RefParameter Comment="Vertical Synchronization Polarity" DefaultValue="LTDC_VSPOLARITY_AL" Name="VSPolarity" Type="list" Group="Signal Polarity">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_CMN_CortexM33NS"/>
+        <PossibleValue Comment="Active Low" Value="LTDC_VSPOLARITY_AL"/>
+        <PossibleValue Comment="Active High" Value="LTDC_VSPOLARITY_AH"/>
+    </RefParameter>
+	
+    <RefParameter Comment="Data Enable Polarity" DefaultValue="LTDC_DEPOLARITY_AL" Name="DEPolarity" Type="list" Group="Signal Polarity">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_CMN_CortexM33NS"/>
+        <PossibleValue Comment="Active Low" Value="LTDC_DEPOLARITY_AL"/>
+        <!-- add the condition: if DSI is used, then (Action=) remove the value from the list -->
+        <PossibleValue Comment="Active High" Value="LTDC_DEPOLARITY_AH" Condition="DSIUsed_ForRCC" Action="Remove" />
+    </RefParameter>
+	
+    <RefParameter Comment="Pixel Clock Polarity" DefaultValue="LTDC_PCPOLARITY_IPC" Name="PCPolarity" Type="list" Group="Signal Polarity">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_CMN_CortexM33NS"/>
+        <PossibleValue Comment="Normal Input" Value="LTDC_PCPOLARITY_IPC"/>
+        <PossibleValue Comment="Inverted Input" Value="LTDC_PCPOLARITY_IIPC"/>
+    </RefParameter>
+	
+	
+    <!-- Layer Default Color RefParameters for LTDC -->
+    <RefParameter Comment="Red" DefaultValue="0" Max="255" Min="0" Name="Red" Type="integer" Group="Layer Default Color">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_CMN_CortexM33NS"/>
+    </RefParameter>
+    <RefParameter Comment="Green" DefaultValue="0" Max="255" Min="0" Name="Green" Type="integer" Group="Layer Default Color">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_CMN_CortexM33NS"/>
+    </RefParameter>
+    <RefParameter Comment="Blue" DefaultValue="0" Max="255" Min="0" Name="Blue" Type="integer" Group="Layer Default Color">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_CMN_CortexM33NS"/>
+    </RefParameter>
+    <RefParameter Comment="Reserved" DefaultValue="null" Max="255" Min="0" Name="Reserved" Type="integer" Visible="false">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_CMN_CortexM33NS"/>
+    </RefParameter>
+    <!-- the single frame mode -->
+    <RefParameter Comment="The single frame mode" DefaultValue="0" Max="1" Min="0" Name="SFTrig" Type="list" Visible="true" Group="Single frame mode">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_CMN_CortexM33NS"/>
+        <Description> Configures the single frame mode </Description>
+        <PossibleValue Comment="Single frame mode not available" Value="0"/>
+        <PossibleValue Comment="Single frame mode available" Value="1"/>
+    </RefParameter>
+	<RefParameter Comment="External Trigger" DefaultValue="0" Max="1" Min="0" Name="SFExtTrig" Type="list" Visible="true" Group="Single frame mode">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_CMN_CortexM33NS"/>
+        <Description> Configures the single frame mode. External Trigger</Description>
+        <PossibleValue Comment="External trigger disabled" Value="0"/>
+        <PossibleValue Comment="External trigger enabled" Value="1"/>
+    </RefParameter>
+    <!-- External display interface -->
+    <RefParameter Comment="Chrominance order" Name="YCbCrOrder" DefaultValue="0" Type="list" Visible="true" Group="External display interface">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_CMN_CortexM33NS"/>
+        <Description> This bit defines the chrominance order (whether Cb or Cr is output first).</Description>
+        <PossibleValue Comment="Cb is output first" Value="0"/>
+        <PossibleValue Comment="Cr is output first" Value="1"/>
+    </RefParameter>
+    <RefParameter Comment="CCIR hard-wired coefficients" Name="YCbCrSel" DefaultValue="0" Type="list" Visible="true" Group="External display interface">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_CMN_CortexM33NS"/>
+        <Description> This bit selects the set of CCIR hard-wired coefficients (ITU-R BT.601 or 709).</Description>
+        <PossibleValue Comment="Use ITU-R BT.601 set" Value="0"/>
+        <PossibleValue Comment="ITU-R BT.709 set" Value="1"/>
+    </RefParameter>
+    <RefParameter Comment="Conversion to YCbCr 422 " Name="YCbCrEn" DefaultValue="0" Type="list" Visible="true" Group="External display interface">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_CMN_CortexM33NS"/>
+        <Description> Configures the output conversion to YCbCr 422.</Description>
+        <PossibleValue Comment="Conversion disabled" Value="0"/>
+        <PossibleValue Comment="Conversion enabled" Value="1"/>
+    </RefParameter>
+    <!-- Rotation -->
+    <RefParameter Comment="Rotation Enable" Name="RotEn" DefaultValue="1" Type="string" Visible="true" Group="Rotation">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_ROT_CortexM33NS"/>
+    </RefParameter>
+    <RefParameter Comment="Rotation Enable" Name="RotEn" DefaultValue="0" Type="string" Visible="false" Group="Rotation"/>
+    <RefParameter Comment="FIFO underrun at rotation interrupt enable" Name="FifoUnderThresh" DefaultValue="0" Type="list" Visible="true" Group="Rotation">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_ROT_CortexM33NS"/>
+        <Description> Configures the Fifo underrun interrupt</Description>
+        <PossibleValue Comment="FIFO underrun interrupt disabled" Value="0"/>
+        <PossibleValue Comment="FIFO underrun Interrupt enabled" Value="1"/>
+    </RefParameter>
+      <RefParameter Comment="Buffer 0 address" DefaultValue="0" Visible="true" Max="2047" Min="0" Name="Buffer0Addr" Type="integer" Group="Rotation">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_ROT_CortexM33NS"/>
+        <Description> Configures the Buffer 0 address </Description>
+     </RefParameter>
+     <RefParameter Comment="Buffer 1 address" DefaultValue="0" Visible="true" Max="2047" Min="0" Name="Buffer1Addr" Type="integer" Group="Rotation">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_ROT_CortexM33NS"/>
+        <Description> Configures the Buffer 1 address </Description>
+     </RefParameter>
+     <RefParameter Comment="Buffer pitch" DefaultValue="0" Visible="true" Max="2047" Min="0" Name="BufferPitch" Type="integer" Group="Rotation">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_ROT_CortexM33NS"/>
+       <Description> Configures the Buffer pitch </Description>
+     </RefParameter>
+     <RefParameter Comment="Red component of the rotation" DefaultValue="0" Visible="true" Max="2047" Min="0" Name="InterFrameRed" Type="integer" Group="Rotation">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_ROT_CortexM33NS"/>
+        <Description> Configures the Red component of the rotation intermediate frame color </Description>
+     </RefParameter>
+     <RefParameter Comment="Green component of the rotation" DefaultValue="0" Visible="true" Max="2047" Min="0" Name="InterFrameGreen" Type="integer" Group="Rotation">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_ROT_CortexM33NS"/>
+        <Description> Configures the Green component of the rotation intermediate frame color </Description>
+     </RefParameter>
+     <RefParameter Comment="Blue component of the rotation" DefaultValue="0" Visible="true" Max="2047" Min="0" Name="InterFrameBlue" Type="integer" Group="Rotation">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_ROT_CortexM33NS"/>
+        <Description> Configures the Blue component of the rotation intermediate frame color </Description>
+     </RefParameter>
+
+    <!-- *************** START OF LAYER SETTINGS **************** -->
+    <RefParameter Comment="Number of Layers" Name="Layers" DefaultValue="3" Type="string" Visible="true" Group="Number of Layers" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="(LTDC_LTDC_L2_CortexM33NS&amp;LTDC_LTDC_L0L1_CortexM33NS)"/>
+        <Description> Select the number of layers to configure (max of 3) </Description>
+        <PossibleValue Value="3" Comment="3 layers"/>
+    </RefParameter>
+    <RefParameter Comment="Number of Layers" Name="Layers" DefaultValue="1" Type="string" Visible="true" Group="Number of Layers" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L2_CortexM33NS"/>
+        <Description> Select the number of layers to configure (max of 3) </Description>
+        <PossibleValue Value="1" Comment="1 layer"/>
+    </RefParameter>
+    <RefParameter Comment="Number of Layers" Name="Layers" DefaultValue="2" Type="string" Visible="true" Group="Number of Layers" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description> Select the number of layers to configure (max of 3) </Description>
+        <PossibleValue Value="2" Comment="2 layers"/>
+    </RefParameter>
+	<RefParameter Comment="Number of Layers" Name="Layers" DefaultValue="0" Type="string" Visible="false" Group="Number of Layers" TabName="Layer Settings"/>
+
+    <!-- *************** START OF LAYER 0 SETTINGS **************** -->
+    <!-- Layer Default Color Layer 0 RefParameters for LTDC -->
+
+    <RefParameter Comment="LayerIdx" DefaultValue="0" Visible="false" Max="1" Min="0" Name="LayerIdx_L0" Type="integer" Group="Layer Default Color" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+	 </RefParameter>
+    <RefParameter Comment="Layer 0 - Red" DefaultValue="0" Max="255" Min="0" Name="Red_L0" Type="integer" Group="Layer Default Color" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+     </RefParameter>
+    <RefParameter Comment="Layer 0 - Green" DefaultValue="0" Max="255" Min="0" Name="Green_L0" Type="integer" Group="Layer Default Color" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+     </RefParameter>
+    <RefParameter Comment="Layer 0 - Blue" DefaultValue="0" Max="255" Min="0" Name="Blue_L0" Type="integer" Group="Layer Default Color" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+     </RefParameter>
+    <RefParameter Comment="Layer 0 - Alpha" DefaultValue="0" Max="255" Min="0" Name="Alpha0_L0" Type="integer" Group="Layer Default Color" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+     </RefParameter>
+	
+    <!-- Layer 0 Windows Position -->
+    <RefParameter Comment="Layer 0 - Window Horizontal Start" DefaultValue="0" Max="4095" Min="0" Name="WindowX0_L0" Type="integer" Group="Windows Position" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description>Configures the Window Horizontal Start Position Window X0.</Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 0 - Window Horizontal Stop" DefaultValue="0" Max="4095" Min="0" Name="WindowX1_L0" Type="integer" Group="Windows Position" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description>Configures the Window Horizontal Stop Position Window X1.</Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 0 - Window Vertical Start" DefaultValue="0" Max="2047" Min="0" Name="WindowY0_L0" Type="integer" Group="Windows Position" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description>Configures the Window vertical Start Position Window Y0.</Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 0 - Window Vertical Stop" DefaultValue="0" Max="2047" Min="0" Name="WindowY1_L0" Type="integer" Group="Windows Position"  TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description>Configures the Window vertical Stop Position Window Y1.</Description>
+    </RefParameter>
+	
+    <!-- Layer 0 Pixel Format for RGB888-->
+	
+    <RefParameter Comment="Layer 0 - Pixel Format" DefaultValue="LTDC_PIXEL_FORMAT_ARGB8888" Name="PixelFormat_L0" Type="list" Group="Pixel Parameters" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description>Specifies the pixel format.</Description>
+        <PossibleValue Comment="ARGB8888" Value="LTDC_PIXEL_FORMAT_ARGB8888"/>
+        <PossibleValue Comment="RGB888" Value="LTDC_PIXEL_FORMAT_RGB888"/>
+        <PossibleValue Comment="RGB565" Value="LTDC_PIXEL_FORMAT_RGB565"/>
+        <PossibleValue Comment="ARGB1555" Value="LTDC_PIXEL_FORMAT_ARGB1555"/>
+        <PossibleValue Comment="ARGB4444" Value="LTDC_PIXEL_FORMAT_ARGB4444"/>
+        <PossibleValue Comment="L8" Value="LTDC_PIXEL_FORMAT_L8"/>
+        <PossibleValue Comment="AL44" Value="LTDC_PIXEL_FORMAT_AL44"/>
+        <PossibleValue Comment="AL88" Value="LTDC_PIXEL_FORMAT_AL88"/>
+    </RefParameter>
+	
+    <!-- Layer 0 Pixel Format for RGB666 and RGB565-->
+	
+    <RefParameter Comment="Layer 0 - Pixel Format" DefaultValue="LTDC_PIXEL_FORMAT_RGB565" Name="PixelFormat_L0_not888" Type="list" Group="Pixel Parameters" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description>Specifies the pixel format.</Description>
+        <PossibleValue Comment="RGB565" Value="LTDC_PIXEL_FORMAT_RGB565"/>
+        <PossibleValue Comment="ARGB1555" Value="LTDC_PIXEL_FORMAT_ARGB1555"/>
+        <PossibleValue Comment="ARGB4444" Value="LTDC_PIXEL_FORMAT_ARGB4444"/>
+        <PossibleValue Comment="L8" Value="LTDC_PIXEL_FORMAT_L8"/>
+        <PossibleValue Comment="AL44" Value="LTDC_PIXEL_FORMAT_AL44"/>
+        <PossibleValue Comment="AL88" Value="LTDC_PIXEL_FORMAT_AL88"/>
+    </RefParameter>
+	
+	
+    <!-- Layer 0 Blending  -->
+	
+    <RefParameter Comment="Layer 0 - Alpha constant for blending" DefaultValue="0" Max="255" Min="0" Name="Alpha_L0" Type="integer" Group="Blending" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description>Specifies the constant alpha used for blending.</Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 0 - Blending Factor1" DefaultValue="LTDC_BLENDING_FACTOR1_CA" Name="BlendingFactor1_L0" Type="list" Group="Blending" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description>Select the blending factor 1:
+		 &lt;br&gt; LTDC_BLENDING_FACTOR1_CA: blending factor is Alpha constant 
+		 &lt;br&gt; LTDC_BLENDING_FACTOR1_PAxCA: blending factor is Alpha constant x Pixel Alpha 
+        </Description>
+        <PossibleValue Comment="Alpha constant " Value="LTDC_BLENDING_FACTOR1_CA"/>
+        <PossibleValue Comment="Alpha constant x Pixel Alpha " Value="LTDC_BLENDING_FACTOR1_PAxCA"/>
+    </RefParameter>
+    <RefParameter Comment="Layer 0 - Blending Factor2" DefaultValue="LTDC_BLENDING_FACTOR2_CA" Name="BlendingFactor2_L0" Type="list" Group="Blending" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description>Select the blending factor 2.
+		 &lt;br&gt; LTDC_BLENDING_FACTOR2_CA: blending factor is Alpha constant 
+		 &lt;br&gt; LTDC_BLENDING_FACTOR2_PAxCA: blending factor is Alpha constant x Pixel Alpha 
+        </Description>
+        <PossibleValue Comment="Alpha constant " Value="LTDC_BLENDING_FACTOR2_CA"/>
+        <PossibleValue Comment="Alpha constant x Pixel Alpha " Value="LTDC_BLENDING_FACTOR2_PAxCA"/>
+    </RefParameter>
+    <RefParameter Comment="Layer 0 - BlendingOrder" Name="BlendingOrder_L0" DefaultValue="0" Max="16" Min="0" Type="integer" Group="Blending" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description>Configures the blending order.
+         &lt;br&gt; This parameter can be one of between Min_Data = 0x00 and Max_Data = 0x0F.
+        </Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 0 - BurstLength" Name="BurstLength_L0" DefaultValue="0" Max="16" Min="0" Type="integer" Group="Blending" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description> Select the burst length.
+         &lt;br&gt; This parameter must be a number between Min_Data = 0x00 and Max_Data = 0x10.
+        </Description>
+    </RefParameter>
+    <!-- Layer 0 - Frame Buffer RefParameters for LTDC -->
+	
+    <RefParameter Comment="Layer 0 - Color Frame Buffer Start Adress" DefaultValue="0" Max="4294967295" Min="0" Name="FBStartAdress_L0" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description>Configures the color frame buffer address </Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 0 - Color Frame Buffer Line Length (Image Width)" DefaultValue="0" Max="8191" Min="0" Name="ImageWidth_L0" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description>Configures the color frame buffer line length.</Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 0 - Color Frame Buffer Number of Lines (Image Height)" DefaultValue="0" Max="2047" Min="0" Name="ImageHeight_L0" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description>Specifies the number of line in frame buffer.</Description>
+    </RefParameter>
+    <!-- LAYER 0 - Auxiliary -->
+    <RefParameter Comment="Layer 0 - Start address buffer 0" DefaultValue="0" Max="2047" Min="0" Name="StartAddressBuffer0_L0" Type="integer" Group="Auxiliary" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description>Configures the start address buffer 0 </Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 0 - Start address buffer 1" DefaultValue="0" Max="2047" Min="0" Name="StartAddressBuffer1_L0" Type="integer" Group="Auxiliary" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description>Configures the start address buffer 1 </Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 0 - Frame Buffer Pich" DefaultValue="0" Max="2047" Min="0" Name="FrameBufferPich_L0" Type="integer" Group="Auxiliary" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description>Configures the frame buffer pich in bytes.</Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 0 - Frame Buffer Line Length" DefaultValue="0" Max="2047" Min="0" Name="FrameBufferLineLength_L0" Type="integer" Group="Auxiliary" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description>Configures the frame buffer line length.</Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 0 - Buffer Line Number" DefaultValue="0" Max="2047" Min="0" Name="BufferLineNumber_L0" Type="integer" Group="Auxiliary" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description>Configures the buffer line number.</Description>
+    </RefParameter>
+	<!-- LAYER 0 - Scaler -->
+	<RefParameter Comment="Layer 0 - Horizontal input size" DefaultValue="0" Max="2047" Min="0" Name="HorInputSize_L0" Type="integer" Group="Scaler" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description>Configures the horizontal input size</Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 0 - Vertical input size" DefaultValue="0" Max="2047" Min="0" Name="VerInputSize_L0" Type="integer" Group="Scaler" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description>Configures the vertical input size</Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 0 - Horizontal output size" DefaultValue="0" Max="2047" Min="0" Name="HorOutputSize_L0" Type="integer" Group="Scaler" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description>Configures the horizontal output size</Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 0 - Vertical output size" DefaultValue="0" Max="2047" Min="0" Name="VerOutputSize_L0" Type="integer" Group="Scaler" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description>Configures the vertical output size</Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 0 - Enable" DefaultValue="1" Name="Enable_L0" Type="list" Group="Scaler" TabName="Layer Settings"  Visible="false">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description>Enabling the Scaler</Description>
+    </RefParameter>
+    <!-- *************** END OF LAYER 0 SETTINGS *************** -->
+    
+    <!-- *************** START OF LAYER 1 SETTINGS *************** -->
+    <!-- Layer Default Color Layer 1 RefParameters for LTDC -->
+	
+    <RefParameter Comment="Layer 1 - LayerIdx" DefaultValue="1" Visible="false" Max="1" Min="0" Name="LayerIdx_L1" Type="integer" Group="Layer Default Color" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+    </RefParameter>
+    <RefParameter Comment="Layer 1 - Red" DefaultValue="0" Max="255" Min="0" Name="Red_L1" Type="integer" Group="Layer Default Color" TabName="Layer Settings">
+        <Condition Expression="LTDC_LTDC_L0L1_CortexM33NS" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Comment="Layer 1 - Green" DefaultValue="0" Max="255" Min="0" Name="Green_L1" Type="integer" Group="Layer Default Color" TabName="Layer Settings">
+        <Condition Expression="LTDC_LTDC_L0L1_CortexM33NS" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Comment="Layer 1 - Blue" DefaultValue="0" Max="255" Min="0" Name="Blue_L1" Type="integer" Group="Layer Default Color" TabName="Layer Settings">
+        <Condition Expression="LTDC_LTDC_L0L1_CortexM33NS" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Comment="Layer 1 - Alpha" DefaultValue="0" Max="255" Min="0" Name="Alpha0_L1" Type="integer" Group="Layer Default Color" TabName="Layer Settings">
+        <Condition Expression="LTDC_LTDC_L0L1_CortexM33NS" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Comment="Layer 1 - Alpha" Visible="false" DefaultValue="0" Max="255" Min="0" Name="Alpha0_L1" Type="integer" Group="Layer Default Color" TabName="Layer Settings">
+        <Condition Expression="LTDC_LTDC_L0L1_CortexM33NS" Diagnostic=""/>
+    </RefParameter>	
+    <!-- Layer 1 Windows Position -->
+    <RefParameter Comment="Layer 1 - Window Horizontal Start" DefaultValue="0" Max="4095" Min="0" Name="WindowX0_L1" Type="integer" Group="Windows Position" TabName="Layer Settings">
+        <Description>Configures the Window Horizontal Start Position Window X0.</Description>
+        <Condition Expression="LTDC_LTDC_L0L1_CortexM33NS" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Comment="Layer 1 - Window Horizontal Stop" DefaultValue="0" Max="4095" Min="0" Name="WindowX1_L1" Type="integer" Group="Windows Position" TabName="Layer Settings">
+        <Description>Configures the Window Horizontal Stop Position Window X1.</Description>
+        <Condition Expression="LTDC_LTDC_L0L1_CortexM33NS" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Comment="Layer 1 - Window Vertical Start" DefaultValue="0" Max="2047" Min="0" Name="WindowY0_L1" Type="integer" Group="Windows Position" TabName="Layer Settings">
+        <Description>Configures the Window vertical Start Position Window Y0.</Description>
+        <Condition Expression="LTDC_LTDC_L0L1_CortexM33NS" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Comment="Layer 1 - Window Vertical Stop" DefaultValue="0" Max="2047" Min="0" Name="WindowY1_L1" Type="integer" Group="Windows Position"  TabName="Layer Settings">
+        <Description>Configures the Window vertical Stop Position Window Y1.</Description>
+        <Condition Expression="LTDC_LTDC_L0L1_CortexM33NS" Diagnostic=""/>
+    </RefParameter>
+	
+    <!-- Layer 1 Pixel Format for RGB888 -->
+	
+    <RefParameter Comment="Layer 1 - Pixel Format" DefaultValue="LTDC_PIXEL_FORMAT_ARGB8888" Name="PixelFormat_L1" Type="list" Group="Pixel Parameters" TabName="Layer Settings">
+        <Description>Specifies the pixel format.</Description>
+        <Condition Expression="LTDC_LTDC_L0L1_CortexM33NS" Diagnostic=""/>
+        <PossibleValue Comment="ARGB8888" Value="LTDC_PIXEL_FORMAT_ARGB8888"/>
+        <PossibleValue Comment="RGB888" Value="LTDC_PIXEL_FORMAT_RGB888"/>
+        <PossibleValue Comment="RGB565" Value="LTDC_PIXEL_FORMAT_RGB565"/>
+        <PossibleValue Comment="ARGB1555" Value="LTDC_PIXEL_FORMAT_ARGB1555"/>
+        <PossibleValue Comment="ARGB4444" Value="LTDC_PIXEL_FORMAT_ARGB4444"/>
+        <PossibleValue Comment="L8" Value="LTDC_PIXEL_FORMAT_L8"/>
+        <PossibleValue Comment="AL44" Value="LTDC_PIXEL_FORMAT_AL44"/>
+        <PossibleValue Comment="AL88" Value="LTDC_PIXEL_FORMAT_AL88"/>
+    </RefParameter>
+	
+    <!-- Layer 1 Pixel Format for RGB666 and RGB565 -->
+	
+    <RefParameter Comment="Layer 1 - Pixel Format" DefaultValue="LTDC_PIXEL_FORMAT_RGB565" Name="PixelFormat_L1_not888" Type="list" Group="Pixel Parameters" TabName="Layer Settings">
+        <Description>Specifies the pixel format.</Description>
+        <Condition Expression="LTDC_LTDC_L0L1_CortexM33NS" Diagnostic=""/>
+        <PossibleValue Comment="RGB565" Value="LTDC_PIXEL_FORMAT_RGB565"/>
+        <PossibleValue Comment="ARGB1555" Value="LTDC_PIXEL_FORMAT_ARGB1555"/>
+        <PossibleValue Comment="ARGB4444" Value="LTDC_PIXEL_FORMAT_ARGB4444"/>
+        <PossibleValue Comment="L8" Value="LTDC_PIXEL_FORMAT_L8"/>
+        <PossibleValue Comment="AL44" Value="LTDC_PIXEL_FORMAT_AL44"/>
+        <PossibleValue Comment="AL88" Value="LTDC_PIXEL_FORMAT_AL88"/>
+    </RefParameter>
+	
+    <!-- Layer 1 Blending  -->
+	
+    <RefParameter Comment="Layer 1 - Alpha constant for blending" DefaultValue="0" Max="255" Min="0" Name="Alpha_L1" Type="integer" Group="Blending" TabName="Layer Settings">
+        <Description>Specifies the constant alpha used for blending.</Description>
+        <Condition Expression="LTDC_LTDC_L0L1_CortexM33NS" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Comment="Layer 1 - Blending Factor1" DefaultValue="LTDC_BLENDING_FACTOR1_CA" Name="BlendingFactor1_L1" Type="list" Group="Blending" TabName="Layer Settings">
+        <Description>Select the blending factor 1:
+			&lt;br&gt; LTDC_BLENDING_FACTOR1_CA: blending factor is Alpha constant 
+			&lt;br&gt; LTDC_BLENDING_FACTOR1_PAxCA: blending factor is Alpha constant x Pixel Alpha 
+        </Description>
+        <Condition Expression="LTDC_LTDC_L0L1_CortexM33NS" Diagnostic=""/>
+        <PossibleValue Comment="Alpha constant " Value="LTDC_BLENDING_FACTOR1_CA"/>
+        <PossibleValue Comment="Alpha constant x Pixel Alpha " Value="LTDC_BLENDING_FACTOR1_PAxCA"/>
+    </RefParameter>
+    <RefParameter Comment="Layer 1 - Blending Factor2" DefaultValue="LTDC_BLENDING_FACTOR2_CA" Name="BlendingFactor2_L1" Type="list" Group="Blending" TabName="Layer Settings">
+        <Description>Select the blending factor 2.
+			&lt;br&gt; LTDC_BLENDING_FACTOR2_CA: blending factor is Alpha constant 
+			&lt;br&gt; LTDC_BLENDING_FACTOR2_PAxCA: blending factor is Alpha constant x Pixel Alpha 
+        </Description>
+        <Condition Expression="LTDC_LTDC_L0L1_CortexM33NS" Diagnostic=""/>
+        <PossibleValue Comment="Alpha constant " Value="LTDC_BLENDING_FACTOR2_CA"/>
+        <PossibleValue Comment="Alpha constant x Pixel Alpha " Value="LTDC_BLENDING_FACTOR2_PAxCA"/>
+    </RefParameter>
+    <RefParameter Comment="Layer 1 - BlendingOrder" Name="BlendingOrder_L1" DefaultValue="0" Max="16" Min="0" Type="integer" Group="Blending" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description>Configures the blending order.
+         &lt;br&gt; This parameter can be one of between Min_Data = 0x00 and Max_Data = 0x0F.
+        </Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 1 - BurstLength" Name="BurstLength_L1" DefaultValue="0" Max="16" Min="0" Type="integer" Group="Blending" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description> Select the burst length.
+         &lt;br&gt; This parameter must be a number between Min_Data = 0x00 and Max_Data = 0x10.
+        </Description>
+    </RefParameter>
+	
+    <!-- Layer 1 - Frame Buffer RefParameters for LTDC -->
+	
+    <RefParameter Comment="Layer 1 - Color Frame Buffer Start Adress" DefaultValue="0" Max="4294967295" Min="0" Name="FBStartAdress_L1" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
+        <Description>Configures the color frame buffer address </Description>
+        <Condition Expression="LTDC_LTDC_L0L1_CortexM33NS" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Comment="Layer 1 - Color Frame Buffer Line Length (Image Width)" DefaultValue="0" Max="8191" Min="0" Name="ImageWidth_L1" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
+        <Description>Configures the color frame buffer line length.</Description>
+        <Condition Expression="LTDC_LTDC_L0L1_CortexM33NS" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Comment="Layer 1 - Color Frame Buffer Number of Lines (Image Height)" DefaultValue="0" Max="2047" Min="0" Name="ImageHeight_L1" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
+        <Description>Specifies the number of line in frame buffer.</Description>
+        <Condition Expression="LTDC_LTDC_L0L1_CortexM33NS" Diagnostic=""/>
+    </RefParameter>
+
+    <RefParameter Comment="Layer 1 - Start address buffer 0" DefaultValue="0" Max="2047" Min="0" Name="StartAddressBuffer0_L1" Type="integer" Group="Auxiliary" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description>Configures the start address buffer 0 </Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 1 - Start address buffer 1" DefaultValue="0" Max="2047" Min="0" Name="StartAddressBuffer1_L1" Type="integer" Group="Auxiliary" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description>Configures the start address buffer 1 </Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 1 - Frame Buffer Pich" DefaultValue="0" Max="2047" Min="0" Name="FrameBufferPich_L1" Type="integer" Group="Auxiliary" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description>Configures the frame buffer pich in bytes.</Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 1 - Frame Buffer Line Length" DefaultValue="0" Max="2047" Min="0" Name="FrameBufferLineLength_L1" Type="integer" Group="Auxiliary" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description>Configures the frame buffer line length.</Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 1 - Buffer Line Number" DefaultValue="0" Max="2047" Min="0" Name="BufferLineNumber_L1" Type="integer" Group="Auxiliary" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description>Configures buffer line number.</Description>
+    </RefParameter>
+    <!-- LAYER 1 - Scaler -->
+    <RefParameter Comment="Layer 1 - Horizontal input size" DefaultValue="0" Max="2047" Min="0" Name="HorInputSize_L1" Type="integer" Group="Scaler" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description>Configures the horizontal input size</Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 1 - Vertical input size" DefaultValue="0" Max="2047" Min="0" Name="VerInputSize_L1" Type="integer" Group="Scaler" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description>Configures the vertical input size</Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 1 - Horizontal output size" DefaultValue="0" Max="2047" Min="0" Name="HorOutputSize_L1" Type="integer" Group="Scaler" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description>Configures the horizontal output size</Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 1 - Vertical output size" DefaultValue="0" Max="2047" Min="0" Name="VerOutputSize_L1" Type="integer" Group="Scaler" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description>Configures the vertical output size</Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 1 - Enabling" DefaultValue="1" Name="Enable_L1" Type="list" Group="Scaler" TabName="Layer Settings"  Visible="false">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L0L1_CortexM33NS"/>
+        <Description>Enabling the Scaler</Description>
+    </RefParameter>
+	
+    <!-- ***************  END OF LAYER 1 SETTINGS *************** -->
+    
+    <!-- *************** START OF LAYER 2 SETTINGS **************** -->
+    <!-- Layer Default Color Layer 2 RefParameters for LTDC -->
+    
+    <RefParameter Comment="LayerIdx" DefaultValue="2" Visible="false" Max="1" Min="0" Name="LayerIdx_L2" Type="integer" Group="Layer Default Color" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L2_CortexM33NS"/>
+     </RefParameter>
+    <RefParameter Comment="Layer 2 - Red" DefaultValue="0" Max="255" Min="0" Name="Red_L2" Type="integer" Group="Layer Default Color" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L2_CortexM33NS"/>
+     </RefParameter>
+    <RefParameter Comment="Layer 2 - Green" DefaultValue="0" Max="255" Min="0" Name="Green_L2" Type="integer" Group="Layer Default Color" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L2_CortexM33NS"/>
+     </RefParameter>
+    <RefParameter Comment="Layer 2 - Blue" DefaultValue="0" Max="255" Min="0" Name="Blue_L2" Type="integer" Group="Layer Default Color" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L2_CortexM33NS"/>
+     </RefParameter>
+    <RefParameter Comment="Layer 2 - Alpha" DefaultValue="0" Max="255" Min="0" Name="Alpha0_L2" Type="integer" Group="Layer Default Color" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L2_CortexM33NS"/>
+     </RefParameter>
+    
+    <!-- Layer 2 Windows Position -->
+    <RefParameter Comment="Layer 2 - Window Horizontal Start" DefaultValue="0" Max="4095" Min="0" Name="WindowX0_L2" Type="integer" Group="Windows Position" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L2_CortexM33NS"/>
+        <Description>Configures the Window Horizontal Start Position Window X0.</Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 2 - Window Horizontal Stop" DefaultValue="0" Max="4095" Min="0" Name="WindowX1_L2" Type="integer" Group="Windows Position" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L2_CortexM33NS"/>
+        <Description>Configures the Window Horizontal Stop Position Window X1.</Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 2 - Window Vertical Start" DefaultValue="0" Max="2047" Min="0" Name="WindowY0_L2" Type="integer" Group="Windows Position" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L2_CortexM33NS"/>
+        <Description>Configures the Window vertical Start Position Window Y0.</Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 2 - Window Vertical Stop" DefaultValue="0" Max="2047" Min="0" Name="WindowY1_L2" Type="integer" Group="Windows Position"  TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L2_CortexM33NS"/>
+        <Description>Configures the Window vertical Stop Position Window Y1.</Description>
+    </RefParameter>
+    
+    <!-- Layer 0 Pixel Format for RGB888-->
+    
+    <RefParameter Comment="Layer 2 - Pixel Format" DefaultValue="LTDC_PIXEL_FORMAT_ARGB8888" Name="PixelFormat_L2" Type="list" Group="Pixel Parameters" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L2_CortexM33NS"/>
+        <Description>Specifies the pixel format.</Description>
+        <PossibleValue Comment="ARGB8888" Value="LTDC_PIXEL_FORMAT_ARGB8888"/>
+        <PossibleValue Comment="RGB888" Value="LTDC_PIXEL_FORMAT_RGB888"/>
+        <PossibleValue Comment="RGB565" Value="LTDC_PIXEL_FORMAT_RGB565"/>
+        <PossibleValue Comment="ARGB1555" Value="LTDC_PIXEL_FORMAT_ARGB1555"/>
+        <PossibleValue Comment="ARGB4444" Value="LTDC_PIXEL_FORMAT_ARGB4444"/>
+        <PossibleValue Comment="L8" Value="LTDC_PIXEL_FORMAT_L8"/>
+        <PossibleValue Comment="AL44" Value="LTDC_PIXEL_FORMAT_AL44"/>
+        <PossibleValue Comment="AL88" Value="LTDC_PIXEL_FORMAT_AL88"/>
+    </RefParameter>
+    
+    <!-- Layer 0 Pixel Format for RGB666 and RGB565-->
+    
+    <RefParameter Comment="Layer 2 - Pixel Format" DefaultValue="LTDC_PIXEL_FORMAT_RGB565" Name="PixelFormat_L2_not888" Type="list" Group="Pixel Parameters" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L2_CortexM33NS"/>
+        <Description>Specifies the pixel format.</Description>
+        <PossibleValue Comment="RGB565" Value="LTDC_PIXEL_FORMAT_RGB565"/>
+        <PossibleValue Comment="ARGB1555" Value="LTDC_PIXEL_FORMAT_ARGB1555"/>
+        <PossibleValue Comment="ARGB4444" Value="LTDC_PIXEL_FORMAT_ARGB4444"/>
+        <PossibleValue Comment="L8" Value="LTDC_PIXEL_FORMAT_L8"/>
+        <PossibleValue Comment="AL44" Value="LTDC_PIXEL_FORMAT_AL44"/>
+        <PossibleValue Comment="AL88" Value="LTDC_PIXEL_FORMAT_AL88"/>
+    </RefParameter>
+    
+    
+    <!-- Layer 2 Blending  -->
+    
+    <RefParameter Comment="Layer 2 - Alpha constant for blending" DefaultValue="0" Max="255" Min="0" Name="Alpha_L2" Type="integer" Group="Blending" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L2_CortexM33NS"/>
+        <Description>Specifies the constant alpha used for blending.</Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 2 - Blending Factor1" DefaultValue="LTDC_BLENDING_FACTOR1_CA" Name="BlendingFactor1_L2" Type="list" Group="Blending" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L2_CortexM33NS"/>
+        <Description>Select the blending factor 1:
+         &lt;br&gt; LTDC_BLENDING_FACTOR1_CA: blending factor is Alpha constant 
+         &lt;br&gt; LTDC_BLENDING_FACTOR1_PAxCA: blending factor is Alpha constant x Pixel Alpha 
+        </Description>
+        <PossibleValue Comment="Alpha constant " Value="LTDC_BLENDING_FACTOR1_CA"/>
+        <PossibleValue Comment="Alpha constant x Pixel Alpha " Value="LTDC_BLENDING_FACTOR1_PAxCA"/>
+    </RefParameter>
+    <RefParameter Comment="Layer 2 - Blending Factor2" DefaultValue="LTDC_BLENDING_FACTOR2_CA" Name="BlendingFactor2_L2" Type="list" Group="Blending" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L2_CortexM33NS"/>
+        <Description>Select the blending factor 2.
+         &lt;br&gt; LTDC_BLENDING_FACTOR2_CA: blending factor is Alpha constant 
+         &lt;br&gt; LTDC_BLENDING_FACTOR2_PAxCA: blending factor is Alpha constant x Pixel Alpha 
+        </Description>
+        <PossibleValue Comment="Alpha constant " Value="LTDC_BLENDING_FACTOR2_CA"/>
+        <PossibleValue Comment="Alpha constant x Pixel Alpha " Value="LTDC_BLENDING_FACTOR2_PAxCA"/>
+    </RefParameter>
+    <RefParameter Comment="Layer 2 - BlendingOrder" Name="BlendingOrder_L2" DefaultValue="0" Max="16" Min="0" Type="integer" Group="Blending" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L2_CortexM33NS"/>
+        <Description>Configures the blending order.
+         &lt;br&gt; This parameter can be one of between Min_Data = 0x00 and Max_Data = 0x0F.
+        </Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 2 - BurstLength" Name="BurstLength_L2" DefaultValue="0" Max="16" Min="0" Type="integer" Group="Blending" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L2_CortexM33NS"/>
+        <Description> Select the burst length.
+         &lt;br&gt; This parameter must be a number between Min_Data = 0x00 and Max_Data = 0x10.
+        </Description>
+    </RefParameter>
+    
+    <!-- Layer 2 - Frame Buffer RefParameters for LTDC -->
+    
+    <RefParameter Comment="Layer 2 - Color Frame Buffer Start Adress" DefaultValue="0" Max="4294967295" Min="0" Name="FBStartAdress_L2" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L2_CortexM33NS"/>
+        <Description>Configures the color frame buffer address </Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 2 - Color Frame Buffer Line Length (Image Width)" DefaultValue="0" Max="8191" Min="0" Name="ImageWidth_L2" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L2_CortexM33NS"/>
+        <Description>Configures the color frame buffer line length.</Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 2 - Color Frame Buffer Number of Lines (Image Height)" DefaultValue="0" Max="2047" Min="0" Name="ImageHeight_L2" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L2_CortexM33NS"/>
+        <Description>Specifies the number of line in frame buffer.</Description>
+    </RefParameter>
+    
+    <RefParameter Comment="Layer 2 - Start address buffer 0" DefaultValue="0" Max="2047" Min="0" Name="StartAddressBuffer0_L2" Type="integer" Group="Auxiliary" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L2_CortexM33NS"/>
+        <Description>Configures the start address buffer 0 </Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 2 - Start address buffer 1" DefaultValue="0" Max="2047" Min="0" Name="StartAddressBuffer1_L2" Type="integer" Group="Auxiliary" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L2_CortexM33NS"/>
+        <Description>Configures the start address buffer 1 </Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 2 - Frame Buffer Pich" DefaultValue="0" Max="2047" Min="0" Name="FrameBufferPich_L2" Type="integer" Group="Auxiliary" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L2_CortexM33NS"/>
+        <Description>Configures the frame buffer pich in bytes.</Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 2 - Frame Buffer Line Length" DefaultValue="0" Max="2047" Min="0" Name="FrameBufferLineLength_L2" Type="integer" Group="Auxiliary" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L2_CortexM33NS"/>
+        <Description>Configures the frame buffer line length.</Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 2 - Buffer Line Number" DefaultValue="0" Max="2047" Min="0" Name="BufferLineNumber_L2" Type="integer" Group="Auxiliary" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L2_CortexM33NS"/>
+        <Description>Configures buffer line number.</Description>
+    </RefParameter>
+    <!-- LAYER 2 - Scaler -->
+    <RefParameter Comment="Layer 2 - Horizontal input size" DefaultValue="0" Max="2047" Min="0" Name="HorInputSize_L2" Type="integer" Group="Scaler" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L2_CortexM33NS"/>
+        <Description>Configures the horizontal input size</Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 2 - Vertical input size" DefaultValue="0" Max="2047" Min="0" Name="VerInputSize_L2" Type="integer" Group="Scaler" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L2_CortexM33NS"/>
+        <Description>Configures the vertical input size</Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 2 - Horizontal output size" DefaultValue="0" Max="2047" Min="0" Name="HorOutputSize_L2" Type="integer" Group="Scaler" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L2_CortexM33NS"/>
+        <Description>Configures the horizontal output size</Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 2 - Vertical output size" DefaultValue="0" Max="2047" Min="0" Name="VerOutputSize_L2" Type="integer" Group="Scaler" TabName="Layer Settings">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L2_CortexM33NS"/>
+        <Description>Configures the vertical output size</Description>
+    </RefParameter>
+    <RefParameter Comment="Layer 2 - Enabling" DefaultValue="1" Name="Enable_L2" Type="list" Group="Scaler" TabName="Layer Settings"  Visible="false">
+        <Condition Diagnostic="" Expression="LTDC_LTDC_L2_CortexM33NS"/>
+        <Description>Enabling the Scaler</Description>
+    </RefParameter>
+    
+    <!-- *************** END OF LAYER 2 SETTINGS *************** -->
+    <!-- RefModes 'RGB888' for LTDC -->
+    <RefMode Name="RGB888">
+        <ConfigForMode>Ltdc_Init</ConfigForMode>
+        <ConfigForMode>LTDC_ConfigLayer0</ConfigForMode>
+        <ConfigForMode>LTDC_ConfigLayer1</ConfigForMode>
+		<ConfigForMode>LTDC_ConfigLayer2</ConfigForMode>
+        <!-- Width Synchronization RefParameters for LTDC -->
+        <Parameter Name="HSync"/>
+        <Parameter Name="HBP"/>
+              <!-- WARNING : ActiveW parameter is also used by X-CUBE-TOUCHGFX -->
+        <Parameter Name="ActiveW"/>
+        <Parameter Name="HFP"/>
+        <Parameter Name="HorizontalSync"/>
+        <Parameter Name="AccumulatedHBP"/>
+        <Parameter Name="AccumulatedActiveW"/>
+        <Parameter Name="TotalWidth"/>
+		
+        <!-- Height Synchronization RefParameters for LTDC -->
+        <Parameter Name="VSync"/>
+        <Parameter Name="VBP"/>
+        <Parameter Name="ActiveH"/>
+        <Parameter Name="VFP"/>
+        <Parameter Name="VerticalSync"/>
+        <Parameter Name="AccumulatedVBP"/>
+        <Parameter Name="AccumulatedActiveH"/>
+        <Parameter Name="TotalHeigh"/>
+		
+        <!-- Polarity RefParameter -->
+        <Parameter Name="HSPolarity"/>
+        <Parameter Name="VSPolarity"/>
+        <Parameter Name="DEPolarity"/>
+        <Parameter Name="PCPolarity"/>
+		
+        <!-- Layer Default Color RefParameters -->
+        <Parameter Name="Red"/>
+        <Parameter Name="Green"/>
+        <Parameter Name="Blue"/>
+        <!-- the single frame mode -->
+		<Parameter Name="SFTrig"/>
+		<Parameter Name="SFExtTrig"/>
+		<!--External display interface-->
+        <Parameter Name="YCbCrOrder"/>
+        <Parameter Name="YCbCrSel"/>
+        <Parameter Name="YCbCrEn"/>
+		<!-- Rotation -->
+		<Parameter Name="RotEn"/>
+		<Parameter Name="FifoUnderThresh"/>
+		<Parameter Name="Buffer0Addr"/>
+		<Parameter Name="Buffer1Addr"/>
+		<Parameter Name="BufferPitch"/>
+		<Parameter Name="InterFrameRed"/>
+		<Parameter Name="InterFrameGreen"/>
+		<Parameter Name="InterFrameBlue"/>
+        <!-- LTDC Layer settings start here -->
+        <Parameter Name="Layers"/>
+        <!-- LTDC L0 (Background) parameters -->
+        <Parameter Name="LayerIdx_L0" />
+		
+        <Parameter Name="WindowX0_L0" />
+        <Parameter Name="WindowX1_L0" />
+        <Parameter Name="WindowY0_L0" />
+        <Parameter Name="WindowY1_L0" />
+		
+        <Parameter Name="PixelFormat_L0" />
+		
+        <Parameter Name="Alpha_L0" />
+        <Parameter Name="Alpha0_L0" />
+        <Parameter Name="BlendingFactor1_L0" />
+        <Parameter Name="BlendingFactor2_L0" />
+        <Parameter Name="BlendingOrder_L0" />
+		<Parameter Name="BurstLength_L0" />
+		
+        <Parameter Name="FBStartAdress_L0" />
+        <Parameter Name="ImageWidth_L0" />
+        <Parameter Name="ImageHeight_L0" />
+        <Parameter Name="StartAddressBuffer0_L0" />
+        <Parameter Name="StartAddressBuffer1_L0" />
+        <Parameter Name="FrameBufferPich_L0" />
+        <Parameter Name="FrameBufferLineLength_L0" />
+        <Parameter Name="BufferLineNumber_L0" />
+        <Parameter Name="HorInputSize_L0" />
+        <Parameter Name="VerInputSize_L0" />
+        <Parameter Name="HorOutputSize_L0" />
+        <Parameter Name="VerOutputSize_L0" />
+        <Parameter Name="Enable_L0" />
+
+        <Parameter Name="Blue_L0" />
+        <Parameter Name="Green_L0" />
+        <Parameter Name="Red_L0" />
+		
+        <!-- LTDC L1 (Foreground) parameters -->
+        <Parameter Name="LayerIdx_L1" />
+		
+        <Parameter Name="WindowX0_L1" />
+        <Parameter Name="WindowX1_L1" />
+        <Parameter Name="WindowY0_L1" />
+        <Parameter Name="WindowY1_L1" />
+		
+        <Parameter Name="PixelFormat_L1" />
+		
+        <Parameter Name="Alpha_L1" />
+        <Parameter Name="Alpha0_L1" />
+        <Parameter Name="BlendingFactor1_L1" />
+        <Parameter Name="BlendingFactor2_L1" />
+        <Parameter Name="BlendingOrder_L1" />
+        <Parameter Name="BurstLength_L1" />
+
+	    <Parameter Name="StartAddressBuffer0_L1" />
+        <Parameter Name="StartAddressBuffer1_L1" />
+        <Parameter Name="FrameBufferPich_L1" />
+        <Parameter Name="FrameBufferLineLength_L1" />
+        <Parameter Name="BufferLineNumber_L1" />
+        <Parameter Name="HorInputSize_L1" />
+        <Parameter Name="VerInputSize_L1" />
+        <Parameter Name="HorOutputSize_L1" />
+        <Parameter Name="VerOutputSize_L1" />
+        <Parameter Name="Enable_L1" />
+
+        <Parameter Name="FBStartAdress_L1" />
+        <Parameter Name="ImageWidth_L1" />
+        <Parameter Name="ImageHeight_L1" />
+		
+        <Parameter Name="Blue_L1" />
+        <Parameter Name="Green_L1" />
+        <Parameter Name="Red_L1" />
+        
+        <Parameter Name="LayerIdx_L2" />
+        
+        <Parameter Name="WindowX0_L2" />
+        <Parameter Name="WindowX1_L2" />
+        <Parameter Name="WindowY0_L2" />
+        <Parameter Name="WindowY1_L2" />
+        
+        <Parameter Name="PixelFormat_L2" />
+        
+        <Parameter Name="Alpha_L2" />
+        <Parameter Name="Alpha0_L2" />
+        <Parameter Name="BlendingFactor1_L2" />
+        <Parameter Name="BlendingFactor2_L2" />
+        <Parameter Name="BlendingOrder_L2" />
+        <Parameter Name="BurstLength_L2" />
+
+        <Parameter Name="StartAddressBuffer0_L2" />
+        <Parameter Name="StartAddressBuffer1_L2" />
+        <Parameter Name="FrameBufferPich_L2" />
+        <Parameter Name="FrameBufferLineLength_L2" />
+        <Parameter Name="BufferLineNumber_L2" />
+        <Parameter Name="HorInputSize_L2" />
+        <Parameter Name="VerInputSize_L2" />
+        <Parameter Name="HorOutputSize_L2" />
+        <Parameter Name="VerOutputSize_L2" />
+        <Parameter Name="Enable_L2" />
+
+        <Parameter Name="FBStartAdress_L2" />
+        <Parameter Name="ImageWidth_L2" />
+        <Parameter Name="ImageHeight_L2" />
+        
+        <Parameter Name="Blue_L2" />
+        <Parameter Name="Green_L2" />
+        <Parameter Name="Red_L2" />
+        
+	
+    </RefMode>
+	
+    <!-- RefModes 'RGB666' for LTDC -->
+    <RefMode Name="RGB666">
+        <ConfigForMode>Ltdc_Init</ConfigForMode>
+        <ConfigForMode>LTDC_ConfigLayer0</ConfigForMode>
+        <ConfigForMode>LTDC_ConfigLayer1</ConfigForMode>
+        <ConfigForMode>LTDC_ConfigLayer2</ConfigForMode>
+        <!-- LTDC init parameters -->
+
+        <!-- Width Synchronization RefParameters for LTDC -->
+        <Parameter Name="HSync"/>
+        <Parameter Name="HBP"/>
+        <Parameter Name="ActiveW"/>
+        <Parameter Name="HFP"/>
+        <Parameter Name="HorizontalSync"/>
+        <Parameter Name="AccumulatedHBP"/>
+        <Parameter Name="AccumulatedActiveW"/>
+        <Parameter Name="TotalWidth"/>
+		
+        <!-- Height Synchronization RefParameters for LTDC -->
+        <Parameter Name="VSync"/>
+        <Parameter Name="VBP"/>
+              <!-- WARNING : ActiveH parameter is also used by X-CUBE-TOUCHGFX -->
+        <Parameter Name="ActiveH"/>
+        <Parameter Name="VFP"/>
+        <Parameter Name="VerticalSync"/>
+        <Parameter Name="AccumulatedVBP"/>
+        <Parameter Name="AccumulatedActiveH"/>
+        <Parameter Name="TotalHeigh"/>
+		
+        <!-- Polarity RefParameter -->
+        <Parameter Name="HSPolarity"/>
+        <Parameter Name="VSPolarity"/>
+        <Parameter Name="DEPolarity"/>
+        <Parameter Name="PCPolarity"/>
+		
+        <!-- Layer Default Color RefParameters -->
+        <Parameter Name="Red"/>
+        <Parameter Name="Green"/>
+        <Parameter Name="Blue"/>
+        <!-- the single frame mode -->
+        <Parameter Name="SFTrig"/>
+        <Parameter Name="SFExtTrig"/>
+        <!--External display interface-->
+        <Parameter Name="YCbCrOrder"/>
+        <Parameter Name="YCbCrSel"/>
+        <Parameter Name="YCbCrEn"/>
+		<!-- Rotation -->
+        <Parameter Name="RotEn"/>
+        <Parameter Name="FifoUnderThresh"/>
+        <Parameter Name="Buffer0Addr"/>
+        <Parameter Name="Buffer1Addr"/>
+        <Parameter Name="BufferPitch"/>
+        <Parameter Name="InterFrameRed"/>
+        <Parameter Name="InterFrameGreen"/>
+        <Parameter Name="InterFrameBlue"/>
+        <!-- LTDC Layer settings start here -->
+        <Parameter Name="Layers"/>
+        <!-- LTDC Config L0 (Background) parameters -->
+        <Parameter Name="LayerIdx_L0" />
+		
+        <Parameter Name="WindowX0_L0" />
+        <Parameter Name="WindowX1_L0" />
+        <Parameter Name="WindowY0_L0" />
+        <Parameter Name="WindowY1_L0" />
+		
+              <!-- WARNING : PixelFormat_L0 parameter is also used by X-CUBE-TOUCHGFX -->
+        <Parameter Name="PixelFormat_L0" />
+		
+        <Parameter Name="Alpha_L0" />
+        <Parameter Name="Alpha0_L0" />
+        <Parameter Name="BlendingFactor1_L0" />
+        <Parameter Name="BlendingFactor2_L0" />
+        <Parameter Name="BlendingOrder_L0" />
+        <Parameter Name="BurstLength_L0" />
+        <Parameter Name="StartAddressBuffer0_L0" />
+        <Parameter Name="StartAddressBuffer1_L0" />
+        <Parameter Name="FrameBufferPich_L0" />
+        <Parameter Name="FrameBufferLineLength_L0" />
+        <Parameter Name="BufferLineNumber_L0" />
+        <Parameter Name="HorInputSize_L0" />
+        <Parameter Name="VerInputSize_L0" />
+        <Parameter Name="HorOutputSize_L0" />
+        <Parameter Name="VerOutputSize_L0" />
+        <Parameter Name="Enable_L0" />
+        <Parameter Name="FBStartAdress_L0" />
+        <Parameter Name="ImageWidth_L0" />
+        <Parameter Name="ImageHeight_L0" />
+		
+        <Parameter Name="Blue_L0" />
+        <Parameter Name="Green_L0" />
+        <Parameter Name="Red_L0" />
+		
+		
+        <!-- LTDC Config L1 (Foreground) parameters -->
+        <Parameter Name="LayerIdx_L1" />
+		
+        <Parameter Name="WindowX0_L1" />
+        <Parameter Name="WindowX1_L1" />
+        <Parameter Name="WindowY0_L1" />
+        <Parameter Name="WindowY1_L1" />
+        <Parameter Name="StartAddressBuffer0_L1" />
+        <Parameter Name="StartAddressBuffer1_L1" />
+        <Parameter Name="FrameBufferPich_L1" />
+        <Parameter Name="FrameBufferLineLength_L1" />
+        <Parameter Name="BufferLineNumber_L1" />
+        <Parameter Name="HorInputSize_L1" />
+        <Parameter Name="VerInputSize_L1" />
+        <Parameter Name="HorOutputSize_L1" />
+        <Parameter Name="VerOutputSize_L1" />
+        <Parameter Name="Enable_L1" />
+        <Parameter Name="PixelFormat_L1" />
+		
+        <Parameter Name="Alpha_L1" />
+        <Parameter Name="Alpha0_L1" />
+        <Parameter Name="BlendingFactor1_L1" />
+        <Parameter Name="BlendingFactor2_L1" />	
+        <Parameter Name="BlendingOrder_L1" />
+        <Parameter Name="BurstLength_L1" />
+        <Parameter Name="StartAddressBuffer0_L1" />
+        <Parameter Name="StartAddressBuffer1_L1" />
+        <Parameter Name="FrameBufferPich_L1" />
+        <Parameter Name="FrameBufferLineLength_L1" />
+        <Parameter Name="BufferLineNumber_L1" />
+        <Parameter Name="FBStartAdress_L1" />
+        <Parameter Name="ImageWidth_L1" />
+        <Parameter Name="ImageHeight_L1" />
+		
+        <Parameter Name="Blue_L1" />
+        <Parameter Name="Green_L1" />
+        <Parameter Name="Red_L1" />
+        
+		<!-- LTDC Config L2 (Foreground) parameters -->
+        <Parameter Name="LayerIdx_L2" />
+        
+        <Parameter Name="WindowX0_L2" />
+        <Parameter Name="WindowX1_L2" />
+        <Parameter Name="WindowY0_L2" />
+        <Parameter Name="WindowY1_L2" />
+        
+        <Parameter Name="PixelFormat_L2" />
+        
+        <Parameter Name="Alpha_L2" />
+        <Parameter Name="Alpha0_L2" />
+        <Parameter Name="BlendingFactor1_L2" />
+        <Parameter Name="BlendingFactor2_L2" />
+        <Parameter Name="BlendingOrder_L2" />
+        <Parameter Name="BurstLength_L2" />
+        <Parameter Name="StartAddressBuffer0_L2" />
+        <Parameter Name="StartAddressBuffer1_L2" />
+        <Parameter Name="FrameBufferPich_L2" />
+        <Parameter Name="FrameBufferLineLength_L2" />
+        <Parameter Name="BufferLineNumber_L2" />
+        <Parameter Name="HorInputSize_L2" />
+        <Parameter Name="VerInputSize_L2" />
+        <Parameter Name="HorOutputSize_L2" />
+        <Parameter Name="VerOutputSize_L2" />
+        <Parameter Name="Enable_L2" />
+        <Parameter Name="FBStartAdress_L2" />
+        <Parameter Name="ImageWidth_L2" />
+        <Parameter Name="ImageHeight_L2" />
+        
+        <Parameter Name="Blue_L2" />
+        <Parameter Name="Green_L2" />
+        <Parameter Name="Red_L2" />
+		
+    </RefMode>
+	
+    <!-- RefModes 'RGB565' for LTDC -->
+    <RefMode Name="RGB565">
+        <ConfigForMode>Ltdc_Init</ConfigForMode>
+        <!-- <ConfigForMode>LTDC_ConfigLayer0_not888</ConfigForMode>
+        <ConfigForMode>LTDC_ConfigLayer1_not888</ConfigForMode> -->
+        <ConfigForMode>LTDC_ConfigLayer0</ConfigForMode>
+        <ConfigForMode>LTDC_ConfigLayer1</ConfigForMode>
+        <ConfigForMode>LTDC_ConfigLayer2</ConfigForMode>
+		
+        <!-- Width Synchronization RefParameters for LTDC -->
+        <Parameter Name="HSync"/>
+        <Parameter Name="HBP"/>
+        <Parameter Name="ActiveW"/>
+        <Parameter Name="HFP"/>
+        <Parameter Name="HorizontalSync"/>
+        <Parameter Name="AccumulatedHBP"/>
+        <Parameter Name="AccumulatedActiveW"/>
+        <Parameter Name="TotalWidth"/>
+		
+        <!-- Height Synchronization RefParameters for LTDC -->
+        <Parameter Name="VSync"/>
+        <Parameter Name="VBP"/>
+        <Parameter Name="ActiveH"/>
+        <Parameter Name="VFP"/>
+        <Parameter Name="VerticalSync"/>
+        <Parameter Name="AccumulatedVBP"/>
+        <Parameter Name="AccumulatedActiveH"/>
+        <Parameter Name="TotalHeigh"/>
+		
+        <!-- Polarity RefParameter -->
+        <Parameter Name="HSPolarity"/>
+        <Parameter Name="VSPolarity"/>
+        <Parameter Name="DEPolarity"/>
+        <Parameter Name="PCPolarity"/>
+		
+        <!-- Layer Default Color RefParameters -->
+        <Parameter Name="Red"/>
+        <Parameter Name="Green"/>
+        <Parameter Name="Blue"/>
+		
+		<!-- the single frame mode -->
+        <Parameter Name="SFTrig"/>
+        <Parameter Name="SFExtTrig"/>
+        <Parameter Name="Buffer0Addr"/>
+        <Parameter Name="Buffer1Addr"/>
+        <Parameter Name="BufferPitch"/>
+        <Parameter Name="InterFrameRed"/>
+        <Parameter Name="InterFrameGreen"/>
+        <Parameter Name="InterFrameBlue"/>
+        <!--External display interface-->
+        <Parameter Name="YCbCrOrder"/>
+        <Parameter Name="YCbCrSel"/>
+        <Parameter Name="YCbCrEn"/>
+		<!-- Rotation -->
+        <Parameter Name="RotEn"/>
+        <Parameter Name="FifoUnderThresh"/>
+        <Parameter Name="Buffer0Addr"/>
+        <Parameter Name="Buffer1Addr"/>
+        <Parameter Name="BufferPitch"/>
+        <Parameter Name="InterFrameRed"/>
+        <Parameter Name="InterFrameGreen"/>
+        <Parameter Name="InterFrameBlue"/>
+        <!-- LTDC Config L0 (Background) parameters -->
+        <Parameter Name="LayerIdx_L0" />
+		
+        <Parameter Name="WindowX0_L0" />
+        <Parameter Name="WindowX1_L0" />
+        <Parameter Name="WindowY0_L0" />
+        <Parameter Name="WindowY1_L0" />
+		
+        <!-- <Parameter Name="PixelFormat_L0_not888" /> replaced with -->
+        <Parameter Name="PixelFormat_L0" />
+        <Parameter Name="Alpha_L0" />
+        <Parameter Name="Alpha0_L0" />
+        <Parameter Name="BlendingFactor1_L0" />
+        <Parameter Name="BlendingFactor2_L0" />
+        <Parameter Name="BlendingOrder_L0" />
+        <Parameter Name="BurstLength_L0" />
+        <Parameter Name="StartAddressBuffer0_L0" />
+        <Parameter Name="StartAddressBuffer1_L0" />
+        <Parameter Name="FrameBufferPich_L0" />
+        <Parameter Name="FrameBufferLineLength_L0" />
+        <Parameter Name="BufferLineNumber_L0" />
+        <Parameter Name="HorInputSize_L0" />
+        <Parameter Name="VerInputSize_L0" />
+        <Parameter Name="HorOutputSize_L0" />
+        <Parameter Name="VerOutputSize_L0" />
+        <Parameter Name="Enable_L0" />
+        <Parameter Name="FBStartAdress_L0" />
+        <Parameter Name="ImageWidth_L0" />
+        <Parameter Name="ImageHeight_L0" />
+		
+        <Parameter Name="Blue_L0" />
+        <Parameter Name="Green_L0" />
+        <Parameter Name="Red_L0" />
+		
+        <!-- LTDC Layer settings start here -->
+        <Parameter Name="Layers"/>
+        <!-- LTDC Config L1 (Foreground) parameters -->
+        <Parameter Name="LayerIdx_L1" />
+		
+        <Parameter Name="WindowX0_L1" />
+        <Parameter Name="WindowX1_L1" />
+        <Parameter Name="WindowY0_L1" />
+        <Parameter Name="WindowY1_L1" />
+		
+        <!-- <Parameter Name="PixelFormat_L1_not888" /> replaced with: -->
+        <Parameter Name="PixelFormat_L1" />
+		
+        <Parameter Name="Alpha_L1" />
+        <Parameter Name="Alpha0_L1" />
+        <Parameter Name="BlendingFactor1_L1" />
+        <Parameter Name="BlendingFactor2_L1" />
+        <Parameter Name="BlendingOrder_L1" />
+        <Parameter Name="BurstLength_L1" />
+        <Parameter Name="FBStartAdress_L1" />
+        <Parameter Name="ImageWidth_L1" />
+        <Parameter Name="ImageHeight_L1" />
+        <Parameter Name="StartAddressBuffer0_L1" />
+        <Parameter Name="StartAddressBuffer1_L1" />
+        <Parameter Name="FrameBufferPich_L1" />
+        <Parameter Name="FrameBufferLineLength_L1" />
+        <Parameter Name="BufferLineNumber_L1" />
+        <Parameter Name="HorInputSize_L1" />
+        <Parameter Name="VerInputSize_L1" />
+        <Parameter Name="HorOutputSize_L1" />
+        <Parameter Name="VerOutputSize_L1" />
+        <Parameter Name="Enable_L1" />
+        <Parameter Name="Blue_L1" />
+        <Parameter Name="Green_L1" />
+        <Parameter Name="Red_L1" />
+        
+        <Parameter Name="LayerIdx_L2" />
+        
+        <Parameter Name="WindowX0_L2" />
+        <Parameter Name="WindowX1_L2" />
+        <Parameter Name="WindowY0_L2" />
+        <Parameter Name="WindowY1_L2" />
+        
+        <!-- <Parameter Name="PixelFormat_L1_not888" /> replaced with: -->
+        <Parameter Name="PixelFormat_L2" />
+        
+        <Parameter Name="Alpha_L2" />
+        <Parameter Name="Alpha0_L2" />
+        <Parameter Name="BlendingFactor1_L2" />
+        <Parameter Name="BlendingFactor2_L2" />
+        <Parameter Name="BlendingOrder_L2" />
+        <Parameter Name="BurstLength_L2" />
+        <Parameter Name="StartAddressBuffer0_L2" />
+        <Parameter Name="StartAddressBuffer1_L2" />
+        <Parameter Name="FrameBufferPich_L2" />
+        <Parameter Name="FrameBufferLineLength_L2" />
+        <Parameter Name="BufferLineNumber_L2" />
+        <Parameter Name="HorInputSize_L2" />
+        <Parameter Name="VerInputSize_L2" />
+        <Parameter Name="HorOutputSize_L2" />
+        <Parameter Name="VerOutputSize_L2" />
+        <Parameter Name="Enable_L2" />
+        <Parameter Name="FBStartAdress_L2" />
+        <Parameter Name="ImageWidth_L2" />
+        <Parameter Name="ImageHeight_L2" />
+        
+        <Parameter Name="Blue_L2" />
+        <Parameter Name="Green_L2" />
+        <Parameter Name="Red_L2" />
+		
+    </RefMode>
+		
+		
+    <!-- ModeLogicOperator for LTDC -->
+    <ModeLogicOperator Name="OR">
+        <Mode Name="Display" UserName="Display Type">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="RGB888" UserName="RGB888 (24 bits) - DSI mode" RemoveCondition="!DSIHOST:$modeexist_DSIHost_Video">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="DSIMode" />
+                    </SignalLogicalOp>
+                    <Semaphore>Semaphore_LTDC_ConfiguredforDSI_24bits</Semaphore>
+                </Mode>
+                <Mode Name="RGB888" UserName="RGB888 (24 bits)">
+                    <Condition Diagnostic="DSI Host Video mode or Adapted Command Mode must be disabled" Expression="!(Semaphore_MODEVIDEODSIHOST|Semaphore_MODEADAPTEDDSIHOST|Semaphore_MODEADAPTEDTEDSIHOST)"/> 
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="R0" />
+                        <Signal Name="R1" />
+                        <Signal Name="R2" />
+                        <Signal Name="R3" />
+                        <Signal Name="R4" />
+                        <Signal Name="R5" />
+                        <Signal Name="R6" />
+                        <Signal Name="R7" />
+						
+                        <Signal Name="G0" />
+                        <Signal Name="G1" />
+                        <Signal Name="G2" />
+                        <Signal Name="G3" />
+                        <Signal Name="G4" />
+                        <Signal Name="G5" />
+                        <Signal Name="G6" />
+                        <Signal Name="G7" />
+						
+                        <Signal Name="B0" />
+                        <Signal Name="B1" />
+                        <Signal Name="B2" />
+                        <Signal Name="B3" />
+                        <Signal Name="B4" />
+                        <Signal Name="B5" />
+                        <Signal Name="B6" />
+                        <Signal Name="B7" />
+						
+                        <Signal Name="HSYNC" />
+                        <Signal Name="VSYNC" />
+                        <Signal Name="CLK" />
+                        <Signal Name="DE" />
+                    </SignalLogicalOp>
+                </Mode>
+                <Mode Name="RGB666" UserName="RGB666 (18 bits) - DSI mode" RemoveCondition="!DSIHOST:$modeexist_DSIHost_Video">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="DSIMode" />
+                    </SignalLogicalOp>
+                    <Semaphore>Semaphore_LTDC_ConfiguredforDSI_18bits</Semaphore>
+                </Mode>
+                <Mode Name="RGB666" UserName="RGB666 (18 bits)">
+                    <Condition Diagnostic="DSI Host Video mode or Adapted Command Mode must be disabled" Expression="!(Semaphore_MODEVIDEODSIHOST|Semaphore_MODEADAPTEDDSIHOST|Semaphore_MODEADAPTEDTEDSIHOST)"/> 
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="R2" />
+                        <Signal Name="R3" />
+                        <Signal Name="R4" />
+                        <Signal Name="R5" />
+                        <Signal Name="R6" />
+                        <Signal Name="R7" />
+						
+                        <Signal Name="G2" />
+                        <Signal Name="G3" />
+                        <Signal Name="G4" />
+                        <Signal Name="G5" />
+                        <Signal Name="G6" />
+                        <Signal Name="G7" />
+						
+                        <Signal Name="B2" />
+                        <Signal Name="B3" />
+                        <Signal Name="B4" />
+                        <Signal Name="B5" />
+                        <Signal Name="B6" />
+                        <Signal Name="B7" />
+						
+                        <Signal Name="HSYNC" />
+                        <Signal Name="VSYNC" />
+                        <Signal Name="CLK" />
+                        <Signal Name="DE" />
+                    </SignalLogicalOp>
+                </Mode>
+                <Mode Name="RGB565" UserName="RGB565 (16 bits) - DSI mode" RemoveCondition="!DSIHOST:$modeexist_DSIHost_Video">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="DSIMode" />
+                    </SignalLogicalOp>
+                    <Semaphore>Semaphore_LTDC_ConfiguredforDSI_16bits</Semaphore>
+                </Mode>
+                <Mode Name="RGB565" UserName="RGB565 (16 bits)">
+                    <Condition Diagnostic="DSI Host Video mode or Adapted Command Mode must be disabled" Expression="!(Semaphore_MODEVIDEODSIHOST|Semaphore_MODEADAPTEDDSIHOST|Semaphore_MODEADAPTEDTEDSIHOST)"/> 
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="R3" />
+                        <Signal Name="R4" />
+                        <Signal Name="R5" />
+                        <Signal Name="R6" />
+                        <Signal Name="R7" />
+						
+                        <Signal Name="G2" />
+                        <Signal Name="G3" />
+                        <Signal Name="G4" />
+                        <Signal Name="G5" />
+                        <Signal Name="G6" />
+                        <Signal Name="G7" />
+						
+                        <Signal Name="B3" />
+                        <Signal Name="B4" />
+                        <Signal Name="B5" />
+                        <Signal Name="B6" />
+                        <Signal Name="B7" />
+						
+                        <Signal Name="HSYNC" />
+                        <Signal Name="VSYNC" />
+                        <Signal Name="CLK" />
+                        <Signal Name="DE" />
+                    </SignalLogicalOp>
+                </Mode>
+                 <Mode Name="RGB888" UserName="YUV422 (16 bits)" RemoveCondition="!DIE501">
+                    <Condition Diagnostic="DSI Host Video mode or Adapted Command Mode must be disabled" Expression="!(Semaphore_MODEVIDEODSIHOST|Semaphore_MODEADAPTEDDSIHOST|Semaphore_MODEADAPTEDTEDSIHOST)"/> 
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="R0" />
+                        <Signal Name="R1" />
+                        <Signal Name="R2" />
+                        <Signal Name="R3" />
+                        <Signal Name="R4" />
+                        <Signal Name="R5" />
+                        <Signal Name="R6" />
+                        <Signal Name="R7" />
+						
+                        <Signal Name="G0" />
+                        <Signal Name="G1" />
+                        <Signal Name="G2" />
+                        <Signal Name="G3" />
+                        <Signal Name="G4" />
+                        <Signal Name="G5" />
+                        <Signal Name="G6" />
+                        <Signal Name="G7" />
+						
+                       				
+                        <Signal Name="HSYNC" />
+                        <Signal Name="VSYNC" />
+                        <Signal Name="CLK" />
+                        <Signal Name="DE" />
+                    </SignalLogicalOp>
+                </Mode>
+				 <Mode Name="RGB332" UserName="RGB332 (8 bits)">
+                    <Condition Diagnostic="DSI Host Video mode or Adapted Command Mode must be disabled" Expression="!(Semaphore_MODEVIDEODSIHOST|Semaphore_MODEADAPTEDDSIHOST|Semaphore_MODEADAPTEDTEDSIHOST)"/> 
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="R5" />
+                        <Signal Name="R6" />
+                        <Signal Name="R7" />
+						
+                        <Signal Name="G5" />
+                        <Signal Name="G6" />
+                        <Signal Name="G7" />
+						
+                        <Signal Name="B6" />
+                        <Signal Name="B7" />
+						
+                        <Signal Name="HSYNC" />
+                        <Signal Name="VSYNC" />
+                        <Signal Name="CLK" />
+                        <Signal Name="DE" />
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+              <!-- WARNING : MW_LTDC_MW semaphore is also used by X-CUBE-TOUCHGFX -->
+            <Semaphore>MW_LTDC_MW</Semaphore>
+        </Mode>
+    </ModeLogicOperator>
+	
+	
+    <!-- RefSignal for LCD-TFT -->
+    <RefSignal Name="R0" IOMode="AlternateFunctionPushPullIORetimingLTDCOtherIPs"/>
+    <RefSignal Name="R1" IOMode="AlternateFunctionPushPullIORetimingLTDCOtherIPs"/>
+    <RefSignal Name="R2" IOMode="AlternateFunctionPushPullIORetimingLTDCOtherIPs"/>
+    <RefSignal Name="R3" IOMode="AlternateFunctionPushPullIORetimingLTDCOtherIPs"/>
+    <RefSignal Name="R4" IOMode="AlternateFunctionPushPullIORetimingLTDCOtherIPs"/>
+    <RefSignal Name="R5" IOMode="AlternateFunctionPushPullIORetimingLTDCOtherIPs"/>
+    <RefSignal Name="R6" IOMode="AlternateFunctionPushPullIORetimingLTDCOtherIPs"/>
+    <RefSignal Name="R7" IOMode="AlternateFunctionPushPullIORetimingLTDCOtherIPs"/>
+
+    <RefSignal Name="G0" IOMode="AlternateFunctionPushPullIORetimingLTDCOtherIPs"/>
+    <RefSignal Name="G1" IOMode="AlternateFunctionPushPullIORetimingLTDCOtherIPs"/>
+    <RefSignal Name="G2" IOMode="AlternateFunctionPushPullIORetimingLTDCOtherIPs"/>
+    <RefSignal Name="G3" IOMode="AlternateFunctionPushPullIORetimingLTDCOtherIPs"/>
+    <RefSignal Name="G4" IOMode="AlternateFunctionPushPullIORetimingLTDCOtherIPs"/>
+    <RefSignal Name="G5" IOMode="AlternateFunctionPushPullIORetimingLTDCOtherIPs"/>
+    <RefSignal Name="G6" IOMode="AlternateFunctionPushPullIORetimingLTDCOtherIPs"/>
+    <RefSignal Name="G7" IOMode="AlternateFunctionPushPullIORetimingLTDCOtherIPs"/>
+
+    <RefSignal Name="B0" IOMode="AlternateFunctionPushPullIORetimingLTDCOtherIPs"/>
+    <RefSignal Name="B1" IOMode="AlternateFunctionPushPullIORetimingLTDCOtherIPs"/>
+    <RefSignal Name="B2" IOMode="AlternateFunctionPushPullIORetimingLTDCOtherIPs"/>
+    <RefSignal Name="B3" IOMode="AlternateFunctionPushPullIORetimingLTDCOtherIPs"/>
+    <RefSignal Name="B4" IOMode="AlternateFunctionPushPullIORetimingLTDCOtherIPs"/>
+    <RefSignal Name="B5" IOMode="AlternateFunctionPushPullIORetimingLTDCOtherIPs"/>
+    <RefSignal Name="B6" IOMode="AlternateFunctionPushPullIORetimingLTDCOtherIPs"/>
+    <RefSignal Name="B7" IOMode="AlternateFunctionPushPullIORetimingLTDCOtherIPs"/>
+
+    <RefSignal Name="HSYNC" IOMode="AlternateFunctionPushPullIORetimingLTDCOtherIPs"/>
+    <RefSignal Name="VSYNC" IOMode="AlternateFunctionPushPullIORetimingLTDCOtherIPs"/>
+    <RefSignal Name="CLK" IOMode="AlternateFunctionPushPullMediumSpeedDefaultIORetiming"/>
+    <RefSignal Name="DE" IOMode="AlternateFunctionPushPullIORetimingLTDCOtherIPs"/>
+    <!-- Virtual RefSignals-->
+    <RefSignal Name="DSIMode" Virtual="true"/>
+    <!-- Clock Semaphore for this IP. -->
+    <Semaphore>LTDCUsed_ForRCC</Semaphore>
+</IP>

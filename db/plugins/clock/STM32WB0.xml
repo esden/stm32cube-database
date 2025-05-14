@@ -1,0 +1,445 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Clock xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" savedConfig="false" xsi:noNamespaceSchemaLocation="../../../../../../../doc/V4/Development/Specifications/db/MCU_Clock.xsd">
+
+    <Background  imageName="hide-cec-H5" name="hideI2S2"  x="1012" y="1220">
+        <Condition Diagnostic="" Expression="!I2S2_Exist"/>
+    </Background>
+    <Background  imageName="blackline2" name="hideI2S2cross"  x="1300" y="1293">
+        <Condition Diagnostic="" Expression="!I2S2_Exist"/>
+    </Background>
+     <Background  imageName="Mux2EntriesWB07" name="hideI2S3"  x="990" y="1005">
+        <Condition Diagnostic="" Expression="I2S2_Exist"/>
+    </Background>
+    <Background  imageName="hide-cec-H5" name="hideLPUART" x="990" y="500" > 
+        <Condition Diagnostic="" Expression="I2S2_Exist"/>
+    </Background>
+    <Background  imageName="blackline2" name="hideLPUARTcross"  x="1290" y="580"> 
+        <Condition Diagnostic="" Expression="I2S2_Exist"/>
+    </Background>
+    <Background  imageName="hide-wb0" name="hideLPUARTcross2"  x="932" y="588"> 
+        <Condition Diagnostic="" Expression="I2S2_Exist"/>
+    </Background>
+    <Tree id="ClockTree">
+        <!--Divers source-->
+        <Element id="HSIRC" type="fixedSource" isKey="true" refParameter="HSI_VALUE" x="295" y="505">
+            <Output signalId="HSI" to="MCOMult"/>
+            <Output signalId="HSI" to="SysClkSource"/>
+        </Element>
+        <Element id="PLL64RC" type="fixedSource" refParameter="PLL64_VALUE" x="295" y="548" refEnable="EnableHSE">
+            <Output signalId="PLL64" to="SysClkSource"/>
+        </Element>
+        				
+        <Element id="HSEOSC" type="variedSource" x="200" y="400" refParameter="HSE_VALUE">
+            <Output signalId="HSE" to="MCOMult"/>
+            <Output signalId="HSE" to="SysClkSource"/>           
+        </Element>
+
+        <Element id="LSEOSC" type="variedSource" refParameter="LSE_VALUE" x="200" y="194">
+            <Output signalId="LSE" to="RTCClkSource"/>
+            <Output signalId="LSE" to="LPUARTMult"/>
+            <Output signalId="LSE" to="LSCOMult"/>
+        </Element>
+        
+        <!--LSI Mux-->
+        <Element id="LSIRC" type="fixedSource" refParameter="LSI_VALUE" x="295" y="235" refEnable="EnableLSI">
+            <Output signalId="LSI" to="RTCClkSource"/>
+            <Output signalId="LSI" to="LSCOMult"/>
+        </Element>
+
+        <!--RC64MPLL Mux-->
+        <Element id="RC64MPLL" type="multiplexor" refParameter="RC64MPLLSource" x="398" y="512">
+            <Input signalId="HSI"    from="HSIRC"        refValue="RCC_LSCOSOURCE_HSI"/>
+            <Input signalId="PLL64"  from="PLL64RC"      refValue="RCC_LSCOSOURCE_PLL64"/>
+            <Output signalId="RC64MPLLCLK" to="SysClkSource"/>
+            <Output signalId="RC64MPLLCLK" to="CLKI2S3Mult"/>
+        </Element>
+
+        <!--System Clock Mux-->
+        <Element id="SysClkSource" type="multiplexor" refParameter="SYSCLKSource" x="515" y="410">
+            <Input signalId="HSE"          from="HSEOSC"        refValue="RCC_SYSCLKSOURCE_DIRECT_HSE"/>
+            <Input signalId="RC64MPLLCLK"  from="RC64MPLL"      refValue="RCC_SYSCLKSOURCE_RC64MPLL"/>
+            <Output signalId="SYSCLKInput" to="SysCLKOutput"/>
+        </Element>
+
+        <Element id="SysCLKOutput" type="output" refParameter="SysCLKFreq_VALUE" x="550" y="425">
+            <Input signalId="SYSCLKInput" from="SysClkSource"/>
+            <Output signalId="SYSCLK"  to="CLK16MHzDiv2" />
+            <Output signalId="SYSCLK"  to="CLK16MHzDiv4" />
+            <Output signalId="SYSCLK"  to="CLK32MHzDiv2" />
+            <Output signalId="SYSCLK"  to="CLK32MHzDiv1" />
+            <Output signalId="SYSCLK"  to="SYSCLK32Prescaler" />
+            <Output signalId="SYSCLK"  to="SYSCLK64Prescaler" />
+            <Output signalId="SYSCLK"  to="MCOMult" />
+            <Output signalId="SYSCLK"  to="TimerOutput" />
+        </Element>
+
+        <Element id="TimerOutput" type="activeOutput" refParameter="SysCLKFreq_VALUE" x="1299" y="332">
+            <Input signalId="SYSCLK" from="SysCLKOutput"/>
+        </Element>
+		<Element id="CLK16MHzDiv2" type="devisor" refParameter="CLK_16MHz_Div2" x="663" y="710" refEnable="SysSourceHSEEnable">
+            <Input signalId="SYSCLK" from="SysCLKOutput"/>
+            <Output signalId="CLK16MHz2"  to="CLK16MHzSource" />
+        </Element>
+
+		<Element id="CLK16MHzDiv4" type="devisor" refParameter="CLK_16MHz_Div4" x="663" y="750" refEnable="SYSCLK64Enable">
+            <Input signalId="SYSCLK" from="SysCLKOutput"/>
+            <Output signalId="CLK16MHz4"  to="CLK16MHzSource" />
+        </Element>
+ 
+         <!--CLK16MHzSource-->
+        <Element id="CLK16MHzSource" type="multiplexor" refParameter="Clk16MHzSource" x="747" y="714">
+            <Input signalId="CLK16MHz2"    from="CLK16MHzDiv2"        refValue="CLK16MHzDiv2"/>
+            <Input signalId="CLK16MHz4"    from="CLK16MHzDiv4"       refValue="CLK16MHzDiv4"/>
+            <Output signalId="Clk16MHzCLK" to="Clk16MHzOutput"/>
+        </Element>
+
+       <Element id="Clk16MHzOutput" type="output" refParameter="Clk16MHzFreq_VALUE" x="1299" y="730">
+            <Input signalId="Clk16MHzCLK" from="CLK16MHzSource"/>
+            <Output signalId="CLK16MHz"  to="ClkSMPSDiv4" />
+            <Output signalId="CLK16MHz"  to="ClkSMPSDiv2" />
+            <Output signalId="CLK16MHz"  to="LPUARTMult" />
+            <Output signalId="CLK16MHz"  to="BLEMult" />
+            <Output signalId="CLK16MHz"  to="CLKI2S3Mult" />
+            <Output signalId="CLK16MHz"  to="CLKI2S2Mult" />
+            <Output signalId="CLK16MHz"  to="CLK16RTCDevisor" />
+            <Output signalId="CLK16MHz"  to="MCOMult" />
+        </Element>
+
+		<Element id="ClkSMPSDiv4" type="devisor" refParameter="CLK_SMPS_Div4" x="967" y="657">
+            <Input signalId="CLK16MHz" from="Clk16MHzOutput"/>
+            <Output signalId="ClkSMPS4"  to="ClkSMPS" />
+        </Element>
+
+		<Element id="ClkSMPSDiv2" type="devisor" refParameter="CLK_SMPS_Div2" x="967" y="697">
+            <Input signalId="CLK16MHz" from="Clk16MHzOutput"/>
+            <Output signalId="ClkSMPS2"  to="ClkSMPS" />
+        </Element>
+ 
+         <!--ClkSMPS-->
+        <Element id="ClkSMPS" type="multiplexor" refParameter="ClkSMPSSource" x="1030" y="662">
+            <Input signalId="ClkSMPS4"    from="ClkSMPSDiv4"        refValue="RCC_SMPSCLK_DIV4"/>
+            <Input signalId="ClkSMPS2"    from="ClkSMPSDiv2"       refValue="RCC_SMPSCLK_DIV2"/>
+            <Output signalId="SMPSCLK" to="ClkSMPSOutput"/>
+        </Element>
+
+       <Element id="ClkSMPSOutput" type="activeOutput" refParameter="ClkSMPSFreq_VALUE" x="1299" y="678">
+            <Input signalId="SMPSCLK" from="ClkSMPS"/>
+            <Output signalId="SMPSCLKOut" to="MCOMult"/>
+        </Element>
+
+      	  <!--LPUART-->
+        <Element id="LPUARTMult" type="multiplexor" refParameter="LPUARTClockSelection" x="1030" y="550" refEnable="LPUART1Enable">
+            <Condition Expression="!I2S2_Exist" Diagnostic=""/>
+            <Input signalId="LSE"    from="LSEOSC"       refValue="RCC_LPUART1_CLKSOURCE_LSE"/>
+            <Input signalId="CLK16MHz"    from="Clk16MHzOutput"        refValue="RCC_LPUART1_CLKSOURCE_16M"/>
+            <Output signalId="LPUARTCLK" to="ClkLPUARTOutput"/>
+        </Element>
+
+       <Element id="ClkLPUARTOutput" type="activeOutput" refParameter="LPUARTFreq_VALUE" x="1299" y="565" refEnable="LPUART1Enable">
+            <Condition Expression="!I2S2_Exist" Diagnostic=""/>
+            <Input signalId="LPUARTCLK" from="LPUARTMult"/>
+        </Element>
+
+        <!--LSCO Mux-->
+        <Element id="LSCOMult" type="multiplexor" refParameter="LSCOSource1"  x="672" y="1145"  refEnable="LSCOEnable">
+            <Input signalId="LSI"    from="LSIRC"        refValue="RCC_LSCOSOURCE_LSI"/>
+            <Input signalId="LSE"    from="LSEOSC"       refValue="RCC_LSCOSOURCE_LSE"/>   
+            <Output signalId="LSCOInput" to="LSCOOutput"/>
+        </Element>
+        <Element id="LSCOOutput" type="activeOutput" refParameter="LSCOPinFreq_Value" x="310" y="1160" refEnable="LSCOEnable">
+            <Input signalId="LSCOInput" from="LSCOMult"/>
+        </Element>
+        
+        <Element id="CLK32MHzDiv1" type="devisor" refParameter="CLK_32MHz_Div1" x="663" y="837" refEnable="SysSourceHSEEnable">
+            <Input signalId="SYSCLK" from="SysCLKOutput"/>
+            <Output signalId="CLK32MHz1"  to="CLK32MHzSource" />
+        </Element>
+
+		<Element id="CLK32MHzDiv2" type="devisor" refParameter="CLK_32MHz_Div2" x="663" y="877" refEnable="SYSCLK64Enable">
+            <Input signalId="SYSCLK" from="SysCLKOutput"/>
+            <Output signalId="CLK32MHz2"  to="CLK32MHzSource" />
+        </Element>
+ 
+         <!--CLK32MHzSource-->
+        <Element id="CLK32MHzSource" type="multiplexor" refParameter="Clk32MHzSource" x="747" y="843">
+            <Input signalId="CLK32MHz1"    from="CLK32MHzDiv1"        refValue="SysCLKOutput"/>
+            <Input signalId="CLK32MHz2"    from="CLK32MHzDiv2"       refValue="CLK32MHzDiv2"/>
+            <Output signalId="Clk32MHzCLK" to="Clk32MHzOutput"/>
+        </Element>
+
+       <Element id="Clk32MHzOutput" type="output" refParameter="Clk32MHzFreq_VALUE" x="1299" y="858">
+            <Input signalId="Clk32MHzCLK" from="CLK32MHzSource"/>
+            <Output signalId="Clk32MHz"  to="BLEMult" />
+            <Output signalId="Clk32MHz"  to="CLKI2S3Mult" />
+            <Output signalId="Clk32MHz"  to="CLKI2S2Mult" />
+        </Element>
+
+        <Element id="BLEMult" type="multiplexor" refParameter="BLEMultSource" x="1030" y="786" refEnable="RADIOEnable">
+            <Input signalId="CLK16MHz"    from="Clk16MHzOutput"       refValue="RCC_RF_CLK_16M"/>
+            <Input signalId="Clk32MHz"    from="Clk32MHzOutput"        refValue="RCC_RF_CLK_32M"/>
+            <Output signalId="BLECLK" to="BLEOutput"/>
+        </Element>
+
+        <Element id="BLEOutput" type="activeOutput" refParameter="BLEFreq_VALUE" x="1299" y="801" refEnable="RADIOEnable">
+            <Input signalId="BLECLK" from="BLEMult"/>
+        </Element>
+
+        <Element id="SYSCLK32Prescaler" type="devisor" refParameter="SYSCLK32Divider" x="909" y="410" refEnable="SysSourceHSEEnable">
+            <Input signalId="SYSCLK" from="SysCLKOutput"/>
+            <Output signalId="CLKSYS32" to="CLKSYSMult"/>
+     
+        </Element>
+
+        <Element id="SYSCLK64Prescaler" type="devisor" refParameter="SYSCLK64Divider" x="909" y="450" refEnable="SYSCLK64Enable">
+            <Input signalId="SYSCLK" from="SysCLKOutput"/>
+            <Output signalId="CLKSYS64" to="CLKSYSMult"/>
+        </Element>
+       
+        <Element id="CLKSYSMult" type="multiplexor" refParameter="CLKSYSMultSource" x="1027" y="413" >
+            <Input signalId="CLKSYS32"    from="SYSCLK32Prescaler"        refValue="SYSCLK32Prescaler"/>
+            <Input signalId="CLKSYS64"    from="SYSCLK64Prescaler"       refValue="SYSCLK64Prescaler"/>
+            <Output signalId="CLKSYS" to="CLKSYSOutput"/>
+        </Element>
+
+        <Element id="CLKSYSOutput" type="activeOutput" refParameter="CLKSYSFreq_VALUE" x="1299" y="430">
+            <Input signalId="CLKSYS" from="CLKSYSMult"/>
+            <Output signalId="CLK_SYS" to="MCOMult"/>
+        </Element>
+       
+        <Element id="CLKI2S3Mult" type="multiplexor" refParameter="CLKI2S3MultSource" x="1030" y="935" refEnable="I2S3Enable">
+            <Condition Expression="I2S2_Exist" Diagnostic=""/>
+            <Input signalId="Clk32MHz"    from="Clk32MHzOutput"       refValue="RCC_SPI3I2S_CLKSOURCE_32M"/>
+            <Input signalId="CLK16MHz"    from="Clk16MHzOutput"        refValue="RCC_SPI3I2S_CLKSOURCE_16M"/>
+            <Output signalId="CLKI2S3" to="CLKI2S3Output"/>
+        </Element>
+        <Element id="CLKI2S3Mult" type="multiplexor" refParameter="CLKI2S3MultSource" x="1030" y="920" refEnable="I2S3Enable">
+            <Input signalId="Clk32MHz"    from="Clk32MHzOutput"       refValue="RCC_SPI3I2S_CLKSOURCE_32M"/>
+            <Input signalId="CLK16MHz"    from="Clk16MHzOutput"        refValue="RCC_SPI3I2S_CLKSOURCE_16M"/>
+            <Input  signalId="RC64MPLLCLK"  from="RC64MPLL"          refValue="RCC_SPI3I2S_CLKSOURCE_64M"/>
+            <Output signalId="CLKI2S3" to="CLKI2S3Output"/>
+        </Element>
+
+        <Element id="CLKI2S3Output" type="activeOutput" refParameter="CLKI2S3Freq_VALUE" x="1299" y="950" refEnable="I2S3Enable">
+            <Input signalId="CLKI2S3" from="CLKI2S3Mult"/>
+        </Element>
+
+        <Element id="CLKI2S2Output" type="activeOutput" refParameter="CLKI2S2Freq_VALUE" x="1299" y="1100" refEnable="I2S2Enable">
+            <Input signalId="CLKI2S2" from="CLKI2S2Mult"/>
+        </Element>
+		
+          <Element id="CLKI2S2Mult" type="multiplexor" refParameter="CLKI2S2MultSource" x="1030" y="1084" refEnable="I2S2Enable">
+            <Input signalId="Clk32MHz"    from="Clk32MHzOutput"       refValue="RCC_SPI2I2S_CLKSOURCE_32M"/>
+            <Input signalId="CLK16MHz"    from="Clk16MHzOutput"        refValue="RCC_SPI2I2S_CLKSOURCE_16M"/>
+            <Output signalId="CLKI2S2" to="CLKI2S2Output"/>
+        </Element>
+
+        <!--IP clock-->
+      
+		<Element id="CLK16RTCDevisor" type="devisor" refParameter="RCC_RTC_Clock_Source_FROM_CLK_16MHz" x="440" y="163">
+            <Input signalId="CLK16MHz" from="Clk16MHzOutput"/>
+            <Output signalId="CLK16_RTC"  to="RTCClkSource" />
+            <Output signalId="CLK16_RTC"  to="MCOMult" />
+        </Element>
+        <Element id="RTCClkSource" type="multiplexor" refParameter="RTCClockSelection" x="540" y="166" refEnable="RTCEnable,IWDGEnable,RADIO_TIMEREnable">
+            <Input signalId="CLK16_RTC" from="CLK16RTCDevisor"  refValue="RCC_RTC_WDG_BLEWKUP_CLKSOURCE_HSI64M_DIV2048" />
+            <Input signalId="LSE"     from="LSEOSC"           refValue="RCC_RTC_WDG_BLEWKUP_CLKSOURCE_LSE"/>
+            <Input signalId="LSI"     from="LSIRC"  	      refValue="RCC_RTC_WDG_BLEWKUP_CLKSOURCE_LSI"/>
+            <Output signalId="RTCCLK" to="RTCOutput"/>
+        </Element>
+        <Element id="RTCOutput" type="output" refParameter="RTCFreq_Value" x="613" y="197" refEnable="RTCEnable,IWDGEnable,RADIO_TIMEREnable">
+            <Input signalId="RTCCLK" from="RTCClkSource"/>
+        </Element>
+
+       
+
+        <!--MCO Mux-->
+        <Element id="MCOMult" type="multiplexor" refParameter="RCC_MCO1Source" x="497" y="943" refEnable="MCOEnable">
+            <Input signalId="CLK16MHz"  from="Clk16MHzOutput"    refValue="RCC_MCOSOURCE_ADC"/>
+            <Input signalId="SMPSCLK"   from="ClkSMPSOutput"     refValue="RCC_MCOSOURCE_SMPS"/>
+            <Input signalId="CLK_SYS" from="CLKSYSOutput" refValue="RCC_MCO1SOURCE_SYSCLK"   />
+            <Input signalId="HSE"    from="HSEOSC"       refValue="RCC_MCO1SOURCE_HSE"/>
+            <Input signalId="HSI"    from="HSIRC"        refValue="RCC_MCO1SOURCE_HSI"   />
+            <Input signalId="CLK16_RTC" from="CLK16RTCDevisor"         refValue="RCC_MCOSOURCE_HSI64M_DIV2048"/>
+            <Output signalId="MCO1DivInput" to="MCODiv"/>
+        </Element>
+        <Element id="MCODiv" type="devisor" refParameter="RCC_MCODiv" x="390" y="1005" refEnable="MCOEnable">
+            <Input signalId="MCO1DivInput" from="MCOMult"/>
+            <Output signalId="MCO1DivOuput" to="MCOPin"/>
+        </Element>
+        <Element id="MCOPin" type="output" refParameter="MCO1PinFreq_Value" x="310" y="1004" refEnable="MCOEnable">
+            <Input signalId="MCO1DivOuput" from="MCODiv"/>
+        </Element>
+      
+     	    
+    </Tree>
+    <Signals>
+        <Signal id="HSE" refParameter="HSE_VALUE"/>
+        <Signal id="LSI" refParameter="LSI_VALUE"/>
+        <Signal id="LSE" refParameter="LSE_VALUE"/>
+        <Signal id="MSI"/>
+        <Signal id="PLL64"/>
+        <Signal id="HSI" refParameter="HSI_VALUE"/>
+        <Signal id="SYSCLKInput"/>
+        <Signal id="CLK16MHz2"/>
+        <Signal id="CLK32MHz1"/>
+        <Signal id="CLK16MHz4"/>
+        <Signal id="SYSCLK"/>
+        <Signal id="Clk16MHzCLK"/>
+        <Signal id="CLK16MHz"/>
+        <Signal id="CLK32MHz2"/>
+        <Signal id="Clk32MHzCLK"/>
+        <Signal id="Clk32MHz"/>
+        <Signal id="CLKI2S2"/>
+        <Signal id="CLKI2S3"/>
+        <Signal id="CLKSYSInput"/>
+        <Signal id="BLECLK"/>
+        <Signal id="SMPSCLK"/>
+        <Signal id="LPUARTCLK"/>
+        <Signal id="ClkSMPS4"/>
+        <Signal id="ClkSMPS2"/>
+        <Signal id="CLKSYS32"/>
+        <Signal id="CLKSYS64"/>
+        <Signal id="CLKSYS"/>
+        <Signal id="CLK_SYS"/>
+        <Signal id="CLK16_RTC"/>
+        <Signal id="RTCCLK"/>
+        <Signal id="RC64MPLLCLK"/>
+        <Signal id="SMPSCLKOut"/>
+        <Signal id="MCO1DivInput"/>
+        <Signal id="MCO1DivOuput"/>
+        <Signal id="LSCOInput"/>
+    </Signals>
+	
+    <!-- Clk16MHz label -->
+    <Label id="MCOMuxLabel"    type="muxLabel" text="CLK16MHz Source Mux" posX="700" posY="678"/>
+    <Label id="CLK_16MHzMCOLabel" type="SpecialInfo" posX="815" posY="725" text="CLK_16MHz"/>
+    <Label id="CLK_SYSToLabel" type="SpecialInfo" posX="1360" posY="735" text="To CLKANA_ADC, USART, I2C, BLE16,"/>
+    <Label id="CLK_SYSToLabel" type="SpecialInfo" posX="1360" posY="745" text="FLASH, PWR, RNG (MHz)">
+       <Condition Expression="!I2S2_Exist" Diagnostic=""/>
+    </Label>
+    <Label id="CLK_SYSToLabel" type="SpecialInfo" posX="1360" posY="745" text="FLASH, PWR, RNG, LPUART (MHz)">
+       <Condition Expression="I2S2_Exist" Diagnostic=""/>
+    </Label>
+
+    <!-- RC64MPLL -->
+    <Label id="RC64MPLLMuxLabel"    type="muxLabel" text="RC64MPLL" posX="380" posY="480"/>
+
+    <!-- Clk32MHz label -->
+    <Label id="MCOMuxLabel"    type="muxLabel" text="CLK32MHz Source Mux" posX="700" posY="808"/>
+    <Label id="CLK_16MHzMCOLabel" type="SpecialInfo" posX="815" posY="852" text="CLK_32MHz"/>
+    <Label id="CLK_ToLPUARTLabel" type="SpecialInfo" posX="1360" posY="865" text="To RADIO32, CLKDIG_ADC (MHz)"/>
+
+    <!--LPUART mux-->   
+    <Label id="LPUARTMuxLabel"    type="muxLabel" text="LPUART Source Mux" posX="990" posY="518"  refEnable="LPUART1Enable">
+       <Condition Expression="!I2S2_Exist" Diagnostic=""/>
+    </Label>
+    <Label id="LPUARTLSELabel"    type="signal"   text="LSE"             posX="947" posY="542" refEnable="LPUART1Enable">
+       <Condition Expression="!I2S2_Exist" Diagnostic=""/>
+    </Label>
+    <Label id="CLK_LPUARTLabel" type="SpecialInfo" posX="1160" posY="560" text="CLK_LPUART" refEnable="LPUART1Enable">
+       <Condition Expression="!I2S2_Exist" Diagnostic=""/>
+    </Label>
+    <Label id="CLK_ToLPUARTLabel" type="SpecialInfo" posX="1360" posY="570" text="To LPUART (MHz)" refEnable="LPUART1Enable">
+       <Condition Expression="!I2S2_Exist" Diagnostic=""/>
+    </Label>
+
+    <!-- SMPS label -->
+    <Label id="SMPSMuxLabel"    type="muxLabel" text="SMPS Source Mux" posX="990" posY="628"/>
+    <Label id="SMPSMCOLabel" type="SpecialInfo" posX="1160" posY="672" text="CLK_SMPS"/>
+    <Label id="CLK_ToLPUARTLabel" type="SpecialInfo" posX="1360" posY="685" text="To SMPS (MHz)"/>
+
+    <!-- RADIO label -->
+    <Label id="BLEMuxLabel"    type="muxLabel" text="RADIO Source Mux" posX="990" posY="753" refEnable="RADIOEnable"/>
+    <Label id="BLEMCOLabel" type="SpecialInfo" posX="1160" posY="795" text="CLKSYS_RADIO" refEnable="RADIOEnable"/>
+    <Label id="CLK_SYSToLabel" type="SpecialInfo" posX="1360" posY="808" text="To RADIO (MHz)" refEnable="RADIOEnable"/>
+
+    <!--I2S2 mux-->   
+    <Label id="I2S2MuxLabel"    type="muxLabel" text="I2S2 Source Mux" posX="990" posY="1052" refEnable="I2S2Enable"/>
+    <Label id="I2S2LSELabel"    type="signal"   text="CLK_32MHz"             posX="947" posY="1075" refEnable="I2S2Enable"/>
+    <Label id="I2S2LSELabel"    type="signal"   text="CLK_16MHz"             posX="947" posY="1117" refEnable="I2S2Enable"/>
+    <Label id="CLK_I2S2Label" type="SpecialInfo" posX="1160" posY="1095" text="CLK_I2S2" refEnable="I2S2Enable"/>
+    <Label id="CLK_ToI2S2Label" type="SpecialInfo" posX="1360" posY="1105" text="To I2S2 (MHz)" refEnable="I2S2Enable"/>
+   
+    <!--I2S3 mux-->   
+    <Label id="I2SMuxLabel"    type="muxLabel" text="I2S3 Source Mux" posX="990" posY="890" refEnable="I2S3Enable">
+       <Condition Expression="!I2S2_Exist" Diagnostic=""/>
+    </Label>
+    <Label id="I2SMuxLabel"    type="muxLabel" text="I2S3 Source Mux" posX="990" posY="902" refEnable="I2S3Enable">
+       <Condition Expression="I2S2_Exist" Diagnostic=""/>
+    </Label>
+    <Label id="I2SLSELabel"    type="signal"   text="CLK_32MHz"             posX="947" posY="913" refEnable="I2S3Enable">
+       <Condition Expression="!I2S2_Exist" Diagnostic=""/>
+    </Label>
+    <Label id="I2SLSELabel"    type="signal"   text="CLK_32MHz"             posX="947" posY="925" refEnable="I2S3Enable">
+       <Condition Expression="I2S2_Exist" Diagnostic=""/>
+    </Label>
+    <Label id="I2SLSELabel"    type="signal"   text="CLK_16MHz"             posX="947" posY="947" refEnable="I2S3Enable">
+       <Condition Expression="!I2S2_Exist" Diagnostic=""/>
+    </Label>
+    <Label id="I2SLSELabel"    type="signal"   text="CLK_16MHz"             posX="947" posY="967" refEnable="I2S3Enable">
+       <Condition Expression="I2S2_Exist" Diagnostic=""/>
+    </Label>
+    <Label id="I2SLSELabel"    type="signal"   text="RC64MPLL"             posX="947" posY="982" refEnable="I2S3Enable">
+       <Condition Expression="!I2S2_Exist" Diagnostic=""/>
+    </Label>
+    <Label id="CLK_I2SLabel" type="SpecialInfo" posX="1160" posY="945" text="CLK_I2S3" refEnable="I2S3Enable"/>
+    <Label id="CLK_ToLabel" type="SpecialInfo" posX="1360" posY="957" text="To I2S3 (MHz)" refEnable="I2S3Enable"/>
+
+    <!--CLK_SYS -->
+    <Label id="CLK_SYSToLabel" type="SpecialInfo" posX="1360" posY="435" text="To CPU, AHB0, APB0, APB1, SRAM,"/>
+    <Label id="CLK_SYSToLabel" type="SpecialInfo" posX="1360" posY="445" text="PKA (MHz)"/>
+    <Label id="CLK_SYS" type="SpecialInfo"  posX="1160" posY="425" text="CLK_SYS"/>
+
+    <!--RTC labels-->
+    <Label id="RTCMuxLabel"       type="muxLabel"    text="Low Speed Clock Mux" posX="511" posY="144" refEnable="RTCEnable,IWDGEnable,RADIO_TIMEREnable"/>
+    <Label id="RTCOutputLabel"    type="SpecialInfo" text="To RTC, WDG, RADIOWKUP (KHz)"  posX="675" posY="204" refEnable="RTCEnable,IWDGEnable,RADIO_TIMEREnable"/>
+    <Label id="LSEForRTCLabel"    type="signal"      text="LSE"     posX="503" posY="195" refEnable="EnableLSERTC,IWDGEnable,RADIO_TIMEREnable"/>
+    <Label id="LSIForRTCLabel"    type="signal"      text="LSI"     posX="503" posY="226" refEnable="RTCEnable,IWDGEnable,RADIO_TIMEREnable"/>
+    <Label id="HSEForRTCLabel"    type="signal"      text="CLK_16MHz"     posX="380" posY="160" refEnable="RTCEnable,IWDGEnable,RADIO_TIMEREnable"/>
+    <!--sysclock labels-->
+    
+    <Label id="SystemCLKMuxLabel" type="muxLabel" posX="479" posY="372" text="System Clock Mux"/>
+    <Label id="SystemHSILabel"    type="signal"   posX="455" posY="402" text="HSE"/>
+    <Label id="SystemPLLCLKLabel" type="signal"   posX="455" posY="442" text="RC64MPLL"/>
+    <Label id="SYSCLKLabel"       type="info"     posX="549" posY="410" text="SYSCLK (MHz)"/>
+    <Label id="SYSCLKLabel"       type="info"     posX="908" posY="395" text="SYSCLKDIV"/>
+    <Label id="SYSCLKTOLabel" type="SpecialInfo" posX="1360" posY="338" text="To TIM2, TIM16, TIM17 (MHz)">
+       <Condition Expression="!I2S2_Exist" Diagnostic=""/>
+    </Label>
+    <Label id="SYSCLKTOLabel" type="SpecialInfo" posX="1360" posY="338" text="To TIM1 (MHz)">
+       <Condition Expression="I2S2_Exist" Diagnostic=""/>
+    </Label>
+    <!--PLL Source labels-->
+    <!--Label id="PLLSourcMuxHSELabel" type="signal"   text="HSE"  		  posX="368" posY="538" refEnable="EnableHSE"/-->
+    <!--Main PLL labels-->
+   
+
+    <!-- source constraint label -->
+    <Label id="HSIRCLabel"    type="info"       posX="302" posY="493" text="HSI RC"/>
+    <Label id="HSIRCCstLabel" type="constraint" posX="302" posY="528" text="64 MHz"/>
+    <Label id="HSIRCLabel"    type="info"       posX="302" posY="537" text="PLL64M"/>
+    <Label id="HSIRCCstLabel" type="constraint" posX="302" posY="573" text="64 MHz"/>
+    <Label id="LSI_RCLabel"   type="Info"       posX="302" posY="222" text="LSI RC"/>
+    <Label id="LSI_RCcST"     type="constraint" posX="302" posY="260" text="32 KHz"/>
+ 
+    <!--LSCO label-->
+    <Label id="LSCOLabel"       type="info"     text="(MHz) LCO"      posX="227" posY="1165" refEnable="LSCOEnable"/>
+    <Label id="LSCOMuxLabel"    type="muxLabel" text="LCO Source Mux" posX="640" posY="1105"  refEnable="LSCOEnable"/>
+    <Label id="LSCOLSELabel"    type="signal"   text="LSE"             posX="710" posY="1175"  refEnable="LSCOEnable"/>
+    <Label id="LSCOLSILabel"    type="signal"   text="LSI"             posX="710" posY="1135"  refEnable="LSCOEnable"/>
+
+    <!--MCO label-->
+    <Label id="MCOLabel"       type="info"     text="(MHz) MCO"      posX="230" posY="1010" refEnable="MCOEnable"/>
+    <Label id="MCOMuxLabel"    type="muxLabel" text="MCO Source Mux" posX="467" posY="902"  refEnable="MCOEnable"/>
+    <Label id="MCOCLKANA_ADCLabel"    type="signal"   text="CLKANA_ADC"            posX="540" posY="935"  refEnable="MCOEnable"/>
+    <Label id="MCOCLK_SMPSLabel"    type="signal"   text="CLK_SMPS"            posX="553" posY="960"  refEnable="MCOEnable"/>
+    <Label id="MCOCLK_SYSLabel"    type="signal"   text="CLK_SYS"            posX="559" posY="990"  refEnable="MCOEnable"/>
+    <Label id="MCOHSELabel"    type="signal"   text="HSE"         posX="582" posY="1015" refEnable="MCOEnable"/>
+    <Label id="MCOHSILabel" type="signal"   text="HSI"         posX="582" posY="1040" refEnable="MCOEnable"/>
+    <Label id="MCOCLK_16MHz/512Label" type="signal"   text="CLK_16MHz/512"         posX="531" posY="1065" refEnable="MCOEnable"/>
+
+
+	
+ 
+
+</Clock>

@@ -91,6 +91,7 @@ extern void       APP_ZIGBEE_StackLayersInit              ( void );
 extern void       APP_ZIGBEE_NwkFormOrJoinTaskInit        ( void );
 extern void       APP_ZIGBEE_NwkFormOrJoin                ( void );
 
+extern void       APP_ZIGBEE_PermitJoin                   ( uint8_t cPermitJoinDelay );
 extern bool       APP_ZIGBEE_IsAppliJoinNetwork           ( void );
 extern bool       APP_ZIGBEE_GetCurrentChannel            ( uint8_t * cCurrentChannel );
 extern bool       APP_ZIGBEE_SetTxPower                   ( uint8_t cTxPower );

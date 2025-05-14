@@ -2,17 +2,17 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file    ${FamilyName?lower_case}xx_it.h
+  * @file    ${FamilyName?lower_case}[#if FamilyName=="STM32WB0" || FamilyName=="STM32WL3"]x[#else]xx[/#if]_it.h
   * @brief   This file contains the headers of the interrupt handlers.
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --] 
- ******************************************************************************
+  ******************************************************************************
   */
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __${FamilyName}xx_IT_H
-#define __${FamilyName}xx_IT_H
+#ifndef __${FamilyName}[#if FamilyName=="STM32WB0" || FamilyName=="STM32WL3"]x[#else]xx[/#if]_IT_H
+#define __${FamilyName}[#if FamilyName=="STM32WB0" || FamilyName=="STM32WL3"]x[#else]xx[/#if]_IT_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -63,4 +63,4 @@ void ${swlowRadioInterrupt.irqHandler}(void);
 }
 #endif
 
-#endif /* __${FamilyName}xx_IT_H */
+#endif /* __${FamilyName}[#if FamilyName=="STM32WB0" || FamilyName=="STM32WL3"]x[#else]xx[/#if]_IT_H */

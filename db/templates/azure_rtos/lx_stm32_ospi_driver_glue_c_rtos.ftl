@@ -48,7 +48,7 @@
       [#assign LX_USE_OCTOSPI_value = value]
     [/#if]
 	
-    [#if "${FamilyName?lower_case}" == "stm32u5"]
+    [#if "${FamilyName?lower_case}" == "stm32u5" || "${FamilyName?lower_case}" == "stm32mp2" ]
       [#assign  used_api= "OSPI"]
     [/#if]
     
@@ -72,7 +72,7 @@
 /**************************************************************************/
 #include "lx_stm32_ospi_driver.h"
 [#if LX_USE_OCTOSPI_value == "octo SPI"]
-[#if "${FamilyName?lower_case}" == "stm32u5"]
+[#if "${FamilyName?lower_case}" == "stm32u5" || "${FamilyName?lower_case}" == "stm32mp2"]
 [#if ospi_comp == "MX25LM51245G"]
 
 /* HAL DMA API implementation for OctoSPI component MX25LM51245G
@@ -246,7 +246,7 @@ INT lx_stm32_ospi_get_status(UINT instance)
 [#if glue_api == "DMA_API"]
   /* Initialize the read status register command */
 
-  [#if "${FamilyName?lower_case}" == "stm32u5"]
+  [#if "${FamilyName?lower_case}" == "stm32u5" || "${FamilyName?lower_case}" == "stm32mp2"]
   s_command.OperationType         = HAL_OSPI_OPTYPE_COMMON_CFG;
   s_command.FlashId               = HAL_OSPI_FLASH_ID_1;
   s_command.Instruction           = LX_STM32_OSPI_OCTAL_READ_STATUS_REG_CMD;
@@ -370,7 +370,7 @@ INT lx_stm32_ospi_read(UINT instance, ULONG *address, ULONG *buffer, ULONG words
 [#if glue_api == "DMA_API"]
   /* Initialize the read command */
 
-  [#if "${FamilyName?lower_case}" == "stm32u5"]
+  [#if "${FamilyName?lower_case}" == "stm32u5" || "${FamilyName?lower_case}" == "stm32mp2"]
   s_command.OperationType         = HAL_OSPI_OPTYPE_COMMON_CFG;
   s_command.FlashId               = HAL_OSPI_FLASH_ID_1;
   s_command.InstructionMode       = HAL_OSPI_INSTRUCTION_8_LINES;
@@ -481,7 +481,7 @@ INT lx_stm32_ospi_write(UINT instance, ULONG *address, ULONG *buffer, ULONG word
 
   /* Initialize the program command */
 
-[#if "${FamilyName?lower_case}" == "stm32u5"]  
+[#if "${FamilyName?lower_case}" == "stm32u5" || "${FamilyName?lower_case}" == "stm32mp2"]
   s_command.OperationType         = HAL_OSPI_OPTYPE_COMMON_CFG;
   s_command.FlashId               = HAL_OSPI_FLASH_ID_1;
   s_command.Instruction           = LX_STM32_OSPI_OCTAL_PAGE_PROG_CMD;
@@ -598,7 +598,7 @@ INT lx_stm32_ospi_write(UINT instance, ULONG *address, ULONG *buffer, ULONG word
 
   /* Initialize the program command */
 
-[#if "${FamilyName?lower_case}" == "stm32u5"]
+[#if "${FamilyName?lower_case}" == "stm32u5" || "${FamilyName?lower_case}" == "stm32mp2"]
   s_command.OperationType         = HAL_OSPI_OPTYPE_COMMON_CFG;
   s_command.FlashId               = HAL_OSPI_FLASH_ID_1;
   s_command.Instruction           = LX_STM32_OSPI_OCTAL_PAGE_PROG_CMD;
@@ -642,7 +642,7 @@ INT lx_stm32_ospi_write(UINT instance, ULONG *address, ULONG *buffer, ULONG word
   /* USER CODE END OSPI_WRITE_CMD 1 */
 
   /* Perform the write page by page */
-[#if "${FamilyName?lower_case}" == "stm32u5"]
+[#if "${FamilyName?lower_case}" == "stm32u5" || "${FamilyName?lower_case}" == "stm32mp2"]
   do
   {
     s_command.Address = current_addr;
@@ -724,7 +724,7 @@ INT lx_stm32_ospi_erase(UINT instance, ULONG block, ULONG erase_count, UINT full
 
   /* Initialize the erase command */
 
-  [#if "${FamilyName?lower_case}" == "stm32u5"]
+  [#if "${FamilyName?lower_case}" == "stm32u5" || "${FamilyName?lower_case}" == "stm32mp2"]
   s_command.OperationType         = HAL_OSPI_OPTYPE_COMMON_CFG;
   s_command.FlashId               = HAL_OSPI_FLASH_ID_1;
   s_command.InstructionMode       = HAL_OSPI_INSTRUCTION_8_LINES;
@@ -860,7 +860,7 @@ static uint8_t ospi_memory_reset(${used_api}_HandleTypeDef *h${used_api?lower_ca
   ${used_api}_AutoPollingTypeDef s_config;
 
   /* Initialize the reset enable command */
-  [#if "${FamilyName?lower_case}" == "stm32u5"]
+  [#if "${FamilyName?lower_case}" == "stm32u5" || "${FamilyName?lower_case}" == "stm32mp2"]
   s_command.OperationType         = HAL_OSPI_OPTYPE_COMMON_CFG;
   s_command.FlashId               = HAL_OSPI_FLASH_ID_1;
   s_command.Instruction           = LX_STM32_OSPI_RESET_ENABLE_CMD;
@@ -903,7 +903,7 @@ static uint8_t ospi_memory_reset(${used_api}_HandleTypeDef *h${used_api?lower_ca
   }
 
   /* Configure automatic polling mode to wait the memory is ready */
-  [#if "${FamilyName?lower_case}" == "stm32u5"]
+  [#if "${FamilyName?lower_case}" == "stm32u5" || "${FamilyName?lower_case}" == "stm32mp2"]
   s_command.Instruction  = LX_STM32_OSPI_OCTAL_READ_STATUS_REG_CMD;
   s_command.InstructionSize = HAL_OSPI_INSTRUCTION_16_BITS;
   s_command.DataMode     = HAL_OSPI_DATA_1_LINE;
@@ -958,7 +958,7 @@ static uint8_t ospi_set_write_enable(${used_api}_HandleTypeDef *h${used_api?lowe
   ${used_api}_RegularCmdTypeDef  s_command;
 
   /* Enable write operations */
-  [#if "${FamilyName?lower_case}" == "stm32u5"]
+  [#if "${FamilyName?lower_case}" == "stm32u5" || "${FamilyName?lower_case}" == "stm32mp2"]
   s_command.OperationType         = HAL_OSPI_OPTYPE_COMMON_CFG;
   s_command.FlashId               = HAL_OSPI_FLASH_ID_1;
   s_command.Instruction           = LX_STM32_OSPI_OCTAL_WRITE_ENABLE_CMD;
@@ -1024,7 +1024,7 @@ static uint8_t ospi_auto_polling_ready(${used_api}_HandleTypeDef *h${used_api?lo
   uint32_t start = LX_STM32_OSPI_CURRENT_TIME();
 
   /* Configure automatic polling mode to wait for memory ready */
-  [#if "${FamilyName?lower_case}" == "stm32u5"]
+  [#if "${FamilyName?lower_case}" == "stm32u5" || "${FamilyName?lower_case}" == "stm32mp2"]
   s_command.OperationType         = HAL_OSPI_OPTYPE_COMMON_CFG;
   s_command.FlashId               = HAL_OSPI_FLASH_ID_1;
   s_command.Instruction           = LX_STM32_OSPI_OCTAL_READ_STATUS_REG_CMD;
@@ -1087,7 +1087,7 @@ static uint8_t ospi_auto_polling_ready(${used_api}_HandleTypeDef *h${used_api?lo
       break;
     }
     /* the Memory is ready, break from the loop */
-    [#if "${FamilyName?lower_case}" == "stm32u5"]
+    [#if "${FamilyName?lower_case}" == "stm32u5" || "${FamilyName?lower_case}" == "stm32mp2"]
     if ((reg[0] & s_config.Mask ) == s_config.Match)
     {
       break;
@@ -1121,7 +1121,7 @@ static uint8_t ospi_set_octal_mode(${used_api}_HandleTypeDef *h${used_api?lower_
   ${used_api}_AutoPollingTypeDef s_config;
   uint8_t reg[2];
 
-  [#if "${FamilyName?lower_case}" == "stm32u5"]
+    [#if "${FamilyName?lower_case}" == "stm32u5" || "${FamilyName?lower_case}" == "stm32mp2"]
   s_command.OperationType      = HAL_OSPI_OPTYPE_COMMON_CFG;
   s_command.FlashId            = HAL_OSPI_FLASH_ID_1;
   s_command.InstructionDtrMode = HAL_OSPI_INSTRUCTION_DTR_DISABLE;
@@ -1178,7 +1178,7 @@ static uint8_t ospi_set_octal_mode(${used_api}_HandleTypeDef *h${used_api?lower_
   }
 
   /* Configure automatic polling mode to wait for write enabling */
-  [#if "${FamilyName?lower_case}" == "stm32u5"]
+    [#if "${FamilyName?lower_case}" == "stm32u5" || "${FamilyName?lower_case}" == "stm32mp2"]
   s_config.Match = LX_STM32_OSPI_SR_WEL;
   s_config.Mask  = LX_STM32_OSPI_SR_WEL;
 
@@ -1275,7 +1275,7 @@ static uint8_t ospi_set_octal_mode(${used_api}_HandleTypeDef *h${used_api?lower_
   }
 
   /* Check the configuration has been correctly done */
-  [#if "${FamilyName?lower_case}" == "stm32u5"]
+    [#if "${FamilyName?lower_case}" == "stm32u5" || "${FamilyName?lower_case}" == "stm32mp2"]
   s_command.Instruction     = LX_STM32_OSPI_OCTAL_READ_CFG_REG2_CMD;
   s_command.InstructionMode = HAL_OSPI_INSTRUCTION_8_LINES;
   s_command.InstructionSize = HAL_OSPI_INSTRUCTION_16_BITS;
@@ -1388,7 +1388,7 @@ void HAL_${used_api}_TxCpltCallback(${used_api}_HandleTypeDef *h${used_api?lower
 [/#if]
 [/#if]
 [#else]
-[#if "${FamilyName?lower_case}" == "stm32u5"]
+  [#if "${FamilyName?lower_case}" == "stm32u5" || "${FamilyName?lower_case}" == "stm32mp2"]
 #error "[This error is thrown on purpose] : the OCTOSPI IP is configured as ${LX_USE_OCTOSPI_value} which is not supported yet.
 [#if ospi_comp == "MX25LM51245G"]
 

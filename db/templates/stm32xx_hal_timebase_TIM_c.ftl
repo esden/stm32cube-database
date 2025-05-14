@@ -11,9 +11,14 @@
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
+[#if FamilyName=="STM32WB0"]
+#include "${FamilyName?lower_case}x_hal.h"
+#include "${FamilyName?lower_case}x_hal_tim.h"
+[#else]
 #include "${FamilyName?lower_case}xx_hal.h"
 #include "${FamilyName?lower_case}xx_hal_tim.h"
- 
+[/#if]
+
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 [#if FamilyName=="STM32WBA"]
@@ -66,8 +71,12 @@ void ${instance}_IRQHandler(void);
 HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
 {
   RCC_ClkInitTypeDef    clkconfig;
-[#if FamilyName!="STM32H7" && FamilyName!="STM32F0" && FamilyName!="STM32F1" && FamilyName!="STM32F2" && FamilyName!="STM32F3" && FamilyName!="STM32F4" && FamilyName!="STM32F7" && FamilyName!="STM32G0" && FamilyName!="STM32L0" && FamilyName!="STM32L1" && FamilyName!="STM32L4" && FamilyName!="STM32H5" && FamilyName!="STM32WBA"]
+[#if FamilyName!="STM32MP2" && FamilyName!="STM32H7" && FamilyName!="STM32F0" && FamilyName!="STM32F1" && FamilyName!="STM32F2" && FamilyName!="STM32F3" && FamilyName!="STM32F4" && FamilyName!="STM32F7" && FamilyName!="STM32G0" && FamilyName!="STM32L0" && FamilyName!="STM32L1" && FamilyName!="STM32L4" && FamilyName!="STM32H5" && FamilyName!="STM32WBA"]
   uint32_t              uwTimclock = 0;
+  uint32_t              uwPrescalerValue = 0;
+[/#if]
+[#if FamilyName =="STM32MP2"]
+  uint32_t              uwTimclock, uwAPB1Prescaler = 0;
   uint32_t              uwPrescalerValue = 0;
 [/#if]
 [#if FamilyName=="STM32H7" || FamilyName=="STM32G0" || FamilyName=="STM32L0" || FamilyName=="STM32L4" || FamilyName=="STM32H5" || FamilyName="STM32WBA"]
@@ -108,7 +117,7 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
 [#if FamilyName=="STM32H5"]
   HAL_StatusTypeDef     status;
 [/#if]
-[#if FamilyName!="STM32WL" && FamilyName!="STM32H7" && FamilyName!="STM32G4" && FamilyName!="STM32U5" && FamilyName!="STM32F0" && FamilyName!="STM32F1"  && FamilyName!="STM32F2" && FamilyName!="STM32F3" && FamilyName!="STM32F4" && FamilyName!="STM32F7" && FamilyName!="STM32G0" && FamilyName!="STM32L1" && FamilyName!="STM32L4" && FamilyName!="STM32H5" && FamilyName!="STM32WBA"]
+[#if FamilyName!="STM32WL" && FamilyName!="STM32H7" && FamilyName!="STM32C0" && FamilyName!="STM32G4" && FamilyName!="STM32U5" && FamilyName!="STM32F0" && FamilyName!="STM32F1"  && FamilyName!="STM32F2" && FamilyName!="STM32F3" && FamilyName!="STM32F4" && FamilyName!="STM32F7" && FamilyName!="STM32G0" && FamilyName!="STM32L1" && FamilyName!="STM32L4" && FamilyName!="STM32H5" && FamilyName!="STM32WBA"]
   /*Configure the ${instance} IRQ priority */
  [#if DIE != "DIE501"] 
   HAL_NVIC_SetPriority(${timeBaseInterrupt}, TickPriority ,0); 
@@ -122,15 +131,15 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
   IRQ_Enable(${timeBaseInterrupt});
   [/#if]  
 [/#if]
-[#if FamilyName=="STM32H7"]
-/*Configure the ${instance} IRQ priority */
+[#if FamilyName=="STM32H7" || FamilyName=="STM32C0"]
+  /*Configure the ${instance} IRQ priority */
   if (TickPriority < (1UL << __NVIC_PRIO_BITS))
-  {
-  HAL_NVIC_SetPriority(${timeBaseInterrupt}, TickPriority ,0U); 
+   {
+     HAL_NVIC_SetPriority(${timeBaseInterrupt}, TickPriority ,0); 
   
-  /* Enable the ${instance} global Interrupt */
-  HAL_NVIC_EnableIRQ(${timeBaseInterrupt}); 
-    uwTickPrio = TickPriority;
+     /* Enable the ${instance} global Interrupt */
+     HAL_NVIC_EnableIRQ(${timeBaseInterrupt}); 
+     uwTickPrio = TickPriority;
     }
   else
   {
@@ -144,15 +153,22 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
   __HAL_RCC_${instance}_FORCE_RESET();
   __HAL_RCC_${instance}_RELEASE_RESET();
 [/#if]
-  
   /* Get clock configuration */
-  HAL_RCC_GetClockConfig(&clkconfig, &pFLatency);
-  
+  HAL_RCC_GetClockConfig(&clkconfig, &pFLatency);  
 [#if FamilyName=="STM32H7" || FamilyName=="STM32F0" || FamilyName=="STM32F1" || FamilyName=="STM32F2" || FamilyName=="STM32F3" || FamilyName=="STM32F4" || FamilyName=="STM32F7" || FamilyName=="STM32G0" || FamilyName=="STM32L0" || FamilyName=="STM32L1" || FamilyName=="STM32L4" || FamilyName=="STM32H5" || FamilyName=="STM32WBA"]
  [#if APB=="APB1"]
   /* Get ${APB} prescaler */
   uw${APB}Prescaler = clkconfig.${APB}CLKDivider; 
 [/#if] 
+[#if FamilyName=="STM32MP2"]
+ [#if APB=="APB1"]
+  /* Get ${APB} prescaler */
+  uw${APB}Prescaler = clkconfig.${APB}_Div; 
+ [#elseif APB=="APB2"]
+ /* Get ${APB} prescaler */
+  uw${APB}Prescaler = clkconfig.${APB}_Div;
+[/#if] 
+[/#if]
 [#if APB=="APB2" &&  (FamilyName=="STM32L0" || FamilyName=="STM32WBA")]
   /* Get ${APB} prescaler */
   uw${APB}Prescaler = clkconfig.${APB}CLKDivider; 
@@ -194,14 +210,14 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
     [#if TIMAPB2Presc?? && TIMAPB2Presc!="1" && FamilyName!="STM32L0"]
       uwTimclock = ${TIMAPB2Presc}*HAL_RCC_GetPCLK2Freq();
     [#else]
-       [#if FamilyName!="STM32WBA"]
+       [#if FamilyName!="STM32WBA"  ]
       uwTimclock = HAL_RCC_GetPCLK2Freq();
        [/#if]
     [/#if]
      
     [/#if]
    [/#if]
-[#if FamilyName!="STM32H7" && FamilyName!="STM32F0" && FamilyName!="STM32F1"  && FamilyName!="STM32F2" && FamilyName!="STM32F3" && FamilyName!="STM32F4" && FamilyName!="STM32F7" && FamilyName!="STM32G0" && FamilyName!="STM32L0" && FamilyName!="STM32L1" && FamilyName!="STM32L4" && FamilyName!="STM32H5" && FamilyName!="STM32WBA"]
+[#if FamilyName!="STM32MP2" && FamilyName!="STM32H7" && FamilyName!="STM32F0" && FamilyName!="STM32F1"  && FamilyName!="STM32F2" && FamilyName!="STM32F3" && FamilyName!="STM32F4" && FamilyName!="STM32F7" && FamilyName!="STM32G0" && FamilyName!="STM32L0" && FamilyName!="STM32L1" && FamilyName!="STM32L4" && FamilyName!="STM32H5" && FamilyName!="STM32WBA" && FamilyName!="STM32WB0"]
   /* Compute ${instance} clock */
     [#if APB=="APB1"]
         [#if TIMAPB1Presc?? && TIMAPB1Presc!="1"]
@@ -217,6 +233,22 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
         [/#if]
     [/#if]
    [/#if]
+[#if FamilyName=="STM32WB0"]
+  /* Compute ${instance} clock */
+  uwTimclock = HAL_RCC_GetSysClockFreq();
+[/#if]
+  
+  [#if FamilyName=="STM32MP2"]
+  /* Compute ${instance} clock */
+ if (uwAPB1Prescaler == RCC_APB1_DIV1) 
+  {
+    uwTimclock = HAL_RCC_GetFreq(RCC_CLOCKTYPE_ICN_APB1);
+  }
+  else
+  {
+    uwTimclock = 2*HAL_RCC_GetFreq(RCC_CLOCKTYPE_ICN_APB1);
+  }
+  [/#if]
   
 [#if FamilyName=="STM32H5"]
   /* Compute the prescaler value to have ${instance} counter clock equal to 100KHz */

@@ -215,6 +215,7 @@ extern "C" {
 #define UCPD_INSTANCE0 ${USBPD_PORT0}
 
 /* defined used to configure function : USBPD_HW_Init_DMARxInstance,USBPD_HW_DeInit_DMARxInstance */
+[#if !USBPDCORE_LIB_NO_PD]
 #define UCPDDMA_INSTANCE0_CLOCKENABLE_RX    do{                                     \
                                                 ${USBPDenableClock};      \
                                               }while(0)
@@ -239,7 +240,7 @@ extern "C" {
 #define UCPDDMA_INSTANCE0_LL_CHANNEL_TX   LL_DMA_${USBPD_PORT0_DMA_LL_CHANNEL_TX}
 
 #define UCPDDMA_INSTANCE0_CHANNEL_TX   ${USBPD_PORT0_DMA_CHANNEL_TX}
-
+[/#if]
 /* defined used to configure  USBPD_HW_SetFRSSignalling */
 [#if USBPD_PORT0_FRSTX1_PIN != ""]
 #define UCPDFRS_INSTANCE0_FRSCC1  do{                                                                   \

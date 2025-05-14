@@ -194,12 +194,14 @@ void MX_${data.ipName}_GPIO_Init(void)
 [#else]
                 #tIRQ_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
 [/#if]
-[#if EnableCode??]
+[#if EnableCode?? ]
+[#if initVector.enableIRQ]
 [#if DIE != "DIE501"]
                 #tHAL_NVIC_EnableIRQ(${initVector.vector});#n
 [#else]
                 #tIRQ_Enable(${initVector.vector});
-[/#if]                
+[/#if]
+[/#if]
 [/#if]
 [#else]
     [#if NVICPriorityGroup??]

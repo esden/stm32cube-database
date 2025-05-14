@@ -90,7 +90,6 @@ oemirot_appli_non_secure=${appli_non_secure}
 [/#if]
 [#if isAppliOnly??]
 oemirot_appli=${appli}
-com_port=COM7
 	[#if  BootPathType=="ST_IROT_UROT"]
 stirot_iloader_boot_path_project=${CubeFwPath}\Projects\STM32H7S78-DK\Applications\ROT\STiROT_iLoader
 	[/#if]

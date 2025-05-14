@@ -31,6 +31,7 @@ Key: ${key}; Value: ${myHash[key]}
 #include "ll_sys.h"
 [#if (myHash["BLE"] == "Enabled")]
 #include "app_ble.h"
+#include "auto/ble_raw_api.h"
 [/#if]
 [#if myHash["SEQUENCER_STATUS"]?number == 1 ]
 #include "stm32_seq.h"
@@ -39,6 +40,19 @@ Key: ${key}; Value: ${myHash[key]}
 [#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
 #include "cmsis_os2.h"
 [/#if]
+[#if myHash["BLE_MODE_SIMPLEST_BLE"] == "Enabled" ]
+#include "skel_ble.h"
+[/#if]
+/* External variables --------------------------------------------------------*/
+[#if (myHash["BLE"] == "Enabled")]
+/**
+  * @brief  Missed HCI event flag
+  */
+extern uint8_t missed_hci_event_flag;
+[/#if]
+/* USER CODE BEGIN EV */
+
+/* USER CODE END EV */
 
 /* External function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN EFP */
@@ -56,17 +70,17 @@ void HostStack_Process(void)
 
   /* USER CODE END HostStack_Process 0 */
 
-  [#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled")]
+[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled") || (myHash["BLE_MODE_SIMPLEST_BLE"] == "Enabled")]
   /* Process BLE Host stack */
   BleStackCB_Process();
-  [/#if]
+[/#if]
 
   /* USER CODE BEGIN HostStack_Process 1 */
 
   /* USER CODE END HostStack_Process 1 */
 }
 
-[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled")]
+[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled") || (myHash["BLE_MODE_SIMPLEST_BLE"] == "Enabled")]
 /**
   * @brief  BLE Host stack processing callback.
   * @param  None
@@ -79,16 +93,23 @@ void BleStackCB_Process(void)
   /* USER CODE END BleStackCB_Process 0 */
 [#if myHash["BLE_MODE_SKELETON"] == "Enabled" ]
 
+[#elseif myHash["BLE_MODE_SIMPLEST_BLE"] == "Enabled" ]
+  Ble_HostStack_Process();
 [#else]
+  if (missed_hci_event_flag)
+  {
+    missed_hci_event_flag = 0;
+    HCI_HARDWARE_ERROR_EVENT(0x03);
+  }
   /* BLE Host stack processing through background task */
 [#if myHash["SEQUENCER_STATUS"]?number == 1 ]
   UTIL_SEQ_SetTask( 1U << CFG_TASK_BLE_HOST, CFG_SEQ_PRIO_0);
 
 [#elseif myHash["THREADX_STATUS"]?number == 1 ]
-  tx_semaphore_put(&BLE_HOST_Thread_Sem);
+  tx_semaphore_put(&BleHostSemaphore);
 
 [#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
-  osSemaphoreRelease(BleStackSemaphore);
+  osSemaphoreRelease(BleHostSemaphore);
 
 [/#if]
 [/#if]

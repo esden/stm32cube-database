@@ -10,12 +10,27 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
+[#assign myHash = {}]
+[#list SWIPdatas as SWIP]
+    [#if SWIP.defines??]
+        [#list SWIP.defines as definition]
+            [#assign myHash = {definition.name:definition.value} + myHash]
+        [/#list]
+    [/#if]
+[/#list]
 
 /* Includes ------------------------------------------------------------------*/
+#include <stdbool.h>
+
 #include "app_common.h"
 #include "hw.h"
 #include "baes.h"
+[#if (myHash["CFG_MM_TYPE"]?number == 2)]
 #include "advanced_memory_manager.h"
+[/#if]
+[#if (myHash["CFG_MM_TYPE"]?number == 1)]
+#include "stm32_mm.h"
+[/#if]
 
 /* Private includes -----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -28,7 +43,10 @@
 /* USER CODE END PTD */
 
 /* Private defines -----------------------------------------------------------*/
+[#if (myHash["CFG_MM_TYPE"]?number == 1)]
+#define C_SYS_MEMORY_HEAP_SIZE_BYTES          CFG_MM_POOL_SIZE
 
+[/#if]
 /* USER CODE BEGIN PD */
 
 /* USER CODE END PD */
@@ -47,7 +65,10 @@
 /* USER CODE END PC */
 
 /* Private variables ---------------------------------------------------------*/
+[#if (myHash["CFG_MM_TYPE"]?number == 1)]
+static uint8_t        SYS_MEMORY_HEAP[C_SYS_MEMORY_HEAP_SIZE_BYTES];
 
+[/#if]
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -169,6 +190,16 @@ void ZIGBEE_PLAT_AesCmacCompute( const uint8_t * pInput, uint32_t lInputLength, 
  */
 bool ZIGBEE_PLAT_ZbHeapInit( void )
 {	
+[#if (myHash["CFG_MM_TYPE"]?number == 1)]
+  static bool  bHeapAlreadyDone = false;
+  
+  /* Initialize System Heap used by Zigbee Stack */
+  if ( bHeapAlreadyDone == false )
+  {
+    UTIL_MM_Init( SYS_MEMORY_HEAP, C_SYS_MEMORY_HEAP_SIZE_BYTES );
+    bHeapAlreadyDone = true;
+  }
+[/#if]
 
   return true;
 }
@@ -178,6 +209,7 @@ bool ZIGBEE_PLAT_ZbHeapInit( void )
  */
 void * ZIGBEE_PLAT_ZbHeapMalloc( uint32_t iSize )
 {
+[#if (myHash["CFG_MM_TYPE"]?number == 2)]
   void  *ptr = NULL;
 
   /* Fix a problem with AMM if iSize is null */
@@ -190,7 +222,18 @@ void * ZIGBEE_PLAT_ZbHeapMalloc( uint32_t iSize )
   {
     ptr = NULL;
   }
-  
+[/#if]
+[#if (myHash["CFG_MM_TYPE"]?number == 1)]
+  void  *ptr;
+
+  ptr = UTIL_MM_GetBuffer( iSize );
+[/#if]
+[#if (myHash["CFG_MM_TYPE"]?number == 0)]
+  void  *ptr;
+
+  ptr = malloc( iSize );
+[/#if]
+
   return ptr;
 }
 
@@ -201,7 +244,15 @@ void ZIGBEE_PLAT_ZbHeapFree( void * ptr )
 {
   if ( ptr != NULL )
   {
+[#if (myHash["CFG_MM_TYPE"]?number == 2)]  
     AMM_Free( ptr );
+[/#if]
+[#if (myHash["CFG_MM_TYPE"]?number == 1)]
+    UTIL_MM_ReleaseBuffer( ptr );
+[/#if]
+[#if (myHash["CFG_MM_TYPE"]?number == 0)]
+    free( ptr );
+[/#if]
   }
   else
   {
@@ -224,7 +275,11 @@ unsigned int ZIGBEE_PLAT_ZbHeapMallocCurrentSize()
  */
 bool ZIGBEE_PLAT_HeapInit( void )
 {
+[#if (myHash["CFG_MM_TYPE"]?number == 1)]
+  return ZIGBEE_PLAT_ZbHeapInit();
+[#else]
   return true;
+[/#if]
 }
 
 /**
@@ -232,6 +287,7 @@ bool ZIGBEE_PLAT_HeapInit( void )
  */
 void * ZIGBEE_PLAT_HeapMalloc( uint32_t iSize )
 {
+[#if (myHash["CFG_MM_TYPE"]?number == 2)]
   void  *ptr = NULL;
 
   /* Fix a problem with AMM if iSize is null */
@@ -244,7 +300,18 @@ void * ZIGBEE_PLAT_HeapMalloc( uint32_t iSize )
   {
     ptr = NULL;
   }
-  
+[/#if]
+[#if (myHash["CFG_MM_TYPE"]?number == 1)]
+  void  *ptr;
+
+  ptr = UTIL_MM_GetBuffer( iSize );
+[/#if]
+[#if (myHash["CFG_MM_TYPE"]?number == 0)]
+  void  *ptr;
+
+  ptr = malloc( iSize );
+[/#if]
+
   return ptr;
 }
 
@@ -255,7 +322,15 @@ void ZIGBEE_PLAT_HeapFree( void * ptr )
 {
   if ( ptr != NULL )
   {
-    AMM_Free( ptr );  
+[#if (myHash["CFG_MM_TYPE"]?number == 2)]  
+    AMM_Free( ptr );
+[/#if]
+[#if (myHash["CFG_MM_TYPE"]?number == 1)]
+    UTIL_MM_ReleaseBuffer( ptr );
+[/#if]
+[#if (myHash["CFG_MM_TYPE"]?number == 0)]
+    free( ptr );
+[/#if]
   }
   else
   {

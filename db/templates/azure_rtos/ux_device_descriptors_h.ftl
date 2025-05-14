@@ -69,7 +69,11 @@ extern "C" {
 #define USBD_MAX_NUM_CONFIGURATION                     1U
 #define USBD_MAX_SUPPORTED_CLASS                       3U
 #define USBD_MAX_CLASS_ENDPOINTS                       9U
+[#if FamilyName?lower_case?starts_with("stm32c0")]
+#define USBD_MAX_CLASS_INTERFACES                      12U
+[#else]
 #define USBD_MAX_CLASS_INTERFACES                      11U
+[/#if]
 
 [#assign usbd_msc_ep_out_address = 0]
 [#assign usbd_msc_ep_in_address = 0]
@@ -643,6 +647,13 @@ extern "C" {
 [/#if][/#list]
 [/#if]
 [/#list]
+[#if (ux_device_bidirectional_endpoint_support_val == "0") && (UX_class_nb > 3)]
+#error Bidirectional endpoint flag disabled, max selected device classes should not be more then 3.
+[/#if]
+
+[#if (ux_device_bidirectional_endpoint_support_val == "1") && (UX_class_nb > 5)]
+#error Bidirectional endpoint flag enabled, max selected device classes should not be more then 5.
+[/#if]
 
 #define USBD_CONFIG_MAXPOWER                           ${usbd_max_power}U
 #define USBD_COMPOSITE_USE_IAD                         ${usbd_composite_aid}U
@@ -653,7 +664,23 @@ extern "C" {
 /* USER CODE BEGIN ET */
 
 /* USER CODE END ET */
-
+[#if FamilyName?lower_case?starts_with("stm32c0")]
+/* Enum Class Type */
+typedef enum
+{
+  CLASS_TYPE_NONE     = 0,
+  CLASS_TYPE_HID      = 1,
+  CLASS_TYPE_CDC_ACM  = 2,
+  CLASS_TYPE_MSC      = 3,
+  CLASS_TYPE_CDC_ECM  = 4,
+  CLASS_TYPE_DFU      = 5,
+  CLASS_TYPE_VIDEO    = 6,
+  CLASS_TYPE_PIMA_MTP = 7,
+  CLASS_TYPE_CCID     = 8,
+  CLASS_TYPE_PRINTER  = 9,
+  CLASS_TYPE_RNDIS    = 10,
+} USBD_CompositeClassTypeDef;
+[#else]
 /* Enum Class Type */
 typedef enum
 {
@@ -669,6 +696,7 @@ typedef enum
   CLASS_TYPE_CCID     = 9,
   CLASS_TYPE_PRINTER  = 10,
 } USBD_CompositeClassTypeDef;
+[/#if]
 
 [#list SWIPdatas as SWIP]
 [#if SWIP.variables??]
@@ -999,7 +1027,7 @@ typedef struct
   uint8_t bDefaultFrameIndex;
   uint8_t bAspectRatioX;
   uint8_t bAspectRatioY;
-  uint8_t bmInterlaceFlag;
+  uint8_t bmInterfaceFlag;
   uint8_t bCopyProtect;
 } __PACKED USBD_VIDEOPayloadFormatDescTypeDef;
 

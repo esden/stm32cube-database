@@ -41,10 +41,10 @@ Global variables Api:
 
 
 
-[#--------------------------------------------------------------------------------------------------------------------------------]				
+[#--------------------------------------------------------------------------------------------------------------------------------]
 [#-- Basic srvc (FTL data models)
 	 NB: this functions should not be used on java DM (else undefined behavior) --]
-[#--------------------------------------------------------------------------------------------------------------------------------]				
+[#--------------------------------------------------------------------------------------------------------------------------------]
 
 [#function srvc_convertNberDecToHexaString	pDecNber]
 	[#local module = "srvc_convertNberDecToHexa"]
@@ -172,6 +172,16 @@ is supposed to contain elmts of list type--]
 [#return isElmtFound]
 [/#function]
 
+
+[#--Convert String "{key=value}" to Map key=value  --]
+[#function srvc_str_toMap str]
+	[#assign map = { "key":"value" }]
+	[#if str?matches("^\\{.+=.*\\}$")] [#-- matches  {key=value}  --]
+		[#assign l=((str?keep_before("}"))?keep_after("{"))?split("=")]
+		[#assign map = { l[0]: l[1] }]
+	[/#if]
+	[#return map]
+[/#function]
 
 [#--Search in a strings list an element starting the provided string.
 	Return the 1st found element from the list. Empty if nothing match.--]

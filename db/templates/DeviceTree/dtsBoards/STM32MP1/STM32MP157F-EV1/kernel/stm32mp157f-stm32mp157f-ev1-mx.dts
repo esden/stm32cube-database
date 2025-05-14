@@ -14,7 +14,7 @@
 /* USER CODE END includes */
 
 /{
-	model = "STMicroelectronics STM32MP157F-EV1 STM32CubeMX board - openstlinux-5.15-yocto-kirkstone-mp1-v22.11.23";
+	model = "STMicroelectronics STM32MP157F-EV1 STM32CubeMX board - openstlinux-6.1-yocto-mickledore-mp1-v23.06.21";
 	compatible = "st,stm32mp157f-board_157f-ev1-mx", "st,stm32mp157f-ev1", "st,stm32mp157";
 
 	/* USER CODE BEGIN root */
@@ -162,6 +162,7 @@
 		compatible = "gpio-backlight";
 		gpios = <&gpiod 13 GPIO_ACTIVE_LOW>;
 		default-on;
+		default-brightness-level = <1>;
 		status = "okay";
 	};
 
@@ -261,9 +262,8 @@
 			reg = <0xe8000000 0x8000000>;
 			no-map;
 		};
-		
-		/* global autoconfigured region for contiguous allocations */
-		linux,cma {
+
+		linux,cma{
 			compatible = "shared-dma-pool";
 			reusable;
 			size = <0x8000000>;
@@ -867,6 +867,9 @@
 			pinmux = <STM32_PINMUX('A', 10, ANALOG)>;
 		};
 	};
+
+	/* USER CODE BEGIN pinctrl */
+	/* USER CODE END pinctrl */
 };
 
 &pinctrl_z{
@@ -889,6 +892,9 @@
 					<STM32_PINMUX('Z', 5, ANALOG)>;
 		};
 	};
+	
+	 /* USER CODE BEGIN pinctrl_z */
+	/* USER CODE END pinctrl_z */
 };
 
 &m4_rproc{
@@ -903,6 +909,10 @@
 	interrupts = <68 1>;
 	wakeup-source;
 	/* USER CODE END m4_rproc */
+
+	m4_system_resources{
+		status = "okay";
+	};
 };
 
 &bsec{
@@ -931,6 +941,9 @@
 	status = "okay";
 
 	/* USER CODE BEGIN dcmi */
+	sram = <&dcmi_pool>;
+	dmas = <&dmamux1 75 0x400 0x01>, <&mdma1 0 0x3 0x1200000a 0 0>;
+	dma-names = "tx", "mdma_tx";
 
 	port{
 
@@ -1078,6 +1091,7 @@
 	/* USER CODE BEGIN dsi */
 	#address-cells = <1>;
 	#size-cells = <0>;
+	default-on;
 
 	ports{
 		#address-cells = <1>;
@@ -1156,7 +1170,7 @@
 	nand-controller@4,0{
 		status = "okay";
 
-		nand: nand@0{
+		nand@0{
 			reg = <0>;
 			nand-on-flash-bbt;
 			#address-cells = <1>;
@@ -1191,8 +1205,9 @@
 	/* USER CODE BEGIN i2c2 */
 	i2c-scl-rising-time-ns = <185>;
 	i2c-scl-falling-time-ns = <20>;
-    /delete-property/dmas;
-	/delete-property/dma-names;
+	/delete-property/ dmas;
+	/delete-property/ dma-names;
+
 	wm8994:wm8994@1b{
 		compatible = "wlf,wm8994";
 		#sound-dai-cells = <0>;
@@ -1290,8 +1305,10 @@
 		panel = <&panel_dsi>;
 		pinctrl-0 = <&goodix_pins>;
 		pinctrl-names = "default";
+		AVDD28-supply = <&v3v3>;
+		VDDIO-supply = <&v3v3>;
 		status = "okay";
-		interrupts = <14 IRQ_TYPE_EDGE_RISING>;
+		interrupts = <14 IRQ_TYPE_NONE>;
 		interrupt-parent = <&stmfx_pinctrl>;
 	};
 	/* USER CODE END i2c2 */
@@ -1444,11 +1461,6 @@
 			power-off-time-sec = <10>;
 			status = "okay";
 		};
-
-		watchdog{
-			compatible = "st,stpmic1-wdt";
-			status = "disabled";
-		};
 	};
 	/* USER CODE END i2c4 */
 };
@@ -1462,8 +1474,8 @@
 	/* USER CODE BEGIN i2c5 */
 	i2c-scl-rising-time-ns = <185>;
 	i2c-scl-falling-time-ns = <20>;
-	/delete-property/dmas;
-	/delete-property/dma-names;
+	/delete-property/ dmas;
+	/delete-property/ dma-names;
 	/* USER CODE END i2c5 */
 };
 
@@ -1475,6 +1487,7 @@
 	status = "okay";
 
 	/* USER CODE BEGIN ltdc */
+	default-on;
 
 	port{
 
@@ -1489,6 +1502,10 @@
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&fdcan1_pins_mx>;
 	pinctrl-1 = <&fdcan1_sleep_pins_mx>;
+	status = "okay";
+};
+
+&m4_rcc{
 	status = "okay";
 };
 
@@ -1796,5 +1813,13 @@
 
 &cpu1{
 	cpu-supply = <&vddcore>;
+};
+
+&sram4{
+
+	dcmi_pool:dcmi-pool@0{
+		reg = <0x0 0x8000>;
+		pool;
+	};
 };
 /* USER CODE END addons */

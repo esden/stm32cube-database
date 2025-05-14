@@ -118,6 +118,9 @@
           [#if index == 2]
             [#assign semaphoreControl = i]
           [/#if]
+          [#if index == 3]
+            [#assign initialState = i]
+          [/#if]
           [#assign index = index + 1]
         [/#list]
         [#if semaphoreName != "0"]
@@ -156,6 +159,9 @@
           [#if index == 3]
             [#assign semaphoreControl = i]
           [/#if]
+          [#if index == 4]
+            [#assign initialCount = i]
+          [/#if]
           [#assign index = index + 1]
         [/#list]
         [#if semaphoreName != "0"] 
@@ -165,9 +171,9 @@
           [/#if]
           #t/* definition and creation of ${semaphoreName} */
           [#if semaphoreAllocation == "Dynamic"]
-            #t${semaphoreName}Handle = xSemaphoreCreateCounting(${semaphoreCount}, 0);
+            #t${semaphoreName}Handle = xSemaphoreCreateCounting(${semaphoreCount}, ${initialCount});
           [#else]
-            #t${semaphoreName}Handle = xSemaphoreCreateCountingStatic(${semaphoreCount}, 0, &${semaphoreControl});
+            #t${semaphoreName}Handle = xSemaphoreCreateCountingStatic(${semaphoreCount}, ${initialCount}, &${semaphoreControl});
           [/#if]
         [/#if]
       [/#if]

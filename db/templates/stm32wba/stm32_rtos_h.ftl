@@ -42,6 +42,9 @@ extern "C" {
 #include "app_threadx.h"
 [/#if]
 [#if myHash["FREERTOS_STATUS"]?number == 1 ]
+#include "cmsis_os2.h"
+#include "app_freertos.h"
+#include "task.h"
 [/#if]
 /* USER CODE BEGIN Includes */
 
@@ -55,60 +58,117 @@ extern "C" {
 /* Exported constants --------------------------------------------------------*/
 [#if myHash["SEQUENCER_STATUS"]?number == 1 ]
 /* Sequencer priorities by default  */
-#define CFG_TASK_PRIO_HW_RNG                    CFG_SEQ_PRIO_0
-#define CFG_TASK_PRIO_LINK_LAYER                CFG_SEQ_PRIO_0
+#define TASK_PRIO_RNG                           CFG_SEQ_PRIO_0
+#define TASK_PRIO_LINK_LAYER                    CFG_SEQ_PRIO_0
 [#if (myHash["THREAD"] == "Enabled") || (myHash["THREAD_SKELETON"] == "Enabled")]
-#define CFG_TASK_PRIO_ALARM                     CFG_SEQ_PRIO_1
-#define CFG_TASK_PRIO_US_ALARM                  CFG_TASK_PRIO_ALARM
-#define CFG_TASK_PRIO_TASKLETS                  CFG_SEQ_PRIO_0
-#define CFG_TASK_PRIO_UART                      CFG_SEQ_PRIO_1
+#define TASK_PRIO_ALARM                         CFG_SEQ_PRIO_1
+#define TASK_PRIO_US_ALARM                      TASK_PRIO_ALARM
+#define TASK_PRIO_TASKLETS                      CFG_SEQ_PRIO_0
+#define TASK_PRIO_UART                          CFG_SEQ_PRIO_1
+#define TASK_PRIO_PKA                           CFG_SEQ_PRIO_1
 [/#if]
 [#if (myHash["ZIGBEE"] == "Enabled") || (myHash["ZIGBEE_SKELETON"] == "Enabled") || (myHash["mac_802_15_4_SKELETON"] == "Enabled")]
-#define CFG_TASK_PRIO_MAC_LAYER                 CFG_SEQ_PRIO_1
+#define TASK_PRIO_MAC_LAYER                     CFG_SEQ_PRIO_1
 [/#if]
 [#if (myHash["ZIGBEE"] == "Enabled")]
-#define CFG_TASK_PRIO_ZIGBEE_LAYER              CFG_SEQ_PRIO_1
+#define TASK_PRIO_ZIGBEE_LAYER                  CFG_SEQ_PRIO_1
+#define TASK_PRIO_ZIGBEE_NETWORK_FORM           CFG_SEQ_PRIO_1
+#define TASK_PRIO_ZIGBEE_APP_START              CFG_SEQ_PRIO_1
+[/#if]
+[/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+/* FreeRTOS priorities by default  */
+#define TASK_PRIO_LINK_LAYER                    osPriorityRealtime2
+#define TASK_PRIO_TEMP_MEAS_LL                  osPriorityRealtime2
+[#if (myHash["CFG_MM_TYPE"]?number == 2)]
+#define TASK_PRIO_AMM                           osPriorityNormal
+[/#if]
+#define TASK_PRIO_RNG                           osPriorityHigh
+[#if (myHash["BLE"] == "Enabled")]
+#define TASK_PRIO_FLASH_MANAGER                 osPriorityNormal
+#define TASK_PRIO_BLE_HOST                      osPriorityNormal
+#define TASK_PRIO_HCI_ASYNC_EVENT               osPriorityNormal
+#define TASK_PRIO_BLE_TIMER                     osPriorityNormal
+#define TASK_PRIO_BPKA                          osPriorityNormal
+[/#if]
 
-#define CFG_TASK_PRIO_ZIGBEE_NETWORK_FORM       CFG_SEQ_PRIO_1
-#define CFG_TASK_PRIO_ZIGBEE_APP_START          CFG_SEQ_PRIO_1
+[#if (myHash["ZIGBEE"] == "Enabled")]
+#define TASK_PRIO_ZIGBEE_LAYER                  osPriorityRealtime1
+#define TASK_PRIO_MAC_LAYER                     osPriorityRealtime3
+#define TASK_PRIO_ZIGBEE_NETWORK_FORM           osPriorityNormal
+#define TASK_PRIO_ZIGBEE_APP_START              osPriorityBelowNormal
 [/#if]
 [/#if]
 [#if myHash["THREADX_STATUS"]?number == 1 ]
 /* ThreadX priorities by default  */
-#define CFG_TASK_PRIO_MAC_LAYER                 5u
-#define CFG_TASK_PREEMP_MAC_LAYER               0u
+#define TASK_PRIO_LINK_LAYER                    (7u)
+#define TASK_PREEMP_LINK_LAYER                  (0u)
 
-#define CFG_TASK_PRIO_LINK_LAYER                7u
-#define CFG_TASK_PREEMP_LINK_LAYER              0u
+#define TASK_PRIO_TEMP_MEAS_LL                  (7u)
+#define TASK_PREEMP_TEMP_MEAS_LL                (0u)
 
-#define CFG_TASK_PRIO_LINK_LAYER_TEMP           7u
-#define CFG_TASK_PREEMP_LINK_LAYER_TEMP         0u
+[#if (myHash["CFG_MM_TYPE"]?number == 2)]
+#define TASK_PRIO_AMM                           (15u)
+#define TASK_PREEMP_AMM                         (0u)
 
-#define CFG_TASK_PRIO_ZIGBEE_LAYER              9u
-#define CFG_TASK_PREEMP_ZIGBEE_LAYER            0u
-
-#define CFG_TASK_PRIO_HW_RNG                    11u
-#define CFG_TASK_PREEMP_HW_RNG                  0u
-
-#define CFG_TASK_PRIO_AMM_BCKGND                15u
-#define CFG_TASK_PREEMP_AMM_BCKGND              0u
-
-#define CFG_TASK_PRIO_ZIGBEE_NETWORK_FORM       16u
-#define CFG_TASK_PREEMP_ZIGBEE_NETWORK_FORM     0u
-
-#define CFG_TASK_PRIO_ZIGBEE_APP_START          17u
-#define CFG_TASK_PREEMP_ZIGBEE_APP_START        0u
 [/#if]
-[#if myHash["FREERTOS_STATUS"]?number == 1 ]
-/* FreeRTOS priorities by default  */
-#define CFG_TASK_PRIO_MAC_LAYER                 osPriorityRealtime3
-#define CFG_TASK_PRIO_LINK_LAYER                osPriorityRealtime2
-#define CFG_TASK_PRIO_LINK_LAYER_TEMP           osPriorityRealtime2
-#define CFG_TASK_PRIO_ZIGBEE_LAYER              osPriorityRealtime1
-#define CFG_TASK_PRIO_HW_RNG                    osPriorityHigh
+#define TASK_PRIO_RNG                           (11u)
+#define TASK_PREEMP_RNG                         (0u)
+[#if (myHash["BLE"] == "Enabled")]
 
-#define CFG_TASK_PRIO_ZIGBEE_NETWORK_FORM       osPriorityNormal
-#define CFG_TASK_PRIO_ZIGBEE_APP_START          osPriorityBelowNormal
+#define TASK_PRIO_FLASH_MANAGER                 (11u)
+#define TASK_PREEMP_FLASH_MANAGER               (0u)
+
+#define TASK_PRIO_BLE_HOST                      (15u)
+#define TASK_PREEMP_BLE_HOST                    (0u)
+
+#define TASK_PRIO_HCI_ASYNC_EVENT               (15u)
+#define TASK_PREEMP_HCI_ASYNC_EVENT             (0u)
+
+#define TASK_PRIO_BLE_TIMER                     (15u)
+#define TASK_PREEMP_BLE_TIMER                   (0u)
+
+#define TASK_PRIO_BPKA                          (15u)
+#define TASK_PREEMP_BPKA                        (0u)
+
+[#if (myHash["BLE_MODE_TRANSPARENT_UART"] == "Enabled")]
+#define TASK_PRIO_TX_TO_HOST                    (15u)
+#define TASK_PREEMP_TX_TO_HOST                  (0u)
+
+[/#if]
+[/#if]
+[#if (myHash["ZIGBEE"] == "Enabled")]
+#define TASK_PRIO_MAC_LAYER                     (5u)
+#define TASK_PREEMP_MAC_LAYER                   (0u)
+
+#define TASK_PRIO_ZIGBEE_LAYER                  (9u)
+#define TASK_PREEMP_ZIGBEE_LAYER                (0u)
+
+#define TASK_PRIO_ZIGBEE_NETWORK_FORM           (16u)
+#define TASK_PREEMP_ZIGBEE_NETWORK_FORM         (0u)
+
+#define TASK_PRIO_ZIGBEE_APP_START              (17u)
+#define TASK_PREEMP_ZIGBEE_APP_START            (0u)
+[/#if]
+[#if (myHash["THREAD"] == "Enabled")]
+#define TASK_PRIO_ALARM                         (6u)
+#define TASK_PREEMP_ALARM                       (6u)
+
+#define TASK_PRIO_US_ALARM                      TASK_PRIO_ALARM
+#define TASK_PREEMP_US_ALARM                    TASK_PRIO_ALARM
+
+#define TASK_PRIO_TASKLETS                      (7u)
+#define TASK_PREEMP_TASKLETS                    (7u)
+
+#define TASK_PRIO_PKA                           (10u) 
+#define TASK_PREEMP_PRIO_PKA                    (10u)
+
+#define TASK_PRIO_CLI_UART                      (12u)
+#define TASK_PREEMP_CLI_UART                    (12u)
+
+#define TASK_PRIO_SEND                          (13u) 
+#define TASK_PREEMP_PRIO_SEND                   (13u)
+[/#if]
 [/#if]
 
 /* USER CODE BEGIN TASK_Priority_Define */
@@ -116,23 +176,46 @@ extern "C" {
 /* USER CODE END TASK_Priority_Define */
 
 [#if (myHash["FREERTOS_STATUS"]?number == 1) || (myHash["THREADX_STATUS"]?number == 1) ]
-#define RTOS_MAX_THREAD                         20u
+#define RTOS_MAX_THREAD                         (20u)
   
 #define RTOS_STACK_SIZE_LARGE                   ( 1024u * 3u )
-#define RTOS_STACK_SIZE_ENHANCED                ( 1024u * 2u )
+#define RTOS_STACK_SIZE_MODERATE                ( 2048u )
 #define RTOS_STACK_SIZE_NORMAL                  ( 1024u )
 #define RTOS_STACK_SIZE_REDUCED                 ( 512u )
-#define RTOS_STACK_SIZE_SMALL                   ( 384u )
+#define RTOS_STACK_SIZE_SMALL                   ( 256u )
+#define RTOS_STACK_SIZE_TINY                    ( configMINIMAL_STACK_SIZE )
 
 /* Tasks stack sizes by default  */
-#define TASK_LINK_LAYER_STACK_SIZE              RTOS_STACK_SIZE_LARGE
-#define TASK_LINK_LAYER_TEMP_STACK_SIZE         RTOS_STACK_SIZE_REDUCED
-#define TASK_MAC_LAYER_STACK_SIZE               RTOS_STACK_SIZE_ENHANCED
-#define TASK_ZIGBEE_LAYER_STACK_SIZE            RTOS_STACK_SIZE_LARGE
-#define TASK_HW_RNG_STACK_SIZE                  RTOS_STACK_SIZE_REDUCED
-#define TASK_ZIGBEE_NETWORK_FORM_STACK_SIZE     RTOS_STACK_SIZE_LARGE
-#define TASK_ZIGBEE_APP_START_STACK_SIZE        RTOS_STACK_SIZE_NORMAL
-#define TASK_AMM_BCKGND_STACK_SIZE              RTOS_STACK_SIZE_NORMAL
+#define TASK_STACK_SIZE_LINK_LAYER              RTOS_STACK_SIZE_LARGE
+#define TASK_STACK_SIZE_TEMP_MEAS_LL            RTOS_STACK_SIZE_SMALL
+[#if (myHash["CFG_MM_TYPE"]?number == 2)]
+#define TASK_STACK_SIZE_AMM                     RTOS_STACK_SIZE_SMALL
+[/#if]
+#define TASK_STACK_SIZE_RNG                     RTOS_STACK_SIZE_REDUCED
+[#if (myHash["BLE"] == "Enabled")]
+#define TASK_STACK_SIZE_FLASH_MANAGER           RTOS_STACK_SIZE_NORMAL
+#define TASK_STACK_SIZE_BLE_HOST                RTOS_STACK_SIZE_MODERATE
+#define TASK_STACK_SIZE_HCI_ASYNC_EVENT         RTOS_STACK_SIZE_NORMAL
+#define TASK_STACK_SIZE_BLE_TIMER               RTOS_STACK_SIZE_SMALL
+#define TASK_STACK_SIZE_BPKA                    RTOS_STACK_SIZE_SMALL
+[#if (myHash["BLE_MODE_TRANSPARENT_UART"] == "Enabled")]
+#define TASK_STACK_SIZE_TX_TO_HOST              RTOS_STACK_SIZE_NORMAL
+[/#if]
+[/#if]
+[#if (myHash["ZIGBEE"] == "Enabled")]
+#define TASK_STACK_SIZE_MAC_LAYER               RTOS_STACK_SIZE_MODERATE
+#define TASK_STACK_SIZE_ZIGBEE_LAYER            RTOS_STACK_SIZE_LARGE
+#define TASK_STACK_SIZE_ZIGBEE_NETWORK_FORM     RTOS_STACK_SIZE_LARGE
+#define TASK_STACK_SIZE_ZIGBEE_APP_START        RTOS_STACK_SIZE_NORMAL
+[/#if]
+[#if (myHash["THREAD"] == "Enabled")]
+#define TASK_STACK_SIZE_ALARM                   RTOS_STACK_SIZE_MODERATE
+#define TASK_STACK_SIZE_ALARM_US                RTOS_STACK_SIZE_NORMAL
+#define TASK_STACK_SIZE_TASKLETS                RTOS_STACK_SIZE_LARGE
+#define TASK_STACK_SIZE_CLI_UART                RTOS_STACK_SIZE_NORMAL
+#define TASK_STACK_SIZE_SEND                    RTOS_STACK_SIZE_NORMAL 
+#define TASK_STACK_SIZE_PKA                     RTOS_STACK_SIZE_NORMAL  
+[/#if]
 /* USER CODE BEGIN TASK_Size_Define */
 
 /* USER CODE END TASK_Size_Define */
@@ -142,7 +225,7 @@ extern "C" {
 /* Attributes needed by CMSIS */
 #define TASK_DEFAULT_ATTR_BITS                  ( 0u )
 #define TASK_DEFAULT_CB_MEM                     ( 0u )
-#define TASK_DEFAULT_CB_SIZE                    (  0u )
+#define TASK_DEFAULT_CB_SIZE                    ( 0u )
 #define TASK_DEFAULT_STACK_MEM                  ( 0u )
   
 #define SEMAPHORE_DEFAULT_ATTR_BITS             ( 0u )
@@ -168,6 +251,10 @@ extern "C" {
 /* USER CODE END EM */
 
 /* Exported variables --------------------------------------------------------*/
+[#if myHash["THREADX_STATUS"]?number == 1 ]
+extern TX_BYTE_POOL       *pBytePool;   /* ThreadX byte pool pointer for whole WPAN middleware */
+
+[/#if]
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */

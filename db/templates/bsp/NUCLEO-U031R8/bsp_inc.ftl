@@ -31,7 +31,6 @@
     [/#list]
   [/#if]
 [/#list]
-
 [#if instName.toLowerCase()?contains("nucleo")]
 #include "${FamilyName?lower_case}xx_nucleo.h"
 [#else]
@@ -40,3 +39,4 @@
 [#if VCP == "true"]
 #include <stdio.h>
 [/#if]
+#n

@@ -23,7 +23,7 @@ extern "C" {
 
 /* USER CODE BEGIN Private Includes */
 
-/* USER CODE BEGIN Private Includes */
+/* USER CODE END Private Includes */
 
 /* Private defines -----------------------------------------------------------*/
 
@@ -42,7 +42,7 @@ extern "C" {
 #define UX_HCD_STM32_MAX_NB_CHANNELS          8
 [/#if]
 
-[#if FamilyName?lower_case == "stm32h5"]
+[#if FamilyName?lower_case == "stm32h5" || FamilyName?lower_case == "stm32c0"]
 #define UX_DCD_STM32_MAX_ED                   8
 #define UX_HCD_STM32_MAX_NB_CHANNELS          8
 [/#if]

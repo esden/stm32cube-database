@@ -26,6 +26,19 @@
 		serial3 = &usart2;
 	};
 
+	hdmi:connector{
+		compatible = "hdmi-connector";
+		label = "hdmi";
+		type = "a";
+
+		port{
+
+			hdmi_connector_in:endpoint{
+				remote-endpoint = <&sii9022_out>;
+			};
+		};
+	};
+
 	led{
 		compatible = "gpio-leds";
 
@@ -518,6 +531,15 @@
 					<STM32_PINMUX('D', 6, ANALOG)>;
 		};
 	};
+
+	/* USER CODE BEGIN pinctrl */
+	stusb1600_pins_a:stusb1600-0{
+             pins{
+                    bias-pull-up;
+                     pinmux = <STM32_PINMUX('I', 11, GPIO)>;
+              };
+       };
+	/* USER CODE END pinctrl */
 };
 
 &pinctrl_z{
@@ -540,6 +562,9 @@
 					<STM32_PINMUX('Z', 5, ANALOG)>;
 		};
 	};
+	
+	/* USER CODE BEGIN pinctrl_z */
+	/* USER CODE END pinctrl_z */
 };
 
 &m4_rproc{
@@ -692,7 +717,7 @@
 	nvmem-cells = <&ethernet_mac_address>;
 	nvmem-cell-names = "mac-address";
 
-	mdio0{
+	mdio{
 		#address-cells = <1>;
 		#size-cells = <0>;
 		compatible = "snps,dwmac-mdio";
@@ -752,6 +777,14 @@
 
 				sii9022_in:endpoint{
 					remote-endpoint = <&ltdc_ep0_out>;
+				};
+			};
+
+			port@1{
+				reg = <1>;
+
+				sii9022_out:endpoint{
+					remote-endpoint = <&hdmi_connector_in>;
 				};
 			};
 
@@ -988,11 +1021,6 @@
 			power-off-time-sec = <10>;
 			status = "okay";
 		};
-
-		watchdog{
-			compatible = "st,stpmic1-wdt";
-			status = "disabled";
-		};
 	};
 	/* USER CODE END i2c4 */
 };
@@ -1011,7 +1039,7 @@
 
 		i2s2_endpoint:endpoint{
 			remote-endpoint = <&sii9022_tx_endpoint>;
-			format = "i2s";
+			dai-format = "i2s";
 			mclk-fs = <256>;
 		};
 	};
@@ -1026,6 +1054,7 @@
 	status = "okay";
 
 	/* USER CODE BEGIN ltdc */
+	default-on;
 
 	port{
 		#address-cells = <1>;
@@ -1150,6 +1179,7 @@
 
 	/* USER CODE BEGIN sdmmc2 */
 	non-removable;
+	cap-sdio-irq;
 	st,neg-edge;
 	bus-width = <4>;
 	vmmc-supply = <&v3v3>;
@@ -1160,9 +1190,6 @@
 	brcmf:bcrmf@1{
 		reg = <1>;
 		compatible = "brcm,bcm4329-fmac";
-		interrupt-parent = <&gpiod>;
-		interrupts = <0 IRQ_TYPE_LEVEL_HIGH>; /* WL_HOST_WAKE */
-		interrupt-names = "host-wake";
 	};
 	/* USER CODE END sdmmc2 */
 };

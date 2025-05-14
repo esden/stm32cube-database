@@ -14,6 +14,7 @@
 [#assign PG_VALIDATION = 0]
 
 /* Includes ------------------------------------------------------------------*/
+#include "log_module.h"
 #include "app_conf.h"
 #include "stm32_adv_trace.h"
 #include "serial_cmd_interpreter.h"

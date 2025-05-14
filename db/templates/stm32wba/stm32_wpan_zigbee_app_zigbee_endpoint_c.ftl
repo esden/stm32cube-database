@@ -20,6 +20,8 @@ Key: ${key}; Value: ${myHash[key]}
 [#assign userCodeIndex_GP = 0]
 [#assign userListIndex_GP = 0]
 [#assign userAlignPad = 43]                [#-- Default alignment of variables declaration --]
+[#assign userFctAlignPad = 27]             [#-- Default alignment of functions declaration --]
+[#assign userFctVarAlignPad = 75]          [#-- Default alignment of functions Variables declaration --]
 [#assign userDefineLength = 10]            [#-- Length if a #define --]
 [#assign allHashEndpoint_GP = {}]
 [#assign zigbeeGenericParamHash_GP = {}]   [#-- Hash to register all generic param --]
@@ -129,11 +131,9 @@ Key: ${key}; Value: ${myHash[key]}
         [#assign masterCbTypeName = allHashCluster_GP[cluster]["key3masterCbTypeName"]?replace("$ROLE",clusterRole?cap_first)?replace("$LOWERROLE",clusterRole)?replace("$ENDPOINT","" + endpoint)]
         [#assign isAlone = "false" ]
         [#assign cbName = ""]
-
         [#-- Get elements of the callback master of the Cluster --]
-        [#assign searchCBName = "CB_"+ clusterNameForCBName?upper_case + "_" + clusterRole?upper_case] 
+        [#assign searchCBName = "CB_"+ clusterNameForCBName?upper_case + "_" + clusterRole?upper_case ] 
         [#assign clusterRoleForCBName = clusterRole?cap_first ]
-                
         [#-- Get elements of the CallBacks function activated --]
         [#assign cbToRegister = []]
         [#list allHashCallBacks_GP?keys as cbXMLArgumentName]
@@ -141,10 +141,9 @@ Key: ${key}; Value: ${myHash[key]}
                 [#assign cbToRegister = cbToRegister + [allHashCallBacks_GP[cbXMLArgumentName]]]
             [/#if]
         [/#list]
-
         [#if cbToRegister[0]??]
             [#if step == "declaration"]
-                [#lt]/* ${clusterNameForCBName?cap_first} ${clusterRoleForCBName}${endpointName} Callbacks */
+                [#lt]/* ${clusterNameForCBName} ${clusterRoleForCBName}${endpointName} Callbacks */
             [/#if]
             [#assign allCallbackName = ""]
             [#list cbToRegister as activatedCallback]
@@ -180,8 +179,9 @@ Key: ${key}; Value: ${myHash[key]}
                 [/#if]
                 [#if  cbName != "" && callbackDefArg != "()"]
                     [#if step == "declaration"]
-                        [#lt]${callbackDefStruct} ${cbName}${callbackDefArg};
-                    [#else]
+                        [#lt]${callbackDefStruct?right_pad(userFctAlignPad)} ${cbName?right_pad(userFctVarAlignPad - userFctAlignPad)}${callbackDefArg};
+                    [/#if]
+                    [#if step == "definition"]
                         [#if callbackDefStruct?contains("ZbZclTunnelStatusT")]
                             [#assign declVar = "enum ZbZclTunnelStatusT   eStatus = ZCL_TUNNEL_STATUS_SUCCESS;"]
                             [#assign retVar = "return eStatus;"]
@@ -200,9 +200,9 @@ Key: ${key}; Value: ${myHash[key]}
                         [/#if]
                         [#lt]/**
                         [#if endpointName != ""]
-                            [#lt] * @brief  ${clusterNameForCBName?cap_first} ${clusterRoleForCBName?cap_first} '${cbFinalPointerName}' ${endpointName} command Callback
+                            [#lt] * @brief  ${clusterNameForCBName} ${clusterRoleForCBName?cap_first} '${cbFinalPointerName}' ${endpointName} command Callback
                         [#else]
-                            [#lt] * @brief  ${clusterNameForCBName?cap_first} ${clusterRoleForCBName?cap_first} '${cbFinalPointerName}' command Callback
+                            [#lt] * @brief  ${clusterNameForCBName} ${clusterRoleForCBName?cap_first} '${cbFinalPointerName}' command Callback
                         [/#if]
                         [#lt] */
                         [#lt]${callbackDefStruct} ${cbName}${callbackDefArg}
@@ -217,8 +217,7 @@ Key: ${key}; Value: ${myHash[key]}
                     [/#if]
                 [/#if]
             [/#list]
-
-            [#if step == "declaration"]
+            [#if (step == "declaration") && (clusterNameForCBName != "OTA")]
                 [#if cbName != ""]
                     [#if isAlone == "false" ]
                         [#assign masterCbName = "st" + clusterNameForCBName + clusterRoleForCBName + "Callbacks" + endpointNameCbk]
@@ -246,7 +245,33 @@ Key: ${key}; Value: ${myHash[key]}
                 [#else]
                     [#lt]${masterCbTypeName} ${masterCbName};
                 [/#if]
-            [/#if]  
+            [/#if]
+            [#if step == "configcode"]
+                [#if cbName != ""]
+                    [#if isAlone == "false" ]
+                        [#assign masterCbName = "st" + clusterNameForCBName + clusterRoleForCBName + "Config" + endpointNameCbk]
+                        [#if clusterRoleForCBName == "Client" ]
+                            [#assign masterCbName = masterCbName + ".callbacks"]
+                        [/#if]
+                        [#if allCallbackName??]
+                            [#list allCallbackName?split(":") as currentCallBackName]
+                                [#if currentCallBackName?contains("$NULL")]
+                                    [#lt]  ${masterCbName}.${currentCallBackName?replace("$NULL","")} = NULL;
+                                [#else]
+                                    [#assign cbPtNameList = currentCallBackName?split("_")]
+                                    [#assign cbFinalCallbackName = ""]
+                                    [#list cbPtNameList as cbPtName]
+                                        [#assign cbFinalCallbackName = cbFinalCallbackName + cbPtName?cap_first ]
+                                    [/#list]
+                                    [#assign allCallbackNameToAdd = cbPointerName]
+                                    [#assign cbName2 = "APP_ZIGBEE_" + clusterNameForCBName + clusterRoleForCBName + cbFinalCallbackName + "Callback" + endpointNameCbk]
+                                    [#lt]  ${masterCbName}.${currentCallBackName?lower_case} = ${cbName2};
+                                [/#if]
+                            [/#list]
+                        [/#if]
+                    [/#if]
+                [/#if]
+            [/#if]
         [/#if]
     [/#list]
 [/#macro]
@@ -275,7 +300,7 @@ Key: ${key}; Value: ${myHash[key]}
     [#assign profileId  = allHashEndpoint_GP[endpoint]["ProfID"]]
     [#assign clusterValue  = allHashCluster_GP[cluster]["clusterValue"]?split("_")]
     [#assign clusterName = allHashCluster_GP[cluster]["key1clusterName"]]
-    [#assign clusterNameForCBName = allHashCluster_GP[cluster]["key2clusterNameForCBName"]]
+    [#assign clusterNameForCBName = allHashCluster_GP[cluster]["key2clusterNameForCBName"]?cap_first ]
     [#assign commentPrinted = "no"]
     [#if seqPrintedCluster_GP?seq_contains(endpoint)]
     [#else]
@@ -306,15 +331,15 @@ Key: ${key}; Value: ${myHash[key]}
         [#if allocNameFunction == ""]
             [#break]
         [/#if]
-        [#if (clusterRole == "server" && allocSpecificParamServer != "") ||(clusterRole == "client" && allocSpecificParamClient != "")]
+        [#if (clusterRole == "server" && allocSpecificParamServer != "") || (clusterRole == "client" && allocSpecificParamClient != "")]
             [#-- [#assign clusterValueName = ${allHashCluster_GP[cluster]["clusterValue"]?lower_case?cap_first?replace("_", "/")} --]
             [#assign clusterValueList = allHashCluster_GP[cluster]["clusterValue"]?split("_") ]
             [#assign clusterValueName = clusterValueList[0]?lower_case?cap_first ]
             [#if commentPrinted == "no"]
-                [#lt]  /* Add ${clusterNameForCBName?cap_first} ${clusterValueName}${endpointName?replace("_"," ")} Cluster */
+                [#lt]  /* Add ${clusterNameForCBName} ${clusterValueName}${endpointName?replace("_"," ")} Cluster */
                 [#assign commentPrinted = "yes"]
             [/#if]
-            [#if (clusterNameForCBName == "colorControl") && (clusterRole == "server")]
+            [#if (clusterNameForCBName == "ColorControl") && (clusterRole == "server")]
                 [#lt]  ${additionnalParameters?split("/")[0]} =
                 [#lt]  {
                 [#lt]    .callbacks = stColorControlServerCallbacks,
@@ -322,50 +347,44 @@ Key: ${key}; Value: ${myHash[key]}
                 [#lt]     *          .capabilities           //uint8_t (e.g. ZCL_COLOR_CAP_HS)
                 [#lt]     *          .enhanced_supported     //bool
                 [#lt]     */
-                [#lt]    /* USER CODE BEGIN Color Server Config (endpoint${endpoint}) */
-                [#lt]    /* USER CODE END Color Server Config (endpoint${endpoint}) */
+                [#lt]    /* USER CODE BEGIN Color_Server_Config_(endpoint${endpoint}) */
+                [#lt]    /* USER CODE END Color_Server_Config_(endpoint${endpoint}) */
                 [#lt]  };
+
             [/#if]
-            [#if clusterNameForCBName == "otaUpgrade"]
-                [#lt]  ${additionnalParameters?split("/")[0]}  =
-                [#lt]  {
-                [#lt]    .profile_id = ${profileId},
-                [#lt]    .endpoint = APP_ZIGBEE_ENDPOINT${endpointName},
-                [#if clusterRole == "client"]
-                    [#lt]    .callbacks = stOtaUpgradeClientCallbacks,
+            [#if clusterNameForCBName == "OTA"]
+                [#assign configStructDef = additionnalParameters?split("/")[0]]
+                [#assign configStructName = configStructDef?split(" ")[2]]
+                [#lt]  ${configStructDef};
+                
+                [#lt]  memset( &${configStructName}, 0, sizeof( ${configStructName} ) );
+
+                [#lt]  ${configStructName}.profile_id = APP_ZIGBEE_PROFILE_ID${endpointName};
+                [#lt]  ${configStructName}.endpoint = APP_ZIGBEE_ENDPOINT${endpointName};
+                [#if clusterRole == "client" ]
+                    [#lt]  ${configStructName}.activation_policy = ZCL_OTA_ACTIVATION_POLICY_SERVER;
+                    [#lt]  ${configStructName}.timeout_policy = ZCL_OTA_TIMEOUT_POLICY_APPLY_UPGRADE;
+                                
+                    [#lt]  ZbZclOtaClientGetDefaultCallbacks( &${configStructName}.callbacks );
                 [/#if]
-                [#lt]    /* Please complete the other attributes according to your application:
-                [#if clusterRole == "server"]
-                    [#lt]     *          .minimum_block_period           //uint16_t
-                    [#lt]     *          .upgrade_end_current_time       //uint32_t
-                    [#lt]     *          .upgrade_end_upgrade_time       //uint32_t
-                    [#lt]     *          .image_eval                     //ZbZclOtaServerImageEvalT
-                    [#lt]     *          .image_read                     //ZbZclOtaServerImageReadT
-                    [#lt]     *          .image_upgrade_end_req          //ZbZclOtaServerUpgradeEndReqT
-                    [#lt]     *          .arg                            //void *
-                [#else]
-                    [#lt]     *          .activation_policy      //enum ZbZclOtaActivationPolicy
-                    [#lt]     *          .timeout_policy         //enum ZbZclOtaTimeoutPolicy
-                    [#lt]     *          .image_block_delay      //uint32_t
-                    [#lt]     *          .current_image          //struct ZbZclOtaHeader
-                    [#lt]     *          .ca_pub_key_array       //const uint8_t *
-                    [#lt]     *          .ca_pub_key_len         //unsigned int
-                [/#if]
-                [#lt]     */
-                [#lt]    /* USER CODE BEGIN OTA ${clusterRole?cap_first} (endpoint${endpoint}) */
-                [#lt]    /* USER CODE END OTA ${clusterRole?cap_first} (endpoint${endpoint}) */
-                [#lt]  };
+
+                [@generateZgbCallbacks cluster "configcode"/]
+                
+                [#lt]  /* Please complete the other attributes according to your application */
+                [#lt]  /* USER CODE BEGIN OTA_${clusterRole?cap_first}${endpointName?replace("_"," ")} */
+                [#lt]  /* USER CODE END OTA_${clusterRole?cap_first}${endpointName?replace("_"," ")} */
+
             [/#if]
             [#-- Write ALLOC functions --]       
-            [#if ((clusterNameForCBName == "diagnostics") && (clusterRole == "server"))]
+            [#if ((clusterNameForCBName == "Diagnostics") && (clusterRole == "server"))]
                 [#lt]  if ( ${allocNameFunction}${allocSpecificParamServer} == false )
                 [#lt]  {
                 [#lt]    LOG_ERROR_APP( "Error : Diagnostic Server Cluster allocation failed." );
                 [#lt]  }
             [#else]
-                [#lt]  stZigbeeAppInfo.${clusterNameForCBName?cap_first}${clusterRole?cap_first}${endpointName} = ${allocNameFunction}[#if clusterRole == "server"]${allocSpecificParamServer}[#else]${allocSpecificParamClient}[/#if];
-                [#lt]  assert( stZigbeeAppInfo.${clusterNameForCBName?cap_first}${clusterRole?cap_first}${endpointName} != NULL );
-                [#lt]  ZbZclClusterEndpointRegister( stZigbeeAppInfo.${clusterNameForCBName?cap_first}${clusterRole?cap_first}${endpointName} );
+                [#lt]  stZigbeeAppInfo.${clusterNameForCBName}${clusterRole?cap_first}${endpointName} = ${allocNameFunction}[#if clusterRole == "server"]${allocSpecificParamServer}[#else]${allocSpecificParamClient}[/#if];
+                [#lt]  assert( stZigbeeAppInfo.${clusterNameForCBName}${clusterRole?cap_first}${endpointName} != NULL );
+                [#lt]  ZbZclClusterEndpointRegister( stZigbeeAppInfo.${clusterNameForCBName}${clusterRole?cap_first}${endpointName} );
             [/#if]
 
         [/#if]
@@ -374,18 +393,18 @@ Key: ${key}; Value: ${myHash[key]}
 
 [#-- Generate Cluster redefine. Cluster Basic-Server is never listed --]
 [#macro generateZgbClusterRedefine cluster]
-    [#assign clusterNameForCBName = allHashCluster_GP[cluster]["key2clusterNameForCBName"]]
+    [#assign clusterNameForCBName = allHashCluster_GP[cluster]["key2clusterNameForCBName"]?cap_first ]
     [#assign clusterValue  = allHashCluster_GP[cluster]["clusterValue"]]
     [#if zigbeeGenericParamHash_GP["ZGB_NB_ENDPOINTS"]?number == 1 ]
         [#assign endpointName = ""]
     [#else]
         [#assign endpointName = "_" + allHashCluster_GP[cluster]["epNb"]]
     [/#if]
-    [#if !((clusterNameForCBName?contains("basic")) && (clusterValue == "SERVER"))]
+    [#if !((clusterNameForCBName?lower_case?contains("basic")) && (clusterValue == "SERVER"))]
         [#if clusterValue?contains("CLIENT")]
-            [#assign clusterFinalName = clusterNameForCBName?cap_first + "Client" + endpointName]
+            [#assign clusterFinalName = clusterNameForCBName + "Client" + endpointName]
         [#else]
-            [#assign clusterFinalName = clusterNameForCBName?cap_first + "Server" + endpointName]
+            [#assign clusterFinalName = clusterNameForCBName + "Server" + endpointName]
         [/#if]
         [#lt]#define ${clusterFinalName?right_pad(userAlignPad - userDefineLength)} pstZbCluster[${userListIndex_GP}]
         [#assign userListIndex_GP = userListIndex_GP + 1]
@@ -405,7 +424,7 @@ Key: ${key}; Value: ${myHash[key]}
     [#assign manageBasic = true]
     [#list allHashCluster_GP?keys as cluster]
         [#assign clusterName = allHashCluster_GP[cluster]["key1clusterName"]]
-        [#assign clusterNameForCBName = allHashCluster_GP[cluster]["key2clusterNameForCBName"]]
+        [#assign clusterNameForCBName = allHashCluster_GP[cluster]["key2clusterNameForCBName"]?cap_first ]
         [#assign clusterValue  = allHashCluster_GP[cluster]["clusterValue"]]
         [#if (clusterNb == 1)]
             [#assign clusterNumber = ""]
@@ -428,7 +447,7 @@ Key: ${key}; Value: ${myHash[key]}
             [#if step != "display"]
                 [#assign rightPadSize = userAlignPad - userDefineLength ]
                 [#lt]#define ${clusterDefineID?right_pad(rightPadSize)} ZCL_CLUSTER_${clusterName?upper_case}
-                [#lt]#define ${clusterDefineName?right_pad(rightPadSize)} "${clusterNameForCBName?cap_first} ${clusterTypeName}"
+                [#lt]#define ${clusterDefineName?right_pad(rightPadSize)} "${clusterNameForCBName} ${clusterTypeName}"
 
             [#else]
                 [#lt]  LOG_INFO_APP( "%s on Endpoint %d.", ${clusterDefineName}, APP_ZIGBEE_ENDPOINT${endpointName} );
@@ -544,8 +563,9 @@ Key: ${key}; Value: ${myHash[key]}
 #include <assert.h>
 #include <stdint.h>
 
-#include "app_conf.h"
 #include "app_common.h"
+#include "app_conf.h"
+#include "log_module.h"
 #include "app_entry.h"
 #include "app_zigbee.h"
 #include "dbg_trace.h"
@@ -624,8 +644,6 @@ Key: ${key}; Value: ${myHash[key]}
 /* USER CODE END PC */
 
 /* Private variables ---------------------------------------------------------*/
-static uint16_t   iDeviceShortAddress;
-
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -697,7 +715,9 @@ void APP_ZIGBEE_ApplicationStart( void )
  */
 void APP_ZIGBEE_PersistenceStartup(void)
 {
-  /* Not used */
+  /* USER CODE BEGIN APP_ZIGBEE_PersistenceStartup */
+
+  /* USER CODE END APP_ZIGBEE_PersistenceStartup */
 }
 
 /**
@@ -786,8 +806,7 @@ void APP_ZIGBEE_GetStartupConfig( struct ZbStartupT * pstConfig )
  */
 void APP_ZIGBEE_SetNewDevice( uint16_t iShortAddress, uint64_t dlExtendedAddress, uint8_t cCapability )
 {
-  iDeviceShortAddress = iShortAddress;
-  LOG_INFO_APP( "New Device (%d) on Network : with Extended ( 0x%016" PRIX64 " ) and Short ( 0x%04" PRIX16 " ) Address.", cCapability, dlExtendedAddress, iDeviceShortAddress );
+  LOG_INFO_APP( "New Device (%d) on Network : with Extended ( " LOG_DISPLAY64() " ) and Short ( 0x%04X ) Address.", cCapability, LOG_NUMBER64( dlExtendedAddress ), iShortAddress );
 
   /* USER CODE BEGIN APP_ZIGBEE_SetNewDevice */
 

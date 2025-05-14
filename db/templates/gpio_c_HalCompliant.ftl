@@ -1,11 +1,13 @@
 [#ftl]
 
+[#assign contextFolderBsp=contextFolder]
 [#assign contextFolder=""]
 [#if cpucore!=""]
 [#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")+"/"]
 [/#if]
 
 [#compress]
+
 [#list datas as data]
     [#if data.ipName=="gpio"]
 /**
@@ -61,7 +63,12 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN MX_GPIO_Init_1 */
 
 /* USER CODE END MX_GPIO_Init_1 */
+
   		[#if clock?size >0 ]#n#t/* GPIO Ports Clock Enable */[/#if]
+  		 [#if RESMGR_UTILITY?? && FamilyName=="STM32MP2"]
+  		  [@common.optinclude name=contextFolder+mxTmpFolder+"/ResMgr_Rifaware_EXTI.tmp"/][#-- ADD RESMGR_UTILITY Code--]
+         [@common.optinclude name=contextFolder+mxTmpFolder+"/ResMgr_Rifaware_RCC.tmp"/][#-- ADD RESMGR_UTILITY Code--]
+          [/#if]
             [#list clock as clockMacro]
                 [#if clockMacro!=""] 
                     [#if clockMacro?contains("(")]
@@ -70,7 +77,14 @@ static void MX_GPIO_Init(void)
                         #t${clockMacro}();
                     [/#if]
                 [/#if]
-            [/#list] 
+            [/#list]
+
+            [#if InitNvic??&&InitNvic?size>0]
+                [#list InitNvic as initVector]
+                    [#if initVector.extiPin?? && initVector.extiPin?size >0 ]#n#tLL_APB0_GRP1_EnableClock(LL_APB0_GRP1_PERIPH_SYSCFG);[/#if]
+                [/#list]
+            [/#if]
+
         [/#if]
     [/#if]
 
@@ -233,10 +247,20 @@ static void MX_${data.ipName}_GPIO_Init(void)
 [/#if]
 [/#if]
         [/#if]
+
+[#if initVector.extiPin?? && initVector.extiPin?size>0]
+#n
+[#list initVector.extiPin as extiPin]
+#tLL_EXTI_EnableIT(${extiPin});
+[/#list]
+[/#if]
+
 [/#list]
 [/#compress]
 [/#if]
 #n
+[@common.optinclude name=contextFolderBsp+mxTmpFolder+"/bsp_common_demo_gpio.tmp"/][#--BSP functions and callbacks --]
+
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 
 /* USER CODE END MX_GPIO_Init_2 */

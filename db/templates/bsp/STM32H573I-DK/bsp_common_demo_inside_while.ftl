@@ -34,25 +34,42 @@
 
 
 [#if Bsp_Common_DEMO?? && Bsp_Common_DEMO == "true"]
-
+[#compress]
     [#if BUTTON == "1"]
-    /* -- Sample board code for User push-button in interrupt mode ---- */
-    if (BspButtonState == BUTTON_PRESSED)
-    {
-      /* Update button state */
-      BspButtonState = BUTTON_RELEASED;
-      /* -- Sample board code to toggle leds ---- */
-      BSP_LED_Toggle(LED_GREEN);
-      /* ..... Perform your action ..... */
-    }
-    [#elseif BUTTON == "2"]
-    /* -- Sample board code for User push-button without interrupt mode ---- */
-    if (BSP_PB_GetState(BUTTON_USER) == BUTTON_PRESSED)
-    {
-      /* -- Sample board code to toggle leds ---- */
-      BSP_LED_Toggle(LED_GREEN);
-      /* ..... Perform your action ..... */
-    }
-    [/#if]
+        #t#t/* -- Sample board code for User push-button in interrupt mode ---- */
+        #t#tif (BspButtonState == BUTTON_PRESSED)
+        #t#t{
+        #t#t#t/* Update button state */
+        #t#t#tBspButtonState = BUTTON_RELEASED;
+        [@toggle_Leds/]
+        #t#t#t/* ..... Perform your action ..... */
+        #t#t}
 
+    [#elseif BUTTON == "2"]
+        #t#t/* -- Sample board code for User push-button without interrupt mode ---- */
+        #t#tif (BSP_PB_GetState(BUTTON_USER) == BUTTON_PRESSED)
+        #t#t{
+        [@toggle_Leds/]
+        #t#t#t/* ..... Perform your action ..... */
+        #t#t}
+    [/#if]
+[/#compress]
 [/#if]
+
+[#macro toggle_Leds]
+    [#if (LED1??&& LED1=="true") || (LED2??&& LED2=="true") || (LED3??&& LED3=="true") ]
+        #t#t#t/* -- Sample board code to toggle leds ---- */
+        [#if  LED1?? && LED1 == "true"]
+            #t#t#tBSP_LED_Toggle(LED_GREEN);
+        [/#if]
+        [#if  LED2?? && LED2 == "true"]
+            #t#t#tBSP_LED_Toggle(LED_ORANGE);
+        [/#if]
+        [#if  LED3?? && LED3 == "true"]
+            #t#t#tBSP_LED_Toggle(LED_RED);
+        [/#if]
+        [#if  LED4?? && LED4 == "true"]
+            #t#t#tBSP_LED_Toggle(LED_BLUE);
+        [/#if]
+    [/#if]
+[/#macro]

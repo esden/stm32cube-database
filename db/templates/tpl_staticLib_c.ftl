@@ -14,7 +14,11 @@
 */
 
 /* Includes ------------------------------------------------------------------*/
+[#if FamilyName="STM32WB0" || FamilyName="STM32WL3"]
+#include "${FamilyName?lower_case}x_hal.h"
+[#else]
 #include "${FamilyName?lower_case}xx_hal.h"
+[/#if]
 
 /** Functions ----------------------------------------------------------------*/
 void myFunction(void)

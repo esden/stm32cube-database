@@ -136,7 +136,7 @@ extern "C" {
 [#if  AZRTOS_APP_MEM_ALLOCATION_METHOD_VAL == "1"]
 /* Using static memory allocation via threadX Byte memory pools */
 
-#define USE_STATIC_ALLOCATION                ${AZRTOS_APP_MEM_ALLOCATION_METHOD_VAL}
+#define USE_STATIC_ALLOCATION                    ${AZRTOS_APP_MEM_ALLOCATION_METHOD_VAL}
 
 [#if TX_ENABLED == "true" && TX_APP_MEM_POOL_SIZE_VAL != "valueNotSetted"]
 #define TX_APP_MEM_POOL_SIZE                     ${TX_APP_MEM_POOL_SIZE_VAL}

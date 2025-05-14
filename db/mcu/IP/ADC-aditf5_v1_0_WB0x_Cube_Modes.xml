@@ -1,0 +1,1495 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu"
+    xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+    DBVersion="V3.0"
+    IPType="peripheral"
+    Name="ADC"
+    Version="aditf5_v1_0_WB0x_Cube"
+    ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd">
+    <About>ADC: Analog to Digital Converter</About>
+      <!-- ADC_Settings parameters -->  
+    <RefMode Comment="ADCx Settings" Group="ADC_Settings" Name="ADC_Settings">
+        <ConfigForMode>ADC_RegularConfig</ConfigForMode>
+        <Parameter Name="Sequencer"/> <!-- Sequencer  --> 
+        <!--<Parameter Name="ContinuousConvMode"/>  Continuous conversion mode  --> 
+        <Parameter Name="Overrun"/>            <!-- overrun configuration  -->
+        <Parameter Name="SamplingMode"/>       <!-- sampling mode  -->
+        <Parameter Name="SampleRate"/>         <!-- sample rate  -->
+        <Parameter Name="ConversionType"/>      <!-- ADC conversion type -->
+        <Parameter Name="DataWidth"/>          <!-- width of the output data  -->
+        <Parameter Name="DataRatio"/>          <!-- ratio of the output data  -->
+        <Parameter Name="InvertOutputMode"/>   <!-- Specifies the bit to bit inversion  -->
+        <Parameter Name="ContinuousConvMode"/>
+		<Parameter Name="DMAContinuousRequests"/>
+        <Parameter Name="SequenceLength"/>
+
+    </RefMode>
+     <RefMode Comment="Calibration Point 1" Group="Calibration_Point_1" Name="Calibration_Point_1">
+        <ConfigForMode>ADC_Calibration</ConfigForMode>
+        <Parameter Name="Gain1"/>
+        <Parameter Name="Offset1"/>
+
+  </RefMode>
+     <RefMode Comment="Calibration Point 2" Group="Calibration_Point_2" Name="Calibration_Point_2">
+        <ConfigForMode>ADC_Calibration</ConfigForMode>
+        <Parameter Name="Gain2"/>
+        <Parameter Name="Offset2"/>
+  </RefMode>
+     <RefMode Comment="Calibration Point 3" Group="Calibration_Point_3" Name="Calibration_Point_3">
+        <ConfigForMode>ADC_Calibration</ConfigForMode>
+        <Parameter Name="Gain3"/>
+        <Parameter Name="Offset3"/>
+  </RefMode>
+     <RefMode Comment="Calibration Point 4" Group="Calibration_Point_4" Name="Calibration_Point_4">
+        <ConfigForMode>ADC_Calibration</ConfigForMode>
+        <Parameter Name="Gain4"/>
+        <Parameter Name="Offset4"/>
+  </RefMode>
+    <RefParameter Comment="Sequencer" DefaultValue="FULLY_CONFIGURABLE" Group="ADCgroup" Name="Sequencer" Type="list">
+        <PossibleValue Comment="Sequencer set to fully configurable" Value="FULLY_CONFIGURABLE" />
+    </RefParameter>
+     <!-- Possible values of ContinuousConvMode parameter -->
+    <RefParameter Comment="Continuous Conversion Mode" DefaultValue="DISABLE" Group="ADCgroup" Name="ContinuousConvMode" Type="list">
+        <PossibleValue Comment="Disabled" Value="DISABLE"/>
+        <PossibleValue Action="Disable" Comment="Enabled" Condition="DiscontinuousConvMode = ENABLE" Diagnostic="Continuous and Discontinuous modes could not be used at the same time" Value="ENABLE"/>
+        <Description>Enable or Disable the Continuous Conversion Mode</Description>
+    </RefParameter>
+        <!-- Possible values of Overrun parameter HAL ADC -->
+    <RefParameter Comment="Overrun" DefaultValue="ADC_NEW_DATA_IS_LOST" Group="ADCgroup" Name="Overrun" Type="list">
+        <PossibleValue Comment="Previous data is preserved, new data is lost" Value="ADC_NEW_DATA_IS_LOST"/>
+        <PossibleValue Comment="Previous data is overwritten, new data is kept" Value="ADC_NEW_DATA_IS_KEPT"/>
+        <Description>Select the behaviour in case of overrun</Description>
+    </RefParameter>
+            <!-- Possible values of SamplingMode HAL ADC -->
+    <RefParameter Comment="SamplingMode" DefaultValue="ADC_SAMPLING_AT_START" Group="ADCgroup" Name="SamplingMode" Type="list">
+        <PossibleValue Comment="Sampling only at conversion start" Value="ADC_SAMPLING_AT_START"/>
+        <PossibleValue Comment="Sampling sampling phase starts after end of converfsion" Value="ADC_SAMPLING_AT_END"/>
+    </RefParameter>
+                <!-- Possible values of SampleRate HAL ADC -->
+    <RefParameter Comment="SampleRate" DefaultValue="ADC_SAMPLE_RATE_16" Group="ADCgroup" Name="SampleRate" Type="list">
+        <PossibleValue Comment="ADC conversion rate at F_ADC_CLK /16" Value="ADC_SAMPLE_RATE_16"/>
+        <PossibleValue Comment="ADC conversion rate at F_ADC_CLK /20" Value="ADC_SAMPLE_RATE_20"/>
+        <PossibleValue Comment="ADC conversion rate at F_ADC_CLK /24" Value="ADC_SAMPLE_RATE_24"/>
+        <PossibleValue Comment="ADC conversion rate at F_ADC_CLK /28" Value="ADC_SAMPLE_RATE_28"/>
+    </RefParameter>
+    <RefParameter Comment="ConversionType" DefaultValue="ADC_CONVERSION_WITH_DS" Group="ADCgroup" Name="ConversionType" Type="list">
+        <PossibleValue Comment="ADC conversion through the Down Sampler" Value="ADC_CONVERSION_WITH_DS"/>
+        <PossibleValue Comment="ADC conversion through the Decimation Filter" Value="ADC_CONVERSION_WITH_DF"/>
+    </RefParameter>
+    
+     <!-- Possible value of DMAAccessMode parameter -->
+    <RefParameter Comment="DMA Access Mode" DefaultValue="null" Group="ADCs_Common_Settings" Name="DMAAccessModeView" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="Mode=ADC_MODE_INDEPENDENT | Mode=null "/>
+    </RefParameter>   
+    <RefParameter Comment="DMA Access Mode" DefaultValue="DISABLED" Group="ADCs_Common_Settings" Name="DMAAccessModeView" Type="list">
+        <Condition Diagnostic="" Expression="DMAAccessMode=ADC_DMAACCESSMODE_DISABLED"/>
+        <PossibleValue  Comment="DMA access mode disabled" Value="DISABLED" />
+        <PossibleValue  Comment="DMA access mode enabled" Value="ENABLE"/>
+    </RefParameter>
+    <RefParameter Comment="DMA Access Mode" DefaultValue="ENABLE" Group="ADCs_Common_Settings" Name="DMAAccessModeView" Type="list">
+        <PossibleValue  Comment="DMA access mode disabled" Value="DISABLED" />
+        <PossibleValue  Comment="DMA access mode enabled" Value="ENABLE"/>
+    </RefParameter>
+        
+        
+    <RefParameter Comment="DMA Access Mode" DefaultValue="null" Group="ADCs_Common_Settings" Name="DMAAccessMode" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="Mode=ADC_MODE_INDEPENDENT | Mode=null "/>
+    </RefParameter>
+        
+    <RefParameter Comment="DMA Access Mode" DefaultValue="ADC_DMAACCESSMODE_DISABLED" Group="ADCs_Common_Settings" Name="DMAAccessMode" Type="list" Visible="false">
+        <PossibleValue Action="Remove" Condition="DMAAccessModeView=ENABLE" Comment="DMA access mode disabled" Value="ADC_DMAACCESSMODE_DISABLED"/>
+        <PossibleValue Action="Remove" Condition="(DMAAccessModeView=DISABLED) | (ADC_RESOLUTION6b_$IpInstance|ADC_RESOLUTION8b_$IpInstance)" Comment="DMA access mode enabled" Value="ADC_DMAACCESSMODE_12_10_BITS"/>
+        <PossibleValue Action="Remove" Condition="(DMAAccessModeView=DISABLED) | (ADC_RESOLUTION12b_$IpInstance|ADC_RESOLUTION10b_$IpInstance)" Comment="DMA access mode enabled" Value="ADC_DMAACCESSMODE_8_6_BITS"/>
+    </RefParameter>   
+   <!-- Possible values of data width definitions HAL ADC -->
+    <RefParameter Comment="DataWidth" DefaultValue="ADC_SAMPLING_AT_START" Group="ADCgroup" Name="DataWidth" Type="list">
+        <PossibleValue Comment="ADC Down Sampler data width 12 bits" Value="ADC_DS_DATA_WIDTH_12_BIT"/>
+        <PossibleValue Comment="ADC Down Sampler data width 13 bits" Value="ADC_DS_DATA_WIDTH_13_BIT"/>
+        <PossibleValue Comment="ADC Down Sampler data width 14 bits" Value="ADC_DS_DATA_WIDTH_14_BIT"/>
+        <PossibleValue Comment="ADC Down Sampler data width 15 bits" Value="ADC_DS_DATA_WIDTH_15_BIT"/>
+        <PossibleValue Comment="ADC Down Sampler data width 16 bits" Value="ADC_DS_DATA_WIDTH_16_BIT"/>
+    </RefParameter>
+                    <!-- Possible values of data width definitions HAL ADC -->
+    <RefParameter Comment="DataRatio" DefaultValue="ADC_DS_RATIO_1" Group="ADCgroup" Name="DataRatio" Type="list">
+        <PossibleValue Comment="ADC Down Sampler ratio 1, no down sampling (default)" Value="ADC_DS_RATIO_1"/>
+        <PossibleValue Comment="ADC Down Sampler ratio 2 " Value="ADC_DS_RATIO_2"/>
+        <PossibleValue Comment=" ADC Down Sampler ratio 4" Value="ADC_DS_RATIO_4"/>
+        <PossibleValue Comment="ADC Down Sampler ratio 8" Value="ADC_DS_RATIO_8"/>
+        <PossibleValue Comment="ADC Down Sampler ratio 16" Value="ADC_DS_RATIO_16"/>
+        <PossibleValue Comment="ADC Down Sampler ratio 32" Value="ADC_DS_RATIO_32"/>
+        <PossibleValue Comment="ADC Down Sampler ratio 64" Value="ADC_DS_RATIO_64"/>
+        <PossibleValue Comment="ADC Down Sampler ratio 128" Value="ADC_DS_RATIO_128"/>
+    </RefParameter>
+                    <!-- Possible values of InvertOutputMode definitions HAL ADC -->
+    <RefParameter Comment="InvertOutputMode" DefaultValue="ADC_DATA_INVERT_NONE" Group="ADCgroup" Name="InvertOutputMode" Type="list">
+        <PossibleValue Comment="No inversion" Value="ADC_DATA_INVERT_NONE"/>
+        <PossibleValue Comment="Inversion only for differential input" Value="ADC_DATA_INVERT_DIFF"/>
+        <PossibleValue Comment="Inversion only for single negative input" Value="ADC_DATA_INVERT_SING"/>
+        <PossibleValue Comment="Inversion for both input type" Value="ADC_DATA_INVERT_BOTH"/>
+    </RefParameter>
+     <!-- Possible values of ADC input voltage range HAL ADC -->
+     <RefParameter Comment="voltage range" DefaultValue="ADC_VIN_RANGE_1V2" Group="ADCgroup" Name="VoltRange" Type="list">
+        <PossibleValue Comment="ADC input voltage range up to 1.2 V" Value="ADC_VIN_RANGE_1V2"/>
+        <PossibleValue Comment="ADC input voltage range up to 2.4 V" Value="ADC_VIN_RANGE_2V4"/>
+        <PossibleValue Comment="ADC input voltage range up to 3.6 V" Value="ADC_VIN_RANGE_3V6"/>
+    </RefParameter>
+ <!--  ######################################################################################## Calibration Point ######################################################################################## -->
+     <RefParameter Comment="Calibration Point" DefaultValue="None" Group="ADCgroup" Name="Number" Visible="true" Type="list">
+        <PossibleValue Comment="None" Value="ADC_CALIB_NONE"/>
+        <PossibleValue Comment="Calibration Point 1" Value="ADC_CALIB_POINT_1" Semaphore="ADC_CALIB_POINT_1"/>
+        <PossibleValue Comment="Calibration Point 2" Value="ADC_CALIB_POINT_2" Semaphore="ADC_CALIB_POINT_2"/>
+        <PossibleValue Comment="Calibration Point 3" Value="ADC_CALIB_POINT_3" Semaphore="ADC_CALIB_POINT_3"/>
+        <PossibleValue Comment="Calibration Point 4" Value="ADC_CALIB_POINT_4" Semaphore="ADC_CALIB_POINT_4"/>
+    </RefParameter>
+
+    <!--  ########################################################################################regular  conversion parameters######################################################################################## -->
+    
+    
+    <RefParameter Comment="DMA Continuous Requests" DefaultValue="LIMITED" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="$IpNumber=4 &amp; DMAContinuousRequests=DISABLE"/>
+        <PossibleValue Comment="LIMITED" Value="LIMITED"/>
+        <Description>Enable/Disable DMA Continuous Requests</Description>
+    </RefParameter>
+    <RefParameter Comment="DMA Continuous Requests" DefaultValue="UNLIMITED" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="$IpNumber=4  &amp; DMAContinuousRequests=ENABLE"/>
+        <PossibleValue Comment="LIMITED" Value="UNLIMITED"/>
+        <Description>Enable/Disable DMA Continuous Requests</Description>
+    </RefParameter>
+    <RefParameter Comment="DMA Continuous Requests" DefaultValue="NONE" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="$IpNumber=4 &amp; DMAContinuousRequests=DISABLE"/>
+        <PossibleValue Comment="none" Value="NONE"/>
+        <Description>Enable/Disable DMA Continuous Requests</Description>
+    </RefParameter>
+    <RefParameter Comment="DMA Continuous Requests" DefaultValue="NONE" Group="ADCgroup" Name="DMAContinuousRequestsForConfigFile" Type="list" Visible="false">
+        <PossibleValue Comment="none" Value="NONE"/>
+        <Description>Enable/Disable DMA Continuous Requests</Description>
+    </RefParameter>
+    <RefParameter Comment="DMA Continuous Requests" DefaultValue="DISABLE" Group="ADCgroup" Name="DMAContinuousRequests" Type="list">
+        <PossibleValue Comment="Disabled" Value="DISABLE"/>
+        <PossibleValue Comment="Enabled"  Value="ENABLE" />
+        <Description>Enable/Disable DMA Continuous Requests</Description>
+    </RefParameter>
+
+    <RefParameter Comment="Enable Regular Conversions" DefaultValue="ENABLE" Group="ADCgroup" Name="EnableRegularConversion" Type="list">
+        <PossibleValue Comment="Enable" Value="ENABLE"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+        <Description>Enable/Disable Regular Conversion</Description> 
+    </RefParameter>
+        
+ 
+
+    <RefParameter Comment="Sequence Length" DefaultValue="1" Group="ADCgroup" Max="16" Min="1" Name="NbrOfConversion" Type="integer">
+        <Description>Number of regular channels to be converted</Description>
+    </RefParameter>
+    <RefParameter Comment="Number Of Conversion Flag" DefaultValue="0" Group="ADCgroup" Max="1" Min="0" Name="NbrOfConversionFlag" Type="integer" Visible="false"/>
+    <RefParameter Comment="SequenceLength" DefaultValue="=ADC1:NbrOfConversion" Group="ADCgroup" Max="1" Min="0" Name="SequenceLength" Type="integer" Visible="false"/>
+
+    
+    <!-- RefMode of ADC_Regular_ConversionMode -->
+    <RefMode Abstract="true" Comment="Regular Conversion Settings" Group="ADC_Regular_ConversionMode" Name="ADC_Regular_ConversionMode">        
+        <Parameter Name="EnableRegularConversion"/>  
+        <Parameter Name="NbrOfConversionFlag"/>
+        <Parameter Name="NbrOfConversion"/>
+       
+    </RefMode>
+	        
+    <RefParameter Comment="Channel" DefaultValue="" Group="ADCChannel" Name="Channel" Type="list" >
+        <PossibleValue Comment="Channel IN0_Diff" Value="ADC_CHANNEL_VINP0_VINM0"/>
+        <PossibleValue Comment="Channel IN1_Diff" Value="ADC_CHANNEL_VINP1_VINM1"/>
+        <PossibleValue Comment="Channel IN2_Diff" Value="ADC_CHANNEL_VINP2_VINM2"/>
+        <PossibleValue Comment="Channel IN3_Diff" Value="ADC_CHANNEL_VINP3_VINM3"/>     
+        <PossibleValue Comment="Channel INM0"  Value="ADC_CHANNEL_VINM0"/>
+        <PossibleValue Comment="Channel INP0"  Value="ADC_CHANNEL_VINP0"/>
+        <PossibleValue Comment="Channel INM1"  Value="ADC_CHANNEL_VINM1"/>
+        <PossibleValue Comment="Channel INP1"  Value="ADC_CHANNEL_VINP1"/>
+        <PossibleValue Comment="Channel INM2"  Value="ADC_CHANNEL_VINM2"/>
+        <PossibleValue Comment="Channel INP2"  Value="ADC_CHANNEL_VINP2"/>
+        <PossibleValue Comment="Channel INM3"  Value="ADC_CHANNEL_VINM3"/>
+        <PossibleValue Comment="Channel INP3"  Value="ADC_CHANNEL_VINP3"/>       
+        <PossibleValue Comment="Channel Vbat"  Value="ADC_CHANNEL_VBAT"/>
+        <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
+    </RefParameter>
+  
+    <RefParameter Comment="Channel" DefaultValue="" Visible="false" Group="ADCChannel" Name="Channel" Type="list" />
+
+    <RefParameter Visible="false" Comment="comm" DefaultValue="+ChannelVREF+|ChannelTS+|ChannelVBAT" Name="commmn" Type="list"/>
+    
+    <RefParameter Comment="ChannelVREF" DefaultValue="ADC_CHANNEL_VREFINT" Name="ChannelVREF" Type="list" Visible="false">
+        <Condition Expression="VrefTSelected$IpInstance" Diagnostic=""/>
+
+        <PossibleValue Comment="ADC_CHANNEL_VREFINT" Value="ADC_CHANNEL_VREFINT"/>
+    </RefParameter>
+    <RefParameter Comment="ChannelTS" DefaultValue="ADC_CHANNEL_TEMPSENSOR" Name="ChannelTS" Type="list" Visible="false">
+        <Condition Expression="VtsATSelected$IpInstance" Diagnostic=""/>
+
+        <PossibleValue Comment="ADC_CHANNEL_TEMPSENSOR" Value="ADC_CHANNEL_TEMPSENSOR"/>
+    </RefParameter>
+   
+
+    <RefParameter Comment="Rank" DefaultValue="ADC_RANK_CHANNEL_NUMBER" Group="ADCChannel" Name="Rank" Type="list" Visible="false"> 
+        <Condition Diagnostic="" Expression="Sequencer=NOT_FULLY_CONFIGURABLE"/>
+   
+    </RefParameter>		  
+   
+    <RefParameter Comment="Rank" DefaultValue="1" Group="ADCgroup" Max="16" Min="1" Name="Rank" Type="integer">
+        <Condition Diagnostic="" Expression="Sequencer=FULLY_CONFIGURABLE"/>
+        <Description>The rank in the regular group sequencer</Description>
+    </RefParameter>
+    <RefParameter Comment="RankArg" DefaultValue="1" Group="ADCgroup" Name="RankArg" Type="String" Visible="false">
+    </RefParameter>
+    
+    
+    
+    
+     <!-- WDD2 case not fully configurable -->
+    
+     <RefParameter Comment="Number Of Channel" Visible="false" DefaultValue="null" Group="Analog WatchDog"  Name="NbrOfChannel_WDG2CONV1" Type="list">
+        <Condition Diagnostic="" Expression="EnableAnalogWatchDog2=false"/>
+    </RefParameter>
+     <RefParameter Comment="Number Of Channel" Visible="false" DefaultValue="null" Group="Analog WatchDog"  Name="NbrOfChannel_WDG2CONV1" Type="list">
+        <Condition Diagnostic="" Expression="Sequencer=FULLY_CONFIGURABLE"/>
+    </RefParameter>
+    
+    <RefParameter Comment="Monitored by" Visible="false" DefaultValue="null" Group="Analog WatchDog"  Name="WDG2MonitoredBy" Type="list">
+        <Condition Diagnostic="" Expression="EnableAnalogWatchDog2=false"/>
+    </RefParameter>
+    <RefParameter Comment="Monitored by" Visible="false" DefaultValue="null" Group="Analog WatchDog"  Name="WDG2MonitoredBy" Type="list">
+        <Condition Diagnostic="" Expression="Sequencer=FULLY_CONFIGURABLE"/>
+    </RefParameter>
+    
+    
+    <RefParameter Comment="Monitored by" Visible="false" DefaultValue="ADC_ANALOGWATCHDOG_2" Group="ADCgroup" Name="WDG2MonitoredBy" Type="list">
+        <PossibleValue Comment="Analog Watchdog"  Value="ADC_ANALOGWATCHDOG_2"/>
+        <Description>For a dedicated channel, the generated analog watchdog configuration will correspond to the sum of all "Monitored" configurations for this channel when the number of ranks is  greater than 1.</Description> 
+    </RefParameter>   
+     <RefParameter Comment="Monitored by" Visible="false" DefaultValue="null" Group="Analog WatchDog"  Name="WDG2MonitoredBy" Type="list">
+    </RefParameter>      
+    
+    
+     <RefParameter Comment="Number Of Channel can be monitored" DefaultValue="1" Group="Analog WatchDog"  Name="NbrOfChannel_WDG2CONV1" Type="list">
+         <Condition Diagnostic="" Expression="Singelreg"/> 
+        <PossibleValue Comment="1"  Value="1" Semaphore="Sem_WDG2_1channel"/>
+        <PossibleValue Comment="2" Value="2" Semaphore="Sem_WDG2_2channel"/>
+        <PossibleValue Comment="3" Value="3" Semaphore="Sem_WDG2_3channel" />
+        <PossibleValue Comment="4" Value="4" Semaphore="Sem_WDG2_4channel"/>
+        <PossibleValue Comment="5" Value="5" Semaphore="Sem_WDG2_5channel"/>
+        <PossibleValue Comment="6" Value="6" Semaphore="Sem_WDG2_6channel"/>
+        <PossibleValue Comment="7" Value="7" Semaphore="Sem_WDG2_7channel"/>
+        <PossibleValue Comment="8" Value="8" Semaphore="Sem_WDG2_8channel"/>
+        <PossibleValue Comment="9"  Value="9" Semaphore="Sem_WDG2_9channel"/>
+        <PossibleValue Comment="10" Value="10" Semaphore="Sem_WDG2_10channel"/>
+        <PossibleValue Comment="11" Value="11" Semaphore="Sem_WDG2_11channel" />
+        <PossibleValue Comment="12" Value="12" Semaphore="Sem_WDG2_12channel"/>
+        <PossibleValue Comment="13" Value="13" Semaphore="Sem_WDG2_13channel"/>
+        <PossibleValue Comment="14" Value="14" Semaphore="Sem_WDG2_14channel"/>
+        <PossibleValue Comment="15" Value="15" Semaphore="Sem_WDG2_15channel"/>
+        <PossibleValue Comment="16" Value="16" Semaphore="Sem_WDG2_16channel"/>
+       
+
+        <Description>Number of regular channels to be converted</Description>
+    </RefParameter>
+    
+         <RefParameter Comment="Number Of Channel can be monitored" DefaultValue="null" Group="Analog WatchDog"   Visible="false"  Name="NbrOfChannel_WDG2CONV1" Type="list"/>
+
+    <!-- Monitored channel WDG2 -->
+    
+     
+     <RefParameter Comment="1st Channel" Visible="false" DefaultValue="__NULL" Group="Analog WatchDog"  Name="WDGCONV1Channel1" Type="list">
+    <Condition Diagnostic="" Expression="EnableAnalogWatchDog2=false |Sequencer=FULLY_CONFIGURABLE"/>    </RefParameter>
+    <RefParameter Comment=" Channel" Visible="false" DefaultValue="__NULL" Group="Analog WatchDog"  Name="WDGCONV1Channel1" Type="list">
+    <Condition Diagnostic="" Expression="EnableAnalogWatchDog2=false|Sequencer=FULLY_CONFIGURABLE"/>    </RefParameter>
+     <RefParameter Comment="11th Channel" Visible="false" DefaultValue="__NULL" Group="Analog WatchDog"  Name="WDGCONV1Channel2" Type="list">
+    <Condition Diagnostic="" Expression="EnableAnalogWatchDog2=false|Sequencer=FULLY_CONFIGURABLE"/>    </RefParameter>
+     <RefParameter Comment="11th Channel" Visible="false" DefaultValue="__NULL" Group="Analog WatchDog"  Name="WDGCONV1Channel3" Type="list">
+    <Condition Diagnostic="" Expression="EnableAnalogWatchDog2=false|Sequencer=FULLY_CONFIGURABLE"/>    </RefParameter>
+     <RefParameter Comment=" Channel" Visible="false" DefaultValue="__NULL" Group="Analog WatchDog"  Name="WDGCONV1Channel4" Type="list">
+    <Condition Diagnostic="" Expression="EnableAnalogWatchDog2=false|Sequencer=FULLY_CONFIGURABLE"/>    </RefParameter>
+     <RefParameter Comment="11th Channel" Visible="false" DefaultValue="__NULL" Group="Analog WatchDog"  Name="WDGCONV1Channel5" Type="list">
+    <Condition Diagnostic="" Expression="EnableAnalogWatchDog2=false|Sequencer=FULLY_CONFIGURABLE"/>    </RefParameter>
+     <RefParameter Comment="11th Channel" Visible="false" DefaultValue="__NULL" Group="Analog WatchDog"  Name="WDGCONV1Channel6" Type="list">
+    <Condition Diagnostic="" Expression="EnableAnalogWatchDog2=false|Sequencer=FULLY_CONFIGURABLE"/>    </RefParameter>
+    <RefParameter Comment="11th Channel" Visible="false" DefaultValue="__NULL" Group="Analog WatchDog"  Name="WDGCONV1Channel7" Type="list">
+    <Condition Diagnostic="" Expression="EnableAnalogWatchDog2=false|Sequencer=FULLY_CONFIGURABLE"/>    </RefParameter>
+     <RefParameter Comment="11th Channel" Visible="false" DefaultValue="__NULL" Group="Analog WatchDog"  Name="WDGCONV1Channel8" Type="list">
+    <Condition Diagnostic="" Expression="EnableAnalogWatchDog2=false|Sequencer=FULLY_CONFIGURABLE"/>    </RefParameter>
+     <RefParameter Comment="11th Channel" Visible="false" DefaultValue="__NULL" Group="Analog WatchDog"  Name="WDGCONV1Channel9" Type="list">
+    <Condition Diagnostic="" Expression="EnableAnalogWatchDog2=false|Sequencer=FULLY_CONFIGURABLE"/>    </RefParameter>
+     <RefParameter Comment="11th Channel" Visible="false" DefaultValue="__NULL" Group="Analog WatchDog"  Name="WDGCONV1Channel10" Type="list">
+    <Condition Diagnostic="" Expression="EnableAnalogWatchDog2=false|Sequencer=FULLY_CONFIGURABLE"/>    </RefParameter>
+     <RefParameter Comment="11th Channel" Visible="false" DefaultValue="__NULL" Group="Analog WatchDog"  Name="WDGCONV1Channel11" Type="list">
+    <Condition Diagnostic="" Expression="EnableAnalogWatchDog2=false|Sequencer=FULLY_CONFIGURABLE"/>    </RefParameter>
+     <RefParameter Comment="11th Channel" Visible="false" DefaultValue="__NULL" Group="Analog WatchDog"  Name="WDGCONV1Channel12" Type="list">
+    <Condition Diagnostic="" Expression="EnableAnalogWatchDog2=false|Sequencer=FULLY_CONFIGURABLE"/>    </RefParameter>
+    <RefParameter Comment="11th Channel" Visible="false" DefaultValue="__NULL" Group="Analog WatchDog"  Name="WDGCONV1Channel13" Type="list">
+    <Condition Diagnostic="" Expression="EnableAnalogc=false|Sequencer=FULLY_CONFIGURABLE"/>    </RefParameter>
+     <RefParameter Comment="11th Channel" Visible="false" DefaultValue="__NULL" Group="Analog WatchDog"  Name="WDGCONV1Channel14" Type="list">
+    <Condition Diagnostic="" Expression="EnableAnalogWatchDog2=false|Sequencer=FULLY_CONFIGURABLE"/>    </RefParameter>
+     <RefParameter Comment="11th Channel" Visible="false" DefaultValue="__NULL" Group="Analog WatchDog"  Name="WDGCONV1Channel15" Type="list">
+    <Condition Diagnostic="" Expression="EnableAnalogWatchDog2=false|Sequencer=FULLY_CONFIGURABLE"/>    </RefParameter>
+     <RefParameter Comment="11th Channel" Visible="false" DefaultValue="__NULL" Group="Analog WatchDog"  Name="WDGCONV1Channel16" Type="list">
+    <Condition Diagnostic="" Expression="EnableAnalogWatchDog2=false|Sequencer=FULLY_CONFIGURABLE"/>    </RefParameter>
+     
+    <RefParameter Comment="1st Channel" DefaultValue="__NULL" Group="Analog WatchDog"  Name="WDGCONV1Channel1" Type="list">
+        <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_1channel|Sem_WDG2_2channel|Sem_WDG2_3channel|Sem_WDG2_4channel|Sem_WDG2_5channel|Sem_WDG2_6channel|Sem_WDG2_7channel|Sem_WDG2_8channel|Sem_WDG2_9channel|Sem_WDG2_10channel|Sem_WDG2_11channel|Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel  &amp; !AWD2_isSelected_$IpInstance"/>
+        <PossibleValue Comment="None" Value="__NULL"/>
+        <PossibleValue Comment="Channel IN0_Diff"  Condition="!SHANNELN0DIFFISSELECTED" Diagnostic="Available when IN0DIFF mode is activated"  Value="ADC_CHANNEL_VINP0_VINM0"/>
+        <PossibleValue Comment="Channel IN1_Diff"  Condition="!SHANNELN1DIFFISSELECTED" Diagnostic="Available when IN1DIFF mode is activated"  Value="ADC_CHANNEL_VINP1_VINM1"/>
+        <PossibleValue Comment="Channel IN2_Diff"  Condition="!SHANNELN2DIFFISSELECTED" Diagnostic="Available when IN2DIFF is activated" Value="ADC_CHANNEL_VINP2_VINM2"/>
+        <PossibleValue Comment="Channel IN3_Diff"  Condition="!SHANNELN3DIFFISSELECTED" Diagnostic="Available when IN3DIFF mode is activated" Value="ADC_CHANNEL_VINP3_VINM3"/>
+        <PossibleValue Comment="Channel INM0"  Condition="!SHANNELNM0ISSELECTED" Diagnostic="Available when INM0 mode is activated" Value="ADC_CHANNEL_VINM0"/>
+        <PossibleValue Comment="Channel INP0"  Condition="!SHANNELNP0ISSELECTED" Diagnostic="Available when INP0 mode is activated"  Value="ADC_CHANNEL_VINP0"/>
+        <PossibleValue Comment="Channel INM1"  Condition="!SHANNELNM1ISSELECTED" Diagnostic="Available when INM1 mode is activated"  Value="ADC_CHANNEL_VINM1"/>
+        <PossibleValue Comment="Channel INP1"  Condition="!SHANNELNP1ISSELECTED" Diagnostic="Available when INP1 mode is activated" Value="ADC_CHANNEL_VINP1"/>
+        <PossibleValue Comment="Channel INM2"  Condition="!SHANNELNM2ISSELECTED" Diagnostic="Available when INM2 mode is activated"  Value="ADC_CHANNEL_VINM2"/>
+        <PossibleValue Comment="Channel INP2"  Condition="!SHANNELNP2ISSELECTED" Diagnostic="Available when INP2 mode is activated"  Value="ADC_CHANNEL_VINP2"/>
+        <PossibleValue Comment="Channel INM3"  Condition="!SHANNELNM3ISSELECTED" Diagnostic="Available when INM3 mode is activated"  Value="ADC_CHANNEL_VINM3"/>
+        <PossibleValue Comment="Channel INP3"  Condition="!SHANNELNP3ISSELECTED" Diagnostic="Available when INP3 mode is activated"  Value="ADC_CHANNEL_VINP3"/>       
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT"/>
+        <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
+    </RefParameter>
+    <RefParameter Comment="" DefaultValue="__NULL" Group="ADCgroup" Name="WDGCONV1Channel1" Type="list" Visible="false">
+    </RefParameter>
+  
+    
+    <RefParameter  Comment="2nd Channel" DefaultValue="__NULL" Group="Analog WatchDog"  Name="WDGCONV1Channel2" Type="list">
+        <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_2channel|Sem_WDG2_3channel|Sem_WDG2_4channel|Sem_WDG2_5channel|Sem_WDG2_6channel|Sem_WDG2_7channel|Sem_WDG2_8channel|Sem_WDG2_9channel|Sem_WDG2_10channel|Sem_WDG2_11channel|Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
+Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel  &amp; !AWD2_isSelected_$IpInstance"/>
+        
+        <PossibleValue Comment="None" Value="__NULL"/>
+        <PossibleValue Comment="Channel IN0_Diff"  Condition="!SHANNELN0DIFFISSELECTED" Diagnostic="Available when IN0DIFF mode is activated"  Value="ADC_CHANNEL_VINP0_VINM0"/>
+        <PossibleValue Comment="Channel IN1_Diff"  Condition="!SHANNELN1DIFFISSELECTED" Diagnostic="Available when IN1DIFF mode is activated"  Value="ADC_CHANNEL_VINP1_VINM1"/>
+        <PossibleValue Comment="Channel IN2_Diff"  Condition="!SHANNELN2DIFFISSELECTED" Diagnostic="Available when IN2DIFF is activated" Value="ADC_CHANNEL_VINP2_VINM2"/>
+        <PossibleValue Comment="Channel IN3_Diff"  Condition="!SHANNELN3DIFFISSELECTED" Diagnostic="Available when IN3DIFF mode is activated" Value="ADC_CHANNEL_VINP3_VINM3"/> 
+        <PossibleValue Comment="Channel INM0"  Condition="!SHANNELNM0ISSELECTED" Diagnostic="Available when INM0 mode is activated" Value="ADC_CHANNEL_VINM0"/>
+        <PossibleValue Comment="Channel INP0"  Condition="!SHANNELNP0ISSELECTED" Diagnostic="Available when INP0 mode is activated"  Value="ADC_CHANNEL_VINP0"/>
+        <PossibleValue Comment="Channel INM1"  Condition="!SHANNELNM1ISSELECTED" Diagnostic="Available when INM1 mode is activated"  Value="ADC_CHANNEL_VINM1"/>
+        <PossibleValue Comment="Channel INP1"  Condition="!SHANNELNP1ISSELECTED" Diagnostic="Available when INP1 mode is activated" Value="ADC_CHANNEL_VINP1"/>
+        <PossibleValue Comment="Channel INM2"  Condition="!SHANNELNM2ISSELECTED" Diagnostic="Available when INM2 mode is activated"  Value="ADC_CHANNEL_VINM2"/>
+        <PossibleValue Comment="Channel INP2"  Condition="!SHANNELNP2ISSELECTED" Diagnostic="Available when INP2 mode is activated"  Value="ADC_CHANNEL_VINP2"/>
+        <PossibleValue Comment="Channel INM3"  Condition="!SHANNELNM3ISSELECTED" Diagnostic="Available when INM3 mode is activated"  Value="ADC_CHANNEL_VINM3"/>
+        <PossibleValue Comment="Channel INP3"  Condition="!SHANNELNP3ISSELECTED" Diagnostic="Available when INP3 mode is activated"  Value="ADC_CHANNEL_VINP3"/>       
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT"/>
+        <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
+    </RefParameter>
+    <RefParameter Comment="2nd Channel" Visible="false" DefaultValue="__NULL" Group="Analog WatchDog"  Name="WDGCONV1Channel2" Type="list">
+       </RefParameter>
+  
+    
+    <RefParameter Comment="3rd Channel" DefaultValue="__NULL" Group="Analog WatchDog"  Name="WDGCONV1Channel3" Type="list">
+        <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_3channel|Sem_WDG2_4channel|Sem_WDG2_5channel|Sem_WDG2_6channel|Sem_WDG2_7channel|Sem_WDG2_8channel|Sem_WDG2_9channel|Sem_WDG2_10channel|Sem_WDG2_11channel|Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
+Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel &amp; !AWD2_isSelected_$IpInstance"/>
+        <PossibleValue Comment="None" Value="__NULL"/>
+        <PossibleValue Comment="Channel IN0_Diff"  Condition="!SHANNELN0DIFFISSELECTED" Diagnostic="Available when IN0DIFF mode is activated"  Value="ADC_CHANNEL_VINP0_VINM0"/>
+        <PossibleValue Comment="Channel IN1_Diff"  Condition="!SHANNELN1DIFFISSELECTED" Diagnostic="Available when IN1DIFF mode is activated"  Value="ADC_CHANNEL_VINP1_VINM1"/>
+        <PossibleValue Comment="Channel IN2_Diff"  Condition="!SHANNELN2DIFFISSELECTED" Diagnostic="Available when IN2DIFF is activated" Value="ADC_CHANNEL_VINP2_VINM2"/>
+        <PossibleValue Comment="Channel IN3_Diff"  Condition="!SHANNELN3DIFFISSELECTED" Diagnostic="Available when IN3DIFF mode is activated" Value="ADC_CHANNEL_VINP3_VINM3"/>
+        <PossibleValue Comment="Channel INM0"  Condition="!SHANNELNM0ISSELECTED" Diagnostic="Available when INM0 mode is activated" Value="ADC_CHANNEL_VINM0"/>
+        <PossibleValue Comment="Channel INP0"  Condition="!SHANNELNP0ISSELECTED" Diagnostic="Available when INP0 mode is activated"  Value="ADC_CHANNEL_VINP0"/>
+        <PossibleValue Comment="Channel INM1"  Condition="!SHANNELNM1ISSELECTED" Diagnostic="Available when INM1 mode is activated"  Value="ADC_CHANNEL_VINM1"/>
+        <PossibleValue Comment="Channel INP1"  Condition="!SHANNELNP1ISSELECTED" Diagnostic="Available when INP1 mode is activated" Value="ADC_CHANNEL_VINP1"/>
+        <PossibleValue Comment="Channel INM2"  Condition="!SHANNELNM2ISSELECTED" Diagnostic="Available when INM2 mode is activated"  Value="ADC_CHANNEL_VINM2"/>
+        <PossibleValue Comment="Channel INP2"  Condition="!SHANNELNP2ISSELECTED" Diagnostic="Available when INP2 mode is activated"  Value="ADC_CHANNEL_VINP2"/>
+        <PossibleValue Comment="Channel INM3"  Condition="!SHANNELNM3ISSELECTED" Diagnostic="Available when INM3 mode is activated"  Value="ADC_CHANNEL_VINM3"/>
+        <PossibleValue Comment="Channel INP3"  Condition="!SHANNELNP3ISSELECTED" Diagnostic="Available when INP3 mode is activated"  Value="ADC_CHANNEL_VINP3"/>       
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT"/>
+        <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
+    </RefParameter>
+    <RefParameter   Comment="3rd Channel"  Group="Analog WatchDog"  Name="WDGCONV1Channel3" Type="list" Visible="false">
+    </RefParameter>
+    
+    <RefParameter Comment="4th Channel" DefaultValue="__NULL" Group="Analog WatchDog"  Name="WDGCONV1Channel4" Type="list">
+        <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_4channel|Sem_WDG2_5channel|Sem_WDG2_6channel|Sem_WDG2_7channel|Sem_WDG2_8channel|Sem_WDG2_9channel|Sem_WDG2_10channel|Sem_WDG2_11channel|Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
+Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel &amp;  !AWD2_isSelected_$IpInstance"/>
+        
+        <PossibleValue Comment="None" Value="__NULL"/>
+        <PossibleValue Comment="Channel IN0_Diff"  Condition="!SHANNELN0DIFFISSELECTED" Diagnostic="Available when IN0DIFF mode is activated"  Value="ADC_CHANNEL_VINP0_VINM0"/>
+        <PossibleValue Comment="Channel IN1_Diff"  Condition="!SHANNELN1DIFFISSELECTED" Diagnostic="Available when IN1DIFF mode is activated"  Value="ADC_CHANNEL_VINP1_VINM1"/>
+        <PossibleValue Comment="Channel IN2_Diff"  Condition="!SHANNELN2DIFFISSELECTED" Diagnostic="Available when IN2DIFF is activated" Value="ADC_CHANNEL_VINP2_VINM2"/>
+        <PossibleValue Comment="Channel IN3_Diff"  Condition="!SHANNELN3DIFFISSELECTED" Diagnostic="Available when IN3DIFF mode is activated" Value="ADC_CHANNEL_VINP3_VINM3"/>       
+        <PossibleValue Comment="Channel INM0"  Condition="!SHANNELNM0ISSELECTED" Diagnostic="Available when INM0 mode is activated" Value="ADC_CHANNEL_VINM0"/>
+        <PossibleValue Comment="Channel INP0"  Condition="!SHANNELNP0ISSELECTED" Diagnostic="Available when INP0 mode is activated"  Value="ADC_CHANNEL_VINP0"/>
+        <PossibleValue Comment="Channel INM1"  Condition="!SHANNELNM1ISSELECTED" Diagnostic="Available when INM1 mode is activated"  Value="ADC_CHANNEL_VINM1"/>
+        <PossibleValue Comment="Channel INP1"  Condition="!SHANNELNP1ISSELECTED" Diagnostic="Available when INP1 mode is activated" Value="ADC_CHANNEL_VINP1"/>
+        <PossibleValue Comment="Channel INM2"  Condition="!SHANNELNM2ISSELECTED" Diagnostic="Available when INM2 mode is activated"  Value="ADC_CHANNEL_VINM2"/>
+        <PossibleValue Comment="Channel INP2"  Condition="!SHANNELNP2ISSELECTED" Diagnostic="Available when INP2 mode is activated"  Value="ADC_CHANNEL_VINP2"/>
+        <PossibleValue Comment="Channel INM3"  Condition="!SHANNELNM3ISSELECTED" Diagnostic="Available when INM3 mode is activated"  Value="ADC_CHANNEL_VINM3"/>
+        <PossibleValue Comment="Channel INP3"  Condition="!SHANNELNP3ISSELECTED" Diagnostic="Available when INP3 mode is activated"  Value="ADC_CHANNEL_VINP3"/>       
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT"/>
+        <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
+    </RefParameter>
+    <RefParameter Comment="" DefaultValue="null" Group="Analog WatchDog" Name="WDGCONV1Channel4" Type="list" Visible="false">
+      </RefParameter>
+    
+      
+     <RefParameter Comment="5th Channel" DefaultValue="__NULL" Group="Analog WatchDog"  Name="WDGCONV1Channel5" Type="list">
+          <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_5channel|Sem_WDG2_6channel|Sem_WDG2_7channel|Sem_WDG2_8channel|Sem_WDG2_9channel|Sem_WDG2_10channel|Sem_WDG2_11channel|Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
+Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel &amp;  !AWD2_isSelected_$IpInstance"/>
+        
+        <PossibleValue Comment="None" Value="__NULL"/>
+        <PossibleValue Comment="Channel IN0_Diff"  Condition="!SHANNELN0DIFFISSELECTED" Diagnostic="Available when IN0DIFF mode is activated"  Value="ADC_CHANNEL_VINP0_VINM0"/>
+        <PossibleValue Comment="Channel IN1_Diff"  Condition="!SHANNELN1DIFFISSELECTED" Diagnostic="Available when IN1DIFF mode is activated"  Value="ADC_CHANNEL_VINP1_VINM1"/>
+        <PossibleValue Comment="Channel IN2_Diff"  Condition="!SHANNELN2DIFFISSELECTED" Diagnostic="Available when IN2DIFF is activated" Value="ADC_CHANNEL_VINP2_VINM2"/>
+        <PossibleValue Comment="Channel IN3_Diff"  Condition="!SHANNELN3DIFFISSELECTED" Diagnostic="Available when IN3DIFF mode is activated" Value="ADC_CHANNEL_VINP3_VINM3"/>        
+        <PossibleValue Comment="Channel INM0"  Condition="!SHANNELNM0ISSELECTED" Diagnostic="Available when INM0 mode is activated" Value="ADC_CHANNEL_VINM0"/>
+        <PossibleValue Comment="Channel INP0"  Condition="!SHANNELNP0ISSELECTED" Diagnostic="Available when INP0 mode is activated"  Value="ADC_CHANNEL_VINP0"/>
+        <PossibleValue Comment="Channel INM1"  Condition="!SHANNELNM1ISSELECTED" Diagnostic="Available when INM1 mode is activated"  Value="ADC_CHANNEL_VINM1"/>
+        <PossibleValue Comment="Channel INP1"  Condition="!SHANNELNP1ISSELECTED" Diagnostic="Available when INP1 mode is activated" Value="ADC_CHANNEL_VINP1"/>
+        <PossibleValue Comment="Channel INM2"  Condition="!SHANNELNM2ISSELECTED" Diagnostic="Available when INM2 mode is activated"  Value="ADC_CHANNEL_VINM2"/>
+        <PossibleValue Comment="Channel INP2"  Condition="!SHANNELNP2ISSELECTED" Diagnostic="Available when INP2 mode is activated"  Value="ADC_CHANNEL_VINP2"/>
+        <PossibleValue Comment="Channel INM3"  Condition="!SHANNELNM3ISSELECTED" Diagnostic="Available when INM3 mode is activated"  Value="ADC_CHANNEL_VINM3"/>
+        <PossibleValue Comment="Channel INP3"  Condition="!SHANNELNP3ISSELECTED" Diagnostic="Available when INP3 mode is activated"  Value="ADC_CHANNEL_VINP3"/>       
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT"/>
+        <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
+      </RefParameter>
+    <RefParameter Comment="" DefaultValue="__NULL" Group="Analog WatchDog" Name="WDGCONV1Channel5" Type="list" Visible="false">
+      </RefParameter>
+    
+    <RefParameter Comment="6th Channel" DefaultValue="__NULL" Group="Analog WatchDog"  Name="WDGCONV1Channel6" Type="list">
+        <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_6channel|Sem_WDG2_7channel|Sem_WDG2_8channel|Sem_WDG2_9channel|Sem_WDG2_10channel|Sem_WDG2_11channel|Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
+Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel  &amp; !AWD2_isSelected_$IpInstance"/>
+<PossibleValue Comment="None" Value="__NULL"/>
+        <PossibleValue Comment="Channel IN0_Diff"  Condition="!SHANNELN0DIFFISSELECTED" Diagnostic="Available when IN0DIFF mode is activated"  Value="ADC_CHANNEL_VINP0_VINM0"/>
+        <PossibleValue Comment="Channel IN1_Diff"  Condition="!SHANNELN1DIFFISSELECTED" Diagnostic="Available when IN1DIFF mode is activated"  Value="ADC_CHANNEL_VINP1_VINM1"/>
+        <PossibleValue Comment="Channel IN2_Diff"  Condition="!SHANNELN2DIFFISSELECTED" Diagnostic="Available when IN2DIFF is activated" Value="ADC_CHANNEL_VINP2_VINM2"/>
+        <PossibleValue Comment="Channel IN3_Diff"  Condition="!SHANNELN3DIFFISSELECTED" Diagnostic="Available when IN3DIFF mode is activated" Value="ADC_CHANNEL_VINP3_VINM3"/>
+        <PossibleValue Comment="Channel INM0"  Condition="!SHANNELNM0ISSELECTED" Diagnostic="Available when INM0 mode is activated" Value="ADC_CHANNEL_VINM0"/>
+        <PossibleValue Comment="Channel INP0"  Condition="!SHANNELNP0ISSELECTED" Diagnostic="Available when INP0 mode is activated"  Value="ADC_CHANNEL_VINP0"/>
+        <PossibleValue Comment="Channel INM1"  Condition="!SHANNELNM1ISSELECTED" Diagnostic="Available when INM1 mode is activated"  Value="ADC_CHANNEL_VINM1"/>
+        <PossibleValue Comment="Channel INP1"  Condition="!SHANNELNP1ISSELECTED" Diagnostic="Available when INP1 mode is activated" Value="ADC_CHANNEL_VINP1"/>
+        <PossibleValue Comment="Channel INM2"  Condition="!SHANNELNM2ISSELECTED" Diagnostic="Available when INM2 mode is activated"  Value="ADC_CHANNEL_VINM2"/>
+        <PossibleValue Comment="Channel INP2"  Condition="!SHANNELNP2ISSELECTED" Diagnostic="Available when INP2 mode is activated"  Value="ADC_CHANNEL_VINP2"/>
+        <PossibleValue Comment="Channel INM3"  Condition="!SHANNELNM3ISSELECTED" Diagnostic="Available when INM3 mode is activated"  Value="ADC_CHANNEL_VINM3"/>
+        <PossibleValue Comment="Channel INP3"  Condition="!SHANNELNP3ISSELECTED" Diagnostic="Available when INP3 mode is activated"  Value="ADC_CHANNEL_VINP3"/>       
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT"/>
+        <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
+    </RefParameter>
+    <RefParameter Comment="" DefaultValue="null" Group="Analog WatchDog" Name="WDGCONV1Channel6" Type="list" Visible="false">
+      </RefParameter>
+    
+    <RefParameter Comment="7th Channel" DefaultValue="__NULL" Group="Analog WatchDog"  Name="WDGCONV1Channel7" Type="list">
+        <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_7channel|Sem_WDG2_8channel|Sem_WDG2_9channel|Sem_WDG2_10channel|Sem_WDG2_11channel|Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
+Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel &amp; !AWD2_isSelected_$IpInstance"/>
+        
+        <PossibleValue Comment="None" Value="__NULL"/>
+        <PossibleValue Comment="Channel IN0_Diff"  Condition="!SHANNELN0DIFFISSELECTED" Diagnostic="Available when IN0DIFF mode is activated"  Value="ADC_CHANNEL_VINP0_VINM0"/>
+        <PossibleValue Comment="Channel IN1_Diff"  Condition="!SHANNELN1DIFFISSELECTED" Diagnostic="Available when IN1DIFF mode is activated"  Value="ADC_CHANNEL_VINP1_VINM1"/>
+        <PossibleValue Comment="Channel IN2_Diff"  Condition="!SHANNELN2DIFFISSELECTED" Diagnostic="Available when IN2DIFF is activated" Value="ADC_CHANNEL_VINP2_VINM2"/>
+        <PossibleValue Comment="Channel IN3_Diff"  Condition="!SHANNELN3DIFFISSELECTED" Diagnostic="Available when IN3DIFF mode is activated" Value="ADC_CHANNEL_VINP3_VINM3"/>
+        <PossibleValue Comment="Channel INM0"  Condition="!SHANNELNM0ISSELECTED" Diagnostic="Available when INM0 mode is activated" Value="ADC_CHANNEL_VINM0"/>
+        <PossibleValue Comment="Channel INP0"  Condition="!SHANNELNP0ISSELECTED" Diagnostic="Available when INP0 mode is activated"  Value="ADC_CHANNEL_VINP0"/>
+        <PossibleValue Comment="Channel INM1"  Condition="!SHANNELNM1ISSELECTED" Diagnostic="Available when INM1 mode is activated"  Value="ADC_CHANNEL_VINM1"/>
+        <PossibleValue Comment="Channel INP1"  Condition="!SHANNELNP1ISSELECTED" Diagnostic="Available when INP1 mode is activated" Value="ADC_CHANNEL_VINP1"/>
+        <PossibleValue Comment="Channel INM2"  Condition="!SHANNELNM2ISSELECTED" Diagnostic="Available when INM2 mode is activated"  Value="ADC_CHANNEL_VINM2"/>
+        <PossibleValue Comment="Channel INP2"  Condition="!SHANNELNP2ISSELECTED" Diagnostic="Available when INP2 mode is activated"  Value="ADC_CHANNEL_VINP2"/>
+        <PossibleValue Comment="Channel INM3"  Condition="!SHANNELNM3ISSELECTED" Diagnostic="Available when INM3 mode is activated"  Value="ADC_CHANNEL_VINM3"/>
+        <PossibleValue Comment="Channel INP3"  Condition="!SHANNELNP3ISSELECTED" Diagnostic="Available when INP3 mode is activated"  Value="ADC_CHANNEL_VINP3"/>       
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT"/>
+        <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
+    </RefParameter>
+     <RefParameter Comment="" DefaultValue="__NULL" Group="Analog WatchDog" Name="WDGCONV1Channel7" Type="list" Visible="false">
+      </RefParameter>
+    
+    <RefParameter Comment="8th Channel" DefaultValue="__NULL" Group="Analog WatchDog"  Name="WDGCONV1Channel8" Type="list">
+        <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_8channel|Sem_WDG2_9channel|Sem_WDG2_10channel|Sem_WDG2_11channel|Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
+Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel &amp; !AWD2_isSelected_$IpInstance"/>
+        
+        <PossibleValue Comment="None" Value="__NULL"/>
+        <PossibleValue Comment="Channel IN0_Diff"  Condition="!SHANNELN0DIFFISSELECTED" Diagnostic="Available when IN0DIFF mode is activated"  Value="ADC_CHANNEL_VINP0_VINM0"/>
+        <PossibleValue Comment="Channel IN1_Diff"  Condition="!SHANNELN1DIFFISSELECTED" Diagnostic="Available when IN1DIFF mode is activated"  Value="ADC_CHANNEL_VINP1_VINM1"/>
+        <PossibleValue Comment="Channel IN2_Diff"  Condition="!SHANNELN2DIFFISSELECTED" Diagnostic="Available when IN2DIFF is activated" Value="ADC_CHANNEL_VINP2_VINM2"/>
+        <PossibleValue Comment="Channel IN3_Diff"  Condition="!SHANNELN3DIFFISSELECTED" Diagnostic="Available when IN3DIFF mode is activated" Value="ADC_CHANNEL_VINP3_VINM3"/> 
+        <PossibleValue Comment="Channel INM0"  Condition="!SHANNELNM0ISSELECTED" Diagnostic="Available when INM0 mode is activated" Value="ADC_CHANNEL_VINM0"/>
+        <PossibleValue Comment="Channel INP0"  Condition="!SHANNELNP0ISSELECTED" Diagnostic="Available when INP0 mode is activated"  Value="ADC_CHANNEL_VINP0"/>
+        <PossibleValue Comment="Channel INM1"  Condition="!SHANNELNM1ISSELECTED" Diagnostic="Available when INM1 mode is activated"  Value="ADC_CHANNEL_VINM1"/>
+        <PossibleValue Comment="Channel INP1"  Condition="!SHANNELNP1ISSELECTED" Diagnostic="Available when INP1 mode is activated" Value="ADC_CHANNEL_VINP1"/>
+        <PossibleValue Comment="Channel INM2"  Condition="!SHANNELNM2ISSELECTED" Diagnostic="Available when INM2 mode is activated"  Value="ADC_CHANNEL_VINM2"/>
+        <PossibleValue Comment="Channel INP2"  Condition="!SHANNELNP2ISSELECTED" Diagnostic="Available when INP2 mode is activated"  Value="ADC_CHANNEL_VINP2"/>
+        <PossibleValue Comment="Channel INM3"  Condition="!SHANNELNM3ISSELECTED" Diagnostic="Available when INM3 mode is activated"  Value="ADC_CHANNEL_VINM3"/>
+        <PossibleValue Comment="Channel INP3"  Condition="!SHANNELNP3ISSELECTED" Diagnostic="Available when INP3 mode is activated"  Value="ADC_CHANNEL_VINP3"/>       
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT"/>
+        <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
+    </RefParameter>
+     <RefParameter Comment="" DefaultValue="__NULL" Group="Analog WatchDog" Name="WDGCONV1Channel8" Type="list" Visible="false">
+      </RefParameter>
+    
+    <RefParameter Comment="9th Channel" DefaultValue="__NULL" Group="Analog WatchDog"  Name="WDGCONV1Channel9" Type="list">
+        <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_9channel|Sem_WDG2_10channel|Sem_WDG2_11channel|Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
+Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel &amp; !AWD2_isSelected_$IpInstance"/>
+       
+        <PossibleValue Comment="None" Value="__NULL"/>
+        <PossibleValue Comment="Channel IN0_Diff"  Condition="!SHANNELN0DIFFISSELECTED" Diagnostic="Available when IN0DIFF mode is activated"  Value="ADC_CHANNEL_VINP0_VINM0"/>
+        <PossibleValue Comment="Channel IN1_Diff"  Condition="!SHANNELN1DIFFISSELECTED" Diagnostic="Available when IN1DIFF mode is activated"  Value="ADC_CHANNEL_VINP1_VINM1"/>
+        <PossibleValue Comment="Channel IN2_Diff"  Condition="!SHANNELN2DIFFISSELECTED" Diagnostic="Available when IN2DIFF is activated" Value="ADC_CHANNEL_VINP2_VINM2"/>
+        <PossibleValue Comment="Channel IN3_Diff"  Condition="!SHANNELN3DIFFISSELECTED" Diagnostic="Available when IN3DIFF mode is activated" Value="ADC_CHANNEL_VINP3_VINM3"/>
+        <PossibleValue Comment="Channel INM0"  Condition="!SHANNELNM0ISSELECTED" Diagnostic="Available when INM0 mode is activated" Value="ADC_CHANNEL_VINM0"/>
+        <PossibleValue Comment="Channel INP0"  Condition="!SHANNELNP0ISSELECTED" Diagnostic="Available when INP0 mode is activated"  Value="ADC_CHANNEL_VINP0"/>
+        <PossibleValue Comment="Channel INM1"  Condition="!SHANNELNM1ISSELECTED" Diagnostic="Available when INM1 mode is activated"  Value="ADC_CHANNEL_VINM1"/>
+        <PossibleValue Comment="Channel INP1"  Condition="!SHANNELNP1ISSELECTED" Diagnostic="Available when INP1 mode is activated" Value="ADC_CHANNEL_VINP1"/>
+        <PossibleValue Comment="Channel INM2"  Condition="!SHANNELNM2ISSELECTED" Diagnostic="Available when INM2 mode is activated"  Value="ADC_CHANNEL_VINM2"/>
+        <PossibleValue Comment="Channel INP2"  Condition="!SHANNELNP2ISSELECTED" Diagnostic="Available when INP2 mode is activated"  Value="ADC_CHANNEL_VINP2"/>
+        <PossibleValue Comment="Channel INM3"  Condition="!SHANNELNM3ISSELECTED" Diagnostic="Available when INM3 mode is activated"  Value="ADC_CHANNEL_VINM3"/>
+        <PossibleValue Comment="Channel INP3"  Condition="!SHANNELNP3ISSELECTED" Diagnostic="Available when INP3 mode is activated"  Value="ADC_CHANNEL_VINP3"/>       
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT"/>
+        <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
+    </RefParameter>
+     <RefParameter Comment="" DefaultValue="__NULL" Group="Analog WatchDog" Name="WDGCONV1Channel9" Type="list" Visible="false">
+      </RefParameter>
+    
+    <RefParameter Comment="10th Channel" DefaultValue="__NULL" Group="Analog WatchDog"  Name="WDGCONV1Channel10" Type="list">
+        <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_10channel|Sem_WDG2_11channel|Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
+Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel &amp; !AWD2_isSelected_$IpInstance"/>
+        <PossibleValue Comment="None" Value="__NULL"/>
+        <PossibleValue Comment="Channel IN0_Diff"  Condition="!SHANNELN0DIFFISSELECTED" Diagnostic="Available when IN0DIFF mode is activated"  Value="ADC_CHANNEL_VINP0_VINM0"/>
+        <PossibleValue Comment="Channel IN1_Diff"  Condition="!SHANNELN1DIFFISSELECTED" Diagnostic="Available when IN1DIFF mode is activated"  Value="ADC_CHANNEL_VINP1_VINM1"/>
+        <PossibleValue Comment="Channel IN2_Diff"  Condition="!SHANNELN2DIFFISSELECTED" Diagnostic="Available when IN2DIFF is activated" Value="ADC_CHANNEL_VINP2_VINM2"/>
+        <PossibleValue Comment="Channel IN3_Diff"  Condition="!SHANNELN3DIFFISSELECTED" Diagnostic="Available when IN3DIFF mode is activated" Value="ADC_CHANNEL_VINP3_VINM3"/>
+        <PossibleValue Comment="Channel INM0"  Condition="!SHANNELNM0ISSELECTED" Diagnostic="Available when INM0 mode is activated" Value="ADC_CHANNEL_VINM0"/>
+        <PossibleValue Comment="Channel INP0"  Condition="!SHANNELNP0ISSELECTED" Diagnostic="Available when INP0 mode is activated"  Value="ADC_CHANNEL_VINP0"/>
+        <PossibleValue Comment="Channel INM1"  Condition="!SHANNELNM1ISSELECTED" Diagnostic="Available when INM1 mode is activated"  Value="ADC_CHANNEL_VINM1"/>
+        <PossibleValue Comment="Channel INP1"  Condition="!SHANNELNP1ISSELECTED" Diagnostic="Available when INP1 mode is activated" Value="ADC_CHANNEL_VINP1"/>
+        <PossibleValue Comment="Channel INM2"  Condition="!SHANNELNM2ISSELECTED" Diagnostic="Available when INM2 mode is activated"  Value="ADC_CHANNEL_VINM2"/>
+        <PossibleValue Comment="Channel INP2"  Condition="!SHANNELNP2ISSELECTED" Diagnostic="Available when INP2 mode is activated"  Value="ADC_CHANNEL_VINP2"/>
+        <PossibleValue Comment="Channel INM3"  Condition="!SHANNELNM3ISSELECTED" Diagnostic="Available when INM3 mode is activated"  Value="ADC_CHANNEL_VINM3"/>
+        <PossibleValue Comment="Channel INP3"  Condition="!SHANNELNP3ISSELECTED" Diagnostic="Available when INP3 mode is activated"  Value="ADC_CHANNEL_VINP3"/>       
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT"/>
+        <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
+    </RefParameter>
+     <RefParameter Comment="" DefaultValue="__NULL" Group="Analog WatchDog" Name="WDGCONV1Channel10" Type="list" Visible="false">
+      </RefParameter>
+    
+     <RefParameter Comment="11th Channel" DefaultValue="__NULL" Group="Analog WatchDog"  Name="WDGCONV1Channel11" Type="list">
+        <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_11channel|Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
+Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel&amp; !AWD2_isSelected_$IpInstance"/>
+        <PossibleValue Comment="Channel IN0_Diff"  Condition="!SHANNELN0DIFFISSELECTED" Diagnostic="Available when IN0DIFF mode is activated"  Value="ADC_CHANNEL_VINP0_VINM0"/>
+        <PossibleValue Comment="Channel IN1_Diff"  Condition="!SHANNELN1DIFFISSELECTED" Diagnostic="Available when IN1DIFF mode is activated"  Value="ADC_CHANNEL_VINP1_VINM1"/>
+        <PossibleValue Comment="Channel IN2_Diff"  Condition="!SHANNELN2DIFFISSELECTED" Diagnostic="Available when IN2DIFF is activated" Value="ADC_CHANNEL_VINP2_VINM2"/>
+        <PossibleValue Comment="Channel IN3_Diff"  Condition="!SHANNELN3DIFFISSELECTED" Diagnostic="Available when IN3DIFF mode is activated" Value="ADC_CHANNEL_VINP3_VINM3"/>        
+        <PossibleValue Comment="Channel INM0"  Condition="!SHANNELNM0ISSELECTED" Diagnostic="Available when INM0 mode is activated" Value="ADC_CHANNEL_VINM0"/>
+        <PossibleValue Comment="Channel INP0"  Condition="!SHANNELNP0ISSELECTED" Diagnostic="Available when INP0 mode is activated"  Value="ADC_CHANNEL_VINP0"/>
+        <PossibleValue Comment="Channel INM1"  Condition="!SHANNELNM1ISSELECTED" Diagnostic="Available when INM1 mode is activated"  Value="ADC_CHANNEL_VINM1"/>
+        <PossibleValue Comment="Channel INP1"  Condition="!SHANNELNP1ISSELECTED" Diagnostic="Available when INP1 mode is activated" Value="ADC_CHANNEL_VINP1"/>
+        <PossibleValue Comment="Channel INM2"  Condition="!SHANNELNM2ISSELECTED" Diagnostic="Available when INM2 mode is activated"  Value="ADC_CHANNEL_VINM2"/>
+        <PossibleValue Comment="Channel INP2"  Condition="!SHANNELNP2ISSELECTED" Diagnostic="Available when INP2 mode is activated"  Value="ADC_CHANNEL_VINP2"/>
+        <PossibleValue Comment="Channel INM3"  Condition="!SHANNELNM3ISSELECTED" Diagnostic="Available when INM3 mode is activated"  Value="ADC_CHANNEL_VINM3"/>
+        <PossibleValue Comment="Channel INP3"  Condition="!SHANNELNP3ISSELECTED" Diagnostic="Available when INP3 mode is activated"  Value="ADC_CHANNEL_VINP3"/>       
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT"/>
+        <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
+    </RefParameter>
+     <RefParameter Comment="" DefaultValue="__NULL" Group="Analog WatchDog" Name="WDGCONV1Channel11" Type="list" Visible="false">
+      </RefParameter>
+    
+    <RefParameter Comment="12th Channel" DefaultValue="__NULL" Group="Analog WatchDog"  Name="WDGCONV1Channel12" Type="list">
+        <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
+Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel &amp; !AWD2_isSelected_$IpInstance"/>
+       
+        <PossibleValue Comment="None" Value="__NULL"/>
+        <PossibleValue Comment="Channel IN0_Diff"  Condition="!SHANNELN0DIFFISSELECTED" Diagnostic="Available when IN0DIFF mode is activated"  Value="ADC_CHANNEL_VINP0_VINM0"/>
+        <PossibleValue Comment="Channel IN1_Diff"  Condition="!SHANNELN1DIFFISSELECTED" Diagnostic="Available when IN1DIFF mode is activated"  Value="ADC_CHANNEL_VINP1_VINM1"/>
+        <PossibleValue Comment="Channel IN2_Diff"  Condition="!SHANNELN2DIFFISSELECTED" Diagnostic="Available when IN2DIFF is activated" Value="ADC_CHANNEL_VINP2_VINM2"/>
+        <PossibleValue Comment="Channel IN3_Diff"  Condition="!SHANNELN3DIFFISSELECTED" Diagnostic="Available when IN3DIFF mode is activated" Value="ADC_CHANNEL_VINP3_VINM3"/>
+        <PossibleValue Comment="Channel INM0"  Condition="!SHANNELNM0ISSELECTED" Diagnostic="Available when INM0 mode is activated" Value="ADC_CHANNEL_VINM0"/>
+        <PossibleValue Comment="Channel INP0"  Condition="!SHANNELNP0ISSELECTED" Diagnostic="Available when INP0 mode is activated"  Value="ADC_CHANNEL_VINP0"/>
+        <PossibleValue Comment="Channel INM1"  Condition="!SHANNELNM1ISSELECTED" Diagnostic="Available when INM1 mode is activated"  Value="ADC_CHANNEL_VINM1"/>
+        <PossibleValue Comment="Channel INP1"  Condition="!SHANNELNP1ISSELECTED" Diagnostic="Available when INP1 mode is activated" Value="ADC_CHANNEL_VINP1"/>
+        <PossibleValue Comment="Channel INM2"  Condition="!SHANNELNM2ISSELECTED" Diagnostic="Available when INM2 mode is activated"  Value="ADC_CHANNEL_VINM2"/>
+        <PossibleValue Comment="Channel INP2"  Condition="!SHANNELNP2ISSELECTED" Diagnostic="Available when INP2 mode is activated"  Value="ADC_CHANNEL_VINP2"/>
+        <PossibleValue Comment="Channel INM3"  Condition="!SHANNELNM3ISSELECTED" Diagnostic="Available when INM3 mode is activated"  Value="ADC_CHANNEL_VINM3"/>
+        <PossibleValue Comment="Channel INP3"  Condition="!SHANNELNP3ISSELECTED" Diagnostic="Available when INP3 mode is activated"  Value="ADC_CHANNEL_VINP3"/>       
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT"/>
+        <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/> 
+    </RefParameter>
+     <RefParameter Comment="" DefaultValue="__NULL" Group="Analog WatchDog" Name="WDGCONV1Channel12" Type="list" Visible="false">
+      </RefParameter>
+    
+    <RefParameter Comment="13th Channel" DefaultValue="__NULL" Group="Analog WatchDog"  Name="WDGCONV1Channel13" Type="list">
+        <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
+Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel &amp; !AWD2_isSelected_$IpInstance"/>
+        <PossibleValue Comment="None" Value="__NULL"/>
+        <PossibleValue Comment="Channel IN0_Diff"  Condition="!SHANNELN0DIFFISSELECTED" Diagnostic="Available when IN0DIFF mode is activated"  Value="ADC_CHANNEL_VINP0_VINM0"/>
+        <PossibleValue Comment="Channel IN1_Diff"  Condition="!SHANNELN1DIFFISSELECTED" Diagnostic="Available when IN1DIFF mode is activated"  Value="ADC_CHANNEL_VINP1_VINM1"/>
+        <PossibleValue Comment="Channel IN2_Diff"  Condition="!SHANNELN2DIFFISSELECTED" Diagnostic="Available when IN2DIFF is activated" Value="ADC_CHANNEL_VINP2_VINM2"/>
+        <PossibleValue Comment="Channel IN3_Diff"  Condition="!SHANNELN3DIFFISSELECTED" Diagnostic="Available when IN3DIFF mode is activated" Value="ADC_CHANNEL_VINP3_VINM3"/>
+        <PossibleValue Comment="Channel INM0"  Condition="!SHANNELNM0ISSELECTED" Diagnostic="Available when INM0 mode is activated" Value="ADC_CHANNEL_VINM0"/>
+        <PossibleValue Comment="Channel INP0"  Condition="!SHANNELNP0ISSELECTED" Diagnostic="Available when INP0 mode is activated"  Value="ADC_CHANNEL_VINP0"/>
+        <PossibleValue Comment="Channel INM1"  Condition="!SHANNELNM1ISSELECTED" Diagnostic="Available when INM1 mode is activated"  Value="ADC_CHANNEL_VINM1"/>
+        <PossibleValue Comment="Channel INP1"  Condition="!SHANNELNP1ISSELECTED" Diagnostic="Available when INP1 mode is activated" Value="ADC_CHANNEL_VINP1"/>
+        <PossibleValue Comment="Channel INM2"  Condition="!SHANNELNM2ISSELECTED" Diagnostic="Available when INM2 mode is activated"  Value="ADC_CHANNEL_VINM2"/>
+        <PossibleValue Comment="Channel INP2"  Condition="!SHANNELNP2ISSELECTED" Diagnostic="Available when INP2 mode is activated"  Value="ADC_CHANNEL_VINP2"/>
+        <PossibleValue Comment="Channel INM3"  Condition="!SHANNELNM3ISSELECTED" Diagnostic="Available when INM3 mode is activated"  Value="ADC_CHANNEL_VINM3"/>
+        <PossibleValue Comment="Channel INP3"  Condition="!SHANNELNP3ISSELECTED" Diagnostic="Available when INP3 mode is activated"  Value="ADC_CHANNEL_VINP3"/>       
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT"/>
+        <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
+    </RefParameter>
+     <RefParameter Comment="" DefaultValue="__NULL" Group="Analog WatchDog" Name="WDGCONV1Channel13" Type="list" Visible="false">
+      </RefParameter>
+    
+    <RefParameter Comment="14th Channel" DefaultValue="__NULL" Group="Analog WatchDog"  Name="WDGCONV1Channel14" Type="list">
+        <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;   Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
+Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel &amp; !AWD2_isSelected_$IpInstance"/>
+       
+        <PossibleValue Comment="None" Value="__NULL"/>
+         <PossibleValue Comment="Channel IN0_Diff"  Condition="!SHANNELN0DIFFISSELECTED" Diagnostic="Available when IN0DIFF mode is activated"  Value="ADC_CHANNEL_VINP0_VINM0"/>
+        <PossibleValue Comment="Channel IN1_Diff"  Condition="!SHANNELN1DIFFISSELECTED" Diagnostic="Available when IN1DIFF mode is activated"  Value="ADC_CHANNEL_VINP1_VINM1"/>
+        <PossibleValue Comment="Channel IN2_Diff"  Condition="!SHANNELN2DIFFISSELECTED" Diagnostic="Available when IN2DIFF is activated" Value="ADC_CHANNEL_VINP2_VINM2"/>
+        <PossibleValue Comment="Channel IN3_Diff"  Condition="!SHANNELN3DIFFISSELECTED" Diagnostic="Available when IN3DIFF mode is activated" Value="ADC_CHANNEL_VINP3_VINM3"/>
+        <PossibleValue Comment="Channel INM0"  Condition="!SHANNELNM0ISSELECTED" Diagnostic="Available when INM0 mode is activated" Value="ADC_CHANNEL_VINM0"/>
+        <PossibleValue Comment="Channel INP0"  Condition="!SHANNELNP0ISSELECTED" Diagnostic="Available when INP0 mode is activated"  Value="ADC_CHANNEL_VINP0"/>
+        <PossibleValue Comment="Channel INM1"  Condition="!SHANNELNM1ISSELECTED" Diagnostic="Available when INM1 mode is activated"  Value="ADC_CHANNEL_VINM1"/>
+        <PossibleValue Comment="Channel INP1"  Condition="!SHANNELNP1ISSELECTED" Diagnostic="Available when INP1 mode is activated" Value="ADC_CHANNEL_VINP1"/>
+        <PossibleValue Comment="Channel INM2"  Condition="!SHANNELNM2ISSELECTED" Diagnostic="Available when INM2 mode is activated"  Value="ADC_CHANNEL_VINM2"/>
+        <PossibleValue Comment="Channel INP2"  Condition="!SHANNELNP2ISSELECTED" Diagnostic="Available when INP2 mode is activated"  Value="ADC_CHANNEL_VINP2"/>
+        <PossibleValue Comment="Channel INM3"  Condition="!SHANNELNM3ISSELECTED" Diagnostic="Available when INM3 mode is activated"  Value="ADC_CHANNEL_VINM3"/>
+        <PossibleValue Comment="Channel INP3"  Condition="!SHANNELNP3ISSELECTED" Diagnostic="Available when INP3 mode is activated"  Value="ADC_CHANNEL_VINP3"/>       
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT"/>
+        <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
+    </RefParameter>
+     <RefParameter Comment="" DefaultValue="__NULL" Group="Analog WatchDog" Name="WDGCONV1Channel14" Type="list" Visible="false">
+      </RefParameter>
+    
+     <RefParameter Comment="15th Channel" DefaultValue="__NULL" Group="Analog WatchDog"  Name="WDGCONV1Channel15" Type="list">
+        <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;   Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
+Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel &amp; !AWD2_isSelected_$IpInstance"/>
+        <PossibleValue Comment="None" Value="__NULL"/>
+        <PossibleValue Comment="Channel IN0_Diff"  Condition="!SHANNELN0DIFFISSELECTED" Diagnostic="Available when IN0DIFF mode is activated"  Value="ADC_CHANNEL_VINP0_VINM0"/>
+        <PossibleValue Comment="Channel IN1_Diff"  Condition="!SHANNELN1DIFFISSELECTED" Diagnostic="Available when IN1DIFF mode is activated"  Value="ADC_CHANNEL_VINP1_VINM1"/>
+        <PossibleValue Comment="Channel IN2_Diff"  Condition="!SHANNELN2DIFFISSELECTED" Diagnostic="Available when IN2DIFF is activated" Value="ADC_CHANNEL_VINP2_VINM2"/>
+        <PossibleValue Comment="Channel IN3_Diff"  Condition="!SHANNELN3DIFFISSELECTED" Diagnostic="Available when IN3DIFF mode is activated" Value="ADC_CHANNEL_VINP3_VINM3"/>
+         <PossibleValue Comment="Channel INM0"  Condition="!SHANNELNM0ISSELECTED" Diagnostic="Available when INM0 mode is activated" Value="ADC_CHANNEL_VINM0"/>
+        <PossibleValue Comment="Channel INP0"  Condition="!SHANNELNP0ISSELECTED" Diagnostic="Available when INP0 mode is activated"  Value="ADC_CHANNEL_VINP0"/>
+        <PossibleValue Comment="Channel INM1"  Condition="!SHANNELNM1ISSELECTED" Diagnostic="Available when INM1 mode is activated"  Value="ADC_CHANNEL_VINM1"/>
+        <PossibleValue Comment="Channel INP1"  Condition="!SHANNELNP1ISSELECTED" Diagnostic="Available when INP1 mode is activated" Value="ADC_CHANNEL_VINP1"/>
+        <PossibleValue Comment="Channel INM2"  Condition="!SHANNELNM2ISSELECTED" Diagnostic="Available when INM2 mode is activated"  Value="ADC_CHANNEL_VINM2"/>
+        <PossibleValue Comment="Channel INP2"  Condition="!SHANNELNP2ISSELECTED" Diagnostic="Available when INP2 mode is activated"  Value="ADC_CHANNEL_VINP2"/>
+        <PossibleValue Comment="Channel INM3"  Condition="!SHANNELNM3ISSELECTED" Diagnostic="Available when INM3 mode is activated"  Value="ADC_CHANNEL_VINM3"/>
+        <PossibleValue Comment="Channel INP3"  Condition="!SHANNELNP3ISSELECTED" Diagnostic="Available when INP3 mode is activated"  Value="ADC_CHANNEL_VINP3"/>       
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT"/>
+        <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
+    </RefParameter>
+     <RefParameter Comment="" DefaultValue="__NULL" Group="Analog WatchDog" Name="WDGCONV1Channel15" Type="list" Visible="false">
+      </RefParameter>
+    
+    <RefParameter Comment="16th Channel" DefaultValue="__NULL" Group="Analog WatchDog"  Name="WDGCONV1Channel16" Type="list">
+        <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;   Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
+Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel &amp; !AWD2_isSelected_$IpInstance"/>
+        <PossibleValue Comment="None" Value="__NULL"/>
+        <PossibleValue Comment="Channel IN0_Diff"  Condition="!SHANNELN0DIFFISSELECTED" Diagnostic="Available when IN0DIFF mode is activated"  Value="ADC_CHANNEL_VINP0_VINM0"/>
+        <PossibleValue Comment="Channel IN1_Diff"  Condition="!SHANNELN1DIFFISSELECTED" Diagnostic="Available when IN1DIFF mode is activated"  Value="ADC_CHANNEL_VINP1_VINM1"/>
+        <PossibleValue Comment="Channel IN2_Diff"  Condition="!SHANNELN2DIFFISSELECTED" Diagnostic="Available when IN2DIFF is activated" Value="ADC_CHANNEL_VINP2_VINM2"/>
+        <PossibleValue Comment="Channel IN3_Diff"  Condition="!SHANNELN3DIFFISSELECTED" Diagnostic="Available when IN3DIFF mode is activated" Value="ADC_CHANNEL_VINP3_VINM3"/>
+        <PossibleValue Comment="Channel INM0"  Condition="!SHANNELNM0ISSELECTED" Diagnostic="Available when INM0 mode is activated" Value="ADC_CHANNEL_VINM0"/>
+        <PossibleValue Comment="Channel INP0"  Condition="!SHANNELNP0ISSELECTED" Diagnostic="Available when INP0 mode is activated"  Value="ADC_CHANNEL_VINP0"/>
+        <PossibleValue Comment="Channel INM1"  Condition="!SHANNELNM1ISSELECTED" Diagnostic="Available when INM1 mode is activated"  Value="ADC_CHANNEL_VINM1"/>
+        <PossibleValue Comment="Channel INP1"  Condition="!SHANNELNP1ISSELECTED" Diagnostic="Available when INP1 mode is activated" Value="ADC_CHANNEL_VINP1"/>
+        <PossibleValue Comment="Channel INM2"  Condition="!SHANNELNM2ISSELECTED" Diagnostic="Available when INM2 mode is activated"  Value="ADC_CHANNEL_VINM2"/>
+        <PossibleValue Comment="Channel INP2"  Condition="!SHANNELNP2ISSELECTED" Diagnostic="Available when INP2 mode is activated"  Value="ADC_CHANNEL_VINP2"/>
+        <PossibleValue Comment="Channel INM3"  Condition="!SHANNELNM3ISSELECTED" Diagnostic="Available when INM3 mode is activated"  Value="ADC_CHANNEL_VINM3"/>
+        <PossibleValue Comment="Channel INP3"  Condition="!SHANNELNP3ISSELECTED" Diagnostic="Available when INP3 mode is activated"  Value="ADC_CHANNEL_VINP3"/>       
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT"/>
+        <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>    </RefParameter>
+     <RefParameter Comment="" DefaultValue="__NULL" Group="Analog WatchDog" Name="WDGCONV1Channel16" Type="list" Visible="false">
+      </RefParameter>
+    
+     <RefParameter Comment="" DefaultValue="__NULL" Group="ADCgroup" Name="WDGCONV1Channel1" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="EnableAnalogWatchDog2=false"/>
+      </RefParameter>
+        
+    <RefParameter Comment="Regular Watchdogmode" DefaultValue="null" Group="ADCChannel" Name="RegWDModeFC" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="MonitoredBy=__NULL"/>
+    </RefParameter>
+    <RefParameter Comment="Regular Watchdogmode" DefaultValue="ADC_ANALOGWATCHDOG_SINGLE_REG" Group="ADCChannel" Name="RegWDModeFC" Type="list" Visible="false">
+        <PossibleValue Comment="Multiple channels"  Value="ADC_ANALOGWATCHDOG_SINGLE_REG"/>
+    </RefParameter>
+    <RefParameter Comment="Regular Watchdogmode" DefaultValue="ADC_ANALOGWATCHDOG_SINGLE_REG" Group="ADCChannel" Name="RegWDModeFC" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="MonitoredBy=ADC_ANALOGWATCHDOG_2 &amp; WatchdogMode2=ADC_ANALOGWATCHDOG_SINGLE_REG"/>
+    </RefParameter>
+   <RefParameter Comment="Regular Watchdogmode" DefaultValue="null" Group="ADCChannel" Name="RegWDModeFC" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="MonitoredBy=__NULL"/>
+    </RefParameter>
+      <!-- Possible value of WatchdogModewdg2 parameters -->
+    <RefParameter Comment="Watchdog Mode" DefaultValue="null" Group="ADCgroup" Name="WatchdogMode2" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="EnableAnalogWatchDog2=false"/>
+    </RefParameter>
+     <RefParameter Comment="Watchdog Mode" Visible="false" DefaultValue="ADC_ANALOGWATCHDOG_SINGLE_REG" Group="ADCgroup" Name="WatchdogMode2" Type="list">
+         <Condition Diagnostic="" Expression="Sequencer=FULLY_CONFIGURABLE"/>
+         <PossibleValue Comment="Multiple channels"  Value="ADC_ANALOGWATCHDOG_SINGLE_REG"/>
+        <Description>Configures the ADC analog watchdog mode.</Description>
+    </RefParameter>
+    <RefParameter Comment="Watchdog Mode" DefaultValue="ADC_ANALOGWATCHDOG_SINGLE_REG" Group="ADCgroup" Name="WatchdogMode2" Type="list">
+        <Condition Diagnostic="" Expression="$IpInstance_NOTCONFIGURABLE"/>
+        <PossibleValue Comment="Multiple channels" Semaphore="Singelreg"  Value="ADC_ANALOGWATCHDOG_SINGLE_REG"/>
+        <PossibleValue Comment="All regular channels" Semaphore="SemAllregAWD2" Value="ADC_ANALOGWATCHDOG_ALL_REG"/>
+        <Description>Configures the ADC analog watchdog mode.</Description>
+    </RefParameter>
+    <RefParameter Comment="Watchdog Mode" DefaultValue="null" Group="ADCgroup" Name="WatchdogMode2" Type="list" Visible="false">
+    </RefParameter>
+    
+     <RefParameter Comment="Channelvcore" DefaultValue="ADC_CHANNEL_VCORE" Name="ChannelVDDCORE" Type="list" Visible="false">
+        <PossibleValue Comment="ADC_CHANNEL_VCORE" Value="ADC_CHANNEL_VCORE"  />
+        <Condition Expression="VcorefTSelected$IpInstance" Diagnostic=""/>
+
+    </RefParameter>
+    <RefParameter Comment="Channelvcore" DefaultValue="null" Name="ChannelVDDCORE" Type="list" Visible="false">
+	</RefParameter>
+<RefParameter Name="Interrupt" Comment="Overrun interrupt"   DefaultValue="__NULL"  Type="list"  Group="IP Internal Interrupt"  TabName="Advanced Settings for LPBAM">
+        <Description>description</Description>
+        <PossibleValue Comment="Enable" Value="ADC_IT_OVR"/>
+        <PossibleValue Comment="Disable" Value="__NULL"/>
+</RefParameter>
+
+    <RefParameter Comment="Gain 1" DefaultValue="0x00" Max="0xFFFFFFFF" Min="0x00000000" Name="Gain1" Type="hex" Visible="true ">
+	</RefParameter>
+    <RefParameter Comment="Offset 1" DefaultValue="0x00" Max="0xFFFFFFFF" Min="0x00000000" Name="Offset1" Type="hex" Visible="true ">
+	</RefParameter>
+
+    <RefParameter Comment="Gain 2" DefaultValue="0x00" Max="0xFFFFFFFF" Min="0x00000000" Name="Gain2" Type="hex" Visible="true ">
+	</RefParameter>
+    <RefParameter Comment="Offset 2" DefaultValue="0x00" Max="0xFFFFFFFF" Min="0x00000000" Name="Offset2" Type="hex" Visible="true ">
+	</RefParameter>
+
+    <RefParameter Comment="Gain 3" DefaultValue="0x00" Max="0xFFFFFFFF" Min="0x00000000" Name="Gain3" Type="hex" Visible="true ">
+	</RefParameter>
+    <RefParameter Comment="Offset 3" DefaultValue="0x00" Max="0xFFFFFFFF" Min="0x00000000" Name="Offset3" Type="hex" Visible="true ">
+	</RefParameter>
+
+    <RefParameter Comment="Gain 4" DefaultValue="0x00" Max="0xFFFFFFFF" Min="0x00000000" Name="Gain4" Type="hex" Visible="true ">
+	</RefParameter>
+    <RefParameter Comment="Offset 4" DefaultValue="0x00" Max="0xFFFFFFFF" Min="0x00000000" Name="Offset4" Type="hex" Visible="true ">
+	</RefParameter>
+
+
+    <RefParameter Comment="Gain" DefaultValue="=ADC1:Gain1"  Name="Gain" Type="hex" Visible="false">
+<Condition Expression="ADC_CALIB_POINT_1" Diagnostic="" />
+	</RefParameter>
+
+    <RefParameter Comment="Gain" DefaultValue="=ADC1:Gain2"  Name="Gain" Type="hex" Visible="false">
+<Condition Expression="ADC_CALIB_POINT_2" Diagnostic="" />
+	</RefParameter>
+
+    <RefParameter Comment="Gain" DefaultValue="=ADC1:Gain3"  Name="Gain" Type="hex" Visible="false">
+<Condition Expression="ADC_CALIB_POINT_3" Diagnostic="" />
+	</RefParameter>
+
+    <RefParameter Comment="Gain" DefaultValue="=ADC1:Gain4"  Name="Gain" Type="hex" Visible="false">
+<Condition Expression="ADC_CALIB_POINT_4" Diagnostic="" />
+	</RefParameter>
+    <RefParameter Comment="Gain" DefaultValue="0x00"  Name="Gain" Type="hex" Visible="false">
+	</RefParameter>
+
+    <RefParameter Comment="Offset" DefaultValue="=ADC1:Offset1"  Name="Offset" Type="hex" Visible="false">
+<Condition Expression="ADC_CALIB_POINT_1" Diagnostic="" />
+	</RefParameter>
+
+    <RefParameter Comment="Offset" DefaultValue="=ADC1:Offset2"  Name="Offset" Type="hex" Visible="false">
+<Condition Expression="ADC_CALIB_POINT_2" Diagnostic="" />
+	</RefParameter>
+
+    <RefParameter Comment="Offset" DefaultValue="=ADC1:Offset3"  Name="Offset" Type="hex" Visible="false">
+<Condition Expression="ADC_CALIB_POINT_3" Diagnostic="" />
+	</RefParameter>
+
+    <RefParameter Comment="Offset" DefaultValue="=ADC1:Offset4"  Name="Offset" Type="hex" Visible="false">
+<Condition Expression="ADC_CALIB_POINT_4" Diagnostic="" />
+	</RefParameter>
+    <RefParameter Comment="Offset" DefaultValue="0x00"  Name="Offset" Type="hex" Visible="false">
+	</RefParameter>
+
+    <RefMode BaseMode="ADC_Regular_ConversionMode" Comment="Regular Channel Settings" Group="ADC_Regular_ConversionMode" Name="ChannelRegularConversion">
+        <ConfigForMode>ADC_RegularChannelRankConfig</ConfigForMode>
+        <ConfigForMode>ADC_RegularChannelConfigForWD</ConfigForMode>
+
+        <Parameter Name="Rank"/>
+        <Parameter Name="VoltRange"/>
+        <Parameter Name="Number"/>
+        <Parameter Name="Gain"/>
+        <Parameter Name="Offset"/>
+        <Parameter Name="RankArg"/>
+        <Parameter Name="Channel"/>
+        <Parameter Name="MonitoredBy"/>
+        <Parameter Name="RegHighThreshold"/>
+        <Parameter Name="RegLowThreshold"/>	
+        <Parameter Name="RegITMode"/>
+        <Parameter Name="MonitoredBy"/>
+        <Parameter Name="AWDChannel"/>
+        <Parameter Name="ChannelVDDCORE"/>
+        <Parameter Name="RegWDModeFC"/>
+
+       
+
+    </RefMode>
+    <RefMode Comment="Regular Channel Settings" Name="ChannelRegularConversionCopy">
+        <ConfigForMode>ADC_RegularChannelRankConfig</ConfigForMode>
+        <ConfigForMode>ADC_RegularChannelConfigForWD</ConfigForMode>
+
+        <Parameter Name="Rank"/>
+        <Parameter Name="RankArg"/>
+        <Parameter Name="VoltRange"/>
+        <Parameter Name="Number"/>
+        <Parameter Name="Gain"/>
+        <Parameter Name="Offset"/>
+        <Parameter Name="Channel"/>
+        <Parameter Name="MonitoredBy"/>
+        <Parameter Name="RegHighThreshold"/>
+        <Parameter Name="RegLowThreshold"/>	
+        <Parameter Name="RegITMode"/>
+        <Parameter Name="MonitoredBy"/>
+        <Parameter Name="AWDChannel"/>
+        <Parameter Name="ChannelVDDCORE"/>
+        <Parameter Name="RegWDModeFC"/>
+
+        
+       
+    </RefMode>
+    
+    <!-- WatchDog2 parameters -->
+    <RefMode Comment="Analog Watchdog" Group="WatchDog2" Name="Analog Watchdog">
+        <ConfigForMode>ADC_AnalogWDGConfigForAWD2</ConfigForMode>
+
+        <Parameter Name="EnableAnalogWatchDog2"/>
+        <Parameter Name="AWD2WatchdogNumber"/>
+        <Parameter Name="AWD2HighThreshold"/>
+        <Parameter Name="AWD2LowThreshold"/>
+        <Parameter Name="EventType"/>
+        <Parameter Name="WatchdogMode2"/>
+
+        
+         <Parameter Name="NbrOfChannel_WDG2CONV1"/>
+        <Parameter Name="WDG2MonitoredBy"/>
+        <Parameter Name="WDGCONV1Channel1"/> 
+        <Parameter Name="WDGCONV1Channel2"/>
+        <Parameter Name="WDGCONV1Channel3"/>
+        <Parameter Name="WDGCONV1Channel4"/>
+        <Parameter Name="WDGCONV1Channel5"/>
+        <Parameter Name="WDGCONV1Channel6"/>
+        <Parameter Name="WDGCONV1Channel7"/>
+        <Parameter Name="WDGCONV1Channel8"/>
+        <Parameter Name="WDGCONV1Channel9"/>
+        <Parameter Name="WDGCONV1Channel10"/>
+        <Parameter Name="WDGCONV1Channel11"/>
+        <Parameter Name="WDGCONV1Channel12"/>
+        <Parameter Name="WDGCONV1Channel13"/>
+        <Parameter Name="WDGCONV1Channel14"/>
+        <Parameter Name="WDGCONV1Channel15"/>
+        <Parameter Name="WDGCONV1Channel16"/>
+        
+
+    </RefMode> 
+	
+  
+    <!-- Possible value of WatchdogMode parameters -->
+    <RefParameter Comment="Watchdog Mode" DefaultValue="null" Group="ADCgroup" Name="WatchdogMode" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="EnableAnalogWatchDog1=false"/>
+    </RefParameter>
+    <RefParameter Comment="Watchdog Mode" DefaultValue="ADC_ANALOGWATCHDOG_SINGLE_REG" Group="ADCgroup" Name="WatchdogMode" Type="list">
+        <PossibleValue Comment="Single regular channel"  Value="ADC_ANALOGWATCHDOG_SINGLE_REG"/>
+        <PossibleValue Comment="All regular channels" Semaphore="AllRegular" Value="ADC_ANALOGWATCHDOG_ALL_REG"/>
+        <Description>Configures the ADC analog watchdog mode.</Description>
+    </RefParameter>
+
+    <!-- ADC selected channels through mode list -->
+    <RefParameter Comment="ADC selected channels through mode list" DefaultValue="null" Group="ADCgroup" Name="SelectedChannel" Type="String"/>
+    <!-- Possible value of WatchdogChannel parameter -->
+    <RefParameter Comment="Analog WatchDog Channel" DefaultValue="null" Group="ADCChannel" Name="WatchdogChannel" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="EnableAnalogWatchDog1=false"/>
+    </RefParameter>
+    <RefParameter Comment="Analog WatchDog Channel" DefaultValue="null" Group="ADCChannel" Name="WatchdogChannel" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="AllRegular"/>
+    </RefParameter>
+   
+    <RefParameter Comment="Analog WatchDog Channel" DefaultValue="" Group="ADCChannel" Name="WatchdogChannel" Type="list">
+        <PossibleValue Comment="Channel IN0_Diff" Value="ADC_CHANNEL_VINP0_VINM0"/>
+        <PossibleValue Comment="Channel IN1_Diff" Value="ADC_CHANNEL_VINP1_VINM1"/>
+        <PossibleValue Comment="Channel IN2_Diff" Value="ADC_CHANNEL_VINP2_VINM2"/>
+        <PossibleValue Comment="Channel IN3_Diff" Value="ADC_CHANNEL_VINP3_VINM3"/>
+        <PossibleValue Comment="Channel INM0"  Value="ADC_CHANNEL_VINM0"/>
+        <PossibleValue Comment="Channel INP0"  Value="ADC_CHANNEL_VINP0"/>
+        <PossibleValue Comment="Channel INM1"  Value="ADC_CHANNEL_VINM1"/>
+        <PossibleValue Comment="Channel INP1"  Value="ADC_CHANNEL_VINP1"/>
+        <PossibleValue Comment="Channel INM2"  Value="ADC_CHANNEL_VINM2"/>
+        <PossibleValue Comment="Channel INP2"  Value="ADC_CHANNEL_VINP2"/>
+        <PossibleValue Comment="Channel INM3"  Value="ADC_CHANNEL_VINM3"/>
+        <PossibleValue Comment="Channel INP3"  Value="ADC_CHANNEL_VINP3"/>       
+        <PossibleValue Comment="Channel Vbat"  Value="ADC_CHANNEL_VBAT"/>
+        <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
+        <Description>ADC channel for the analog watchdog</Description> 
+    </RefParameter>
+    <RefParameter Comment="Analog WatchDog Channel" Visible="false" DefaultValue="" Group="ADCChannel" Name="WatchdogChannel" Type="list"/>
+
+        
+   
+    
+    <!-- ***************************************************WatchDog2 parameters  ****************************************** -->
+    <RefParameter Comment="Enable Analog WatchDog Mode" DefaultValue="false" Group="ADCgroup" Name="EnableAnalogWatchDog2" Type="boolean" Visible="false">
+        <Condition Expression="EnableRegularConversion=DISABLE &amp; Sequencer=FULLY_CONFIGURABLE" Diagnostic=""/>
+        <PossibleValue Comment="false" Value="false"/>
+        <Description>Enable/Disable Analog WatchDog Mode</Description> 
+    </RefParameter>
+    <RefParameter Comment="Enable Analog WatchDog Mode" DefaultValue="false" Group="ADCgroup" Name="EnableAnalogWatchDog2" Type="boolean">
+        <PossibleValue Comment="true" Value="true" Semaphore="AWD2_isSelected_$IpInstance"/>
+        <PossibleValue Comment="false" Value="false"/>
+        <Description>Enable/Disable Analog WatchDog Mode</Description> 
+    </RefParameter>
+	
+    <!--  WatchDog2 Number parameters -->
+    <RefParameter Comment="Watchdog instance" DefaultValue="null" Group="ADCgroup" Name="AWD2WatchdogNumber" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="!AWD2_isSelected_$IpInstance"/>
+    </RefParameter>
+    <RefParameter Comment="Watchdog instance" DefaultValue="null" Group="ADCgroup" Name="AWD2WatchdogNumber" Type="list" Visible="false" >
+        <Condition Diagnostic="" Expression="Sequencer=NOT_FULLY_CONFIGURABLE | (EnableRegularConversion=DISABLE)"/>
+    </RefParameter>
+    <RefParameter Comment="Watchdog instance" DefaultValue="ADC_ANALOGWATCHDOG_2" Group="ADCgroup" Name="AWD2WatchdogNumber" Type="list" Visible="false">
+        <PossibleValue Comment="WatchDog" Value="ADC_ANALOGWATCHDOG_2"/>
+        <Description>Number of used watchDogs.</Description>
+    </RefParameter>
+	 
+    <!-- Possible Value of HighThreshold parameters: Min and Max of this parameter depend on ADC resolution -->
+    <RefParameter Comment="High Threshold" DefaultValue="null" Group="ADCgroup" Name="AWD2HighThreshold" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="EnableAnalogWatchDog2=false"/>
+    </RefParameter>
+   
+    <RefParameter Comment="High Threshold" DefaultValue="0" Group="ADCgroup" Max="4095" Min="=AWD2LowThreshold" Name="AWD2HighThreshold" Type="integer">
+        <Description>Configures the ADC analog watchdog High threshold value.</Description>
+    </RefParameter>
+
+    <!-- Possible value of LowThreshold parameter -->
+    <RefParameter Comment="Low Threshold" DefaultValue="null" Group="ADCgroup" Name="AWD2LowThreshold" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="EnableAnalogWatchDog2=false"/>
+    </RefParameter>
+   
+    <RefParameter Comment="Low Threshold" DefaultValue="0" Group="ADCgroup" Max="=AWD2HighThreshold" Min="0" Name="AWD2LowThreshold" Type="integer">
+        <Description>Configures the ADC analog watchdog Low threshold value.</Description>
+    </RefParameter>
+	
+		    
+    <!-- Possible value of ITMode parameter -->
+    <RefParameter Comment="ADC watchdog event type" DefaultValue="null" Group="ADCgroup" Name="EventType" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="EnableAnalogWatchDog2=false"/>
+    </RefParameter>
+   
+    <RefParameter Comment="ADC watchdog event type" DefaultValue="ADC_AWD_EVENT_POLLING" Group="ADCgroup" Name="EventType" Type="list">
+        <PossibleValue Comment="ADC watchdog event type polling" Value="ADC_AWD_EVENT_POLLING"/>
+        <PossibleValue Comment="ADC watchdog event type interrupt" Value="ADC_AWD_EVENT_INTERRUPT"/>
+        <Description>Specifies whether the analog watchdog is configured in interrupt mode or in polling mode.</Description>
+    </RefParameter>
+
+	
+    <!-- Possible value of MonitoredBy parameter -->
+   
+    <RefParameter Comment="Monitored by" DefaultValue="__NULL" Group="ADCgroup" Name="MonitoredBy" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="!AWD2_isSelected_$IpInstance"/> 
+        <PossibleValue Comment="None" Value="__NULL"/>
+               
+        <Description>For a dedicated channel, the generated analog watchdog configuration will correspond to the sum of all "Monitored" configurations for this channel when the number of ranks is  greater than 1.</Description> 
+    </RefParameter> 
+    
+    <RefParameter Comment="Monitored by" DefaultValue="__NULL" Group="ADCgroup" Name="MonitoredBy" Type="list">
+        <PossibleValue Comment="None" Value="__NULL"/>
+        <PossibleValue Comment="Analog Watchdog"  Condition="!AWD2_isSelected_$IpInstance" Action="Disable" Diagnostic="Analog Watchdog 2 is not selected " Value="ADC_ANALOGWATCHDOG_2"/>
+        <Description>For a dedicated channel, the generated analog watchdog configuration will correspond to the sum of all "Monitored" configurations for this channel when the number of ranks is  greater than 1.</Description> 
+    </RefParameter>
+   
+    <RefParameter Comment="Monitored by" DefaultValue="null" Group="ADCgroup" Name="MonitoredBy" Type="list" Visible="false"/>
+    
+    
+     <RefParameter Comment="Watchdog instance" DefaultValue="ADC_ANALOGWATCHDOG_2" Group="ADCgroup" Name="AWD2WatchdogNumber" Type="list" Visible="false">
+        <PossibleValue Comment="WatchDog" Value="ADC_ANALOGWATCHDOG_2"/>
+        <Description>Number of used watchDogs.</Description>
+    </RefParameter>
+
+    <RefParameter Comment="Regular ITMode" DefaultValue="null" Group="ADCChannel" Name="RegITMode" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="MonitoredBy=__NULL"/>
+    </RefParameter>
+    <RefParameter Comment="Regular ITMode" DefaultValue="DISABLE" Group="ADCChannel" Name="RegITMode" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="MonitoredBy=ADC_ANALOGWATCHDOG_2 &amp; AWD2ITMode=DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Regular ITMode" DefaultValue="ENABLE" Group="ADCChannel" Name="RegITMode" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="MonitoredBy=ADC_ANALOGWATCHDOG_2 &amp; AWD2ITMode=ENABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Regular ITMode" DefaultValue="null" Group="ADCChannel" Name="RegITMode" Type="list" Visible="false">
+    </RefParameter>
+    
+    
+    <RefParameter Comment="Regular HighThreshold" DefaultValue="null" Group="ADCChannel" Name="RegHighThreshold" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="MonitoredBy=__NULL"/>
+    </RefParameter>
+    <RefParameter Comment="Regular HighThreshold" DefaultValue="=AWD2HighThreshold" Group="ADCChannel" Name="RegHighThreshold" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="MonitoredBy=ADC_ANALOGWATCHDOG_2"/>
+    </RefParameter>
+    <RefParameter Comment="Regular HighThreshold" DefaultValue="null" Group="ADCChannel" Name="RegHighThreshold" Type="list" Visible="false">	  
+    </RefParameter>
+    
+    
+    
+    <RefParameter Comment="Regular LowThreshold" DefaultValue="null" Group="ADCChannel" Name="RegLowThreshold" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="MonitoredBy=__NULL"/>
+    </RefParameter>
+    <RefParameter Comment="Regular LowThreshold" DefaultValue="=AWD2LowThreshold" Group="ADCChannel" Name="RegLowThreshold" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="MonitoredBy=ADC_ANALOGWATCHDOG_2"/>
+    </RefParameter>
+
+    <RefParameter Comment="Regular LowThreshold" DefaultValue="null" Group="ADCChannel" Name="RegLowThreshold" Type="list" Visible="false">
+    </RefParameter> 
+    
+    
+    <RefParameter Comment="AWDChannel" DefaultValue="__NULL" Group="ADCChannel" Name="AWDChannel" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="MonitoredBy=__NULL"/>
+    </RefParameter> 
+    
+    <RefParameter Comment="AWDChannel" DefaultValue="__NULL" Group="ADCChannel" Name="AWDChannel" Type="list" Visible="false">
+        <PossibleValue Comment="Channel IN0_Diff"  Value="ADC_CHANNEL_VINP0_VINM0"/>
+        <PossibleValue Comment="Channel IN1_Diff"  Value="ADC_CHANNEL_VINP1_VINM1"/>
+        <PossibleValue Comment="Channel IN2_Diff"  Value="ADC_CHANNEL_VINP2_VINM2"/>
+        <PossibleValue Comment="Channel IN3_Diff"  Value="ADC_CHANNEL_VINP3_VINM3"/>
+        <PossibleValue Comment="Channel INM0"  Value="ADC_CHANNEL_VINM0"/>
+        <PossibleValue Comment="Channel INP0"  Value="ADC_CHANNEL_VINP0"/>
+        <PossibleValue Comment="Channel INM1"  Value="ADC_CHANNEL_VINM1"/>
+        <PossibleValue Comment="Channel INP1"  Value="ADC_CHANNEL_VINP1"/>
+        <PossibleValue Comment="Channel INM2"  Value="ADC_CHANNEL_VINM2"/>
+        <PossibleValue Comment="Channel INP2"  Value="ADC_CHANNEL_VINP2"/>
+        <PossibleValue Comment="Channel INM3"  Value="ADC_CHANNEL_VINM3"/>
+        <PossibleValue Comment="Channel INP3"  Value="ADC_CHANNEL_VINP3"/>       
+        <PossibleValue Comment="Channel Vbat"  Value="ADC_CHANNEL_VBAT"/>
+        <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
+        <Description>ADC channel for the analog watchdog</Description> 
+    </RefParameter>
+    
+     <RefParameter Comment="AWDChannel" DefaultValue="__NULL" Group="ADCChannel" Name="AWDChannel" Type="list" Visible="false"/>
+
+    <RefParameter Comment="UnUsedParameter" DefaultValue="ADC_ANALOGWATCHDOG_SINGLE_REG" Name="UnUsedParameter" Type="list" Visible="false">
+        <PossibleValue Comment="Single regular channel" Value="ADC_ANALOGWATCHDOG_SINGLE_REG"/>
+    </RefParameter>
+    
+    
+    
+    <!-- Not displayed parameters -->
+    <RefParameter Comment="Master Flag" DefaultValue="0" Max="1" Min="0" Name="master" Type="integer" Visible="false"/>
+    
+    <!-- List of all available channel used to -->
+    
+     <RefParameter Comment="Channel" DefaultValue="ADC_CHANNEL_VINM0" Group="ADCChannel" Name="AllChannels" Type="list" Visible="true">
+        <PossibleValue Comment="Channel IN0_Diff" Value="ADC_CHANNEL_VINP0_VINM0"/>
+        <PossibleValue Comment="Channel IN1_Diff" Value="ADC_CHANNEL_VINP1_VINM1"/>
+        <PossibleValue Comment="Channel IN2_Diff" Value="ADC_CHANNEL_VINP2_VINM2"/>
+        <PossibleValue Comment="Channel IN3_Diff" Value="ADC_CHANNEL_VINP3_VINM3"/>
+        <PossibleValue Comment="Channel INM0"  Value="ADC_CHANNEL_VINM0"/>
+        <PossibleValue Comment="Channel INP0"  Value="ADC_CHANNEL_VINP0"/>
+        <PossibleValue Comment="Channel INM1"  Value="ADC_CHANNEL_VINM1"/>
+        <PossibleValue Comment="Channel INP1"  Value="ADC_CHANNEL_VINP1"/>
+        <PossibleValue Comment="Channel INM2"  Value="ADC_CHANNEL_VINM2"/>
+        <PossibleValue Comment="Channel INP2"  Value="ADC_CHANNEL_VINP2"/>
+        <PossibleValue Comment="Channel INM3"  Value="ADC_CHANNEL_VINM3"/>
+        <PossibleValue Comment="Channel INP3"  Value="ADC_CHANNEL_VINP3"/>       
+        <PossibleValue Comment="Channel Vbat"  Value="ADC_CHANNEL_VBAT"/>
+        <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
+    </RefParameter>
+    <RefParameter Comment="Channel" DefaultValue="" Group="ADCChannel" Name="AllChannels" Type="list" Visible="false"/>
+
+    <RefParameter Comment="Available Channel" DefaultValue="ADC_CHANNEL_TEMPSENSOR" Group="ADCChannel" Name="Available_Channel" Type="list" Visible="false">
+    </RefParameter>
+
+    <!-- Possible Value of AnalogWDChannel parameters -->
+   
+    <RefParameter Comment="Analog WatchDog Channel" DefaultValue="" Group="ADCChannel" Name="AnalogWDChannel" Type="list">
+        <PossibleValue Comment="Channel IN0_Diff"  Condition="!SHANNELN0DIFFISSELECTED" Value="ADC_AWD_CH_VINP0"/>
+        <PossibleValue Comment="Channel IN1_Diff"  Condition="!SHANNELN1DIFFISSELECTED" Value="ADC_AWD_CH_VINP1"/>
+        <PossibleValue Comment="Channel IN2_Diff"  Condition="!SHANNELN2DIFFISSELECTED" Value="ADC_AWD_CH_VINP2"/>
+        <PossibleValue Comment="Channel IN3_Diff"  Condition="!SHANNELN3DIFFISSELECTED" Value="ADC_AWD_CH_VINP2"/>
+        <PossibleValue Comment="Channel INM0"  Condition="!SHANNELNM0ISSELECTED" Value="ADC_AWD_CH_VINM0"/>
+        <PossibleValue Comment="Channel INP0"  Condition="!SHANNELNP0ISSELECTED" Value="ADC_AWD_CH_VINP0"/>
+        <PossibleValue Comment="Channel INM1"  Condition="!SHANNELNM1ISSELECTED" Value="ADC_AWD_CH_VINM1"/>
+        <PossibleValue Comment="Channel INP1"  Condition="!SHANNELNP1ISSELECTED" Value="ADC_AWD_CH_VINP1"/>
+        <PossibleValue Comment="Channel INM2"  Condition="!SHANNELNM2ISSELECTED" Value="ADC_AWD_CH_VINM2"/>
+        <PossibleValue Comment="Channel INP2"  Condition="!SHANNELNP2ISSELECTED" Value="ADC_AWD_CH_VINP2"/>
+        <PossibleValue Comment="Channel INM3"  Condition="!SHANNELNM3ISSELECTED" Value="ADC_AWD_CH_VINM3"/>
+        <PossibleValue Comment="Channel INP3"  Condition="!SHANNELNP3ISSELECTED" Value="ADC_AWD_CH_VINP3"/>       
+        <PossibleValue Comment="Channel Vbat" Value="ADC_AWD_CH_VBAT"/>
+        <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_AWD_CH_TEMPSENSOR"/>
+       
+        <Description>ADC channel for the analog watchdog</Description> 
+    </RefParameter>
+     <RefParameter Comment="Analog WatchDog Channel" Visible="false" DefaultValue="" Group="ADCChannel" Name="AnalogWDChannel" Type="list"/>
+
+    
+    <!-- ChannelForWatchDog used to specify witch channel list to be available for analog watch dog mode-->
+    <RefParameter Comment="Channel type for WatchDog" DefaultValue="Regular" Name="ChannelForWatchDog" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="WatchdogMode=ADC_ANALOGWATCHDOG_SINGLE_REG"/>
+        <PossibleValue Comment="Regular" Value="Regular"/>
+    </RefParameter>
+    <RefParameter Comment="Channel type for WatchDog" DefaultValue="none" Name="ChannelForWatchDog" Type="list" Visible="false">
+        <PossibleValue Comment="none" Value="none"/>
+    </RefParameter>
+    
+    <!-- RefModes -->
+     
+    <RefMode Comment="" Name="VINM0">
+        <ConfigForMode>ADC_RegularChannelConfig</ConfigForMode>
+        <Parameter Name="Channel" RefParameter="Channel">
+            <PossibleValue>ADC_CHANNEL_VINM0</PossibleValue>
+        </Parameter>
+        <!--Parameter Name="Rank"/--> 
+    </RefMode>
+    <RefMode Comment="" Name="VINP0">
+        <ConfigForMode>ADC_RegularChannelConfig</ConfigForMode>
+        <Parameter Name="Channel" RefParameter="Channel">
+            <PossibleValue>ADC_CHANNEL_VINP0</PossibleValue>
+        </Parameter>
+        <!--Parameter Name="Rank"/--> 
+    </RefMode>
+      <RefMode Comment="" Name="VINM1">
+        <ConfigForMode>ADC_RegularChannelConfig</ConfigForMode>
+        <Parameter Name="Channel" RefParameter="Channel">
+            <PossibleValue>ADC_CHANNEL_VINM1</PossibleValue>
+        </Parameter>
+        <!--Parameter Name="Rank"/--> 
+    </RefMode>
+    <RefMode Comment="" Name="VINP1">
+        <ConfigForMode>ADC_RegularChannelConfig</ConfigForMode>
+        <Parameter Name="Channel" RefParameter="Channel">
+            <PossibleValue>ADC_CHANNEL_VINP1</PossibleValue>
+        </Parameter>
+        <!--Parameter Name="Rank"/--> 
+    </RefMode>
+        <RefMode Comment="" Name="VINM2">
+        <ConfigForMode>ADC_RegularChannelConfig</ConfigForMode>
+        <Parameter Name="Channel" RefParameter="Channel">
+            <PossibleValue>ADC_CHANNEL_VINM2</PossibleValue>
+        </Parameter>
+        <!--Parameter Name="Rank"/--> 
+    </RefMode>
+    <RefMode Comment="" Name="VINP2">
+        <ConfigForMode>ADC_RegularChannelConfig</ConfigForMode>
+        <Parameter Name="Channel" RefParameter="Channel">
+            <PossibleValue>ADC_CHANNEL_VINP2</PossibleValue>
+        </Parameter>
+        <!--Parameter Name="Rank"/--> 
+    </RefMode>
+    <RefMode Comment="" Name="VINM3">
+        <ConfigForMode>ADC_RegularChannelConfig</ConfigForMode>
+        <Parameter Name="Channel" RefParameter="Channel">
+            <PossibleValue>ADC_CHANNEL_VINM3</PossibleValue>
+        </Parameter>
+        <!--Parameter Name="Rank"/--> 
+    </RefMode>
+    <RefMode Comment="" Name="VINP3">
+        <ConfigForMode>ADC_RegularChannelConfig</ConfigForMode>
+        <Parameter Name="Channel" RefParameter="Channel">
+            <PossibleValue>ADC_CHANNEL_VINP3</PossibleValue>
+        </Parameter>
+        <!--Parameter Name="Rank"/--> 
+    </RefMode>
+   <RefMode Comment="" Name="VIN0_Diff">
+        <ConfigForMode>ADC_RegularChannelConfig</ConfigForMode>
+        <Parameter Name="Channel" RefParameter="Channel">
+            <PossibleValue>ADC_CHANNEL_VINP0_VINM0</PossibleValue>
+        </Parameter>
+        <!--Parameter Name="Rank"/--> 
+    </RefMode> 
+       <RefMode Comment="" Name="VIN1_Diff">
+        <ConfigForMode>ADC_RegularChannelConfig</ConfigForMode>
+        <Parameter Name="Channel" RefParameter="Channel">
+            <PossibleValue>ADC_CHANNEL_VINP1_VINM1</PossibleValue>
+        </Parameter>
+        <!--Parameter Name="Rank"/--> 
+    </RefMode> 
+       <RefMode Comment="" Name="VIN2_Diff">
+        <ConfigForMode>ADC_RegularChannelConfig</ConfigForMode>
+        <Parameter Name="Channel" RefParameter="Channel">
+            <PossibleValue>ADC_CHANNEL_VINP2_VINM2</PossibleValue>
+        </Parameter>
+        <!--Parameter Name="Rank"/--> 
+    </RefMode> 
+       <RefMode Comment="" Name="VIN3_Diff">
+        <ConfigForMode>ADC_RegularChannelConfig</ConfigForMode>
+        <Parameter Name="Channel" RefParameter="Channel">
+            <PossibleValue>ADC_CHANNEL_VINP3_VINM3</PossibleValue>
+        </Parameter>
+        <!--Parameter Name="Rank"/--> 
+    </RefMode> 
+      
+    
+
+    <RefMode Comment="" Name="IN-TempSens">
+        <ConfigForMode>ADC_RegularChannelConfig</ConfigForMode>
+        <Parameter Name="Channel">
+            <PossibleValue>ADC_CHANNEL_TEMPSENSOR</PossibleValue>
+        </Parameter>
+        <!--Parameter Name="Rank"/--> 
+    </RefMode>
+    <RefMode Comment="" Name="IN-Vbat">
+        <Parameter Name="Channel">
+            <PossibleValue>ADC_CHANNEL_VBAT</PossibleValue>
+        </Parameter>
+    </RefMode>    
+    
+    <ModeLogicOperator Name="OR">
+        <!-- External channels --> 
+        <Mode Name="VIN0_Diff">
+            <ModeLogicOperator Name="OR">
+                <Mode Name="VIN0_Diff">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VINM0"/>
+                        <Signal Name="VINP0"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>channelSelected</Semaphore>
+            <Semaphore>SHANNELN0DIFFISSELECTED</Semaphore>
+
+        </Mode>
+        <Mode Name="VIN1_Diff">
+            <ModeLogicOperator Name="OR">
+                <Mode Name="VIN1_Diff">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VINM1"/>
+                        <Signal Name="VINP1"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>channelSelected</Semaphore>
+            <Semaphore>SHANNELN1DIFFISSELECTED</Semaphore>
+
+        </Mode>
+        <Mode Name="VIN2_Diff">
+            <ModeLogicOperator Name="OR">
+                <Mode Name="VIN2_Diff">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VINM2"/>
+                        <Signal Name="VINP2"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>channelSelected</Semaphore>
+            <Semaphore>SHANNELN2DIFFISSELECTED</Semaphore>
+
+        </Mode>
+        <Mode Name="VIN3_Diff">
+            <ModeLogicOperator Name="OR">
+                <Mode Name="VIN3_Diff">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VINM3"/>
+                        <Signal Name="VINP3"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>channelSelected</Semaphore>
+            <Semaphore>SHANNELN3DIFFISSELECTED</Semaphore>
+
+        </Mode>
+		<Mode Name="VINM0">
+            <ModeLogicOperator Name="OR">
+                <Mode Name="VINM0">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VINM0"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>channelSelected</Semaphore>
+            <Semaphore>SHANNELNM0ISSELECTED</Semaphore>
+
+        </Mode>
+        <Mode Name="VINP0">
+            <ModeLogicOperator Name="OR">
+                <Mode Name="VINP0">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VINP0"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>channelSelected</Semaphore>
+            <Semaphore>SHANNELNP0ISSELECTED</Semaphore>
+        </Mode>
+        
+		<Mode Name="VINM1">
+            <ModeLogicOperator Name="OR">
+                <Mode Name="VINM1">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VINM1"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>channelSelected</Semaphore>
+            <Semaphore>SHANNELNM1ISSELECTED</Semaphore>
+
+        </Mode>
+        <Mode Name="VINP1">
+            <ModeLogicOperator Name="OR">
+                <Mode Name="VINP1">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VINP1"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>channelSelected</Semaphore>
+            <Semaphore>SHANNELNP1ISSELECTED</Semaphore>
+        </Mode>
+ 
+
+		<Mode Name="VINM2">
+            <ModeLogicOperator Name="OR">
+                <Mode Name="VINM2">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VINM2"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>channelSelected</Semaphore>
+            <Semaphore>SHANNELNM2ISSELECTED</Semaphore>
+
+        </Mode>
+        <Mode Name="VINP2">
+            <ModeLogicOperator Name="OR">
+                <Mode Name="VINP2">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VINP2"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>channelSelected</Semaphore>
+            <Semaphore>SHANNELNP2ISSELECTED</Semaphore>
+        </Mode>
+ 
+		<Mode Name="VINM3">
+            <ModeLogicOperator Name="OR">
+                <Mode Name="VINM3">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VINM3"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>channelSelected</Semaphore>
+            <Semaphore>SHANNELNM3ISSELECTED</Semaphore>
+
+        </Mode>
+
+		<Mode Name="VINP3">
+            <ModeLogicOperator Name="OR">
+                <Mode Name="VINP3">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VINP3"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>channelSelected</Semaphore>
+            <Semaphore>SHANNELNP3ISSELECTED</Semaphore>
+
+        </Mode>
+		<Mode Name="PDM_DATA">
+            <ModeLogicOperator Name="OR">
+                <Mode Name="PDM_DATA">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="PDM_DATA"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>channelSelected</Semaphore>
+            <Semaphore>SHANNELNM1ISSELECTED</Semaphore>
+
+        </Mode>
+        <Mode Name="PDM_CLK">
+            <ModeLogicOperator Name="OR">
+                <Mode Name="PDM_CLK">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="PDM_CLK"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>channelSelected</Semaphore>
+            <Semaphore>SHANNELNP1ISSELECTED</Semaphore>
+        </Mode>
+		<Mode Name="PGA_CAP0">
+            <ModeLogicOperator Name="OR">
+                <Mode Name="PGA_CAP0">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="PGA_CAP0"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>channelSelected</Semaphore>
+            <Semaphore>SHANNELNM2ISSELECTED</Semaphore>
+
+        </Mode>
+        <Mode Name="PGA_CAP1">
+            <ModeLogicOperator Name="OR">
+                <Mode Name="PGA_CAP1">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="PGA_CAP1"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>channelSelected</Semaphore>
+            <Semaphore>SHANNELNP2ISSELECTED</Semaphore>
+        </Mode>
+        <Mode Name="PGA_VIN">
+            <ModeLogicOperator Name="OR">
+                <Mode Name="PGA_VIN">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="PGA_VIN"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>channelSelected</Semaphore>
+            <Semaphore>SHANNELNM3ISSELECTED</Semaphore>
+
+        </Mode>
+		<Mode Name="PGA_VBIAS_MIC">
+            <ModeLogicOperator Name="OR">
+                <Mode Name="PGA_VBIAS_MIC">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="PGA_VBIAS_MIC"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>channelSelected</Semaphore>
+            <Semaphore>SHANNELNP3ISSELECTED</Semaphore>
+
+        </Mode>
+		
+	
+       
+        <!-- Internal channels -->
+        <Mode Name="IN-TempSens" UserName="Temperature Sensor Channel">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="IN-TempSens" UserName="Single-ended">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="TempSens_Input"/>
+                    </SignalLogicalOp>                   
+                    <Semaphore>VtsATSelected$IpInstance</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>channelSelected</Semaphore>
+            <Semaphore>SHANNELTSISSELECTED</Semaphore>
+
+        </Mode>    
+        <Mode Name="IN-Vbat" UserName="Vbat Channel">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="IN-Vbat" UserName="Vbat Channel">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="Vbat_Input"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>VbatfTSelected$IpInstance</Semaphore> 
+            <Semaphore>channelSelected$IpInstance</Semaphore>
+        </Mode>  
+    </ModeLogicOperator>
+    <Semaphore>$IpInstance_USED</Semaphore>
+	<RefSignal IOMode="Analog" Name="VINM0" />
+	<RefSignal IOMode="Analog" Name="VINP0" />
+	<RefSignal IOMode="Analog" Name="VINM1" />
+	<RefSignal IOMode="Analog" Name="VINP1" />
+	<RefSignal IOMode="Analog" Name="VINM2" />
+	<RefSignal IOMode="Analog" Name="VINP2" />
+	<RefSignal IOMode="Analog" Name="VINM3" />
+	<RefSignal IOMode="Analog" Name="VINP3" />
+	<RefSignal IOMode="Analog" Name="PDM_DATA" />
+	<RefSignal IOMode="Analog" Name="PDM_CLK" />
+	<RefSignal IOMode="Analog" Name="PGA_VIN" />
+	<RefSignal IOMode="Analog" Name="PGA_CAP0" />
+	<RefSignal IOMode="Analog" Name="PGA_CAP1" />
+	<RefSignal IOMode="Analog" Name="PGA_VBIAS_MIC" />
+	<RefSignal IOMode="Analog" Name="TempSens_Input" Virtual="true"/>
+    <RefSignal IOMode="Analog" Name="Vbat_Input" Virtual="true"/>
+	
+
+    <Semaphore>USE_$IpInstance</Semaphore>
+
+</IP>

@@ -409,6 +409,16 @@ static void OnledEvent(void *context);
   */
 static void PingPong_Process(void);
 
+/**
+  * @brief PingPong TX configure and process
+  */
+static void RadioSend(void);
+
+/**
+  * @brief PingPong RX configure and process
+  */
+static void RadioRx(void);
+
 [#elseif (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PER")]
 /**
   * @brief Packet Error Rate state machine implementation
@@ -660,37 +670,11 @@ void SubghzApp_Init(void)
   APP_LOG(TS_OFF, VLEVEL_M, "LORA_MODULATION\n\r");
   APP_LOG(TS_OFF, VLEVEL_M, "LORA_BW=%d kHz\n\r", (1 << LORA_BANDWIDTH) * 125);
   APP_LOG(TS_OFF, VLEVEL_M, "LORA_SF=%d\n\r", LORA_SPREADING_FACTOR);
-
-  Radio.SetTxConfig(MODEM_LORA, TX_OUTPUT_POWER, 0, LORA_BANDWIDTH,
-                    LORA_SPREADING_FACTOR, LORA_CODINGRATE,
-                    LORA_PREAMBLE_LENGTH, LORA_FIX_LENGTH_PAYLOAD_ON,
-                    true, 0, 0, LORA_IQ_INVERSION_ON, TX_TIMEOUT_VALUE);
-
-  Radio.SetRxConfig(MODEM_LORA, LORA_BANDWIDTH, LORA_SPREADING_FACTOR,
-                    LORA_CODINGRATE, 0, LORA_PREAMBLE_LENGTH,
-                    LORA_SYMBOL_TIMEOUT, LORA_FIX_LENGTH_PAYLOAD_ON,
-                    0, true, 0, 0, LORA_IQ_INVERSION_ON, true);
-
-  Radio.SetMaxPayloadLength(MODEM_LORA, MAX_APP_BUFFER_SIZE);
-
 #elif ((USE_MODEM_LORA == 0) && (USE_MODEM_FSK == 1))
   APP_LOG(TS_OFF, VLEVEL_M, "---------------\n\r");
   APP_LOG(TS_OFF, VLEVEL_M, "FSK_MODULATION\n\r");
   APP_LOG(TS_OFF, VLEVEL_M, "FSK_BW=%d Hz\n\r", FSK_BANDWIDTH);
   APP_LOG(TS_OFF, VLEVEL_M, "FSK_DR=%d bits/s\n\r", FSK_DATARATE);
-
-  Radio.SetTxConfig(MODEM_FSK, TX_OUTPUT_POWER, FSK_FDEV, 0,
-                    FSK_DATARATE, 0,
-                    FSK_PREAMBLE_LENGTH, FSK_FIX_LENGTH_PAYLOAD_ON,
-                    true, 0, 0, 0, TX_TIMEOUT_VALUE);
-
-  Radio.SetRxConfig(MODEM_FSK, FSK_BANDWIDTH, FSK_DATARATE,
-                    0, FSK_AFC_BANDWIDTH, FSK_PREAMBLE_LENGTH,
-                    0, FSK_FIX_LENGTH_PAYLOAD_ON, 0, true,
-                    0, 0, false, true);
-
-  Radio.SetMaxPayloadLength(MODEM_FSK, MAX_APP_BUFFER_SIZE);
-
 #else
 #error "Please define a modulation in the subghz_phy_app.h file."
 #endif /* USE_MODEM_LORA | USE_MODEM_FSK */
@@ -699,8 +683,6 @@ void SubghzApp_Init(void)
   memset(BufferTx, 0x0, MAX_APP_BUFFER_SIZE);
 
   APP_LOG(TS_ON, VLEVEL_L, "rand=%d\n\r", random_delay);
-  /*starts reception*/
-  Radio.Rx(RX_TIMEOUT_VALUE + random_delay);
 
 [#if THREADX??][#-- If AzRtos is used --]
   /* No need to allocate the stack and create thread for SubGHz_Phy_App_Process. */
@@ -711,6 +693,10 @@ void SubghzApp_Init(void)
   /*register task to to be run in while(1) after Radio IT*/
   UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_SubGHz_Phy_App_Process), UTIL_SEQ_RFU, PingPong_Process);
 [/#if][#--  THREADX vs FREERTOS vs SEQUENCER --]
+
+  /*starts first process */
+  HAL_Delay(RX_TIMEOUT_VALUE + random_delay);
+  RadioRx();
 [#elseif (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PER")]
   /* Radio Set frequency */
   Radio.SetChannel(RF_FREQUENCY);
@@ -1387,6 +1373,66 @@ static void OnRxError(void)
 /* USER CODE BEGIN PrFD */
 [#if (FILL_UCS == "true")]
 [#if (INTERNAL_USER_SUBGHZ_APP == "SUBGHZ_PINGPONG")]
+static void RadioSend(void)
+{
+#if ((USE_MODEM_LORA == 1) && (USE_MODEM_FSK == 0))
+  Radio.Sleep();
+  Radio.SetChannel(RF_FREQUENCY);
+  Radio.SetTxConfig(MODEM_LORA, TX_OUTPUT_POWER, 0, LORA_BANDWIDTH,
+                    LORA_SPREADING_FACTOR, LORA_CODINGRATE,
+                    LORA_PREAMBLE_LENGTH, LORA_FIX_LENGTH_PAYLOAD_ON,
+                    true, 0, 0, LORA_IQ_INVERSION_ON, TX_TIMEOUT_VALUE);
+  Radio.SetMaxPayloadLength(MODEM_LORA, MAX_APP_BUFFER_SIZE);
+#elif ((USE_MODEM_LORA == 0) && (USE_MODEM_FSK == 1))
+  Radio.SetTxConfig(MODEM_FSK, TX_OUTPUT_POWER, FSK_FDEV, 0,
+                    FSK_DATARATE, 0,
+                    FSK_PREAMBLE_LENGTH, FSK_FIX_LENGTH_PAYLOAD_ON,
+                    true, 0, 0, 0, TX_TIMEOUT_VALUE);
+  Radio.SetMaxPayloadLength(MODEM_FSK, MAX_APP_BUFFER_SIZE);
+#else
+#error "Please define a modulation in the subghz_phy_app.h file."
+#endif /* USE_MODEM_LORA | USE_MODEM_FSK */
+
+  Radio.Send(BufferTx, PAYLOAD_LEN);
+}
+
+static void RadioRx(void)
+{
+#if ((USE_MODEM_LORA == 1) && (USE_MODEM_FSK == 0))
+  Radio.Sleep();
+  Radio.SetChannel(RF_FREQUENCY);
+  Radio.SetRxConfig(MODEM_LORA, LORA_BANDWIDTH, LORA_SPREADING_FACTOR,
+                    LORA_CODINGRATE, 0, LORA_PREAMBLE_LENGTH,
+                    LORA_SYMBOL_TIMEOUT, LORA_FIX_LENGTH_PAYLOAD_ON,
+                    0, true, 0, 0, LORA_IQ_INVERSION_ON, true);
+  if (LORA_FIX_LENGTH_PAYLOAD_ON == true)
+  {
+    Radio.SetMaxPayloadLength(MODEM_LORA, PAYLOAD_LEN);
+  }
+  else
+  {
+    Radio.SetMaxPayloadLength(MODEM_LORA, MAX_APP_BUFFER_SIZE);
+  }
+#elif ((USE_MODEM_LORA == 0) && (USE_MODEM_FSK == 1))
+  Radio.SetRxConfig(MODEM_FSK, FSK_BANDWIDTH, FSK_DATARATE,
+                    0, FSK_AFC_BANDWIDTH, FSK_PREAMBLE_LENGTH,
+                    0, FSK_FIX_LENGTH_PAYLOAD_ON, 0, true,
+                    0, 0, false, true);
+  if (LORA_FIX_LENGTH_PAYLOAD_ON == true)
+  {
+    Radio.SetMaxPayloadLength(MODEM_FSK, PAYLOAD_LEN);
+  }
+  else
+  {
+    Radio.SetMaxPayloadLength(MODEM_FSK, MAX_APP_BUFFER_SIZE);
+  }
+#else
+#error "Please define a modulation in the subghz_phy_app.h file."
+#endif /* USE_MODEM_LORA | USE_MODEM_FSK */
+
+  Radio.Rx(RX_TIMEOUT_VALUE);
+}
+
 static void PingPong_Process(void)
 {
   Radio.Sleep();
@@ -1414,21 +1460,21 @@ static void PingPong_Process(void)
                     "\n\r");
             APP_LOG(TS_ON, VLEVEL_L, "Master Tx start\n\r");
             memcpy(BufferTx, PING, sizeof(PING) - 1);
-            Radio.Send(BufferTx, PAYLOAD_LEN);
+            RadioSend();
           }
           else if (strncmp((const char *)BufferRx, PING, sizeof(PING) - 1) == 0)
           {
             /* A master already exists then become a slave */
             isMaster = false;
             APP_LOG(TS_ON, VLEVEL_L, "Slave Rx start\n\r");
-            Radio.Rx(RX_TIMEOUT_VALUE);
+            RadioRx();
           }
           else /* valid reception but neither a PING or a PONG message */
           {
             /* Set device as master and start again */
             isMaster = true;
             APP_LOG(TS_ON, VLEVEL_L, "Master Rx start\n\r");
-            Radio.Rx(RX_TIMEOUT_VALUE);
+            RadioRx();
           }
         }
       }
@@ -1451,21 +1497,21 @@ static void PingPong_Process(void)
                     "\n\r");
             APP_LOG(TS_ON, VLEVEL_L, "Slave  Tx start\n\r");
             memcpy(BufferTx, PONG, sizeof(PONG) - 1);
-            Radio.Send(BufferTx, PAYLOAD_LEN);
+            RadioSend();
           }
           else /* valid reception but not a PING as expected */
           {
             /* Set device as master and start again */
             isMaster = true;
             APP_LOG(TS_ON, VLEVEL_L, "Master Rx start\n\r");
-            Radio.Rx(RX_TIMEOUT_VALUE);
+            RadioRx();
           }
         }
       }
       break;
     case TX:
       APP_LOG(TS_ON, VLEVEL_L, "Rx start\n\r");
-      Radio.Rx(RX_TIMEOUT_VALUE);
+      RadioRx();
       break;
     case RX_TIMEOUT:
     case RX_ERROR:
@@ -1478,17 +1524,17 @@ static void PingPong_Process(void)
         APP_LOG(TS_ON, VLEVEL_L, "Master Tx start\n\r");
         /* master sends PING*/
         memcpy(BufferTx, PING, sizeof(PING) - 1);
-        Radio.Send(BufferTx, PAYLOAD_LEN);
+        RadioSend();
       }
       else
       {
         APP_LOG(TS_ON, VLEVEL_L, "Slave Rx start\n\r");
-        Radio.Rx(RX_TIMEOUT_VALUE);
+        RadioRx();
       }
       break;
     case TX_TIMEOUT:
       APP_LOG(TS_ON, VLEVEL_L, "Slave Rx start\n\r");
-      Radio.Rx(RX_TIMEOUT_VALUE);
+      RadioRx();
       break;
     default:
       break;

@@ -69,8 +69,6 @@
 
 #define BUS_SPI1_BAUDRATE                   18000000
 
-/* User button EXTI handle */
-#define H_EXTI_13                           hpb_exti[BUTTON_USER]
 
 /**
   * @}

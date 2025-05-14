@@ -1082,7 +1082,11 @@
 [#-- hdac1.Instance = DAC1; --]
     [#if ipvar.initCallBacks??]
 [#if hnadlerName!="" && !instName?starts_with("LPDMA") && instName!="TAMP"  && instName!="PWR"]
+        [#if instName == "ADF1"]
+        #t${hnadlerName}.Instance = ${instName}_Filter0;
+        [#else]
         #t${hnadlerName}.Instance = ${instName};
+        [/#if]
 [/#if]
         [#list ipvar.initCallBacks.entrySet() as entry]#n
             [#assign instanceList = entry.value]
@@ -1174,7 +1178,11 @@ static void MX_${instName}_DeInit(void)
  [#if ipvar.initCallBacks??]
     [#if hnadlerName!="" && instName!="TAMP" && instName!="PWR"]
     #t/* Set ${instName} instance */
+    [#if instName == "ADF1"]
+    #t${hnadlerName}.Instance = ${instName}_Filter0;
+    [#else]
     #t${hnadlerName}.Instance = ${instName};
+    [/#if]
     [/#if]
         [#list ipvar.initCallBacks.entrySet() as entry]#n
             [#assign instanceList = entry.value]
