@@ -1,21 +1,38 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-3-Clause)
+/*
+ * Copyright (C) 2024, STMicroelectronics - All Rights Reserved
+ * Author: STM32CubeMX code generation for STMicroelectronics.
+ */
+
+/* For more information on Device Tree configuration, please refer to
+ * https://wiki.st.com/stm32mpu/wiki/Category:Device_tree_configuration
+ */
 /dts-v1/;
+
 #include "dt-bindings/clock/stm32mp25-clksrc.h"
 #include "dt-bindings/reset/stm32mp25-resets.h"
 #include <dt-bindings/pinctrl/stm32-pinfunc.h>
 #include "stm32mp257.dtsi"
-#include "stm32mp257f-board_257f-ev1-mx-rcc.dtsi"
-#include "stm32mp257f-board_257f-ev1-mx-resmem.dtsi"
+#include "stm32mp257f-stm32mp257f-ev1-mx-rcc.dtsi"
+#include "stm32mp257f-stm32mp257f-ev1-mx-resmem.dtsi"
 #include "stm32mp25xxai-pinctrl.dtsi"
 
 /* USER CODE BEGIN includes */
 #include <dt-bindings/clock/stm32mp25-clksrc.h>
 #include <dt-bindings/reset/stm32mp25-resets.h>
-#include "stm32mp257f-ev1-resmem.dtsi"
 /* USER CODE END includes */
 
-/{
+/ {
 	model = "STMicroelectronics STM32MP257F-EV1 STM32CubeMX board";
-	compatible = "st,stm32mp257f-board_257f-ev1-mx", "st,stm32mp257f-ev1", "st,stm32mp257";
+	compatible = "st,stm32mp257f-stm32mp257f-ev1-mx", "st,stm32mp257f-ev1", "st,stm32mp257";
+
+	memory@80000000 {
+		device_type = "memory";
+		reg = <0x0 0x80000000 0x00000001 0x00000000>;
+
+		/* USER CODE BEGIN memory */
+		/* USER CODE END memory */
+	};
 
 	/* USER CODE BEGIN root */
 
@@ -27,79 +44,29 @@
 		stdout-device = &uart5;
 	};
 	/* USER CODE END root */
-};
 
-&pinctrl{
+}; /*root*/
 
-	ospi_port1_clk_pins_mx:ospi_port1_clk_mx-0{
-
-		pins{
-			pinmux = <STM32_PINMUX('D', 0, AF10)>;
-			bias-disable;
-			drive-push-pull;
-			slew-rate = <3>;
-		};
-	};
-
-	ospi_port1_io_pins_mx:ospi_port1_io_mx-0{
-
-		pins{
-			pinmux = <STM32_PINMUX('D', 4, AF10)>,
-					<STM32_PINMUX('D', 5, AF10)>,
-					<STM32_PINMUX('D', 6, AF10)>,
-					<STM32_PINMUX('D', 7, AF10)>;
-			bias-disable;
-			drive-push-pull;
-			slew-rate = <3>;
-		};
-	};
-
-	ospi_port1_ncs_pins_mx:ospi_port1_ncs_mx-0{
-
-		pins{
-			pinmux = <STM32_PINMUX('D', 3, AF10)>;
-			bias-disable;
-			drive-push-pull;
-			slew-rate = <3>;
-		};
-	};
-
-	uart5_pins_mx:uart5_mx-0{
-
-		pins1{
-			pinmux = <STM32_PINMUX('G', 10, AF5)>;
+&pinctrl {
+	uart5_pins_mx: uart5_mx-0 {
+		pins1 {
+			pinmux = <STM32_PINMUX('G', 10, AF5)>; /* UART5_RX */
 			bias-disable;
 			drive-push-pull;
 		};
-
-		pins2{
-			pinmux = <STM32_PINMUX('G', 9, AF5)>;
+		pins2 {
+			pinmux = <STM32_PINMUX('G', 9, AF5)>; /* UART5_TX */
 			bias-disable;
 			drive-push-pull;
 			slew-rate = <0>;
 		};
 	};
 
-	usart6_pins_mx:usart6_mx-0{
-
-		pins1{
-			pinmux = <STM32_PINMUX('F', 13, AF3)>;
-			bias-disable;
-			drive-push-pull;
-			slew-rate = <0>;
-		};
-
-		pins2{
-			pinmux = <STM32_PINMUX('F', 14, AF3)>;
-			bias-disable;
-			drive-push-pull;
-		};
-	};
 	/* USER CODE BEGIN pinctrl */
 	/* USER CODE END pinctrl */
 };
 
-&pinctrl_z{
+&pinctrl_z {
 	/* USER CODE BEGIN pinctrl_z */
 	/* USER CODE END pinctrl_z */
 };
@@ -112,55 +79,13 @@
 	/* USER CODE END bsec */
 };
 
-&nvic{
-	status = "okay";
-};
-
-&ommanager{
-	pinctrl-names = "default";
-	pinctrl-0 = <&ospi_port1_clk_pins_mx>, <&ospi_port1_io_pins_mx>, <&ospi_port1_ncs_pins_mx>;
-	status = "okay";
-	memory-region = <&mm_ospi2>;
-	memory-region-names = "mm_ospi2";
-};
-
-&saes{
-	status = "okay";
-};
-
-&systick{
-	status = "okay";
-
-	/* USER CODE BEGIN systick */
-	clocks = <&rcc CK_ICN_HS_MCU>;
-	clock-frequency = <1000000>;
-	/* USER CODE END systick */
-};
-
-&uart5{
-	pinctrl-names = "default";
-	pinctrl-0 = <&uart5_pins_mx>;
-	status = "okay";
-
-	/* USER CODE BEGIN uart5 */
-	clocks = <&rcc CK_KER_UART5>;
-	current-speed = <115200>;
-	/* USER CODE END uart5 */
-};
-
-&usart6{
-	pinctrl-names = "default";
-	pinctrl-0 = <&usart6_pins_mx>;
-	status = "okay";
-};
-
-/* USER CODE BEGIN addons */
-
 &ospi2{
+	status = "okay";
+
+	/* USER CODE BEGIN ospi2 */
 	memory-region = <&mm_ospi2>;
 	#address-cells = <1>;
 	#size-cells = <0>;
-	status = "okay";
 
 	flash0:flash@0{
 		compatible = "jedec,spi-nor";
@@ -186,5 +111,29 @@
 			};
 		};
 	};
+	/* USER CODE END ospi2 */
 };
+
+&systick{
+	status = "okay";
+
+	/* USER CODE BEGIN systick */
+	clocks = <&rcc CK_ICN_HS_MCU>;
+	clock-frequency = <1000000>;
+	/* USER CODE END systick */
+};
+
+&uart5{
+	pinctrl-names = "default";
+	pinctrl-0 = <&uart5_pins_mx>;
+	status = "okay";
+
+	/* USER CODE BEGIN uart5 */
+	clocks = <&rcc CK_KER_UART5>;
+	current-speed = <115200>;
+	/* USER CODE END uart5 */
+};
+
+/* USER CODE BEGIN addons */
 /* USER CODE END addons */
+

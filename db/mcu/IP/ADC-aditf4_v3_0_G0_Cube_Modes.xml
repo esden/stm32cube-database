@@ -23,6 +23,7 @@
         <Parameter Name="TriggeredMode"/>
         <!--Parameter Name="commmn"/-->
         <Parameter Name="ChannelVREF"/>
+        <Parameter Name="ChannelVBAT"/>
         <Parameter Name="ChannelTS"/>
     </RefMode>
     
@@ -224,6 +225,7 @@
         <Condition Diagnostic="" Expression="Sequencer=NOT_FULLY_CONFIGURABLE"/>
     </RefParameter>
     <RefParameter Comment="Number Of Conversion Flag" DefaultValue="0" Group="ADCgroup" Max="1" Min="0" Name="NbrOfConversionFlag" Type="integer" Visible="false"/>
+
     <RefParameter Comment="Number Of Conversion" DefaultValue="1" Group="ADCgroup" Max="8" Min="1" Name="NbrOfConversion" Type="integer">
         <Condition Diagnostic="" Expression="Sequencer=FULLY_CONFIGURABLE"/>
         <Description>Number of regular channels to be converted</Description>
@@ -427,6 +429,7 @@
         <PossibleValue Comment="Channel 21" Value="ADC_CHANNEL_21"/>
         <PossibleValue Comment="Channel 22" Value="ADC_CHANNEL_22"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT"/>
         <PossibleValue Comment="Channel Vdda" Value="ADC_CHANNEL_VDDA"/>
         <PossibleValue Comment="Channel Vssa" Value="ADC_CHANNEL_VSSA"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
@@ -462,12 +465,13 @@
         <PossibleValue Comment="Backward" Value="ADC_SCAN_SEQ_FIXED_BACKWARD"/>
         <Description>
             Configurable scan direction (Forward from channel 0 to 18 or Backward from channel 18 to channel 0) &lt;br&gt;
+            Vbat = channel 14 &lt;br&gt;
             Vrefint = channel 13 &lt;br&gt;
             TempSensor = channel 12
         </Description>
     </RefParameter>
     
-   
+    <!--RefParameter Visible="false" Comment="comm" DefaultValue="ChannelVREF|ChannelTS|ChannelVBAT" Name="commmn" Type="list"/-->
     
     <RefParameter Comment="ChannelVREF" DefaultValue="ADC_CHANNEL_VREFINT" Name="ChannelVREF" Type="list" Visible="false">
         <Condition Expression="VrefTSelected$IpInstance" Diagnostic=""/>
@@ -480,7 +484,13 @@
         <PossibleValue Comment="ADC_CHANNEL_TEMPSENSOR" Value="ADC_CHANNEL_TEMPSENSOR"/>
     </RefParameter>
     <RefParameter Comment="ChannelTS" DefaultValue="null" Name="ChannelTS" Type="list" Visible="false"/>
-  
+    
+    <RefParameter Comment="Channelvbat" DefaultValue="ADC_CHANNEL_VBAT" Name="ChannelVBAT" Type="list" Visible="false">
+        <Condition Expression="VbatfTSelected$IpInstance" Diagnostic=""/>
+        <PossibleValue Comment="ADC_CHANNEL_VBAT" Value="ADC_CHANNEL_VBAT"/>
+    </RefParameter>
+    <RefParameter Comment="Channelvbat" DefaultValue="null" Name="ChannelVBAT" Type="list" Visible="false"/>
+
      <RefParameter Comment="Watchdog Mode" DefaultValue="null" Group="ADCgroup" Name="WatchdogMode2" Type="list" Visible="false">
         <Condition Diagnostic="" Expression="EnableAnalogWatchDog2=false"/>
     </RefParameter>
@@ -625,7 +635,7 @@
     <Condition Diagnostic="" Expression="EnableAnalogWatchDog2=false|Sequencer=FULLY_CONFIGURABLE"/>    </RefParameter>
     
     <RefParameter Comment="1st Channel" DefaultValue="__NULL" Group="Analog WatchDog 2"  Name="WDGCONV1Channel1" Type="list">
-        <Condition Diagnostic="" Expression="Singelreg &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_1channel|Sem_WDG2_2channel|Sem_WDG2_3channel|Sem_WDG2_4channel|Sem_WDG2_5channel|Sem_WDG2_6channel|Sem_WDG2_7channel|Sem_WDG2_8channel|Sem_WDG2_9channel|Sem_WDG2_10channel|Sem_WDG2_11channel|Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
+        <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_1channel|Sem_WDG2_2channel|Sem_WDG2_3channel|Sem_WDG2_4channel|Sem_WDG2_5channel|Sem_WDG2_6channel|Sem_WDG2_7channel|Sem_WDG2_8channel|Sem_WDG2_9channel|Sem_WDG2_10channel|Sem_WDG2_11channel|Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
 Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel  &amp; !AWD2_isSelected_$IpInstance"/>
         <PossibleValue Comment="None" Value="__NULL"/>
         
@@ -649,13 +659,14 @@ Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
     <RefParameter Comment="" DefaultValue="__NULL" Group="ADCgroup" Name="WDGCONV1Channel1" Type="list" Visible="false">
     </RefParameter>
     <RefParameter  Comment="2nd Channel" DefaultValue="__NULL" Group="Analog WatchDog 2"  Name="WDGCONV1Channel2" Type="list">
-        <Condition Diagnostic="" Expression="Singelreg &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_2channel|Sem_WDG2_3channel|Sem_WDG2_4channel|Sem_WDG2_5channel|Sem_WDG2_6channel|Sem_WDG2_7channel|Sem_WDG2_8channel|Sem_WDG2_9channel|Sem_WDG2_10channel|Sem_WDG2_11channel|Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
+        <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_2channel|Sem_WDG2_3channel|Sem_WDG2_4channel|Sem_WDG2_5channel|Sem_WDG2_6channel|Sem_WDG2_7channel|Sem_WDG2_8channel|Sem_WDG2_9channel|Sem_WDG2_10channel|Sem_WDG2_11channel|Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
 Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel  &amp; !AWD2_isSelected_$IpInstance"/>
         
         <PossibleValue Comment="None" Value="__NULL"/>
@@ -679,13 +690,14 @@ Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
     <RefParameter Comment="" DefaultValue="__NULL" Group="ADCgroup" Name="WDGCONV1Channel2" Type="list" Visible="false">
     </RefParameter>
     <RefParameter Comment="3rd Channel" DefaultValue="__NULL" Group="Analog WatchDog 2"  Name="WDGCONV1Channel3" Type="list">
-        <Condition Diagnostic="" Expression="Singelreg &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_3channel|Sem_WDG2_4channel|Sem_WDG2_5channel|Sem_WDG2_6channel|Sem_WDG2_7channel|Sem_WDG2_8channel|Sem_WDG2_9channel|Sem_WDG2_10channel|Sem_WDG2_11channel|Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
+        <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_3channel|Sem_WDG2_4channel|Sem_WDG2_5channel|Sem_WDG2_6channel|Sem_WDG2_7channel|Sem_WDG2_8channel|Sem_WDG2_9channel|Sem_WDG2_10channel|Sem_WDG2_11channel|Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
 Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel &amp; !AWD2_isSelected_$IpInstance"/>
         <PossibleValue Comment="None" Value="__NULL"/>
 
@@ -709,13 +721,14 @@ Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
     <RefParameter Comment="" DefaultValue="__NULL" Group="ADCgroup" Name="WDGCONV1Channel3" Type="list" Visible="false">
     </RefParameter>
     <RefParameter Comment="4th Channel" DefaultValue="__NULL" Group="Analog WatchDog 2"  Name="WDGCONV1Channel4" Type="list">
-        <Condition Diagnostic="" Expression="Singelreg &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_4channel|Sem_WDG2_5channel|Sem_WDG2_6channel|Sem_WDG2_7channel|Sem_WDG2_8channel|Sem_WDG2_9channel|Sem_WDG2_10channel|Sem_WDG2_11channel|Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
+        <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_4channel|Sem_WDG2_5channel|Sem_WDG2_6channel|Sem_WDG2_7channel|Sem_WDG2_8channel|Sem_WDG2_9channel|Sem_WDG2_10channel|Sem_WDG2_11channel|Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
 Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel &amp;  !AWD2_isSelected_$IpInstance"/>
         
         <PossibleValue Comment="None" Value="__NULL"/>
@@ -739,13 +752,14 @@ Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
     <RefParameter Comment="" DefaultValue="__NULL" Group="ADCgroup" Name="WDGCONV1Channel4" Type="list" Visible="false">
     </RefParameter>
     <RefParameter Comment="5th Channel" DefaultValue="__NULL" Group="Analog WatchDog 2"  Name="WDGCONV1Channel5" Type="list">
-          <Condition Diagnostic="" Expression="Singelreg &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_5channel|Sem_WDG2_6channel|Sem_WDG2_7channel|Sem_WDG2_8channel|Sem_WDG2_9channel|Sem_WDG2_10channel|Sem_WDG2_11channel|Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
+          <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_5channel|Sem_WDG2_6channel|Sem_WDG2_7channel|Sem_WDG2_8channel|Sem_WDG2_9channel|Sem_WDG2_10channel|Sem_WDG2_11channel|Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
 Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel &amp;  !AWD2_isSelected_$IpInstance"/>
         
           <PossibleValue Comment="None" Value="__NULL"/>
@@ -769,13 +783,14 @@ Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
       </RefParameter>
       <RefParameter Comment="" DefaultValue="__NULL" Group="ADCgroup" Name="WDGCONV1Channel5" Type="list" Visible="false">
     </RefParameter>
       <RefParameter Comment="6th Channel" DefaultValue="__NULL" Group="Analog WatchDog 2"  Name="WDGCONV1Channel6" Type="list">
-        <Condition Diagnostic="" Expression="Singelreg &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_6channel|Sem_WDG2_7channel|Sem_WDG2_8channel|Sem_WDG2_9channel|Sem_WDG2_10channel|Sem_WDG2_11channel|Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
+        <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_6channel|Sem_WDG2_7channel|Sem_WDG2_8channel|Sem_WDG2_9channel|Sem_WDG2_10channel|Sem_WDG2_11channel|Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
 Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel  &amp; !AWD2_isSelected_$IpInstance"/>
 <PossibleValue Comment="None" Value="__NULL"/>
 
@@ -799,13 +814,14 @@ Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
     <RefParameter Comment="" DefaultValue="__NULL" Group="ADCgroup" Name="WDGCONV1Channel6" Type="list" Visible="false">
     </RefParameter>
     <RefParameter Comment="7th Channel" DefaultValue="__NULL" Group="Analog WatchDog 2"  Name="WDGCONV1Channel7" Type="list">
-        <Condition Diagnostic="" Expression="Singelreg &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_7channel|Sem_WDG2_8channel|Sem_WDG2_9channel|Sem_WDG2_10channel|Sem_WDG2_11channel|Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
+        <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_7channel|Sem_WDG2_8channel|Sem_WDG2_9channel|Sem_WDG2_10channel|Sem_WDG2_11channel|Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
 Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel &amp; !AWD2_isSelected_$IpInstance"/>
         
         <PossibleValue Comment="None" Value="__NULL"/>
@@ -829,13 +845,14 @@ Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
     <RefParameter Comment="" DefaultValue="__NULL" Group="ADCgroup" Name="WDGCONV1Channel7" Type="list" Visible="false">
     </RefParameter>
     <RefParameter Comment="8th Channel" DefaultValue="__NULL" Group="Analog WatchDog 2"  Name="WDGCONV1Channel8" Type="list">
-        <Condition Diagnostic="" Expression="Singelreg &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_8channel|Sem_WDG2_9channel|Sem_WDG2_10channel|Sem_WDG2_11channel|Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
+        <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_8channel|Sem_WDG2_9channel|Sem_WDG2_10channel|Sem_WDG2_11channel|Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
 Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel &amp; !AWD2_isSelected_$IpInstance"/>
         
         <PossibleValue Comment="None" Value="__NULL"/>
@@ -859,13 +876,14 @@ Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
     <RefParameter Comment="" DefaultValue="__NULL" Group="ADCgroup" Name="WDGCONV1Channel8" Type="list" Visible="false">
     </RefParameter>
     <RefParameter Comment="9th Channel" DefaultValue="__NULL" Group="Analog WatchDog 2"  Name="WDGCONV1Channel9" Type="list">
-        <Condition Diagnostic="" Expression="Singelreg &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_9channel|Sem_WDG2_10channel|Sem_WDG2_11channel|Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
+        <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_9channel|Sem_WDG2_10channel|Sem_WDG2_11channel|Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
 Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel &amp; !AWD2_isSelected_$IpInstance"/>
        
         <PossibleValue Comment="None" Value="__NULL"/>
@@ -889,13 +907,14 @@ Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
     <RefParameter Comment="" DefaultValue="__NULL" Group="ADCgroup" Name="WDGCONV1Channel9" Type="list" Visible="false">
     </RefParameter>
     <RefParameter Comment="10th Channel" DefaultValue="__NULL" Group="Analog WatchDog 2"  Name="WDGCONV1Channel10" Type="list">
-        <Condition Diagnostic="" Expression="Singelreg &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_10channel|Sem_WDG2_11channel|Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
+        <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_10channel|Sem_WDG2_11channel|Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
 Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel &amp; !AWD2_isSelected_$IpInstance"/>
         <PossibleValue Comment="None" Value="__NULL"/>
          <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"  Condition="!SHANNEL0ISSELECTED" Diagnostic="Available when IN0 mode is activated" Action="Disable"  />
@@ -918,13 +937,14 @@ Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
    <RefParameter Comment="" DefaultValue="__NULL" Group="ADCgroup" Name="WDGCONV1Channel10" Type="list" Visible="false">
     </RefParameter>
     <RefParameter Comment="11th Channel" DefaultValue="__NULL" Group="Analog WatchDog 2"  Name="WDGCONV1Channel11" Type="list">
-        <Condition Diagnostic="" Expression="Singelreg &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_11channel|Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
+        <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_11channel|Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
 Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel&amp; !AWD2_isSelected_$IpInstance"/>
         <PossibleValue Comment="None" Value="__NULL"/>
          <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"  Condition="!SHANNEL0ISSELECTED" Diagnostic="Available when IN0 mode is activated" Action="Disable"  />
@@ -947,13 +967,14 @@ Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
     <RefParameter Comment="" DefaultValue="__NULL" Group="ADCgroup" Name="WDGCONV1Channel11" Type="list" Visible="false">
     </RefParameter>
     <RefParameter Comment="12th Channel" DefaultValue="__NULL" Group="Analog WatchDog 2"  Name="WDGCONV1Channel12" Type="list">
-        <Condition Diagnostic="" Expression="Singelreg &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
+        <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_12channel|Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
 Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel &amp; !AWD2_isSelected_$IpInstance"/>
        
         <PossibleValue Comment="None" Value="__NULL"/>
@@ -977,13 +998,14 @@ Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
     <RefParameter Comment="" DefaultValue="__NULL" Group="ADCgroup" Name="WDGCONV1Channel12" Type="list" Visible="false">
     </RefParameter>
     <RefParameter Comment="13th Channel" DefaultValue="__NULL" Group="Analog WatchDog 2"  Name="WDGCONV1Channel13" Type="list">
-        <Condition Diagnostic="" Expression="Singelreg &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
+        <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG2_13channel|Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
 Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel &amp; !AWD2_isSelected_$IpInstance"/>
         <PossibleValue Comment="None" Value="__NULL"/>
          <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"  Condition="!SHANNEL0ISSELECTED" Diagnostic="Available when IN0 mode is activated" Action="Disable"  />
@@ -1006,13 +1028,14 @@ Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
     <RefParameter Comment="" DefaultValue="__NULL" Group="ADCgroup" Name="WDGCONV1Channel13" Type="list" Visible="false">
     </RefParameter>
     <RefParameter Comment="14th Channel" DefaultValue="__NULL" Group="Analog WatchDog 2"  Name="WDGCONV1Channel14" Type="list">
-        <Condition Diagnostic="" Expression="Singelreg &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;   Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
+        <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;   Sem_WDG2_14channel|Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
 Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel &amp; !AWD2_isSelected_$IpInstance"/>
        
         <PossibleValue Comment="None" Value="__NULL"/>
@@ -1036,6 +1059,7 @@ Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
@@ -1043,7 +1067,7 @@ Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_
      <RefParameter Comment="" DefaultValue="__NULL" Group="Analog WatchDog 2" Name="WDGCONV1Channel14" Type="list" Visible="false">
       </RefParameter>
       <RefParameter Comment="15th Channel" DefaultValue="__NULL" Group="Analog WatchDog 2"  Name="WDGCONV1Channel15" Type="list">
-        <Condition Diagnostic="" Expression="Singelreg &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;   Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
+        <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;   Sem_WDG2_15channel|Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
 Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel &amp; !AWD2_isSelected_$IpInstance"/>
         <PossibleValue Comment="None" Value="__NULL"/>
          <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"  Condition="!SHANNEL0ISSELECTED" Diagnostic="Available when IN0 mode is activated" Action="Disable"  />
@@ -1066,13 +1090,14 @@ Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
      <RefParameter Comment="" DefaultValue="__NULL" Group="Analog WatchDog 2" Name="WDGCONV1Channel15" Type="list" Visible="false">
       </RefParameter>
       <RefParameter Comment="16th Channel" DefaultValue="__NULL" Group="Analog WatchDog 2"  Name="WDGCONV1Channel16" Type="list">
-        <Condition Diagnostic="" Expression="Singelreg &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;   Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
+        <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;   Sem_WDG2_16channel|Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
 Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel &amp; !AWD2_isSelected_$IpInstance"/>
         <PossibleValue Comment="None" Value="__NULL"/>
          <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"  Condition="!SHANNEL0ISSELECTED" Diagnostic="Available when IN0 mode is activated" Action="Disable"  />
@@ -1095,13 +1120,14 @@ Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
      <RefParameter Comment="" DefaultValue="__NULL" Group="Analog WatchDog 2" Name="WDGCONV1Channel16" Type="list" Visible="false">
       </RefParameter>
       <RefParameter Comment="17th Channel" DefaultValue="__NULL" Group="Analog WatchDog 2"  Name="WDGCONV1Channel17" Type="list">
-        <Condition Diagnostic="" Expression="Singelreg &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;   Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
+        <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;   Sem_WDG2_17channel|Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
 Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel &amp; !AWD2_isSelected_$IpInstance"/>
         <PossibleValue Comment="None" Value="__NULL"/>
          <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"  Condition="!SHANNEL0ISSELECTED" Diagnostic="Available when IN0 mode is activated" Action="Disable"  />
@@ -1124,13 +1150,14 @@ Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
      <RefParameter Comment="" DefaultValue="__NULL" Group="Analog WatchDog 2" Name="WDGCONV1Channel17" Type="list" Visible="false">
       </RefParameter>
       <RefParameter Comment="18th Channel" DefaultValue="__NULL" Group="Analog WatchDog 2"  Name="WDGCONV1Channel18" Type="list">
-        <Condition Diagnostic="" Expression="Singelreg &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;   Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
+        <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;   Sem_WDG2_18channel|Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
 Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel &amp; !AWD2_isSelected_$IpInstance"/>
         <PossibleValue Comment="None" Value="__NULL"/>
          <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"  Condition="!SHANNEL0ISSELECTED" Diagnostic="Available when IN0 mode is activated" Action="Disable"  />
@@ -1153,13 +1180,14 @@ Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
      <RefParameter Comment="" DefaultValue="__NULL" Group="Analog WatchDog 2" Name="WDGCONV1Channel18" Type="list" Visible="false">
       </RefParameter>
       <RefParameter Comment="19th Channel" DefaultValue="__NULL" Group="Analog WatchDog 2"  Name="WDGCONV1Channel19" Type="list">
-        <Condition Diagnostic="" Expression="Singelreg &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;   Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
+        <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;   Sem_WDG2_19channel|Sem_WDG2_20channel|Sem_WDG2_21channel|
 Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel &amp; !AWD2_isSelected_$IpInstance"/>
         <PossibleValue Comment="None" Value="__NULL"/>
          <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"  Condition="!SHANNEL0ISSELECTED" Diagnostic="Available when IN0 mode is activated" Action="Disable"  />
@@ -1182,13 +1210,14 @@ Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
      <RefParameter Comment="" DefaultValue="__NULL" Group="Analog WatchDog 2" Name="WDGCONV1Channel19" Type="list" Visible="false">
       </RefParameter>
       <RefParameter Comment="20th Channel" DefaultValue="__NULL" Group="Analog WatchDog 2"  Name="WDGCONV1Channel20" Type="list">
-        <Condition Diagnostic="" Expression="Singelreg &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;   Sem_WDG2_20channel|Sem_WDG2_21channel|
+        <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;   Sem_WDG2_20channel|Sem_WDG2_21channel|
 Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel &amp; !AWD2_isSelected_$IpInstance"/>
         <PossibleValue Comment="None" Value="__NULL"/>
          <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"  Condition="!SHANNEL0ISSELECTED" Diagnostic="Available when IN0 mode is activated" Action="Disable"  />
@@ -1211,13 +1240,14 @@ Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
      <RefParameter Comment="" DefaultValue="__NULL" Group="Analog WatchDog 2" Name="WDGCONV1Channel20" Type="list" Visible="false">
       </RefParameter>
       <RefParameter Comment="21 st Channel" DefaultValue="__NULL" Group="Analog WatchDog 2"  Name="WDGCONV1Channel21" Type="list">
-        <Condition Diagnostic="" Expression="Singelreg &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;   Sem_WDG2_21channel|
+        <Condition Diagnostic="" Expression="Singelreg &amp; EnableAnalogWatchDog2=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;   Sem_WDG2_21channel|
 Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_WDG2_26channel|Sem_WDG2_27channel|Sem_WDG2_28channel|Sem_WDG2_29channel &amp; !AWD2_isSelected_$IpInstance"/>
         <PossibleValue Comment="None" Value="__NULL"/>
          <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"  Condition="!SHANNEL0ISSELECTED" Diagnostic="Available when IN0 mode is activated" Action="Disable"  />
@@ -1240,6 +1270,7 @@ Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
@@ -1335,7 +1366,7 @@ Sem_WDG2_22channel|Sem_WDG2_23channel|Sem_WDG2_24channel|Sem_WDG2_25channel|Sem_
     <Condition Diagnostic="" Expression="EnableAnalogWatchDog3=false|Sequencer=FULLY_CONFIGURABLE"/>    </RefParameter>
     
     <RefParameter Comment="1st Channel" DefaultValue="__NULL" Group="Analog WatchDog 3"  Name="WDG3CONV1Channel1" Type="list">
-        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG3_1channel|Sem_WDG3_2channel|Sem_WDG3_3channel|Sem_WDG3_4channel|Sem_WDG3_5channel|Sem_WDG3_6channel|Sem_WDG3_7channel|Sem_WDG3_8channel|Sem_WDG3_9channel|Sem_WDG3_10channel|Sem_WDG3_11channel|Sem_WDG3_12channel|Sem_WDG3_13channel|Sem_WDG3_14channel|Sem_WDG3_15channel|Sem_WDG3_16channel|Sem_WDG3_17channel|Sem_WDG3_18channel|Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
+        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; EnableAnalogWatchDog3=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG3_1channel|Sem_WDG3_2channel|Sem_WDG3_3channel|Sem_WDG3_4channel|Sem_WDG3_5channel|Sem_WDG3_6channel|Sem_WDG3_7channel|Sem_WDG3_8channel|Sem_WDG3_9channel|Sem_WDG3_10channel|Sem_WDG3_11channel|Sem_WDG3_12channel|Sem_WDG3_13channel|Sem_WDG3_14channel|Sem_WDG3_15channel|Sem_WDG3_16channel|Sem_WDG3_17channel|Sem_WDG3_18channel|Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
 Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_WDG3_26channel|Sem_WDG3_27channel|Sem_WDG3_28channel|Sem_WDG3_29channel  &amp; !AWD3_isSelected_$IpInstance"/>
         <PossibleValue Comment="None" Value="__NULL"/>
          <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"  Condition="!SHANNEL0ISSELECTED" Diagnostic="Available when IN0 mode is activated" Action="Disable"  />
@@ -1358,6 +1389,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
@@ -1387,6 +1419,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
@@ -1395,7 +1428,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
 
     </RefParameter>
      <RefParameter Comment="3rd Channel" DefaultValue="__NULL" Group="Analog WatchDog 3"  Name="WDG3CONV1Channel3" Type="list">
-        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG3_3channel|Sem_WDG3_4channel|Sem_WDG3_5channel|Sem_WDG3_6channel|Sem_WDG3_7channel|Sem_WDG3_8channel|Sem_WDG3_9channel|Sem_WDG3_10channel|Sem_WDG3_11channel|Sem_WDG3_12channel|Sem_WDG3_13channel|Sem_WDG3_14channel|Sem_WDG3_15channel|Sem_WDG3_16channel|Sem_WDG3_17channel|Sem_WDG3_18channel|Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
+        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; EnableAnalogWatchDog3=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG3_3channel|Sem_WDG3_4channel|Sem_WDG3_5channel|Sem_WDG3_6channel|Sem_WDG3_7channel|Sem_WDG3_8channel|Sem_WDG3_9channel|Sem_WDG3_10channel|Sem_WDG3_11channel|Sem_WDG3_12channel|Sem_WDG3_13channel|Sem_WDG3_14channel|Sem_WDG3_15channel|Sem_WDG3_16channel|Sem_WDG3_17channel|Sem_WDG3_18channel|Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
 Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_WDG3_26channel|Sem_WDG3_27channel|Sem_WDG3_28channel|Sem_WDG3_29channel &amp; !AWD3_isSelected_$IpInstance"/>
         <PossibleValue Comment="None" Value="__NULL"/>
          <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"  Condition="!SHANNEL0ISSELECTED" Diagnostic="Available when IN0 mode is activated" Action="Disable"  />
@@ -1418,6 +1451,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
@@ -1426,7 +1460,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
 
     </RefParameter>
     <RefParameter Comment="4th Channel" DefaultValue="__NULL" Group="Analog WatchDog 3"  Name="WDG3CONV1Channel4" Type="list">
-        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG3_4channel|Sem_WDG3_5channel|Sem_WDG3_6channel|Sem_WDG3_7channel|Sem_WDG3_8channel|Sem_WDG3_9channel|Sem_WDG3_10channel|Sem_WDG3_11channel|Sem_WDG3_12channel|Sem_WDG3_13channel|Sem_WDG3_14channel|Sem_WDG3_15channel|Sem_WDG3_16channel|Sem_WDG3_17channel|Sem_WDG3_18channel|Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
+        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; EnableAnalogWatchDog3=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG3_4channel|Sem_WDG3_5channel|Sem_WDG3_6channel|Sem_WDG3_7channel|Sem_WDG3_8channel|Sem_WDG3_9channel|Sem_WDG3_10channel|Sem_WDG3_11channel|Sem_WDG3_12channel|Sem_WDG3_13channel|Sem_WDG3_14channel|Sem_WDG3_15channel|Sem_WDG3_16channel|Sem_WDG3_17channel|Sem_WDG3_18channel|Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
 Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_WDG3_26channel|Sem_WDG3_27channel|Sem_WDG3_28channel|Sem_WDG3_29channel &amp;  !AWD3_isSelected_$IpInstance"/>
         <PossibleValue Comment="None" Value="__NULL"/>
          <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"  Condition="!SHANNEL0ISSELECTED" Diagnostic="Available when IN0 mode is activated" Action="Disable"  />
@@ -1449,13 +1483,14 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
     <RefParameter Comment="" DefaultValue="null" Group="Analog WatchDog 3" Name="WDG3CONV1Channel4" Type="list" Visible="false">
       </RefParameter>
       <RefParameter Comment="5th Channel" DefaultValue="__NULL" Group="Analog WatchDog 3"  Name="WDG3CONV1Channel5" Type="list">
-        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG3_5channel|Sem_WDG3_6channel|Sem_WDG3_7channel|Sem_WDG3_8channel|Sem_WDG3_9channel|Sem_WDG3_10channel|Sem_WDG3_11channel|Sem_WDG3_12channel|Sem_WDG3_13channel|Sem_WDG3_14channel|Sem_WDG3_15channel|Sem_WDG3_16channel|Sem_WDG3_17channel|Sem_WDG3_18channel|Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
+        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; EnableAnalogWatchDog3=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG3_5channel|Sem_WDG3_6channel|Sem_WDG3_7channel|Sem_WDG3_8channel|Sem_WDG3_9channel|Sem_WDG3_10channel|Sem_WDG3_11channel|Sem_WDG3_12channel|Sem_WDG3_13channel|Sem_WDG3_14channel|Sem_WDG3_15channel|Sem_WDG3_16channel|Sem_WDG3_17channel|Sem_WDG3_18channel|Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
 Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_WDG3_26channel|Sem_WDG3_27channel|Sem_WDG3_28channel|Sem_WDG3_29channel &amp;  !AWD3_isSelected_$IpInstance"/>
         
        <PossibleValue Comment="None" Value="__NULL"/>
@@ -1479,13 +1514,14 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
     <RefParameter Comment="" DefaultValue="null" Group="Analog WatchDog 3" Name="WDG3CONV1Channel5" Type="list" Visible="false">
       </RefParameter>
       <RefParameter Comment="6th Channel" DefaultValue="__NULL" Group="Analog WatchDog 3"  Name="WDG3CONV1Channel6" Type="list">
-        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG3_6channel|Sem_WDG3_7channel|Sem_WDG3_8channel|Sem_WDG3_9channel|Sem_WDG3_10channel|Sem_WDG3_11channel|Sem_WDG3_12channel|Sem_WDG3_13channel|Sem_WDG3_14channel|Sem_WDG3_15channel|Sem_WDG3_16channel|Sem_WDG3_17channel|Sem_WDG3_18channel|Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
+        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; EnableAnalogWatchDog3=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG3_6channel|Sem_WDG3_7channel|Sem_WDG3_8channel|Sem_WDG3_9channel|Sem_WDG3_10channel|Sem_WDG3_11channel|Sem_WDG3_12channel|Sem_WDG3_13channel|Sem_WDG3_14channel|Sem_WDG3_15channel|Sem_WDG3_16channel|Sem_WDG3_17channel|Sem_WDG3_18channel|Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
 Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_WDG3_26channel|Sem_WDG3_27channel|Sem_WDG3_28channel|Sem_WDG3_29channel  &amp; !AWD3_isSelected_$IpInstance"/>
         <PossibleValue Comment="None" Value="__NULL"/>
          <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"  Condition="!SHANNEL0ISSELECTED" Diagnostic="Available when IN0 mode is activated" Action="Disable"  />
@@ -1508,13 +1544,14 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
     <RefParameter Comment="" DefaultValue="null" Group="Analog WatchDog 3" Name="WDG3CONV1Channel6" Type="list" Visible="false">
       </RefParameter>
       <RefParameter Comment="7th Channel" DefaultValue="__NULL" Group="Analog WatchDog 3"  Name="WDG3CONV1Channel7" Type="list">
-        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG3_7channel|Sem_WDG3_8channel|Sem_WDG3_9channel|Sem_WDG3_10channel|Sem_WDG3_11channel|Sem_WDG3_12channel|Sem_WDG3_13channel|Sem_WDG3_14channel|Sem_WDG3_15channel|Sem_WDG3_16channel|Sem_WDG3_17channel|Sem_WDG3_18channel|Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
+        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; EnableAnalogWatchDog3=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG3_7channel|Sem_WDG3_8channel|Sem_WDG3_9channel|Sem_WDG3_10channel|Sem_WDG3_11channel|Sem_WDG3_12channel|Sem_WDG3_13channel|Sem_WDG3_14channel|Sem_WDG3_15channel|Sem_WDG3_16channel|Sem_WDG3_17channel|Sem_WDG3_18channel|Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
 Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_WDG3_26channel|Sem_WDG3_27channel|Sem_WDG3_28channel|Sem_WDG3_29channel &amp; !AWD3_isSelected_$IpInstance"/>
        <PossibleValue Comment="None" Value="__NULL"/>
         <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"  Condition="!SHANNEL0ISSELECTED" Diagnostic="Available when IN0 mode is activated" Action="Disable"  />
@@ -1537,13 +1574,14 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
      <RefParameter Comment="" DefaultValue="null" Group="Analog WatchDog 3" Name="WDG3CONV1Channel7" Type="list" Visible="false">
       </RefParameter>
       <RefParameter Comment="8th Channel" DefaultValue="__NULL" Group="Analog WatchDog 3"  Name="WDG3CONV1Channel8" Type="list">
-        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG3_8channel|Sem_WDG3_9channel|Sem_WDG3_10channel|Sem_WDG3_11channel|Sem_WDG3_12channel|Sem_WDG3_13channel|Sem_WDG3_14channel|Sem_WDG3_15channel|Sem_WDG3_16channel|Sem_WDG3_17channel|Sem_WDG3_18channel|Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
+        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; EnableAnalogWatchDog3=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG3_8channel|Sem_WDG3_9channel|Sem_WDG3_10channel|Sem_WDG3_11channel|Sem_WDG3_12channel|Sem_WDG3_13channel|Sem_WDG3_14channel|Sem_WDG3_15channel|Sem_WDG3_16channel|Sem_WDG3_17channel|Sem_WDG3_18channel|Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
 Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_WDG3_26channel|Sem_WDG3_27channel|Sem_WDG3_28channel|Sem_WDG3_29channel &amp; !AWD3_isSelected_$IpInstance"/>
         <PossibleValue Comment="None" Value="__NULL"/>
         <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"  Condition="!SHANNEL0ISSELECTED" Diagnostic="Available when IN0 mode is activated" Action="Disable"  />
@@ -1566,13 +1604,14 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
      <RefParameter Comment="" DefaultValue="null" Group="Analog WatchDog 3" Name="WDG3CONV1Channel8" Type="list" Visible="false">
       </RefParameter>
       <RefParameter Comment="9th Channel" DefaultValue="__NULL" Group="Analog WatchDog 3"  Name="WDG3CONV1Channel9" Type="list">
-        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG3_9channel|Sem_WDG3_10channel|Sem_WDG3_11channel|Sem_WDG3_12channel|Sem_WDG3_13channel|Sem_WDG3_14channel|Sem_WDG3_15channel|Sem_WDG3_16channel|Sem_WDG3_17channel|Sem_WDG3_18channel|Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
+        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; EnableAnalogWatchDog3=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG3_9channel|Sem_WDG3_10channel|Sem_WDG3_11channel|Sem_WDG3_12channel|Sem_WDG3_13channel|Sem_WDG3_14channel|Sem_WDG3_15channel|Sem_WDG3_16channel|Sem_WDG3_17channel|Sem_WDG3_18channel|Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
 Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_WDG3_26channel|Sem_WDG3_27channel|Sem_WDG3_28channel|Sem_WDG3_29channel &amp; !AWD3_isSelected_$IpInstance"/>
         <PossibleValue Comment="None" Value="__NULL"/>
         <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"  Condition="!SHANNEL0ISSELECTED" Diagnostic="Available when IN0 mode is activated" Action="Disable"  />
@@ -1595,13 +1634,14 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
      <RefParameter Comment="" DefaultValue="null" Group="Analog WatchDog 3" Name="WDG3CONV1Channel9" Type="list" Visible="false">
       </RefParameter>
       <RefParameter Comment="10th Channel" DefaultValue="__NULL" Group="Analog WatchDog 3"  Name="WDG3CONV1Channel10" Type="list">
-        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG3_10channel|Sem_WDG3_11channel|Sem_WDG3_12channel|Sem_WDG3_13channel|Sem_WDG3_14channel|Sem_WDG3_15channel|Sem_WDG3_16channel|Sem_WDG3_17channel|Sem_WDG3_18channel|Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
+        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; EnableAnalogWatchDog3=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG3_10channel|Sem_WDG3_11channel|Sem_WDG3_12channel|Sem_WDG3_13channel|Sem_WDG3_14channel|Sem_WDG3_15channel|Sem_WDG3_16channel|Sem_WDG3_17channel|Sem_WDG3_18channel|Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
 Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_WDG3_26channel|Sem_WDG3_27channel|Sem_WDG3_28channel|Sem_WDG3_29channel &amp; !AWD3_isSelected_$IpInstance"/>
         <PossibleValue Comment="None" Value="__NULL"/>
          <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"  Condition="!SHANNEL0ISSELECTED" Diagnostic="Available when IN0 mode is activated" Action="Disable"  />
@@ -1624,13 +1664,14 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
      <RefParameter Comment="" DefaultValue="null" Group="Analog WatchDog 3" Name="WDG3CONV1Channel10" Type="list" Visible="false">
       </RefParameter>
       <RefParameter Comment="11th Channel" DefaultValue="__NULL" Group="Analog WatchDog 3"  Name="WDG3CONV1Channel11" Type="list">
-        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG3_11channel|Sem_WDG3_12channel|Sem_WDG3_13channel|Sem_WDG3_14channel|Sem_WDG3_15channel|Sem_WDG3_16channel|Sem_WDG3_17channel|Sem_WDG3_18channel|Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
+        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; EnableAnalogWatchDog3=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG3_11channel|Sem_WDG3_12channel|Sem_WDG3_13channel|Sem_WDG3_14channel|Sem_WDG3_15channel|Sem_WDG3_16channel|Sem_WDG3_17channel|Sem_WDG3_18channel|Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
 Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_WDG3_26channel|Sem_WDG3_27channel|Sem_WDG3_28channel|Sem_WDG3_29channel&amp; !AWD3_isSelected_$IpInstance"/>
         <PossibleValue Comment="None" Value="__NULL"/>
          <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"  Condition="!SHANNEL0ISSELECTED" Diagnostic="Available when IN0 mode is activated" Action="Disable"  />
@@ -1653,13 +1694,14 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
      <RefParameter Comment="" DefaultValue="null" Group="Analog WatchDog 3" Name="WDG3CONV1Channel11" Type="list" Visible="false">
       </RefParameter>
       <RefParameter Comment="12th Channel" DefaultValue="__NULL" Group="Analog WatchDog 3"  Name="WDG3CONV1Channel12" Type="list">
-        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG3_12channel|Sem_WDG3_13channel|Sem_WDG3_14channel|Sem_WDG3_15channel|Sem_WDG3_16channel|Sem_WDG3_17channel|Sem_WDG3_18channel|Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
+        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; EnableAnalogWatchDog3=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG3_12channel|Sem_WDG3_13channel|Sem_WDG3_14channel|Sem_WDG3_15channel|Sem_WDG3_16channel|Sem_WDG3_17channel|Sem_WDG3_18channel|Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
 Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_WDG3_26channel|Sem_WDG3_27channel|Sem_WDG3_28channel|Sem_WDG3_29channel &amp; !AWD3_isSelected_$IpInstance"/>
         <PossibleValue Comment="None" Value="__NULL"/>
         <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"  Condition="!SHANNEL0ISSELECTED" Diagnostic="Available when IN0 mode is activated" Action="Disable"  />
@@ -1682,13 +1724,14 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
      <RefParameter Comment="" DefaultValue="null" Group="Analog WatchDog 3" Name="WDG3CONV1Channel12" Type="list" Visible="false">
       </RefParameter>
       <RefParameter Comment="13th Channel" DefaultValue="__NULL" Group="Analog WatchDog 3"  Name="WDG3CONV1Channel13" Type="list">
-        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG3_13channel|Sem_WDG3_14channel|Sem_WDG3_15channel|Sem_WDG3_16channel|Sem_WDG3_17channel|Sem_WDG3_18channel|Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
+        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; EnableAnalogWatchDog3=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;  Sem_WDG3_13channel|Sem_WDG3_14channel|Sem_WDG3_15channel|Sem_WDG3_16channel|Sem_WDG3_17channel|Sem_WDG3_18channel|Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
 Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_WDG3_26channel|Sem_WDG3_27channel|Sem_WDG3_28channel|Sem_WDG3_29channel &amp; !AWD3_isSelected_$IpInstance"/>
         <PossibleValue Comment="None" Value="__NULL"/>
          <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"  Condition="!SHANNEL0ISSELECTED" Diagnostic="Available when IN0 mode is activated" Action="Disable"  />
@@ -1711,13 +1754,14 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
      <RefParameter Comment="" DefaultValue="null" Group="Analog WatchDog 3" Name="WDG3CONV1Channel13" Type="list" Visible="false">
       </RefParameter>
       <RefParameter Comment="14th Channel" DefaultValue="__NULL" Group="Analog WatchDog 3"  Name="WDG3CONV1Channel14" Type="list">
-        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;   Sem_WDG3_14channel|Sem_WDG3_15channel|Sem_WDG3_16channel|Sem_WDG3_17channel|Sem_WDG3_18channel|Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
+        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; EnableAnalogWatchDog3=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;   Sem_WDG3_14channel|Sem_WDG3_15channel|Sem_WDG3_16channel|Sem_WDG3_17channel|Sem_WDG3_18channel|Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
 Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_WDG3_26channel|Sem_WDG3_27channel|Sem_WDG3_28channel|Sem_WDG3_29channel &amp; !AWD3_isSelected_$IpInstance"/>
         <PossibleValue Comment="None" Value="__NULL"/>
          <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"  Condition="!SHANNEL0ISSELECTED" Diagnostic="Available when IN0 mode is activated" Action="Disable"  />
@@ -1740,13 +1784,14 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
      <RefParameter Comment="" DefaultValue="null" Group="Analog WatchDog 3" Name="WDG3CONV1Channel14" Type="list" Visible="false">
       </RefParameter>
       <RefParameter Comment="15th Channel" DefaultValue="__NULL" Group="Analog WatchDog 3"  Name="WDG3CONV1Channel15" Type="list">
-        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;   Sem_WDG3_15channel|Sem_WDG3_16channel|Sem_WDG3_17channel|Sem_WDG3_18channel|Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
+        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; EnableAnalogWatchDog3=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;   Sem_WDG3_15channel|Sem_WDG3_16channel|Sem_WDG3_17channel|Sem_WDG3_18channel|Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
 Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_WDG3_26channel|Sem_WDG3_27channel|Sem_WDG3_28channel|Sem_WDG3_29channel &amp; !AWD3_isSelected_$IpInstance"/>
         <PossibleValue Comment="None" Value="__NULL"/>
          <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"  Condition="!SHANNEL0ISSELECTED" Diagnostic="Available when IN0 mode is activated" Action="Disable"  />
@@ -1769,13 +1814,14 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
      <RefParameter Comment="" DefaultValue="null" Group="Analog WatchDog 3" Name="WDG3CONV1Channel15" Type="list" Visible="false">
       </RefParameter>
       <RefParameter Comment="16th Channel" DefaultValue="__NULL" Group="Analog WatchDog 3"  Name="WDG3CONV1Channel16" Type="list">
-        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;   Sem_WDG3_16channel|Sem_WDG3_17channel|Sem_WDG3_18channel|Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
+        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; EnableAnalogWatchDog3=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;   Sem_WDG3_16channel|Sem_WDG3_17channel|Sem_WDG3_18channel|Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
 Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_WDG3_26channel|Sem_WDG3_27channel|Sem_WDG3_28channel|Sem_WDG3_29channel &amp; !AWD3_isSelected_$IpInstance"/>
         <PossibleValue Comment="None" Value="__NULL"/>
          <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"  Condition="!SHANNEL0ISSELECTED" Diagnostic="Available when IN0 mode is activated" Action="Disable"  />
@@ -1798,13 +1844,14 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
      <RefParameter Comment="" DefaultValue="null" Group="Analog WatchDog 3" Name="WDG3CONV1Channel16" Type="list" Visible="false">
       </RefParameter>
       <RefParameter Comment="17th Channel" DefaultValue="__NULL" Group="Analog WatchDog 3"  Name="WDG3CONV1Channel17" Type="list">
-        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;   Sem_WDG3_17channel|Sem_WDG3_18channel|Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
+        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; EnableAnalogWatchDog3=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;   Sem_WDG3_17channel|Sem_WDG3_18channel|Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
 Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_WDG3_26channel|Sem_WDG3_27channel|Sem_WDG3_28channel|Sem_WDG3_29channel &amp; !AWD3_isSelected_$IpInstance"/>
         <PossibleValue Comment="None" Value="__NULL"/>
          <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"  Condition="!SHANNEL0ISSELECTED" Diagnostic="Available when IN0 mode is activated" Action="Disable"  />
@@ -1827,13 +1874,14 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
      <RefParameter Comment="" DefaultValue="null" Group="Analog WatchDog 3" Name="WDG3CONV1Channel17" Type="list" Visible="false">
       </RefParameter>
       <RefParameter Comment="18th Channel" DefaultValue="__NULL" Group="Analog WatchDog 3"  Name="WDG3CONV1Channel18" Type="list">
-        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;   Sem_WDG3_18channel|Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
+        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; EnableAnalogWatchDog3=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;   Sem_WDG3_18channel|Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
 Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_WDG3_26channel|Sem_WDG3_27channel|Sem_WDG3_28channel|Sem_WDG3_29channel &amp; !AWD3_isSelected_$IpInstance"/>
         <PossibleValue Comment="None" Value="__NULL"/>
          <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"  Condition="!SHANNEL0ISSELECTED" Diagnostic="Available when IN0 mode is activated" Action="Disable"  />
@@ -1856,13 +1904,14 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
      <RefParameter Comment="" DefaultValue="null" Group="Analog WatchDog 3" Name="WDG3CONV1Channel18" Type="list" Visible="false">
       </RefParameter>
       <RefParameter Comment="19th Channel" DefaultValue="__NULL" Group="Analog WatchDog 3"  Name="WDG3CONV1Channel19" Type="list">
-        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;   Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
+        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; EnableAnalogWatchDog3=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;   Sem_WDG3_19channel|Sem_WDG3_20channel|Sem_WDG3_21channel|
 Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_WDG3_26channel|Sem_WDG3_27channel|Sem_WDG3_28channel|Sem_WDG3_29channel &amp; !AWD3_isSelected_$IpInstance"/>
         <PossibleValue Comment="None" Value="__NULL"/>
          <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"  Condition="!SHANNEL0ISSELECTED" Diagnostic="Available when IN0 mode is activated" Action="Disable"  />
@@ -1885,13 +1934,14 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
      <RefParameter Comment="" DefaultValue="null" Group="Analog WatchDog 3" Name="WDG3CONV1Channel19" Type="list" Visible="false">
       </RefParameter>
       <RefParameter Comment="20th Channel" DefaultValue="__NULL" Group="Analog WatchDog 3"  Name="WDG3CONV1Channel20" Type="list">
-        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;   Sem_WDG3_20channel|Sem_WDG3_21channel|
+        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; EnableAnalogWatchDog3=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;   Sem_WDG3_20channel|Sem_WDG3_21channel|
 Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_WDG3_26channel|Sem_WDG3_27channel|Sem_WDG3_28channel|Sem_WDG3_29channel &amp; !AWD3_isSelected_$IpInstance"/>
         <PossibleValue Comment="None" Value="__NULL"/>
         <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"  Condition="!SHANNEL0ISSELECTED" Diagnostic="Available when IN0 mode is activated" Action="Disable"  />
@@ -1914,13 +1964,14 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
      <RefParameter Comment="" DefaultValue="null" Group="Analog WatchDog 3" Name="WDG3CONV1Channel20" Type="list" Visible="false">
       </RefParameter>
       <RefParameter Comment="21 st Channel" DefaultValue="__NULL" Group="Analog WatchDog 3"  Name="WDG3CONV1Channel21" Type="list">
-        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;   Sem_WDG3_21channel|
+        <Condition Diagnostic="" Expression="SingelregWDG3 &amp; EnableAnalogWatchDog3=true &amp; Sequencer=NOT_FULLY_CONFIGURABLE &amp;   Sem_WDG3_21channel|
 Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_WDG3_26channel|Sem_WDG3_27channel|Sem_WDG3_28channel|Sem_WDG3_29channel &amp; !AWD3_isSelected_$IpInstance"/>
         <PossibleValue Comment="None" Value="__NULL"/>
          <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"  Condition="!SHANNEL0ISSELECTED" Diagnostic="Available when IN0 mode is activated" Action="Disable"  />
@@ -1943,6 +1994,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="Available when IN17 mode is activated" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="Available when IN18 mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="Available when Vrefint mode is activated" Action="Disable"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNELVBATISSELECTED" Diagnostic="Available when Vbat mode is activated" Action="Disable"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="Available when Temperature Sensor mode is activated" Action="Disable"/>
 
     </RefParameter>
@@ -1961,7 +2013,9 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         <Parameter Name="RegITMode"/>
         <Parameter Name="MonitoredBy"/>
         <Parameter Name="AWDChannel"/>
-
+        <!--Parameter Name="ChannelVREF"/>
+        <Parameter Name="ChannelVBAT"/>
+        <Parameter Name="ChannelTS"/-->
     </RefMode>
     <RefMode Comment="Regular Channel Settings" Name="ChannelRegularConversionCopy">
         <Parameter Name="Rank"/>
@@ -1972,7 +2026,9 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         <Parameter Name="RegITMode"/>
         <Parameter Name="MonitoredBy"/>
         <Parameter Name="AWDChannel"/>
-
+        <!--Parameter Name="ChannelVREF"/>
+        <Parameter Name="ChannelVBAT"/>
+        <Parameter Name="ChannelTS"/-->
     </RefMode>
     <!-- WatchDog parameters 
     <RefMode Comment="" Group="WatchDog" Name="WatchDog">
@@ -2132,7 +2188,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         <PossibleValue Comment="Channel 22" Value="ADC_CHANNEL_22"/>
         <PossibleValue Comment="Channel Temperature sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT"/>
-
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT"/>
         <PossibleValue Comment="Channel Vdda" Value="ADC_CHANNEL_VDDA"/>
         <PossibleValue Comment="Channel Vssa" Value="ADC_CHANNEL_VSSA"/>
      
@@ -2429,6 +2485,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         <PossibleValue Comment="Channel 22" Value="ADC_CHANNEL_22"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT"/>
         <PossibleValue Comment="Channel Vdda" Value="ADC_CHANNEL_VDDA"/>
         <PossibleValue Comment="Channel Vssa" Value="ADC_CHANNEL_VSSA"/>
         <Description>ADC channel for the analog watchdog</Description> 
@@ -2471,6 +2528,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         <PossibleValue Comment="Channel 22" Value="ADC_CHANNEL_22"/>
         <PossibleValue Comment="Channel Temperature sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT"/>
         <PossibleValue Comment="Channel Vdda" Value="ADC_CHANNEL_VDDA"/>
         <PossibleValue Comment="Channel Vssa" Value="ADC_CHANNEL_VSSA"/>
         <!--PossibleValue Comment="Channel Vlcd" Value="ADC_CHANNEL_VLCD"/-->
@@ -2591,11 +2649,13 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="" Action="Disable" />
         <PossibleValue Comment="Channel Temperature sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNEL19ISSELECTED" Diagnostic="" Action="Disable" />
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNEL20ISSELECTED" Diagnostic="" Action="Disable" />
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT" Condition="!SHANNEL21ISSELECTED" Diagnostic="" Action="Disable" />
         <PossibleValue Comment="Channel 19" Value="ADC_CHANNEL_19"/>
         <PossibleValue Comment="Channel 20" Value="ADC_CHANNEL_20"/>
         <PossibleValue Comment="Channel 21" Value="ADC_CHANNEL_21"/>
         <PossibleValue Comment="Channel 22" Value="ADC_CHANNEL_22"/>
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT"/>
+        <PossibleValue Comment="Channel Vbat" Value="ADC_CHANNEL_VBAT"/>
         <PossibleValue Comment="Channel Vdda" Value="ADC_CHANNEL_VDDA"/>
         <PossibleValue Comment="Channel Vssa" Value="ADC_CHANNEL_VSSA"/>
         <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
@@ -2781,6 +2841,13 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         <ConfigForMode>ADC_RegularChannelConfig</ConfigForMode>
         <Parameter Name="Channel">
             <PossibleValue>ADC_CHANNEL_VREFINT</PossibleValue>
+        </Parameter>
+        <!--Parameter Name="Rank"/--> 
+    </RefMode>
+    <RefMode Comment="" Name="IN-Vbat">
+        <ConfigForMode>ADC_RegularChannelConfig</ConfigForMode>
+        <Parameter Name="Channel">
+            <PossibleValue>ADC_CHANNEL_VBAT</PossibleValue>
         </Parameter>
         <!--Parameter Name="Rank"/--> 
     </RefMode>
@@ -3148,11 +3215,24 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         <!-- Internal channels -->
         
         
+        
+        <Mode Name="IN-Vbat"  RemoveCondition="(DIE453)|(DIE443)|STM32G050K8Tx|STM32G050F6Px|STM32G050K6Tx" UserName="Vbat Channel">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="IN-Vbat" UserName="Vbat Channel">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="Vbat_Input"/>
+                    </SignalLogicalOp>                 
+                    <Semaphore>VbatfTSelected$IpInstance</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>channelSelected</Semaphore>
+            <Semaphore>SHANNELVBATISSELECTED</Semaphore>
 
+        </Mode>
         
         
         <!-- Trigger -->
-        <Mode Name="External-Trigger-for-Regular-conversion" UserName="Regular EXTI Conversion Trigger" RemoveCondition="(STM32C0)">
+        <Mode Name="External-Trigger-for-Regular-conversion" UserName="Regular EXTI Conversion Trigger">
             <ModeLogicOperator Name="OR">
                 <Mode Name="External-Trigger-for-Regular-conversion" UserName="Regular Conversion Trigger">
                     <SignalLogicalOp Name="AND">
@@ -3192,6 +3272,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
     <RefSignal IOMode="Analog" Name="IN22"/>
     <RefSignal IOMode="Analog" Name="TempSens_Input" Virtual="true"/>
     <RefSignal IOMode="Analog" Name="Vref_Input" Virtual="true"/>
+    <RefSignal IOMode="Analog" Name="Vbat_Input" Virtual="true"/>
     <RefSignal IOMode="Analog" Name="Vssa_Input" Virtual="true"/>
     <RefSignal IOMode="Analog" Name="Vdda_Input" Virtual="true"/>
 

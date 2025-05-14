@@ -335,8 +335,10 @@ ${T2}u-boot,dm-pre-reloc;
 							[/#list]
 							[#break]
 						[/#if]
-					[/#list]
-
+					[/#list]    
+					[#if ip?matches("ETH[1-9]")]
+                        			[#local ip = "ETH"]
+                    			[/#if]
 					[#--Double Edge--]
 					[#if gpioparamEntry.value.containsKey(ip+"_DE")]
 					[#assign clkEdgeValue =gpioparamEntry.value.get(ip+"_DE")]
