@@ -10,10 +10,30 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
+[#assign PG_FILL_UCS = "False"]
+[#assign PG_BSP_NUCLEO_WBA52CG = 0]
+[#assign PG_VALIDATION = 0]
+[#assign PG_SKIP_LIST = "False"]
+[#assign myHash = {}]
+[#list SWIPdatas as SWIP]
+    [#if SWIP.defines??]
+        [#list SWIP.defines as definition]
+            [#assign myHash = {definition.name:definition.value} + myHash]
+        [/#list]
+    [/#if]
+[/#list]
+[#--
+Key & Value:
+[#list myHash?keys as key]
+Key: ${key}; Value: ${myHash[key]}
+[/#list]
+--]
 
 #include "app_common.h"
 #include "bleplat.h"
+[#if (myHash["USE_SNVMA_NVM"]?number != 0)]
 #include "nvm.h"
+[/#if]
 #include "baes.h"
 #include "bpka.h"
 #include "ble_timer.h"
@@ -35,7 +55,11 @@ int BLEPLAT_NvmAdd( uint8_t type,
                     const uint8_t* extra_data,
                     uint16_t extra_size )
 {
+[#if (myHash["USE_SNVMA_NVM"]?number != 0)]
   return NVM_Add( type, data, size, extra_data, extra_size );
+[#else]
+  return 0;
+[/#if]
 }
 
 /*****************************************************************************/
@@ -46,7 +70,11 @@ int BLEPLAT_NvmGet( uint8_t mode,
                     uint8_t* data,
                     uint16_t size )
 {
+[#if (myHash["USE_SNVMA_NVM"]?number != 0)]
   return NVM_Get( mode, type, offset, data, size );
+[#else]
+  return 0;
+[/#if]
 }
 
 /*****************************************************************************/
@@ -55,14 +83,22 @@ int BLEPLAT_NvmCompare( uint16_t offset,
                         const uint8_t* data,
                         uint16_t size )
 {
+[#if (myHash["USE_SNVMA_NVM"]?number != 0)]
   return NVM_Compare( offset, data, size );
+[#else]
+  return 0;
+[/#if]
 }
 
 /*****************************************************************************/
 
 void BLEPLAT_NvmDiscard( uint8_t mode )
 {
+[#if (myHash["USE_SNVMA_NVM"]?number != 0)]
   NVM_Discard( mode );
+[#else]
+  return;
+[/#if]
 }
 
 /*****************************************************************************/

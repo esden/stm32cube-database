@@ -85,12 +85,12 @@ typedef struct
 
 /* USER CODE END EM */
 
-/* Exported functions ------------------------------------------------------- */
+/* Exported functions prototypes ---------------------------------------------*/
 void ${SERVICE_SHORT_NAME_UpperCase}_APP_Init(void);
 void ${SERVICE_SHORT_NAME_UpperCase}_APP_EvtRx(${SERVICE_SHORT_NAME_UpperCase}_APP_ConnHandleNotEvt_t *p_Notification);
-/* USER CODE BEGIN EF */
+/* USER CODE BEGIN EFP */
 
-/* USER CODE END EF */
+/* USER CODE END EFP */
 
 #ifdef __cplusplus
 }

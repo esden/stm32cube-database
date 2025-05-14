@@ -3646,7 +3646,7 @@ void SVCCTL_InitCustomSvc(void)
    *                              = ${SERVICES_INFO[service?string][item_MAX_ATTRIBUTES_RECORDS]}
    *
    * This value doesn't take into account number of descriptors manually added
-   * In case of descriptors addded, please update the max_attr_record value accordingly in the next SVCCTL_InitService User Section
+   * In case of descriptors added, please update the max_attr_record value accordingly in the next SVCCTL_InitService User Section
    */
   max_attr_record = ${SERVICES_INFO[service?string][item_MAX_ATTRIBUTES_RECORDS]};
 

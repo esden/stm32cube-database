@@ -85,14 +85,14 @@ else
   echo AppliCfg with python script
   applicfg="$cube_fw_path/Utilities/PC_Software/ROT_AppliConfig/AppliCfg.py"
   #determine/check python version command
-  python="python "
+  python="python3 "
 fi
 # postbuild
 echo "Postbuild $signing image" >> $current_log_file
 
 if  [ $app_image_number -eq 1 ] && [ $signing == "nonsecure" ]; then
   echo "Creating only one image" >> $current_log_file
-  $python$applicfg oneimage -fb $s_code_bin -o $image_s_size -sb $ns_code_bin -i 0x0 -ob $one_code_bin$ --vb >> $current_log_file
+  $python$applicfg oneimage -fb "$appli_secure_path/$appli_secure" -sb "$appli_non_secure_path/$appli_non_secure" -o $secure_code_size -i 0x0 -ob "$appli_assembly_path/$appli_assembly" --vb >> $current_log_file
   if [ $? != 0 ]; then 
   	echo "Error with TPC see $current_log_file"
   fi

@@ -245,7 +245,7 @@ void ${SERVICE_SHORT_NAME_UpperCase}_Notification(${SERVICE_SHORT_NAME_UpperCase
             [/#if]
         [/#list]
     [/#list]
-	[/#if]
+    [/#if]
 
     default:
       /* USER CODE BEGIN Service${SvcNbr}_Notification_default */

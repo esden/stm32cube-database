@@ -293,10 +293,13 @@
 /*
 //     <o>Start Address <0-0xFFFFFFE0>
 */
-#define SAU_INIT_START4     0x60000000      /* start address of SAU region 4 */
-[#if McuName?starts_with("STM32U545")|| McuName?starts_with("STM32U535")]
+
+[#if McuName?starts_with("STM32U535")|| McuName?starts_with("STM32U545")]
 #define SAU_INIT_START4       0x90000000      /* start address of SAU region 4 */
+[#else]
+#define SAU_INIT_START4       0x60000000      /* start address of SAU region 4 */
 [/#if]
+
 /*
 //     <o>End Address <0x1F-0xFFFFFFFF>
 */

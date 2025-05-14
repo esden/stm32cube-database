@@ -53,14 +53,14 @@ typedef struct
 /*
  * The number of SysTick increments that make up one tick period.
  */
-#if ( CFG_LPM_SUPPORTED != 0)
+#if ( CFG_LPM_LEVEL != 0)
 static uint32_t ulTimerCountsForOneTick;
 
 static LpTimerContext_t LpTimerContext;
 #endif
 /* Global variables ----------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
-#if ( CFG_LPM_SUPPORTED != 0)
+#if ( CFG_LPM_LEVEL != 0)
 static void LpTimerInit( void );
 static void LpTimerCb( void );
 static void LpTimerStart( uint32_t time_to_sleep );
@@ -81,7 +81,7 @@ void vPortSetupTimerInterrupt( void );
 void vPortSuppressTicksAndSleep( TickType_t xExpectedIdleTime )
 {
   /* If low power is not used, do not stop the SysTick and continue execution */
-#if ( CFG_LPM_SUPPORTED != 0)
+#if ( CFG_LPM_LEVEL != 0)
   /**
    * Although this is not documented as such, when xExpectedIdleTime = 0xFFFFFFFF = (~0),
    * it likely means the system may enter low power for ever ( from a FreeRTOS point of view ).
@@ -165,7 +165,7 @@ void vPortSuppressTicksAndSleep( TickType_t xExpectedIdleTime )
  * sleep mode, it is easier and simpler to go with a low power timer as soon as the tick need to be
  * suppressed.
  */
-#if ( CFG_LPM_SUPPORTED != 0)
+#if ( CFG_LPM_LEVEL != 0)
 void vPortSetupTimerInterrupt( void )
 {
   LpTimerInit( );
@@ -190,7 +190,7 @@ void vPortSetupTimerInterrupt( void )
  * @param  None
  * @retval None
  */
-#if ( CFG_LPM_SUPPORTED != 0)
+#if ( CFG_LPM_LEVEL != 0)
 static void LpTimerInit( void )
 {
   ( void ) HW_TS_Create(CFG_TIM_PROC_ID_ISR, &(LpTimerContext.LpTimerFreeRTOS_Id), hw_ts_SingleShot, LpTimerCb);
@@ -205,7 +205,7 @@ static void LpTimerInit( void )
  * @param  None
  * @retval None
  */
-#if ( CFG_LPM_SUPPORTED != 0)
+#if ( CFG_LPM_LEVEL != 0)
 static void LpTimerCb( void )
 {
   /**
@@ -222,7 +222,7 @@ static void LpTimerCb( void )
  * @param  time_to_sleep : Number of FreeRTOS ticks
  * @retval None
  */
-#if ( CFG_LPM_SUPPORTED != 0)
+#if ( CFG_LPM_LEVEL != 0)
 static void LpTimerStart( uint32_t time_to_sleep )
 {
   uint64_t time;
@@ -259,10 +259,10 @@ static void LpTimerStart( uint32_t time_to_sleep )
  * @param  None
  * @retval None
  */
-#if ( CFG_LPM_SUPPORTED != 0)
+#if ( CFG_LPM_LEVEL != 0)
 static void LpEnter( void )
 {
-#if ( CFG_LPM_SUPPORTED == 1)
+#if ( CFG_LPM_LEVEL != 0)
   UTIL_LPM_EnterLowPower();
 #endif
   return;
@@ -275,7 +275,7 @@ static void LpEnter( void )
  * @param  None
  * @retval The number of tick rate (FreeRTOS tick)
  */
-#if ( CFG_LPM_SUPPORTED != 0)
+#if ( CFG_LPM_LEVEL != 0)
 static uint32_t LpGetElapsedTime( void )
 {
   uint64_t val_ticks, time_ps;

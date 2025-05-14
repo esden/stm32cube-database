@@ -18,14 +18,15 @@
 [#assign UX_DEVICE_ENABLED = "false"]
 [#assign AZRTOS_APP_MEM_ALLOCATION_METHOD_VAL = "1"]
 [#assign TX_APP_GENERATE_INIT_CODE_value = "false"]
+[#assign WPAN_ENABLED = "0"]
 [#assign familyName=FamilyName?lower_case]
 [#compress]
 [#if packs??]
 [#list packs as variables]
 [#if variables.value != "ThreadX" ] 
-  [#if variables.value?lower_case=="display"] 
+  [#if variables.value?lower_case=="display"]
 	[#assign DisplayPack = "true"]
-  [/#if]	    
+  [/#if]
 [/#if]  
 [/#list]
 [/#if]
@@ -34,10 +35,12 @@
   [#list SWIP.defines as definition]
     [#assign value = definition.value]
     [#assign name = definition.name]
-	
+    [#if name == "WPAN_ENABLED" && value == "true"]
+      [#assign WPAN_ENABLED = value]
+    [/#if]
     [#if name == "FILEX_ENABLED" && value == "true"]
       [#assign FX_ENABLED = value]
-    [/#if]    
+    [/#if]
 	[#if name == "NETXDUO_ENABLED" && value == "true"]
       [#assign NX_ENABLED = value]
     [/#if]
@@ -313,7 +316,11 @@ void MX_ThreadX_Init(void)
   * @param  count : TX timer count
   * @retval None
   */
+[#if familyName?starts_with("stm32wba") && WPAN_ENABLED == "true"]
+__weak void ${TX_LOW_POWER_TIMER_SETUP_value}(ULONG count)
+[#else]
 void ${TX_LOW_POWER_TIMER_SETUP_value}(ULONG count)
+[/#if]
 {
   /* USER CODE BEGIN  ${TX_LOW_POWER_TIMER_SETUP_value} */
 
@@ -327,7 +334,11 @@ void ${TX_LOW_POWER_TIMER_SETUP_value}(ULONG count)
   * @param  None
   * @retval None
   */
+[#if familyName?starts_with("stm32wba") && WPAN_ENABLED == "true"]
+__weak void ${TX_LOW_POWER_USER_ENTER_value}(void)
+[#else]
 void ${TX_LOW_POWER_USER_ENTER_value}(void)
+[/#if]
 {
   /* USER CODE BEGIN  ${TX_LOW_POWER_USER_ENTER_value} */
 
@@ -341,7 +352,11 @@ void ${TX_LOW_POWER_USER_ENTER_value}(void)
   * @param  None
   * @retval None
   */
+[#if familyName?starts_with("stm32wba") && WPAN_ENABLED == "true"]
+__weak void ${TX_LOW_POWER_USER_EXIT_value}(void)
+[#else]
 void ${TX_LOW_POWER_USER_EXIT_value}(void)
+[/#if]
 {
   /* USER CODE BEGIN  ${TX_LOW_POWER_USER_EXIT_value} */
 
@@ -355,7 +370,11 @@ void ${TX_LOW_POWER_USER_EXIT_value}(void)
   * @param  None
   * @retval Amount of time (in ticks)
   */
+[#if familyName?starts_with("stm32wba") && WPAN_ENABLED == "true"]
+__weak ULONG ${TX_LOW_POWER_USER_TIMER_ADJUST_value}(void)
+[#else]
 ULONG ${TX_LOW_POWER_USER_TIMER_ADJUST_value}(void)
+[/#if]
 {
   /* USER CODE BEGIN  ${TX_LOW_POWER_USER_TIMER_ADJUST_value} */
   return 0;

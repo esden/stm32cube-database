@@ -55,12 +55,6 @@ extern "C" {
  */
 #define SNVMA_NVM_NUMBER                ${myHash["SNVMA_NVM_NUMBER"]}u
 
-/**
- * @brief Polynomial value for CRC16
- *
- */
-#define SNVMA_POLY_CRC16                0x${myHash["SNVMA_POLY_CRC16"]}u
-
 /* Check that NVM number does not exceed limitations */
 #if SNVMA_NVM_NUMBER > SNVMA_MAX_NUMBER_NVM
 #error Number of NVM to manage is to high
@@ -70,6 +64,7 @@ extern "C" {
 /* +                        NVM IDs part - USER DEFINED                     + */
 /* ========================================================================== */
 
+[#if myHash["SNVMA_NVM_NUMBER"]?number != 0]
 [#list 1..myHash["SNVMA_NVM_NUMBER"]?number as nvm_number]
 /* NVM ID #${nvm_number} */
 #define ${myHash["SNVMA_NVM_ID_${nvm_number}"]}
@@ -83,11 +78,13 @@ extern "C" {
 #endif
 
 [/#list]
+[/#if]
 /* ========================================================================== */
 /* +                       Check part - NOT USER DEFINED                    + */
 /* ========================================================================== */
 
 /* Compute the number of sectors required */
+[#if myHash["SNVMA_NVM_NUMBER"]?number != 0]
 [#assign SNVMA_NUMBER_OF_SECTOR_NEEDED = ""]
 [#list 1..myHash["SNVMA_NVM_NUMBER"]?number as nvm_number]
 [#assign SNVMA_NUMBER_OF_SECTOR_NEEDED = SNVMA_NUMBER_OF_SECTOR_NEEDED + "(SNVMA_NVM_ID_" + nvm_number?string  + "_BANK_NUMBER * SNVMA_NVM_ID_" + nvm_number?string + "_BANK_SIZE) + "]
@@ -104,6 +101,7 @@ extern "C" {
 
 #define SNVMA_NUMBER_OF_BANKS ${SNVMA_NUMBER_OF_BANKS}
 
+[/#if]
 /* Check that required number of sector does not exceed Flash capacities */
 #if SNVMA_NUMBER_OF_SECTOR_NEEDED == 0u
 #error SNVMA_NUMBER_OF_SECTOR_NEEDED shall not be zero
@@ -127,11 +125,13 @@ extern "C" {
  */
 typedef enum SNVMA_BufferId
 {
+[#if myHash["SNVMA_NVM_NUMBER"]?number != 0]
 [#list 1..(myHash["SNVMA_NVM_NUMBER"]?number) as nvm_number]
-  [#list 1..4 as buffer_nbr]
+  [#list 1..(myHash["SNVMA_NVM_ID_${nvm_number}_BUFFER_NBR"]?number) as buffer_nbr]
   ${myHash["SNVMA_NVM_ID_${nvm_number}_BUFFER_${buffer_nbr}_NAME"]},
   [/#list]
 [/#list]
+[/#if]
 [#if (PG_SKIP_LIST == "True")]
   SNVMA_BufferId_1,
   SNVMA_BufferId_2,
@@ -141,6 +141,8 @@ typedef enum SNVMA_BufferId
 }SNVMA_BufferId_t;
 
 /* Exported variables --------------------------------------------------------*/
+extern SNVMA_NvmElt_t SNVMA_NvmConfiguration [SNVMA_NVM_NUMBER];
+
 /* Exported macros -----------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
 

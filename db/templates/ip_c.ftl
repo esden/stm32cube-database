@@ -22,7 +22,7 @@
 [#assign ipvar = IP]
 /* Includes ------------------------------------------------------------------*/
 #include "${name?lower_case}.h"
-[#if name=="ETH" && (F4_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || H5_ETH_NoLWIP??)]
+[#if name=="ETH" && (F4_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || H5_ETH_NoLWIP?? || MP13_ETH_NoLWIP??)]
 #include "string.h"
 [/#if]
 
@@ -110,7 +110,7 @@
 [@common.optincludeFile path=coreDir+"Inc" name="gfxmmu_lut.h"/]
 [/#if]
 [#-- WorkAround for Ticket 30863 --]
-[#if name=="ETH" && (H7_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || H5_ETH_NoLWIP??)]
+[#if name=="ETH" && (H7_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || H5_ETH_NoLWIP?? || MP13_ETH_NoLWIP??)]
 [#if !H5_ETH_NoLWIP??]
 #if defined ( __ICCARM__ ) /*!< IAR Compiler */
 
@@ -1009,8 +1009,13 @@ ETH_TxPacketConfig TxConfig;
                 [/#if]
                 [#list initService.nvic as initVector]
                   [#if !initVector.vector?contains("WKUP") && !initVector.vector?contains("WakeUp") && initVector.codeInMspInit]
+                  [#if DIE != "DIE501"] 
                     #t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
                     #t#tHAL_NVIC_EnableIRQ(${initVector.vector});
+                  [#else]
+                     #t#tIRQ_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
+                     #t#tIRQ_Enable(${initVector.vector});
+                  [/#if]  
                   [/#if]
                 [/#list]
                 [#assign lowPower = "no"]
@@ -1038,8 +1043,13 @@ ETH_TxPacketConfig TxConfig;
                     [@common.generateUsbWakeUpInterrupt ipName=ipName tabN=3/]
                     [#list initService.nvic as initVector]
                        [#if initVector.vector?contains("WKUP") || initVector.vector?contains("WakeUp")]
+                           [#if DIE != "DIE501"]
                            #t#t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
                            #t#t#tHAL_NVIC_EnableIRQ(${initVector.vector});
+                           [#else]
+                           #t#t#tIRQ_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
+                           #t#t#tIRQ_Enable(${initVector.vector});
+                           [/#if]                         
                        [/#if]
                     [/#list]
                     #t#t}
@@ -1048,8 +1058,13 @@ ETH_TxPacketConfig TxConfig;
            [#else]
               [#list initService.nvic as initVector]
                 [#if initVector.codeInMspInit]
-                  #t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
-                  #t#tHAL_NVIC_EnableIRQ(${initVector.vector});
+                [#if DIE != "DIE501"]
+                #t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+                #t#tHAL_NVIC_EnableIRQ(${initVector.vector});
+                [#else]
+                #t#tIRQ_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
+                #t#tIRQ_Enable(${initVector.vector});
+                [/#if]
                 [/#if]
               [/#list]
            [/#if]
@@ -1099,14 +1114,22 @@ ETH_TxPacketConfig TxConfig;
     [#if service??&&service.nvic??&&nvicExist&&service.nvic?size>0]#n#t#t/* ${ipName} interrupt Deinit */[#--#n#t#tHAL_NVIC_DisableIRQ([#if service.nvic.vector??]${service.nvic.vector}[/#if]);--]
 [#list service.nvic as initVector]
                [#if initVector.shared=="false"]
+                [#if DIE != "DIE501"]           
                 #t#tHAL_NVIC_DisableIRQ(${initVector.vector});
+                [#else]
+                #t#tIRQ_Disable(${initVector.vector});
+                [/#if] 
                 [#else]
 #t/* USER CODE BEGIN ${ipName}:${initVector.vector} disable */
 #t#t/**
 #t#t* Uncomment the line below to disable the "${initVector.vector}" interrupt 
 #t#t*        Be aware, disabling shared interrupt may affect other IPs
 #t#t*/
+[#if DIE != "DIE501"] 
 #t#t/* HAL_NVIC_DisableIRQ(${initVector.vector}); */
+[#else]
+#t#t/* IRQ_Disable(${initVector.vector}); */
+[/#if] 
 #t/* USER CODE END ${ipName}:${initVector.vector} disable */
 #n
 
@@ -1423,7 +1446,7 @@ static uint32_t ${entry.value}=0;
 [/#if]
     [#if  words[0]?contains("DFSDM")]
         [#assign word0 = words[0]]
-        [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4"]
+        [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE501" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4"]
             #tif(${words[0]}_Init == 0)
         [#else]
             #tif([#if word0.contains("DFSDM1")&& mode=="DFSDM_Channel"](IS_DFSDM1_CHANNEL_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Channel"]!(IS_DFSDM1_CHANNEL_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if][#if word0.contains("DFSDM1")&& mode=="DFSDM_Filter"](IS_DFSDM1_FILTER_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Filter"]!(IS_DFSDM1_FILTER_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if](${words[0]}_Init == 0)) 
@@ -1483,7 +1506,7 @@ static uint32_t ${entry.value}=0;
     [#if i>0]
     [#if  words[i]?contains("DFSDM")]
         [#assign word0 = words[i]]
-        [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4"]
+        [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE501"|| DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4"]
             #tif(${words[0]}_Init == 0)
         [#else]
             #telse if([#if word0.contains("DFSDM1")&& mode=="DFSDM_Channel"](IS_DFSDM1_CHANNEL_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Channel"]!(IS_DFSDM1_CHANNEL_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if][#if word0.contains("DFSDM1")&& mode=="DFSDM_Filter"](IS_DFSDM1_FILTER_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Filter"]!(IS_DFSDM1_FILTER_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if](${words[i]}_Init == 0))
@@ -1653,7 +1676,7 @@ uint32_t DFSDM1_Init = 0;
 [#if mspIsEmpty1=="no"]
 [#if  words[0]?contains("DFSDM")]
 [#assign word0 = words[0]]
-    [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4"]
+    [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE501" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4"]
         #tif(${words[0]}_Init == 0)
     [#else]
         #tif([#if word0.contains("DFSDM1")&& mode=="DFSDM_Channel"](IS_DFSDM1_CHANNEL_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Channel"]!(IS_DFSDM1_CHANNEL_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if][#if word0.contains("DFSDM1")&& mode=="DFSDM_Filter"](IS_DFSDM1_FILTER_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Filter"]!(IS_DFSDM1_FILTER_INSTANCE(${mode?lower_case}Handle->Instance))&&[/#if](${words[0]}_Init == 0))
@@ -1740,7 +1763,7 @@ uint32_t DFSDM1_Init = 0;
 [#assign words = instanceList]
 [#if words[0]?contains("DFSDM")]
 [#assign word0 = words[0]]
-    [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4"]
+    [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE501" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4"]
         #t${words[0]}_Init-- ;
         #tif(${words[0]}_Init == 0)
     [#else]
@@ -1785,7 +1808,7 @@ uint32_t DFSDM1_Init = 0;
         [#if i>0]
 [#if words[i]?contains("DFSDM")]
     [#assign word0 = words[i]]
-        [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4"]
+        [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE501"|| DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4"]
         [#else]
             #telse if([#if word0.contains("DFSDM1")&& mode=="DFSDM_Channel"](IS_DFSDM1_CHANNEL_INSTANCE(${mode?lower_case}Handle->Instance))[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Channel"]!(IS_DFSDM1_CHANNEL_INSTANCE(${mode?lower_case}Handle->Instance))[/#if][#if word0.contains("DFSDM1")&& mode=="DFSDM_Filter"](IS_DFSDM1_FILTER_INSTANCE(${mode?lower_case}Handle->Instance))[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Filter"]!(IS_DFSDM1_FILTER_INSTANCE(${mode?lower_case}Handle->Instance))[/#if])
             #t{

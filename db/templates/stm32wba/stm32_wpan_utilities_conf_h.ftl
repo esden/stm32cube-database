@@ -10,6 +10,20 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
+[#assign myHash = {}]
+[#list SWIPdatas as SWIP]
+    [#if SWIP.defines??]
+        [#list SWIP.defines as definition]
+            [#assign myHash = {definition.name:definition.value} + myHash]
+        [/#list]
+    [/#if]
+[/#list]
+[#--
+Key & Value:
+[#list myHash?keys as key]
+Key: ${key}; Value: ${myHash[key]}
+[/#list]
+--]
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef UTILITIES_CONF_H

@@ -73,11 +73,11 @@ TX_SEMAPHORE BLE_TIMER_Thread_Sem;
 [/#if]
 /* Private functions prototype------------------------------------------------*/
 void BLE_TIMER_Background(void);
+static void BLE_TIMER_Callback(void* arg);
+static BLE_TIMER_t* BLE_TIMER_GetFromList(tListNode * listHead, uint8_t id);
 [#if myHash["THREADX_STATUS"]?number == 1 ]
 static void BLE_TIMER_Background_Entry(unsigned long thread_input);
 [/#if]
-static void BLE_TIMER_Callback(void* arg);
-static BLE_TIMER_t* BLE_TIMER_GetFromList(tListNode * listHead, uint8_t id);
 
 void BLE_TIMER_Init(void)
 {

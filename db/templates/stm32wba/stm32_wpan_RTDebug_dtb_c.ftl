@@ -6,15 +6,7 @@
   * @author  MCD Application Team
   * @brief   Real Time Debug module API definition for DTB usage
   ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2022 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 /* USER CODE END Header */
@@ -32,7 +24,7 @@
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 
-#if(RT_DEBUG_DTB == 1)
+#if(CFG_RT_DEBUG_DTB == 1)
 /* Private function prototypes -----------------------------------------------*/
 static void RT_DEBUG_SetDTBMode(uint8_t dtb, uint8_t mode);
 
@@ -146,5 +138,5 @@ void RT_DEBUG_DTBConfig(void)
   //RT_DEBUG_SetDTBMode(6, 6); /* test tm 01 */
 }
 
-#endif /* RT_DEBUG_DTB */
+#endif /* CFG_RT_DEBUG_DTB */
 

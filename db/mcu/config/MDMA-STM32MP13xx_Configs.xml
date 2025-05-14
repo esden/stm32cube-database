@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<IP DBVersion="V4.0" Name="DMA" Version="STM32Cube_FW_MP13_V0.7.0" IncludeFile="stm32MP13xx_hal.h" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd" xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+    <RefConfig Name="HAL_MDMA_Init">
+      <IFCondition Expression = "Rank=First">
+       <CallLibMethod Name="HAL_MDMA_Init"/>
+        <IFCondition Expression = "!(Request=MDMA_REQUEST_SW)">
+          <CallLibMethod Name="HAL_MDMA_ConfigPostRequestMask"/>
+        </IFCondition>
+      </IFCondition>
+      <IFCondition Expression = "Rank=Intermediate">
+        <CallLibMethod Name="HAL_MDMA_LinkedList_CreateNode">
+          <MethodArg Name="PostRequestMaskAddress" ParameterName="MaskAddress"/>
+          <MethodArg Name="PostRequestMaskData" ParameterName="MaskData"/>
+
+          
+        <!--
+          <MethodArg Name="SrcAddress" FValue="0"/>
+          <MethodArg Name="DstAddress" FValue="0"/>
+          <MethodArg Name="BlockDataLength" FValue="0"/>
+          <MethodArg Name="BlockCount" FValue="0"/>
+          -->
+        </CallLibMethod>
+        <CallLibMethod Name="HAL_MDMA_LinkedList_AddNode">
+          <MethodArg Name="pPrevNode" FValue="0"/>
+        </CallLibMethod>
+      </IFCondition>
+      <IFCondition Expression = "Rank=Last">
+        <CallLibMethod Name="HAL_MDMA_LinkedList_CreateNode">
+          <MethodArg Name="PostRequestMaskAddress" ParameterName="MaskAddress"/>
+          <MethodArg Name="PostRequestMaskData" ParameterName="MaskData"/>
+        <!--
+          <MethodArg Name="SrcAddress" FValue="0"/>
+          <MethodArg Name="DstAddress" FValue="0"/>
+          <MethodArg Name="BlockDataLength" FValue="0"/>
+          <MethodArg Name="BlockCount" FValue="0"/>
+          -->
+        </CallLibMethod>
+        <CallLibMethod Name="HAL_MDMA_LinkedList_AddNode">
+          <MethodArg Name="pPrevNode" FValue="0"/>
+        </CallLibMethod>
+        <IFCondition Expression = "(CircularMode=MDMA_CIRCULAR_LIST_LOOPING_ON_FIRST_ELEMENT)|(CircularMode=MDMA_CIRCULAR_LIST_LOOPING_ON_SECOND_ELEMENT)">
+          <CallLibMethod Name="HAL_MDMA_LinkedList_EnableCircularMode">
+        </CallLibMethod>
+        </IFCondition>
+      </IFCondition>
+      <Component Name="HAL:MDMA"/>
+    </RefConfig>
+    <RefConfig Name="HAL_MDMA_DeInit">
+      <CallLibMethod Name="HAL_MDMA_DeInit"/>
+    </RefConfig>
+    
+    <LibMethod Comment="" Name="HAL_MDMA_Init">
+        <Argument Comment="" AddressOf="true" GenericType="struct" Name="hmdma" TypeName="MDMA_HandleTypeDef" Context="global">
+            <Argument Comment="" AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="MDMA_Channel_TypeDef *"/>
+            <Argument Comment="" AddressOf="false" GenericType="struct" Name="Init" TypeName="MDMA_InitTypeDef">
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="Request"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="TransferTriggerMode"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="Priority"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="Endianness"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="SourceInc"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="DestinationInc"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="SourceDataSize"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="DestDataSize"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="DataAlignment"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="BufferTransferLength"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="SourceBurst"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="DestBurst"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="SourceBlockAddressOffset"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="DestBlockAddressOffset"/>
+            </Argument>
+            <Argument Comment="" AddressOf="false" GenericType="enum" Name="Lock" TypeName="HAL_LockTypeDef"/>
+            <Argument Comment="" AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_MDMA_StateTypeDef"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="Parent"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferCpltCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferBufferCpltCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferBlockCpltCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferRepeatBlockCpltCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferErrorCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferAbortCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="FirstLinkedListNodeAddress" TypeName="MDMA_LinkNodeTypeDef"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="LastLinkedListNodeAddress" TypeName="MDMA_LinkNodeTypeDef"/>
+            <Argument Comment="" AddressOf="false" GenericType="simple" Name="LinkedListNodeCounter"/>
+            <Argument Comment="" AddressOf="false" GenericType="simple" Name="ErrorCode"/>
+        </Argument>
+    </LibMethod>
+    
+    <LibMethod Comment="Configure post request address and data masks" Name="HAL_MDMA_ConfigPostRequestMask">
+        <Argument Comment="" AddressOf="true" GenericType="struct" Name="hmdma" TypeName="MDMA_HandleTypeDef" Context="global">
+            <Argument Comment="" AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="MDMA_Channel_TypeDef *"/>
+            <Argument Comment="" AddressOf="false" GenericType="struct" Name="Init" TypeName="MDMA_InitTypeDef">
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="Request"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="TransferTriggerMode"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="Priority"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="Endianness"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="SourceInc"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="DestinationInc"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="SourceDataSize"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="DestDataSize"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="DataAlignment"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="BufferTransferLength"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="SourceBurst"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="DestBurst"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="SourceBlockAddressOffset"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="DestBlockAddressOffset"/>
+            </Argument>
+            <Argument Comment="" AddressOf="false" GenericType="enum" Name="Lock" TypeName="HAL_LockTypeDef"/>
+            <Argument Comment="" AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_MDMA_StateTypeDef"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="Parent"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferCpltCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferBufferCpltCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferBlockCpltCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferRepeatBlockCpltCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferErrorCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferAbortCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="FirstLinkedListNodeAddress" TypeName="MDMA_LinkNodeTypeDef"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="LastLinkedListNodeAddress" TypeName="MDMA_LinkNodeTypeDef"/>
+            <Argument Comment="" AddressOf="false" GenericType="simple" Name="LinkedListNodeCounter"/>
+            <Argument Comment="" AddressOf="false" GenericType="simple" Name="ErrorCode"/>
+        </Argument>
+        <Argument Comment="" AddressOf="false" GenericType="simple" Name="MaskAddress"/>
+        <Argument Comment="" AddressOf="false" GenericType="simple" Name="MaskData"/>
+    </LibMethod>
+    
+    <LibMethod Comment="Initialize MDMA link node according to specified parameters" Name="HAL_MDMA_LinkedList_CreateNode">
+        <Argument Comment="" AddressOf="true" GenericType="baseaddress" Name="node" TypeName="MDMA_LinkNodeTypeDef" Context="global"/>
+        <Argument Comment="" AddressOf="true" GenericType="struct" Name="nodeConfig" TypeName="MDMA_LinkNodeConfTypeDef">
+            <Argument Comment="" AddressOf="false" GenericType="struct" Name="Init" TypeName="MDMA_InitTypeDef">
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="Request"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="TransferTriggerMode"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="Priority"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="Endianness"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="SourceInc"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="DestinationInc"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="SourceDataSize"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="DestDataSize"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="DataAlignment"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="BufferTransferLength"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="SourceBurst"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="DestBurst"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="SourceBlockAddressOffset"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="DestBlockAddressOffset"/>
+            </Argument>
+            <Argument Comment="" AddressOf="false" GenericType="simple" Name="PostRequestMaskAddress"/>
+            <Argument Comment="" AddressOf="false" GenericType="simple" Name="PostRequestMaskData"/>
+            <Argument Comment="" AddressOf="false" GenericType="simple" Name="SrcAddress"/>
+            <Argument Comment="" AddressOf="false" GenericType="simple" Name="DstAddress"/>
+            <Argument Comment="" AddressOf="false" GenericType="simple" Name="BlockDataLength"/>
+            <Argument Comment="" AddressOf="false" GenericType="simple" Name="BlockCount"/>
+        </Argument>
+    </LibMethod>
+    
+    <LibMethod Comment="Connect a node to the linked list" Name="HAL_MDMA_LinkedList_AddNode">
+        <Argument Comment="" AddressOf="true" GenericType="struct" Name="hmdma" TypeName="MDMA_HandleTypeDef">
+            <Argument Comment="" AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="MDMA_Channel_TypeDef *"/>
+            <Argument Comment="" AddressOf="false" GenericType="struct" Name="Init" TypeName="MDMA_InitTypeDef">
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="Request"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="TransferTriggerMode"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="Priority"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="Endianness"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="SourceInc"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="DestinationInc"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="SourceDataSize"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="DestDataSize"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="DataAlignment"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="BufferTransferLength"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="SourceBurst"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="DestBurst"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="SourceBlockAddressOffset"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="DestBlockAddressOffset"/>
+            </Argument>
+            <Argument Comment="" AddressOf="false" GenericType="enum" Name="Lock" TypeName="HAL_LockTypeDef"/>
+            <Argument Comment="" AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_MDMA_StateTypeDef"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="Parent"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferCpltCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferBufferCpltCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferBlockCpltCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferRepeatBlockCpltCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferErrorCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferAbortCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="FirstLinkedListNodeAddress" TypeName="MDMA_LinkNodeTypeDef"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="LastLinkedListNodeAddress" TypeName="MDMA_LinkNodeTypeDef"/>
+            <Argument Comment="" AddressOf="false" GenericType="simple" Name="LinkedListNodeCounter"/>
+            <Argument Comment="" AddressOf="false" GenericType="simple" Name="ErrorCode"/>
+        </Argument>
+        <Argument Comment="" AddressOf="true" GenericType="simple" Name="pNewNode" TypeName="MDMA_LinkNodeTypeDef"/>
+        <Argument Comment="" AddressOf="false" GenericType="simple" Name="pPrevNode" TypeName="MDMA_LinkNodeTypeDef"/>
+    </LibMethod>
+    
+    <LibMethod Comment="Make the linked list circular by connecting the last node to the first" Name="HAL_MDMA_LinkedList_EnableCircularMode">
+        <Argument Comment="" AddressOf="true" GenericType="struct" Name="hmdma" TypeName="MDMA_HandleTypeDef">
+            <Argument Comment="" AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="MDMA_Channel_TypeDef *"/>
+            <Argument Comment="" AddressOf="false" GenericType="struct" Name="Init" TypeName="MDMA_InitTypeDef">
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="Request"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="TransferTriggerMode"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="Priority"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="Endianness"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="SourceInc"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="DestinationInc"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="SourceDataSize"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="DestDataSize"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="DataAlignment"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="BufferTransferLength"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="SourceBurst"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="DestBurst"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="SourceBlockAddressOffset"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="DestBlockAddressOffset"/>
+            </Argument>
+            <Argument Comment="" AddressOf="false" GenericType="enum" Name="Lock" TypeName="HAL_LockTypeDef"/>
+            <Argument Comment="" AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_MDMA_StateTypeDef"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="Parent"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferCpltCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferBufferCpltCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferBlockCpltCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferRepeatBlockCpltCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferErrorCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferAbortCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="FirstLinkedListNodeAddress" TypeName="MDMA_LinkNodeTypeDef"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="LastLinkedListNodeAddress" TypeName="MDMA_LinkNodeTypeDef"/>
+            <Argument Comment="" AddressOf="false" GenericType="simple" Name="LinkedListNodeCounter"/>
+            <Argument Comment="" AddressOf="false" GenericType="simple" Name="ErrorCode"/>
+        </Argument>
+    </LibMethod>
+    
+    <LibMethod Comment="" Name="HAL_MDMA_LinkedList_DisableCircularMode">
+        <Argument Comment="" AddressOf="true" GenericType="struct" Name="hmdma" TypeName="MDMA_HandleTypeDef" Context="global">
+            <Argument Comment="" AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="MDMA_Channel_TypeDef *"/>
+            <Argument Comment="" AddressOf="false" GenericType="struct" Name="Init" TypeName="MDMA_InitTypeDef">
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="Request"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="TransferTriggerMode"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="Priority"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="Endianness"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="SourceInc"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="DestinationInc"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="SourceDataSize"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="DestDataSize"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="DataAlignment"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="BufferTransferLength"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="SourceBurst"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="DestBurst"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="SourceBlockAddressOffset"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="DestBlockAddressOffset"/>
+            </Argument>
+            <Argument Comment="" AddressOf="false" GenericType="enum" Name="Lock" TypeName="HAL_LockTypeDef"/>
+            <Argument Comment="" AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_MDMA_StateTypeDef"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="Parent"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferCpltCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferBufferCpltCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferBlockCpltCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferRepeatBlockCpltCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferErrorCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferAbortCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="FirstLinkedListNodeAddress" TypeName="MDMA_LinkNodeTypeDef"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="LastLinkedListNodeAddress" TypeName="MDMA_LinkNodeTypeDef"/>
+            <Argument Comment="" AddressOf="false" GenericType="simple" Name="LinkedListNodeCounter"/>
+            <Argument Comment="" AddressOf="false" GenericType="simple" Name="ErrorCode"/>
+        </Argument>
+    </LibMethod>
+    
+    <LibMethod Comment="" Name="HAL_MDMA_DeInit">
+        <Argument Comment="" AddressOf="true" GenericType="struct" Name="hmdma" TypeName="MDMA_HandleTypeDef" Context="global">
+            <Argument Comment="" AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="MDMA_Channel_TypeDef *"/>
+            <Argument Comment="" AddressOf="false" GenericType="struct" Name="Init" TypeName="MDMA_InitTypeDef">
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="Request"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="TransferTriggerMode"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="Priority"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="Endianness"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="SourceInc"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="DestinationInc"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="SourceDataSize"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="DestDataSize"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="DataAlignment"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="BufferTransferLength"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="SourceBurst"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="DestBurst"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="SourceBlockAddressOffset"/>
+                <Argument Comment="" AddressOf="false" GenericType="simple" Name="DestBlockAddressOffset"/>
+            </Argument>
+            <Argument Comment="" AddressOf="false" GenericType="enum" Name="Lock" TypeName="HAL_LockTypeDef"/>
+            <Argument Comment="" AddressOf="false" GenericType="enum" Name="State" TypeName="HAL_MDMA_StateTypeDef"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="Parent"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferCpltCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferBufferCpltCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferBlockCpltCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferRepeatBlockCpltCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferErrorCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="XferAbortCallback"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="FirstLinkedListNodeAddress" TypeName="MDMA_LinkNodeTypeDef"/>
+            <Argument Comment="" AddressOf="true" GenericType="simple" Name="LastLinkedListNodeAddress" TypeName="MDMA_LinkNodeTypeDef"/>
+            <Argument Comment="" AddressOf="false" GenericType="simple" Name="LinkedListNodeCounter"/>
+            <Argument Comment="" AddressOf="false" GenericType="simple" Name="ErrorCode"/>
+        </Argument>
+    </LibMethod>
+    <RefComponent Cclass="HAL" Cgroup="MDMA" Cversion="0.7.0">
+        <File Category="header" Name="Drivers/STM32mp13xx_HAL_Driver/Inc/stm32mp13xx_hal_mdma.h"/>
+        <File Category="source" Name="Drivers/STM32mp13xx_HAL_Driver/Src/stm32mp13xx_hal_mdma.c"/>
+    </RefComponent>
+</IP>

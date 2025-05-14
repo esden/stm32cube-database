@@ -22,7 +22,7 @@ typedef enum {
   APP_APPE_INIT,
 } app_debug_signal_t;
 
-#if(RT_DEBUG_GPIO_MODULE == 1)
+#if(CFG_RT_DEBUG_GPIO_MODULE == 1)
 
 /************************************/
 /** Application local signal table **/
@@ -35,7 +35,7 @@ static const rt_debug_signal_t app_debug_table[] = {
 #endif /* USE_RT_DEBUG_APP_APPE_INIT */
 };
 
-#endif /* RT_DEBUG_GPIO_MODULE */
+#endif /* CFG_RT_DEBUG_GPIO_MODULE */
 
 /**************************************/
 /** Application debug API definition **/

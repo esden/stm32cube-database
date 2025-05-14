@@ -79,7 +79,9 @@
 #define C_PANID                 0x${PANID}U
 #define C_CHANNEL_NB            ${CHANNEL}U
 [/#if]
-
+[#if ((THREAD_APPLICATION = "MTD") && (FREERTOS_STATUS = 1)) ||(THREAD_APPLICATION = "MTD")]
+#define THREAD_LINK_POLL_PERIOD_MS      (5000)                        /**< 5s */
+[/#if]
 [#if FREERTOS_STATUS = 1 ]
 
 osMutexId_t MtxOtCmdId;
@@ -342,6 +344,16 @@ static void APP_THREAD_DeviceConfig(void)
   otError error;
 [#if (THREAD_APPLICATION = "FTD_CLI")]
   error = otSetStateChangedCallback(NULL, APP_THREAD_StateNotif, NULL);
+[#elseif ((THREAD_APPLICATION = "MTD") && (FREERTOS_STATUS = 1)) ||(THREAD_APPLICATION = "MTD")]
+  otNetworkKey networkKey = {{0x${NETWORKKEY}}};
+
+  otLinkModeConfig OT_LinkMode = {0};
+/* Set the sleepy end device mode */
+  OT_LinkMode.mRxOnWhenIdle = 0;
+  OT_LinkMode.mDeviceType = 0;
+  OT_LinkMode.mNetworkData = 1U;
+
+  error = otInstanceErasePersistentInfo(NULL);
 [#else]
   otNetworkKey networkKey = {{0x${NETWORKKEY}}};
   
@@ -379,6 +391,20 @@ static void APP_THREAD_DeviceConfig(void)
   {
     APP_THREAD_Error(ERR_THREAD_SET_NETWORK_KEY,error);
   }
+[#if ((THREAD_APPLICATION = "MTD") && (FREERTOS_STATUS = 1)) ||(THREAD_APPLICATION = "MTD")]
+  error = otLinkSetPollPeriod(NULL, THREAD_LINK_POLL_PERIOD_MS);
+[#if ((THREAD_APPLICATION = "MTD") && (FREERTOS_STATUS = 1))]
+/*if (error != OT_ERROR_NONE)
+  {
+  APP_THREAD_Error(ERR_THREAD_TO_BE_DEFINED,error); // l'erreur pour la pollperiod n'existe pas
+ }*/
+[/#if]
+  error = otThreadSetLinkMode(NULL, OT_LinkMode);
+  if (error != OT_ERROR_NONE)
+  {
+   APP_THREAD_Error(ERR_THREAD_LINK_MODE,error);
+  }
+[/#if]
   error = otIp6SetEnabled(NULL, true);
   if (error != OT_ERROR_NONE)
   {

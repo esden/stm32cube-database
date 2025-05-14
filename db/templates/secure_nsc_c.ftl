@@ -27,6 +27,9 @@
 [#if FamilyName=="STM32WBA"]
 /** @addtogroup STM32WBAxx_HAL_Examples
 [/#if]
+[#if FamilyName=="STM32N6"]
+/** @addtogroup STM32N6xx_HAL_Examples
+[/#if]
   * @{
   */
 

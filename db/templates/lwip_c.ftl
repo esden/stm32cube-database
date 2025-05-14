@@ -551,16 +551,8 @@ void MX_LWIP_Init(void)
 #t/*  Registers the default network interface */
 #tnetif_set_default(&gnetif);
 #n
-#tif (netif_is_link_up(&gnetif))
-#t{
-#t#t/* When the netif is fully configured this function must be called */
-#t#tnetif_set_up(&gnetif);
-#t}
-#telse
-#t{
-#t#t/* When the netif link is down this function must be called */
-#t#tnetif_set_down(&gnetif);
-#t}  
+#t/* We must always bring the network interface up connection or not... */
+#tnetif_set_up(&gnetif); 
 #n  
 [#if (netif_callback == 1) ] [#-- No RTOS needed --]
 #t/* Set the link callback function, this function is called on change of link status*/

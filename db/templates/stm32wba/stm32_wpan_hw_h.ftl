@@ -10,6 +10,20 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
+[#assign myHash = {}]
+[#list SWIPdatas as SWIP]
+    [#if SWIP.defines??]
+        [#list SWIP.defines as definition]
+            [#assign myHash = {definition.name:definition.value} + myHash]
+        [/#list]
+    [/#if]
+[/#list]
+[#--
+Key & Value:
+[#list myHash?keys as key]
+Key: ${key}; Value: ${myHash[key]}
+[/#list]
+--]
 
 #ifndef HW_H__
 #define HW_H__
@@ -108,6 +122,18 @@ extern void HW_AES_SetKey( uint32_t mode,
 extern void HW_AES_Crypt( const uint32_t* input,
                           uint32_t* output );
 
+[#if (myHash["ZIGBEE"] == "Enabled") || (myHash["ZIGBEE_SKELETON"] == "Enabled") || (myHash["mac_802_15_4_SKELETON"] == "Enabled")]
+/*
+ * HW_AES_Crypt
+ *
+ * Encrypts/decrypts the 16-byte input data ("input").
+ * Result is written in the 16-byte buffer ("output") allocated by the user.
+ *
+ * Note : input & output are 8 bits aligned.
+ */
+extern void HW_AES_Crypt8( const uint8_t* input, uint8_t* output );
+
+[/#if]
 /*
  * HW_AES_Disable
  *

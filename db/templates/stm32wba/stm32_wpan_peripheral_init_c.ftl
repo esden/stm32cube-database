@@ -11,7 +11,63 @@
   */
 /* USER CODE END Header */
 
+/* Includes ------------------------------------------------------------------*/
+#include "app_conf.h"
 #include "peripheral_init.h"
+#include "${main_h}"
+
+/* Private includes -----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+
+/* USER CODE END Includes */
+[#-- [#if NVICSystemInit??]
+ /**
+  * @brief  Configure the CPU NVIC peripheral at Standby mode exit.
+  * @param  None
+  * @retval None
+  */
+void MX_StandbyExit_NVICPeripharalInit(void)
+{
+  [#list NVICSystemInit as initVector]  
+#t${""?right_pad(2)}HAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+#t${""?right_pad(2)}HAL_NVIC_EnableIRQ(${initVector.vector});
+  [/#list]
+}
+[/#if] --]
+
+/* External variables --------------------------------------------------------*/
+[#assign PreviousHandler = ""]
+[#if handlersList??]
+  [#list handlersList as handler]
+    [#list handler.entrySet() as entry]
+      [#list entry.value as ipHandler]
+        [#if (ipHandler.handler != "hrtc")
+		  && (ipHandler.handler != "handle_GPDMA1_Channel1")
+		  && (ipHandler.handler != "handle_GPDMA1_Channel0")
+		  && (ipHandler.handler != "huart1")
+		]
+            [#if ipHandler.handler != PreviousHandler]
+				[#if (ipHandler.handler == "hadc4")]
+#if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)	
+extern ${ipHandler.handlerType} ${ipHandler.handler};
+#endif /* USE_TEMPERATURE_BASED_RADIO_CALIBRATION */
+				[#else]
+extern ${ipHandler.handlerType} ${ipHandler.handler};
+				[/#if]
+                [#assign PreviousHandler = ipHandler.handler]
+            [/#if]
+        [/#if]
+    [/#list]
+  [/#list]
+[/#list]
+[/#if]
+
+/* USER CODE BEGIN EV */
+
+
+/* USER CODE END EV */
+
+/* Functions Definition ------------------------------------------------------*/
 
 /**
   * @brief  Configure the SoC peripherals at Standby mode exit.
@@ -29,9 +85,19 @@ void MX_StandbyExit_PeripharalInit(void)
   [#list handlersList as handler]
     [#list handler.entrySet() as entry]
       [#list entry.value as ipHandler]
-		[#if ipHandler.handler != "hrtc"]
+		[#if (ipHandler.handler != "hrtc")
+		  && (ipHandler.handler != "handle_GPDMA1_Channel1")
+		  && (ipHandler.handler != "handle_GPDMA1_Channel0")
+		  && (ipHandler.handler != "huart1")
+		]
 			[#if ipHandler.handler != PreviousIpHandler]
+				[#if (ipHandler.handler == "hadc4")]
+#if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)
 ${""?right_pad(2)}memset(&${ipHandler.handler}, 0, sizeof(${ipHandler.handler}));
+#endif /* USE_TEMPERATURE_BASED_RADIO_CALIBRATION */
+				[#else]
+${""?right_pad(2)}memset(&${ipHandler.handler}, 0, sizeof(${ipHandler.handler}));
+                [/#if]
 				[#assign PreviousIpHandler = ipHandler.handler]
 			[/#if]
 		[/#if]
@@ -42,20 +108,43 @@ ${""?right_pad(2)}memset(&${ipHandler.handler}, 0, sizeof(${ipHandler.handler}))
 
 [#if voidsList??]
   [#list voidsList as void]
-	[#if void.functionName??]
+	[#if void.functionName?? && void.genCode]
 		[#if (void.functionName != "SystemClock_Config") 
 		  && (void.functionName != "SystemPower_Config")
 		  && (void.functionName != "MX_RTC_Init")
 		  && (void.functionName != "APPE_Init")
 		  && (void.functionName != "MX_RF_Init")
+		  && (void.functionName != "MX_CORTEX_M33_Init")
 		  && (void.functionName != "MX_CORTEX_M33_NS_Init")
+		  && (void.functionName != "MX_GPDMA1_Init")
+		  && (void.functionName != "MX_USART1_UART_Init")
+		  && (void.functionName != "MX_USART2_UART_Init")
+		  && (void.functionName != "MX_HSEM_Init")
 		]
+			[#if (void.functionName == "MX_ADC4_Init")]
+#if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)			
 ${""?right_pad(2)}${void.functionName}();
+#endif /* USE_TEMPERATURE_BASED_RADIO_CALIBRATION */
+			[#else]
+${""?right_pad(2)}${void.functionName}();
+			[/#if]
 		[/#if]
 	[/#if]
   [/#list]
 [/#if]
 
+#if (CFG_DEBUGGER_LEVEL == 0)
+  GPIO_InitTypeDef DbgIOsInit = {0};
+  DbgIOsInit.Mode = GPIO_MODE_ANALOG;
+  DbgIOsInit.Pull = GPIO_NOPULL;
+  DbgIOsInit.Pin = GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15;
+  HAL_GPIO_Init(GPIOA, &DbgIOsInit);
+  
+  DbgIOsInit.Mode = GPIO_MODE_ANALOG;
+  DbgIOsInit.Pull = GPIO_NOPULL;
+  DbgIOsInit.Pin = GPIO_PIN_3|GPIO_PIN_4;
+  HAL_GPIO_Init(GPIOB, &DbgIOsInit);
+#endif /* CFG_DEBUGGER_LEVEL */
   /* USER CODE BEGIN MX_STANDBY_EXIT_PERIPHERAL_INIT_2 */
 
   /* USER CODE END MX_STANDBY_EXIT_PERIPHERAL_INIT_2 */

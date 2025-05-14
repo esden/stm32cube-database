@@ -297,10 +297,10 @@
         <PossibleValue Comment="I2C2 Clksource Hsi"    Value="RCC_I2C2CLKSOURCE_HSI"    Semaphore="I2C2SourceHSI"/>
     </RefParameter>
     <!--I2S2CLockSelection-->
-    <RefParameter Visible="false"  Comment="I2S2/SPI2 Clock Selection" DefaultValue="RCC_I2S2CLKSOURCE_HSI"    Name="I2S2CLockSelection" Type="list" IP="I2S2,SPI2">
-        <PossibleValue Comment="I2S2/SPI2 Clksource PCLK1"  Value="RCC_I2S2CLKSOURCE_PLL"    Semaphore="I2S2CLKSOURCE_PLL"/>
-        <PossibleValue Comment="I2S2/SPI2 Clksource Sysclk" Value="RCC_I2S2CLKSOURCE_HSI"    Semaphore="I2S2CLKSOURCE_HSI"/>
-        <PossibleValue Comment="I2S2/SPI2 Clksource Hsi"    Value="RCC_I2S2CLKSOURCE_PIN"    Semaphore="I2S2CLKSOURCE_PIN"/>
+    <RefParameter Visible="false"  Comment="I2S2 Clock Selection" DefaultValue="RCC_I2S2CLKSOURCE_HSI"    Name="I2S2CLockSelection" Type="list" IP="I2S2">
+        <PossibleValue Comment="I2S2 Clksource PCLK1"  Value="RCC_I2S2CLKSOURCE_PLL"    Semaphore="I2S2CLKSOURCE_PLL"/>
+        <PossibleValue Comment="I2S2 Clksource Sysclk" Value="RCC_I2S2CLKSOURCE_HSI"    Semaphore="I2S2CLKSOURCE_HSI"/>
+        <PossibleValue Comment="I2S2 Clksource Hsi"    Value="RCC_I2S2CLKSOURCE_PIN"    Semaphore="I2S2CLKSOURCE_PIN"/>
     </RefParameter>
   
     <!--I2C3CLockSelection-->
@@ -437,7 +437,7 @@
     <RefParameter Visible="false" Comment="I2C3 clock Source" Name="I2C3Freq_Value" DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="I2C3"/>
     <RefParameter Visible="false" Comment="I2C2 clock Source" Name="I2C2Freq_Value" DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="I2C2"/>
     <RefParameter Visible="false" Comment="I2C1 clock Source" Name="I2C1Freq_Value" DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="I2C1"/>    
-    <RefParameter Visible="false" Comment="I2S2/SPI2 clock Source" Name="I2S2Freq_Value" DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="I2S2,SPI2"/>
+    <RefParameter Visible="false" Comment="I2S2 clock Source" Name="I2S2Freq_Value" DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="I2S2"/>
 	
     <RefParameter Visible="false" Comment="USART1 clock Source"  Name="USART1Freq_Value"  DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="USART1"/>
     <RefParameter Visible="false" Comment="USART2 clock Source"  Name="USART2Freq_Value"  DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="USART2"/>
@@ -475,7 +475,7 @@
     
     <!--PLLQ output-->
     <RefParameter Visible="false" Comment="PLLQ"     Name="PLLQoutputFreq_Value"     DefaultValue="16000000"  Max="48000000" Type="double" Display="value/1000000" Unit="MHz">
-        <Condition Diagnostic="" Expression="(RNGCLKSOURCE_PLL &amp; RNGUsed_ForRCC) | (I2S2Used_ForRCC|SPI2Used_ForRCC) &amp; I2S2CLKSOURCE_PLL | ((Semaphore_input_Channel1TIM16 &amp; TIM16 &amp; SEM2RCC_MCO_REQUIRED_TIM16)|MCOConfig) &amp;  MCO1SOURCE_PLLQCLK "/>
+        <Condition Diagnostic="" Expression="(RNGCLKSOURCE_PLL &amp; RNGUsed_ForRCC) | (I2S2Used_ForRCC) &amp; I2S2CLKSOURCE_PLL | ((Semaphore_input_Channel1TIM16 &amp; TIM16 &amp; SEM2RCC_MCO_REQUIRED_TIM16)|MCOConfig) &amp;  MCO1SOURCE_PLLQCLK "/>
     </RefParameter>
     <RefParameter Visible="false" Comment="PLLQ"     Name="PLLQoutputFreq_Value"     DefaultValue="16000000"  Type="double" Display="value/1000000" Unit="MHz"/>
 
@@ -762,11 +762,11 @@
     </RefParameter>
 
     <!--I2S2 Enable-->
-    <RefParameter Visible="false" Name="I2S2Enable" Comment="I2S2,SPI2" Type="list" DefaultValue="true" IP="I2S2,SPI2">
-        <Condition Expression="(I2S2Used_ForRCC|SPI2Used_ForRCC)" Diagnostic="I2S2/SPI2 is activated"/>
+    <RefParameter Visible="false" Name="I2S2Enable" Comment="I2S2" Type="list" DefaultValue="true" IP="I2S2">
+        <Condition Expression="(I2S2Used_ForRCC)" Diagnostic="I2S2 is activated"/>
         <PossibleValue Value="true" Comment="true"/>
     </RefParameter>	
-    <RefParameter Visible="false" Name="I2S2Enable" Comment="I2S2,SPI2" Type="list" DefaultValue="false">
+    <RefParameter Visible="false" Name="I2S2Enable" Comment="I2S2" Type="list" DefaultValue="false">
         <PossibleValue Value="false" Comment="false"/>
     </RefParameter>
 	
@@ -886,7 +886,7 @@
     </RefParameter>
     <RefParameter Visible="false" Comment="HSI is Used" DefaultValue="0" Name="HSIUsedForSys" Min="0" Type="integer"/>
     <RefParameter Visible="false" Comment="HSI Is Used" DefaultValue="1" Name="HSIUsed" Min="1" Type="integer">
-        <Condition Expression="ADCUsed_ForRCC &amp; ADCCLKSOURCE_HSI | I2C2SourceHSI &amp; I2C2Used_ForRCC| ((I2S2Used_ForRCC|SPI2Used_ForRCC) &amp; I2S2CLKSOURCE_HSI)|(USART1SourceHSI&amp; USART1Used_ForRCC)|(USART2SourceHSI&amp; USART2Used_ForRCC)|(LPUART1SourceHSI&amp; LPUARTUsed_ForRCC)|(LPTIM1SOURCEHSI&amp; LPTIM1Used_ForRCC)|(LPTIM2SOURCEHSI &amp; LPTIM2Used_ForRCC)|(LPTIM3SOURCEHSI &amp; LPTIM3Used_ForRCC)|(I2C1SourceHSI&amp; I2C1Used_ForRCC)|(I2C3SourceHSI&amp; I2C3Used_ForRCC)|((PLLSourceHSI)&amp; (PLLUsed=1))|(SYSCLKSource=RCC_SYSCLKSOURCE_HSI)|((RCC_MCO1Source=RCC_MCO1SOURCE_HSI)&amp;((((Semaphore_input_Channel1TIM16 &amp; TIM16 &amp; SEM2RCC_MCO_REQUIRED_TIM16)|MCOConfig))))" Diagnostic="LSE is used if "/>
+        <Condition Expression="ADCUsed_ForRCC &amp; ADCCLKSOURCE_HSI | I2C2SourceHSI &amp; I2C2Used_ForRCC| ((I2S2Used_ForRCC) &amp; I2S2CLKSOURCE_HSI)|(USART1SourceHSI&amp; USART1Used_ForRCC)|(USART2SourceHSI&amp; USART2Used_ForRCC)|(LPUART1SourceHSI&amp; LPUARTUsed_ForRCC)|(LPTIM1SOURCEHSI&amp; LPTIM1Used_ForRCC)|(LPTIM2SOURCEHSI &amp; LPTIM2Used_ForRCC)|(LPTIM3SOURCEHSI &amp; LPTIM3Used_ForRCC)|(I2C1SourceHSI&amp; I2C1Used_ForRCC)|(I2C3SourceHSI&amp; I2C3Used_ForRCC)|((PLLSourceHSI)&amp; (PLLUsed=1))|(SYSCLKSource=RCC_SYSCLKSOURCE_HSI)|((RCC_MCO1Source=RCC_MCO1SOURCE_HSI)&amp;((((Semaphore_input_Channel1TIM16 &amp; TIM16 &amp; SEM2RCC_MCO_REQUIRED_TIM16)|MCOConfig))))" Diagnostic="LSE is used if "/>
     </RefParameter>
     <RefParameter Visible="false" Comment="HSI is Used" DefaultValue="0" Name="HSIUsed" Min="0" Type="integer"/>    
     
@@ -918,7 +918,7 @@
 	
     <!-- PLL used -->
     <RefParameter Visible="false" Comment="MainPLL Is Used" DefaultValue="1" Name="PLLUsed" Min="1" Max="1" Type="integer">
-        <Condition Expression="((Semaphore_input_Channel1TIM16 &amp; TIM16 &amp; SEM2RCC_MCO_REQUIRED_TIM16)|MCOConfig) &amp;  (MCO1SOURCE_PLLPCLK | MCO1SOURCE_PLLQCLK | MCO1SOURCE_PLLCLK)| ADCUsed_ForRCC &amp; ADCSourcePLL | (RNGCLKSOURCE_PLL &amp; RNGUsed_ForRCC) | (I2S2Used_ForRCC|SPI2Used_ForRCC) &amp; I2S2CLKSOURCE_PLL | SysSourcePLL" Diagnostic=" "/>
+        <Condition Expression="((Semaphore_input_Channel1TIM16 &amp; TIM16 &amp; SEM2RCC_MCO_REQUIRED_TIM16)|MCOConfig) &amp;  (MCO1SOURCE_PLLPCLK | MCO1SOURCE_PLLQCLK | MCO1SOURCE_PLLCLK)| ADCUsed_ForRCC &amp; ADCSourcePLL | (RNGCLKSOURCE_PLL &amp; RNGUsed_ForRCC) | (I2S2Used_ForRCC) &amp; I2S2CLKSOURCE_PLL | SysSourcePLL" Diagnostic=" "/>
     </RefParameter>
 	
     <RefParameter Visible="false" Comment="Main PLL is Used" DefaultValue="0" Name="PLLUsed" Min="0" Max="0" Type="integer"/>
@@ -1038,10 +1038,6 @@
         <Condition Expression="I2S2Used_ForRCC" Diagnostic="I2S2 Activated"/>
         <PossibleValue Comment="Periphclk I2S2" Value="RCC_PERIPHCLK_I2S2"/>
     </RefParameter>
-    <RefParameter Visible="false" Name="PeriphClockSelectionARG" Comment="RCC_PERIPHCLK_I2S2Var" Type="list" IP="SPI2" DefaultValue="RCC_PERIPHCLK_I2S2">
-        <Condition Expression="SPI2Used_ForRCC" Diagnostic="I2S2 Activated"/>
-        <PossibleValue Comment="Periphclk I2S2" Value="RCC_PERIPHCLK_I2S2"/>
-    </RefParameter>	
 	
     <RefParameter Visible="false" Name="PeriphClockSelectionARG" Comment="RCC_PERIPHCLK_I2C1Var" Type="list" IP="I2C1" DefaultValue="RCC_PERIPHCLK_I2C1">
         <Condition Expression="I2C1Used_ForRCC" Diagnostic="I2C1 Activated"/>
@@ -1132,9 +1128,6 @@
     
     <RefParameter Visible="false" Name="I2s2ClockSelectionARG" Comment="I2s2ClockSelectionARG" Type="list" IP="I2S2" DefaultValue="+I2S2CLockSelection">
         <Condition Expression="I2S2Used_ForRCC" Diagnostic="USART2 Activated"/>
-    </RefParameter>
-    <RefParameter Visible="false" Name="I2s2ClockSelectionARG" Comment="I2s2ClockSelectionARG" Type="list" IP="SPI2" DefaultValue="+I2S2CLockSelection">
-        <Condition Expression="SPI2Used_ForRCC" Diagnostic="USART2 Activated"/>
     </RefParameter>
     <RefParameter Visible="false" Name="I2s2ClockSelectionARG" Comment="I2s2ClockSelectionARG" Type="list" DefaultValue="null"/>
 	

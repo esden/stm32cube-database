@@ -76,18 +76,16 @@ extern TX_BYTE_POOL *pBytePool; /* ThreadX byte pool pointer for whole WPAN midd
 
 /* USER CODE END EM */
 
-/* Exported functions ---------------------------------------------*/
+/* Exported functions prototypes ---------------------------------------------*/
 void MX_APPE_Config(void);
 uint32_t MX_APPE_Init(void *p_param);
 [#if myHash["SEQUENCER_STATUS"]?number == 1 ]
 void MX_APPE_Process(void);
 [#elseif myHash["THREADX_STATUS"]?number == 1 ]
-void ThreadXLowPowerUserEnter(void);
-void ThreadXLowPowerUserExit(void);
 [#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
 [/#if]
 
-/* USER CODE BEGIN EF */
+/* USER CODE BEGIN EFP */
 [#if PG_FILL_UCS == "True"]
 [#if PG_BSP_NUCLEO_WBA52CG == 1]
 #if (CFG_BUTTON_SUPPORTED == 1)
@@ -99,7 +97,7 @@ void APPE_Button3Action(void);
 [/#if]
 [/#if]
 
-/* USER CODE END EF */
+/* USER CODE END EFP */
 
 #ifdef __cplusplus
 } /* extern "C" */

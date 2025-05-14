@@ -102,6 +102,8 @@
         <PossibleValue Comment="UART7_TX" Value="DMA_REQUEST_UART7_TX"/>
         <PossibleValue Comment="UART8_RX" Value="DMA_REQUEST_UART8_RX"/>
         <PossibleValue Comment="UART8_TX" Value="DMA_REQUEST_UART8_TX"/>
+        <PossibleValue Comment="SAES_IN" Value="DMA_REQUEST_SAES_IN"/>
+        <PossibleValue Comment="SAES_OUT" Value="DMA_REQUEST_SAES_OUT"/>
         <PossibleValue Comment="SPI4_RX" Value="DMA_REQUEST_SPI4_RX"/>
         <PossibleValue Comment="SPI4_TX" Value="DMA_REQUEST_SPI4_TX"/>
         <PossibleValue Comment="SPI5_RX" Value="DMA_REQUEST_SPI5_RX"/>
@@ -271,7 +273,8 @@
     <RefParameter Comment="Clock enable mode" DefaultValue="" Group="" Name="ClockEnableMode" Type="list" Visible="false">
         <PossibleValue Comment="DMA1 clock enable" Value="__HAL_RCC_DMA1_CLK_ENABLE"/>
         <PossibleValue Comment="DMA2 clock enable" Value="__HAL_RCC_DMA2_CLK_ENABLE"/>
-        <PossibleValue Comment="DMAMUX clock enable" Value="__HAL_RCC_DMAMUX_CLK_ENABLE"/>
+        <PossibleValue Comment="DMAMUX1 clock enable" Value="__HAL_RCC_DMAMUX1_CLK_ENABLE"/>
+        <PossibleValue Comment="DMAMUX2 clock enable" Value="__HAL_RCC_DMAMUX2_CLK_ENABLE"/>
     </RefParameter>
     <RefParameter Comment="DMA_Handle" DefaultValue="" Group="" Name="DMA_Handle" Type="list" Visible="false"/>
     <RefParameter Comment="IpInstance" DefaultValue="" Group="" Name="IpInstance" Type="list" Visible="false"/>
@@ -366,7 +369,7 @@
     </RefMode>
     <RefMode Abstract="true" BaseMode="" Comment="DMA1" Name="DMA1">
         <Parameter Name="ClockEnableMode">
-            <PossibleValue>__HAL_RCC_DMAMUX_CLK_ENABLE;__HAL_RCC_DMA1_CLK_ENABLE</PossibleValue>
+            <PossibleValue>__HAL_RCC_DMAMUX1_CLK_ENABLE;__HAL_RCC_DMA1_CLK_ENABLE</PossibleValue>
         </Parameter>
         <Parameter Name="IpInstance">
             <PossibleValue>DMA</PossibleValue>
@@ -374,7 +377,7 @@
     </RefMode>
     <RefMode Abstract="true" BaseMode="" Comment="DMA2" Name="DMA2">
         <Parameter Name="ClockEnableMode">
-            <PossibleValue>__HAL_RCC_DMAMUX_CLK_ENABLE;__HAL_RCC_DMA2_CLK_ENABLE</PossibleValue>
+            <PossibleValue>__HAL_RCC_DMAMUX1_CLK_ENABLE;__HAL_RCC_DMA2_CLK_ENABLE</PossibleValue>
         </Parameter>
         <Parameter Name="IpInstance">
             <PossibleValue>DMA</PossibleValue>
@@ -382,7 +385,7 @@
     </RefMode>
     <RefMode Abstract="true" BaseMode="" Comment="DMA3" Name="DMA3">
         <Parameter Name="ClockEnableMode">
-            <PossibleValue>__HAL_RCC_DMAMUX_CLK_ENABLE;__HAL_RCC_DMA2_CLK_ENABLE</PossibleValue>
+            <PossibleValue>__HAL_RCC_DMAMUX1_CLK_ENABLE;__HAL_RCC_DMA2_CLK_ENABLE</PossibleValue>
         </Parameter>
         <Parameter Name="IpInstance">
             <PossibleValue>DMA</PossibleValue>
@@ -923,6 +926,48 @@
         </Parameter>
         <Parameter Name="FIFOMode">
             <PossibleValue>DMA_FIFOMODE_ENABLE</PossibleValue>
+        </Parameter>
+    </RefMode>
+    <RefMode BaseMode="DMA_Request" Comment="SAES_IN" Name="SAES_IN">
+        <Parameter Name="Request">
+            <PossibleValue>DMA_REQUEST_SAES_IN</PossibleValue>
+        </Parameter>
+        <Parameter Name="Direction">
+            <PossibleValue>DMA_MEMORY_TO_PERIPH</PossibleValue>
+        </Parameter>
+        <Parameter Name="DMA_Handle">
+            <PossibleValue>hdmain</PossibleValue>
+        </Parameter>
+        <Parameter Name="Mode">
+            <PossibleValue>DMA_NORMAL</PossibleValue>
+            <PossibleValue>DMA_CIRCULAR</PossibleValue>
+        </Parameter>
+        <Parameter Name="IpInstance">
+            <PossibleValue>SAES</PossibleValue>
+        </Parameter>
+        <Parameter Name="PeriphInc">
+            <PossibleValue>DMA_PINC_DISABLE</PossibleValue>
+        </Parameter>
+    </RefMode>
+    <RefMode BaseMode="DMA_Request" Comment="SAES_OUT" Name="SAES_OUT">
+        <Parameter Name="Request">
+            <PossibleValue>DMA_REQUEST_SAES_OUT</PossibleValue>
+        </Parameter>
+        <Parameter Name="Direction">
+            <PossibleValue>DMA_PERIPH_TO_MEMORY</PossibleValue>
+        </Parameter>
+        <Parameter Name="DMA_Handle">
+            <PossibleValue>hdmaout</PossibleValue>
+        </Parameter>
+        <Parameter Name="Mode">
+            <PossibleValue>DMA_NORMAL</PossibleValue>
+            <PossibleValue>DMA_CIRCULAR</PossibleValue>
+        </Parameter>
+        <Parameter Name="IpInstance">
+            <PossibleValue>SAES</PossibleValue>
+        </Parameter>
+        <Parameter Name="PeriphInc">
+            <PossibleValue>DMA_PINC_DISABLE</PossibleValue>
         </Parameter>
     </RefMode>
     <RefMode BaseMode="DMA_Request" Comment="SAI1_A" Name="SAI1_A">
@@ -2588,6 +2633,12 @@
     <ModeLogicOperator Name="OR">
         <Mode Name="DMA1 Context" RemoveDisable="true" UserName="DMA1">
             <ModeLogicOperator Name="XOR">
+                <Mode Name="Application">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_DMA1_Application"/>
+                    </SignalLogicalOp>
+                    <Semaphore>DMA1ForApplication</Semaphore>
+                </Mode>
                 <Mode Name="CortexA7NS" UserName="A7NS">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="VS_DMA1_A7NS"/>
@@ -2601,10 +2652,30 @@
                     <Condition Diagnostic="Can’t switch context as context allocation is fixed" Expression="1=0"/>
                     <Semaphore>DMA1ForA7S</Semaphore>
                 </Mode>
+                <Mode Name="FirstStageBootLoader" UserName="FSBL">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_DMA1_FSBL"/>
+                    </SignalLogicalOp>
+                    <Condition Diagnostic="Can’t switch context as context allocation is fixed" Expression="1=0"/>
+                    <Semaphore>DMA1ForFSBL</Semaphore>
+                </Mode>
+                <Mode Name="External Memory Loader" UserName="ExtMemLoader">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_DMA1_ExtMemLoader"/>
+                    </SignalLogicalOp>
+                    <Condition Diagnostic="Can’t switch context as context allocation is fixed" Expression="1=0"/>
+                    <Semaphore>DMA1ForExtMemLoader</Semaphore>
+                </Mode>
             </ModeLogicOperator>
         </Mode>
         <Mode Name="DMA2 Context" RemoveDisable="true" UserName="DMA2">
             <ModeLogicOperator Name="XOR">
+                <Mode Name="Application">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_DMA2_Application"/>
+                    </SignalLogicalOp>
+                    <Semaphore>DMA2ForApplication</Semaphore>
+                </Mode>
                 <Mode Name="CortexA7NS" UserName="A7NS">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="VS_DMA2_A7NS"/>
@@ -2618,22 +2689,56 @@
                     <Condition Diagnostic="Can’t switch context as context allocation is fixed" Expression="1=0"/>
                     <Semaphore>DMA2ForA7S</Semaphore>
                 </Mode>
+                <Mode Name="FirstStageBootLoader" UserName="FSBL">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_DMA2_FSBL"/>
+                    </SignalLogicalOp>
+                    <Condition Diagnostic="Can’t switch context as context allocation is fixed" Expression="1=0"/>
+                    <Semaphore>DMA2ForFSBL</Semaphore>
+                </Mode>
+                <Mode Name="External Memory Loader" UserName="ExtMemLoader">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_DMA2_ExtMemLoader"/>
+                    </SignalLogicalOp>
+                    <Condition Diagnostic="Can’t switch context as context allocation is fixed" Expression="1=0"/>
+                    <Semaphore>DMA2ForExtMemLoader</Semaphore>
+                </Mode>
             </ModeLogicOperator>
         </Mode>
         <Mode Name="DMA3 Context" RemoveDisable="true" UserName="DMA3">
             <ModeLogicOperator Name="XOR">
+                <Mode Name="Application">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_DMA3_Application"/>
+                    </SignalLogicalOp>
+                    <Semaphore>DMA3ForApplication</Semaphore>
+                </Mode>
+                <Mode Name="CortexA7NS" UserName="A7S">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_DMA3_A7NS"/>
+                    </SignalLogicalOp>
+                    <Condition Diagnostic="" Expression="1=0"/>
+                    <Semaphore>DMA3ForA7NS</Semaphore>
+                </Mode>
                 <Mode Name="CortexA7S" UserName="A7S">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="VS_DMA3_A7S"/>
                     </SignalLogicalOp>
                     <Semaphore>DMA3ForA7S</Semaphore>
                 </Mode>
-                <Mode Name="CortexA7NS" UserName="A7NS">
+                <Mode Name="FirstStageBootLoader" UserName="FSBL">
                     <SignalLogicalOp Name="AND">
-                        <Signal Name="VS_DMA3_A7NS"/>
+                        <Signal Name="VS_DMA3_FSBL"/>
                     </SignalLogicalOp>
                     <Condition Diagnostic="Can’t switch context as context allocation is fixed" Expression="1=0"/>
-                    <Semaphore>DMA3ForA7NS</Semaphore>
+                    <Semaphore>DMA3ForFSBL</Semaphore>
+                </Mode>
+                <Mode Name="External Memory Loader" UserName="ExtMemLoader">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_DMA3_ExtMemLoader"/>
+                    </SignalLogicalOp>
+                    <Condition Diagnostic="Can’t switch context as context allocation is fixed" Expression="1=0"/>
+                    <Semaphore>DMA3ForExtMemLoader</Semaphore>
                 </Mode>
             </ModeLogicOperator>
         </Mode>
@@ -2837,6 +2942,8 @@
                         <Mode Name="UART8_TX">
                             <Condition Diagnostic="" Expression="S_UART8_TX_RX|S_UART8_TX"/>
                         </Mode>
+                        <Mode Name="SAES_IN"/>
+                        <Mode Name="SAES_OUT"/>
                         <Mode Name="SPI4_RX">
                             <Condition Diagnostic="" Expression="SPI4_DmaReceive"/>
                         </Mode>
@@ -2910,10 +3017,19 @@
             </ModeLogicOperator>
         </Mode>
     </ModeLogicOperator>
+    <RefSignal Name="VS_DMA1_Application" Virtual="true"/>
     <RefSignal Name="VS_DMA1_A7NS" Virtual="true"/>
     <RefSignal Name="VS_DMA1_A7S" Virtual="true"/>
+    <RefSignal Name="VS_DMA1_FSBL" Virtual="true"/>
+    <RefSignal Name="VS_DMA1_ExtMemLoader" Virtual="true"/>
+    <RefSignal Name="VS_DMA2_Application" Virtual="true"/>
     <RefSignal Name="VS_DMA2_A7NS" Virtual="true"/>
     <RefSignal Name="VS_DMA2_A7S" Virtual="true"/>
-    <RefSignal Name="VS_DMA3_A7S" Virtual="true"/>
+    <RefSignal Name="VS_DMA2_FSBL" Virtual="true"/>
+    <RefSignal Name="VS_DMA2_ExtMemLoader" Virtual="true"/>
+    <RefSignal Name="VS_DMA3_Application" Virtual="true"/>
     <RefSignal Name="VS_DMA3_A7NS" Virtual="true"/>
+    <RefSignal Name="VS_DMA3_A7S" Virtual="true"/>
+    <RefSignal Name="VS_DMA3_FSBL" Virtual="true"/>
+    <RefSignal Name="VS_DMA3_ExtMemLoader" Virtual="true"/>
 </IP>

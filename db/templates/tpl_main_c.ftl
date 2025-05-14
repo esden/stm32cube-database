@@ -30,7 +30,7 @@
     #include "app_threadx.h"
 [/#if]
 #include "${main_h}"
-[#if (H7_ETH_NoLWIP?? || F4_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || H5_ETH_NoLWIP??) && HALCompliant??]
+[#if (H7_ETH_NoLWIP?? || F4_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || H5_ETH_NoLWIP?? || MP13_ETH_NoLWIP??) && HALCompliant??]
 #include "string.h"
 [/#if]
 [#if jpeg_utils_conf_h??]
@@ -52,6 +52,8 @@
 [#if Secure=="false" || TZEN=="0" ]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_inc.tmp"/][#--include freertos includes --]
 [/#if]
+
+[@common.optinclude name=contextFolder+"/Core/Src/bsp_inc.tmp"/] [#--BSP includes --]
 
 [#-- if !HALCompliant??--][#-- if HALCompliant Begin --]
 [#assign LWIPUSed = "false"]
@@ -173,7 +175,7 @@
 #define HSEM_ID_0 (0U) /* HW semaphore 0*/
 #endif
 [/#if]
-[#if TZEN=="1" && Secure=="true" && FamilyName!="STM32H5"]
+[#if TZEN=="1" && Secure=="true" && FamilyName!="STM32H5" && FamilyName!="STM32MP13"]
 #n
 /* Non-secure Vector table to jump to (internal Flash Bank2 here)             */
 /* Caution: address must correspond to non-secure internal Flash where is     */
@@ -194,6 +196,8 @@
   [#else]
 #define VTOR_TABLE_NS_START_ADDR  0x08080000UL
   [/#if]
+[#elseif isMMTApplyed?? && isMMTApplyed=="true" &&  NS_Start_Code??]
+#define VTOR_TABLE_NS_START_ADDR  ${NS_Start_Code}UL
 [#else]
 #define VTOR_TABLE_NS_START_ADDR  0x08100000UL
 [/#if]
@@ -253,8 +257,8 @@ extern PCD_HandleTypeDef ${handleName};
 [/#if]
 /* Private variables ---------------------------------------------------------*/
 [#-- WorkAround for Ticket 30863 --]
-[#if (H7_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || F4_ETH_NoLWIP??  || H5_ETH_NoLWIP??) && HALCompliant??]
-[#if H7_ETH_NoLWIP?? || F7_ETH_NoLWIP??]
+[#if (H7_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || F4_ETH_NoLWIP??  || H5_ETH_NoLWIP?? || MP13_ETH_NoLWIP??) && HALCompliant??]
+[#if H7_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || MP13_ETH_NoLWIP??]
 #if defined ( __ICCARM__ ) /*!< IAR Compiler */
 #pragma location=[#if RxDescAddress??]${RxDescAddress}[#else]0x30040000[/#if]
 ETH_DMADescTypeDef  DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
@@ -272,7 +276,11 @@ ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT] __attribute__((section(".TxDecr
 
 #endif
 [/#if] [#-- end if (H7_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || F4_ETH_NoLWIP??) --]
+[#if FamilyName=="STM32MP13"]
+ETH_TxPacketConfig_t TxConfig;
+[#else]
 ETH_TxPacketConfig TxConfig;
+[/#if]
 [#if F4_ETH_NoLWIP?? || H5_ETH_NoLWIP??]
 ETH_DMADescTypeDef  DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
 ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
@@ -360,6 +368,7 @@ ${dHandle};
 	[#if !XCUBEFREERTOS?? && (Secure=="false" || TZEN=="0")]
     [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_vars.tmp"/]   
 	[/#if]
+	[@common.optinclude name=contextFolder+"/Core/Src/bsp_common_vars.tmp"/] [#--BSP glbal variables --]
     [#-- ADD RTOS Code End--]
     [/#compress]
    [#else] [#-- if !HALCompliant : add only LPBAM handler --]
@@ -402,13 +411,12 @@ ${dHandle};
 [#if clockConfig??]
 /* Private function prototypes -----------------------------------------------*/
 [#if TZEN=="1" && Secure=="true"]
-[#if FamilyName=="STM32H5" && Structure?? && Structure=="FullSecure"]
+[#if (FamilyName=="STM32H5" && Structure?? && Structure=="FullSecure") ||  FamilyName=="STM32MP13"]
 [#else]
 static void NonSecure_Init(void);
 [/#if]
 [/#if]
-[#if rccFctName?? && ((!McuDualCore?? && TZEN=="0") || ((TZEN=="1" && Secure=="true") && rccIsSecure??) || ((TZEN=="1" && Secure=="false") && !rccIsSecure??)|| (bootMode?? && bootMode=="boot0" && cpucore=="ARM_CORTEX_M7" && McuDualCore??) || (cpucore=="ARM_CORTEX_M4" && McuDualCore?? && FamilyName=="STM32WL"))
-|| ((TZEN=="1" && Secure=="false") && (bootPathType?? && (bootPathType == "ST_IROT_UROT_SECURE_MANAGER")))]
+[#if rccFctName?? && ((!McuDualCore?? && TZEN=="0") || ((TZEN=="1" && Secure=="true") && rccIsSecure??) || ((TZEN=="1" && Secure=="false") && !rccIsSecure??)|| (bootMode?? && bootMode=="boot0" && cpucore=="ARM_CORTEX_M7" && McuDualCore??) || (cpucore=="ARM_CORTEX_M4" && McuDualCore?? && FamilyName=="STM32WL") || (FamilyName=="STM32MP13" && contextFolder?contains("Application")))]
 void SystemClock_Config(void); [#-- remove static --]
 [#if commonClockConfig??]
 void PeriphCommonClock_Config(void);
@@ -429,8 +437,10 @@ static void SystemPower_Config(void);
 [/#if]
 [#if mpuControl??] [#-- if MPU config is enabled --]
 [#--if !McuDualCore?? || (cpucore=="ARM_CORTEX_M7" && McuDualCore??)--]
+[#if bootPathType??]
 static void MPU_Initialize(void); 
-static void MPU_Config(void); 
+ [/#if]
+static void MPU_Config(void);
 [#--/#if--]  
 [/#if]    
 
@@ -441,7 +451,7 @@ static void MPU_Config(void);
 [#if HALCompliant??]
     [#list voids as void]
         [#if void.genCode && !(IpInit_ToIgnore?contains(void.ipName)) && !void.ipType?contains("thirdparty")&&!void.ipType?contains("middleware")&&!void.functionName?contains("VREFBUF")&&void.functionName!="Init" && !void.functionName?contains("MotorControl") && !void.functionName?contains("ETZPC") && !void.functionName?contains("TRACER_EMB") && !void.functionName?contains("GUI_INTERFACE")]
-            [#if !(void.functionName?contains("RF") && FamilyName!="STM32WB") ]
+            [#if !((void.functionName?contains("RF") && FamilyName!="STM32WB") || void.functionName?contains("PTA")) ]
                 [#if void.isStatic]
                     static void ${""?right_pad(2)}${void.functionName}(void);
                     [#assign staticVoids =staticVoids + " "+ '${void.functionName}']
@@ -503,8 +513,13 @@ int main(void)
   /* USER CODE END Boot_Mode_Sequence_0 */
 [/#if]
 
+[#if mpuControl?? && (FamilyName=="STM32H7" || FamilyName=="STM32H7RS" || FamilyName=="STM32F7")]
+#n#t/* MPU Configuration--------------------------------------------------------*/
+#tMPU_Config();
+[/#if]
 
 [#if ICache??] [#-- if CPU ICache is enabled --]
+/* Enable the CPU Cache */
 #n#t/* Enable I-Cache---------------------------------------------------------*/
 
     #tSCB_EnableICache();
@@ -555,7 +570,7 @@ int main(void)
 [#if isHALUsed??]
 #tHAL_Init();
 
-[#if VTOR_TABLE_ADDR?? && TZEN=="1" && Secure=="true"]
+[#if VTOR_TABLE_ADDR?? && ((TZEN=="1" && Secure=="true")||(isMMTApplyed?? && isMMTApplyed=="true" && TZEN=="0" && Secure=="-1"))]
 #n#t/* Configure The Vector Table address */
   #tSCB->VTOR = ${VTOR_TABLE_ADDR};
 [#if mpuControl??]
@@ -575,8 +590,10 @@ int main(void)
 #n#t/* MPU Initialization--------------------------------------------------------*/
 #tMPU_Initialize();
 [/#if]
+[#if FamilyName !="STM32H7" && FamilyName!="STM32H7RS" && FamilyName!="STM32F7"]
 #n#t/* MPU Configuration--------------------------------------------------------*/
 #tMPU_Config();
+[/#if]
 [/#if]
 
 [#if HSEMConfig??]
@@ -659,13 +676,13 @@ int main(void)
 [/#list]
 [#-- start NVIC configuration for LL PWR--]
 
-[#if (PWRLL?? && FamilyName!="STM32U5" && FamilyName!="STM32WBA")||(PWRLL?? && FamilyName=="STM32WBA" && PWR_interrupt?? && Secure=="false")]
+[#if (PWRLL?? && FamilyName!="STM32U5" && FamilyName!="STM32WBA")||(PWRLL?? && FamilyName=="STM32WBA" && PWR_interrupt?? )]
 [#if systemVectors??]
 [#assign systemHandlers = false]
 [#assign firstSystemInterrupt = true]
 [#assign firstPeripheralInterrupt = true]
 [#list systemVectors as initVector] 
-    [#if initVector.vector?contains("PWR") || initVector.vector?contains("WKUP")]
+    [#if initVector.vector?contains("PWR") || (initVector.vector?contains("WKUP")&& Secure=="false")|| (initVector.vector?contains("WKUP_S")&& Secure=="true")]
     [#if initVector.systemHandler=="true"]
     [#assign systemHandlers = true]
     [#if firstSystemInterrupt]
@@ -736,8 +753,7 @@ int main(void)
     [#if void.functionName?? && void.functionName?contains("SystemClock_Config") && !void.isNotGenerated]
 
 [#if rccFctName??]
-[#if (!McuDualCore?? && TZEN=="0") ||  ((TZEN=="1" && Secure=="true") && rccIsSecure??) || ((TZEN=="1" && Secure=="false") && !rccIsSecure??) || (bootMode?? && bootMode=="boot0" && cpucore=="ARM_CORTEX_M7" && McuDualCore??) || (cpucore=="ARM_CORTEX_M4" && McuDualCore?? && FamilyName=="STM32WL")
-|| ((TZEN=="1" && Secure=="false") && (bootPathType?? && (bootPathType == "ST_IROT_UROT_SECURE_MANAGER")))]
+[#if (!McuDualCore?? && TZEN=="0") ||  ((TZEN=="1" && Secure=="true") && rccIsSecure??) || ((TZEN=="1" && Secure=="false") && !rccIsSecure??) || (bootMode?? && bootMode=="boot0" && cpucore=="ARM_CORTEX_M7" && McuDualCore??) || (cpucore=="ARM_CORTEX_M4" && McuDualCore?? && FamilyName=="STM32WL") || (FamilyName=="STM32MP13" && contextFolder?contains("Application"))]
 [#if FamilyName=="STM32MP1"]
 #tif(IS_ENGINEERING_BOOT_MODE())
 #t{
@@ -900,7 +916,7 @@ int main(void)
   #t#tError_Handler();
   #t}
    [#else]
-   [#if !(void.functionName?contains("RF") && FamilyName!="STM32WB") ]
+   [#if !((void.functionName?contains("RF") && FamilyName!="STM32WB") || void.functionName?contains("PTA")) ]
   #t${void.functionName}();
      [/#if]
    [/#if]
@@ -956,23 +972,38 @@ int main(void)
   MX_ThreadX_Init();
 [/#if]
 [#list voids as void]
-[#if void.functionName?? && void.functionName?contains("APPE_Init")]
+    [#if FamilyName="STM32WB"]
+        [#if void.functionName?? && void.functionName?contains("APPE_Init")]
 [#-- BZ 114099 --]
-[#if !void.isNotGenerated && void.genCode]
+            [#if !void.isNotGenerated && void.genCode]
+
 #t/* Init code for STM32_WPAN */
-[#if FamilyName="STM32WB"]
 #tMX_APPE_Init();
-[#elseif FamilyName="STM32WBA"]
-#tMX_APPE_Init(NULL);
-[/#if]
-[/#if]
-[/#if]
+            [/#if]
+        [/#if]
+    [/#if]
 [/#list]
 [#if (FREERTOS?? && !HALCompliant??) || XCUBEFREERTOS??][#-- If FreeRtos is used --]
+
+
   /* Call init function for freertos objects (in freertos.c) */
   MX_FREERTOS_Init(); 
 [/#if][#-- If FreeRtos is used --]
 #n
+[#-- BSP init --]
+[@common.optinclude name=contextFolder+"/Core/Src/bsp_common_init.tmp"/]
+[@common.optinclude name=contextFolder+"/Core/Src/bsp_common_demo_before_while.tmp"/][#list voids as void]
+    [#if FamilyName="STM32WBA"]
+        [#if void.functionName?? && void.functionName?contains("APPE_Init")]
+[#-- BZ 114099 --]
+            [#if !void.isNotGenerated && void.genCode]
+
+#t/* Init code for STM32_WPAN */
+#tMX_APPE_Init(NULL);
+            [/#if]
+        [/#if]
+    [/#if]
+[/#list]
 
 [#if Secure=="false" || TZEN=="0" ]
  [@common.optinclude name=contextFolder+mxTmpFolder+"/rtos_kernelStart.tmp"/]
@@ -981,7 +1012,7 @@ int main(void)
   /* We should never get here as control is now taken by the scheduler */
 [/#if]
 [#if TZEN=="1" && Secure=="true"][#-- FreeRTOS is not enabled in that case --]
-[#if FamilyName=="STM32H5" && Structure?? && Structure=="FullSecure"]
+[#if (FamilyName=="STM32H5" && Structure?? && Structure=="FullSecure") ||  FamilyName=="STM32MP13"]
 [#else]
 #n
 #t/*************** Setup and jump to non-secure *******************************/
@@ -1006,6 +1037,7 @@ int main(void)
 #t/* USER CODE BEGIN WHILE */
 #twhile (1)
 #t{
+[@common.optinclude name=contextFolder+"/Core/Src/bsp_common_demo_inside_while.tmp"/]
 #t#t/* USER CODE END WHILE */
 [#if USB_HOST?? && !FREERTOS??]
 #t#tMX_USB_HOST_Process();
@@ -1045,7 +1077,7 @@ int main(void)
 }
 [/#if]
 [#if TZEN=="1" && Secure=="true"]
-[#if FamilyName=="STM32H5" && Structure?? && Structure=="FullSecure"]
+[#if (FamilyName=="STM32H5" && Structure?? && Structure=="FullSecure") || FamilyName=="STM32MP13"]
 [#else]
 #n
 /**
@@ -1073,7 +1105,7 @@ static void NonSecure_Init(void)
 [/#if]
 [#compress]
 
-[#if clockConfig?? && rccFctName?? && ((!McuDualCore?? && TZEN=="0") ||  ((TZEN=="1" && Secure=="true") && rccIsSecure??) || ((TZEN=="1" && Secure=="false") && !rccIsSecure??) || (bootMode?? && bootMode=="boot0" && cpucore=="ARM_CORTEX_M7") ||(cpucore=="ARM_CORTEX_M4" && FamilyName=="STM32WL")
+[#if clockConfig?? && rccFctName?? && ((!McuDualCore?? && TZEN=="0") ||  ((TZEN=="1" && Secure=="true") && rccIsSecure??) || ((TZEN=="1" && Secure=="false") && !rccIsSecure??) || (bootMode?? && bootMode=="boot0" && cpucore=="ARM_CORTEX_M7") ||(cpucore=="ARM_CORTEX_M4" && FamilyName=="STM32WL") || (FamilyName=="STM32MP13" && contextFolder?contains("Application"))
 || ((TZEN=="1" && Secure=="false") && (bootPathType?? && (bootPathType == "ST_IROT_UROT_SECURE_MANAGER")))) ]
 
 #n/**
@@ -1196,7 +1228,11 @@ static void SystemPower_Config(void)
    
     [#if initVector.vector=="PVD_IRQn" || initVector.vector=="PVD_AVD_IRQn" || initVector.vector=="PWR_S3WU_IRQn"|| initVector.vector=="PVD_PVM_IRQn" || initVector.vector=="WKUP_IRQn"]
     #t/* ${initVector.vector} interrupt configuration */
+    [#if DIE != "DIE501"]
     #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+    [#else]
+    #tIRQ_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
+    [/#if]
     [/#if]
     
  
@@ -1204,7 +1240,11 @@ static void SystemPower_Config(void)
     [#if initVector.systemHandler=="false"]
     [#if initVector.vector=="PVD_IRQn" || initVector.vector=="PVD_AVD_IRQn" || initVector.vector=="PWR_S3WU_IRQn" || initVector.vector=="PVD_PVM_IRQn"|| initVector.vector=="WKUP_IRQn"]
 [#if EnableCode??]
+      [#if DIE != "DIE501"]
       #tHAL_NVIC_EnableIRQ(${initVector.vector});
+      [#else]
+      #tIRQ_Enable(${initVector.vector});
+      [/#if]      
     [/#if]
     [/#if]
     [/#if]
@@ -1272,9 +1312,17 @@ static void MX_NVIC_Init(void)
     #t{
     [@common.generateUsbWakeUpInterrupt ipName=ipName tabN=2/]
     [#if vector.usedDriver == "HAL"]
+    [#if DIE != "DIE501"]
     #t#tHAL_NVIC_SetPriority(${vector.vector}, ${vector.preemptionPriority}, ${vector.subPriority});
+    [#else]
+    #t#tIRQ_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
+    [/#if]
 [#if EnableCode??]
+    [#if DIE != "DIE501"]
     #t#tHAL_NVIC_EnableIRQ(${vector.vector});
+    [#else]
+    #t#tIRQ_Enable(${initVector.vector});
+    [/#if]    
 [/#if]
     [#else]
       [#if !NVICPriorityGroup??]
@@ -1289,7 +1337,11 @@ static void MX_NVIC_Init(void)
     #t}
   [#else]
     [#if vector.usedDriver == "HAL"]
+    [#if DIE != "DIE501"]
     #tHAL_NVIC_SetPriority(${vector.vector}, ${vector.preemptionPriority}, ${vector.subPriority});
+    [#else]
+    #tIRQ_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
+    [/#if]
     [#else]
       [#if !NVICPriorityGroup??]
     #tNVIC_SetPriority(${vector.vector}, ${vector.preemptionPriority});
@@ -1300,7 +1352,11 @@ static void MX_NVIC_Init(void)
     [#if vector.systemHandler=="false"]
 [#if EnableCode??]
       [#if vector.usedDriver == "HAL"]
+      [#if DIE != "DIE501"]
       #tHAL_NVIC_EnableIRQ(${vector.vector});
+      [#else]
+      #tIRQ_Enable(${initVector.vector});
+      [/#if]
       [#else]
       #tNVIC_EnableIRQ(${vector.vector});
       [/#if]
@@ -1402,6 +1458,9 @@ static void MX_NVIC_Init(void)
      [#assign instName = instanceData.instanceName]
 
         [#assign halMode= instanceData.halMode]
+		[#if halMode=="USBH" && FamilyName=="STM32MP13"]
+		[#assign halMode= "USB"]
+		[/#if]
 /**
 #t* @brief  ${instName} Initialization Function
 #t* @param  None
@@ -1666,7 +1725,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   /* USER CODE END Callback 1 */
 }
 [/#if]
-
+[@common.optinclude name=contextFolder+"/Core/Src/bsp_common_demo_fct.tmp"/] [#--BSP functions and callbacks --]
 /**
   * @brief  This function is executed in case of error occurrence.
   * @retval None

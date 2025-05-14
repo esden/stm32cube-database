@@ -265,7 +265,7 @@ typedef struct{
 /* Private variables ---------------------------------------------------------*/
 [#if SERVICE_NUMBER_OF_CHARACTERISTICS != "0"]
   [#list 1..SERVICE_NUMBER_OF_CHARACTERISTICS?number as characteristic]
-static const uint8_t Size[@characteristicShortNameCapitalized characteristic/] = ${SERVICES_CHARS_VALUE_LENGTH[characteristic?string]};
+static const uint16_t Size[@characteristicShortNameCapitalized characteristic/] = ${SERVICES_CHARS_VALUE_LENGTH[characteristic?string]};
   [/#list]
 [/#if]
 
@@ -297,15 +297,31 @@ do {\
     uuid_struct[12] = uuid_12; uuid_struct[13] = uuid_13; uuid_struct[14] = uuid_14; uuid_struct[15] = uuid_15; \
 }while(0)
 
-/* Hardware Characteristics Service */
+        [#if myHash["SERVICE"+SvcNbr+"_UUID_TYPE"] == "0x02"]
 /*
  The following 128bits UUIDs have been generated from the random UUID
  generator:
- D973F2E0-B19E-11E2-9E96-0800200C9A66: Service 128bits UUID
- D973F2E1-B19E-11E2-9E96-0800200C9A66: Characteristic_1 128bits UUID
- D973F2E2-B19E-11E2-9E96-0800200C9A66: Characteristic_2 128bits UUID
- */
+          [#if myHash["SERVICE"+SvcNbr+"_UUID_128_INPUT_TYPE"] == "0"]
+ 0000${myHash["SERVICE"+SvcNbr+"_UUID"]?replace(" ","")}CC7A482A984A7F2ED5B3E58F: Service 128bits UUID
+          [#else]
+ ${myHash["SERVICE"+SvcNbr+"_UUID"]?replace(" ","")}: Service 128bits UUID
+          [/#if]
+        [/#if]
+            [#if SERVICE_NUMBER_OF_CHARACTERISTICS != "0"]
+              [#list 1..SERVICE_NUMBER_OF_CHARACTERISTICS?number as characteristic]
+                [#if SERVICES_CHARS_INFO[characteristic?string][item_UUID_TYPE] == "0x02"]
+                  [#if SERVICES_CHARS_INFO[characteristic?string][item_UUID_128_INPUT_TYPE] == "0"]
+ 0000${SERVICES_CHARS_INFO[characteristic?string][item_UUID]?replace(" ","")}8E2245419D4C21EDAE82ED19: Characteristic 128bits UUID
+                  [#else]
+ ${SERVICES_CHARS_INFO[characteristic?string][item_UUID]?replace(" ","")}: Characteristic 128bits UUID
+                  [/#if]
+                [/#if]
+              [/#list]
+            [/#if]
         [#if myHash["SERVICE"+SvcNbr+"_UUID_TYPE"] == "0x02"]
+ */
+        [/#if]
+   [#if myHash["SERVICE"+SvcNbr+"_UUID_TYPE"] == "0x02"]
             [#if myHash["SERVICE"+SvcNbr+"_UUID_128_INPUT_TYPE"] == "0"]
 #define COPY_${SERVICE_SHORT_NAME_UpperCase}_UUID(uuid_struct)       COPY_UUID_128(uuid_struct,0x00,0x00,0x${myHash["SERVICE"+SvcNbr+"_UUID"]?lower_case?replace(" ",",0x")},0xcc,0x7a,0x48,0x2a,0x98,0x4a,0x7f,0x2e,0xd5,0xb3,0xe5,0x8f)
             [#else]
@@ -803,11 +819,11 @@ void ${SERVICE_SHORT_NAME_UpperCase}_Init(void)
                              &(${SERVICE_SHORT_NAME_UpperCase}_Context.${SERVICE_SHORT_NAME?capitalize}SvcHdle));
   if (ret != BLE_STATUS_SUCCESS)
   {
-    APP_DBG_MSG("  Fail   : aci_gatt_add_service command: ${SERVICE_SHORT_NAME}, error code: 0x%x \n\r", ret);
+    LOG_INFO_APP("  Fail   : aci_gatt_add_service command: ${SERVICE_SHORT_NAME}, error code: 0x%x \n\r", ret);
   }
   else
   {
-    APP_DBG_MSG("  Success: aci_gatt_add_service command: ${SERVICE_SHORT_NAME} \n\r");
+    LOG_INFO_APP("  Success: aci_gatt_add_service command: ${SERVICE_SHORT_NAME} \n\r");
   }
 
     [#if SERVICE_NUMBER_OF_CHARACTERISTICS != "0"]
@@ -882,11 +898,11 @@ void ${SERVICE_SHORT_NAME_UpperCase}_Init(void)
                           &(${SERVICE_SHORT_NAME_UpperCase}_Context.[@characteristicShortNameCapitalized characteristic/]CharHdle));
   if (ret != BLE_STATUS_SUCCESS)
   {
-    APP_DBG_MSG("  Fail   : aci_gatt_add_char command   : [@characteristicShortName characteristic/], error code: 0x%2X\n", ret);
+    LOG_INFO_APP("  Fail   : aci_gatt_add_char command   : [@characteristicShortName characteristic/], error code: 0x%2X\n", ret);
   }
   else
   {
-    APP_DBG_MSG("  Success: aci_gatt_add_char command   : [@characteristicShortName characteristic/]\n");
+    LOG_INFO_APP("  Success: aci_gatt_add_char command   : [@characteristicShortName characteristic/]\n");
   }
 
   /* USER CODE BEGIN SVCCTL_InitService${SvcNbr}Char${characteristic} */
@@ -929,11 +945,11 @@ tBleStatus ${SERVICE_SHORT_NAME_UpperCase}_UpdateValue(${SERVICE_SHORT_NAME_Uppe
                                        (uint8_t *)pData->p_Payload);
       if (ret != BLE_STATUS_SUCCESS)
       {
-        APP_DBG_MSG("  Fail   : aci_gatt_update_char_value [@characteristicShortName characteristic/] command, error code: 0x%2X\n", ret);
+        LOG_INFO_APP("  Fail   : aci_gatt_update_char_value [@characteristicShortName characteristic/] command, error code: 0x%2X\n", ret);
       }
       else
       {
-        APP_DBG_MSG("  Success: aci_gatt_update_char_value [@characteristicShortName characteristic/] command\n");
+        LOG_INFO_APP("  Success: aci_gatt_update_char_value [@characteristicShortName characteristic/] command\n");
       }
       /* USER CODE BEGIN Service${SvcNbr}_Char_Value_${characteristic?string}*/
 

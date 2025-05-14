@@ -333,6 +333,16 @@
         <Element id="ADCoutput" type="activeOutput" refParameter="ADCFreq_Value"  x="1055" y="1045"  refEnable="ADCEnable">
             <Input signalId="ADCCLK" from="ADCMult"/>
         </Element>
+		
+        <Element id="ASMult" type="multiplexor" refParameter="ASClockSelection" orientation="LEFT" x="908" y="1265" refEnable="ASEnable">
+            <Input signalId="PLLPCLK"      from="PLL1P"         refValue="RCC_ASCLKSOURCE_PLL1P"/>            
+			<Input signalId="PLLQCLK"      from="PLL1Q"         refValue="RCC_ASCLKSOURCE_PLL1Q"/>
+            
+            <Output signalId="ASCLK" to="ASoutput"/>
+        </Element>
+        <Element id="ASoutput" type="activeOutput" refParameter="ASFreq_Value"  x="1055" y="1280"  refEnable="ASEnable">
+            <Input signalId="ASCLK" from="ASMult"/>
+        </Element>
 
       
         <Element id="I2C1Mult" type="multiplexor" refParameter="I2C1CLockSelection" orientation="LEFT" x="997" y="750" refEnable="I2C1Enable" refSecure="I2C1TZEnable">
@@ -547,20 +557,20 @@
             <Element id="PLLFRACN" type="fractional" refParameter="PLLFRACN" x="507" y="580" refLock="PLLIsSecureLocked">
                 <Output signalId="PLL1FRACNClk" to="PLLN"/>
             </Element>
-            <Element id="PLL1P" type="devisor" refParameter="PLL1P" x="575" y="586" refEnable="SAI1Enable,ADCEnable,MCOEnable" refLock="PLLIsSecureLocked">
+            <Element id="PLL1P" type="devisor" refParameter="PLL1P" x="575" y="586" refEnable="ASEnable,SAI1Enable,ADCEnable,MCOEnable" refLock="PLLIsSecureLocked">
                 <Input signalId="VCOOutput" from="PLLN"/>
                 <Output signalId="PLLPCLK" to="PLLPoutput"/> 
             </Element>
-            <Element id="PLLPoutput" type="output" refParameter="PLLPoutputFreq_Value" x="661" y="585" refEnable="SAI1Enable,ADCEnable,MCOEnable">
+            <Element id="PLLPoutput" type="output" refParameter="PLLPoutputFreq_Value" x="661" y="585" refEnable="ASEnable,SAI1Enable,ADCEnable,MCOEnable">
                 <Input signalId="PLLPCLK" from="PLL1P"/>
             </Element>
 
-            <Element id="PLL1Q" type="devisor" refParameter="PLL1Q" x="575" y="548" refEnable="SAI1Enable,RNGEnable,MCOEnable" refLock="PLLIsSecureLocked">
+            <Element id="PLL1Q" type="devisor" refParameter="PLL1Q" x="575" y="548" refEnable="ASEnable,SAI1Enable,RNGEnable,MCOEnable" refLock="PLLIsSecureLocked">
                 <Input signalId="VCOOutput" from="PLLN"/>
                 <Output signalId="PLLQCLK" to="CK48Mult"/>
                 <Output signalId="PLLQCLK" to="PLLQoutput"/>
             </Element>
-            <Element id="PLLQoutput" type="output" refParameter="PLLQoutputFreq_Value" x="661" y="547" refEnable="SAI1Enable,RNGEnable,MCOEnable">
+            <Element id="PLLQoutput" type="output" refParameter="PLLQoutputFreq_Value" x="661" y="547" refEnable="ASEnable,SAI1Enable,RNGEnable,MCOEnable">
                 <Input signalId="PLLQCLK" from="PLL1Q"/>
             </Element>
 				
@@ -591,6 +601,7 @@
         <Signal id="I2C1CLK"/>
         <Signal id="I2C3CLK"/>
         <Signal id="ADCCLK"/>
+        <Signal id="ASCLK"/>
         <Signal id="CK48CLK"/>
         <Signal id="SAI1CLK"/>
         <Signal id="MCO1DivInput"/>
@@ -826,13 +837,18 @@
     <Label id="I2C3HSILabel"    type="signal"      text="SYSCLK"         posX="954" posY="940" refEnable="I2C3Enable"/>
     <Label id="I2C3PCLK1Label"  type="signal"      text="HSI"            posX="954" posY="977" refEnable="I2C3Enable"/>
     
-    <Label id="ADCMMUXLabel"   type="muxLabel"    text="ADC4 Clock Mux" posX="845" posY="970"  refEnable="ADCEnable"/>
+    <Label id="ADCMMUXLabel"   type="muxLabel"    text="ADC4 Clock Mux" posX="865" posY="970"  refEnable="ADCEnable"/>
     <Label id="ADCOutput"      type="SpecialInfo" text="To ADC4 (MHz)"  posX="1113" posY="1050"  refEnable="ADCEnable"/> 	
     <Label id="ADCppLabel"    type="signal"      text="HCLK1"       posX="858" posY="990"  refEnable="ADCEnable"/>
     <Label id="ADCSYSCLKLabel" type="signal"      text="SYSCLK"       posX="858" posY="1015"  refEnable="ADCEnable"/>
     <Label id="ADCHSEQLabel"   type="signal"      text="HSE"           posX="858" posY="1040"  refEnable="ADCEnable"/>
     <Label id="ADCHSIQLabel"   type="signal"      text="HSI"           posX="858" posY="1070"  refEnable="ADCEnable"/>
     <Label id="ADCHSIQLabel"   type="signal"      text="PLL1P"           posX="858" posY="1095"  refEnable="ADCEnable"/>
+	
+    <Label id="ASMMUXLabel"   type="muxLabel"    text="Audio Clock Mux"      posX="865" posY="1229"  refEnable="ASEnable"/>
+    <Label id="ASOutput"      type="SpecialInfo" text="To Audio Sync (MHz)"  posX="1113" posY="1285"  refEnable="ASEnable"/> 	
+    <Label id="ASPLL"         type="signal"      text="PLL1P"       posX="858" posY="1256"  refEnable="ASEnable"/>
+    <Label id="ASPLL"         type="signal"      text="PLL1Q"       posX="858" posY="1297"  refEnable="ASEnable"/>
     
     <!--RNG mux-->
     <Label id="RNGMUXLabel"    type="muxLabel"    text="RNG Clock Mux" posX="950" posY="1105" refEnable="RNGEnable"/>

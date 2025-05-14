@@ -10,7 +10,21 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
-
+[#assign PG_SKIP_LIST = "False"]
+[#assign myHash = {}]
+[#list SWIPdatas as SWIP]
+    [#if SWIP.defines??]
+        [#list SWIP.defines as definition]
+            [#assign myHash = {definition.name:definition.value} + myHash]
+        [/#list]
+    [/#if]
+[/#list]
+[#--
+Key & Value:
+[#list myHash?keys as key]
+Key: ${key}; Value: ${myHash[key]}
+[/#list]
+--]
 
 /* Includes ------------------------------------------------------------------*/
 #if defined (__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)
@@ -31,6 +45,7 @@
 #include "stm32wbaxx.h"
 #include "utilities_common.h"
 #include "cmsis_compiler.h"
+#include "peripheral_init.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -113,13 +128,13 @@ static void Standby_Restore_GPIO(void)
 
   // ---------------------------------------------------------------------------
 
-  *(uint32_t *)0x42020000 = 0xA8000000;  // Configure GPIOA_MODER 15:13 AF (JTAG), 12:0 In  STANDBY MESURMENTS OK
+  *(uint32_t *)0x42020000 = 0xA8000000;  /* Configure GPIOA_MODER 15:13 AF (JTAG), 12:0 Input */
 
-  __ASM("mov r0, r0"); // Delay to allow GPIOx_IDR.IDy to be updated after GPIOx_MODER is set to Input
-  __ASM("mov r0, r0"); // Delay to allow GPIOx_IDR.IDy to be updated after GPIOx_MODER is set to Input
+  __ASM("mov r0, r0"); /* Delay to allow GPIOx_IDR.IDy to be updated after GPIOx_MODER is set to Input */
+  __ASM("mov r0, r0"); /* Delay to allow GPIOx_IDR.IDy to be updated after GPIOx_MODER is set to Input */
 
   temp = LL_GPIO_ReadInputPort(GPIOA);
-  LL_GPIO_WriteOutputPort(GPIOA, temp); // Restore Port A output drive levels
+  LL_GPIO_WriteOutputPort(GPIOA, temp); /* Restore Port A output drive levels */
 
   /* GPIOA_MODER set to reset value */
   *(uint32_t *)0x42020000 = 0xABFFFFFF;
@@ -168,16 +183,19 @@ static void Standby_Restore_GPIO(void)
 
 static void Enter_Stop_Standby_Mode(void)
 {
-      /* Disabling ICACHE */
+  /* Disabling ICACHE */
   LL_ICACHE_Disable();
-
+#if defined(STM32WBAXX_SI_CUT1_0)
   /* Wait until ICACHE_SR.BUSYF is cleared */
   while(LL_ICACHE_IsActiveFlag_BUSY() == 1U);
 
   /* Wait until ICACHE_SR.BSYENDF is set */
   while(LL_ICACHE_IsActiveFlag_BSYEND() == 0U);
-
+#endif /* STM32WBAXX_SI_CUT1_0 */
+  
+#if (CFG_SCM_SUPPORTED == 1)
   scm_setwaitstates(LP);
+#endif /* CFG_SCM_SUPPORTED */
 
   LL_LPM_EnableDeepSleep();
 
@@ -186,17 +204,20 @@ static void Enter_Stop_Standby_Mode(void)
 
 static void Exit_Stop_Standby_Mode(void)
 {
-    LL_ICACHE_Enable();
-    while(LL_ICACHE_IsEnabled() == 0U);
-
-    if (LL_PWR_IsActiveFlag_STOP() == 1U)
-    {
-      scm_setup();
-    }
-    else
-    {
-      scm_setwaitstates( RUN );
-    }
+#if defined(STM32WBAXX_SI_CUT1_0)
+  LL_ICACHE_Enable();
+  while(LL_ICACHE_IsEnabled() == 0U);
+#endif /* STM32WBAXX_SI_CUT1_0 */
+#if (CFG_SCM_SUPPORTED == 1)
+  if (LL_PWR_IsActiveFlag_STOP() == 1U)
+  {
+    scm_setup();
+  }
+  else
+  {
+    scm_setwaitstates( RUN );
+  }
+#endif /* CFG_SCM_SUPPORTED */
 }
 
 void PWR_EnterOffMode( void )
@@ -235,7 +256,9 @@ void PWR_EnterOffMode( void )
 
   /* At this point, system comes out of standby. Restore selected CPU peripheral registers */
   restore_system_register();
+#if defined(STM32WBAXX_SI_CUT1_0)
   SYS_WAITING_CYCLES_25();
+#endif /* STM32WBAXX_SI_CUT1_0 */
 
   SYSTEM_DEBUG_SIGNAL_RESET(LOW_POWER_STANDBY_MODE_ACTIVE);
 
@@ -251,7 +274,7 @@ void PWR_ExitOffMode( void )
 
   /* USER CODE END PWR_ExitOffMode_1 */
 
-  if( 1UL == boot_after_standby )
+  if ( 1UL == boot_after_standby )
   {
     boot_after_standby = 0;
 
@@ -279,22 +302,16 @@ void PWR_ExitOffMode( void )
 #endif /* PREFETCH_ENABLE */
 
     Standby_Restore_GPIO();
-    MX_GPIO_Init();
+
+    MX_StandbyExit_PeripharalInit();
 
     SYSTEM_DEBUG_SIGNAL_RESET(LOW_POWER_STANDBY_MODE_ACTIVE);
     SYSTEM_DEBUG_SIGNAL_SET(LOW_POWER_STANDBY_MODE_EXIT);
 
-    /* RNG */
-    MX_RNG_Init();
-
-    /* Restore ICACHE */
-    MX_ICACHE_Init();
-
-    /* Restore ADC */
-    MX_ADC4_Init();
-
     /* Restore system clock configuration */
+#if (CFG_SCM_SUPPORTED == 1)
     scm_standbyexit();
+#endif /* CFG_SCM_SUPPORTED */
 
     /* Enable RTC peripheral clock */
     LL_PWR_EnableBkUpAccess();
@@ -333,8 +350,9 @@ void PWR_EnterStopMode( void )
   LL_PWR_SetPowerMode(LL_PWR_MODE_STOP1);
 
   __WFI( );
+#if defined(STM32WBAXX_SI_CUT1_0)
   SYS_WAITING_CYCLES_25();
-
+#endif /* STM32WBAXX_SI_CUT1_0 */
   /* USER CODE BEGIN PWR_EnterStopMode_2 */
 
   /* USER CODE END PWR_EnterStopMode_2 */
@@ -382,20 +400,17 @@ void PWR_ExitSleepMode( void )
   /* USER CODE END PWR_ExitSleepMode */
 }
 
-static uint32_t standby_cnt = 0; // Debug only
 uint32_t is_boot_from_standby(void)
 {
-#if (CFG_DBG_SUPPORTED == 0)
+#if (CFG_DEBUGGER_LEVEL > 1)
   LL_DBGMCU_DisableDBGStopMode();
   LL_DBGMCU_DisableDBGStandbyMode();
-#endif
+#endif /* CFG_DEBUGGER_LEVEL */
 
   __HAL_RCC_PWR_CLK_ENABLE();
 
   LL_PWR_EnableUltraLowPowerMode();
   __HAL_FLASH_SLEEP_POWERDOWN_ENABLE();
-
-  standby_cnt++;
 
   /* Ensure this is a return from Standby, and not a reset */
   if( (LL_PWR_IsActiveFlag_SB() == 1UL ) &&

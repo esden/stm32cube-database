@@ -101,7 +101,7 @@ typedef enum
 } APP_BLE_ConnStatus_t;
 [/#if]
 --]
-
+[#if (myHash["BLE_MODE_HOST_SKELETON"] != "Enabled")]
 typedef enum
 {
   APP_BLE_IDLE,
@@ -120,6 +120,7 @@ typedef enum
 [/#if]
 
 } APP_BLE_ConnStatus_t;
+[/#if]
 
 /**
   * HCI Event Packet Types
@@ -292,7 +293,7 @@ extern TX_SEMAPHORE PROC_GAP_COMPLETE_Sem;
 
 /* USER CODE END EM */
 
-/* Exported functions ---------------------------------------------*/
+/* Exported functions prototypes ---------------------------------------------*/
 void APP_BLE_Init(void);
 [#if  (myHash["BLE_MODE_PERIPHERAL"] == "Enabled")]
 APP_BLE_ConnStatus_t APP_BLE_Get_Server_Connection_Status(void);
@@ -309,16 +310,12 @@ void APP_BLE_Procedure_Gap_Peripheral(ProcGapPeripheralId_t ProcGapPeripheralId)
 [#if (myHash["BLE_MODE_CENTRAL"] == "Enabled")]
 void APP_BLE_Procedure_Gap_Central(ProcGapCentralId_t ProcGapCentralId);
 [/#if]
-/* USER CODE BEGIN EF */
-[#if PG_FILL_UCS == "True"]
-[#if PG_BSP_NUCLEO_WBA52CG == 1]
-void APP_BLE_Key_Button1_Action(void);
-void APP_BLE_Key_Button2_Action(void);
-void APP_BLE_Key_Button3_Action(void);
+[#if (myHash["BLE_OPTIONS_LL_ONLY"] == "BLE_OPTIONS_LL_ONLY")]
+const uint8_t* BleGetBdAddress(void);
 [/#if]
-[/#if]
+/* USER CODE BEGIN EFP */
 
-/* USER CODE END EF */
+/* USER CODE END EFP */
 
 #ifdef __cplusplus
 }

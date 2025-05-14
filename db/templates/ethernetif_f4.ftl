@@ -341,18 +341,24 @@ static void low_level_init(struct netif *netif)
   #endif /* LWIP_ARP */
       
 [#if with_rtos == 1]
-[#if cmsis_version = "v2"]
+[#if cmsis_version = "v1"]
   /* create a binary semaphore used for informing ethernetif of frame reception */
-  RxPktSemaphore = osSemaphoreNew(1, 1, NULL);
-  
+  osSemaphoreDef(RxSem);
+  RxPktSemaphore = osSemaphoreCreate(osSemaphore(RxSem), 1);
+
   /* create a binary semaphore used for informing ethernetif of frame transmission */
-  TxPktSemaphore = osSemaphoreNew(1, 1, NULL);
+  osSemaphoreDef(TxSem);
+  TxPktSemaphore = osSemaphoreCreate(osSemaphore(TxSem), 1);
+
+  /* Decrease the semaphore's initial count from 1 to 0 */
+  osSemaphoreWait(RxPktSemaphore, 0);
+  osSemaphoreWait(TxPktSemaphore, 0);
 [#else][#-- else cmsis_version --]
   /* create a binary semaphore used for informing ethernetif of frame reception */
-  RxPktSemaphore = xSemaphoreCreateBinary();
-  
+  RxPktSemaphore = osSemaphoreNew(1, 0, NULL);
+
   /* create a binary semaphore used for informing ethernetif of frame transmission */
-  TxPktSemaphore = xSemaphoreCreateBinary();
+  TxPktSemaphore = osSemaphoreNew(1, 0, NULL);
 [/#if][#-- endif cmsis_version --]
 
   /* create the task that handles the ETH_MAC */
@@ -514,17 +520,20 @@ static err_t low_level_output(struct netif *netif, struct pbuf *p)
 [#if with_rtos == 1]
   pbuf_ref(p);
   
-  HAL_ETH_Transmit_IT(&heth, &TxConfig);
+  if (HAL_ETH_Transmit_IT(&heth, &TxConfig) == HAL_OK) {
 [#if cmsis_version = "v1"]
-  while(osSemaphoreWait(TxPktSemaphore, TIME_WAITING_FOR_INPUT)!=osOK)
+    while(osSemaphoreWait(TxPktSemaphore, TIME_WAITING_FOR_INPUT)!=osOK)
 [#else]
-  while(osSemaphoreAcquire(TxPktSemaphore, TIME_WAITING_FOR_INPUT)!=osOK)
+    while(osSemaphoreAcquire(TxPktSemaphore, TIME_WAITING_FOR_INPUT)!=osOK)
 [/#if][#-- endif cmsis_version --]
 
-  {
-  }
+    {
+    }
 
-  HAL_ETH_ReleaseTxPacket(&heth);
+    HAL_ETH_ReleaseTxPacket(&heth);
+  } else {
+    pbuf_free(p);
+  }
 [#else][#-- endif with_rtos --]
   HAL_ETH_Transmit(&heth, &TxConfig, ETH_DMA_TRANSMIT_TIMEOUT);
 [/#if][#-- endelse with_rtos --]

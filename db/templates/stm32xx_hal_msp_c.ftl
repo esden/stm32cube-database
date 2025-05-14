@@ -165,18 +165,26 @@ void HAL_MspInit(void)
 #t/* Peripheral interrupt init */
 [/#if]
 
-[#if (initVector.codeInMspInit && initVector.usedDriver=="HAL" && initVector.vector!="RCC_IRQn" && initVector.vector!="RCC_WAKEUP_IRQn") || (FamilyName=="STM32WBA" && PWR_interrupt?? && Secure=="false" && initVector.vector?contains("WKUP") && initVector.usedDriver=="HAL")]
+[#if (initVector.codeInMspInit && initVector.usedDriver=="HAL" && initVector.vector!="RCC_IRQn" && initVector.vector!="RCC_WAKEUP_IRQn") || (FamilyName=="STM32WBA" && PWR_interrupt?? && Secure=="false" && initVector.vector?contains("WKUP") && initVector.usedDriver=="HAL")|| (FamilyName=="STM32WBA" && PWR_interrupt?? &&  initVector.vector?contains("WKUP_S") && initVector.usedDriver=="HAL")]
     [#if initVector.systemHandler=="false" || initVector.preemptionPriority!="0" || initVector.subPriority!="0"]
     [#if initVector.vector!="SysTick_IRQn"]
     [#if (initVector.vector!="PVD_AVD_IRQn" && FamilyName=="STM32U5") && (initVector.vector!="PVD_PVM_IRQn" && FamilyName=="STM32U5") || (initVector.vector!="PVD_IRQn" && FamilyName=="STM32WBA" )]
     [#if !(initVector.vector="RADIO_IRQn" && LOW_RADIO?? ) ]
     #t/* ${initVector.vector} interrupt configuration */
+    [#if DIE != "DIE501"]    
     #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+    [#else]
+    #tIRQ_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
+    [/#if]
     [/#if]
  [/#if]
 [#if ((FamilyName!="STM32U5" && FamilyName!="STM32WBA"))]
     #t/* ${initVector.vector} interrupt configuration */
+    [#if DIE != "DIE501"]
     #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+    [#else]
+    #tIRQ_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
+    [/#if]
     [/#if]
     [/#if]
     [/#if]
@@ -193,7 +201,11 @@ void HAL_MspInit(void)
     [/#if]
 [#if (FamilyName!="STM32U5" && (FamilyName!="STM32WBA"))]
  [#if EnableCode??]
+ [#if DIE != "DIE501"]
     #tHAL_NVIC_EnableIRQ(${initVector.vector});
+  [#else]
+    #tIRQ_Enable(${initVector.vector});
+  [/#if]  
  [/#if]
     [/#if]
 [/#if]
@@ -206,13 +218,17 @@ void HAL_MspInit(void)
     #t/* ${initVector.vector} interrupt configuration */
     #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
     [/#if]
-[#if (FamilyName!="STM32U5" && (FamilyName!="STM32WBA")) || (FamilyName=="STM32WBA" && PWR_interrupt?? && Secure=="false" && initVector.vector?contains("WKUP") && initVector.usedDriver=="HAL")]
+[#if (FamilyName!="STM32U5" && (FamilyName!="STM32WBA")) || (FamilyName=="STM32WBA" && PWR_interrupt?? && Secure=="false" && initVector.vector?contains("WKUP") && initVector.usedDriver=="HAL")|| (FamilyName=="STM32WBA" && PWR_interrupt?? &&  initVector.vector?contains("WKUP_S") && initVector.usedDriver=="HAL")]
         [#if (McuName?starts_with("STM32G0B1") || McuName?starts_with("STM32G0C1")) && initVector.vector=="RCC_IRQn"]
     #t/* RCC_CRS_IRQn interrupt configuration */
     #tHAL_NVIC_SetPriority(RCC_CRS_IRQn, ${initVector.preemptionPriority}, ${initVector.subPriority});
     [#else]
     #t/* ${initVector.vector} interrupt configuration */
+    [#if DIE != "DIE501"]
     #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+    [#else]
+    #tIRQ_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
+    [/#if]
     [/#if]
     [/#if]
     [/#if]
@@ -223,12 +239,17 @@ void HAL_MspInit(void)
       #tHAL_NVIC_EnableIRQ(${initVector.vector});
 [/#if]
     [/#if]
-[#if (FamilyName!="STM32U5" && (FamilyName!="STM32WBA"))|| (FamilyName=="STM32WBA" && PWR_interrupt?? && Secure=="false" && initVector.vector?contains("WKUP") && initVector.usedDriver=="HAL")]
+[#if (FamilyName!="STM32U5" && (FamilyName!="STM32WBA"))|| (FamilyName=="STM32WBA" && PWR_interrupt?? && Secure=="false" && initVector.vector?contains("WKUP") && initVector.usedDriver=="HAL")|| (FamilyName=="STM32WBA" && PWR_interrupt?? && initVector.vector?contains("WKUP_S") && initVector.usedDriver=="HAL")]
 [#if EnableCode??]
  [#if (McuName?starts_with("STM32G0B1") || McuName?starts_with("STM32G0C1")) && initVector.vector=="RCC_IRQn"]
       #tHAL_NVIC_EnableIRQ(RCC_CRS_IRQn);
       [#else]
+      [#if DIE != "DIE501"]
       #tHAL_NVIC_EnableIRQ(${initVector.vector});
+       [#else]
+      #tIRQ_Enable(${initVector.vector});
+       [/#if]
+      
 [/#if]
 [/#if]
     [/#if]
@@ -1161,9 +1182,17 @@ void HAL_MspInit(void)
                 [/#if]
                 [#list initService.nvic as initVector]
                   [#if !initVector.vector?contains("WKUP") && !initVector.vector?contains("WakeUp") && initVector.codeInMspInit]
-                    #t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+                    [#if DIE != "DIE501"]
+                     #t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+                    [#else]
+                     #t#tIRQ_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
+                    [/#if]
 [#if GenerateNvicEnable]
-                    #t#tHAL_NVIC_EnableIRQ(${initVector.vector});
+                    [#if DIE != "DIE501"]
+                     #t#tHAL_NVIC_EnableIRQ(${initVector.vector});
+                    [#else]
+                     #t#tIRQ_Enable(${initVector.vector});
+                    [/#if]
 [/#if]
                   [/#if]
                 [/#list]
@@ -1243,9 +1272,17 @@ void HAL_MspInit(void)
 --]
                     [#list initService.nvic as initVector]
                        [#if initVector.vector?contains("WKUP") || initVector.vector?contains("WakeUp")]
+                           [#if DIE != "DIE501"]
                            #t#t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+                            [#else]
+                            #t#t#tIRQ_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
+                            [/#if]
                            [#if GenerateNvicEnable]
+                           [#if DIE != "DIE501"]
                            #t#t#tHAL_NVIC_EnableIRQ(${initVector.vector});
+                           [#else]
+                           #t#t#tIRQ_Enable(${initVector.vector});
+                           [/#if]
                            [/#if]
                        [/#if]
                     [/#list]
@@ -1255,9 +1292,17 @@ void HAL_MspInit(void)
             [#else]
               [#list initService.nvic as initVector]
                 [#if initVector.codeInMspInit]
+                  [#if DIE != "DIE501"]
                   #t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+                   [#else]
+                  #t#tIRQ_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
+                   [/#if]
 [#if GenerateNvicEnable]
+                  [#if DIE != "DIE501"]
                   #t#tHAL_NVIC_EnableIRQ(${initVector.vector});
+                  [#else]
+                  #t#tIRQ_Enable(${initVector.vector});
+                   [/#if]
 [/#if]
                 [/#if]
               [/#list]
@@ -1313,15 +1358,23 @@ void HAL_MspInit(void)
         [#-- DeInit NVIC if DeInit --]
         [#if service??&&service.nvic??&&nvicExist&&service.nvic?size>0]#n#t#t/* ${ipName} interrupt DeInit */[#--#n#t#tHAL_NVIC_DisableIRQ([#if service.nvic.vector??]${service.nvic.vector}[/#if]);--]
             [#list service.nvic as initVector]
-                [#if initVector.shared=="false"]             
+                [#if initVector.shared=="false"]  
+                [#if DIE != "DIE501"]           
                 #t#tHAL_NVIC_DisableIRQ(${initVector.vector});
+                [#else]
+                #t#tIRQ_Disable(${initVector.vector});
+                [/#if] 
                 [#else]
 #t/* USER CODE BEGIN ${ipName}:${initVector.vector} disable */
 #t#t/**
 #t#t* Uncomment the line below to disable the "${initVector.vector}" interrupt 
 #t#t*        Be aware, disabling shared interrupt may affect other IPs
 #t#t*/
+[#if DIE != "DIE501"]
 #t#t/* HAL_NVIC_DisableIRQ(${initVector.vector}); */
+[#else]
+#t#t/* IRQ_Disable(${initVector.vector}); */
+[/#if]
 #t/* USER CODE END ${ipName}:${initVector.vector} disable */
 #n
                 [/#if]
@@ -1556,7 +1609,7 @@ static uint32_t ${entry.value}=0;
   
     [#if  words[0].contains("DFSDM")]
         [#assign word0 = words[0]]  
-            [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4"]
+            [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE501" || DIE == "DIE472" || FamilyName == "STM32L4"]
                 #tif(${words[0]}_Init == 0)             
             [#else]
             #tif([#if word0.contains("DFSDM1")&& mode=="DFSDM_Channel"](IS_DFSDM1_CHANNEL_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Channel"]!(IS_DFSDM1_CHANNEL_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM1")&& mode=="DFSDM_Filter"](IS_DFSDM1_FILTER_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Filter"]!(IS_DFSDM1_FILTER_INSTANCE(h${mode?lower_case}->Instance))&&[/#if](${words[0]}_Init == 0))   
@@ -1617,7 +1670,7 @@ static uint32_t ${entry.value}=0;
     [#if i>0]    
     [#if  inst.contains("DFSDM")]
     [#assign word0 = inst]  
-        [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4"]
+        [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE501" || DIE == "DIE472" || FamilyName == "STM32L4"]
             #tif(${inst}_Init == 0)             
         [#else]
              #telse if([#if word0.contains("DFSDM1")&& mode=="DFSDM_Channel"](IS_DFSDM1_CHANNEL_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Channel"]!(IS_DFSDM1_CHANNEL_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM1")&& mode=="DFSDM_Filter"](IS_DFSDM1_FILTER_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Filter"]!(IS_DFSDM1_FILTER_INSTANCE(h${mode?lower_case}->Instance))&&[/#if](${inst}_Init == 0))
@@ -1783,7 +1836,7 @@ uint32_t DFSDM_Init = 0;
 
 [#if  words[0]?contains("DFSDM")]
     [#assign word0 = words[0]]  
-    [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4"]
+    [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE501" || DIE == "DIE472" || FamilyName == "STM32L4"]
         #tif(${inst}_Init == 0)             
     [#else]
          #tif([#if word0.contains("DFSDM1")&& mode=="DFSDM_Channel"](IS_DFSDM1_CHANNEL_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Channel"]!(IS_DFSDM1_CHANNEL_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM1")&& mode=="DFSDM_Filter"](IS_DFSDM1_FILTER_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Filter"]!(IS_DFSDM1_FILTER_INSTANCE(h${mode?lower_case}->Instance))&&[/#if](${words[0]}_Init == 0))
@@ -1818,7 +1871,7 @@ uint32_t DFSDM_Init = 0;
         [#if i>0]   
             [#if  words[i]?contains("DFSDM")]
                 [#assign word0 = words[i]] 
-                [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4"]
+                [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE501" || DIE == "DIE472" || FamilyName == "STM32L4"]
                     #tif(${words[i]}_Init == 0)             
                 [#else]
                      #tif([#if word0.contains("DFSDM1")&& mode=="DFSDM_Channel"](IS_DFSDM1_CHANNEL_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Channel"]!(IS_DFSDM1_CHANNEL_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM1")&& mode=="DFSDM_Filter"](IS_DFSDM1_FILTER_INSTANCE(h${mode?lower_case}->Instance))&&[/#if][#if word0.contains("DFSDM2")&& mode=="DFSDM_Filter"]!(IS_DFSDM1_FILTER_INSTANCE(h${mode?lower_case}->Instance))&&[/#if](${words[i]}_Init == 0))
@@ -1895,7 +1948,7 @@ uint32_t DFSDM_Init = 0;
 [#assign words = instanceList]
 [#if words[0]?contains("DFSDM")]
     [#assign word0 = words[0]]  
-    [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4"]
+    [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE501" || DIE == "DIE472" || FamilyName == "STM32L4"]
         #t${words[0]}_Init-- ;
         #tif(${words[0]}_Init == 0)           
     [#else]
@@ -1931,7 +1984,7 @@ uint32_t DFSDM_Init = 0;
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspDeInit 1 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspDeInit 1 */
-[#if words[0]?contains("DFSDM")&&!(DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4")]
+[#if words[0]?contains("DFSDM")&&!(DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE501" || DIE == "DIE472" || FamilyName == "STM32L4")]
  
    #t#t}
 
@@ -1945,7 +1998,7 @@ uint32_t DFSDM_Init = 0;
         [#if i>0]
 [#if words[i]?contains("DFSDM")]
 [#assign word0 = words[i]]  
-    [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4"]
+    [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE501" || DIE == "DIE472" || FamilyName == "STM32L4"]
         #t${words[i]}_Init-- ;
         #tif(${words[i]}_Init == 0)           
     [#else]
@@ -1962,7 +2015,7 @@ uint32_t DFSDM_Init = 0;
     #telse if(h${mode?lower_case}->Instance==${words[i]?replace("I2S","SPI")})
     [/#if]
 [/#if]
-[#if words[i]?contains("DFSDM")&&!(DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4")]
+[#if words[i]?contains("DFSDM")&&!(DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE501" || DIE == "DIE472" || FamilyName == "STM32L4")]
 #t#t{
 [#else]
 #t{
@@ -1977,7 +2030,7 @@ uint32_t DFSDM_Init = 0;
 #t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspDeInit 1 */
 
 #n#t/* USER CODE END ${words[i]?replace("I2S","SPI")}_MspDeInit 1 */
-[#if words[i]?contains("DFSDM")&&!(DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4")]
+[#if words[i]?contains("DFSDM")&&!(DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE501" || DIE == "DIE472" || FamilyName == "STM32L4")]
 
 #t#t}
 
@@ -2003,7 +2056,7 @@ uint32_t DFSDM_Init = 0;
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspDeInit 1 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspDeInit 1 */
-[#if words[0]?contains("DFSDM")&&!(DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE472" || FamilyName == "STM32L4")]
+[#if words[0]?contains("DFSDM")&&!(DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE501" || DIE == "DIE472" || FamilyName == "STM32L4")]
 
 #t#t}
 

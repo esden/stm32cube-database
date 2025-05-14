@@ -18,6 +18,9 @@
 /* Includes ------------------------------------------------------------------*/
 #include "${main_h}"
 #include "${FamilyName?lower_case}xx_it.h"
+
+[@common.optinclude name=contextFolder+"/Core/Src/bsp_inc.tmp"/][#-- BSP includes --]
+
 [#if cpucore!="" && cpucore?replace("ARM_CORTEX_","")=="M4"]
     [#if  timeBaseSource_M4??]
         [#assign timeBaseSource = timeBaseSource_M4]
@@ -222,9 +225,9 @@ void ${vector.irqHandler}(void)
 [#if vector.operation != "W1"]
 #t/* USER CODE BEGIN ${vector.name} 1 */
 [#if vector.name == "NonMaskableInt_IRQn"]
-#twhile (1)
-#t{
-#t}
+#t while (1)
+ #t{
+ #t}
 [#else]
 #n
 [/#if]
@@ -295,6 +298,10 @@ void ${vector.irqHandler}(void)
 
 [#compress]
 
+[#-- BSP interrupts --]
+[@common.optinclude name=contextFolder+"/Core/Src/bsp_common_it.tmp"/]
+
+
 [#list nvic as vector]
 
 [#if vector?? && !vector.systemHandler && vector.irqHandlerGenerated]
@@ -313,7 +320,7 @@ void ${vector.irqHandler}(void)
 [#elseif vector.name=="FMC_IRQn" || vector.name=="FSMC_IRQn" || vector.name=="HASH_RNG_IRQn" || vector.name=="TIM6_DAC_IRQn"]
   #t${vector.halHandler}
 [#elseif vector.ipHandle != "" && vector.halUsed]
-  #t${vector.halHandler}[#if timeBaseSource==vector.ipName && FamilyName=="STM32MP1"][#else](&${vector.ipHandle});[/#if]
+  #t${vector.halHandler}[#if timeBaseSource?? && timeBaseSource==vector.ipName && (FamilyName=="STM32MP1" || DIE == "DIE501")][#else](&${vector.ipHandle});[/#if]
 [#elseif vector.halUsed]
   #t${vector.halHandler}();
 [/#if]

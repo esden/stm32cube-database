@@ -680,8 +680,14 @@
                 [/#if]
                 [#list initService.nvic as initVector]
                   [#if !initVector.vector?contains("WKUP") && !initVector.vector?contains("WakeUp") && initVector.codeInMspInit]
+                    [#if DIE != "DIE501"]
                     #t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
                     #t#tHAL_NVIC_EnableIRQ(${initVector.vector});
+                    [#else]
+                    #t#tIRQ_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
+                    #t#tIRQ_Enable(${initVector.vector});
+                    [/#if]
+                    
                   [/#if]
                 [/#list]
                 [#assign lowPower = "no"]
@@ -709,8 +715,13 @@
                     [@common.generateUsbWakeUpInterrupt ipName=ipName tabN=3/]
                     [#list initService.nvic as initVector]
                        [#if initVector.vector?contains("WKUP") || initVector.vector?contains("WakeUp")]
+                       [#if DIE != "DIE501"]
                            #t#t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
                            #t#t#tHAL_NVIC_EnableIRQ(${initVector.vector});
+                       [#else]
+                        #t#t#tIRQ_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
+                        #t#t#tIRQ_Enable(${initVector.vector});
+                       [/#if]
                        [/#if]
                     [/#list]
                     #t#t}
@@ -719,8 +730,13 @@
             [#else]
               [#list initService.nvic as initVector]
                 [#if initVector.codeInMspInit]
+                [#if DIE != "DIE501"]
                   #t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
                   #t#tHAL_NVIC_EnableIRQ(${initVector.vector});
+                  [#else]
+                  #t#tIRQ_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
+                  #t#tIRQ_Enable(${initVector.vector});
+                  [/#if]
                 [/#if]
               [/#list]
             [/#if]
@@ -762,8 +778,12 @@
 [#-- DeInit NVIC if DeInit --]
     [#if nvicExist&&service??&&service.nvic?size>0]#n#t#t/* Peripheral interrupt Deinit*/[#--#n#t#tHAL_NVIC_DisableIRQ([#if service.nvic.vector??]${service.nvic.vector}[/#if]);--]
 [#list service.nvic as initVector]                
-                [#if initVector.shared=="false"]             
+                [#if initVector.shared=="false"] 
+                [#if DIE != "DIE501"]               
                 #t#tHAL_NVIC_DisableIRQ(${initVector.vector});#n
+                [#else]
+                #t#tIRQ_Disable(${initVector.vector});#n
+                [/#if] 
                 [#else]
 
 #t/* USER CODE BEGIN ${ipName}:${initVector.vector} disable */
@@ -771,7 +791,11 @@
 #t#t* Uncomment the line below to disable the "${initVector.vector}" interrupt 
 #t#t*        Be aware, disabling shared interrupt may affect other IPs
 #t#t*/
+[#if DIE != "DIE501"] 
 #t#t/* HAL_NVIC_DisableIRQ(${initVector.vector}); */
+[#else]
+#t#t/* IRQ_Disable(${initVector.vector}); */
+[/#if]
 #t/* USER CODE END ${ipName}:${initVector.vector} disable */
 #n
                 [/#if]

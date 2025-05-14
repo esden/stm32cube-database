@@ -45,6 +45,8 @@ Key: ${key}; Value: ${myHash[key]}
 #define BLE_CFG_SVC_MAX_NBR_CB                    (${myHash["BLE_CFG_SVC_MAX_NBR_CB"]})
 #define BLE_CFG_CLT_MAX_NBR_CB                    (${myHash["BLE_CFG_CLT_MAX_NBR_CB"]})
 
+#define BLE_CFG_MAX_NBR_CB                        (${myHash["BLE_CFG_MAX_NBR_CB"]})
+
 /* USER CODE BEGIN ble_conf_1 */
 
 /* USER CODE END ble_conf_1 */

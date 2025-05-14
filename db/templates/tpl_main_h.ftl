@@ -32,7 +32,7 @@
 extern "C" {
 #endif
 
-[#if TZEN=="1" && Secure=="true"]
+[#if TZEN=="1" && Secure=="true" && !(FamilyName=="STM32MP13")]
 #if defined ( __ICCARM__ )
 #  define CMSE_NS_CALL  __cmse_nonsecure_call
 #  define CMSE_NS_ENTRY __cmse_nonsecure_entry
@@ -103,7 +103,7 @@ extern "C" {
 #n
 
 [#-- /#if --]
-[#if TZEN=="1" && Secure=="false"]
+[#if TZEN=="1" && Secure=="false" && !(FamilyName=="STM32MP13")]
 [#if (Structure?? && Structure=="FullNonSecure")]
 [#else]
 #include "secure_nsc.h"    /* For export Non-secure callable APIs */
@@ -186,7 +186,7 @@ extern "C" {
 /* USER CODE END Includes */
 #n
 /* Exported types ------------------------------------------------------------*/
-[#if TZEN=="1" && Secure=="true"]
+[#if TZEN=="1" && Secure=="true" && !(FamilyName=="STM32MP13")]
 /* Function pointer declaration in non-secure*/
 #if defined ( __ICCARM__ )
 typedef void (CMSE_NS_CALL *funcptr)(void);

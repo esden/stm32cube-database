@@ -167,13 +167,13 @@ typedef struct
 
 /* USER CODE END EM */
 
-/* Exported functions ------------------------------------------------------- */
+/* Exported functions prototypes ---------------------------------------------*/
 void ${SERVICE_SHORT_NAME_UpperCase}_Init(void);
 void ${SERVICE_SHORT_NAME_UpperCase}_Notification(${SERVICE_SHORT_NAME_UpperCase}_NotificationEvt_t *p_Notification);
 tBleStatus ${SERVICE_SHORT_NAME_UpperCase}_UpdateValue(${SERVICE_SHORT_NAME_UpperCase}_CharOpcode_t CharOpcode, ${SERVICE_SHORT_NAME_UpperCase}_Data_t *pData);
-/* USER CODE BEGIN EF */
+/* USER CODE BEGIN EFP */
 
-/* USER CODE END EF */
+/* USER CODE END EFP */
 
 
 #ifdef __cplusplus

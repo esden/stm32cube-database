@@ -7,8 +7,11 @@
     ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd" 
     xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
     <About>DTS : Digital Temperature Sensor</About>
- 
     
+    <RefParameter Name="Instance" DefaultValue="DTS1" Comment="Instance" Group="Basic parameters" Type="string" Visible="false">
+        <Condition Diagnostic="" Expression="DIE501"/>
+    </RefParameter>
+
     <RefParameter Name="RefClock" Comment="Reference Clock Selection" DefaultValue="DTS_REFCLKSEL_PCLK" Type="list" Group="Basic parameters"  Visible="true">
         <Description>
             The clock selection allows to select two kind of clock &lt;br/&gt;
@@ -26,7 +29,7 @@
     </RefParameter>
   
     <RefParameter Name="TriggerInput" Comment="Input Trigger Selection" DefaultValue="DTS_TRIGGER_HW_NONE" Type="list" Group="Basic parameters"  Visible="true">
-        <Condition Expression="DIE474" Diagnostic=""/>    
+        <Condition Expression="DIE474" Diagnostic=""/>
         <Description>
             The temperature measurement can be triggered either by software or by an external event which can be &lt;br/&gt;
             a Low Power Timer (LPTIM) or the EXTernal Interrupt (EXTI13)
@@ -35,6 +38,19 @@
         <PossibleValue Condition="!Semaphore_ModeSelectedLPTIM1" Value="DTS_TRIGGER_LPTIMER1" Comment="External Interrupt Mode with LPTIMER1 trigger detection" Diagnostic="Activate LPTIM1 IP"/>
         <PossibleValue Condition="!Semaphore_ModeSelectedLPTIM2" Value="DTS_TRIGGER_LPTIMER2" Comment="External Interrupt Mode with LPTIMER2 trigger detection" Diagnostic="Activate LPTIM2 IP"/>
         <PossibleValue Condition="!GPIO_EXTI13_SEM" Value="DTS_TRIGGER_EXTI13" Comment="External Interrupt Mode with EXTI13 trigger detection" Diagnostic="Associate the GPIO_EXTI13 state to one among of pin numbered 13 in the pinout view"/>
+    </RefParameter>
+   <RefParameter Name="TriggerInput" Comment="Input Trigger Selection" DefaultValue="DTS_TRIGGER_HW_NONE" Type="list" Group="Basic parameters"  Visible="true">
+        <Condition Expression="DIE501" Diagnostic=""/>
+        <Description>
+            The temperature measurement can be triggered either by software or by an external event which can be &lt;br/&gt;
+            a Low Power Timer (LPTIM) or the EXTernal Interrupt (EXTI13)
+        </Description>
+        <PossibleValue Value="DTS_TRIGGER_HW_NONE" Comment="No Hardware trigger detection" Diagnostic="Measurement trigger done by software"/>
+        <PossibleValue Condition="!Semaphore_ModeSelectedLPTIM1" Value="DTS_TRIGGER_LPTIMER1" Comment="External Interrupt Mode with LPTIMER1 trigger detection" Diagnostic="Activate LPTIM1 IP"/>
+        <PossibleValue Condition="!Semaphore_ModeSelectedLPTIM2" Value="DTS_TRIGGER_LPTIMER2" Comment="External Interrupt Mode with LPTIMER2 trigger detection" Diagnostic="Activate LPTIM2 IP"/>
+        <PossibleValue Condition="!Semaphore_ModeSelectedLPTIM3" Value="DTS_TRIGGER_LPTIMER3" Comment="External Interrupt Mode with LPTIMER3 trigger detection" Diagnostic="Activate LPTIM3 IP"/>
+        <PossibleValue Condition="!GPIO_EXTI13_SEM" Value="DTS_TRIGGER_EXTI13" Comment="External Interrupt Mode with EXTI13 trigger detection" Diagnostic="Associate the GPIO_EXTI13 state to one among of pin numbered 13 in the pinout view"/>
+        <PossibleValue Value="DTS_TRIGGER_HW_NONE_CONT" Comment="No Hardware trigger detection on continuous mode" Diagnostic="Measurement trigger done by software"/> 
     </RefParameter>
     <RefParameter Name="TriggerInput" Comment="Input Trigger Selection" DefaultValue="DTS_TRIGGER_HW_NONE" Type="list" Group="Basic parameters"  Visible="true">
         <Description>
@@ -71,7 +87,7 @@
         <PossibleValue Value="DTS_SMP_TIME_14_CYCLE" Comment="14 cycles for the sampling time"/>
         <PossibleValue Value="DTS_SMP_TIME_15_CYCLE" Comment="15 cycles for the sampling time"/>
     </RefParameter>
-    
+
     <RefParameter Name="Divider" Comment="Divider" DefaultValue="0" Type="integer" Group="Basic parameters"  Visible="true" Min="0" Max="0" >
         <Condition Expression="DTS_REFCLK_LSE" Diagnostic="Divider available only on PCLK clock reference"/>
         <Description>
@@ -79,7 +95,7 @@
             When the LSE reference clock is selected, the divider is not used and has to be set to 0
         </Description>
     </RefParameter>
-    
+
     <RefParameter Name="Divider" Comment="Divider" DefaultValue="0" Type="integer" Group="Basic parameters"  Visible="true" Min="0" Max="127">
         <Description>
             The divider is used to divide PCLK reference clock for calibration phase &lt;br/&gt;
@@ -87,19 +103,62 @@
         </Description>
     </RefParameter>
 
-    <RefParameter Name="HighThreshold" Comment="High Threshold" DefaultValue="0x0" Type="hex" Group="Basic parameters"  Visible="true" Min="0x0" Max="0xFFFF"/>
-    
-    <RefParameter Name="LowThreshold" Comment="Low Threshold" DefaultValue="0x0" Type="Hex" Group="Basic parameters"  Visible="true" Min="0x0" Max="0xFFFF"/>
-    
+    <RefParameter Name="HighThreshold" Comment="High Threshold" DefaultValue="0x0" Type="hex" Group="Basic parameters"  Visible="true" Min="0x0" Max="0xFFFF">
+         <Condition Diagnostic="" Expression="!DIE501"/>
+    </RefParameter>
+
+    <RefParameter Name="LowThreshold" Comment="Low Threshold" DefaultValue="0x0" Type="Hex" Group="Basic parameters"  Visible="true" Min="0x0" Max="0xFFFF">
+         <Condition Diagnostic="" Expression="!DIE501"/>
+    </RefParameter>
+
+    <RefParameter Name="HighInterruptThreshold" Comment="High Interrupt Threshold" DefaultValue="0x0" Type="hex" Group="Basic parameters"  Visible="true" Min="0x0" Max="0xFFFF">
+        <Condition Diagnostic="" Expression="DIE501"/>
+    </RefParameter>
+
+    <RefParameter Name="LowInterruptThreshold" Comment="Low Interrupt Threshold" DefaultValue="0x0" Type="Hex" Group="Basic parameters"  Visible="true" Min="0x0" Max="0xFFFF">
+        <Condition Diagnostic="" Expression="DIE501"/>
+    </RefParameter>
+
+    <RefParameter Name="InterruptSource" Comment="Interrupt Source" DefaultValue="DTS_ITSRC_HIGH" Type="list" Group="Basic parameters"  Visible="true">
+        <Condition Diagnostic="" Expression="DIE501"/>
+        <Description>
+            the interrupt source of the DTS sensor.
+        </Description>
+        <PossibleValue Value="DTS_ITSRC_HIGH"      Comment="DTS_ITENR_TS1_ITHEN"/>
+        <PossibleValue Value="DTS_ITSRC_LOW"       Comment="DTS_ITENR_TS1_ITLEN"/>
+        <PossibleValue Value="DTS_ITSRC_END"       Comment="DTS_ITENR_TS1_ITEEN"/>
+        <PossibleValue Value="DTS_ITSRC_ASYN_HIGH" Comment="DTS_ITENR_TS1_AITHEN"/>
+        <PossibleValue Value="DTS_ITSRC_ASYN_LOW"  Comment="DTS_ITENR_TS1_AITLEN"/>
+        <PossibleValue Value="DTS_ITSRC_ASYN_END"  Comment="DTS_ITENR_TS1_AITEEN"/>
+    </RefParameter>
+
+    <RefParameter Name="InterruptSource" Comment="Interrupt Source" DefaultValue="null" Type="string" Group="Basic parameters"  Visible="false"/>
+
+    <RefParameter Name="WakeupTarget" Comment="Wakeup Target" DefaultValue="DTS_WAKEUPTARGET_CPU1" Type="list" Group="Basic parameters"  Visible="true">
+        <Condition Diagnostic="" Expression="DIE501"/>
+        <Description>
+            the Wakeup Target.
+        </Description>
+        <PossibleValue Value="DTS_WAKEUPTARGET_CPU1"       Comment="CPU1"/>
+        <PossibleValue Value="DTS_WAKEUPTARGET_CPU2"       Comment="CPU2"/>
+    </RefParameter>
+
+    <RefParameter Name="WakeupTarget" Comment="Wakeup Target" DefaultValue="null" Type="string" Group="Basic parameters"  Visible="false"/>
+
     <RefMode Name="DTS" Comment="DTS initialization" HalMode="DTS" Abstract="true">
         <ConfigForMode>DTS_Init</ConfigForMode>
+        <Parameter Name="Instance"/>
         <Parameter Name="RefClock"/>
         <Parameter Name="QuickMeasure"/>
         <Parameter Name="TriggerInput"/>
         <Parameter Name="SamplingTime"/>
         <Parameter Name="Divider"/>
-        <Parameter Name="HighThreshold"/>    
+        <Parameter Name="InterruptSource"/>
+        <Parameter Name="HighThreshold"/>
         <Parameter Name="LowThreshold"/>
+        <Parameter Name="HighInterruptThreshold"/>
+        <Parameter Name="LowInterruptThreshold"/>
+        <Parameter Name="WakeupTarget"/>
     </RefMode>
 
     <ModeLogicOperator Name="OR">

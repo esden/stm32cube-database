@@ -1048,7 +1048,7 @@ enum ZbStatusCodeT ZbStartupWait(struct ZigBeeT *zb, struct ZbStartupT *config)
   status = ZbStartup(zb, config, ZbStartupWaitCb, info);
   if (status != ZB_STATUS_SUCCESS) 
   {
-    info->active = false;
+    free(info);
     return status;
   }
   
@@ -1385,25 +1385,16 @@ static void APP_ZIGBEE_ProcessNotifyM0ToM4(void * argument)
     osThreadFlagsWait(1,osFlagsWaitAll,osWaitForever);
     if (CptReceiveNotifyFromM0 != 0)
     {
-      /* If CptReceiveNotifyFromM0 is > 1. it means that we did not serve all the events from the radio */
-      if (CptReceiveNotifyFromM0 > 1U)
-      {
-        APP_ZIGBEE_Error(ERR_REC_MULTI_MSG_FROM_M0, 0);
-      }
-      else
-      {
-        Zigbee_CallBackProcessing();
-      }
-      /* Reset counter */
       CptReceiveNotifyFromM0 = 0;
+      Zigbee_CallBackProcessing();
     }
   }
 }
 
 /**
  * @brief Process the requests coming from the M0.
- * @param
- * @return
+ * @param  None
+ * @retval None
  */
 static void APP_ZIGBEE_ProcessRequestM0ToM4(void * argument)
 {
@@ -1414,8 +1405,8 @@ static void APP_ZIGBEE_ProcessRequestM0ToM4(void * argument)
     osThreadFlagsWait(1,osFlagsWaitAll,osWaitForever);
     if (CptReceiveRequestFromM0 != 0)
     {
-      Zigbee_M0RequestProcessing();
       CptReceiveRequestFromM0 = 0;
+      Zigbee_M0RequestProcessing();
     }
   }
 }
@@ -1432,28 +1423,18 @@ static void APP_ZIGBEE_ProcessNotifyM0ToM4( ULONG argument )
   for ( ;;) 
   {
     tx_semaphore_get(&NotifyM0ToM4Semaphore, TX_WAIT_FOREVER);
-    if (CptReceiveNotifyFromM0 != 0) 
+    if (CptReceiveNotifyFromM0 != 0)
     {
-      /* If CptReceiveNotifyFromM0 is > 1. it means that we did not serve all the events from the radio */
-      if (CptReceiveNotifyFromM0 > 1U) 
-      { 
-        APP_ZIGBEE_Error(ERR_REC_MULTI_MSG_FROM_M0, 0); 
-      }
-      else 
-      { 
-        Zigbee_CallBackProcessing(); 
-      }
-
-      /* Reset counter */
       CptReceiveNotifyFromM0 = 0;
+      Zigbee_CallBackProcessing();
     }
   }
 }
 
 /**
  * @brief Process the requests coming from the M0.
- * @param
- * @return
+ * @param  None
+ * @retval None
  */
 static void APP_ZIGBEE_ProcessRequestM0ToM4( ULONG argument )
 {
@@ -1465,8 +1446,8 @@ static void APP_ZIGBEE_ProcessRequestM0ToM4( ULONG argument )
     
     if (CptReceiveRequestFromM0 != 0)
     {
-      Zigbee_M0RequestProcessing();
       CptReceiveRequestFromM0 = 0;
+      Zigbee_M0RequestProcessing();
     }
   }
 }
@@ -1478,34 +1459,25 @@ static void APP_ZIGBEE_ProcessRequestM0ToM4( ULONG argument )
  */
 static void APP_ZIGBEE_ProcessNotifyM0ToM4(void)
 {
-  if (CptReceiveNotifyFromM0 != 0) 
+  if (CptReceiveNotifyFromM0 != 0)
   {
-    /* If CptReceiveNotifyFromM0 is > 1. it means that we did not serve all the events from the radio */
-    if (CptReceiveNotifyFromM0 > 1U) 
-    {
-      APP_ZIGBEE_Error(ERR_REC_MULTI_MSG_FROM_M0, 0);
-    }
-    else 
-    {
-      Zigbee_CallBackProcessing();
-    }
-  
     /* Reset counter */
     CptReceiveNotifyFromM0 = 0;
+    Zigbee_CallBackProcessing();
   }
 }
 
 /**
  * @brief Process the requests coming from the M0.
- * @param
- * @return
+ * @param  None
+ * @retval None
  */
 static void APP_ZIGBEE_ProcessRequestM0ToM4(void)
 {
-  if (CptReceiveRequestFromM0 != 0) 
+  if (CptReceiveRequestFromM0 != 0)
   {
-    Zigbee_M0RequestProcessing();
     CptReceiveRequestFromM0 = 0;
+    Zigbee_M0RequestProcessing();
   }
 }
 [/#if]

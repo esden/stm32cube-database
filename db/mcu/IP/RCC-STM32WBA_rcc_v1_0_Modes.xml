@@ -493,6 +493,12 @@
         <PossibleValue Comment="LPTIM2 Clksource Hsi"  Value="RCC_LPTIM2CLKSOURCE_HSI" Semaphore="LPTIM2SOURCEHSI"/>
         <PossibleValue Comment="LPTIM2 Clksource Lse"  Value="RCC_LPTIM2CLKSOURCE_LSE" Semaphore="LPTIM2SOURCELSE"/>
     </RefParameter>
+
+    <!--ASClockSelection-->	
+    <RefParameter Visible="false" Comment="Audio Clock Selection" DefaultValue="RCC_ASCLKSOURCE_PLL1P" Name="ASClockSelection" Type="list" IP="AUDIOSYNC_Clock">
+        <PossibleValue Comment="Audio Clksource Pll1p" Value="RCC_ASCLKSOURCE_PLL1P" Semaphore="ASPLL1P"/>
+        <PossibleValue Comment="Audio Clksource Pll1q" Value="RCC_ASCLKSOURCE_PLL1Q" Semaphore="ASPLL1Q"/>
+    </RefParameter>
     
     <!--SAI1CLockSelection-->
     <RefParameter Visible="false"  Comment="SAI1 Clock Selection" DefaultValue="RCC_SAI1CLKSOURCE_HSI" Name="SAI1CLockSelectionVirtual" Type="list" IP="SAI1_SAIB,SAI1_SAIA">
@@ -838,6 +844,13 @@
     </RefParameter>
     <RefParameter Visible="false" Comment="LPTIM2 clock Source"  Name="LPTIM2Freq_Value"  DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="LPTIM2"/>
 	
+    <RefParameter Visible="false" Comment="Audio clock"   Name="ASFreq_Value" DefaultValue="4000000" Max="100000000" Type="double" Display="value/1000000" Unit="MHz" IP="AUDIOSYNC_Clock">
+        <Condition Diagnostic="" Expression="(scale1|scale1_1)"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="Audio Clock"   Name="ASFreq_Value" DefaultValue="4000000" Max="16000000" Type="double" Display="value/1000000" Unit="MHz" IP="AUDIOSYNC_Clock">
+        <Condition Diagnostic="" Expression="scale2"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="Audio clock Source"  Name="ASFreq_Value"  DefaultValue="4000000"  Type="double" Display="value/1000000" Unit="MHz" IP="AUDIOSYNC_Clock"/>	
      
    
     <RefParameter Visible="false" Comment="RNG clock"   Name="RNGFreq_Value" DefaultValue="4000000" Max="48000000" Type="double" Display="value/1000000" Unit="MHz" IP="RNG">
@@ -1027,6 +1040,14 @@
         <PossibleValue Value="true" Comment="true"/>
     </RefParameter>	
     <RefParameter Visible="false" Name="ADCTZEnable" Comment="ADC in Asynchronous mode" Type="list" DefaultValue="false" >
+        <PossibleValue Value="false" Comment="false"/>
+    </RefParameter>
+	
+    <RefParameter Visible="false" Name="ASEnable" Comment="Audio synchro" Type="list" DefaultValue="true" IP="AUDIOSYNC_Clock">
+        <Condition Expression="AUDIOSYNC" Diagnostic="AS is activated"/>
+        <PossibleValue Value="true" Comment="true"/>
+    </RefParameter>	
+    <RefParameter Visible="false" Name="ASEnable" Comment="Audio synchro" Type="list" DefaultValue="false" IP="AUDIOSYNC_Clock">
         <PossibleValue Value="false" Comment="false"/>
     </RefParameter>
     
@@ -1546,6 +1567,14 @@
     <RefParameter Visible="false" Name="PeriphClockSelectionARG" Comment="Peripherals clock selection" IP="SPI3" Type="list" DefaultValue="RCC_PERIPHCLK_SPI3">
         <Condition Expression="SPI3Used_ForRCC" Diagnostic="SPI3 Activated"/>
     </RefParameter>
+	
+    <RefParameter Visible="false" Name="PeriphClockSelectionARG" Comment="Peripherals clock selection" IP="SAI1_SAIB" Type="list" DefaultValue="RCC_PERIPHCLK_SAI1">
+        <Condition Expression="SAI1_SAIBUsed_ForRCC" Diagnostic="SAI1 Activated"/>
+    </RefParameter>
+    <RefParameter Visible="false" Name="PeriphClockSelectionARG" Comment="Peripherals clock selection" IP="SAI1_SAIA" Type="list" DefaultValue="RCC_PERIPHCLK_SAI1">
+        <Condition Expression="SAI1_SAIAUsed_ForRCC" Diagnostic="SAI1 Activated"/>
+    </RefParameter>
+
     <RefParameter Visible="false" Comment="Periph Clock Selection" Name="PeriphClockSelectionARG" DefaultValue="null" Type="list"/>
 	
 
@@ -1570,6 +1599,7 @@
     <RefParameter Visible="false" Name="RCC_PERIPHCLK_RTSVar" Comment="RCC_PERIPHCLK_RTSVar" Type="list" DefaultValue=""/>
 	
     <RefParameter Visible="false" Name="RCC_PERIPHCLK_SYSTICKVar" Comment="RCC_PERIPHCLK_SYSTICKVar" Type="list" DefaultValue="RCC_PERIPHCLK_SYSTICK">
+		<Condition Expression="CLKSOURCE_LSE|CLKSOURCE_LSI" Diagnostic=""/>
         <PossibleValue Value="RCC_PERIPHCLK_SYSTICK" Comment="RCC_PERIPHCLK_SYSTICK"/>
     </RefParameter>
     <RefParameter Visible="false" Name="RCC_PERIPHCLK_SYSTICKVar" Comment="RCC_PERIPHCLK_SYSTICKVar" Type="list" DefaultValue=""/>
@@ -1580,6 +1610,7 @@
     <RefParameter Visible="false" Name="RadioSlpTimClockSelectionARG" Comment="Radio Slp Tim Clock Selection" Type="list" DefaultValue="null"/>
 	
     <RefParameter Visible="false" Name="SystickClockSelectionARG" Comment="Systick ClockSelection" Type="list" DefaultValue="+CortexCLockSelection">
+		<Condition Expression="CLKSOURCE_LSE|CLKSOURCE_LSI" Diagnostic="Systick Activated"/>
     </RefParameter> 
     <RefParameter Visible="false" Name="SystickClockSelectionARG" Comment="Systick Clock Selection" Type="list" DefaultValue="null"/>
 
@@ -2385,13 +2416,24 @@
             </ModeLogicOperator>
         </Mode>
       
-        <Mode Name="Audio_ClockInSAI1" UserName="SAI1 Extern CLock">
+        <Mode Name="Audio_ClockInSAI1" UserName="SAI1 Extern Clock">
             <ModeLogicOperator Name="OR">
                 <Mode Name="Audio_ClockInSAI1">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="$SingleInstanceAUDIOCLK"/>
                     </SignalLogicalOp>
                     <Semaphore>SAI1EXTCLK</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
+		
+        <Mode Name="AUDIOSYNC_Clock" UserName="Bluetooth Audio Synchronization">
+            <ModeLogicOperator Name="OR">
+                <Mode Name="AUDIOSYNC_Clock">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="AUDIOSYNC"/>
+                    </SignalLogicalOp>
+                    <Semaphore>AUDIOSYNC</Semaphore>
                 </Mode>
             </ModeLogicOperator>
         </Mode>
@@ -2406,6 +2448,7 @@
     <RefSignal IOMode="System" Name="OSC_OUT"/>
     <RefSignal IOMode="AlternateFunctionPushPull" Name="$SingleInstanceAUDIOCLK"/>
     <RefSignal Virtual="true" Name="LSE" />
+    <RefSignal Virtual="true" Name="AUDIOSYNC" />
     <RefSignal Virtual="true" Name="GTZEN_PRIV"/>
     <RefSignal Virtual="true" Name="GTZEN_SEC_PRIV"/>
     <RefSignal Virtual="true" Name="GTZEN_NSEC_PRIV"/>

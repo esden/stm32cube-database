@@ -166,6 +166,9 @@
 #include "shci.h"
 [/#if]
 #include "otp.h"
+[#if (BLE = 1) && ((BLE_TRANSPARENT_MODE_UART = 1) ||(BLE_TRANSPARENT_MODE_VCP = 1))]
+#include "shci.h"
+[/#if]
 [#if THREAD = 1]
 #include "stm_list.h"
 #include "advanced_memory_manager.h"
@@ -181,7 +184,7 @@
 extern RTC_HandleTypeDef hrtc;
 [#if THREAD = 1]
 /**
- * Strucuture of Trace_Elt_t
+ * Structure of Trace_Elt_t
  * buffer : trace buffer
  * size : size of the trace buffer
  */
@@ -192,7 +195,7 @@ typedef __PACKED_STRUCT
 } TraceEltHeader_t;
 
 /**
- * Strucuture of Trace_Elt_t
+ * Structure of Trace_Elt_t
  * buffer : trace buffer
  * size : size of the trace buffer
  */
@@ -204,7 +207,7 @@ typedef __PACKED_STRUCT
 
 
 /**
- * Strucuture of Trace_Elt_t
+ * Structure of Trace_Elt_t
  * buffer : trace buffer
  * size : size of the trace buffer
  */
@@ -844,13 +847,63 @@ __WEAK void APP_BLE_Init(void)
 }
 
 [/#if]
+
 [#if (BLE = 1) && ((BLE_TRANSPARENT_MODE_UART = 1) ||(BLE_TRANSPARENT_MODE_VCP = 1))]
 static void APPE_SysUserEvtRx(TL_EvtPacket_t * p_evt_rx)
 {
+  TL_AsynchEvt_t *p_sys_event;
+  WirelessFwInfo_t WirelessInfo;
+
   LST_insert_tail (&SysEvtQueue, (tListNode *)p_evt_rx);
 
-  UTIL_SEQ_SetTask(1<<CFG_TASK_SYSTEM_HCI_ASYNCH_EVT_ID, CFG_SCH_PRIO_0);
+ if (p_evt_rx->evtserial.evt.evtcode == SHCI_EVTCODE){
 
+    p_sys_event = (TL_AsynchEvt_t *)(p_evt_rx->evtserial.evt.payload);
+
+    switch(p_sys_event->subevtcode)
+    {
+    case SHCI_SUB_EVT_CODE_READY:
+    /* Read the firmware version of both the wireless firmware and the FUS */
+    SHCI_GetWirelessFwInfo(&WirelessInfo);
+    APP_DBG_MSG("Wireless Firmware version %d.%d.%d\n", WirelessInfo.VersionMajor, WirelessInfo.VersionMinor, WirelessInfo.VersionSub);
+    APP_DBG_MSG("Wireless Firmware build %d\n", WirelessInfo.VersionReleaseType);
+    APP_DBG_MSG("FUS version %d.%d.%d\n", WirelessInfo.FusVersionMajor, WirelessInfo.FusVersionMinor, WirelessInfo.FusVersionSub);
+      APP_DBG_MSG(">>== SHCI_SUB_EVT_CODE_READY\n\r");
+    UTIL_SEQ_SetTask(1<<CFG_TASK_SYSTEM_HCI_ASYNCH_EVT_ID, CFG_SCH_PRIO_0);
+
+    case SHCI_SUB_EVT_ERROR_NOTIF:
+      APP_DBG_MSG(">>== SHCI_SUB_EVT_ERROR_NOTIF \n\r");
+      break;
+
+    case SHCI_SUB_EVT_BLE_NVM_RAM_UPDATE:
+      APP_DBG_MSG(">>== SHCI_SUB_EVT_BLE_NVM_RAM_UPDATE -- BLE NVM RAM HAS BEEN UPDATED BY CPU2 \n");
+      APP_DBG_MSG("     - StartAddress = %lx , Size = %ld\n",
+                  ((SHCI_C2_BleNvmRamUpdate_Evt_t*)p_sys_event->payload)->StartAddress,
+                  ((SHCI_C2_BleNvmRamUpdate_Evt_t*)p_sys_event->payload)->Size);
+      break;
+
+    case SHCI_SUB_EVT_NVM_START_WRITE:
+      APP_DBG_MSG("==>> SHCI_SUB_EVT_NVM_START_WRITE : NumberOfWords = %ld\n",
+                  ((SHCI_C2_NvmStartWrite_Evt_t*)p_sys_event->payload)->NumberOfWords);
+      break;
+
+    case SHCI_SUB_EVT_NVM_END_WRITE:
+      APP_DBG_MSG(">>== SHCI_SUB_EVT_NVM_END_WRITE\n\r");
+      break;
+
+    case SHCI_SUB_EVT_NVM_START_ERASE:
+      APP_DBG_MSG("==>>SHCI_SUB_EVT_NVM_START_ERASE : NumberOfSectors = %ld\n",
+                  ((SHCI_C2_NvmStartErase_Evt_t*)p_sys_event->payload)->NumberOfSectors);
+      break;
+
+    case SHCI_SUB_EVT_NVM_END_ERASE:
+      APP_DBG_MSG(">>== SHCI_SUB_EVT_NVM_END_ERASE\n\r");
+      break;
+
+    default:
+      break;
+    }
+  }
   return;
 }
 
@@ -1533,7 +1586,7 @@ void TL_TRACES_EvtReceived( TL_EvtPacket_t * hcievt )
 
 #if (CFG_AMM_ENABLED != 0)
 /**
- * @brief Process the traces comming from the M0 or M4.
+ * @brief Process the traces coming from the M0 or M4.
  * @param  None
  * @retval None
  */

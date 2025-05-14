@@ -3,7 +3,8 @@
 # Absolute path to this script  
 [#assign DOLLAR = "$"]
 [#assign BASH = "{BASH_SOURCE[0]}"]
-[#assign user = "user"]
+[#-- we must be able to find the user name --]
+[#--  [#assign user = "pwe"]--]
 if [ $# -ge 1 ] && [ -d $1 ]; then
     projectdir=$1
 else
@@ -20,9 +21,9 @@ if [ "$VAR1" = "$VAR2" ]; then
     stm32programmercli="C:\Program Files\STMicroelectronics\STM32Cube\STM32CubeProgrammer\bin\STM32_Programmer_CLI.exe"
     stm32tpccli="${tpcPath}"
 else	
-    PATH="/home/${DOLLAR}${user}/STMicroelectronics/STM32Cube/STM32CubeProgrammer":$PATH
+    PATH="/home/${user}/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin":$PATH
     PATH="${tpcPath}":$PATH
-    stm32programmercli="STM32_Programmer_CLI"
+    stm32programmercli="/home/${user}/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/STM32_Programmer_CLI"
     stm32tpccli="${tpcPath}"
 fi
 # ==============================================================================
@@ -44,19 +45,19 @@ stirot_appli_bin=${appli_secure}
 stirot_appli=${appli_secure}
 [/#if]
 isFullSecure=${isFullSecure}
-stirot_boot_path_project=$projectdir
-rot_provisioning_path=$projectdir
+stirot_boot_path_project=$projectdir"/../"
+[#--  rot_provisioning_path=$projectdir"/../Binary"--]
 	[#if appli_non_secure??] 
 # ==============================================================================
 #                            For Assembly Python script
 # ==============================================================================
-appli_path=${appli_secure_path}
+appli_path=$projectdir"${appli_secure_path}"
 appli_non_secure=${appli_non_secure}
-appli_non_secure_path=${appli_non_secure_path}
+appli_non_secure_path=$projectdir"${appli_non_secure_path}"
 appli_assembly=${appli_assembly_file_name}
-appli_assembly_path=${appli_assembly_path}
+appli_assembly_path=$projectdir"${appli_assembly_path}"
 code_size=${secure_code_size}
-code_image_path=${code_image_path}
+code_image_path=$projectdir"${code_image_path}"
 	[/#if]
 [#--  
 stirot_boot_path_project=${boot_path_project}
@@ -82,18 +83,18 @@ oemirot_appli_non_secure=${appli_non_secure}
 oemirot_appli_assembly_sign=${appli_assembly_sign}
 	[/#if]
 [/#if]
-oemirot_boot_path_project=$projectdir
-rot_provisioning_path=$projectdir
+oemirot_boot_path_project=$projectdir"/../"
+rot_provisioning_path=$projectdir"/../"
 	[#if appli_assembly??]
 # ==============================================================================
 #                            For Assembly Python script
 # ==============================================================================
-appli_path=${appli_secure_path}
-appli_non_secure_path=${appli_non_secure_path}
-appli_assembly_path=${appli_assembly_path}
+appli_path=$projectdir"${appli_secure_path}"
+appli_non_secure_path=$projectdir"${appli_non_secure_path}"
+appli_assembly_path=$projectdir"${appli_assembly_path}"
 appli_assembly=${appli_assembly_file_name}
 code_size=${secure_code_size}
-code_image_path=${code_image_path}
+code_image_path=$projectdir"${code_image_path}"
 isFullSecure=${isFullSecure}
 	[/#if]
 [#--
@@ -117,5 +118,5 @@ ssfi_binary=SecureManagerPackage_v1.0.0.rc1.ssfi
 # Configure Virtual Com Port
 com_port=COM4
 [/#if]
-echo $rot_provisioning_path
+[#--  echo $rot_provisioning_path--]
 

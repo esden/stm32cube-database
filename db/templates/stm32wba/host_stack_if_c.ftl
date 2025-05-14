@@ -29,7 +29,7 @@ Key: ${key}; Value: ${myHash[key]}
 #include "host_stack_if.h"
 #include "app_conf.h"
 #include "ll_sys.h"
-[#if (myHash["BLE_MODE_SKELETON"] != "Enabled")]
+[#if (myHash["BLE"] == "Enabled")]
 #include "app_ble.h"
 [/#if]
 [#if myHash["SEQUENCER_STATUS"]?number == 1 ]
@@ -55,7 +55,7 @@ void HostStack_Process(void)
 
   /* USER CODE END HostStack_Process 0 */
 
-  [#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled")]
+  [#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled")]
   /* Process BLE Host stack */
   BleStackCB_Process();
   [/#if]
@@ -65,7 +65,7 @@ void HostStack_Process(void)
   /* USER CODE END HostStack_Process 1 */
 }
 
-[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled")]
+[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled")]
 /**
   * @brief  BLE Host stack processing callback.
   * @param  None

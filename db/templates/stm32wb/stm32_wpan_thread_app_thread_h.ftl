@@ -10,11 +10,15 @@
  */
 /* USER CODE END Header */
 [#assign THREAD_APPLICATION = 0]
+[#assign FREERTOS_STATUS = 0]
 [#list SWIPdatas as SWIP]
 	[#if SWIP.defines??]
 		[#list SWIP.defines as definition]
             [#if (definition.name == "THREAD_APPLICATION") ]
                 [#assign THREAD_APPLICATION = definition.value]
+            [/#if]
+			[#if (definition.name == "FREERTOS_STATUS")  && (definition.value == "1")]
+                [#assign FREERTOS_STATUS = 1]
             [/#if]
 		[/#list]
 	[/#if]
@@ -80,6 +84,9 @@ typedef enum
 [/#if]
   ERR_THREAD_ERASE_PERSISTENT_INFO,
   ERR_THREAD_SET_NETWORK_KEY,
+[#if ((THREAD_APPLICATION = "MTD") && (FREERTOS_STATUS = 1)) ||(THREAD_APPLICATION = "MTD")]
+  ERR_THREAD_LINK_MODE,
+[/#if]
 /* USER CODE BEGIN ERROR_APPLI_ENUM */
 
 /* USER CODE END ERROR_APPLI_ENUM */

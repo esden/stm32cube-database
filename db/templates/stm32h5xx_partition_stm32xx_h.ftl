@@ -55,10 +55,21 @@
 #ifndef PARTITION_STM32H573XX_H
 #define PARTITION_STM32H573XX_H
 [/#if]
+[#if McuName?starts_with("STM32H523")]
+#ifndef PARTITION_STM32H523XX_H
+#define PARTITION_STM32H523XX_H
+[/#if]
+[#if McuName?starts_with("STM32H533")]
+#ifndef PARTITION_STM32H533XX_H
+#define PARTITION_STM32H533XX_H
+[/#if]
 [#assign nonSecureIT0 = "100, 100"/]
 [#assign nonSecureIT1 = "100, 100"/]
 [#assign nonSecureIT2 = "100, 100"/]
 [#assign nonSecureIT3 = "100, 100"/]
+[#if SAU??]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/sau_partition.tmp"/][#-- ADD SAU init Code--]
+[#else]
 /*
 //-------- <<< Use Configuration Wizard in Context Menu >>> -----------------
 */
@@ -229,7 +240,7 @@
 //   <e>Initialize SAU Region 5
 //   <i> Setup SAU Region 5 memory attributes
 */
-#define SAU_INIT_REGION5    0
+#define SAU_INIT_REGION5    1
 
 /*
 //     <o>Start Address <0-0xFFFFFFE0>
@@ -255,7 +266,7 @@
 //   <e>Initialize SAU Region 6
 //   <i> Setup SAU Region 6 memory attributes
 */
-#define SAU_INIT_REGION6    0
+#define SAU_INIT_REGION6    1
 
 /*
 //     <o>Start Address <0-0xFFFFFFE0>
@@ -281,7 +292,7 @@
 //   <e>Initialize SAU Region 7
 //   <i> Setup SAU Region 7 memory attributes
 */
-#define SAU_INIT_REGION7    0
+#define SAU_INIT_REGION7    1
 
 /*
 //     <o>Start Address <0-0xFFFFFFE0>
@@ -306,7 +317,7 @@
 /*
 // </h>
 */
-
+[/#if]
 /*
 // <e>Setup behaviour of Sleep and Exception Handling
 */
@@ -747,4 +758,10 @@ __STATIC_INLINE void TZ_SAU_Setup (void)
 [/#if]
 [#if McuName?starts_with("STM32H573")]
 #endif  /* PARTITION_STM32H573XX_H */
+[/#if]
+[#if McuName?starts_with("STM32H523")]
+#endif  /* PARTITION_STM32H523XX_H */
+[/#if]
+[#if McuName?starts_with("STM32H533")]
+#endif  /* PARTITION_STM32H533XX_H */
 [/#if]

@@ -10,6 +10,20 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
+[#assign myHash = {}]
+[#list SWIPdatas as SWIP]
+    [#if SWIP.defines??]
+        [#list SWIP.defines as definition]
+            [#assign myHash = {definition.name:definition.value} + myHash]
+        [/#list]
+    [/#if]
+[/#list]
+[#--
+Key & Value:
+[#list myHash?keys as key]
+Key: ${key}; Value: ${myHash[key]}
+[/#list]
+--]
 
 #include "app_common.h"
 #include "stm32wbaxx_hal.h"
@@ -18,7 +32,15 @@
 #include "stm32wbaxx_ll_rcc.h"
 #include "app_conf.h"
 #include "scm.h"
+[#if (myHash["USE_TEMPERATURE_BASED_RADIO_CALIBRATION"]?number == 1)]
+#if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)
 #include "adc_ctrl.h"
+#endif /* (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1) */
+[/#if]
+
+/* USER CODE BEGIN Includes */
+
+/* USER CODE END Includes */
 
 #define max(a,b) ((a) > (b) ? a : b)
 
@@ -29,8 +51,13 @@ void (*low_isr_callback)(void) = NULL;
 /* RNG handle */
 extern RNG_HandleTypeDef hrng;
 
+[#if (myHash["USE_TEMPERATURE_BASED_RADIO_CALIBRATION"]?number == 1)]
+#if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)
 /* Link Layer temperature request from background */
 extern void ll_sys_bg_temperature_measurement(void);
+#endif /* (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1) */
+
+[/#if]
 
 /* Radio critical sections */
 static uint32_t primask_bit = 0;
@@ -260,6 +287,9 @@ void LINKLAYER_PLAT_EnableSpecificIRQ(uint8_t isr_type)
     {
       /* When specific counter for link layer high ISR reaches 0, interrupt is enabled */
       HAL_NVIC_EnableIRQ(RADIO_INTR_NUM);
+      /* USER CODE BEGIN LINKLAYER_PLAT_EnableSpecificIRQ_1*/
+
+      /* USER CODE END LINKLAYER_PLAT_EnableSpecificIRQ_1*/
     }
   }
 
@@ -302,6 +332,9 @@ void LINKLAYER_PLAT_DisableSpecificIRQ(uint8_t isr_type)
     prio_high_isr_counter++;
     if(prio_high_isr_counter == 1)
     {
+      /* USER CODE BEGIN LINKLAYER_PLAT_DisableSpecificIRQ_1*/
+
+      /* USER CODE END LINKLAYER_PLAT_DisableSpecificIRQ_1*/
       /* When specific counter for link layer high ISR value is 1, interrupt is disabled */
       HAL_NVIC_DisableIRQ(RADIO_INTR_NUM);
     }
@@ -338,7 +371,15 @@ void LINKLAYER_PLAT_DisableSpecificIRQ(uint8_t isr_type)
   */
 void LINKLAYER_PLAT_EnableRadioIT(void)
 {
+  /* USER CODE BEGIN LINKLAYER_PLAT_EnableRadioIT_1*/
+
+  /* USER CODE END LINKLAYER_PLAT_EnableRadioIT_1*/
+
   HAL_NVIC_EnableIRQ((IRQn_Type) RADIO_INTR_NUM);
+
+  /* USER CODE BEGIN LINKLAYER_PLAT_EnableRadioIT_2*/
+
+  /* USER CODE END LINKLAYER_PLAT_EnableRadioIT_2*/
 }
 
 /**
@@ -348,7 +389,15 @@ void LINKLAYER_PLAT_EnableRadioIT(void)
   */
 void LINKLAYER_PLAT_DisableRadioIT(void)
 {
+  /* USER CODE BEGIN LINKLAYER_PLAT_DisableRadioIT_1*/
+
+  /* USER CODE END LINKLAYER_PLAT_DisableRadioIT_1*/
+
   HAL_NVIC_DisableIRQ((IRQn_Type) RADIO_INTR_NUM);
+
+  /* USER CODE BEGIN LINKLAYER_PLAT_DisableRadioIT_2*/
+
+  /* USER CODE END LINKLAYER_PLAT_DisableRadioIT_2*/
 }
 
 /**
@@ -360,7 +409,9 @@ void LINKLAYER_PLAT_StartRadioEvt(void)
 {
   __HAL_RCC_RADIO_CLK_SLEEP_ENABLE();
   NVIC_SetPriority(RADIO_INTR_NUM, RADIO_INTR_PRIO_HIGH);
+#if (CFG_SCM_SUPPORTED == 1)
   scm_notifyradiostate(SCM_RADIO_ACTIVE);
+#endif /* CFG_SCM_SUPPORTED */
 }
 
 /**
@@ -372,7 +423,9 @@ void LINKLAYER_PLAT_StopRadioEvt(void)
 {
   __HAL_RCC_RADIO_CLK_SLEEP_DISABLE();
   NVIC_SetPriority(RADIO_INTR_NUM, RADIO_INTR_PRIO_LOW);
+#if (CFG_SCM_SUPPORTED == 1)
   scm_notifyradiostate(SCM_RADIO_NOT_ACTIVE);
+#endif /* CFG_SCM_SUPPORTED */
 }
 
 /**
@@ -382,7 +435,42 @@ void LINKLAYER_PLAT_StopRadioEvt(void)
   */
 void LINKLAYER_PLAT_RequestTemperature(void)
 {
+[#if (myHash["USE_TEMPERATURE_BASED_RADIO_CALIBRATION"]?number == 1)]
 #if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)
   ll_sys_bg_temperature_measurement();
 #endif /* USE_TEMPERATURE_BASED_RADIO_CALIBRATION */
+[/#if]
+}
+
+/**
+  * @brief  Enable RTOS context switch.
+  * @param  None
+  * @retval None
+  */
+void LINKLAYER_PLAT_EnableOSContextSwitch(void)
+{
+[#if myHash["THREADX_STATUS"]?number == 1 ]
+  tx_interrupt_control(TX_INT_ENABLE);
+[/#if]
+}
+
+/**
+  * @brief  Disable RTOS context switch.
+  * @param  None
+  * @retval None
+  */
+void LINKLAYER_PLAT_DisableOSContextSwitch(void)
+{
+[#if myHash["THREADX_STATUS"]?number == 1 ]
+  tx_interrupt_control(TX_INT_DISABLE);
+[/#if]
+}
+
+/**
+ * @brief Notify the upper layer that new Link Layer timings have been applied.
+ * @param evnt_timing[in]: Evnt_timing_t pointer to structure contains drift time , execution time and scheduling time
+ * @retval None.
+ */
+void LINKLAYER_PLAT_SCHLDR_TIMING_UPDATE_NOT(Evnt_timing_t * p_evnt_timing)
+{
 }

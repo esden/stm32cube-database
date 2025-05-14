@@ -21,6 +21,9 @@
 
 #include "stm32wbaxx_hal.h"
 
+/* Debug */
+#include "log_module.h"
+
 /* Global variables ----------------------------------------------------------*/
 /* Private typedef -----------------------------------------------------------*/
 
@@ -104,7 +107,6 @@ static FM_FlashOpConfig_t fm_flashop_parameters;
  */
 static FM_BackGround_States_t FM_CurrentBackGroundState;
 
-
 /* Private function prototypes -----------------------------------------------*/
 
 static FM_Cmd_Status_t FM_CheckFlashManagerState(FM_CallbackNode_t *CallbackNode);
@@ -127,12 +129,18 @@ FM_Cmd_Status_t FM_Write(uint32_t *Src, uint32_t *Dest, int32_t Size, FM_Callbac
 
   if (((uint32_t)Dest < FLASH_BASE) || ((uint32_t)Dest > (FLASH_BASE + FLASH_BANK_SIZE))
                                     || (((uint32_t)Dest + Size) > (FLASH_BASE + FLASH_BANK_SIZE)))
-  {/* Destination address not part of the flash */
+  {
+    LOG_ERROR_SYSTEM("\r\nFM_Write - Destination address not part of the flash");
+
+    /* Destination address not part of the flash */
     return FM_ERROR;
   }
 
   if (((uint32_t) Src & ALIGNMENT_32) || ((uint32_t) Dest & ALIGNMENT_128))
-  { /* Source or destination address not properly aligned */
+  {
+    LOG_ERROR_SYSTEM("\r\nFM_Write - Source or destination address not properly aligned");
+
+    /* Source or destination address not properly aligned */
     return FM_ERROR;
   }
 
@@ -153,6 +161,9 @@ FM_Cmd_Status_t FM_Write(uint32_t *Src, uint32_t *Dest, int32_t Size, FM_Callbac
     /* Window request to be executed in background */
     FM_ProcessRequest();
   }
+
+  LOG_INFO_SYSTEM("\r\nFM_Write - Returned value : %d", status);
+
   return status;
 }
 
@@ -168,12 +179,18 @@ FM_Cmd_Status_t FM_Erase(uint32_t FirstSect, uint32_t NbrSect, FM_CallbackNode_t
   FM_Cmd_Status_t status;
 
   if ((FirstSect > FLASH_PAGE_NB) || ((FirstSect + NbrSect) > FLASH_PAGE_NB))
-  { /* Inconsistent request */
+  {
+    LOG_ERROR_SYSTEM("\r\nFM_Erase - Inconsistent request");
+
+    /* Inconsistent request */
     return FM_ERROR;
   }
 
   if (NbrSect == 0)
-  { /* Inconsistent request */
+  {
+    LOG_ERROR_SYSTEM("\r\nFM_Erase - Inconsistent request");
+
+    /* Inconsistent request */
     return FM_ERROR;
   }
 
@@ -193,6 +210,9 @@ FM_Cmd_Status_t FM_Erase(uint32_t FirstSect, uint32_t NbrSect, FM_CallbackNode_t
     /* Window request to be executed in background */
     FM_ProcessRequest();
   }
+
+  LOG_INFO_SYSTEM("\r\nFM_Erase - Returned value : %d", status);
+
   return status;
 }
 
@@ -212,8 +232,12 @@ void FM_BackgroundProcess (void)
   {
     case FM_BKGND_NOWINDOW_FLASHOP:
     {
+      LOG_INFO_SYSTEM("\r\nFM_BackgroundProcess - Case FM_BKGND_NOWINDOW_FLASHOP");
+
       if (fm_flashop == FM_WRITE_OP)
       {
+        LOG_INFO_SYSTEM("\r\nFM_BackgroundProcess - Case FM_BKGND_NOWINDOW_FLASHOP - Write operation");
+
         /* Update duration time value */
         duration = TIME_WINDOW_WRITE_REQUEST;
 
@@ -246,6 +270,8 @@ void FM_BackgroundProcess (void)
       }
       else
       {
+        LOG_INFO_SYSTEM("\r\nFM_BackgroundProcess - Case FM_BKGND_NOWINDOW_FLASHOP - Erase operation");
+
         /* Update duration time value */
         duration = TIME_WINDOW_ERASE_REQUEST;
 
@@ -278,15 +304,23 @@ void FM_BackgroundProcess (void)
 
     case FM_BKGND_WINDOWED_FLASHOP:
     {
+      LOG_INFO_SYSTEM("\r\nFM_BackgroundProcess - Case FM_BKGND_WINDOWED_FLASHOP");
+
       if (fm_window_granted == false)
       {
+        LOG_INFO_SYSTEM("\r\nFM_BackgroundProcess - Case FM_BKGND_WINDOWED_FLASHOP - No time window granted yet, request one");
+
         /* No time window granted yet, request one */
         RFTS_ReqWindow(duration, &FM_WindowAllowed_Callback);
       }
       else
       {
+        LOG_INFO_SYSTEM("\r\nFM_BackgroundProcess - Case FM_BKGND_WINDOWED_FLASHOP - Time window granted");
+
         if (fm_flashop == FM_WRITE_OP)
-        { /* Flash Write operation */
+        {
+          /* Flash Write operation */
+          LOG_INFO_SYSTEM("\r\nFM_BackgroundProcess - Case FM_BKGND_WINDOWED_FLASHOP - Write operation");
 
           HAL_FLASH_Unlock();
 
@@ -308,7 +342,9 @@ void FM_BackgroundProcess (void)
 
     }
     else
-    { /* Flash Erase operation */
+    {
+      /* Flash Erase operation */
+      LOG_INFO_SYSTEM("\r\nFM_BackgroundProcess - Case FM_BKGND_WINDOWED_FLASHOP - Erase operation");
 
       HAL_FLASH_Unlock();
 
@@ -371,7 +407,9 @@ void FM_BackgroundProcess (void)
     }
   }
   else
-  { /* Flash operation not complete yet */
+  {
+    /* Flash operation not complete yet */
+    LOG_INFO_SYSTEM("\r\nFM_BackgroundProcess - Flash operation not complete yet, request a new time window");
 
     /* Request a new time window */
     RFTS_ReqWindow(duration, &FM_WindowAllowed_Callback);
@@ -461,6 +499,8 @@ static FM_Cmd_Status_t FM_CheckFlashManagerState(FM_CallbackNode_t *CallbackNode
 static void FM_WindowAllowed_Callback(void)
 {
   fm_window_granted = true;
+
+  LOG_INFO_SYSTEM("\r\nFM_WindowAllowed_Callback");
 
   /* Flash operation to be executed in background */
   FM_ProcessRequest();

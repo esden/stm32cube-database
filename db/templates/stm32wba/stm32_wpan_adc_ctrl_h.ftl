@@ -14,8 +14,6 @@
 #ifndef ADC_CTRL_H
 #define ADC_CTRL_H
 
-#include "app_conf.h"
-
 #if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)
 
 #include <stdint.h>

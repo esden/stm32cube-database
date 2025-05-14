@@ -32,8 +32,10 @@ Key: ${key}; Value: ${myHash[key]}
 #define LL_SYS_IF_H
 
 /* Includes ------------------------------------------------------------------*/
+[#if (myHash["BLE"] == "Enabled")]
 [#if myHash["THREADX_STATUS"]?number == 1 ]
 #include "tx_api.h"
+[/#if]
 [/#if]
 
 /* Private includes ----------------------------------------------------------*/
@@ -52,10 +54,12 @@ Key: ${key}; Value: ${myHash[key]}
 /* USER CODE END EC */
 
 /* External variables --------------------------------------------------------*/
+[#if (myHash["BLE"] == "Enabled")]
 [#if myHash["THREADX_STATUS"]?number == 1 ]
 /* LINK_LAYER_TASK related resources */
-extern TX_MUTEX LINK_LAYER_Thread_Mutex;
+extern TX_MUTEX           LinkLayerMutex;
 
+[/#if]
 [/#if]
 /* USER CODE BEGIN EV */
 
@@ -66,10 +70,15 @@ extern TX_MUTEX LINK_LAYER_Thread_Mutex;
 
 /* USER CODE END EM */
 
-/* Exported functions ---------------------------------------------*/
-/* USER CODE BEGIN EF */
+/* Exported functions prototypes ---------------------------------------------*/
+[#if (myHash["USE_TEMPERATURE_BASED_RADIO_CALIBRATION"]?number == 1)]
+#if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)
+void ll_sys_bg_temperature_measurement(void);
+#endif /* USE_TEMPERATURE_BASED_RADIO_CALIBRATION */
+[/#if]
+/* USER CODE BEGIN EFP */
 
-/* USER CODE END EF */
+/* USER CODE END EFP */
 
 #ifdef __cplusplus
 }

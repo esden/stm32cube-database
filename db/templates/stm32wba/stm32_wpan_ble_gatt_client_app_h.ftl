@@ -73,7 +73,7 @@ typedef enum
   PROC_GATT_DISC_ALL_PRIMARY_SERVICES,
   PROC_GATT_DISC_ALL_CHARS,
   PROC_GATT_DISC_ALL_DESCS,
-  PROC_GATT_ENABLE_ALL_NOTIFICATIONS,
+  PROC_GATT_PROPERTIES_ENABLE_ALL,
   /* USER CODE BEGIN ProcGattId_t*/
 
   /* USER CODE END ProcGattId_t */
@@ -119,7 +119,7 @@ extern TX_SEMAPHORE PROC_GATT_COMPLETE_Sem;
 
 /* USER CODE END EM */
 
-/* Exported functions ---------------------------------------------*/
+/* Exported functions prototypes ---------------------------------------------*/
 void GATT_CLIENT_APP_Init(void);
 uint8_t GATT_CLIENT_APP_Procedure_Gatt(uint8_t index, ProcGattId_t GattProcId);
 void GATT_CLIENT_APP_Notification(GATT_CLIENT_APP_ConnHandle_Notif_evt_t *p_Notif);

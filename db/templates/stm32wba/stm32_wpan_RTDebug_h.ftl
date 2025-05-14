@@ -15,7 +15,7 @@
 
 #include "debug_config.h"
 
-#if(RT_DEBUG_GPIO_MODULE == 1)
+#if(CFG_RT_DEBUG_GPIO_MODULE == 1)
 
 /**************************************************************/
 /** Generic macros for local signal table index recuperation **/
@@ -23,7 +23,12 @@
 /**************************************************************/
 
 #define GENERIC_DEBUG_GPIO_SET(signal, table) do {                    \
-  uint32_t debug_table_idx = table[signal];                           \
+  uint32_t debug_table_idx = 0;                                       \
+  if(signal >= sizeof(table))                                         \
+  {                                                                   \
+    return;                                                           \
+  }                                                                   \
+  debug_table_idx = table[signal];                                    \
   if(debug_table_idx != RT_DEBUG_SIGNAL_UNUSED)                       \
   {                                                                   \
     HAL_GPIO_WritePin(general_debug_table[debug_table_idx].GPIO_port, \
@@ -33,7 +38,12 @@
 } while(0)
 
 #define GENERIC_DEBUG_GPIO_RESET(signal, table) do {                  \
-  uint32_t debug_table_idx = table[signal];                           \
+  uint32_t debug_table_idx = 0;                                       \
+  if(signal >= sizeof(table))                                         \
+  {                                                                   \
+    return;                                                           \
+  }                                                                   \
+  debug_table_idx = table[signal];                                    \
   if(debug_table_idx != RT_DEBUG_SIGNAL_UNUSED)                       \
   {                                                                   \
     HAL_GPIO_WritePin(general_debug_table[debug_table_idx].GPIO_port, \
@@ -43,7 +53,12 @@
 } while(0)
 
 #define GENERIC_DEBUG_GPIO_TOGGLE(signal, table) do {                  \
-  uint32_t debug_table_idx = table[signal];                            \
+  uint32_t debug_table_idx = 0;                                        \
+  if(signal >= sizeof(table))                                          \
+  {                                                                    \
+    return;                                                            \
+  }                                                                    \
+  debug_table_idx = table[signal];                                     \
   if(debug_table_idx != RT_DEBUG_SIGNAL_UNUSED)                        \
   {                                                                    \
     HAL_GPIO_TogglePin(general_debug_table[debug_table_idx].GPIO_port, \
@@ -51,7 +66,7 @@
   }                                                                    \
 } while(0)
 
-#endif /* RT_DEBUG_GPIO_MODULE */
+#endif /* CFG_RT_DEBUG_GPIO_MODULE */
 
 /* System debug API definition */
 void SYSTEM_DEBUG_SIGNAL_SET(system_debug_signal_t signal);

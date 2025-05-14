@@ -189,9 +189,17 @@ void MX_${data.ipName}_GPIO_Init(void)
                 [#assign irqNum = irqNum+1]
                 [#if irqNum==1]#n#t/* EXTI interrupt init*/[/#if]               
 [#if usedDriver == "HAL"]
+[#if DIE != "DIE501"]
                 #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+[#else]
+                #tIRQ_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
+[/#if]
 [#if EnableCode??]
+[#if DIE != "DIE501"]
                 #tHAL_NVIC_EnableIRQ(${initVector.vector});#n
+[#else]
+                #tIRQ_Enable(${initVector.vector});
+[/#if]                
 [/#if]
 [#else]
     [#if NVICPriorityGroup??]

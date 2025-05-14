@@ -37,7 +37,11 @@ int mbedtls_hardware_poll( void *Data, unsigned char *Output, size_t Len, size_t
     if (HAL_RNG_GenerateRandomNumber(&hrng, &randomValue) == HAL_OK)
     {
       *oLen += 4;
+      [#if FamilyName=="STM32F4"]
+      memcpy(&(Output[index * 4]), &randomValue, 4);
+      [#else]
       memset(&(Output[index * 4]), (int)randomValue, 4);
+      [/#if]
     }
     else
     {

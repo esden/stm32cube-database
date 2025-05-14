@@ -70,10 +70,13 @@
 <ScratchFile FileVersion="${FileVersion}">
 <FileVersion>${FileVersion}</FileVersion> [#-- add file version for UC30 --]
 <Workspace>
+[/#compress]
 <WorkspaceType>[#if (IdeMode?? || ide=="STM32CubeIDE") && family=="STM32MP1xx"]Multi-project[#else]${WorkspaceType}[/#if]</WorkspaceType>
 <WorkspacePath>${WorkspacePath}</WorkspacePath>
+[#compress]
 <underRoot>${underRoot}</underRoot>
 <TrustZone>${TrustZone}</TrustZone>
+[#if Structure??]<Structure>${Structure}</Structure>[/#if]
 [#if Multi_folder == "true"] 
 <ProjectStructure>${ProjectStructure}</ProjectStructure>
  [/#if]
@@ -93,6 +96,7 @@
 [#if staticLibraryProject??]<StaticLibraryProject>true</StaticLibraryProject> [#-- Static Library Project --][/#if]
 
     [#--<Version>${version}</Version>--]
+[/#compress]
 <IocFile>${projectName}.ioc</IocFile>
 
 [#if TrustZone=="0"]
@@ -127,7 +131,6 @@
 [/#if]
 </Workspace>
 </ScratchFile>
-[/#compress]
 
 [#-- Marco generateConfig --]
 [#macro generateConfig multiConfig elem]
@@ -195,6 +198,9 @@
             [#if dataKey=="active"]
                [#assign active =  elem[dataKey]]
             [/#if]
+            [#if dataKey=="Context"]
+               [#assign Context =  elem[dataKey]]
+            [/#if]
             [#if dataKey=="threadsafeCore"]
                [#assign threadsafeCore =  elem[dataKey]]
             [/#if]
@@ -211,6 +217,7 @@
     <name>${Configuration}[#if (multiConfig == "true")][#if Secure!="-1"][#if Secure=="1"]_S[#else]_NS[/#if][#else]_${cpuCore?replace("ARM Cortex-", "C")}[/#if][#else][/#if]</name>	 [#-- project configuration name. Ex: STM32F407_EVAL --]
 <mainSourceRepo>[#if mainSourceRepo??]${mainSourceRepo}[/#if]</mainSourceRepo>   
 <sourceStructure>[#if sourceStructure??]${sourceStructure}[/#if]</sourceStructure>
+[#if Context??]<Context>${Context}</Context>[/#if]
  <device>${project.deviceId}</device>		 [#--  STM32 selected device. Ex: STM32F407ZE --]
     [#if IdeMode?? || ide=="STM32CubeIDE" || family=="STM32MP1xx"]
     <cpucore>${cpuCore}</cpucore>    
@@ -221,7 +228,7 @@
     [#if !IdeMode?? && (multiConfig == "true")]
     <bootmode>${bootmode}</bootmode>  [#-- for boot mode could be equals to SRAM or FLASH --]
     [/#if]
-     [#if TrustZone == "1" &&prj_ctx?? && prj_ctx=="1" && SecureOnly=="0"]
+     [#if TrustZone == "1" &&prj_ctx?? && prj_ctx=="1"]
     <ExePath>${ExePath}</ExePath>
     [/#if]
    [#if OutputFilesFormat??]
@@ -295,7 +302,7 @@
 	<lib>${LinkAdditionalLibs}</lib>
 [/#if]
 	</LinkAdditionalLibs>
-[#if TrustZone == "1" && prj_ctx?? && prj_ctx=="1" && SecureOnly=="0"]
+[#if TrustZone == "1" && prj_ctx?? && prj_ctx=="1"]
 	<TrustZoneLibName>${TrustZoneLibName}</TrustZoneLibName>
 [/#if]
 </LinkSettings>
@@ -594,17 +601,17 @@
 [/#if]
     <configs>
 [#if ProjectConfigs?size > 1  || WorkspaceType=="Multi-project"]
-[#list ProjectConfigs?keys as configName]
-[#assign elemConfig = ProjectConfigs[configName] ]
-        [#list elemConfig?keys as dataKey]
-            [#if dataKey=="Secure"]
-               [#assign Secure =  elemConfig[dataKey]]
-            [/#if]
-        [/#list]
+    [#list ProjectConfigs?keys as configName]
+    [#assign elemConfig = ProjectConfigs[configName] ]
+            [#list elemConfig?keys as dataKey]
+                [#if dataKey=="Secure"]
+                   [#assign Secure =  elemConfig[dataKey]]
+                [/#if]
+            [/#list]
 [#if prjSecure=Secure]
-[@generateConfig multiConfig="true" elem=ProjectConfigs[configName]/]
-[/#if]
-[/#list]
+    [@generateConfig multiConfig="true" elem=ProjectConfigs[configName]/]
+    [/#if]
+    [/#list]
 [#else]
 [@generateConfig multiConfig="false" elem=""/]
 [/#if]

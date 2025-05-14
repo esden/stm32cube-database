@@ -548,8 +548,13 @@
                 [#if initVector.codeInMspInit]
                   [#assign irqNum = irqNum+1]
                   [#if irqNum==1]#n#t#t/* Peripheral interrupt init*/[/#if]
+                  [#if DIE != "DIE501"]
                   #t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
                   #t#tHAL_NVIC_EnableIRQ(${initVector.vector});
+                  [#else]
+                  #t#tIRQ_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
+                  #t#tIRQ_Enable(${initVector.vector});
+                  [/#if]
                 [/#if]
             [/#list]
         [/#if]
@@ -573,7 +578,11 @@
 [#-- DeInit NVIC if DeInit --]
     [#if nvicExist&&service.nvic?size>0]#n#t#t/* Peripheral interrupt Deinit*/[#--#n#t#tHAL_NVIC_DisableIRQ([#if service.nvic.vector??]${service.nvic.vector}[/#if]);--]
             [#list service.nvic as initVector]
+                [#if DIE != "DIE501"]           
                 #t#tHAL_NVIC_DisableIRQ(${initVector.vector});
+                [#else]
+                #t#tIRQ_Disable(${initVector.vector});
+                [/#if] 
             [/#list]
     [/#if]
 

@@ -35,7 +35,7 @@ typedef enum
 /* Exported constants --------------------------------------------------------*/
 /* Exported variables --------------------------------------------------------*/
 /* Exported macros -----------------------------------------------------------*/
-/* Exported functions ------------------------------------------------------- */
+/* Exported functions prototypes ---------------------------------------------*/
 RFTS_Cmd_Status_t RFTS_ReqWindow(uint32_t Duration, void (*Callback)(void));
 RFTS_Cmd_Status_t RFTS_RelWindow(void);
 

@@ -155,6 +155,11 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <MethodArg Name="PeriphID" FValue="GTZC_PERIPH_PKA"/>
       </CallLibMethod>
     </IFCondition>
+    <IFCondition Expression="(PTA_Illegal_Access_Interrupt=Enabled)">
+      <CallLibMethod Name="HAL_GTZC_TZIC_EnableIT">
+        <MethodArg Name="PeriphID" FValue="GTZC_PERIPH_PTACONV"/>
+      </CallLibMethod>
+    </IFCondition>
     <IFCondition Expression="(RAMCFG_Illegal_Access_Interrupt=Enabled)">
       <CallLibMethod Name="HAL_GTZC_TZIC_EnableIT">
         <MethodArg Name="PeriphID" FValue="GTZC_PERIPH_RAMCFG"/>
@@ -707,6 +712,18 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
                 <CallLibMethod Name="HAL_GTZC_TZSC_ConfigPeriphAttributes">
                   <MethodArg Name="PeriphID" FValue="GTZC_PERIPH_PKA"/>
                   <MethodArg Name="PeriphAttributes" ParameterName="PKA_Privilege"/>
+                </CallLibMethod>
+              </IFCondition>
+              <IFCondition Expression="($IpInstance=GTZC_S &amp; PTA_GTZC_SECURE) &amp; (PTA_Secure=GTZC_TZSC_PERIPH_SEC)">
+                <CallLibMethod Name="HAL_GTZC_TZSC_ConfigPeriphAttributes">
+                  <MethodArg Name="PeriphID" FValue="GTZC_PERIPH_PTACONV"/>
+                  <MethodArg Name="PeriphAttributes" ParameterName="PTA_Secure|PTA_Privilege"/>
+                </CallLibMethod>
+              </IFCondition>
+              <IFCondition Expression="(!($IpInstance=GTZC_S)) &amp; (!PTA_GTZC_SECURE) &amp; (PTA_Secure=GTZC_TZSC_PERIPH_NSEC) &amp; (PTA_Privilege=GTZC_TZSC_PERIPH_PRIV)">
+                <CallLibMethod Name="HAL_GTZC_TZSC_ConfigPeriphAttributes">
+                  <MethodArg Name="PeriphID" FValue="GTZC_PERIPH_PTACONV"/>
+                  <MethodArg Name="PeriphAttributes" ParameterName="PTA_Privilege"/>
                 </CallLibMethod>
               </IFCondition>
               <IFCondition Expression="($IpInstance=GTZC_S &amp; RAMCFG_GTZC_SECURE) &amp; (RAMCFG_Secure=GTZC_TZSC_PERIPH_SEC)">

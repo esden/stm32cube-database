@@ -52,11 +52,12 @@
 <ScratchFile FileVersion="${FileVersion}">
 <FileVersion>${FileVersion}</FileVersion> [#-- add file version for UC30 --]
 <Workspace>
-
+[/#compress]
 <WorkspaceType>Single-project</WorkspaceType>
 <WorkspacePath>${WorkspacePath}</WorkspacePath>
+[#compress]
 <underRoot>${underRoot}</underRoot> [#-- ${underRoot}--]
-
+[#if Structure??]<Structure>${Structure}</Structure>[/#if]
 [#-- list of toolchains to be generated: EWARM,MDK-ARM,TrueSTUDIO,RIDE: This tag can contain one or more than one toolchain: EWARM,MDK-ARM,TrueSTUDIO,RIDE --]
 
     <Toolchain>${ide}</Toolchain>
@@ -64,9 +65,10 @@
 [#if staticLibraryProject??]<StaticLibraryProject>true</StaticLibraryProject> [#-- Static Library Project --][/#if]
 
     [#--<Version>${version}</Version>--]
+[/#compress]    
 <IocFile>${projectName}.ioc</IocFile>
 
-[#if (IdeMode?? || ide=="STM32CubeIDE") && family=="STM32MP1xx"]
+[#if (IdeMode?? || ide=="STM32CubeIDE") && family=="STM32MP13xx"]
 <Project>    
     <ProjectName>${projectName}_DTS</ProjectName>
     <ProjectNature>DTS</ProjectNature>
@@ -82,7 +84,6 @@
 [/#if]
 </Workspace>
 </ScratchFile>
-[/#compress]
 
 [#-- Marco generateConfig --]
 [#macro generateConfig multiConfig elem]

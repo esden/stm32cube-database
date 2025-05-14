@@ -24,11 +24,13 @@ Key & Value:
 Key: ${key}; Value: ${myHash[key]}
 [/#list]
 --]
+/* Includes ------------------------------------------------------------------*/
 
 #include "app_sys.h"
 #include "app_conf.h"
 #include "timer_if.h"
 #include "stm32_lpm.h"
+[#if (myHash["BLE"] == "Enabled")]
 [#if myHash["SEQUENCER_STATUS"]?number == 1 ]
 #include "stm32_seq.h"
 [#elseif myHash["THREADX_STATUS"]?number == 1 ]
@@ -36,9 +38,11 @@ Key: ${key}; Value: ${myHash[key]}
 [#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
 #include "cmsis_os.h"
 [/#if]
+[/#if]
 #include "ll_intf.h"
 #include "ll_sys.h"
 
+[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled")]
 void APP_SYS_BLE_EnterDeepSleep(void)
 {
   ble_stat_t cmd_status = GENERAL_FAILURE;
@@ -65,3 +69,39 @@ void APP_SYS_BLE_EnterDeepSleep(void)
     }
   }
 }
+[#else]
+#include "ral.h"
+
+/* External functions ----------------------------------------------------------*/
+extern uint32_t             llhwc_cmn_is_dp_slp_enabled(void);
+
+/* External variables ----------------------------------------------------------*/
+extern uint8_t              is_Radio_DeepSleep;
+
+/* Functions Definition ------------------------------------------------------*/
+
+void APP_SYS_LPM_EnterLowPowerMode(void)
+{
+  ral_instance_t radio_instance;
+  uint8_t channel;
+  uint64_t next_radio_evt;
+
+  /* Ensure there are no radio events (implement bsp function like bsp_is_radio_idle() ) */
+  ral_event_state_enum_t radio_state = ral_get_current_event_state( &radio_instance, &channel );
+  LL_UNUSED(radio_instance);
+  LL_UNUSED(channel);
+  if (radio_state != RAL_IDLE)
+    return;
+
+  next_radio_evt = os_timer_get_earliest_time();
+  if ( llhwc_cmn_is_dp_slp_enabled() == 0 )
+  {
+    if ( next_radio_evt > RADIO_DEEPSLEEP_WAKEUP_TIME_US )
+    {
+      /* No event in a "near" futur */
+      ll_sys_dp_slp_enter( next_radio_evt - RADIO_DEEPSLEEP_WAKEUP_TIME_US );
+    }
+  }
+}
+
+[/#if]

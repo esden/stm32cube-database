@@ -40,7 +40,7 @@ extern "C" {
 [#if LPBAMQUEUEMODULES??]
     [#assign allModules = ["ADC", "COMP", "DAC", "LPDMA", "LPGPIO", "I2C", "LPTIM", "OPAMP", "RTC", "SPI", "LPUART", "VREFBUF"]]
   [#list allModules as module]
-	[#if isModuleUsed(module)]
+	[#if LPBAMQUEUEMODULES?contains(module)]
 [#compress]#define LPBAM_${module?replace("LPDMA","DMA")?replace("LPGPIO","GPIO")?replace("LPUART","UART")}_MODULE_ENABLED[/#compress]
 	[#else]
 /*#define LPBAM_${module}_MODULE_ENABLED   */

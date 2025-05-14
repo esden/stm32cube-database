@@ -108,7 +108,7 @@
             #n#t/* Create the semaphores(s) */
           [/#if]
           #t/* creation of ${semaphoreName} */
-          #t${semaphoreName}Handle = osSemaphoreNew(1, 1, &${semaphoreName}_attributes);
+          #t${semaphoreName}Handle = osSemaphoreNew(1, 0, &${semaphoreName}_attributes);
           #n
         [/#if]
       [/#if]

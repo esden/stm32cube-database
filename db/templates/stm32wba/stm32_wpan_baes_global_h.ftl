@@ -11,6 +11,20 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
+[#assign myHash = {}]
+[#list SWIPdatas as SWIP]
+    [#if SWIP.defines??]
+        [#list SWIP.defines as definition]
+            [#assign myHash = {definition.name:definition.value} + myHash]
+        [/#list]
+    [/#if]
+[/#list]
+[#--
+Key & Value:
+[#list myHash?keys as key]
+Key: ${key}; Value: ${myHash[key]}
+[/#list]
+--]
 
 #ifndef BAES_GLOBAL_H__
 #define BAES_GLOBAL_H__
@@ -20,6 +34,13 @@
 #include "baes.h"
 
 /* Default software configuration */
+[#if myHash["OTHER_THAN_BLE"]?number == 1]
+#define     AES_BLOCK_SIZE_BIT      128u            // AES Size in Bits
+#define     AES_BLOCK_SIZE_BYTE     16u             // AES Size in Bytes.
+#define     AES_BLOCK_SIZE_WORD     4u              // AES Size in Words.
+
+#define     AES_EXPANDED_KEY_SIZE   44u
+[/#if]
 
 /* By default, use of AES H/W implementation instead of S/W */
 #ifndef CFG_BAES_SW

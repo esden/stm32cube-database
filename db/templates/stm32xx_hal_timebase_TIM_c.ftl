@@ -107,10 +107,17 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
 [/#if]
 [#if FamilyName!="STM32WL" && FamilyName!="STM32H7" && FamilyName!="STM32G4" && FamilyName!="STM32U5" && FamilyName!="STM32F0" && FamilyName!="STM32F1"  && FamilyName!="STM32F2" && FamilyName!="STM32F3" && FamilyName!="STM32F4" && FamilyName!="STM32F7" && FamilyName!="STM32G0" && FamilyName!="STM32L1" && FamilyName!="STM32L4" && FamilyName!="STM32H5" && FamilyName!="STM32WBA"]
   /*Configure the ${instance} IRQ priority */
+ [#if DIE != "DIE501"] 
   HAL_NVIC_SetPriority(${timeBaseInterrupt}, TickPriority ,0); 
-  
+  [#else]
+  IRQ_SetPriority(${timeBaseInterrupt}, TickPriority);
+  [/#if] 
   /* Enable the ${instance} global Interrupt */
+  [#if DIE != "DIE501"]
   HAL_NVIC_EnableIRQ(${timeBaseInterrupt}); 
+  [#else]
+  IRQ_Enable(${timeBaseInterrupt});
+  [/#if]  
 [/#if]
 [#if FamilyName=="STM32H7"]
 /*Configure the ${instance} IRQ priority */
@@ -262,7 +269,11 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
     {
     [#if FamilyName!="STM32U5" && FamilyName!="STM32L0" && FamilyName!="STM32H5"]
     /* Enable the ${instance} global Interrupt */
+        [#if DIE != "DIE501"]    
         HAL_NVIC_EnableIRQ(${timeBaseInterrupt}); 
+        [#else]
+        IRQ_Enable(${timeBaseInterrupt});
+        [/#if]
       /* Configure the SysTick IRQ priority */
      [/#if]
       if (TickPriority < (1UL << __NVIC_PRIO_BITS))
@@ -272,7 +283,11 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
       [#else]
         /* Enable the ${instance} global Interrupt */
       [/#if]
+      [#if DIE != "DIE501"]
         HAL_NVIC_SetPriority(${timeBaseInterrupt}, TickPriority, 0U);
+      [#else]
+        IRQ_SetPriority(${timeBaseInterrupt}, TickPriority);
+      [/#if]        
         uwTickPrio = TickPriority;
       }
       else
@@ -318,7 +333,11 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
   HAL_TIM_RegisterCallback(&h${instance?lower_case}, HAL_TIM_PERIOD_ELAPSED_CB_ID, TimeBase_TIM_PeriodElapsedCallback);
  [/#if]
   /* Enable the ${instance} global Interrupt */
+  [#if DIE != "DIE501"]
   HAL_NVIC_EnableIRQ(${timeBaseInterrupt}); 
+  [#else]
+  IRQ_Enable(${timeBaseInterrupt});
+  [/#if]
 
   /* Return function status */
   return status; 
@@ -346,7 +365,11 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
   HAL_TIM_RegisterCallback(&h${instance?lower_case}, HAL_TIM_PERIOD_ELAPSED_CB_ID, TimeBase_TIM_PeriodElapsedCallback);
 #endif
   /* Enable the ${instance} global Interrupt */
-  HAL_NVIC_EnableIRQ(${timeBaseInterrupt}); 
+  [#if DIE != "DIE501"]
+  HAL_NVIC_EnableIRQ(${timeBaseInterrupt});
+  [#else]
+  IRQ_Enable(${timeBaseInterrupt});
+  [/#if]  
 
   /* Return function Status */
   return Status; 

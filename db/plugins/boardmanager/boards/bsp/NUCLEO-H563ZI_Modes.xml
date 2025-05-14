@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V4.0" 
+	IPType="bspip" 
+	Name="NUCLEO-H563ZI"
+	Version="nucleo-H563zi-q_v1_0_Cube"
+	xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" 
+	ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd" 
+	xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+  
+	<About>BSP for NUCLEO-H563ZI</About>
+	<!-- BSP COMMON -->
+	<RefParameter Name="LD1" Comment="USER LED GREEN (LD1)" DefaultValue="false" Type="boolean" Group="Led" TabName="Human Machine Interface">
+		<PossibleValue Comment="true" Value="true" Semaphore="S_LED_GREEN"/>
+		<PossibleValue Comment="false" Value="false"/>
+		<Description>Pin PB0 is used to drive the user Green Led</Description>
+	</RefParameter>
+	<RefParameter Name="LD2" Comment="USER LED YELLOW (LD2)" DefaultValue="false" Type="boolean" Group="Led" TabName="Human Machine Interface">
+		<PossibleValue Comment="true" Value="true" Semaphore="S_LED_YELLOW"/>
+		<PossibleValue Comment="false" Value="false"/>
+		<Description>Pin PF4 is used to drive the user Yellow Led</Description>
+	</RefParameter>
+	<RefParameter Name="LD3" Comment="USER LED RED (LD3)" DefaultValue="false" Type="boolean" Group="Led" TabName="Human Machine Interface">
+		<PossibleValue Comment="true" Value="true" Semaphore="S_LED_RED"/>
+		<PossibleValue Comment="false" Value="false"/>
+		<Description>Pin PG4 is used to drive the user Red Led</Description>
+	</RefParameter>
+	
+	<RefParameter Name="BUTTON" Comment="USER BUTTON" DefaultValue="0" Type="list" Group="Button" TabName="Human Machine Interface">
+		<PossibleValue Comment="Mode GPIO" Value="2" Semaphore="S_USER_BUTTON_POLL"/>
+		<PossibleValue Comment="Mode EXTI" Value="1" Semaphore="S_USER_BUTTON_EXTI"/>
+		<PossibleValue Comment="Disable" Value="0"/>
+		<Description>Pin PC13 is used to detect press/release on the user button. This detection could be made by polling or under interrupt</Description>
+	</RefParameter>
+	
+	<RefParameter Name="VCP" Comment="Virtual Com Port" DefaultValue="false" Type="boolean" Group="VCOM" TabName="Human Machine Interface">
+            <PossibleValue Comment="true" Value="true" Semaphore="S_VCOM"/>
+            <PossibleValue Comment="false" Value="false"/>
+			<Description>
+				Peripheral USART3 (Pin PD9, PD8) is used to send trace through the ST-Link&lt;br/&gt;
+				- Baud rate : 115200 &lt;br/&gt;
+				- Data : 8 bit &lt;br/&gt;
+				- Parity : none &lt;br/&gt;
+				- Stop : 1 bit &lt;br/&gt;
+				- Flow control  : No hardware control        &lt;br/&gt;
+
+			</Description>
+        </RefParameter>
+        <!-- Demo code genaration: Bsp_Common_DEMO is set by the wizard.
+        if Bsp_Common_DEMO = true, applicative code is generated for the enabled features. -->
+	<RefParameter Name="Bsp_Common_DEMO" Comment="Generate demonstration code" DefaultValue="false" Type="boolean" Group="Demonstration" TabName="Human Machine Interface" Visible="false">
+            <PossibleValue Comment="true" Value="true" Semaphore="SEM_Common_DEMO_ON"/>
+            <PossibleValue Comment="false" Value="false"/>
+            <Description>Generate demonstration code for selected BSP Common features.&lt;br/&gt;
+                    &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;@note&lt;/b&gt;This parameter is configurable only at project creation in the board project wizard.
+                    &lt;br/&gt;Demonstration code is added only at 1st generation in user section and will not be updated in successive generations.&lt;/font&gt;
+            </Description>
+        </RefParameter>
+	<RefParameter Name="Bsp_Common_DEMO_Enabled" Comment="Generate demonstration code" DefaultValue="Enabled" Type="string" Group="Demonstration code" TabName="Human Machine Interface" Visible="true">
+            <Condition Diagnostic="" Expression="SEM_Common_DEMO_ON"/>
+            <Description>Generate demonstration code for selected BSP Common features.&lt;br/&gt;
+                    &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;@note&lt;/b&gt;This parameter is configurable only at project creation in the board project wizard.
+                    &lt;br/&gt;Demonstration code is added only at 1st generation in user section and will not be updated in successive generations.&lt;/font&gt;
+            </Description>
+        </RefParameter>
+	<RefParameter Name="Bsp_Common_DEMO_Enabled" Comment="Generate demonstration code" DefaultValue="Disabled" Type="string" Group="Demonstration code" TabName="Human Machine Interface" Visible="true">
+            <Condition Diagnostic="" Expression="!SEM_Common_DEMO_ON"/>
+            <Description>Generate demonstration code for selected BSP Common features.&lt;br/&gt;
+                    &lt;font color=&quot;blue&quot;&gt;&lt;b&gt;@note&lt;/b&gt;This parameter is configurable only at project creation in the board project wizard.
+                    &lt;br/&gt;Demonstration code is added only at 1st generation in user section and will not be updated in successive generations.&lt;/font&gt;
+            </Description>
+        </RefParameter>
+        <!-- BSP USB PD -->
+	<RefParameter Name="USB_PD_DEMO" Comment="USB Power Delivery demo" DefaultValue="false" Type="boolean" Group="Demo" TabName="USB Power Delivery" Visible="true">
+            <PossibleValue Comment="true" Value="true" Semaphore="S_USB_PD_DEMO_ON"/>
+            <PossibleValue Comment="false" Value="false"/>
+            <Description>USB Power Delivery feature demo over TCPP01-M12</Description>
+        </RefParameter>
+	<RefParameter Name="USB_PD_MODE" Comment="USB Power Delivery mode" DefaultValue="0" Type="list" Group="Demo" TabName="USB Power Delivery" Visible="true">
+            <PossibleValue Comment="Disable" Value="0"/>
+            <PossibleValue Comment="USB PD mode Sink" Value="1" Semaphore="S_USB_PD_SINK"/>
+            <PossibleValue Comment="USB PD mode Source" Value="2" Semaphore="S_USB_PD_SOURCE"/>
+            <Description>USB Power Delivery mode over TCPP03-M20</Description>
+        </RefParameter>
+		
+	<RefMode Abstract="true" Name="COMMON" HalMode="">
+		<Parameter Name="LD1"/>
+		<Parameter Name="LD2"/>
+		<Parameter Name="LD3"/>
+		<Parameter Name="BUTTON"/>
+		<Parameter Name="VCP"/>
+		<Parameter Name="Bsp_Common_DEMO"/>
+		<Parameter Name="Bsp_Common_DEMO_Enabled"/>
+
+		<BspDependency Name="LD1" Comment="" BspIpName="GPIO_B_0" BspModeName="Reserved" Api="" GroupName="BSP">
+			<Condition Diagnostic="" Expression="S_LED_GREEN"/>
+		</BspDependency>
+		<BspDependency Name="LD2" Comment="" BspIpName="GPIO_F_4" BspModeName="Reserved" Api="" GroupName="BSP">
+			<Condition Diagnostic="" Expression="S_LED_YELLOW"/>
+		</BspDependency>
+		<BspDependency Name="LD3" Comment="" BspIpName="GPIO_G_4" BspModeName="Reserved" Api="" GroupName="BSP">
+			<Condition Diagnostic="" Expression="S_LED_RED"/>
+		</BspDependency>
+
+		<BspDependency Name="BUTTON" Comment="" BspIpName="GPIO_C_13" BspModeName="Reserved" Api="HAL_EXTI_DRIVER" GroupName="BSP">
+			<Condition Diagnostic="" Expression="S_USER_BUTTON_EXTI"/>
+		</BspDependency>
+		<BspDependency Name="BUTTON" Comment="" BspIpName="GPIO_C_13" BspModeName="Reserved" Api="" GroupName="BSP">
+			<Condition Diagnostic="" Expression="S_USER_BUTTON_POLL | S_USER_BUTTON_EXTI"/>
+		</BspDependency>
+		
+		<BspDependency Name="VCP" Comment="Use an USART or a LPUART for this application" BspIpName="USART3" BspModeName="" Api="" GroupName="BSP">
+			<Condition Diagnostic="" Expression="S_VCOM"/>
+		</BspDependency>
+		<BspDependency Name="VCP_TX" Comment="Use an USART or a LPUART for this application" BspIpName="GPIO_D_9" BspModeName="Reserved" Api="" GroupName="BSP">
+			<Condition Diagnostic="" Expression="S_VCOM"/>
+		</BspDependency>
+		<BspDependency Name="VCP_RX" Comment="Use an USART or a LPUART for this application" BspIpName="GPIO_D_8" BspModeName="Reserved" Api="" GroupName="BSP">
+			<Condition Diagnostic="" Expression="S_VCOM"/>
+		</BspDependency>
+		<ConfigForMode>Bsp_Common</ConfigForMode>
+	</RefMode>	
+	
+	
+
+	<RefMode Abstract="true" Name="USB_PD" HalMode="">
+		<Parameter Name="USB_PD_DEMO"/>
+		<Parameter Name="USB_PD_MODE"/>
+		<!-- Peripherals -->		
+		<BspDependency Name="USB" Comment="" BspIpName="USB" BspModeName="" Api="" GroupName="BSP">
+			<Condition Diagnostic="" Expression="S_USB_PD_DEMO_ON"/>
+		</BspDependency>
+		<!-- GPIO -->						
+		<BspDependency Name="UCPD_CC1" Comment="" BspIpName="GPIO_B_13" BspModeName="Reserved" Api="" GroupName="BSP">
+			<Condition Diagnostic="" Expression="S_USB_PD_DEMO_ON"/>
+		</BspDependency>
+		<BspDependency Name="UCPD_CC2" Comment="" BspIpName="GPIO_B_14" BspModeName="Reserved" Api="" GroupName="BSP">
+			<Condition Diagnostic="" Expression="S_USB_PD_DEMO_ON"/>
+		</BspDependency>
+		<BspDependency Name="UCPD_FLT" Comment="" BspIpName="GPIO_G_7" BspModeName="Reserved" Api="" GroupName="BSP">
+			<Condition Diagnostic="" Expression="S_USB_PD_DEMO_ON"/>
+		</BspDependency>
+		<BspDependency Name="USB_DBn" Comment="" BspIpName="GPIO_A_9" BspModeName="Reserved" Api="" GroupName="BSP">
+			<Condition Diagnostic="" Expression="S_USB_PD_DEMO_ON"/>
+		</BspDependency>		
+		<BspDependency Name="USB_BUS_DP" Comment="" BspIpName="GPIO_A_12" BspModeName="Reserved" Api="" GroupName="BSP">
+			<Condition Diagnostic="" Expression="S_USB_PD_DEMO_ON"/>
+		</BspDependency>
+		<BspDependency Name="USB_BUS_DM" Comment="" BspIpName="GPIO_A_11" BspModeName="Reserved" Api="" GroupName="BSP">
+			<Condition Diagnostic="" Expression="S_USB_PD_DEMO_ON"/>
+		</BspDependency>
+		<BspDependency Name="USB_BUS_SENSE" Comment="" BspIpName="GPIO_A_4" BspModeName="Reserved" Api="" GroupName="BSP">
+			<Condition Diagnostic="" Expression="S_USB_PD_DEMO_ON"/>
+		</BspDependency>
+		<ConfigForMode>Bsp_UsbPd</ConfigForMode>
+	</RefMode>
+
+	
+	<!-- ModeLogicOperator for HS/FS -->
+	<ModeLogicOperator Name="OR">					
+		<Mode Name="COMMON" UserName="Human Machine Interface">
+			<ModeLogicOperator Name="OR">
+				<Mode Name="COMMON" UserName="Human Machine Interface">
+					<SignalLogicalOp Name="AND">							
+						<Signal Name="VS_BSP_COMMON"/>							
+					</SignalLogicalOp>		
+				<Semaphore></Semaphore>
+				</Mode>
+			</ModeLogicOperator>
+		</Mode>		
+		<!-- Disabled for Mx6.10: Not yet supported
+		 <Mode Name="USB_PD" UserName="BSP Usb Power Delivery">
+			<ModeLogicOperator Name="OR">
+				<Mode Name="USB_PD" UserName="BSP Usb Power Delivery">
+					<SignalLogicalOp Name="AND">							
+						<Signal Name="VS_BSP_USB_PD"/>						
+					</SignalLogicalOp>						
+				</Mode>
+			</ModeLogicOperator>
+		</Mode> -->
+	</ModeLogicOperator>	
+	<Semaphore></Semaphore>
+	<Semaphore></Semaphore>
+		
+	
+	<RefSignal Name="VS_BSP_COMMON" Virtual="true"/>	
+	<RefSignal Name="VS_BSP_USB_PD" Virtual="true"/>
+	
+</IP>

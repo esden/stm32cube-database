@@ -11,9 +11,10 @@
   */
 /* USER CODE END Header */
 
-#include "adc_ctrl.h"
+#include "app_conf.h"
 
 #if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)
+#include "adc_ctrl.h"
 #include "stm32wbaxx_ll_adc.h"
 #include "utilities_common.h"
 #include "RTDebug.h"

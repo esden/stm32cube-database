@@ -273,8 +273,13 @@
                   [#if initVector.codeInMspInit]
                     [#assign irqNum = irqNum+1]
                     [#if irqNum==1]#n#t#t/* Peripheral interrupt init*/[/#if]
+                    [#if DIE != "DIE501"]
                     #t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
                     #t#tHAL_NVIC_EnableIRQ(${initVector.vector});
+                    [#else]
+                    #t#tIRQ_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
+                    #t#tIRQ_Enable(${initVector.vector});
+                    [/#if]
                   [/#if]
                 [/#list]
             [/#if]
@@ -288,8 +293,12 @@
         #t#t#t/* Peripheral clock disable */ #n #t#t#t__HAL_RCC_${ipName}_CLK_DISABLE();
 [#if initService.nvic??&&initService.nvic?size>0]
                 [#list initService.nvic as initVector]
-#t#t#t/* ${ipName} interrupt DeInit */                    
+#t#t#t/* ${ipName} interrupt DeInit */  
+                    [#if DIE != "DIE501"]                 
                     #t#t#tHAL_NVIC_DisableIRQ(${initVector.vector});
+                    [#else]
+                    #t#t#tIRQ_Disable(${initVector.vector});
+                    [/#if]
                 [/#list]
             [/#if]
 #t#t#t}
@@ -368,9 +377,14 @@
                   [#if initVector.codeInMspInit]
                     [#assign irqNum = irqNum+1]
                     [#if irqNum==1]#n#t#t#t/* Peripheral interrupt init*/[/#if]
+                    [#if DIE != "DIE501"]
                     #t#t#tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
                     #t#t#tHAL_NVIC_EnableIRQ(${initVector.vector});
-                  [/#if]
+                   [#else]
+                    #t#tIRQ_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
+                    #t#tIRQ_Enable(${initVector.vector});
+                   [/#if]
+                   [/#if]
                 [/#list]
             [/#if]
         [/#if]
@@ -383,8 +397,12 @@
         #t#t#t/* Peripheral clock disable */#n#t#t#t__HAL_RCC_${ipName}_CLK_DISABLE();
 [#if initService.nvic??&&initService.nvic?size>0] 
                 [#list initService.nvic as initVector]
-#t#t/* ${ipName} interrupt DeInit */                   
+#t#t/* ${ipName} interrupt DeInit */ 
+                    [#if DIE != "DIE501"]                   
                     #t#t#tHAL_NVIC_DisableIRQ(${initVector.vector});
+                    [#else]
+                    #t#t#tIRQ_Disable(${initVector.vector});
+                    [/#if]
                 [/#list]
             [/#if]
 #t#t#t}

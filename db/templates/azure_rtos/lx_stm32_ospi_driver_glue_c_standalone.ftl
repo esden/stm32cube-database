@@ -923,6 +923,7 @@ static uint8_t ospi_memory_reset(${used_api}_HandleTypeDef *h${used_api?lower_ca
   /* Configure automatic polling mode to wait the memory is ready */
   [#if "${FamilyName?lower_case}" == "stm32u5"]
   s_command.Instruction  = LX_STM32_OSPI_OCTAL_READ_STATUS_REG_CMD;
+  s_command.InstructionSize = HAL_OSPI_INSTRUCTION_16_BITS;
   s_command.DataMode     = HAL_OSPI_DATA_1_LINE;
   s_command.NbData       = 1;
   s_command.DataDtrMode  = HAL_OSPI_DATA_DTR_DISABLE;

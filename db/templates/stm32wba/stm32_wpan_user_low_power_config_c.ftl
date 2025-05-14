@@ -21,7 +21,7 @@
 #include "user_low_power_config.h"
 #include "stdint.h"
 #include "app_conf.h"
-#include "stm32wba52xx.h"
+#include "stm32wbaxx.h"
 
 /* Exported constants --------------------------------------------------------*/
 

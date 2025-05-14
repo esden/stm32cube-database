@@ -54,6 +54,16 @@ Key: ${key}; Value: ${myHash[key]}
 /* Private typedef -----------------------------------------------------------*/
 
 /* USER CODE BEGIN PTD */
+[#if PG_FILL_UCS == "True"]
+[#if (RF_APPLICATION == "P2PCLIENT")]
+
+typedef struct
+{
+  uint8_t selection;
+  uint8_t level;
+}P2PButton_t;
+[/#if]
+[/#if]
 
 /* USER CODE END PTD */
 
@@ -104,6 +114,7 @@ typedef struct
   uint16_t ServiceChangedCharValueHdl;
   uint16_t ServiceChangedCharDescHdl;
   uint16_t ServiceChangedCharEndHdl;
+  uint8_t ServiceChangedCharProperties;
 
   /* USER CODE BEGIN BleClientAppContext_t */
 [#if PG_FILL_UCS == "True"]
@@ -165,10 +176,10 @@ static uint16_t gattCharValueHdl = 0;
 static uint8_t P2PLedSelection;
 static uint8_t P2PLedLevel;
 
-static uint8_t P2PButtonSelection;
-static uint8_t P2PButtonLevel;
+static P2PButton_t P2PButtonData;
 [/#if]
 [/#if]
+
 /* USER CODE END PV */
 
 /* Global variables ----------------------------------------------------------*/
@@ -266,14 +277,11 @@ void GATT_CLIENT_APP_Init(void)
 [#if (RF_APPLICATION == "P2PCLIENT")]
   UTIL_SEQ_RegTask(1U << CFG_TASK_P2PC_WRITE_CHAR_ID, UTIL_SEQ_RFU, P2Pclient_write_char);
 
-  for(index = 0; index < BLE_CFG_CLT_MAX_NBR_CB; index++)
-  {
-    a_ClientContext[index].P2PLedSelection = 0x00;
-    a_ClientContext[index].P2PLedLevel = 0x00;
+  P2PLedSelection = 0x00;
+  P2PLedLevel = 0x00;
 
-    a_ClientContext[index].P2PButtonSelection = 0x01;
-    a_ClientContext[index].P2PButtonLevel = 0x00;
-  }
+  P2PButtonData.selection = 0x01;
+  P2PButtonData.level = 0x00;
 [/#if]
 [/#if]
 
@@ -300,6 +308,19 @@ void GATT_CLIENT_APP_Notification(GATT_CLIENT_APP_ConnHandle_Notif_evt_t *p_Noti
 
     case PEER_DISCON_HANDLE_EVT :
       /* USER CODE BEGIN PEER_DISCON_HANDLE_EVT */
+[#if PG_FILL_UCS == "True"]
+[#if (RF_APPLICATION == "P2PCLIENT")]
+    {
+      uint8_t index = 0;
+
+      while((index < BLE_CFG_CLT_MAX_NBR_CB) &&
+            (a_ClientContext[index].state != GATT_CLIENT_APP_IDLE))
+      {
+        a_ClientContext[index].state = GATT_CLIENT_APP_IDLE;
+      }
+    }
+[/#if]
+[/#if]
 
       /* USER CODE END PEER_DISCON_HANDLE_EVT */
       break;
@@ -343,7 +364,7 @@ void GATT_CLIENT_APP_Discover_services(uint8_t index)
   GATT_CLIENT_APP_Procedure_Gatt(index, PROC_GATT_DISC_ALL_PRIMARY_SERVICES);
   GATT_CLIENT_APP_Procedure_Gatt(index, PROC_GATT_DISC_ALL_CHARS);
   GATT_CLIENT_APP_Procedure_Gatt(index, PROC_GATT_DISC_ALL_DESCS);
-  GATT_CLIENT_APP_Procedure_Gatt(index, PROC_GATT_ENABLE_ALL_NOTIFICATIONS);
+  GATT_CLIENT_APP_Procedure_Gatt(index, PROC_GATT_PROPERTIES_ENABLE_ALL);
 
   return;
 }
@@ -366,17 +387,17 @@ uint8_t GATT_CLIENT_APP_Procedure_Gatt(uint8_t index, ProcGattId_t GattProcId)
       {
         a_ClientContext[index].state = GATT_CLIENT_APP_DISCOVER_SERVICES;
 
-        APP_DBG_MSG("GATT services discovery\n");
+        LOG_INFO_APP("GATT services discovery\n");
         result = aci_gatt_disc_all_primary_services(a_ClientContext[index].connHdl);
 
         if (result == BLE_STATUS_SUCCESS)
         {
           gatt_cmd_resp_wait();
-          APP_DBG_MSG("PROC_GATT_DISC_ALL_PRIMARY_SERVICES services discovered Successfully\n\n");
+          LOG_INFO_APP("PROC_GATT_DISC_ALL_PRIMARY_SERVICES services discovered Successfully\n\n");
         }
         else
         {
-          APP_DBG_MSG("PROC_GATT_DISC_ALL_PRIMARY_SERVICES aci_gatt_disc_all_primary_services cmd NOK status =0x%02X\n\n", result);
+          LOG_INFO_APP("PROC_GATT_DISC_ALL_PRIMARY_SERVICES aci_gatt_disc_all_primary_services cmd NOK status =0x%02X\n\n", result);
         }
       }
       break; /* PROC_GATT_DISC_ALL_PRIMARY_SERVICES */
@@ -385,7 +406,7 @@ uint8_t GATT_CLIENT_APP_Procedure_Gatt(uint8_t index, ProcGattId_t GattProcId)
       {
         a_ClientContext[index].state = GATT_CLIENT_APP_DISCOVER_CHARACS;
 
-        APP_DBG_MSG("DISCOVER_ALL_CHARS ConnHdl=0x%04X ALLServiceHandle[0x%04X - 0x%04X]\n",
+        LOG_INFO_APP("DISCOVER_ALL_CHARS ConnHdl=0x%04X ALLServiceHandle[0x%04X - 0x%04X]\n",
                           a_ClientContext[index].connHdl,
                           a_ClientContext[index].ALLServiceStartHdl,
                           a_ClientContext[index].ALLServiceEndHdl);
@@ -398,11 +419,11 @@ uint8_t GATT_CLIENT_APP_Procedure_Gatt(uint8_t index, ProcGattId_t GattProcId)
         if (result == BLE_STATUS_SUCCESS)
         {
           gatt_cmd_resp_wait();
-          APP_DBG_MSG("All characteristics discovered Successfully\n\n");
+          LOG_INFO_APP("All characteristics discovered Successfully\n\n");
         }
         else
         {
-          APP_DBG_MSG("All characteristics discovery Failed, status =0x%02X\n\n", result);
+          LOG_INFO_APP("All characteristics discovery Failed, status =0x%02X\n\n", result);
         }
       }
       break; /* PROC_GATT_DISC_ALL_CHARS */
@@ -411,7 +432,7 @@ uint8_t GATT_CLIENT_APP_Procedure_Gatt(uint8_t index, ProcGattId_t GattProcId)
       {
         a_ClientContext[index].state = GATT_CLIENT_APP_DISCOVER_WRITE_DESC;
 
-        APP_DBG_MSG("DISCOVER_ALL_CHAR_DESCS [0x%04X - 0x%04X]\n",
+        LOG_INFO_APP("DISCOVER_ALL_CHAR_DESCS [0x%04X - 0x%04X]\n",
                          a_ClientContext[index].ALLServiceStartHdl,
                          a_ClientContext[index].ALLServiceEndHdl);
         result = aci_gatt_disc_all_char_desc(
@@ -422,28 +443,36 @@ uint8_t GATT_CLIENT_APP_Procedure_Gatt(uint8_t index, ProcGattId_t GattProcId)
         if (result == BLE_STATUS_SUCCESS)
         {
           gatt_cmd_resp_wait();
-          APP_DBG_MSG("All characteristic descriptors discovered Successfully\n\n");
+          LOG_INFO_APP("All characteristic descriptors discovered Successfully\n\n");
         }
         else
         {
-          APP_DBG_MSG("All characteristic descriptors discovery Failed, status =0x%02X\n\n", result);
+          LOG_INFO_APP("All characteristic descriptors discovery Failed, status =0x%02X\n\n", result);
         }
       }
       break; /* PROC_GATT_DISC_ALL_DESCS */
-      case PROC_GATT_ENABLE_ALL_NOTIFICATIONS:
+      case PROC_GATT_PROPERTIES_ENABLE_ALL:
       {
-        uint16_t enable = 0x0001;
+        uint16_t charPropVal = 0x0000;
 
         if (a_ClientContext[index].ServiceChangedCharDescHdl != 0x0000)
         {
+          if(((a_ClientContext[index].ServiceChangedCharProperties) & CHAR_PROP_NOTIFY) == CHAR_PROP_NOTIFY)
+          {
+            charPropVal = 0x0001;
+          }
+          if(((a_ClientContext[index].ServiceChangedCharProperties) & CHAR_PROP_INDICATE) == CHAR_PROP_INDICATE)
+          {
+            charPropVal = 0x0002;
+          }
           result = aci_gatt_write_char_desc(a_ClientContext[index].connHdl,
                                             a_ClientContext[index].ServiceChangedCharDescHdl,
                                             2,
-                                            (uint8_t *) &enable);
+                                            (uint8_t *) &charPropVal);
           gatt_cmd_resp_wait();
-          APP_DBG_MSG(" ServiceChangedCharDescHdl =0x%04X\n",a_ClientContext[index].ServiceChangedCharDescHdl);
+          LOG_INFO_APP(" ServiceChangedCharDescHdl =0x%04X\n",a_ClientContext[index].ServiceChangedCharDescHdl);
         }
-        /* USER CODE BEGIN PROC_GATT_ENABLE_ALL_NOTIFICATIONS */
+        /* USER CODE BEGIN PROC_GATT_PROPERTIES_ENABLE_ALL */
 [#if PG_FILL_UCS == "True"]
 [#if (RF_APPLICATION == "P2PCLIENT")]
         if(a_ClientContext[index].P2PNotificationDescHdl != 0x0000)
@@ -453,23 +482,23 @@ uint8_t GATT_CLIENT_APP_Procedure_Gatt(uint8_t index, ProcGattId_t GattProcId)
                                             2,
                                             (uint8_t *) &enable);
           gatt_cmd_resp_wait();
-          APP_DBG_MSG(" P2PNotificationDescHdl =0x%04X\n",a_ClientContext[index].P2PNotificationDescHdl);
+          LOG_INFO_APP(" P2PNotificationDescHdl =0x%04X\n",a_ClientContext[index].P2PNotificationDescHdl);
         }
 [/#if]
 [/#if]
 
-        /* USER CODE END PROC_GATT_ENABLE_ALL_NOTIFICATIONS */
+        /* USER CODE END PROC_GATT_PROPERTIES_ENABLE_ALL */
 
         if (result == BLE_STATUS_SUCCESS)
         {
-          APP_DBG_MSG("All notifications enabled Successfully\n\n");
+          LOG_INFO_APP("All notifications enabled Successfully\n\n");
         }
         else
         {
-          APP_DBG_MSG("All notifications enabled Failed, status =0x%02X\n\n", result);
+          LOG_INFO_APP("All notifications enabled Failed, status =0x%02X\n\n", result);
         }
       }
-      break; /* PROC_GATT_ENABLE_ALL_NOTIFICATIONS */
+      break; /* PROC_GATT_PROPERTIES_ENABLE_ALL */
     default:
       break;
     }
@@ -576,7 +605,7 @@ static SVCCTL_EvtAckStatus_t Event_Handler(void *Event)
         {
           aci_att_exchange_mtu_resp_event_rp0 * exchange_mtu_resp;
           exchange_mtu_resp = (aci_att_exchange_mtu_resp_event_rp0 *)p_blecore_evt->data;
-          APP_DBG_MSG("  MTU exchanged size = %d\n",exchange_mtu_resp->Server_RX_MTU );
+          LOG_INFO_APP("  MTU exchanged size = %d\n",exchange_mtu_resp->Server_RX_MTU );
           UNUSED(exchange_mtu_resp);
           /* USER CODE BEGIN ACI_ATT_EXCHANGE_MTU_RESP_VSEVT_CODE */
 
@@ -608,9 +637,19 @@ __USED static void gatt_Notification(GATT_CLIENT_APP_Notification_evt_t *p_Notif
     case P2P_NOTIFICATION_INFO_RECEIVED_EVT:
     {
       P2PLedSelection = p_Notif->DataTransfered.p_Payload[0];
+      UNUSED(P2PLedSelection);
       P2PLedLevel = p_Notif->DataTransfered.p_Payload[1];
 
-      UTIL_SEQ_SetTask( 1u<<CFG_TASK_SEND_NOTIF_ID, CFG_SEQ_PRIO_0);
+      if (P2PLedLevel == 0x00)
+      {
+        BSP_LED_Off(LED_BLUE);
+        LOG_INFO_APP("  P2P APPLICATION CLIENT : NOTIFICATION RECEIVED - LED OFF \n");
+      }
+      else
+      {
+        BSP_LED_On(LED_BLUE);
+        LOG_INFO_APP("  P2P APPLICATION CLIENT : NOTIFICATION RECEIVED - LED ON\n");
+      }
       break;
     }
 [/#if]
@@ -645,7 +684,7 @@ static void gatt_parse_services(aci_att_read_by_group_type_resp_event_rp0 *p_evt
   uint8_t uuid_offset, uuid_size, uuid_short_offset;
   uint8_t i, idx, numServ, index;
 
-  APP_DBG_MSG("ACI_ATT_READ_BY_GROUP_TYPE_RESP_VSEVT_CODE - ConnHdl=0x%04X\n",
+  LOG_INFO_APP("ACI_ATT_READ_BY_GROUP_TYPE_RESP_VSEVT_CODE - ConnHdl=0x%04X\n",
                 p_evt->Connection_Handle);
 
   for (index = 0 ; index < BLE_CFG_CLT_MAX_NBR_CB ; index++)
@@ -690,7 +729,7 @@ static void gatt_parse_services(aci_att_read_by_group_type_resp_event_rp0 *p_evt
       ServiceStartHdl =  UNPACK_2_BYTE_PARAMETER(&p_evt->Attribute_Data_List[uuid_offset - 4]);
       ServiceEndHdl = UNPACK_2_BYTE_PARAMETER(&p_evt->Attribute_Data_List[uuid_offset - 2]);
       uuid = UNPACK_2_BYTE_PARAMETER(&p_evt->Attribute_Data_List[uuid_offset + uuid_short_offset]);
-      APP_DBG_MSG("  %d/%d short UUID=0x%04X, handle [0x%04X - 0x%04X]",
+      LOG_INFO_APP("  %d/%d short UUID=0x%04X, handle [0x%04X - 0x%04X]",
                    i + 1, numServ, uuid, ServiceStartHdl,ServiceEndHdl);
 
       /* complete context fields */
@@ -708,14 +747,14 @@ static void gatt_parse_services(aci_att_read_by_group_type_resp_event_rp0 *p_evt
         a_ClientContext[index].GAPServiceStartHdl = ServiceStartHdl;
         a_ClientContext[index].GAPServiceEndHdl = ServiceEndHdl;
 
-        APP_DBG_MSG(", GAP_SERVICE_UUID found\n");
+        LOG_INFO_APP(", GAP_SERVICE_UUID found\n");
       }
       else if (uuid == GENERIC_ATTRIBUTE_SERVICE_UUID)
       {
         a_ClientContext[index].GATTServiceStartHdl = ServiceStartHdl;
         a_ClientContext[index].GATTServiceEndHdl = ServiceEndHdl;
 
-        APP_DBG_MSG(", GENERIC_ATTRIBUTE_SERVICE_UUID found\n");
+        LOG_INFO_APP(", GENERIC_ATTRIBUTE_SERVICE_UUID found\n");
       }
 /* USER CODE BEGIN gatt_parse_services_1 */
 [#if PG_FILL_UCS == "True"]
@@ -725,7 +764,7 @@ static void gatt_parse_services(aci_att_read_by_group_type_resp_event_rp0 *p_evt
         a_ClientContext[index].P2PServiceHdl = ServiceStartHdl;
         a_ClientContext[index].P2PServiceEndHdl = ServiceEndHdl;
 
-        APP_DBG_MSG(", P2P_SERVICE_UUID found\n");
+        LOG_INFO_APP(", P2P_SERVICE_UUID found\n");
       }
 [/#if]
 [/#if]
@@ -733,7 +772,7 @@ static void gatt_parse_services(aci_att_read_by_group_type_resp_event_rp0 *p_evt
 /* USER CODE END gatt_parse_services_1 */
       else
       {
-        APP_DBG_MSG("\n");
+        LOG_INFO_APP("\n");
       }
 
       uuid_offset += p_evt->Attribute_Data_Length;
@@ -741,7 +780,7 @@ static void gatt_parse_services(aci_att_read_by_group_type_resp_event_rp0 *p_evt
   }
   else
   {
-    APP_DBG_MSG("ACI_ATT_READ_BY_GROUP_TYPE_RESP_VSEVT_CODE, failed no free index in connection table !\n");
+    LOG_INFO_APP("ACI_ATT_READ_BY_GROUP_TYPE_RESP_VSEVT_CODE, failed no free index in connection table !\n");
   }
 
   return;
@@ -754,13 +793,13 @@ static void gatt_parse_services_by_UUID(aci_att_find_by_type_value_resp_event_rp
 {
   uint8_t i;
 
-  APP_DBG_MSG("ACI_ATT_FIND_BY_TYPE_VALUE_RESP_VSEVT_CODE - ConnHdl=0x%04X, Num_of_Handle_Pair=%d\n",
+  LOG_INFO_APP("ACI_ATT_FIND_BY_TYPE_VALUE_RESP_VSEVT_CODE - ConnHdl=0x%04X, Num_of_Handle_Pair=%d\n",
                 p_evt->Connection_Handle,
                 p_evt->Num_of_Handle_Pair);
 
   for(i = 0 ; i < p_evt->Num_of_Handle_Pair ; i++)
   {
-    APP_DBG_MSG("ACI_ATT_FIND_BY_TYPE_VALUE_RESP_VSEVT_CODE - PaitId=%d Found_Attribute_Handle=0x%04X, Group_End_Handle=0x%04X\n",
+    LOG_INFO_APP("ACI_ATT_FIND_BY_TYPE_VALUE_RESP_VSEVT_CODE - PaitId=%d Found_Attribute_Handle=0x%04X, Group_End_Handle=0x%04X\n",
                   i,
                   p_evt->Attribute_Group_Handle_Pair[i].Found_Attribute_Handle,
                   p_evt->Attribute_Group_Handle_Pair[i].Group_End_Handle);
@@ -783,7 +822,7 @@ static void gatt_parse_chars(aci_att_read_by_type_resp_event_rp0 *p_evt)
   uint8_t i, idx, numHdlValuePair, index;
   uint8_t CharProperties;
 
-  APP_DBG_MSG("ACI_ATT_READ_BY_TYPE_RESP_VSEVT_CODE - ConnHdl=0x%04X\n",
+  LOG_INFO_APP("ACI_ATT_READ_BY_TYPE_RESP_VSEVT_CODE - ConnHdl=0x%04X\n",
                 p_evt->Connection_Handle);
 
   for (index = 0 ; index < BLE_CFG_CLT_MAX_NBR_CB ; index++)
@@ -825,7 +864,7 @@ static void gatt_parse_chars(aci_att_read_by_type_resp_event_rp0 *p_evt)
 
     p_evt->Data_Length -= 1;
 
-    APP_DBG_MSG("  ConnHdl=0x%04X, number of value pair = %d\n", a_ClientContext[index].connHdl, numHdlValuePair);
+    LOG_INFO_APP("  ConnHdl=0x%04X, number of value pair = %d\n", a_ClientContext[index].connHdl, numHdlValuePair);
     /* Loop on number of attribute value tuples */
     for (i = 0; i < numHdlValuePair; i++)
     {
@@ -836,22 +875,22 @@ static void gatt_parse_chars(aci_att_read_by_type_resp_event_rp0 *p_evt)
 
       if ( (uuid != 0x0) && (CharProperties != 0x0) && (CharStartHdl != 0x0) && (CharValueHdl != 0) )
       {
-        APP_DBG_MSG("    %d/%d short UUID=0x%04X, Properties=0x%04X, CharHandle [0x%04X - 0x%04X]",
+        LOG_INFO_APP("    %d/%d short UUID=0x%04X, Properties=0x%04X, CharHandle [0x%04X - 0x%04X]",
                      i + 1, numHdlValuePair, uuid, CharProperties, CharStartHdl, CharValueHdl);
 
         if (uuid == DEVICE_NAME_UUID)
         {
-          APP_DBG_MSG(", GAP DEVICE_NAME charac found\n");
+          LOG_INFO_APP(", GAP DEVICE_NAME charac found\n");
         }
         else if (uuid == APPEARANCE_UUID)
         {
-          APP_DBG_MSG(", GAP APPEARANCE charac found\n");
+          LOG_INFO_APP(", GAP APPEARANCE charac found\n");
         }
         else if (uuid == SERVICE_CHANGED_CHARACTERISTIC_UUID)
         {
           a_ClientContext[index].ServiceChangedCharStartHdl = CharStartHdl;
           a_ClientContext[index].ServiceChangedCharValueHdl = CharValueHdl;
-          APP_DBG_MSG(", GATT SERVICE_CHANGED_CHARACTERISTIC_UUID charac found\n");
+          LOG_INFO_APP(", GATT SERVICE_CHANGED_CHARACTERISTIC_UUID charac found\n");
         }
 /* USER CODE BEGIN gatt_parse_chars_1 */
 [#if PG_FILL_UCS == "True"]
@@ -860,19 +899,19 @@ static void gatt_parse_chars(aci_att_read_by_type_resp_event_rp0 *p_evt)
         {
           a_ClientContext[index].P2PNotificationCharHdl = CharStartHdl;
           a_ClientContext[index].P2PNotificationValueHdl = CharValueHdl;
-          APP_DBG_MSG(", ST_P2P_NOTIFY_CHAR_UUID charac found\n");
+          LOG_INFO_APP(", ST_P2P_NOTIFY_CHAR_UUID charac found\n");
         }
         else if (uuid == ST_P2P_WRITE_CHAR_UUID)
         {
           a_ClientContext[index].P2PWriteToServerCharHdl = CharStartHdl;
           a_ClientContext[index].P2PWriteToServerValueHdl = CharValueHdl;
-          APP_DBG_MSG(", ST_P2P_WRITE_CHAR_UUID charac found\n");
+          LOG_INFO_APP(", ST_P2P_WRITE_CHAR_UUID charac found\n");
         }
         else if (uuid == ST_P2P_WRITE_WITH_RES_CHAR_UUID)
         {
-          a_ClientContext[index].P2PWriteWithResToServerCharHdl = CharStartHdl;
-          a_ClientContext[index].P2PWriteWithResToServerValueHdl = CharValueHdl;
-          APP_DBG_MSG(", ST_P2P_WRITE_WITH_RES_CHAR_UUID charac found\n");
+          a_ClientContext[0].P2PWriteWithResToServerCharHdl = CharStartHdl;
+          a_ClientContext[0].P2PWriteWithResToServerValueHdl = CharValueHdl;
+          LOG_INFO_APP(", ST_P2P_WRITE_WITH_RES_CHAR_UUID charac found\n");
         }
 [/#if]
 [/#if]
@@ -880,7 +919,7 @@ static void gatt_parse_chars(aci_att_read_by_type_resp_event_rp0 *p_evt)
 /* USER CODE END gatt_parse_chars_1 */
         else
         {
-          APP_DBG_MSG("\n");
+          LOG_INFO_APP("\n");
         }
 
       }
@@ -889,7 +928,7 @@ static void gatt_parse_chars(aci_att_read_by_type_resp_event_rp0 *p_evt)
   }
   else
   {
-    APP_DBG_MSG("ACI_ATT_READ_BY_TYPE_RESP_VSEVT_CODE, failed handle not found in connection table !\n");
+    LOG_INFO_APP("ACI_ATT_READ_BY_TYPE_RESP_VSEVT_CODE, failed handle not found in connection table !\n");
   }
 
   return;
@@ -903,7 +942,7 @@ static void gatt_parse_descs(aci_att_find_info_resp_event_rp0 *p_evt)
   uint8_t uuid_offset, uuid_size, uuid_short_offset;
   uint8_t i, numDesc, handle_uuid_pair_size, index;
 
-  APP_DBG_MSG("ACI_ATT_FIND_INFO_RESP_VSEVT_CODE - ConnHdl=0x%04X\n",
+  LOG_INFO_APP("ACI_ATT_FIND_INFO_RESP_VSEVT_CODE - ConnHdl=0x%04X\n",
               p_evt->Connection_Handle);
 
   for (index = 0 ; index < BLE_CFG_CLT_MAX_NBR_CB ; index++)
@@ -946,7 +985,7 @@ static void gatt_parse_descs(aci_att_find_info_resp_event_rp0 *p_evt)
 
       if (uuid == PRIMARY_SERVICE_UUID)
       {
-        APP_DBG_MSG("PRIMARY_SERVICE_UUID=0x%04X handle=0x%04X\n", uuid, handle);
+        LOG_INFO_APP("PRIMARY_SERVICE_UUID=0x%04X handle=0x%04X\n", uuid, handle);
       }
       else if (uuid == CHARACTERISTIC_UUID)
       {
@@ -955,13 +994,13 @@ static void gatt_parse_descs(aci_att_find_info_resp_event_rp0 *p_evt)
         gattCharValueHdl = 0;
 
         gattCharStartHdl = handle;
-        APP_DBG_MSG("reset - UUID & handle - CHARACTERISTIC_UUID=0x%04X CharStartHandle=0x%04X\n", uuid, handle);
+        LOG_INFO_APP("reset - UUID & handle - CHARACTERISTIC_UUID=0x%04X CharStartHandle=0x%04X\n", uuid, handle);
       }
       else if ( (uuid == CHAR_EXTENDED_PROPERTIES_DESCRIPTOR_UUID)
              || (uuid == CLIENT_CHAR_CONFIG_DESCRIPTOR_UUID) )
       {
 
-        APP_DBG_MSG("Descriptor UUID=0x%04X, handle=0x%04X-0x%04X-0x%04X",
+        LOG_INFO_APP("Descriptor UUID=0x%04X, handle=0x%04X-0x%04X-0x%04X",
                       uuid,
                       gattCharStartHdl,
                       gattCharValueHdl,
@@ -969,7 +1008,7 @@ static void gatt_parse_descs(aci_att_find_info_resp_event_rp0 *p_evt)
         if (a_ClientContext[index].ServiceChangedCharValueHdl == gattCharValueHdl)
         {
           a_ClientContext[index].ServiceChangedCharDescHdl = handle;
-          APP_DBG_MSG(", Service Changed found\n");
+          LOG_INFO_APP(", Service Changed found\n");
         }
 /* USER CODE BEGIN gatt_parse_descs_1 */
 [#if PG_FILL_UCS == "True"]
@@ -977,19 +1016,19 @@ static void gatt_parse_descs(aci_att_find_info_resp_event_rp0 *p_evt)
         else if (a_ClientContext[index].P2PWriteToServerValueHdl == gattCharValueHdl)
         {
           a_ClientContext[index].P2PWriteToServerDescHdl = handle;
-          APP_DBG_MSG("P2PWrite found : Desc UUID=0x%04X handle=0x%04X-0x%04X-0x%04X\n",
+          LOG_INFO_APP("P2PWrite found : Desc UUID=0x%04X handle=0x%04X-0x%04X-0x%04X\n",
                        uuid, gattCharStartHdl, gattCharValueHdl, handle);
         }
         else if (a_ClientContext[index].P2PNotificationValueHdl == gattCharValueHdl)
         {
           a_ClientContext[index].P2PNotificationDescHdl = handle;
-          APP_DBG_MSG("P2PNotification found : Desc UUID=0x%04X handle=0x%04X-0x%04X-0x%04X\n",
+          LOG_INFO_APP("P2PNotification found : Desc UUID=0x%04X handle=0x%04X-0x%04X-0x%04X\n",
                        uuid, gattCharStartHdl, gattCharValueHdl, handle);
         }
         else if (a_ClientContext[index].P2PWriteWithResToServerValueHdl == gattCharValueHdl)
         {
           a_ClientContext[index].P2PWriteWithResToServerDescHdl = handle;
-          APP_DBG_MSG("P2PWrite with Response found : Desc UUID=0x%04X handle=0x%04X-0x%04X-0x%04X\n",
+          LOG_INFO_APP("P2PWrite with Response found : Desc UUID=0x%04X handle=0x%04X-0x%04X-0x%04X\n",
                        uuid, gattCharStartHdl, gattCharValueHdl, handle);
         }
 [/#if]
@@ -997,41 +1036,41 @@ static void gatt_parse_descs(aci_att_find_info_resp_event_rp0 *p_evt)
 /* USER CODE END gatt_parse_descs_1 */
         else
         {
-          APP_DBG_MSG("\n");
+          LOG_INFO_APP("\n");
         }
       }
       else
       {
         gattCharValueHdl = handle;
 
-        APP_DBG_MSG("  UUID=0x%04X, handle=0x%04X", uuid, handle);
+        LOG_INFO_APP("  UUID=0x%04X, handle=0x%04X", uuid, handle);
 
         if (uuid == DEVICE_NAME_UUID)
         {
-          APP_DBG_MSG(", found GAP DEVICE_NAME_UUID\n");
+          LOG_INFO_APP(", found GAP DEVICE_NAME_UUID\n");
         }
         else if (uuid == APPEARANCE_UUID)
         {
-          APP_DBG_MSG(", found GAP APPEARANCE_UUID\n");
+          LOG_INFO_APP(", found GAP APPEARANCE_UUID\n");
         }
         else if (uuid == SERVICE_CHANGED_CHARACTERISTIC_UUID)
         {
-          APP_DBG_MSG(", found GATT SERVICE_CHANGED_CHARACTERISTIC_UUID\n");
+          LOG_INFO_APP(", found GATT SERVICE_CHANGED_CHARACTERISTIC_UUID\n");
         }
 /* USER CODE BEGIN gatt_parse_descs_2 */
 [#if PG_FILL_UCS == "True"]
 [#if (RF_APPLICATION == "P2PCLIENT")]
         else if (uuid == ST_P2P_WRITE_CHAR_UUID)
         {
-          APP_DBG_MSG(", found ST_P2P_WRITE_CHAR_UUID\n");
+          LOG_INFO_APP(", found ST_P2P_WRITE_CHAR_UUID\n");
         }
         else if (uuid == ST_P2P_NOTIFY_CHAR_UUID)
         {
-          APP_DBG_MSG(", found ST_P2P_NOTIFY_CHAR_UUID\n");
+          LOG_INFO_APP(", found ST_P2P_NOTIFY_CHAR_UUID\n");
         }
         else if (uuid == ST_P2P_WRITE_WITH_RES_CHAR_UUID)
         {
-          APP_DBG_MSG(", found ST_P2P_WRITE_WITH_RES_CHAR_UUID\n");
+          LOG_INFO_APP(", found ST_P2P_WRITE_WITH_RES_CHAR_UUID\n");
         }
 [/#if]
 [/#if]
@@ -1039,7 +1078,7 @@ static void gatt_parse_descs(aci_att_find_info_resp_event_rp0 *p_evt)
 /* USER CODE END gatt_parse_descs_2 */
         else
         {
-          APP_DBG_MSG("\n");
+          LOG_INFO_APP("\n");
         }
       }
     uuid_offset += handle_uuid_pair_size;
@@ -1047,7 +1086,7 @@ static void gatt_parse_descs(aci_att_find_info_resp_event_rp0 *p_evt)
   }
   else
   {
-    APP_DBG_MSG("ACI_ATT_FIND_INFO_RESP_VSEVT_CODE, failed handle not found in connection table !\n");
+    LOG_INFO_APP("ACI_ATT_FIND_INFO_RESP_VSEVT_CODE, failed handle not found in connection table !\n");
   }
 
   return;
@@ -1055,7 +1094,7 @@ static void gatt_parse_descs(aci_att_find_info_resp_event_rp0 *p_evt)
 
 static void gatt_parse_notification(aci_gatt_notification_event_rp0 *p_evt)
 {
-  APP_DBG_MSG("ACI_GATT_NOTIFICATION_VSEVT_CODE - ConnHdl=0x%04X, Attribute_Handle=0x%04X\n",
+  LOG_INFO_APP("ACI_GATT_NOTIFICATION_VSEVT_CODE - ConnHdl=0x%04X, Attribute_Handle=0x%04X\n",
                 p_evt->Connection_Handle,
                 p_evt->Attribute_Handle);
 /* USER CODE BEGIN gatt_parse_notification_1 */
@@ -1076,7 +1115,7 @@ static void gatt_parse_notification(aci_gatt_notification_event_rp0 *p_evt)
   {
     if (p_evt->Attribute_Handle == a_ClientContext[index].P2PNotificationValueHdl)
     {
-      APP_DBG_MSG("  Incoming Nofification received P2P Server information\n");
+      LOG_INFO_APP("  Incoming Nofification received P2P Server information\n");
       Notification.Client_Evt_Opcode = P2P_NOTIFICATION_INFO_RECEIVED_EVT;
       Notification.DataTransfered.length = p_evt->Attribute_Value_Length;
       Notification.DataTransfered.p_Payload = &p_evt->Attribute_Value[0];
@@ -1086,7 +1125,7 @@ static void gatt_parse_notification(aci_gatt_notification_event_rp0 *p_evt)
   }
   else
   {
-    APP_DBG_MSG("ACI_GATT_NOTIFICATION_VSEVT_CODE, failed handle not found in connection table !\n");
+    LOG_INFO_APP("ACI_GATT_NOTIFICATION_VSEVT_CODE, failed handle not found in connection table !\n");
   }
 [/#if]
 [/#if]
@@ -1149,13 +1188,13 @@ static void P2Pclient_write_char(void)
   uint8_t index = 0;
   tBleStatus ret = BLE_STATUS_INVALID_PARAMS;
 
-  if (P2PButtonLevel == 0x00)
+  if (P2PButtonData.level == 0x00)
   {
-    P2PButtonLevel = 0x01;
+    P2PButtonData.level = 0x01;
   }
   else
   {
-    P2PButtonLevel = 0x00;
+    P2PButtonData.level = 0x00;
   }
 
   for(index = 0; index < BLE_CFG_CLT_MAX_NBR_CB; index++)
@@ -1164,18 +1203,18 @@ static void P2Pclient_write_char(void)
     {
       ret = aci_gatt_write_without_resp(a_ClientContext[index].connHdl,
                                         a_ClientContext[index].P2PWriteToServerValueHdl,
-                                        2, /* charValueLen */
-                                        (uint8_t *)  &P2PButtonSelection);
+                                        2,
+                                        (uint8_t *)&P2PButtonData);
 
       if (ret != BLE_STATUS_SUCCESS)
       {
-        APP_DBG_MSG("aci_gatt_write_without_resp failed, connHdl=0x%04X, ValueHdl=0x%04X\n",
+        LOG_INFO_APP("aci_gatt_write_without_resp failed, connHdl=0x%04X, ValueHdl=0x%04X\n",
                 a_ClientContext[index].connHdl,
                 a_ClientContext[index].P2PWriteToServerValueHdl);
       }
       else
       {
-        APP_DBG_MSG("aci_gatt_write_without_resp success, connHdl=0x%04X, ValueHdl=0x%04X\n",
+        LOG_INFO_APP("aci_gatt_write_without_resp success, connHdl=0x%04X, ValueHdl=0x%04X\n",
           a_ClientContext[index].connHdl,
           a_ClientContext[index].P2PWriteToServerValueHdl);
       }

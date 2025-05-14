@@ -63,8 +63,8 @@
 [#assign CFG_GAP_DEVICE_NAME = ""]
 [#assign CFG_GAP_DEVICE_NAME_LENGTH = 0]
 [#assign APPLI_PRINT_FILE_FUNC_LINE = 0]
-[#assign CFG_BLE_IRK_HEX = "0"]
-[#assign CFG_BLE_ERK_HEX = "0"]
+[#assign CFG_BLE_IR_HEX = "0"]
+[#assign CFG_BLE_ER_HEX = "0"]
 [#assign CFG_USE_SMPS = 0]
 [#assign OFFSET_PAYLOAD_LENGTH = 9]
 [#assign OFFSET_PAYLOAD_DATA = 10]
@@ -74,8 +74,8 @@
 [#assign CFG_BLE_MAX_ATT_MTU = 156]
 [#assign CFG_BLE_ATT_VALUE_ARRAY_SIZE = 1344]
 [#assign CFG_BLE_DATA_LENGTH_EXTENSION = 1]
-[#assign CFG_BLE_SLAVE_SCA = 500]
-[#assign CFG_BLE_MASTER_SCA = 0]
+[#assign CFG_BLE_PERIPHERAL_SCA = 500]
+[#assign CFG_BLE_CENTRAL_SCA = 0]
 [#-- BZ126317
 [#assign CFG_BLE_LSE_SOURCE = 0]
 --]
@@ -311,11 +311,11 @@
             [#if (definition.name == "APPLI_PRINT_FILE_FUNC_LINE")]
                 [#assign APPLI_PRINT_FILE_FUNC_LINE = definition.value]
             [/#if]
-            [#if (definition.name == "CFG_BLE_IRK_HEX")]
-                [#assign CFG_BLE_IRK_HEX = definition.value]
+            [#if (definition.name == "CFG_BLE_IR_HEX")]
+                [#assign CFG_BLE_IR_HEX = definition.value]
             [/#if]
-            [#if (definition.name == "CFG_BLE_ERK_HEX")]
-                [#assign CFG_BLE_ERK_HEX = definition.value]
+            [#if (definition.name == "CFG_BLE_ER_HEX")]
+                [#assign CFG_BLE_ER_HEX = definition.value]
             [/#if]
             [#if (definition.name == "CFG_USE_SMPS")]
                 [#assign CFG_USE_SMPS = definition.value]
@@ -344,11 +344,11 @@
             [#if (definition.name == "CFG_BLE_DATA_LENGTH_EXTENSION")]
                 [#assign CFG_BLE_DATA_LENGTH_EXTENSION = definition.value]
             [/#if]
-            [#if (definition.name == "CFG_BLE_SLAVE_SCA")]
-                [#assign CFG_BLE_SLAVE_SCA = definition.value]
+            [#if (definition.name == "CFG_BLE_PERIPHERAL_SCA")]
+                [#assign CFG_BLE_PERIPHERAL_SCA = definition.value]
             [/#if]
-            [#if (definition.name == "CFG_BLE_MASTER_SCA")]
-                [#assign CFG_BLE_MASTER_SCA = definition.value]
+            [#if (definition.name == "CFG_BLE_CENTRAL_SCA")]
+                [#assign CFG_BLE_CENTRAL_SCA = definition.value]
             [/#if]
 [#-- BZ126317
             [#if (definition.name == "CFG_BLE_LSE_SOURCE")]
@@ -618,14 +618,14 @@
 
 [#if (BT_SIG_BEACON != "0") || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_P2P_CLIENT = 1)|| (CUSTOM_P2P_ROUTER = 1)|| ( BLE_TRANSPARENT_MODE_UART = 1)|| ( BLE_TRANSPARENT_MODE_VCP = 1)|| (CUSTOM_TEMPLATE = 1)]
 /**
-*   Identity root key used to derive LTK and CSRK
+*   Identity root key used to derive IRK and DHK(Legacy)
 */
-#define CFG_BLE_IRK     {${CFG_BLE_IRK_HEX}}
+#define CFG_BLE_IR     {${CFG_BLE_IR_HEX}}
 
 /**
-* Encryption root key used to derive LTK and CSRK
+* Encryption root key used to derive LTK(Legacy) and CSRK
 */
-#define CFG_BLE_ERK     {${CFG_BLE_ERK_HEX}}
+#define CFG_BLE_ER     {${CFG_BLE_ER_HEX}}
 
 [/#if]
 [#if Line != "STM32WBx0 Value Line" ]
@@ -801,7 +801,7 @@
 
 #define L2CAP_INTERVAL_MIN              CONN_P(1000) /* 1s */
 #define L2CAP_INTERVAL_MAX              CONN_P(1000) /* 1s */
-#define L2CAP_SLAVE_LATENCY             0x0000
+#define L2CAP_PERIPHERAL_LATENCY             0x0000
 #define L2CAP_TIMEOUT_MULTIPLIER        0x1F4
 
 [/#if]
@@ -943,12 +943,12 @@
 #define CFG_BLE_DATA_LENGTH_EXTENSION   ${CFG_BLE_DATA_LENGTH_EXTENSION}
 
 /**
- * Sleep clock accuracy in Slave mode (ppm value)
+ * Sleep clock accuracy in Peripheral mode (ppm value)
  */
-#define CFG_BLE_SLAVE_SCA   ${CFG_BLE_SLAVE_SCA}
+#define CFG_BLE_PERIPHERAL_SCA   ${CFG_BLE_PERIPHERAL_SCA}
 
 /**
- * Sleep clock accuracy in Master mode
+ * Sleep clock accuracy in Central mode
  * 0 : 251 ppm to 500 ppm
  * 1 : 151 ppm to 250 ppm
  * 2 : 101 ppm to 150 ppm
@@ -958,7 +958,7 @@
  * 6 : 21 ppm to 30 ppm
  * 7 : 0 ppm to 20 ppm
  */
-#define CFG_BLE_MASTER_SCA   ${CFG_BLE_MASTER_SCA}
+#define CFG_BLE_CENTRAL_SCA   ${CFG_BLE_CENTRAL_SCA}
 
 
 /**
@@ -995,7 +995,7 @@
 #define CFG_BLE_HSE_STARTUP_TIME  ${CFG_BLE_HSE_STARTUP_TIME}
 
 /**
- * Maximum duration of the connection event when the device is in Slave mode in units of 625/256 us (~2.44 us)
+ * Maximum duration of the connection event when the device is in Peripheral mode in units of 625/256 us (~2.44 us)
  */
 #define CFG_BLE_MAX_CONN_EVENT_LENGTH  (${CFG_BLE_MAX_CONN_EVENT_LENGTH})
 
@@ -1111,7 +1111,8 @@
   /* BLE core version (16-bit signed integer). 
    * - SHCI_C2_BLE_INIT_BLE_CORE_5_2
    * - SHCI_C2_BLE_INIT_BLE_CORE_5_3
-   * which are used to set: 11(5.2), 12(5.3).
+   * - SHCI_C2_BLE_INIT_BLE_CORE_5_4
+   * which are used to set: 11(5.2), 12(5.3), 13(5.4).
    */
 
 #define CFG_BLE_CORE_VERSION   (${CFG_BLE_CORE_VERSION})
@@ -1373,8 +1374,8 @@ typedef enum
  * Debug
  ******************************************************************************/
 /**
- * When set, this resets some hw resources to set the device in the same state than the power up
- * The FW resets only register that may prevent the FW to run properly
+ * When set, this resets some hw resources to put the device in the same state as at power up.
+ * It resets only register that may prevent the FW to run properly.
  *
  * This shall be set to 0 in a final product
  *

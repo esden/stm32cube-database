@@ -34,6 +34,10 @@
 	<!-- Parameters Host_channels --> 
 	<RefParameter Comment="Host Channels" DefaultValue="16" Name="Host_channels"  Min="1" Max="16" Type="integer" Visible="false">	
 		<Condition Expression="(VirtualMode = Ext_Phy_Host) | (VirtualMode = Int_Phy_Host)" Diagnostic=""/>		
+	</RefParameter>	
+	
+	<RefParameter Comment="Host Channels" DefaultValue="16" Name="Host_channels"  Min="1" Max="16" Type="integer" Visible="true">	
+		<Condition Expression="DIE501" Diagnostic=""/>		
 	</RefParameter>
 	<RefParameter Comment="Host Channels" DefaultValue="null" Name="Host_channels"  Min="1" Max="16" Type="integer" Visible="false">				
 	</RefParameter>
@@ -41,10 +45,10 @@
 	<!-- Parameters phy_itface --> 	
 	<RefParameter Comment="Physical interface" DefaultValue="USB_OTG_ULPI_PHY" Name="phy_itface" Type="List">
 		<PossibleValue Value="USB_OTG_ULPI_PHY" Comment="External Phy"/>
-		<Condition Expression="(VirtualMode = Ext_Phy_Host) | (VirtualMode = Ext_Phy_Device)" Diagnostic=""/>		
+		<Condition Expression="((VirtualMode = Ext_Phy_Host) | (VirtualMode = Ext_Phy_Device)) &amp; !DIE501" Diagnostic=""/>		
 	</RefParameter>	
 	<RefParameter Comment="Physical interface" DefaultValue="USB_OTG_HS_EMBEDDED_PHY" Name="phy_itface" Type="List">		
-		<Condition Expression="(STM32F7x3) &amp; ((VirtualMode = Int_Phy_Host) | (VirtualMode = Int_Phy_Device))" Diagnostic=""/>		
+		<Condition Expression="((STM32F7x3) &amp; ((VirtualMode = Int_Phy_Host) | (VirtualMode = Int_Phy_Device))) | DIE501" Diagnostic=""/>		
 		<PossibleValue Value="USB_OTG_HS_EMBEDDED_PHY" Comment="Internal Phy"/>	
 	</RefParameter>	
 	<RefParameter Comment="Physical interface" DefaultValue="USB_OTG_EMBEDDED_PHY" Name="phy_itface" Type="List">		
@@ -55,10 +59,16 @@
 
 	<!-- Parameters speed --> 	
 	<RefParameter Comment="Speed" DefaultValue="USB_OTG_SPEED_HIGH" Name="speed" Type="List">	
-		<Condition Expression="(VirtualMode = Ext_Phy_Host) | (VirtualMode = Ext_Phy_Device)" Diagnostic=""/>	
+		<Condition Expression="!DIE501 &amp; ((VirtualMode = Ext_Phy_Host) | (VirtualMode = Ext_Phy_Device))" Diagnostic=""/>	
 		<PossibleValue Comment="High Speed 480MBit/s" Value="USB_OTG_SPEED_HIGH" />
 		<PossibleValue Comment="Host Full Speed 12MBit/s" Value="USB_OTG_SPEED_HIGH_IN_FULL"/>
 		<PossibleValue Comment="Low Speed 1.5MBit/s" Value="USB_OTG_SPEED_LOW" />
+	</RefParameter>		
+	<RefParameter Comment="Speed" DefaultValue="USB_OTG_SPEED_HIGH" Name="speed" Type="List">	
+		<Condition Expression="DIE501 &amp; ((VirtualMode = Ext_Phy_Host) | (VirtualMode = Ext_Phy_Device))" Diagnostic=""/>	
+		<PossibleValue Comment="High Speed 480MBit/s" Value="USB_OTG_SPEED_HIGH" />
+		<PossibleValue Comment="Host Full Speed 12MBit/s" Value="USB_OTG_SPEED_HIGH_IN_FULL"/>
+		<PossibleValue Comment="Low Speed 1.5MBit/s" Value="USB_OTG_SPEED_FULL" />
 	</RefParameter>	
 	<RefParameter Comment="Speed" DefaultValue="USB_OTG_SPEED_HIGH" Name="speed" Type="List">	
 		<Condition Expression="(STM32F7x3) &amp; ((VirtualMode = Int_Phy_Host) | (VirtualMode = Int_Phy_Device))" Diagnostic=""/>		
@@ -194,6 +204,7 @@
 		<Parameter Name="lpm_enable"/>
 		<Parameter Name="use_dedicated_ep1"/>
 		<Parameter Name="vbus_sensing_enable"/>	
+		<Parameter Name="use_external_vbus"/>
 	</RefMode>
 	
 	<!-- USB Full Speed in Host mode -->
@@ -208,7 +219,7 @@
 		<Parameter Name="dma_enable"/>
 		<Parameter Name="phy_itface"/>			
 		<Parameter Name="low_power_enable"/>	
-		<Parameter Name="vbus_sensing_enable"/>			
+		<Parameter Name="vbus_sensing_enable"/>
 	</RefMode>
 	
 	<!-- USB Full Speed in Device mode -->

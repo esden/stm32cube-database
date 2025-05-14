@@ -531,6 +531,7 @@
 /*#define TX_NO_FILEX_POINTER*/
 [/#if]
 
+[#if ALIGN_TYPE_DEFINED_value??]
 /* Determinate if the basic alignment type is defined. */
 
 [#if ALIGN_TYPE_DEFINED_value == "1"]
@@ -538,7 +539,9 @@
 [#else]
 /*#define ALIGN_TYPE_DEFINED*/
 [/#if]
+[/#if]
 
+[#if ALIGN_TYPE_DEFINED_value??]
 /* Define basic alignment type used in block and byte pool operations. */
 
 [#if ALIGN_TYPE_DEFINED_value == "1"]
@@ -546,13 +549,16 @@
 [#else]
 /*#define ALIGN_TYPE  ULONG*/
 [/#if]
+[/#if]
 
+[#if TX_MEMSET_value ??]
 /* Define the TX_MEMSET macro to the standard library function. */
 
 [#if TX_MEMSET_value != "memset"]
 #define TX_MEMSET  ${TX_MEMSET_value}((a),(b),(c))
 [#else]
 /*#define TX_MEMSET  memset((a),(b),(c))*/
+[/#if]
 [/#if]
 
 [#if TX_ENABLE_IAR_LIBRARY_SUPPORT_value != "not defined"]

@@ -2,14 +2,14 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file    app_zigbee.h
-  * @author  MCD Application Team
-  * @brief   Header for Zigbee Application.
+  * File Name          : app_zigbee.h
+  * Description        : Header for Zigbee Application.
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 /* USER CODE END Header */
+
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef APP_ZIGBEE_H
 #define APP_ZIGBEE_H
@@ -19,65 +19,92 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-/* Private includes ----------------------------------------------------------*/
-#include "tl.h"
-#include "tl_zigbee_hci.h"
-
+#include "app_common.h"
+#include "app_zigbee_endpoint.h"
+#include "zigbee.h"
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
 
-/* Exported types ------------------------------------------------------------*/
 
-/* Application errors                 */
-/*------------------------------------*/
+/* Exported defines ----------------------------------------------------------*/
+/* USER CODE BEGIN ED */
 
-/*
- *  List of all errors tracked by the Zigbee application
- *  running on M4. Some of these errors may be fatal
- *  or just warnings
- */
+/* USER CODE END ED */  
+    
+/* Exported types ------------------------------------------------------------*/  
+/* --- Zigbee Application status --- */
 typedef enum
 {
-  ERR_REC_MULTI_MSG_FROM_M0,
-  ERR_ZIGBE_CMD_TO_M0,
-/* USER CODE BEGIN ERROR_APPLI_ENUM */
+  APP_ZIGBEE_OK       = 0x00u,
+  APP_ZIGBEE_ERROR    = 0x01u,
+} APP_ZIGBEE_StatusTypeDef;
 
-/* USER CODE END ERROR_APPLI_ENUM */
-  ERR_ZIGBEE_CHECK_WIRELESS
-} ErrAppliIdEnum_t;
+
+/* --- Zigbee Application Information --- */
+typedef struct ZigbeeAppInfoT
+{
+  bool                  bHasInit;
+  bool                  bInitAfterJoin;
+  bool                  bPersistNotification;
+  bool                  bNwkStartup;
+  struct ZigBeeT        * pstZigbee;
+  enum ZbStartType      eStartupControl;
+  enum ZbStatusCodeT    eJoinStatus;
+  uint32_t              lPersistNumWrites;
+  uint32_t              lJoinDelay;
+  /* USER CODE BEGIN ZigbeeAppInfo_t */
+
+  /* USER CODE END ZigbeeAppInfo_t */ 
+    
+  struct ZbZclClusterT  * pstZbCluster[CLUSTER_NB_MAX];
+} ZigbeeAppInfo_t;
+
 /* USER CODE BEGIN ET */
 
 /* USER CODE END ET */
 
-/* Exported constants --------------------------------------------------------*/
+/* Exported constants ------------------------------------------------------- */
+extern const uint8_t                      sec_key_ha[ZB_SEC_KEYSIZE];
+extern const uint8_t                      sec_key_distrib_uncert[ZB_SEC_KEYSIZE];
+
 /* USER CODE BEGIN EC */
 
 /* USER CODE END EC */
 
-/* External variables --------------------------------------------------------*/
+/* External variables ------------------------------------------------------- */
+extern ZigbeeAppInfo_t                    stZigbeeAppInfo;
+
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
 
-/* Exported macros ------------------------------------------------------------*/
+/* Exported macros -----------------------------------------------------------*/
 /* USER CODE BEGIN EM */
 
 /* USER CODE END EM */
 
-/* Exported functions ------------------------------------------------------- */
-void APP_ZIGBEE_Init(void);
-void APP_ZIGBEE_Error(uint32_t ErrId, uint32_t ErrCode);
-void APP_ZIGBEE_RegisterCmdBuffer(TL_CmdPacket_t *p_buffer);
-void APP_ZIGBEE_ProcessNotifyM0ToM4(void);
-void APP_ZIGBEE_ProcessRequestM0ToM4(void);
-void APP_ZIGBEE_TL_INIT(void);
-void Pre_ZigbeeCmdProcessing(void);
-/* USER CODE BEGIN EF */
+/* Exported functions prototypes ---------------------------------------------*/
+extern void       APP_ZIGBEE_Init                         ( void );
+extern void       APP_ZIGBEE_Task                         ( void );
+extern void       APP_ZIGBEE_StackLayersInit              ( void );
+extern void       APP_ZIGBEE_NwkFormOrJoinTaskInit        ( void );
+extern void       APP_ZIGBEE_NwkFormOrJoin                ( void );
 
-/* USER CODE END EF */
+extern bool       APP_ZIGBEE_IsAppliJoinNetwork           ( void );
+extern bool       APP_ZIGBEE_GetCurrentChannel            ( uint8_t * cCurrentChannel );
+extern bool       APP_ZIGBEE_SetTxPower                   ( uint8_t cTxPower );
+extern void       APP_ZIGBEE_PrintGenericInfo             ( void );
+extern void       APP_ZIGBEE_PrintApplicationInfo         ( void );
+extern void       APP_ZIGBEE_Error                        ( uint32_t ErrId, uint32_t ErrCode );
+
+/* USER CODE BEGIN EFP */
+
+/* USER CODE END EFP */
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
 #endif /* APP_ZIGBEE_H */
+

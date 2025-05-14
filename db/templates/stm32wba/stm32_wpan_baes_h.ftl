@@ -10,6 +10,20 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
+[#assign myHash = {}]
+[#list SWIPdatas as SWIP]
+    [#if SWIP.defines??]
+        [#list SWIP.defines as definition]
+            [#assign myHash = {definition.name:definition.value} + myHash]
+        [/#list]
+    [/#if]
+[/#list]
+[#--
+Key & Value:
+[#list myHash?keys as key]
+Key: ${key}; Value: ${myHash[key]}
+[/#list]
+--]
 
 #ifndef BAES_H__
 #define BAES_H__
@@ -47,6 +61,10 @@ extern void BAES_EcbCrypt( const uint8_t* key,
 /* AES CMAC interface */
 
 extern void BAES_CmacSetKey( const uint8_t* key );
+
+[#if myHash["OTHER_THAN_BLE"]?number == 1]
+extern void BAES_CmacSetVector( const uint8_t * pIV );
+[/#if]
 
 extern void BAES_CmacCompute( const uint8_t* input,
                               uint32_t size,

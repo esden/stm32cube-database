@@ -10,6 +10,20 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
+[#assign myHash = {}]
+[#list SWIPdatas as SWIP]
+    [#if SWIP.defines??]
+        [#list SWIP.defines as definition]
+            [#assign myHash = {definition.name:definition.value} + myHash]
+        [/#list]
+    [/#if]
+[/#list]
+[#--
+Key & Value:
+[#list myHash?keys as key]
+Key: ${key}; Value: ${myHash[key]}
+[/#list]
+--]
 
 #include "baes_global.h"
 
@@ -102,6 +116,24 @@ void BAES_CmacSetKey( const uint8_t* key )
   av->iv[0] = av->iv[1] = av->iv[2] = av->iv[3] = 0;
 }
 
+[#if myHash["OTHER_THAN_BLE"]?number == 1]
+/*
+ * Initialization for AES-CMAC for Authentication TAG Generation.
+ * Must be called each time a new CMAC has to be computed.
+ */
+
+void BAES_CmacSetVector( const uint8_t * pIV )
+{
+    BAES_CMAC_t  * av = &BAES_CMAC_var;
+
+    // -- Update IV if exist else set to zero --
+    if ( pIV != NULL )
+      { memcpy( av->iv, pIV, AES_BLOCK_SIZE_BYTE ); }
+    else
+      { memset( av->iv, 0x00, AES_BLOCK_SIZE_BYTE ); }
+}
+
+[/#if]
 /*****************************************************************************/
 
 /*

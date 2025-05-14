@@ -48,7 +48,14 @@ Key: ${key}; Value: ${myHash[key]}
 #include "stm_list.h"
 #include "utilities_common.h"
 
+/* Debug */
+#include "log_module.h"
+
 /* Global variables ----------------------------------------------------------*/
+
+/* Handle of HAL CRC */
+extern CRC_HandleTypeDef hcrc;
+
 /* Private defines -----------------------------------------------------------*/
 /* Alignment 128bits for NVM Start address */
 #define SNVMA_MASK_ALIGNMENT_128  0x0000000Fu
@@ -123,9 +130,6 @@ static uint8_t SNVMA_CommandPending = FALSE;
 /* Bitmask for write operation */
 static uint32_t SNVMA_IdBitmask = 0x00000000;
 
-/* Handle of HAL CRC */
-static CRC_HandleTypeDef SNVMA_CrcHandle;
-
 /* Bank header for write operation */
 static SNVMA_BankHeader_t SNVMA_WriteBankHeader;
 
@@ -137,18 +141,6 @@ static SNVMA_FlashOpInfo_t SNVMA_FlashInfo;
 
 /* Representation of the Bank configuration */
 static SNVMA_BankElt_t SNVMA_BankConfiguration[SNVMA_NUMBER_OF_BANKS];
-
-/* Representation of the NVM configuration */
-static SNVMA_NvmElt_t SNVMA_NvmConfiguration [SNVMA_NVM_NUMBER] =
-{
-[#list 1..myHash["SNVMA_NVM_NUMBER"]?number as nvm_number]
-  /* NVM ID #${nvm_number} */
-  {
-    .BankNumber = SNVMA_NVM_ID_${nvm_number}_BANK_NUMBER,
-    .BankSize = SNVMA_NVM_ID_${nvm_number}_BANK_SIZE,
-  },
-[/#list]
-};
 
 /* Callback prototypes -----------------------------------------------*/
 
@@ -246,7 +238,9 @@ SNVMA_Cmd_Status_t SNVMA_Init (const uint32_t * p_NvmStartAddress)
 {
   SNVMA_Cmd_Status_t error = SNVMA_ERROR_NOK;
 
+  uint16_t bankNbr = 0x00;
   uint16_t bankConfIdx = 0x00;
+  uint32_t bankPrint = 0x00;
   uint32_t nvmOffset = 0x00;
   uint32_t addressOffset = 0x00;
 
@@ -276,23 +270,8 @@ SNVMA_Cmd_Status_t SNVMA_Init (const uint32_t * p_NvmStartAddress)
   }
   else
   {
-    /* Enter critical section */
-    UTILS_ENTER_CRITICAL_SECTION();
-
-    /* Prepare CRC Handle for init */
-    SNVMA_CrcHandle.Instance = CRC;
-    SNVMA_CrcHandle.Init.DefaultPolynomialUse = DEFAULT_POLYNOMIAL_DISABLE;
-    SNVMA_CrcHandle.Init.DefaultInitValueUse = DEFAULT_INIT_VALUE_ENABLE;
-    SNVMA_CrcHandle.Init.CRCLength = CRC_POLYLENGTH_16B;
-    SNVMA_CrcHandle.Init.GeneratingPolynomial = SNVMA_POLY_CRC16;
-    SNVMA_CrcHandle.Init.InputDataInversionMode = CRC_INPUTDATA_INVERSION_NONE;
-    SNVMA_CrcHandle.Init.OutputDataInversionMode = CRC_OUTPUTDATA_INVERSION_DISABLE;
-    SNVMA_CrcHandle.InputDataFormat = CRC_INPUTDATA_FORMAT_WORDS;
-
-    /* Leave critical section */
-    UTILS_EXIT_CRITICAL_SECTION ();
-
-    if (HAL_CRC_Init (&SNVMA_CrcHandle) != HAL_OK)
+    if ((hcrc.State == HAL_CRC_STATE_RESET) ||
+        (hcrc.State == HAL_CRC_STATE_ERROR))
     {
       error = SNVMA_ERROR_CRC_INIT;
     }
@@ -314,103 +293,129 @@ SNVMA_Cmd_Status_t SNVMA_Init (const uint32_t * p_NvmStartAddress)
 
       /* For each NVM */
       for (uint8_t nvmIdx = 0x00;
-           nvmIdx < SNVMA_NVM_NUMBER;
+           (nvmIdx < SNVMA_NVM_NUMBER) && (error == SNVMA_ERROR_NOK);
            nvmIdx++)
       {
-        p_currentRestoreBank = NULL;
+        /* Updates levels for bank numbers and bank foot print */
+        bankNbr += SNVMA_NvmConfiguration[nvmIdx].BankNumber;
+        bankPrint += (SNVMA_NvmConfiguration[nvmIdx].BankSize * SNVMA_NvmConfiguration[nvmIdx].BankNumber);
 
-        /* Get the first bank element of our NVM - Will be used as the bank list of the NVM */
-        SNVMA_NvmConfiguration[nvmIdx].p_BankList = &SNVMA_BankConfiguration[bankConfIdx];
-
-        /* For each bank ... */
-        for (uint8_t bankIdx = 0x00;
-             bankIdx < SNVMA_NvmConfiguration[nvmIdx].BankNumber;
-             bankIdx++)
+        /* Check the Bank configuration, Is number of banks ok ? */
+        if ((SNVMA_NvmConfiguration[nvmIdx].BankNumber < SNVMA_MIN_NUMBER_BANK) ||
+            (bankNbr > SNVMA_NUMBER_OF_BANKS))
         {
-          /* ... compute bank addresses */
-          SNVMA_BankConfiguration[bankConfIdx].p_StartAddr = (uint32_t *)((uint32_t)p_NvmStartAddress + addressOffset);
+          error = SNVMA_ERROR_BANK_NUMBER;
+        }
+        /* Is bank size ok ? */
+        else if ((SNVMA_NvmConfiguration[nvmIdx].BankSize == 0x00) ||
+                 (bankPrint > SNVMA_NUMBER_OF_SECTOR_NEEDED))
+        {
+          error = SNVMA_ERROR_BANK_SIZE;
+        }
+        else
+        {
+          p_currentRestoreBank = NULL;
 
-          /* Shall this bank be the one in use */
-          if (IsHeaderOk (SNVMA_BankConfiguration[bankConfIdx].p_StartAddr,
-                          nvmIdx) == FALSE)
+          /* Get the first bank element of our NVM - Will be used as the bank list of the NVM */
+          SNVMA_NvmConfiguration[nvmIdx].p_BankList = &SNVMA_BankConfiguration[bankConfIdx];
+
+          /* For each bank ... */
+          for (uint8_t bankIdx = 0x00;
+              bankIdx < SNVMA_NvmConfiguration[nvmIdx].BankNumber;
+              bankIdx++)
           {
-            /* Erase the bank */
-            while (EraseSector (((nvmOffset + addressOffset) / FLASH_PAGE_SIZE),
-                                SNVMA_NvmConfiguration[nvmIdx].BankSize) == FALSE);
-          }
-          /* Check if CRC OK */
-          else if (IsCrcOk (SNVMA_BankConfiguration[bankConfIdx].p_StartAddr) == FALSE)
-          {
-            /* Erase the bank */
-            while (EraseSector (((nvmOffset + addressOffset) / FLASH_PAGE_SIZE),
-                                SNVMA_NvmConfiguration[nvmIdx].BankSize) == FALSE);
-          }
-          /* Valid bank */
-          else
-          {
-            /* Compute buffer addresses in the bank */
-            if (SNVMA_NvmConfiguration[nvmIdx].p_BankForRestore == NULL)
+            /* ... compute bank addresses */
+            SNVMA_BankConfiguration[bankConfIdx].p_StartAddr = (uint32_t *)((uint32_t)p_NvmStartAddress + addressOffset);
+
+            /* Shall this bank be the one in use */
+            if (IsHeaderOk (SNVMA_BankConfiguration[bankConfIdx].p_StartAddr,
+                            nvmIdx) == FALSE)
             {
-              SNVMA_NvmConfiguration[nvmIdx].p_BankForRestore = &SNVMA_BankConfiguration[bankConfIdx];
+              /* Erase the bank */
+              while (EraseSector (((nvmOffset + addressOffset) / FLASH_PAGE_SIZE),
+                                  SNVMA_NvmConfiguration[nvmIdx].BankSize) == FALSE);
+
+              LOG_ERROR_SYSTEM("\r\nSNVMA_Init - Corrupted banks erases [IsHeaderOk]");
             }
+            /* Check if CRC OK */
+            else if (IsCrcOk (SNVMA_BankConfiguration[bankConfIdx].p_StartAddr) == FALSE)
+            {
+              /* Erase the bank */
+              while (EraseSector (((nvmOffset + addressOffset) / FLASH_PAGE_SIZE),
+                                  SNVMA_NvmConfiguration[nvmIdx].BankSize) == FALSE);
+
+              LOG_ERROR_SYSTEM("\r\nSNVMA_Init - Corrupted banks erases [IsCrcOk]");
+            }
+            /* Valid bank */
             else
             {
-              /* Get the current bank in use for this NVM */
-              p_currentRestoreBank = SNVMA_NvmConfiguration[nvmIdx].p_BankForRestore;
-
-              /* Already have a valid bank in use, determine which bank is the newest */
-              SNVMA_NvmConfiguration[nvmIdx].p_BankForRestore = GetNewestBank (p_currentRestoreBank,
-                                                                               &SNVMA_BankConfiguration[bankConfIdx]);
-
-              if (SNVMA_NvmConfiguration[nvmIdx].p_BankForRestore == p_currentRestoreBank)
+              /* Compute buffer addresses in the bank */
+              if (SNVMA_NvmConfiguration[nvmIdx].p_BankForRestore == NULL)
               {
-                /* Erase &SNVMA_BankConfiguration[bankConfIdx] */
-                while (EraseSector (((nvmOffset + addressOffset) / FLASH_PAGE_SIZE),
-                                    SNVMA_NvmConfiguration[nvmIdx].BankSize) == FALSE);
+                SNVMA_NvmConfiguration[nvmIdx].p_BankForRestore = &SNVMA_BankConfiguration[bankConfIdx];
               }
               else
               {
-                /* Erase p_currentRestoreBank */
-                while (EraseSector ((((uint32_t)p_currentRestoreBank->p_StartAddr - FLASH_BASE_NS) / FLASH_PAGE_SIZE),
-                                    SNVMA_NvmConfiguration[nvmIdx].BankSize) == FALSE);
+                /* Get the current bank in use for this NVM */
+                p_currentRestoreBank = SNVMA_NvmConfiguration[nvmIdx].p_BankForRestore;
+
+                /* Already have a valid bank in use, determine which bank is the newest */
+                SNVMA_NvmConfiguration[nvmIdx].p_BankForRestore = GetNewestBank (p_currentRestoreBank,
+                                                                                &SNVMA_BankConfiguration[bankConfIdx]);
+
+                if (SNVMA_NvmConfiguration[nvmIdx].p_BankForRestore == p_currentRestoreBank)
+                {
+                  /* Erase &SNVMA_BankConfiguration[bankConfIdx] */
+                  while (EraseSector (((nvmOffset + addressOffset) / FLASH_PAGE_SIZE),
+                                      SNVMA_NvmConfiguration[nvmIdx].BankSize) == FALSE);
+                }
+                else
+                {
+                  /* Erase p_currentRestoreBank */
+                  while (EraseSector ((((uint32_t)p_currentRestoreBank->p_StartAddr - FLASH_BASE_NS) / FLASH_PAGE_SIZE),
+                                      SNVMA_NvmConfiguration[nvmIdx].BankSize) == FALSE);
+                }
               }
             }
-          }
 
-          /* Determine the next write bank, is there any bank for restore ? */
-          if (SNVMA_NvmConfiguration[nvmIdx].p_BankForRestore == NULL)
-          {
-            /* The bank for write will be the first of list */
-            SNVMA_NvmConfiguration[nvmIdx].p_BankForWrite = &SNVMA_NvmConfiguration[nvmIdx].p_BankList[0];
-          }
-          /* Is the bank to restore the last one in the bank list */
-          else if (SNVMA_NvmConfiguration[nvmIdx].p_BankForRestore ==
-                   &SNVMA_NvmConfiguration[nvmIdx].p_BankList[SNVMA_NvmConfiguration[nvmIdx].BankNumber - 1])
-          {
-            /* The bank for write will be the first of list */
-            SNVMA_NvmConfiguration[nvmIdx].p_BankForWrite = &SNVMA_NvmConfiguration[nvmIdx].p_BankList[0];
-          }
-          else
-          {
-            /* The bank for write will be the one after the restore list */
-            SNVMA_NvmConfiguration[nvmIdx].p_BankForWrite = SNVMA_NvmConfiguration[nvmIdx].p_BankForRestore + 1;
-          }
+            /* Determine the next write bank, is there any bank for restore ? */
+            if (SNVMA_NvmConfiguration[nvmIdx].p_BankForRestore == NULL)
+            {
+              /* The bank for write will be the first of list */
+              SNVMA_NvmConfiguration[nvmIdx].p_BankForWrite = &SNVMA_NvmConfiguration[nvmIdx].p_BankList[0];
+            }
+            /* Is the bank to restore the last one in the bank list */
+            else if (SNVMA_NvmConfiguration[nvmIdx].p_BankForRestore ==
+                    &SNVMA_NvmConfiguration[nvmIdx].p_BankList[SNVMA_NvmConfiguration[nvmIdx].BankNumber - 1])
+            {
+              /* The bank for write will be the first of list */
+              SNVMA_NvmConfiguration[nvmIdx].p_BankForWrite = &SNVMA_NvmConfiguration[nvmIdx].p_BankList[0];
+            }
+            else
+            {
+              /* The bank for write will be the one after the restore list */
+              SNVMA_NvmConfiguration[nvmIdx].p_BankForWrite = SNVMA_NvmConfiguration[nvmIdx].p_BankForRestore + 1;
+            }
 
-          /* Add the bank size to the address offset */
-          addressOffset = addressOffset + ((SNVMA_NvmConfiguration[nvmIdx].BankSize * FLASH_PAGE_SIZE));
+            /* Add the bank size to the address offset */
+            addressOffset = addressOffset + ((SNVMA_NvmConfiguration[nvmIdx].BankSize * FLASH_PAGE_SIZE));
 
-          /* Update bank conf index */
-          bankConfIdx++;
+            /* Update bank conf index */
+            bankConfIdx++;
+          }
         }
       }
 
-      /* Init is over, all OK */
-      SNVMA_ModuleInit = TRUE;
+      if (error == SNVMA_ERROR_NOK)
+      {
+        /* Init is over, all OK */
+        SNVMA_ModuleInit = TRUE;
+
+        error = SNVMA_ERROR_OK;
+      }
 
       /* Leave critical section */
       UTILS_EXIT_CRITICAL_SECTION ();
-
-      error = SNVMA_ERROR_OK;
     }
   }
 
@@ -522,6 +527,8 @@ SNVMA_Cmd_Status_t SNVMA_Register (const SNVMA_BufferId_t BufferId,
       error = SNVMA_ERROR_OK;
     }
   }
+
+  LOG_ERROR_SYSTEM("\r\nSNVMA_Register returned %d", (uint8_t)error);
 
   return error;
 }
@@ -643,6 +650,8 @@ SNVMA_Cmd_Status_t SNVMA_Restore (const SNVMA_BufferId_t BufferId)
     UTILS_EXIT_CRITICAL_SECTION ();
   }
 
+  LOG_ERROR_SYSTEM("\r\nSNVMA_Restore returned %d", (uint8_t)error);
+
   return error;
 }
 
@@ -677,8 +686,12 @@ SNVMA_Cmd_Status_t SNVMA_Write (const SNVMA_BufferId_t BufferId,
     /* Set the impacted NVM */
     SNVMA_IdBitmask |= (1u << nvmId);
 
+    LOG_INFO_SYSTEM("\r\nSNVMA_Write - Impacted NVM : %d", SNVMA_IdBitmask);
+
     /* Store the pending buffer ... */
     SNVMA_NvmConfiguration[nvmId].PendingBufferWriteOp |= (1u << idxBuf);
+
+    LOG_INFO_SYSTEM("\r\nSNVMA_Write - Pending buffer : %d", (uint8_t)(1u << idxBuf));
 
     /* ... and the callback - Can be NULL */
     SNVMA_NvmConfiguration[nvmId].a_Callback[idxBuf] = Callback;
@@ -740,6 +753,8 @@ SNVMA_Cmd_Status_t SNVMA_Write (const SNVMA_BufferId_t BufferId,
         /* Leave critical section */
         UTILS_EXIT_CRITICAL_SECTION ();
 
+        LOG_INFO_SYSTEM("\r\nSNVMA_Write - Flash operation started (Header write request) : %d", (uint8_t)SNVMA_NvmConfiguration[nvmId].PendingBufferWriteOp);
+
         error = SNVMA_ERROR_OK;
       }
     }
@@ -767,6 +782,8 @@ void SNVMA_FlashManagerCallback(FM_FlashOp_Status_t Status)
   {
     case SNVMA_HEADER_WRITE:
     {
+      LOG_INFO_SYSTEM("\r\nSNVMA_FlashManagerCallback - Flash operation state : SNVMA_HEADER_WRITE");
+
       /* Check flash operation status */
       if (Status == FM_OPERATION_COMPLETE)
       {
@@ -853,6 +870,8 @@ void SNVMA_FlashManagerCallback(FM_FlashOp_Status_t Status)
       /* Status == FM_OPERATION_AVAILABLE */
       else
       {
+        LOG_INFO_SYSTEM("\r\nSNVMA_FlashManagerCallback - Flash operation state : SNVMA_RETRY_WRITE - Retry write operation");
+
         /* Retry write operation of the header */
         flashFunRet = FM_Write ((uint32_t *)&SNVMA_WriteBankHeader,
                                 SNVMA_NvmConfiguration[SNVMA_FlashInfo.NvmId].p_BankForWrite->p_StartAddr,
@@ -884,6 +903,8 @@ void SNVMA_FlashManagerCallback(FM_FlashOp_Status_t Status)
 
     case SNVMA_BUFFER_WRITE:
     {
+      LOG_INFO_SYSTEM("\r\nSNVMA_FlashManagerCallback - Flash operation state : SNVMA_BUFFER_WRITE");
+
       /* Check flash operation status */
       if (Status == FM_OPERATION_COMPLETE)
       {
@@ -1110,6 +1131,8 @@ void SNVMA_FlashManagerCallback(FM_FlashOp_Status_t Status)
                   }
                 }
 
+                LOG_INFO_SYSTEM("\r\nSNVMA_FlashManagerCallback - Flash operation state : SNVMA_BUFFER_WRITE - Start the pending write operation");
+
                 /* Start the pending write operation */
                 flashFunRet = StartFlashWrite (SNVMA_FlashInfo.NvmId);
 
@@ -1166,6 +1189,8 @@ void SNVMA_FlashManagerCallback(FM_FlashOp_Status_t Status)
       /* Status == FM_OPERATION_AVAILABLE */
       else
       {
+        LOG_INFO_SYSTEM("\r\nSNVMA_FlashManagerCallback - Flash operation state : SNVMA_BUFFER_WRITE - Retry write operation");
+
         /* Retry the buffer write */
         flashFunRet = FM_Write (
           SNVMA_NvmConfiguration[SNVMA_FlashInfo.NvmId].a_Buffers[SNVMA_FlashInfo.BufferId].p_Addr,
@@ -1197,6 +1222,8 @@ void SNVMA_FlashManagerCallback(FM_FlashOp_Status_t Status)
 
     case SNVMA_ERASE_BANK:
     {
+      LOG_INFO_SYSTEM("\r\nSNVMA_FlashManagerCallback - Flash operation state : SNVMA_ERASE_BANK");
+
       /* Check flash operation status */
       if (Status == FM_OPERATION_COMPLETE)
       {
@@ -1252,6 +1279,8 @@ void SNVMA_FlashManagerCallback(FM_FlashOp_Status_t Status)
               break;
             }
           }
+
+          LOG_INFO_SYSTEM("\r\nSNVMA_FlashManagerCallback - Flash operation state : SNVMA_ERASE_BANK - Start the pending write operation");
 
           /* Start the pending write operation */
           flashFunRet = StartFlashWrite (SNVMA_FlashInfo.NvmId);
@@ -1335,6 +1364,8 @@ void SNVMA_FlashManagerCallback(FM_FlashOp_Status_t Status)
 
     case SNVMA_RETRY_WRITE:
     {
+      LOG_INFO_SYSTEM("\r\nSNVMA_FlashManagerCallback - Flash operation state : SNVMA_RETRY_WRITE");
+
       /* Check flash operation status */
       if (Status == FM_OPERATION_COMPLETE)
       {
@@ -1401,6 +1432,8 @@ void SNVMA_FlashManagerCallback(FM_FlashOp_Status_t Status)
       /* Status == FM_OPERATION_AVAILABLE */
       else
       {
+        LOG_INFO_SYSTEM("\r\nSNVMA_FlashManagerCallback - Flash operation state : SNVMA_RETRY_WRITE - Retry erase operation");
+
         /* Retry erase operation */
         flashFunRet = FM_Erase ((((uint32_t)SNVMA_NvmConfiguration[SNVMA_FlashInfo.NvmId].p_BankForWrite->p_StartAddr -
                                             FLASH_PAGE_SIZE) / FLASH_PAGE_SIZE),
@@ -1503,29 +1536,31 @@ uint8_t IsCrcOk (const uint32_t * const p_BankStartAddress)
   uint32_t * payloadAddr = (uint32_t *)((uint32_t)(p_BankStartAddress) + sizeof (SNVMA_BankHeader_t));
   uint32_t offSet = 0x00;
 
+  LOG_INFO_SYSTEM("\r\nStart of CRC computation");
+
   /* First buffer CRC computation */
-  crcComputedValue = HAL_CRC_Calculate (&SNVMA_CrcHandle,
+  crcComputedValue = HAL_CRC_Calculate (&hcrc,
                                         payloadAddr,
                                         ((SNVMA_BankHeader_t *)p_BankStartAddress)->SizeId1);
 
   offSet = SNVMA_ALIGN_128(((SNVMA_BankHeader_t *)p_BankStartAddress)->SizeId1 * sizeof (uint32_t));
 
   /* Second buffer CRC computation */
-  crcComputedValue = HAL_CRC_Accumulate (&SNVMA_CrcHandle,
+  crcComputedValue = HAL_CRC_Accumulate (&hcrc,
                                          (uint32_t *)((uint32_t)payloadAddr + offSet),
                                          ((SNVMA_BankHeader_t *)p_BankStartAddress)->SizeId2);
 
   offSet += SNVMA_ALIGN_128(((SNVMA_BankHeader_t *)p_BankStartAddress)->SizeId2 * sizeof (uint32_t));
 
   /* Third buffer CRC computation */
-  crcComputedValue = HAL_CRC_Accumulate (&SNVMA_CrcHandle,
+  crcComputedValue = HAL_CRC_Accumulate (&hcrc,
                                          (uint32_t *)((uint32_t)payloadAddr + offSet),
                                          ((SNVMA_BankHeader_t *)p_BankStartAddress)->SizeId3);
 
   offSet += SNVMA_ALIGN_128(((SNVMA_BankHeader_t *)p_BankStartAddress)->SizeId3 * sizeof (uint32_t));
 
   /* Second buffer CRC computation */
-  crcComputedValue = HAL_CRC_Accumulate (&SNVMA_CrcHandle,
+  crcComputedValue = HAL_CRC_Accumulate (&hcrc,
                                          (uint32_t *)((uint32_t)payloadAddr + offSet),
                                          ((SNVMA_BankHeader_t *)p_BankStartAddress)->SizeId4);
 
@@ -1534,6 +1569,8 @@ uint8_t IsCrcOk (const uint32_t * const p_BankStartAddress)
   {
     error = TRUE;
   }
+
+  LOG_INFO_SYSTEM("\r\nEnd of CRC computation, value : %d", crcComputedValue);
 
   return error;
 }
@@ -1632,13 +1669,13 @@ FM_Cmd_Status_t StartFlashWrite (const uint8_t NvmId)
       /* First crc computation */
       if (crcValue == 0x00)
       {
-        crcValue = HAL_CRC_Calculate (&SNVMA_CrcHandle,
+        crcValue = HAL_CRC_Calculate (&hcrc,
                                       SNVMA_NvmConfiguration[NvmId].a_Buffers[cnt].p_Addr,
                                       SNVMA_NvmConfiguration[NvmId].a_Buffers[cnt].Size);
       }
       else
       {
-        crcValue = HAL_CRC_Accumulate (&SNVMA_CrcHandle,
+        crcValue = HAL_CRC_Accumulate (&hcrc,
                                        SNVMA_NvmConfiguration[NvmId].a_Buffers[cnt].p_Addr,
                                        SNVMA_NvmConfiguration[NvmId].a_Buffers[cnt].Size);
       }
@@ -1705,6 +1742,8 @@ void InvokeBufferCallback (const uint8_t NvmId, const SNVMA_Callback_Status_t Ca
         {
           /* Invoke callback */
           SNVMA_NvmConfiguration[NvmId].a_Callback[pendingShift] (CallbackStatus);
+
+          LOG_INFO_SYSTEM("\r\nSNVMA - InvokeBufferCallback for NVM ID : %d\n", NvmId);
 
           /* Enter critical section */
           UTILS_ENTER_CRITICAL_SECTION();

@@ -59,10 +59,16 @@
 [#if (IdeMode?? || ide=="STM32CubeIDE") && family=="STM32MP1xx"]
     [#assign WorkspaceType = "Multi-project"]
 [/#if]
+[/#compress]
 <WorkspaceType>${WorkspaceType}</WorkspaceType>
 <WorkspacePath>${WorkspacePath}</WorkspacePath>
+[#compress]
 <underRoot>${underRoot}</underRoot>
 <TrustZone>${TrustZone}</TrustZone>
+[#if Structure??]<Structure>${Structure}</Structure>[/#if]
+[#if ide!="STM32CubeIDE" && Multi_folder == "true"] 
+<ProjectStructure>${ProjectStructure}</ProjectStructure>
+ [/#if]
 <HAL_Driver>${HAL_Driver}</HAL_Driver>[#-- modified to give only the hal driver path --]
 <CMSIS>${CMSISPath}</CMSIS> [#-- modified to give only the relatif path to cmsis folder --]
   [#if ProjectType?? ]
@@ -77,8 +83,9 @@
 [#if staticLibraryProject??]<StaticLibraryProject>true</StaticLibraryProject> [#-- Static Library Project --][/#if]
 
     [#--<Version>${version}</Version>--]
+[/#compress]
 <IocFile>${projectName}.ioc</IocFile>
-[#if MultiProject=="0" | family=="STM32MP1xx"]
+[#if MultiProject=="0" || family=="STM32MP1xx" &&  DeviceTree??]
 [@generateProject prjSecure="-1" Prjconfig="null" configName=""/]
 [#else]
 [#list ProjectConfigs?keys as _configName]
@@ -88,7 +95,7 @@
 
 [#--[/#list]--]
 [/#if]
-[#if (IdeMode?? || ide=="STM32CubeIDE") && family=="STM32MP1xx"]
+[#if (IdeMode?? || ide=="STM32CubeIDE") && family=="STM32MP1xx" && DeviceTree?? ]
 <Project>    
     <ProjectName>${projectName}_DTS</ProjectName>
     <ProjectNature>DTS</ProjectNature>
@@ -98,7 +105,6 @@
 [/#if]
 </Workspace>
 </ScratchFile>
-[/#compress]
 
 [#-- Marco generateConfig --]
 [#macro generateConfig multiConfig elem]
@@ -171,14 +177,29 @@
             [#if dataKey=="threadsafeCore"]
                [#assign threadsafeCore =  elem[dataKey]]
             [/#if]
+
+            [#if dataKey=="ConfigName"]
+               [#assign ConfigName =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="Configuration"]
+               [#assign Configuration =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="Context"]
+               [#assign Context =  elem[dataKey]]
+            [/#if]
         [/#list]   
     [/#if]
 [/#if]
 <config>
+[#if family!="STM32H7RSxx"]
 <name>${Configuration}[#if (multiConfig == "true")][#if Secure!="-1"][#if Secure=="1" && family!="STM32WLxx"]_S[/#if][#if Secure=="0" && family!="STM32WLxx"]_NS[/#if][#if Secure=="1" && family=="STM32WLxx"]_${cpuCore?replace("ARM Cortex-", "C")?replace("+", "PLUS")}[#else]_${cpuCore?replace("ARM Cortex-", "C")?replace("+", "PLUS")}[/#if][/#if][/#if]</name>	 [#-- project configuration name. Ex: STM32F407_EVAL --]
+[#else] 
+<name>${Configuration}</name>
+[/#if]
 <mainSourceRepo>[#if mainSourceRepo??]${mainSourceRepo?replace("+", "PLUS")}[/#if]</mainSourceRepo>   
 <sourceStructure>[#if sourceStructure??]${sourceStructure}[/#if]</sourceStructure>
- <device>${project.deviceId}</device>		 [#--  STM32 selected device. Ex: STM32F407ZE --]
+[#if Context??]<Context>${Context}</Context>[/#if]
+ <device>${project.deviceId}</device>		 [#--  STM32 selected device. Ex: STM32F407ZE --]    
     [#if IdeMode?? || ide=="STM32CubeIDE" || family=="STM32MP1xx"]
     <cpucore>${cpuCore}</cpucore>    
     [#else]
@@ -188,7 +209,7 @@
     [#if !IdeMode?? && (multiConfig == "true")]
     <bootmode>${bootmode}</bootmode>  [#-- for boot mode could be equals to SRAM or FLASH --]
     [/#if]
-     [#if TrustZone == "1" && prj_ctx=="1"]
+     [#if TrustZone == "1" && prj_ctx??  && prj_ctx=="1"]
     <ExePath>${ExePath}</ExePath>
     [/#if]
     [#if OutputFilesFormat??]
@@ -492,7 +513,7 @@
 [#if dataKey=="AdefinesList"]
                [#assign AdefinesList =  elem[dataKey]]
             [/#if]
-[#if dataKey=="aDefineToRemove"]
+            [#if dataKey=="aDefineToRemove"]
                [#assign aDefineToRemove =  elem[dataKey]]
             [/#if]
             [#if dataKey=="HeapSize"]
@@ -504,6 +525,7 @@
             [#if dataKey=="Configuration"]
                [#assign Configuration =  elem[dataKey]]
             [/#if]
+
             [#if dataKey=="active"]
                [#assign active =  elem[dataKey]]
             [/#if]
@@ -513,10 +535,17 @@
     [/#if]
 
 [#--/#list--]
-<Project>    
+<Project>
 [#-- <ProjectPath>${ProjectPath}</ProjectPath>  --][#-- added to give project path --]
-    <ProjectName>${projectName}[#if TrustZone=="1"][#if ConfigSecure=="1"]_S[#else]_NS[/#if][/#if][#if (MultiProject == "1")][#if MultiProject=="1" && cpuCore??]_${cpuCore?replace("ARM Cortex-", "C")?replace("+", "PLUS")}[#else]_CM4[/#if][/#if]</ProjectName> [#-- modified to give only the project name without path --]
-    [#if active?? && !active]
+[#if family!="STM32H7RSxx"]
+    <ProjectName>${Configuration}[#if TrustZone=="1"][#if ConfigSecure=="1"]_S[#else]_NS[/#if][/#if][#if (MultiProject == "1")][#if MultiProject=="1" && cpuCore??]_${cpuCore?replace("ARM Cortex-", "C")?replace("+", "PLUS")}[#else]_CM4[/#if][/#if]</ProjectName> [#-- modified to give only the project name without path --]
+[#else]
+    <ProjectName>${Configuration}</ProjectName>
+[/#if]
+
+[#if active?? && active]
+    <Excluded>false</Excluded>
+[#else]
     <Excluded>true</Excluded>
 [/#if]
     <ProjectNature>${ProjectNature}</ProjectNature> [#-- Cpp --]
@@ -926,7 +955,7 @@
             [#else]
                 [#list ProjectConfigs?keys as configName]
                     [#assign elem = Prjconfig]
-                    [#if (MultiProject == "0") || (MultiProject == "1" && configName==selectedConfig)]
+                    [#if (MultiProject == "0") || (MultiProject == "1" && selectedConfig?? && configName==selectedConfig)]
                     [#list elem?keys as dataKey]
                         [#if dataKey=="inc"]
                            [#--<sourceEntry>
@@ -1128,7 +1157,7 @@
                     [#-- selectedConfig --]
                     [#assign removeFromConfig = "0"]
                     [#assign excludeFromConfig = "0"]
-                    [#if multiConfigurationProject?? && ConfigsAndFiles??]
+                    [#if multiConfigurationProject?? && ConfigsAndFiles?? && selectedConfig??]
                         [#if !ConfigsAndFiles[selectedConfig]?seq_contains(filesName?replace("/","\\"))]
                             [#assign removeFromConfig = "1"]
                         [/#if]
@@ -1143,7 +1172,8 @@
                 [/#list]
             [/#if]
         </group>		   
-			[#if family!="STM32L5xx" && family!="STM32U5xx" && family!="STM32H5xx" && family!="STM32WBAxx"&& cmsisSourceFileNameList?size>0]
+
+			[#if family!="STM32L5xx" && family!="STM32U5xx" && family!="STM32H7RSxx" && family!="STM32H5xx" && family!="STM32WBAxx" && cmsisSourceFileNameList?size>0]
             <group>			
                 <name>CMSIS</name>
                 [#assign cmsisFilesAdded = ""]
@@ -1175,7 +1205,7 @@
                         [#assign usedMw =  usedMWPerCore[mwKey]]
                     [/#list]
                 [/#if]
-                [#assign declaredMW = ""]
+                [#assign declaredMW = []]
                 [#list usedMWandRootFolder?keys as middName]
                     
                     [#assign exclude = true]                    
@@ -1187,7 +1217,7 @@
                                 
                             [/#if]
                             [#assign MwRoot =  usedMWandRootFolder[middName]]  
-                            [#if used==true  && !(declaredMW?contains(MwRoot?replace("Middlewares/","")))]
+                            [#if used==true  && !(declaredMW?seq_contains(MwRoot?replace("Middlewares/","")))]
                                 [#assign MwRoot =  usedMWandRootFolder[middName]]                 
                                 <group>   
                                 <name>${MwRoot?replace("Middlewares/","")}</name>                                             
@@ -1248,7 +1278,7 @@
                                 
                                     [/#list]   
                                 </group>
-                                 [#assign declaredMW = declaredMW + " " + MwRoot?replace("Middlewares/","")]
+                                 [#assign declaredMW = declaredMW + [MwRoot?replace("Middlewares/","")]]
                             [/#if]  
                                
                         [/#list]
@@ -1379,7 +1409,7 @@
                     [#-- selectedConfig --]
                     [#assign removeFromConfig = "0"]
                     [#assign excludeFromConfig = "0"]
-                    [#if multiConfigurationProject?? && ConfigsAndFiles??]
+                    [#if multiConfigurationProject?? && ConfigsAndFiles?? && selectedConfig??]
                         [#if !ConfigsAndFiles[selectedConfig]?seq_contains(filesName?replace("/","\\"))]
                             [#assign removeFromConfig = "1"]
                         [/#if]
