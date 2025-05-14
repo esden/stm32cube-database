@@ -91,6 +91,19 @@
 /*                                            creation strategy control,  */
 /*                                            resulting in version 6.2.0  */
 /*                                                                        */
+[#if FamilyName?lower_case == "stm32u0"]
+/*  03-08-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added option to disable dev */
+/*                                            alternate setting support,  */
+/*                                            added option to disable dev */
+/*                                            framework initialize scan,  */
+/*                                            added option to reference   */
+/*                                            names by pointer to chars,  */
+/*                                            added option to enable      */
+/*                                            basic USBX error checking,  */
+/*                                            resulting in version 6.2.1  */
+/*                                                                        */
+[/#if]
 /**************************************************************************/
 
 #ifndef UX_USER_H
@@ -103,7 +116,9 @@
 [#assign UX_DEVICE_HID_CUSTOM_ENABLED_Value = "false"]
 [#assign UX_DEVICE_PIMA_ENABLED_Value = "false"]
 [#assign UX_DEVICE_CDC_ECM_ENABLED_Value = "false"]
-
+[#assign UX_DEVICE_PRINTER_ENABLED_Value = "false"]
+        [#assign UX_STANDALONE_ENABLED_Value = ""]
+        [#assign UX_DEVICE_CLASS_PRINTER_WRITE_AUTO_ZLP_value = ""]
 
 
 [#list SWIPdatas as SWIP]
@@ -138,6 +153,10 @@
 
   [#if name?contains("UX_DEVICE_CDC_ECM") && (value=="1")]
    [#assign UX_DEVICE_CDC_ECM_ENABLED_Value = "true"]
+  [/#if]
+
+  [#if name?contains("UX_DEVICE_PRINTER") && (value=="1")]
+   [#assign UX_DEVICE_PRINTER_ENABLED_Value = "true"]
   [/#if]
 
 [/#list]
@@ -384,6 +403,10 @@
    [#assign UX_DEVICE_CLASS_CDC_ACM_WRITE_AUTO_ZLP_value = value]
   [/#if]
 
+  [#if name == "UX_DEVICE_CLASS_PRINTER_WRITE_AUTO_ZLP"]
+   [#assign UX_DEVICE_CLASS_PRINTER_WRITE_AUTO_ZLP_value = value]
+  [/#if]
+
   [#if name == "UX_HOST_DEVICE_CLASS_CODE_VALIDATION_ENABLE"]
    [#assign UX_HOST_DEVICE_CLASS_CODE_VALIDATION_ENABLE_value = value]
   [/#if]
@@ -435,6 +458,46 @@
   [#if name == "UX_OTG_SUPPORT"]
    [#assign UX_OTG_SUPPORT_value = value]
   [/#if] 
+  
+  [#if name == "UX_DEVICE_CLASS_AUDIO_FEEDBACK_SUPPORT"]
+   [#assign UX_DEVICE_CLASS_AUDIO_FEEDBACK_SUPPORT_value = value]
+  [/#if] 
+  
+  [#if name == "UX_DEVICE_CLASS_AUDIO_INTERRUPT_SUPPORT"]
+   [#assign UX_DEVICE_CLASS_AUDIO_INTERRUPT_SUPPORT_value = value]
+  [/#if] 
+
+  [#if name == "UX_STANDALONE"]
+   [#assign UX_STANDALONE_ENABLED_Value = value]
+  [/#if] 
+
+  [#if name == "UX_ENABLE_ERROR_CHECKING"]
+    [#assign UX_ENABLE_ERROR_CHECKING_value = value]
+  [/#if]
+  
+  [#if name == "UX_DEVICE_ALTERNATE_SETTING_SUPPORT_DISABLE"]
+    [#assign UX_DEVICE_ALTERNATE_SETTING_SUPPORT_DISABLE_value = value]
+  [/#if]
+
+  [#if name == "UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE"]
+    [#assign UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE_value = value]
+  [/#if]
+
+  [#if name == "UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_CONTROL"]
+    [#assign UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_CONTROL_value = value]
+  [/#if]
+
+  [#if name == "UX_ALIGN_MIN"]
+    [#assign UX_ALIGN_MIN_value = value]
+  [/#if]
+
+  [#if name == "UX_MAX_CLASSES"]
+    [#assign UX_MAX_CLASSES_value = value]
+  [/#if]
+
+  [#if name == "UX_NAME_REFERENCED_BY_POINTER"]
+    [#assign UX_NAME_REFERENCED_BY_POINTER_value = value]
+  [/#if]
 
 [/#list]
 [/#if]
@@ -483,13 +546,25 @@
 /* Override various options with default values already assigned in ux_api.h or ux_port.h. Please
    also refer to ux_port.h for descriptions on each of these options.  */
 
+[#if UX_ALIGN_MIN_value??]
+/* Defined, this value represents minimal allocated memory alignment in number of bytes.
+   The default is UX_ALIGN_16 (0x0f) to align allocated memory to 16 bytes.  */
+[#if UX_ALIGN_MIN_value == "UX_ALIGN_16"]
+/* #define UX_ALIGN_MIN                      UX_ALIGN_16 */
+[#else]
+#define UX_ALIGN_MIN                         ${UX_ALIGN_MIN_value}
+[/#if]
+[/#if]
+
 /* Defined, this value represents how many ticks per seconds for a specific hardware platform.
    The default is 1000 indicating 1 tick per millisecond.  */
 
-[#if UX_PERIODIC_RATE_value == "1000"]
+[#if UX_PERIODIC_RATE_value == "1000" && UX_STANDALONE_ENABLED_Value == "0"]
 /* #define UX_PERIODIC_RATE     (TX_TIMER_TICKS_PER_SECOND) */
-[#else]
+[#elseif UX_PERIODIC_RATE_value != "1000" && UX_STANDALONE_ENABLED_Value == "0"]
 #define UX_PERIODIC_RATE        ${UX_PERIODIC_RATE_value}
+[#elseif UX_STANDALONE_ENABLED_Value == "1"]
+#define UX_PERIODIC_RATE        1000
 [/#if]
 
 /* Define control transfer timeout value in millisecond.
@@ -512,11 +587,20 @@
 [/#if]
 [/#if]
 
+
 /* Defined, this value is the maximum number of classes that can be loaded by USBX. This value
    represents the class container and not the number of instances of a class. For instance, if a
    particular implementation of USBX needs the hub class, the printer class, and the storage
    class, then the UX_MAX_CLASSES value can be set to 3 regardless of the number of devices
    that belong to these classes.  */
+[#if UX_MAX_CLASSES_value??]
+[#if UX_MAX_CLASSES_value == "2"]
+/* #define UX_MAX_CLASSES    2 */
+[#else]
+#define UX_MAX_CLASSES       ${UX_MAX_CLASSES_value}
+[/#if]
+[/#if]
+
 
 [#if UX_MAX_CLASS_DRIVER_value == "2"]
 /* #define UX_MAX_CLASS_DRIVER    2 */
@@ -899,7 +983,11 @@
 
 /* defined, this macro enables device audio feedback endpoint support.  */
 
+[#if UX_DEVICE_CLASS_AUDIO_FEEDBACK_SUPPORT_value == "1"]
+#define UX_DEVICE_CLASS_AUDIO_FEEDBACK_SUPPORT
+[#else]
 /* #define UX_DEVICE_CLASS_AUDIO_FEEDBACK_SUPPORT  */
+[/#if]
 
 /* Defined, class _write is pending ZLP automatically (complete transfer) after buffer is sent.  */
 
@@ -909,9 +997,18 @@
 /* #define UX_DEVICE_CLASS_CDC_ACM_WRITE_AUTO_ZLP  */
 [/#if]
 
-/* defined, this macro enables device audio interrupt endpoint support.  */
+[#if UX_DEVICE_CLASS_PRINTER_WRITE_AUTO_ZLP_value == "1" && UX_DEVICE_PRINTER_ENABLED_Value == "true"]
+#define UX_DEVICE_CLASS_PRINTER_WRITE_AUTO_ZLP
+[#else]
+/* #define UX_DEVICE_CLASS_PRINTER_WRITE_AUTO_ZLP  */
+[/#if]
 
-/* define UX_DEVICE_CLASS_AUDIO_INTERRUPT_SUPPORT  */
+/* defined, this macro enables device audio interrupt endpoint support.  */
+[#if UX_DEVICE_CLASS_AUDIO_INTERRUPT_SUPPORT_value == "1"]
+#define UX_DEVICE_CLASS_AUDIO_INTERRUPT_SUPPORT
+[#else]
+/* #define UX_DEVICE_CLASS_AUDIO_INTERRUPT_SUPPORT  */
+[/#if]
 
 /* Defined, this macro enables device bi-directional endpoint support. */
 
@@ -919,6 +1016,30 @@
 #define UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT
 [#else]
 /* #define UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT */
+[/#if]
+
+[#if UX_DEVICE_ALTERNATE_SETTING_SUPPORT_DISABLE_value??]
+/* Defined, this macro disables interface alternate setting support.
+   Device stalls
+ */
+[#if UX_DEVICE_ALTERNATE_SETTING_SUPPORT_DISABLE_value == "1"]
+#define UX_DEVICE_ALTERNATE_SETTING_SUPPORT_DISABLE
+[#else]
+/* #define UX_DEVICE_ALTERNATE_SETTING_SUPPORT_DISABLE  */
+[/#if]
+[/#if]
+
+[#if UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE_value??]
+/* Defined, this macro disables device framework scan, where max number of endpoints (except EP0)
+   and max number of interfaces are calculated at runtime, as a base to allocate memory for
+   interfaces and endpoints structures and their buffers.
+   Undefined, the following two macros must be defined to initialize memory structures. */
+   
+[#if UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE_value == "1"]
+#define UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE
+[#else]
+/* #define UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE */
+[/#if]
 [/#if]
 
 /* Defined, this macro enables device/host PIMA MTP support.  */
@@ -979,26 +1100,58 @@
 #define UX_HOST_CLASS_AUDIO_INTERRUPT_SUPPORT
 [/#if]
 
-/* Defined, this value will only enable the host side of usbx.  */
+[#if UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_CONTROL_value??]
+/* Defined, this value controls host configuration instance creation, include all
+   interfaces and endpoints physical resources.
+   Possible settings:
+    UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_ALL (0) - The default, create all inside configuration.
+    UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_OWNED (1) - Create things owned by class driver.
+   Not defined, default setting is applied. */
 
+[#if UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_CONTROL_value == "UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_ALL"]
+/* #define UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_CONTROL        UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_ALL */
+[#else]
+#define UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_CONTROL           ${UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_CONTROL_value}
+[/#if]
+[/#if]
+
+[#if UX_NAME_REFERENCED_BY_POINTER_value??]
+/* Defined, the _name in structs are referenced by pointer instead of by contents.
+   By default the _name is an array of string that saves characters, the contents are compared to confirm match.
+   If referenced by pointer the address pointer to const string is saved, the pointers are compared to confirm match. */
+[#if UX_NAME_REFERENCED_BY_POINTER_value == "0"]
+/* #define UX_NAME_REFERENCED_BY_POINTER  */
+[#else]
+#define UX_NAME_REFERENCED_BY_POINTER
+[/#if]
+[/#if]
+
+/* Defined, this value will only enable the host side of usbx.  */
+[#if FamilyName?lower_case == "stm32u0"]
+/* #define UX_HOST_SIDE_ONLY */
+[#else]
 [#if UX_HOST_SIDE_ONLY_value == "1" && UX_HOST_ENABLED_Value == "true"]
 #define UX_HOST_SIDE_ONLY
 [#else]
 /* #define UX_HOST_SIDE_ONLY */
 [/#if]
+[/#if]
 
+[#if FamilyName?lower_case == "stm32u0"]
+#define UX_DEVICE_SIDE_ONLY
+[#else]
 /* Defined, this value will only enable the device side of usbx.  */
 [#if UX_DEVICE_SIDE_ONLY_value == "1" && UX_DEVICE_ENABLED_Value == "true"]
 #define UX_DEVICE_SIDE_ONLY
 [#else]
 /* #define UX_DEVICE_SIDE_ONLY */
 [/#if]
-
+[/#if]
 /* Defined, this value will include the OTG polling thread. OTG can only be active if both host/device are present.
 */
 #ifndef UX_HOST_SIDE_ONLY
 #ifndef UX_DEVICE_SIDE_ONLY
-[#if (DIE=="DIE455" || DIE=="DIE474" || DIE=="DIE484" || UX_OTG_SUPPORT_value = "0")]
+[#if (DIE=="DIE455" || DIE=="DIE474" || DIE=="DIE484"  || DIE=="DIE478"  || DIE=="DIE489" || (UX_OTG_SUPPORT_value?? && UX_OTG_SUPPORT_value == "0" ))]
 /* #define UX_OTG_SUPPORT */
 [#else]
 #define UX_OTG_SUPPORT
@@ -1007,7 +1160,11 @@
 #endif
 
 /* Defined, this macro will enable the standalone mode of usbx.  */
+[#if UX_STANDALONE_ENABLED_Value == "1"]
+#define UX_STANDALONE
+[#else]
 /* #define UX_STANDALONE  */
+[/#if]
 
 /* Defined, this value represents the maximum size of single transfers for the SCSI data phase.
    By default it's 1024.
@@ -1140,6 +1297,17 @@
 /* #define UX_MAX_TT                        8 */
 [#else]
 #define UX_MAX_TT                           ${UX_MAX_TT_value}
+[/#if]
+
+[#if UX_ENABLE_ERROR_CHECKING_value??]
+/* Defined, this option enables the basic USBX error checking. This define is typically used
+   when the application is debugging and removed after the application is fully debugged.  */
+   
+[#if UX_ENABLE_ERROR_CHECKING_value == "0"]
+/* #define UX_ENABLE_ERROR_CHECKING */
+[#else]
+#define UX_ENABLE_ERROR_CHECKING
+[/#if]
 [/#if]
 
 /* USER CODE BEGIN 2 */

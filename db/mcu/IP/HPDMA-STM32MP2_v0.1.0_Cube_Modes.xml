@@ -1,0 +1,2462 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V4.0" IPType="service" Name="HPDMA" Version="STM32MP2_v0.1.0_Cube" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" 
+	ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd" 
+	xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+	<About>HPDMA: for DMA</About>
+        <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+        <RefParameter Comment="HPDMA instance" DefaultValue="HPDMA" Name="Instance" Type="list" Visible="false"/>
+
+
+<!--for ADC -->
+
+	
+	<RefParameter Comment="semaphore for ADC" DefaultValue="FAKEVALUE" Name="PARAMFORADC4"  Type="list" Visible="false">
+		<PossibleValue Comment="FORADC" Value="FAKEVALUE" Semaphore="SEM_DMA_REQ_ADC4"/>
+		<Condition Diagnostic="" Expression="SEM_IP_ADC4_$IpInstanceCH0|SEM_IP_ADC4_$IpInstanceCH1|SEM_IP_ADC4_$IpInstanceCH2|SEM_IP_ADC4_$IpInstanceCH3"/>
+	</RefParameter>
+	<RefParameter Comment="semaphore for ADC4" DefaultValue="FAKEVALUE" Name="PARAMFORADC4"  Type="list" Visible="false">
+		<PossibleValue Comment="FORADC" Value="FAKEVALUE" />
+	</RefParameter>
+
+
+<!--SECURITY-->
+
+    <RefParameter Comment="Enable Channel as Secured" DefaultValue="DMA_CHANNEL_NSEC" TabName="SECURITY"  Name="ChannelSEC_HPDMACH0"  Group="CH0" Type="list">
+        <PossibleValue Comment="SECURE" Value="DMA_CHANNEL_SEC"/>
+        <PossibleValue Comment="NON SECURE" Value="DMA_CHANNEL_NSEC"/>
+        <Condition Diagnostic="" Expression="(S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH0 &amp; (REQUEST_HPDMACH0=DMA_REQUEST_SW))|(S_SECURE &amp; SEM_LINKEDLIST_$IpInstanceCH0) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+    
+
+    <RefParameter Comment="Enable Channel as Secured" DefaultValue="DMA_CHANNEL_SEC" TabName="SECURITY"  Name="ChannelSEC_HPDMACH0"  Group="CH0" Type="list">
+        <PossibleValue Comment="SECURE" Value="DMA_CHANNEL_SEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH0 &amp; !(REQUEST_HPDMACH0=DMA_REQUEST_SW) &amp; (
+            (SEM_IP_ADC4_$IpInstanceCH0 &amp; ADC4_SECURE)|
+            (SEM_IP_DAC1_$IpInstanceCH0 &amp; DAC1_SECURE)|
+            (SEM_IP_I2C3_$IpInstanceCH0 &amp; I2C3_SECURE)|
+            (SEM_IP_SPI3_$IpInstanceCH0 &amp; SPI3_SECURE)|
+            (SEM_IP_LPUART1_$IpInstanceCH0 &amp; LPUART1_SECURE)|
+            (SEM_IP_ADF1_$IpInstanceCH0 &amp; ADF1_SECURE)|
+            (SEM_IP_LPTIM1_$IpInstanceCH0 &amp; LPTIM1_SECURE)|
+            (SEM_IP_LPTIM3_$IpInstanceCH0 &amp; LPTIM3_SECURE)) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+
+    <RefParameter Comment="Enable Channel as Secured" DefaultValue="DMA_CHANNEL_NSEC" TabName="SECURITY"  Name="ChannelSEC_HPDMACH0"  Group="CH0" Type="list">
+        <PossibleValue Comment="NON SECURE" Value="DMA_CHANNEL_NSEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+   
+    <RefParameter Comment="Enable Channel as Secured" DefaultValue="null" Group="SECURITY" Name="ChannelSEC_HPDMACH0" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="!S_SECURE &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+
+    <RefParameter Comment="Enable Channel as Privileged" DefaultValue="DMA_CHANNEL_NPRIV" TabName="SECURITY"  Name="ChannelPRIV_HPDMACH0"  Group="CH0" Type="list">
+        <Condition Diagnostic="" Expression="!S_LPBAM_CONF"/>
+            <PossibleValue Comment="PRIVILEDGED" Value="DMA_CHANNEL_PRIV"/>
+            <PossibleValue Comment="NON PRIVILEDGED" Value="DMA_CHANNEL_NPRIV"/>
+    </RefParameter>
+
+    <RefParameter Comment="Enable Source as Secured" DefaultValue="DMA_CHANNEL_SRC_SEC" TabName="SECURITY"  Name="SrcSEC_HPDMACH0"  Group="CH0" Type="list">
+        <PossibleValue Comment="SECURE" Value="DMA_CHANNEL_SRC_SEC"/>
+        <PossibleValue Comment="NON SECURE" Value="DMA_CHANNEL_SRC_NSEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH0 &amp; (ChannelSEC_HPDMACH0=DMA_CHANNEL_SEC) &amp; (REQUEST_HPDMACH0=DMA_REQUEST_SW) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+
+    <RefParameter Comment="Enable Source as Secured" DefaultValue="DMA_CHANNEL_SRC_NSEC" TabName="SECURITY"  Name="SrcSEC_HPDMACH0"  Group="CH0" Type="list">
+        <PossibleValue Comment="NON SECURE" Value="DMA_CHANNEL_SRC_NSEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH0 &amp; !(ChannelSEC_HPDMACH0=DMA_CHANNEL_SEC) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+    <RefParameter Comment="Enable Source as Secured" DefaultValue="DMA_CHANNEL_SRC_SEC" TabName="SECURITY"  Name="SrcSEC_HPDMACH0"  Group="CH0" Type="list">
+        <PossibleValue Comment="SECURE" Value="DMA_CHANNEL_SRC_SEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH0 &amp; (ChannelSEC_HPDMACH0=DMA_CHANNEL_SEC) &amp; (DIRECTION_HPDMACH0=DMA_PERIPH_TO_MEMORY) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+    <RefParameter Comment="Enable Source as Secured" DefaultValue="DMA_CHANNEL_SRC_SEC" TabName="SECURITY"  Name="SrcSEC_HPDMACH0"  Group="CH0" Type="list">
+        <PossibleValue Comment="SECURE" Value="DMA_CHANNEL_SRC_SEC"/>
+        <PossibleValue Comment="NON SECURE" Value="DMA_CHANNEL_SRC_NSEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH0 &amp; (ChannelSEC_HPDMACH0=DMA_CHANNEL_SEC) &amp; !(DIRECTION_HPDMACH0=DMA_PERIPH_TO_MEMORY) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+    <RefParameter Comment="Enable Source as Secured" DefaultValue="null" Group="SECURITY" Name="SrcSEC_HPDMACH0" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="!S_SECURE | (S_SECURE &amp; SEM_LINKEDLIST_$IpInstanceCH0) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+
+    <RefParameter Comment="Enable Destination as Secured" DefaultValue="DMA_CHANNEL_DEST_SEC" TabName="SECURITY"  Name="DestSEC_HPDMACH0"  Group="CH0" Type="list">
+        <PossibleValue Comment="SECURE" Value="DMA_CHANNEL_DEST_SEC"/>
+        <PossibleValue Comment="NON SECURE" Value="DMA_CHANNEL_DEST_NSEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH0 &amp; (ChannelSEC_HPDMACH0=DMA_CHANNEL_SEC) &amp; !(DIRECTION_HPDMACH0=DMA_MEMORY_TO_PERIPH) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+    <RefParameter Comment="Enable Destination as Secured" DefaultValue="DMA_CHANNEL_DEST_NSEC" TabName="SECURITY"  Name="DestSEC_HPDMACH0"  Group="CH0" Type="list">
+        <PossibleValue Comment="NON SECURE" Value="DMA_CHANNEL_DEST_NSEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH0 &amp; !(ChannelSEC_HPDMACH0=DMA_CHANNEL_SEC) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+    <RefParameter Comment="Enable Destination as Secured" DefaultValue="DMA_CHANNEL_DEST_SEC" TabName="SECURITY"  Name="DestSEC_HPDMACH0"  Group="CH0" Type="list">
+        <PossibleValue Comment="SECURE" Value="DMA_CHANNEL_DEST_SEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH0 &amp; (ChannelSEC_HPDMACH0=DMA_CHANNEL_SEC) &amp; (DIRECTION_HPDMACH0=DMA_MEMORY_TO_PERIPH) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+    <RefParameter Comment="Enable Destination as Secured" DefaultValue="null" Group="SECURITY" Name="DestSEC_HPDMACH0" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="!S_SECURE | (S_SECURE &amp; SEM_LINKEDLIST_$IpInstanceCH0) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+
+
+
+   <RefParameter Comment="Channel Attributes" DefaultValue="+ChannelPRIV_HPDMACH0+|ChannelSEC_HPDMACH0+|SrcSEC_HPDMACH0+|DestSEC_HPDMACH0"  Type="list" Name="ChannelAttributes_HPDMACH0"  Visible="false">
+    <Condition Diagnostic="" Expression="S_SECURE &amp; !SEM_CIRCULAR_$IpInstanceCH0 &amp; !SEM_LINKEDLIST_$IpInstanceCH0 &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+    <RefParameter Comment="Channel Attributes" DefaultValue="+ChannelPRIV_HPDMACH0+|ChannelSEC_HPDMACH0"  Type="list" Name="ChannelAttributes_HPDMACH0"  Visible="false">
+    <Condition Diagnostic="" Expression="S_SECURE &amp; (SEM_CIRCULAR_$IpInstanceCH0|SEM_LINKEDLIST_$IpInstanceCH0) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+
+
+    <RefParameter Comment="Channel Attributes" DefaultValue="+ChannelPRIV_HPDMACH0"  Name="ChannelAttributes_HPDMACH0"  Type="list"  Visible="false">
+    <Condition Diagnostic="" Expression="!S_SECURE &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+
+
+
+    
+    <RefParameter Comment="Enable Channel as Secured" DefaultValue="DMA_CHANNEL_NSEC" TabName="SECURITY"  Name="ChannelSEC_HPDMACH1"  Group="CH1" Type="list">
+        <PossibleValue Comment="SECURE" Value="DMA_CHANNEL_SEC"/>
+        <PossibleValue Comment="NON SECURE" Value="DMA_CHANNEL_NSEC"/>
+        <Condition Diagnostic="" Expression="(S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH1 &amp; (REQUEST_HPDMACH1=DMA_REQUEST_SW))|(S_SECURE &amp; SEM_LINKEDLIST_$IpInstanceCH1) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+
+    <RefParameter Comment="Enable Channel as Secured" DefaultValue="DMA_CHANNEL_SEC" TabName="SECURITY"  Name="ChannelSEC_HPDMACH1"  Group="CH1" Type="list">
+        <PossibleValue Comment="SECURE" Value="DMA_CHANNEL_SEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH1 &amp; !(REQUEST_HPDMACH1=DMA_REQUEST_SW) &amp; (  
+           (SEM_IP_ADC4_$IpInstanceCH1 &amp; ADC4_SECURE)|
+            (SEM_IP_DAC1_$IpInstanceCH1 &amp; DAC1_SECURE)|
+            (SEM_IP_I2C3_$IpInstanceCH1 &amp; I2C3_SECURE)|
+            (SEM_IP_SPI3_$IpInstanceCH1 &amp; SPI3_SECURE)|
+            (SEM_IP_LPUART1_$IpInstanceCH1 &amp; LPUART1_SECURE)|
+            (SEM_IP_ADF1_$IpInstanceCH1 &amp; ADF1_SECURE)|
+            (SEM_IP_LPTIM1_$IpInstanceCH1 &amp; LPTIM1_SECURE)|
+            (SEM_IP_LPTIM3_$IpInstanceCH1 &amp; LPTIM3_SECURE)) &amp; !S_LPBAM_CONF"/>  
+    </RefParameter>
+
+    <RefParameter Comment="Enable Channel as Secured" DefaultValue="DMA_CHANNEL_NSEC" TabName="SECURITY"  Name="ChannelSEC_HPDMACH1"  Group="CH1" Type="list">
+        
+        <PossibleValue Comment="NON SECURE" Value="DMA_CHANNEL_NSEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+   
+    <RefParameter Comment="Enable Channel as Secured" DefaultValue="null" Group="SECURITY" Name="ChannelSEC_HPDMACH1" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="!S_SECURE &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+
+    <RefParameter Comment="Enable Channel as Privileged" DefaultValue="DMA_CHANNEL_NPRIV" TabName="SECURITY"  Name="ChannelPRIV_HPDMACH1"  Group="CH1" Type="list">
+        <Condition Diagnostic="" Expression="!S_LPBAM_CONF"/>
+            <PossibleValue Comment="PRIVILEDGED" Value="DMA_CHANNEL_PRIV"/>
+            <PossibleValue Comment="NON PRIVILEDGED" Value="DMA_CHANNEL_NPRIV"/>
+    </RefParameter>
+
+    <RefParameter Comment="Enable Source as Secured" DefaultValue="DMA_CHANNEL_SRC_SEC" TabName="SECURITY"  Name="SrcSEC_HPDMACH1"  Group="CH1" Type="list">
+        <PossibleValue Comment="SECURE" Value="DMA_CHANNEL_SRC_SEC"/>
+        <PossibleValue Comment="NON SECURE" Value="DMA_CHANNEL_SRC_NSEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH1 &amp; (ChannelSEC_HPDMACH1=DMA_CHANNEL_SEC) &amp; (REQUEST_HPDMACH1=DMA_REQUEST_SW) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+
+    <RefParameter Comment="Enable Source as Secured" DefaultValue="DMA_CHANNEL_SRC_NSEC" TabName="SECURITY"  Name="SrcSEC_HPDMACH1"  Group="CH1" Type="list">
+        <PossibleValue Comment="NON SECURE" Value="DMA_CHANNEL_SRC_NSEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH1 &amp; !(ChannelSEC_HPDMACH1=DMA_CHANNEL_SEC) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+    <RefParameter Comment="Enable Source as Secured" DefaultValue="DMA_CHANNEL_SRC_SEC" TabName="SECURITY"  Name="SrcSEC_HPDMACH1"  Group="CH1" Type="list">
+        <PossibleValue Comment="SECURE" Value="DMA_CHANNEL_SRC_SEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH1 &amp; (ChannelSEC_HPDMACH1=DMA_CHANNEL_SEC) &amp; (DIRECTION_HPDMACH1=DMA_PERIPH_TO_MEMORY) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+    <RefParameter Comment="Enable Source as Secured" DefaultValue="DMA_CHANNEL_SRC_SEC" TabName="SECURITY"  Name="SrcSEC_HPDMACH1"  Group="CH1" Type="list">
+        <PossibleValue Comment="SECURE" Value="DMA_CHANNEL_SRC_SEC"/>
+        <PossibleValue Comment="NON SECURE" Value="DMA_CHANNEL_SRC_NSEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH1 &amp; (ChannelSEC_HPDMACH1=DMA_CHANNEL_SEC) &amp; !(DIRECTION_HPDMACH1=DMA_PERIPH_TO_MEMORY) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+    <RefParameter Comment="Enable Source as Secured" DefaultValue="null" Group="SECURITY" Name="SrcSEC_HPDMACH1" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="!S_SECURE | (S_SECURE &amp; SEM_LINKEDLIST_$IpInstanceCH1) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+
+    <RefParameter Comment="Enable Destination as Secured" DefaultValue="DMA_CHANNEL_DEST_SEC" TabName="SECURITY"  Name="DestSEC_HPDMACH1"  Group="CH1" Type="list">
+        <PossibleValue Comment="SECURE" Value="DMA_CHANNEL_DEST_SEC"/>
+        <PossibleValue Comment="NON SECURE" Value="DMA_CHANNEL_DEST_NSEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH1 &amp; (ChannelSEC_HPDMACH1=DMA_CHANNEL_SEC) &amp; !(DIRECTION_HPDMACH1=DMA_MEMORY_TO_PERIPH) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+    <RefParameter Comment="Enable Destination as Secured" DefaultValue="DMA_CHANNEL_DEST_NSEC" TabName="SECURITY"  Name="DestSEC_HPDMACH1"  Group="CH1" Type="list">
+        <PossibleValue Comment="NON SECURE" Value="DMA_CHANNEL_DEST_NSEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH1 &amp; !(ChannelSEC_HPDMACH1=DMA_CHANNEL_SEC) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+    <RefParameter Comment="Enable Destination as Secured" DefaultValue="DMA_CHANNEL_DEST_SEC" TabName="SECURITY"  Name="DestSEC_HPDMACH1"  Group="CH1" Type="list">
+        <PossibleValue Comment="SECURE" Value="DMA_CHANNEL_DEST_SEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH1 &amp; (ChannelSEC_HPDMACH1=DMA_CHANNEL_SEC) &amp; (DIRECTION_HPDMACH1=DMA_MEMORY_TO_PERIPH) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+    <RefParameter Comment="Enable Destination as Secured" DefaultValue="null" Group="SECURITY" Name="DestSEC_HPDMACH1" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="!S_SECURE  | (S_SECURE &amp; SEM_LINKEDLIST_$IpInstanceCH1) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+    
+
+    <RefParameter Comment="Channel Attributes" DefaultValue="+ChannelPRIV_HPDMACH1+|ChannelSEC_HPDMACH1+|SrcSEC_HPDMACH1+|DestSEC_HPDMACH1"  Type="list" Name="ChannelAttributes_HPDMACH1"  Visible="false">
+    <Condition Diagnostic="" Expression="S_SECURE &amp; !SEM_CIRCULAR_$IpInstanceCH1 &amp; !SEM_LINKEDLIST_$IpInstanceCH1 &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+    <RefParameter Comment="Channel Attributes" DefaultValue="+ChannelPRIV_HPDMACH1+|ChannelSEC_HPDMACH1"  Type="list" Name="ChannelAttributes_HPDMACH1"  Visible="false">
+    <Condition Diagnostic="" Expression="S_SECURE &amp; (SEM_CIRCULAR_$IpInstanceCH1|SEM_LINKEDLIST_$IpInstanceCH1) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+
+
+    <RefParameter Comment="Channel Attributes" DefaultValue="+ChannelPRIV_HPDMACH1"  Name="ChannelAttributes_HPDMACH1"  Type="list"  Visible="false">
+    <Condition Diagnostic="" Expression="!S_SECURE &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+
+    
+
+
+
+    <RefParameter Comment="Enable Channel as Secured" DefaultValue="DMA_CHANNEL_NSEC" TabName="SECURITY"  Name="ChannelSEC_HPDMACH2"  Group="CH2" Type="list">
+        <PossibleValue Comment="SECURE" Value="DMA_CHANNEL_SEC"/>
+        <PossibleValue Comment="NON SECURE" Value="DMA_CHANNEL_NSEC"/>
+    <Condition Diagnostic="" Expression="(S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH2 &amp; (REQUEST_HPDMACH2=DMA_REQUEST_SW))|(S_SECURE &amp; SEM_LINKEDLIST_$IpInstanceCH2) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+
+    <RefParameter Comment="Enable Channel as Secured" DefaultValue="DMA_CHANNEL_SEC" TabName="SECURITY"  Name="ChannelSEC_HPDMACH2"  Group="CH2" Type="list">
+        <PossibleValue Comment="SECURE" Value="DMA_CHANNEL_SEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH2 &amp; !(REQUEST_HPDMACH2=DMA_REQUEST_SW) &amp; (
+              (SEM_IP_ADC4_$IpInstanceCH4 &amp; ADC4_SECURE)|
+            (SEM_IP_DAC1_$IpInstanceCH4 &amp; DAC1_SECURE)|
+            (SEM_IP_I2C3_$IpInstanceCH4 &amp; I2C3_SECURE)|
+            (SEM_IP_SPI3_$IpInstanceCH4 &amp; SPI3_SECURE)|
+            (SEM_IP_LPUART1_$IpInstanceCH4 &amp; LPUART1_SECURE)|
+            (SEM_IP_ADF1_$IpInstanceCH4 &amp; ADF1_SECURE)|
+            (SEM_IP_LPTIM1_$IpInstanceCH4 &amp; LPTIM1_SECURE)|
+            (SEM_IP_LPTIM3_$IpInstanceCH4 &amp; LPTIM3_SECURE)) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+
+    <RefParameter Comment="Enable Channel as Secured" DefaultValue="DMA_CHANNEL_NSEC" TabName="SECURITY"  Name="ChannelSEC_HPDMACH2"  Group="CH2" Type="list">
+        
+        <PossibleValue Comment="NON SECURE" Value="DMA_CHANNEL_NSEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+   
+    <RefParameter Comment="Enable Channel as Secured" DefaultValue="null" Group="SECURITY" Name="ChannelSEC_HPDMACH2" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="!S_SECURE &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+
+    <RefParameter Comment="Enable Channel as Privileged" DefaultValue="DMA_CHANNEL_NPRIV" TabName="SECURITY"  Name="ChannelPRIV_HPDMACH2"  Group="CH2" Type="list">
+        <Condition Diagnostic="" Expression="!S_LPBAM_CONF"/>
+            <PossibleValue Comment="PRIVILEDGED" Value="DMA_CHANNEL_PRIV"/>
+            <PossibleValue Comment="NON PRIVILEDGED" Value="DMA_CHANNEL_NPRIV"/>
+    </RefParameter>
+
+    <RefParameter Comment="Enable Source as Secured" DefaultValue="DMA_CHANNEL_SRC_SEC" TabName="SECURITY"  Name="SrcSEC_HPDMACH2"  Group="CH2" Type="list">
+        <PossibleValue Comment="SECURE" Value="DMA_CHANNEL_SRC_SEC"/>
+        <PossibleValue Comment="NON SECURE" Value="DMA_CHANNEL_SRC_NSEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH2 &amp; (ChannelSEC_HPDMACH2=DMA_CHANNEL_SEC) &amp; (REQUEST_HPDMACH2=DMA_REQUEST_SW) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+
+    <RefParameter Comment="Enable Source as Secured" DefaultValue="DMA_CHANNEL_SRC_NSEC" TabName="SECURITY"  Name="SrcSEC_HPDMACH2"  Group="CH2" Type="list">
+        <PossibleValue Comment="NON SECURE" Value="DMA_CHANNEL_SRC_NSEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH2 &amp; !(ChannelSEC_HPDMACH2=DMA_CHANNEL_SEC) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+    <RefParameter Comment="Enable Source as Secured" DefaultValue="DMA_CHANNEL_SRC_SEC" TabName="SECURITY"  Name="SrcSEC_HPDMACH2"  Group="CH2" Type="list">
+        <PossibleValue Comment="SECURE" Value="DMA_CHANNEL_SRC_SEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH2 &amp; (ChannelSEC_HPDMACH2=DMA_CHANNEL_SEC) &amp; (DIRECTION_HPDMACH2=DMA_PERIPH_TO_MEMORY) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+    <RefParameter Comment="Enable Source as Secured" DefaultValue="DMA_CHANNEL_SRC_SEC" TabName="SECURITY"  Name="SrcSEC_HPDMACH2"  Group="CH2" Type="list">
+        <PossibleValue Comment="SECURE" Value="DMA_CHANNEL_SRC_SEC"/>
+        <PossibleValue Comment="NON SECURE" Value="DMA_CHANNEL_SRC_NSEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH2 &amp; (ChannelSEC_HPDMACH2=DMA_CHANNEL_SEC) &amp; !(DIRECTION_HPDMACH2=DMA_PERIPH_TO_MEMORY) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+    <RefParameter Comment="Enable Source as Secured" DefaultValue="null" Group="SECURITY" Name="SrcSEC_HPDMACH2" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="!S_SECURE  | (S_SECURE &amp; SEM_LINKEDLIST_$IpInstanceCH2) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+
+    <RefParameter Comment="Enable Destination as Secured" DefaultValue="DMA_CHANNEL_DEST_SEC" TabName="SECURITY"  Name="DestSEC_HPDMACH2"  Group="CH2" Type="list">
+        <PossibleValue Comment="SECURE" Value="DMA_CHANNEL_DEST_SEC"/>
+        <PossibleValue Comment="NON SECURE" Value="DMA_CHANNEL_DEST_NSEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH2 &amp; (ChannelSEC_HPDMACH2=DMA_CHANNEL_SEC) &amp; !(DIRECTION_HPDMACH2=DMA_MEMORY_TO_PERIPH) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+    <RefParameter Comment="Enable Destination as Secured" DefaultValue="DMA_CHANNEL_DEST_NSEC" TabName="SECURITY"  Name="DestSEC_HPDMACH2"  Group="CH2" Type="list">
+        <PossibleValue Comment="NON SECURE" Value="DMA_CHANNEL_DEST_NSEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH2 &amp; !(ChannelSEC_HPDMACH2=DMA_CHANNEL_SEC) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+    <RefParameter Comment="Enable Destination as Secured" DefaultValue="DMA_CHANNEL_DEST_SEC" TabName="SECURITY"  Name="DestSEC_HPDMACH2"  Group="CH2" Type="list">
+        <PossibleValue Comment="SECURE" Value="DMA_CHANNEL_DEST_SEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH2 &amp; (ChannelSEC_HPDMACH2=DMA_CHANNEL_SEC) &amp; (DIRECTION_HPDMACH2=DMA_MEMORY_TO_PERIPH) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+    <RefParameter Comment="Enable Destination as Secured" DefaultValue="null" Group="SECURITY" Name="DestSEC_HPDMACH2" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="!S_SECURE | (S_SECURE &amp; SEM_LINKEDLIST_$IpInstanceCH2) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+
+
+    <RefParameter Comment="Channel Attributes" DefaultValue="+ChannelPRIV_HPDMACH2+|ChannelSEC_HPDMACH2+|SrcSEC_HPDMACH2+|DestSEC_HPDMACH2"  Type="list" Name="ChannelAttributes_HPDMACH2"  Visible="false">
+    <Condition Diagnostic="" Expression="S_SECURE &amp; !SEM_CIRCULAR_$IpInstanceCH2 &amp; !SEM_LINKEDLIST_$IpInstanceCH2 &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+    <RefParameter Comment="Channel Attributes" DefaultValue="+ChannelPRIV_HPDMACH2+|ChannelSEC_HPDMACH2"  Type="list" Name="ChannelAttributes_HPDMACH2"  Visible="false">
+    <Condition Diagnostic="" Expression="S_SECURE &amp; (SEM_CIRCULAR_$IpInstanceCH2|SEM_LINKEDLIST_$IpInstanceCH2) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+
+
+    <RefParameter Comment="Channel Attributes" DefaultValue="+ChannelPRIV_HPDMACH2"  Name="ChannelAttributes_HPDMACH2"  Type="list"  Visible="false">
+    <Condition Diagnostic="" Expression="!S_SECURE &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+
+    
+    <RefParameter Comment="Enable Channel as Secured" DefaultValue="DMA_CHANNEL_NSEC" TabName="SECURITY"  Name="ChannelSEC_HPDMACH3"  Group="CH3" Type="list">
+        <PossibleValue Comment="SECURE" Value="DMA_CHANNEL_SEC"/>
+        <PossibleValue Comment="NON SECURE" Value="DMA_CHANNEL_NSEC"/>
+        <Condition Diagnostic="" Expression="(S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH3 &amp; (REQUEST_HPDMACH3=DMA_REQUEST_SW))|(S_SECURE &amp; SEM_LINKEDLIST_$IpInstanceCH3) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+
+    <RefParameter Comment="Enable Channel as Secured" DefaultValue="DMA_CHANNEL_SEC" TabName="SECURITY"  Name="ChannelSEC_HPDMACH3"  Group="CH3" Type="list">
+        <PossibleValue Comment="SECURE" Value="DMA_CHANNEL_SEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH3 &amp; !(REQUEST_HPDMACH3=DMA_REQUEST_SW) &amp; (
+            (SEM_IP_ADC4_$IpInstanceCH3 &amp; ADC4_SECURE)|
+            (SEM_IP_DAC1_$IpInstanceCH3 &amp; DAC1_SECURE)|
+            (SEM_IP_I2C3_$IpInstanceCH3 &amp; I2C3_SECURE)|
+            (SEM_IP_SPI3_$IpInstanceCH3 &amp; SPI3_SECURE)|
+            (SEM_IP_LPUART1_$IpInstanceCH3 &amp; LPUART1_SECURE)|
+            (SEM_IP_ADF1_$IpInstanceCH3 &amp; ADF1_SECURE)|
+            (SEM_IP_LPTIM1_$IpInstanceCH3 &amp; LPTIM1_SECURE)|
+            (SEM_IP_LPTIM3_$IpInstanceCH3 &amp; LPTIM3_SECURE)) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+
+    <RefParameter Comment="Enable Channel as Secured" DefaultValue="DMA_CHANNEL_NSEC" TabName="SECURITY"  Name="ChannelSEC_HPDMACH3"  Group="CH3" Type="list">
+        
+        <PossibleValue Comment="NON SECURE" Value="DMA_CHANNEL_NSEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+   
+    <RefParameter Comment="Enable Channel as Secured" DefaultValue="null" Group="SECURITY" Name="ChannelSEC_HPDMACH3" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="!S_SECURE &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+
+    <RefParameter Comment="Enable Channel as Privileged" DefaultValue="DMA_CHANNEL_NPRIV" TabName="SECURITY"  Name="ChannelPRIV_HPDMACH3"  Group="CH3" Type="list">
+        <Condition Diagnostic="" Expression="!S_SECURE &amp; !S_LPBAM_CONF"/>
+            <PossibleValue Comment="PRIVILEDGED" Value="DMA_CHANNEL_PRIV"/>
+            <PossibleValue Comment="NON PRIVILEDGED" Value="DMA_CHANNEL_NPRIV"/>
+    </RefParameter>
+
+    <RefParameter Comment="Enable Source as Secured" DefaultValue="DMA_CHANNEL_SRC_SEC" TabName="SECURITY"  Name="SrcSEC_HPDMACH3"  Group="CH3" Type="list">
+        <PossibleValue Comment="SECURE" Value="DMA_CHANNEL_SRC_SEC"/>
+        <PossibleValue Comment="NON SECURE" Value="DMA_CHANNEL_SRC_NSEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH3 &amp; (ChannelSEC_HPDMACH3=DMA_CHANNEL_SEC) &amp; (REQUEST_HPDMACH3=DMA_REQUEST_SW) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+
+    <RefParameter Comment="Enable Source as Secured" DefaultValue="DMA_CHANNEL_SRC_NSEC" TabName="SECURITY"  Name="SrcSEC_HPDMACH3"  Group="CH3" Type="list">
+        <PossibleValue Comment="NON SECURE" Value="DMA_CHANNEL_SRC_NSEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH3 &amp; !(ChannelSEC_HPDMACH3=DMA_CHANNEL_SEC) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+    <RefParameter Comment="Enable Source as Secured" DefaultValue="DMA_CHANNEL_SRC_SEC" TabName="SECURITY"  Name="SrcSEC_HPDMACH3"  Group="CH3" Type="list">
+        <PossibleValue Comment="SECURE" Value="DMA_CHANNEL_SRC_SEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH3 &amp; (ChannelSEC_HPDMACH3=DMA_CHANNEL_SEC) &amp; (DIRECTION_HPDMACH3=DMA_PERIPH_TO_MEMORY) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+    <RefParameter Comment="Enable Source as Secured" DefaultValue="DMA_CHANNEL_SRC_SEC" TabName="SECURITY"  Name="SrcSEC_HPDMACH3"  Group="CH3" Type="list">
+        <PossibleValue Comment="SECURE" Value="DMA_CHANNEL_SRC_SEC"/>
+        <PossibleValue Comment="NON SECURE" Value="DMA_CHANNEL_SRC_NSEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH3 &amp; (ChannelSEC_HPDMACH3=DMA_CHANNEL_SEC) &amp; !(DIRECTION_HPDMACH3=DMA_PERIPH_TO_MEMORY) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+    <RefParameter Comment="Enable Source as Secured" DefaultValue="null" Group="SECURITY" Name="SrcSEC_HPDMACH3" Type="list" Visible="false">
+        
+        <Condition Diagnostic="" Expression="!S_SECURE | (S_SECURE &amp; SEM_LINKEDLIST_$IpInstanceCH3) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+
+    <RefParameter Comment="Enable Destination as Secured" DefaultValue="DMA_CHANNEL_DEST_SEC" TabName="SECURITY"  Name="DestSEC_HPDMACH3"  Group="CH3" Type="list">
+        <PossibleValue Comment="SECURE" Value="DMA_CHANNEL_DEST_SEC"/>
+        <PossibleValue Comment="NON SECURE" Value="DMA_CHANNEL_DEST_NSEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH3 &amp; (ChannelSEC_HPDMACH3=DMA_CHANNEL_SEC) &amp; !(DIRECTION_HPDMACH3=DMA_MEMORY_TO_PERIPH) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+    <RefParameter Comment="Enable Destination as Secured" DefaultValue="DMA_CHANNEL_DEST_NSEC" TabName="SECURITY"  Name="DestSEC_HPDMACH3"  Group="CH3" Type="list">
+        <PossibleValue Comment="NON SECURE" Value="DMA_CHANNEL_DEST_NSEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH3 &amp; !(ChannelSEC_HPDMACH3=DMA_CHANNEL_SEC) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+    <RefParameter Comment="Enable Destination as Secured" DefaultValue="DMA_CHANNEL_DEST_SEC" TabName="SECURITY"  Name="DestSEC_HPDMACH3"  Group="CH3" Type="list">
+        <PossibleValue Comment="SECURE" Value="DMA_CHANNEL_DEST_SEC"/>
+        <Condition Diagnostic="" Expression="S_SECURE &amp; SEM_SIMPLEREQUEST_$IpInstanceCH3 &amp; (ChannelSEC_HPDMACH3=DMA_CHANNEL_SEC) &amp; (DIRECTION_HPDMACH3=DMA_MEMORY_TO_PERIPH) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+    <RefParameter Comment="Enable Destination as Secured" DefaultValue="null" Group="SECURITY" Name="DestSEC_HPDMACH3" Type="list" Visible="false">
+        
+        <Condition Diagnostic="" Expression="!S_SECURE | (S_SECURE &amp; SEM_LINKEDLIST_$IpInstanceCH3) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+    
+
+    <RefParameter Comment="Channel Attributes" DefaultValue="+ChannelPRIV_HPDMACH3+|ChannelSEC_HPDMACH3+|SrcSEC_HPDMACH3+|DestSEC_HPDMACH3"  Type="list" Name="ChannelAttributes_HPDMACH3"  Visible="false">
+    <Condition Diagnostic="" Expression="S_SECURE &amp; !SEM_CIRCULAR_$IpInstanceCH3 &amp; !SEM_LINKEDLIST_$IpInstanceCH3 &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+    <RefParameter Comment="Channel Attributes" DefaultValue="+ChannelPRIV_HPDMACH3+|ChannelSEC_HPDMACH3"  Type="list" Name="ChannelAttributes_HPDMACH3"  Visible="false">
+    <Condition Diagnostic="" Expression="S_SECURE &amp; (SEM_CIRCULAR_$IpInstanceCH3|SEM_LINKEDLIST_$IpInstanceCH3) &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+
+
+    <RefParameter Comment="Channel Attributes" DefaultValue="+ChannelPRIV_HPDMACH3"  Name="ChannelAttributes_HPDMACH3"  Type="list"  Visible="false">
+    <Condition Diagnostic="" Expression="!S_SECURE &amp; !S_LPBAM_CONF"/>
+    </RefParameter>
+
+    
+
+    <!--SECURITY-->
+
+
+
+
+
+<RefParameter Name="RECAP_HPDMACH0" Comment="Request" Group="Channel 0"  DefaultValue="+REQUEST_HPDMACH0" TabName="All Channels" Type="StringRW" >
+<Condition Diagnostic="" Expression="SEM_SIMPLEREQUEST_$IpInstanceCH0"/>
+ <Description>DMA is not intended to hardware support the case of simultaneous enabled channels incorrectly configured with a same hardware peripheral request signal, and there is no user setting error reporting.</Description>
+</RefParameter>
+<RefParameter Name="RECAP_HPDMACH1" Comment="Request" Group="Channel 1"  DefaultValue="+REQUEST_HPDMACH1" TabName="All Channels" Type="StringRW" >
+<Condition Diagnostic="" Expression="SEM_SIMPLEREQUEST_$IpInstanceCH1"/>
+ <Description>DMA is not intended to hardware support the case of simultaneous enabled channels incorrectly configured with a same hardware peripheral request signal, and there is no user setting error reporting.</Description>
+</RefParameter>
+<RefParameter Name="RECAP_HPDMACH2" Comment="Request" Group="Channel 2"  DefaultValue="+REQUEST_HPDMACH2" TabName="All Channels" Type="StringRW" >
+<Condition Diagnostic="" Expression="SEM_SIMPLEREQUEST_$IpInstanceCH2"/>
+ <Description>DMA is not intended to hardware support the case of simultaneous enabled channels incorrectly configured with a same hardware peripheral request signal, and there is no user setting error reporting.</Description>
+</RefParameter>
+<RefParameter Name="RECAP_HPDMACH3" Comment="Request" Group="Channel 3"  DefaultValue="+REQUEST_HPDMACH3" TabName="All Channels" Type="StringRW" >
+<Condition Diagnostic="" Expression="SEM_SIMPLEREQUEST_$IpInstanceCH3"/>
+ <Description>DMA is not intended to hardware support the case of simultaneous enabled channels incorrectly configured with a same hardware peripheral request signal, and there is no user setting error reporting.</Description>
+</RefParameter>
+
+
+
+<RefParameter Name="RECAP_HPDMACH0" Comment="Request" Group="Channel 0"  DefaultValue="LinkedList Hosting" TabName="All Channels" Type="StringRW" >
+<Condition Diagnostic="" Expression="SEM_LINKEDLIST_$IpInstanceCH0"/>
+</RefParameter>
+<RefParameter Name="RECAP_HPDMACH1" Comment="Request" Group="Channel 1"  DefaultValue="LinkedList Hosting" TabName="All Channels" Type="StringRW" >
+<Condition Diagnostic="" Expression="SEM_LINKEDLIST_$IpInstanceCH1"/>
+</RefParameter>
+<RefParameter Name="RECAP_HPDMACH2" Comment="Request" Group="Channel 2"  DefaultValue="LinkedList Hosting" TabName="All Channels" Type="StringRW" >
+<Condition Diagnostic="" Expression="SEM_LINKEDLIST_$IpInstanceCH2"/>
+</RefParameter>
+<RefParameter Name="RECAP_HPDMACH3" Comment="Request" Group="Channel 3"  DefaultValue="LinkedList Hosting" TabName="All Channels" Type="StringRW" >
+<Condition Diagnostic="" Expression="SEM_LINKEDLIST_$IpInstanceCH3"/>
+</RefParameter>
+
+
+
+<RefParameter Name="RECAP_HPDMACH0" Comment="Request" Group="Channel 0"  DefaultValue="null" TabName="All Channels" Type="StringRW" Visible="false"/>
+<RefParameter Name="RECAP_HPDMACH1" Comment="Request" Group="Channel 1"  DefaultValue="null" TabName="All Channels" Type="StringRW" Visible="false"/>
+<RefParameter Name="RECAP_HPDMACH2" Comment="Request" Group="Channel 2"  DefaultValue="null" TabName="All Channels" Type="StringRW" Visible="false"/>
+<RefParameter Name="RECAP_HPDMACH3" Comment="Request" Group="Channel 3"  DefaultValue="null" TabName="All Channels" Type="StringRW" Visible="false"/>
+
+
+
+<!-- pour génération de code -->
+
+
+<RefParameter Name="pNode_HPDMACH3" Comment="forcodegeneration" Group=""  DefaultValue="Node_HPDMA1_Channel3"  Type="StringRW"/>    
+<RefParameter Name="pQueueLinkList_HPDMACH3" Comment="forcodegeneration" Group=""  DefaultValue="List_HPDMA1_Channel3"  Type="StringRW"/>
+
+<RefParameter Name="pNode_HPDMACH2" Comment="forcodegeneration" Group=""  DefaultValue="Node_HPDMA1_Channel2"  Type="StringRW"/>    
+<RefParameter Name="pQueueLinkList_HPDMACH2" Comment="forcodegeneration" Group=""  DefaultValue="List_HPDMA1_Channel2"  Type="StringRW"/>
+
+<RefParameter Name="pNode_HPDMACH1" Comment="forcodegeneration" Group=""  DefaultValue="Node_HPDMA1_Channel1"  Type="StringRW"/>    
+<RefParameter Name="pQueueLinkList_HPDMACH1" Comment="forcodegeneration" Group=""  DefaultValue="List_HPDMA1_Channel1"  Type="StringRW"/>
+
+<RefParameter Name="pNode_HPDMACH0" Comment="forcodegeneration" Group=""  DefaultValue="Node_HPDMA1_Channel0"  Type="StringRW"/>    
+<RefParameter Name="pQueueLinkList_HPDMACH0" Comment="forcodegeneration" Group=""  DefaultValue="List_HPDMA1_Channel0"  Type="StringRW"/>
+<RefParameter Name="pPrevNode" Comment="forcodegeneration" Group=""  DefaultValue="NULL"  Type="list">
+    <PossibleValue Comment="" Value="NULL"/>
+</RefParameter>
+
+<!-- pour génération de code -->
+
+
+   
+    
+
+
+
+<!--DMA_InitTypeDef-->
+
+
+<RefParameter Name="TRANSFEREVENTMODE_HPDMACH0" Comment="Transfer Event Generation" Group="Transfer Event Configuration"  DefaultValue="DMA_TCEM_BLOCK_TRANSFER" TabName="CH0" Type="list" >
+<Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH0"/>
+        <PossibleValue Comment="The TC (and the HT) event is generated at the (respectively half) end of each block " Value="DMA_TCEM_BLOCK_TRANSFER"/>
+</RefParameter>
+<RefParameter Name="TRANSFEREVENTMODE_HPDMACH0" Comment="Transfer Event Generation" Group="Transfer Event Configuration"  DefaultValue="null" TabName="CH0" Type="list"  Visible="false">
+<Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH0"/>
+</RefParameter>
+
+
+
+<RefParameter Name="MODE_HPDMACH0"  Comment="Transaction Mode" DefaultValue="DMA_NORMAL" Group="Channel configuration"  TabName="CH0"  Type="list">
+        <PossibleValue Comment="Normal" Value="DMA_NORMAL"/>
+</RefParameter>
+
+
+<!-- circular mode begin -->
+
+<RefParameter Name="CIRCULARMODE_HPDMACH0"  Comment="Circular Mode" DefaultValue="DISABLE" Group="Circular configuration"  TabName="CH0"  Type="list">
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+        <PossibleValue Comment="Enable" Value="ENABLE" Semaphore="SEM_CIRCULAR_$IpInstanceCH0"/>
+</RefParameter>
+ 
+<RefParameter Name="NODETYPE_HPDMACH0"  Comment="Node Type" DefaultValue="null" Group="Channel configuration"  TabName="CH0"  Type="list" Visible="false">
+       <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH0"/>
+</RefParameter>
+<RefParameter Name="NODETYPE_HPDMACH0"  Comment="Node Type" DefaultValue="DMA_HPDMA_LINEAR_NODE" Group="Channel configuration"  TabName="CH0"  Type="list" Visible="false">
+       <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH0"/>
+        <PossibleValue Comment="GPDMA 2D Addressing" Value="DMA_HPDMA_LINEAR_NODE"/>
+</RefParameter>
+
+<RefParameter Name="SRCADD_HPDMACH0"  Comment="Source Address" DefaultValue="0" Max="65535" Min="0"  Group="Runtime configuration"  TabName="CH0"  Type="integer">
+     <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH0 &amp; SEM_REQ_SW_$IpInstanceCH0"/>
+</RefParameter>
+<RefParameter Name="SRCADD_HPDMACH0"  Comment="Source Address" DefaultValue="null" Max="65535" Min="0"  Group="Runtime configuration"  TabName="CH0"  Type="integer" Visible="false">
+     <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH0 | !SEM_REQ_SW_$IpInstanceCH0"/>
+</RefParameter>
+
+<RefParameter Name="DSTADD_HPDMACH0"  Comment="Destination Address" DefaultValue="0" Max="65535" Min="0"  Group="Runtime configuration"  TabName="CH0"  Type="integer">
+     <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH0 &amp; SEM_REQ_SW_$IpInstanceCH0"/>
+</RefParameter>
+<RefParameter Name="DSTADD_HPDMACH0"  Comment="Destination Address" DefaultValue="null" Max="65535" Min="0"  Group="Runtime configuration"  TabName="CH0"  Type="integer" Visible="false">
+     <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH0 | !SEM_REQ_SW_$IpInstanceCH0"/>
+</RefParameter>
+
+<RefParameter Name="DATASIZE_HPDMACH0"  Comment="Data Size" DefaultValue="0" Max="65535" Min="0"  Group="Runtime configuration"  TabName="CH0"  Type="integer">
+     <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH0 &amp; SEM_REQ_SW_$IpInstanceCH0"/>
+</RefParameter>
+<RefParameter Name="DATASIZE_HPDMACH0"  Comment="Data Size" DefaultValue="null" Max="65535" Min="0"  Group="Runtime configuration"  TabName="CH0"  Type="integer" Visible="false">
+     <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH0 | !SEM_REQ_SW_$IpInstanceCH0"/>
+</RefParameter>
+
+<!-- circular mode end -->
+
+
+
+<RefParameter Name="PRIORITY_HPDMACH0"  Comment="Priority" DefaultValue="DMA_LOW_PRIORITY_LOW_WEIGHT" Group="Channel configuration"  TabName="CH0"  Type="list">
+    <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH0"/>
+        <PossibleValue Comment="Low" Value="DMA_LOW_PRIORITY_LOW_WEIGHT"/>
+        <PossibleValue Comment="Medium" Value="DMA_LOW_PRIORITY_MID_WEIGHT"/>
+        <PossibleValue Comment="High" Value="DMA_LOW_PRIORITY_HIGH_WEIGHT"/>
+        <PossibleValue Comment="Very High" Value="DMA_HIGH_PRIORITY"/>
+</RefParameter>
+<RefParameter Name="PRIORITY_HPDMACH0"  Comment="Priority" DefaultValue="null" Group="Channel configuration"  TabName="CH0"  Type="list" Visible="false">
+    <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH0"/>
+</RefParameter>
+
+<RefParameter Name="SRCDATAWIDTH_HPDMACH0" Comment="Data Width" Group="Source Data Setting" TabName="CH0" DefaultValue="DMA_SRC_DATAWIDTH_BYTE" Type="list">
+        <PossibleValue Comment="Byte" Value="DMA_SRC_DATAWIDTH_BYTE"/>
+        <PossibleValue Comment="Half Word" Value="DMA_SRC_DATAWIDTH_HALFWORD"/>
+        <PossibleValue Comment="Word" Value="DMA_SRC_DATAWIDTH_WORD"/>
+</RefParameter>
+
+<RefParameter Name="DESTDATAWIDTH_HPDMACH0" Comment="Data Width" Group="Destination Data Setting" TabName="CH0" DefaultValue="DMA_DEST_DATAWIDTH_BYTE" Type="list">
+        <PossibleValue Comment="Byte" Value="DMA_DEST_DATAWIDTH_BYTE"/>
+        <PossibleValue Comment="Half Word" Value="DMA_DEST_DATAWIDTH_HALFWORD"/>
+        <PossibleValue Comment="Word" Value="DMA_DEST_DATAWIDTH_WORD"/>
+</RefParameter>
+
+<RefParameter Name="SRCINC_HPDMACH0" Comment="Source Address Increment After Transfer" Group="Source Data Setting" TabName="CH0"  DefaultValue="DMA_SINC_FIXED"  Type="list">
+        <PossibleValue Comment="Disabled" Value="DMA_SINC_FIXED"/>
+        <PossibleValue Comment="Enabled" Value="DMA_SINC_INCREMENTED"/>
+</RefParameter>
+
+<RefParameter Name="DESTINC_HPDMACH0"  Comment="Destination Address Increment After Transfer"  Group="Destination Data Setting" TabName="CH0" DefaultValue="DMA_DINC_FIXED" Type="list">
+        <PossibleValue Comment="Disabled" Value="DMA_DINC_FIXED"/>
+        <PossibleValue Comment="Enabled" Value="DMA_DINC_INCREMENTED"/>
+</RefParameter>
+
+<RefParameter Name="DIRECTION_HPDMACH0" Comment="Direction"  Group="Channel configuration"  TabName="CH0" DefaultValue="DMA_PERIPH_TO_MEMORY" Type="list">
+    <Condition Diagnostic="MEMTOMEM has to be used carefully while accessing an IP register as a source or destination. We Advice you to use MEM to Periph or Periph to Mem instead, when possible" Expression="!SEM_REQ_SW_$IpInstanceCH0"/>
+        <PossibleValue Comment="Peripheral To Memory" Value="DMA_PERIPH_TO_MEMORY"/>
+        <PossibleValue Comment="Memory To Peripheral" Value="DMA_MEMORY_TO_PERIPH"/>
+         <PossibleValue Comment="Memory To Memory" Value="DMA_MEMORY_TO_MEMORY"/>
+        
+</RefParameter>
+<RefParameter Name="DIRECTION_HPDMACH0" Comment="Direction"  Group="Channel configuration"  TabName="CH0" DefaultValue="DMA_MEMORY_TO_MEMORY" Type="list">
+         <Condition Diagnostic="" Expression="SEM_REQ_SW_$IpInstanceCH0"/>
+        <PossibleValue Comment="Memory To Memory" Value="DMA_MEMORY_TO_MEMORY"/>
+</RefParameter>
+
+
+<RefParameter Name="BLKHWREQUEST_HPDMACH0" Comment="Block HW request protocol" Group="Request Configuration" TabName="CH0" DefaultValue="DMA_BREQ_BLOCK"   Type="list" >
+        <Condition Diagnostic="not configurable" Expression="(SEM_REQ_LPTIM1UE_$IpInstanceCH0|SEM_REQ_LPTIM2UE_$IpInstanceCH0|SEM_REQ_LPTIM3UE_$IpInstanceCH0)"/>
+        <PossibleValue Comment="Block Level" Value="DMA_BREQ_BLOCK"/>
+</RefParameter>
+<RefParameter  Name="BLKHWREQUEST_HPDMACH0" Comment="Block HW request protocol" Group="Request Configuration"   TabName="CH0" DefaultValue="DMA_BREQ_SINGLE_BURST" Type="list">
+        <Condition Diagnostic="not configurable" Expression="!(SEM_REQ_LPTIM1UE_$IpInstanceCH0|SEM_REQ_LPTIM2UE_$IpInstanceCH0|SEM_REQ_LPTIM3UE_$IpInstanceCH0)"/>
+        <PossibleValue Comment="Single/Burst Level" Value="DMA_BREQ_SINGLE_BURST"/>
+</RefParameter>
+
+
+<RefParameter Name="IPHANDLE_HPDMACH0" Comment="IPHANDLE"  Group="Request Configuration" TabName="CH0" DefaultValue="IPHANDLE" Visible="false" Type="list">
+    <Condition Diagnostic="not configurable" Expression="!SEM_REQ_SW_$IpInstanceCH0"/>
+   <PossibleValue Comment="IPHANDLE" Value="IPHANDLE"/>
+</RefParameter>
+<RefParameter Name="IPHANDLE_HPDMACH0" Comment="IPHANDLE"  Group="Request Configuration" TabName="CH0" DefaultValue="__NULL" Visible="false" Type="list">
+    <Condition Diagnostic="not configurable" Expression="SEM_REQ_SW_$IpInstanceCH0"/>
+    <PossibleValue Comment="__NULL" Value="__NULL"/>
+</RefParameter>
+
+
+<RefParameter Name="DMAHANDLE_HPDMACH0" Comment="DMA Handle in IP Structure"  Group="Request Configuration" TabName="CH0" DefaultValue="NONE" Type="list">
+    <PossibleValue Comment="NONE" Value="NONE" Condition="!SEM_REQ_SW_$IpInstanceCH0"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="DMA_Handle" Value="DMA_Handle" Condition="!SEM_REQ_ADC4_$IpInstanceCH0"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="DMA_Handle1" Value="DMA_Handle1" Condition="!SEM_REQ_DAC1_$IpInstanceCH0"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="DMA_Handle2" Value="DMA_Handle2" Condition="!SEM_REQ_DAC2_$IpInstanceCH0" Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="hdmarx" Value="hdmarx" Condition="!(SEM_REQ_SPI3RX_$IpInstanceCH0|SEM_REQ_I2C3RX_$IpInstanceCH0|SEM_REQ_LPUART1RX_$IpInstanceCH0)"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="hdmatx" Value="hdmatx" Condition="!(SEM_REQ_SPI3TX_$IpInstanceCH0|SEM_REQ_I2C3TX_$IpInstanceCH0|SEM_REQ_LPUART1TX_$IpInstanceCH0)"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="hdma" Value="hdma" Condition="!(SEM_REQ_ADF1FLT0_$IpInstanceCH0)" Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="hdma[LPTIM_DMA_ID_CC1]" Value="hdma[LPTIM_DMA_ID_CC1]" Condition="!(SEM_REQ_LPTIM1IC1_$IpInstanceCH0|SEM_REQ_LPTIM3IC1_$IpInstanceCH0)" Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="hdma[LPTIM_DMA_ID_CC2]" Value="hdma[LPTIM_DMA_ID_CC2]" Condition="!(SEM_REQ_LPTIM1IC2_$IpInstanceCH0|SEM_REQ_LPTIM3IC2_$IpInstanceCH0)" Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="hdma[LPTIM_DMA_ID_UPDATE]" Value="hdma[LPTIM_DMA_ID_UPDATE]" Condition="!(SEM_REQ_LPTIM1UE_$IpInstanceCH0|SEM_REQ_LPTIM3UE_$IpInstanceCH0)" Diagnostic="" Action="Disable"/>
+</RefParameter>
+
+
+<RefParameter Name="IPINSTANCE_HPDMACH0" Comment="IPINSTANCE_HPDMACH0" Group="Request Configuration" TabName="CH0" DefaultValue="HPDMA1" Visible="false" Type="list">
+    <PossibleValue Comment="SoftWare" Value="HPDMA1" Semaphore="SEM_IP_DMA_$IpInstanceCH0" Condition="!SEM_REQ_SW_$IpInstanceCH0"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="ADC4" Value="ADC4" Semaphore="SEM_IP_ADC4_$IpInstanceCH0" Condition="!SEM_REQ_ADC4_$IpInstanceCH0"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="DAC1" Value="DAC1" Semaphore="SEM_IP_DAC1_$IpInstanceCH0" Condition="!(SEM_REQ_DAC1_$IpInstanceCH0|SEM_REQ_DAC2_$IpInstanceCH0)"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="SPI3" Value="SPI3" Semaphore="SEM_IP_SPI3_$IpInstanceCH0" Condition="!(SEM_REQ_SPI3RX_$IpInstanceCH0|SEM_REQ_SPI3TX_$IpInstanceCH0)"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="I2C3" Value="I2C3" Semaphore="SEM_IP_I2C3_$IpInstanceCH0" Condition="!(SEM_REQ_I2C3RX_$IpInstanceCH0|SEM_REQ_I2C3TX_$IpInstanceCH0|SEM_REQ_I2C3EVC_$IpInstanceCH0)" Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="LPUART1" Value="LPUART1" Semaphore="SEM_IP_LPUART1_$IpInstanceCH0" Condition="!(SEM_REQ_LPUART1RX_$IpInstanceCH0|SEM_REQ_LPUART1TX_$IpInstanceCH0)"  Diagnostic="" Action="Disable"/>
+     <PossibleValue Comment="ADF1" Value="ADF1" Semaphore="SEM_IP_ADF1_$IpInstanceCH0" Condition="!(SEM_REQ_ADF1FLT0_$IpInstanceCH0)" Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="LPTIM3" Value="LPTIM3" Semaphore="SEM_IP_LPTIM3_$IpInstanceCH0" Condition="!(SEM_REQ_LPTIM3IC1_$IpInstanceCH0|SEM_REQ_LPTIM3IC2_$IpInstanceCH0|SEM_REQ_LPTIM3UE_$IpInstanceCH0)" Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="LPTIM1" Value="LPTIM1" Semaphore="SEM_IP_LPTIM1_$IpInstanceCH0" Condition="!(SEM_REQ_LPTIM1IC1_$IpInstanceCH0|SEM_REQ_LPTIM1IC2_$IpInstanceCH0|SEM_REQ_LPTIM1UE_$IpInstanceCH0)" Diagnostic="
+        " Action="Disable"/>
+</RefParameter>
+
+
+<RefParameter Name="REQUEST_HPDMACH0" Comment="Request" Group="Request Configuration" TabName="CH0" DefaultValue="DMA_REQUEST_SW" Type="list">
+    <PossibleValue Comment="SoftWare" Value="DMA_REQUEST_SW" Semaphore="SEM_REQ_SW_$IpInstanceCH0" />
+    <PossibleValue Comment="ADC4" Value="HPDMA1_REQUEST_ADC4" Semaphore="SEM_REQ_ADC4_$IpInstanceCH0" Condition="!ADC4_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="DAC1_CH1" Value="HPDMA1_REQUEST_DAC1_CH1" Semaphore="SEM_REQ_DAC1_$IpInstanceCH0" Condition="!DAC1_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="DAC1_CH2" Value="HPDMA1_REQUEST_DAC1_CH2" Semaphore="SEM_REQ_DAC2_$IpInstanceCH0" Condition="!DAC1_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="SPI3_RX" Value="HPDMA1_REQUEST_SPI3_RX" Semaphore="SEM_REQ_SPI3RX_$IpInstanceCH0" Condition="!SPI3_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="SPI3_TX" Value="HPDMA1_REQUEST_SPI3_TX" Semaphore="SEM_REQ_SPI3TX_$IpInstanceCH0" Condition="!SPI3_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="I2C3_RX" Value="HPDMA1_REQUEST_I2C3_RX" Semaphore="SEM_REQ_I2C3RX_$IpInstanceCH0" Condition="!I2C3_Dma" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="I2C3_TX" Value="HPDMA1_REQUEST_I2C3_TX" Semaphore="SEM_REQ_I2C3TX_$IpInstanceCH0" Condition="!I2C3_Dma" Diagnostic="IP has to be configured" Action="Disable"/>
+    <!--<PossibleValue Comment="I2C3_EVC" Value="HPDMA1_REQUEST_I2C3_EVC" Semaphore="SEM_REQ_I2C3EVC_$IpInstanceCH0" Condition="!I2C3_Dma" Diagnostic="IP has to be configured" Action="Disable"/>-->
+    <PossibleValue Comment="LPUART1_RX" Value="HPDMA1_REQUEST_LPUART1_RX" Semaphore="SEM_REQ_LPUART1RX_$IpInstanceCH0" Condition="!LPUART1_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="LPUART1_TX" Value="HPDMA1_REQUEST_LPUART1_TX" Semaphore="SEM_REQ_LPUART1TX_$IpInstanceCH0" Condition="!LPUART1_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="ADF1_FLT0" Value="HPDMA1_REQUEST_ADF1_FLT0" Semaphore="SEM_REQ_ADF1FLT0_$IpInstanceCH0" Condition="!ADF1_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="LPTIM1_IC1" Value="HPDMA1_REQUEST_LPTIM1_IC1" Semaphore="SEM_REQ_LPTIM1IC1_$IpInstanceCH0" Condition="!LPTIM1_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="LPTIM1_IC2" Value="HPDMA1_REQUEST_LPTIM1_IC2" Semaphore="SEM_REQ_LPTIM1IC2_$IpInstanceCH0" Condition="!LPTIM1_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="LPTIM1_UE" Value="HPDMA1_REQUEST_LPTIM1_UE" Semaphore="SEM_REQ_LPTIM1UE_$IpInstanceCH0" Condition="!LPTIM1_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="LPTIM3_IC1" Value="HPDMA1_REQUEST_LPTIM3_IC1" Semaphore="SEM_REQ_LPTIM3IC1_$IpInstanceCH0" Condition="!LPTIM3_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="LPTIM3_IC2" Value="HPDMA1_REQUEST_LPTIM3_IC2" Semaphore="SEM_REQ_LPTIM3IC2_$IpInstanceCH0" Condition="!LPTIM3_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="LPTIM3_UE" Value="HPDMA1_REQUEST_LPTIM3_UE" Semaphore="SEM_REQ_LPTIM3UE_$IpInstanceCH0" Condition="!LPTIM3_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+</RefParameter>
+
+<!--DMA_InitTypeDef-->
+
+<!--DMA_DataHandlingConfTypeDef-->
+
+<RefParameter Name="DATAHANDLING_HPDMACH0" Comment="Data Handling Configuration"  Group="Data Handling" DefaultValue="NONE" TabName="CH0" Type="list" >
+     <PossibleValue Comment="Disable" Value="NONE"/>
+     <PossibleValue Comment="Enable" Value="ENABLE" Semaphore="SEM_DATA_HANDLING_$IpInstanceCH0"/>  
+</RefParameter>
+
+
+<RefParameter Name="DATAALIGNEMENT_HPDMACH0"  Comment="Data Alignment" Group="Data Handling"  DefaultValue="DMA_DATA_RIGHTALIGN_ZEROPADDED"  TabName="CH0" Type="list">
+    <Condition Diagnostic="" Expression="SEM_DATA_HANDLING_$IpInstanceCH0"/>
+    <!-- value to be conditionned with src and dest data size-->
+        <PossibleValue Comment="Right Aligned padded with 0 up to destination data width when src data width smaller than dest data width" Value="DMA_DATA_RIGHTALIGN_ZEROPADDED"/>
+        <PossibleValue Comment="Right Aligned Left Truncated down to destination data width when src data width bigger than dest data width" Value="DMA_DATA_RIGHTALIGN_LEFTTRUNC"/>
+        <PossibleValue Comment="Right Aligned padded with sign extended up to destination data width when src data width smaller than dest data width" Value="DMA_DATA_RIGHTALIGN_SIGNEXT"/>
+        <PossibleValue Comment="Left Aligned Right Truncated down to the destination data width when src data width bigger than dest data width" Value="DMA_DATA_LEFTALIGN_RIGHTTRUNC"/>
+</RefParameter>
+<RefParameter Name="DATAALIGNEMENT_HPDMACH0" Comment="Data Alignment"  Group="Data Handling" DefaultValue="DMA_DATA_RIGHTALIGN_ZEROPADDED"  TabName="CH0"  Type="list" Visible="false">
+    <Condition Diagnostic="" Expression="!SEM_DATA_HANDLING_$IpInstanceCH0"/>
+     <PossibleValue Comment="Right Aligned padded with 0 up to destination data width when src data width smaller than dest data width" Value="DMA_DATA_RIGHTALIGN_ZEROPADDED"/>
+</RefParameter>
+
+<!--DMA_DataHandlingConfTypeDef-->
+
+
+<!--DMA_TriggerConfTypeDef-->
+
+<RefParameter Name="TRIGGERPOLARITY_HPDMACH0" Comment="Trigger Configuration" Group="Trigger"  DefaultValue="DMA_TRIG_POLARITY_MASKED" TabName="CH0" Type="list">
+        <PossibleValue Comment="Disable" Value="DMA_TRIG_POLARITY_MASKED" Semaphore="SEM_NOTRIG_$IpInstanceCH0"/>
+        <PossibleValue Comment="Trigger of the selected DMA request on the rising edge of the selected trigger event input" Value="DMA_TRIG_POLARITY_RISING"/>
+        <PossibleValue Comment="Trigger of the selected DMA request on the falling edge of the selected trigger event input" Value="DMA_TRIG_POLARITY_FALLING"/>
+</RefParameter>
+<RefParameter Name="TRIGGERMODE_HPDMACH0" Comment="Trigger Mode" Group="Trigger" DefaultValue="DMA_TRIGM_BLOCK_TRANSFER" TabName="CH0" Type="list" >
+        <Condition Diagnostic="" Expression="!SEM_NOTRIG_$IpInstanceCH0"/>
+        <PossibleValue Comment="A block transfer is conditioned by (at least) one hit trigger" Value="DMA_TRIGM_BLOCK_TRANSFER"/>
+        <PossibleValue Comment="A repeated block transfer is conditioned by (at least) one hit trigger" Value="DMA_TRIGM_REPEATED_BLOCK_TRANSFER" Condition="!SEM_2DADDRESSING__$IpInstanceCH0" Action="Disable"/>
+        <PossibleValue Comment="A single/burst transfer is conditioned by (at least) one hit trigger" Value="DMA_TRIGM_SINGLE_BURST_TRANSFER "/>
+</RefParameter>
+<RefParameter Name="TRIGGERMODE_HPDMACH0" Comment="Trigger Mode" Group="Trigger" DefaultValue="null" TabName="CH0" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="SEM_NOTRIG_$IpInstanceCH0"/>
+</RefParameter>
+<RefParameter Name="TRIGGERSELECTION_HPDMACH0" Comment="Trigger Selection"  Group="Trigger"  DefaultValue="" TabName="CH0" Type="list" >
+        <Condition Diagnostic="" Expression="!SEM_NOTRIG_$IpInstanceCH0"/>
+        <PossibleValue Comment="EXTI LINE 0" Value="HPDMA1_TRIGGER_EXTI_LINE0"/>
+        <PossibleValue Comment="EXTI LINE 1" Value="HPDMA1_TRIGGER_EXTI_LINE1"/>
+        <PossibleValue Comment="EXTI LINE 2" Value="HPDMA1_TRIGGER_EXTI_LINE2"/>
+        <PossibleValue Comment="EXTI LINE 3" Value="HPDMA1_TRIGGER_EXTI_LINE3"/>
+        <PossibleValue Comment="EXTI LINE 4" Value="HPDMA1_TRIGGER_EXTI_LINE4"/>
+        <PossibleValue Comment="TAMP TRIG1" Value="HPDMA1_TRIGGER_TAMP_TRG1"/>
+        <PossibleValue Comment="TAMP TRIG2" Value="HPDMA1_TRIGGER_TAMP_TRG2"/>
+        <PossibleValue Comment="TAMP TRIG3" Value="HPDMA1_TRIGGER_TAMP_TRG3"/>
+
+        <PossibleValue Comment="LPTIM1 CH1" Value="HPDMA1_TRIGGER_LPTIM1_CH1"/>
+        <PossibleValue Comment="LPTIM1 CH2" Value="HPDMA1_TRIGGER_LPTIM1_CH2"/>
+        <PossibleValue Comment="LPTIM CH1" Value="HPDMA1_TRIGGER_LPTIM3_CH1"/>
+        <PossibleValue Comment="LPTIM4 OUT" Value="HPDMA1_TRIGGER_LPTIM4_OUT"/>
+
+        <PossibleValue Comment="COMP1 OUT" Value="HPDMA1_TRIGGER_COMP1_OUT"/>
+        <PossibleValue Comment="COMP2 OUT" Value="HPDMA1_TRIGGER_COMP2_OUT"/>
+
+        <PossibleValue Comment="RTC ALRA TRG" Value="HPDMA1_TRIGGER_RTC_ALRA_TRG"/>
+        <PossibleValue Comment="RTC ALRB TRG" Value="HPDMA1_TRIGGER_RTC_ALRB_TRG"/>
+        <PossibleValue Comment="RTC WUT TRG" Value="HPDMA1_TRIGGER_RTC_WUT_TRG"/>
+
+        
+        <PossibleValue Comment="HPDMA CH0 TCF" Value="HPDMA1_TRIGGER_HPDMA1_CH0_TCF"/>
+        <PossibleValue Comment="HPDMA CH1 TCF" Value="HPDMA1_TRIGGER_HPDMA1_CH1_TCF"/>
+        <PossibleValue Comment="HPDMA CH2 TCF" Value="HPDMA1_TRIGGER_HPDMA1_CH2_TCF"/>
+        <PossibleValue Comment="HPDMA CH3 TCF" Value="HPDMA1_TRIGGER_HPDMA1_CH3_TCF"/>
+
+        <PossibleValue Comment="GPDMA CH0 TCF" Value="HPDMA1_TRIGGER_GPDMA1_CH0_TCF"/>
+        <PossibleValue Comment="GPDMA CH1 TCF" Value="HPDMA1_TRIGGER_GPDMA1_CH1_TCF"/>
+        <PossibleValue Comment="GPDMA CH4 TCF" Value="HPDMA1_TRIGGER_GPDMA1_CH4_TCF"/>
+        <PossibleValue Comment="GPDMA CH5 TCF" Value="HPDMA1_TRIGGER_GPDMA1_CH5_TCF"/>
+        <PossibleValue Comment="GPDMA CH6 TCF" Value="HPDMA1_TRIGGER_GPDMA1_CH6_TCF"/>
+        <PossibleValue Comment="GPDMA CH7 TCF" Value="HPDMA1_TRIGGER_GPDMA1_CH7_TCF"/>
+        <PossibleValue Comment="GPDMA CH12 TCF" Value="HPDMA1_TRIGGER_GPDMA1_CH12_TCF"/>
+        <PossibleValue Comment="GPDMA CH13 TCF" Value="HPDMA1_TRIGGER_GPDMA1_CH13_TCF"/>
+
+        <PossibleValue Comment="TIM2 TRGO" Value="HPDMA1_TRIGGER_TIM2_TRGO"/>
+        <PossibleValue Comment="TIM15 TRGO" Value="HPDMA1_TRIGGER_TIM15_TRGO"/>
+         <PossibleValue Comment="ADC4 AWD1" Value="HPDMA1_TRIGGER_ADC4_AWD1"/>
+</RefParameter>
+<RefParameter Name="TRIGGERSELECTION_HPDMACH0" Comment="Trigger Selection"  Group="Trigger"  DefaultValue="null" TabName="CH0" Type="list" Visible="false" >
+        <Condition Diagnostic="" Expression="SEM_NOTRIG_$IpInstanceCH0"/>
+ </RefParameter>
+
+<!--DMA_TriggerConfTypeDef-->
+
+
+<!--DMA_InitLinkedListTypeDef for circular simple request -->
+
+<RefParameter Name="PRIORITY_LL_CIRCULAR_HPDMACH0"  Comment="Priority" DefaultValue="DMA_LOW_PRIORITY_LOW_WEIGHT" Group="Channel configuration"  TabName="CH0"  Type="list">
+     <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH0"/>
+        <PossibleValue Comment="Low" Value="DMA_LOW_PRIORITY_LOW_WEIGHT"/>
+        <PossibleValue Comment="Medium" Value="DMA_LOW_PRIORITY_MID_WEIGHT"/>
+        <PossibleValue Comment="High" Value="DMA_LOW_PRIORITY_HIGH_WEIGHT"/>
+        <PossibleValue Comment="Very High" Value="DMA_HIGH_PRIORITY"/>
+</RefParameter>
+<RefParameter Name="PRIORITY_LL_CIRCULAR_HPDMACH0"  Comment="Priority" DefaultValue="null" Group="Channel Configuration for Linked List"  TabName="CH0"  Type="list" Visible="false">
+       <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH0"/>
+</RefParameter>
+
+<RefParameter Name="LINKSTEPMODE_CIRCULAR_HPDMACH0" Comment="Linked List Execution Mode" Group="Channel Configuration for Linked List" DefaultValue="DMA_LSM_FULL_EXECUTION"  TabName="CH0" Type="list" >
+      <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH0"/>
+        <PossibleValue Comment="The List is fully executed" Value="DMA_LSM_FULL_EXECUTION"/>
+</RefParameter>
+<RefParameter Name="LINKSTEPMODE_CIRCULAR_HPDMACH0" Comment="Linked List Execution Mode" Group="Channel Configuration for Linked List" DefaultValue="null"  TabName="CH0" Type="list" Visible="false">
+      <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH0"/>
+</RefParameter>
+
+<RefParameter Name="LINKALLOCATEDPORT_CIRCULAR_HPDMACH0" Comment="Circular Port" Group="Circular configuration"  DefaultValue="null" TabName="CH0" Type="list" Visible="false">
+</RefParameter>
+
+
+<RefParameter Name="TRANSFEREVENTMODE_LL_CIRCULAR_HPDMACH0" Comment="Transfer Event Generation" Group="Transfer Event Configuration" DefaultValue="DMA_TCEM_BLOCK_TRANSFER"  TabName="CH0"  Type="list">
+     <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH0"/>
+        <PossibleValue Comment="The TC (and the HT) event is generated at the (respectively half) end of each block " Value="DMA_TCEM_BLOCK_TRANSFER"/>
+        <PossibleValue Comment="The TC (and the HT) event is generated at the (respectively half) end of each linked-list item" Value="DMA_TCEM_EACH_LL_ITEM_TRANSFER"/>
+        <PossibleValue Comment="The TC (and the HT) event is generated at the (respectively half) end of the last linked-list item " Value="DMA_TCEM_LAST_LL_ITEM_TRANSFER"/>
+</RefParameter> 
+
+<RefParameter Name="TRANSFEREVENTMODE_LL_CIRCULAR_HPDMACH0" Comment="Transfer Event Generation" Group="Transfer Event Configuration" DefaultValue="null"  TabName="CH0"  Type="list" Visible="false">
+     <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH0"/>
+</RefParameter> 
+
+<RefParameter Name="LINKEDLISTMODE_CIRCULAR_HPDMACH0"  Comment="Execution Mode (circular/linear) of the Linked List" DefaultValue="DMA_LINKEDLIST" Group="Channel Configuration for Linked List"  TabName="CH0"  Type="list">
+     <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH0"/>
+        <PossibleValue Comment="Circular" Value="DMA_LINKEDLIST_CIRCULAR"/>
+</RefParameter> 
+<RefParameter Name="LINKEDLISTMODE_CIRCULAR_HPDMACH0"  Comment="Execution Mode (circular/linear) of the Linked List" DefaultValue="null" Group="Channel Configuration for Linked List"  TabName="CH0"  Type="list" Visible="false">
+     <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH0"/>
+</RefParameter> 
+
+ 
+<!--DMA_InitLinkedListTypeDef for circular simple request -->
+
+
+
+
+
+<!--DMA_InitLinkedListTypeDef-->
+
+<RefParameter Name="PRIORITY_LL_HPDMACH0"  Comment="Priority" DefaultValue="DMA_LOW_PRIORITY_LOW_WEIGHT" Group="Channel Configuration for Linked List"  TabName="CH0"  Type="list">
+        <PossibleValue Comment="Low" Value="DMA_LOW_PRIORITY_LOW_WEIGHT"/>
+        <PossibleValue Comment="Medium" Value="DMA_LOW_PRIORITY_MID_WEIGHT"/>
+        <PossibleValue Comment="High" Value="DMA_LOW_PRIORITY_HIGH_WEIGHT"/>
+        <PossibleValue Comment="Very High" Value="DMA_HIGH_PRIORITY"/>
+</RefParameter>
+
+<RefParameter Name="LINKSTEPMODE_HPDMACH0" Comment="Linked List Execution Mode" Group="Channel Configuration for Linked List" DefaultValue="DMA_LSM_FULL_EXECUTION"  TabName="CH0" Type="list" >
+        <PossibleValue Comment="The List is fully executed" Value="DMA_LSM_FULL_EXECUTION"/>
+        <PossibleValue Comment="First Element of the List is executed " Value="DMA_LSM_1LINK_EXECUTION"/>
+</RefParameter>
+
+<RefParameter Name="LINKALLOCATEDPORT_HPDMACH0" Comment="Allocated Port for Transfer" Group="Channel Configuration for Linked List"  DefaultValue="null" TabName="CH0" Type="list" Visible="false">
+</RefParameter>
+
+<RefParameter Name="TRANSFEREVENTMODE_LL_HPDMACH0" Comment="Transfer Event Generation" Group="Channel Configuration for Linked List" DefaultValue="DMA_TCEM_LAST_LL_ITEM_TRANSFER"  TabName="CH0"  Type="list">
+        <PossibleValue Comment="The TC (and the HT) event is generated at the (respectively half) end of each linked-list item" Value="DMA_TCEM_EACH_LL_ITEM_TRANSFER"/>
+        <PossibleValue Comment="The TC (and the HT) event is generated at the (respectively half) end of the last linked-list item " Value="DMA_TCEM_LAST_LL_ITEM_TRANSFER"/>
+</RefParameter> 
+
+<RefParameter Name="LINKEDLISTMODE_HPDMACH0"  Comment="Execution Mode (circular/linear) of the Linked List" DefaultValue="DMA_LINKEDLIST_NORMAL" Group="Channel Configuration for Linked List"  TabName="CH0"  Type="list">
+        <PossibleValue Comment="Linear" Value="DMA_LINKEDLIST_NORMAL"/>
+        <PossibleValue Comment="Circular" Value="DMA_LINKEDLIST_CIRCULAR"/>
+</RefParameter> 
+
+ <!--DMA_InitLinkedListTypeDef-->
+
+
+
+
+
+
+<!--DMA_InitTypeDef-->
+
+
+<RefParameter Name="TRANSFEREVENTMODE_HPDMACH1" Comment="Transfer Event Generation" Group="Transfer Event Configuration"  DefaultValue="DMA_TCEM_BLOCK_TRANSFER" TabName="CH1" Type="list" >
+<Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH1"/>
+        <PossibleValue Comment="The TC (and the HT) event is generated at the (respectively half) end of each block " Value="DMA_TCEM_BLOCK_TRANSFER"/>
+</RefParameter>
+<RefParameter Name="TRANSFEREVENTMODE_HPDMACH1" Comment="Transfer Event Generation" Group="Transfer Event Configuration"  DefaultValue="null" TabName="CH1" Type="list"  Visible="false">
+<Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH1"/>
+</RefParameter>
+
+
+
+<RefParameter Name="MODE_HPDMACH1"  Comment="Transaction Mode" DefaultValue="DMA_NORMAL" Group="Channel configuration"  TabName="CH1"  Type="list">
+        <PossibleValue Comment="Normal" Value="DMA_NORMAL"/>
+</RefParameter>
+
+
+<!-- circular mode begin -->
+
+<RefParameter Name="CIRCULARMODE_HPDMACH1"  Comment="Circular Mode" DefaultValue="DISABLE" Group="Circular configuration"  TabName="CH1"  Type="list">
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+        <PossibleValue Comment="Enable" Value="ENABLE" Semaphore="SEM_CIRCULAR_$IpInstanceCH1"/>
+</RefParameter>
+ 
+<RefParameter Name="NODETYPE_HPDMACH1"  Comment="Node Type" DefaultValue="null" Group="Channel configuration"  TabName="CH1"  Type="list" Visible="false">
+       <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH1"/>
+</RefParameter>
+<RefParameter Name="NODETYPE_HPDMACH1"  Comment="Node Type" DefaultValue="DMA_HPDMA_LINEAR_NODE" Group="Channel configuration"  TabName="CH1"  Type="list" Visible="false">
+       <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH1"/>
+        <PossibleValue Comment="GPDMA 2D Addressing" Value="DMA_HPDMA_LINEAR_NODE"/>
+</RefParameter>
+
+<RefParameter Name="SRCADD_HPDMACH1"  Comment="Source Address" DefaultValue="0" Max="65535" Min="0"  Group="Runtime configuration"  TabName="CH1"  Type="integer">
+     <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH1 &amp; SEM_REQ_SW_$IpInstanceCH1"/>
+</RefParameter>
+<RefParameter Name="SRCADD_HPDMACH1"  Comment="Source Address" DefaultValue="null" Max="65535" Min="0"  Group="Runtime configuration"  TabName="CH1"  Type="integer" Visible="false">
+     <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH1 |  !SEM_REQ_SW_$IpInstanceCH1"/>
+</RefParameter>
+
+<RefParameter Name="DSTADD_HPDMACH1"  Comment="Destination Address" DefaultValue="0" Max="65535" Min="0"  Group="Runtime configuration"  TabName="CH1"  Type="integer">
+     <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH1 &amp; SEM_REQ_SW_$IpInstanceCH1"/>
+</RefParameter>
+<RefParameter Name="DSTADD_HPDMACH1"  Comment="Destination Address" DefaultValue="null" Max="65535" Min="0"  Group="Runtime configuration"  TabName="CH1"  Type="integer" Visible="false">
+     <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH1 |  !SEM_REQ_SW_$IpInstanceCH1"/>
+</RefParameter>
+
+<RefParameter Name="DATASIZE_HPDMACH1"  Comment="Data Size" DefaultValue="0" Max="65535" Min="0"  Group="Runtime configuration"  TabName="CH1"  Type="integer">
+     <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH1 &amp; SEM_REQ_SW_$IpInstanceCH1"/>
+</RefParameter>
+<RefParameter Name="DATASIZE_HPDMACH1"  Comment="Data Size" DefaultValue="null" Max="65535" Min="0"  Group="Runtime configuration"  TabName="CH1"  Type="integer" Visible="false">
+     <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH1 |  !SEM_REQ_SW_$IpInstanceCH1"/>
+</RefParameter>
+
+<!-- circular mode end -->
+
+
+
+<RefParameter Name="PRIORITY_HPDMACH1"  Comment="Priority" DefaultValue="DMA_LOW_PRIORITY_LOW_WEIGHT" Group="Channel configuration"  TabName="CH1"  Type="list">
+    <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH1"/>
+        <PossibleValue Comment="Low" Value="DMA_LOW_PRIORITY_LOW_WEIGHT"/>
+        <PossibleValue Comment="Medium" Value="DMA_LOW_PRIORITY_MID_WEIGHT"/>
+        <PossibleValue Comment="High" Value="DMA_LOW_PRIORITY_HIGH_WEIGHT"/>
+        <PossibleValue Comment="Very High" Value="DMA_HIGH_PRIORITY"/>
+</RefParameter>
+<RefParameter Name="PRIORITY_HPDMACH1"  Comment="Priority" DefaultValue="null" Group="Channel configuration"  TabName="CH1"  Type="list" Visible="false">
+    <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH1"/>
+</RefParameter>
+
+<RefParameter Name="SRCDATAWIDTH_HPDMACH1" Comment="Data Width" Group="Source Data Setting" TabName="CH1" DefaultValue="DMA_SRC_DATAWIDTH_BYTE" Type="list">
+        <PossibleValue Comment="Byte" Value="DMA_SRC_DATAWIDTH_BYTE"/>
+        <PossibleValue Comment="Half Word" Value="DMA_SRC_DATAWIDTH_HALFWORD"/>
+        <PossibleValue Comment="Word" Value="DMA_SRC_DATAWIDTH_WORD"/>
+</RefParameter>
+
+<RefParameter Name="DESTDATAWIDTH_HPDMACH1" Comment="Data Width" Group="Destination Data Setting" TabName="CH1" DefaultValue="DMA_DEST_DATAWIDTH_BYTE" Type="list">
+        <PossibleValue Comment="Byte" Value="DMA_DEST_DATAWIDTH_BYTE"/>
+        <PossibleValue Comment="Half Word" Value="DMA_DEST_DATAWIDTH_HALFWORD"/>
+        <PossibleValue Comment="Word" Value="DMA_DEST_DATAWIDTH_WORD"/>
+</RefParameter>
+
+<RefParameter Name="SRCINC_HPDMACH1" Comment="Source Address Increment After Transfer" Group="Source Data Setting" TabName="CH1"  DefaultValue="DMA_SINC_FIXED"  Type="list">
+        <PossibleValue Comment="Disabled" Value="DMA_SINC_FIXED"/>
+        <PossibleValue Comment="Enabled" Value="DMA_SINC_INCREMENTED"/>
+</RefParameter>
+
+<RefParameter Name="DESTINC_HPDMACH1"  Comment="Destination Address Increment After Transfer"  Group="Destination Data Setting" TabName="CH1" DefaultValue="DMA_DINC_FIXED" Type="list">
+        <PossibleValue Comment="Disabled" Value="DMA_DINC_FIXED"/>
+        <PossibleValue Comment="Enabled" Value="DMA_DINC_INCREMENTED"/>
+</RefParameter>
+
+<RefParameter Name="DIRECTION_HPDMACH1" Comment="Direction"  Group="Channel configuration"  TabName="CH1" DefaultValue="DMA_PERIPH_TO_MEMORY" Type="list">
+    <Condition Diagnostic="MEMTOMEM has to be used carefully while accessing an IP register as a source or destination. We Advice you to use MEM to Periph or Periph to Mem instead, when possible" Expression="!SEM_REQ_SW_$IpInstanceCH1"/>
+        <PossibleValue Comment="Peripheral To Memory" Value="DMA_PERIPH_TO_MEMORY"/>
+        <PossibleValue Comment="Memory To Peripheral" Value="DMA_MEMORY_TO_PERIPH"/>
+         <PossibleValue Comment="Memory To Memory" Value="DMA_MEMORY_TO_MEMORY"/>
+</RefParameter>
+<RefParameter Name="DIRECTION_HPDMACH1" Comment="Direction"  Group="Channel configuration"  TabName="CH1" DefaultValue="DMA_MEMORY_TO_MEMORY" Type="list">
+         <Condition Diagnostic="" Expression="SEM_REQ_SW_$IpInstanceCH1"/>
+        <PossibleValue Comment="Memory To Memory" Value="DMA_MEMORY_TO_MEMORY"/>
+</RefParameter>
+
+
+<RefParameter Name="BLKHWREQUEST_HPDMACH1" Comment="Block HW request protocol" Group="Request Configuration" TabName="CH1" DefaultValue="DMA_BREQ_BLOCK"   Type="list" >
+        <Condition Diagnostic="not configurable" Expression="(SEM_REQ_LPTIM1UE_$IpInstanceCH1|SEM_REQ_LPTIM2UE_$IpInstanceCH1|SEM_REQ_LPTIM3UE_$IpInstanceCH1)"/>
+        <PossibleValue Comment="Block Level" Value="DMA_BREQ_BLOCK"/>
+</RefParameter>
+<RefParameter  Name="BLKHWREQUEST_HPDMACH1" Comment="Block HW request protocol" Group="Request Configuration"   TabName="CH1" DefaultValue="DMA_BREQ_SINGLE_BURST" Type="list">
+        <Condition Diagnostic="not configurable" Expression="!(SEM_REQ_LPTIM1UE_$IpInstanceCH1|SEM_REQ_LPTIM2UE_$IpInstanceCH1|SEM_REQ_LPTIM3UE_$IpInstanceCH1)"/>
+        <PossibleValue Comment="Single/Burst Level" Value="DMA_BREQ_SINGLE_BURST"/>
+</RefParameter>
+
+
+<RefParameter Name="IPHANDLE_HPDMACH1" Comment="IPHANDLE"  Group="Request Configuration" TabName="CH1" DefaultValue="IPHANDLE" Visible="false" Type="list">
+    <Condition Diagnostic="not configurable" Expression="!SEM_REQ_SW_$IpInstanceCH1"/>
+   <PossibleValue Comment="IPHANDLE" Value="IPHANDLE"/>
+</RefParameter>
+<RefParameter Name="IPHANDLE_HPDMACH1" Comment="IPHANDLE"  Group="Request Configuration" TabName="CH1" DefaultValue="__NULL" Visible="false" Type="list">
+    <Condition Diagnostic="not configurable" Expression="SEM_REQ_SW_$IpInstanceCH1"/>
+    <PossibleValue Comment="__NULL" Value="__NULL"/>
+</RefParameter>
+
+
+<RefParameter Name="DMAHANDLE_HPDMACH1" Comment="DMA Handle in IP Structure"  Group="Request Configuration" TabName="CH1" DefaultValue="NONE" Type="list">
+    <PossibleValue Comment="NONE" Value="NONE" Condition="!SEM_REQ_SW_$IpInstanceCH1"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="DMA_Handle" Value="DMA_Handle" Condition="!SEM_REQ_ADC4_$IpInstanceCH1"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="DMA_Handle1" Value="DMA_Handle1" Condition="!SEM_REQ_DAC1_$IpInstanceCH1"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="DMA_Handle2" Value="DMA_Handle2" Condition="!SEM_REQ_DAC2_$IpInstanceCH1" Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="hdmarx" Value="hdmarx" Condition="!(SEM_REQ_SPI3RX_$IpInstanceCH1|SEM_REQ_I2C3RX_$IpInstanceCH1|SEM_REQ_LPUART1RX_$IpInstanceCH1)"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="hdmatx" Value="hdmatx" Condition="!(SEM_REQ_SPI3TX_$IpInstanceCH1|SEM_REQ_I2C3TX_$IpInstanceCH1|SEM_REQ_LPUART1TX_$IpInstanceCH1)"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="hdma" Value="hdma" Condition="!(SEM_REQ_ADF1FLT0_$IpInstanceCH1)" Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="hdma[LPTIM_DMA_ID_CC1]" Value="hdma[LPTIM_DMA_ID_CC1]" Condition="!(SEM_REQ_LPTIM1IC1_$IpInstanceCH1|SEM_REQ_LPTIM3IC1_$IpInstanceCH1)" Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="hdma[LPTIM_DMA_ID_CC2]" Value="hdma[LPTIM_DMA_ID_CC2]" Condition="!(SEM_REQ_LPTIM1IC2_$IpInstanceCH1|SEM_REQ_LPTIM3IC2_$IpInstanceCH1)" Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="hdma[LPTIM_DMA_ID_UPDATE]" Value="hdma[LPTIM_DMA_ID_UPDATE]" Condition="!(SEM_REQ_LPTIM1UE_$IpInstanceCH1|SEM_REQ_LPTIM3UE_$IpInstanceCH1)" Diagnostic="" Action="Disable"/>
+</RefParameter>
+
+
+<RefParameter Name="IPINSTANCE_HPDMACH1" Comment="IPINSTANCE_HPDMACH1" Group="Request Configuration" TabName="CH1" DefaultValue="HPDMA1" Visible="false" Type="list">
+    <PossibleValue Comment="SoftWare" Value="HPDMA1" Semaphore="SEM_IP_DMA_$IpInstanceCH1" Condition="!SEM_REQ_SW_$IpInstanceCH1"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="ADC4" Value="ADC4" Semaphore="SEM_IP_ADC4_$IpInstanceCH1" Condition="!SEM_REQ_ADC4_$IpInstanceCH1"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="DAC1" Value="DAC1" Semaphore="SEM_IP_DAC1_$IpInstanceCH1" Condition="!(SEM_REQ_DAC1_$IpInstanceCH1|SEM_REQ_DAC2_$IpInstanceCH1)"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="SPI3" Value="SPI3" Semaphore="SEM_IP_SPI3_$IpInstanceCH1" Condition="!(SEM_REQ_SPI3RX_$IpInstanceCH1|SEM_REQ_SPI3TX_$IpInstanceCH1)"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="I2C3" Value="I2C3" Semaphore="SEM_IP_I2C3_$IpInstanceCH1" Condition="!(SEM_REQ_I2C3RX_$IpInstanceCH1|SEM_REQ_I2C3TX_$IpInstanceCH1|SEM_REQ_I2C3EVC_$IpInstanceCH1)" Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="LPUART1" Value="LPUART1" Semaphore="SEM_IP_LPUART1_$IpInstanceCH1" Condition="!(SEM_REQ_LPUART1RX_$IpInstanceCH1|SEM_REQ_LPUART1TX_$IpInstanceCH1)"  Diagnostic="" Action="Disable"/>
+     <PossibleValue Comment="ADF1" Value="ADF1" Semaphore="SEM_IP_ADF1_$IpInstanceCH1" Condition="!(SEM_REQ_ADF1FLT0_$IpInstanceCH1)" Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="LPTIM3" Value="LPTIM3" Semaphore="SEM_IP_LPTIM3_$IpInstanceCH1" Condition="!(SEM_REQ_LPTIM3IC1_$IpInstanceCH1|SEM_REQ_LPTIM3IC2_$IpInstanceCH1|SEM_REQ_LPTIM3UE_$IpInstanceCH1)" Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="LPTIM1" Value="LPTIM1" Semaphore="SEM_IP_LPTIM1_$IpInstanceCH1" Condition="!(SEM_REQ_LPTIM1IC1_$IpInstanceCH1|SEM_REQ_LPTIM1IC2_$IpInstanceCH1|SEM_REQ_LPTIM1UE_$IpInstanceCH1)" Diagnostic="
+        " Action="Disable"/>
+</RefParameter>
+
+
+<RefParameter Name="REQUEST_HPDMACH1" Comment="Request" Group="Request Configuration" TabName="CH1" DefaultValue="DMA_REQUEST_SW" Type="list">
+    <PossibleValue Comment="SoftWare" Value="DMA_REQUEST_SW" Semaphore="SEM_REQ_SW_$IpInstanceCH1"/>
+    <PossibleValue Comment="ADC4" Value="HPDMA1_REQUEST_ADC4" Semaphore="SEM_REQ_ADC4_$IpInstanceCH1" Condition="!ADC4_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="DAC1_CH1" Value="HPDMA1_REQUEST_DAC1_CH1" Semaphore="SEM_REQ_DAC1_$IpInstanceCH1" Condition="!DAC1_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="DAC1_CH2" Value="HPDMA1_REQUEST_DAC1_CH2" Semaphore="SEM_REQ_DAC2_$IpInstanceCH1" Condition="!DAC1_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="SPI3_RX" Value="HPDMA1_REQUEST_SPI3_RX" Semaphore="SEM_REQ_SPI3RX_$IpInstanceCH1" Condition="!SPI3_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="SPI3_TX" Value="HPDMA1_REQUEST_SPI3_TX" Semaphore="SEM_REQ_SPI3TX_$IpInstanceCH1" Condition="!SPI3_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="I2C3_RX" Value="HPDMA1_REQUEST_I2C3_RX" Semaphore="SEM_REQ_I2C3RX_$IpInstanceCH1" Condition="!I2C3_Dma" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="I2C3_TX" Value="HPDMA1_REQUEST_I2C3_TX" Semaphore="SEM_REQ_I2C3TX_$IpInstanceCH1" Condition="!I2C3_Dma" Diagnostic="IP has to be configured" Action="Disable"/>
+    <!--<PossibleValue Comment="I2C3_EVC" Value="HPDMA1_REQUEST_I2C3_EVC" Semaphore="SEM_REQ_I2C3EVC_$IpInstanceCH1" Condition="!I2C3_Dma" Diagnostic="IP has to be configured" Action="Disable"/>-->
+    <PossibleValue Comment="LPUART1_RX" Value="HPDMA1_REQUEST_LPUART1_RX" Semaphore="SEM_REQ_LPUART1RX_$IpInstanceCH1" Condition="!LPUART1_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="LPUART1_TX" Value="HPDMA1_REQUEST_LPUART1_TX" Semaphore="SEM_REQ_LPUART1TX_$IpInstanceCH1" Condition="!LPUART1_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="ADF1_FLT0" Value="HPDMA1_REQUEST_ADF1_FLT0" Semaphore="SEM_REQ_ADF1FLT0_$IpInstanceCH1" Condition="!ADF1_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="LPTIM1_IC1" Value="HPDMA1_REQUEST_LPTIM1_IC1" Semaphore="SEM_REQ_LPTIM1IC1_$IpInstanceCH1" Condition="!LPTIM1_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="LPTIM1_IC2" Value="HPDMA1_REQUEST_LPTIM1_IC2" Semaphore="SEM_REQ_LPTIM1IC2_$IpInstanceCH1" Condition="!LPTIM1_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="LPTIM1_UE" Value="HPDMA1_REQUEST_LPTIM1_UE" Semaphore="SEM_REQ_LPTIM1UE_$IpInstanceCH1" Condition="!LPTIM1_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="LPTIM3_IC1" Value="HPDMA1_REQUEST_LPTIM3_IC1" Semaphore="SEM_REQ_LPTIM3IC1_$IpInstanceCH1" Condition="!LPTIM3_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="LPTIM3_IC2" Value="HPDMA1_REQUEST_LPTIM3_IC2" Semaphore="SEM_REQ_LPTIM3IC2_$IpInstanceCH1" Condition="!LPTIM3_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="LPTIM3_UE" Value="HPDMA1_REQUEST_LPTIM3_UE" Semaphore="SEM_REQ_LPTIM3UE_$IpInstanceCH1" Condition="!LPTIM3_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+</RefParameter>
+
+<!--DMA_InitTypeDef-->
+
+<!--DMA_DataHandlingConfTypeDef-->
+
+<RefParameter Name="DATAHANDLING_HPDMACH1" Comment="Data Handling Configuration"  Group="Data Handling" DefaultValue="NONE" TabName="CH1" Type="list" >
+     <PossibleValue Comment="Disable" Value="NONE"/>
+     <PossibleValue Comment="Enable" Value="ENABLE" Semaphore="SEM_DATA_HANDLING_$IpInstanceCH1"/>  
+</RefParameter>
+
+
+<RefParameter Name="DATAALIGNEMENT_HPDMACH1"  Comment="Data Alignment" Group="Data Handling"  DefaultValue="DMA_DATA_RIGHTALIGN_ZEROPADDED"  TabName="CH1" Type="list">
+    <Condition Diagnostic="" Expression="SEM_DATA_HANDLING_$IpInstanceCH1"/>
+    <!-- value to be conditionned with src and dest data size-->
+        <PossibleValue Comment="Right Aligned padded with 0 up to destination data width when src data width smaller than dest data width" Value="DMA_DATA_RIGHTALIGN_ZEROPADDED"/>
+        <PossibleValue Comment="Right Aligned Left Truncated down to destination data width when src data width bigger than dest data width" Value="DMA_DATA_RIGHTALIGN_LEFTTRUNC"/>
+        <PossibleValue Comment="Right Aligned padded with sign extended up to destination data width when src data width smaller than dest data width" Value="DMA_DATA_RIGHTALIGN_SIGNEXT"/>
+        <PossibleValue Comment="Left Aligned Right Truncated down to the destination data width when src data width bigger than dest data width" Value="DMA_DATA_LEFTALIGN_RIGHTTRUNC"/>
+</RefParameter>
+<RefParameter Name="DATAALIGNEMENT_HPDMACH1" Comment="Data Alignment"  Group="Data Handling" DefaultValue="DMA_DATA_RIGHTALIGN_ZEROPADDED"  TabName="CH1"  Type="list" Visible="false">
+    <Condition Diagnostic="" Expression="!SEM_DATA_HANDLING_$IpInstanceCH1"/>
+     <PossibleValue Comment="Right Aligned padded with 0 up to destination data width when src data width smaller than dest data width" Value="DMA_DATA_RIGHTALIGN_ZEROPADDED"/>
+</RefParameter>
+
+<!--DMA_DataHandlingConfTypeDef-->
+
+
+<!--DMA_TriggerConfTypeDef-->
+
+<RefParameter Name="TRIGGERPOLARITY_HPDMACH1" Comment="Trigger Configuration" Group="Trigger"  DefaultValue="DMA_TRIG_POLARITY_MASKED" TabName="CH1" Type="list">
+        <PossibleValue Comment="Disable" Value="DMA_TRIG_POLARITY_MASKED" Semaphore="SEM_NOTRIG_$IpInstanceCH1"/>
+        <PossibleValue Comment="Trigger of the selected DMA request on the rising edge of the selected trigger event input" Value="DMA_TRIG_POLARITY_RISING"/>
+        <PossibleValue Comment="Trigger of the selected DMA request on the falling edge of the selected trigger event input" Value="DMA_TRIG_POLARITY_FALLING"/>
+</RefParameter>
+<RefParameter Name="TRIGGERMODE_HPDMACH1" Comment="Trigger Mode" Group="Trigger" DefaultValue="DMA_TRIGM_BLOCK_TRANSFER" TabName="CH1" Type="list" >
+        <Condition Diagnostic="" Expression="!SEM_NOTRIG_$IpInstanceCH1"/>
+        <PossibleValue Comment="A block transfer is conditioned by (at least) one hit trigger" Value="DMA_TRIGM_BLOCK_TRANSFER"/>
+        <PossibleValue Comment="A repeated block transfer is conditioned by (at least) one hit trigger" Value="DMA_TRIGM_REPEATED_BLOCK_TRANSFER" Condition="!SEM_2DADDRESSING__$IpInstanceCH1" Action="Disable"/>
+        <PossibleValue Comment="A single/burst transfer is conditioned by (at least) one hit trigger" Value="DMA_TRIGM_SINGLE_BURST_TRANSFER "/>
+</RefParameter>
+<RefParameter Name="TRIGGERMODE_HPDMACH1" Comment="Trigger Mode" Group="Trigger" DefaultValue="null" TabName="CH1" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="SEM_NOTRIG_$IpInstanceCH1"/>
+</RefParameter>
+<RefParameter Name="TRIGGERSELECTION_HPDMACH1" Comment="Trigger Selection"  Group="Trigger"  DefaultValue="" TabName="CH1" Type="list" >
+        <Condition Diagnostic="" Expression="!SEM_NOTRIG_$IpInstanceCH1"/>
+        <PossibleValue Comment="EXTI LINE 0" Value="HPDMA1_TRIGGER_EXTI_LINE0"/>
+        <PossibleValue Comment="EXTI LINE 1" Value="HPDMA1_TRIGGER_EXTI_LINE1"/>
+        <PossibleValue Comment="EXTI LINE 2" Value="HPDMA1_TRIGGER_EXTI_LINE2"/>
+        <PossibleValue Comment="EXTI LINE 3" Value="HPDMA1_TRIGGER_EXTI_LINE3"/>
+        <PossibleValue Comment="EXTI LINE 4" Value="HPDMA1_TRIGGER_EXTI_LINE4"/>
+        <PossibleValue Comment="TAMP TRIG1" Value="HPDMA1_TRIGGER_TAMP_TRG1"/>
+        <PossibleValue Comment="TAMP TRIG2" Value="HPDMA1_TRIGGER_TAMP_TRG2"/>
+        <PossibleValue Comment="TAMP TRIG3" Value="HPDMA1_TRIGGER_TAMP_TRG3"/>
+
+        <PossibleValue Comment="LPTIM1 CH1" Value="HPDMA1_TRIGGER_LPTIM1_CH1"/>
+        <PossibleValue Comment="LPTIM1 CH2" Value="HPDMA1_TRIGGER_LPTIM1_CH2"/>
+        <PossibleValue Comment="LPTIM CH1" Value="HPDMA1_TRIGGER_LPTIM3_CH1"/>
+        <PossibleValue Comment="LPTIM4 OUT" Value="HPDMA1_TRIGGER_LPTIM4_OUT"/>
+
+        <PossibleValue Comment="COMP1 OUT" Value="HPDMA1_TRIGGER_COMP1_OUT"/>
+        <PossibleValue Comment="COMP2 OUT" Value="HPDMA1_TRIGGER_COMP2_OUT"/>
+
+        <PossibleValue Comment="RTC ALRA TRG" Value="HPDMA1_TRIGGER_RTC_ALRA_TRG"/>
+        <PossibleValue Comment="RTC ALRB TRG" Value="HPDMA1_TRIGGER_RTC_ALRB_TRG"/>
+        <PossibleValue Comment="RTC WUT TRG" Value="HPDMA1_TRIGGER_RTC_WUT_TRG"/>
+
+        
+        <PossibleValue Comment="HPDMA CH0 TCF" Value="HPDMA1_TRIGGER_HPDMA1_CH0_TCF"/>
+        <PossibleValue Comment="HPDMA CH1 TCF" Value="HPDMA1_TRIGGER_HPDMA1_CH1_TCF"/>
+        <PossibleValue Comment="HPDMA CH2 TCF" Value="HPDMA1_TRIGGER_HPDMA1_CH2_TCF"/>
+        <PossibleValue Comment="HPDMA CH3 TCF" Value="HPDMA1_TRIGGER_HPDMA1_CH3_TCF"/>
+
+        <PossibleValue Comment="GPDMA CH0 TCF" Value="HPDMA1_TRIGGER_GPDMA1_CH0_TCF"/>
+        <PossibleValue Comment="GPDMA CH1 TCF" Value="HPDMA1_TRIGGER_GPDMA1_CH1_TCF"/>
+        <PossibleValue Comment="GPDMA CH4 TCF" Value="HPDMA1_TRIGGER_GPDMA1_CH4_TCF"/>
+        <PossibleValue Comment="GPDMA CH5 TCF" Value="HPDMA1_TRIGGER_GPDMA1_CH5_TCF"/>
+        <PossibleValue Comment="GPDMA CH6 TCF" Value="HPDMA1_TRIGGER_GPDMA1_CH6_TCF"/>
+        <PossibleValue Comment="GPDMA CH7 TCF" Value="HPDMA1_TRIGGER_GPDMA1_CH7_TCF"/>
+        <PossibleValue Comment="GPDMA CH12 TCF" Value="HPDMA1_TRIGGER_GPDMA1_CH12_TCF"/>
+        <PossibleValue Comment="GPDMA CH13 TCF" Value="HPDMA1_TRIGGER_GPDMA1_CH13_TCF"/>
+
+        <PossibleValue Comment="TIM2 TRGO" Value="HPDMA1_TRIGGER_TIM2_TRGO"/>
+        <PossibleValue Comment="TIM15 TRGO" Value="HPDMA1_TRIGGER_TIM15_TRGO"/>
+        <PossibleValue Comment="ADC4 AWD1" Value="HPDMA1_TRIGGER_ADC4_AWD1"/>
+
+</RefParameter>
+<RefParameter Name="TRIGGERSELECTION_HPDMACH1" Comment="Trigger Selection"  Group="Trigger"  DefaultValue="null" TabName="CH1" Type="list" Visible="false" >
+        <Condition Diagnostic="" Expression="SEM_NOTRIG_$IpInstanceCH1"/>
+ </RefParameter>
+
+<!--DMA_TriggerConfTypeDef-->
+
+
+<!--DMA_InitLinkedListTypeDef for circular simple request -->
+
+<RefParameter Name="PRIORITY_LL_CIRCULAR_HPDMACH1"  Comment="Priority" DefaultValue="DMA_LOW_PRIORITY_LOW_WEIGHT" Group="Channel configuration"  TabName="CH1"  Type="list">
+     <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH1"/>
+        <PossibleValue Comment="Low" Value="DMA_LOW_PRIORITY_LOW_WEIGHT"/>
+        <PossibleValue Comment="Medium" Value="DMA_LOW_PRIORITY_MID_WEIGHT"/>
+        <PossibleValue Comment="High" Value="DMA_LOW_PRIORITY_HIGH_WEIGHT"/>
+        <PossibleValue Comment="Very High" Value="DMA_HIGH_PRIORITY"/>
+</RefParameter>
+<RefParameter Name="PRIORITY_LL_CIRCULAR_HPDMACH1"  Comment="Priority" DefaultValue="null" Group="Channel Configuration for Linked List"  TabName="CH1"  Type="list" Visible="false">
+       <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH1"/>
+</RefParameter>
+
+<RefParameter Name="LINKSTEPMODE_CIRCULAR_HPDMACH1" Comment="Linked List Execution Mode" Group="Channel Configuration for Linked List" DefaultValue="DMA_LSM_FULL_EXECUTION"  TabName="CH1" Type="list" >
+      <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH1"/>
+        <PossibleValue Comment="The List is fully executed" Value="DMA_LSM_FULL_EXECUTION"/>
+</RefParameter>
+<RefParameter Name="LINKSTEPMODE_CIRCULAR_HPDMACH1" Comment="Linked List Execution Mode" Group="Channel Configuration for Linked List" DefaultValue="null"  TabName="CH1" Type="list" Visible="false">
+      <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH1"/>
+</RefParameter>
+
+<RefParameter Name="LINKALLOCATEDPORT_CIRCULAR_HPDMACH1" Comment="Circular Port" Group="Circular configuration"  DefaultValue="null" TabName="CH1" Type="list" Visible="false">
+     </RefParameter>
+
+
+<RefParameter Name="TRANSFEREVENTMODE_LL_CIRCULAR_HPDMACH1" Comment="Transfer Event Generation" Group="Transfer Event Configuration" DefaultValue="DMA_TCEM_BLOCK_TRANSFER"  TabName="CH1"  Type="list">
+     <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH1"/>
+        <PossibleValue Comment="The TC (and the HT) event is generated at the (respectively half) end of each block " Value="DMA_TCEM_BLOCK_TRANSFER"/>
+        <PossibleValue Comment="The TC (and the HT) event is generated at the (respectively half) end of each linked-list item" Value="DMA_TCEM_EACH_LL_ITEM_TRANSFER"/>
+        <PossibleValue Comment="The TC (and the HT) event is generated at the (respectively half) end of the last linked-list item " Value="DMA_TCEM_LAST_LL_ITEM_TRANSFER"/>
+</RefParameter> 
+
+<RefParameter Name="TRANSFEREVENTMODE_LL_CIRCULAR_HPDMACH1" Comment="Transfer Event Generation" Group="Transfer Event Configuration" DefaultValue="null"  TabName="CH1"  Type="list" Visible="false">
+     <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH1"/>
+</RefParameter> 
+
+<RefParameter Name="LINKEDLISTMODE_CIRCULAR_HPDMACH1"  Comment="Execution Mode (circular/linear) of the Linked List" DefaultValue="DMA_LINKEDLIST" Group="Channel Configuration for Linked List"  TabName="CH1"  Type="list">
+     <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH1"/>
+        <PossibleValue Comment="Circular" Value="DMA_LINKEDLIST_CIRCULAR"/>
+</RefParameter> 
+<RefParameter Name="LINKEDLISTMODE_CIRCULAR_HPDMACH1"  Comment="Execution Mode (circular/linear) of the Linked List" DefaultValue="null" Group="Channel Configuration for Linked List"  TabName="CH1"  Type="list" Visible="false">
+     <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH1"/>
+</RefParameter> 
+
+ 
+<!--DMA_InitLinkedListTypeDef for circular simple request -->
+
+
+
+
+
+<!--DMA_InitLinkedListTypeDef-->
+
+<RefParameter Name="PRIORITY_LL_HPDMACH1"  Comment="Priority" DefaultValue="DMA_LOW_PRIORITY_LOW_WEIGHT" Group="Channel Configuration for Linked List"  TabName="CH1"  Type="list">
+        <PossibleValue Comment="Low" Value="DMA_LOW_PRIORITY_LOW_WEIGHT"/>
+        <PossibleValue Comment="Medium" Value="DMA_LOW_PRIORITY_MID_WEIGHT"/>
+        <PossibleValue Comment="High" Value="DMA_LOW_PRIORITY_HIGH_WEIGHT"/>
+        <PossibleValue Comment="Very High" Value="DMA_HIGH_PRIORITY"/>
+</RefParameter>
+
+<RefParameter Name="LINKSTEPMODE_HPDMACH1" Comment="Linked List Execution Mode" Group="Channel Configuration for Linked List" DefaultValue="DMA_LSM_FULL_EXECUTION"  TabName="CH1" Type="list" >
+        <PossibleValue Comment="The List is fully executed" Value="DMA_LSM_FULL_EXECUTION"/>
+        <PossibleValue Comment="First Element of the List is executed " Value="DMA_LSM_1LINK_EXECUTION"/>
+</RefParameter>
+
+<RefParameter Name="LINKALLOCATEDPORT_HPDMACH1" Comment="Allocated Port for Transfer" Group="Channel Configuration for Linked List"  DefaultValue="null" TabName="CH1" Type="list" Visible="false">
+</RefParameter>
+
+<RefParameter Name="TRANSFEREVENTMODE_LL_HPDMACH1" Comment="Transfer Event Generation" Group="Channel Configuration for Linked List" DefaultValue="DMA_TCEM_LAST_LL_ITEM_TRANSFER"  TabName="CH1"  Type="list">
+        <PossibleValue Comment="The TC (and the HT) event is generated at the (respectively half) end of each linked-list item" Value="DMA_TCEM_EACH_LL_ITEM_TRANSFER"/>
+        <PossibleValue Comment="The TC (and the HT) event is generated at the (respectively half) end of the last linked-list item " Value="DMA_TCEM_LAST_LL_ITEM_TRANSFER"/>
+</RefParameter> 
+
+<RefParameter Name="LINKEDLISTMODE_HPDMACH1"  Comment="Execution Mode (circular/linear) of the Linked List" DefaultValue="DMA_LINKEDLIST_NORMAL" Group="Channel Configuration for Linked List"  TabName="CH1"  Type="list">
+        <PossibleValue Comment="Linear" Value="DMA_LINKEDLIST_NORMAL"/>
+        <PossibleValue Comment="Circular" Value="DMA_LINKEDLIST_CIRCULAR"/>
+</RefParameter> 
+
+ <!--DMA_InitLinkedListTypeDef-->
+
+
+
+
+
+<!--DMA_InitTypeDef-->
+
+
+<RefParameter Name="TRANSFEREVENTMODE_HPDMACH2" Comment="Transfer Event Generation" Group="Transfer Event Configuration"  DefaultValue="DMA_TCEM_BLOCK_TRANSFER" TabName="CH2" Type="list" >
+<Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH2"/>
+        <PossibleValue Comment="The TC (and the HT) event is generated at the (respectively half) end of each block " Value="DMA_TCEM_BLOCK_TRANSFER"/>
+</RefParameter>
+<RefParameter Name="TRANSFEREVENTMODE_HPDMACH2" Comment="Transfer Event Generation" Group="Transfer Event Configuration"  DefaultValue="null" TabName="CH2" Type="list"  Visible="false">
+<Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH2"/>
+</RefParameter>
+
+
+
+<RefParameter Name="MODE_HPDMACH2"  Comment="Transaction Mode" DefaultValue="DMA_NORMAL" Group="Channel configuration"  TabName="CH2"  Type="list">
+        <PossibleValue Comment="Normal" Value="DMA_NORMAL"/>
+</RefParameter>
+
+
+<!-- circular mode begin -->
+
+<RefParameter Name="CIRCULARMODE_HPDMACH2"  Comment="Circular Mode" DefaultValue="DISABLE" Group="Circular configuration"  TabName="CH2"  Type="list">
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+        <PossibleValue Comment="Enable" Value="ENABLE" Semaphore="SEM_CIRCULAR_$IpInstanceCH2"/>
+</RefParameter>
+ 
+<RefParameter Name="NODETYPE_HPDMACH2"  Comment="Node Type" DefaultValue="null" Group="Channel configuration"  TabName="CH2"  Type="list" Visible="false">
+       <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH2"/>
+</RefParameter>
+<RefParameter Name="NODETYPE_HPDMACH2"  Comment="Node Type" DefaultValue="DMA_HPDMA_LINEAR_NODE" Group="Channel configuration"  TabName="CH2"  Type="list" Visible="false">
+       <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH2"/>
+        <PossibleValue Comment="GPDMA 2D Addressing" Value="DMA_HPDMA_LINEAR_NODE"/>
+</RefParameter>
+
+<RefParameter Name="SRCADD_HPDMACH2"  Comment="Source Address" DefaultValue="0" Max="65535" Min="0"  Group="Runtime configuration"  TabName="CH2"  Type="integer">
+     <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH2 &amp; SEM_REQ_SW_$IpInstanceCH2"/>
+</RefParameter>
+<RefParameter Name="SRCADD_HPDMACH2"  Comment="Source Address" DefaultValue="null" Max="65535" Min="0"  Group="Runtime configuration"  TabName="CH2"  Type="integer" Visible="false">
+     <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH2 |  !SEM_REQ_SW_$IpInstanceCH2"/>
+</RefParameter>
+
+<RefParameter Name="DSTADD_HPDMACH2"  Comment="Destination Address" DefaultValue="0" Max="65535" Min="0"  Group="Runtime configuration"  TabName="CH2"  Type="integer">
+     <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH2 &amp; SEM_REQ_SW_$IpInstanceCH2"/>
+</RefParameter>
+<RefParameter Name="DSTADD_HPDMACH2"  Comment="Destination Address" DefaultValue="null" Max="65535" Min="0"  Group="Runtime configuration"  TabName="CH2"  Type="integer" Visible="false">
+     <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH2 |  !SEM_REQ_SW_$IpInstanceCH2"/>
+</RefParameter>
+
+<RefParameter Name="DATASIZE_HPDMACH2"  Comment="Data Size" DefaultValue="0" Max="65535" Min="0"  Group="Runtime configuration"  TabName="CH2"  Type="integer">
+     <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH2 &amp; SEM_REQ_SW_$IpInstanceCH2"/>
+</RefParameter>
+<RefParameter Name="DATASIZE_HPDMACH2"  Comment="Data Size" DefaultValue="null" Max="65535" Min="0"  Group="Runtime configuration"  TabName="CH2"  Type="integer" Visible="false">
+     <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH2 |  !SEM_REQ_SW_$IpInstanceCH2"/>
+</RefParameter>
+
+<!-- circular mode end -->
+
+
+
+<RefParameter Name="PRIORITY_HPDMACH2"  Comment="Priority" DefaultValue="DMA_LOW_PRIORITY_LOW_WEIGHT" Group="Channel configuration"  TabName="CH2"  Type="list">
+    <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH2"/>
+        <PossibleValue Comment="Low" Value="DMA_LOW_PRIORITY_LOW_WEIGHT"/>
+        <PossibleValue Comment="Medium" Value="DMA_LOW_PRIORITY_MID_WEIGHT"/>
+        <PossibleValue Comment="High" Value="DMA_LOW_PRIORITY_HIGH_WEIGHT"/>
+        <PossibleValue Comment="Very High" Value="DMA_HIGH_PRIORITY"/>
+</RefParameter>
+<RefParameter Name="PRIORITY_HPDMACH2"  Comment="Priority" DefaultValue="null" Group="Channel configuration"  TabName="CH2"  Type="list" Visible="false">
+    <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH2"/>
+</RefParameter>
+
+<RefParameter Name="SRCDATAWIDTH_HPDMACH2" Comment="Data Width" Group="Source Data Setting" TabName="CH2" DefaultValue="DMA_SRC_DATAWIDTH_BYTE" Type="list">
+        <PossibleValue Comment="Byte" Value="DMA_SRC_DATAWIDTH_BYTE"/>
+        <PossibleValue Comment="Half Word" Value="DMA_SRC_DATAWIDTH_HALFWORD"/>
+        <PossibleValue Comment="Word" Value="DMA_SRC_DATAWIDTH_WORD"/>
+</RefParameter>
+
+<RefParameter Name="DESTDATAWIDTH_HPDMACH2" Comment="Data Width" Group="Destination Data Setting" TabName="CH2" DefaultValue="DMA_DEST_DATAWIDTH_BYTE" Type="list">
+        <PossibleValue Comment="Byte" Value="DMA_DEST_DATAWIDTH_BYTE"/>
+        <PossibleValue Comment="Half Word" Value="DMA_DEST_DATAWIDTH_HALFWORD"/>
+        <PossibleValue Comment="Word" Value="DMA_DEST_DATAWIDTH_WORD"/>
+</RefParameter>
+
+<RefParameter Name="SRCINC_HPDMACH2" Comment="Source Address Increment After Transfer" Group="Source Data Setting" TabName="CH2"  DefaultValue="DMA_SINC_FIXED"  Type="list">
+        <PossibleValue Comment="Disabled" Value="DMA_SINC_FIXED"/>
+        <PossibleValue Comment="Enabled" Value="DMA_SINC_INCREMENTED"/>
+</RefParameter>
+
+<RefParameter Name="DESTINC_HPDMACH2"  Comment="Destination Address Increment After Transfer"  Group="Destination Data Setting" TabName="CH2" DefaultValue="DMA_DINC_FIXED" Type="list">
+        <PossibleValue Comment="Disabled" Value="DMA_DINC_FIXED"/>
+        <PossibleValue Comment="Enabled" Value="DMA_DINC_INCREMENTED"/>
+</RefParameter>
+
+<RefParameter Name="DIRECTION_HPDMACH2" Comment="Direction"  Group="Channel configuration"  TabName="CH2" DefaultValue="DMA_PERIPH_TO_MEMORY" Type="list">
+    <Condition Diagnostic="MEMTOMEM has to be used carefully while accessing an IP register as a source or destination. We Advice you to use MEM to Periph or Periph to Mem instead, when possible" Expression="!SEM_REQ_SW_$IpInstanceCH2"/>
+        <PossibleValue Comment="Peripheral To Memory" Value="DMA_PERIPH_TO_MEMORY"/>
+        <PossibleValue Comment="Memory To Peripheral" Value="DMA_MEMORY_TO_PERIPH"/>
+         <PossibleValue Comment="Memory To Memory" Value="DMA_MEMORY_TO_MEMORY"/>
+        
+</RefParameter>
+<RefParameter Name="DIRECTION_HPDMACH2" Comment="Direction"  Group="Channel configuration"  TabName="CH2" DefaultValue="DMA_MEMORY_TO_MEMORY" Type="list">
+         <Condition Diagnostic="" Expression="SEM_REQ_SW_$IpInstanceCH2"/>
+        <PossibleValue Comment="Memory To Memory" Value="DMA_MEMORY_TO_MEMORY"/>
+</RefParameter>
+
+
+<RefParameter Name="BLKHWREQUEST_HPDMACH2" Comment="Block HW request protocol" Group="Request Configuration" TabName="CH2" DefaultValue="DMA_BREQ_BLOCK"   Type="list" >
+        <Condition Diagnostic="not configurable" Expression="(SEM_REQ_LPTIM1UE_$IpInstanceCH2|SEM_REQ_LPTIM2UE_$IpInstanceCH2|SEM_REQ_LPTIM3UE_$IpInstanceCH2)"/>
+        <PossibleValue Comment="Block Level" Value="DMA_BREQ_BLOCK"/>
+</RefParameter>
+<RefParameter  Name="BLKHWREQUEST_HPDMACH2" Comment="Block HW request protocol" Group="Request Configuration"   TabName="CH2" DefaultValue="DMA_BREQ_SINGLE_BURST" Type="list">
+        <Condition Diagnostic="not configurable" Expression="!(SEM_REQ_LPTIM1UE_$IpInstanceCH2|SEM_REQ_LPTIM2UE_$IpInstanceCH2|SEM_REQ_LPTIM3UE_$IpInstanceCH2)"/>
+        <PossibleValue Comment="Single/Burst Level" Value="DMA_BREQ_SINGLE_BURST"/>
+</RefParameter>
+
+
+<RefParameter Name="IPHANDLE_HPDMACH2" Comment="IPHANDLE"  Group="Request Configuration" TabName="CH2" DefaultValue="IPHANDLE" Visible="false" Type="list">
+    <Condition Diagnostic="not configurable" Expression="!SEM_REQ_SW_$IpInstanceCH2"/>
+   <PossibleValue Comment="IPHANDLE" Value="IPHANDLE"/>
+</RefParameter>
+<RefParameter Name="IPHANDLE_HPDMACH2" Comment="IPHANDLE"  Group="Request Configuration" TabName="CH2" DefaultValue="__NULL" Visible="false" Type="list">
+    <Condition Diagnostic="not configurable" Expression="SEM_REQ_SW_$IpInstanceCH2"/>
+    <PossibleValue Comment="__NULL" Value="__NULL"/>
+</RefParameter>
+
+
+<RefParameter Name="DMAHANDLE_HPDMACH2" Comment="DMA Handle in IP Structure"  Group="Request Configuration" TabName="CH2" DefaultValue="NONE" Type="list">
+    <PossibleValue Comment="NONE" Value="NONE" Condition="!SEM_REQ_SW_$IpInstanceCH2"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="DMA_Handle" Value="DMA_Handle" Condition="!SEM_REQ_ADC4_$IpInstanceCH2"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="DMA_Handle1" Value="DMA_Handle1" Condition="!SEM_REQ_DAC1_$IpInstanceCH2"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="DMA_Handle2" Value="DMA_Handle2" Condition="!SEM_REQ_DAC2_$IpInstanceCH2" Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="hdmarx" Value="hdmarx" Condition="!(SEM_REQ_SPI3RX_$IpInstanceCH2|SEM_REQ_I2C3RX_$IpInstanceCH2|SEM_REQ_LPUART1RX_$IpInstanceCH2)"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="hdmatx" Value="hdmatx" Condition="!(SEM_REQ_SPI3TX_$IpInstanceCH2|SEM_REQ_I2C3TX_$IpInstanceCH2|SEM_REQ_LPUART1TX_$IpInstanceCH2)"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="hdma" Value="hdma" Condition="!(SEM_REQ_ADF1FLT0_$IpInstanceCH2)" Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="hdma[LPTIM_DMA_ID_CC1]" Value="hdma[LPTIM_DMA_ID_CC1]" Condition="!(SEM_REQ_LPTIM1IC1_$IpInstanceCH2|SEM_REQ_LPTIM3IC1_$IpInstanceCH2)" Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="hdma[LPTIM_DMA_ID_CC2]" Value="hdma[LPTIM_DMA_ID_CC2]" Condition="!(SEM_REQ_LPTIM1IC2_$IpInstanceCH2|SEM_REQ_LPTIM3IC2_$IpInstanceCH2)" Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="hdma[LPTIM_DMA_ID_UPDATE]" Value="hdma[LPTIM_DMA_ID_UPDATE]" Condition="!(SEM_REQ_LPTIM1UE_$IpInstanceCH2|SEM_REQ_LPTIM3UE_$IpInstanceCH2)" Diagnostic="" Action="Disable"/>
+</RefParameter>
+
+
+<RefParameter Name="IPINSTANCE_HPDMACH2" Comment="IPINSTANCE_HPDMACH2" Group="Request Configuration" TabName="CH2" DefaultValue="HPDMA1" Visible="false" Type="list">
+    <PossibleValue Comment="SoftWare" Value="HPDMA1" Semaphore="SEM_IP_DMA_$IpInstanceCH2" Condition="!SEM_REQ_SW_$IpInstanceCH2"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="ADC4" Value="ADC4" Semaphore="SEM_IP_ADC4_$IpInstanceCH2" Condition="!SEM_REQ_ADC4_$IpInstanceCH2"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="DAC1" Value="DAC1" Semaphore="SEM_IP_DAC1_$IpInstanceCH2" Condition="!(SEM_REQ_DAC1_$IpInstanceCH2|SEM_REQ_DAC2_$IpInstanceCH2)"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="SPI3" Value="SPI3" Semaphore="SEM_IP_SPI3_$IpInstanceCH2" Condition="!(SEM_REQ_SPI3RX_$IpInstanceCH2|SEM_REQ_SPI3TX_$IpInstanceCH2)"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="I2C3" Value="I2C3" Semaphore="SEM_IP_I2C3_$IpInstanceCH2" Condition="!(SEM_REQ_I2C3RX_$IpInstanceCH2|SEM_REQ_I2C3TX_$IpInstanceCH2|SEM_REQ_I2C3EVC_$IpInstanceCH2)" Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="LPUART1" Value="LPUART1" Semaphore="SEM_IP_LPUART1_$IpInstanceCH2" Condition="!(SEM_REQ_LPUART1RX_$IpInstanceCH2|SEM_REQ_LPUART1TX_$IpInstanceCH2)"  Diagnostic="" Action="Disable"/>
+     <PossibleValue Comment="ADF1" Value="ADF1" Semaphore="SEM_IP_ADF1_$IpInstanceCH2" Condition="!(SEM_REQ_ADF1FLT0_$IpInstanceCH2)" Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="LPTIM3" Value="LPTIM3" Semaphore="SEM_IP_LPTIM3_$IpInstanceCH2" Condition="!(SEM_REQ_LPTIM3IC1_$IpInstanceCH2|SEM_REQ_LPTIM3IC2_$IpInstanceCH2|SEM_REQ_LPTIM3UE_$IpInstanceCH2)" Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="LPTIM1" Value="LPTIM1" Semaphore="SEM_IP_LPTIM1_$IpInstanceCH2" Condition="!(SEM_REQ_LPTIM1IC1_$IpInstanceCH2|SEM_REQ_LPTIM1IC2_$IpInstanceCH2|SEM_REQ_LPTIM1UE_$IpInstanceCH2)" Diagnostic="
+        " Action="Disable"/>
+</RefParameter>
+
+
+<RefParameter Name="REQUEST_HPDMACH2" Comment="Request" Group="Request Configuration" TabName="CH2" DefaultValue="DMA_REQUEST_SW" Type="list">
+    <PossibleValue Comment="SoftWare" Value="DMA_REQUEST_SW" Semaphore="SEM_REQ_SW_$IpInstanceCH2"/>
+    <PossibleValue Comment="ADC4" Value="HPDMA1_REQUEST_ADC4" Semaphore="SEM_REQ_ADC4_$IpInstanceCH2" Condition="!ADC4_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="DAC1_CH1" Value="HPDMA1_REQUEST_DAC1_CH1" Semaphore="SEM_REQ_DAC1_$IpInstanceCH2" Condition="!DAC1_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="DAC1_CH2" Value="HPDMA1_REQUEST_DAC1_CH2" Semaphore="SEM_REQ_DAC2_$IpInstanceCH2" Condition="!DAC1_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="SPI3_RX" Value="HPDMA1_REQUEST_SPI3_RX" Semaphore="SEM_REQ_SPI3RX_$IpInstanceCH2" Condition="!SPI3_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="SPI3_TX" Value="HPDMA1_REQUEST_SPI3_TX" Semaphore="SEM_REQ_SPI3TX_$IpInstanceCH2" Condition="!SPI3_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="I2C3_RX" Value="HPDMA1_REQUEST_I2C3_RX" Semaphore="SEM_REQ_I2C3RX_$IpInstanceCH2" Condition="!I2C3_Dma" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="I2C3_TX" Value="HPDMA1_REQUEST_I2C3_TX" Semaphore="SEM_REQ_I2C3TX_$IpInstanceCH2" Condition="!I2C3_Dma" Diagnostic="IP has to be configured" Action="Disable"/>
+    <!--<PossibleValue Comment="I2C3_EVC" Value="HPDMA1_REQUEST_I2C3_EVC" Semaphore="SEM_REQ_I2C3EVC_$IpInstanceCH2" Condition="!I2C3_Dma" Diagnostic="IP has to be configured" Action="Disable"/>-->
+    <PossibleValue Comment="LPUART1_RX" Value="HPDMA1_REQUEST_LPUART1_RX" Semaphore="SEM_REQ_LPUART1RX_$IpInstanceCH2" Condition="!LPUART1_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="LPUART1_TX" Value="HPDMA1_REQUEST_LPUART1_TX" Semaphore="SEM_REQ_LPUART1TX_$IpInstanceCH2" Condition="!LPUART1_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="ADF1_FLT0" Value="HPDMA1_REQUEST_ADF1_FLT0" Semaphore="SEM_REQ_ADF1FLT0_$IpInstanceCH2" Condition="!ADF1_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="LPTIM1_IC1" Value="HPDMA1_REQUEST_LPTIM1_IC1" Semaphore="SEM_REQ_LPTIM1IC1_$IpInstanceCH2" Condition="!LPTIM1_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="LPTIM1_IC2" Value="HPDMA1_REQUEST_LPTIM1_IC2" Semaphore="SEM_REQ_LPTIM1IC2_$IpInstanceCH2" Condition="!LPTIM1_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="LPTIM1_UE" Value="HPDMA1_REQUEST_LPTIM1_UE" Semaphore="SEM_REQ_LPTIM1UE_$IpInstanceCH2" Condition="!LPTIM1_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="LPTIM3_IC1" Value="HPDMA1_REQUEST_LPTIM3_IC1" Semaphore="SEM_REQ_LPTIM3IC1_$IpInstanceCH2" Condition="!LPTIM3_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="LPTIM3_IC2" Value="HPDMA1_REQUEST_LPTIM3_IC2" Semaphore="SEM_REQ_LPTIM3IC2_$IpInstanceCH2" Condition="!LPTIM3_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="LPTIM3_UE" Value="HPDMA1_REQUEST_LPTIM3_UE" Semaphore="SEM_REQ_LPTIM3UE_$IpInstanceCH2" Condition="!LPTIM3_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+</RefParameter>
+
+<!--DMA_InitTypeDef-->
+
+<!--DMA_DataHandlingConfTypeDef-->
+
+<RefParameter Name="DATAHANDLING_HPDMACH2" Comment="Data Handling Configuration"  Group="Data Handling" DefaultValue="NONE" TabName="CH2" Type="list" >
+     <PossibleValue Comment="Disable" Value="NONE"/>
+     <PossibleValue Comment="Enable" Value="ENABLE" Semaphore="SEM_DATA_HANDLING_$IpInstanceCH2"/>  
+</RefParameter>
+
+
+<RefParameter Name="DATAALIGNEMENT_HPDMACH2"  Comment="Data Alignment" Group="Data Handling"  DefaultValue="DMA_DATA_RIGHTALIGN_ZEROPADDED"  TabName="CH2" Type="list">
+    <Condition Diagnostic="" Expression="SEM_DATA_HANDLING_$IpInstanceCH2"/>
+    <!-- value to be conditionned with src and dest data size-->
+        <PossibleValue Comment="Right Aligned padded with 0 up to destination data width when src data width smaller than dest data width" Value="DMA_DATA_RIGHTALIGN_ZEROPADDED"/>
+        <PossibleValue Comment="Right Aligned Left Truncated down to destination data width when src data width bigger than dest data width" Value="DMA_DATA_RIGHTALIGN_LEFTTRUNC"/>
+        <PossibleValue Comment="Right Aligned padded with sign extended up to destination data width when src data width smaller than dest data width" Value="DMA_DATA_RIGHTALIGN_SIGNEXT"/>
+        <PossibleValue Comment="Left Aligned Right Truncated down to the destination data width when src data width bigger than dest data width" Value="DMA_DATA_LEFTALIGN_RIGHTTRUNC"/>
+</RefParameter>
+<RefParameter Name="DATAALIGNEMENT_HPDMACH2" Comment="Data Alignment"  Group="Data Handling" DefaultValue="DMA_DATA_RIGHTALIGN_ZEROPADDED"  TabName="CH2"  Type="list" Visible="false">
+    <Condition Diagnostic="" Expression="!SEM_DATA_HANDLING_$IpInstanceCH2"/>
+     <PossibleValue Comment="Right Aligned padded with 0 up to destination data width when src data width smaller than dest data width" Value="DMA_DATA_RIGHTALIGN_ZEROPADDED"/>
+</RefParameter>
+
+<!--DMA_DataHandlingConfTypeDef-->
+
+
+<!--DMA_TriggerConfTypeDef-->
+
+<RefParameter Name="TRIGGERPOLARITY_HPDMACH2" Comment="Trigger Configuration" Group="Trigger"  DefaultValue="DMA_TRIG_POLARITY_MASKED" TabName="CH2" Type="list">
+        <PossibleValue Comment="Disable" Value="DMA_TRIG_POLARITY_MASKED" Semaphore="SEM_NOTRIG_$IpInstanceCH2"/>
+        <PossibleValue Comment="Trigger of the selected DMA request on the rising edge of the selected trigger event input" Value="DMA_TRIG_POLARITY_RISING"/>
+        <PossibleValue Comment="Trigger of the selected DMA request on the falling edge of the selected trigger event input" Value="DMA_TRIG_POLARITY_FALLING"/>
+</RefParameter>
+<RefParameter Name="TRIGGERMODE_HPDMACH2" Comment="Trigger Mode" Group="Trigger" DefaultValue="DMA_TRIGM_BLOCK_TRANSFER" TabName="CH2" Type="list" >
+        <Condition Diagnostic="" Expression="!SEM_NOTRIG_$IpInstanceCH2"/>
+        <PossibleValue Comment="A block transfer is conditioned by (at least) one hit trigger" Value="DMA_TRIGM_BLOCK_TRANSFER"/>
+        <PossibleValue Comment="A repeated block transfer is conditioned by (at least) one hit trigger" Value="DMA_TRIGM_REPEATED_BLOCK_TRANSFER" Condition="!SEM_2DADDRESSING__$IpInstanceCH2" Action="Disable"/>
+        <PossibleValue Comment="A single/burst transfer is conditioned by (at least) one hit trigger" Value="DMA_TRIGM_SINGLE_BURST_TRANSFER "/>
+</RefParameter>
+<RefParameter Name="TRIGGERMODE_HPDMACH2" Comment="Trigger Mode" Group="Trigger" DefaultValue="null" TabName="CH2" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="SEM_NOTRIG_$IpInstanceCH2"/>
+</RefParameter>
+<RefParameter Name="TRIGGERSELECTION_HPDMACH2" Comment="Trigger Selection"  Group="Trigger"  DefaultValue="" TabName="CH2" Type="list" >
+        <Condition Diagnostic="" Expression="!SEM_NOTRIG_$IpInstanceCH2"/>
+        <PossibleValue Comment="EXTI LINE 0" Value="HPDMA1_TRIGGER_EXTI_LINE0"/>
+        <PossibleValue Comment="EXTI LINE 1" Value="HPDMA1_TRIGGER_EXTI_LINE1"/>
+        <PossibleValue Comment="EXTI LINE 2" Value="HPDMA1_TRIGGER_EXTI_LINE2"/>
+        <PossibleValue Comment="EXTI LINE 3" Value="HPDMA1_TRIGGER_EXTI_LINE3"/>
+        <PossibleValue Comment="EXTI LINE 4" Value="HPDMA1_TRIGGER_EXTI_LINE4"/>
+        <PossibleValue Comment="TAMP TRIG1" Value="HPDMA1_TRIGGER_TAMP_TRG1"/>
+        <PossibleValue Comment="TAMP TRIG2" Value="HPDMA1_TRIGGER_TAMP_TRG2"/>
+        <PossibleValue Comment="TAMP TRIG3" Value="HPDMA1_TRIGGER_TAMP_TRG3"/>
+
+        <PossibleValue Comment="LPTIM1 CH1" Value="HPDMA1_TRIGGER_LPTIM1_CH1"/>
+        <PossibleValue Comment="LPTIM1 CH2" Value="HPDMA1_TRIGGER_LPTIM1_CH2"/>
+        <PossibleValue Comment="LPTIM CH1" Value="HPDMA1_TRIGGER_LPTIM3_CH1"/>
+        <PossibleValue Comment="LPTIM4 OUT" Value="HPDMA1_TRIGGER_LPTIM4_OUT"/>
+
+        <PossibleValue Comment="COMP1 OUT" Value="HPDMA1_TRIGGER_COMP1_OUT"/>
+        <PossibleValue Comment="COMP2 OUT" Value="HPDMA1_TRIGGER_COMP2_OUT"/>
+
+        <PossibleValue Comment="RTC ALRA TRG" Value="HPDMA1_TRIGGER_RTC_ALRA_TRG"/>
+        <PossibleValue Comment="RTC ALRB TRG" Value="HPDMA1_TRIGGER_RTC_ALRB_TRG"/>
+        <PossibleValue Comment="RTC WUT TRG" Value="HPDMA1_TRIGGER_RTC_WUT_TRG"/>
+
+        
+        <PossibleValue Comment="HPDMA CH0 TCF" Value="HPDMA1_TRIGGER_HPDMA1_CH0_TCF"/>
+        <PossibleValue Comment="HPDMA CH1 TCF" Value="HPDMA1_TRIGGER_HPDMA1_CH1_TCF"/>
+        <PossibleValue Comment="HPDMA CH2 TCF" Value="HPDMA1_TRIGGER_HPDMA1_CH2_TCF"/>
+        <PossibleValue Comment="HPDMA CH3 TCF" Value="HPDMA1_TRIGGER_HPDMA1_CH3_TCF"/>
+
+        <PossibleValue Comment="GPDMA CH0 TCF" Value="HPDMA1_TRIGGER_GPDMA1_CH0_TCF"/>
+        <PossibleValue Comment="GPDMA CH1 TCF" Value="HPDMA1_TRIGGER_GPDMA1_CH1_TCF"/>
+        <PossibleValue Comment="GPDMA CH4 TCF" Value="HPDMA1_TRIGGER_GPDMA1_CH4_TCF"/>
+        <PossibleValue Comment="GPDMA CH5 TCF" Value="HPDMA1_TRIGGER_GPDMA1_CH5_TCF"/>
+        <PossibleValue Comment="GPDMA CH6 TCF" Value="HPDMA1_TRIGGER_GPDMA1_CH6_TCF"/>
+        <PossibleValue Comment="GPDMA CH7 TCF" Value="HPDMA1_TRIGGER_GPDMA1_CH7_TCF"/>
+        <PossibleValue Comment="GPDMA CH12 TCF" Value="HPDMA1_TRIGGER_GPDMA1_CH12_TCF"/>
+        <PossibleValue Comment="GPDMA CH13 TCF" Value="HPDMA1_TRIGGER_GPDMA1_CH13_TCF"/>
+
+        <PossibleValue Comment="TIM2 TRGO" Value="HPDMA1_TRIGGER_TIM2_TRGO"/>
+        <PossibleValue Comment="TIM15 TRGO" Value="HPDMA1_TRIGGER_TIM15_TRGO"/>
+         <PossibleValue Comment="ADC4 AWD1" Value="HPDMA1_TRIGGER_ADC4_AWD1"/>
+
+</RefParameter>
+<RefParameter Name="TRIGGERSELECTION_HPDMACH2" Comment="Trigger Selection"  Group="Trigger"  DefaultValue="null" TabName="CH2" Type="list" Visible="false" >
+        <Condition Diagnostic="" Expression="SEM_NOTRIG_$IpInstanceCH2"/>
+ </RefParameter>
+
+<!--DMA_TriggerConfTypeDef-->
+
+
+<!--DMA_InitLinkedListTypeDef for circular simple request -->
+
+<RefParameter Name="PRIORITY_LL_CIRCULAR_HPDMACH2"  Comment="Priority" DefaultValue="DMA_LOW_PRIORITY_LOW_WEIGHT" Group="Channel configuration"  TabName="CH2"  Type="list">
+     <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH2"/>
+        <PossibleValue Comment="Low" Value="DMA_LOW_PRIORITY_LOW_WEIGHT"/>
+        <PossibleValue Comment="Medium" Value="DMA_LOW_PRIORITY_MID_WEIGHT"/>
+        <PossibleValue Comment="High" Value="DMA_LOW_PRIORITY_HIGH_WEIGHT"/>
+        <PossibleValue Comment="Very High" Value="DMA_HIGH_PRIORITY"/>
+</RefParameter>
+<RefParameter Name="PRIORITY_LL_CIRCULAR_HPDMACH2"  Comment="Priority" DefaultValue="null" Group="Channel Configuration for Linked List"  TabName="CH2"  Type="list" Visible="false">
+       <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH2"/>
+</RefParameter>
+
+<RefParameter Name="LINKSTEPMODE_CIRCULAR_HPDMACH2" Comment="Linked List Execution Mode" Group="Channel Configuration for Linked List" DefaultValue="DMA_LSM_FULL_EXECUTION"  TabName="CH2" Type="list" >
+      <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH2"/>
+        <PossibleValue Comment="The List is fully executed" Value="DMA_LSM_FULL_EXECUTION"/>
+</RefParameter>
+<RefParameter Name="LINKSTEPMODE_CIRCULAR_HPDMACH2" Comment="Linked List Execution Mode" Group="Channel Configuration for Linked List" DefaultValue="null"  TabName="CH2" Type="list" Visible="false">
+      <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH2"/>
+</RefParameter>
+
+<RefParameter Name="LINKALLOCATEDPORT_CIRCULAR_HPDMACH2" Comment="Circular Port" Group="Circular configuration"  DefaultValue="null" TabName="CH2" Type="list" Visible="false">
+</RefParameter>
+
+<RefParameter Name="TRANSFEREVENTMODE_LL_CIRCULAR_HPDMACH2" Comment="Transfer Event Generation" Group="Transfer Event Configuration" DefaultValue="DMA_TCEM_BLOCK_TRANSFER"  TabName="CH2"  Type="list">
+     <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH2"/>
+        <PossibleValue Comment="The TC (and the HT) event is generated at the (respectively half) end of each block " Value="DMA_TCEM_BLOCK_TRANSFER"/>
+        <PossibleValue Comment="The TC (and the HT) event is generated at the (respectively half) end of each linked-list item" Value="DMA_TCEM_EACH_LL_ITEM_TRANSFER"/>
+        <PossibleValue Comment="The TC (and the HT) event is generated at the (respectively half) end of the last linked-list item " Value="DMA_TCEM_LAST_LL_ITEM_TRANSFER"/>
+</RefParameter> 
+
+<RefParameter Name="TRANSFEREVENTMODE_LL_CIRCULAR_HPDMACH2" Comment="Transfer Event Generation" Group="Transfer Event Configuration" DefaultValue="null"  TabName="CH2"  Type="list" Visible="false">
+     <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH2"/>
+</RefParameter> 
+
+<RefParameter Name="LINKEDLISTMODE_CIRCULAR_HPDMACH2"  Comment="Execution Mode (circular/linear) of the Linked List" DefaultValue="DMA_LINKEDLIST" Group="Channel Configuration for Linked List"  TabName="CH2"  Type="list">
+     <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH2"/>
+        <PossibleValue Comment="Circular" Value="DMA_LINKEDLIST_CIRCULAR"/>
+</RefParameter> 
+<RefParameter Name="LINKEDLISTMODE_CIRCULAR_HPDMACH2"  Comment="Execution Mode (circular/linear) of the Linked List" DefaultValue="null" Group="Channel Configuration for Linked List"  TabName="CH2"  Type="list" Visible="false">
+     <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH2"/>
+</RefParameter> 
+
+ 
+<!--DMA_InitLinkedListTypeDef for circular simple request -->
+
+
+
+
+
+<!--DMA_InitLinkedListTypeDef-->
+
+<RefParameter Name="PRIORITY_LL_HPDMACH2"  Comment="Priority" DefaultValue="DMA_LOW_PRIORITY_LOW_WEIGHT" Group="Channel Configuration for Linked List"  TabName="CH2"  Type="list">
+        <PossibleValue Comment="Low" Value="DMA_LOW_PRIORITY_LOW_WEIGHT"/>
+        <PossibleValue Comment="Medium" Value="DMA_LOW_PRIORITY_MID_WEIGHT"/>
+        <PossibleValue Comment="High" Value="DMA_LOW_PRIORITY_HIGH_WEIGHT"/>
+        <PossibleValue Comment="Very High" Value="DMA_HIGH_PRIORITY"/>
+</RefParameter>
+
+<RefParameter Name="LINKSTEPMODE_HPDMACH2" Comment="Linked List Execution Mode" Group="Channel Configuration for Linked List" DefaultValue="DMA_LSM_FULL_EXECUTION"  TabName="CH2" Type="list" >
+        <PossibleValue Comment="The List is fully executed" Value="DMA_LSM_FULL_EXECUTION"/>
+        <PossibleValue Comment="First Element of the List is executed " Value="DMA_LSM_1LINK_EXECUTION"/>
+</RefParameter>
+
+<RefParameter Name="LINKALLOCATEDPORT_HPDMACH2" Comment="Allocated Port for Transfer" Group="Channel Configuration for Linked List"  DefaultValue="null" TabName="CH2" Type="list" Visible="false">
+</RefParameter>
+
+<RefParameter Name="TRANSFEREVENTMODE_LL_HPDMACH2" Comment="Transfer Event Generation" Group="Channel Configuration for Linked List" DefaultValue="DMA_TCEM_LAST_LL_ITEM_TRANSFER"  TabName="CH2"  Type="list">
+        <PossibleValue Comment="The TC (and the HT) event is generated at the (respectively half) end of each linked-list item" Value="DMA_TCEM_EACH_LL_ITEM_TRANSFER"/>
+        <PossibleValue Comment="The TC (and the HT) event is generated at the (respectively half) end of the last linked-list item " Value="DMA_TCEM_LAST_LL_ITEM_TRANSFER"/>
+</RefParameter> 
+
+<RefParameter Name="LINKEDLISTMODE_HPDMACH2"  Comment="Execution Mode (circular/linear) of the Linked List" DefaultValue="DMA_LINKEDLIST_NORMAL" Group="Channel Configuration for Linked List"  TabName="CH2"  Type="list">
+        <PossibleValue Comment="Linear" Value="DMA_LINKEDLIST_NORMAL"/>
+        <PossibleValue Comment="Circular" Value="DMA_LINKEDLIST_CIRCULAR"/>
+</RefParameter> 
+
+ <!--DMA_InitLinkedListTypeDef-->
+
+ 
+
+<!--DMA_InitTypeDef-->
+
+
+<RefParameter Name="TRANSFEREVENTMODE_HPDMACH3" Comment="Transfer Event Generation" Group="Transfer Event Configuration"  DefaultValue="DMA_TCEM_BLOCK_TRANSFER" TabName="CH3" Type="list" >
+<Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH3"/>
+        <PossibleValue Comment="The TC (and the HT) event is generated at the (respectively half) end of each block " Value="DMA_TCEM_BLOCK_TRANSFER"/>
+</RefParameter>
+<RefParameter Name="TRANSFEREVENTMODE_HPDMACH3" Comment="Transfer Event Generation" Group="Transfer Event Configuration"  DefaultValue="null" TabName="CH3" Type="list"  Visible="false">
+<Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH3"/>
+</RefParameter>
+
+
+
+<RefParameter Name="MODE_HPDMACH3"  Comment="Transaction Mode" DefaultValue="DMA_NORMAL" Group="Channel configuration"  TabName="CH3"  Type="list">
+        <PossibleValue Comment="Normal" Value="DMA_NORMAL"/>
+</RefParameter>
+
+
+<!-- circular mode begin -->
+
+<RefParameter Name="CIRCULARMODE_HPDMACH3"  Comment="Circular Mode" DefaultValue="DISABLE" Group="Circular configuration"  TabName="CH3"  Type="list">
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+        <PossibleValue Comment="Enable" Value="ENABLE" Semaphore="SEM_CIRCULAR_$IpInstanceCH3"/>
+</RefParameter>
+ 
+<RefParameter Name="NODETYPE_HPDMACH3"  Comment="Node Type" DefaultValue="null" Group="Channel configuration"  TabName="CH3"  Type="list" Visible="false">
+       <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH3"/>
+</RefParameter>
+<RefParameter Name="NODETYPE_HPDMACH3"  Comment="Node Type" DefaultValue="DMA_HPDMA_LINEAR_NODE" Group="Channel configuration"  TabName="CH3"  Type="list" Visible="false">
+       <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH3"/>
+        <PossibleValue Comment="GPDMA 2D Addressing" Value="DMA_HPDMA_LINEAR_NODE"/>
+</RefParameter>
+
+<RefParameter Name="SRCADD_HPDMACH3"  Comment="Source Address" DefaultValue="0" Max="65535" Min="0"  Group="Runtime configuration"  TabName="CH3"  Type="integer">
+     <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH3 &amp; SEM_REQ_SW_$IpInstanceCH3"/>
+</RefParameter>
+<RefParameter Name="SRCADD_HPDMACH3"  Comment="Source Address" DefaultValue="null" Max="65535" Min="0"  Group="Runtime configuration"  TabName="CH3"  Type="integer" Visible="false">
+     <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH3 |  !SEM_REQ_SW_$IpInstanceCH3"/>
+</RefParameter>
+
+<RefParameter Name="DSTADD_HPDMACH3"  Comment="Destination Address" DefaultValue="0" Max="65535" Min="0"  Group="Runtime configuration"  TabName="CH3"  Type="integer">
+     <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH3 &amp; SEM_REQ_SW_$IpInstanceCH3"/>
+</RefParameter>
+<RefParameter Name="DSTADD_HPDMACH3"  Comment="Destination Address" DefaultValue="null" Max="65535" Min="0"  Group="Runtime configuration"  TabName="CH3"  Type="integer" Visible="false">
+     <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH3 |  !SEM_REQ_SW_$IpInstanceCH3"/>
+</RefParameter>
+
+<RefParameter Name="DATASIZE_HPDMACH3"  Comment="Data Size" DefaultValue="0" Max="65535" Min="0"  Group="Runtime configuration"  TabName="CH3"  Type="integer">
+     <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH3 &amp; SEM_REQ_SW_$IpInstanceCH3"/>
+</RefParameter>
+<RefParameter Name="DATASIZE_HPDMACH3"  Comment="Data Size" DefaultValue="null" Max="65535" Min="0"  Group="Runtime configuration"  TabName="CH3"  Type="integer" Visible="false">
+     <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH3 |  !SEM_REQ_SW_$IpInstanceCH3"/>
+</RefParameter>
+
+<!-- circular mode end -->
+
+
+
+<RefParameter Name="PRIORITY_HPDMACH3"  Comment="Priority" DefaultValue="DMA_LOW_PRIORITY_LOW_WEIGHT" Group="Channel configuration"  TabName="CH3"  Type="list">
+    <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH3"/>
+        <PossibleValue Comment="Low" Value="DMA_LOW_PRIORITY_LOW_WEIGHT"/>
+        <PossibleValue Comment="Medium" Value="DMA_LOW_PRIORITY_MID_WEIGHT"/>
+        <PossibleValue Comment="High" Value="DMA_LOW_PRIORITY_HIGH_WEIGHT"/>
+        <PossibleValue Comment="Very High" Value="DMA_HIGH_PRIORITY"/>
+</RefParameter>
+<RefParameter Name="PRIORITY_HPDMACH3"  Comment="Priority" DefaultValue="null" Group="Channel configuration"  TabName="CH3"  Type="list" Visible="false">
+    <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH3"/>
+</RefParameter>
+
+<RefParameter Name="SRCDATAWIDTH_HPDMACH3" Comment="Data Width" Group="Source Data Setting" TabName="CH3" DefaultValue="DMA_SRC_DATAWIDTH_BYTE" Type="list">
+        <PossibleValue Comment="Byte" Value="DMA_SRC_DATAWIDTH_BYTE"/>
+        <PossibleValue Comment="Half Word" Value="DMA_SRC_DATAWIDTH_HALFWORD"/>
+        <PossibleValue Comment="Word" Value="DMA_SRC_DATAWIDTH_WORD"/>
+</RefParameter>
+
+<RefParameter Name="DESTDATAWIDTH_HPDMACH3" Comment="Data Width" Group="Destination Data Setting" TabName="CH3" DefaultValue="DMA_DEST_DATAWIDTH_BYTE" Type="list">
+        <PossibleValue Comment="Byte" Value="DMA_DEST_DATAWIDTH_BYTE"/>
+        <PossibleValue Comment="Half Word" Value="DMA_DEST_DATAWIDTH_HALFWORD"/>
+        <PossibleValue Comment="Word" Value="DMA_DEST_DATAWIDTH_WORD"/>
+</RefParameter>
+
+<RefParameter Name="SRCINC_HPDMACH3" Comment="Source Address Increment After Transfer" Group="Source Data Setting" TabName="CH3"  DefaultValue="DMA_SINC_FIXED"  Type="list">
+        <PossibleValue Comment="Disabled" Value="DMA_SINC_FIXED"/>
+        <PossibleValue Comment="Enabled" Value="DMA_SINC_INCREMENTED"/>
+</RefParameter>
+
+<RefParameter Name="DESTINC_HPDMACH3"  Comment="Destination Address Increment After Transfer"  Group="Destination Data Setting" TabName="CH3" DefaultValue="DMA_DINC_FIXED" Type="list">
+        <PossibleValue Comment="Disabled" Value="DMA_DINC_FIXED"/>
+        <PossibleValue Comment="Enabled" Value="DMA_DINC_INCREMENTED"/>
+</RefParameter>
+
+<RefParameter Name="DIRECTION_HPDMACH3" Comment="Direction"  Group="Channel configuration"  TabName="CH3" DefaultValue="DMA_PERIPH_TO_MEMORY" Type="list">
+    <Condition Diagnostic="MEMTOMEM has to be used carefully while accessing an IP register as a source or destination. We Advice you to use MEM to Periph or Periph to Mem instead, when possible" Expression="!SEM_REQ_SW_$IpInstanceCH3"/>
+        <PossibleValue Comment="Peripheral To Memory" Value="DMA_PERIPH_TO_MEMORY"/>
+        <PossibleValue Comment="Memory To Peripheral" Value="DMA_MEMORY_TO_PERIPH"/>
+         <PossibleValue Comment="Memory To Memory" Value="DMA_MEMORY_TO_MEMORY"/>
+        
+</RefParameter>
+<RefParameter Name="DIRECTION_HPDMACH3" Comment="Direction"  Group="Channel configuration"  TabName="CH3" DefaultValue="DMA_MEMORY_TO_MEMORY" Type="list">
+         <Condition Diagnostic="" Expression="SEM_REQ_SW_$IpInstanceCH3"/>
+        <PossibleValue Comment="Memory To Memory" Value="DMA_MEMORY_TO_MEMORY"/>
+</RefParameter>
+
+
+<RefParameter Name="BLKHWREQUEST_HPDMACH3" Comment="Block HW request protocol" Group="Request Configuration" TabName="CH3" DefaultValue="DMA_BREQ_BLOCK"   Type="list" >
+        <Condition Diagnostic="not configurable" Expression="(SEM_REQ_LPTIM1UE_$IpInstanceCH3|SEM_REQ_LPTIM2UE_$IpInstanceCH3|SEM_REQ_LPTIM3UE_$IpInstanceCH3)"/>
+        <PossibleValue Comment="Block Level" Value="DMA_BREQ_BLOCK"/>
+</RefParameter>
+<RefParameter  Name="BLKHWREQUEST_HPDMACH3" Comment="Block HW request protocol" Group="Request Configuration"   TabName="CH3" DefaultValue="DMA_BREQ_SINGLE_BURST" Type="list">
+        <Condition Diagnostic="not configurable" Expression="!(SEM_REQ_LPTIM1UE_$IpInstanceCH3|SEM_REQ_LPTIM2UE_$IpInstanceCH3|SEM_REQ_LPTIM3UE_$IpInstanceCH3)"/>
+        <PossibleValue Comment="Single/Burst Level" Value="DMA_BREQ_SINGLE_BURST"/>
+</RefParameter>
+
+
+<RefParameter Name="IPHANDLE_HPDMACH3" Comment="IPHANDLE"  Group="Request Configuration" TabName="CH3" DefaultValue="IPHANDLE" Visible="false" Type="list">
+    <Condition Diagnostic="not configurable" Expression="!SEM_REQ_SW_$IpInstanceCH3"/>
+   <PossibleValue Comment="IPHANDLE" Value="IPHANDLE"/>
+</RefParameter>
+<RefParameter Name="IPHANDLE_HPDMACH3" Comment="IPHANDLE"  Group="Request Configuration" TabName="CH3" DefaultValue="__NULL" Visible="false" Type="list">
+    <Condition Diagnostic="not configurable" Expression="SEM_REQ_SW_$IpInstanceCH3"/>
+    <PossibleValue Comment="__NULL" Value="__NULL"/>
+</RefParameter>
+
+
+<RefParameter Name="DMAHANDLE_HPDMACH3" Comment="DMA Handle in IP Structure"  Group="Request Configuration" TabName="CH3" DefaultValue="NONE" Type="list">
+    <PossibleValue Comment="NONE" Value="NONE" Condition="!SEM_REQ_SW_$IpInstanceCH3"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="DMA_Handle" Value="DMA_Handle" Condition="!SEM_REQ_ADC4_$IpInstanceCH3"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="DMA_Handle1" Value="DMA_Handle1" Condition="!SEM_REQ_DAC1_$IpInstanceCH3"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="DMA_Handle2" Value="DMA_Handle2" Condition="!SEM_REQ_DAC2_$IpInstanceCH3" Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="hdmarx" Value="hdmarx" Condition="!(SEM_REQ_SPI3RX_$IpInstanceCH3|SEM_REQ_I2C3RX_$IpInstanceCH3|SEM_REQ_LPUART1RX_$IpInstanceCH3)"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="hdmatx" Value="hdmatx" Condition="!(SEM_REQ_SPI3TX_$IpInstanceCH3|SEM_REQ_I2C3TX_$IpInstanceCH3|SEM_REQ_LPUART1TX_$IpInstanceCH3)"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="hdma" Value="hdma" Condition="!(SEM_REQ_ADF1FLT0_$IpInstanceCH3)" Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="hdma[LPTIM_DMA_ID_CC1]" Value="hdma[LPTIM_DMA_ID_CC1]" Condition="!(SEM_REQ_LPTIM1IC1_$IpInstanceCH3|SEM_REQ_LPTIM3IC1_$IpInstanceCH3)" Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="hdma[LPTIM_DMA_ID_CC2]" Value="hdma[LPTIM_DMA_ID_CC2]" Condition="!(SEM_REQ_LPTIM1IC2_$IpInstanceCH3|SEM_REQ_LPTIM3IC2_$IpInstanceCH3)" Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="hdma[LPTIM_DMA_ID_UPDATE]" Value="hdma[LPTIM_DMA_ID_UPDATE]" Condition="!(SEM_REQ_LPTIM1UE_$IpInstanceCH3|SEM_REQ_LPTIM3UE_$IpInstanceCH3)" Diagnostic="" Action="Disable"/>
+</RefParameter>
+
+
+<RefParameter Name="IPINSTANCE_HPDMACH3" Comment="IPINSTANCE_HPDMACH3" Group="Request Configuration" TabName="CH3" DefaultValue="HPDMA1" Visible="false" Type="list">
+    <PossibleValue Comment="SoftWare" Value="HPDMA1" Semaphore="SEM_IP_DMA_$IpInstanceCH3" Condition="!SEM_REQ_SW_$IpInstanceCH3"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="ADC4" Value="ADC4" Semaphore="SEM_IP_ADC4_$IpInstanceCH3" Condition="!SEM_REQ_ADC4_$IpInstanceCH3"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="DAC1" Value="DAC1" Semaphore="SEM_IP_DAC1_$IpInstanceCH3" Condition="!(SEM_REQ_DAC1_$IpInstanceCH3|SEM_REQ_DAC2_$IpInstanceCH3)"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="SPI3" Value="SPI3" Semaphore="SEM_IP_SPI3_$IpInstanceCH3" Condition="!(SEM_REQ_SPI3RX_$IpInstanceCH3|SEM_REQ_SPI3TX_$IpInstanceCH3)"  Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="I2C3" Value="I2C3" Semaphore="SEM_IP_I2C3_$IpInstanceCH3" Condition="!(SEM_REQ_I2C3RX_$IpInstanceCH3|SEM_REQ_I2C3TX_$IpInstanceCH3|SEM_REQ_I2C3EVC_$IpInstanceCH3)" Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="LPUART1" Value="LPUART1" Semaphore="SEM_IP_LPUART1_$IpInstanceCH3" Condition="!(SEM_REQ_LPUART1RX_$IpInstanceCH3|SEM_REQ_LPUART1TX_$IpInstanceCH3)"  Diagnostic="" Action="Disable"/>
+     <PossibleValue Comment="ADF1" Value="ADF1" Semaphore="SEM_IP_ADF1_$IpInstanceCH3" Condition="!(SEM_REQ_ADF1FLT0_$IpInstanceCH3)" Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="LPTIM3" Value="LPTIM3" Semaphore="SEM_IP_LPTIM3_$IpInstanceCH3" Condition="!(SEM_REQ_LPTIM3IC1_$IpInstanceCH3|SEM_REQ_LPTIM3IC2_$IpInstanceCH3|SEM_REQ_LPTIM3UE_$IpInstanceCH3)" Diagnostic="" Action="Disable"/>
+    <PossibleValue Comment="LPTIM1" Value="LPTIM1" Semaphore="SEM_IP_LPTIM1_$IpInstanceCH3" Condition="!(SEM_REQ_LPTIM1IC1_$IpInstanceCH3|SEM_REQ_LPTIM1IC2_$IpInstanceCH3|SEM_REQ_LPTIM1UE_$IpInstanceCH3)" Diagnostic="
+        " Action="Disable"/>
+</RefParameter>
+
+
+<RefParameter Name="REQUEST_HPDMACH3" Comment="Request" Group="Request Configuration" TabName="CH3" DefaultValue="DMA_REQUEST_SW" Type="list">
+    <PossibleValue Comment="SoftWare" Value="DMA_REQUEST_SW" Semaphore="SEM_REQ_SW_$IpInstanceCH3"/>
+    <PossibleValue Comment="ADC4" Value="HPDMA1_REQUEST_ADC4" Semaphore="SEM_REQ_ADC4_$IpInstanceCH3" Condition="!ADC4_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="DAC1_CH1" Value="HPDMA1_REQUEST_DAC1_CH1" Semaphore="SEM_REQ_DAC1_$IpInstanceCH3" Condition="!DAC1_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="DAC1_CH2" Value="HPDMA1_REQUEST_DAC1_CH2" Semaphore="SEM_REQ_DAC2_$IpInstanceCH3" Condition="!DAC1_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="SPI3_RX" Value="HPDMA1_REQUEST_SPI3_RX" Semaphore="SEM_REQ_SPI3RX_$IpInstanceCH3" Condition="!SPI3_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="SPI3_TX" Value="HPDMA1_REQUEST_SPI3_TX" Semaphore="SEM_REQ_SPI3TX_$IpInstanceCH3" Condition="!SPI3_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="I2C3_RX" Value="HPDMA1_REQUEST_I2C3_RX" Semaphore="SEM_REQ_I2C3RX_$IpInstanceCH3" Condition="!I2C3_Dma" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="I2C3_TX" Value="HPDMA1_REQUEST_I2C3_TX" Semaphore="SEM_REQ_I2C3TX_$IpInstanceCH3" Condition="!I2C3_Dma" Diagnostic="IP has to be configured" Action="Disable"/>
+   <!-- <PossibleValue Comment="I2C3_EVC" Value="HPDMA1_REQUEST_I2C3_EVC" Semaphore="SEM_REQ_I2C3EVC_$IpInstanceCH3" Condition="!I2C3_Dma" Diagnostic="IP has to be configured" Action="Disable"/>-->
+    <PossibleValue Comment="LPUART1_RX" Value="HPDMA1_REQUEST_LPUART1_RX" Semaphore="SEM_REQ_LPUART1RX_$IpInstanceCH3" Condition="!LPUART1_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="LPUART1_TX" Value="HPDMA1_REQUEST_LPUART1_TX" Semaphore="SEM_REQ_LPUART1TX_$IpInstanceCH3" Condition="!LPUART1_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="ADF1_FLT0" Value="HPDMA1_REQUEST_ADF1_FLT0" Semaphore="SEM_REQ_ADF1FLT0_$IpInstanceCH3" Condition="!ADF1_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="LPTIM1_IC1" Value="HPDMA1_REQUEST_LPTIM1_IC1" Semaphore="SEM_REQ_LPTIM1IC1_$IpInstanceCH3" Condition="!LPTIM1_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="LPTIM1_IC2" Value="HPDMA1_REQUEST_LPTIM1_IC2" Semaphore="SEM_REQ_LPTIM1IC2_$IpInstanceCH3" Condition="!LPTIM1_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="LPTIM1_UE" Value="HPDMA1_REQUEST_LPTIM1_UE" Semaphore="SEM_REQ_LPTIM1UE_$IpInstanceCH3" Condition="!LPTIM1_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="LPTIM3_IC1" Value="HPDMA1_REQUEST_LPTIM3_IC1" Semaphore="SEM_REQ_LPTIM3IC1_$IpInstanceCH3" Condition="!LPTIM3_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="LPTIM3_IC2" Value="HPDMA1_REQUEST_LPTIM3_IC2" Semaphore="SEM_REQ_LPTIM3IC2_$IpInstanceCH3" Condition="!LPTIM3_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+    <PossibleValue Comment="LPTIM3_UE" Value="HPDMA1_REQUEST_LPTIM3_UE" Semaphore="SEM_REQ_LPTIM3UE_$IpInstanceCH3" Condition="!LPTIM3_Used" Diagnostic="IP has to be configured" Action="Disable"/>
+</RefParameter>
+
+<!--DMA_InitTypeDef-->
+
+<!--DMA_DataHandlingConfTypeDef-->
+
+<RefParameter Name="DATAHANDLING_HPDMACH3" Comment="Data Handling Configuration"  Group="Data Handling" DefaultValue="NONE" TabName="CH3" Type="list" >
+     <PossibleValue Comment="Disable" Value="NONE"/>
+     <PossibleValue Comment="Enable" Value="ENABLE" Semaphore="SEM_DATA_HANDLING_$IpInstanceCH3"/>  
+</RefParameter>
+
+
+<RefParameter Name="DATAALIGNEMENT_HPDMACH3"  Comment="Data Alignment" Group="Data Handling"  DefaultValue="DMA_DATA_RIGHTALIGN_ZEROPADDED"  TabName="CH3" Type="list">
+    <Condition Diagnostic="" Expression="SEM_DATA_HANDLING_$IpInstanceCH3"/>
+    <!-- value to be conditionned with src and dest data size-->
+        <PossibleValue Comment="Right Aligned padded with 0 up to destination data width when src data width smaller than dest data width" Value="DMA_DATA_RIGHTALIGN_ZEROPADDED"/>
+        <PossibleValue Comment="Right Aligned Left Truncated down to destination data width when src data width bigger than dest data width" Value="DMA_DATA_RIGHTALIGN_LEFTTRUNC"/>
+        <PossibleValue Comment="Right Aligned padded with sign extended up to destination data width when src data width smaller than dest data width" Value="DMA_DATA_RIGHTALIGN_SIGNEXT"/>
+        <PossibleValue Comment="Left Aligned Right Truncated down to the destination data width when src data width bigger than dest data width" Value="DMA_DATA_LEFTALIGN_RIGHTTRUNC"/>
+</RefParameter>
+<RefParameter Name="DATAALIGNEMENT_HPDMACH3" Comment="Data Alignment"  Group="Data Handling" DefaultValue="DMA_DATA_RIGHTALIGN_ZEROPADDED"  TabName="CH3"  Type="list" Visible="false">
+    <Condition Diagnostic="" Expression="!SEM_DATA_HANDLING_$IpInstanceCH3"/>
+     <PossibleValue Comment="Right Aligned padded with 0 up to destination data width when src data width smaller than dest data width" Value="DMA_DATA_RIGHTALIGN_ZEROPADDED"/>
+</RefParameter>
+
+<!--DMA_DataHandlingConfTypeDef-->
+
+
+<!--DMA_TriggerConfTypeDef-->
+
+<RefParameter Name="TRIGGERPOLARITY_HPDMACH3" Comment="Trigger Configuration" Group="Trigger"  DefaultValue="DMA_TRIG_POLARITY_MASKED" TabName="CH3" Type="list">
+        <PossibleValue Comment="Disable" Value="DMA_TRIG_POLARITY_MASKED" Semaphore="SEM_NOTRIG_$IpInstanceCH3"/>
+        <PossibleValue Comment="Trigger of the selected DMA request on the rising edge of the selected trigger event input" Value="DMA_TRIG_POLARITY_RISING"/>
+        <PossibleValue Comment="Trigger of the selected DMA request on the falling edge of the selected trigger event input" Value="DMA_TRIG_POLARITY_FALLING"/>
+</RefParameter>
+<RefParameter Name="TRIGGERMODE_HPDMACH3" Comment="Trigger Mode" Group="Trigger" DefaultValue="DMA_TRIGM_BLOCK_TRANSFER" TabName="CH3" Type="list" >
+        <Condition Diagnostic="" Expression="!SEM_NOTRIG_$IpInstanceCH3"/>
+        <PossibleValue Comment="A block transfer is conditioned by (at least) one hit trigger" Value="DMA_TRIGM_BLOCK_TRANSFER"/>
+        <PossibleValue Comment="A repeated block transfer is conditioned by (at least) one hit trigger" Value="DMA_TRIGM_REPEATED_BLOCK_TRANSFER" Condition="!SEM_2DADDRESSING__$IpInstanceCH3" Action="Disable"/>
+        <PossibleValue Comment="A single/burst transfer is conditioned by (at least) one hit trigger" Value="DMA_TRIGM_SINGLE_BURST_TRANSFER "/>
+</RefParameter>
+<RefParameter Name="TRIGGERMODE_HPDMACH3" Comment="Trigger Mode" Group="Trigger" DefaultValue="null" TabName="CH3" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="SEM_NOTRIG_$IpInstanceCH3"/>
+</RefParameter>
+<RefParameter Name="TRIGGERSELECTION_HPDMACH3" Comment="Trigger Selection"  Group="Trigger"  DefaultValue="" TabName="CH3" Type="list" >
+        <Condition Diagnostic="" Expression="!SEM_NOTRIG_$IpInstanceCH3"/>
+        <PossibleValue Comment="EXTI LINE 0" Value="HPDMA1_TRIGGER_EXTI_LINE0"/>
+        <PossibleValue Comment="EXTI LINE 1" Value="HPDMA1_TRIGGER_EXTI_LINE1"/>
+        <PossibleValue Comment="EXTI LINE 2" Value="HPDMA1_TRIGGER_EXTI_LINE2"/>
+        <PossibleValue Comment="EXTI LINE 3" Value="HPDMA1_TRIGGER_EXTI_LINE3"/>
+        <PossibleValue Comment="EXTI LINE 4" Value="HPDMA1_TRIGGER_EXTI_LINE4"/>
+        <PossibleValue Comment="TAMP TRIG1" Value="HPDMA1_TRIGGER_TAMP_TRG1"/>
+        <PossibleValue Comment="TAMP TRIG2" Value="HPDMA1_TRIGGER_TAMP_TRG2"/>
+        <PossibleValue Comment="TAMP TRIG3" Value="HPDMA1_TRIGGER_TAMP_TRG3"/>
+
+        <PossibleValue Comment="LPTIM1 CH1" Value="HPDMA1_TRIGGER_LPTIM1_CH1"/>
+        <PossibleValue Comment="LPTIM1 CH2" Value="HPDMA1_TRIGGER_LPTIM1_CH2"/>
+        <PossibleValue Comment="LPTIM CH1" Value="HPDMA1_TRIGGER_LPTIM3_CH1"/>
+        <PossibleValue Comment="LPTIM4 OUT" Value="HPDMA1_TRIGGER_LPTIM4_OUT"/>
+
+        <PossibleValue Comment="COMP1 OUT" Value="HPDMA1_TRIGGER_COMP1_OUT"/>
+        <PossibleValue Comment="COMP2 OUT" Value="HPDMA1_TRIGGER_COMP2_OUT"/>
+
+        <PossibleValue Comment="RTC ALRA TRG" Value="HPDMA1_TRIGGER_RTC_ALRA_TRG"/>
+        <PossibleValue Comment="RTC ALRB TRG" Value="HPDMA1_TRIGGER_RTC_ALRB_TRG"/>
+        <PossibleValue Comment="RTC WUT TRG" Value="HPDMA1_TRIGGER_RTC_WUT_TRG"/>
+
+        
+        <PossibleValue Comment="HPDMA CH0 TCF" Value="HPDMA1_TRIGGER_HPDMA1_CH0_TCF"/>
+        <PossibleValue Comment="HPDMA CH1 TCF" Value="HPDMA1_TRIGGER_HPDMA1_CH1_TCF"/>
+        <PossibleValue Comment="HPDMA CH2 TCF" Value="HPDMA1_TRIGGER_HPDMA1_CH2_TCF"/>
+        <PossibleValue Comment="HPDMA CH3 TCF" Value="HPDMA1_TRIGGER_HPDMA1_CH3_TCF"/>
+
+        <PossibleValue Comment="GPDMA CH0 TCF" Value="HPDMA1_TRIGGER_GPDMA1_CH0_TCF"/>
+        <PossibleValue Comment="GPDMA CH1 TCF" Value="HPDMA1_TRIGGER_GPDMA1_CH1_TCF"/>
+        <PossibleValue Comment="GPDMA CH4 TCF" Value="HPDMA1_TRIGGER_GPDMA1_CH4_TCF"/>
+        <PossibleValue Comment="GPDMA CH5 TCF" Value="HPDMA1_TRIGGER_GPDMA1_CH5_TCF"/>
+        <PossibleValue Comment="GPDMA CH6 TCF" Value="HPDMA1_TRIGGER_GPDMA1_CH6_TCF"/>
+        <PossibleValue Comment="GPDMA CH7 TCF" Value="HPDMA1_TRIGGER_GPDMA1_CH7_TCF"/>
+        <PossibleValue Comment="GPDMA CH12 TCF" Value="HPDMA1_TRIGGER_GPDMA1_CH12_TCF"/>
+        <PossibleValue Comment="GPDMA CH13 TCF" Value="HPDMA1_TRIGGER_GPDMA1_CH13_TCF"/>
+
+        <PossibleValue Comment="TIM2 TRGO" Value="HPDMA1_TRIGGER_TIM2_TRGO"/>
+        <PossibleValue Comment="TIM15 TRGO" Value="HPDMA1_TRIGGER_TIM15_TRGO"/>
+         <PossibleValue Comment="ADC4 AWD1" Value="HPDMA1_TRIGGER_ADC4_AWD1"/>
+</RefParameter>
+<RefParameter Name="TRIGGERSELECTION_HPDMACH3" Comment="Trigger Selection"  Group="Trigger"  DefaultValue="null" TabName="CH3" Type="list" Visible="false" >
+        <Condition Diagnostic="" Expression="SEM_NOTRIG_$IpInstanceCH3"/>
+ </RefParameter>
+
+<!--DMA_TriggerConfTypeDef-->
+
+
+<!--DMA_InitLinkedListTypeDef for circular simple request -->
+
+<RefParameter Name="PRIORITY_LL_CIRCULAR_HPDMACH3"  Comment="Priority" DefaultValue="DMA_LOW_PRIORITY_LOW_WEIGHT" Group="Channel configuration"  TabName="CH3"  Type="list">
+     <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH3"/>
+        <PossibleValue Comment="Low" Value="DMA_LOW_PRIORITY_LOW_WEIGHT"/>
+        <PossibleValue Comment="Medium" Value="DMA_LOW_PRIORITY_MID_WEIGHT"/>
+        <PossibleValue Comment="High" Value="DMA_LOW_PRIORITY_HIGH_WEIGHT"/>
+        <PossibleValue Comment="Very High" Value="DMA_HIGH_PRIORITY"/>
+</RefParameter>
+<RefParameter Name="PRIORITY_LL_CIRCULAR_HPDMACH3"  Comment="Priority" DefaultValue="null" Group="Channel Configuration for Linked List"  TabName="CH3"  Type="list" Visible="false">
+       <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH3"/>
+</RefParameter>
+
+<RefParameter Name="LINKSTEPMODE_CIRCULAR_HPDMACH3" Comment="Linked List Execution Mode" Group="Channel Configuration for Linked List" DefaultValue="DMA_LSM_FULL_EXECUTION"  TabName="CH3" Type="list" >
+      <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH3"/>
+        <PossibleValue Comment="The List is fully executed" Value="DMA_LSM_FULL_EXECUTION"/>
+</RefParameter>
+<RefParameter Name="LINKSTEPMODE_CIRCULAR_HPDMACH3" Comment="Linked List Execution Mode" Group="Channel Configuration for Linked List" DefaultValue="null"  TabName="CH3" Type="list" Visible="false">
+      <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH3"/>
+</RefParameter>
+
+<RefParameter Name="LINKALLOCATEDPORT_CIRCULAR_HPDMACH3" Comment="Circular Port" Group="Circular configuration"  DefaultValue="null" TabName="CH3" Type="list" Visible="false">
+</RefParameter>
+
+
+<RefParameter Name="TRANSFEREVENTMODE_LL_CIRCULAR_HPDMACH3" Comment="Transfer Event Generation" Group="Transfer Event Configuration" DefaultValue="DMA_TCEM_BLOCK_TRANSFER"  TabName="CH3"  Type="list">
+     <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH3"/>
+        <PossibleValue Comment="The TC (and the HT) event is generated at the (respectively half) end of each block " Value="DMA_TCEM_BLOCK_TRANSFER"/>
+        <PossibleValue Comment="The TC (and the HT) event is generated at the (respectively half) end of each linked-list item" Value="DMA_TCEM_EACH_LL_ITEM_TRANSFER"/>
+        <PossibleValue Comment="The TC (and the HT) event is generated at the (respectively half) end of the last linked-list item " Value="DMA_TCEM_LAST_LL_ITEM_TRANSFER"/>
+</RefParameter> 
+
+<RefParameter Name="TRANSFEREVENTMODE_LL_CIRCULAR_HPDMACH3" Comment="Transfer Event Generation" Group="Transfer Event Configuration" DefaultValue="null"  TabName="CH3"  Type="list" Visible="false">
+     <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH3"/>
+</RefParameter> 
+
+<RefParameter Name="LINKEDLISTMODE_CIRCULAR_HPDMACH3"  Comment="Execution Mode (circular/linear) of the Linked List" DefaultValue="DMA_LINKEDLIST" Group="Channel Configuration for Linked List"  TabName="CH3"  Type="list">
+     <Condition Diagnostic="" Expression="SEM_CIRCULAR_$IpInstanceCH3"/>
+        <PossibleValue Comment="Circular" Value="DMA_LINKEDLIST_CIRCULAR"/>
+</RefParameter> 
+<RefParameter Name="LINKEDLISTMODE_CIRCULAR_HPDMACH3"  Comment="Execution Mode (circular/linear) of the Linked List" DefaultValue="null" Group="Channel Configuration for Linked List"  TabName="CH3"  Type="list" Visible="false">
+     <Condition Diagnostic="" Expression="!SEM_CIRCULAR_$IpInstanceCH3"/>
+</RefParameter> 
+
+ 
+<!--DMA_InitLinkedListTypeDef for circular simple request -->
+
+
+
+
+
+<!--DMA_InitLinkedListTypeDef-->
+
+<RefParameter Name="PRIORITY_LL_HPDMACH3"  Comment="Priority" DefaultValue="DMA_LOW_PRIORITY_LOW_WEIGHT" Group="Channel Configuration for Linked List"  TabName="CH3"  Type="list">
+        <PossibleValue Comment="Low" Value="DMA_LOW_PRIORITY_LOW_WEIGHT"/>
+        <PossibleValue Comment="Medium" Value="DMA_LOW_PRIORITY_MID_WEIGHT"/>
+        <PossibleValue Comment="High" Value="DMA_LOW_PRIORITY_HIGH_WEIGHT"/>
+        <PossibleValue Comment="Very High" Value="DMA_HIGH_PRIORITY"/>
+</RefParameter>
+
+<RefParameter Name="LINKSTEPMODE_HPDMACH3" Comment="Linked List Execution Mode" Group="Channel Configuration for Linked List" DefaultValue="DMA_LSM_FULL_EXECUTION"  TabName="CH3" Type="list" >
+        <PossibleValue Comment="The List is fully executed" Value="DMA_LSM_FULL_EXECUTION"/>
+        <PossibleValue Comment="First Element of the List is executed " Value="DMA_LSM_1LINK_EXECUTION"/>
+</RefParameter>
+
+<RefParameter Name="LINKALLOCATEDPORT_HPDMACH3" Comment="Allocated Port for Transfer" Group="Channel Configuration for Linked List"  DefaultValue="null" TabName="CH3" Type="list" Visible="false">
+</RefParameter>
+
+<RefParameter Name="TRANSFEREVENTMODE_LL_HPDMACH3" Comment="Transfer Event Generation" Group="Channel Configuration for Linked List" DefaultValue="DMA_TCEM_LAST_LL_ITEM_TRANSFER"  TabName="CH3"  Type="list">
+        <PossibleValue Comment="The TC (and the HT) event is generated at the (respectively half) end of each linked-list item" Value="DMA_TCEM_EACH_LL_ITEM_TRANSFER"/>
+        <PossibleValue Comment="The TC (and the HT) event is generated at the (respectively half) end of the last linked-list item " Value="DMA_TCEM_LAST_LL_ITEM_TRANSFER"/>
+</RefParameter> 
+
+<RefParameter Name="LINKEDLISTMODE_HPDMACH3"  Comment="Execution Mode (circular/linear) of the Linked List" DefaultValue="DMA_LINKEDLIST_NORMAL" Group="Channel Configuration for Linked List"  TabName="CH3"  Type="list">
+        <PossibleValue Comment="Linear" Value="DMA_LINKEDLIST_NORMAL"/>
+        <PossibleValue Comment="Circular" Value="DMA_LINKEDLIST_CIRCULAR"/>
+</RefParameter> 
+
+ <!--DMA_InitLinkedListTypeDef-->
+
+
+<!--LPBAM Specific --> 
+
+
+<RefParameter Name="Interrupt1_HPDMACH0" Comment="Data Transfer Error"   DefaultValue="DISABLE"  Type="list"  TabName="Advanced Settings for LPBAM" Group="IP Internal Interrupt for CH0">
+        <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
+        <Description>description</Description>
+        <PossibleValue Comment="Enable" Value="DMA_IT_DTE"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+</RefParameter>
+
+<RefParameter Name="Interrupt2_HPDMACH0" Comment="Update Link Error"   DefaultValue="DISABLE"  Type="list"  TabName="Advanced Settings for LPBAM" Group="IP Internal Interrupt for CH0">
+    <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
+        <Description>description</Description>
+        <PossibleValue Comment="Enable" Value="DMA_IT_ULE"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+</RefParameter>
+
+<RefParameter Name="Interrupt3_HPDMACH0" Comment="User Setting Error"   DefaultValue="DISABLE"  Type="list"  TabName="Advanced Settings for LPBAM" Group="IP Internal Interrupt for CH0">
+    <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
+        <Description>description</Description>
+        <PossibleValue Comment="Enable" Value="DMA_IT_USE"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+</RefParameter>
+
+<RefParameter Name="Interrupt4_HPDMACH0" Comment="Trigger Overrun Error"   DefaultValue="DISABLE"  Type="list"  TabName="Advanced Settings for LPBAM" Group="IP Internal Interrupt for CH0">
+    <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
+        <Description>description</Description>
+        <PossibleValue Comment="Enable" Value="DMA_IT_TO"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+</RefParameter>
+ 
+
+
+<RefParameter Comment="Interrupt parameter for code generation __HAL_DAC_ENABLE_IT" DefaultValue="/+Interrupt1_HPDMACH0+|Interrupt2_HPDMACH0+|Interrupt3_HPDMACH0+|Interrupt4_HPDMACH0/\|DISABLE//DISABLE\|//" Group="IP Internal Interrupt for CH0" Type="list"  Name="ORingInterrupt_HPDMACH0"  Visible="true" TabName="Advanced Settings for LPBAM">
+      <Condition Diagnostic="" Expression="!((Interrupt1_HPDMACH0=DISABLE) &amp; (Interrupt2_HPDMACH0=DISABLE) &amp; (Interrupt3_HPDMACH0=DISABLE) &amp; (Interrupt4_HPDMACH0=DISABLE)) &amp; S_LPBAM_CONF"/> 
+</RefParameter>
+<RefParameter  Comment="Interrupt parameter for code generation __HAL_DAC_ENABLE_IT" DefaultValue="__NULL" Name="ORingInterrupt_HPDMACH0" Type="String" >
+               <Condition Diagnostic="" Expression="((Interrupt1_HPDMACH0=DISABLE) &amp; (Interrupt2_HPDMACH0=DISABLE) &amp; (Interrupt3_HPDMACH0=DISABLE) &amp; (Interrupt4_HPDMACH0=DISABLE)) | !S_LPBAM_CONF"/> 
+ </RefParameter>
+
+
+
+<RefParameter Name="Interrupt1_HPDMACH1" Comment="Data Transfer Error"   DefaultValue="DISABLE"  Type="list"  TabName="Advanced Settings for LPBAM" Group="IP Internal Interrupt for CH1">
+    <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
+        <Description>description</Description>
+        <PossibleValue Comment="Enable" Value="DMA_IT_DTE"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+</RefParameter>
+
+<RefParameter Name="Interrupt2_HPDMACH1" Comment="Update Link Error"   DefaultValue="DISABLE"  Type="list"  TabName="Advanced Settings for LPBAM" Group="IP Internal Interrupt for CH1">
+    <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
+        <Description>description</Description>
+        <PossibleValue Comment="Enable" Value="DMA_IT_ULE"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+</RefParameter>
+
+<RefParameter Name="Interrupt3_HPDMACH1" Comment="User Setting Error"   DefaultValue="DISABLE"  Type="list"  TabName="Advanced Settings for LPBAM" Group="IP Internal Interrupt for CH1">
+    <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
+        <Description>description</Description>
+        <PossibleValue Comment="Enable" Value="DMA_IT_USE"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+</RefParameter>
+
+<RefParameter Name="Interrupt4_HPDMACH1" Comment="Trigger Overrun Error"   DefaultValue="DISABLE"  Type="list"  TabName="Advanced Settings for LPBAM" Group="IP Internal Interrupt for CH1">
+    <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
+        <Description>description</Description>
+        <PossibleValue Comment="Enable" Value="DMA_IT_TO"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+</RefParameter>
+ 
+
+
+<RefParameter Comment="Interrupt parameter for code generation __HAL_DAC_ENABLE_IT" DefaultValue="/+Interrupt1_HPDMACH1+|Interrupt2_HPDMACH1+|Interrupt3_HPDMACH1+|Interrupt4_HPDMACH1/\|DISABLE//DISABLE\|//" Group="IP Internal Interrupt for CH1" Type="list"  Name="ORingInterrupt_HPDMACH1"  Visible="true" TabName="Advanced Settings for LPBAM">
+      <Condition Diagnostic="" Expression="!((Interrupt1_HPDMACH1=DISABLE) &amp; (Interrupt2_HPDMACH1=DISABLE) &amp; (Interrupt3_HPDMACH1=DISABLE) &amp; (Interrupt4_HPDMACH1=DISABLE)) &amp; S_LPBAM_CONF"/> 
+</RefParameter>
+<RefParameter  Comment="Interrupt parameter for code generation __HAL_DAC_ENABLE_IT" DefaultValue="__NULL" Name="ORingInterrupt_HPDMACH1" Type="String" >
+               <Condition Diagnostic="" Expression="((Interrupt1_HPDMACH1=DISABLE) &amp; (Interrupt2_HPDMACH1=DISABLE) &amp; (Interrupt3_HPDMACH1=DISABLE) &amp; (Interrupt4_HPDMACH1=DISABLE)) | !S_LPBAM_CONF"/> 
+ </RefParameter>
+
+
+
+
+<RefParameter Name="Interrupt1_HPDMACH2" Comment="Data Transfer Error"   DefaultValue="DISABLE"  Type="list"  TabName="Advanced Settings for LPBAM" Group="IP Internal Interrupt for CH2">
+    <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
+        <Description>description</Description>
+        <PossibleValue Comment="Enable" Value="DMA_IT_DTE"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+</RefParameter>
+
+<RefParameter Name="Interrupt2_HPDMACH2" Comment="Update Link Error"   DefaultValue="DISABLE"  Type="list"  TabName="Advanced Settings for LPBAM" Group="IP Internal Interrupt for CH2">
+    <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
+        <Description>description</Description>
+        <PossibleValue Comment="Enable" Value="DMA_IT_ULE"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+</RefParameter>
+
+<RefParameter Name="Interrupt3_HPDMACH2" Comment="User Setting Error"   DefaultValue="DISABLE"  Type="list"  TabName="Advanced Settings for LPBAM" Group="IP Internal Interrupt for CH2">
+    <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
+        <Description>description</Description>
+        <PossibleValue Comment="Enable" Value="DMA_IT_USE"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+</RefParameter>
+ 
+<RefParameter Name="Interrupt4_HPDMACH2" Comment="Trigger Overrun Error"   DefaultValue="DISABLE"  Type="list"  TabName="Advanced Settings for LPBAM" Group="IP Internal Interrupt for CH2">
+    <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
+        <Description>description</Description>
+        <PossibleValue Comment="Enable" Value="DMA_IT_TO"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+</RefParameter>
+ 
+
+
+<RefParameter Comment="Interrupt parameter for code generation __HAL_DAC_ENABLE_IT" DefaultValue="/+Interrupt1_HPDMACH2+|Interrupt2_HPDMACH2+|Interrupt3_HPDMACH2+|Interrupt4_HPDMACH2/\|DISABLE//DISABLE\|//" Group="IP Internal Interrupt for CH2" Type="list"  Name="ORingInterrupt_HPDMACH2"  Visible="false" TabName="Advanced Settings for LPBAM">
+      <Condition Diagnostic="" Expression="!((Interrupt1_HPDMACH2=DISABLE) &amp; (Interrupt2_HPDMACH2=DISABLE) &amp; (Interrupt3_HPDMACH2=DISABLE) &amp; (Interrupt4_HPDMACH2=DISABLE)) &amp; S_LPBAM_CONF"/> 
+</RefParameter>
+<RefParameter  Comment="Interrupt parameter for code generation __HAL_DAC_ENABLE_IT" DefaultValue="__NULL" Name="ORingInterrupt_HPDMACH2" Type="String" >
+               <Condition Diagnostic="" Expression="((Interrupt1_HPDMACH2=DISABLE) &amp; (Interrupt2_HPDMACH2=DISABLE) &amp; (Interrupt3_HPDMACH2=DISABLE) &amp; (Interrupt4_HPDMACH2=DISABLE)) | !S_LPBAM_CONF"/> 
+ </RefParameter>
+
+
+
+
+<RefParameter Name="Interrupt1_HPDMACH3" Comment="Data Transfer Error"   DefaultValue="DISABLE"  Type="list"  TabName="Advanced Settings for LPBAM" Group="IP Internal Interrupt for CH3">
+    <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
+        <Description>description</Description>
+        <PossibleValue Comment="Enable" Value="DMA_IT_DTE"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+</RefParameter>
+
+<RefParameter Name="Interrupt2_HPDMACH3" Comment="Update Link Error"   DefaultValue="DISABLE"  Type="list"  TabName="Advanced Settings for LPBAM" Group="IP Internal Interrupt for CH3">
+    <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
+        <Description>description</Description>
+        <PossibleValue Comment="Enable" Value="DMA_IT_ULE"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+</RefParameter>
+
+<RefParameter Name="Interrupt3_HPDMACH3" Comment="User Setting Error"   DefaultValue="DISABLE"  Type="list"  TabName="Advanced Settings for LPBAM" Group="IP Internal Interrupt for CH3">
+    <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
+        <Description>description</Description>
+        <PossibleValue Comment="Enable" Value="DMA_IT_USE"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+</RefParameter>
+<RefParameter Name="Interrupt4_HPDMACH3" Comment="Trigger Overrun Error"   DefaultValue="DISABLE"  Type="list"  TabName="Advanced Settings for LPBAM" Group="IP Internal Interrupt for CH3">
+    <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
+        <Description>description</Description>
+        <PossibleValue Comment="Enable" Value="DMA_IT_TO"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+</RefParameter>
+ 
+
+
+<RefParameter Comment="Interrupt parameter for code generation __HAL_DAC_ENABLE_IT" DefaultValue="/+Interrupt1_HPDMACH3+|Interrupt2_HPDMACH3+|Interrupt3_HPDMACH3+|Interrupt4_HPDMACH3/\|DISABLE//DISABLE\|//" Group="IP Internal Interrupt for CH3" Type="list"  Name="ORingInterrupt_HPDMACH3"  Visible="true" TabName="Advanced Settings for LPBAM">
+      <Condition Diagnostic="" Expression="!((Interrupt1_HPDMACH3=DISABLE) &amp; (Interrupt2_HPDMACH3=DISABLE) &amp; (Interrupt3_HPDMACH3=DISABLE) &amp; (Interrupt4_HPDMACH3=DISABLE)) &amp; S_LPBAM_CONF"/> 
+</RefParameter>
+<RefParameter  Comment="Interrupt parameter for code generation __HAL_DAC_ENABLE_IT" DefaultValue="__NULL" Name="ORingInterrupt_HPDMACH3" Type="String" >
+               <Condition Diagnostic="" Expression="((Interrupt1_HPDMACH3=DISABLE) &amp; (Interrupt2_HPDMACH3=DISABLE) &amp; (Interrupt3_HPDMACH3=DISABLE) &amp; (Interrupt4_HPDMACH3=DISABLE)) | !S_LPBAM_CONF"/> 
+ </RefParameter>
+
+
+
+<!--LPBAM Specific -->
+ 
+<RefMode Name="CommonConfig" Abstract="true">
+<Parameter Name="RECAP_HPDMACH0"/>
+<Parameter Name="RECAP_HPDMACH1"/>
+<Parameter Name="RECAP_HPDMACH2"/>
+<Parameter Name="RECAP_HPDMACH3"/>
+
+</RefMode>
+
+
+<RefMode Name="SIMPLEREQUEST_HPDMACH0" BaseMode="CommonConfig">
+    <ConfigForMode>Init_HPDMACH0</ConfigForMode>
+
+ <Parameter Name="ChannelPRIV_HPDMACH0"/>
+    <Parameter Name="ChannelSEC_HPDMACH0"/>
+    <Parameter Name="SrcSEC_HPDMACH0"/>
+    <Parameter Name="DestSEC_HPDMACH0"/>
+
+    <Parameter Name="CIRCULARMODE_HPDMACH0"/>
+    <Parameter Name="REQUEST_HPDMACH0"/>
+    <Parameter Name="PRIORITY_HPDMACH0"/>
+    <Parameter Name="PRIORITY_LL_CIRCULAR_HPDMACH0"/> 
+    <Parameter Name="MODE_HPDMACH0"/> 
+    
+    <Parameter Name="DMAHANDLE_HPDMACH0"/>
+    <Parameter Name="DIRECTION_HPDMACH0"/>
+    <Parameter Name="IPINSTANCE_HPDMACH0"/>
+    <Parameter Name="IPHANDLE_HPDMACH0"/>
+    <Parameter Name="BLKHWREQUEST_HPDMACH0"/>
+    <Parameter Name="SRCINC_HPDMACH0"/>
+    <Parameter Name="DESTINC_HPDMACH0"/>
+    <Parameter Name="SRCDATAWIDTH_HPDMACH0"/>
+    <Parameter Name="DESTDATAWIDTH_HPDMACH0"/>
+
+   
+    <Parameter Name="DATAHANDLING_HPDMACH0"/>
+    
+    <Parameter Name="DATAALIGNEMENT_HPDMACH0"/>
+
+ 
+    <Parameter Name="TRIGGERPOLARITY_HPDMACH0"/>
+    <Parameter Name="TRIGGERMODE_HPDMACH0"/>
+    <Parameter Name="TRIGGERSELECTION_HPDMACH0"/>
+
+
+    <Parameter Name="TRANSFEREVENTMODE_HPDMACH0"/>
+
+     <!-- specific for circular mode -->    
+      
+    <Parameter Name="LINKEDLISTMODE_CIRCULAR_HPDMACH0"/> 
+    <Parameter Name="LINKSTEPMODE_CIRCULAR_HPDMACH0"/> 
+    <Parameter Name="TRANSFEREVENTMODE_LL_CIRCULAR_HPDMACH0"/> 
+
+    <Parameter Name="SRCADD_HPDMACH0"/>
+    <Parameter Name="DSTADD_HPDMACH0"/>
+    <Parameter Name="DATASIZE_HPDMACH0"/>
+    <Parameter Name="NODETYPE_HPDMACH0"/>
+    <!-- specific for circular mode -->
+
+      <!--LPBAM Specific --> 
+    <Parameter Name="Interrupt1_HPDMACH0"/>
+    <Parameter Name="Interrupt2_HPDMACH0"/>
+    <Parameter Name="Interrupt3_HPDMACH0"/>
+    <Parameter Name="Interrupt4_HPDMACH0"/>
+    
+    <!--LPBAM Specific --> 
+     
+    
+</RefMode>
+
+<RefMode Name="LINKEDLIST_HPDMACH0" BaseMode="CommonConfig">
+    <ConfigForMode>Init_LL_HPDMACH0</ConfigForMode> 
+
+     <Parameter Name="ChannelPRIV_HPDMACH0"/>
+    <Parameter Name="ChannelSEC_HPDMACH0"/>
+    <Parameter Name="SrcSEC_HPDMACH0"/>
+    <Parameter Name="DestSEC_HPDMACH0"/>
+ 
+     <Parameter Name="PRIORITY_LL_HPDMACH0"/> 
+    <Parameter Name="LINKEDLISTMODE_HPDMACH0"/> 
+    <Parameter Name="LINKSTEPMODE_HPDMACH0"/> 
+    <Parameter Name="TRANSFEREVENTMODE_LL_HPDMACH0"/> 
+
+
+      <!--LPBAM Specific --> 
+    <Parameter Name="Interrupt1_HPDMACH0"/>
+    <Parameter Name="Interrupt2_HPDMACH0"/>
+    <Parameter Name="Interrupt3_HPDMACH0"/>
+    <Parameter Name="Interrupt4_HPDMACH0"/>
+    
+    <!--LPBAM Specific --> 
+     
+
+</RefMode>
+
+
+
+
+
+<RefMode Name="SIMPLEREQUEST_HPDMACH1" BaseMode="CommonConfig">
+    <ConfigForMode>Init_HPDMACH1</ConfigForMode>
+<Parameter Name="ChannelPRIV_HPDMACH1"/>
+    <Parameter Name="ChannelSEC_HPDMACH1"/>
+    <Parameter Name="SrcSEC_HPDMACH1"/>
+    <Parameter Name="DestSEC_HPDMACH1"/>
+
+     <Parameter Name="CIRCULARMODE_HPDMACH1"/>
+         <Parameter Name="REQUEST_HPDMACH1"/>
+    <Parameter Name="PRIORITY_HPDMACH1"/>
+    <Parameter Name="PRIORITY_LL_CIRCULAR_HPDMACH1"/> 
+    <Parameter Name="MODE_HPDMACH1"/> 
+
+    <Parameter Name="DMAHANDLE_HPDMACH1"/>
+    <Parameter Name="DIRECTION_HPDMACH1"/>
+    <Parameter Name="IPINSTANCE_HPDMACH1"/>
+    <Parameter Name="IPHANDLE_HPDMACH1"/>
+    <Parameter Name="BLKHWREQUEST_HPDMACH1"/>
+    <Parameter Name="SRCINC_HPDMACH1"/>
+    <Parameter Name="DESTINC_HPDMACH1"/>
+    <Parameter Name="SRCDATAWIDTH_HPDMACH1"/>
+    <Parameter Name="DESTDATAWIDTH_HPDMACH1"/>
+    
+    
+   
+    <Parameter Name="DATAHANDLING_HPDMACH1"/>
+    
+    <Parameter Name="DATAALIGNEMENT_HPDMACH1"/>
+
+ 
+    <Parameter Name="TRIGGERPOLARITY_HPDMACH1"/>
+    <Parameter Name="TRIGGERMODE_HPDMACH1"/>
+    <Parameter Name="TRIGGERSELECTION_HPDMACH1"/>
+
+
+    <Parameter Name="TRANSFEREVENTMODE_HPDMACH1"/>
+
+     <!-- specific for circular mode -->    
+      
+    <Parameter Name="LINKEDLISTMODE_CIRCULAR_HPDMACH1"/> 
+    <Parameter Name="LINKSTEPMODE_CIRCULAR_HPDMACH1"/> 
+    <Parameter Name="TRANSFEREVENTMODE_LL_CIRCULAR_HPDMACH1"/> 
+
+    <Parameter Name="SRCADD_HPDMACH1"/>
+    <Parameter Name="DSTADD_HPDMACH1"/>
+    <Parameter Name="DATASIZE_HPDMACH1"/>
+    <Parameter Name="NODETYPE_HPDMACH1"/>
+    <!-- specific for circular mode -->
+
+     <!--LPBAM Specific --> 
+    <Parameter Name="Interrupt1_HPDMACH1"/>
+    <Parameter Name="Interrupt2_HPDMACH1"/>
+    <Parameter Name="Interrupt3_HPDMACH1"/>
+    <Parameter Name="Interrupt4_HPDMACH1"/>
+    
+    <!--LPBAM Specific --> 
+
+    
+</RefMode>
+
+<RefMode Name="LINKEDLIST_HPDMACH1" BaseMode="CommonConfig">
+    <ConfigForMode>Init_LL_HPDMACH1</ConfigForMode>  
+
+    <Parameter Name="ChannelPRIV_HPDMACH1"/>
+    <Parameter Name="ChannelSEC_HPDMACH1"/>
+    <Parameter Name="SrcSEC_HPDMACH1"/>
+    <Parameter Name="DestSEC_HPDMACH1"/>
+
+     <Parameter Name="PRIORITY_LL_HPDMACH1"/> 
+    <Parameter Name="LINKEDLISTMODE_HPDMACH1"/> 
+    <Parameter Name="LINKSTEPMODE_HPDMACH1"/> 
+    <Parameter Name="TRANSFEREVENTMODE_LL_HPDMACH1"/> 
+
+
+    <!--LPBAM Specific --> 
+    <Parameter Name="Interrupt1_HPDMACH1"/>
+    <Parameter Name="Interrupt2_HPDMACH1"/>
+    <Parameter Name="Interrupt3_HPDMACH1"/>
+    <Parameter Name="Interrupt4_HPDMACH1"/>
+    
+    <!--LPBAM Specific --> 
+
+   
+
+</RefMode>
+
+
+
+
+<RefMode Name="SIMPLEREQUEST_HPDMACH2" BaseMode="CommonConfig">
+    <ConfigForMode>Init_HPDMACH2</ConfigForMode>
+
+    <Parameter Name="ChannelPRIV_HPDMACH2"/>
+    <Parameter Name="ChannelSEC_HPDMACH2"/>
+    <Parameter Name="SrcSEC_HPDMACH2"/>
+    <Parameter Name="DestSEC_HPDMACH2"/>
+
+     <Parameter Name="CIRCULARMODE_HPDMACH2"/>
+        <Parameter Name="REQUEST_HPDMACH2"/>
+    <Parameter Name="PRIORITY_HPDMACH2"/>
+    <Parameter Name="PRIORITY_LL_CIRCULAR_HPDMACH2"/> 
+    <Parameter Name="MODE_HPDMACH2"/> 
+ 
+    <Parameter Name="DMAHANDLE_HPDMACH2"/>
+    <Parameter Name="DIRECTION_HPDMACH2"/>
+    <Parameter Name="IPINSTANCE_HPDMACH2"/>
+    <Parameter Name="IPHANDLE_HPDMACH2"/>
+    <Parameter Name="BLKHWREQUEST_HPDMACH2"/>
+    <Parameter Name="SRCINC_HPDMACH2"/>
+    <Parameter Name="DESTINC_HPDMACH2"/>
+    <Parameter Name="SRCDATAWIDTH_HPDMACH2"/>
+    <Parameter Name="DESTDATAWIDTH_HPDMACH2"/>
+    
+    
+   
+    <Parameter Name="DATAHANDLING_HPDMACH2"/>
+    
+    <Parameter Name="DATAALIGNEMENT_HPDMACH2"/>
+
+ 
+    <Parameter Name="TRIGGERPOLARITY_HPDMACH2"/>
+    <Parameter Name="TRIGGERMODE_HPDMACH2"/>
+    <Parameter Name="TRIGGERSELECTION_HPDMACH2"/>
+
+
+    <Parameter Name="TRANSFEREVENTMODE_HPDMACH2"/>
+
+     <!-- specific for circular mode -->    
+      
+    <Parameter Name="LINKEDLISTMODE_CIRCULAR_HPDMACH2"/> 
+    <Parameter Name="LINKSTEPMODE_CIRCULAR_HPDMACH2"/> 
+    <Parameter Name="TRANSFEREVENTMODE_LL_CIRCULAR_HPDMACH2"/> 
+
+    <Parameter Name="SRCADD_HPDMACH2"/>
+    <Parameter Name="DSTADD_HPDMACH2"/>
+    <Parameter Name="DATASIZE_HPDMACH2"/>
+    <Parameter Name="NODETYPE_HPDMACH2"/>
+    <!-- specific for circular mode -->
+
+    <!--LPBAM Specific --> 
+    <Parameter Name="Interrupt1_HPDMACH2"/>
+    <Parameter Name="Interrupt2_HPDMACH2"/>
+    <Parameter Name="Interrupt3_HPDMACH2"/>
+    <Parameter Name="Interrupt4_HPDMACH2"/>
+    
+<!--LPBAM Specific --> 
+
+    
+</RefMode>
+
+<RefMode Name="LINKEDLIST_HPDMACH2" BaseMode="CommonConfig">
+    <ConfigForMode>Init_LL_HPDMACH2</ConfigForMode>  
+
+    <Parameter Name="ChannelPRIV_HPDMACH2"/>
+    <Parameter Name="ChannelSEC_HPDMACH2"/>
+    <Parameter Name="SrcSEC_HPDMACH2"/>
+    <Parameter Name="DestSEC_HPDMACH2"/>
+
+     <Parameter Name="PRIORITY_LL_HPDMACH2"/> 
+    <Parameter Name="LINKEDLISTMODE_HPDMACH2"/> 
+    <Parameter Name="LINKSTEPMODE_HPDMACH2"/> 
+    <Parameter Name="TRANSFEREVENTMODE_LL_HPDMACH2"/> 
+
+<!--LPBAM Specific --> 
+    <Parameter Name="Interrupt1_HPDMACH2"/>
+    <Parameter Name="Interrupt2_HPDMACH2"/>
+    <Parameter Name="Interrupt3_HPDMACH2"/>
+    <Parameter Name="Interrupt4_HPDMACH2"/>
+    
+<!--LPBAM Specific --> 
+
+
+
+</RefMode>
+
+
+
+<RefMode Name="SIMPLEREQUEST_HPDMACH3" BaseMode="CommonConfig">
+    <ConfigForMode>Init_HPDMACH3</ConfigForMode>
+<Parameter Name="ChannelPRIV_HPDMACH3"/>
+    <Parameter Name="ChannelSEC_HPDMACH3"/>
+    <Parameter Name="SrcSEC_HPDMACH3"/>
+    <Parameter Name="DestSEC_HPDMACH3"/>
+
+    <Parameter Name="CIRCULARMODE_HPDMACH3"/>
+        <Parameter Name="REQUEST_HPDMACH3"/>
+    <Parameter Name="PRIORITY_HPDMACH3"/>
+    <Parameter Name="PRIORITY_LL_CIRCULAR_HPDMACH3"/> 
+    <Parameter Name="MODE_HPDMACH3"/> 
+
+    <Parameter Name="DMAHANDLE_HPDMACH3"/>
+    <Parameter Name="DIRECTION_HPDMACH3"/>
+    <Parameter Name="IPINSTANCE_HPDMACH3"/>
+    <Parameter Name="IPHANDLE_HPDMACH3"/>
+    <Parameter Name="BLKHWREQUEST_HPDMACH3"/>
+    <Parameter Name="SRCINC_HPDMACH3"/>
+    <Parameter Name="DESTINC_HPDMACH3"/>
+    <Parameter Name="SRCDATAWIDTH_HPDMACH3"/>
+    <Parameter Name="DESTDATAWIDTH_HPDMACH3"/>
+    
+    <Parameter Name="DATAHANDLING_HPDMACH3"/>
+    
+    <Parameter Name="DATAALIGNEMENT_HPDMACH3"/>
+
+ 
+    <Parameter Name="TRIGGERPOLARITY_HPDMACH3"/>
+    <Parameter Name="TRIGGERMODE_HPDMACH3"/>
+    <Parameter Name="TRIGGERSELECTION_HPDMACH3"/>
+
+
+    <Parameter Name="TRANSFEREVENTMODE_HPDMACH3"/>
+
+     <!-- specific for circular mode -->    
+      
+    <Parameter Name="LINKEDLISTMODE_CIRCULAR_HPDMACH3"/> 
+    <Parameter Name="LINKSTEPMODE_CIRCULAR_HPDMACH3"/> 
+    <Parameter Name="TRANSFEREVENTMODE_LL_CIRCULAR_HPDMACH3"/> 
+
+    <Parameter Name="SRCADD_HPDMACH3"/>
+    <Parameter Name="DSTADD_HPDMACH3"/>
+    <Parameter Name="DATASIZE_HPDMACH3"/>
+    <Parameter Name="NODETYPE_HPDMACH3"/>
+    <!-- specific for circular mode -->
+
+    <!--LPBAM Specific --> 
+    <Parameter Name="Interrupt1_HPDMACH3"/>
+    <Parameter Name="Interrupt2_HPDMACH3"/>
+    <Parameter Name="Interrupt3_HPDMACH3"/>
+    <Parameter Name="Interrupt4_HPDMACH3"/>
+    
+    
+<!--LPBAM Specific --> 
+
+    
+    
+</RefMode>
+
+<RefMode Name="LINKEDLIST_HPDMACH3" BaseMode="CommonConfig">
+    <ConfigForMode>Init_LL_HPDMACH3</ConfigForMode>  
+
+    <Parameter Name="ChannelPRIV_HPDMACH3"/>
+    <Parameter Name="ChannelSEC_HPDMACH3"/>
+    <Parameter Name="SrcSEC_HPDMACH3"/>
+    <Parameter Name="DestSEC_HPDMACH3"/>
+     <Parameter Name="PRIORITY_LL_HPDMACH3"/> 
+    <Parameter Name="LINKEDLISTMODE_HPDMACH3"/> 
+    <Parameter Name="LINKSTEPMODE_HPDMACH3"/> 
+    <Parameter Name="TRANSFEREVENTMODE_LL_HPDMACH3"/> 
+
+
+<!--LPBAM Specific --> 
+    <Parameter Name="Interrupt1_HPDMACH3"/>
+    <Parameter Name="Interrupt2_HPDMACH3"/>
+    <Parameter Name="Interrupt3_HPDMACH3"/>
+    <Parameter Name="Interrupt4_HPDMACH3"/>
+    
+    
+<!--LPBAM Specific --> 
+
+   
+
+</RefMode>
+
+
+
+
+
+
+<ModeLogicOperator Name="XOR">
+     
+      
+           
+        <Mode Name="ENABLE_HPDMACH0" UserName="Channel 0  - No Internal FIFO" >
+                <ModeLogicOperator Name="XOR">
+                    <Mode Name="LINKEDLIST_HPDMACH0" UserName="Linked-List Mode">
+                                        <Semaphore>SEM_LINKEDLIST_$IpInstanceCH0</Semaphore>
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_HPDMACH0"/>
+                        </SignalLogicalOp>
+                    </Mode>
+                    <Mode Name="SIMPLEREQUEST_HPDMACH0" UserName="Standard Request Mode" >
+                         <Condition Diagnostic="not available when configurring IP from LPBAM context" Expression="!S_LPBAM_CONF"/>
+                                        <Semaphore>SEM_SIMPLEREQUEST_$IpInstanceCH0</Semaphore>
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_HPDMACH0"/>
+                    </SignalLogicalOp>
+                    </Mode>
+                </ModeLogicOperator>
+        </Mode>
+        <Mode Name="ENABLE_HPDMACH1" UserName="Channel 1  - No Internal FIFO" >
+                <ModeLogicOperator Name="XOR">
+                    <Mode Name="LINKEDLIST_HPDMACH1" UserName="Linked-List Mode">
+                                        <Semaphore>SEM_LINKEDLIST_$IpInstanceCH1</Semaphore>
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_HPDMACH1"/>
+                        </SignalLogicalOp>
+                    </Mode>
+                    <Mode Name="SIMPLEREQUEST_HPDMACH1" UserName="Standard Request Mode" >
+                        <Condition Diagnostic="not available when configurring IP from LPBAM context" Expression="!S_LPBAM_CONF"/>
+                                        <Semaphore>SEM_SIMPLEREQUEST_$IpInstanceCH1</Semaphore>
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_HPDMACH1"/>
+                    </SignalLogicalOp>
+                    </Mode>
+                </ModeLogicOperator>
+        </Mode>
+        <Mode Name="ENABLE_HPDMACH2" UserName="Channel 2  - No Internal FIFO" >
+                <ModeLogicOperator Name="XOR">
+                    <Mode Name="LINKEDLIST_HPDMACH2" UserName="Linked-List Mode">
+                                        <Semaphore>SEM_LINKEDLIST_$IpInstanceCH2</Semaphore>
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_HPDMACH2"/>
+                        </SignalLogicalOp>
+                    </Mode>
+                    <Mode Name="SIMPLEREQUEST_HPDMACH2" UserName="Standard Request Mode">
+                        <Condition Diagnostic="not available when configurring IP from LPBAM context" Expression="!S_LPBAM_CONF"/>
+                                        <Semaphore>SEM_SIMPLEREQUEST_$IpInstanceCH2</Semaphore>
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_HPDMACH2"/>
+                    </SignalLogicalOp>
+                    </Mode>
+                </ModeLogicOperator>
+        </Mode>
+        <Mode Name="ENABLE_HPDMACH3" UserName="Channel 3  - No Internal FIFO" >
+                <ModeLogicOperator Name="XOR">
+                    <Mode Name="LINKEDLIST_HPDMACH3" UserName="Linked-List Mode">
+                                        <Semaphore>SEM_LINKEDLIST_$IpInstanceCH3</Semaphore>
+                        <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_HPDMACH3"/>
+                        </SignalLogicalOp>
+                    </Mode>
+                    <Mode Name="SIMPLEREQUEST_HPDMACH3" UserName="Standard Request Mode" >
+                        <Condition Diagnostic="not available when configurring IP from LPBAM context" Expression="!S_LPBAM_CONF"/>
+                                        <Semaphore>SEM_SIMPLEREQUEST_$IpInstanceCH3</Semaphore>
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_HPDMACH3"/>
+                    </SignalLogicalOp>
+                    </Mode>
+                </ModeLogicOperator>
+        </Mode>
+
+
+</ModeLogicOperator>
+
+           
+
+<RefSignal Name="VS_HPDMACH0"   Virtual="true"/>
+<RefSignal Name="VS_HPDMACH1"   Virtual="true"/>
+<RefSignal Name="VS_HPDMACH2"   Virtual="true"/>
+<RefSignal Name="VS_HPDMACH3"   Virtual="true"/>
+
+
+</IP>

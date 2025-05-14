@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V4.0" IPType="peripheral" Name="PSSI" Version="pssi_v1_H7RS" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd" xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+    <About>PSSI: Parallel Synchronous Slave Interface</About>
+    <!-- Generic RefParameters for PSSI --> 
+    <RefParameter Name="Instance" DefaultValue="PSSI" Comment="Instance" Type="" Visible="false"/>
+    <RefParameter Name="DataWidth" Comment="Data Width" DefaultValue="" Type="list">
+        <PossibleValue Value="HAL_PSSI_8BITS"  Comment="8 Bits" />
+        <PossibleValue Value="HAL_PSSI_16BITS" Comment="16 Bits"/>
+        <PossibleValue Value="HAL_PSSI_32BITS" Comment="32 Bits"/>
+        <Description>
+            Bits size of the word &lt;br&gt;
+            If the Bus Width is smaller than the Data Width, then the least-significant bits of the Data is sent first. &lt;br&gt;
+        </Description>
+    </RefParameter>
+  
+    <RefParameter Name="BusWidth" Comment="Bus Width" DefaultValue="" Type="uniqueElementList" Visible="false">
+        <PossibleValue Value="HAL_PSSI_8LINES" Comment="8 lines"/>
+        <PossibleValue Value="HAL_PSSI_16LINES" Comment="16 lines"/>
+    </RefParameter>
+
+    <RefParameter Name="CLKSource" Comment="Clock Source" DefaultValue="HAL_PSSI_CLOCK_INT" Type="List" Visible="true">
+        <PossibleValue Value="HAL_PSSI_CLOCK_INT" Comment="Internal Clock"/>
+        <PossibleValue Value="HAL_PSSI_CLOCK_EXT" Comment="External Clock"/>
+    </RefParameter>
+
+    <RefParameter Name="ControlSignal" Comment="Control Signals" DefaultValue="HAL_PSSI_DE_RDY_DISABLE" Type="list" >
+        <PossibleValue Value="HAL_PSSI_DE_RDY_DISABLE"       Comment="Neither DE nor RDY are enabled"             />
+        <PossibleValue Value="HAL_PSSI_DE_RDY_ALT_ENABLE"    Comment="Both RDY and DE alternate functions enabled"/>
+        <PossibleValue Value="HAL_PSSI_MAP_RDY_BIDIR_ENABLE" Comment="Bi-directional on RDY pin"                  />
+        <PossibleValue Value="HAL_PSSI_MAP_DE_BIDIR_ENABLE"  Comment="Bi-directional on DE pin"                   />
+        <PossibleValue Value="HAL_PSSI_RDY_ENABLE"           Comment="Only RDY enabled"                           />
+        <PossibleValue Value="HAL_PSSI_RDY_MAP_ENABLE"       Comment="Only RDY enabled, mapped to DE pin"         />
+        <PossibleValue Value="HAL_PSSI_DE_ENABLE"            Comment="Only DE enabled"                            />
+        <PossibleValue Value="HAL_PSSI_DE_MAP_ENABLE"        Comment="Only DE enabled, mapped to RDY pin"         />
+        <Description>
+            &lt;u&gt;No control signal used: &lt;/u&gt;&lt;br&gt;
+            &lt;i&gt;Neither DE nor RDY are enabled&lt;/i&gt;: control signals are not used&lt;br&gt;
+            &lt;br&gt;
+            &lt;u&gt;Both control signals used: &lt;/u&gt;&lt;br&gt;
+            &lt;i&gt;Both RDY and DE alternate functions enabled &lt;/i&gt;: Ready and Data Enable control signals are used on their proper pins&lt;br&gt;
+            &lt;i&gt;Bi-directional on RDY pin&lt;/i&gt;: Data Enable and Ready control signal are used on the Ready pin&lt;br&gt;
+            &lt;i&gt;Bi-directional on DE pin&lt;/i&gt;: Data Enable and Ready control signal are used on the Data Enable pin&lt;br&gt;
+            &lt;br&gt;
+            &lt;u&gt;Only one control signal used: &lt;/u&gt;&lt;br&gt;
+            &lt;i&gt;Only RDY enabled&lt;/i&gt;: only Ready control signal is used on Ready pin&lt;br&gt;
+            &lt;i&gt;Only DE enabled&lt;/i&gt;: only Data Enable control signal is used Data Enable pin&lt;br&gt;
+            &lt;i&gt;Only RDY enabled, mapped to DE pin&lt;/i&gt;: only Ready control signal is used on Data Enable pin&lt;br&gt;
+            &lt;i&gt;Only DE enabled, mapped to RDY pin&lt;/i&gt;: only Data Enable control signal is used Ready pin&lt;br&gt;
+            &lt;br&gt;
+            When PSSI module is receiving: &lt;br&gt;
+                DE: PSSI samples Data Enable signal which is enabled by the transmitter to indicate when the data is valid.&lt;br&gt;
+                RDY: PSSI drives Ready to indicate when PSSI is ready to sample the data. &lt;br&gt;
+            When PSSI module is transmitting: &lt;br&gt;
+                RDY: PSSI samples Ready updated by the transmitter when the transmitter is ready to get data.&lt;br&gt;
+                DE: PSSI drives Data Enable to indicate the receiver as soon as the data are ready. &lt;br&gt;
+        </Description>
+    </RefParameter>
+    <RefParameter Name="ClockPolarity" Comment="Clock Polarity" DefaultValue="HAL_PSSI_FALLING_EDGE" Type="list">
+        <PossibleValue Value="HAL_PSSI_FALLING_EDGE" Comment="Falling Edge"/>
+        <PossibleValue Value="HAL_PSSI_RISING_EDGE"  Comment="Rising Edge" />
+        <Description>
+            This parameter configures the capture edge of the parallel clock or the edge used for driving outputs&lt;br&gt;
+            0: Falling edge active for inputs or rising edge active for outputs&lt;br&gt;
+            1: Rising edge active for inputs or falling edge active for outputs.&lt;br&gt;
+        </Description>
+    </RefParameter>
+    <RefParameter Name="DataEnablePolarity" Comment="Data Enable Polarity" DefaultValue="HAL_PSSI_DEPOL_ACTIVE_LOW" Type="list">
+        <PossibleValue Value="HAL_PSSI_DEPOL_ACTIVE_LOW"  Comment="Active Low" />
+        <PossibleValue Value="HAL_PSSI_DEPOL_ACTIVE_HIGH" Comment="Active High"/>
+        <Description>
+            When DE (Data Enable) is inactive, it means that the data must not be sampled by the receiver at the next clock edge. &lt;br&gt;
+            This parameter specifies if DE is active when this signal is 0 (Low) or when it is 1 (High)&lt;br&gt;
+        </Description>
+    </RefParameter>
+    <RefParameter Name="ReadyPolarity" Comment="Ready Polarity" DefaultValue="HAL_PSSI_RDYPOL_ACTIVE_LOW" Type="list">
+        <PossibleValue Value="HAL_PSSI_RDYPOL_ACTIVE_LOW"  Comment="Active Low" />
+        <PossibleValue Value="HAL_PSSI_RDYPOL_ACTIVE_HIGH" Comment="Active High"/>
+        <Description>
+            When RDY (Ready) is inactive, it means that the data are not transmitted by the transmitter at the next clock edge. &lt;br&gt;
+            This parameter specifies if RDY is active when this signal is 0 (Low) or when it is 1 (High)&lt;br&gt;
+        </Description>
+    </RefParameter>
+  
+    <!--  MODES Definitions -->
+    <!-- Abstract RefMode --> 
+    <RefMode Name="PSSI"    Comment="PSSI initialization" HalMode="PSSI" Abstract="true">
+        <ConfigForMode>PSSI_Init</ConfigForMode>
+        <Parameter Name="DataWidth"          Group="Configuration"/>
+        <Parameter Name="ControlSignal"      Group="Configuration"/>
+        <Parameter Name="ClockPolarity"      Group="Configuration"/>
+        <Parameter Name="DataEnablePolarity" Group="Configuration"/>
+        <Parameter Name="ReadyPolarity"      Group="Configuration"/>
+		<Parameter Name="CLKSource"      Group="Configuration"/>
+    </RefMode>
+  
+    <!-- Instanciated RefModes -->
+    <RefMode Name="PSSI_8"  Comment="PSSI initialization" HalMode="PSSI" BaseMode="PSSI" >
+        <Parameter Name="BusWidth">
+            <PossibleValue>HAL_PSSI_8LINES</PossibleValue>
+        </Parameter>
+        <Parameter Name="DataWidth">
+            <PossibleValue>HAL_PSSI_8BITS</PossibleValue>
+            <PossibleValue>HAL_PSSI_16BITS</PossibleValue>
+            <PossibleValue>HAL_PSSI_32BITS</PossibleValue>
+        </Parameter>
+    </RefMode>
+    <RefMode Name="PSSI_16" Comment="PSSI initialization" HalMode="PSSI" BaseMode="PSSI" >
+        <Parameter Name="BusWidth">
+            <PossibleValue>HAL_PSSI_16LINES</PossibleValue>
+        </Parameter>
+        <Parameter Name="DataWidth">
+            <PossibleValue>HAL_PSSI_16BITS</PossibleValue>
+            <PossibleValue>HAL_PSSI_32BITS</PossibleValue>
+        </Parameter>        
+    </RefMode>
+    <!-- UI presentation -->
+    <ModeLogicOperator Name="OR">
+        <Mode Name="PSSI">
+            <Condition Expression="!DCMI" Diagnostic="DCMI and PSSI are in exclusive choice"/>
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="PSSI_8" UserName="with a Bus Width = 8 bits" ShrinkName="Activate PSSI with Bus Width = 8 bits">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="D0"/>
+                        <Signal Name="D1"/>
+                        <Signal Name="D2"/>
+                        <Signal Name="D3"/>
+                        <Signal Name="D4"/>
+                        <Signal Name="D5"/>
+                        <Signal Name="D6"/>
+                        <Signal Name="D7"/>
+                        <Signal Name="DE"/>
+                        <Signal Name="PDCK"/>
+                        <Signal Name="RDY"/>
+                    </SignalLogicalOp>
+                </Mode>   
+                <Mode Name="PSSI_16" UserName="with a Bus Width = 16 bits">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="D0"/>
+                        <Signal Name="D1"/>
+                        <Signal Name="D2"/>
+                        <Signal Name="D3"/>
+                        <Signal Name="D4"/>
+                        <Signal Name="D5"/>
+                        <Signal Name="D6"/>
+                        <Signal Name="D7"/>
+                        <Signal Name="D8"/>
+                        <Signal Name="D9"/>
+                        <Signal Name="D10"/>
+                        <Signal Name="D11"/>
+                        <Signal Name="D12"/>
+                        <Signal Name="D13"/>
+                        <Signal Name="D14"/>
+                        <Signal Name="D15"/>
+                        <Signal Name="DE"/>
+                        <Signal Name="PDCK"/>
+                        <Signal Name="RDY"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Semaphore>PSSI_DmaTransmit</Semaphore>
+            <Semaphore>PSSI_DmaReceive</Semaphore>
+        </Mode>
+    </ModeLogicOperator>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="D0"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="D1"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="D2"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="D3"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="D4"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="D5"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="D6"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="D7"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="D8"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="D9"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="D10"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="D11"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="D12"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="D13"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="D14"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="D15"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="DE"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="PDCK"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="RDY"/>
+    <!-- this semaphore is defined as soon as one of PSSI mode is activated -->
+    <!-- This allows the mutual exclusion with DCMI -->
+    <Semaphore>PSSI</Semaphore>
+</IP>

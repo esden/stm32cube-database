@@ -178,7 +178,7 @@ TX_THREAD       fx_app_thread;
 [#if FX_SRAM_INTERFACE_value == "1"]
 [#if LINK_SRAM_DRIVER_value == "1" || FORMAT_SRAM_MEDIA_value == "1"]
 /* Buffer for FileX FX_MEDIA sector cache. */
-[#if FamilyName=="STM32C0"]
+[#if FamilyName=="STM32C0" || FamilyName=="STM32U0"]
 uint32_t fx_sram_media_memory[FX_SRAM_SECTOR_SIZE / sizeof(uint32_t)];
 
 [#else]
@@ -197,7 +197,11 @@ FX_MEDIA        sram_disk;
 [#if FX_SD_INTERFACE_value == "1"]
 [#if LINK_SD_DRIVER_value == "1" || FORMAT_SD_MEDIA_value == "1"]
 /* Buffer for FileX FX_MEDIA sector cache. */
+[#if FamilyName=="STM32U0"]
+uint32_t fx_nor_simulator_media_memory[FX_NOR_SIMULATOR_SECTOR_SIZE / sizeof(uint32_t)];
+[#else]
 ALIGN_32BYTES (uint32_t fx_sd_media_memory[FX_STM32_SD_DEFAULT_SECTOR_SIZE / sizeof(uint32_t)]);
+[/#if]
 /* Define FileX global data structures.  */
 FX_MEDIA        sdio_disk;
 [/#if]
@@ -242,7 +246,11 @@ FX_MEDIA        nor_ospi_flash_disk;
 [#if LX_NOR_USE_SIMULATOR_DRIVER_value == "true" && FX_LX_NOR_INTERFACE_value == "1"]
 [#if LINK_NOR_SIMULATOR_DRIVER_value == "1" || FORMAT_NOR_SIMULATOR_MEDIA_value == "1"]
 /* Buffer for FileX FX_MEDIA sector cache. */
+[#if FamilyName=="STM32U0"]
+uint32_t fx_nor_simulator_media_memory[FX_NOR_SIMULATOR_SECTOR_SIZE / sizeof(uint32_t)];
+[#else]
 ALIGN_32BYTES (uint32_t fx_nor_simulator_media_memory[FX_NOR_SIMULATOR_SECTOR_SIZE / sizeof(uint32_t)]);
+[/#if]
 /* Define FileX global data structures.  */
 FX_MEDIA        nor_simulator_flash_disk;
 [/#if]

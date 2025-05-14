@@ -79,9 +79,15 @@
 /* Includes ------------------------------------------------------------------*/
 #include "lwip.h"
 #include "lwip/init.h"
+[#if (series != "stm32h7rs")]
 #include "lwip/netif.h"
+[/#if]
 [#if keil == 1]
+[#if (series=="stm32h7rs")]
+#if (defined ( __CC_ARM ) || defined (__ARMCC_VERSION))  /* MDK ARM Compiler */
+[#else]
 #if defined ( __CC_ARM )  /* MDK ARM Compiler */
+[/#if]
 #include "lwip/sio.h"
 #endif /* MDK ARM Compiler */
 [/#if][#-- endif keil --]
@@ -98,14 +104,16 @@
 
 /* USER CODE END 0 */
 /* Private function prototypes -----------------------------------------------*/
-[#if ((series == "stm32h7") || (series == "stm32f4") || (series == "stm32f7")) && (netif_callback == 1) ]
+[#if ((series == "stm32h7") || (series == "stm32f4") || (series == "stm32f7") || (series == "stm32h7rs")) && (netif_callback == 1) ]
 static void ethernet_link_status_updated(struct netif *netif);
 [#if with_rtos == 0]
 static void Ethernet_Link_Periodic_Handle(struct netif *netif);
 [/#if][#-- endif with_rtos --]
 [/#if][#-- endif series && netif_callback --] 
 /* ETH Variables initialization ----------------------------------------------*/
+[#if series != "stm32h7rs"]
 [#include mxTmpFolder+"/eth_vars.tmp"]
+[/#if]
 
 [#compress][#if lwip_dhcp == 1]
 [#if with_rtos == 0]
@@ -401,7 +409,7 @@ uint32_t DHCPcoarseTimer = 0;
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
-[#if (series != "stm32h7") && (series != "stm32f4") && (series != "stm32f7")]
+[#if (series != "stm32h7") && (series != "stm32f4") && (series != "stm32f7") && (series != "stm32h7rs")]
   [#if (netif_callback == 1) && (with_rtos == 1)]
 /* Semaphore to signal Ethernet Link state update */
 osSemaphoreId Netif_LinkSemaphore = NULL;
@@ -491,11 +499,11 @@ void MX_LWIP_Init(void)
 [/#list]
 [#compress]
 [#if with_rtos == 0]
-#n#t/* Initilialize the LwIP stack without RTOS */
+#n#t/* Initialize the LwIP stack without RTOS */
 #tlwip_init();
 [/#if][#-- endif with_rtos --]
 [#if with_rtos == 1]
-#n#t/* Initilialize the LwIP stack with RTOS */
+#n#t/* Initialize the LwIP stack with RTOS */
 #ttcpip_init( NULL, NULL );
 [/#if][#-- endif with_rtos --]
 #n
@@ -551,18 +559,24 @@ void MX_LWIP_Init(void)
 #t/*  Registers the default network interface */
 #tnetif_set_default(&gnetif);
 #n
+[#if (series != "stm32h7rs")]
 #t/* We must always bring the network interface up connection or not... */
 #tnetif_set_up(&gnetif); 
-#n  
+#n
+[/#if][#-- endif series --]
 [#if (netif_callback == 1) ] [#-- No RTOS needed --]
+[#if series == "stm32h7rs"]
+#tethernet_link_status_updated(&gnetif);
+#n
+[/#if]
 #t/* Set the link callback function, this function is called on change of link status*/
-[#if (series != "stm32h7") && (series != "stm32f4") && (series != "stm32f7")]
+[#if (series != "stm32h7") && (series != "stm32f4") && (series != "stm32f7") && (series != "stm32h7rs")]
 #tnetif_set_link_callback(&gnetif, ethernetif_update_config);
-[#else][#-- case series == "stm32h7/f7/f4" --]
+[#else][#-- case series == "stm32h7/f7/f4/h7rs" --]
 #tnetif_set_link_callback(&gnetif, ethernet_link_status_updated);
 [/#if][#-- endif series --]
 #n 
-[#if ((series != "stm32h7") && (series != "stm32f4") && (series != "stm32f7")) && (with_rtos == 1)]
+[#if ((series != "stm32h7") && (series != "stm32f4") && (series != "stm32f7") && (series != "stm32h7rs")) && (with_rtos == 1)]
 #t/* create a binary semaphore used for informing ethernetif of frame reception */
 [#if cmsis_version = "v2"]
 #tNetif_LinkSemaphore = osSemaphoreNew(1, 1, NULL);
@@ -588,9 +602,9 @@ void MX_LWIP_Init(void)
 #tosThreadCreate (osThread(LinkThr), &link_arg);
 /* USER CODE END OS_THREAD_DEF_CREATE_CMSIS_RTOS_V1 */
 [/#if][#-- endif cmsis_version --]
-[#else][#-- case series == "stm32h7/f7/f4" --]
-#t/* Create the Ethernet link handler thread */
+[#else][#-- case series == "stm32h7/f7/f4/h7rs" --]
 [#if with_rtos == 1]
+#t/* Create the Ethernet link handler thread */
 [#if cmsis_version = "v2"]
 /* USER CODE BEGIN H7_OS_THREAD_NEW_CMSIS_RTOS_V2 */
 #tmemset(&attributes, 0x0, sizeof(osThreadAttr_t));
@@ -628,11 +642,15 @@ void MX_LWIP_Init(void)
 #endif
 
 #n
-[#if (series == "stm32h7") || (series == "stm32f4") || (series == "stm32f7")]
+[#if (series == "stm32h7") || (series == "stm32f4") || (series == "stm32f7") || (series == "stm32h7rs")]
 [#if (with_rtos == 0) && (netif_callback == 1)] 
 /**
   * @brief  Ethernet Link periodic check
+  [#if series == "stm32h7rs"]
+  * @param  netif: the network interface 
+  [#else]
   * @param  netif 
+  [/#if]
   * @retval None
   */
 static void Ethernet_Link_Periodic_Handle(struct netif *netif)
@@ -677,7 +695,7 @@ void MX_LWIP_Process(void)
   sys_check_timeouts();
 [/#if][#-- endif lwip_timers --]
 
-[#if ((series == "stm32h7") || (series == "stm32f4") || (series == "stm32f7")) && (netif_callback == 1)]  
+[#if ((series == "stm32h7") || (series == "stm32f4") || (series == "stm32f7") || (series == "stm32h7rs")) && (netif_callback == 1)]  
   Ethernet_Link_Periodic_Handle(&gnetif);
 [/#if][#-- endif series && netif_callback --] 
 
@@ -687,7 +705,7 @@ void MX_LWIP_Process(void)
 [/#if][#-- endif with_rtos --]
 
 
-[#if (netif_callback == 1) && ((series == "stm32h7") || (series == "stm32f4") || (series == "stm32f7"))]
+[#if (netif_callback == 1) && ((series == "stm32h7") || (series == "stm32f4") || (series == "stm32f7") || (series == "stm32h7rs"))]
 /**
   * @brief  Notify the User about the network interface config status 
   * @param  netif: the network interface
@@ -709,7 +727,11 @@ static void ethernet_link_status_updated(struct netif *netif)
 [/#if][#-- endif netif_callback && series --]
 
 [#if keil == 1]
+[#if (series=="stm32h7rs")]
+#if (defined ( __CC_ARM ) || defined (__ARMCC_VERSION))  /* MDK ARM Compiler */
+[#else]
 #if defined ( __CC_ARM )  /* MDK ARM Compiler */
+[/#if]
 /**
  * Opens a serial device for communication.
  *

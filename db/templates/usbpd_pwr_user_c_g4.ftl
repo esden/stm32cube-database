@@ -20,6 +20,8 @@
 #endif /* _TRACE */
 
 /* USER CODE BEGIN include */
+[@common.optinclude name=mxTmpFolder+"/usbpd_pwr_user_c_Include.tmp"/]
+
 /* USER CODE END include */
 
 /** @addtogroup BSP
@@ -461,7 +463,13 @@ __weak int32_t BSP_USBPD_PWR_VBUSSetVoltage_APDO(uint32_t Instance,
 __weak int32_t BSP_USBPD_PWR_VBUSGetVoltage(uint32_t Instance, uint32_t *pVoltage)
 {
   /* USER CODE BEGIN BSP_USBPD_PWR_VBUSGetVoltage */
-
+[#assign name=mxTmpFolder+"/usbpd_pwr_user_c_VbusGetVoltage.tmp"]
+[#assign objectConstructor = "freemarker.template.utility.ObjectConstructor"?new()]
+[#assign file = objectConstructor("java.io.File",workspace+"/"+name)]
+[#assign exist = file.exists()]
+[#if exist]
+  [#include "${name}"]
+[#else]
   /* Check if instance is valid       */
   int32_t ret;
   uint32_t val = 0U;
@@ -477,6 +485,7 @@ __weak int32_t BSP_USBPD_PWR_VBUSGetVoltage(uint32_t Instance, uint32_t *pVoltag
   }
   *pVoltage = val;
   return ret;
+[/#if]
   /* USER CODE END BSP_USBPD_PWR_VBUSGetVoltage */
 }
 
@@ -491,6 +500,13 @@ __weak int32_t BSP_USBPD_PWR_VBUSGetVoltage(uint32_t Instance, uint32_t *pVoltag
 __weak int32_t BSP_USBPD_PWR_VBUSGetCurrent(uint32_t Instance, int32_t *pCurrent)
 {
   /* USER CODE BEGIN BSP_USBPD_PWR_VBUSGetCurrent */
+[#assign name=mxTmpFolder+"/usbpd_pwr_user_c_VbusGetCurrent.tmp"]
+[#assign objectConstructor = "freemarker.template.utility.ObjectConstructor"?new()]
+[#assign file = objectConstructor("java.io.File",workspace+"/"+name)]
+[#assign exist = file.exists()]
+[#if exist]
+  [#include "${name}"]
+[#else]
   /* Check if instance is valid       */
   int32_t ret;
 
@@ -504,6 +520,7 @@ __weak int32_t BSP_USBPD_PWR_VBUSGetCurrent(uint32_t Instance, int32_t *pCurrent
     ret = BSP_ERROR_FEATURE_NOT_SUPPORTED;
   }
   return ret;
+[/#if]
   /* USER CODE END BSP_USBPD_PWR_VBUSGetCurrent */
 }
 

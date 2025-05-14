@@ -86,6 +86,7 @@
   * @{
   */
 /* USER CODE BEGIN Private_Define */
+[@common.optinclude name=mxTmpFolder+"/usbpd_pwr_if_c_PrivateDefine.tmp"/]
 
 /* USER CODE END Private_Define */
 /**
@@ -102,6 +103,7 @@
 #define PWR_IF_DEBUG_TRACE(_PORT_, __MESSAGE__)
 #endif /* _TRACE */
 /* USER CODE BEGIN Private_Macro */
+[@common.optinclude name=mxTmpFolder+"/usbpd_pwr_if_c_Macro.tmp"/]
 
 /* USER CODE END Private_Macro */
 /**
@@ -113,6 +115,7 @@
   * @{
   */
 /* USER CODE BEGIN Private_Variables */
+[@common.optinclude name=mxTmpFolder+"/usbpd_pwr_if_c_Variables.tmp"/]
 
 /* USER CODE END Private_Variables */
 /**
@@ -124,6 +127,7 @@
   * @{
   */
 /* USER CODE BEGIN USBPD_USER_PRIVATE_FUNCTIONS_Prototypes */
+[@common.optinclude name=mxTmpFolder+"/usbpd_pwr_if_c_Prototypes.tmp"/]
 
 /* USER CODE END USBPD_USER_PRIVATE_FUNCTIONS_Prototypes */
 /**
@@ -143,7 +147,15 @@
 USBPD_StatusTypeDef USBPD_PWR_IF_Init(void)
 {
 /* USER CODE BEGIN USBPD_PWR_IF_Init */
+[#assign name=mxTmpFolder+"/usbpd_pwr_if_c_Init.tmp"]
+[#assign objectConstructor = "freemarker.template.utility.ObjectConstructor"?new()]
+[#assign file = objectConstructor("java.io.File",workspace+"/"+name)]
+[#assign exist = file.exists()]
+[#if exist]
+  [#include "${name}"]
+[#else]
   return USBPD_ERROR;
+[/#if]
 /* USER CODE END USBPD_PWR_IF_Init */
 }
 
@@ -156,6 +168,13 @@ USBPD_StatusTypeDef USBPD_PWR_IF_Init(void)
 USBPD_StatusTypeDef USBPD_PWR_IF_SetProfile(uint8_t PortNum)
 {
 /* USER CODE BEGIN USBPD_PWR_IF_SetProfile */
+[#assign name=mxTmpFolder+"/usbpd_pwr_if_c_Setprofile.tmp"]
+[#assign objectConstructor = "freemarker.template.utility.ObjectConstructor"?new()]
+[#assign file = objectConstructor("java.io.File",workspace+"/"+name)]
+[#assign exist = file.exists()]
+[#if exist]
+  [#include "${name}"]
+[#else]
   USBPD_StatusTypeDef      _status = USBPD_ERROR;
   PWR_IF_DEBUG_TRACE(PortNum, "ADVICE: update USBPD_PWR_IF_SetProfile");
 /*   if (BSP_ERROR_NONE == BSP_USBPD_PWR_VBUSSetVoltage_Fixed(PortNum, 5000, 3000, 3000))
@@ -163,7 +182,8 @@ USBPD_StatusTypeDef USBPD_PWR_IF_SetProfile(uint8_t PortNum)
      _status = USBPD_OK;
   }
  */
-  return _status;
+   return _status;
+[/#if]
 /* USER CODE END USBPD_PWR_IF_SetProfile */
 }
 
@@ -361,6 +381,7 @@ void USBPD_PWR_IF_GetPortPDOs(uint8_t PortNum, USBPD_CORE_DataInfoType_TypeDef D
   }
 [/#if]
 /* USER CODE BEGIN USBPD_PWR_IF_GetPortPDOs */
+[@common.optinclude name=mxTmpFolder+"/usbpd_pwr_if_c_GetPortPDOs.tmp"/]
 
 /* USER CODE END USBPD_PWR_IF_GetPortPDOs */
 }
@@ -377,7 +398,15 @@ void USBPD_PWR_IF_GetPortPDOs(uint8_t PortNum, USBPD_CORE_DataInfoType_TypeDef D
 USBPD_StatusTypeDef USBPD_PWR_IF_SearchRequestedPDO(uint8_t PortNum, uint32_t RdoPosition, uint32_t *Pdo)
 {
 /* USER CODE BEGIN USBPD_PWR_IF_SearchRequestedPDO */
+[#assign name=mxTmpFolder+"/usbpd_pwr_if_c_SearchRequestedPDO.tmp"]
+[#assign objectConstructor = "freemarker.template.utility.ObjectConstructor"?new()]
+[#assign file = objectConstructor("java.io.File",workspace+"/"+name)]
+[#assign exist = file.exists()]
+[#if exist]
+  [#include "${name}"]
+[#else]
   return USBPD_FAIL;
+[/#if]
 /* USER CODE END USBPD_PWR_IF_SearchRequestedPDO */
 }
 
@@ -444,6 +473,7 @@ uint8_t USBPD_PWR_IF_GetVBUSStatus(uint8_t PortNum, USBPD_VBUSPOWER_STATUS Power
 void USBPD_PWR_IF_UpdateVbusThreshold(uint8_t PortNum)
 {
 /* USER CODE BEGIN USBPD_PWR_IF_UpdateVbusThreshold */
+[@common.optinclude name=mxTmpFolder+"/usbpd_pwr_if_c_UpdateVbusThreshold.tmp"/]
 /* USER CODE END USBPD_PWR_IF_UpdateVbusThreshold */
 }
 
@@ -455,6 +485,8 @@ void USBPD_PWR_IF_UpdateVbusThreshold(uint8_t PortNum)
 void USBPD_PWR_IF_ResetVbusThreshold(uint8_t PortNum)
 {
 /* USER CODE BEGIN USBPD_PWR_IF_ResetVbusThreshold */
+[@common.optinclude name=mxTmpFolder+"/usbpd_pwr_if_c_ResetVbusThreshold.tmp"/]
+
 /* USER CODE END USBPD_PWR_IF_ResetVbusThreshold */
 }
 [/#if]
@@ -470,6 +502,7 @@ void USBPD_PWR_IF_ResetVbusThreshold(uint8_t PortNum)
   * @{
   */
 /* USER CODE BEGIN USBPD_USER_PRIVATE_FUNCTIONS_Definition */
+[@common.optinclude name=mxTmpFolder+"/usbpd_pwr_if_c_Functions.tmp"/]
 
 /* USER CODE END USBPD_USER_PRIVATE_FUNCTIONS_Definition */
 /**

@@ -19,7 +19,6 @@
 #include "${main_h}"
 #include "${FamilyName?lower_case}xx_it.h"
 
-[@common.optinclude name=contextFolder+"/Core/Src/bsp_inc.tmp"/][#-- BSP includes --]
 
 [#if cpucore!="" && cpucore?replace("ARM_CORTEX_","")=="M4"]
     [#if  timeBaseSource_M4??]
@@ -59,7 +58,7 @@
 [#if TRACER_EMB??] [#-- If TRACER_EMB is used --]
 #include "tracer_emb.h"
 [/#if]
-[#if GUI_INTERFACE?? && timeBaseSource=="SysTick"] [#-- If GUI_INTERFACE is used and timebase source is SysTick --]
+[#if GUI_INTERFACE?? && timeBaseSource?? && timeBaseSource=="SysTick"] [#-- If GUI_INTERFACE is used and timebase source is SysTick --]
 #include "gui_api.h"
 [/#if]
 [#assign swlowRadioIrqSelected = false]
@@ -299,7 +298,7 @@ void ${vector.irqHandler}(void)
 [#compress]
 
 [#-- BSP interrupts --]
-[@common.optinclude name=contextFolder+"/Core/Src/bsp_common_it.tmp"/]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/bsp_common_it.tmp"/]
 
 
 [#list nvic as vector]

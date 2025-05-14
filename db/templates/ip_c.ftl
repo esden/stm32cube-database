@@ -22,7 +22,7 @@
 [#assign ipvar = IP]
 /* Includes ------------------------------------------------------------------*/
 #include "${name?lower_case}.h"
-[#if name=="ETH" && (F4_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || H5_ETH_NoLWIP?? || MP13_ETH_NoLWIP??)]
+[#if name=="ETH" && (F4_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || H5_ETH_NoLWIP?? || MP13_ETH_NoLWIP?? || H7RS_ETH_NoLWIP??)]
 #include "string.h"
 [/#if]
 
@@ -110,7 +110,7 @@
 [@common.optincludeFile path=coreDir+"Inc" name="gfxmmu_lut.h"/]
 [/#if]
 [#-- WorkAround for Ticket 30863 --]
-[#if name=="ETH" && (H7_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || H5_ETH_NoLWIP?? || MP13_ETH_NoLWIP??)]
+[#if name=="ETH" && (H7_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || H5_ETH_NoLWIP?? || MP13_ETH_NoLWIP?? || H7RS_ETH_NoLWIP??)]
 [#if !H5_ETH_NoLWIP??]
 #if defined ( __ICCARM__ ) /*!< IAR Compiler */
 
@@ -124,21 +124,36 @@ ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptor
 __attribute__((at([#if RxDescAddress??]${RxDescAddress}[#else]0x30040000[/#if]))) ETH_DMADescTypeDef  DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
 __attribute__((at([#if TxDescAddress??]${TxDescAddress}[#else]0x30040060[/#if]))) ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
 
-#elif defined ( __GNUC__ ) /* GNU Compiler */ 
+[#if H7RS_ETH_NoLWIP??]
+#elif defined ( __GNUC__ ) || defined ( __ARMCC_VERSION )) /* GNU Compiler */ 
+
+ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT] __attribute__((section(".RxDescripSection"))); /* Ethernet Rx DMA Descriptors */
+ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT] __attribute__((section(".TxDescripSection")));   /* Ethernet Tx DMA Descriptors */
+[#else]
+#elif defined ( __GNUC__ ) /* GNU Compiler */
 
 ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT] __attribute__((section(".RxDecripSection"))); /* Ethernet Rx DMA Descriptors */
 ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT] __attribute__((section(".TxDecripSection")));   /* Ethernet Tx DMA Descriptors */
+[/#if]
 
 #endif
 [/#if]
 ETH_BufferTypeDef Txbuffer[ETH_TX_DESC_CNT * 2U];
-ETH_TxPacketConfig TxConfig; 
+[#if FamilyName=="STM32H5" || FamilyName=="STM32MP13" || FamilyName=="STM32H7RS"]
+ETH_TxPacketConfigTypeDef TxConfig;
+[#else]
+ETH_TxPacketConfig TxConfig;
+[/#if]
 [/#if]
 [#if name=="ETH" && (F4_ETH_NoLWIP?? || H5_ETH_NoLWIP??)]
 ETH_DMADescTypeDef  DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
 ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
 
-ETH_TxPacketConfig TxConfig; 
+[#if FamilyName=="STM32H5" || FamilyName=="STM32MP13" || FamilyName=="STM32H7RS"]
+ETH_TxPacketConfigTypeDef TxConfig;
+[#else]
+ETH_TxPacketConfig TxConfig;
+[/#if]
 [/#if]
 [#-- End workaround for Ticket 30863 --]
 [#-- Tracker 276386 -- GetHandle End --]
@@ -1209,7 +1224,7 @@ ${variable.value} ${variable.name};
                [/#if]
            [/#list]
     [/#if]
-    [#if  !(instName?starts_with("GPDMA")) && !(instName?starts_with("LPDMA")) && instanceData.initServices?? && instanceData.initServices.dma?? && (FamilyName=="STM32U5" | FamilyName=="STM32H5")]
+    [#if  !(instName?starts_with("GPDMA")) && !(instName?starts_with("LPDMA")) && instanceData.initServices?? && instanceData.initServices.dma?? && (FamilyName=="STM32U5" | FamilyName=="STM32H5" | FamilyName=="STM32H7RS")]
         [#assign service=instanceData.initServices.dma]
            [#list service as dmaConfig]
                 [#list dmaConfig.variables as variable] [#-- variables declaration --]

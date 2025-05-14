@@ -1980,6 +1980,14 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *p_Pckt)
           break;
         /* PAIRING */
 [/#if]
+    [#if (BT_SIG_BEACON = "0")]
+        case ACI_GATT_INDICATION_VSEVT_CODE:
+        {
+          APP_DBG_MSG(">>== ACI_GATT_INDICATION_VSEVT_CODE \r");
+          aci_gatt_confirm_indication(BleApplicationContext.BleApplicationContext_legacy.connectionHandle);
+        }
+        break;
+    [/#if]
 
         /* USER CODE BEGIN BLUE_EVT */
 

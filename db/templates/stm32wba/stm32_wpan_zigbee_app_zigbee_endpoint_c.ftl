@@ -283,6 +283,8 @@ Key: ${key}; Value: ${myHash[key]}
         
         [#lt]  /* Add EndPoint${endpointName?replace("_"," ")} */
         [#lt]  memset( &stRequest, 0, sizeof( stRequest ) );
+        [#lt]  memset( &stConfig, 0, sizeof( stConfig ) );
+
         [#lt]  stRequest.profileId = APP_ZIGBEE_PROFILE_ID${endpointName};
         [#lt]  stRequest.deviceId = APP_ZIGBEE_DEVICE_ID${endpointName};
         [#lt]  stRequest.endpoint = APP_ZIGBEE_ENDPOINT${endpointName};

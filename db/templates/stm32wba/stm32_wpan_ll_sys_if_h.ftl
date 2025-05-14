@@ -35,6 +35,8 @@ Key: ${key}; Value: ${myHash[key]}
 [#if (myHash["BLE"] == "Enabled")]
 [#if myHash["THREADX_STATUS"]?number == 1 ]
 #include "tx_api.h"
+[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+#include "cmsis_os2.h"
 [/#if]
 [/#if]
 
@@ -58,6 +60,9 @@ Key: ${key}; Value: ${myHash[key]}
 [#if myHash["THREADX_STATUS"]?number == 1 ]
 /* LINK_LAYER_TASK related resources */
 extern TX_MUTEX           LinkLayerMutex;
+
+[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+extern osMutexId_t LinkLayerMutex;
 
 [/#if]
 [/#if]

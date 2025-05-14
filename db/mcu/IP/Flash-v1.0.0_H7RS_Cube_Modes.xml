@@ -1,0 +1,619 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" DBVersion="V4.0" IPType="service" IpGroup="System Core" Name="Flash" Version="1.0.0" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd">
+
+	<RefMode Abstract="false" Name="Activate_FlashIP">
+		<ConfigForMode>Activate_FlashIP</ConfigForMode>
+
+		<!-- BEGIN OB parameters -->
+		
+		
+		<!-- OptionType parameters -->
+		<Parameter Name="OptionType" />
+		<Parameter Name="OptionType_WRP" />
+		<Parameter Name="OptionType_USER" />
+		<Parameter Name="OptionType_HDP" />
+		
+		<!-- OptionType_USER parameters -->
+		<Parameter Name="USERType" />
+
+		<Parameter Name="OB_USERType_Config1ALL" />
+		<Parameter Name="USERConfig1" />
+		<Parameter Name="OB_BOR_Level_active" />
+		<Parameter Name="OB_BOR_level" />
+		<Parameter Name="OB_User_Configuration1_active" />
+		<Parameter Name="OB_IWDG1_SW_UI" />
+		<Parameter Name="OB_nRST_STOP_UI" />
+		<Parameter Name="OB_nRST_STDBY_UI" />
+		<Parameter Name="OB_IO_HSLV_UI" />
+		<Parameter Name="OB_FZ_IWDG_STOP_UI" />
+		<Parameter Name="OB_FZ_IWDG_SDBY_UI" />
+		<Parameter Name="OB_XSPI1_HSLV_UI" />
+		<Parameter Name="OB_XSPI2_HSLV_UI" />
+
+		<Parameter Name="OB_USERType_Config2ALL" />
+		<Parameter Name="USERConfig2" />
+		<Parameter Name="OB_User_Configuration2_active" />
+		<Parameter Name="OB_USER_SRAM_ECC" />
+		<Parameter Name="OB_ECC_ON_SRAM_UI" />
+		<Parameter Name="OB_USER_I2C_NI3C" />
+		<Parameter Name="OB_I2C_NI3C" />
+
+		<Parameter Name="OB_USER_DTCM_AXI_SHARE" />
+		<Parameter Name="OB_DTCM_active" />
+		<Parameter Name="OB_DTCM_AXI_SHARE" />
+
+		<Parameter Name="OB_USER_ITCM_AXI_SHARE" />
+		<Parameter Name="OB_ITCM_active" />
+		<Parameter Name="OB_ITCM_AXI_SHARE" />
+
+		<!-- OptionType_WRP parameters -->
+		<Parameter Name="OB_WRP_active" />
+		<Parameter Name="OB_nWRP0" />
+		<Parameter Name="OB_nWRP1" />
+		<Parameter Name="OB_nWRP2" />
+		<Parameter Name="OB_nWRP3" />
+		<Parameter Name="OB_nWRP4" />
+		<Parameter Name="OB_nWRP5" />
+		<Parameter Name="OB_nWRP6" />
+		<Parameter Name="OB_nWRP7" />
+
+		<Parameter Name="OB_WRP_Enabled_Sectors" />
+		<Parameter Name="OB_WRP_Enabled_Sector0" />
+		<Parameter Name="OB_WRP_Enabled_Sector1" />
+		<Parameter Name="OB_WRP_Enabled_Sector2" />
+		<Parameter Name="OB_WRP_Enabled_Sector3" />
+		<Parameter Name="OB_WRP_Enabled_Sector4" />
+		<Parameter Name="OB_WRP_Enabled_Sector5" />
+		<Parameter Name="OB_WRP_Enabled_Sector6" />
+		<Parameter Name="OB_WRP_Enabled_Sector7" />
+
+		<Parameter Name="OB_WRP_Disabled_Sectors" />
+		<Parameter Name="OB_WRP_Disable_Sector0" />
+		<Parameter Name="OB_WRP_Disable_Sector1" />
+		<Parameter Name="OB_WRP_Disable_Sector2" />
+		<Parameter Name="OB_WRP_Disable_Sector3" />
+		<Parameter Name="OB_WRP_Disable_Sector4" />
+		<Parameter Name="OB_WRP_Disable_Sector5" />
+		<Parameter Name="OB_WRP_Disable_Sector6" />
+		<Parameter Name="OB_WRP_Disable_Sector7" />
+
+		<Parameter Name="OB_WRP_State_Enable" />
+		<Parameter Name="OB_WRP_State_Disable" />
+		
+		<Parameter Name="WRPSector" />
+		<Parameter Name="WRPState" />
+
+		<!-- OptionType_HDP parameters -->
+		<Parameter Name="OB_HDP_active" />
+		<Parameter Name="HDPStartPage" />
+		<Parameter Name="HDPEndPage" />
+
+	</RefMode>
+
+	<ModeLogicOperator Name="OR">
+		<Mode Name="Activate_FlashIP" UserName="Enable" RemoveDisable="true">
+			<ModeLogicOperator Name="OR">
+				<Mode Name="Activate_FlashIP" UserName="Enable">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="SIG_Activate_FlashIP" />
+					</SignalLogicalOp>
+					<Semaphore>SEMA_Activate_FlashIP</Semaphore>
+				</Mode>
+			</ModeLogicOperator>
+		</Mode>
+	</ModeLogicOperator>
+	<RefSignal Name="SIG_Activate_FlashIP" Virtual="true" />
+
+	<!-- BEGIN HAL OB User Configuration REFPARAMETERS-->
+	<RefParameter Group="OBProgram" Comment="Option Type" Name="OptionType" DefaultValue="+OptionType_WRP+|OptionType_USER+|OptionType_HDP" Type="string" Visible="false">
+		<Condition Diagnostic="" Expression="OB_WRP_active=true | OB_BOR_Level_active=true
+		| (OB_User_Configuration1_active=true &amp; (!SEM_OB_NRST_STOP_NULL | !SEM_OB_IWDGHW_NULL | !SEM_OB_NRST_STDBY_NULL 
+		| !SEM_OB_VDDIO_HSLV_NULL | !SEM_OB_IWDG_STOP_NULL | !SEM_OB_IWDG_STDBY_NULL | !SEM_OB_XSPI1_HSLV_NULL | !SEM_OB_XSPI2_HSLV_NULL )) 
+		| (OB_User_Configuration2_active=true &amp; (!SEM_OB_AXISRAM_ECC_NULL| I2C1_I2C_FLASH| I2C1_SMBus_FLASH | I3C1_I3C_Controller_FLASH 
+		| I3C1_I3C_Target_FLASH))" />
+	</RefParameter>
+	
+	<RefParameter Group="OBProgram" Comment="Option Type USER" DefaultValue="OPTIONBYTE_USER" Name="OptionType_USER" Type="string" Visible="false">
+		<Condition Diagnostic="" Expression="OB_BOR_Level_active=true
+		|(OB_User_Configuration1_active=true &amp; (!SEM_OB_NRST_STOP_NULL | !SEM_OB_IWDGHW_NULL | !SEM_OB_NRST_STDBY_NULL 
+		| !SEM_OB_VDDIO_HSLV_NULL | !SEM_OB_IWDG_STOP_NULL | !SEM_OB_IWDG_STDBY_NULL | !SEM_OB_XSPI1_HSLV_NULL 
+		| !SEM_OB_XSPI2_HSLV_NULL )) 
+		| (OB_User_Configuration2_active=true &amp; (!SEM_OB_AXISRAM_ECC_NULL | I2C1_I2C_FLASH| I2C1_SMBus_FLASH 
+		| I3C1_I3C_Controller_FLASH | I3C1_I3C_Target_FLASH))" />
+	</RefParameter>	
+	<RefParameter Group="OBProgram" Comment="Option Type USER" DefaultValue="" Name="OptionType_USER" Type="string" Visible="false"/>
+	
+	<RefParameter Group="OBProgram" Comment="User Type" Name="USERType" DefaultValue="+OB_USER_BOR_LEV+|OB_USERType_Config1ALL+|OB_USERType_Config2ALL+|OB_USER_DTCM_AXI_SHARE+|OB_USER_ITCM_AXI_SHARE" Type="string" Visible="false" >
+		<Condition Diagnostic="" Expression="OptionType_USER=OPTIONBYTE_USER" />
+	</RefParameter>
+
+	<RefParameter Group="OBProgram" Comment="User Config1" Name="USERConfig1" DefaultValue="+OB_BOR_level" Type="string" Visible="false" >
+		<Condition Diagnostic="" Expression="OB_BOR_Level_active=true &amp; SEM_OB_IWDGHW_NULL &amp; SEM_OB_NRST_STOP_NULL 
+		&amp; SEM_OB_NRST_STDBY_NULL &amp; SEM_OB_VDDIO_HSLV_NULL &amp; SEM_OB_IWDG_STOP_NULL &amp; SEM_OB_IWDG_STDBY_NULL 
+		&amp; SEM_OB_XSPI1_HSLV_NULL &amp; SEM_OB_XSPI2_HSLV_NULL &amp; SEM_OB_AXISRAM_ECC_NULL" />
+	</RefParameter>
+
+	<RefParameter Group="OBProgram" Comment="User Config1" Name="USERConfig1" DefaultValue="+OB_IWDGSW+|OB_nRST_STOP+|OB_nRST_STDBY+|OB_IO_HSLV+|OB_FZ_IWDG_STOP+|OB_FZ_IWDG_SDBY+|OB_XSPI1_HSLV+|OB_XSPI2_HSLV" Type="string" Visible="false" >
+		<Condition Diagnostic="" Expression="OB_BOR_Level_active=false &amp; ((!SEM_OB_IWDGHW_NULL | !SEM_OB_NRST_STOP_NULL | !SEM_OB_NRST_STDBY_NULL | !SEM_OB_VDDIO_HSLV_NULL
+		| !SEM_OB_IWDG_STOP_NULL | !SEM_OB_IWDG_STDBY_NULL | !SEM_OB_XSPI1_HSLV_NULL | !SEM_OB_XSPI2_HSLV_NULL) &amp; OB_User_Configuration1_active=true) " />
+	</RefParameter>
+
+	<RefParameter Group="OBProgram" Comment="User Config1" Name="USERConfig1" DefaultValue="+OB_BOR_level+|OB_IWDGSW+|OB_nRST_STOP+|OB_nRST_STDBY+|OB_IO_HSLV+|OB_FZ_IWDG_STOP+|OB_FZ_IWDG_SDBY+|OB_XSPI1_HSLV+|OB_XSPI2_HSLV" Type="string" Visible="false" >
+		<Condition Diagnostic="" Expression="OB_BOR_Level_active=true  &amp; ((!SEM_OB_IWDGHW_NULL | !SEM_OB_NRST_STOP_NULL | !SEM_OB_NRST_STDBY_NULL 
+		| !SEM_OB_VDDIO_HSLV_NULL | !SEM_OB_IWDG_STOP_NULL | !SEM_OB_IWDG_STDBY_NULL | !SEM_OB_XSPI1_HSLV_NULL | !SEM_OB_XSPI2_HSLV_NULL) 
+		&amp; OB_User_Configuration1_active=true)" />
+	</RefParameter>
+
+	<RefParameter Group="OBProgram" Comment="User Config2" Name="USERConfig2" DefaultValue="+OB_I2C_NI3C+|OB_DTCM_AXI_SHARE" Type="string" Visible="false" >
+		<Condition Diagnostic="" Expression="OB_DTCM_active=true &amp; OB_ITCM_active=false &amp; OB_User_Configuration2_active=false" />
+	</RefParameter>
+	<RefParameter Group="OBProgram" Comment="User Config2" Name="USERConfig2" DefaultValue="+OB_I2C_NI3C+|OB_ITCM_AXI_SHARE" Type="string" Visible="false" >
+		<Condition Diagnostic="" Expression="OB_DTCM_active=false &amp; OB_ITCM_active=true &amp; OB_User_Configuration2_active=false" />
+	</RefParameter>
+	<RefParameter Group="OBProgram" Comment="User Config2" Name="USERConfig2" DefaultValue="+OB_I2C_NI3C+|OB_ECC_ON_SRAM" Type="string" Visible="false" >
+		<Condition Diagnostic="" Expression="OB_DTCM_active=false &amp; OB_ITCM_active=false &amp; (OB_User_Configuration2_active=true &amp; (!SEM_OB_AXISRAM_ECC_NULL | I2C1_I2C_FLASH| I2C1_SMBus_FLASH | I3C1_I3C_Controller_FLASH  | I3C1_I3C_Target_FLASH))" />
+	</RefParameter>
+	<RefParameter Group="OBProgram" Comment="User Config2" Name="USERConfig2" DefaultValue="+OB_I2C_NI3C+|OB_DTCM_AXI_SHARE+|OB_ITCM_AXI_SHARE" Type="string" Visible="false" >
+		<Condition Diagnostic="" Expression="OB_DTCM_active=true &amp; OB_ITCM_active=true &amp; OB_User_Configuration2_active=false" />
+	</RefParameter>
+	<RefParameter Group="OBProgram" Comment="User Config2" Name="USERConfig2" DefaultValue="+OB_I2C_NI3C+|OB_DTCM_AXI_SHARE+|OB_ECC_ON_SRAM" Type="string" Visible="false" >
+		<Condition Diagnostic="" Expression="OB_DTCM_active=true &amp; OB_ITCM_active=false &amp; (OB_User_Configuration2_active=false)" />
+	</RefParameter>
+	<RefParameter Group="OBProgram" Comment="User Config2" Name="USERConfig2" DefaultValue="+OB_I2C_NI3C+|OB_ITCM_AXI_SHARE+|OB_ECC_ON_SRAM" Type="string" Visible="false" >
+		<Condition Diagnostic="" Expression="OB_DTCM_active=false &amp; OB_ITCM_active=true &amp; (OB_User_Configuration2_active=false)" />
+	</RefParameter>
+	<RefParameter Group="OBProgram" Comment="User Config2" Name="USERConfig2" DefaultValue="+OB_I2C_NI3C+|OB_DTCM_AXI_SHARE+|OB_ITCM_AXI_SHARE+|OB_ECC_ON_SRAM" Type="string" Visible="false" >
+		<Condition Diagnostic="" Expression="OB_DTCM_active=true &amp; OB_ITCM_active=true &amp; (OB_User_Configuration2_active=true &amp; (!SEM_OB_AXISRAM_ECC_NULL  | I2C1_I2C_FLASH| I2C1_SMBus_FLASH | I3C1_I3C_Controller_FLASH  | I3C1_I3C_Target_FLASH))" />
+	</RefParameter>
+	<RefParameter Group="OBProgram" Comment="User Config2" Name="USERConfig2" DefaultValue="+OB_I2C_NI3C" Type="string" Visible="false">
+		<Condition Diagnostic="" Expression="I2C1_I2C_FLASH| I2C1_SMBus_FLASH | I3C1_I3C_Controller_FLASH  | I3C1_I3C_Target_FLASH" />
+	</RefParameter>
+	
+	<!-- BEGIN HAL OB BOR Level REFPARAMETERS-->
+	<RefParameter Comment="" DefaultValue="OB_USER_BOR_LEV" Group="BOR Level" Name="OB_USER_BOR_LEV" Type="string" Visible="false">
+		<Condition Diagnostic="" Expression="OB_BOR_Level_active=true" />
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="" Group="BOR Level" Name="OB_USER_BOR_LEV" Type="string" Visible="false" />
+	<RefParameter Comment="          Activate" DefaultValue="false" Group="BOR Level" Name="OB_BOR_Level_active" Type="boolean">
+		<PossibleValue Comment="false" Value="false" />
+		<PossibleValue Semaphore="SEM_FLASH_OB_USER" Comment="true" Value="true" />
+	</RefParameter>
+	<RefParameter Comment="                    BOR Level" DefaultValue="OB_BOR_LEVEL_0" Group="BOR Level" Name="OB_BOR_level" Type="list">
+		<Description>
+These bits contain the supply level threshold that activates/releases the reset.&lt;br&gt;They can be written to program a new BOR level value into Flash memory.&lt;br&gt;
+BOR level 0 (reset level threshold around 2.1 V).&lt;br&gt;
+BOR level 1 (reset level threshold around 2.1 V).&lt;br&gt;
+BOR level 2 (reset level threshold around 2.4 V).&lt;br&gt;
+BOR level 3 (reset level threshold around 2.7 V)</Description>
+		<PossibleValue Comment="BOR LEVEL 0" Value="OB_BOR_LEVEL_0" />
+		<PossibleValue Comment="BOR LEVEL 1" Value="OB_BOR_LEVEL_1" />
+		<PossibleValue Comment="BOR LEVEL 2" Value="OB_BOR_LEVEL_2" />
+		<PossibleValue Comment="BOR LEVEL 3" Value="OB_BOR_LEVEL_3" />
+		<Condition Expression="OB_BOR_Level_active=true" Diagnostic="" />
+	</RefParameter>
+	<!-- END HAL OB BOR Level REFPARAMETERS-->
+
+	<!-- BEGIN HAL User Config1 REFPARAMETERS-->
+	<RefParameter Comment="" DefaultValue="+OB_USER_IWDG_SW+|OB_USER_NRST_STOP+|OB_USER_NRST_STDBY+|OB_USER_VDDIO_HSLV+|OB_USER_IWDG_STOP+|OB_USER_IWDG_STDBY+|OB_USER_XSPI1_HSLV+|OB_USER_XSPI2_HSLV" 
+		Group="User Configuration 1" Name="OB_USERType_Config1ALL" Type="string" Visible="false">
+		<Condition Diagnostic="" Expression="(!SEM_OB_IWDGHW_NULL | !SEM_OB_NRST_STOP_NULL | !SEM_OB_NRST_STDBY_NULL | !SEM_OB_VDDIO_HSLV_NULL 
+		| !SEM_OB_IWDG_STOP_NULL | !SEM_OB_IWDG_STDBY_NULL | !SEM_OB_XSPI1_HSLV_NULL | !SEM_OB_XSPI2_HSLV_NULL) &amp; OB_User_Configuration1_active=true" />
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="" Group="User Configuration 1" Name="OB_USERType_Config1ALL" Type="string" Visible="false" />
+	
+	<RefParameter Comment="          Activate" DefaultValue="false" Group="User Configuration 1" Name="OB_User_Configuration1_active" Type="boolean">
+		<PossibleValue Comment="false" Value="false" />
+		<PossibleValue Semaphore="SEM_FLASH_OB_USER" Comment="true" Value="true" />
+	</RefParameter>
+
+	<!-- USER CONFIG 1-->
+	<RefParameter Comment="          IWDG_HW" DefaultValue="OB_IWDG_NOUPD" Group="User Configuration 1" Name="OB_IWDG1_SW_UI" Type="list">
+		<Description>Option Bytes User IWDG control mode.</Description>
+		<PossibleValue Comment="no update" Value="OB_IWDG_NOUPD"  Semaphore="SEM_OB_IWDGHW_NULL"/>
+		<PossibleValue Comment="enable" Value="OB_IWDG_SW" />
+		<PossibleValue Comment="disable" Value="OB_IWDG_HW" />
+		<Condition Diagnostic="" Expression="OB_User_Configuration1_active=true" />
+	</RefParameter>
+	<RefParameter Comment="          IWDG_HW" DefaultValue="+OB_IWDG1_SW_UI" Group="User Configuration 1" Name="OB_IWDGSW" Type="String" Visible="false">
+		<Condition Expression="(OB_IWDG1_SW_UI=OB_IWDG_SW | OB_IWDG1_SW_UI=OB_IWDG_HW) &amp; OB_User_Configuration1_active=true" Diagnostic="" />
+	</RefParameter>	
+	<!-- USER TYPE-->
+	<RefParameter Comment="                    IWDG_HW" DefaultValue="" Group="User Configuration 1" Name="OB_IWDGSW" Type="string" Visible="false" />
+	<RefParameter Comment="          IWDG_HW" DefaultValue="OB_USER_IWDG_SW" Group="User Configuration 1" Name="OB_USER_IWDG_SW" Type="String" Visible="false">
+		<Condition Expression="(OB_IWDG1_SW_UI=OB_IWDG_SW | OB_IWDG1_SW_UI=OB_IWDG_HW) &amp; OB_User_Configuration1_active=true" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="                    IWDG_HW" DefaultValue="" Group="User Configuration 1" Name="OB_USER_IWDG_SW" Type="string" Visible="false" />
+
+	<!-- USER CONFIG 1-->
+	<RefParameter Comment="          NRST_STOP" DefaultValue="OB_STOP_NOUPD" Group="User Configuration 1" Name="OB_nRST_STOP_UI" Type="list">
+		<Description>FLASH Option Bytes User stop entry reset.</Description>
+		<PossibleValue Comment="no update" Value="OB_STOP_NOUPD"  Semaphore="SEM_OB_NRST_STOP_NULL" />
+		<PossibleValue Comment="enable" Value="OB_STOP_NORST" />
+		<PossibleValue Comment="disable" Value="OB_STOP_RST" />
+		<Condition Expression="OB_User_Configuration1_active=true" Diagnostic="" />
+	</RefParameter>	
+    <RefParameter Comment="          NRST_STOP" DefaultValue="+OB_nRST_STOP_UI" Group="User Configuration 1" Name="OB_nRST_STOP" Type="String" Visible="false">
+		<Condition Expression="(OB_nRST_STOP_UI=OB_STOP_NORST | OB_nRST_STOP_UI=OB_STOP_RST) &amp; OB_User_Configuration1_active=true" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="                    NRST_STOP" DefaultValue="" Group="User Configuration 1" Name="OB_nRST_STOP" Type="string" Visible="false" />
+	<!-- USER TYPE-->
+    <RefParameter Comment="          NRST_STOP" DefaultValue="OB_USER_NRST_STOP" Group="User Configuration 1" Name="OB_USER_NRST_STOP" Type="String" Visible="false">
+		<Condition Expression="(OB_nRST_STOP_UI=OB_STOP_NORST | OB_nRST_STOP_UI=OB_STOP_RST) &amp; OB_User_Configuration1_active=true" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="                    NRST_STOP" DefaultValue="" Group="User Configuration 1" Name="OB_USER_NRST_STOP" Type="string" Visible="false" />
+
+	<!-- USER CONFIG 1-->
+	<RefParameter Comment="          NRST_STDBY" DefaultValue="OB_STANDBY_NOUPD" Group="User Configuration 1" Name="OB_nRST_STDBY_UI" Type="list">
+		<Description>FLASH Option Bytes User standby entry reset</Description>
+		<PossibleValue Comment="no update" Value="OB_STANDBY_NOUPD"  Semaphore="SEM_OB_NRST_STDBY_NULL"/>
+		<PossibleValue Comment="enable" Value="OB_STANDBY_NORST" />
+		<PossibleValue Comment="disable" Value="OB_STANDBY_RST" />
+		<Condition Expression="OB_User_Configuration1_active=true" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          NRST_STDBY" DefaultValue="+OB_nRST_STDBY_UI" Group="User Configuration 1" Name="OB_nRST_STDBY" Type="String" Visible="false">
+		<Condition Expression="(OB_nRST_STDBY_UI=OB_STANDBY_NORST | OB_nRST_STDBY_UI=OB_STANDBY_RST) &amp; OB_User_Configuration1_active=true" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="                    NRST_STDBY" DefaultValue="" Group="User Configuration 1" Name="OB_nRST_STDBY" Type="string" Visible="false" />
+	<!-- USER TYPE-->
+	<RefParameter Comment="          NRST_STDBY" DefaultValue="OB_USER_NRST_STDBY" Group="User Configuration 1" Name="OB_USER_NRST_STDBY" Type="String" Visible="false">
+		<Condition Expression="(OB_nRST_STDBY_UI=OB_STANDBY_NORST | OB_nRST_STDBY_UI=OB_STANDBY_RST) &amp; OB_User_Configuration1_active=true" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="                    NRST_STDBY" DefaultValue="" Group="User Configuration 1" Name="OB_USER_NRST_STDBY" Type="string" Visible="false" />
+
+	<!-- USER CONFIG 1-->
+	<RefParameter Comment="          VDDIO_HSLV" DefaultValue="OB_VDDIO_HSLV_NOUPD" Group="User Configuration 1" Name="OB_IO_HSLV_UI" Type="list">
+		<Description>FLASH Option Bytes User I/O High-Speed at Low-Voltage.</Description>
+		<PossibleValue Comment="no update" Value="OB_VDDIO_HSLV_NOUPD"  Semaphore="SEM_OB_VDDIO_HSLV_NULL"/>
+		<PossibleValue Comment="enable" Value="OB_VDDIO_HSLV_ENABLE" />
+		<PossibleValue Comment="disable" Value="OB_VDDIO_HSLV_DISABLE" />
+		<Condition Expression="OB_User_Configuration1_active=true" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          VDDIO_HSLV" DefaultValue="+OB_IO_HSLV_UI" Group="User Configuration 1" Name="OB_IO_HSLV" Type="String" Visible="false">
+		<Condition Expression="(OB_IO_HSLV_UI=OB_VDDIO_HSLV_ENABLE | OB_IO_HSLV_UI=OB_VDDIO_HSLV_DISABLE) &amp; OB_User_Configuration1_active=true" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="                    VDDIO_HSLV" DefaultValue="" Group="User Configuration 1" Name="OB_IO_HSLV" Type="string" Visible="false" />
+	<!-- USER TYPE-->
+	<RefParameter Comment="          VDDIO_HSLV" DefaultValue="OB_USER_VDDIO_HSLV" Group="User Configuration 1" Name="OB_USER_VDDIO_HSLV" Type="String" Visible="false">
+		<Condition Expression="(OB_IO_HSLV_UI=OB_VDDIO_HSLV_ENABLE | OB_IO_HSLV_UI=OB_VDDIO_HSLV_DISABLE) &amp; OB_User_Configuration1_active=true" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="                    VDDIO_HSLV" DefaultValue="" Group="User Configuration 1" Name="OB_USER_VDDIO_HSLV" Type="string" Visible="false" />
+
+	<!-- USER CONFIG 1-->
+	<RefParameter Comment="          IWDG_FZ_STOP" DefaultValue="OB_IWDG_STOP_NOUPD" Group="User Configuration 1" Name="OB_FZ_IWDG_STOP_UI" Type="list">
+		<Description>FLASH Option Bytes User IWDG Stop Mode Freeze.</Description>
+		<PossibleValue Comment="no update" Value="OB_IWDG_STOP_NOUPD"  Semaphore="SEM_OB_IWDG_STOP_NULL"/>
+		<PossibleValue Comment="enable" Value="OB_IWDG_STOP_RUN" />
+		<PossibleValue Comment="disable" Value="OB_IWDG_STOP_FREEZE" />
+		<Condition Expression="OB_User_Configuration1_active=true" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          IWDG_FZ_STOP" DefaultValue="+OB_FZ_IWDG_STOP_UI" Group="User Configuration 1" Name="OB_FZ_IWDG_STOP" Type="String" Visible="false">
+		<Condition Expression="(OB_FZ_IWDG_STOP_UI=OB_IWDG_STOP_RUN | OB_FZ_IWDG_STOP_UI=OB_IWDG_STOP_FREEZE) &amp; OB_User_Configuration1_active=true" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="                    IWDG_FZ_STOP" DefaultValue="" Group="User Configuration 1" Name="OB_FZ_IWDG_STOP" Type="string" Visible="false" />
+	<!-- USER TYPE-->
+	<RefParameter Comment="          IWDG_FZ_STOP" DefaultValue="OB_USER_IWDG_STOP" Group="User Configuration 1" Name="OB_USER_IWDG_STOP" Type="String" Visible="false">
+		<Condition Expression="(OB_FZ_IWDG_STOP_UI=OB_IWDG_STOP_RUN | OB_FZ_IWDG_STOP_UI=OB_IWDG_STOP_FREEZE) &amp; OB_User_Configuration1_active=true" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="                    IWDG_FZ_STOP" DefaultValue="" Group="User Configuration 1" Name="OB_USER_IWDG_STOP" Type="string" Visible="false" />
+
+	<!-- USER CONFIG 1-->
+	<RefParameter Comment="          IWDG_FZ_SDBY" DefaultValue="OB_IWDG_STDBY_NOUPD" Group="User Configuration 1" Name="OB_FZ_IWDG_SDBY_UI" Type="list">
+		<Description>FLASH Option Bytes User IWDG Standby Mode Freeze.</Description>
+		<PossibleValue Comment="no update" Value="OB_IWDG_STDBY_NOUPD"  Semaphore="SEM_OB_IWDG_STDBY_NULL"/>
+		<PossibleValue Comment="enable" Value="OB_IWDG_STDBY_RUN" />
+		<PossibleValue Comment="disable" Value="OB_IWDG_STDBY_FREEZE" />
+		<Condition Expression="OB_User_Configuration1_active=true" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          IWDG_FZ_SDBY" DefaultValue="+OB_FZ_IWDG_SDBY_UI" Group="User Configuration 1" Name="OB_FZ_IWDG_SDBY" Type="String" Visible="false">
+		<Condition Expression="(OB_FZ_IWDG_SDBY_UI=OB_IWDG_STDBY_RUN | OB_FZ_IWDG_SDBY_UI=OB_IWDG_STDBY_FREEZE) &amp; OB_User_Configuration1_active=true" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="                    IWDG_FZ_SDBY" DefaultValue="" Group="User Configuration 1" Name="OB_FZ_IWDG_SDBY" Type="string" Visible="false" />
+	<!-- USER TYPE-->
+	<RefParameter Comment="          IWDG_FZ_SDBY" DefaultValue="OB_USER_IWDG_STDBY" Group="User Configuration 1" Name="OB_USER_IWDG_STDBY" Type="String" Visible="false">
+		<Condition Expression="(OB_FZ_IWDG_SDBY_UI=OB_IWDG_STDBY_RUN | OB_FZ_IWDG_SDBY_UI=OB_IWDG_STDBY_FREEZE) &amp; OB_User_Configuration1_active=true" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="                    IWDG_FZ_SDBY" DefaultValue="" Group="User Configuration 1" Name="OB_USER_IWDG_STDBY" Type="string" Visible="false" />
+	
+	<!-- USER CONFIG 1-->
+	<RefParameter Comment="          XSPI1_HSLV" DefaultValue="OB_XSPI1_HSLV_NOUPD" Group="User Configuration 1" Name="OB_XSPI1_HSLV_UI" Type="list">
+		<Description>FLASH Option Bytes User XSPI 1 High-Speed at Low-Voltage.</Description>
+		<PossibleValue Comment="no update" Value="OB_XSPI1_HSLV_NOUPD"  Semaphore="SEM_OB_XSPI1_HSLV_NULL"/>
+		<PossibleValue Comment="enable" Value="OB_XSPI1_HSLV_ENABLE" />
+		<PossibleValue Comment="disable" Value="OB_XSPI1_HSLV_DISABLE" />
+		<Condition Expression="OB_User_Configuration1_active=true" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          XSPI1_HSLV" DefaultValue="+OB_XSPI1_HSLV_UI" Group="User Configuration 1" Name="OB_XSPI1_HSLV" Type="String" Visible="false">
+		<Condition Expression="(OB_XSPI1_HSLV_UI=OB_XSPI1_HSLV_ENABLE | OB_XSPI1_HSLV_UI=OB_XSPI1_HSLV_DISABLE) &amp; OB_User_Configuration1_active=true" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="                    XSPI1_HSLV" DefaultValue="" Group="User Configuration 1" Name="OB_XSPI1_HSLV" Type="string" Visible="false" />
+	<!-- USER TYPE-->
+	<RefParameter Comment="          XSPI1_HSLV" DefaultValue="OB_USER_XSPI1_HSLV" Group="User Configuration 1" Name="OB_USER_XSPI1_HSLV" Type="String" Visible="false">
+		<Condition Expression="(OB_XSPI1_HSLV_UI=OB_XSPI1_HSLV_ENABLE | OB_XSPI1_HSLV_UI=OB_XSPI1_HSLV_DISABLE) &amp; OB_User_Configuration1_active=true" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="                    XSPI1_HSLV" DefaultValue="" Group="User Configuration 1" Name="OB_USER_XSPI1_HSLV" Type="string" Visible="false" />
+	
+	<!-- USER CONFIG 1-->
+	<RefParameter Comment="          XSPI2_HSLV" DefaultValue="OB_XSPI2_HSLV_NOUPD" Group="User Configuration 1" Name="OB_XSPI2_HSLV_UI" Type="list">
+		<Description>FLASH Option Bytes User XSPI 2 High-Speed at Low-Voltage.</Description>
+		<PossibleValue Comment="no update" Value="OB_XSPI2_HSLV_NOUPD"  Semaphore="SEM_OB_XSPI2_HSLV_NULL"/>
+		<PossibleValue Comment="enable" Value="OB_XSPI2_HSLV_ENABLE" />
+		<PossibleValue Comment="disable" Value="OB_XSPI2_HSLV_DISABLE" />
+		<Condition Expression="OB_User_Configuration1_active=true" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="          XSPI2_HSLV" DefaultValue="+OB_XSPI2_HSLV_UI" Group="User Configuration 1" Name="OB_XSPI2_HSLV" Type="String" Visible="false">
+		<Condition Expression="(OB_XSPI2_HSLV_UI=OB_XSPI2_HSLV_ENABLE | OB_XSPI2_HSLV_UI=OB_XSPI2_HSLV_DISABLE) &amp; OB_User_Configuration1_active=true" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="                    XSPI2_HSLV" DefaultValue="" Group="User Configuration 1" Name="OB_XSPI2_HSLV" Type="string" Visible="false" />
+	<!-- USER TYPE-->
+	<RefParameter Comment="          XSPI2_HSLV" DefaultValue="OB_USER_XSPI2_HSLV" Group="User Configuration 1" Name="OB_USER_XSPI2_HSLV" Type="String" Visible="false">
+		<Condition Expression="(OB_XSPI2_HSLV_UI=OB_XSPI2_HSLV_ENABLE | OB_XSPI2_HSLV_UI=OB_XSPI2_HSLV_DISABLE) &amp; OB_User_Configuration1_active=true" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="                    XSPI2_HSLV" DefaultValue="" Group="User Configuration 1" Name="OB_USER_XSPI2_HSLV" Type="string" Visible="false" />
+	<!-- END HAL User Config1 REFPARAMETERS-->
+
+
+	<!-- BEGIN HAL User Config2 REFPARAMETERS-->
+	<RefParameter Comment="Option Bytes" DefaultValue="+OB_USER_SRAM_ECC+|OB_USER_I2C_NI3C" Group="User Configuration 2" Name="OB_USERType_Config2ALL" Type="string" Visible="false">
+		<Condition Diagnostic="" Expression="(!SEM_OB_AXISRAM_ECC_NULL | I2C1_I2C_FLASH| I2C1_SMBus_FLASH | I3C1_I3C_Controller_FLASH  | I3C1_I3C_Target_FLASH) &amp; OB_User_Configuration2_active=true"/>
+	</RefParameter>
+	<RefParameter Comment="Option Bytes" DefaultValue="" Group="User Configuration 2" Name="OB_USERType_Config2ALL" Type="string" Visible="false">
+	</RefParameter>
+
+	<RefParameter Group="User Configuration 2" Comment="OB_USER_I2C_NI3C" Name="OB_USER_I2C_NI3C" DefaultValue="OB_USER_I2C_NI3C" Type="string" Visible="false">
+		<Condition Expression="(I2C1_I2C_FLASH| I2C1_SMBus_FLASH | I3C1_I3C_Controller_FLASH  | I3C1_I3C_Target_FLASH) &amp; OB_User_Configuration2_active=true" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Group="User Configuration 2" Comment="OB_USER_I2C_NI3C" Name="OB_USER_I2C_NI3C" DefaultValue="" Type="string" Visible="false" />
+	
+	<RefParameter Group="User Configuration 2" Comment="OB_USER_SRAM_ECC" Name="OB_USER_SRAM_ECC" DefaultValue="OB_USER_SRAM_ECC" Type="string" Visible="false">
+		<Condition Expression="(OB_ECC_ON_SRAM_UI=OB_AXISRAM_ECC_ENABLE | OB_ECC_ON_SRAM_UI=OB_AXISRAM_ECC_DISABLE) &amp; OB_User_Configuration2_active=true" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Group="User Configuration 2" Comment="OB_USER_SRAM_ECC" Name="OB_USER_SRAM_ECC" DefaultValue="" Type="string" Visible="false" />
+
+	<RefParameter Comment="          Activate" DefaultValue="true" Group="User Configuration 2" Name="OB_User_Configuration2_active" Type="boolean">
+		<PossibleValue Comment="false" Value="false" />
+		<PossibleValue Semaphore="SEM_FLASH_OB_USER" Comment="true" Value="true" />
+	</RefParameter>
+
+	<RefParameter Comment="          ECC_ON_SRAM" DefaultValue="OB_AXISRAM_ECC__NOUPD" Group="User Configuration 2" Name="OB_ECC_ON_SRAM_UI" Type="list">
+		<Description>FLASH Option Bytes User ECC on sRAM.</Description>
+		<PossibleValue Comment="no update" Value="OB_AXISRAM_ECC__NOUPD"  Semaphore="SEM_OB_AXISRAM_ECC_NULL"/>
+		<PossibleValue Comment="Enable" Value="OB_AXISRAM_ECC_ENABLE" />
+		<PossibleValue Comment="Disable" Value="OB_AXISRAM_ECC_DISABLE" />
+		<Condition Diagnostic="" Expression="OB_User_Configuration2_active=true" />
+	</RefParameter>	
+	<RefParameter Comment="          ECC_ON_SRAM" DefaultValue="+OB_ECC_ON_SRAM_UI" Group="User Configuration 2" Name="OB_ECC_ON_SRAM" Type="String" Visible="false">
+		<Condition Expression="(OB_ECC_ON_SRAM_UI=OB_AXISRAM_ECC_ENABLE | OB_ECC_ON_SRAM_UI=OB_AXISRAM_ECC_DISABLE) &amp; OB_User_Configuration2_active=true" Diagnostic="" />
+	</RefParameter>	
+	<RefParameter Comment="                    ECC_ON_SRAM" DefaultValue="" Group="User Configuration 2" Name="OB_ECC_ON_SRAM" Type="string" Visible="false" />
+
+
+	<RefParameter Group="User Configuration 2" Comment="                    I2C_NI3C" Name="OB_I2C_NI3C" DefaultValue="OB_I2C_NI3C_I2C" Type="string">
+		<Description>The option byte I2C_NI3C settings is link to I3C or I2C peripheral enabling status.&lt;br&gt;This update and code generation of I2C_NI3C option byte is totally managed by the tool STM32CubeMX.</Description>
+		<Condition Expression="I2C1_I2C_FLASH | I2C1_SMBus_FLASH " Diagnostic="" />
+	</RefParameter>
+	<RefParameter Group="User Configuration 2" Comment="                    I2C_NI3C" Name="OB_I2C_NI3C" DefaultValue="OB_I2C_NI3C_I3C" Type="string">
+		<Description>The option byte I2C_NI3C settings is link to I3C or I2C peripheral enabling status.&lt;br&gt;This update and code generation of I2C_NI3C option byte is totally managed by the tool STM32CubeMX.</Description>
+		<Condition Expression="I3C1_I3C_Controller_FLASH  | I3C1_I3C_Target_FLASH" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Group="User Configuration 2" Comment="                    I2C_NI3C" Name="OB_I2C_NI3C" DefaultValue="" Type="string">
+		<Description>The option byte I2C_NI3C settings is link to I3C or I2C peripheral enabling status.&lt;br&gt;This update and code generation of I2C_NI3C option byte is totally managed by the tool STM32CubeMX.</Description>
+		<Condition Diagnostic="" Expression="OB_User_Configuration2_active=true" />
+	</RefParameter>
+	<RefParameter Group="User Configuration 2" Comment="                    I2C_NI3C" Name="OB_I2C_NI3C" DefaultValue="" Type="string" Visible="false" />
+	<!-- END HAL User Config2 REFPARAMETERS-->
+
+	<!-- BEGIN HAL DTCM Ram Protection REFPARAMETERS-->
+	<RefParameter Comment="" DefaultValue="OB_USER_DTCM_AXI_SHARE" Group="DTCM Ram Protection" Name="OB_USER_DTCM_AXI_SHARE" Type="string" Visible="false">
+		<Condition Diagnostic="" Expression="OB_DTCM_active=true" />
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="" Group="DTCM Ram Protection" Name="OB_USER_DTCM_AXI_SHARE" Type="string" Visible="false" />
+	<RefParameter Comment="          Activate" DefaultValue="false" Group="DTCM Ram Protection" Name="OB_DTCM_active" Type="boolean">
+		<PossibleValue Comment="false" Value="false" />
+		<PossibleValue Semaphore="SEM_FLASH_OB_USER" Comment="true" Value="true" />
+	</RefParameter>
+	<RefParameter Comment="                    DTCM_AXI_SHARE" DefaultValue="OB_DTCM_AXI_SHARE_0" Group="DTCM Ram Protection" Name="OB_DTCM_AXI_SHARE" Type="list">
+		<Description>FLASH Option Bytes User DTCM AXI share.</Description>
+		<PossibleValue Comment="0" Value="OB_DTCM_AXI_SHARE_0" />
+		<PossibleValue Comment="1" Value="OB_DTCM_AXI_SHARE_1" />
+		<PossibleValue Comment="2" Value="OB_DTCM_AXI_SHARE_2" />
+		<PossibleValue Comment="3" Value="OB_DTCM_AXI_SHARE_3" />
+		<Condition Diagnostic="" Expression="OB_DTCM_active=true" />
+	</RefParameter>
+	<!-- END HAL DTCM Ram Protection REFPARAMETERS-->
+
+	<!-- BEGIN HAL ITCM Ram Protection REFPARAMETERS-->
+	<RefParameter Comment="" DefaultValue="OB_USER_ITCM_AXI_SHARE" Group="ITCM Ram Protection" Name="OB_USER_ITCM_AXI_SHARE" Type="string" Visible="false">
+		<Condition Diagnostic="" Expression="OB_ITCM_active=true" />
+	</RefParameter>
+	<RefParameter Comment="" DefaultValue="" Group="ITCM Ram Protection" Name="OB_USER_ITCM_AXI_SHARE" Type="string" Visible="false" />
+	<RefParameter Comment="          Activate" DefaultValue="false" Group="ITCM Ram Protection" Name="OB_ITCM_active" Type="boolean">
+		<PossibleValue Comment="false" Value="false" />
+		<PossibleValue Semaphore="SEM_FLASH_OB_USER" Comment="true" Value="true" />
+	</RefParameter>
+	<RefParameter Comment="                    ITCM_AXI_SHARE" DefaultValue="OB_ITCM_AXI_SHARE_0" Group="ITCM Ram Protection" Name="OB_ITCM_AXI_SHARE" Type="list">
+		<Description>FLASH Option Bytes User ITCM AXI share.</Description>
+		<PossibleValue Comment="0" Value="OB_ITCM_AXI_SHARE_0" />
+		<PossibleValue Comment="1" Value="OB_ITCM_AXI_SHARE_1" />
+		<PossibleValue Comment="2" Value="OB_ITCM_AXI_SHARE_2" />
+		<PossibleValue Comment="3" Value="OB_ITCM_AXI_SHARE_3" />
+		<Condition Diagnostic="" Expression="OB_ITCM_active=true" />
+	</RefParameter>
+	<!-- END HAL  ITCM Ram Protection REFPARAMETERS-->
+
+	<!-- BEGIN WRP REFPARAMETERS-->
+	<RefParameter Group="OBProgram" Comment="Option Type WRP" DefaultValue="OPTIONBYTE_WRP" Name="OptionType_WRP" Type="string" Visible="false">
+		<Condition Diagnostic="" Expression="OB_WRP_active=true" />
+	</RefParameter>
+	<RefParameter Group="OBProgram" Comment="Option Type WRP" DefaultValue="" Name="OptionType_WRP" Type="string" Visible="false" />
+
+	<RefParameter Comment="          Activate" DefaultValue="false" Group="Write Protection" Name="OB_WRP_active" Type="boolean">
+		<PossibleValue Comment="false" Value="false" />
+		<PossibleValue Semaphore="SEM_FLASH_OB_WRP" Comment="true" Value="true" />
+	</RefParameter>
+	<RefParameter Comment="                    WRPS0" DefaultValue="true" Group="Write Protection" Name="OB_nWRP0" Type="boolean">
+		<Description>Sector 0 to be write protected.</Description>
+		<PossibleValue Comment="Enable" Value="true" />
+		<PossibleValue Comment="Disable" Value="false" />
+		<Condition Diagnostic="" Expression="OB_WRP_active=true" />
+	</RefParameter>
+	<RefParameter Comment="                    WRPS1" DefaultValue="true" Group="Write Protection" Name="OB_nWRP1" Type="boolean">
+		<Description>Sector 1 to be write protected.</Description>
+		<PossibleValue Comment="Enable" Value="true" />
+		<PossibleValue Comment="Disable" Value="false" />
+		<Condition Diagnostic="" Expression="OB_WRP_active=true" />
+	</RefParameter>
+	<RefParameter Comment="                    WRPS2" DefaultValue="true" Group="Write Protection" Name="OB_nWRP2" Type="boolean">
+		<Description>Sector 2 to be write protected.</Description>
+		<PossibleValue Comment="Enable" Value="true" />
+		<PossibleValue Comment="Disable" Value="false" />
+		<Condition Diagnostic="" Expression="OB_WRP_active=true" />
+	</RefParameter>
+	<RefParameter Comment="                    WRPS3" DefaultValue="true" Group="Write Protection" Name="OB_nWRP3" Type="boolean">
+		<Description>Sector 3 to be write protected.</Description>
+		<PossibleValue Comment="Enable" Value="true" />
+		<PossibleValue Comment="Disable" Value="false" />
+		<Condition Diagnostic="" Expression="OB_WRP_active=true" />
+	</RefParameter>
+	<RefParameter Comment="                    WRPS4" DefaultValue="true" Group="Write Protection" Name="OB_nWRP4" Type="boolean">
+		<Description>Sector 4 to be write protected.</Description>
+		<PossibleValue Comment="Enable" Value="true" />
+		<PossibleValue Comment="Disable" Value="false" />
+		<Condition Diagnostic="" Expression="OB_WRP_active=true" />
+	</RefParameter>
+	<RefParameter Comment="                    WRPS5" DefaultValue="true" Group="Write Protection" Name="OB_nWRP5" Type="boolean">
+		<Description>Sector 5 to be write protected.</Description>
+		<PossibleValue Comment="Enable" Value="true" />
+		<PossibleValue Comment="Disable" Value="false" />
+		<Condition Diagnostic="" Expression="OB_WRP_active=true" />
+	</RefParameter>
+	<RefParameter Comment="                    WRPS6" DefaultValue="true" Group="Write Protection" Name="OB_nWRP6" Type="boolean">
+		<Description>Sector 6 to be write protected.</Description>
+		<PossibleValue Comment="Enable" Value="true" />
+		<PossibleValue Comment="Disable" Value="false" />
+		<Condition Diagnostic="" Expression="OB_WRP_active=true" />
+	</RefParameter>
+	<RefParameter Comment="                    WRPS7" DefaultValue="true" Group="Write Protection" Name="OB_nWRP7" Type="boolean">
+		<Description>Sector 7 to be write protected.</Description>
+		<PossibleValue Comment="Enable" Value="true" />
+		<PossibleValue Comment="Disable" Value="false" />
+		<Condition Diagnostic="" Expression="OB_WRP_active=true" />
+	</RefParameter>
+
+	<RefParameter Comment="enable0" DefaultValue="0" Group="Write Protection" Name="OB_WRP_Enabled_Sector0" Type="string" Visible="false">
+		<Condition Diagnostic="" Expression="OB_nWRP0=true" />
+	</RefParameter>
+	<RefParameter Comment="enable0" DefaultValue="" Group="Write Protection" Name="OB_WRP_Enabled_Sector0" Type="string" Visible="false" />
+	<RefParameter Comment="disable0" DefaultValue="0" Group="Write Protection" Name="OB_WRP_Disable_Sector0" Type="string" Visible="false">
+		<Condition Diagnostic="" Expression="OB_nWRP0=false" />
+	</RefParameter>
+	<RefParameter Comment="disable0" DefaultValue="" Group="Write Protection" Name="OB_WRP_Disable_Sector0" Type="string" Visible="false" />
+
+	<RefParameter Comment="enable1" DefaultValue="1" Group="Write Protection" Name="OB_WRP_Enabled_Sector1" Type="string" Visible="false">
+		<Condition Diagnostic="" Expression="OB_nWRP1=true" />
+	</RefParameter>
+	<RefParameter Comment="enable1" DefaultValue="" Group="Write Protection" Name="OB_WRP_Enabled_Sector1" Type="string" Visible="false" />
+	<RefParameter Comment="disable1" DefaultValue="1" Group="Write Protection" Name="OB_WRP_Disable_Sector1" Type="string" Visible="false">
+		<Condition Diagnostic="" Expression="OB_nWRP1=false" />
+	</RefParameter>
+	<RefParameter Comment="disable1" DefaultValue="" Group="Write Protection" Name="OB_WRP_Disable_Sector1" Type="string" Visible="false" />
+
+	<RefParameter Comment="enable2" DefaultValue="2" Group="Write Protection" Name="OB_WRP_Enabled_Sector2" Type="string" Visible="false">
+		<Condition Diagnostic="" Expression="OB_nWRP2=true" />
+	</RefParameter>
+	<RefParameter Comment="enable2" DefaultValue="" Group="Write Protection" Name="OB_WRP_Enabled_Sector2" Type="string" Visible="false" />
+	<RefParameter Comment="disable2" DefaultValue="2" Group="Write Protection" Name="OB_WRP_Disable_Sector2" Type="string" Visible="false">
+		<Condition Diagnostic="" Expression="OB_nWRP2=false" />
+	</RefParameter>
+	<RefParameter Comment="disable2" DefaultValue="" Group="Write Protection" Name="OB_WRP_Disable_Sector2" Type="string" Visible="false" />
+
+	<RefParameter Comment="enable3" DefaultValue="3" Group="Write Protection" Name="OB_WRP_Enabled_Sector3" Type="string" Visible="false">
+		<Condition Diagnostic="" Expression="OB_nWRP3=true" />
+	</RefParameter>
+	<RefParameter Comment="enable3" DefaultValue="" Group="Write Protection" Name="OB_WRP_Enabled_Sector3" Type="string" Visible="false" />
+	<RefParameter Comment="disable3" DefaultValue="3" Group="Write Protection" Name="OB_WRP_Disable_Sector3" Type="string" Visible="false">
+		<Condition Diagnostic="" Expression="OB_nWRP3=false" />
+	</RefParameter>
+	<RefParameter Comment="disable3" DefaultValue="" Group="Write Protection" Name="OB_WRP_Disable_Sector3" Type="string" Visible="false" />
+
+	<RefParameter Comment="enable4" DefaultValue="4" Group="Write Protection" Name="OB_WRP_Enabled_Sector4" Type="string" Visible="false">
+		<Condition Diagnostic="" Expression="OB_nWRP4=true" />
+	</RefParameter>
+	<RefParameter Comment="enable4" DefaultValue="" Group="Write Protection" Name="OB_WRP_Enabled_Sector4" Type="string" Visible="false" />
+	<RefParameter Comment="disable4" DefaultValue="4" Group="Write Protection" Name="OB_WRP_Disable_Sector4" Type="string" Visible="false">
+		<Condition Diagnostic="" Expression="OB_nWRP4=false" />
+	</RefParameter>
+	<RefParameter Comment="disable4" DefaultValue="" Group="Write Protection" Name="OB_WRP_Disable_Sector4" Type="string" Visible="false" />
+
+	<RefParameter Comment="enable5" DefaultValue="5" Group="Write Protection" Name="OB_WRP_Enabled_Sector5" Type="string" Visible="false">
+		<Condition Diagnostic="" Expression="OB_nWRP5=true" />
+	</RefParameter>
+	<RefParameter Comment="enable5" DefaultValue="" Group="Write Protection" Name="OB_WRP_Enabled_Sector5" Type="string" Visible="false" />
+	<RefParameter Comment="disable5" DefaultValue="5" Group="Write Protection" Name="OB_WRP_Disable_Sector5" Type="string" Visible="false">
+		<Condition Diagnostic="" Expression="OB_nWRP5=false" />
+	</RefParameter>
+	<RefParameter Comment="disable5" DefaultValue="" Group="Write Protection" Name="OB_WRP_Disable_Sector5" Type="string" Visible="false" />
+
+	<RefParameter Comment="enable6" DefaultValue="6" Group="Write Protection" Name="OB_WRP_Enabled_Sector6" Type="string" Visible="false">
+		<Condition Diagnostic="" Expression="OB_nWRP6=true" />
+	</RefParameter>
+	<RefParameter Comment="enable6" DefaultValue="" Group="Write Protection" Name="OB_WRP_Enabled_Sector6" Type="string" Visible="false" />
+	<RefParameter Comment="disable6" DefaultValue="6" Group="Write Protection" Name="OB_WRP_Disable_Sector6" Type="string" Visible="false">
+		<Condition Diagnostic="" Expression="OB_nWRP6=false" />
+	</RefParameter>
+	<RefParameter Comment="disable6" DefaultValue="" Group="Write Protection" Name="OB_WRP_Disable_Sector6" Type="string" Visible="false" />
+
+	<RefParameter Comment="enable7" DefaultValue="7" Group="Write Protection" Name="OB_WRP_Enabled_Sector7" Type="string" Visible="false">
+		<Condition Diagnostic="" Expression="OB_nWRP7=true" />
+	</RefParameter>
+	<RefParameter Comment="enable7" DefaultValue="" Group="Write Protection" Name="OB_WRP_Enabled_Sector7" Type="string" Visible="false" />
+	<RefParameter Comment="disable7" DefaultValue="7" Group="Write Protection" Name="OB_WRP_Disable_Sector7" Type="string" Visible="false">
+		<Condition Diagnostic="" Expression="OB_nWRP7=false" />
+	</RefParameter>
+	<RefParameter Comment="disable7" DefaultValue="" Group="Write Protection" Name="OB_WRP_Disable_Sector7" Type="string" Visible="false" />
+
+	<RefParameter Comment="Enable All Sectors" DefaultValue="0|1|2|3|4|5|6|7" Group="Write Protection" Name="WRPSector" Type="string" Visible="false">
+		<Condition Diagnostic="" Expression="OB_WRP_active=true" />
+	</RefParameter>
+	<RefParameter Comment="OB_WRP_State_Enable" DefaultValue="OB_WRPSTATE_ENABLE" Group="Write Protection" Name="WRPState" Type="string" Visible="false">
+		<PossibleValue Comment="OB_WRPSTATE_ENABLE" Value="OB_WRPSTATE_ENABLE" Semaphore="WRP_ENABLE_ALLSECTORS"/>
+		<Condition Expression="SEM_FLASH_OB_WRP &amp; OB_nWRP0=true &amp; OB_nWRP1=true &amp; OB_nWRP2=true &amp; OB_nWRP3=true &amp; OB_nWRP4=true &amp; OB_nWRP5=true &amp; OB_nWRP6=true &amp; OB_nWRP7=true" Diagnostic="" />
+	</RefParameter> 
+	<RefParameter Comment="OB_WRP_State_Disable" DefaultValue="OB_WRPSTATE_DISABLE" Group="Write Protection" Name="WRPState" Type="string" Visible="false">
+		<PossibleValue Comment="OB_WRPSTATE_DISABLE" Value="OB_WRPSTATE_DISABLE" Semaphore="WRP_DISABLE_ALLSECTORS"/>
+		<Condition Expression="SEM_FLASH_OB_WRP &amp; OB_nWRP0=false &amp; OB_nWRP1=false &amp; OB_nWRP2=false &amp; OB_nWRP3=false &amp; OB_nWRP4=false &amp; OB_nWRP5=false &amp; OB_nWRP6=false &amp; OB_nWRP7=false" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="Enabled_Sectors" DefaultValue="+OB_WRP_Enabled_Sector0+|OB_WRP_Enabled_Sector1+|OB_WRP_Enabled_Sector2+|OB_WRP_Enabled_Sector3+|OB_WRP_Enabled_Sector4+|OB_WRP_Enabled_Sector5+|OB_WRP_Enabled_Sector6+|OB_WRP_Enabled_Sector7" Group="Write Protection" Name="OB_WRP_Enabled_Sectors" Type="string" Visible="false">
+		<Condition Expression="OB_nWRP0=true|OB_nWRP1=true|OB_nWRP2=true|OB_nWRP3=true|OB_nWRP4=true|OB_nWRP5=true|OB_nWRP6=true|OB_nWRP7=true" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="Disabled_Sectors" DefaultValue="+OB_WRP_Disable_Sector0+|OB_WRP_Disable_Sector1+|OB_WRP_Disable_Sector2+|OB_WRP_Disable_Sector3+|OB_WRP_Disable_Sector4+|OB_WRP_Disable_Sector5+|OB_WRP_Disable_Sector6+|OB_WRP_Disable_Sector7" Group="Write Protection" Name="OB_WRP_Disabled_Sectors" Type="string" Visible="false">
+		<Condition Expression="OB_nWRP0=false|OB_nWRP1=false|OB_nWRP2=false|OB_nWRP3=false|OB_nWRP4=false|OB_nWRP5=false|OB_nWRP6=false|OB_nWRP7=false" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="OB_WRP_State_Enable" DefaultValue="OB_WRPSTATE_ENABLE" Group="Write Protection" Name="OB_WRP_State_Enable" Type="string" Visible="false">
+		<Condition Expression="OB_nWRP0=true|OB_nWRP1=true|OB_nWRP2=true|OB_nWRP3=true|OB_nWRP4=true|OB_nWRP5=true|OB_nWRP6=true|OB_nWRP7=true" Diagnostic="" />
+	</RefParameter>
+	<RefParameter Comment="OB_WRP_State_Disable" DefaultValue="OB_WRPSTATE_DISABLE" Group="Write Protection" Name="OB_WRP_State_Disable" Type="string" Visible="false">
+		<Condition Expression="OB_nWRP0=false|OB_nWRP1=false|OB_nWRP2=false|OB_nWRP3=false|OB_nWRP4=false|OB_nWRP5=false|OB_nWRP6=false|OB_nWRP7=false" Diagnostic="" />
+	</RefParameter>
+	<!-- END WRP REFPARAMETERS-->
+
+	<!-- BEGIN HDP REFPARAMETERS-->
+	<RefParameter Group="OBProgram" Comment="Option Type HDP" DefaultValue="OPTIONBYTE_HDP" Name="OptionType_HDP" Type="string" Visible="false">
+		<Condition Diagnostic="" Expression="OB_HDP_active=true" />
+	</RefParameter>
+	<RefParameter Group="OBProgram" Comment="Option Type HDP" DefaultValue="" Name="OptionType_HDP" Type="string" Visible="false" />
+	<RefParameter Comment="          Activate" DefaultValue="false" Group="HDP Protection" Name="OB_HDP_active" Type="boolean">
+		<PossibleValue Comment="false" Value="false" />
+		<PossibleValue Semaphore="SEM_FLASH_OB_HDP" Comment="true" Value="true" />
+	</RefParameter>
+	<RefParameter Comment="                    HDPStartPage" DefaultValue="0x0" Min="0x0" Max="0xfff" Group="HDP Protection" Name="HDPStartPage" Type="hex">
+		<Description>Start address that contains the first 256-byte block of HDP area (used for OPTIONBYTE_HDP).</Description>
+		<Condition Diagnostic="" Expression="OB_HDP_active=true" />
+	</RefParameter>
+	<RefParameter Comment="                    HDPEndPage" DefaultValue="0x0" Min="0x0" Max="0xfff" Group="HDP Protection" Name="HDPEndPage" Type="hex">
+		<Description>End address that contains the last 256-byte block of HDP area (used for OPTIONBYTE_HDP).</Description>
+		<Condition Diagnostic="" Expression="OB_HDP_active=true" />
+	</RefParameter>
+	<!-- END HDP REFPARAMETERS-->
+
+	<!-- END HAL OB User Configuration REFPARAMETERS-->
+</IP>

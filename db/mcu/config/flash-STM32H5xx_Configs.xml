@@ -15,7 +15,12 @@
 		<IFCondition Expression="!SEM_FLASH_OB_NSBOOTADDR &amp; !SEM_FLASH_OB_NSBOOTLOCK &amp; !SEM_FLASH_OB_SECBOOTADDR &amp; !SEM_FLASH_OB_SECBOOTLOCK &amp;
 								 !SEM_FLASH_OB_WMSEC1 &amp; !SEM_FLASH_OB_WMSEC2 &amp; !SEM_FLASH_OB_WRP1 &amp; !SEM_FLASH_OB_WRP2 &amp; 
 								 !SEM_FLASH_OB_EDATA1 &amp; !SEM_FLASH_OB_EDATA1 &amp; !SEM_FLASH_OB_HDP1 &amp; !SEM_FLASH_OB_HDP2 &amp;
-								 (SEM_FLASH_OB_ProductState|SEM_FLASH_OB_USER|SEM_FLASH_OB_OTP_LOCK)">
+								 (SEM_FLASH_OB_ProductState|SEM_FLASH_OB_USER|SEM_FLASH_OB_OTP_LOCK)
+								 &amp; (!SEM_OB_IO_VDD_HSLV_NULL | !SEM_OB_IO_VDDIO2_HSLV_NULL | !SEM_OB_IWDG_STOP_NULL 
+								| !SEM_OB_IWDG_STDBY_NULL | !SEM_OB_UBE_ST_NULL | !SEM_OB_SWAP_BANK_NULL | !SEM_OB_IWDGSW_NULL 
+								| !SEM_OB_WWDGSW_NULL | !SEM_OB_NRST_STOP_NULL | !SEM_OB_NRST_STDBY_NULL | !SEM_OB_SRAM1_ECC_NULL 
+								| !SEM_OB_SRAM1_RST_NULL | !SEM_OB_SRAM2_ECC_NULL | !SEM_OB_SRAM2_RST_NULL | !SEM_OB_SRAM3_ECC_NULL 
+								| !SEM_OB_SRAM1_3_RST_NULL | !SEM_OB_BKPRAM_ECC_NULL)">
 			<CallLibMethod Name="HAL_FLASH_OB_Unlock" />
 			<CallLibMethod Name="HAL_FLASHEx_OBProgram" />
 			<CallLibMethod Name="HAL_FLASH_OB_Lock" />
@@ -94,62 +99,45 @@
 		</IFCondition>
 		
 		<!-- WRP --> 
-		<IFCondition Expression="SEM_FLASH_OB_WRP1 &amp; !WRP1_ENABLE_ALLSECTORS &amp; !WRP1_DISABLE_ALLSECTORS &amp; !WRP_BOTHBANKS">
+		<IFCondition Expression="SEM_FLASH_OB_WRP1 &amp; !WRP1_ENABLE_ALLSECTORS &amp; !WRP1_DISABLE_ALLSECTORS">
 			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
 				<MethodArg Name="Banks" FValue="FLASH_BANK_1" />
-				<MethodArg Name="WRPState" FValue="OB_WRPSTATE_DISABLE" />
+				<MethodArg Name="WRPState" FValue="OB_WRPSTATE_ENABLE" />
 				<MethodArg Name="WRPSector" ParameterName="OB_WRP1_Enabled_Sectors" />
 			</CallLibMethod>
 			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
 				<MethodArg Name="Banks" FValue="FLASH_BANK_1" />
-				<MethodArg Name="WRPState" FValue="OB_WRPSTATE_ENABLE" />
+				<MethodArg Name="WRPState" FValue="OB_WRPSTATE_DISABLE" />
 				<MethodArg Name="WRPSector" ParameterName="OB_WRP1_Disabled_Sectors" />
 			</CallLibMethod>
 		</IFCondition>
-		<IFCondition Expression="SEM_FLASH_OB_WRP1 &amp; (WRP1_ENABLE_ALLSECTORS | WRP1_DISABLE_ALLSECTORS) &amp; !WRP_BOTHBANKS">
+		<IFCondition Expression="SEM_FLASH_OB_WRP1 &amp; (WRP1_ENABLE_ALLSECTORS | WRP1_DISABLE_ALLSECTORS)">
 			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
 				<MethodArg Name="Banks" FValue="FLASH_BANK_1" />
 				<MethodArg Name="WRPState" ParameterName="WRP1State" />
 				<MethodArg Name="WRPSector" ParameterName="WRP1Sector" />
 			</CallLibMethod>
 		</IFCondition>
-		<IFCondition Expression="SEM_FLASH_OB_WRP2 &amp; !WRP2_ENABLE_ALLSECTORS &amp; !WRP2_DISABLE_ALLSECTORS &amp; !WRP_BOTHBANKS">
+		<IFCondition Expression="SEM_FLASH_OB_WRP2 &amp; !WRP2_ENABLE_ALLSECTORS &amp; !WRP2_DISABLE_ALLSECTORS">
 			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
 				<MethodArg Name="Banks" FValue="FLASH_BANK_2" />
-				<MethodArg Name="WRPState" FValue="OB_WRPSTATE_DISABLE" />
+				<MethodArg Name="WRPState" FValue="OB_WRPSTATE_ENABLE" />
 				<MethodArg Name="WRPSector" ParameterName="OB_WRP2_Enabled_Sectors" />
 			</CallLibMethod>
 			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
 				<MethodArg Name="Banks" FValue="FLASH_BANK_2" />
-				<MethodArg Name="WRPState" FValue="OB_WRPSTATE_ENABLE" />
+				<MethodArg Name="WRPState" FValue="OB_WRPSTATE_DISABLE" />
 				<MethodArg Name="WRPSector" ParameterName="OB_WRP2_Disabled_Sectors" />
 			</CallLibMethod>
 		</IFCondition>
-		<IFCondition Expression="SEM_FLASH_OB_WRP2 &amp; (WRP2_ENABLE_ALLSECTORS | WRP2_DISABLE_ALLSECTORS)&amp; !WRP_BOTHBANKS">
+		<IFCondition Expression="SEM_FLASH_OB_WRP2 &amp; (WRP2_ENABLE_ALLSECTORS | WRP2_DISABLE_ALLSECTORS)">
 			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
 				<MethodArg Name="Banks" FValue="FLASH_BANK_2" />
 				<MethodArg Name="WRPState" ParameterName="WRP2State" />
 				<MethodArg Name="WRPSector" ParameterName="WRP2Sector" />
 			</CallLibMethod>
 		</IFCondition>
-		<IFCondition Expression="WRP_BOTHBANKS &amp; !WRP2_ENABLE_ALLSECTORS &amp; !WRP2_DISABLE_ALLSECTORS ">
-			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
-				<MethodArg Name="Banks" FValue="FLASH_BANK_BOTH" />
-				<MethodArg Name="WRPState" FValue="OB_WRPSTATE_DISABLE" />
-				<MethodArg Name="WRPSector" ParameterName="OB_WRP2_Enabled_Sectors" />
-			</CallLibMethod>
-			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
-				<MethodArg Name="WRPState" FValue="OB_WRPSTATE_ENABLE" />
-				<MethodArg Name="WRPSector" ParameterName="OB_WRP1_Disabled_Sectors" />
-			</CallLibMethod>
-		</IFCondition>
-		<IFCondition Expression="WRP_BOTHBANKS &amp; (WRP2_ENABLE_ALLSECTORS | WRP2_DISABLE_ALLSECTORS) ">
-			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
-				<MethodArg Name="Banks" FValue="FLASH_BANK_BOTH" />
-				<MethodArg Name="WRPState" ParameterName="WRP2State" />
-				<MethodArg Name="WRPSector" ParameterName="WRP2Sector" />
-			</CallLibMethod>
-		</IFCondition>
+		
 		
 		<!-- EDATA --> 
 		<IFCondition Expression="SEM_FLASH_OB_EDATA1 &amp; !EDATA_BOTHBANKS">

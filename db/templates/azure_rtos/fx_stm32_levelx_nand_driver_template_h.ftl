@@ -17,6 +17,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /* Includes ------------------------------------------------------------------*/
 #include "fx_api.h"
 #include "lx_api.h"
@@ -56,13 +57,6 @@ extern "C" {
 [/#list]
 [/#if]
 
-#ifdef  LX_NAND_SIMULATOR_DRIVER
-#include "lx_stm32_nand_simulator_driver.h"
-
-#define  LX_NAND_SIMULATOR_DRIVER_ID        0x01
-#define  LX_NAND_SIMULATOR_DRIVER_NAME      "FX Levelx NAND flash Simulator"
-#endif
-
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
@@ -72,6 +66,14 @@ extern "C" {
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
+
+#ifdef  LX_NAND_SIMULATOR_DRIVER
+#include "lx_stm32_nand_simulator_driver.h"
+
+#define  LX_NAND_SIMULATOR_DRIVER_ID        0x01
+#define  LX_NAND_SIMULATOR_DRIVER_NAME      "FX Levelx NAND flash Simulator"
+#endif
+
 
 #ifdef  LX_NAND_CUSTOM_DRIVER
 /*
@@ -120,6 +122,7 @@ extern "C" {
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
 
+/* #define FX_NAND_FORMAT_FLASH_BEFORE_OPEN */
 /* USER CODE END EM */
 #if !defined(LX_NAND_DEFAULT_DRIVER) && !defined (LX_NAND_CUSTOM_DRIVERS) && !defined(LX_NAND_SIMULATOR_DRIVER)
 #error "[This error was thrown on purpose] : No NAND lowlevel driver defined"

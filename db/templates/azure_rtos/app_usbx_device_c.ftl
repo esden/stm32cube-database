@@ -11,7 +11,12 @@
   */
 /* USER CODE END Header */
 
+[#assign AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE_VAL = "1" ]
 [#assign USBX_DEVICE_CLASS_NB = 0]
+        [#assign UX_STANDALONE_ENABLED_Value = ""]
+        [#assign REG_UX_DEVICE_CCID_value = ""]
+        [#assign REG_UX_DEVICE_PRINTER_value = ""]
+        [#assign REG_UX_DEVICE_VIDEO_value = ""]
 [#compress]
 [#list SWIPdatas as SWIP]
 [#if SWIP.defines??]
@@ -20,6 +25,9 @@
     [#assign name = definition.name]
     [#if name == "AZRTOS_APP_MEM_ALLOCATION_METHOD"]
       [#assign AZRTOS_APP_MEM_ALLOCATION_METHOD_VAL = value]
+    [/#if]
+    [#if name == "AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE"]
+      [#assign AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE_VAL = value]
     [/#if]
     [#if name == "USBX_DEVICE_APP_THREAD_NAME"]
       [#assign USBX_DEVICE_APP_THREAD_NAME_value = value]
@@ -60,6 +68,22 @@
     [#if name == "REG_UX_DEVICE_RNDIS"]
       [#assign REG_UX_DEVICE_RNDIS_value = value]
     [/#if]
+    [#if name == "REG_UX_DEVICE_THREAD"]
+      [#assign REG_UX_DEVICE_THREAD_value = value]
+    [/#if]
+    [#if name == "REG_UX_DEVICE_VIDEO"]
+      [#assign REG_UX_DEVICE_VIDEO_value = value]
+    [/#if]
+    [#if name == "REG_UX_DEVICE_CCID"]
+      [#assign REG_UX_DEVICE_CCID_value = value]
+    [/#if]
+    [#if name == "REG_UX_DEVICE_PRINTER"]
+      [#assign REG_UX_DEVICE_PRINTER_value = value]
+    [/#if]
+    [#if name == "UX_STANDALONE"]
+      [#assign UX_STANDALONE_ENABLED_Value = value]
+    [/#if]
+
    [/#list]
 [/#if]
 [/#list]
@@ -91,6 +115,15 @@
     [#if REG_UX_DEVICE_RNDIS_value == "1"]
       [#assign USBX_DEVICE_CLASS_NB = USBX_DEVICE_CLASS_NB+1]
     [/#if]
+    [#if REG_UX_DEVICE_VIDEO_value == "1"]
+      [#assign USBX_DEVICE_CLASS_NB = USBX_DEVICE_CLASS_NB+1]
+    [/#if]
+    [#if REG_UX_DEVICE_CCID_value == "1"]
+      [#assign USBX_DEVICE_CLASS_NB = USBX_DEVICE_CLASS_NB+1]
+    [/#if]
+    [#if REG_UX_DEVICE_PRINTER_value == "1"]
+      [#assign USBX_DEVICE_CLASS_NB = USBX_DEVICE_CLASS_NB+1]
+    [/#if]
 /* Includes ------------------------------------------------------------------*/
 #include "app_usbx_device.h"
 
@@ -115,7 +148,16 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+[#if UX_STANDALONE_ENABLED_Value == "1" && AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE_VAL  != "0" ]
 
+/* USER CODE BEGIN UX_Device_Memory_Buffer */
+
+/* USER CODE END UX_Device_Memory_Buffer */
+#if defined ( __ICCARM__ )
+#pragma data_alignment=4
+#endif
+__ALIGN_BEGIN static UCHAR ux_device_byte_pool_buffer[UX_DEVICE_APP_MEM_POOL_SIZE] __ALIGN_END;
+[/#if]
 [#if REG_UX_DEVICE_HID_MOUSE_value == "1"]
 static ULONG hid_mouse_interface_number;
 static ULONG hid_mouse_configuration_number;
@@ -156,6 +198,18 @@ static ULONG rndis_configuration_number;
 static UCHAR rndis_local_nodeid[UX_DEVICE_CLASS_RNDIS_NODE_ID_LENGTH];
 static UCHAR rndis_remote_nodeid[UX_DEVICE_CLASS_RNDIS_NODE_ID_LENGTH];
 [/#if]
+[#if REG_UX_DEVICE_VIDEO_value == "1"]
+static ULONG video_interface_number;
+static ULONG video_configuration_number;
+[/#if]
+[#if REG_UX_DEVICE_CCID_value == "1"]
+static ULONG ccid_interface_number;
+static ULONG ccid_configuration_number;
+[/#if]
+[#if REG_UX_DEVICE_PRINTER_value == "1"]
+static ULONG printer_interface_number;
+static ULONG printer_configuration_number;
+[/#if]
 [#if REG_UX_DEVICE_HID_MOUSE_value == "1"]
 static UX_SLAVE_CLASS_HID_PARAMETER hid_mouse_parameter;
 [/#if]
@@ -183,7 +237,17 @@ static UX_SLAVE_CLASS_PIMA_PARAMETER pima_mtp_parameter;
 [#if REG_UX_DEVICE_RNDIS_value == "1"]
 static UX_SLAVE_CLASS_RNDIS_PARAMETER rndis_parameter;
 [/#if]
-[#if REG_UX_DEVICE_THREAD_value == "1"]
+[#if REG_UX_DEVICE_VIDEO_value == "1"]
+static UX_DEVICE_CLASS_VIDEO_PARAMETER video_parameter;
+static UX_DEVICE_CLASS_VIDEO_STREAM_PARAMETER video_stream_parameter[USBD_VIDEO_STREAM_NMNBER];
+[/#if]
+[#if REG_UX_DEVICE_CCID_value == "1"]
+static UX_DEVICE_CLASS_CCID_PARAMETER ccid_parameter;
+[/#if]
+[#if REG_UX_DEVICE_PRINTER_value == "1"]
+static UX_DEVICE_CLASS_PRINTER_PARAMETER printer_parameter;
+[/#if]
+[#if REG_UX_DEVICE_THREAD_value == "1" && UX_STANDALONE_ENABLED_Value == "0"]
 static TX_THREAD ux_device_app_thread;
 [/#if]
 [#if REG_UX_DEVICE_PIMA_MTP_value == "1" ]
@@ -192,13 +256,18 @@ extern USHORT USBD_MTP_DeviceSupportedCaptureFormats[];
 extern USHORT USBD_MTP_DeviceSupportedImageFormats[];
 extern USHORT USBD_MTP_ObjectPropSupported[];
 [/#if]
+[#if REG_UX_DEVICE_CCID_value == "1" ]
+extern UX_DEVICE_CLASS_CCID_HANDLES USBD_CCID_Handles;
+extern ULONG USBD_CCID_Clocks[];
+extern ULONG USBD_CCID_DataRates[];
+[/#if]
 
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
-[#if REG_UX_DEVICE_THREAD_value  == "1"]
+[#if REG_UX_DEVICE_THREAD_value == "1" && UX_STANDALONE_ENABLED_Value == "0"]
 static VOID ${USBX_DEVICE_APP_THREAD_NAME_value}(ULONG thread_input);
 [/#if]
 [#if (REG_USBX_DEVICE_CON_CK_value == "1") && (REG_UX_DEVICE_CORE_value  == "true") && (USBX_DEVICE_CLASS_NB != 0)]
@@ -210,10 +279,18 @@ static UINT USBD_ChangeFunction(ULONG Device_State);
 
 /**
   * @brief  Application USBX Device Initialization.
+[#if UX_STANDALONE_ENABLED_Value == "1"]
+  * @param  none
+[#else]
   * @param  memory_ptr: memory pointer
+[/#if]
   * @retval status
   */
+[#if UX_STANDALONE_ENABLED_Value == "1"]
+UINT MX_USBX_Device_Init(VOID)
+[#else]
 UINT MX_USBX_Device_Init(VOID *memory_ptr)
+[/#if]
 {
   UINT ret = UX_SUCCESS;
 [#if (REG_UX_DEVICE_CORE_value  == "true") && (USBX_DEVICE_CLASS_NB != 0)]
@@ -226,21 +303,23 @@ UINT MX_USBX_Device_Init(VOID *memory_ptr)
   UCHAR *string_framework;
   UCHAR *language_id_framework;
 [/#if]
-[#if ((REG_UX_DEVICE_CORE_value  == "true") && (USBX_DEVICE_CLASS_NB != 0))  |  (REG_UX_DEVICE_THREAD_value  == "1")]
+[#if ((REG_UX_DEVICE_CORE_value  == "true") && (USBX_DEVICE_CLASS_NB != 0) && (UX_STANDALONE_ENABLED_Value == "1") && (AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE_VAL  != "0"))]
   UCHAR *pointer;
 [/#if]
-[#if AZRTOS_APP_MEM_ALLOCATION_METHOD_VAL  != "0" && (((REG_UX_DEVICE_CORE_value == "true") && (USBX_DEVICE_CLASS_NB != 0)) || REG_UX_DEVICE_THREAD_value == "1")]
+[#if AZRTOS_APP_MEM_ALLOCATION_METHOD_VAL  != "0" && UX_STANDALONE_ENABLED_Value == "0" && (((REG_UX_DEVICE_CORE_value == "true") && (USBX_DEVICE_CLASS_NB != 0)) || REG_UX_DEVICE_THREAD_value == "1")]
+  UCHAR *pointer;
   TX_BYTE_POOL *byte_pool = (TX_BYTE_POOL*)memory_ptr;
 [/#if]
 
   /* USER CODE BEGIN MX_USBX_Device_Init0 */
-[#if REG_UX_DEVICE_CORE_value  == "false"]
-  UX_PARAMETER_NOT_USED(ux_device_memory_buffer);
+[#if (REG_UX_DEVICE_CORE_value  == "false" && UX_STANDALONE_ENABLED_Value == "1")  ||  (USBX_DEVICE_CLASS_NB == 0 && UX_STANDALONE_ENABLED_Value == "1")]
+  UX_PARAMETER_NOT_USED(ux_device_byte_pool_buffer);
 [#else]
 
 [/#if]
   /* USER CODE END MX_USBX_Device_Init0 */
 [#if (REG_UX_DEVICE_CORE_value  == "true") && (USBX_DEVICE_CLASS_NB != 0)]
+[#if UX_STANDALONE_ENABLED_Value == "0"]
   /* Allocate the stack for USBX Memory */
   if (tx_byte_allocate(byte_pool, (VOID **) &pointer,
                        USBX_DEVICE_MEMORY_STACK_SIZE, TX_NO_WAIT) != TX_SUCCESS)
@@ -249,6 +328,9 @@ UINT MX_USBX_Device_Init(VOID *memory_ptr)
     return TX_POOL_ERROR;
     /* USER CODE END USBX_ALLOCATE_STACK_ERROR */
   }
+[#else]
+  pointer = ux_device_byte_pool_buffer;
+[/#if]
 
   /* Initialize USBX Memory */
   if (ux_system_initialize(pointer, USBX_DEVICE_MEMORY_STACK_SIZE, UX_NULL, 0) != UX_SUCCESS)
@@ -705,6 +787,131 @@ UINT MX_USBX_Device_Init(VOID *memory_ptr)
 
 [/#if]
 
+[#if REG_UX_DEVICE_VIDEO_value == "1"]
+  /* Initialize the video class parameters for the device */
+  video_stream_parameter[0].ux_device_class_video_stream_parameter_callbacks.ux_device_class_video_stream_change
+    = USBD_VIDEO_StreamChange;
+
+  video_stream_parameter[0].ux_device_class_video_stream_parameter_callbacks.ux_device_class_video_stream_payload_done
+    = USBD_VIDEO_StreamPayloadDone;
+
+  video_stream_parameter[0].ux_device_class_video_stream_parameter_callbacks.ux_device_class_video_stream_request
+    = USBD_VIDEO_StreamRequest;
+
+  video_stream_parameter[0].ux_device_class_video_stream_parameter_max_payload_buffer_nb
+    = USBD_VIDEO_PAYLOAD_BUFFER_NUMBER;
+
+  video_stream_parameter[0].ux_device_class_video_stream_parameter_max_payload_buffer_size
+    = USBD_VIDEO_StreamGetMaxPayloadBufferSize();
+
+[#if UX_STANDALONE_ENABLED_Value == "0"]
+  video_stream_parameter[0].ux_device_class_video_stream_parameter_thread_entry
+    = ux_device_class_video_write_thread_entry;
+[#else]
+  video_stream_parameter[0].ux_device_class_video_stream_parameter_task_function
+    = ux_device_class_video_write_task_function;
+[/#if]
+
+  /* Set the parameters for Video device */
+  video_parameter.ux_device_class_video_parameter_streams_nb  = USBD_VIDEO_STREAM_NMNBER;
+  video_parameter.ux_device_class_video_parameter_streams     = video_stream_parameter;
+
+  video_parameter.ux_device_class_video_parameter_callbacks.ux_slave_class_video_instance_activate
+    = USBD_VIDEO_Activate;
+
+  video_parameter.ux_device_class_video_parameter_callbacks.ux_slave_class_video_instance_deactivate
+    = USBD_VIDEO_Deactivate;
+
+  /* USER CODE BEGIN VIDEO_PARAMETER */
+
+  /* USER CODE END VIDEO_PARAMETER */
+
+  /* Get video configuration number */
+  video_configuration_number = USBD_Get_Configuration_Number(CLASS_TYPE_VIDEO, 0);
+
+  /* Find video interface number */
+  video_interface_number = USBD_Get_Interface_Number(CLASS_TYPE_VIDEO, 0);
+
+  /* Initialize the device VIDEO */
+  if (ux_device_stack_class_register(_ux_system_device_class_video_name,
+                                     ux_device_class_video_entry,
+                                     video_configuration_number,
+                                     video_interface_number,
+                                     (VOID *)&video_parameter) != UX_SUCCESS)
+  {
+    /* USER CODE BEGIN USBX_DEVICE_VIDEO_REGISTER_ERORR */
+    return UX_ERROR;
+    /* USER CODE END USBX_DEVICE_VIDEO_REGISTER_ERORR */
+  }
+
+[/#if]
+
+[#if REG_UX_DEVICE_CCID_value == "1"]
+  /* Initialize the ccid class parameters for the device */
+  ccid_parameter.ux_device_class_ccid_handles             = &USBD_CCID_Handles;
+  ccid_parameter.ux_device_class_ccid_instance_activate   = USBD_CCID_Activate;
+  ccid_parameter.ux_device_class_ccid_instance_deactivate = USBD_CCID_Deactivate;
+  ccid_parameter.ux_device_class_ccid_max_n_slots         = USBD_CCID_MAX_SLOT_INDEX;
+  ccid_parameter.ux_device_class_ccid_max_n_busy_slots    = USBD_CCID_MAX_BUSY_SLOTS;
+  ccid_parameter.ux_device_class_ccid_max_transfer_length = USBD_CCID_MAX_BLOCK_SIZE_HEADER;
+  ccid_parameter.ux_device_class_ccid_n_clocks            = USBD_CCID_N_CLOCKS;
+  ccid_parameter.ux_device_class_ccid_clocks              = USBD_CCID_Clocks;
+  ccid_parameter.ux_device_class_ccid_n_data_rates        = USBD_CCID_N_DATA_RATES;
+  ccid_parameter.ux_device_class_ccid_data_rates          = USBD_CCID_DataRates;
+
+  /* USER CODE BEGIN CCID_PARAMETER */
+
+  /* USER CODE END CCID_PARAMETER */
+
+  /* Get ccid configuration number */
+  ccid_configuration_number = USBD_Get_Configuration_Number(CLASS_TYPE_CCID, 0);
+
+  /* Find ccid interface number */
+  ccid_interface_number = USBD_Get_Interface_Number(CLASS_TYPE_CCID, 0);
+
+  /* Initialize the device CCID class */
+  if (ux_device_stack_class_register(_ux_system_device_class_ccid_name,
+                                     ux_device_class_ccid_entry,
+                                     ccid_configuration_number,
+                                     ccid_interface_number,
+                                     &ccid_parameter) != UX_SUCCESS)
+  {
+    /* USER CODE BEGIN USBX_DEVICE_CCID_REGISTER_ERORR */
+    return UX_ERROR;
+    /* USER CODE END USBX_DEVICE_CCID_REGISTER_ERORR */
+  }
+[/#if]
+
+[#if REG_UX_DEVICE_PRINTER_value == "1"]
+  /* Initialize the printer class parameters for the device */
+  printer_parameter.ux_device_class_printer_device_id           = USBD_PRINTER_GetDeviceID();
+  printer_parameter.ux_device_class_printer_instance_activate   = USBD_PRINTER_Activate;
+  printer_parameter.ux_device_class_printer_instance_deactivate = USBD_PRINTER_Deactivate;
+  printer_parameter.ux_device_class_printer_soft_reset          = USBD_PRINTER_SoftReset;
+
+  /* USER CODE BEGIN PRINTER_PARAMETER */
+
+  /* USER CODE END PRINTER_PARAMETER */
+
+  /* Get printer configuration number */
+  printer_configuration_number = USBD_Get_Configuration_Number(CLASS_TYPE_PRINTER, 0);
+
+  /* Find printer interface number */
+  printer_interface_number = USBD_Get_Interface_Number(CLASS_TYPE_PRINTER, 0);
+
+  /* Initialize the device printer class */
+  if (ux_device_stack_class_register(_ux_system_device_class_printer_name,
+                                     ux_device_class_printer_entry,
+                                     printer_configuration_number,
+                                     printer_interface_number,
+                                     &printer_parameter) != UX_SUCCESS)
+  {
+    /* USER CODE BEGIN USBX_DEVICE_PRINTER_REGISTER_ERORR */
+    return UX_ERROR;
+    /* USER CODE END USBX_DEVICE_PRINTER_REGISTER_ERORR */
+  }
+[/#if]
+
 [#if (REG_UX_DEVICE_CDC_ECM_value == "1") || (REG_UX_DEVICE_RNDIS_value == "1")]
 
   /* Perform the initialization of the network driver. This will initialize the
@@ -714,7 +921,7 @@ UINT MX_USBX_Device_Init(VOID *memory_ptr)
 
 [/#if]
 
-[#if REG_UX_DEVICE_THREAD_value  == "1"]
+[#if REG_UX_DEVICE_THREAD_value == "1" && UX_STANDALONE_ENABLED_Value == "0"]
   /* Allocate the stack for device application main thread */
   if (tx_byte_allocate(byte_pool, (VOID **) &pointer, UX_DEVICE_APP_THREAD_STACK_SIZE,
                        TX_NO_WAIT) != TX_SUCCESS)
@@ -743,7 +950,7 @@ UINT MX_USBX_Device_Init(VOID *memory_ptr)
   return ret;
 }
 
-[#if REG_UX_DEVICE_THREAD_value == "1"]
+[#if REG_UX_DEVICE_THREAD_value == "1" && UX_STANDALONE_ENABLED_Value == "0"]
 /**
   * @brief  Function implementing ${USBX_DEVICE_APP_THREAD_NAME_value}.
   * @param  thread_input: User thread input parameter.
@@ -757,6 +964,56 @@ static VOID ${USBX_DEVICE_APP_THREAD_NAME_value}(ULONG thread_input)
 }
 [/#if]
 
+[#if UX_STANDALONE_ENABLED_Value == "1"]
+/**
+  * @brief  _ux_utility_interrupt_disable
+  *         USB utility interrupt disable.
+  * @param  none
+  * @retval none
+  */
+ALIGN_TYPE _ux_utility_interrupt_disable(VOID)
+{
+  UINT interrupt_save;
+
+  /* USER CODE BEGIN _ux_utility_interrupt_disable */
+  interrupt_save = __get_PRIMASK();
+  __disable_irq();
+  /* USER CODE END _ux_utility_interrupt_disable */
+
+  return interrupt_save;
+}
+
+/**
+  * @brief  _ux_utility_interrupt_restore
+  *         USB utility interrupt restore.
+  * @param  flags
+  * @retval none
+  */
+VOID _ux_utility_interrupt_restore(ALIGN_TYPE flags)
+{
+  /* USER CODE BEGIN _ux_utility_interrupt_restore */
+  __set_PRIMASK(flags);
+  /* USER CODE END _ux_utility_interrupt_restore */
+}
+
+/**
+  * @brief  _ux_utility_time_get
+  *         Get Time Tick for host timing.
+  * @param  none
+  * @retval time tick
+  */
+ULONG _ux_utility_time_get(VOID)
+{
+  ULONG time_tick = 0U;
+
+  /* USER CODE BEGIN _ux_utility_time_get */
+
+  /* USER CODE END _ux_utility_time_get */
+
+  return time_tick;
+}
+
+[/#if]
 [#if (REG_USBX_DEVICE_CON_CK_value  == "1") && (REG_UX_DEVICE_CORE_value  == "true") && (USBX_DEVICE_CLASS_NB != 0)]
 /**
   * @brief  USBD_ChangeFunction

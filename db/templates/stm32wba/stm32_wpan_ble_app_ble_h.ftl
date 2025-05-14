@@ -38,6 +38,8 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 [#if myHash["THREADX_STATUS"]?number == 1 ]
 #include "tx_api.h"
+[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+#include "cmsis_os2.h"
 [/#if]
 
 /* Private includes ----------------------------------------------------------*/
@@ -111,6 +113,8 @@ typedef enum
 [#if  (myHash["BLE_MODE_PERIPHERAL"] == "Enabled")]
   APP_BLE_ADV_FAST,
   APP_BLE_ADV_LP,
+  APP_BLE_ADV_NON_CONN_FAST,
+  APP_BLE_ADV_NON_CONN_LP,
 [/#if]
 [#if  (myHash["BLE_MODE_CENTRAL"] == "Enabled")]
   APP_BLE_SCANNING,
@@ -118,7 +122,9 @@ typedef enum
   APP_BLE_DISCOVERING_SERVICES,
   APP_BLE_DISCOVERING_CHARACS,
 [/#if]
+  /* USER CODE BEGIN APP_BLE_ConnStatus_t*/
 
+  /* USER CODE END APP_BLE_ConnStatus_t */
 } APP_BLE_ConnStatus_t;
 [/#if]
 
@@ -167,11 +173,11 @@ typedef enum
 {
   PROC_GAP_PERIPH_ADVERTISE_START_LP,
   PROC_GAP_PERIPH_ADVERTISE_START_FAST,
+  PROC_GAP_PERIPH_ADVERTISE_NON_CONN_START_LP,
+  PROC_GAP_PERIPH_ADVERTISE_NON_CONN_START_FAST,
   PROC_GAP_PERIPH_ADVERTISE_STOP,
   PROC_GAP_PERIPH_ADVERTISE_DATA_UPDATE,
   PROC_GAP_PERIPH_CONN_PARAM_UPDATE,
-
-  PROC_GAP_PERIPH_SET_BROADCAST_MODE,
   /* USER CODE BEGIN ProcGapPeripheralId_t */
 
   /* USER CODE END ProcGapPeripheralId_t */
@@ -275,6 +281,13 @@ extern TX_SEMAPHORE BLE_HOST_Thread_Sem;
 
 /* PROC_GAP_COMPLETE related resources */
 extern TX_SEMAPHORE PROC_GAP_COMPLETE_Sem;
+
+[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+/* BLE_STACK_TASK related resources */
+extern osSemaphoreId_t         BleStackSemaphore;
+
+/* HCI_ASYNC_EVT_TASK related resources */
+extern osSemaphoreId_t         HCIasyncEvtSemaphore;
 
 [/#if]
 /* USER CODE BEGIN EV */

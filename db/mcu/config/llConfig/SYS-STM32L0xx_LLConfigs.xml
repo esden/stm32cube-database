@@ -61,6 +61,13 @@
     
   </RefConfig>
   
+     <LibMethod Comment="Switch to SMPS regulator instead of LDO" Name="LL_PWR_SetRegulatorSupply">
+		<Argument AddressOf="false" GenericType="simple" Name="PowerMode" OptimizationCondition="equal" />
+	</LibMethod>
+         <LibMethod Comment="" Name="LL_PWR_SetSmartRunDomainMode">
+		<Argument AddressOf="false" GenericType="simple" Name="SmartRun" OptimizationCondition="equal" />
+	</LibMethod>
+  
   <RefConfig Comment="Enable the PVD Output" Name="PVDEnable">
 		<CallLibMethod Name="LL_PWR_EnablePVD" ReturnHAL="false"/>
   </RefConfig>
@@ -70,6 +77,33 @@
             <MethodArg Name="IoPinConnect" ParameterName="SYSCFG_Vrefint_OUTPUT"/>
         </CallLibMethod>
     </RefConfig>
+    <RefConfig Comment="Disable the internal Pull-Up in Dead Battery pins of UCPD peripheral" Name="DisableDeadBatterySignals">
+		<IFCondition Expression="DisableDeadBatterySignalsConfig=Disable">
+			<CallLibMethod Name="LL_PWR_DisableUCPDDeadBattery" ReturnHAL="false"/>
+		</IFCondition>
+	</RefConfig>
+	<RefConfig Comment="Switch to SMPS regulator instead of LDO" Name="Configsmps">
+		<IFCondition Expression="PowerMode=PWR_SMPS_SUPPLY">
+			<CallLibMethod Name="LL_PWR_SetRegulatorSupply" ReturnHAL="false">
+				<MethodArg Name="PowerMode" ParameterName="PowerMode" />
+			</CallLibMethod>
+			<CallLibMethod Name="" Type="HardCode">
+				<HardCode Text="#n#twhile(LL_PWR_IsActiveFlag_REGULATOR()!=1) #n#t{#n#t}" />
+			</CallLibMethod>
+		</IFCondition>
+		<IFCondition Expression="S_LPBAM_CONF">
+			<CallLibMethod Name="LL_PWR_SetRegulatorSupply" ReturnHAL="false">
+				<MethodArg Name="PowerMode" ParameterName="PowerMode" />
+			</CallLibMethod>
+		</IFCondition>
+	</RefConfig>
+	<RefConfig Comment="Smart Run Domain Config" Name="Configsmartrun">
+		<IFCondition Expression="S_LPBAM_CONF">
+			<CallLibMethod Name="LL_PWR_SetSmartRunDomainMode" ReturnHAL="false">
+				<MethodArg Name="SmartRun" ParameterName="SmartRun" />
+			</CallLibMethod>
+		</IFCondition>
+	</RefConfig>
 	<LibMethod Comment="Enable Internal voltage reference" Name="LL_VREFBUF_Enable" />
 	<LibMethod Comment="Disable Internal voltage reference" Name="LL_VREFBUF_Disable" />
 
@@ -85,7 +119,8 @@
 	<LibMethod Comment="Set the trimming code for VREFBUF calibration (Tune the internal reference buffer voltage)" Name="LL_VREFBUF_SetTrimming">
 		<Argument AddressOf="false" GenericType="simple" Name="Value" OptimizationCondition="equal" />
 	</LibMethod>
-
+	
+	<LibMethod Comment="" Name="LL_PWR_DisableUCPDDeadBattery"/>
 
 	<LibMethod Comment="Enable Power Voltage Detector" Name="LL_PWR_EnablePVD" />
 	<LibMethod Comment="Disable Power Voltage Detector" Name="LL_PWR_DisablePVD" />

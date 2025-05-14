@@ -21,7 +21,11 @@
 #n
 [#if variables??]
 [#list variables as variable]
+[#if (variable.value == "DMA_NodeTypeDef" && FamilyName=="STM32H7RS")]
+${variable.value} ${variable.name} __attribute__((section("noncacheable_buffer")));
+[#else]
 ${variable.value} ${variable.name};
+[/#if]
 [/#list]
 #n
 [/#if]

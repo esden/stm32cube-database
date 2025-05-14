@@ -10,7 +10,7 @@
 
   * @attention
   *
-  * Copyright (c) 2022 STMicroelectronics.
+  * Copyright (c) 2023 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -43,8 +43,11 @@
   */
 
 #define HAL_MODULE_ENABLED
-
-[#assign allModules = ["ADC","CEC","COMP","CORDIC","CRC","AES","DAC","DCACHE","DCMI","DTS","ETH","FDCAN","FMAC","GTZC","HASH", "HCD","IRDA","IWDG","I2C","I3C","I2S","LPTIM","NAND","NOR","OPAMP", "OCTOSPI","OTFDEC","PKA","RNG","RTC","SAI","SD","SDRAM","MMC", "SMARTCARD","SMBUS","SPI","SRAM","TIM","RAMCFG","UART","USART","WWDG","PSSI", "ICACHE", "PCD"]]
+[#if DIE == "DIE478"]
+  [#assign allModules = ["ADC","CEC","CRC","AES","DAC","DCACHE","DCMI","DTS","FDCAN","GTZC","HASH","IWDG","I2C","I3C","I2S","LPTIM","NAND","NOR","OCTOSPI","OTFDEC","PKA","RNG","RTC","SD","MMC","SPI","SRAM","TIM","RAMCFG","UART","USART","WWDG","PSSI", "ICACHE", "PCD", "HCD", "SMARTCARD","SMBUS","IRDA"]]
+[#else]
+  [#assign allModules = ["ADC","CEC","COMP","CORDIC","CRC","AES","DAC","DCACHE","DCMI","DTS","ETH","FDCAN","FMAC","GTZC","HASH", "HCD","IRDA","IWDG","I2C","I3C","I2S","LPTIM","NAND","NOR","OPAMP", "OCTOSPI","OTFDEC","PKA","RNG","RTC","SAI","SD","SDRAM","MMC", "SMARTCARD","SMBUS","SPI","SRAM","TIM","RAMCFG","UART","USART","WWDG","PSSI", "ICACHE", "PCD"]]
+[/#if]
 [#list allModules as module]
     [#if isModuleUsed(module)]
 [#compress]#define HAL_${module?replace("QUADSPI","QSPI")?replace("OCTOSPI","XSPI")?replace("AES","CRYP")?replace("SCRYP","CRYP")?replace("ADF","MDF")}_MODULE_ENABLED[/#compress]
@@ -125,7 +128,7 @@
                                                 in voltage and temperature.*/
 
 #if !defined  (LSI_STARTUP_TIME)
-  #define LSI_STARTUP_TIME          130UL      /*!< Time out for LSI start up, in ms */
+  #define LSI_STARTUP_TIME          130UL      /*!< Time out for LSI start up, in us */
 #endif /* LSI_STARTUP_TIME */
 
 /**
@@ -139,13 +142,21 @@
 #if !defined  (LSE_STARTUP_TIMEOUT)
   #define LSE_STARTUP_TIMEOUT    [#if LSE_Timout??]${LSE_Timout}[#else]5000[/#if]UL     /*!< Time out for LSE start up, in ms */
 #endif /* LSE_STARTUP_TIMEOUT */
-
+[#if DIE != "DIE478"]
 /**
   * @brief External clock source for SPI/SAI peripheral
   *        This value is used by the SPI/SAI HAL module to compute the SPI/SAI clock source
   *        frequency, this source is inserted directly through I2S_CKIN pad.
 
   */
+[#else]
+/**
+  * @brief External clock source for SPI peripheral
+  *        This value is used by the SPI HAL module to compute the SPI clock source
+  *        frequency, this source is inserted directly through I2S_CKIN pad.
+
+  */
+[/#if]
 #if !defined  (EXTERNAL_CLOCK_VALUE)
   #define EXTERNAL_CLOCK_VALUE    [#if external_sai1_clock_value??]${externall_sai1_clock_value}[#else]12288000[/#if]UL /*!< Value of the External clock in Hz*/
 #endif /* EXTERNAL_CLOCK_VALUE */
@@ -187,15 +198,21 @@
   */
 #define  USE_HAL_ADC_REGISTER_CALLBACKS       0U    /* ADC register callback disabled       */
 #define  USE_HAL_CEC_REGISTER_CALLBACKS       0U    /* CEC register callback disabled       */
+[#if DIE != "DIE478"]
 #define  USE_HAL_COMP_REGISTER_CALLBACKS      0U    /* COMP register callback disabled      */
 #define  USE_HAL_CORDIC_REGISTER_CALLBACKS    0U    /* CORDIC register callback disabled    */
+[/#if]
 #define  USE_HAL_CRYP_REGISTER_CALLBACKS      0U    /* CRYP register callback disabled      */
 #define  USE_HAL_DAC_REGISTER_CALLBACKS       0U    /* DAC register callback disabled       */
 #define  USE_HAL_DCMI_REGISTER_CALLBACKS      0U    /* DCMI register callback disabled      */
 #define  USE_HAL_DTS_REGISTER_CALLBACKS       0U    /* DTS register callback disabled       */
+[#if DIE != "DIE478"]
 #define  USE_HAL_ETH_REGISTER_CALLBACKS       0U    /* ETH register callback disabled       */
+[/#if]
 #define  USE_HAL_FDCAN_REGISTER_CALLBACKS     0U    /* FDCAN register callback disabled     */
+[#if DIE != "DIE478"]
 #define  USE_HAL_FMAC_REGISTER_CALLBACKS      0U    /* FMAC register callback disabled      */
+[/#if]
 #define  USE_HAL_NOR_REGISTER_CALLBACKS       0U    /* NOR register callback disabled       */
 #define  USE_HAL_HASH_REGISTER_CALLBACKS      0U    /* HASH register callback disabled      */
 #define  USE_HAL_HCD_REGISTER_CALLBACKS       0U    /* HCD register callback disabled       */
@@ -207,17 +224,22 @@
 #define  USE_HAL_LPTIM_REGISTER_CALLBACKS     0U    /* LPTIM register callback disabled     */
 #define  USE_HAL_MMC_REGISTER_CALLBACKS       0U    /* MMC register callback disabled       */
 #define  USE_HAL_NAND_REGISTER_CALLBACKS      0U    /* NAND register callback disabled      */
-
-#define  USE_HAL_OPAMP_REGISTER_CALLBACKS     0U    /* OTFDEC register callback disabled    */
-#define  USE_HAL_OTFDEC_REGISTER_CALLBACKS    0U    /* OPAMP register callback disabled     */
+[#if DIE != "DIE478"]
+#define  USE_HAL_OPAMP_REGISTER_CALLBACKS     0U    /* OPAMP register callback disabled     */
+[/#if]
+#define  USE_HAL_OTFDEC_REGISTER_CALLBACKS    0U    /* OTFDEC register callback disabled    */
 #define  USE_HAL_PCD_REGISTER_CALLBACKS       0U    /* PCD register callback disabled       */
 #define  USE_HAL_PKA_REGISTER_CALLBACKS       0U    /* PKA register callback disabled       */
 #define  USE_HAL_RAMCFG_REGISTER_CALLBACKS    0U    /* RAMCFG register callback disabled    */
 #define  USE_HAL_RNG_REGISTER_CALLBACKS       0U    /* RNG register callback disabled       */
 #define  USE_HAL_RTC_REGISTER_CALLBACKS       0U    /* RTC register callback disabled       */
+[#if DIE != "DIE478"]
 #define  USE_HAL_SAI_REGISTER_CALLBACKS       0U    /* SAI register callback disabled       */
+[/#if]
 #define  USE_HAL_SD_REGISTER_CALLBACKS        0U    /* SD register callback disabled        */
+[#if DIE != "DIE478"]
 #define  USE_HAL_SDRAM_REGISTER_CALLBACKS     0U    /* SDRAM register callback disabled     */
+[/#if]
 #define  USE_HAL_SMARTCARD_REGISTER_CALLBACKS 0U    /* SMARTCARD register callback disabled */
 #define  USE_HAL_SMBUS_REGISTER_CALLBACKS     0U    /* SMBUS register callback disabled     */
 #define  USE_HAL_SPI_REGISTER_CALLBACKS       0U    /* SPI register callback disabled       */
@@ -238,10 +260,7 @@
 #define USE_SPI_CRC                   [#if CRC_SPI??]${CRC_SPI}[#else]1U[/#if]
 
 
-
 /* Includes ----------------------------------------------------------------------------------------------------------*/
-
-
 
 
 /**
@@ -312,9 +331,11 @@
   #include "stm32h5xx_hal_sram.h"
 #endif /* HAL_SRAM_MODULE_ENABLED */
 
+[#if DIE != "DIE478"]
 #ifdef HAL_SDRAM_MODULE_ENABLED
   #include "stm32h5xx_hal_sdram.h"
 #endif /* HAL_SDRAM_MODULE_ENABLED */
+[/#if]
 
 #ifdef HAL_MMC_MODULE_ENABLED
  #include "stm32h5xx_hal_mmc.h"
@@ -368,9 +389,11 @@
  #include "stm32h5xx_hal_rtc.h"
 #endif /* HAL_RTC_MODULE_ENABLED */
 
+		[#if DIE != "DIE478"]
 #ifdef HAL_SAI_MODULE_ENABLED
  #include "stm32h5xx_hal_sai.h"
 #endif /* HAL_SAI_MODULE_ENABLED */
+		[/#if]
 
 #ifdef HAL_SD_MODULE_ENABLED
  #include "stm32h5xx_hal_sd.h"
@@ -415,14 +438,18 @@
 #ifdef HAL_HCD_MODULE_ENABLED
  #include "stm32h5xx_hal_hcd.h"
 #endif /* HAL_HCD_MODULE_ENABLED */
+		[#if DIE != "DIE478"]
 
 #ifdef HAL_COMP_MODULE_ENABLED
  #include "stm32h5xx_hal_comp.h"
 #endif /* HAL_COMP_MODULE_ENABLED */
+		[/#if]
 
+		[#if DIE != "DIE478"]
 #ifdef HAL_CORDIC_MODULE_ENABLED
  #include "stm32h5xx_hal_cordic.h"
 #endif /* HAL_CORDIC_MODULE_ENABLED */
+		[/#if]
 
 #ifdef HAL_DCMI_MODULE_ENABLED
  #include "stm32h5xx_hal_dcmi.h"
@@ -432,9 +459,11 @@
  #include "stm32h5xx_hal_exti.h"
 #endif /* HAL_EXTI_MODULE_ENABLED */
 
+		[#if DIE != "DIE478"]
 #ifdef HAL_ETH_MODULE_ENABLED
  #include "stm32h5xx_hal_eth.h"
 #endif /* HAL_ETH_MODULE_ENABLED */
+		[/#if]
 
 #ifdef HAL_FDCAN_MODULE_ENABLED
  #include "stm32h5xx_hal_fdcan.h"
@@ -444,6 +473,7 @@
   #include "stm32h5xx_hal_cec.h"
 #endif /* HAL_CEC_MODULE_ENABLED */
 
+		[#if DIE != "DIE478"]
 #ifdef HAL_FMAC_MODULE_ENABLED
  #include "stm32h5xx_hal_fmac.h"
 #endif /* HAL_FMAC_MODULE_ENABLED */
@@ -451,6 +481,7 @@
 #ifdef HAL_OPAMP_MODULE_ENABLED
   #include "stm32h5xx_hal_opamp.h"
 #endif /* HAL_OPAMP_MODULE_ENABLED */
+		[/#if]
 
 #ifdef HAL_OTFDEC_MODULE_ENABLED
  #include "stm32h5xx_hal_otfdec.h"

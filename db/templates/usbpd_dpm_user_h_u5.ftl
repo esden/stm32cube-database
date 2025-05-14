@@ -82,6 +82,9 @@ typedef struct
 [#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
   USBPD_MIDB_TypeDef  DPM_ManuInfoPort;                         /*!< Manufacturer information used for the port            */
 [/#if]
+[#if SNK || DRP]
+  USBPD_SKEDB_TypeDef DPM_SNKExtendedCapa;                        /*!< SNK Extended Capability                 */
+[/#if]
   uint16_t            ReservedManu;                             /*!< Reserved bits to match with Manufacturer information            */
 } USBPD_USER_SettingsTypeDef;
 
@@ -94,6 +97,7 @@ typedef struct
 [/#if]
 [/#if]
 /* USER CODE BEGIN Typedef */
+[@common.optinclude name=mxTmpFolder+"/usbpd_dpm_user_h_Typedef.tmp"/]
 
 /* USER CODE END Typedef */
 
@@ -106,6 +110,7 @@ typedef void     (*GUI_SAVE_INFO)(uint8_t PortNum, uint8_t DataId, uint8_t *Ptr,
 [/#if]
 /* Exported define -----------------------------------------------------------*/
 /* USER CODE BEGIN Define */
+[@common.optinclude name=mxTmpFolder+"/usbpd_dpm_user_h_Define.tmp"/]
 
 /* USER CODE END Define */
 
@@ -121,6 +126,7 @@ typedef void     (*GUI_SAVE_INFO)(uint8_t PortNum, uint8_t DataId, uint8_t *Ptr,
 
 /* Exported variables --------------------------------------------------------*/
 /* USER CODE BEGIN Private_Variables */
+[@common.optinclude name=mxTmpFolder+"/usbpd_dpm_user_h_Variables.tmp"/]
 
 /* USER CODE END Private_Variables */
 

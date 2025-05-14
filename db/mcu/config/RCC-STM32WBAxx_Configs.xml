@@ -13,6 +13,12 @@
         </IFCondition>		
     </RefConfig>
 	
+	<RefConfig Comment="Supply configuration update enable" Name="RCC_MODIFY_REG">
+        <CallLibMethod Name="HAL_PWREx_ConfigSupply" ReturnHAL="false">
+            <MethodArg Name="SupplySource" ParameterName="SupplySource"/>
+        </CallLibMethod>
+    </RefConfig>
+	
 	<!--Fix 126267 YBC-->
 	<RefConfig Comment="Set LSE Trimming Value" Name="RCC_LSE_TRIM">
         <IFCondition Expression="(!LSE_R) &amp; (LSEUsed=1)">
@@ -90,7 +96,7 @@
         <CallLibMethod Name="HAL_RCCEx_PeriphCLKConfig">
             <MethodArg Name="PeriphClockSelection" ParameterName="C_PeriphClockSelectionARG"/>
             <MethodArg Name="RTCClockSelection" ParameterName=""/>
-            <MethodArg Name="SystickClockSelection" ParameterName="SystickClockSelectionARG"/>
+            <MethodArg Name="SystickClockSelection" ParameterName=""/>
             <MethodArg Name="Usart1ClockSelection" ParameterName=""/>
             <MethodArg Name="Usart2ClockSelection" ParameterName=""/>
             <MethodArg Name="Lpuart1ClockSelection" ParameterName=""/>
@@ -119,6 +125,23 @@
         <CallLibMethod Name="HAL_PWREx_ControlVoltageScaling">
             <MethodArg Name="REGULATOR" ParameterName="PWR_Regulator_Voltage_Scale"/>
         </CallLibMethod>
+    </RefConfig>
+	
+    <RefConfig Comment="" Name="RCC_SYSTICK_Clock">
+		<IFCondition Expression="Systick_External">
+        <CallLibMethod Name="" Type="HardCode">
+            <HardCode Text="#n#t /* Select SysTick source clock */"/>
+        </CallLibMethod>
+        <CallLibMethod Name="HAL_SYSTICK_CLKSourceConfig" ReturnHAL="false">
+            <MethodArg Name="CLKSource" ParameterName="CortexCLockSelectionARG"/>
+        </CallLibMethod>
+        <CallLibMethod Name="" Type="HardCode">
+            <HardCode Text="#n#t /* Re-Initialize Tick with new clock source */"/>
+        </CallLibMethod>
+        <CallLibMethod Name="" Type="HardCode">
+            <HardCode Text="#tif (HAL_InitTick(TICK_INT_PRIORITY) != HAL_OK)#n#t{#n#t#tError_Handler();#t#n#t}"/>
+        </CallLibMethod>
+		</IFCondition>
     </RefConfig>
 
     <RefConfig Comment="MCO configuration" Name="RCC_MCO1Config">
@@ -217,8 +240,11 @@
     </LibMethod>
     <LibMethod Comment="" Name="HAL_RCCEx_HSESetTrimming">
         <Argument AddressOf="false" GenericType="simple" Name="HSE_TRIM" OptimizationCondition="equal"/>
-    </LibMethod>	
+    </LibMethod>
 
+    <LibMethod Comment="" Name="HAL_PWREx_ConfigSupply">
+        <Argument AddressOf="false" GenericType="simple" Name="SupplySource" OptimizationCondition="equal"/>
+    </LibMethod>
 
     <LibMethod Comment="" Name="HAL_SYSTICK_Config">
         <Argument AddressOf="false" GenericType="simple" Name="TicksNumb" OptimizationCondition="equal"/>       
@@ -301,7 +327,6 @@
         <File Category="source" Name="Drivers/STM32WBAxx_HAL_Driver/Src/stm32wbaxx_hal_i2c_ex.c"/>
         <File Category="header" Name="Drivers/STM32WBAxx_HAL_Driver/Inc/stm32wbaxx_ll_bus.h"/>
         <File Category="header" Name="Drivers/STM32WBAxx_HAL_Driver/Inc/stm32wbaxx_ll_system.h"/>
-        <File Category="header" Name="Drivers/STM32WBAxx_HAL_Driver/Inc/stm32wbaxx_ll_utils.h"/>
     </RefComponent>    
     <RefComponent Cclass="HAL" Cgroup="RCC" Cversion="0.3.0">
         <File Category="header" Name="Drivers/STM32WBAxx_HAL_Driver/Inc/stm32wbaxx_hal_rcc.h"/>
@@ -312,6 +337,7 @@
         <File Category="header" Name="Drivers/STM32WBAxx_HAL_Driver/Inc/stm32wbaxx_hal_cortex.h"/>
         <File Category="header" Name="Drivers/STM32WBAxx_HAL_Driver/Inc/stm32wbaxx_ll_rcc.h"/>
         <File Category="header" Name="Drivers/STM32WBAxx_HAL_Driver/Inc/stm32wbaxx_ll_cortex.h"/>
+        <File Category="header" Name="Drivers/STM32WBAxx_HAL_Driver/Inc/stm32wbaxx_ll_utils.h"/>
     </RefComponent>
     <RefComponent Cclass="HAL" Cgroup="FLASH" Cversion="0.3.0">
         <File Category="header" Name="Drivers/STM32WBAxx_HAL_Driver/Inc/stm32wbaxx_hal_flash.h"/>

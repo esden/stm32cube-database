@@ -1,0 +1,199 @@
+<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" DBVersion="V4.0" IPType="middleware" IpGroup="Middleware" Name="EXTMEM_LOADER" Version="1.0.0" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd">
+
+	<RefMode Abstract="false" Name="Activate_EXTMEM_LOADER">
+		<ConfigForMode>EXTMEM_LOADER_ENABLE</ConfigForMode>
+
+		<!-- ExtMemLoader -->
+		<Parameter Added="true" Name="RefParam_ELOADER_Board"/>
+		<Parameter Added="true" Name="RefParam_ELOADER_Keil"/>
+		<Parameter Added="true" Name="RefParam_ELOADER_memory"/>
+		<Parameter Added="true" Name="RefParam_ELOADER_Target"/>
+		<Parameter Added="true" Name="RefParam_DEBUG_enable"/>
+		<Parameter Added="true" Name="RefParam_TRACE_enable"/>
+		<Parameter Added="true" Name="RefParam_Loader_Name"/>
+		<Parameter Added="true" Name="RefParam_ELOADER_ADDRESS"/>
+		<Parameter Added="true" Name="RefParam_ELOADER_END_ADDRESS"/>
+		<Parameter Added="true" Name="RefParam_ELOADER_SIZE"/>
+		<Parameter Added="true" Name="RefParam_SECTORS_NBR"/>
+		<Parameter Added="true" Name="RefParam_SECTORS_SIZE"/>
+		<Parameter Added="true" Name="RefParam_MEM_SIZE_Display"/>
+		<Parameter Added="true" Name="RefParam_PAGE_SIZE"/>
+		<Parameter Added="true" Name="RefParam_INIT_VAL"/>
+		<Parameter Added="true" Name="RefParam_MEM_SIZE"/>
+		<Parameter Added="true" Name="RefParam_PAGE_TIMEOUT"/>
+		<Parameter Added="true" Name="RefParam_SECTOR_TIMEOUT"/>
+		<Parameter Added="true" Name="RefParam_ELOADER_ADDRESS_HEX"/>
+		<Parameter Added="true" Name="RefParam_MEM_END_ADDRESS"/>
+
+		<BspDependency Name="USART" Comment="Use an UART or UART for trace" BspIpName="(U|US)ART" BspModeName="Asynchronous" GroupName="Debug">
+			<Condition Expression="EXTMEM_LOADER_EL &amp; SEM_ELOADER_TRACE"  Diagnostic="ExtMemLoader debug interface"/>
+		</BspDependency>
+
+	</RefMode>
+
+	<ModeLogicOperator Name="OR">
+		<Mode Name="Activate_EXTMEM_LOADER" UserName="Activate External Memory Loader">
+			<ModeLogicOperator Name="OR">
+				<Mode Name="Activate_EXTMEM_LOADER" UserName="Activate HAL Flash">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="SIG_Activate_EXTMEM_LOADER" />
+					</SignalLogicalOp>
+					<Semaphore>SEMA_Activate_EXTMEM_LOADER</Semaphore>
+
+				</Mode>
+			</ModeLogicOperator>
+			<Condition Expression="XSPI1_Used | XSPI2_Used | SDMMC1_Used | SDMMC2_Used" Diagnostic="Active only if XSPI or SDMMC is enbaled"/>
+		</Mode>
+    </ModeLogicOperator>
+
+	<RefSignal Name="SIG_Activate_EXTMEM_LOADER" Virtual="true"/>
+
+	<!-- ExtMemLoader config -->
+	<RefParameter Added="true" Comment="Select memory loader for your board" DefaultValue="" Group="Board selection" Name="RefParam_ExtMemLoader_Board" TabName="External Memory Loader" Type="list" Unit="" Visible="false">
+		<Condition Expression="!EXTMEM_LOADER_EL" Diagnostic="Needed for ExtMemLoader project"/>
+	</RefParameter>
+	<RefParameter Added="true" Comment="Select memory loader for your board" DefaultValue="$PROJ_DIR$/../../ExtMemLoader/config/EXTMEM_BOARD.board" Group="Board selection" Name="RefParam_ELOADER_Board" TabName="External Memory Loader" Type="list" Unit="" Visible="false">
+		<PossibleValue Comment="Custom Board" Value="$PROJ_DIR$/../../ExtMemLoader/config/EXTMEM_BOARD.board" Semaphore="SEM_ELOADER_CUSTOM"/>
+					   <!--Condition="!EXTMEM_LOADER_EL" Action="Disable" Diagnostic="EXTMEM should be enabled in ExtMemLoader context" />-->
+	</RefParameter>
+
+	<RefParameter Added="true" Comment="k3" DefaultValue="+'-U-O142 -O2254 -S0 -C0 -A1 -N00 -D00(5BA02477) -L00(0) -TO18 -TC10000000 -TP21 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO7 -FD20000000 -FC10000 -FN1 -FF0STM32H7Rx_64k.FLM -FS08000000 -FL010000 -FP0(%%Device:STM32H7R7Z8Jx%Flash\STM32H7Rx_64k.FLM) -FF1{ProjectName}_ExtMemLoader -FS1'+RefParam_ELOADER_ADDRESS+' -FL1'+RefParam_MEM_SIZE+' -WA0 -WE0 -WVCE4 -WS2710 -WM0 -WP2 -WK0'" Group="Board selection" Name="RefParam_ELOADER_Keil" TabName="External Memory Loader" Type="stringRW" Unit="" Visible="false">
+		<!--<PossibleValue Comment="Custom Board" Value="+-U-O142 -O2254 -S0 -C0 -A1 -N00 -D00(5BA02477) -L00(0) -TO18 -TC10000000 -TP21 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO7 -FD20000000 -FC1000 -FN1 -FF0STM32H7Rx_64k.FLM -FS08000000 -FL010000 -FP0($$Device:STM32H7R7Z8Jx$Flash\STM32H7Rx_64k.FLM) -FF1${ProjectName}_ExtMemLoader -FS1+RefParam_ELOADER_ADDRESS -FL1+RefParam_MEM_SIZE -WA0 -WE0 -WVCE4 -WS2710 -WM0 -WP2 -WK0" Semaphore="SEM_ELOADER_CUSTOM"/>-->
+		<!--Condition="!EXTMEM_LOADER_EL" Action="Disable" Diagnostic="EXTMEM should be enabled in ExtMemLoader context" />-->
+	</RefParameter>
+
+	<RefParameter Added="true" Comment="select the memory" DefaultValue="EXTMEM1" Group="Configuration" Name="RefParam_ELOADER_memory" TabName="External Memory Loader" Type="list" Unit="" Visible="false">
+		<Description>The memeory targeted by the loader. The Memories are defined in the EXTMEM middleware.</Description>
+		<Condition Expression="!EXTMEM_LOADER_EL | !SEM_ELOADER_CUSTOM" Diagnostic="Needed for ExtMemLoader project"/>
+	</RefParameter>
+	<RefParameter Added="true" Comment="select the memory" DefaultValue="EXTMEM1" Group="Configuration" Name="RefParam_ELOADER_memory" TabName="External Memory Loader" Type="list" Unit="">
+		<Description>The memeory targeted by the loader. The Memories are defined in the EXTMEM middleware.</Description>
+		<PossibleValue Comment="Memory 1" Value="EXTMEM1"/>
+		<PossibleValue Comment="Memory 2" Value="EXTMEM2" Condition="EXTMEM_MANAGER:RefParam_EXTMEM_Number_of_Memory=1 | EXTMEM_MANAGER:RefParam_MEMORY_2_Driver_Selection = EXTMEM_NOT_USED" Action="Disable"/>
+	</RefParameter>
+
+	<RefParameter Added="true" Comment="select the target IDE\Tool" DefaultValue="Selected Toolchain" Group="Configuration" Name="RefParam_ELOADER_Target" TabName="External Memory Loader" Type="list" Unit="" Visible="false">
+		<Condition Expression="!EXTMEM_LOADER_EL | !SEM_ELOADER_CUSTOM" Diagnostic="Needed for ExtMemLoader project"/>
+	</RefParameter>
+	<RefParameter Added="true" Comment="select the target IDE\Tool" DefaultValue="Selected Toolchain" Group="Configuration" Name="RefParam_ELOADER_Target" TabName="External Memory Loader" Type="list" Unit="">
+		<Description>Select the target IDE \ Tool for the ExtMemLoader:&lt;br/&gt;
+			&lt;font color=&quot;blue&quot;&gt;&lt;b&gt;Selected Toolchain:&lt;/b&gt;&lt;/font&gt; the ExtMemLoader project will generate an external memory loader for the target toolchain selected in the Project Manager Tab.&lt;br/&gt;
+			&lt;font color=&quot;blue&quot;&gt;&lt;b&gt;STM32CubeProgrammer:&lt;/b&gt;&lt;/font&gt; the ExtMemLoader project will generate an external memory loader for STM32CubeProgrammer Tool.&lt;br/&gt;
+			&lt;font color=&quot;orange&quot;&gt;&lt;b&gt;Warning:&lt;/b&gt; Changing this parameter will lead to linker file settings update in the ExtMemLoader project settings.&lt;/font&gt;&lt;br/&gt;
+			&lt;font color=&quot;orange&quot;&gt;&lt;&gt; For MDK-ARM, the debug options "Run to main()" the "Initialization file" will be updated in the ExtMemLoader project settings.&lt;/font&gt;&lt;br/&gt;
+		</Description>
+
+		<PossibleValue Comment="Selected Toolchain" Value="IDE" Semaphore="SEM_ELOADER_IDE"/>
+		<PossibleValue Comment="STM32CubeProgrammer" Value="PROGRAMMER" Semaphore="SEM_ELOADER_PROGRAMMER"/>
+	</RefParameter>
+
+	<RefParameter Added="true" Comment="Enable debug" DefaultValue="false" Group="Configuration" Name="RefParam_DEBUG_enable" TabName="External Memory Loader" Type="boolean" Visible="false">
+		<Condition Expression="!EXTMEM_LOADER_EL | !SEM_ELOADER_CUSTOM" Diagnostic="Needed for ExtMemLoader project"/>
+	</RefParameter>
+	<RefParameter Added="true" Comment="Enable debug" DefaultValue="false" Group="Configuration" Name="RefParam_DEBUG_enable" TabName="External Memory Loader" Type="boolean" Visible="false">
+		<PossibleValue Comment="true" Value="true"   Semaphore="SEM_ELOADER_DEBUG" />
+		<PossibleValue Comment="false" Value="false" />
+		<Description>
+			&lt;b&gt;&lt;/b&gt; Add main() entry point for debug purpose&lt;br/&gt;
+			&lt;font color=&quot;orange&quot;&gt;&lt;b&gt;Warning:&lt;/b&gt; Changing this parameter will lead to linker file update. Any change in the linker file will be lost.&lt;/font&gt;&lt;br/&gt;
+		</Description>
+	</RefParameter>
+
+	<RefParameter Added="true" Comment="Enable use of UART/USART for trace" DefaultValue="false" Group="Configuration" Name="RefParam_TRACE_enable" TabName="External Memory Loader" Type="boolean" Visible="false">
+		<Condition Expression="!EXTMEM_LOADER_EL | !SEM_ELOADER_CUSTOM" Diagnostic="Needed for ExtMemLoader project"/>
+	</RefParameter>
+	<RefParameter Added="true" Comment="Enable use of UART/USART for trace" DefaultValue="false" Group="Configuration" Name="RefParam_TRACE_enable" TabName="External Memory Loader" Type="boolean" Visible="false">
+		<PossibleValue Comment="true" Value="true"   Semaphore="SEM_ELOADER_TRACE" />
+		<PossibleValue Comment="false" Value="false" />
+		<Description>
+			&lt;b&gt;Modes:&lt;/b&gt; Asynchronous&lt;br/&gt;
+			&lt;font color=&quot;blue&quot;&gt;&lt;b&gt;EXTMEM - Platform Settings panel:&lt;/b&gt; Platform proposals&lt;/font&gt;&lt;br/&gt;
+			&#160;&#160;&#160;&#8226; Ensure that chosen UART/USART is selected in Found Solutions&lt;br/&gt;
+		</Description>
+	</RefParameter>
+
+	<RefParameter Added="true" Comment="Loader name" DefaultValue="Custom_Memory_Loader" Group="Target memory parameters" Name="RefParam_Loader_Name" TabName="External Memory Loader" Type="stringRW">
+		<Description>External memory Loader name</Description>
+	</RefParameter>
+	<RefParameter Added="true" Comment="Start address" DefaultValue="0x90000000" Group="Target memory parameters" Max="0xFFFFFFFF" Min="0" Name="RefParam_ELOADER_ADDRESS" TabName="External Memory Loader" Type="string" Unit="" Visible="false">
+		<Condition Expression="!EXTMEM_LOADER_EL | !SEM_ELOADER_CUSTOM" Diagnostic="Needed for ExtMemLoader project"/>
+	</RefParameter>
+	<RefParameter Added="true" Comment="Start address" DefaultValue="0x90000000" Group="Target memory parameters" Max="0xFFFFFFFF" Min="0" Name="RefParam_ELOADER_ADDRESS" TabName="External Memory Loader" Type="string" Unit="">
+		<Description>External memory start address</Description>
+		<Condition Expression="(RefParam_ELOADER_memory=EXTMEM1 &amp; EXTMEM_MANAGER:RefParam_MEMORY_1_Instance=XSPI1) | (RefParam_ELOADER_memory=EXTMEM2 &amp; EXTMEM_MANAGER:RefParam_MEMORY_2_Instance=XSPI1)" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Added="true" Comment="Start address" DefaultValue="0x70000000" Group="Target memory parameters" Max="0xFFFFFFFF" Min="0" Name="RefParam_ELOADER_ADDRESS" TabName="External Memory Loader" Type="string" Unit="">
+		<Description>External memory start address</Description>
+		<Condition Expression="(RefParam_ELOADER_memory=EXTMEM1 &amp; EXTMEM_MANAGER:RefParam_MEMORY_1_Instance=XSPI2) | (RefParam_ELOADER_memory=EXTMEM2 &amp; EXTMEM_MANAGER:RefParam_MEMORY_2_Instance=XSPI2) " Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Added="true" Comment="Start address" DefaultValue="0x00000000" Group="Target memory parameters" Max="0xFFFFFFFF" Min="0" Name="RefParam_ELOADER_ADDRESS" TabName="External Memory Loader" Type="string" Unit="">
+		<Description>External memory loader start address</Description>
+		<Condition Expression="((RefParam_ELOADER_memory=EXTMEM1 &amp; (EXTMEM_MANAGER:RefParam_MEMORY_1_Instance=SDMMC1 | EXTMEM_MANAGER:RefParam_MEMORY_1_Instance=SDMMC2)) | (RefParam_ELOADER_memory=EXTMEM2 &amp; (EXTMEM_MANAGER:RefParam_MEMORY_2_Instance=SDMMC1 | EXTMEM_MANAGER:RefParam_MEMORY_2_Instance=SDMMC2)) ) " Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Added="true" Comment="Start address" DefaultValue="0x00000000" Group="Target memory parameters" Max="0xFFFFFFFF" Min="0" Name="RefParam_ELOADER_ADDRESS" TabName="External Memory Loader" Type="stringRW" Unit="">
+		<Description>External memory loader start address</Description>
+	</RefParameter>
+
+	<RefParameter Added="true" Comment="End address" DefaultValue="0x9FFFFFFF" Group="Target memory parameters" Max="0xFFFFFFFF" Min="0" Name="RefParam_ELOADER_END_ADDRESS" TabName="External Memory Loader" Type="string" Unit="" Visible="false">
+		<Condition Expression="!EXTMEM_LOADER_EL | !SEM_ELOADER_CUSTOM" Diagnostic="Needed for ExtMemLoader project"/>
+	</RefParameter>
+	<RefParameter Added="true" Comment="End address" DefaultValue="0x9FFFFFFF" Group="Target memory parameters" Max="0xFFFFFFFF" Min="0" Name="RefParam_ELOADER_END_ADDRESS" TabName="External Memory Loader" Type="string" Unit="">
+		<Description>External memory end address</Description>
+		<Condition Expression="(RefParam_ELOADER_memory=EXTMEM1 &amp; EXTMEM_MANAGER:RefParam_MEMORY_1_Instance=XSPI1) | (RefParam_ELOADER_memory=EXTMEM2 &amp; EXTMEM_MANAGER:RefParam_MEMORY_2_Instance=XSPI1)" Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Added="true" Comment="End address" DefaultValue="0x7FFFFFFF" Group="Target memory parameters" Max="0xFFFFFFFF" Min="0" Name="RefParam_ELOADER_END_ADDRESS" TabName="External Memory Loader" Type="string" Unit="">
+		<Description>External memory end address</Description>
+		<Condition Expression="(RefParam_ELOADER_memory=EXTMEM1 &amp; EXTMEM_MANAGER:RefParam_MEMORY_1_Instance=XSPI2) | (RefParam_ELOADER_memory=EXTMEM2 &amp; EXTMEM_MANAGER:RefParam_MEMORY_2_Instance=XSPI2) " Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Added="true" Comment="End address" DefaultValue="0xFFFFFFFF" Group="Target memory parameters" Max="0xFFFFFFFF" Min="0" Name="RefParam_ELOADER_END_ADDRESS" TabName="External Memory Loader" Type="string" Unit="">
+		<Description>External memory loader end address</Description>
+		<Condition Expression="((RefParam_ELOADER_memory=EXTMEM1 &amp; (EXTMEM_MANAGER:RefParam_MEMORY_1_Instance=SDMMC1 | EXTMEM_MANAGER:RefParam_MEMORY_1_Instance=SDMMC2)) | (RefParam_ELOADER_memory=EXTMEM2 &amp; (EXTMEM_MANAGER:RefParam_MEMORY_2_Instance=SDMMC1 | EXTMEM_MANAGER:RefParam_MEMORY_2_Instance=SDMMC2)) ) " Diagnostic=""/>
+	</RefParameter>
+	<RefParameter Added="true" Comment="End address" DefaultValue="0xFFFFFFFF" Group="Target memory parameters" Max="0xFFFFFFFF" Min="0" Name="RefParam_ELOADER_END_ADDRESS" TabName="External Memory Loader" Type="stringRW" Unit="">
+		<Description>External memory loader end address</Description>
+	</RefParameter>
+
+	<RefParameter Added="true" Comment="Size" DefaultValue="0x10000000" Group="Target memory parameters" Max="0xFFFFFFFF" Min="0" Name="RefParam_ELOADER_SIZE" TabName="External Memory Loader" Type="hex" Unit="Bytes" Visible="false">
+		<Description>External memory maximum size</Description>
+	</RefParameter>
+	<RefParameter Added="true" Comment="Number of sectors" DefaultValue="0" Group="Target memory parameters" Max="0xFFFFFFFF" Min="0" Name="RefParam_SECTORS_NBR" TabName="External Memory Loader" Type="string" Unit="" Visible="false">
+		<Description>External memory sectors' number</Description>
+		<Condition Expression="EXTMEM_LOADER_EL=0  | !SEM_ELOADER_CUSTOM" Diagnostic="Needed for ExtMemLoader project"/>
+	</RefParameter>
+	<RefParameter Added="true" Comment="Number of sectors" DefaultValue="0" Group="Target memory parameters" Max="0xFFFFFFFF" Min="1" Name="RefParam_SECTORS_NBR" TabName="External Memory Loader" Type="hex" Unit="">
+		<Description>External memory sectors' number</Description>
+	</RefParameter>
+	<RefParameter Added="true" Comment="Sector size" DefaultValue="0" Group="Target memory parameters" Max="0xFFFFFFFF" Min="0" Name="RefParam_SECTORS_SIZE" TabName="External Memory Loader" Type="string" Unit="Bytes" Visible="false">
+		<Description>External memory sectors' size</Description>
+		<Condition Expression="EXTMEM_LOADER_EL=0  | !SEM_ELOADER_CUSTOM" Diagnostic="Needed for ExtMemLoader project"/>
+	</RefParameter>
+	<RefParameter Added="true" Comment="Sector size" DefaultValue="0" Group="Target memory parameters" Max="0xFFFFFFFF" Min="1" Name="RefParam_SECTORS_SIZE" TabName="External Memory Loader" Type="hex" Unit="Bytes">
+		<Description>External memory sectors' size</Description>
+	</RefParameter>
+	<RefParameter Added="true" Comment="Page size" DefaultValue="0x100" Group="Target memory parameters" Max="0xFFFFFFFF" Min="1" Name="RefParam_PAGE_SIZE" TabName="External Memory Loader" Type="integer" Unit="Bytes">
+		<Description>External memory page size</Description>
+	</RefParameter>
+	<RefParameter Added="true" Comment="Memory size" DefaultValue="=(RefParam_SECTORS_SIZE*RefParam_SECTORS_NBR)" Group="Target memory parameters" Name="RefParam_MEM_SIZE" TabName="External Memory Loader" Type="hex" Unit="Bytes" Visible="false">
+		<Description>External memory size (sectors' size * sectors' number)</Description>
+	</RefParameter>
+	<RefParameter Added="true" Comment="Memory size" DefaultValue="+RefParam_MEM_SIZE" Group="Target memory parameters" Name="RefParam_MEM_SIZE_Display" TabName="External Memory Loader" Type="string" Unit="Bytes">
+		<Description>External memory size (sectors' size * sectors' number)</Description>
+	</RefParameter>
+	<RefParameter Added="true" Comment="Initial value" DefaultValue="0xFF" Group="Target memory parameters" Max="0xFFFFFFFF" Min="0" Name="RefParam_INIT_VAL" TabName="External Memory Loader" Type="integer" Unit="Bytes" Visible="false">
+		<Description>Initial value (Erased memory)</Description>
+	</RefParameter>
+	<RefParameter Added="true" Comment="Program Page Timeout" DefaultValue="10000" Group="Target memory parameters" Name="RefParam_PAGE_TIMEOUT" TabName="External Memory Loader" Type="integer" Unit="ms">
+		<Description>Program Page Timeout in milliseconds</Description>
+	</RefParameter>
+	<RefParameter Added="true" Comment="Erase Sector Timeout" DefaultValue="6000" Group="Target memory parameters" Name="RefParam_SECTOR_TIMEOUT" TabName="External Memory Loader" Type="integer" Unit="ms">
+		<Description>Erase Sector Timeout in milliseconds</Description>
+	</RefParameter>
+
+	<RefParameter Added="true" Comment="Memory start address hex" DefaultValue="+RefParam_ELOADER_ADDRESS" Group="Target memory parameters" Name="RefParam_ELOADER_ADDRESS_HEX" TabName="External Memory Loader" Type="hex" Unit="Bytes" Visible="false">
+		<Description>External memory size + start address</Description>
+	</RefParameter>
+
+	<RefParameter Added="true" Comment="Memory end address" DefaultValue="=RefParam_ELOADER_ADDRESS_HEX+(RefParam_SECTORS_SIZE*RefParam_SECTORS_NBR -1)" Group="Target memory parameters" Name="RefParam_MEM_END_ADDRESS" TabName="External Memory Loader" Type="hex" Unit="Bytes" Visible="false">
+		<Description>External memory size + start address</Description>
+	</RefParameter>
+</IP>

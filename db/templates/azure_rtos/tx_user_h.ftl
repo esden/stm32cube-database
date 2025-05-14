@@ -180,18 +180,6 @@
       [#assign TX_TIMER_TICKS_PER_SECOND_value = value]
     [/#if]
 	
-	[#if name == "ALIGN_TYPE_DEFINED"]
-      [#assign ALIGN_TYPE_DEFINED_value = value]
-    [/#if]
-	
-	[#if name == "ALIGN_TYPE_VAL"]
-      [#assign ALIGN_TYPE_VAL_value = value]
-    [/#if]
-	
-	[#if name == "TX_MEMSET"]
-      [#assign TX_MEMSET_value = value]
-    [/#if]
-	
 	[#if name == "TX_SAFETY_CRITICAL"]
       [#assign TX_SAFETY_CRITICAL_value = value]
     [/#if]

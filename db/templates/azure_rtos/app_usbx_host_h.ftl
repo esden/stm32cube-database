@@ -18,6 +18,7 @@
 extern "C" {
 #endif
 
+[#assign AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE_VAL = "1" ]
 [#compress]
 [#list SWIPdatas as SWIP]
 [#if SWIP.defines??]
@@ -27,6 +28,9 @@ extern "C" {
 
     [#if name == "AZRTOS_APP_MEM_ALLOCATION_METHOD"]
       [#assign AZRTOS_APP_MEM_ALLOCATION_METHOD_VAL = value]
+    [/#if]
+    [#if name == "AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE"]
+      [#assign AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE_VAL = value]
     [/#if]
     [#if name == "USBX_HOST_SYS_SIZE"]
       [#assign USBX_HOST_SYS_SIZE_value = value]
@@ -58,9 +62,16 @@ extern "C" {
     [#if name == "USBX_HOST_APP_THREAD_PRIO"]
       [#assign USBX_HOST_APP_THREAD_PRIO_value = value]
     [/#if]
+    [#if name == "UX_HOST_APP_MEM_POOL_SIZE_STANDALONE"]
+      [#assign UX_HOST_APP_MEM_POOL_SIZE_STANDALONE_value = value]
+    [/#if]
     [#if name == "REG_UX_HOST_HID_RCU"]
       [#assign REG_UX_HOST_HID_RCU_value = value]
     [/#if]
+    [#if name == "UX_STANDALONE"]
+      [#assign UX_STANDALONE_ENABLED_Value = value]
+    [/#if]
+
    [/#list]
 [/#if]
 [/#list]
@@ -102,10 +113,13 @@ extern "C" {
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
+[#if UX_STANDALONE_ENABLED_Value == "1" && AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE_VAL  != "0" ]
+#define UX_HOST_APP_MEM_POOL_SIZE  ${UX_HOST_APP_MEM_POOL_SIZE_STANDALONE_value}
+[/#if]
 [#if REG_UX_HOST_CORE_value == "true"]
 #define USBX_HOST_MEMORY_STACK_SIZE     ${USBX_HOST_SYS_SIZE_value}
 [/#if]
-[#if REG_UX_HOST_THREAD_value == "1"]
+[#if REG_UX_HOST_THREAD_value == "1" && UX_STANDALONE_ENABLED_Value == "0"]
 
 #define UX_HOST_APP_THREAD_STACK_SIZE   ${USBX_HOST_APP_THREAD_Size_value}
 #define UX_HOST_APP_THREAD_PRIO         ${USBX_HOST_APP_THREAD_PRIO_value}
@@ -121,7 +135,11 @@ extern "C" {
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
+[#if UX_STANDALONE_ENABLED_Value == "1"]
+UINT MX_USBX_Host_Init(VOID);
+[#else]
 UINT MX_USBX_Host_Init(VOID *memory_ptr);
+[/#if]
 
 /* USER CODE BEGIN EFP */
 
@@ -132,7 +150,7 @@ UINT MX_USBX_Host_Init(VOID *memory_ptr);
 
 /* USER CODE END PD */
 
-[#if REG_UX_HOST_THREAD_value == "1"]
+[#if REG_UX_HOST_THREAD_value == "1" && UX_STANDALONE_ENABLED_Value == "0"]
 #ifndef UX_HOST_APP_THREAD_NAME
 #define UX_HOST_APP_THREAD_NAME  "USBX App Host Main Thread"
 #endif

@@ -62,6 +62,9 @@
 #include "vcp.h"
 #include "vcp_conf.h"
 #endif /* (CFG_USB_INTERFACE_ENABLE != 0) */
+#ifdef ENABLE_OPENTHREAD_CLI
+#include "uart.h"
+#endif /* ENABLE_OPENTHREAD_CLI */
 
 /* Private includes -----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -152,6 +155,9 @@ static uint32_t ProcessCmdString(uint8_t* buf , uint32_t len);
 static void RxCpltCallback(void);
 #endif /* (CFG_FULL_LOW_POWER == 0) */
 #endif /* (CFG_USB_INTERFACE_ENABLE != 0) */
+#ifdef ENABLE_OPENTHREAD_CLI
+extern void otAppCliInit(otInstance *aInstance);
+#endif /* ENABLE_OPENTHREAD_CLI */
 
 
 [#if FREERTOS_STATUS = 1 ]
@@ -341,22 +347,59 @@ void APP_THREAD_Error(uint32_t ErrId, uint32_t ErrCode)
  */
 static void APP_THREAD_DeviceConfig(void)
 {
+[#if (THREAD_APPLICATION = "FTD_CLI")]
   otError error;
+
+ #ifdef ENABLE_OPENTHREAD_CLI
+  static otInstance *PtOpenThreadInstance;
+  otInstanceFinalize(NULL);
+  PtOpenThreadInstance = otInstanceInitSingle();
+  otAppCliInit(PtOpenThreadInstance);
+ #endif /* ENABLE_OPENTHREAD_CLI */
+
+[/#if]
+[#if ((THREAD_APPLICATION = "MTD") && (FREERTOS_STATUS = 1)) ||(THREAD_APPLICATION = "MTD")]
+  otError error = OT_ERROR_NONE;
+[/#if]
+[#if (THREAD_APPLICATION = "FTD")]
+  otError error;
+[/#if]
 [#if (THREAD_APPLICATION = "FTD_CLI")]
   error = otSetStateChangedCallback(NULL, APP_THREAD_StateNotif, NULL);
 [#elseif ((THREAD_APPLICATION = "MTD") && (FREERTOS_STATUS = 1)) ||(THREAD_APPLICATION = "MTD")]
   otNetworkKey networkKey = {{0x${NETWORKKEY}}};
 
   otLinkModeConfig OT_LinkMode = {0};
+  /* Set the pool period to 5 sec. It means that when the device will enter
+   * in 'sleepy end device' mode, it will send an ACK_Request every 5 sec.
+   * This message will act as keep alive message.
+   */
+  otLinkSetPollPeriod(NULL, THREAD_LINK_POLL_PERIOD_MS);
 /* Set the sleepy end device mode */
   OT_LinkMode.mRxOnWhenIdle = 0;
   OT_LinkMode.mDeviceType = 0;
   OT_LinkMode.mNetworkData = 1U;
 
+ #if (CFG_FULL_LOW_POWER == 0)
+ #ifdef ENABLE_OPENTHREAD_CLI
+  static otInstance *PtOpenThreadInstance;
+  otInstanceFinalize(NULL);
+  PtOpenThreadInstance = otInstanceInitSingle();
+  otAppCliInit(PtOpenThreadInstance);
+ #endif /* ENABLE_OPENTHREAD_CLI */
+ #endif /* (CFG_FULL_LOW_POWER == 0) */
+
   error = otInstanceErasePersistentInfo(NULL);
 [#else]
   otNetworkKey networkKey = {{0x${NETWORKKEY}}};
-  
+
+ #ifdef ENABLE_OPENTHREAD_CLI
+  static otInstance *PtOpenThreadInstance;
+  otInstanceFinalize(NULL);
+  PtOpenThreadInstance = otInstanceInitSingle();
+  otAppCliInit(PtOpenThreadInstance);
+ #endif /* ENABLE_OPENTHREAD_CLI */
+
   error = otInstanceErasePersistentInfo(NULL);
 [/#if]
   if (error != OT_ERROR_NONE)
@@ -369,8 +412,6 @@ static void APP_THREAD_DeviceConfig(void)
   {
     APP_THREAD_Error(ERR_THREAD_ERASE_PERSISTENT_INFO,error);
   }
-  otInstanceFinalize(NULL);
-  otInstanceInitSingle();
   error = otSetStateChangedCallback(NULL, APP_THREAD_StateNotif, NULL);
   if (error != OT_ERROR_NONE)
   {
@@ -392,13 +433,6 @@ static void APP_THREAD_DeviceConfig(void)
     APP_THREAD_Error(ERR_THREAD_SET_NETWORK_KEY,error);
   }
 [#if ((THREAD_APPLICATION = "MTD") && (FREERTOS_STATUS = 1)) ||(THREAD_APPLICATION = "MTD")]
-  error = otLinkSetPollPeriod(NULL, THREAD_LINK_POLL_PERIOD_MS);
-[#if ((THREAD_APPLICATION = "MTD") && (FREERTOS_STATUS = 1))]
-/*if (error != OT_ERROR_NONE)
-  {
-  APP_THREAD_Error(ERR_THREAD_TO_BE_DEFINED,error); // l'erreur pour la pollperiod n'existe pas
- }*/
-[/#if]
   error = otThreadSetLinkMode(NULL, OT_LinkMode);
   if (error != OT_ERROR_NONE)
   {
@@ -858,6 +892,24 @@ static uint32_t  ProcessCmdString( uint8_t* buf , uint32_t len )
  */
 static void Send_CLI_To_M0(void)
 {
+ #ifdef ENABLE_OPENTHREAD_CLI
+  /* Don't use the ThreadCliCmdBuffer when buffer is too large as data may be overwritten.
+     Use locals variables instead */
+  uint16_t l_plen = 0;
+  uint8_t l_ThreadCliCmdBuffer[255] = {0};
+
+  memcpy(l_ThreadCliCmdBuffer, CommandString, indexReceiveChar);
+  l_plen = indexReceiveChar;
+
+    /* Clear receive buffer, character counter and command complete */
+  CptReceiveCmdFromUser = 0;
+  indexReceiveChar = 0;
+  memset(CommandString, 0, C_SIZE_CMD_STRING);
+
+  APP_DBG("[Send_CLI_To_M0] payload : %s", l_ThreadCliCmdBuffer);
+
+  otPlatUartReceived(l_ThreadCliCmdBuffer, l_plen);
+ #else
   memset(ThreadCliCmdBuffer.cmdserial.cmd.payload, 0x0U, 255U);
   memcpy(ThreadCliCmdBuffer.cmdserial.cmd.payload, CommandString, indexReceiveChar);
   ThreadCliCmdBuffer.cmdserial.cmd.plen = indexReceiveChar;
@@ -868,13 +920,87 @@ static void Send_CLI_To_M0(void)
   indexReceiveChar = 0;
   memset(CommandString, 0, C_SIZE_CMD_STRING);
 
-[#if (THREAD_APPLICATION == "FTD_CLI")]
+
   APP_DBG("[Send_CLI_To_M0] payload : %s", ThreadCliCmdBuffer.cmdserial.cmd.payload);
 
-[/#if]
+
   TL_CLI_SendCmd();
+[#if ((THREAD_APPLICATION = "MTD") && (FREERTOS_STATUS = 1)) ||(THREAD_APPLICATION = "MTD")]
+#endif /* ENABLE_OPENTHREAD_CLI */
+}
+
+#ifdef ENABLE_OPENTHREAD_CLI
+/**
+ * @brief  Wrapper function to flush UART data (called from the OpenThread stack)
+           Not used but definition needed.
+ * @param  None
+ * @retval OT_ERROR_NONE
+ */
+otError otPlatUartFlush(void)
+{
+  return OT_ERROR_NONE;
+}
+
+/**
+ * @brief  Wrapper function to send data through the UART from the OpenThread stack
+ * @param  aBuf: Buffer of data to transmit
+ * @param  aBufLength: Number of data to transmit (in bytes)
+ * @retval OT_ERROR_NONE
+ */
+otError otPlatUartSend(const uint8_t *aBuf, uint16_t aBufLength)
+{
+   /* WORKAROUND: if string to output is "> " then respond directly to M0 and do not output it */
+  if (strcmp((const char *)aBuf, "> ") != 0)
+  {
+    /* Write to CLI UART */
+    HW_UART_Transmit(CFG_CLI_UART, (uint8_t*)aBuf, aBufLength, 100);
+  }
+
+  otPlatUartSendDone();
+
+  return OT_ERROR_NONE;
+}
+#endif /* ENABLE_OPENTHREAD_CLI */
+#endif /* (CFG_FULL_LOW_POWER == 0) */
+[#else]
+#endif /* ENABLE_OPENTHREAD_CLI */
 }
 #endif /* (CFG_FULL_LOW_POWER == 0) */
+
+#ifdef ENABLE_OPENTHREAD_CLI
+/**
+ * @brief  Wrapper function to flush UART data (called from the OpenThread stack)
+           Not used but definition needed.
+ * @param  None
+ * @retval OT_ERROR_NONE
+ */
+otError otPlatUartFlush(void)
+{
+  return OT_ERROR_NONE;
+}
+
+/**
+ * @brief  Wrapper function to send data through the UART from the OpenThread stack
+ * @param  aBuf: Buffer of data to transmit
+ * @param  aBufLength: Number of data to transmit (in bytes)
+ * @retval OT_ERROR_NONE
+ */
+otError otPlatUartSend(const uint8_t *aBuf, uint16_t aBufLength)
+{
+   /* WORKAROUND: if string to output is "> " then respond directly to M0 and do not output it */
+  if (strcmp((const char *)aBuf, "> ") != 0)
+  {
+    /* Write to CLI UART */
+    HW_UART_Transmit(CFG_CLI_UART, (uint8_t*)aBuf, aBufLength, 100);
+  }
+
+  otPlatUartSendDone();
+
+  return OT_ERROR_NONE;
+}
+#endif /* ENABLE_OPENTHREAD_CLI */
+
+[/#if]
 
 /**
  * @brief Send notification for CLI TL Channel.

@@ -12,6 +12,9 @@
 [#if paramEntry.value??  && paramEntry.key=="LSE_Timout"][#assign LSE_Timout = paramEntry.value][/#if]
 [/#list]
 [/#list]
+[#if cpucore!="" && (contextFolder=="" || contextFolder=="/")]
+    [#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")+"/"]
+[/#if]
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
@@ -48,6 +51,9 @@ extern "C" {
 #include "${FamilyName?lower_case}xx_hal.h"
 [#assign includesList = includesList+" "+"${FamilyName?lower_case}xx_hal.h"]
 [/#if]
+[#compress]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/bsp_inc.tmp"/] [#--BSP includes --]
+[/#compress]
 [#assign RESMGR_UTILITYUsed = false]
 [#list ips as ip]
 [#if ip?contains("LWIP")]

@@ -441,7 +441,7 @@ Key: ${key}; Value: ${BSP_myHash[key]}
 [#elseif myHash["THREADX_STATUS"]?number == 1 ]
 #include "app_threadx.h"
 [#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
-#include "cmsis_os.h"
+#include "cmsis_os2.h"
 [/#if]
 #include "otp.h"
 #include "stm32_timer.h"
@@ -503,35 +503,26 @@ typedef enum
 /* USER CODE END PTD */
 
 [#if (myHash["BLE_MODE_TRANSPARENT_UART"] == "Enabled")]
-/* Definitions for "uart_rx_state" */
-enum
-{
-  HCI_RX_STATE_WAIT_TYPE = 0,
-  HCI_RX_STATE_WAIT_HEADER,
-  HCI_RX_STATE_WAIT_PAYLOAD
-};
-
 /* Maximum size of data buffer (Rx or Tx) */
 #define HCI_DATA_MAX_SIZE         313
-#define NUM_OF_TX_BUFFER           60
-#define NUM_OF_RX_BUFFER           60
+#define NUM_OF_TX_SYNCHRO          2
+#define NUM_OF_TX_ASYNCHRO        50
+#define NUM_OF_RX_BUFFER          12
+#define NUM_OF_TX_BUFFER           (NUM_OF_TX_ASYNCHRO + NUM_OF_TX_SYNCHRO)    
+
+typedef struct
+{
+  tListNode                 node;  /* Actual node in the list */
+  uint8_t buf[HCI_DATA_MAX_SIZE];  /* Memory buffer */
+} UART_node;
 
 /* Global variables structure */
 typedef struct
 {
-  uint8_t   uart_state;
   volatile uint8_t uart_tx_on;
-  uint16_t uart_rx_size;
-  uint16_t rx_total_size;
   uint8_t  rx_state;
-  uint8_t  rx_idx;
-  uint8_t  index_rx_free;
-  uint8_t  index_received;
-  uint8_t  rx_buf[NUM_OF_RX_BUFFER][HCI_DATA_MAX_SIZE];
-  uint8_t  index_free;
-  uint8_t  index_to_send;
-  uint8_t  tx_buf[NUM_OF_TX_BUFFER][HCI_DATA_MAX_SIZE];
   uint8_t  rxReceivedState;
+  UART_node buff_node[NUM_OF_RX_BUFFER+NUM_OF_TX_BUFFER];
 } HciTransport_var_t;
 
 extern RNG_HandleTypeDef hrng;
@@ -647,21 +638,41 @@ typedef struct
 
 [#if myHash["THREADX_STATUS"]?number == 1 ]
 /* BLE_HOST_TASK related defines */
-#define BLE_HOST_TASK_STACK_SIZE    (256*7)
-#define BLE_HOST_TASK_PRIO          (15)
-#define BLE_HOST_TASK_PREEM_TRES    (0)
+#define BLE_HOST_TASK_STACK_SIZE          (2048)
+#define BLE_HOST_TASK_PRIO                (15)
+#define BLE_HOST_TASK_PREEM_TRES          (0)
 
 /* HCI_ASYNCH_EVT_TASK related defines */
-#define HCI_ASYNCH_EVT_TASK_STACK_SIZE    (256*7)
+#define HCI_ASYNCH_EVT_TASK_STACK_SIZE    (1024)
 #define HCI_ASYNCH_EVT_TASK_PRIO          (15)
 #define HCI_ASYNCH_EVT_TASK_PREEM_TRES    (0)
 
 [#if (myHash["BLE_MODE_TRANSPARENT_UART"] == "Enabled")]
 /* TX_TO_HOST_TASK related defines */
-#define TX_TO_HOST_TASK_STACK_SIZE    (256*7)
-#define TX_TO_HOST_TASK_PRIO          (15)
-#define TX_TO_HOST_TASK_PREEM_TRES    (0)
+#define TX_TO_HOST_TASK_STACK_SIZE        (256*7)
+#define TX_TO_HOST_TASK_PRIO              (15)
+#define TX_TO_HOST_TASK_PREEM_TRES        (0)
 [/#if]
+
+[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+/* BLE_STACK_TASK related defines */
+#define BLE_STACK_TASK_STACK_SIZE         (512 * 4)
+#define BLE_STACK_TASK_PRIO               (osPriorityNormal)
+
+/* HCI_ASYNCH_EVT_TASK related defines */
+#define HCI_ASYNCH_EVT_TASK_STACK_SIZE    (512 * 4)
+#define HCI_ASYNCH_EVT_TASK_PRIO          (osPriorityNormal)
+
+[/#if]
+[#if (myHash["BLE_MODE_TRANSPARENT_UART"] == "Enabled")]
+/* Definitions for "uart_rx_state" */
+#define HCI_RX_STATE_WAIT_TYPE    0
+#define HCI_RX_STATE_WAIT_HEADER  1
+#define HCI_RX_STATE_WAIT_PAYLOAD 2
+
+/* Definition for "hci_event_type" */
+#define HCI_EVENT_SYNCHRO         0
+#define HCI_EVENT_ASYNCHRO        1      
 
 [/#if]
 /* USER CODE BEGIN PD */
@@ -689,17 +700,11 @@ static tListNode BleAsynchEventQueue;
 
 [#if (myHash["BLE_MODE_TRANSPARENT_UART"] != "Enabled")]
 [#if (myHash["CFG_BD_ADDRESS_TYPE"] == "GAP_PUBLIC_ADDR")]
-static const uint8_t a_MBdAddr[BD_ADDR_SIZE] =
+static uint8_t a_BdAddr[BD_ADDR_SIZE];
+static const uint8_t a_BdAddrDefault[BD_ADDR_SIZE] =
 {
-  (uint8_t)((CFG_BD_ADDRESS & 0x0000000000FF)),
-  (uint8_t)((CFG_BD_ADDRESS & 0x00000000FF00) >> 8),
-  (uint8_t)((CFG_BD_ADDRESS & 0x000000FF0000) >> 16),
-  (uint8_t)((CFG_BD_ADDRESS & 0x0000FF000000) >> 24),
-  (uint8_t)((CFG_BD_ADDRESS & 0x00FF00000000) >> 32),
-  (uint8_t)((CFG_BD_ADDRESS & 0xFF0000000000) >> 40)
+  0x65, 0x43, 0x21, 0x1E, 0x08, 0x00
 };
-
-static uint8_t a_BdAddrUdn[BD_ADDR_SIZE];
 [/#if]
 
 /* Identity root key used to derive IRK and DHK(Legacy) */
@@ -728,10 +733,10 @@ GATT_CLIENT_APP_ConnHandle_Notif_evt_t clientHandleNotification;
 
 [#if ((myHash["BLE_MODE_TRANSPARENT_UART"] != "Enabled") && (myHash["BLE_OPTIONS_LL_ONLY"] != "BLE_OPTIONS_LL_ONLY"))]
 [#if PG_SKIP_LIST == "False"]
-static const char a_GapDeviceName[] = { [#rt] [#list "${CFG_GAP_DEVICE_NAME}"?split("(?!^)", "r") as char][#t][#lt]'${char}'<#sep>, [#rt]
+static char a_GapDeviceName[] = { [#rt] [#list "${CFG_GAP_DEVICE_NAME}"?split("(?!^)", "r") as char][#t][#lt]'${char}'<#sep>, [#rt]
     [/#list][#lt] }; /* Gap Device Name */
 [#else]
-static const char a_GapDeviceName[] = {  ${CFG_GAP_DEVICE_NAME} }; /* Gap Device Name */
+static char a_GapDeviceName[] = {  ${CFG_GAP_DEVICE_NAME} }; /* Gap Device Name */
 [/#if]
 [/#if]
 
@@ -828,8 +833,16 @@ static AMM_VirtualMemoryCallbackFunction_t APP_BLE_ResumeFlowProcessCb;
 
 [/#if]
 [#if (myHash["BLE_MODE_TRANSPARENT_UART"] == "Enabled")]
+tListNode UART_RX_Pool;
+tListNode UART_RX_List;
+tListNode UART_TX_Pool;
+tListNode UART_TX_List;
+
+uint8_t app_busy = 0;
+volatile uint8_t uart_tx_buffer_full = 0;
+
+UART_node *ongoing_TX_node;
 HciTransport_var_t HCI_var;
-uint8_t bufferHci[HCI_DATA_MAX_SIZE] = {0};
 
 static uint8_t *readBusBuffer;
 static uint8_t *writeBusBuffer;
@@ -854,6 +867,14 @@ TX_THREAD TX_TO_HOST_Thread;
 TX_SEMAPHORE TX_TO_HOST_Thread_Sem;
 
 [/#if]
+[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+/* BLE_STACK_TASK related resources */
+osSemaphoreId_t         BleStackSemaphore;
+osThreadId_t            BleStackThread;
+
+/* HCI_ASYNC_EVT_TASK related resources */
+osSemaphoreId_t         HCIasyncEvtSemaphore;
+osThreadId_t            HCIasyncEvtThread;
 [/#if]
 /* USER CODE BEGIN PV */
 [#if PG_FILL_UCS == "True"]
@@ -873,15 +894,15 @@ TX_SEMAPHORE BLE_HOST_Thread_Sem;
 /* PROC_GAP_COMPLETE related resources */
 TX_SEMAPHORE PROC_GAP_COMPLETE_Sem;
 
+[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+osSemaphoreId_t       ProcGapCompleteSemaphore;
+
 [/#if]
 /* USER CODE BEGIN GV */
 
 /* USER CODE END GV */
 
 /* Private function prototypes -----------------------------------------------*/
-[#if  (myHash["FREERTOS_STATUS"] == "1")]
-static void HciUserEvtProcess(void *argument);
-[/#if]
 static void BleStack_Process_BG(void);
 [#if (myHash["BLE_MODE_TRANSPARENT_UART"] != "Enabled")]
 static void Ble_UserEvtRx(void);
@@ -898,25 +919,25 @@ static void gap_cmd_resp_release(void);
 [/#if]
 [/#if]
 [#if (myHash["BLE_MODE_TRANSPARENT_UART"] == "Enabled")]
-static void TM_Init( void );
+static void TM_Init(void);
 static void TM_SysLocalCmd(uint8_t *data);
-static void TM_TxToHost( void );
+static void TM_TxToHost(void);
 static void TM_UART_TxComplete(uint8_t *buffer);
-static void TM_UART_RxComplete( uint8_t *buffer );
+static void TM_UART_RxComplete(uint8_t *buffer);
 
 static void BLEUART_Write(UART_HandleTypeDef *huart, uint8_t *buffer, uint16_t size);
 static void BLEUART_Read(UART_HandleTypeDef *huart, uint8_t *buffer, uint16_t size);
 
-static int HCI_UartSend( uint8_t *data );
-static uint16_t HCI_GetDataToSend( uint8_t **dataToSend );
-static uint8_t* HCI_GetFreeTxBuffer( void );
-static uint8_t* HCI_GetDataReceived( void );
-static uint8_t* HCI_GetFreeRxBuffer( void );
+static int HCI_UartSend(uint8_t *data, uint8_t hci_event_type);
+static uint16_t HCI_GetDataToSend(uint8_t **dataToSend);
+static uint8_t* HCI_GetFreeTxBuffer(uint8_t hci_event_type);
+static uint8_t* HCI_GetDataReceived(void);
+static uint8_t* HCI_GetFreeRxBuffer(void);
 [/#if]
 [#if ((myHash["BLE_MODE_TRANSPARENT_UART"] != "Enabled") && (myHash["USE_SNVMA_NVM"]?number != 0) )]
 static void BLE_NvmCallback (SNVMA_Callback_Status_t);
 [/#if]
-static uint8_t  HOST_BLE_Init(void);
+static uint8_t HOST_BLE_Init(void);
 [#if myHash["THREADX_STATUS"]?number == 1 ]
 [#if (myHash["BLE_MODE_TRANSPARENT_UART"] == "Enabled")]
 static void TM_TxToHost_Entry(unsigned long thread_input);
@@ -924,6 +945,9 @@ static void TM_TxToHost_Entry(unsigned long thread_input);
 static void Ble_UserEvtRx_Entry(unsigned long thread_input);
 [/#if]
 static void BleStack_Process_BG_Entry(unsigned long thread_input);
+[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+static void BleUserEvtRx_Task_Entry(void* thread_input);
+static void BleStack_Task_Entry(void* thread_input);
 [/#if]
 /* USER CODE BEGIN PFP */
 [#if PG_FILL_UCS == "True"]
@@ -1013,7 +1037,44 @@ void APP_BLE_Init(void)
   }
 [/#if]
 [#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+  const osSemaphoreAttr_t BleStackSemaphore_attributes = {
+    .name = "BLE stack Semaphore"
+  };
+  BleStackSemaphore = osSemaphoreNew(1U, 0U, &BleStackSemaphore_attributes);
+  if (BleStackSemaphore == NULL)
+  {
+    Error_Handler();
+  }
 
+  const osThreadAttr_t BleStackTask_attributes = {
+    .name = "BLE stack Thread",
+    .priority = (osPriority_t)BLE_STACK_TASK_PRIO,
+    .stack_size = BLE_STACK_TASK_STACK_SIZE
+  };
+  BleStackThread = osThreadNew(BleStack_Task_Entry, NULL, &BleStackTask_attributes);
+  if (BleStackThread == NULL)
+  {
+    Error_Handler();
+  }
+  
+  const osSemaphoreAttr_t HCIasyncEvtSemaphore_attributes = {
+    .name = "HCI asynch EVT Semaphore"
+  };
+  HCIasyncEvtSemaphore = osSemaphoreNew(1U, 0U, &HCIasyncEvtSemaphore_attributes);
+  if (HCIasyncEvtSemaphore == NULL)
+  {
+    Error_Handler();
+  }
+  const osThreadAttr_t HCIasyncEvtTask_attributes = {
+    .name = "HCI asynch event Task",
+    .priority = (osPriority_t)HCI_ASYNCH_EVT_TASK_PRIO,
+    .stack_size = HCI_ASYNCH_EVT_TASK_STACK_SIZE
+  };
+  HCIasyncEvtThread = osThreadNew(BleUserEvtRx_Task_Entry, NULL, &HCIasyncEvtTask_attributes);
+  if (HCIasyncEvtThread == NULL)
+  {
+    Error_Handler();
+  }
 [/#if]
 [#if (myHash["USE_SNVMA_NVM"]?number != 0)]
 
@@ -1047,6 +1108,17 @@ void APP_BLE_Init(void)
     /* Initialization of HCI & GATT & GAP layer */
     Ble_Hci_Gap_Gatt_Init();
 
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+    const osSemaphoreAttr_t ProcGapCompleteSemaphore_attributes = {
+      .name = "ProcGapCompleteSemaphore"
+    };
+    ProcGapCompleteSemaphore = osSemaphoreNew(1U, 0U, &ProcGapCompleteSemaphore_attributes);
+    if (ProcGapCompleteSemaphore == NULL)
+    {
+      Error_Handler();
+    }
+
+[/#if]
 [/#if]
 [#if (myHash["BLE_MODE_TRANSPARENT_UART"] != "Enabled")]
     /* Initialization of the BLE Services */
@@ -1068,15 +1140,15 @@ void APP_BLE_Init(void)
     /* Create timer to handle the Advertising Stop */
     UTIL_TIMER_Create(&(bleAppContext.Advertising_mgr_timer_Id),
                       0,
-                      (UTIL_TIMER_Mode_t)hw_ts_SingleShot,
+                      UTIL_TIMER_ONESHOT,
                       &Adv_Cancel_Req,
-                      0);
+                      NULL);
     /* Create timer to handle the Led Switch OFF */
     UTIL_TIMER_Create(&(bleAppContext.SwitchOffGPIO_timer_Id),
                       0,
-                      (UTIL_TIMER_Mode_t)hw_ts_SingleShot,
+                      UTIL_TIMER_ONESHOT,
                       &Switch_OFF_GPIO,
-                      0);
+                      NULL);
 
 [/#if]
 [/#if]
@@ -1256,7 +1328,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *p_Pckt)
         case HCI_LE_CONNECTION_UPDATE_COMPLETE_SUBEVT_CODE:
         {
 [#if ((myHash["BLE_MODE_PERIPHERAL"] == "Enabled") || (myHash["BLE_MODE_CENTRAL"] == "Enabled"))]
-          uint16_t conn_interval_us = 0;
+          uint32_t conn_interval_us = 0;
 [/#if]
           hci_le_connection_update_complete_event_rp0 *p_conn_update_complete;
           p_conn_update_complete = (hci_le_connection_update_complete_event_rp0 *) p_meta_evt->data;
@@ -1294,7 +1366,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *p_Pckt)
         case HCI_LE_ENHANCED_CONNECTION_COMPLETE_SUBEVT_CODE:
         {
 [#if ((myHash["BLE_MODE_PERIPHERAL"] == "Enabled") || (myHash["BLE_MODE_CENTRAL"] == "Enabled"))]
-          uint16_t conn_interval_us = 0;
+          uint32_t conn_interval_us = 0;
 [/#if]
           hci_le_enhanced_connection_complete_event_rp0 *p_enhanced_conn_complete;
           p_enhanced_conn_complete = (hci_le_enhanced_connection_complete_event_rp0 *) p_meta_evt->data;
@@ -1362,7 +1434,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *p_Pckt)
         case HCI_LE_CONNECTION_COMPLETE_SUBEVT_CODE:
         {
 [#if ((myHash["BLE_MODE_PERIPHERAL"] == "Enabled") || (myHash["BLE_MODE_CENTRAL"] == "Enabled"))]
-          uint16_t conn_interval_us = 0;
+          uint32_t conn_interval_us = 0;
 [/#if]
           hci_le_connection_complete_event_rp0 *p_conn_complete;
           p_conn_complete = (hci_le_connection_complete_event_rp0 *) p_meta_evt->data;
@@ -1722,18 +1794,27 @@ APP_BLE_ConnStatus_t APP_BLE_Get_Client_Connection_Status(uint16_t Connection_Ha
 void APP_BLE_Procedure_Gap_General(ProcGapGeneralId_t ProcGapGeneralId)
 {
   tBleStatus status;
-  uint8_t phy_tx, phy_rx;
+ 
+  /* USER CODE BEGIN Procedure_Gap_General_1 */
+
+  /* USER CODE END Procedure_Gap_General_1 */
 
   switch(ProcGapGeneralId)
   {
     case PROC_GAP_GEN_PHY_TOGGLE:
     {
+      uint8_t phy_tx = 0U, phy_rx = 0U;
+
 [#if myHash["THREADX_STATUS"]?number == 1 ]
       tx_mutex_get(&LinkLayerMutex, TX_WAIT_FOREVER);
+[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+      osMutexAcquire(LinkLayerMutex, osWaitForever);
 [/#if]
       status = hci_le_read_phy(bleAppContext.BleApplicationContext_legacy.connectionHandle, &phy_tx, &phy_rx);
 [#if myHash["THREADX_STATUS"]?number == 1 ]
       tx_mutex_put(&LinkLayerMutex);
+[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+      osMutexRelease(LinkLayerMutex);
 [/#if]
       if (status != BLE_STATUS_SUCCESS)
       {
@@ -1807,6 +1888,10 @@ void APP_BLE_Procedure_Gap_General(ProcGapGeneralId_t ProcGapGeneralId)
     default:
       break;
   }
+  
+  /* USER CODE BEGIN Procedure_Gap_General_2 */
+
+  /* USER CODE END Procedure_Gap_General_2 */
   return;
 }
 [/#if]
@@ -1815,9 +1900,14 @@ void APP_BLE_Procedure_Gap_General(ProcGapGeneralId_t ProcGapGeneralId)
 void APP_BLE_Procedure_Gap_Peripheral(ProcGapPeripheralId_t ProcGapPeripheralId)
 {
   tBleStatus status;
-  uint32_t paramA = ADV_INTERVAL_MIN;
-  uint32_t paramB = ADV_INTERVAL_MAX;
-  uint32_t paramC, paramD;
+  uint32_t paramA = 0U;
+  uint32_t paramB = 0U;
+  uint32_t paramC = 0U;
+  uint32_t paramD = 0U;
+  
+  /* USER CODE BEGIN Procedure_Gap_Peripheral_1 */
+
+  /* USER CODE END Procedure_Gap_Peripheral_1 */
 
   /* First set parameters before calling ACI APIs, only if needed */
   switch(ProcGapPeripheralId)
@@ -1827,17 +1917,37 @@ void APP_BLE_Procedure_Gap_Peripheral(ProcGapPeripheralId_t ProcGapPeripheralId)
       paramA = ADV_INTERVAL_MIN;
       paramB = ADV_INTERVAL_MAX;
       paramC = APP_BLE_ADV_FAST;
+      paramD = ADV_IND;
 
       break;
-    }/* PROC_GAP_PERIPH_ADVERTISE_START_FAST */
+    }
+    case PROC_GAP_PERIPH_ADVERTISE_NON_CONN_START_FAST:
+    {
+      paramA = ADV_INTERVAL_MIN;
+      paramB = ADV_INTERVAL_MAX;
+      paramC = APP_BLE_ADV_NON_CONN_FAST;
+      paramD = ADV_NONCONN_IND;
+
+      break;
+    }
     case PROC_GAP_PERIPH_ADVERTISE_START_LP:
     {
       paramA = ADV_LP_INTERVAL_MIN;
       paramB = ADV_LP_INTERVAL_MAX;
       paramC = APP_BLE_ADV_LP;
+      paramD = ADV_IND;
 
       break;
-    }/* PROC_GAP_PERIPH_ADVERTISE_START_LP */
+    }
+    case PROC_GAP_PERIPH_ADVERTISE_NON_CONN_START_LP:
+    {
+      paramA = ADV_LP_INTERVAL_MIN;
+      paramB = ADV_LP_INTERVAL_MAX;
+      paramC = APP_BLE_ADV_NON_CONN_LP;
+      paramD = ADV_NONCONN_IND;
+
+      break;
+    }
     case PROC_GAP_PERIPH_ADVERTISE_STOP:
     {
       paramC = APP_BLE_IDLE;
@@ -1856,18 +1966,27 @@ void APP_BLE_Procedure_Gap_Peripheral(ProcGapPeripheralId_t ProcGapPeripheralId)
       /* USER CODE END CONN_PARAM_UPDATE */
       break;
     }/* PROC_GAP_PERIPH_CONN_PARAM_UPDATE */
+    /* USER CODE BEGIN PARAM_UPDATE_1 */
+
+    /* USER CODE END PARAM_UPDATE_1 */
     default:
       break;
   }
+
+  /* USER CODE BEGIN Procedure_Gap_Peripheral_2 */
+
+  /* USER CODE END Procedure_Gap_Peripheral_2 */
 
   /* Call ACI APIs */
   switch(ProcGapPeripheralId)
   {
     case PROC_GAP_PERIPH_ADVERTISE_START_FAST:
     case PROC_GAP_PERIPH_ADVERTISE_START_LP:
+    case PROC_GAP_PERIPH_ADVERTISE_NON_CONN_START_FAST:
+    case PROC_GAP_PERIPH_ADVERTISE_NON_CONN_START_LP:
     {
-      /* Start Fast or Low Power Advertising */
-      status = aci_gap_set_discoverable(ADV_TYPE,
+      /* Start Advertising */
+      status = aci_gap_set_discoverable(paramD,
                                         paramA,
                                         paramB,
                                         CFG_BD_ADDRESS_TYPE,
@@ -1890,7 +2009,15 @@ void APP_BLE_Procedure_Gap_Peripheral(ProcGapPeripheralId_t ProcGapPeripheralId)
       }
 
       /* Update Advertising data */
-      status = aci_gap_update_adv_data(sizeof(a_AdvData), (uint8_t*) a_AdvData);
+      uint8_t *adv_data_p;
+      uint8_t adv_data_len;      
+      
+      adv_data_p = &a_AdvData[0];
+      adv_data_len = sizeof(a_AdvData);
+      /* USER CODE BEGIN ADV_DATA_UPDATE_1 */
+
+      /* USER CODE END ADV_DATA_UPDATE_1 */
+      status = aci_gap_update_adv_data(adv_data_len, adv_data_p);
       if (status != BLE_STATUS_SUCCESS)
       {
         LOG_INFO_APP("==>> Start Advertising Failed, result: 0x%02X\n", status);
@@ -1917,7 +2044,15 @@ void APP_BLE_Procedure_Gap_Peripheral(ProcGapPeripheralId_t ProcGapPeripheralId)
     }/* PROC_GAP_PERIPH_ADVERTISE_STOP */
     case PROC_GAP_PERIPH_ADVERTISE_DATA_UPDATE:
     {
-      status = aci_gap_update_adv_data(sizeof(a_AdvData), (uint8_t*) a_AdvData);
+      uint8_t *adv_data_p;
+      uint8_t adv_data_len;      
+      
+      adv_data_p = &a_AdvData[0];
+      adv_data_len = sizeof(a_AdvData);
+      /* USER CODE BEGIN ADV_DATA_UPDATE_2 */
+
+      /* USER CODE END ADV_DATA_UPDATE_2 */
+      status = aci_gap_update_adv_data(adv_data_len, adv_data_p);
       if (status != BLE_STATUS_SUCCESS)
       {
         LOG_INFO_APP("aci_gap_update_adv_data - fail, result: 0x%02X\n",status);
@@ -1948,15 +2083,16 @@ void APP_BLE_Procedure_Gap_Peripheral(ProcGapPeripheralId_t ProcGapPeripheralId)
 
       break;
     }/* PROC_GAP_PERIPH_CONN_PARAM_UPDATE */
+    /* USER CODE BEGIN ACI_CALL */
 
-    case PROC_GAP_PERIPH_SET_BROADCAST_MODE:
-    {
-
-      break;
-    }/* PROC_GAP_PERIPH_SET_BROADCAST_MODE */
+    /* USER CODE END ACI_CALL */
     default:
       break;
   }
+  
+  /* USER CODE BEGIN Procedure_Gap_Peripheral_3 */
+
+  /* USER CODE END Procedure_Gap_Peripheral_3 */
   return;
 }
 [/#if]
@@ -1971,6 +2107,10 @@ void APP_BLE_Procedure_Gap_Central(ProcGapCentralId_t ProcGapCentralId)
   UNUSED(paramB);
   UNUSED(paramC);
   UNUSED(paramD);
+  
+  /* USER CODE BEGIN Procedure_Gap_Central_1 */
+
+  /* USER CODE END Procedure_Gap_Central_1 */
 
   /* First set parameters before calling ACI APIs, only if needed */
   switch(ProcGapCentralId)
@@ -1991,9 +2131,16 @@ void APP_BLE_Procedure_Gap_Central(ProcGapCentralId_t ProcGapCentralId)
 
       break;
     }/* PROC_GAP_CENTRAL_SCAN_TERMINATE */
+    /* USER CODE BEGIN PARAM_UPDATE */
+
+    /* USER CODE END PARAM_UPDATE */
     default:
       break;
   }
+  
+  /* USER CODE BEGIN Procedure_Gap_Central_2 */
+
+  /* USER CODE END Procedure_Gap_Central_2 */
 
   /* Call ACI APIs */
   switch(ProcGapCentralId)
@@ -2028,10 +2175,17 @@ void APP_BLE_Procedure_Gap_Central(ProcGapCentralId_t ProcGapCentralId)
       }
       break;
     }/* PROC_GAP_CENTRAL_SCAN_TERMINATE */
+    /* USER CODE BEGIN ACI_CALL */
 
+    /* USER CODE END ACI_CALL */
     default:
       break;
   }
+
+  /* USER CODE BEGIN Procedure_Gap_Central_3 */
+
+  /* USER CODE END Procedure_Gap_Central_3 */
+
   return;
 }
 [/#if]
@@ -2045,9 +2199,9 @@ void APP_BLE_Procedure_Gap_Central(ProcGapCentralId_t ProcGapCentralId)
  * LOCAL FUNCTIONS
  *
  *************************************************************/
-uint8_t HOST_BLE_Init(void)
+static uint8_t HOST_BLE_Init(void)
 {
-  tBleStatus return_status = BLE_STATUS_FAILED;
+  tBleStatus return_status;
 
   pInitParams.numAttrRecord           = CFG_BLE_NUM_GATT_ATTRIBUTES;
   pInitParams.numAttrServ             = CFG_BLE_NUM_GATT_SERVICES;
@@ -2076,20 +2230,32 @@ uint8_t HOST_BLE_Init(void)
 }
 
 [#if (myHash["BLE_MODE_TRANSPARENT_UART"] == "Enabled")]
-static void TM_Init( void )
+static void TM_Init(void)
 {
 [#if myHash["THREADX_STATUS"]?number == 1]
   CHAR * pStack;
 [/#if]
   /* UART init. */
-  HCI_var.uart_state = 0;
   HCI_var.uart_tx_on = 0;
   HCI_var.rx_state = HCI_RX_STATE_WAIT_TYPE;
-  HCI_var.rx_idx = 0;
   HCI_var.rxReceivedState = 0;
+  
+  uart_tx_buffer_full = 0;
+  
+  LST_init_head(&UART_RX_Pool);
+  LST_init_head(&UART_RX_List);
+  LST_init_head(&UART_TX_Pool);
+  LST_init_head(&UART_TX_List);
 
-  os_disable_isr();
-  HCI_var.uart_state |= 1;
+  for (uint8_t rx_index = 0; rx_index < NUM_OF_RX_BUFFER; rx_index++)
+  {
+    LST_insert_tail(&UART_RX_Pool, (tListNode *)(&(HCI_var.buff_node[rx_index])));
+  }
+
+  for (uint8_t tx_index = 0; tx_index < NUM_OF_TX_BUFFER; tx_index++)
+  {
+    LST_insert_tail(&UART_TX_Pool, (tListNode *)(&(HCI_var.buff_node[NUM_OF_RX_BUFFER + tx_index])));
+  }
 
 [#if BspIpDatas??]
 [#list 0..(nbInstance-1) as i]
@@ -2130,13 +2296,13 @@ static void TM_Init( void )
     Error_Handler();
   }
 [#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+//TODO
 [/#if]
 
 }
 
 static void TM_SysLocalCmd (uint8_t *data)
 {
-  data = &HCI_var.rx_buf[HCI_var.rx_idx-1][0];
   uint16_t lcmd_opcode =(uint16_t)(data[1] | (data[2]<<8));
 
   switch(lcmd_opcode)
@@ -2171,36 +2337,37 @@ static void TM_SysLocalCmd (uint8_t *data)
   return;
 }
 
-static void TM_TxToHost( void )
+static void TM_TxToHost(void)
 {
   if ( HCI_var.rxReceivedState != 0 )
   {
     uint8_t *pData = 0;
     uint8_t packet_type;
+    tBleStatus status = BLE_STATUS_SUCCESS;
 
     pData = HCI_GetDataReceived();
 
     if ( pData != NULL )
     {
       packet_type = *pData;
-      HCI_var.uart_rx_size = 0;
-      HCI_var.rx_total_size = 0;
-      HCI_var.uart_state &= ~2;
-      BleStack_Request( pData );
-      HostStack_Process();
 
-      if( packet_type == 0x01 )
-      {
-        HCI_UartSend( pData );
-      }
-      else if( packet_type == TL_LOCCMD_PKT_TYPE )
+      if( packet_type == TL_LOCCMD_PKT_TYPE )
       {
         TM_SysLocalCmd(pData);
-        HCI_UartSend( pData );
       }
-      else if( packet_type == TL_LOCRSP_PKT_TYPE )
+
+      BleStack_Request(pData);
+      HostStack_Process();
+
+      if(( packet_type == 0x01 ) || ( packet_type == TL_LOCCMD_PKT_TYPE ) || ( packet_type == TL_LOCRSP_PKT_TYPE ))
       {
-        HCI_UartSend( pData );
+        status = HCI_UartSend(pData, HCI_EVENT_SYNCHRO);
+      }
+
+      if( status != BLE_STATUS_SUCCESS )
+      {
+        /* No more TX buffer available - Synchro event not sent */
+        assert_param(0);
       }
     }
   }
@@ -2211,17 +2378,15 @@ static void TM_TxToHost( void )
     uint16_t size;
 
     HCI_var.uart_tx_on |= 2;
-    size = HCI_GetDataToSend( &pData );
+    size = HCI_GetDataToSend(&pData);
 
     if( pData != 0 )
     {
-      HCI_var.uart_state |= 8;
-
       os_disable_isr();
 [#if BspIpDatas??]
 [#list 0..(nbInstance-1) as i]
 [#if BSP_myHash["bspName"+i] == "Serial Link for CubeMonitor RF"]
-      BLEUART_Write(&h${BSP_myHash["IpInstance"+i]?lower_case?replace("s","")}, pData, size );
+      BLEUART_Write(&h${BSP_myHash["IpInstance"+i]?lower_case?replace("s","")}, pData, size);
 [/#if]
 [/#list]
 [/#if]
@@ -2232,23 +2397,16 @@ static void TM_TxToHost( void )
   }
   else
   {}
-
 }
 
 static void TM_UART_TxComplete(uint8_t *buffer)
 {
-  change_state_options_t event_options;
-  HCI_var.index_to_send++;
+  memset(ongoing_TX_node->buf, 0, HCI_DATA_MAX_SIZE);
+  LST_insert_tail(&UART_TX_Pool,(tListNode*) ongoing_TX_node);
 
-  /* Notify LL that Host is ready */
-  event_options.combined_value = 0x0F;
-  ll_intf_chng_evnt_hndlr_state(event_options);
+  uart_tx_buffer_full = 0;   
 
-  if ( HCI_var.index_to_send == NUM_OF_TX_BUFFER )
-  {
-    HCI_var.index_to_send = 0;
-  }
-  if ( HCI_var.index_free == HCI_var.index_to_send)
+  if ( LST_get_size(&UART_TX_List) == 0)
   {
     HCI_var.uart_tx_on = 0; /* No more data to send */
   }
@@ -2260,18 +2418,16 @@ static void TM_UART_TxComplete(uint8_t *buffer)
 [#elseif myHash["THREADX_STATUS"]?number == 1 ]
     tx_semaphore_put(&TX_TO_HOST_Thread_Sem);
 [#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+//TODO
 [/#if]
   }
-
-  HCI_var.uart_state  &= ~8;
 }
 
 static void TM_UART_RxComplete( uint8_t *buffer )
 {
-  uint8_t *data = HCI_var.rx_buf[HCI_var.rx_idx];
+  UART_node *pNode = ((UART_node*)(UART_RX_List.prev));
+  uint8_t *data = pNode->buf;
   uint16_t size_to_receive = 1, header_size, payload_size;
-
-  HCI_var.uart_state &= ~1;
 
   switch ( HCI_var.rx_state )
   {
@@ -2313,7 +2469,6 @@ static void TM_UART_RxComplete( uint8_t *buffer )
         header_size = HCI_ISODATA_HDR_SIZE;
         payload_size = data[3] | ((data[4] &0x3F) << 8);
       }
-      HCI_var.rx_total_size = header_size + payload_size;
 
       if ( payload_size > 0 )
       {
@@ -2328,20 +2483,11 @@ static void TM_UART_RxComplete( uint8_t *buffer )
   default:
   case HCI_RX_STATE_WAIT_PAYLOAD:
     {
-      HCI_var.uart_rx_size = HCI_var.rx_total_size;
-      HCI_var.uart_state |= 2;
       HCI_var.rxReceivedState += 1;
-      HCI_var.rx_idx++;
-      if( HCI_var.rx_idx == NUM_OF_RX_BUFFER )
-      {
-        HCI_var.rx_idx = 0;
-      }
       HCI_var.rx_state = HCI_RX_STATE_WAIT_TYPE;
       data = HCI_GetFreeRxBuffer();
     }
   }
-
-  HCI_var.uart_state |= 1;
 
   os_disable_isr();
 [#if BspIpDatas??]
@@ -2358,38 +2504,39 @@ static void TM_UART_RxComplete( uint8_t *buffer )
 [#elseif myHash["THREADX_STATUS"]?number == 1 ]
   tx_semaphore_put(&TX_TO_HOST_Thread_Sem);
 [#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+//TODO
 [/#if]
 }
 
 static void BLEUART_Write(UART_HandleTypeDef *huart, uint8_t *buffer, uint16_t size)
 {
   writeBusBuffer = buffer;
-#if defined(OPENTHREAD_FTD) || defined(OPENTHREAD_MTD)
-  HAL_UART_Transmit_IT(huart, buffer, size);
-#else
   HAL_UART_Transmit_DMA(huart, buffer, size);
-#endif
-  return;
 }
 
 static void BLEUART_Read(UART_HandleTypeDef *huart, uint8_t *buffer, uint16_t size)
 {
+  HAL_StatusTypeDef uart_status;
   readBusBuffer = buffer;
-#if defined(OPENTHREAD_FTD) || defined(OPENTHREAD_MTD)
-  HAL_UART_Receive_IT(huart, buffer, size);
-#else
-  HAL_UART_Receive_DMA(huart, buffer, size);
-#endif
-  return;
+
+  uart_status = HAL_UART_Receive_DMA(huart, buffer, size);
+  if ( uart_status != HAL_OK )
+  {
+    /* No more RX buffer available - UART blocked in idle mode */
+    assert_param(0);
+  }
 }
 
-static int HCI_UartSend( uint8_t *data )
+static int HCI_UartSend(uint8_t *data, uint8_t hci_event_type)
 {
   uint16_t size;
-  uint8_t *pData = HCI_GetFreeTxBuffer();
+  uint8_t *pData = HCI_GetFreeTxBuffer(hci_event_type);
 
   if ( pData == 0 )
-    return 1;
+  {
+    /* No more TX buffer available */
+    return BLE_STATUS_FAILED;
+  }
 
   HCI_var.uart_tx_on |= 1;
 
@@ -2420,101 +2567,102 @@ static int HCI_UartSend( uint8_t *data )
     memcpy( pData, data, size);
   }
 
-  return 0u;
+  return BLE_STATUS_SUCCESS;
 }
 
-static uint16_t HCI_GetDataToSend( uint8_t **dataToSend )
+static uint16_t HCI_GetDataToSend(uint8_t **dataToSend)
 {
   uint16_t size;
+  UART_node *pNode = NULL;
 
-  if ( HCI_var.tx_buf[HCI_var.index_to_send][0] == HCI_ACLDATA_PKT_TYPE )
+  if (LST_get_size(&UART_TX_List) != 0)
   {
-    size = HCI_ACLDATA_HDR_SIZE + HCI_var.tx_buf[HCI_var.index_to_send][3];
-  }
-  else if( HCI_var.tx_buf[HCI_var.index_to_send][0] == HCI_ISODATA_PKT_TYPE)
-  {
-    size = HCI_ISODATA_HDR_SIZE +
-      (HCI_var.tx_buf[HCI_var.index_to_send][3] |
-       ((HCI_var.tx_buf[HCI_var.index_to_send][4] &0x3F) << 8));
-  }
-  else /* TL_LOCCMD_PKT_TYPE, TL_LOCRSP_PKT_TYPE and other*/
-  {
-    size = HCI_EVENT_HDR_SIZE + HCI_var.tx_buf[HCI_var.index_to_send][2];
-  }
+    LST_remove_head(&UART_TX_List,(tListNode**) &pNode);
 
-  *dataToSend = &HCI_var.tx_buf[HCI_var.index_to_send][0];
-
-  return size;
-}
-
-uint8_t* HCI_GetFreeTxBuffer( void )
-{
-  uint8_t *pBuffer = 0;
-
-  pBuffer = &HCI_var.tx_buf[HCI_var.index_free][0];
-
-  if( (HCI_var.index_free + 1) == HCI_var.index_to_send)
-  {
-    //No more data free.
-    pBuffer = NULL;
-  }
-  else if( (HCI_var.index_free + 1) == NUM_OF_TX_BUFFER )
-  {
-    if( HCI_var.index_to_send == 0)
+    if ( pNode->buf[0] == HCI_ACLDATA_PKT_TYPE )
     {
-      // No more free buffer: index_free = index_to_send = 0
-      pBuffer = NULL;
+      size = HCI_ACLDATA_HDR_SIZE + pNode->buf[3];
+    }
+    else if( pNode->buf[0] == HCI_ISODATA_PKT_TYPE)
+    {
+      size = HCI_ISODATA_HDR_SIZE +
+        (pNode->buf[3] | ((pNode->buf[4] &0x3F) << 8));
     }
     else
     {
-      HCI_var.index_free = 0;
+      size = HCI_EVENT_HDR_SIZE + pNode->buf[2];
+    }
+
+    *dataToSend = &pNode->buf[0];
+
+    ongoing_TX_node = pNode;
+  }
+  else
+  {
+    size = 0;
+  }
+  return size;
+}
+
+static uint8_t* HCI_GetFreeTxBuffer(uint8_t hci_event_type)
+{
+  UART_node *pNode = NULL;
+  uint8_t size = LST_get_size(&UART_TX_Pool);
+  
+  if (((hci_event_type == HCI_EVENT_ASYNCHRO) && (size > NUM_OF_TX_SYNCHRO))
+      || ((hci_event_type == HCI_EVENT_SYNCHRO) && (size > 0)))
+  {
+    LST_remove_head(&UART_TX_Pool,(tListNode**) &pNode);
+    
+    if (pNode != NULL)
+    {
+      LST_insert_tail(&UART_TX_List, (tListNode *)pNode);
+      return pNode->buf;
+    }
+    else
+    {
+      return NULL;
     }
   }
   else
   {
-    HCI_var.index_free++;
+    return NULL;
   }
-
-  return pBuffer;
 }
 
-static uint8_t* HCI_GetFreeRxBuffer( void )
+static uint8_t* HCI_GetFreeRxBuffer(void)
 {
-  uint8_t *pBuffer = 0;
+  UART_node *pNode = NULL;
 
-  pBuffer = &HCI_var.rx_buf[HCI_var.index_rx_free][0];
-
-  memset( pBuffer, 0, HCI_DATA_MAX_SIZE );
-  HCI_var.index_rx_free++;
-  if ( HCI_var.index_rx_free == NUM_OF_RX_BUFFER )
+  if (LST_get_size(&UART_RX_Pool) != 0)
   {
-    HCI_var.index_rx_free = 0;
-  }
+    LST_remove_head(&UART_RX_Pool,(tListNode**) &pNode);
+    memset( pNode->buf, 0, HCI_DATA_MAX_SIZE );
+    LST_insert_tail(&UART_RX_List, (tListNode *)pNode);
 
-  if ( HCI_var.index_rx_free == HCI_var.index_received)
+    return pNode->buf;
+  }
+  else
   {
-    /* No more data free */
+    return NULL;
   }
-
-  return pBuffer;
 }
 
-static uint8_t* HCI_GetDataReceived( void )
+static uint8_t* HCI_GetDataReceived(void)
 {
-  uint8_t *pBuffer = 0;
-
+  UART_node *pNode = NULL;
   HCI_var.rxReceivedState -= 1;
 
-  pBuffer = &HCI_var.rx_buf[HCI_var.index_received][0];
-
-  /* Increase the index of received data */
-  HCI_var.index_received++;
-  if ( HCI_var.index_received == NUM_OF_RX_BUFFER )
+  if (LST_get_size(&UART_RX_List) != 0)
   {
-    HCI_var.index_received = 0;
+    LST_remove_head(&UART_RX_List,(tListNode**) &pNode);
+    LST_insert_tail(&UART_RX_Pool, (tListNode *)pNode);
+    return pNode->buf;
   }
-
-  return pBuffer;
+  else
+  {
+    return NULL;
+  }
 }
 [/#if]
 
@@ -2523,7 +2671,7 @@ static void Ble_Hci_Gap_Gatt_Init(void)
 {
 [#if (myHash["BLE_OPTIONS_LL_ONLY"] != "BLE_OPTIONS_LL_ONLY")]
   uint8_t role;
-  uint16_t gap_service_handle, gap_dev_name_char_handle, gap_appearance_char_handle;
+  uint16_t gap_service_handle = 0U, gap_dev_name_char_handle = 0U, gap_appearance_char_handle = 0U;
 [/#if]
 [#if (myHash["CFG_BD_ADDRESS_TYPE"] == "GAP_PUBLIC_ADDR")]
   const uint8_t *p_bd_addr;
@@ -2534,7 +2682,7 @@ static void Ble_Hci_Gap_Gatt_Init(void)
 [#if (myHash["BLE_OPTIONS_LL_ONLY"] != "BLE_OPTIONS_LL_ONLY")]
   uint16_t a_appearance[1] = {CFG_GAP_APPEARANCE};
 [/#if]
-  tBleStatus ret = BLE_STATUS_INVALID_PARAMS;
+  tBleStatus ret;
 
   /* USER CODE BEGIN Ble_Hci_Gap_Gatt_Init*/
 
@@ -2545,6 +2693,11 @@ static void Ble_Hci_Gap_Gatt_Init(void)
 [#if (myHash["CFG_BD_ADDRESS_TYPE"] ==  "GAP_PUBLIC_ADDR")]
   /* Write the BD Address */
   p_bd_addr = BleGetBdAddress();
+
+  /* USER CODE BEGIN BD_Address_Mngt */
+
+  /* USER CODE END BD_Address_Mngt */
+
   ret = aci_hal_write_config_data(CONFIG_DATA_PUBADDR_OFFSET,
                                   CONFIG_DATA_PUBADDR_LEN,
                                   (uint8_t*) p_bd_addr);
@@ -2782,7 +2935,7 @@ static void Ble_Hci_Gap_Gatt_Init(void)
 static void Ble_UserEvtRx( void)
 {
   SVCCTL_UserEvtFlowStatus_t svctl_return_status;
-  BleEvtPacket_t *phcievt;
+  BleEvtPacket_t *phcievt = NULL;
 
   LST_remove_head ( &BleAsynchEventQueue, (tListNode **)&phcievt );
 
@@ -2804,7 +2957,7 @@ static void Ble_UserEvtRx( void)
 [#elseif myHash["THREADX_STATUS"]?number == 1 ]
     tx_semaphore_put(&HCI_ASYNCH_EVT_Thread_Sem);
 [#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
-
+    osSemaphoreRelease(HCIasyncEvtSemaphore);
 [/#if]
   }
 
@@ -2814,7 +2967,7 @@ static void Ble_UserEvtRx( void)
 [#elseif myHash["THREADX_STATUS"]?number == 1 ]
   tx_semaphore_put(&BLE_HOST_Thread_Sem);
 [#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
-
+  osSemaphoreRelease(BleStackSemaphore);
 [/#if]
 
 }
@@ -2831,13 +2984,33 @@ const uint8_t* BleGetBdAddress(void)
   uint32_t udn;
   uint32_t company_id;
   uint32_t device_id;
+  
+  uint8_t a_BDAddrNull[BD_ADDR_SIZE];
+  memset(&a_BDAddrNull[0], 0x00, sizeof(a_BDAddrNull));
 
-  udn = LL_FLASH_GetUDN();
+  a_BdAddr[0] = (uint8_t)(CFG_BD_ADDRESS & 0x0000000000FF);
+  a_BdAddr[1] = (uint8_t)((CFG_BD_ADDRESS & 0x00000000FF00) >> 8);
+  a_BdAddr[2] = (uint8_t)((CFG_BD_ADDRESS & 0x000000FF0000) >> 16);
+  a_BdAddr[3] = (uint8_t)((CFG_BD_ADDRESS & 0x0000FF000000) >> 24);
+  a_BdAddr[4] = (uint8_t)((CFG_BD_ADDRESS & 0x00FF00000000) >> 32);
+  a_BdAddr[5] = (uint8_t)((CFG_BD_ADDRESS & 0xFF0000000000) >> 40);
 
-  if (udn != 0xFFFFFFFF)
+  if(memcmp(&a_BdAddr[0], &a_BDAddrNull[0], BD_ADDR_SIZE) != 0)
   {
-    company_id = LL_FLASH_GetSTCompanyID();
-    device_id = LL_FLASH_GetDeviceID();
+    p_bd_addr = (const uint8_t *)a_BdAddr;
+  }
+  else
+  {
+    udn = LL_FLASH_GetUDN();
+
+    /* USER CODE BEGIN BleGetBdAddress_1 */
+
+    /* USER CODE END BleGetBdAddress_1 */
+
+    if (udn != 0xFFFFFFFF)
+    {
+      company_id = LL_FLASH_GetSTCompanyID();
+      device_id = LL_FLASH_GetDeviceID();
 
     /**
      * Public Address with the ST company ID
@@ -2847,25 +3020,30 @@ const uint8_t* BleGetBdAddress(void)
      * Note: In order to use the Public Address in a final product, a dedicated
      * 24bits company ID (OUI) shall be bought.
      */
-    a_BdAddrUdn[0] = (uint8_t)(udn & 0x000000FF);
-    a_BdAddrUdn[1] = (uint8_t)((udn & 0x0000FF00) >> 8);
-    a_BdAddrUdn[2] = (uint8_t)device_id;
-    a_BdAddrUdn[3] = (uint8_t)(company_id & 0x000000FF);
-    a_BdAddrUdn[4] = (uint8_t)((company_id & 0x0000FF00) >> 8);
-    a_BdAddrUdn[5] = (uint8_t)((company_id & 0x00FF0000) >> 16);
-
-    p_bd_addr = (const uint8_t *)a_BdAddrUdn;
-  }
-  else
-  {
-    OTP_Read(0, &p_otp_addr);
-    if (p_otp_addr)
-    {
-      p_bd_addr = (uint8_t*)(p_otp_addr->bd_address);
+      a_BdAddr[0] = (uint8_t)(udn & 0x000000FF);
+      a_BdAddr[1] = (uint8_t)((udn & 0x0000FF00) >> 8);
+      a_BdAddr[2] = (uint8_t)device_id;
+      a_BdAddr[3] = (uint8_t)(company_id & 0x000000FF);
+      a_BdAddr[4] = (uint8_t)((company_id & 0x0000FF00) >> 8);
+      a_BdAddr[5] = (uint8_t)((company_id & 0x00FF0000) >> 16);
+      p_bd_addr = (const uint8_t *)a_BdAddr;
     }
     else
     {
-      p_bd_addr = a_MBdAddr;
+      if (OTP_Read(0, &p_otp_addr) == HAL_OK)
+      {
+        a_BdAddr[0] = p_otp_addr->bd_address[0];
+        a_BdAddr[1] = p_otp_addr->bd_address[1];
+        a_BdAddr[2] = p_otp_addr->bd_address[2];
+        a_BdAddr[3] = p_otp_addr->bd_address[3];
+        a_BdAddr[4] = p_otp_addr->bd_address[4];
+        a_BdAddr[5] = p_otp_addr->bd_address[5];
+        p_bd_addr = (const uint8_t *)a_BdAddr;
+      }
+      else
+      {
+        p_bd_addr = (const uint8_t *)a_BdAddrDefault;
+      }
     }
   }
 
@@ -2892,7 +3070,15 @@ static void BleStack_Process_BG(void)
     BleStackCB_Process( );
   }
 [#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+  uint8_t running = 0x0;
 
+  osMutexAcquire(LinkLayerMutex, osWaitForever);
+  running = BleStack_Process( );
+  osMutexRelease(LinkLayerMutex);
+  if (running == 0x0)
+  {
+    BleStackCB_Process( );
+  }
 [/#if]
 }
 
@@ -2904,7 +3090,7 @@ static void gap_cmd_resp_release(void)
 [#elseif myHash["THREADX_STATUS"]?number == 1 ]
   tx_semaphore_put(&PROC_GAP_COMPLETE_Sem);
 [#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
-
+  osSemaphoreRelease(ProcGapCompleteSemaphore);
 [/#if]
   return;
 }
@@ -2916,7 +3102,7 @@ static void gap_cmd_resp_wait(void)
 [#elseif myHash["THREADX_STATUS"]?number == 1 ]
   tx_semaphore_get(&PROC_GAP_COMPLETE_Sem, TX_WAIT_FOREVER);
 [#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
-
+  osSemaphoreAcquire(ProcGapCompleteSemaphore, osWaitForever);
 [/#if]
   return;
 }
@@ -3000,9 +3186,9 @@ tBleStatus BLECB_Indication( const uint8_t* data,
                           const uint8_t* ext_data,
                           uint16_t ext_length )
 {
-  uint8_t status = BLE_STATUS_FAILED;
 [#if (myHash["BLE_MODE_TRANSPARENT_UART"] != "Enabled")]
-  BleEvtPacket_t *phcievt;
+  uint8_t status = BLE_STATUS_FAILED;
+  BleEvtPacket_t *phcievt = NULL;
   uint16_t total_length = (length+ext_length);
 
   UNUSED(ext_data);
@@ -3030,7 +3216,7 @@ tBleStatus BLECB_Indication( const uint8_t* data,
 [#elseif myHash["THREADX_STATUS"]?number == 1 ]
       tx_semaphore_put(&HCI_ASYNCH_EVT_Thread_Sem);
 [#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
-
+      osSemaphoreRelease(HCIasyncEvtSemaphore);
 [/#if]
       status = BLE_STATUS_SUCCESS;
     }
@@ -3041,6 +3227,9 @@ tBleStatus BLECB_Indication( const uint8_t* data,
   }
 [/#if]
 [#if (myHash["BLE_MODE_TRANSPARENT_UART"] == "Enabled")]
+  uint8_t status;
+  uint8_t bufferHci[HCI_DATA_MAX_SIZE];
+
   memcpy( &bufferHci[0], data, length);
 
   if ( ext_length > 255 )
@@ -3053,7 +3242,16 @@ tBleStatus BLECB_Indication( const uint8_t* data,
     memcpy( &bufferHci[length], ext_data, ext_length );
   }
 
-  if(HCI_UartSend( &bufferHci[0] ) == 0)
+  if (bufferHci[1] == 0xFF) /* ACI events */
+  {
+    status = HCI_UartSend(&bufferHci[0], HCI_EVENT_SYNCHRO);
+  }
+  else 
+  {
+    status = HCI_UartSend(&bufferHci[0], HCI_EVENT_ASYNCHRO);
+  }
+
+  if(status == BLE_STATUS_SUCCESS)
   {
 [#if myHash["SEQUENCER_STATUS"]?number == 1 ]
     UTIL_SEQ_SetTask(1U << CFG_TASK_TX_TO_HOST_ID,CFG_SEQ_PRIO_0);
@@ -3061,7 +3259,11 @@ tBleStatus BLECB_Indication( const uint8_t* data,
     tx_semaphore_put(&TX_TO_HOST_Thread_Sem);
 [#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
 [/#if]
-    status = BLE_STATUS_SUCCESS;
+  }
+  else
+  {
+    app_busy = 1;
+    uart_tx_buffer_full = 1;
   }
 [/#if]
   return status;
@@ -3080,7 +3282,7 @@ void TM_TxToHost_Entry(unsigned long thread_input)
   }
 }
 [#else]
-void Ble_UserEvtRx_Entry(unsigned long thread_input)
+static void Ble_UserEvtRx_Entry(unsigned long thread_input)
 {
   UNUSED(thread_input);
 
@@ -3095,7 +3297,7 @@ void Ble_UserEvtRx_Entry(unsigned long thread_input)
 }
 [/#if]
 
-void BleStack_Process_BG_Entry(unsigned long thread_input)
+static void BleStack_Process_BG_Entry(unsigned long thread_input)
 {
   UNUSED(thread_input);
 
@@ -3104,6 +3306,32 @@ void BleStack_Process_BG_Entry(unsigned long thread_input)
     tx_semaphore_get(&BLE_HOST_Thread_Sem, TX_WAIT_FOREVER);
     BleStack_Process_BG();
     tx_thread_relinquish();
+  }
+}
+[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+static void BleUserEvtRx_Task_Entry(void* argument)
+{
+  UNUSED(argument);
+
+  while(1)
+  {
+    osSemaphoreAcquire(HCIasyncEvtSemaphore, osWaitForever);
+    osMutexAcquire(LinkLayerMutex, osWaitForever);
+    Ble_UserEvtRx();
+    osMutexRelease(LinkLayerMutex);
+    osThreadYield();
+  }
+}
+
+static void BleStack_Task_Entry(void* argument)
+{
+  UNUSED(argument);
+
+  while(1)
+  {
+    osSemaphoreAcquire(BleStackSemaphore, osWaitForever);
+    BleStack_Process_BG();
+    osThreadYield();
   }
 }
 [/#if]

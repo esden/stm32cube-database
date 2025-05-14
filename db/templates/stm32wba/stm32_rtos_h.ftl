@@ -42,7 +42,6 @@ extern "C" {
 #include "app_threadx.h"
 [/#if]
 [#if myHash["FREERTOS_STATUS"]?number == 1 ]
-#include "app_freertos.h"
 [/#if]
 /* USER CODE BEGIN Includes */
 
@@ -91,6 +90,9 @@ extern "C" {
 #define CFG_TASK_PRIO_HW_RNG                    11u
 #define CFG_TASK_PREEMP_HW_RNG                  0u
 
+#define CFG_TASK_PRIO_AMM_BCKGND                15u
+#define CFG_TASK_PREEMP_AMM_BCKGND              0u
+
 #define CFG_TASK_PRIO_ZIGBEE_NETWORK_FORM       16u
 #define CFG_TASK_PREEMP_ZIGBEE_NETWORK_FORM     0u
 
@@ -130,6 +132,7 @@ extern "C" {
 #define TASK_HW_RNG_STACK_SIZE                  RTOS_STACK_SIZE_REDUCED
 #define TASK_ZIGBEE_NETWORK_FORM_STACK_SIZE     RTOS_STACK_SIZE_LARGE
 #define TASK_ZIGBEE_APP_START_STACK_SIZE        RTOS_STACK_SIZE_NORMAL
+#define TASK_AMM_BCKGND_STACK_SIZE              RTOS_STACK_SIZE_NORMAL
 /* USER CODE BEGIN TASK_Size_Define */
 
 /* USER CODE END TASK_Size_Define */
@@ -165,14 +168,6 @@ extern "C" {
 /* USER CODE END EM */
 
 /* Exported variables --------------------------------------------------------*/
-[#if myHash["THREADX_STATUS"]?number == 1 ]
-extern TX_MUTEX           LinkLayerMutex;
-
-[/#if]
-[#if myHash["FREERTOS_STATUS"]?number == 1 ]
-extern osMutexId_t        LinkLayerMutex;
-
-[/#if]
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */

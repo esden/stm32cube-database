@@ -12,7 +12,7 @@ if [ $# -ge 1 ] && [ -d $1 ]; then
 else
     projectdir=$( cd -- "$( dirname -- "${DOLLAR}${BASH}" )" &> /dev/null && pwd )
 fi
-[#if BootPathType?? && (BootPathType=="OEM_IROT") && Secure_Code_Image="" && NonSecure_Code_Image!=""]
+[#if BootPathType?? && (BootPathType=="OEM_IROT") && ((Secure_Code_Image?? && Secure_Code_Image="") && (NonSecure_Code_Image?? && NonSecure_Code_Image!=""))]
 provisioningdir="$(pwd)/../ROT_Provisioning"
 [#else]
 provisioningdir="$(pwd)/../../ROT_Provisioning"
@@ -21,6 +21,8 @@ source "$provisioningdir/env.sh"
 # Environement variable for log file
 current_log_file="$projectdir/postbuild.log"
 [#if appli_assembly??]
+app_image_number=1
+[#elseif isAppliOnly??]
 app_image_number=1
 [#else]
 app_image_number=2
@@ -32,6 +34,8 @@ app_image_number=2
 # ==============================================================================
 	[#if Secure_Code_Image??]
 s_code_xml="$provisioningdir/${ProvisioningFolderName}/Image/${Secure_Code_Image}"
+    [#elseif isAppliOnly??]
+code_xml="$provisioningdir/${ProvisioningFolderName}/Image/${Code_Image}"
 	[/#if]	
 	[#if appli_assembly??]	
 ns_code_xml="$provisioningdir/${ProvisioningFolderName}/Image/${Secure_Code_Image}"
@@ -54,6 +58,9 @@ s_code_xml="$provisioningdir/${ProvisioningFolderName}/Images/${Secure_Code_Imag
 	[/#if]
 	[#if NonSecure_Code_Image??]
 ns_code_xml="$provisioningdir/${ProvisioningFolderName}/Images/${NonSecure_Code_Image}"
+	[/#if]
+	[#if isAppliOnly??]
+code_xml="$provisioningdir/${ProvisioningFolderName}/Images/${Code_Image}"
 	[/#if]
 	[#if appli_assembly??]
 appli_secure=$oemirot_appli_secure
@@ -123,6 +130,14 @@ if [ $signing == "nonsecure" ]; then
   	echo "Error with TPC see $current_log_file"
   fi
 [/#if]
+fi
+
+if [ $signing == "application" ]; then
+  echo "Creating applcaition image"  >> $current_log_file
+  "$stm32tpccli" -pb $code_xml >> $current_log_file
+  if [ $? != 0 ]; then 
+    echo "Error with TPC see $current_log_file"
+  fi
 fi
 
 exit 0

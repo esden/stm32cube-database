@@ -18,7 +18,9 @@ ${variable.value} ${variable.name};
         [/#if]
     [/#list]
 [/#list]
+[#if (ipname?? && !((ipname?contains("USB_OTG")) && (FamilyName=="STM32H7RS"))) || !ipname??]
 void Error_Handler(void);
+[/#if]
 
 [#if IPUsedWithBSP?? && IPUsedWithBSP == "true"]
     [#if IPhandlers??]

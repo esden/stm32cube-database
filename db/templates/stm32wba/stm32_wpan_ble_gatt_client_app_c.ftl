@@ -38,7 +38,7 @@ Key: ${key}; Value: ${myHash[key]}
 [#elseif myHash["THREADX_STATUS"]?number == 1 ]
 #include "app_threadx.h"
 [#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
-#include "cmsis_os.h"
+#include "cmsis_os2.h"
 [/#if]
 #include "app_ble.h"
 
@@ -151,6 +151,11 @@ typedef struct
 #define CLIENT_DISCOVER_TASK_PRIO          (10)
 #define CLIENT_DISCOVER_TASK_PREEM_TRES    (9)
 
+[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+/* CLIENT_DISCOVER_TASK related defines */
+#define CLIENT_DISCOVER_TASK_STACK_SIZE     (128 * 4)
+#define CLIENT_DISCOVER_TASK_PRIO           (osPriorityNormal)
+
 [/#if]
 /* USER CODE BEGIN PD */
 
@@ -193,10 +198,11 @@ TX_SEMAPHORE client_discover_Thread_Sem;
 /* PROC_GATT_COMPLETE related resources */
 TX_SEMAPHORE PROC_GATT_COMPLETE_Sem;
 
-[/#if]
+[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+/* Client discover related resources */
+osSemaphoreId_t         ClientDiscoverSemaphore;
+osThreadId_t            ClientDiscoverThread;
 
-[#if  (myHash["FREERTOS_STATUS"] == "1")]
-extern osThreadId RF_ThreadId;
 [/#if]
 /* USER CODE BEGIN GV */
 
@@ -212,9 +218,10 @@ static void gatt_parse_notification(aci_gatt_notification_event_rp0 *p_evt);
 static void gatt_Notification(GATT_CLIENT_APP_Notification_evt_t *p_Notif);
 [#if myHash["SEQUENCER_STATUS"]?number == 1 ]
 static void client_discover_all(void);
-[/#if]
-[#if myHash["THREADX_STATUS"]?number == 1 ]
+[#elseif myHash["THREADX_STATUS"]?number == 1 ]
 static void client_discover_all_Entry(unsigned long thread_input);
+[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+static void ClientDiscover_Task_Entry(void* argument);
 [/#if]
 static void gatt_cmd_resp_release(void);
 static void gatt_cmd_resp_wait(void);
@@ -269,6 +276,25 @@ void GATT_CLIENT_APP_Init(void)
     Error_Handler();
   }
 [#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+  const osSemaphoreAttr_t ClientDiscoverSemaphore_attributes = {
+    .name = "Client discover Semaphore"
+  };
+  ClientDiscoverSemaphore = osSemaphoreNew(1U, 0U, &ClientDiscoverSemaphore_attributes);
+  if (ClientDiscoverSemaphore == NULL)
+  {
+    Error_Handler();
+  }
+
+  const osThreadAttr_t ClientDiscoverTask_attributes = {
+    .name = "Client discover Thread",
+    .priority = (osPriority_t)CLIENT_DISCOVER_TASK_PRIO,
+    .stack_size = CLIENT_DISCOVER_TASK_STACK_SIZE
+  };
+  ClientDiscoverThread = osThreadNew(ClientDiscover_Task_Entry, NULL, &ClientDiscoverTask_attributes);
+  if (ClientDiscoverThread == NULL)
+  {
+    Error_Handler();
+  }
 
 [/#if]
 
@@ -581,13 +607,9 @@ static SVCCTL_EvtAckStatus_t Event_Handler(void *Event)
           {
             if (a_ClientContext[index].connHdl == p_evt_rsp->Connection_Handle)
             {
+              gatt_cmd_resp_release();
               break;
             }
-          }
-
-          if (a_ClientContext[index].connHdl == p_evt_rsp->Connection_Handle)
-          {
-            gatt_cmd_resp_release();
           }
         }
         break;/* ACI_GATT_PROC_COMPLETE_VSEVT_CODE */
@@ -681,7 +703,7 @@ __USED static void gatt_Notification(GATT_CLIENT_APP_Notification_evt_t *p_Notif
 static void gatt_parse_services(aci_att_read_by_group_type_resp_event_rp0 *p_evt)
 {
   uint16_t uuid, ServiceStartHdl, ServiceEndHdl;
-  uint8_t uuid_offset, uuid_size, uuid_short_offset;
+  uint8_t uuid_offset, uuid_size = 0U, uuid_short_offset = 0U;
   uint8_t i, idx, numServ, index;
 
   LOG_INFO_APP("ACI_ATT_READ_BY_GROUP_TYPE_RESP_VSEVT_CODE - ConnHdl=0x%04X\n",
@@ -695,8 +717,8 @@ static void gatt_parse_services(aci_att_read_by_group_type_resp_event_rp0 *p_evt
     }
   }
 
-  /* check connection handle related to response before processing */
-  if (a_ClientContext[index].connHdl == p_evt->Connection_Handle)
+  /* index < BLE_CFG_CLT_MAX_NBR_CB means connection handle identified */
+  if (index < BLE_CFG_CLT_MAX_NBR_CB)
   {
     /* Number of attribute value tuples */
     numServ = (p_evt->Data_Length) / p_evt->Attribute_Data_Length;
@@ -706,17 +728,16 @@ static void gatt_parse_services(aci_att_read_by_group_type_resp_event_rp0 *p_evt
     * 2 bytes for end handle
     * 2 or 16 bytes data for UUID
     */
+    uuid_offset = 4;           /*UUID offset in bytes in Attribute_Data_List */
     if (p_evt->Attribute_Data_Length == 20) /* we are interested in the UUID is 128 bit.*/
     {
       idx = 16;                /*UUID index of 2 bytes read part in Attribute_Data_List */
-      uuid_offset = 4;         /*UUID offset in bytes in Attribute_Data_List */
       uuid_size = 16;          /*UUID size in bytes */
       uuid_short_offset = 12;  /*UUID offset of 2 bytes read part in UUID field*/
     }
     if (p_evt->Attribute_Data_Length == 6) /* we are interested in the UUID is 16 bit.*/
     {
       idx = 4;
-      uuid_offset = 4;
       uuid_size = 2;
       uuid_short_offset = 0;
     }
@@ -818,7 +839,7 @@ static void gatt_parse_services_by_UUID(aci_att_find_by_type_value_resp_event_rp
 static void gatt_parse_chars(aci_att_read_by_type_resp_event_rp0 *p_evt)
 {
   uint16_t uuid, CharStartHdl, CharValueHdl;
-  uint8_t uuid_offset, uuid_size, uuid_short_offset;
+  uint8_t uuid_offset, uuid_size = 0U, uuid_short_offset = 0U;
   uint8_t i, idx, numHdlValuePair, index;
   uint8_t CharProperties;
 
@@ -833,7 +854,8 @@ static void gatt_parse_chars(aci_att_read_by_type_resp_event_rp0 *p_evt)
     }
   }
 
-  if (a_ClientContext[index].connHdl == p_evt->Connection_Handle)
+  /* index < BLE_CFG_CLT_MAX_NBR_CB means connection handle identified */
+  if (index < BLE_CFG_CLT_MAX_NBR_CB)
   {
     /* event data in Attribute_Data_List contains:
     * 2 bytes for start handle
@@ -845,17 +867,16 @@ static void gatt_parse_chars(aci_att_read_by_type_resp_event_rp0 *p_evt)
     /* Number of attribute value tuples */
     numHdlValuePair = p_evt->Data_Length / p_evt->Handle_Value_Pair_Length;
 
+    uuid_offset = 5;           /* UUID offset in bytes in Attribute_Data_List */
     if (p_evt->Handle_Value_Pair_Length == 21) /* we are interested in  128 bit UUIDs */
     {
       idx = 17;                /* UUID index of 2 bytes read part in Attribute_Data_List */
-      uuid_offset = 5;         /* UUID offset in bytes in Attribute_Data_List */
       uuid_size = 16;          /* UUID size in bytes */
       uuid_short_offset = 12;  /* UUID offset of 2 bytes read part in UUID field */
     }
     if (p_evt->Handle_Value_Pair_Length == 7) /* we are interested in  16 bit UUIDs */
     {
       idx = 5;
-      uuid_offset = 5;
       uuid_size = 2;
       uuid_short_offset = 0;
     }
@@ -939,8 +960,8 @@ static void gatt_parse_chars(aci_att_read_by_type_resp_event_rp0 *p_evt)
 static void gatt_parse_descs(aci_att_find_info_resp_event_rp0 *p_evt)
 {
   uint16_t uuid, handle;
-  uint8_t uuid_offset, uuid_size, uuid_short_offset;
-  uint8_t i, numDesc, handle_uuid_pair_size, index;
+  uint8_t uuid_offset, uuid_size, uuid_short_offset, handle_uuid_pair_size;
+  uint8_t i, numDesc, index;
 
   LOG_INFO_APP("ACI_ATT_FIND_INFO_RESP_VSEVT_CODE - ConnHdl=0x%04X\n",
               p_evt->Connection_Handle);
@@ -953,25 +974,29 @@ static void gatt_parse_descs(aci_att_find_info_resp_event_rp0 *p_evt)
     }
   }
 
-  if (a_ClientContext[index].connHdl == p_evt->Connection_Handle)
+  /* index < BLE_CFG_CLT_MAX_NBR_CB means connection handle identified */
+  if (index < BLE_CFG_CLT_MAX_NBR_CB)
   {
     /* event data in Attribute_Data_List contains:
     * 2 bytes handle
     * 2 or 16 bytes data for UUID
     */
+    uuid_offset = 2;
     if (p_evt->Format == UUID_TYPE_16)
     {
       uuid_size = 2;
-      uuid_offset = 2;
       uuid_short_offset = 0;
       handle_uuid_pair_size = 4;
     }
-    if (p_evt->Format == UUID_TYPE_128)
+    else if (p_evt->Format == UUID_TYPE_128)
     {
       uuid_size = 16;
-      uuid_offset = 2;
       uuid_short_offset = 12;
       handle_uuid_pair_size = 18;
+    }
+    else
+    {
+      return;
     }
     UNUSED(uuid_size);
 
@@ -1111,7 +1136,8 @@ static void gatt_parse_notification(aci_gatt_notification_event_rp0 *p_evt)
     }
   }
 
-  if (a_ClientContext[index].connHdl == p_evt->Connection_Handle)
+  /* index < BLE_CFG_CLT_MAX_NBR_CB means connection handle identified */
+  if (index < BLE_CFG_CLT_MAX_NBR_CB)
   {
     if (p_evt->Attribute_Handle == a_ClientContext[index].P2PNotificationValueHdl)
     {
@@ -1138,20 +1164,60 @@ static void gatt_parse_notification(aci_gatt_notification_event_rp0 *p_evt)
 
 static void client_discover_all(void)
 {
-  GATT_CLIENT_APP_Discover_services(0);
+  uint8_t index = 0;
+  /* USER CODE BEGIN client_discover_1 */
+
+  /* USER CODE END client_discover_1 */
+  
+  GATT_CLIENT_APP_Discover_services(index);
+  
+  /* USER CODE BEGIN client_discover_2 */
+
+  /* USER CODE END client_discover_2 */
   return;
 }
-[/#if]
-[#if myHash["THREADX_STATUS"]?number == 1 ]
+[#elseif myHash["THREADX_STATUS"]?number == 1 ]
 
 void client_discover_all_Entry(unsigned long thread_input)
 {
-  (void)(thread_input);
+  UNUSED(thread_input);
+  uint8_t index = 0;
 
   while(1)
   {
     tx_semaphore_get(&client_discover_Thread_Sem, TX_WAIT_FOREVER);
-    GATT_CLIENT_APP_Discover_services(0);
+
+    /* USER CODE BEGIN client_discover_1 */
+
+    /* USER CODE END client_discover_1 */
+	
+    GATT_CLIENT_APP_Discover_services(index);
+	
+    /* USER CODE BEGIN client_discover_2 */
+
+    /* USER CODE END client_discover_2 */
+  }
+}
+[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+
+static void ClientDiscover_Task_Entry(void* argument)
+{
+  UNUSED(argument);
+  uint8_t index = 0;
+
+  while(1)
+  {
+    osSemaphoreAcquire(ClientDiscoverSemaphore, osWaitForever);
+    /* USER CODE BEGIN client_discover_1 */
+
+    /* USER CODE END client_discover_1 */
+	
+    GATT_CLIENT_APP_Discover_services(index);
+
+    /* USER CODE BEGIN client_discover_2 */
+
+    /* USER CODE END client_discover_2 */
+	osThreadYield();
   }
 }
 [/#if]
@@ -1186,7 +1252,7 @@ static void gatt_cmd_resp_wait(void)
 static void P2Pclient_write_char(void)
 {
   uint8_t index = 0;
-  tBleStatus ret = BLE_STATUS_INVALID_PARAMS;
+  tBleStatus ret;
 
   if (P2PButtonData.level == 0x00)
   {

@@ -1,69 +1,55 @@
 [#ftl]
 [#list SWIPdatas as SWIP]
-[#assign instName = SWIP.ipName]
-[#assign fileName = SWIP.fileName]
-[#assign version = SWIP.version]
+    [#assign instName = SWIP.ipName]
+    [#assign fileName = SWIP.fileName]
+    [#assign version = SWIP.version]
 
-  [#if SWIP.defines??]
-    [#list SWIP.defines as definition]
-      [#if definition.name=="LD1"]
-          [#assign LED1 = definition.value]
-      [/#if]
-      [#if definition.name=="LD2"]
-          [#assign LED2 = definition.value]
-      [/#if]
-      [#if definition.name=="LD3"]
-          [#assign LED3 = definition.value]
-      [/#if]
-      [#if definition.name=="LD4"]
-          [#assign LED4 = definition.value]
-      [/#if]
-      [#if definition.name=="BUTTON"]
-          [#assign BUTTON = definition.value]
-      [/#if]
-      [#if definition.name=="VCP"]
-          [#assign VCP = definition.value]
-      [/#if]
-
-      [#if definition.name=="Bsp_Common_DEMO"]
-          [#assign Bsp_Common_DEMO = definition.value]
-      [/#if]
-    [/#list]
-  [/#if]
+    [#if SWIP.defines??]
+        [#list SWIP.defines as definition]
+            [#if definition.name=="LD1"]
+                [#assign LED1 = definition.value]
+            [/#if]
+            [#if definition.name=="LD2"]
+                [#assign LED2 = definition.value]
+            [/#if]
+            [#if definition.name=="LD3"]
+                [#assign LED3 = definition.value]
+            [/#if]
+            [#if definition.name=="LD4"]
+                [#assign LED4 = definition.value]
+            [/#if]
+            [#if definition.name=="BUTTON"]
+                [#assign BUTTON = definition.value]
+            [/#if]
+            [#if definition.name=="VCP"]
+                [#assign VCP = definition.value]
+            [/#if]
+            [#if definition.name=="Bsp_Common_DEMO"]
+                [#assign Bsp_Common_DEMO = definition.value]
+            [/#if]
+        [/#list]
+    [/#if]
 [/#list]
 
+[#compress]
 [#if Bsp_Common_DEMO?? && Bsp_Common_DEMO == "true"]
-  /* USER CODE BEGIN BSP */
-  
-  [#if VCP == "true"]
-  /* -- Sample board code to send message over COM1 port ---- */
-  printf("Welcome to STM32 world !\n");
-  [/#if]
-
-  [#if LED1?? && LED1 == "true"]
-  /* -- Sample board code to switch on, toggle and off leds ---- */
-  /* Switch on leds */
-  BSP_LED_On(LED_GREEN);
-
-  /* Wait for 250ms */
-  HAL_Delay(250);
-
-  /* Toggle leds (on to off) */
-  BSP_LED_Toggle(LED_GREEN);
-
-  /* Wait for 250ms */
-  HAL_Delay(250);
-
-  /* Toggle leds (off to on) */
-  BSP_LED_Toggle(LED_GREEN);
-
-  /* Wait for 250ms */
-  HAL_Delay(250);
-
-  /* Switch off leds */
-  BSP_LED_Off(LED_GREEN);
-  [/#if]
-  
-  /* USER CODE END BSP */
-  
+    #t/* USER CODE BEGIN BSP */
+    [#if VCP == "true"]
+        #t/* -- Sample board code to send message over COM1 port ---- */
+        #tprintf("Welcome to STM32 world !\n\r");
+    [/#if]
+    [#if (LED1??&& LED1=="true") || (LED2??&& LED2=="true") || (LED3??&& LED3=="true") ]
+        #t/* -- Sample board code to switch on leds ---- */
+        [#if  LED1?? && LED1 == "true"]
+            #tBSP_LED_On(LED_GREEN);
+        [/#if]
+        [#if  LED2?? && LED2 == "true"]
+            #tBSP_LED_On(LED_BLUE);
+        [/#if]
+        [#if  LED3?? && LED3 == "true"]
+            #tBSP_LED_On(LED_RED);
+        [/#if]
+    [/#if]
+    #t/* USER CODE END BSP */
 [/#if]
+[/#compress]

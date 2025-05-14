@@ -7,6 +7,26 @@
 		<CallLibMethod Name="HAL_PWR_EnablePVD" ReturnHAL="false"/>
 	</RefConfig>
 	
+	<RefConfig Comment="Switch to SMPS regulator instead of LDO" Name="Configsmps">
+		<IFCondition Expression="PowerMode=PWR_SMPS_SUPPLY &amp; !nosmpsCodegenSys">
+			<CallLibMethod Name="HAL_PWREx_ConfigSupply" ReturnHAL="true">
+				<MethodArg Name="PWR_SMPS" ParameterName="PowerMode" />
+			</CallLibMethod>
+		</IFCondition>
+		<IFCondition Expression="S_LPBAM_CONF &amp; !nosmpsCodegenSys">
+			<CallLibMethod Name="HAL_PWREx_ConfigSupply" ReturnHAL="true">
+				<MethodArg Name="PWR_SMPS" ParameterName="PowerMode" />
+			</CallLibMethod>
+		</IFCondition>
+	</RefConfig>
+	<RefConfig Comment="Smart Run Domain Config" Name="Configsmartrun">
+		<IFCondition Expression="S_LPBAM_CONF &amp; !nosramCodegenSys">
+			<CallLibMethod Name="HAL_PWREx_ConfigSRDDomain" ReturnHAL="false">
+				<MethodArg Name="SmartRun" ParameterName="SmartRun" />
+			</CallLibMethod>
+		</IFCondition>
+	</RefConfig>
+	
     <RefConfig Comment="Select which pad is connected to VREFINT_ADC" Name="SYS_VREFINT_ADC">
         <CallLibMethod Name="HAL_SYSCFG_VREFINT_OutputSelect" ReturnHAL="false"/>
     </RefConfig>
@@ -19,6 +39,14 @@
     <RefConfig Comment="TIM is the Timing delay source" Name="RTCALARMSource">
         <ConfigFile Name="timebase_RTCALARM_c"/>                    
     </RefConfig>
+    
+            
+	<RefConfig Comment="Disable the internal Pull-Up in Dead Battery pins of UCPD peripheral" Name="DisableDeadBatterySignals">
+		<IFCondition Expression="DisableDeadBatterySignalsConfig=Disable &amp; !SEM_M33NS &amp; !nopwrCodegenSys">
+			<CallLibMethod Name="HAL_PWREx_DisableUCPDDeadBattery" ReturnHAL="false"/>
+		</IFCondition>
+		<Component Name="HAL:UCPD"/>
+	</RefConfig>
     <RefConfigFile Description="Header file for #define" Name="timebase_TIM_c" Template="stm32xx_hal_timebase_TIM_c.ftl">      
         <File Category="source" Condition="all" Name="stm32l0xx_hal_timebase_tim.c" Version=""/>
         <!-- Parameters for Function and Buffer Configurations -->
@@ -42,6 +70,7 @@
    <Argument AddressOf="false" GenericType="simple" Name="SYSCFG_Vrefint_OUTPUT" OptimizationCondition="equal"/>
   </LibMethod>
 
+
     <LibMethod Comment="" Name="HAL_PWR_ConfigPVD">
 		<Argument AddressOf="true" GenericType="struct" Name="sConfigPVD" TypeName="PWR_PVDTypeDef">
 			<Argument AddressOf="false" GenericType="simple" Name="PVDLevel"/>
@@ -49,6 +78,13 @@
 		</Argument>
 	</LibMethod>
 	<LibMethod Comment="" Name="HAL_PWR_EnablePVD"/>
+	<LibMethod Comment="" Name="HAL_PWREx_DisableUCPDDeadBattery"/>
+	<LibMethod Comment="Switch to SMPS regulator instead of LDO" Name="HAL_PWREx_ConfigSupply">
+		<Argument AddressOf="false" GenericType="simple" Name="PWR_SMPS" />
+	</LibMethod>
+	<LibMethod Comment="" Name="HAL_PWREx_ConfigSRDDomain">
+		<Argument AddressOf="false" GenericType="simple" Name="SmartRun" OptimizationCondition="equal" />
+	</LibMethod>
 
     <RefComponent Cclass="HAL" Cgroup="TIM" Cversion="">
         <File Category="header" Name="Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_tim.h"/>

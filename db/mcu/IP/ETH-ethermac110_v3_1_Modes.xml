@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V4.0" IPType="peripheral" Name="ETH" Version="ethermac110_v3_1" 
+	xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" 
+	ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd" 
+	xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+  <About>ETH: Ethernet MAC interface</About>
+	<!-- Generic RefParameters for ETH MII/RMII Modes -->
+	<!-- Generic RefParameters for ETH MII/RMII Modes Extracted from HAL Library with LibExtractor-->
+	<RefParameter Name="hal_eth_init_status" DefaultValue="1" Comment="" Type="" Visible="false"/>
+	<RefParameter Name="Instance" DefaultValue="ETH" Comment="Instance" Type="" Visible="false"/>
+	
+	<RefParameter Comment="Warning" DefaultValue="The ETH can work only when RAM is pointing at 0x24000000"  Name="Warning" Group="General : Ethernet Configuration" Type="string">
+	</RefParameter>
+	<RefParameter Comment="Note" DefaultValue="PHY Driver must be configured from the LwIP 'Platform Settings' top right tab"  Name="Note" Group="General : Ethernet Configuration" Type="string">
+		<Condition Diagnostic="" Expression="S_LWIP"/>
+	</RefParameter>
+	<RefParameter Comment="Note" DefaultValue="N/A" Name="Note" Group="General : Ethernet Configuration" Type="string" Visible="false"/>
+
+	<!-- ST MicroElectronics prefixe Adress -->
+	<RefParameter Comment="Ethernet MAC Address" ArraySize="6" ArrayTypeElement="uint8_t;16" Name="MACAddr" Type="Array" Separator=":" Group="General : Ethernet Configuration" DefaultValue="00:80:E1:00:00:00"/>
+	<RefParameter Name="RxMode" Comment="Rx Mode" Type="list" Group="General : Ethernet Configuration" DefaultValue="ETH_RXPOLLING_MODE" Visible="false">
+		<PossibleValue Comment="Polling Mode" Value="ETH_RXPOLLING_MODE"/>
+        <Description>Polling mode is supported without FreeRTOS.&lt;br&gt;Interrupt mode is supported with FreeRTOS.&lt;br&gt;Tx mode is the same as Rx mode.</Description>
+	</RefParameter>	
+	<RefParameter Comment="Rx Descriptor Length" DefaultValue="4" Max="1024" Min="4" Type="integer" Name="ETH_RX_DESC_CNT" Group="General : Ethernet Configuration">
+		<Description>Rx Descriptor Length value must be modulo 4. Rx descriptor length must be set in a way that Rx descriptor contents must not exceed max value and must not overlap with Rx buffer and Tx descriptor.</Description>
+		<ValueCondition Diagnostic="Value must be modulo 4" Expression="MOD(Value,4) = 0"/>
+	</RefParameter>
+	<RefParameter Comment="First Rx Descriptor Address" DefaultValue="0x30000000" Max="0x30007FFF" Min="0x24000000" Type="hex" Name="RxDescAddress" Group="General : Ethernet Configuration">
+		<Description>Fisrt Rx Descriptor address must be only in the D2 Domain AHB SRAM. Rx descriptor address must not exceed Max value and must no overlap with Tx descriptor and Rx buffer. These areas must not be cacheable.</Description>
+		<ValueCondition Diagnostic="Value must be modulo 4" Expression="MOD(Value,4) = 0"/>
+	</RefParameter>
+	<RefParameter Name="TxDesc" Comment="Tx Desc" Type="string" Group="General : Ethernet Configuration" DefaultValue="DMATxDscrTab"  Visible="false"/>
+
+	<RefParameter Comment="Tx Descriptor Length" DefaultValue="4" Max="1024" Min="4" Type="integer" Name="ETH_TX_DESC_CNT" Group="General : Ethernet Configuration">
+		<Description>Tx Descriptor Length value must be modulo 4. Tx descriptor length must be set in a way that Tx descriptor contents must not exceed max value and must not overlap with Rx descriptor and buffer.</Description>
+		<ValueCondition Diagnostic="Value must be modulo 4" Expression="MOD(Value,4) = 0"/>
+	</RefParameter>
+	<RefParameter Comment="First Tx Descriptor Address" DefaultValue="0x30000200" Max="0x30007FFF" Min="0x24000000" Type="hex" Name="TxDescAddress" Group="General : Ethernet Configuration">
+		<Description>First Tx Descriptor address must be only in the D2 Domain AHB SRAM. Tx descriptor address must not exceed Max value and must no overlap with Rx descriptor and buffer. These areas must not be cacheable.</Description>
+		<ValueCondition Diagnostic="Value must be modulo 4" Expression="MOD(Value,4) = 0"/>
+	</RefParameter>
+	<RefParameter Name="RxDesc" Comment="Rx Desc" Type="string" Group="General : Ethernet Configuration" DefaultValue="DMARxDscrTab"  Visible="false"/>
+	<RefParameter Comment="Rx Buffers Length" DefaultValue="1536" Max="1536" Min="4" Type="integer" Name="RxBuffLen" Group="General : Ethernet Configuration" Visible="true">
+		<Condition Expression="S_AzureRTOS$context | S_LWIP" Diagnostic="Enable only when one AzureRTOS (ThreadX,FileX,..) is enabled"/>
+		<ValueCondition Diagnostic="Value must be modulo 4" Expression="MOD(Value,4) = 0"/>
+		<Description>Rx buffers Length must be set in a way that Rx buffer contents must not exceed max value and must not overlap with Rx and Tx descriptors. Rx Buffer is declared into the NetXDuo Mw. Length for the HAL is set to 0 for this buffer to avoid allocating unnecessary memory space.&lt;br&gt;Value must be modulo 4.</Description>
+	</RefParameter>
+	<RefParameter Comment="Rx Buffers Length" DefaultValue="1524" Max="1536" Min="0" Type="integer" Name="RxBuffLen" Group="General : Ethernet Configuration">
+		<Description>Rx buffers Length must be set in a way that Rx buffer contents not exceed max value and must not overlap with Rx and Tx descriptors. To ensure the zero copy capabilities, a received frame can't be divided into more than one buffer greater than the Rx Buffers Length. That is why we recommend to set this parameter to Ethernet Maximum Transfert Unit(MTU).&lt;br&gt;Value must be modulo 4.</Description>
+		<ValueCondition Diagnostic="Value must be modulo 4" Expression="MOD(Value,4) = 0"/>
+	</RefParameter>
+	<!-- BZ 97589 End -->
+	
+	<RefParameter Comment="Media Interface" DefaultValue="HAL_ETH_MII_MODE" Name="MediaInterface" Type="list" Group="General : Ethernet Configuration" Visible="false">
+		<PossibleValue Value="HAL_ETH_MII_MODE" Comment=""/>
+		<PossibleValue Value="HAL_ETH_RMII_MODE" Comment=""/>
+	</RefParameter>
+	
+	<!-- RefMode for ETH -->
+	<RefMode Name="MII" HalMode="ETH">
+		<ConfigForMode>Init</ConfigForMode>   
+		<Parameter Name="Warning"/>
+		<Parameter Name="Note"/>
+		<Parameter Name="MACAddr"/>
+		<Parameter Name="ETH_TX_DESC_CNT"/>
+		<Parameter Name="TxDescAddress"/>
+		<Parameter Name="TxDesc"/>
+		<Parameter Name="ETH_RX_DESC_CNT"/>
+		<Parameter Name="RxDescAddress"/>
+		 <Parameter Name="RxDesc"/>
+        <Parameter Name="RxBuffLen"/>
+		<Parameter Name="RxMode"/>
+		<Parameter Name="MediaInterface">
+			<PossibleValue>HAL_ETH_MII_MODE</PossibleValue>
+		</Parameter>
+		<Parameter Name="Instance"/>
+	</RefMode>
+	
+	<RefMode Name="RMII" HalMode="ETH">
+		<ConfigForMode>Init</ConfigForMode>
+		<Parameter Name="Warning"/>
+		<Parameter Name="Note"/>
+		<Parameter Name="MACAddr"/>
+		<Parameter Name="ETH_TX_DESC_CNT"/>
+		<Parameter Name="TxDescAddress"/>
+		<Parameter Name="TxDesc"/>
+		<Parameter Name="ETH_RX_DESC_CNT"/>
+		<Parameter Name="RxDescAddress"/>
+		<Parameter Name="RxDesc"/>
+        <Parameter Name="RxBuffLen"/>
+		<Parameter Name="RxMode"/>
+		<Parameter Name="MediaInterface">
+			<PossibleValue>HAL_ETH_RMII_MODE</PossibleValue>
+		</Parameter>
+		<Parameter Name="Instance"/>
+	</RefMode>
+
+	<ModeLogicOperator Name="OR">
+		<Mode Name="Mode">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="MII" RemoveCondition="!UFBGA176 &amp; !LQFP176 &amp; !TFBGA225_OCTO_SMPS &amp; !TFBGA225_HEXA_SMPS">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="MII_COL"/>
+						<Signal Name="MII_CRS"/>
+						<Signal Name="MDC"/>
+						<Signal Name="MDIO"/>
+						<Signal Name="MII_RXD0"/>
+						<Signal Name="MII_RXD1"/>
+						<Signal Name="MII_RXD2"/>
+						<Signal Name="MII_RXD3"/>
+						<Signal Name="MII_RX_CLK"/>
+						<Signal Name="MII_RX_DV"/>
+						<Signal Name="MII_TXD0"/>
+						<Signal Name="MII_TXD1"/>
+						<Signal Name="MII_TXD2"/>
+						<Signal Name="MII_TXD3"/>
+						<Signal Name="MII_TX_CLK"/>
+						<Signal Name="MII_TX_EN"/>
+					</SignalLogicalOp>
+					<Semaphore>MII</Semaphore>
+					<Semaphore>MW_ETH_MW</Semaphore>
+				</Mode>
+				<Mode Name="MII" RemoveCondition="!STM32H7R3A8Ix &amp; !STM32H7S3A8Ix">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="MII_COL"/>
+						<!--<Signal Name="MII_CRS"/>-->
+						<Signal Name="MDC"/>
+						<Signal Name="MDIO"/>
+						<Signal Name="MII_RXD0"/>
+						<Signal Name="MII_RXD1"/>
+						<Signal Name="MII_RXD2"/>
+						<Signal Name="MII_RXD3"/>
+						<Signal Name="MII_RX_CLK"/>
+						<Signal Name="MII_RX_DV"/>
+						<Signal Name="MII_TXD0"/>
+						<Signal Name="MII_TXD1"/>
+						<Signal Name="MII_TXD2"/>
+						<Signal Name="MII_TXD3"/>
+						<Signal Name="MII_TX_CLK"/>
+						<Signal Name="MII_TX_EN"/>
+					</SignalLogicalOp>
+					<Semaphore>MII</Semaphore>
+					<Semaphore>MW_ETH_MW</Semaphore>
+				</Mode>
+				<Mode Name="MII" RemoveCondition="!UFBGA144 &amp; !STM32H7R7A8Ix &amp; !STM32H7S7A8Ix &amp; !WLCSP &amp; !VFQFPN68 &amp; !LQFP100 &amp; !LQFP144">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="MII_COL"/>
+						<!--<Signal Name="MII_CRS"/>-->
+						<Signal Name="MDC"/>
+						<Signal Name="MDIO"/>
+						<Signal Name="MII_RXD0"/>
+						<Signal Name="MII_RXD1"/>
+						<!--<Signal Name="MII_RXD2"/>-->
+						<Signal Name="MII_RXD3"/>
+						<Signal Name="MII_RX_CLK"/>
+						<Signal Name="MII_RX_DV"/>
+						<Signal Name="MII_TXD0"/>
+						<Signal Name="MII_TXD1"/>
+						<Signal Name="MII_TXD2"/>
+						<Signal Name="MII_TXD3"/>
+						<Signal Name="MII_TX_CLK"/>
+						<Signal Name="MII_TX_EN"/>
+					</SignalLogicalOp>
+					<Semaphore>MII</Semaphore>
+					<Semaphore>MW_ETH_MW</Semaphore>
+				</Mode>
+				<Mode Name="MII_PTP_Synchro" RemoveCondition="!UFBGA176 &amp; !LQFP176 &amp; !TFBGA225_OCTO_SMPS &amp; !TFBGA225_HEXA_SMPS">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="MII_COL"/>
+						<Signal Name="MII_CRS"/>
+						<Signal Name="MDC"/>
+						<Signal Name="MDIO"/>
+						<Signal Name="PPS_OUT"/>
+						<Signal Name="MII_RXD0"/>
+						<Signal Name="MII_RXD1"/>
+						<Signal Name="MII_RXD2"/>
+						<Signal Name="MII_RXD3"/>
+						<Signal Name="MII_RX_CLK"/>
+						<Signal Name="MII_RX_DV"/>
+						<Signal Name="MII_TXD0"/>
+						<Signal Name="MII_TXD1"/>
+						<Signal Name="MII_TXD2"/>
+						<Signal Name="MII_TXD3"/>
+						<Signal Name="MII_TX_CLK"/>
+						<Signal Name="MII_TX_EN"/>
+					</SignalLogicalOp>
+					<!--<Semaphore>MII_PTP_Synchro</Semaphore>-->
+					<Semaphore>MII</Semaphore>	
+					<Semaphore>MW_ETH_MW</Semaphore>
+					<Condition Expression="((Semaphore_TriggerSourceITR4TIM2 &amp; Semaphore_ETH_ControllerModeTIM2) | (Semaphore_TriggerSourceITR4TIM3 &amp; Semaphore_ETH_ControllerModeTIM3)) | (FDCAN1Used_ForRCC | FDCAN2Used_ForRCC)" Diagnostic="Only active when TIM2/TIM3 has an enabled Slave Mode with ITR4 as trigger source or if FDCAN is enabled."/>
+				</Mode>	
+				<Mode Name="MII_PTP_Synchro" RemoveCondition="!STM32H7R3A8Ix &amp; !STM32H7S3A8Ix">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="MII_COL"/>
+						<!--<Signal Name="MII_CRS"/>-->
+						<Signal Name="MDC"/>
+						<Signal Name="MDIO"/>
+						<Signal Name="PPS_OUT"/>
+						<Signal Name="MII_RXD0"/>
+						<Signal Name="MII_RXD1"/>
+						<Signal Name="MII_RXD2"/>
+						<Signal Name="MII_RXD3"/>
+						<Signal Name="MII_RX_CLK"/>
+						<Signal Name="MII_RX_DV"/>
+						<Signal Name="MII_TXD0"/>
+						<Signal Name="MII_TXD1"/>
+						<Signal Name="MII_TXD2"/>
+						<Signal Name="MII_TXD3"/>
+						<Signal Name="MII_TX_CLK"/>
+						<Signal Name="MII_TX_EN"/>
+					</SignalLogicalOp>
+					<!--<Semaphore>MII_PTP_Synchro</Semaphore>-->
+					<Semaphore>MII</Semaphore>
+					<Semaphore>MW_ETH_MW</Semaphore>
+					<Condition Expression="((Semaphore_TriggerSourceITR4TIM2 &amp; Semaphore_ETH_ControllerModeTIM2) | (Semaphore_TriggerSourceITR4TIM3 &amp; Semaphore_ETH_ControllerModeTIM3)) | (FDCAN1Used_ForRCC | FDCAN2Used_ForRCC)" Diagnostic="Only active when TIM2/TIM3 has an enabled Slave Mode with ITR4 as trigger source or if FDCAN is enabled."/>
+				</Mode>	
+				<Mode Name="MII_PTP_Synchro" RemoveCondition="!UFBGA144 &amp; !STM32H7R7A8Ix &amp; !STM32H7S7A8Ix &amp; !WLCSP &amp; !VFQFPN68 &amp; !LQFP100 &amp; !LQFP144">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="MII_COL"/>
+						<!--<Signal Name="MII_CRS"/>-->
+						<Signal Name="MDC"/>
+						<Signal Name="MDIO"/>
+						<Signal Name="PPS_OUT"/>
+						<Signal Name="MII_RXD0"/>
+						<Signal Name="MII_RXD1"/>
+						<!--<Signal Name="MII_RXD2"/>-->
+						<Signal Name="MII_RXD3"/>
+						<Signal Name="MII_RX_CLK"/>
+						<Signal Name="MII_RX_DV"/>
+						<Signal Name="MII_TXD0"/>
+						<Signal Name="MII_TXD1"/>
+						<Signal Name="MII_TXD2"/>
+						<Signal Name="MII_TXD3"/>
+						<Signal Name="MII_TX_CLK"/>
+						<Signal Name="MII_TX_EN"/>
+					</SignalLogicalOp>
+					<!--<Semaphore>MII_PTP_Synchro</Semaphore>-->
+					<Semaphore>MII</Semaphore>
+					<Semaphore>MW_ETH_MW</Semaphore>
+					<Condition Expression="((Semaphore_TriggerSourceITR4TIM2 &amp; Semaphore_ETH_ControllerModeTIM2) | (Semaphore_TriggerSourceITR4TIM3 &amp; Semaphore_ETH_ControllerModeTIM3)) | (FDCAN1Used_ForRCC | FDCAN2Used_ForRCC)" Diagnostic="Only active when TIM2/TIM3 has an enabled Slave Mode with ITR4 as trigger source or if FDCAN is enabled."/>
+				</Mode>	
+				<Mode Name="RMII">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="RMII_CRS_DV"/>
+						<Signal Name="MDC"/>
+						<Signal Name="MDIO"/>
+						<Signal Name="RMII_REF_CLK"/>
+						<Signal Name="RMII_RXD0"/>
+						<Signal Name="RMII_RXD1"/>
+						<Signal Name="RMII_TXD0"/>
+						<Signal Name="RMII_TXD1"/>
+						<Signal Name="RMII_TX_EN"/>
+					</SignalLogicalOp>
+					<!--<Semaphore>RMII</Semaphore>-->
+					<Semaphore>RMII</Semaphore>
+					<Semaphore>MW_ETH_MW</Semaphore>
+				</Mode>
+				<Mode Name="RMII_PTP_Synchro">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="RMII_CRS_DV"/>
+						<Signal Name="MDC"/>
+						<Signal Name="MDIO"/>
+						<Signal Name="PPS_OUT"/>
+						<Signal Name="RMII_REF_CLK"/>
+						<Signal Name="RMII_RXD0"/>
+						<Signal Name="RMII_RXD1"/>
+						<Signal Name="RMII_TXD0"/>
+						<Signal Name="RMII_TXD1"/>
+						<Signal Name="RMII_TX_EN"/>
+					</SignalLogicalOp>
+					<!--<Semaphore>RMII_PTP_Synchro</Semaphore>-->
+					<Semaphore>RMII</Semaphore>
+					<Semaphore>MW_ETH_MW</Semaphore>
+					<Condition Expression="((Semaphore_TriggerSourceITR4TIM2 &amp; Semaphore_ETH_ControllerModeTIM2) | (Semaphore_TriggerSourceITR4TIM3 &amp; Semaphore_ETH_ControllerModeTIM3)) | (FDCAN1Used_ForRCC | FDCAN2Used_ForRCC)" Diagnostic="Only active when TIM2/TIM3 has an enabled Slave Mode with ITR4 as trigger source or if FDCAN is enabled."/>
+				</Mode>
+				<Mode Name="GMII"> <!-- Mode not supported by H7 so far ... -->
+					<SignalLogicalOp Name="AND">
+						<Signal Name="CLK125"/>
+						<Signal Name="COL"/>
+						<Signal Name="CRS"/>
+						<Signal Name="GTX_CLK"/>
+						<Signal Name="RXD0"/>
+						<Signal Name="RXD1"/>
+						<Signal Name="RXD2"/>
+						<Signal Name="RXD3"/>
+						<Signal Name="RXD4"/>
+						<Signal Name="RXD5"/>
+						<Signal Name="RXD6"/>
+						<Signal Name="RXD7"/>
+						<Signal Name="RX_CLK"/>
+						<Signal Name="RX_CTL"/>
+						<Signal Name="RX_DV"/>
+						<Signal Name="TXD0"/>
+						<Signal Name="TXD1"/>
+						<Signal Name="TXD2"/>
+						<Signal Name="TXD3"/>
+						<Signal Name="TXD4"/>
+						<Signal Name="TXD5"/>
+						<Signal Name="TXD6"/>
+						<Signal Name="TXD7"/>
+						<Signal Name="TX_CLK"/>
+						<Signal Name="TX_CTL"/>
+						<Signal Name="TX_EN"/>
+						<Signal Name="TX_ER"/>
+					</SignalLogicalOp>
+					<!--<Semaphore>RMII</Semaphore>-->
+					<Semaphore>MW_ETH_MW</Semaphore>
+				</Mode>
+			</ModeLogicOperator>
+			<Semaphore>ETHUsed_ForRCC</Semaphore>
+		</Mode>
+        <Mode Name="ETH PHY_INTN">
+            <ModeLogicOperator Name="XOR">    
+                <Mode Name="ETH PHY_INTN">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="PHY_INTN"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+                    <Condition Diagnostic="Available only if one ETH Mode is enabled" Expression="MII | RMII"/>
+        </Mode>
+		<Mode Name="Activate Rx Err signal">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="Activate Rx Err signal">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="MII_RX_ER"/>
+					</SignalLogicalOp>
+				</Mode>
+		    </ModeLogicOperator>
+					<Condition Expression="MII | RMII" Diagnostic="Active only with an MII Mode"/>
+	    </Mode>
+        <Mode Name="Activate Tx Err signal" RemoveCondition="!STM32H7">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="Activate Tx Err signal">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="MII_TX_ER"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Condition Expression="MII" Diagnostic="Active only with an MII Mode &lt;br&gt;Required for the EEE (Energy Efficient Ethernet) feature"/>
+        </Mode>
+	</ModeLogicOperator>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="CLK"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="MII_COL"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="MII_CRS"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="RMII_CRS_DV"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="MDC"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="MDIO"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="PPS_OUT"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="CLK125"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="MII_RXD0"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="RMII_RXD0"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="MII_RXD1"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="RMII_RXD1"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="MII_RXD2"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="MII_RXD3"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="MII_RX_CLK"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="RMII_REF_CLK"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="MII_RX_DV"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="MII_RX_ER"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="MII_TXD0"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="RMII_TXD0"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="MII_TXD1"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="RMII_TXD1"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="MII_TXD2"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="MII_TXD3"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="MII_TX_CLK"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="MII_TX_EN"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="RMII_TX_EN"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="MII_TX_ER"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="PHY_INTN"/>
+</IP>

@@ -3,8 +3,9 @@
 :: ==============================================================================
 ::                               General
 :: ==============================================================================
-set stm32programmercli="C:\Program Files\STMicroelectronics\STM32Cube\STM32CubeProgrammer\bin\STM32_Programmer_CLI.exe"
-[#if BootPathType?? && (BootPathType=="ST_IROT_UROT_SECURE_MANAGER")]
+[#--  set stm32programmercli="C:\Program Files\STMicroelectronics\STM32Cube\STM32CubeProgrammer\bin\STM32_Programmer_CLI.exe"--]
+set stm32programmercli="${STM32CubeProgrammerPath}"
+[#if BootPathType?? && (BootPathType=="ST_IROT_UROT_SECURE_MANAGER" || isAppliOnly??)]
 set stm32tpccli="${tpcPath}"
 [#else]
 set stm32tpccli=${tpcPath}
@@ -14,8 +15,18 @@ set stm32tpccli=${tpcPath}
 ::               !!!! DOT NOT EDIT --- UPDATED AUTOMATICALLY !!!!
 :: ==============================================================================
 set PROJECT_GENERATED_BY_CUBEMX=true
+[#if isAppliOnly??]
+set cube_fw_path=${CubeFwPath}
+[#else]
 set cube_fw_path="${CubeFwPath}"
+[/#if]
 
+[#if isAppliOnly??]
+set stm32tool_path=${STM32CubeProgrammerLocation}
+set stm32tool_path=%stm32tool_path:\=/%
+set stm32ExtLoaderFlash=-elbl %stm32tool_path%/ExternalLoader/MX66UW1G45G_STM32H7S78-DK_XSPIM1-SFIx.stldr
+set stm32ExtLoaderFlashOpen=-el %stm32tool_path%/ExternalLoader/MX66UW1G45G_STM32H7S78-DK_XSPIM1.stldr
+[/#if] 
 
 [#-- STiRoT --]
 [#if BootPathType?? && BootPathType=="ST_IROT"]
@@ -27,6 +38,10 @@ set stirot_appli=${appli_assembly_sign}
 set stirot_appli_bin=${appli_secure}
 [#elseif appli_secure??] 
 set stirot_appli=${appli_secure}
+[#elseif isAppliOnly??]
+set stirot_appli=${appli}
+set com_port=COM7
+set stirot_iloader_boot_path_project=${CubeFwPath}\Projects\STM32H7S78-DK\Applications\ROT\STiROT_iLoader
 [/#if]
 set isFullSecure=${isFullSecure}
 set stirot_boot_path_project=%~dp0..\
@@ -59,6 +74,13 @@ set oemirot_appli_secure=${appli_secure}
 [/#if]
 [#if appli_non_secure??] 
 set oemirot_appli_non_secure=${appli_non_secure}
+[/#if]
+[#if isAppliOnly??]
+set oemirot_appli=${appli}
+set com_port=COM7
+	[#if  BootPathType=="ST_IROT_UROT"]
+set stirot_iloader_boot_path_project=${CubeFwPath}\Projects\STM32H7S78-DK\Applications\ROT\STiROT_iLoader
+	[/#if]
 [/#if]
 [#if appli_assembly??]
 	[#if appli_assembly_sign??]

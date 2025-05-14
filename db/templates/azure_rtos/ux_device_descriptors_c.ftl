@@ -20,7 +20,10 @@
 [#assign UX_DEVICE_CDC_ACM_ENABLED_Value = "false"]
 [#assign UX_DEVICE_CDC_ECM_ENABLED_Value = "false"]
 [#assign UX_DEVICE_DFU_ENABLED_Value = "false"]
+[#assign UX_DEVICE_VIDEO_ENABLED_Value = "false"]
 [#assign UX_DEVICE_PIMA_MTP_ENABLED_Value = "false"]
+[#assign UX_DEVICE_CCID_ENABLED_Value = "false"]
+[#assign UX_DEVICE_PRINTER_ENABLED_Value = "false"]
 [#assign UX_DEVICE_RNDIS_ENABLED_Value = "false"]
 [#assign HID_ITF_FOUNDED_Value = "false"]
 
@@ -33,15 +36,29 @@
       [#if name == "UX_DEVICE_CLASS_HID_INTERRUPT_OUT_SUPPORT"]
         [#assign UX_DEVICE_CLASS_HID_INTERRUPT_OUT_SUPPORT_value = value]
       [/#if]
-	  [#if name == "UX_PIMA_WITH_MTP_SUPPORT"]
-		[#assign UX_PIMA_WITH_MTP_SUPPORT_value = value]
-	  [/#if]
+      [#if name == "UX_PIMA_WITH_MTP_SUPPORT"]
+        [#assign UX_PIMA_WITH_MTP_SUPPORT_value = value]
+      [/#if]
+	  [#if name == "VS_FORMAT_SUBTYPE"]
+        [#assign vs_format_subtype = value]
+      [/#if]
       [#list SWIPdatas as SWIP]
       [#if SWIP.variables??]
       [#list SWIP.variables as define]
         [#assign def_value = define.value]
         [#assign def_name = define.name]
-          [#if (def_name?contains("UX_DEVICE_HID_MOUSE") && def_value == "1") || (def_name?contains("UX_DEVICE_HID_KEYBOARD") && def_value == "1") || (def_name?contains("UX_DEVICE_HID_CUSTOM") && def_value == "1") || (def_name?contains("UX_DEVICE_STORAGE") && def_value == "1") || (def_name?contains("UX_DEVICE_CDC_ACM") && def_value == "1") || (def_name?contains("UX_DEVICE_CDC_ECM") && def_value == "1") || (def_name?contains("UX_DEVICE_DFU") && def_value == "1") || (def_name?contains("UX_DEVICE_RNDIS") && def_value == "1") || (def_name?contains("UX_DEVICE_PIMA") && def_value == "1")]
+          [#if (def_name?contains("UX_DEVICE_HID_MOUSE") && def_value == "1") ||
+			  (def_name?contains("UX_DEVICE_HID_KEYBOARD") && def_value == "1") ||
+			  (def_name?contains("UX_DEVICE_HID_CUSTOM") && def_value == "1") ||
+			  (def_name?contains("UX_DEVICE_STORAGE") && def_value == "1") ||
+			  (def_name?contains("UX_DEVICE_CDC_ACM") && def_value == "1") ||
+			  (def_name?contains("UX_DEVICE_CDC_ECM") && def_value == "1") ||
+			  (def_name?contains("UX_DEVICE_DFU") && def_value == "1") ||
+			  (def_name?contains("UX_DEVICE_RNDIS") && def_value == "1") ||
+			  (def_name?contains("UX_DEVICE_PIMA") && def_value == "1") ||
+			  (def_name?contains("UX_DEVICE_VIDEO") && def_value == "1") ||
+			  (def_name?contains("UX_DEVICE_CCID") && def_value == "1") ||
+			  (def_name?contains("UX_DEVICE_PRINTER") && def_value == "1")]
             [#if name == "USBD_DEVICE_FRAMEWORK_BUILDER_ENABLED"]
               [#assign usbd_builder_enabled = value]
             [/#if]
@@ -70,8 +87,17 @@
           [#if def_name?contains("UX_DEVICE_CDC_ECM") && def_value == "1"]
             [#assign UX_DEVICE_CDC_ECM_ENABLED_Value = "true"]
           [/#if]
+          [#if def_name?contains("UX_DEVICE_VIDEO") && def_value == "1"]
+            [#assign UX_DEVICE_VIDEO_ENABLED_Value = "true"]
+          [/#if]
           [#if def_name?contains("UX_DEVICE_PIMA") && def_value == "1"]
             [#assign UX_DEVICE_PIMA_MTP_ENABLED_Value = "true"]
+          [/#if]
+          [#if def_name?contains("UX_DEVICE_CCID") && def_value == "1"]
+            [#assign UX_DEVICE_CCID_ENABLED_Value = "true"]
+          [/#if]
+          [#if def_name?contains("UX_DEVICE_PRINTER") && def_value == "1"]
+            [#assign UX_DEVICE_PRINTER_ENABLED_Value = "true"]
           [/#if]
           [#if def_name?contains("UX_DEVICE_RNDIS") && def_value == "1"]
             [#assign UX_DEVICE_RNDIS_ENABLED_Value = "true"]
@@ -145,8 +171,17 @@ uint8_t UserClassInstance[USBD_MAX_CLASS_INTERFACES] = {
 [#if UX_DEVICE_CDC_ECM_ENABLED_Value == "true"]
   CLASS_TYPE_CDC_ECM,
 [/#if]
+[#if UX_DEVICE_VIDEO_ENABLED_Value == "true"]
+  CLASS_TYPE_VIDEO,
+[/#if]
 [#if UX_DEVICE_PIMA_MTP_ENABLED_Value == "true"]
   CLASS_TYPE_PIMA_MTP,
+[/#if]
+[#if UX_DEVICE_CCID_ENABLED_Value == "true"]
+  CLASS_TYPE_CCID,
+[/#if]
+[#if UX_DEVICE_PRINTER_ENABLED_Value == "true"]
+  CLASS_TYPE_PRINTER,
 [/#if]
 [#if UX_DEVICE_RNDIS_ENABLED_Value == "true"]
   CLASS_TYPE_RNDIS,
@@ -411,6 +446,25 @@ static void USBD_FrameWork_DFUDesc(USBD_DevClassHandleTypeDef *pdev,
 static void USBD_FrameWork_MTPDesc(USBD_DevClassHandleTypeDef *pdev,
                                    uint32_t pConf, uint32_t *Sze);
 #endif /* USBD_PIMA_MTP_CLASS_ACTIVATED == 1U */
+[/#if]
+
+[#if def_name?contains("UX_DEVICE_VIDEO") && def_value == "1"]
+#if USBD_VIDEO_CLASS_ACTIVATED == 1U
+static void USBD_FrameWork_VIDEO_Desc(USBD_DevClassHandleTypeDef *pdev,
+                                      uint32_t pConf, uint32_t *Sze);
+#endif /* USBD_VIDEO_CLASS_ACTIVATED == 1U */
+[/#if]
+[#if def_name?contains("UX_DEVICE_CCID") && def_value == "1"]
+#if USBD_CCID_CLASS_ACTIVATED == 1U
+static void USBD_FrameWork_CCID_Desc(USBD_DevClassHandleTypeDef *pdev,
+                                     uint32_t pConf, uint32_t *Sze);
+#endif /* USBD_CCID_CLASS_ACTIVATED == 1U */
+[/#if]
+[#if def_name?contains("UX_DEVICE_PRINTER") && def_value == "1"]
+#if USBD_PRINTER_CLASS_ACTIVATED == 1U
+static void USBD_FrameWork_PRINTER_Desc(USBD_DevClassHandleTypeDef *pdev,
+                                        uint32_t pConf, uint32_t *Sze);
+#endif /* USBD_PRINTER_CLASS_ACTIVATED == 1U */
 [/#if]
 [/#list]
 [/#if]
@@ -1442,6 +1496,49 @@ uint8_t  USBD_FrameWork_AddToConfDesc(USBD_DevClassHandleTypeDef *pdev, uint8_t 
 [#list SWIPdatas as SWIP]
 [#if SWIP.variables??]
 [#list SWIP.variables as define]
+    [#assign def_value = define.value]
+    [#assign def_name = define.name]
+[#if def_name?contains("UX_DEVICE_VIDEO") && def_value == "1"]
+#if USBD_VIDEO_CLASS_ACTIVATED == 1
+
+    case CLASS_TYPE_VIDEO:
+
+      /* Find the first available interface slot and Assign number of interfaces */
+      interface = USBD_FrameWork_FindFreeIFNbr(pdev);
+      pdev->tclasslist[pdev->classId].NumIf = 2U;
+      pdev->tclasslist[pdev->classId].Ifs[0] = interface;
+      pdev->tclasslist[pdev->classId].Ifs[1] = (uint8_t)(interface + 1U);
+
+      /* Assign endpoint numbers */
+      pdev->tclasslist[pdev->classId].NumEps = 1U; /* EP_IN */
+
+      /* Check the current speed to assign endpoint IN */
+      if (pdev->Speed == USBD_HIGH_SPEED)
+      {
+        /* Assign IN Endpoint */
+        USBD_FrameWork_AssignEp(pdev, USBD_VIDEO_EPIN_ADDR,
+                                USBD_EP_TYPE_ISOC, USBD_VIDEO_EPIN_HS_MPS);
+      }
+      else
+      {
+        /* Assign IN Endpoint */
+        USBD_FrameWork_AssignEp(pdev, USBD_VIDEO_EPIN_ADDR,
+                                USBD_EP_TYPE_ISOC, USBD_VIDEO_EPIN_FS_MPS);
+      }
+
+      /* Configure and Append the Descriptor */
+      USBD_FrameWork_VIDEO_Desc(pdev, (uint32_t)pCmpstConfDesc, &pdev->CurrConfDescSz);
+
+      break;
+
+#endif /* USBD_VIDEO_CLASS_ACTIVATED */
+[/#if]
+[/#list]
+[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+[#if SWIP.variables??]
+[#list SWIP.variables as define]
 	[#assign def_value = define.value]
 	[#assign def_name = define.name]
 [#if def_name?contains("UX_DEVICE_PIMA") && def_value == "1"]
@@ -1493,6 +1590,115 @@ uint8_t  USBD_FrameWork_AddToConfDesc(USBD_DevClassHandleTypeDef *pdev, uint8_t 
       break;
 
 #endif /* USBD_PIMA_MTP_CLASS_ACTIVATED */
+[/#if]
+[/#list]
+[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+[#if SWIP.variables??]
+[#list SWIP.variables as define]
+	[#assign def_value = define.value]
+	[#assign def_name = define.name]
+[#if def_name?contains("UX_DEVICE_CCID") && def_value == "1"]
+#if USBD_CCID_CLASS_ACTIVATED == 1U
+
+    case CLASS_TYPE_CCID:
+
+      /* Find the first available interface slot and Assign number of interfaces */
+      interface = USBD_FrameWork_FindFreeIFNbr(pdev);
+      pdev->tclasslist[pdev->classId].NumIf = 1U;
+      pdev->tclasslist[pdev->classId].Ifs[0] = interface;
+
+      /* Assign endpoint numbers */
+      pdev->tclasslist[pdev->classId].NumEps = 3U; /* EP_IN, EP_OUT, CMD_EP */
+
+      /* Check the current speed to assign endpoint IN */
+      if (Speed == USBD_HIGH_SPEED)
+      {
+        /* Assign OUT Endpoint */
+        USBD_FrameWork_AssignEp(pdev, USBD_CCID_EPOUT_ADDR,
+                                USBD_EP_TYPE_BULK, USBD_CCID_EPOUT_HS_MPS);
+
+        /* Assign IN Endpoint */
+        USBD_FrameWork_AssignEp(pdev, USBD_CCID_EPIN_ADDR,
+                                USBD_EP_TYPE_BULK, USBD_CCID_EPIN_HS_MPS);
+
+        /* Assign CMD Endpoint */
+        USBD_FrameWork_AssignEp(pdev, USBD_CCID_EPINCMD_ADDR,
+                                USBD_EP_TYPE_INTR, USBD_CCID_EPINCMD_HS_MPS);
+      }
+      else
+      {
+        /* Assign OUT Endpoint */
+        USBD_FrameWork_AssignEp(pdev, USBD_CCID_EPOUT_ADDR,
+                                USBD_EP_TYPE_BULK, USBD_CCID_EPOUT_FS_MPS);
+
+        /* Assign IN Endpoint */
+        USBD_FrameWork_AssignEp(pdev, USBD_CCID_EPIN_ADDR,
+                                USBD_EP_TYPE_BULK, USBD_CCID_EPIN_FS_MPS);
+
+        /* Assign CMD Endpoint */
+        USBD_FrameWork_AssignEp(pdev, USBD_CCID_EPINCMD_ADDR,
+                                USBD_EP_TYPE_INTR, USBD_CCID_EPINCMD_FS_MPS);
+      }
+
+      /* Configure and Append the Descriptor */
+      USBD_FrameWork_CCID_Desc(pdev, (uint32_t)pCmpstConfDesc, &pdev->CurrConfDescSz);
+
+      break;
+
+#endif /* USBD_CCID_CLASS_ACTIVATED */
+[/#if]
+[/#list]
+[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+[#if SWIP.variables??]
+[#list SWIP.variables as define]
+   [#assign def_value = define.value]
+   [#assign def_name = define.name]
+[#if def_name?contains("UX_DEVICE_PRINTER") && def_value == "1"]
+#if USBD_PRINTER_CLASS_ACTIVATED == 1U
+
+    case CLASS_TYPE_PRINTER:
+
+      /* Find the first available interface slot and Assign number of interfaces */
+      interface = USBD_FrameWork_FindFreeIFNbr(pdev);
+      pdev->tclasslist[pdev->classId].NumIf = 1U;
+      pdev->tclasslist[pdev->classId].Ifs[0] = interface;
+
+      /* Assign endpoint numbers */
+      pdev->tclasslist[pdev->classId].NumEps = 2U; /* EP_IN, EP_OUT */
+
+      /* Check the current speed to assign endpoint IN */
+      if (Speed == USBD_HIGH_SPEED)
+      {
+        /* Assign IN Endpoint */
+        USBD_FrameWork_AssignEp(pdev, USBD_PRNT_EPIN_ADDR,
+                                USBD_EP_TYPE_BULK, USBD_PRNT_EPIN_HS_MPS);
+
+        /* Assign OUT Endpoint */
+        USBD_FrameWork_AssignEp(pdev, USBD_PRNT_EPOUT_ADDR,
+                                USBD_EP_TYPE_BULK, USBD_PRNT_EPOUT_HS_MPS);
+
+      }
+      else
+      {
+        /* Assign IN Endpoint */
+        USBD_FrameWork_AssignEp(pdev, USBD_PRNT_EPIN_ADDR,
+                                USBD_EP_TYPE_BULK, USBD_PRNT_EPIN_FS_MPS);
+
+        /* Assign OUT Endpoint */
+        USBD_FrameWork_AssignEp(pdev, USBD_PRNT_EPOUT_ADDR,
+                                USBD_EP_TYPE_BULK, USBD_PRNT_EPOUT_FS_MPS);
+      }
+
+      /* Configure and Append the Descriptor */
+      USBD_FrameWork_PRINTER_Desc(pdev, (uint32_t)pCmpstConfDesc, &pdev->CurrConfDescSz);
+
+      break;
+
+#endif /* USBD_PRINTER_CLASS_ACTIVATED */
 [/#if]
 [/#list]
 [/#if]
@@ -2212,6 +2418,231 @@ static void USBD_FrameWork_DFUDesc(USBD_DevClassHandleTypeDef *pdev,
 [#list SWIP.variables as define]
 	[#assign def_value = define.value]
 	[#assign def_name = define.name]
+[#if def_name?contains("UX_DEVICE_VIDEO") && def_value == "1"]
+#if USBD_VIDEO_CLASS_ACTIVATED == 1
+/**
+  * @brief  USBD_FrameWork_VIDEO_Desc
+  *         Configure and Append the VIDEO Descriptor
+  * @param  pdev: device instance
+  * @param  pConf: Configuration descriptor pointer
+  * @param  Sze: pointer to the current configuration descriptor size
+  * @retval None
+  */
+static void USBD_FrameWork_VIDEO_Desc(USBD_DevClassHandleTypeDef *pdev,
+                                      uint32_t pConf, uint32_t *Sze)
+{
+[#if vs_format_subtype == "1"]
+  __ALIGN_BEGIN static uint8_t usbd_uvc_guid[16] __ALIGN_END = {DBVAL(UVC_UNCOMPRESSED_GUID),
+                                                                0x00, 0x00, 0x10,
+                                                                0x00, 0x80, 0x00,
+                                                                0x00, 0xAA, 0x00,
+                                                                0x38, 0x9B, 0x71};
+[/#if]
+
+  USBD_IfDescTypedef *pIfDesc;
+  USBD_EpDescTypedef *pEpDesc;
+
+#if USBD_COMPOSITE_USE_IAD == 1
+  static USBD_IadDescTypedef *pIadDesc;
+#endif /* USBD_COMPOSITE_USE_IAD == 1 */
+
+  USBD_VIDEOCSVCIfDescTypeDef *pVideoVCInDesc;
+  USBD_VIDEOInputTerminalDescTypeDef *pVideoITDesc;
+  USBD_VIDEOOutputTerminalDescTypeDef *pVideoOTDesc;
+  USBD_VIDEOVSHeaderDescTypeDef *pVideoSHeaderDesc;
+  USBD_VIDEOPayloadFormatDescTypeDef *pVideoPayForDesc;
+  USBD_VIDEOFrameDescTypeDef *pVideoFrameDesc;
+[#if vs_format_subtype == "1"]
+  USBD_ColorMatchingDescTypeDef *pColMaDesc;
+[/#if]
+
+#if USBD_COMPOSITE_USE_IAD == 1
+  pIadDesc = ((USBD_IadDescTypedef *)(pConf + *Sze));
+  pIadDesc->bLength = (uint8_t)sizeof(USBD_IadDescTypedef);
+  pIadDesc->bDescriptorType = USB_DESC_TYPE_IAD; /* IAD descriptor */
+  pIadDesc->bFirstInterface = pdev->tclasslist[pdev->classId].Ifs[0];
+  pIadDesc->bInterfaceCount = 2U;    /* 2 interfaces */
+  pIadDesc->bFunctionClass = UX_DEVICE_CLASS_VIDEO_CC_VIDEO;
+  pIadDesc->bFunctionSubClass = UX_DEVICE_CLASS_VIDEO_SC_INTERFACE_COLLECTION;
+  pIadDesc->bFunctionProtocol = UX_DEVICE_CLASS_VIDEO_PC_PROTOCOL_UNDEFINED;
+  pIadDesc->iFunction = 0U; /* String Index */
+  *Sze += (uint32_t)sizeof(USBD_IadDescTypedef);
+#endif /* USBD_COMPOSITE_USE_IAD == 1 */
+
+  /* Append VIDEO Interface descriptor to Configuration descriptor */
+  __USBD_FRAMEWORK_SET_IF(pdev->tclasslist[pdev->classId].Ifs[0], 0U, 0U,
+                          UX_DEVICE_CLASS_VIDEO_CC_VIDEO,
+                          UX_DEVICE_CLASS_VIDEO_SC_CONTROL,
+                          UX_DEVICE_CLASS_VIDEO_PC_PROTOCOL_UNDEFINED,
+                          0U);
+
+  /* Append Class-specific VC Interface Descriptor to Configuration descriptor*/
+  pVideoVCInDesc = ((USBD_VIDEOCSVCIfDescTypeDef *)(pConf + *Sze));
+  pVideoVCInDesc->bLength = (uint8_t)sizeof(USBD_VIDEOCSVCIfDescTypeDef);
+  pVideoVCInDesc->bDescriptorType = UX_DEVICE_CLASS_VIDEO_CS_INTERFACE;
+  pVideoVCInDesc->bDescriptorSubtype = 0x01U;
+  pVideoVCInDesc->bcdUVC = 0x0110U;
+  pVideoVCInDesc->wTotalLength = 0x001EU;
+  pVideoVCInDesc->dwClockFrequency = 0x02DC6C00U;
+  pVideoVCInDesc->bInCollection = 0x01U;
+  pVideoVCInDesc->aInterfaceNr = 0x01U;
+  *Sze += (uint32_t)sizeof(USBD_VIDEOCSVCIfDescTypeDef);
+
+  /*Append Input Terminal Descriptor to Configuration descriptor */
+  pVideoITDesc = ((USBD_VIDEOInputTerminalDescTypeDef *)(pConf + *Sze));
+  pVideoITDesc->bLength = (uint8_t)sizeof(USBD_VIDEOInputTerminalDescTypeDef);
+  pVideoITDesc->bDescriptorType = UX_DEVICE_CLASS_VIDEO_CS_INTERFACE;
+  pVideoITDesc->bDescriptorSubtype = 0x02U;
+  pVideoITDesc->bTerminalID = 0x01U;
+  pVideoITDesc->wTerminalType = 0x0200U;
+  pVideoITDesc->bAssocTerminal = 0x00U;
+  pVideoITDesc->iTerminal =  0x00U;
+  *Sze += (uint32_t)sizeof(USBD_VIDEOInputTerminalDescTypeDef);
+
+  /* Append Output Terminal Descriptor to Configuration descriptor */
+  pVideoOTDesc = ((USBD_VIDEOOutputTerminalDescTypeDef *)(pConf + *Sze));
+  pVideoOTDesc->bLength = (uint8_t)sizeof(USBD_VIDEOOutputTerminalDescTypeDef);
+  pVideoOTDesc->bDescriptorType = UX_DEVICE_CLASS_VIDEO_CS_INTERFACE;
+  pVideoOTDesc->bDescriptorSubtype = 0x03U;
+  pVideoOTDesc->bTerminalID = 0x02U;
+  pVideoOTDesc->wTerminalType = 0x0101U;
+  pVideoOTDesc->bAssocTerminal = 0x00U;
+  pVideoOTDesc->bSourceID = 0x01U;
+  pVideoOTDesc->iTerminal = 0x00U;
+  *Sze += (uint32_t)sizeof(USBD_VIDEOOutputTerminalDescTypeDef);
+
+  /* Standard VS (Video Streaming) Interface Descriptor */
+  /* Interface 1, Alternate Setting 0 = Zero Bandwidth*/
+  __USBD_FRAMEWORK_SET_IF(pdev->tclasslist[pdev->classId].Ifs[1], 0U, 0U,
+                          UX_DEVICE_CLASS_VIDEO_CC_VIDEO,
+                          UX_DEVICE_CLASS_VIDEO_SC_STREAMING,
+                          UX_DEVICE_CLASS_VIDEO_PC_PROTOCOL_UNDEFINED,
+                          0U);
+
+  /* Append Class-specific VS Header Descriptor (Input) to Configuration descriptor */
+  pVideoSHeaderDesc = ((USBD_VIDEOVSHeaderDescTypeDef *)(pConf + *Sze));
+  pVideoSHeaderDesc->bLength = (uint8_t)sizeof(USBD_VIDEOVSHeaderDescTypeDef);
+  pVideoSHeaderDesc->bDescriptorType = UX_DEVICE_CLASS_VIDEO_CS_INTERFACE;
+  pVideoSHeaderDesc->bDescriptorSubtype = UX_DEVICE_CLASS_VIDEO_VC_HEADER;
+  pVideoSHeaderDesc->bNumFormats = 0x01U;
+  pVideoSHeaderDesc->wTotalLength = VC_HEADER_SIZE;
+  pVideoSHeaderDesc->bEndpointAddress = USBD_VIDEO_EPIN_ADDR;
+  pVideoSHeaderDesc->bmInfo = 0x00U;
+  pVideoSHeaderDesc->bTerminalLink = 0x02U;
+  pVideoSHeaderDesc->bStillCaptureMethod = 0x00U;
+  pVideoSHeaderDesc->bTriggerSupport = 0x00U;
+  pVideoSHeaderDesc->bTriggerUsage = 0x00U;
+  pVideoSHeaderDesc->bControlSize = 0x01U;
+  pVideoSHeaderDesc->bmaControls = 0x00U;
+  *Sze += (uint32_t)sizeof(USBD_VIDEOVSHeaderDescTypeDef);
+
+  /* Append Payload Format Descriptor to Configuration descriptor */
+  pVideoPayForDesc = ((USBD_VIDEOPayloadFormatDescTypeDef *)(pConf + *Sze));
+  pVideoPayForDesc->bLength = (uint8_t)sizeof(USBD_VIDEOPayloadFormatDescTypeDef);
+  pVideoPayForDesc->bDescriptorType = UX_DEVICE_CLASS_VIDEO_CS_INTERFACE;
+[#if vs_format_subtype == "0"]
+  pVideoPayForDesc->bDescriptorSubType = UX_DEVICE_CLASS_VIDEO_VS_FORMAT_MJPEG;
+[#else]
+  pVideoPayForDesc->bDescriptorSubType = UX_DEVICE_CLASS_VIDEO_VS_FORMAT_UNCOMPRESSED;
+[/#if]
+  pVideoPayForDesc->bFormatIndex = 0x01U;
+  pVideoPayForDesc->bNumFrameDescriptors = 0x01U;
+[#if vs_format_subtype == "1"]
+
+  ux_utility_memory_copy(pVideoPayForDesc->pGiudFormat, usbd_uvc_guid, 16);
+
+  pVideoPayForDesc->bBitsPerPixel = UVC_BITS_PER_PIXEL;
+[#else]
+  pVideoPayForDesc->bmFlags = 0x01U;
+[/#if]
+  pVideoPayForDesc->bDefaultFrameIndex = 0x01U;
+  pVideoPayForDesc->bAspectRatioX = 0x00U;
+  pVideoPayForDesc->bAspectRatioY = 0x00U;
+  pVideoPayForDesc->bmInterlaceFlag = 0x00U;
+  pVideoPayForDesc->bCopyProtect = 0x00U;
+  *Sze += (uint32_t)sizeof(USBD_VIDEOPayloadFormatDescTypeDef);
+
+  /* Append Class-specific VS (Video Streaming) Frame Descriptor to
+     Configuration descriptor */
+  pVideoFrameDesc = ((USBD_VIDEOFrameDescTypeDef *)(pConf + *Sze));
+  pVideoFrameDesc->bLength = (uint8_t)sizeof(USBD_VIDEOFrameDescTypeDef);
+  pVideoFrameDesc->bDescriptorType = UX_DEVICE_CLASS_VIDEO_CS_INTERFACE;
+[#if vs_format_subtype == "0"]
+  pVideoFrameDesc->bDescriptorSubType = UX_DEVICE_CLASS_VIDEO_VS_FRAME_MJPEG;
+[#else]
+  pVideoFrameDesc->bDescriptorSubType = UX_DEVICE_CLASS_VIDEO_VS_FRAME_UNCOMPRESSED;
+[/#if]
+
+  pVideoFrameDesc->bFrameIndex = 0x01U;
+[#if vs_format_subtype == "1"]
+  pVideoFrameDesc->bmCapabilities = 0x00U;
+[#else]
+  pVideoFrameDesc->bmCapabilities = 0x02U;
+[/#if]
+  pVideoFrameDesc->wWidth = UVC_FRAME_WIDTH;
+  pVideoFrameDesc->wHeight = UVC_FRAME_HEIGHT;
+
+  if (pdev->Speed == (uint8_t)USBD_HIGH_SPEED)
+  {
+    pVideoFrameDesc->dwMinBitRate = UVC_MIN_BIT_RATE(UVC_CAM_FPS_HS);
+    pVideoFrameDesc->dwMaxBitRate = UVC_MAX_BIT_RATE(UVC_CAM_FPS_HS);
+    pVideoFrameDesc->dwDefaultFrameInterval = UVC_INTERVAL(UVC_CAM_FPS_HS);
+    pVideoFrameDesc->dwFrameInterval = UVC_INTERVAL(UVC_CAM_FPS_HS);
+  }
+  else
+  {
+    pVideoFrameDesc->dwMinBitRate = UVC_MIN_BIT_RATE(UVC_CAM_FPS_FS);
+    pVideoFrameDesc->dwMaxBitRate = UVC_MAX_BIT_RATE(UVC_CAM_FPS_FS);
+    pVideoFrameDesc->dwDefaultFrameInterval = UVC_INTERVAL(UVC_CAM_FPS_FS);
+    pVideoFrameDesc->dwFrameInterval = UVC_INTERVAL(UVC_CAM_FPS_FS);
+  }
+
+  pVideoFrameDesc->dwMaxVideoFrameBufferSize = UVC_MAX_FRAME_SIZE;
+  pVideoFrameDesc->bFrameIntervalType = 0x01U;
+
+  *Sze += (uint32_t)sizeof(USBD_VIDEOFrameDescTypeDef);
+
+[#if vs_format_subtype == "1"]
+  /* Append Color Matching Descriptor to Configuration descriptor */
+  pColMaDesc = ((USBD_ColorMatchingDescTypeDef *)(pConf + *Sze));
+  pColMaDesc->bLength = (uint8_t)sizeof(USBD_ColorMatchingDescTypeDef);
+  pColMaDesc->bDescriptorType = 0x24U;
+  pColMaDesc->bDescriptorSubType = 0x0DU;
+  pColMaDesc->bColorPrimarie = UVC_COLOR_PRIMARIE;
+  pColMaDesc->bTransferCharacteristics = UVC_TFR_CHARACTERISTICS;
+  pColMaDesc->bMatrixCoefficients = UVC_MATRIX_COEFFICIENTS;
+  *Sze += (uint32_t)sizeof(USBD_ColorMatchingDescTypeDef);
+[/#if]
+
+  /* USB Standard VS Interface  Descriptor - data transfer mode */
+  /* Interface 1, Alternate Setting 1*/
+  __USBD_FRAMEWORK_SET_IF(pdev->tclasslist[pdev->classId].Ifs[1], 1U, 1U,
+                          UX_DEVICE_CLASS_VIDEO_CC_VIDEO,
+                          UX_DEVICE_CLASS_VIDEO_SC_STREAMING,
+                          UX_DEVICE_CLASS_VIDEO_PC_PROTOCOL_UNDEFINED,
+                          0U);
+
+    /* Append Endpoint descriptor to Configuration descriptor */
+  __USBD_FRAMEWORK_SET_EP((pdev->tclasslist[pdev->classId].Eps[0].add),
+                          (USBD_EP_TYPE_ISOC|USBD_EP_ATTR_ISOC_ASYNC),
+                          (uint16_t)(pdev->tclasslist[pdev->classId].Eps[0].size),
+                          USBD_VIDEO_EPIN_HS_BINTERVAL,
+                          USBD_VIDEO_EPIN_FS_BINTERVAL);
+
+  /* Update Config Descriptor and IAD descriptor */
+  ((USBD_ConfigDescTypedef *)pConf)->bNumInterfaces += 2U;
+  ((USBD_ConfigDescTypedef *)pConf)->wDescriptorLength = *Sze;
+}
+#endif /* USBD_VIDEO_CLASS_ACTIVATED == 1 */
+[/#if]
+[/#list]
+[/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+[#if SWIP.variables??]
+[#list SWIP.variables as define]
+	[#assign def_value = define.value]
+	[#assign def_name = define.name]
 [#if def_name?contains("UX_DEVICE_PIMA") && def_value == "1"]
 #if USBD_PIMA_MTP_CLASS_ACTIVATED == 1
 /**
@@ -2260,11 +2691,140 @@ static void  USBD_FrameWork_MTPDesc(USBD_DevClassHandleTypeDef *pdev,
 }
 #endif /* USBD_PIMA_MTP_CLASS_ACTIVATED == 1 */
 [/#if]
+[/#list]
+[/#if]
+[/#list]
+[/#if]
+[#list SWIPdatas as SWIP]
+[#if SWIP.variables??]
+[#list SWIP.variables as define]
+	[#assign def_value = define.value]
+	[#assign def_name = define.name]
+[#if def_name?contains("UX_DEVICE_CCID") && def_value == "1"]
+#if USBD_CCID_CLASS_ACTIVATED == 1U
+/**
+  * @brief  USBD_FrameWork_CCID_Desc
+  *         Configure and Append the CCID Descriptor
+  * @param  pdev: device instance
+  * @param  pConf: Configuration descriptor pointer
+  * @param  Sze: pointer to the current configuration descriptor size
+  * @retval None
+  */
+static void  USBD_FrameWork_CCID_Desc(USBD_DevClassHandleTypeDef *pdev,
+                                      uint32_t pConf, uint32_t *Sze)
+{
+  static USBD_IfDescTypedef       *pIfDesc;
+  static USBD_EpDescTypedef       *pEpDesc;
+  static USBD_CCIDDescTypedef     *pCCIDDesc;
 
-[/#list]
+  /* Append HID Interface descriptor to Configuration descriptor */
+  __USBD_FRAMEWORK_SET_IF(pdev->tclasslist[pdev->classId].Ifs[0], 0U, \
+                          (uint8_t)(pdev->tclasslist[pdev->classId].NumEps),
+                          0x0BU, 0U, 0U, 0U);
+
+  /* Append CCID Functional descriptor to Configuration descriptor */
+  pCCIDDesc = ((USBD_CCIDDescTypedef *)(pConf + *Sze));
+  pCCIDDesc->bLength = 0x36U;
+  pCCIDDesc->bDescriptorType = 0x21U;
+  pCCIDDesc->bcdCCID = 0x0110U;
+  pCCIDDesc->bMaxSlotIndex = USBD_CCID_MAX_SLOT_INDEX;
+  pCCIDDesc->bVoltageSupport = USBD_CCID_VOLTAGE_SUPPLY;
+  pCCIDDesc->dwProtocols = USBD_CCID_PROTOCOL;
+  pCCIDDesc->dwDefaultClock = USBD_CCID_DEFAULT_CLOCK_FREQ;
+  pCCIDDesc->dwMaximumClock = USBD_CCID_MAX_CLOCK_FREQ;
+  pCCIDDesc->bNumClockSupported = USBD_CCID_N_CLOCKS;
+  pCCIDDesc->dwDataRate = USBD_CCID_DEFAULT_DATA_RATE;
+  pCCIDDesc->dwMaxDataRate = USBD_CCID_MAX_DATA_RATE;
+  pCCIDDesc->bNumDataRatesSupported = USBD_CCID_N_DATA_RATES;
+  pCCIDDesc->dwMaxIFSD = 0U;
+  pCCIDDesc->dwSynchProtocols = 0x00000007;
+  pCCIDDesc->dwMechanical = 0U;
+  pCCIDDesc->dwFeatures = 0x000407B8;
+  pCCIDDesc->dwMaxCCIDMessageLength = USBD_CCID_MAX_BLOCK_SIZE_HEADER;
+  pCCIDDesc->bClassGetResponse = 0xFF;
+  pCCIDDesc->bClassEnvelope = 0xFF;
+  pCCIDDesc->wLcdLayout = 0U;
+  pCCIDDesc->bPINSupport = 0U;
+  pCCIDDesc->bMaxCCIDBusySlots = USBD_CCID_MAX_BUSY_SLOTS;
+
+  *Sze += (uint32_t)sizeof(USBD_CCIDDescTypedef);
+
+  /* Append Endpoint descriptor to Configuration descriptor */
+  __USBD_FRAMEWORK_SET_EP((pdev->tclasslist[pdev->classId].Eps[0].add),
+                          USBD_EP_TYPE_BULK,  \
+                          (uint16_t)pdev->tclasslist[pdev->classId].Eps[0].size,
+                          (0x00U), (0x00U));
+
+  /* Append Endpoint descriptor to Configuration descriptor */
+  __USBD_FRAMEWORK_SET_EP((pdev->tclasslist[pdev->classId].Eps[1].add),
+                          USBD_EP_TYPE_BULK,  \
+                          (uint16_t)pdev->tclasslist[pdev->classId].Eps[1].size,
+                          (0x00U), (0x00U));
+
+  /* Append Endpoint descriptor to Configuration descriptor */
+  __USBD_FRAMEWORK_SET_EP(pdev->tclasslist[pdev->classId].Eps[2].add,
+                          USBD_EP_TYPE_INTR, \
+                          (uint16_t)pdev->tclasslist[pdev->classId].Eps[2].size,
+                          USBD_CCID_EPINCMD_HS_BINTERVAL, USBD_CCID_EPINCMD_FS_BINTERVAL);
+
+  /* Update Config Descriptor and IAD descriptor */
+  ((USBD_ConfigDescTypedef *)pConf)->bNumInterfaces += 1U;
+  ((USBD_ConfigDescTypedef *)pConf)->wDescriptorLength  = *Sze;
+
+}
+#endif /* USBD_CCID_CLASS_ACTIVATED */
 [/#if]
 [/#list]
 [/#if]
+[/#list]
+[#list SWIPdatas as SWIP]
+[#if SWIP.variables??]
+[#list SWIP.variables as define]
+	[#assign def_value = define.value]
+	[#assign def_name = define.name]
+[#if def_name?contains("UX_DEVICE_PRINTER") && def_value == "1"]
+#if USBD_PRINTER_CLASS_ACTIVATED == 1U
+/**
+  * @brief  USBD_FrameWork_PRINTER_Desc
+  *         Configure and Append the CCID Descriptor
+  * @param  pdev: device instance
+  * @param  pConf: Configuration descriptor pointer
+  * @param  Sze: pointer to the current configuration descriptor size
+  * @retval None
+  */
+static void  USBD_FrameWork_PRINTER_Desc(USBD_DevClassHandleTypeDef *pdev,
+                                     uint32_t pConf, uint32_t *Sze)
+{
+  static USBD_IfDescTypedef       *pIfDesc;
+  static USBD_EpDescTypedef       *pEpDesc;
+
+  /* Append Printer Interface descriptor to Configuration descriptor */
+  __USBD_FRAMEWORK_SET_IF(pdev->tclasslist[pdev->classId].Ifs[0], 0U, \
+                          (uint8_t)(pdev->tclasslist[pdev->classId].NumEps),
+                          0x07U, 0x01U, USBD_PRNT_IF_PROTOCOL, 0U);
+
+    /* Append Endpoint descriptor to Configuration descriptor */
+  __USBD_FRAMEWORK_SET_EP((pdev->tclasslist[pdev->classId].Eps[0].add),
+                          USBD_EP_TYPE_BULK,  \
+                          (uint16_t)pdev->tclasslist[pdev->classId].Eps[0].size,
+                          (0x00U), (0x00U));
+
+  /* Append Endpoint descriptor to Configuration descriptor */
+  __USBD_FRAMEWORK_SET_EP((pdev->tclasslist[pdev->classId].Eps[1].add),
+                          USBD_EP_TYPE_BULK,  \
+                          (uint16_t)pdev->tclasslist[pdev->classId].Eps[1].size,
+                          (0x00U), (0x00U));
+
+  /* Update Config Descriptor and IAD descriptor */
+  ((USBD_ConfigDescTypedef *)pConf)->bNumInterfaces += 1U;
+  ((USBD_ConfigDescTypedef *)pConf)->wDescriptorLength  = *Sze;
+
+}
+#endif /* USBD_PRINTER_CLASS_ACTIVATED */
+[/#if]
+[/#list]
+[/#if]
+[/#list]
 
 /* USER CODE BEGIN 1 */
 

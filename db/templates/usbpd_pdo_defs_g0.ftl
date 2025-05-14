@@ -154,18 +154,15 @@
 /* USER CODE END Define */
 
 /* Exported typedef ----------------------------------------------------------*/
-
 /* USER CODE BEGIN typedef */
-
 /**
   * @brief  USBPD Port PDO Structure definition
   *
   */
-
+[@common.optinclude name=mxTmpFolder+"/usbpd_pdo_defs_h_Typedef.tmp"/]
 /* USER CODE END typedef */
 
 /* Exported define -----------------------------------------------------------*/
-
 /* USER CODE BEGIN Exported_Define */
 
 #define USBPD_CORE_PDO_SRC_FIXED_MAX_CURRENT 3
@@ -186,9 +183,8 @@
 /* USER CODE END macro */
 
 /* Exported variables --------------------------------------------------------*/
-
 /* USER CODE BEGIN variables */
-
+[@common.optinclude name=mxTmpFolder+"/usbpd_pdo_defs_h_Variables.tmp"/]
 /* USER CODE END variables */
 
 #ifndef __USBPD_PWR_IF_C

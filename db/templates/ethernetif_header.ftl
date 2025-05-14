@@ -46,9 +46,13 @@
 #include "lwip/err.h"
 #include "lwip/netif.h"
 [#if use_rtos == 1][#-- rtos used --]
+[#if series != "stm32h7rs"]
 #include "cmsis_os.h"
+[#else]
+#include "cmsis_os2.h"
+[/#if]
 
-[#if (series != "stm32h7") && (series != "stm32f7") && (series != "stm32f4")][#-- series NOT stm32h7/f7/f4 --]
+[#if (series != "stm32h7") && (series != "stm32f7") && (series != "stm32f4") && (series != "stm32h7rs")][#-- series NOT stm32h7/f7/f4/h7rs --]
 /* Exported types ------------------------------------------------------------*/
 /* Structure that include link thread parameters */
 struct link_str {
@@ -73,7 +77,7 @@ void ethernetif_input(void* argument);
 [#else][#-- rtos NOT used --]
 void ethernetif_input(struct netif *netif);
 [/#if][#-- endif use_rtos --]
-[#if (series != "stm32h7") && (series != "stm32f7") && (series != "stm32f4")][#-- series NOT stm32h7/f7/f4 --]
+[#if (series != "stm32h7") && (series != "stm32f7") && (series != "stm32f4") && (series != "stm32h7rs")][#-- series NOT stm32h7/f7/f4/h7rs --]
 [#if use_rtos == 1][#-- rtos used --]
 [#if cmsis_version = "v1"][#-- cmsis_version v1 --]
 void ethernetif_set_link(void const *argument);
@@ -84,7 +88,7 @@ void ethernetif_set_link(void* argument);
 void ethernetif_set_link(struct netif *netif);
 [/#if][#-- endif use_rtos --]
 [/#if][#-- endif series --]
-[#if (series == "stm32h7") || (series == "stm32f7") || (series == "stm32f4")][#-- series stm32h7/f7/f4 --]
+[#if (series == "stm32h7") || (series == "stm32f7") || (series == "stm32f4") || (series == "stm32h7rs")][#-- series stm32h7/f7/f4/h7rs --]
 [#if use_rtos == 1][#-- rtos used --]
 [#if cmsis_version = "v1"][#-- cmsis_version v1 --]
 void ethernet_link_thread(void const * argument);
@@ -94,12 +98,14 @@ void ethernet_link_thread(void* argument );
 [#else][#-- rtos NOT used --]
 void ethernet_link_check_state(struct netif *netif);
 [/#if][#-- endif with_rtos --]
-[#else][#-- series NOT stm32h7/f7/f4 --]
+[#else][#-- series NOT stm32h7/f7/f4/h7rs --]
 void ethernetif_update_config(struct netif *netif);
 void ethernetif_notify_conn_changed(struct netif *netif);
 [/#if][#-- endif series --]
 
+[#if series != "stm32h7rs"]
 void Error_Handler(void);
+[/#if]
 u32_t sys_jiffies(void);
 u32_t sys_now(void);
 

@@ -1161,6 +1161,11 @@ void Custom_STM_App_Notification(Custom_STM_App_Notification_evt_t *pNotificatio
         [/#list]
     [/#list]
 [/#if]
+    case CUSTOM_STM_NOTIFICATION_COMPLETE_EVT:
+      /* USER CODE BEGIN CUSTOM_STM_NOTIFICATION_COMPLETE_EVT */
+
+      /* USER CODE END CUSTOM_STM_NOTIFICATION_COMPLETE_EVT */
+      break;
 
     default:
       /* USER CODE BEGIN CUSTOM_STM_App_Notification_default */

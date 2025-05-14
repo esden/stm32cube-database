@@ -18,13 +18,22 @@
 extern "C" {
 #endif
 
+[#assign AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE_VAL = "1" ]
 [#assign USBX_DEVICE_CLASS_NB = 0]
+        [#assign UX_STANDALONE_ENABLED_Value = ""]
+        [#assign REG_UX_DEVICE_CCID_value = ""]
+        [#assign REG_UX_DEVICE_PRINTER_value = ""]
+        [#assign REG_UX_DEVICE_VIDEO_value = ""]
+        [#assign REG_UX_DEVICE_THREAD_value = ""]
 [#compress]
 [#list SWIPdatas as SWIP]
 [#if SWIP.defines??]
   [#list SWIP.defines as definition]
     [#assign value = definition.value]
     [#assign name = definition.name]
+    [#if name == "AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE"]
+      [#assign AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE_VAL = value]
+    [/#if]
     [#if name == "USBX_DEVICE_SYS_SIZE"]
       [#assign USBX_DEVICE_SYS_SIZE_value = value]
     [/#if]
@@ -70,9 +79,32 @@ extern "C" {
     [#if name == "REG_UX_DEVICE_RNDIS"]
       [#assign REG_UX_DEVICE_RNDIS_value = value]
     [/#if]
+    [#if name == "REG_UX_DEVICE_VIDEO"]
+      [#assign REG_UX_DEVICE_VIDEO_value = value]
+    [/#if]
+    [#if name == "REG_UX_DEVICE_CCID"]
+      [#assign REG_UX_DEVICE_CCID_value = value]
+    [/#if]
+    [#if name == "REG_UX_DEVICE_PRINTER"]
+      [#assign REG_UX_DEVICE_PRINTER_value = value]
+    [/#if]
+    [#if name == "REG_UX_DEVICE_CORE"]
+      [#assign REG_UX_DEVICE_CORE_value = value]
+    [/#if]
+    [#if name == "REG_UX_DEVICE_THREAD"]
+      [#assign REG_UX_DEVICE_THREAD_value = value]
+    [/#if]
+    [#if name == "UX_DEVICE_APP_MEM_POOL_SIZE_STANDALONE"]
+      [#assign UX_DEVICE_APP_MEM_POOL_SIZE_STANDALONE_value = value]
+    [/#if]
     [#if name == "REG_USBX_DEVICE_CON_CK"]
       [#assign REG_USBX_DEVICE_CON_CK_value = value]
     [/#if]
+    [#if name == "UX_STANDALONE"]
+      [#assign UX_STANDALONE_ENABLED_Value = value]
+    [/#if]
+
+
    [/#list]
 [/#if]
 [/#list]
@@ -119,11 +151,25 @@ extern "C" {
 [#assign USBX_DEVICE_CLASS_NB = USBX_DEVICE_CLASS_NB+1]
 #include "ux_device_rndis.h"
 [/#if]
+[#if REG_UX_DEVICE_VIDEO_value == "1"]
+[#assign USBX_DEVICE_CLASS_NB = USBX_DEVICE_CLASS_NB+1]
+#include "ux_device_video.h"
+[/#if]
+[#if REG_UX_DEVICE_CCID_value == "1"]
+[#assign USBX_DEVICE_CLASS_NB = USBX_DEVICE_CLASS_NB+1]
+#include "ux_device_ccid.h"
+[/#if]
+[#if REG_UX_DEVICE_PRINTER_value == "1"]
+[#assign USBX_DEVICE_CLASS_NB = USBX_DEVICE_CLASS_NB+1]
+#include "ux_device_printer.h"
+[/#if]
 [#if USBX_DEVICE_CLASS_NB != 0 ]
 #include "ux_device_descriptors.h"
 [/#if]
 [/#if]
+[#if UX_STANDALONE_ENABLED_Value == "0"]
 #include "app_azure_rtos_config.h"
+[/#if]
 #include "ux_dcd_stm32.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -137,10 +183,17 @@ extern "C" {
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
+[#if UX_STANDALONE_ENABLED_Value == "1" && AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE_VAL  != "0" ]
+#define UX_DEVICE_APP_MEM_POOL_SIZE         ${UX_DEVICE_APP_MEM_POOL_SIZE_STANDALONE_value}
+[/#if]
+[#if REG_UX_DEVICE_CORE_value == "true"]
 #define USBX_DEVICE_MEMORY_STACK_SIZE       ${USBX_DEVICE_SYS_SIZE_value}
+[/#if]
+[#if REG_UX_DEVICE_THREAD_value == "1" && UX_STANDALONE_ENABLED_Value == "0"]
 
 #define UX_DEVICE_APP_THREAD_STACK_SIZE   ${USBX_DEVICE_APP_THREAD_Size_value}
 #define UX_DEVICE_APP_THREAD_PRIO         ${USBX_DEVICE_APP_THREAD_PRIO_value}
+[/#if]
 
 /* USER CODE BEGIN EC */
 
@@ -152,7 +205,11 @@ extern "C" {
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
+[#if UX_STANDALONE_ENABLED_Value == "1"]
+UINT MX_USBX_Device_Init(VOID);
+[#else]
 UINT MX_USBX_Device_Init(VOID *memory_ptr);
+[/#if]
 
 /* USER CODE BEGIN EFP */
 
@@ -162,6 +219,8 @@ UINT MX_USBX_Device_Init(VOID *memory_ptr);
 /* USER CODE BEGIN PD */
 
 /* USER CODE END PD */
+
+[#if REG_UX_DEVICE_THREAD_value == "1" && UX_STANDALONE_ENABLED_Value == "0"]
 #ifndef UX_DEVICE_APP_THREAD_NAME
 #define UX_DEVICE_APP_THREAD_NAME  "USBX Device App Main Thread"
 #endif
@@ -178,6 +237,7 @@ UINT MX_USBX_Device_Init(VOID *memory_ptr);
 #define UX_DEVICE_APP_THREAD_START_OPTION  TX_AUTO_START
 #endif
 
+[/#if]
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */

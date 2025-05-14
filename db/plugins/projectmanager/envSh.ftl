@@ -18,21 +18,30 @@ VAR1=$OSTYPE
 VAR2="Windows_NT"
 user="" 
 if [ "$VAR1" = "$VAR2" ]; then
-    stm32programmercli="C:\Program Files\STMicroelectronics\STM32Cube\STM32CubeProgrammer\bin\STM32_Programmer_CLI.exe"
+    stm32programmercli="${STM32CubeProgrammerPath}"
     stm32tpccli="${tpcPath}"
 else	
     PATH="/home/${user}/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin":$PATH
     PATH="${tpcPath}":$PATH
-    stm32programmercli="/home/${user}/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/STM32_Programmer_CLI"
+    stm32programmercli="${STM32CubeProgrammerPath}"
     stm32tpccli="${tpcPath}"
 fi
 # ==============================================================================
 #               !!!! DOT NOT EDIT --- UPDATED AUTOMATICALLY !!!!
 # ==============================================================================
 PROJECT_GENERATED_BY_CUBEMX=true
+[#if isAppliOnly??]
+cube_fw_path=${CubeFwPath}
+[#else]
 cube_fw_path="${CubeFwPath}"
+[/#if]
 
-
+[#if isAppliOnly??]
+stm32programmercli_path=${STM32CubeProgrammerLocation}
+stm32ExtLoaderFlash="-elbl $stm32programmercli_path/ExternalLoader/MX66UW1G45G_STM32H7S78-DK_XSPIM1-SFIx.stldr"
+stm32ExtLoaderFlashOpen="-el $stm32programmercli_path/ExternalLoader/MX66UW1G45G_STM32H7S78-DK_XSPIM1.stldr"
+com_port=COM7
+[/#if] 
 [#-- STiRoT --]
 [#if BootPathType?? && BootPathType=="ST_IROT"]
 # ==============================================================================
@@ -43,6 +52,9 @@ stirot_appli=${appli_assembly_sign}
 stirot_appli_bin=${appli_secure}
 [#elseif appli_secure??] 
 stirot_appli=${appli_secure}
+[#elseif isAppliOnly??]
+set stirot_appli=${appli}
+stirot_iloader_boot_path_project=${CubeFwPath}\Projects\STM32H7S78-DK\Applications\ROT\STiROT_iLoader
 [/#if]
 isFullSecure=${isFullSecure}
 stirot_boot_path_project=$projectdir"/../"
@@ -75,6 +87,13 @@ oemirot_appli_secure=${appli_secure}
 [/#if]
 [#if appli_non_secure??] 
 oemirot_appli_non_secure=${appli_non_secure}
+[/#if]
+[#if isAppliOnly??]
+oemirot_appli=${appli}
+com_port=COM7
+	[#if  BootPathType=="ST_IROT_UROT"]
+stirot_iloader_boot_path_project=${CubeFwPath}\Projects\STM32H7S78-DK\Applications\ROT\STiROT_iLoader
+	[/#if]
 [/#if]
 [#if appli_assembly??]
 	[#if appli_assembly_sign??]

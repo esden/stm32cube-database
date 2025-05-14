@@ -37,31 +37,12 @@
   
   [#if VCP == "true"]
   /* -- Sample board code to send message over COM1 port ---- */
-  printf("Welcome to STM32 world !\n");
+  printf("Welcome to STM32 world !\n\r");
   [/#if]
 
   [#if LED1?? && LED1 == "true"]
-  /* -- Sample board code to switch on, toggle and off leds ---- */
-  /* Switch on leds */
+  /* -- Sample board code to switch on leds ---- */
   BSP_LED_On(LED_GREEN);
-
-  /* Wait for 250ms */
-  HAL_Delay(250);
-
-  /* Toggle leds (on to off) */
-  BSP_LED_Toggle(LED_GREEN);
-
-  /* Wait for 250ms */
-  HAL_Delay(250);
-
-  /* Toggle leds (off to on) */
-  BSP_LED_Toggle(LED_GREEN);
-
-  /* Wait for 250ms */
-  HAL_Delay(250);
-
-  /* Switch off leds */
-  BSP_LED_Off(LED_GREEN);
   [/#if]
   
   /* USER CODE END BSP */

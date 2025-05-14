@@ -163,7 +163,7 @@
 		<PossibleValue Value="DISABLE" Comment="Disabled"/>	
 	</RefParameter>	
 	<RefParameter Comment="Use dedicated end point 1 interrupt" DefaultValue="DISABLE" Name="use_dedicated_ep1" Type="List" Group="">	
-		<Condition Expression="DIE470|DIE482" Diagnostic=""/>
+		<Condition Expression="DIE470|DIE482|DIE485" Diagnostic=""/>
 		<PossibleValue Value="ENABLE" Comment="Enabled" Semaphore="$IpInstance_USE_DEDICATED_EP1_ON"/>
 		<PossibleValue Value="DISABLE" Comment="Disabled"/>		
 	</RefParameter>
@@ -255,8 +255,8 @@
 		<Parameter Name="Sof_enable"/>
 	</RefMode>
         
-        <RefMode Name="OTG/Dual_Role_Device" HalMode="USB">
-            <Condition Expression="STM32U5" Diagnostic=""/>
+	<RefMode Name="OTG/Dual_Role_Device" HalMode="USB">
+		<Condition Expression="STM32U5" Diagnostic=""/>
 	</RefMode>
 	
 	<!-- USB Full Speed in Device mode with SOF -->
@@ -280,18 +280,34 @@
 					<Semaphore>OTG_DUAL_ROLE_DEVICE</Semaphore>	
 					<Semaphore>SEMAOoUSBOoOTGOoFSOoDRDOoFOROoUSBX</Semaphore>
 				</Mode>
-				<Mode Name="Host_Only">					
+				<Mode Name="Host_Only" RemoveCondition="DIE485">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="DM"/>
 						<Signal Name="DP"/>						
 					</SignalLogicalOp>
 					<Semaphore>MW_USB_OTG_FS_MW_HOST</Semaphore>	
 					<Semaphore>SEMAOoUSBOoOTGOoFSOoHOSTOoFOROoUSBX</Semaphore>	
-				</Mode>			
-				<Mode Name="Device_Only">
+				</Mode>
+				<Mode Name="Host_Only" RemoveCondition="!DIE485">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="DM" IOMode="System"/>
+						<Signal Name="DP" IOMode="System"/>
+					</SignalLogicalOp>
+					<Semaphore>MW_USB_OTG_FS_MW_HOST</Semaphore>
+					<Semaphore>SEMAOoUSBOoOTGOoFSOoHOSTOoFOROoUSBX</Semaphore>
+				</Mode>
+				<Mode Name="Device_Only" RemoveCondition="DIE485">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="DM"/>
 						<Signal Name="DP"/>						
+					</SignalLogicalOp>
+					<Semaphore>MW_USB_OTG_FS_MW_DEVICE</Semaphore>
+					<Semaphore>SEMAOoUSBOoOTGOoFSOoDEVICEOoFOROoUSBX</Semaphore>
+				</Mode>
+				<Mode Name="Device_Only" RemoveCondition="!DIE485">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="DM" IOMode="System"/>
+						<Signal Name="DP" IOMode="System"/>
 					</SignalLogicalOp>
 					<Semaphore>MW_USB_OTG_FS_MW_DEVICE</Semaphore>
 					<Semaphore>SEMAOoUSBOoOTGOoFSOoDEVICEOoFOROoUSBX</Semaphore>

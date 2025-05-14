@@ -68,7 +68,7 @@
 
     <!-- MemoryType -->
     <RefParameter Comment="Memory Type" DefaultValue="HAL_XSPI_MEMTYPE_MICRON" Name="MemoryType" Type="list" Group="Generic">
-        <Condition Diagnostic="" Expression="!(Sem_$IpInstance_HyperBus)"/>
+        <Condition Diagnostic="" Expression="!(Sem_$IpInstance_HyperBus) &amp; !(Sem_$IpInstance_HyperBus16)"/>
         <PossibleValue Comment="Micron" Value="HAL_XSPI_MEMTYPE_MICRON"/>
         <PossibleValue Comment="Macronix" Value="HAL_XSPI_MEMTYPE_MACRONIX"/>
         <PossibleValue Comment="Macronix RAM" Value="HAL_XSPI_MEMTYPE_MACRONIX_RAM"/>
@@ -76,7 +76,7 @@
         <PossibleValue Comment="AP Memory 16Bits" Value="HAL_XSPI_MEMTYPE_APMEM_16BITS"/>
     </RefParameter>
     <RefParameter Comment="Memory Type" DefaultValue="HAL_XSPI_MEMTYPE_HYPERBUS" Name="MemoryType" Type="list" Group="Generic">
-        <Condition Diagnostic="" Expression="(Sem_$IpInstance_HyperBus)"/>
+        <Condition Diagnostic="" Expression="(Sem_$IpInstance_HyperBus|Sem_$IpInstance_HyperBus16)"/>
         <PossibleValue Comment="HyperBus(TM)" Value="HAL_XSPI_MEMTYPE_HYPERBUS"/>
     </RefParameter>
 
@@ -208,21 +208,21 @@
     <!-- HyperBus(TM) HAL_OSPI_HyperbusCfg() -->
     <!-- RWRecoveryTimeCycle -->
     <RefParameter Comment="RW Recovery Time" DefaultValue="0"  Max="255" Min="0" Name="RWRecoveryTimeCycle" Type="integer"  Group="HyperBus(TM)">
-        <Condition Diagnostic="" Expression="(Sem_$IpInstance_HyperBus) &amp; (MemoryType = HAL_XSPI_MEMTYPE_HYPERBUS)"/>
+        <Condition Diagnostic="" Expression="(Sem_$IpInstance_HyperBus|Sem_$IpInstance_HyperBus16) &amp; (MemoryType = HAL_XSPI_MEMTYPE_HYPERBUS)"/>
     </RefParameter>
     <RefParameter Comment="RW Recovery Time" DefaultValue="null"  Max="255" Min="0" Name="RWRecoveryTimeCycle" Type="integer"  Group="HyperBus(TM)" Visible="false">
     </RefParameter>
         
     <!-- AccessTimeCycle -->
     <RefParameter Comment="Access Time" DefaultValue="0"  Max="255" Min="0" Name="AccessTimeCycle" Type="integer"  Group="HyperBus(TM)">
-        <Condition Diagnostic="" Expression="(Sem_$IpInstance_HyperBus) &amp; (MemoryType = HAL_XSPI_MEMTYPE_HYPERBUS)"/>
+        <Condition Diagnostic="" Expression="(Sem_$IpInstance_HyperBus|Sem_$IpInstance_HyperBus16) &amp; (MemoryType = HAL_XSPI_MEMTYPE_HYPERBUS)"/>
     </RefParameter>
     <RefParameter Comment="Access Time" DefaultValue="null"  Max="255" Min="0" Name="AccessTimeCycle" Type="integer"  Group="HyperBus(TM)" Visible="false">
     </RefParameter>
 
     <!-- WriteZeroLatency -->
     <RefParameter Comment="Write Access Latency" DefaultValue="HAL_XSPI_NO_LATENCY_ON_WRITE" Name="WriteZeroLatency" Type="list" Group="HyperBus(TM)">
-        <Condition Diagnostic="" Expression="(Sem_$IpInstance_HyperBus) &amp; (MemoryType = HAL_XSPI_MEMTYPE_HYPERBUS)"/>
+        <Condition Diagnostic="" Expression="(Sem_$IpInstance_HyperBus|Sem_$IpInstance_HyperBus16) &amp; (MemoryType = HAL_XSPI_MEMTYPE_HYPERBUS)"/>
         <PossibleValue Comment="Disable" Value="HAL_XSPI_NO_LATENCY_ON_WRITE" />
         <PossibleValue Comment="Enable" Value="HAL_XSPI_LATENCY_ON_WRITE" />
     </RefParameter>
@@ -231,7 +231,7 @@
 
     <!-- LatencyMode -->
     <RefParameter Comment="Latency Mode" DefaultValue="HAL_XSPI_VARIABLE_LATENCY" Name="LatencyMode" Type="list" Group="HyperBus(TM)">
-        <Condition Diagnostic="" Expression="(Sem_$IpInstance_HyperBus) &amp; (MemoryType = HAL_XSPI_MEMTYPE_HYPERBUS)"/>
+        <Condition Diagnostic="" Expression="(Sem_$IpInstance_HyperBus|Sem_$IpInstance_HyperBus16) &amp; (MemoryType = HAL_XSPI_MEMTYPE_HYPERBUS)"/>
         <PossibleValue Comment="Variable" Value="HAL_XSPI_VARIABLE_LATENCY" />
         <PossibleValue Comment="Fixed" Value="HAL_XSPI_FIXED_LATENCY" />
     </RefParameter>
@@ -716,6 +716,49 @@
         <Parameter Name="NbData" />
         <Parameter Name="AddressSpace" />-->
     </RefMode>
+	
+    <RefMode Name="hyperbus16_mode"  HalMode="">
+        <ConfigForMode>HSPI_Init</ConfigForMode>
+        <ConfigForMode>HyperBus</ConfigForMode>
+        <ConfigForMode>Memory_mapped</ConfigForMode>
+        <ConfigForMode>Auto_Polling</ConfigForMode>
+        <!-- Initialization -->
+        <Parameter Name="FifoThresholdByte" />
+        <Parameter Name="MemoryMode" />
+        <Parameter Name="MemoryType" />
+        <Parameter Name="MemorySize" />
+		<Parameter Name="DeviceType" />
+        <Parameter Name="ChipSelectHighTimeCycle" />
+        <Parameter Name="FreeRunningClock" />
+        <Parameter Name="ClockMode" />
+        <Parameter Name="WrapSize" />
+        <Parameter Name="ClockPrescaler" />
+        <Parameter Name="SampleShifting" />
+        <Parameter Name="DelayHoldQuarterCycle" />
+        <Parameter Name="ChipSelectBoundary" />
+        <Parameter Name="MaxTran" />		
+        <Parameter Name="Refresh" />
+        <!-- Hyperbus -->
+        <Parameter Name="RWRecoveryTimeCycle" />
+        <Parameter Name="AccessTimeCycle" />
+        <Parameter Name="WriteZeroLatency" />
+        <Parameter Name="LatencyMode" />
+        <!-- Operating Type-->
+        <!-- <Parameter Name="OperationType" />
+        <Parameter Name="Match" />
+        <Parameter Name="Mask" />
+        <Parameter Name="MatchMode" />
+        <Parameter Name="AutomaticStop" />
+        <Parameter Name="Interval" />
+        <Parameter Name="TimeOutActivation" />
+        <Parameter Name="TimeOutPeriod" /> -->
+        <!-- Regular Command Struct-->
+        <!--  <Parameter Name="AddressSize" />
+        <Parameter Name="DQSMode" />
+        <Parameter Name="Address" />
+        <Parameter Name="NbData" />
+        <Parameter Name="AddressSpace" />-->
+    </RefMode>
 
     <RefMode Name="dual_octo_mode"  HalMode="">
         <ConfigForMode>HSPI_Init</ConfigForMode>
@@ -889,22 +932,6 @@
                     </SignalLogicalOp>
                     <Semaphore>Sem_$IpInstance_Octo</Semaphore>
                 </Mode>
-                <Mode Name="hyperbus_mode" UserName="HyperBus(TM)">
-                    <SignalLogicalOp Name="AND">
-                        <Signal Name="NCS"/>
-                        <Signal Name="CLK"/>
-                        <Signal Name="DQS0"/>
-                        <Signal Name="IO0"/>
-                        <Signal Name="IO1"/>
-                        <Signal Name="IO2"/>
-                        <Signal Name="IO3"/>
-                        <Signal Name="IO4"/>
-                        <Signal Name="IO5"/>
-                        <Signal Name="IO6"/>
-                        <Signal Name="IO7"/> 
-                    </SignalLogicalOp>
-                    <Semaphore>Sem_$IpInstance_HyperBus</Semaphore>
-                </Mode>
                 <Mode Name="dual_octo_mode" UserName="Dual-Octo SPI">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="NCS"/>
@@ -955,6 +982,46 @@
                     </SignalLogicalOp>
                     <Semaphore>Sem_$IpInstance_Hexa</Semaphore>
                 </Mode>
+                <Mode Name="hyperbus_mode" UserName="HyperBus(TM)">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="NCS"/>
+                        <Signal Name="CLK"/>
+                        <Signal Name="DQS0"/>
+                        <Signal Name="IO0"/>
+                        <Signal Name="IO1"/>
+                        <Signal Name="IO2"/>
+                        <Signal Name="IO3"/>
+                        <Signal Name="IO4"/>
+                        <Signal Name="IO5"/>
+                        <Signal Name="IO6"/>
+                        <Signal Name="IO7"/> 
+                    </SignalLogicalOp>
+                    <Semaphore>Sem_$IpInstance_HyperBus</Semaphore>
+                </Mode>
+                <Mode Name="hyperbus16_mode" UserName="HyperBus16(TM)">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="NCS"/>
+                        <Signal Name="CLK"/>
+                        <Signal Name="DQS0"/>
+                        <Signal Name="IO0"/>
+                        <Signal Name="IO1"/>
+                        <Signal Name="IO2"/>
+                        <Signal Name="IO3"/>
+                        <Signal Name="IO4"/>
+                        <Signal Name="IO5"/>
+                        <Signal Name="IO6"/>
+                        <Signal Name="IO7"/>
+                        <Signal Name="IO8"/>
+                        <Signal Name="IO9"/>
+                        <Signal Name="IO10"/>
+                        <Signal Name="IO11"/>
+                        <Signal Name="IO12"/>
+                        <Signal Name="IO13"/>
+                        <Signal Name="IO14"/>
+                        <Signal Name="IO15"/>
+                    </SignalLogicalOp>
+                    <Semaphore>Sem_$IpInstance_HyperBus16</Semaphore>
+                </Mode>
             </ModeLogicOperator>
         </Mode>
         <!--Mode Name="OCTOSPI1_DQS" UserName="Data Strobe">
@@ -971,7 +1038,7 @@
         <Mode Name="HSPI1_NCLK" UserName="HyperBus(TM) 1.8V Inverted Clock" RemoveCondition="LQFP48|UFQFPN48">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="nclk_enable" UserName="NCLK">
-                    <Condition Expression="Sem_$IpInstance_HyperBus" Diagnostic=""/>
+                    <Condition Expression="Sem_$IpInstance_HyperBus|Sem_$IpInstance_HyperBus16" Diagnostic=""/>
                     <SignalLogicalOp Name="AND">
                         <Signal Name="NCLK"/>
                     </SignalLogicalOp>

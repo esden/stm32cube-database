@@ -16,11 +16,11 @@
   ******************************************************************************
   * @file    stm32h7xx_nucleo_conf.h
   * @author  MCD Application Team
-  * @brief   STM32H7xx_Nuleo board configuration file.
+  * @brief   STM32H7xx_Nucleo board configuration file.
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2019 STMicroelectronics.
+  * Copyright (c) 2023 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file

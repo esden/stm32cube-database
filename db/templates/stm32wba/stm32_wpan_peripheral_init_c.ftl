@@ -10,12 +10,34 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
+[#assign PG_SKIP_LIST = "False"]
+[#assign myHash = {}]
+[#list SWIPdatas as SWIP]
+    [#if SWIP.defines??]
+        [#list SWIP.defines as definition]
+            [#assign myHash = {definition.name:definition.value} + myHash]
+        [/#list]
+    [/#if]
+[/#list]
+[#--
+Key & Value:
+[#list myHash?keys as key]
+Key: ${key}; Value: ${myHash[key]}
+[/#list]
+--]
 
 /* Includes ------------------------------------------------------------------*/
 #include "app_conf.h"
 #include "peripheral_init.h"
 #include "${main_h}"
-
+[#if (myHash["USE_SNVMA_NVM"]?number != 0)]
+#include "crc_ctrl.h"
+[/#if]
+[#if (myHash["USE_TEMPERATURE_BASED_RADIO_CALIBRATION"]?number == 1)]
+#if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)
+#include "adc_ctrl.h"
+#endif /* USE_TEMPERATURE_BASED_RADIO_CALIBRATION */
+[/#if]
 /* Private includes -----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -80,6 +102,11 @@ void MX_StandbyExit_PeripharalInit(void)
 
   /* USER CODE END MX_STANDBY_EXIT_PERIPHERAL_INIT_1 */
 
+  /* Select SysTick source clock */
+  HAL_SYSTICK_CLKSourceConfig(${myHash["SYSTICK_SOURCE_CLOCK_SELECTION"]});
+  /* Re-Initialize Tick with new clock source */
+  HAL_InitTick(TICK_INT_PRIORITY);
+
 [#assign PreviousIpHandler = ""]
 [#if handlersList??]
   [#list handlersList as handler]
@@ -108,7 +135,7 @@ ${""?right_pad(2)}memset(&${ipHandler.handler}, 0, sizeof(${ipHandler.handler}))
 
 [#if voidsList??]
   [#list voidsList as void]
-	[#if void.functionName?? && void.genCode]
+	[#if void.functionName?? && void.genCode && !void.isStatic]
 		[#if (void.functionName != "SystemClock_Config") 
 		  && (void.functionName != "SystemPower_Config")
 		  && (void.functionName != "MX_RTC_Init")
@@ -122,8 +149,9 @@ ${""?right_pad(2)}memset(&${ipHandler.handler}, 0, sizeof(${ipHandler.handler}))
 		  && (void.functionName != "MX_HSEM_Init")
 		]
 			[#if (void.functionName == "MX_ADC4_Init")]
-#if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)			
+#if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)
 ${""?right_pad(2)}${void.functionName}();
+
 #endif /* USE_TEMPERATURE_BASED_RADIO_CALIBRATION */
 			[#else]
 ${""?right_pad(2)}${void.functionName}();
@@ -132,17 +160,27 @@ ${""?right_pad(2)}${void.functionName}();
 	[/#if]
   [/#list]
 [/#if]
+[#if (myHash["USE_SNVMA_NVM"]?number != 0)]
+  CRCCTRL_Init();
+[/#if]
+[#if (myHash["USE_TEMPERATURE_BASED_RADIO_CALIBRATION"]?number == 1)]
+#if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)
+  ADCCTRL_Init();
+#endif /* USE_TEMPERATURE_BASED_RADIO_CALIBRATION */
+[/#if]
 
 #if (CFG_DEBUGGER_LEVEL == 0)
   GPIO_InitTypeDef DbgIOsInit = {0};
   DbgIOsInit.Mode = GPIO_MODE_ANALOG;
   DbgIOsInit.Pull = GPIO_NOPULL;
   DbgIOsInit.Pin = GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15;
+  __HAL_RCC_GPIOA_CLK_ENABLE();
   HAL_GPIO_Init(GPIOA, &DbgIOsInit);
   
   DbgIOsInit.Mode = GPIO_MODE_ANALOG;
   DbgIOsInit.Pull = GPIO_NOPULL;
   DbgIOsInit.Pin = GPIO_PIN_3|GPIO_PIN_4;
+  __HAL_RCC_GPIOB_CLK_ENABLE();
   HAL_GPIO_Init(GPIOB, &DbgIOsInit);
 #endif /* CFG_DEBUGGER_LEVEL */
   /* USER CODE BEGIN MX_STANDBY_EXIT_PERIPHERAL_INIT_2 */

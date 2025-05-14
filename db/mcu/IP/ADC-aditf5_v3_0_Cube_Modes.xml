@@ -48,7 +48,18 @@
 	 <!--  ########################################################################################ADC1_2 MultiMode parameters####################################################################################### -->
 		 
 		<RefParameter Comment="Mode" DefaultValue="null" Group="ADCsgroup" Name="Mode" Type="list" Visible="false">
-            <Condition Diagnostic="" Expression="(ADC1_Exist|ADC_Exist)&amp;(!ADC2_Exist)"/>
+            <Condition Diagnostic="" Expression="(ADC1_Exist|ADC_Exist)&amp;(!ADC2_Exist)&amp; (DIE483)"/>
+        </RefParameter>
+        <RefParameter Comment="Mode" DefaultValue="ADC_MODE_INDEPENDENT" Group="ADCsgroup" Name="Mode" Type="list">
+            <Condition Diagnostic="Regular simultanious mode should not be available for injected conversion" Expression="((($Index=1|$Index=2)&amp;USE_ADC1&amp;USE_ADC2))"/>
+            <PossibleValue Comment="Independent mode" Value="ADC_MODE_INDEPENDENT"/>
+            <PossibleValue Comment="Dual combined regular simultaneous + injected simultaneous mode" Semaphore="DualMode0_$IpInstance" Value="ADC_DUALMODE_REGSIMULT_INJECSIMULT"/>
+            <PossibleValue Comment="Dual regular simultaneous + alternate trigger mode" Semaphore="DualMode1_$IpInstance" Value="ADC_DUALMODE_REGSIMULT_ALTERTRIG"/>
+            <PossibleValue Comment="Dual Interleaved mode + injected simultaneous mode" Semaphore="DualMode4_$IpInstance" Value="ADC_DUALMODE_REGINTERL_INJECSIMULT"/>
+            <PossibleValue Comment="Dual injected simultaneous mode only" Semaphore="DualModeInjected_$IpInstance" Value="ADC_DUALMODE_INJECSIMULT"/>
+            <PossibleValue Comment="Dual regular simultaneous mode only" Semaphore="DualMode2_$IpInstance" Value="ADC_DUALMODE_REGSIMULT"/>
+            <PossibleValue Comment="Dual interleaved mode only" Semaphore="DualMode_Interl_$IpInstance" Value="ADC_DUALMODE_INTERL"/>
+            <PossibleValue Comment="Dual alternate trigger mode only" Semaphore="DualMode3_$IpInstance" Value="ADC_DUALMODE_ALTERTRIG"/>
         </RefParameter>
          <RefParameter Comment="Mode" DefaultValue="ADC_MODE_INDEPENDENT" Group="ADCsgroup" Name="Mode" Type="list">
             <Condition Diagnostic="Regular simultanious mode should not be available for injected conversion" Expression="(DIE483) &amp; ((($Index=1|$Index=2)&amp; USE_ADC1&amp;USE_ADC2)&amp;(ADC1:InjNumberOfConversion=0)&amp;(ADC2:InjNumberOfConversion=0))"/>
@@ -260,6 +271,14 @@
             </RefParameter>  
             
 	    <!-- Possible Value of Resolution parameter -->
+	    <RefParameter Comment="Resolution" DefaultValue="ADC_RESOLUTION_12B" Group="ADCgroup" Name="ResolutionADC3" Type="list">
+        <Condition Diagnostic="" Expression="(DIE485)"/>
+	        <PossibleValue Action="Disable" Comment="ADC 12-bit resolution" Condition="isNotAllowed_16b14b12b10b" Diagnostic="In case of usage of channels on injected group, ADC frequency should be low than AHB clock frequency /4 for resolution 16, 14, 12 or 10 bits" Semaphore="ADC_RESOLUTION12b_$IpInstance" Value="ADC_RESOLUTION_12B"/>
+	        <PossibleValue Action="Disable" Comment="ADC 10-bit resolution" Condition="isNotAllowed_16b14b12b10b" Diagnostic="In case of usage of channels on injected group, ADC frequency should be low than AHB clock frequency /4 for resolution 16, 14, 12 or 10 bits" Semaphore="ADC_RESOLUTION10b_$IpInstance" Value="ADC_RESOLUTION_10B"/>	        
+            <PossibleValue Action="Disable" Comment="ADC 8-bit resolution"  Condition="isNotAllowed_8b" Diagnostic="In case of usage of channels on injected group, ADC frequency should be low than AHB clock frequency /3 for resolution 8 bits." Semaphore="ADC_RESOLUTION8b_$IpInstance" Value="ADC_RESOLUTION_8B"/>
+	        <PossibleValue Action="Disable" Comment="ADC 6-bit resolution"  Condition="isNotAllowed_6b" Diagnostic="In case of usage of channels on injected group, ADC frequency should be low than AHB clock frequency /3 for resolution 6 bits." Semaphore="ADC_RESOLUTION6b_$IpInstance" Value="ADC_RESOLUTION_6B"/>
+            <Description>Resolution of the ADC conversion</Description>
+	    </RefParameter>
             
             <RefParameter Comment="Resolution" DefaultValue="ADC_RESOLUTION_12B" Group="ADCgroup" Name="ResolutionADC3" Type="list">
         <Condition Diagnostic="" Expression="(DIE483) &amp;(!$IpNumber=1 &amp; !$IpNumber=2 )"/>
@@ -578,10 +597,23 @@
                    <PossibleValue Action="Disable" Comment="Oversampling ratio 256x " Condition="REG_RIGHTBITSHIFT_NONE_$IpInstance |REG_RIGHTBITSHIFT1_$IpInstance | REG_RIGHTBITSHIFT2_$IpInstance | REG_RIGHTBITSHIFT3_$IpInstance" Diagnostic="Shift for oversampling should be equal or greater than 4" Value="ADC_OVERSAMPLING_RATIO_256"/>
     </RefParameter>	-->
    
-    
-    <RefParameter Comment="Oversampling Ratio" DefaultValue="1" Group="ADCgroup" Max="1024" Min="1" Name="Ratio" Type="integer">
-           
-    </RefParameter>
+	<RefParameter Comment="Oversampling Ratio" DefaultValue="1" Group="ADCgroup" Max="1024" Min="1" Name="Ratio" Type="integer">
+		<Condition Diagnostic="" Expression="!(DIE483 &amp;$IpNumber=3)" />
+	</RefParameter>
+	<RefParameter Comment="Oversampling Ratio" DefaultValue="ADC3_OVERSAMPLING_RATIO_2" Group="ADCgroup" Name="Ratio" Type="list">
+		<PossibleValue Comment="Oversampling ratio 2x " Value="ADC3_OVERSAMPLING_RATIO_2" />
+		<PossibleValue Comment="Oversampling ratio 4x " Value="ADC3_OVERSAMPLING_RATIO_4" />
+		<PossibleValue Comment="Oversampling ratio 8x " Value="ADC3_OVERSAMPLING_RATIO_8" />
+		<PossibleValue Comment="Oversampling ratio 16x " Value="ADC3_OVERSAMPLING_RATIO_16" />
+		<PossibleValue Comment="Oversampling ratio 32x " Value="ADC3_OVERSAMPLING_RATIO_32" />
+		<PossibleValue Comment="Oversampling ratio 64x " Value="ADC3_OVERSAMPLING_RATIO_64" />
+		<PossibleValue Comment="Oversampling ratio 128x " Value="ADC3_OVERSAMPLING_RATIO_128" />
+		<PossibleValue Comment="Oversampling ratio 256x " Value="ADC3_OVERSAMPLING_RATIO_256" />
+		<PossibleValue Comment="Oversampling ratio 512x " Value="ADC3_OVERSAMPLING_RATIO_512" />
+		<PossibleValue Comment="Oversampling ratio 1024x " Value="ADC3_OVERSAMPLING_RATIO_1024" />
+
+	</RefParameter>
+
   
    
     <RefParameter Comment="Regular Oversampling Mode" DefaultValue="null" Group="ADCgroup" Name="OversamplingStopReset" Type="list" Visible="false">
@@ -3069,7 +3101,8 @@
         
          <Mode Name="VDAC1_OUT1 Channel">
             <ModeLogicOperator Name="XOR">
-                <Mode Name="VDAC1_OUT1 Channel" UserName="VDAC1_OUT1 Channel" RemoveCondition="($IpNumber=1 &amp; (DIE450|DIE483|DIE480)) |($IpNumber=3 &amp; (DIE450|DIE483|DIE480)) | ($IpNumber=2 &amp; (DIE483|DIE480))">
+
+                <Mode Name="IN-DAC1-OUT1" UserName="VDAC1_OUT1 Channel" RemoveCondition="($IpNumber=1 &amp; (DIE450|DIE483|DIE480|DIE485)) |($IpNumber=3 &amp; (DIE450|DIE483|DIE480)) | ($IpNumber=2 &amp; (DIE483|DIE480|DIE485))">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="VS_DAC1_OUT1"/>
                     </SignalLogicalOp>
@@ -3082,7 +3115,8 @@
         <Mode Name="VDAC1_OUT2 Channel">
             <ModeLogicOperator Name="XOR">
                 
-                <Mode Name="VDAC1_OUT2 Channel" UserName="VDAC1_OUT2 Channel" RemoveCondition="($IpNumber=1 &amp; (DIE450|DIE483|DIE480)) |($IpNumber=3 &amp; (DIE450|DIE483|DIE480))|($IpNumber=2 &amp; (DIE483|DIE480))">
+                <Mode Name="IN-DAC1-OUT2" UserName="VDAC1_OUT2 Channel" RemoveCondition="($IpNumber=1 &amp; (DIE450|DIE483|DIE480|DIE485)) |($IpNumber=3 &amp; (DIE450|DIE483|DIE480))|($IpNumber=2 &amp; (DIE483|DIE480|DIE485))">
+
                     <SignalLogicalOp Name="AND">
                         <Signal Name="VS_DAC1_OUT2"/>
                     </SignalLogicalOp>
@@ -3093,7 +3127,7 @@
 
         </Mode>
         
-        <Mode Name="IN16" RemoveCondition="($IpNumber=1 &amp; (DIE450|DIE483|DIE480)) |($IpNumber=3 &amp; (DIE450|DIE483|DIE480))|($IpNumber=2 &amp; (DIE483|DIE480|DIE450))">
+        <Mode Name="IN16" RemoveCondition="($IpNumber=1 &amp; (DIE450|DIE483|DIE480|DIE485)) |($IpNumber=3 &amp; (DIE450|DIE483|DIE480))|($IpNumber=2 &amp; (DIE483|DIE480|DIE485))">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="VDAC1_OUT1 Channel" UserName="VDAC1_OUT1 Channel">
                     <SignalLogicalOp Name="AND">
@@ -3111,7 +3145,7 @@
             </ModeLogicOperator>
             <Semaphore>channelSelected$IpInstance</Semaphore>
         </Mode>
-        <Mode Name="IN17" RemoveCondition="(DIE450) | (DIE480)| ($IpNumber=1)| ($IpNumber=3)">
+        <Mode Name="IN17" RemoveCondition="(DIE450) | (DIE480)|(DIE485)| ($IpNumber=1)| ($IpNumber=3)|($IpNumber=2 &amp; (DIE485))">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="VDAC1_OUT2 Channel" UserName="VDAC1_OUT2 Channel">
                     <SignalLogicalOp Name="AND">
@@ -3129,7 +3163,7 @@
             </ModeLogicOperator>
             <Semaphore>channelSelected$IpInstance</Semaphore>
         </Mode>
-        <Mode Name="IN16" RemoveCondition="($IpNumber=2)">
+        <Mode Name="IN16" RemoveCondition="($IpNumber=2)|(DIE485)">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="IN16-Differential" UserName="IN16 Differential" RemoveCondition="($IpNumber=3)">
                     <SignalLogicalOp Name="AND">
@@ -3151,7 +3185,7 @@
             <Condition Diagnostic="Channel16 is already used" Expression="!IN15DiffUsed_$IpInstance"/>
         </Mode>
              
-        <Mode Name="IN17" RemoveCondition="($IpNumber=2) | ($IpNumber=3)">
+        <Mode Name="IN17" RemoveCondition="($IpNumber=2) | ($IpNumber=3)|(DIE485)">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="IN17-Single-Ended" UserName="Single-ended">
                     <SignalLogicalOp Name="AND">
@@ -3165,7 +3199,7 @@
         </Mode>
         <!-- DAC2 inputs  -->
     
-        <Mode Name="VDAC2_OUT1 Channel" RemoveCondition="($IpNumber=1) | !(DIE480)" UserName="VDAC2_OUT1 Channel"> 
+        <Mode Name="IN-DAC2-OUT1" RemoveCondition="($IpNumber=1) | !(DIE480)|(DIE485)" UserName="VDAC2_OUT1 Channel"> 
             <ModeLogicOperator Name="XOR">
                 <Mode Name="VDAC2_OUT1 Channel" UserName="VDAC2_OUT1 Channel">
                     <SignalLogicalOp Name="AND">
@@ -3177,7 +3211,7 @@
             <Semaphore>channelSelected$IpInstance</Semaphore>
         </Mode>
         
-        <Mode Name="IN18" RemoveCondition="($IpNumber=3)">
+        <Mode Name="IN18" RemoveCondition="($IpNumber=3)|(DIE485)">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="IN18-Differential" UserName="IN18 Differential">
                     <SignalLogicalOp Name="AND">
@@ -3198,7 +3232,7 @@
             </ModeLogicOperator>
             <Semaphore>channelSelected$IpInstance</Semaphore>
         </Mode>
-        <Mode Name="IN19" RemoveCondition=" ($IpNumber=3)">
+        <Mode Name="IN19" RemoveCondition=" ($IpNumber=3)|(DIE485)">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="IN19-Single-Ended" UserName="Single-ended">
                     <SignalLogicalOp Name="AND">
@@ -3214,7 +3248,7 @@
         
         <!-- Internal channels -->  
         
-        <Mode Name="IN-Vbat" RemoveCondition="(DIE480 &amp;!($IpNumber=2)) | (!DIE480 &amp;!($IpNumber=3))" UserName="Vbat Channel">
+        <Mode Name="IN-Vbat" RemoveCondition="(DIE480 &amp;!($IpNumber=2)) | !(DIE485&amp;($IpNumber=2))" UserName="Vbat Channel">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="IN-Vbat" UserName="Vbat Channel">
                     <SignalLogicalOp Name="AND">
@@ -3226,7 +3260,7 @@
             <Semaphore>channelSelected$IpInstance</Semaphore>
         </Mode>
         
-        <Mode Name="IN-TempSens" RemoveCondition="(DIE480 &amp;!($IpNumber=2)) | (!DIE480 &amp;!($IpNumber=3))" UserName="Temperature Sensor Channel">
+        <Mode Name="IN-TempSens" RemoveCondition="(DIE480 &amp;!($IpNumber=2)) | !(DIE485 &amp;($IpNumber=1))" UserName="Temperature Sensor Channel">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="IN-TempSens" UserName="Temperature Sensor Channel">
                     <SignalLogicalOp Name="AND">
@@ -3239,7 +3273,7 @@
         </Mode>
         
    
-        <Mode Name="IN-Vrefint" RemoveCondition="(DIE480 &amp;!($IpNumber=2)) | (!DIE480 &amp;!($IpNumber=3))" UserName="Vrefint Channel">
+        <Mode Name="IN-Vrefint" RemoveCondition="(DIE480 &amp;!($IpNumber=2)) | !(DIE485 &amp;($IpNumber=1))" UserName="Vrefint Channel">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="IN-Vrefint" UserName="Vrefint Channel">
                     <SignalLogicalOp Name="AND">

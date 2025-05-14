@@ -566,7 +566,7 @@
 	
     <!-- Possible Value of OffsetNumber parameters  -->
     <RefParameter Comment="Offset Number" DefaultValue="ADC_OFFSET_NONE" Group="ADCChannel" Name="OffsetNumber" Type="list">
-        <Condition Diagnostic="" Expression="Regular_OversamplingMode_Enabled_$IpInstance"/>
+        <Condition Diagnostic="" Expression="Injected_OversamplingMode_Enabled_$IpInstance"/>
         <PossibleValue Comment="No offset" Value="ADC_OFFSET_NONE"/>
         <Description>Offset correction is not supported in oversampling mode</Description>
     </RefParameter>
@@ -2502,17 +2502,27 @@
         <!-- External channels -->
         
        <!-- External channels -->
-        <Mode Name="IN1">
-            <ModeLogicOperator Name="XOR">
-                <Mode Name="IN1-Single-Ended" UserName="IN1 Single-ended">
-                    <SignalLogicalOp Name="AND">
-                        <Signal Name="IN1"/>
-                    </SignalLogicalOp>
-                </Mode>
-            
-            </ModeLogicOperator>
-            <Semaphore>channelSelected$IpInstance</Semaphore>
-        </Mode>
+		<Mode Name="IN1">
+		 <ModeLogicOperator Name="XOR">
+			<Mode Name="IN1-Differential" UserName="IN1 Differential">
+				<SignalLogicalOp Name="AND">
+					<Signal Name="IN1" />
+					<Signal Name="IN2" />
+				</SignalLogicalOp>
+				<Semaphore>IN1Used_$IpInstance</Semaphore>
+				<Semaphore>IN1DiffUsed_$IpInstance</Semaphore>
+				<Condition Diagnostic="Channel2 is already used" Expression="!IN2Used_$IpInstance" />
+			</Mode>
+			<Mode Name="IN1-Single-Ended" UserName="IN1 Single-ended">
+				<SignalLogicalOp Name="AND">
+					<Signal Name="IN1" />
+				</SignalLogicalOp>
+				<Semaphore>IN1Used_$IpInstance</Semaphore>
+			</Mode>
+		</ModeLogicOperator>
+		<Semaphore>channelSelected$IpInstance</Semaphore>
+		</Mode>
+		
         <Mode Name="IN2">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="IN2-Differential" UserName="IN2 Differential">

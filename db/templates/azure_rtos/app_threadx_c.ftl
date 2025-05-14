@@ -25,7 +25,7 @@
 [#list packs as variables]
 [#if variables.value != "ThreadX" ] 
   [#if variables.value?lower_case=="display"]
-	[#assign DisplayPack = "true"]
+    [#assign DisplayPack = "true"]
   [/#if]
 [/#if]  
 [/#list]
@@ -41,19 +41,19 @@
     [#if name == "FILEX_ENABLED" && value == "true"]
       [#assign FX_ENABLED = value]
     [/#if]
-	[#if name == "NETXDUO_ENABLED" && value == "true"]
+    [#if name == "NETXDUO_ENABLED" && value == "true"]
       [#assign NX_ENABLED = value]
     [/#if]
-	[#if name == "USBXDEVICE_ENABLED" && value == "true"]
+    [#if name == "USBXDEVICE_ENABLED" && value == "true"]
       [#assign UX_DEVICE_ENABLED = value]
     [/#if]
-	[#if name == "USBXHOST_ENABLED" && value == "true"]
+    [#if name == "USBXHOST_ENABLED" && value == "true"]
       [#assign UX_HOST_ENABLED = value]
     [/#if]
-	 [#if name == "AZRTOS_APP_MEM_ALLOCATION_METHOD"]
+     [#if name == "AZRTOS_APP_MEM_ALLOCATION_METHOD"]
       [#assign AZRTOS_APP_MEM_ALLOCATION_METHOD_VAL = value]
     [/#if]
-	[#if name == "TX_LOW_POWER"]
+    [#if name == "TX_LOW_POWER"]
       [#assign TX_LOW_POWER_value = value]
     [/#if]
 
@@ -110,16 +110,16 @@
     [#if name == "TX_LOW_POWER_TIMER_SETUP"]
       [#assign TX_LOW_POWER_TIMER_SETUP_value = value]
     [/#if]
-	
-	[#if name == "TX_LOW_POWER_USER_ENTER"]
+    
+    [#if name == "TX_LOW_POWER_USER_ENTER"]
       [#assign TX_LOW_POWER_USER_ENTER_value = value]
     [/#if]
-	
-	[#if name == "TX_LOW_POWER_USER_EXIT"]
+    
+    [#if name == "TX_LOW_POWER_USER_EXIT"]
       [#assign TX_LOW_POWER_USER_EXIT_value = value]
     [/#if]
-	
-	[#if name == "TX_LOW_POWER_USER_TIMER_ADJUST"]
+    
+    [#if name == "TX_LOW_POWER_USER_TIMER_ADJUST"]
       [#assign TX_LOW_POWER_USER_TIMER_ADJUST_value = value]
     [/#if]
     [/#list]
@@ -154,16 +154,16 @@
 [#if AZRTOS_APP_MEM_ALLOCATION_METHOD_VAL != "0"]
 [#if TX_APP_GENERATE_INIT_CODE_value != "false"]
 [#if TX_APP_CREATION_value != "0"]
-  TX_THREAD tx_app_thread;
+TX_THREAD tx_app_thread;
 [/#if]
 [#if TX_APP_SEM_CREATION_value != "0"]
-  TX_SEMAPHORE tx_app_semaphore;
+TX_SEMAPHORE tx_app_semaphore;
 [/#if]
 [#if TX_APP_MUTEX_CREATION_value != "0"]
-  TX_MUTEX tx_app_mutex;
+TX_MUTEX tx_app_mutex;
 [/#if]
 [#if TX_APP_MSG_QUEUE_CREATION_value != "0"]
-  TX_QUEUE tx_app_msg_queue;
+TX_QUEUE tx_app_msg_queue;
 [/#if]
 [/#if]
 [/#if]
@@ -213,7 +213,7 @@ UINT App_ThreadX_Init(VOID *memory_ptr)
 [#if AZRTOS_APP_MEM_ALLOCATION_METHOD_VAL != "0"]
 [#if TX_APP_GENERATE_INIT_CODE_value != "false"]
 [#if TX_APP_CREATION_value != "0"]
-CHAR *pointer;
+  CHAR *pointer;
 
   /* Allocate the stack for ${TX_APP_THREAD_NAME_value}  */
   if (tx_byte_allocate(byte_pool, (VOID**) &pointer,
@@ -221,7 +221,7 @@ CHAR *pointer;
   {
     return TX_POOL_ERROR;
   }
-   /* Create ${TX_APP_THREAD_NAME_value}.  */
+  /* Create ${TX_APP_THREAD_NAME_value}.  */
   if (tx_thread_create(&tx_app_thread, "${TX_APP_THREAD_NAME_value}", ${TX_APP_THREAD_ENTRY_value}, 0, pointer,
                        TX_APP_STACK_SIZE, TX_APP_THREAD_PRIO, TX_APP_THREAD_PREEMPTION_THRESHOLD,
                        TX_APP_THREAD_TIME_SLICE, TX_APP_THREAD_AUTO_START) != TX_SUCCESS)
@@ -277,7 +277,7 @@ CHAR *pointer;
 [#if TX_APP_CREATION_value != "0"]
 /**
   * @brief  Function implementing the ${TX_APP_THREAD_ENTRY_value} thread.
-  * @param  thread_input: Not used.
+  * @param  thread_input: Hardcoded to 0.
   * @retval None
   */
 void ${TX_APP_THREAD_ENTRY_value}(ULONG thread_input)
@@ -291,7 +291,7 @@ void ${TX_APP_THREAD_ENTRY_value}(ULONG thread_input)
 [/#if]
 
   /**
-  * @brief  MX_ThreadX_Init
+  * @brief  Function that implements the kernel's initialization.
   * @param  None 
   * @retval None
   */

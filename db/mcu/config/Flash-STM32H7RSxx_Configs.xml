@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" DBVersion="V4.0" Name="Flash" Version="1.0.0" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
+
+	<RefConfig Name="Activate_FlashIP">
+		<!-- OBProgram -->
+		<IFCondition Expression="SEM_FLASH_OB_WRP &amp;!WRP_ENABLE_ALLSECTORS &amp; !WRP_DISABLE_ALLSECTORS">
+			<CallLibMethod Name="HAL_FLASH_Unlock" />
+			<CallLibMethod Name="HAL_FLASH_OB_Unlock" />
+			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
+				<MethodArg Name="WRPState" ParameterName="OB_WRP_State_Enable" />
+				<MethodArg Name="WRPSector" ParameterName="OB_WRP_Enabled_Sectors" />
+			</CallLibMethod>
+			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
+				<MethodArg Name="WRPState" ParameterName="OB_WRP_State_Disable" />
+				<MethodArg Name="WRPSector" ParameterName="OB_WRP_Disabled_Sectors" />
+			</CallLibMethod>
+			<CallLibMethod Name="HAL_FLASH_OB_Lock" />
+			<CallLibMethod Name="HAL_FLASH_Lock" />
+		</IFCondition>
+		<IFCondition Expression="WRP_DISABLE_ALLSECTORS | WRP_ENABLE_ALLSECTORS | SEM_FLASH_OB_NVState 
+		| (SEM_FLASH_OB_USER &amp; OB_BOR_Level_active=true)
+		| SEM_FLASH_OB_HDP | SEM_FLASH_OB_EPOCH 
+		| (OB_User_Configuration1_active=true &amp; (!SEM_OB_NRST_STOP_NULL | !SEM_OB_IWDGHW_NULL | !SEM_OB_NRST_STDBY_NULL 
+		| !SEM_OB_VDDIO_HSLV_NULL | !SEM_OB_IWDG_STOP_NULL | !SEM_OB_IWDG_STDBY_NULL | !SEM_OB_XSPI1_HSLV_NULL | !SEM_OB_XSPI2_HSLV_NULL ))
+		| (OB_User_Configuration2_active=true &amp; (!SEM_OB_AXISRAM_ECC_NULL| I2C1_I2C_FLASH| I2C1_SMBus_FLASH | I3C1_I3C_Controller_FLASH  
+		| I3C1_I3C_Target_FLASH))">
+			<CallLibMethod Name="HAL_FLASH_Unlock" />
+			<CallLibMethod Name="HAL_FLASH_OB_Unlock" />
+			<CallLibMethod Name="HAL_FLASHEx_OBProgram"/>
+			<CallLibMethod Name="HAL_FLASH_OB_Lock" />
+			<CallLibMethod Name="HAL_FLASH_Lock" />
+		</IFCondition>
+	</RefConfig>
+
+	<LibMethod Comment="HAL_FLASHEx_Erase" Name="HAL_FLASHEx_Erase">
+		<Argument AddressOf="true" GenericType="struct" Name="pEraseInit" TypeName="FLASH_EraseInitTypeDef">
+			<Argument AddressOf="false" GenericType="simple" Name="TypeErase" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="Sector" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="NbSectors" OptimizationCondition="equal" />
+		</Argument>
+		<Argument AddressOf="false" GenericType="simple" Name="SectorError" OptimizationCondition="equal" />
+	</LibMethod>
+
+	<LibMethod Comment="HAL_FLASHEx_OBProgram" Name="HAL_FLASHEx_OBProgram">
+		<Argument AddressOf="true" GenericType="struct" Name="pOBInit" TypeName="FLASH_OBProgramInitTypeDef">
+			<Argument AddressOf="false" GenericType="simple" Name="OptionType" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="WRPState" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="WRPSector" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="USERType" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="USERConfig1" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="USERConfig2" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="HDPStartPage" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="HDPEndPage" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="NVState" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="ROTType" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="ROTConfig" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="EPOCH" OptimizationCondition="equal" />
+		</Argument>
+	</LibMethod>
+
+
+	<LibMethod Comment="" Name="HAL_FLASH_Unlock" />
+	<LibMethod Comment="" Name="HAL_FLASH_OB_Unlock" />
+	<LibMethod Comment="" Name="HAL_FLASH_Lock" />
+	<LibMethod Comment="" Name="HAL_FLASH_OB_Lock" />
+
+	<RefComponent Cclass="System Core" Cgroup="Flash" Cversion="1Gg0Gg0">
+		<File Category="header" Name="Drivers/STM32H7RSxx_HAL_Driver/Inc/stm32h7rsxx_hal_flash.h" />
+		<File Category="header" Name="Drivers/STM32H7RSxx_HAL_Driver/Inc/stm32h7rsxx_hal_flash_ex.h" />
+		<File Category="source" Name="Drivers/STM32H7RSxx_HAL_Driver/Src/stm32h7rsxx_hal_flash.c" />
+		<File Category="source" Name="Drivers/STM32H7RSxx_HAL_Driver/Src/stm32h7rsxx_hal_flash_ex.c" />
+	</RefComponent>
+</IP>

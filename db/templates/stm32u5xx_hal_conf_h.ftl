@@ -1,5 +1,4 @@
 [#ftl]
-/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    stm32u5xx_hal_conf.h
@@ -8,7 +7,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2021 STMicroelectronics.
+  * Copyright (c) 2021-2023 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -17,14 +16,13 @@
   *
   ******************************************************************************
   */
-/* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef STM32U5xx_HAL_CONF_H
 #define STM32U5xx_HAL_CONF_H
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Exported types ------------------------------------------------------------*/
@@ -34,7 +32,6 @@
 /**
   * @brief This is the list of modules to be used in the HAL driver
   */
-  
 #define HAL_MODULE_ENABLED
 
 [#assign allModules = ["ADC", "COMP", "CORDIC", "CRC", "AES", "DAC", "DCACHE", "DCMI", "DMA2D", "DSI", "FDCAN", "FMAC", "GFXMMU", "GFXTIM", "GPU2D", "GTZC", "HASH", "HCD", "I2C", "ICACHE", "IRDA", "IWDG", "JPEG", "LPTIM", "LTDC", "MDF", "MMC", "NAND", "NOR", "OPAMP", "OCTOSPI", "OTFDEC", "PCD", "PKA", "PSSI", "RAMCFG", "RNG", "RTC", "SAI", "SD", "SMARTCARD", "SMBUS", "SPI", "SRAM", "TIM", "TSC", "UART", "USART", "WWDG", "HSPI"]]
@@ -75,11 +72,11 @@
   *        (when HSE is used as system clock source, directly or through the PLL).
   */
 #if !defined  (HSE_VALUE)
-  #define HSE_VALUE    [#if hse_value??]${hse_value}[#else]16000000[/#if]UL /*!< Value of the External oscillator in Hz */
+#define HSE_VALUE              [#if hse_value??]${hse_value}[#else]16000000[/#if]UL /*!< Value of the External oscillator in Hz */
 #endif /* HSE_VALUE */
 
 #if !defined  (HSE_STARTUP_TIMEOUT)
-  #define HSE_STARTUP_TIMEOUT    [#if HSE_Timout??]${HSE_Timout}[#else]100[/#if]UL   /*!< Time out for HSE start up, in ms */
+#define HSE_STARTUP_TIMEOUT    [#if HSE_Timout??]${HSE_Timout}[#else]100[/#if]UL   /*!< Time out for HSE start up, in ms */
 #endif /* HSE_STARTUP_TIMEOUT */
 
 /**
@@ -87,7 +84,7 @@
   *        This value is the default MSI range value after Reset.
   */
 #if !defined  (MSI_VALUE)
-  #define MSI_VALUE              4000000UL /*!< Value of the Internal oscillator in Hz*/
+#define MSI_VALUE              4000000UL /*!< Value of the Internal oscillator in Hz*/
 #endif /* MSI_VALUE */
 
 /**
@@ -96,7 +93,7 @@
   *        (when HSI is used as system clock source, directly or through the PLL). 
   */
 #if !defined  (HSI_VALUE)
-  #define HSI_VALUE              16000000UL /*!< Value of the Internal oscillator in Hz*/
+#define HSI_VALUE              16000000UL /*!< Value of the Internal oscillator in Hz*/
 #endif /* HSI_VALUE */
 
 /**
@@ -107,28 +104,28 @@
   *        which is subject to manufacturing process variations.
   */
 #if !defined  (HSI48_VALUE)
-  #define HSI48_VALUE             48000000UL /*!< Value of the Internal High Speed oscillator for USB FS/SDMMC/RNG in Hz.
-                                               The real value my vary depending on manufacturing process variations.*/
+#define HSI48_VALUE             48000000UL /*!< Value of the Internal High Speed oscillator for USB FS/SDMMC/RNG in Hz.
+                                                The real value my vary depending on manufacturing process variations.*/
 #endif /* HSI48_VALUE */
 
 /**
   * @brief Internal Low Speed oscillator (LSI) value.
   */
 #if !defined  (LSI_VALUE)
-  #define LSI_VALUE  [#if lsi_value??]${lsi_value}[#else]32000[/#if]UL     /*!< LSI Typical Value in Hz*/    
-#endif /* LSI_VALUE */                     /*!< Value of the Internal Low Speed oscillator in Hz
-                                                The real value may vary depending on the variations
-                                                in voltage and temperature.*/
+#define LSI_VALUE               [#if lsi_value??]${lsi_value}[#else]32000[/#if]UL    /*!< LSI Typical Value in Hz*/    
+#endif /* LSI_VALUE */                     /*!< Value of the Internal Low Speed oscillator in Hz. The real value may 
+vary depending on the variations in voltage and temperature.*/
+
 /**
   * @brief External Low Speed oscillator (LSE) value.
   *        This value is used by the UART, RTC HAL module to compute the system frequency
   */
 #if !defined  (LSE_VALUE)
-  #define LSE_VALUE  [#if lse_value??]${lse_value}[#else]32768[/#if]UL    /*!< Value of the External Low Speed oscillator in Hz */
+#define LSE_VALUE              [#if lse_value??]${lse_value}[#else]32768[/#if]UL   /*!< Value of the External oscillator in Hz*/
 #endif /* LSE_VALUE */     
 
 #if !defined  (LSE_STARTUP_TIMEOUT)
-  #define LSE_STARTUP_TIMEOUT    [#if LSE_Timout??]${LSE_Timout}[#else]5000[/#if]UL   /*!< Time out for LSE start up, in ms */
+#define LSE_STARTUP_TIMEOUT    [#if LSE_Timout??]${LSE_Timout}[#else]5000[/#if]UL     /*!< Time out for LSE start up, in ms */
 #endif /* LSE_STARTUP_TIMEOUT */
 
 /**
@@ -137,7 +134,7 @@
   *        frequency.
   */
 #if !defined  (EXTERNAL_SAI1_CLOCK_VALUE)
-  #define EXTERNAL_SAI1_CLOCK_VALUE    [#if external_sai1_clock_value??]${externall_sai1_clock_value}[#else]48000[/#if]UL /*!< Value of the SAI1 External clock source in Hz*/
+#define EXTERNAL_SAI1_CLOCK_VALUE  [#if external_sai1_clock_value??]${externall_sai1_clock_value}[#else]48000[/#if]UL /*!< Value of the SAI1 External clock source in Hz*/
 #endif /* EXTERNAL_SAI1_CLOCK_VALUE */
 
 /* Tip: To avoid modifying this file each time you need to use different HSE,
@@ -148,18 +145,16 @@
   * @brief This is the HAL system configuration section
   */     
   [#if advancedSettings??][#assign advancedSettings = advancedSettings[0]][/#if]
-
 #define  VDD_VALUE                    [#if vdd_value??]${vdd_value}[#else]3300[/#if]UL /*!< Value of VDD in mv */
-#define  TICK_INT_PRIORITY            ([#if TICK_INT_PRIORITY??]${TICK_INT_PRIORITY}[#else](1<<__NVIC_PRIO_BITS) - 1[/#if]UL)    /*!< tick interrupt priority (lowest by default)  */            
+#define  TICK_INT_PRIORITY            ([#if TICK_INT_PRIORITY??]${TICK_INT_PRIORITY}[#else](1<<__NVIC_PRIO_BITS) - 1[/#if]UL)  /*!< tick interrupt priority (lowest by default) */
 #define  USE_RTOS                     [#if advancedSettings?? && advancedSettings.USE_RTOS??]${advancedSettings.USE_RTOS}U[#else]0U[/#if]
-#define  PREFETCH_ENABLE              1U                    /*!< Enable prefetch */
+#define  PREFETCH_ENABLE              1U               /*!< Enable prefetch */
 
 /* ########################## Assert Selection ############################## */
 /**
   * @brief Uncomment the line below to expanse the "assert_param" macro in the
   *        HAL drivers code
   */
-
 [#if !fullAssert??]/*[/#if] #define USE_FULL_ASSERT    1U [#if !fullAssert??]*/[/#if]
 
 /* ################## Register callback feature configuration ############### */
@@ -223,11 +218,11 @@
  * Activated: CRC code is present inside driver
  * Deactivated: CRC code cleaned from driver
  */
-#define USE_SPI_CRC                   [#if CRC_SPI??]${CRC_SPI}[#else]0U[/#if]
+#define USE_SPI_CRC                   [#if CRC_SPI??]${CRC_SPI}[#else]1U[/#if]
 
 /* ################## SDMMC peripheral configuration ######################### */
 
-#define USE_SD_TRANSCEIVER           [#if USE_SD_TRANSCEIVER??]${USE_SD_TRANSCEIVER}[#else]0U[/#if]               /*!< use uSD Transceiver */
+#define USE_SD_TRANSCEIVER            [#if USE_SD_TRANSCEIVER??]${USE_SD_TRANSCEIVER}[#else]0U[/#if]
 
 
 /* Includes ------------------------------------------------------------------*/
@@ -236,31 +231,31 @@
   */
 
 #ifdef HAL_RCC_MODULE_ENABLED
-  #include "stm32u5xx_hal_rcc.h"
+#include "stm32u5xx_hal_rcc.h"
 #endif /* HAL_RCC_MODULE_ENABLED */
 
 #ifdef HAL_GPIO_MODULE_ENABLED
-  #include "stm32u5xx_hal_gpio.h"
+#include "stm32u5xx_hal_gpio.h"
 #endif /* HAL_GPIO_MODULE_ENABLED */
 
 #ifdef HAL_ICACHE_MODULE_ENABLED
-  #include "stm32u5xx_hal_icache.h"
+#include "stm32u5xx_hal_icache.h"
 #endif /* HAL_ICACHE_MODULE_ENABLED */
 
 #ifdef HAL_DCACHE_MODULE_ENABLED
-  #include "stm32u5xx_hal_dcache.h"
+#include "stm32u5xx_hal_dcache.h"
 #endif /* HAL_DCACHE_MODULE_ENABLED */
 
 #ifdef HAL_GTZC_MODULE_ENABLED
-  #include "stm32u5xx_hal_gtzc.h"
+#include "stm32u5xx_hal_gtzc.h"
 #endif /* HAL_GTZC_MODULE_ENABLED */
 
 #ifdef HAL_DMA_MODULE_ENABLED
-  #include "stm32u5xx_hal_dma.h"
+#include "stm32u5xx_hal_dma.h"
 #endif /* HAL_DMA_MODULE_ENABLED */
 
 #ifdef HAL_DMA2D_MODULE_ENABLED
-  #include "stm32u5xx_hal_dma2d.h"
+#include "stm32u5xx_hal_dma2d.h"
 #endif /* HAL_DMA2D_MODULE_ENABLED */
 
 #ifdef HAL_DSI_MODULE_ENABLED
@@ -268,63 +263,63 @@
 #endif /* HAL_DSI_MODULE_ENABLED */
 
 #ifdef HAL_CORTEX_MODULE_ENABLED
-  #include "stm32u5xx_hal_cortex.h"
+#include "stm32u5xx_hal_cortex.h"
 #endif /* HAL_CORTEX_MODULE_ENABLED */
 
 #ifdef HAL_PKA_MODULE_ENABLED
-  #include "stm32u5xx_hal_pka.h"
+#include "stm32u5xx_hal_pka.h"
 #endif /* HAL_PKA_MODULE_ENABLED */
 
 #ifdef HAL_ADC_MODULE_ENABLED
-  #include "stm32u5xx_hal_adc.h"
+#include "stm32u5xx_hal_adc.h"
 #endif /* HAL_ADC_MODULE_ENABLED */
 
 #ifdef HAL_COMP_MODULE_ENABLED
-  #include "stm32u5xx_hal_comp.h"
+#include "stm32u5xx_hal_comp.h"
 #endif /* HAL_COMP_MODULE_ENABLED */
 
 #ifdef HAL_CRC_MODULE_ENABLED
-  #include "stm32u5xx_hal_crc.h"
+#include "stm32u5xx_hal_crc.h"
 #endif /* HAL_CRC_MODULE_ENABLED */
 
 #ifdef HAL_CRYP_MODULE_ENABLED
-  #include "stm32u5xx_hal_cryp.h"
+#include "stm32u5xx_hal_cryp.h"
 #endif /* HAL_CRYP_MODULE_ENABLED */
 
 #ifdef HAL_DAC_MODULE_ENABLED
-  #include "stm32u5xx_hal_dac.h"
+#include "stm32u5xx_hal_dac.h"
 #endif /* HAL_DAC_MODULE_ENABLED */
 
 #ifdef HAL_FLASH_MODULE_ENABLED
-  #include "stm32u5xx_hal_flash.h"
+#include "stm32u5xx_hal_flash.h"
 #endif /* HAL_FLASH_MODULE_ENABLED */
 
 #ifdef HAL_HASH_MODULE_ENABLED
-  #include "stm32u5xx_hal_hash.h"
+#include "stm32u5xx_hal_hash.h"
 #endif /* HAL_HASH_MODULE_ENABLED */
 
 #ifdef HAL_SRAM_MODULE_ENABLED
-  #include "stm32u5xx_hal_sram.h"
+#include "stm32u5xx_hal_sram.h"
 #endif /* HAL_SRAM_MODULE_ENABLED */
 
 #ifdef HAL_MMC_MODULE_ENABLED
- #include "stm32u5xx_hal_mmc.h"
+#include "stm32u5xx_hal_mmc.h"
 #endif /* HAL_MMC_MODULE_ENABLED */
 
 #ifdef HAL_NOR_MODULE_ENABLED
-  #include "stm32u5xx_hal_nor.h"
+#include "stm32u5xx_hal_nor.h"
 #endif /* HAL_NOR_MODULE_ENABLED */
 
 #ifdef HAL_NAND_MODULE_ENABLED
-  #include "stm32u5xx_hal_nand.h"
+#include "stm32u5xx_hal_nand.h"
 #endif /* HAL_NAND_MODULE_ENABLED */
 
 #ifdef HAL_I2C_MODULE_ENABLED
- #include "stm32u5xx_hal_i2c.h"
+#include "stm32u5xx_hal_i2c.h"
 #endif /* HAL_I2C_MODULE_ENABLED */
 
 #ifdef HAL_IWDG_MODULE_ENABLED
- #include "stm32u5xx_hal_iwdg.h"
+#include "stm32u5xx_hal_iwdg.h"
 #endif /* HAL_IWDG_MODULE_ENABLED */
 
 #ifdef HAL_JPEG_MODULE_ENABLED
@@ -344,95 +339,95 @@
 #endif /* HAL_OPAMP_MODULE_ENABLED */
 
 #ifdef HAL_PWR_MODULE_ENABLED
- #include "stm32u5xx_hal_pwr.h"
+#include "stm32u5xx_hal_pwr.h"
 #endif /* HAL_PWR_MODULE_ENABLED */
 
 #ifdef HAL_OSPI_MODULE_ENABLED
- #include "stm32u5xx_hal_ospi.h"
+#include "stm32u5xx_hal_ospi.h"
 #endif /* HAL_OSPI_MODULE_ENABLED */
 
 #ifdef HAL_RNG_MODULE_ENABLED
- #include "stm32u5xx_hal_rng.h"
+#include "stm32u5xx_hal_rng.h"
 #endif /* HAL_RNG_MODULE_ENABLED */
 
 #ifdef HAL_RTC_MODULE_ENABLED
- #include "stm32u5xx_hal_rtc.h"
+#include "stm32u5xx_hal_rtc.h"
 #endif /* HAL_RTC_MODULE_ENABLED */
 
 #ifdef HAL_SAI_MODULE_ENABLED
- #include "stm32u5xx_hal_sai.h"
+#include "stm32u5xx_hal_sai.h"
 #endif /* HAL_SAI_MODULE_ENABLED */
 
 #ifdef HAL_SD_MODULE_ENABLED
- #include "stm32u5xx_hal_sd.h"
+#include "stm32u5xx_hal_sd.h"
 #endif /* HAL_SD_MODULE_ENABLED */
 
 #ifdef HAL_SMBUS_MODULE_ENABLED
- #include "stm32u5xx_hal_smbus.h"
+#include "stm32u5xx_hal_smbus.h"
 #endif /* HAL_SMBUS_MODULE_ENABLED */
 
 #ifdef HAL_SPI_MODULE_ENABLED
- #include "stm32u5xx_hal_spi.h"
+#include "stm32u5xx_hal_spi.h"
 #endif /* HAL_SPI_MODULE_ENABLED */
 
 #ifdef HAL_TIM_MODULE_ENABLED
- #include "stm32u5xx_hal_tim.h"
+#include "stm32u5xx_hal_tim.h"
 #endif /* HAL_TIM_MODULE_ENABLED */
 
 #ifdef HAL_TSC_MODULE_ENABLED
- #include "stm32u5xx_hal_tsc.h"
+#include "stm32u5xx_hal_tsc.h"
 #endif /* HAL_TSC_MODULE_ENABLED */
 
 #ifdef HAL_UART_MODULE_ENABLED
- #include "stm32u5xx_hal_uart.h"
+#include "stm32u5xx_hal_uart.h"
 #endif /* HAL_UART_MODULE_ENABLED */
 
 #ifdef HAL_USART_MODULE_ENABLED
- #include "stm32u5xx_hal_usart.h"
+#include "stm32u5xx_hal_usart.h"
 #endif /* HAL_USART_MODULE_ENABLED */
 
 #ifdef HAL_IRDA_MODULE_ENABLED
- #include "stm32u5xx_hal_irda.h"
+#include "stm32u5xx_hal_irda.h"
 #endif /* HAL_IRDA_MODULE_ENABLED */
 
 #ifdef HAL_SMARTCARD_MODULE_ENABLED
- #include "stm32u5xx_hal_smartcard.h"
+#include "stm32u5xx_hal_smartcard.h"
 #endif /* HAL_SMARTCARD_MODULE_ENABLED */
 
 #ifdef HAL_WWDG_MODULE_ENABLED
- #include "stm32u5xx_hal_wwdg.h"
+#include "stm32u5xx_hal_wwdg.h"
 #endif /* HAL_WWDG_MODULE_ENABLED */
 
 #ifdef HAL_PCD_MODULE_ENABLED
- #include "stm32u5xx_hal_pcd.h"
+#include "stm32u5xx_hal_pcd.h"
 #endif /* HAL_PCD_MODULE_ENABLED */
 
 #ifdef HAL_HCD_MODULE_ENABLED
- #include "stm32u5xx_hal_hcd.h"
+#include "stm32u5xx_hal_hcd.h"
 #endif /* HAL_HCD_MODULE_ENABLED */
 
 #ifdef HAL_CORDIC_MODULE_ENABLED
- #include "stm32u5xx_hal_cordic.h"
+#include "stm32u5xx_hal_cordic.h"
 #endif /* HAL_CORDIC_MODULE_ENABLED */
 
 #ifdef HAL_DCMI_MODULE_ENABLED
- #include "stm32u5xx_hal_dcmi.h"
+#include "stm32u5xx_hal_dcmi.h"
 #endif /* HAL_DCMI_MODULE_ENABLED */
 
 #ifdef HAL_EXTI_MODULE_ENABLED
- #include "stm32u5xx_hal_exti.h"
+#include "stm32u5xx_hal_exti.h"
 #endif /* HAL_EXTI_MODULE_ENABLED */
 
 #ifdef HAL_FDCAN_MODULE_ENABLED
- #include "stm32u5xx_hal_fdcan.h"
+#include "stm32u5xx_hal_fdcan.h"
 #endif /* HAL_FDCAN_MODULE_ENABLED */
 
 #ifdef HAL_FMAC_MODULE_ENABLED
- #include "stm32u5xx_hal_fmac.h"
+#include "stm32u5xx_hal_fmac.h"
 #endif /* HAL_FMAC_MODULE_ENABLED */
 
 #ifdef HAL_GFXMMU_MODULE_ENABLED
-  #include "stm32u5xx_hal_gfxmmu.h"
+#include "stm32u5xx_hal_gfxmmu.h"
 #endif /* HAL_GFXMMU_MODULE_ENABLED */
 
 #ifdef HAL_GFXTIM_MODULE_ENABLED
@@ -440,27 +435,27 @@
 #endif /* HAL_GFXTIM_MODULE_ENABLED */
 
 #ifdef HAL_GPU2D_MODULE_ENABLED
-  #include "stm32u5xx_hal_gpu2d.h"
+#include "stm32u5xx_hal_gpu2d.h"
 #endif /* HAL_GPU2D_MODULE_ENABLED */
 
 #ifdef HAL_OTFDEC_MODULE_ENABLED
- #include "stm32u5xx_hal_otfdec.h"
+#include "stm32u5xx_hal_otfdec.h"
 #endif /* HAL_OTFDEC_MODULE_ENABLED */
 
 #ifdef HAL_PSSI_MODULE_ENABLED
- #include "stm32u5xx_hal_pssi.h"
+#include "stm32u5xx_hal_pssi.h"
 #endif /* HAL_PSSI_MODULE_ENABLED */
 
 #ifdef HAL_RAMCFG_MODULE_ENABLED
- #include "stm32u5xx_hal_ramcfg.h"
+#include "stm32u5xx_hal_ramcfg.h"
 #endif /* HAL_RAMCFG_MODULE_ENABLED */
 
 #ifdef HAL_MDF_MODULE_ENABLED
- #include "stm32u5xx_hal_mdf.h"
+#include "stm32u5xx_hal_mdf.h"
 #endif /* HAL_MDF_MODULE_ENABLED */
 
 #ifdef HAL_XSPI_MODULE_ENABLED
- #include "stm32u5xx_hal_xspi.h"
+#include "stm32u5xx_hal_xspi.h"
 #endif /* HAL_XSPI_MODULE_ENABLED */
 
 /* Exported macro ------------------------------------------------------------*/
@@ -473,11 +468,11 @@
   *         If expr is true, it returns no value.
   * @retval None
   */
-  #define assert_param(expr) ((expr) ? (void)0U : assert_failed((uint8_t *)__FILE__, __LINE__))
+#define assert_param(expr) ((expr) ? (void)0U : assert_failed((uint8_t *)__FILE__, __LINE__))
 /* Exported functions ------------------------------------------------------- */
-  void assert_failed(uint8_t *file, uint32_t line);
+void assert_failed(uint8_t *file, uint32_t line);
 #else
-  #define assert_param(expr) ((void)0U)
+#define assert_param(expr) ((void)0U)
 #endif /* USE_FULL_ASSERT */
 
 #ifdef __cplusplus

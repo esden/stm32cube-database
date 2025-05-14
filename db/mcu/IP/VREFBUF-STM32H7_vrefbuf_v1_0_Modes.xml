@@ -4,20 +4,35 @@
 	ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
 	xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
 	<About>VREFBUF</About>
-	
+
 	<RefParameter Comment="Instance" DefaultValue="VREFBUF" Name="Instance" Type="" Visible="false"/>
-	
+    <RefParameter Comment="High impedance mode" DefaultValue="VREFBUF_HIGH_IMPEDANCE_ENABLE" Name="HighImpedanceMode" Type="list" Visible="false">
+		 <Condition Expression="(Sem_ExternalMode | Sem_HoldMode) &amp;(DIE485)" Diagnostic="" />
+		<PossibleValue Comment="Enable" Value="VREFBUF_HIGH_IMPEDANCE_ENABLE" />
+	</RefParameter>
+
+	<RefParameter Comment="High impedance mode" DefaultValue="VREFBUF_HIGH_IMPEDANCE_DISABLE" Name="HighImpedanceMode" Type="list" Visible="false">
+		 <Condition Expression="(Sem_VREFBUFOFF | Sem_InternalMode) &amp;(DIE485)" Diagnostic="" />
+		<PossibleValue Comment="Disable" Value="VREFBUF_HIGH_IMPEDANCE_DISABLE" />
+	</RefParameter>
 	<RefParameter Comment="High impedance mode" DefaultValue="SYSCFG_VREFBUF_HIGH_IMPEDANCE_ENABLE" Name="HighImpedanceMode" Type="list" Visible="false">
 		 <Condition Expression="Sem_ExternalMode | Sem_HoldMode" Diagnostic="" />
 		<PossibleValue Comment="Enable" Value="SYSCFG_VREFBUF_HIGH_IMPEDANCE_ENABLE" />
 	</RefParameter>
-	
+
 	<RefParameter Comment="High impedance mode" DefaultValue="SYSCFG_VREFBUF_HIGH_IMPEDANCE_DISABLE" Name="HighImpedanceMode" Type="list" Visible="false">
 		 <Condition Expression="Sem_VREFBUFOFF | Sem_InternalMode" Diagnostic="" />
 		<PossibleValue Comment="Disable" Value="SYSCFG_VREFBUF_HIGH_IMPEDANCE_DISABLE" />
 	</RefParameter>
-	
+
    <RefParameter Comment="High impedance mode" DefaultValue="null" Name="HighImpedanceMode" Type="list" Visible="false"/>
+   	<RefParameter Comment="Internal Voltage reference scale" DefaultValue="SYSCFG_VREFBUF_VOLTAGE_SCALE0" Name="VoltageScaling" Type="list">
+		<Condition Expression="(Sem_InternalMode | Sem_HoldMode)&amp;(DIE485)" Diagnostic="" />
+		<PossibleValue Comment="SCALE 0: around 2.5 V" Value="VREFBUF_VOLTAGE_SCALE0" />
+		<PossibleValue Comment="SCALE 1: around 2.048 V" Value="VREFBUF_VOLTAGE_SCALE1" />
+        <PossibleValue Comment="SCALE 2: around 1.8 V" Value="VREFBUF_VOLTAGE_SCALE2" />
+		<PossibleValue Comment="SCALE 3: around 1.5 V" Value="VREFBUF_VOLTAGE_SCALE3" />    
+	</RefParameter>
 
 	<RefParameter Comment="Internal Voltage reference scale" DefaultValue="SYSCFG_VREFBUF_VOLTAGE_SCALE0" Name="VoltageScaling" Type="list">
 		<Condition Expression="(Sem_InternalMode | Sem_HoldMode)" Diagnostic="" />
@@ -25,52 +40,52 @@
 		<PossibleValue Comment="SCALE 1: around 2.048 V" Value="SYSCFG_VREFBUF_VOLTAGE_SCALE1" />
                 <PossibleValue Comment="SCALE 2: around 1.8 V" Value="SYSCFG_VREFBUF_VOLTAGE_SCALE2" />
 		<PossibleValue Comment="SCALE 3: around 1.5 V" Value="SYSCFG_VREFBUF_VOLTAGE_SCALE3" />
-               
+
 	</RefParameter>
-	
+
 	<RefParameter Comment="Internal Voltage reference scale" DefaultValue="null" Name="VoltageScaling" Type="list" Visible="false" />
-	
+
 	<RefParameter Comment="Trimming Mode" DefaultValue="__NULL" Name="TrimmingMode" Type="list">
 	    <Condition Expression="Sem_InternalMode" Diagnostic=""/>
 		<PossibleValue Comment="Factory Trimming" Value="__NULL" />
 		<PossibleValue Comment="User Trimming" Value="USER_TRIMMING" />
 	</RefParameter>
-	
+
 	<RefParameter Comment="Trimming Mode" DefaultValue="null" Name="TrimmingMode" Type="list" Visible="false" />
-	
+
 	<RefParameter Comment="Trimming Value" DefaultValue="0" Max="63" Min="0" Name="TrimmingValue" Type="integer">
     	<Condition Expression="TrimmingMode = USER_TRIMMING &amp; Sem_InternalMode" Diagnostic=""/>
     </RefParameter>
-    
+
     <RefParameter Comment="Trimming Value" DefaultValue="null" Max="63" Min="0" Name="TrimmingValue" Type="integer" Visible="false"/>
-	
+
 	<RefMode Name="VREFBUFOFFMode" Group="Voltage_Reference_Buffer_Settings">
             <ConfigForMode>VREF_CLK_ENABLE</ConfigForMode>
 		<ConfigForMode>VREFBUFMODEConfigDisable</ConfigForMode>
 		<ConfigForMode>HighImpedanceModeConfig</ConfigForMode>
 		<Parameter Name="HighImpedanceMode" />
 	</RefMode>
-	
+
 	<RefMode Name="ExternalMode" Group="Voltage_Reference_Buffer_Settings">
              <ConfigForMode>VREF_CLK_ENABLE</ConfigForMode>
 		<ConfigForMode>VREFBUFMODEConfigDisable</ConfigForMode>
 		<ConfigForMode>HighImpedanceModeConfig</ConfigForMode>
 		<Parameter Name="HighImpedanceMode" />
 	</RefMode>
-        
+
         <RefMode Name="InternalMode" Group="Voltage_Reference_Buffer_Settings">
              <ConfigForMode>VREF_CLK_ENABLE</ConfigForMode>
 	    <ConfigForMode>TrimmingValueConfig</ConfigForMode>
     	<ConfigForMode>InternalVoltageReferenceScaleConfig</ConfigForMode>
 		<ConfigForMode>VREFBUFMODEConfigEnable</ConfigForMode>
 		<ConfigForMode>HighImpedanceModeConfig</ConfigForMode>	
-                
+
 		<Parameter Name="HighImpedanceMode" />
 		<Parameter Name="TrimmingMode" />
 		<Parameter Name="TrimmingValue" />
 		<Parameter Name="VoltageScaling" />
 	</RefMode>
-	
+
 	<RefMode Name="HoldMode" Group="Voltage_Reference_Buffer_Settings">
             <ConfigForMode>VREF_CLK_ENABLE</ConfigForMode>
 		<ConfigForMode>InternalVoltageReferenceScaleConfig</ConfigForMode>
@@ -79,10 +94,10 @@
 		<Parameter Name="HighImpedanceMode" />
 		<Parameter Name="VoltageScaling" />
 	</RefMode>
-	
-        	
+
+
         <ModeLogicOperator Name="OR">
-                                          
+
 		<Mode Name="VREFBUFMODE" UserName="VREFBUF Mode" ><!--RemoveCondition="!$modeexist_InternalMode"-->
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="VREFBUFOFFMode" UserName="VREFBUF buffer OFF">
@@ -96,30 +111,29 @@
 						<Signal Name="V_VREFBUF" />
 					</SignalLogicalOp>
 					<Semaphore>Sem_ExternalMode</Semaphore>
-				</Mode>				
+				</Mode>
 				<Mode Name="InternalMode" UserName="Internal voltage reference">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="$SingleInstanceVREFBUF_OUT" />
                                                 <!--Signal Name="V_VREFBUF" /-->
 					</SignalLogicalOp>
 					<Semaphore>Sem_InternalMode</Semaphore>
-				</Mode>				
+				</Mode>
 				<Mode Name="HoldMode" UserName="Hold">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="V_VREFBUF" />
 					</SignalLogicalOp>
 					<Semaphore>Sem_HoldMode</Semaphore>
-				</Mode>					
+				</Mode>
 			</ModeLogicOperator>
-		</Mode>	
-			
+		</Mode>
+
                 </ModeLogicOperator>
-                
+
  <!-- RefSignal for System -->
-	
-	
+
 	<RefSignal IOMode="Analog" Name="V_VREFBUF" Virtual="true" />
-	<RefSignal IOMode="System" Name="$SingleInstanceVREFBUF_OUT" />
+	<RefSignal IOMode="System" Name="$SingleInstanceVREFBUF_OUT" Virtual="true" />
         
         
         

@@ -2,7 +2,7 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file    partition_[#if McuName?starts_with("STM32H562")]stm32h562xx.h[/#if][#if McuName?starts_with("STM32H563")]stm32h563xx.h[/#if][#if McuName?starts_with("STM32H573")]stm32h573xx.h[/#if]
+  * @file    partition_[#if McuName?starts_with("STM32H562")]stm32h562xx.h[/#if][#if McuName?starts_with("STM32H563")]stm32h563xx.h[/#if][#if McuName?starts_with("STM32H573")]stm32h573xx.h[/#if][#if McuName?starts_with("STM32H523")]stm32h523xx.h[/#if][#if McuName?starts_with("STM32H533")]stm32h533xx.h[/#if]
   * @author  MCD Application Team
   * @brief   CMSIS [#if McuName?starts_with("STM32H562")]STM32H562xx[/#if] [#if McuName?starts_with("STM32H563")]STM32H563xx[/#if] [#if McuName?starts_with("STM32H573")]STM32H573xx[/#if] Device Initial Setup for Secure / Non-Secure Zones
   *          for ARMCM33 based on CMSIS CORE partition_ARMCM33.h Template.
@@ -14,26 +14,23 @@
   *           - Setup Interrupt Target
   *
   ******************************************************************************/
-/*
-  * Copyright (c) 2009-2016 ARM Limited. All rights reserved.
-  * Portions Copyright (c) 2020 STMicroelectronics, all rights reserved
+/**
+  * Copyright (c) 2009-2019 Arm Limited. All rights reserved.
+  * Copyright (c) 2023 STMicroelectronics. All rights reserved.  
   *
   * SPDX-License-Identifier: Apache-2.0
- 
   *
- * Licensed under the Apache License, Version 2.0 (the License); you may
- * not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+  * Licensed under the Apache License, Version 2.0 (the License); you may
+  * not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
   *
- * http://www.apache.org/licenses/LICENSE-2.0
-   *
-
-
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an AS IS BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+  * http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an AS IS BASIS, WITHOUT
+  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
  */
 /* USER CODE END Header */
 

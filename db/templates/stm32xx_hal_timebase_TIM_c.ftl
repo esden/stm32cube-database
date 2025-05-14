@@ -60,6 +60,9 @@ void ${instance}_IRQHandler(void);
 [#if FamilyName=="STM32C0"]
 [#assign APB = "APB1"]
 [/#if]
+[#if FamilyName=="STM32U0"]
+[#assign APB = "APB1"]
+[/#if]
 HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
 {
   RCC_ClkInitTypeDef    clkconfig;

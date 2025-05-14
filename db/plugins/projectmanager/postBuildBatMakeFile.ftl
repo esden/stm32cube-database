@@ -4,7 +4,7 @@
 :: arg1 is the binary type (1 nonsecure, 2 secure)
 set "projectdir=%~dp0"
 set signing=%1
-pushd %projectdir%
+pushd "%projectdir%"
 set provisioningdir=%cd%
 set env_script="%provisioningdir%\env.bat"
 call %env_script%
@@ -15,6 +15,8 @@ popd
 setlocal EnableDelayedExpansion
 ::default use case for image non assembly
 [#if appli_assembly??]
+set app_image_number=1
+[#elseif isAppliOnly??]
 set app_image_number=1
 [#else]
 set app_image_number=2
@@ -86,29 +88,34 @@ set "applicfg=%cube_fw_path%\Utilities\PC_Software\ROT_AppliConfig\AppliCfg.py"
 set "python=python "
 
 :postbuild
-echo Postbuild %signing% image > %projectdir%\postbuild.log 2>&1
+echo Postbuild %signing% image > "%projectdir%"\postbuild.log 2>&1
 
 if "%app_image_number%" == "2" (
 goto :continue
 )
 if %signing% == nonsecure (
-echo Creating only one image >> %projectdir%\postbuild.log 2>&1
+echo Creating only one image >> "%projectdir%"\postbuild.log 2>&1
 %python%%applicfg% oneimage -fb "%appli_secure_path%\%appli_secure%" -sb "%appli_non_secure_path%\%appli_non_secure%" -o %secure_code_size% -ob "%appli_assembly_path%\%appli_assembly%" --vb
 "%stm32tpccli%" -pb %ns_code_xml%
 if !errorlevel! neq 0 goto :error
 )
 
+if %signing% == application (
+echo Creating application image  >> "%projectdir%"\postbuild.log 2>&1
+"%stm32tpccli%" -pb %code_xml% >> "%projectdir%"\postbuild.log 2>&1
+if !errorlevel! neq 0 goto :error
+)
 
 :continue
 if %signing% == secure (
-echo Creating secure image  >> %projectdir%\postbuild.log 2>&1
-"%stm32tpccli%" -pb %s_code_xml% >> %projectdir%\postbuild.log 2>&1
+echo Creating secure image  >> "%projectdir%"\postbuild.log 2>&1
+"%stm32tpccli%" -pb %s_code_xml% >> "%projectdir%"\postbuild.log 2>&1
 if !errorlevel! neq 0 goto :error
 )
 
 if %signing% == nonsecure (
-echo Creating nonsecure image  >> %projectdir%\postbuild.log 2>&1
-"%stm32tpccli%" -pb %ns_code_xml% >> %projectdir%\postbuild.log 2>&1
+echo Creating nonsecure image  >> "%projectdir%"\postbuild.log 2>&1
+"%stm32tpccli%" -pb %ns_code_xml% >> "%projectdir%"\postbuild.log 2>&1
 if !errorlevel! neq 0 goto :error
 )
 

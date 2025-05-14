@@ -127,7 +127,7 @@
 	
 	<RefParameter Name="USBH_PROCESS_STACK_SIZE" Comment="USBH_PROCESS_STACK_SIZE (The CMSIS-RTOS stack size requirements in words)" Min="=FREERTOS:configMINIMAL_STACK_SIZE" Max="=FREERTOS:configTOTAL_HEAP_SIZE/4" DefaultValue="=FREERTOS:configMINIMAL_STACK_SIZE" Type="integer" Group="CMSIS_RTOS" Unit="Words" >			
 		<Condition Expression="S_FREERTOS$context" Diagnostic=""/>	
-		<Description>Stack size used by the main USB Host thread. &lt;br&gt;It's up to the user to fine tune this parameter value considering all dependencies.</Description>		
+		<Description>Stack size used by the main USB Host thread. &lt;br&gt;It's up to the user to fine tune this parameter value considering all dependencies.&lt;br&gt; &lt;strong&gt; The value of USBH_PROCESS_STACK_SIZE is between the selected value of the FreeRTOS MINIMAL_STACK_SIZE parameter and its maximum. &lt;/strong&gt; </Description>		
 	</RefParameter>	
 	<RefParameter Name="USBH_PROCESS_STACK_SIZE" Comment="USBH_PROCESS_STACK_SIZE (The CMSIS-RTOS stack size requirements in words)" DefaultValue="0" Type="integer" Group="CMSIS_RTOS" Unit="Words" Visible="false">			
 		<Description>Stack size used by the main USB Host thread. &lt;br&gt;It's up to the user to fine tune this parameter value considering all dependencies.</Description>		
@@ -264,11 +264,41 @@
 	<RefParameter Name="USBH_MTP" Comment="" DefaultValue="0" Max="10" Min="0"  Type="integer" Visible="false">
 		<PossibleValue Comment="" Value="USBH_MTP_CLASS"/>	
 	</RefParameter>
-	
+	<RefParameter Added="true" Comment="NO_SW_VBUS_DRIVE_FS" DefaultValue="false" Group="" Name="SW_VBUS_DRIVE_AUDIO_FS" Type="boolean" Unit="">
+        <Description>Displays the platform settings bloc</Description>
+		<PossibleValue Comment="false" Value="false"/>
+        <PossibleValue Comment="true" Value="true"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="NO_SW_VBUS_DRIVE_FS" DefaultValue="false" Group="" Name="SW_VBUS_DRIVE_CDC_FS" Type="boolean" Unit="">
+        <Description>Displays the platform settings bloc</Description>
+		<PossibleValue Comment="false" Value="false"/>
+        <PossibleValue Comment="true" Value="true"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="NO_SW_VBUS_DRIVE_FS" DefaultValue="false" Group="" Name="SW_VBUS_DRIVE_HID_FS" Type="boolean" Unit="">
+        <Description>Displays the platform settings bloc</Description>
+		<PossibleValue Comment="false" Value="false"/>
+        <PossibleValue Comment="true" Value="true"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="NO_SW_VBUS_DRIVE_FS" DefaultValue="false" Group="" Name="SW_VBUS_DRIVE_MSC_FS" Type="boolean" Unit="">
+        <Description>Displays the platform settings bloc</Description>
+		<PossibleValue Comment="false" Value="false"/>
+        <PossibleValue Comment="true" Value="true"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="NO_SW_VBUS_DRIVE_FS" DefaultValue="false" Group="" Name="SW_VBUS_DRIVE_MTP_FS" Type="boolean" Unit="">
+        <Description>Displays the platform settings bloc</Description>
+		<PossibleValue Comment="false" Value="false"/>
+        <PossibleValue Comment="true" Value="true"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="NO_SW_VBUS_DRIVE_FS" DefaultValue="false" Group="" Name="ALL_SW_VBUS_DRIVE_FS" Type="boolean" Unit="">
+        <Description>Displays the platform settings bloc</Description>
+		<PossibleValue Comment="false" Value="false"/>
+        <PossibleValue Comment="true" Value="true"/>
+    </RefParameter>
 	
 	<!-- RefMode for USB HOST : Support AUDIO Class-->
 	<RefMode Name="AUDIO_FS" Abstract="false" HalMode="">
 		<ConfigForMode>USB_HOST_AUDIO_FS</ConfigForMode>
+		<Parameter Name="SW_VBUS_DRIVE_AUDIO_FS" />
 		<Parameter Name="VirtualModeFS">		
 			<PossibleValue>Audio</PossibleValue>
 		</Parameter>
@@ -311,14 +341,19 @@
 		<Parameter Name="USBH_HandleTypeDef">
 			<PossibleValue>hUsbHostFS</PossibleValue>
 		</Parameter>
-		<BspDependency Name="Drive_VBUS_FS" Comment="The GPIO is capable to drive the Pump charge of the VBUS" BspIpName="GPIO" BspModeName="Output"/>
-		<BspDependency Name="Drive_VBUS_FS" Comment="The I2C is capable to drive the Pump charge of the VBUS" BspIpName="I2C" BspModeName="I2C"/>
+		<BspDependency Name="Drive_VBUS_FS" Comment="The GPIO is capable to drive the Pump charge of the VBUS" BspIpName="GPIO" BspModeName="Output">
+			<Condition Diagnostic="" Expression="SW_VBUS_DRIVE_AUDIO_FS	= false"/>
+		</BspDependency>
+		<BspDependency Name="Drive_VBUS_FS" Comment="The I2C is capable to drive the Pump charge of the VBUS" BspIpName="I2C" BspModeName="I2C">
+			<Condition Diagnostic="" Expression="SW_VBUS_DRIVE_AUDIO_FS	= false"/>
+		</BspDependency>
 	</RefMode>
 	
 	
 	<!-- RefMode for USB HOST : Support CDC Class (Virtual Port Com)-->
 	<RefMode Name="CDC_FS" Abstract="false" HalMode="">
 		<ConfigForMode>USB_HOST_CDC_FS</ConfigForMode>
+		<Parameter Name="SW_VBUS_DRIVE_CDC_FS" />
 		<Parameter Name="VirtualModeFS">		
 			<PossibleValue>Cdc</PossibleValue>
 		</Parameter>
@@ -361,14 +396,21 @@
 		<Parameter Name="USBH_HandleTypeDef">
 			<PossibleValue>hUsbHostFS</PossibleValue>
 		</Parameter>
-		<BspDependency Name="Drive_VBUS_FS" Comment="The GPIO is capable to drive the Pump charge of the VBUS" BspIpName="GPIO" BspModeName="Output"/>
-		<BspDependency Name="Drive_VBUS_FS" Comment="The I2C is capable to drive the Pump charge of the VBUS" BspIpName="I2C" BspModeName="I2C"/>	
-		<BspDependency Name="Drive_VBUS_FS" Comment="The I2C is capable to drive the VBUS over an IOExpander" BspIpName="I2C" BspModeName="I2C" Component="IOExpander"/>	
+		<BspDependency Name="Drive_VBUS_FS" Comment="The GPIO is capable to drive the Pump charge of the VBUS" BspIpName="GPIO" BspModeName="Output">
+			<Condition Diagnostic="" Expression="SW_VBUS_DRIVE_CDC_FS = false"/>
+		</BspDependency>
+		<BspDependency Name="Drive_VBUS_FS" Comment="The I2C is capable to drive the Pump charge of the VBUS" BspIpName="I2C" BspModeName="I2C">
+			<Condition Diagnostic="" Expression="SW_VBUS_DRIVE_CDC_FS = false"/>
+		</BspDependency>
+		<BspDependency Name="Drive_VBUS_FS" Comment="The I2C is capable to drive the VBUS over an IOExpander" BspIpName="I2C" BspModeName="I2C" Component="IOExpander">
+			<Condition Diagnostic="" Expression="SW_VBUS_DRIVE_CDC_FS = false"/>
+		</BspDependency>
 	</RefMode>	
 	
 	<!-- RefMode for USB HOST : Support HID Class-->
 	<RefMode Name="HID_FS" Abstract="false" HalMode="">
 		<ConfigForMode>USB_HOST_HID_FS</ConfigForMode>
+		<Parameter Name="SW_VBUS_DRIVE_HID_FS" />
 		<Parameter Name="VirtualModeFS">		
 			<PossibleValue>Hid</PossibleValue>
 		</Parameter>
@@ -411,13 +453,18 @@
 		<Parameter Name="USBH_HandleTypeDef">
 			<PossibleValue>hUsbHostFS</PossibleValue>
 		</Parameter>
-		<BspDependency Name="Drive_VBUS_FS" Comment="The GPIO is capable to drive the Pump charge of the VBUS" BspIpName="GPIO" BspModeName="Output"/>
-		<BspDependency Name="Drive_VBUS_FS" Comment="The I2C is capable to drive the Pump charge of the VBUS" BspIpName="I2C" BspModeName="I2C"/>		
+		<BspDependency Name="Drive_VBUS_FS" Comment="The GPIO is capable to drive the Pump charge of the VBUS" BspIpName="GPIO" BspModeName="Output">
+			<Condition Diagnostic="" Expression="SW_VBUS_DRIVE_HID_FS = false"/>
+		</BspDependency>
+		<BspDependency Name="Drive_VBUS_FS" Comment="The I2C is capable to drive the Pump charge of the VBUS" BspIpName="I2C" BspModeName="I2C">
+			<Condition Diagnostic="" Expression="SW_VBUS_DRIVE_HID_FS = false"/>
+		</BspDependency>
 	</RefMode>
 	
 	<!-- RefMode for USB HOST : Support MSC Class (Mass Storage)-->
 	<RefMode Name="MSC_FS" Abstract="false" HalMode="">
 		<ConfigForMode>USB_HOST_MSC_FS</ConfigForMode>
+		<Parameter Name="SW_VBUS_DRIVE_MSC_FS" />
 		<Parameter Name="VirtualModeFS">		
 			<PossibleValue>Msc</PossibleValue>
 		</Parameter>
@@ -460,13 +507,18 @@
 		<Parameter Name="USBH_HandleTypeDef">
 			<PossibleValue>hUsbHostFS</PossibleValue>
 		</Parameter>
-		<BspDependency Name="Drive_VBUS_FS" Comment="The GPIO is capable to drive the Pump charge of the VBUS" BspIpName="GPIO" BspModeName="Output"/>
-		<BspDependency Name="Drive_VBUS_FS" Comment="The I2C is capable to drive the Pump charge of the VBUS" BspIpName="I2C" BspModeName="I2C"/>		
+		<BspDependency Name="Drive_VBUS_FS" Comment="The GPIO is capable to drive the Pump charge of the VBUS" BspIpName="GPIO" BspModeName="Output">
+			<Condition Diagnostic="" Expression="SW_VBUS_DRIVE_MSC_FS = false"/>
+		</BspDependency>
+		<BspDependency Name="Drive_VBUS_FS" Comment="The I2C is capable to drive the Pump charge of the VBUS" BspIpName="I2C" BspModeName="I2C">
+			<Condition Diagnostic="" Expression="SW_VBUS_DRIVE_MSC_FS = false"/>
+		</BspDependency>
 	</RefMode>
 	
 	<!-- RefMode for USB HOST : Support MSC Class (Mass Storage)-->
 	<RefMode Name="ALL_Classes_FS"  Abstract="false" HalMode="">
 		<ConfigForMode>USB_HOST_ALL_CLASSES_FS</ConfigForMode>
+		<Parameter Name="ALL_SW_VBUS_DRIVE_FS" />
 		<Parameter Name="VirtualModeFS">		
 			<PossibleValue>All_Classes</PossibleValue>
 		</Parameter>
@@ -509,13 +561,18 @@
 		<Parameter Name="USBH_HandleTypeDef">
 			<PossibleValue>hUsbHostFS</PossibleValue>
 		</Parameter>
-		<BspDependency Name="Drive_VBUS_FS" Comment="The GPIO is capable to drive the Pump charge of the VBUS" BspIpName="GPIO" BspModeName="Output"/>
-		<BspDependency Name="Drive_VBUS_FS" Comment="The I2C is capable to drive the Pump charge of the VBUS" BspIpName="I2C" BspModeName="I2C"/>		
+		<BspDependency Name="Drive_VBUS_FS" Comment="The GPIO is capable to drive the Pump charge of the VBUS" BspIpName="GPIO" BspModeName="Output">
+			<Condition Diagnostic="" Expression="ALL_SW_VBUS_DRIVE_FS = false"/>
+		</BspDependency>
+		<BspDependency Name="Drive_VBUS_FS" Comment="The I2C is capable to drive the Pump charge of the VBUS" BspIpName="I2C" BspModeName="I2C">
+			<Condition Diagnostic="" Expression="ALL_SW_VBUS_DRIVE_FS = false"/>
+		</BspDependency>
 	</RefMode>
 	
 	<!-- RefMode for USB HOST : Support MTP Class-->
 	<RefMode Name="MTP_FS" Abstract="false" HalMode="">
 		<ConfigForMode>USB_HOST_MTP_FS</ConfigForMode>
+		<Parameter Name="SW_VBUS_DRIVE_MTP_FS" />
 		<Parameter Name="VirtualModeFS">		
 			<PossibleValue>Mtp</PossibleValue>
 		</Parameter>
@@ -555,8 +612,12 @@
 		</Parameter>
 		<Parameter Name="hUsbHost"/>
 		<Parameter Name="id"/>
-		<BspDependency Name="Drive_VBUS_FS" Comment="The GPIO is capable to drive the Pump charge of the VBUS" BspIpName="GPIO" BspModeName="Output"/>
-		<BspDependency Name="Drive_VBUS_FS" Comment="The I2C is capable to drive the Pump charge of the VBUS" BspIpName="I2C" BspModeName="I2C"/>		
+		<BspDependency Name="Drive_VBUS_FS" Comment="The GPIO is capable to drive the Pump charge of the VBUS" BspIpName="GPIO" BspModeName="Output">
+			<Condition Diagnostic="" Expression="SW_VBUS_DRIVE_MTP_FS = false"/>
+		</BspDependency>
+		<BspDependency Name="Drive_VBUS_FS" Comment="The I2C is capable to drive the Pump charge of the VBUS" BspIpName="I2C" BspModeName="I2C">
+			<Condition Diagnostic="" Expression="SW_VBUS_DRIVE_MTP_FS = false"/>
+		</BspDependency>
 	</RefMode>
 	
 	

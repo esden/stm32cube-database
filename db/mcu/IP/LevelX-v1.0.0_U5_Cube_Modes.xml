@@ -50,6 +50,12 @@
 		<Parameter Name="LX_NAND_Simulator_Interface">
 			<PossibleValue>1</PossibleValue>
 		</Parameter>
+		<Parameter Added="true" Name="LX_NAND_SIM_TOTAL_BLOCKS"></Parameter>
+        <Parameter Added="true" Name="LX_NAND_SIM_PAGES_PER_BLOCK"></Parameter>
+        <Parameter Added="true" Name="LX_NAND_SIM_BYTES_PER_PAGE"></Parameter>
+        <Parameter Added="true" Name="LX_NAND_SIM_SPARE_BYTES_PER_PAGE"></Parameter>
+        <Parameter Added="true" Name="LX_NAND_SIM_BAD_BLOCK_BYTE_POSITION"></Parameter>
+		<Parameter Added="true" Name="LX_NAND_SIM_EXTRA_BYTES_POSITION"></Parameter>
     </RefMode>
 	<RefMode Abstract="true" Name="NAND_custom_interface">
         <ConfigForMode>NANDOocustomOointerface</ConfigForMode>
@@ -454,4 +460,33 @@ When Set the 0 the user needs to implment the following API at application level
 		<Description></Description>
 		<Condition Diagnostic="" Expression="s_o1_hyperbusmx | s_o2_hyperbusmx"/>
 	</RefParameter>
+	<RefParameter Added="true" Comment="NAND spare bytes per page" DefaultValue="=(LX_NAND_SIM_BYTES_PER_PAGE / 32)" Group="NAND Simulator Driver" Name="LX_NAND_SIM_SPARE_BYTES_PER_PAGE" TabName="LevelX" Type="string">
+        <Description>The number of spare bytes per page. These bytes are not part of the page. They are used for error correction algorithms and bad block flags.</Description>
+    </RefParameter>
+	<RefParameter Added="true" Comment="NAND bad block position" DefaultValue="3" Group="NAND Simulator Driver" Max="63" Min="0" Name="LX_NAND_SIM_BAD_BLOCK_BYTE_POSITION" TabName="LevelX" Type="integer" Unit="">
+        <Description>The position of the bad block byte within the spare bytes.</Description>
+        <ValueCondition Diagnostic="Value must be strictly below the number of spare bytes per page." Expression="(Value &lt; LX_NAND_SIM_SPARE_BYTES_PER_PAGE)*( Value &lt;&gt; LX_NAND_SIM_EXTRA_BYTES_POSITION )"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="NAND pages per block" DefaultValue="16" Group="NAND Simulator Driver" Name="LX_NAND_SIM_PAGES_PER_BLOCK" TabName="LevelX" Type="list">
+        <Description>The number of pages in each block of the simulated NAND memory. The total number of blocks, the pages per block and bytes per page parameters control the total simulated NAND flash size.</Description>
+        <PossibleValue Comment="2" Value="2"/>
+        <PossibleValue Comment="4" Value="4"/>
+        <PossibleValue Comment="8" Value="8"/>
+        <PossibleValue Comment="16" Value="16"/>
+        <PossibleValue Comment="32" Value="32"/>
+        <PossibleValue Comment="64" Value="64"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="NAND bytes per page" DefaultValue="256" Group="NAND Simulator Driver" Name="LX_NAND_SIM_BYTES_PER_PAGE" TabName="LevelX" Type="list">
+        <Description>The number of bytes in each page of the simulated NAND memory. The total number of blocks, the pages per block and bytes per page parameters control the total simulated NAND flash size.</Description>
+        <PossibleValue Comment="256" Value="256"/>
+        <PossibleValue Comment="512" Value="512"/>
+        <PossibleValue Comment="2048" Value="2048"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="NAND extra bytes start position" DefaultValue="5" Group="NAND Simulator Driver" Max="63" Min="0" Name="LX_NAND_SIM_EXTRA_BYTES_POSITION" TabName="LevelX" Type="integer" Unit="">
+        <Description>The start position of extra bytes within the spare bytes.</Description>
+        <ValueCondition Diagnostic="Value must be strictly below the number of spare bytes per page." Expression="(Value &lt; LX_NAND_SIM_SPARE_BYTES_PER_PAGE)*(Value&lt;&gt; LX_NAND_SIM_BAD_BLOCK_BYTE_POSITION)"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="NAND total blocks" DefaultValue="5" Group="NAND Simulator Driver" Max="1024" Min="0" Name="LX_NAND_SIM_TOTAL_BLOCKS" TabName="LevelX" Type="integer" Unit="">
+        <Description>The number of blocks of the simulated NAND memory. This parameter along with the total pages per block and bytes per page determine the total size of the simulated memory.</Description>
+    </RefParameter>
 </IP>

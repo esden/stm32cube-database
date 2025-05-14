@@ -15,8 +15,11 @@
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
+[#if (contextFolder?? && contextFolder=="ExtMemLoader/")]
+#include "extmemloader_init.h"
+[#else]
 #include "${main_h}"
-
+[/#if]
 [#if jpeg_utils_conf_h??]
 #include "${jpeg_utils_conf_h}"
 [/#if]
@@ -37,7 +40,7 @@
 [#list IPdatas as IP]  
 [#list IP.configModelList as instanceData]
     [#assign instName = instanceData.instanceName]
-    [#if !(instName?starts_with("GPDMA")) && !(instName?starts_with("LPDMA")) && instanceData.dmaHandel??]
+    [#if !(instName?starts_with("GPDMA")) && !(instName?starts_with("HPDMA")) &&!(instName?starts_with("LPDMA")) && instanceData.dmaHandel??]
         [#list instanceData.dmaHandel as dHandle]
             extern ${dHandle};#n
             [#assign cmp = true] [#-- Flag to check if DMA is used--]
@@ -92,6 +95,19 @@
 #t*/
 void HAL_MspInit(void)
 {
+[#if !(contextFolder?? && contextFolder=="Appli/" && FamilyName=="STM32H7RS")]
+[#if FamilyName == "STM32H7RS"]
+[#if ValuePWRSUPPLY??]
+#n#t/* Configure the system Power Supply */
+#n#tif (HAL_PWREx_ConfigSupply(${ValuePWRSUPPLY}) != HAL_OK)
+#t{
+#t#t/* Initialization error */
+#t#tError_Handler();
+#t}
+[/#if]
+[/#if]
+[/#if]
+#n
 #t/* USER CODE BEGIN MspInit 0 */
 
 #n#t/* USER CODE END MspInit 0 */
@@ -126,8 +142,16 @@ void HAL_MspInit(void)
         [/#if]
     [/#list]
 [/#if]
-[#if VDDA_ISOLATION??]
- #tHAL_PWREx_EnableVddA(); 
+
+[#if isSBS_XSPIM1_Used?? || isSBS_XSPIM2_Used?? || isSBS_IO_Used??]
+#t__HAL_RCC_SBS_CLK_ENABLE();
+[/#if]
+[#if FamilyName == "STM32U5"]
+[#list IPdatas as IP]
+    [#if IP.ipName?? && IP.ipName?starts_with("ADC") && VDDA_ISOLATION??]
+    #tHAL_PWREx_EnableVddA();  
+    [/#if]
+[/#list]
 [/#if]
 #n
 
@@ -287,12 +311,63 @@ void HAL_MspInit(void)
 [@common.generateConfigModelListCode configModel=config inst="PWR"  nTab=1 index=""/]
 [/#list]
 [/#if]
+
+[#if isXSPIM_P1_Used??]
+#t/* Enable the XSPIM_P1 interface */
+#tHAL_PWREx_EnableXSPIM1();
+[/#if]
+#n
+[#if isXSPIM_P2_Used??]
+#t/* Enable the XSPIM_P2 interface */
+#tHAL_PWREx_EnableXSPIM2();
+[/#if]
+#n
+[#if isUSBVoltageDetector_Used??]
+#t/* Enable USB Voltage detector */
+#tif(HAL_PWREx_EnableUSBVoltageDetector() != HAL_OK)
+#t{
+#t  /* Initialization error */
+#t  Error_Handler();
+#t}
+[/#if]
 #n
 [#-- vrefbuf configuration --]
 [#if vrefbufConfig??]
 [#list vrefbufConfig as config]
 [@common.generateConfigModelListCode configModel=config inst="VREFBUF"  nTab=1 index=""/]
 [/#list]
+[/#if]
+#n
+[#if isSBSLL??]
+[#if isSBS_XSPIM1_Used??]
+#t/* high speed low voltage config */
+#tLL_SBS_EnableXSPI1SpeedOptim();
+[/#if]
+[#if isSBS_XSPIM2_Used??]
+#tLL_SBS_EnableXSPI2SpeedOptim();
+[/#if]
+[#if isSBS_IO_Used??]
+#tLL_SBS_EnableIOSpeedOptim();
+[/#if]
+[#else]
+[#if isSBS_XSPIM1_Used??]
+#t/* high speed low voltage config */
+#tHAL_SBS_EnableIOSpeedOptimize(SBS_IO_XSPI1_HSLV);
+[/#if]
+[#if isSBS_XSPIM2_Used??]
+#tHAL_SBS_EnableIOSpeedOptimize(SBS_IO_XSPI2_HSLV);
+[/#if]
+[#if isSBS_IO_Used??]
+#tHAL_SBS_EnableIOSpeedOptimize(SBS_CCCSR_IOHSLV);
+[/#if]
+[/#if]
+#n
+[#if USB_REGEN??]
+#tHAL_PWREx_EnableUSBReg();
+[/#if]
+#n
+[#if USB_HS_REGEN??]
+#tHAL_PWREx_EnableUSBHSregulator();
 [/#if]
 #n
 #t/* USER CODE BEGIN MspInit 1 */#n
@@ -1011,6 +1086,12 @@ void HAL_MspInit(void)
                     [#if ipvar.usedDriver?contains("HAL") && ipvar.clkCommonResource.entrySet()?contains(clock?trim)]#t#t}[/#if]  
                     [#else]
                         #t#t${clock?trim}[#if !clock?contains('(')]()[/#if];
+                        [#-- For ExtMemLoader project, the XSPI clock should be reset --]
+                        [#if (contextFolder?? && contextFolder=="ExtMemLoader/") && (ipName?lower_case)?matches("xspi[0-9]") && (clock?lower_case)?matches(".*xspi[0-9].*")]
+                          #n#t#t__HAL_RCC_${ipName}_FORCE_RESET();
+                          #t#t__HAL_RCC_${ipName}_RELEASE_RESET();
+                          #n
+                        [/#if]
                     [/#if]        
                 [/#list]
             [/#if]
@@ -1064,7 +1145,7 @@ void HAL_MspInit(void)
     [/#if]
 [/#if]
 
-[#if ipName?contains("DRD_FS") && FamilyName=="STM32U5"]
+[#if ipName?contains("DRD_FS") && (FamilyName=="STM32U5") ]
 [#if serviceType=="Init"]
 #n#t#t/* Enable VDDUSB */
 	#t#tif(__HAL_RCC_PWR_IS_CLK_DISABLED())
@@ -1096,6 +1177,13 @@ void HAL_MspInit(void)
 [/#if]
 [/#if]
 
+[#if ipName?contains("USB") && (FamilyName=="STM32H5" && DIE != "DIE474")]
+[#if serviceType=="Init"]
+#n#t/* Enable VDDUSB */
+#tHAL_PWREx_EnableVddUSB();
+[/#if]
+[/#if]
+
 [#-- if I2C clk_enable should be after GPIO Init Begin --]
     [#if serviceType=="Init" && (ipName?contains("I2C")||(ipName?contains("USB")))] 
            [#if initService.clock??]
@@ -1120,7 +1208,22 @@ void HAL_MspInit(void)
 
     [#if serviceType=="Init"] 
 [#-- bug 322189 Init--]
-[#if ipName?contains("OTG_FS")&&(FamilyName=="STM32L4"||FamilyName=="STM32U5") || Line.equals("STM32G0x1") && ipName?contains("USB_DRD_FS")]
+[#if ipName?contains("USB")&&(FamilyName=="STM32L4")]
+#n#t#t/* Enable VDDUSB */
+  #t#tif(__HAL_RCC_PWR_IS_CLK_DISABLED())
+  #t#t{
+    #t#t#t__HAL_RCC_PWR_CLK_ENABLE();
+    
+    #t#t#tHAL_PWREx_EnableVddUSB();
+    
+    #t#t#t__HAL_RCC_PWR_CLK_DISABLE();
+  #t#t}
+  #t#telse
+  #t#t{
+    #t#t#tHAL_PWREx_EnableVddUSB();
+  #t#t}
+[/#if]
+[#if ipName?contains("OTG_FS")&& FamilyName=="STM32U5" || Line.equals("STM32G0x1") && ipName?contains("USB_DRD_FS")]
 #n#t#t/* Enable VDDUSB */
   #t#tif(__HAL_RCC_PWR_IS_CLK_DISABLED())
   #t#t{
@@ -1606,7 +1709,17 @@ static uint32_t ${entry.value}=0;
 [/#if]
 [/#list]
 [/#if]
-  
+
+[#-- related to Ticket 171590   --]
+[#if nvic??]
+[#list nvic as NVIC]
+[#if  NVIC.name.contains("I3C1_WKUP") && DIE == "DIE485" ]
+#tEXTI_HandleTypeDef     EXTI_HandleStructure;
+#tEXTI_ConfigTypeDef     EXTI_ConfigStructure;
+[/#if]
+[/#list]
+[/#if]
+
     [#if  words[0].contains("DFSDM")]
         [#assign word0 = words[0]]  
             [#if DIE == "DIE451" || DIE == "DIE449" || DIE == "DIE441" || DIE == "DIE450" || DIE == "DIE483" || DIE == "DIE500" || DIE == "DIE501" || DIE == "DIE472" || FamilyName == "STM32L4"]
@@ -1618,7 +1731,11 @@ static uint32_t ${entry.value}=0;
     [#else] 
         [#assign word0 = words[0]]
         [#if  word0.contains("ADF")||word0.contains("MDF")]
+         [#if DIE == "DIE485"]
+            #tif[#if word0.contains("ADF")](IS_MDF_ALL_INSTANCE(h${mode?lower_case}->Instance))[/#if][#if word0.contains("MDF")](IS_MDF_INSTANCE(h${mode?lower_case}->Instance))[/#if]
+         [#else]
             #tif[#if word0.contains("ADF")](IS_ADF_INSTANCE(h${mode?lower_case}->Instance))[/#if][#if word0.contains("MDF")](IS_MDF_INSTANCE(h${mode?lower_case}->Instance))[/#if]
+         [/#if]
             #t{
         [#else]
             [#if ipvar.instanceNbre > 1] [#-- IF of IP instances greater than 0--]
@@ -1735,6 +1852,20 @@ static uint32_t ${entry.value}=0;
 #t{
 [/#if]
 [@common.generateConfigModelListCode configModel=pclockConfig inst=words[0]  nTab=2 index=""/]#n
+
+[#-- related to Ticket 171590   --]
+[#if nvic??]
+[#list nvic as NVIC]
+[#if  NVIC.name.contains("I3C1_WKUP") && DIE == "DIE485" ]
+#t#t/* Configure EXTI line for wakeup interrupt */
+#t#tEXTI_ConfigStructure.Line = EXTI_LINE_25;
+#t#tEXTI_ConfigStructure.Mode  =  EXTI_MODE_INTERRUPT;
+#t#tEXTI_ConfigStructure.Trigger = EXTI_TRIGGER_RISING;
+#n#t#tHAL_EXTI_SetConfigLine(&EXTI_HandleStructure, &EXTI_ConfigStructure);
+[/#if]
+[/#list]
+[/#if]
+
 [#if FamilyName=="STM32MP1"]
 #t}
 [/#if]
@@ -1802,14 +1933,16 @@ static uint32_t ${entry.value}=0;
 uint32_t DFSDM_Init = 0;
 [#assign DFSDM_var = "true"]
 [/#if]
-[#-- #nvoid HAL_${mode}_MspInit(${mode}_HandleTypeDef* h${mode?lower_case}){--] 
-[#if (mspIsEmpty1=="no")&&(mode!="TIM")]
+[#-- #nvoid HAL_${mode}_MspInit(${mode}_HandleTypeDef* h${mode?lower_case}){--]
+[#if (mspIsEmpty1=="no")&&(mode!="TIM" && !mode?starts_with("TIM"))]
 #nvoid HAL_${mode}_MspPostInit(${mode}_HandleTypeDef* h${mode?lower_case})
 {
 [#else]
 [#if (mspIsEmpty1=="no")&&(mode?contains("TIM"))]
-
-#nvoid HAL_TIM_MspPostInit(TIM_HandleTypeDef* h${mode?lower_case}) 
+[#if FamilyName=="STM32H7RS"]
+[#assign mode = "TIM"]
+[/#if]
+#nvoid HAL_TIM_MspPostInit(TIM_HandleTypeDef* h${mode?lower_case})
 {
 [/#if]
 [/#if]
@@ -1960,8 +2093,12 @@ uint32_t DFSDM_Init = 0;
         #t#t{
 [#else]
     [#assign word0 = words[0]]
-    [#if word0.contains("ADF")||word0.contains("MDF")] 
+    [#if word0.contains("ADF")||word0.contains("MDF")]
+     [#if DIE == "DIE485"]
+       #tif[#if word0.contains("ADF")](IS_MDF_ALL_INSTANCE(h${mode?lower_case}->Instance))[/#if][#if word0.contains("MDF")](IS_MDF_INSTANCE(h${mode?lower_case}->Instance))[/#if]
+     [#else]
        #tif[#if word0.contains("ADF")](IS_ADF_INSTANCE(h${mode?lower_case}->Instance))[/#if][#if word0.contains("MDF")](IS_MDF_INSTANCE(h${mode?lower_case}->Instance))[/#if]
+     [/#if]
        #t{
     [#else]
         [#if ipvar.instanceNbre > 1] [#-- IF number of IP instances greater than 0--] 

@@ -40,9 +40,8 @@
 		<PossibleValue Comment="TI" Condition="!(VirtualNSS = VM_NSSHARD)" Diagnostic="Hardware NSS signal must be enabled first" Value="SPI_TIMODE_ENABLE"/>
 	</RefParameter>
 	
-	
 	<RefParameter Comment="Data Size" DefaultValue="SPI_DATASIZE_4BIT" Group="Basic Parameters" Name="DataSize" Type="list">
-		<Condition Diagnostic="" Expression="STM32L4 | DIE495 | DIE460"/>
+		<Condition Diagnostic="" Expression="STM32L4 | DIE495 | DIE460 | DIE459 | DIE489"/>
 		<PossibleValue Comment="4 Bits" Semaphore="$IpInstance_DATASIZE_BYTE" Value="SPI_DATASIZE_4BIT"/>
 		<PossibleValue Comment="5 Bits" Semaphore="$IpInstance_DATASIZE_BYTE" Value="SPI_DATASIZE_5BIT"/>
 		<PossibleValue Comment="6 Bits" Semaphore="$IpInstance_DATASIZE_BYTE" Value="SPI_DATASIZE_6BIT"/>
@@ -85,10 +84,10 @@
 	<RefParameter Comment="Prescaler (for Baud Rate)" DefaultValue="null" Group="Clock Parameters" Name="BaudRatePrescaler" Type="list" Visible="false"/>
 
 	<RefParameter Comment="Baud Rate" DefaultValue="8000000" Group="Clock Parameters" Max="60000000" Min="0" Name="CalculateBaudRate" Type="string">
-                <Description>Calculated Baudrate value based on SPI Clock source and Prescaler</Description>
-                <Condition Diagnostic="" Expression="$IpInstance_Master &amp; DIE471|DIE470"/>
-        </RefParameter>
-        <RefParameter Comment="Baud Rate" DefaultValue="8000000" Group="Clock Parameters" Max="32000000" Min="0" Name="CalculateBaudRate" Type="string">
+        <Description>Calculated Baudrate value based on SPI Clock source and Prescaler</Description>
+        <Condition Diagnostic="" Expression="$IpInstance_Master &amp; DIE471|DIE470"/>
+    </RefParameter>
+    <RefParameter Comment="Baud Rate" DefaultValue="8000000" Group="Clock Parameters" Max="32000000" Min="0" Name="CalculateBaudRate" Type="string">
 		<Description>Calculated Baudrate value based on SPI Clock source and Prescaler</Description>
 		<Condition Diagnostic="" Expression="$IpInstance_Master &amp; DIE495"/>
 	</RefParameter>	
@@ -96,12 +95,10 @@
 		<Description>Calculated Baudrate value based on SPI Clock source and Prescaler</Description>
 		<Condition Diagnostic="" Expression="$IpInstance_Master"/>
 	</RefParameter>
-
 	<RefParameter Comment="Baud Rate" DefaultValue="8000000" Group="Clock Parameters" Max="24000000" Min="0" Name="CalculateBaudRate" Type="string">
 		<Description>Calculated Baudrate value based on SPI Clock source and Prescaler</Description>
 		<Condition Diagnostic="" Expression="$IpInstance_Slave &amp; (TIMode = SPI_TIMODE_ENABLE)"/>
-	</RefParameter>
-	
+	</RefParameter>	
 	<RefParameter Comment="Baud Rate" DefaultValue="null" Group="Clock Parameters" Max="40000000" Min="0" Name="CalculateBaudRate" Type="string" Visible="false"/>
 		
 	<RefParameter Comment="Clock Polarity (CPOL)" DefaultValue="SPI_POLARITY_LOW" Group="Clock Parameters" Name="CLKPolarity" Type="list">
@@ -138,12 +135,10 @@
 	
 	<RefParameter Comment="CRC Polynomial" DefaultValue="X0+X1+X2" Group="Advanced Parameters" Max="8" Name="CRCPolynomial" Type="polynomialOdd">
 		<Condition Diagnostic="" Expression="(CRCCalculation = SPI_CRCCALCULATION_ENABLE) &amp; (((DataSize = SPI_DATASIZE_8BIT) &amp; (CRCLength = SPI_CRC_LENGTH_DATASIZE)) | (CRCLength = SPI_CRC_LENGTH_8BIT))"/>
-	</RefParameter>
-	
+	</RefParameter>	
 	<RefParameter Comment="CRC Polynomial" DefaultValue="X0+X1+X2" Group="Advanced Parameters" Max="16" Name="CRCPolynomial" Type="polynomialOdd">
 		<Condition Diagnostic="" Expression="(CRCCalculation = SPI_CRCCALCULATION_ENABLE) &amp; (((DataSize = SPI_DATASIZE_16BIT) &amp; (CRCLength = SPI_CRC_LENGTH_DATASIZE)) | (CRCLength = SPI_CRC_LENGTH_16BIT))"/>
-	</RefParameter>
-	
+	</RefParameter>	
 	<RefParameter Comment="CRC Polynomial" DefaultValue="7" Group="Advanced Parameters" Max="X1+X3" Min="X1+X3" Name="CRCPolynomial" Type="list" Visible="false">
         <PossibleValue Comment="X0+X1+X2" Value="7"/>
         </RefParameter>
@@ -165,11 +160,11 @@
 		<Condition Diagnostic="" Expression="$IpInstance_NSSHARD_Input"/>
 		<PossibleValue Comment="Input Hardware" Value="SPI_NSS_HARD_INPUT"/>
 	</RefParameter>
-        <RefParameter Comment="NSS Signal Type" DefaultValue="SPI_NSS_SOFT" Group="Advanced Parameters" Name="NSS" Type="list">
+    <RefParameter Comment="NSS Signal Type" DefaultValue="SPI_NSS_SOFT" Group="Advanced Parameters" Name="NSS" Type="list">
 		<PossibleValue Comment="Software" Value="SPI_NSS_SOFT"/>
 	</RefParameter>
 	<RefParameter Comment="NSS Signal Type" DefaultValue="SPI_NSS_SOFT" Group="Advanced Parameters" Name="NSS" Type="list" Visible="false">
-            <PossibleValue Comment="Software" Value="SPI_NSS_SOFT"/>
+        <PossibleValue Comment="Software" Value="SPI_NSS_SOFT"/>
     </RefParameter>
 	
 	
@@ -179,7 +174,7 @@
 			<PossibleValue>VM_NSSHARD</PossibleValue>
 		</Parameter>
 	</RefMode>
-        <RefMode HalMode="SPI" Name="NSS_Signal_Hard_Output">
+    <RefMode HalMode="SPI" Name="NSS_Signal_Hard_Output">
 		<Parameter Name="VirtualNSS">
 			<PossibleValue>VM_NSSHARD</PossibleValue>
 		</Parameter>
@@ -509,7 +504,7 @@
 				</Mode>
 			</ModeLogicOperator>
 			<Semaphore>$IpInstance</Semaphore>
-			<Condition Diagnostic="I2S$IpNumber must be disabled" Expression="!I2S$IpNumber"/>
+			<Condition Diagnostic="I2S$IpNumber must be disabled" Expression="!I2S$IpNumber_Used"/>
 		</Mode>
 		
 		<Mode Name="NSS_Signal" UserName="Hardware NSS Signal">
@@ -519,8 +514,7 @@
 						<Signal Name="NSS"/>
 					</SignalLogicalOp>
                     <Semaphore>$IpInstance_NSSHARD_Input</Semaphore>
-				</Mode>
-			
+				</Mode>			
 				<Mode Name="NSS_Signal_Hard_Output" UserName="Hardware NSS Output Signal">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="NSS"/>
@@ -529,7 +523,7 @@
                     <Condition Diagnostic="$IpInstance must have a master mode selected" Expression="$IpInstance_Master"/>
 				</Mode>
 			</ModeLogicOperator>
-			<Condition Diagnostic="I2S$IpNumber must be disabled" Expression="!I2S$IpNumber"/>
+			<Condition Diagnostic="I2S$IpNumber must be disabled" Expression="!I2S$IpNumber_Used"/>
 			<Condition Diagnostic="$IpInstance must have a mode selected" Expression="$IpInstance"/>
 		</Mode>
 	</ModeLogicOperator>

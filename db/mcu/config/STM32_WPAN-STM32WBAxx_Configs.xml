@@ -6,7 +6,7 @@ DBVersion="V4.0"
 IncludeFile=""
 Name="STM32_WPAN"
 RootFolder="Middlewares/"
-Version="STM32Cube_FW_WBA_V1.2.0"
+Version="STM32Cube_FW_WBA_V1.3.0"
 ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
 
 <!-- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ WBA IMPLEMENTATION BEGIN @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
@@ -54,20 +54,24 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <ConfigFile Name="USART_IF_C"/>
     <!-- System/Modules - inc -->
         <ConfigFile Name="ADC_CTRL_H"/>
+        <ConfigFile Name="CRC_CTRL_H"/>
         <ConfigFile Name="WBA_STM32WBAXX_RESETHANDLER_S"/>
         <ConfigFile Name="BLE_TIMER_H"/>
         <ConfigFile Name="DEBUG_TRACE_H"/>
         <ConfigFile Name="OTP_H"/>
         <ConfigFile Name="SCM_H"/>
         <ConfigFile Name="STM_LIST_H"/>
+        <ConfigFile Name="TEMP_MEASUREMENT_H"/>
         <ConfigFile Name="UTILITIES_COMMON_H"/>
     <!-- System/Modules - src -->
         <ConfigFile Name="ADC_CTRL_C"/>
         <ConfigFile Name="APP_SYS_C"/>
         <ConfigFile Name="BLE_TIMER_C"/>
+        <ConfigFile Name="CRC_CTRL_C"/>
         <ConfigFile Name="OTP_C"/>
         <ConfigFile Name="SCM_C"/>
         <ConfigFile Name="STM_LIST_C"/>
+        <ConfigFile Name="TEMP_MEASUREMENT_C"/>
     <!-- System/Modules/baes - inc -->
         <ConfigFile Name="BAES_H"/>
         <ConfigFile Name="BAES_GLOBAL_H"/>
@@ -115,6 +119,12 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
     <!-- System/Config/Log - src & inc -->
         <ConfigFile Name="USER_LOG_CONFIG_H"/>
         <ConfigFile Name="USER_LOG_CONFIG_C"/>
+    <!-- System/Config/ADC_Ctrl - src & inc -->
+        <ConfigFile Name="ADC_CTRL_CONF_H"/>
+        <ConfigFile Name="ADC_CTRL_CONF_C"/>
+    <!-- System/Config/CRC_Ctrl - src & inc -->
+        <ConfigFile Name="CRC_CTRL_CONF_H"/>
+        <ConfigFile Name="CRC_CTRL_CONF_C"/>
 	<!-- System/Config/LowPower - src & inc -->
         <ConfigFile Name="APP_SYS_H"/>
         <ConfigFile Name="USER_LOW_POWER_CONFIG_H"/>
@@ -258,8 +268,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <!-- Header files for ble/svc/Inc -->
             <File Category="header" Name="ST/STM32_WPAN/ble/svc/Inc/*.h"/>
        <!-- Source files for ble/svc/Src -->
-            <File Category="source" Name="ST/STM32_WPAN/ble/svc/Src/svc_ctl.c"/>
-            <File Category="header" Name="ST/STM32_WPAN/ble/svc/Src/svc_ctl.h"/>
+            <File Category="source" Name="ST/STM32_WPAN/ble/svc/Src/svc_ctl.c" Condition="!(S_BLE_TM)"/>
             <File Category="header" Name="ST/STM32_WPAN/ble/svc/Src/uuid.h"/>
         </SubComponent>
         <SubComponent Csub="BLE_MODE_SKELETON" Cvariant="Enabled">
@@ -278,8 +287,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <!-- Header files for ble/svc/Inc -->
             <File Category="header" Name="ST/STM32_WPAN/ble/svc/Inc/*.h"/>
        <!-- Source files for ble/svc/Src -->
-            <File Category="source" Name="ST/STM32_WPAN/ble/svc/Src/svc_ctl.c"/>
-            <File Category="header" Name="ST/STM32_WPAN/ble/svc/Src/svc_ctl.h"/>
+            <!-- <File Category="source" Name="ST/STM32_WPAN/ble/svc/Src/svc_ctl.c"  Condition="(S_BLE_HOST | S_BLE_HOST_SKELETON) &amp; !(S_BLE_TM)"/> -->
             <File Category="header" Name="ST/STM32_WPAN/ble/svc/Src/uuid.h"/>
         </SubComponent>
         <SubComponent Csub="BLE_MODE_HOST_SKELETON" Cvariant="Enabled">
@@ -299,7 +307,6 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
             <File Category="header" Name="ST/STM32_WPAN/ble/svc/Inc/*.h"/>
        <!-- Source files for ble/svc/Src -->
             <File Category="source" Name="ST/STM32_WPAN/ble/svc/Src/svc_ctl.c"/>
-            <File Category="header" Name="ST/STM32_WPAN/ble/svc/Src/svc_ctl.h"/>
             <File Category="header" Name="ST/STM32_WPAN/ble/svc/Src/uuid.h"/>
         </SubComponent>
     </RefComponent>
@@ -312,50 +319,28 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
             <File Category="header" Name="ST/STM32_WPAN/thread/openthread/common/*.h"/>
             <File Category="header" Name="ST/STM32_WPAN/thread/openthread/config/*.h"/>
             <File Category="header" Name="ST/STM32_WPAN/thread/openthread/platform/*.h"/>
-            <File Category="source" Name="ST/STM32_WPAN/thread/openthread/platform/*.c"/>
             <File Category="header" Name="ST/STM32_WPAN/thread/openthread/stack/include/*.h"/>
             <File Category="header" Name="ST/STM32_WPAN/thread/openthread/stack/include/openthread/*.h"/>
             <File Category="header" Name="ST/STM32_WPAN/thread/openthread/stack/include/openthread/platform/*.h" ExcludedFromBuild="true"/>
             <File Category="header" Name="ST/STM32_WPAN/thread/openthread/stack/include/sys/*.h"/>
-            <File Category="library" Condition="GCC;SIiTcompilerIiGCC &amp; (S_FTD_CLI | S_FTD | S_SKELETON_FTD)" Name="ST/STM32_WPAN/thread/openthread/openthread_lib/stm32wba_ot_ftd_lib_cubeide.a" Version=""/>
-            <File Category="library" Condition="GCC;SIiTcompilerIiGCC &amp; (S_MTD | S_SKELETON_MTD)" Name="ST/STM32_WPAN/thread/openthread/openthread_lib/stm32wba_ot_mtd_lib_cubeide.a" Version=""/>
-            <File Category="library" Condition="IAR832;SIiTideIiEWARMOoV8Gg32 &amp; (S_FTD_CLI | S_FTD | S_SKELETON_FTD)" Name="ST/STM32_WPAN/thread/openthread/openthread_lib/stm32wba_ot_ftd_lib.a" Version=""/>
-            <File Category="library" Condition="IAR850;SIiTideIiEWARMOoV8Gg50 &amp; (S_FTD_CLI | S_FTD | S_SKELETON_FTD)" Name="ST/STM32_WPAN/thread/openthread/openthread_lib/stm32wba_ot_ftd_lib.a" Version=""/>
-            <File Category="library" Condition="IAR920;SIiTideIiEWARMOoV9Gg20 &amp; (S_FTD_CLI | S_FTD | S_SKELETON_FTD)" Name="ST/STM32_WPAN/thread/openthread/openthread_lib/stm32wba_ot_ftd_lib.a" Version=""/>
-            <File Category="library" Condition="IAR832;SIiTideIiEWARMOoV8Gg32 &amp; (S_MTD | S_SKELETON_MTD)" Name="ST/STM32_WPAN/thread/openthread/openthread_lib/stm32wba_ot_mtd_lib.a" Version=""/>
-            <File Category="library" Condition="IAR850;SIiTideIiEWARMOoV8Gg50 &amp; (S_MTD | S_SKELETON_MTD)" Name="ST/STM32_WPAN/thread/openthread/openthread_lib/stm32wba_ot_mtd_lib.a" Version=""/>
-            <File Category="library" Condition="IAR920;SIiTideIiEWARMOoV9Gg20 &amp; (S_MTD | S_SKELETON_MTD)" Name="ST/STM32_WPAN/thread/openthread/openthread_lib/stm32wba_ot_mtd_lib.a" Version=""/>
-            <File Category="library" Condition="IAR832;SIiTideIiEWARMOoV8Gg32" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer_Thread_lib.a" Version=""/>
-            <File Category="library" Condition="IAR850;SIiTideIiEWARMOoV8Gg50" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer_Thread_lib.a" Version=""/>
-            <File Category="library" Condition="IAR920;SIiTideIiEWARMOoV9Gg20" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer_Thread_lib.a" Version=""/>
-            <File Category="library" Condition="KEIL5;(SIiTideIiMDKAaARMOoV5 | SIiTideIiMDKAaARMOoV5Gg27 | SIiTideIiMDKAaARMOoV5Gg32 | SIiTideIiMDKAaARMOoV5Gg37) &amp; (S_FTD_CLI | S_FTD | S_SKELETON_FTD)" Name="ST/STM32_WPAN/thread/openthread/openthread_lib/stm32wba_ot_ftd_lib_KEIL.lib" Version=""/>
-            <File Category="library" Condition="KEIL5;(SIiTideIiMDKAaARMOoV5 | SIiTideIiMDKAaARMOoV5Gg27 | SIiTideIiMDKAaARMOoV5Gg32 | SIiTideIiMDKAaARMOoV5Gg37) &amp; (S_MTD | S_SKELETON_MTD)" Name="ST/STM32_WPAN/thread/openthread/openthread_lib/stm32wba_ot_mtd_lib_KEIL.lib" Version=""/>
-            <File Category="library" Condition="KEIL5;(SIiTideIiMDKAaARMOoV5 | SIiTideIiMDKAaARMOoV5Gg27 | SIiTideIiMDKAaARMOoV5Gg32 | SIiTideIiMDKAaARMOoV5Gg37)" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer_Thread_lib_KEIL.lib" Version=""/>
+            <File Category="source" Name="ST/STM32_WPAN/thread/openthread/platform/*.c"/>
+            <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer_Thread_lib.a" Version=""/>
+            <File Category="library" Condition="(S_FTD_CLI | S_FTD | S_SKELETON_FTD)" Name="ST/STM32_WPAN/thread/openthread/openthread_lib/stm32wba_ot_ftd_lib.a" Version=""/>
+            <File Category="library" Condition="(S_MTD | S_SKELETON_MTD)" Name="ST/STM32_WPAN/thread/openthread/openthread_lib/stm32wba_ot_mtd_lib.a" Version=""/>
          </SubComponent>
          <SubComponent Csub="THREAD_SKELETON" Cvariant="Enabled">
             <!-- list here all the remaining files to be copy/paste in case of minimal distribution -->
             <File Category="header" Name="ST/STM32_WPAN/thread/openthread/common/*.h"/>
             <File Category="header" Name="ST/STM32_WPAN/thread/openthread/config/*.h"/>
             <File Category="header" Name="ST/STM32_WPAN/thread/openthread/platform/*.h"/>
-            <File Category="source" Name="ST/STM32_WPAN/thread/openthread/platform/*.c"/>
             <File Category="header" Name="ST/STM32_WPAN/thread/openthread/stack/include/*.h"/>
             <File Category="header" Name="ST/STM32_WPAN/thread/openthread/stack/include/openthread/*.h"/>
             <File Category="header" Name="ST/STM32_WPAN/thread/openthread/stack/include/openthread/platform/*.h" ExcludedFromBuild="true"/>
             <File Category="header" Name="ST/STM32_WPAN/thread/openthread/stack/include/sys/*.h"/>
-            <File Category="library" Condition="GCC;SIiTcompilerIiGCC &amp; (S_FTD_CLI | S_FTD | S_SKELETON_FTD)" Name="ST/STM32_WPAN/thread/openthread/openthread_lib/stm32wba_ot_ftd_lib_cubeide.a" Version=""/>
-            <File Category="library" Condition="GCC;SIiTcompilerIiGCC &amp; (S_MTD | S_SKELETON_MTD)" Name="ST/STM32_WPAN/thread/openthread/openthread_lib/stm32wba_ot_mtd_lib_cubeide.a" Version=""/>
-            <File Category="library" Condition="IAR832;SIiTideIiEWARMOoV8Gg32 &amp; (S_FTD_CLI | S_FTD | S_SKELETON_FTD)" Name="ST/STM32_WPAN/thread/openthread/openthread_lib/stm32wba_ot_ftd_lib.a" Version=""/>
-            <File Category="library" Condition="IAR850;SIiTideIiEWARMOoV8Gg50 &amp; (S_FTD_CLI | S_FTD | S_SKELETON_FTD)" Name="ST/STM32_WPAN/thread/openthread/openthread_lib/stm32wba_ot_ftd_lib.a" Version=""/>
-            <File Category="library" Condition="IAR920;SIiTideIiEWARMOoV9Gg20 &amp; (S_FTD_CLI | S_FTD | S_SKELETON_FTD)" Name="ST/STM32_WPAN/thread/openthread/openthread_lib/stm32wba_ot_ftd_lib.a" Version=""/>
-            <File Category="library" Condition="IAR832;SIiTideIiEWARMOoV8Gg32 &amp; (S_MTD | S_SKELETON_MTD)" Name="ST/STM32_WPAN/thread/openthread/openthread_lib/stm32wba_ot_mtd_lib.a" Version=""/>
-            <File Category="library" Condition="IAR850;SIiTideIiEWARMOoV8Gg50 &amp; (S_MTD | S_SKELETON_MTD)" Name="ST/STM32_WPAN/thread/openthread/openthread_lib/stm32wba_ot_mtd_lib.a" Version=""/>
-            <File Category="library" Condition="IAR920;SIiTideIiEWARMOoV9Gg20 &amp; (S_MTD | S_SKELETON_MTD)" Name="ST/STM32_WPAN/thread/openthread/openthread_lib/stm32wba_ot_mtd_lib.a" Version=""/>
-            <File Category="library" Condition="IAR832;SIiTideIiEWARMOoV8Gg32" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer_Thread_lib.a" Version=""/>
-            <File Category="library" Condition="IAR850;SIiTideIiEWARMOoV8Gg50" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer_Thread_lib.a" Version=""/>
-            <File Category="library" Condition="IAR920;SIiTideIiEWARMOoV9Gg20" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer_Thread_lib.a" Version=""/>
-            <File Category="library" Condition="KEIL5;(SIiTideIiMDKAaARMOoV5 | SIiTideIiMDKAaARMOoV5Gg27 | SIiTideIiMDKAaARMOoV5Gg32 | SIiTideIiMDKAaARMOoV5Gg37) &amp; (S_FTD_CLI | S_FTD | S_SKELETON_FTD)" Name="ST/STM32_WPAN/thread/openthread/openthread_lib/stm32wba_ot_ftd_lib_KEIL.lib" Version=""/>
-            <File Category="library" Condition="KEIL5;(SIiTideIiMDKAaARMOoV5 | SIiTideIiMDKAaARMOoV5Gg27 | SIiTideIiMDKAaARMOoV5Gg32 | SIiTideIiMDKAaARMOoV5Gg37) &amp; (S_MTD | S_SKELETON_MTD)" Name="ST/STM32_WPAN/thread/openthread/openthread_lib/stm32wba_ot_mtd_lib_KEIL.lib" Version=""/>
-            <File Category="library" Condition="KEIL5;(SIiTideIiMDKAaARMOoV5 | SIiTideIiMDKAaARMOoV5Gg27 | SIiTideIiMDKAaARMOoV5Gg32 | SIiTideIiMDKAaARMOoV5Gg37)" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer_Thread_lib_KEIL.lib" Version=""/>
+            <File Category="source" Name="ST/STM32_WPAN/thread/openthread/platform/*.c"/>
+            <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer_Thread_lib.a" Version=""/>
+            <File Category="library" Condition="(S_FTD_CLI | S_FTD | S_SKELETON_FTD)" Name="ST/STM32_WPAN/thread/openthread/openthread_lib/stm32wba_ot_ftd_lib.a" Version=""/>
+            <File Category="library" Condition="(S_MTD | S_SKELETON_MTD)" Name="ST/STM32_WPAN/thread/openthread/openthread_lib/stm32wba_ot_mtd_lib.a" Version=""/>
          </SubComponent>
     </RefComponent>
 <!-- Thread RefComponents end -->
@@ -383,35 +368,11 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
             <File Category="header" Name="ST/STM32_WPAN/zigbee/stack/port/stm32wba/*.h"/>
             <File Category="header" Name="ST/STM32_WPAN/mac_802_15_4/core/inc/*.h"/>
 
-            <File Category="library" Condition="GCC;SIiTcompilerIiGCC" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer15_4_CubeIDE.a" Version=""/>
-            <File Category="library" Condition="IAR832;SIiTideIiEWARMOoV8Gg32" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/Linklayer15_4.a" Version=""/>
-            <File Category="library" Condition="IAR850;SIiTideIiEWARMOoV8Gg50" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/Linklayer15_4.a" Version=""/>
-            <File Category="library" Condition="IAR920;SIiTideIiEWARMOoV9Gg20" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/Linklayer15_4.a" Version=""/>
-            <File Category="library" Condition="KEIL5;(SIiTideIiMDKAaARMOoV5 | SIiTideIiMDKAaARMOoV5Gg27 | SIiTideIiMDKAaARMOoV5Gg32 | SIiTideIiMDKAaARMOoV5Gg37)" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/Linklayer15_4.lib" Version=""/>
-
-            <File Category="library" Condition="GCC;SIiTcompilerIiGCC" Name="ST/STM32_WPAN/mac_802_15_4/lib/wba_mac_lib_CubeIDE.a" Version=""/>
-            <File Category="library" Condition="IAR832;SIiTideIiEWARMOoV8Gg32" Name="ST/STM32_WPAN/mac_802_15_4/lib/wba_mac_lib.a" Version=""/>
-            <File Category="library" Condition="IAR850;SIiTideIiEWARMOoV8Gg50" Name="ST/STM32_WPAN/mac_802_15_4/lib/wba_mac_lib.a" Version=""/>
-            <File Category="library" Condition="IAR920;SIiTideIiEWARMOoV9Gg20" Name="ST/STM32_WPAN/mac_802_15_4/lib/wba_mac_lib.a" Version=""/>
-            <File Category="library" Condition="KEIL5;(SIiTideIiMDKAaARMOoV5 | SIiTideIiMDKAaARMOoV5Gg27 | SIiTideIiMDKAaARMOoV5Gg32 | SIiTideIiMDKAaARMOoV5Gg37)" Name="ST/STM32_WPAN/mac_802_15_4/lib/wba_mac_lib_KEIL.lib" Version=""/>
-
-            <File Category="library" Condition="GCC;SIiTcompilerIiGCC &amp; (S_ZGB_APP_FFD | S_ZGB_SKELETON_FFD)" Name="ST/STM32_WPAN/zigbee/stack/ZigBeeProFFD_CubeIDE.a" Version=""/>
-            <File Category="library" Condition="IAR832;SIiTideIiEWARMOoV8Gg32 &amp; (S_ZGB_APP_FFD | S_ZGB_SKELETON_FFD)" Name="ST/STM32_WPAN/zigbee/stack/ZigbeeProFFD.a" Version=""/>
-            <File Category="library" Condition="IAR850;SIiTideIiEWARMOoV8Gg50 &amp; (S_ZGB_APP_FFD | S_ZGB_SKELETON_FFD)" Name="ST/STM32_WPAN/zigbee/stack/ZigbeeProFFD.a" Version=""/>
-            <File Category="library" Condition="IAR920;SIiTideIiEWARMOoV9Gg20 &amp; (S_ZGB_APP_FFD | S_ZGB_SKELETON_FFD)" Name="ST/STM32_WPAN/zigbee/stack/ZigbeeProFFD.a" Version=""/>
-            <File Category="library" Condition="KEIL5;(SIiTideIiMDKAaARMOoV5 | SIiTideIiMDKAaARMOoV5Gg27 | SIiTideIiMDKAaARMOoV5Gg32 | SIiTideIiMDKAaARMOoV5Gg37) &amp; (S_ZGB_APP_FFD | S_ZGB_SKELETON_FFD)" Name="ST/STM32_WPAN/zigbee/stack/ZigBeeProFFD.lib" Version=""/>
-
-            <File Category="library" Condition="GCC;SIiTcompilerIiGCC &amp; (S_ZGB_APP_RFD | S_ZGB_SKELETON_RFD)" Name="ST/STM32_WPAN/zigbee/stack/ZigBeeProRFD_CubeIDE.a" Version=""/>
-            <File Category="library" Condition="IAR832;SIiTideIiEWARMOoV8Gg32 &amp; (S_ZGB_APP_RFD | S_ZGB_SKELETON_RFD)" Name="ST/STM32_WPAN/zigbee/stack/ZigbeeProRFD.a" Version=""/>
-            <File Category="library" Condition="IAR850;SIiTideIiEWARMOoV8Gg50 &amp; (S_ZGB_APP_RFD | S_ZGB_SKELETON_RFD)" Name="ST/STM32_WPAN/zigbee/stack/ZigbeeProRFD.a" Version=""/>
-            <File Category="library" Condition="IAR920;SIiTideIiEWARMOoV9Gg20 &amp; (S_ZGB_APP_RFD | S_ZGB_SKELETON_RFD)" Name="ST/STM32_WPAN/zigbee/stack/ZigbeeProRFD.a" Version=""/>
-            <File Category="library" Condition="KEIL5;(SIiTideIiMDKAaARMOoV5 | SIiTideIiMDKAaARMOoV5Gg27 | SIiTideIiMDKAaARMOoV5Gg32 | SIiTideIiMDKAaARMOoV5Gg37) &amp; (S_ZGB_APP_RFD | S_ZGB_SKELETON_RFD)" Name="ST/STM32_WPAN/zigbee/stack/ZigBeeProRFD.lib" Version=""/>
-
-            <File Category="library" Condition="GCC;SIiTcompilerIiGCC" Name="ST/STM32_WPAN/zigbee/clusters/ZigBeeClusters_CubeIDE.a" Version=""/>
-            <File Category="library" Condition="IAR832;SIiTideIiEWARMOoV8Gg32" Name="ST/STM32_WPAN/zigbee/clusters/ZigbeeClusters.a" Version=""/>
-            <File Category="library" Condition="IAR850;SIiTideIiEWARMOoV8Gg50" Name="ST/STM32_WPAN/zigbee/clusters/ZigbeeClusters.a" Version=""/>
-            <File Category="library" Condition="IAR920;SIiTideIiEWARMOoV9Gg20" Name="ST/STM32_WPAN/zigbee/clusters/ZigbeeClusters.a" Version=""/>
-            <File Category="library" Condition="KEIL5;(SIiTideIiMDKAaARMOoV5 | SIiTideIiMDKAaARMOoV5Gg27 | SIiTideIiMDKAaARMOoV5Gg32 | SIiTideIiMDKAaARMOoV5Gg37)" Name="ST/STM32_WPAN/zigbee/clusters/ZigBeeClusters.lib" Version=""/>
+            <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer15_4.a" Version=""/>
+            <File Category="library" Name="ST/STM32_WPAN/mac_802_15_4/lib/wba_mac_lib.a" Version=""/>
+            <File Category="library" Condition="(S_ZGB_APP_FFD | S_ZGB_SKELETON_FFD)" Name="ST/STM32_WPAN/zigbee/stack/ZigBeeProR23_FFD.a" Version=""/>
+            <File Category="library" Condition="(S_ZGB_APP_RFD | S_ZGB_SKELETON_RFD)" Name="ST/STM32_WPAN/zigbee/stack/ZigBeeProR23_RFD.a" Version=""/>
+            <File Category="library" Name="ST/STM32_WPAN/zigbee/clusters/ZigbeeClusters.a" Version=""/>
         </SubComponent>
         <SubComponent Csub="ZIGBEE_SKELETON" Cvariant="Enabled">
           <!--  <File Category="library" Name="ST/STM32_WPAN/zigbee/clusters/*.a"/>-->
@@ -434,35 +395,11 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
             <File Category="header" Name="ST/STM32_WPAN/zigbee/stack/port/stm32wba/*.h"/>
             <File Category="header" Name="ST/STM32_WPAN/mac_802_15_4/core/inc/*.h"/>
 
-            <File Category="library" Condition="GCC;SIiTcompilerIiGCC" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer15_4_CubeIDE.a" Version=""/>
-            <File Category="library" Condition="IAR832;SIiTideIiEWARMOoV8Gg32" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/Linklayer15_4.a" Version=""/>
-            <File Category="library" Condition="IAR850;SIiTideIiEWARMOoV8Gg50" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/Linklayer15_4.a" Version=""/>
-            <File Category="library" Condition="IAR920;SIiTideIiEWARMOoV9Gg20" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/Linklayer15_4.a" Version=""/>
-            <File Category="library" Condition="KEIL5;(SIiTideIiMDKAaARMOoV5 | SIiTideIiMDKAaARMOoV5Gg27 | SIiTideIiMDKAaARMOoV5Gg32 | SIiTideIiMDKAaARMOoV5Gg37)" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/Linklayer15_4.lib" Version=""/>
-
-            <File Category="library" Condition="GCC;SIiTcompilerIiGCC" Name="ST/STM32_WPAN/mac_802_15_4/lib/wba_mac_lib_CubeIDE.a" Version=""/>
-            <File Category="library" Condition="IAR832;SIiTideIiEWARMOoV8Gg32" Name="ST/STM32_WPAN/mac_802_15_4/lib/wba_mac_lib.a" Version=""/>
-            <File Category="library" Condition="IAR850;SIiTideIiEWARMOoV8Gg50" Name="ST/STM32_WPAN/mac_802_15_4/lib/wba_mac_lib.a" Version=""/>
-            <File Category="library" Condition="IAR920;SIiTideIiEWARMOoV9Gg20" Name="ST/STM32_WPAN/mac_802_15_4/lib/wba_mac_lib.a" Version=""/>
-            <File Category="library" Condition="KEIL5;(SIiTideIiMDKAaARMOoV5 | SIiTideIiMDKAaARMOoV5Gg27 | SIiTideIiMDKAaARMOoV5Gg32 | SIiTideIiMDKAaARMOoV5Gg37)" Name="ST/STM32_WPAN/mac_802_15_4/lib/wba_mac_lib_KEIL.lib" Version=""/>
-
-            <File Category="library" Condition="GCC;SIiTcompilerIiGCC &amp; (S_ZGB_APP_FFD | S_ZGB_SKELETON_FFD)" Name="ST/STM32_WPAN/zigbee/stack/ZigBeeProFFD_CubeIDE.a" Version=""/>
-            <File Category="library" Condition="IAR832;SIiTideIiEWARMOoV8Gg32 &amp; (S_ZGB_APP_FFD | S_ZGB_SKELETON_FFD)" Name="ST/STM32_WPAN/zigbee/stack/ZigbeeProFFD.a" Version=""/>
-            <File Category="library" Condition="IAR850;SIiTideIiEWARMOoV8Gg50 &amp; (S_ZGB_APP_FFD | S_ZGB_SKELETON_FFD)" Name="ST/STM32_WPAN/zigbee/stack/ZigbeeProFFD.a" Version=""/>
-            <File Category="library" Condition="IAR920;SIiTideIiEWARMOoV9Gg20 &amp; (S_ZGB_APP_FFD | S_ZGB_SKELETON_FFD)" Name="ST/STM32_WPAN/zigbee/stack/ZigbeeProFFD.a" Version=""/>
-            <File Category="library" Condition="KEIL5;(SIiTideIiMDKAaARMOoV5 | SIiTideIiMDKAaARMOoV5Gg27 | SIiTideIiMDKAaARMOoV5Gg32 | SIiTideIiMDKAaARMOoV5Gg37) &amp; (S_ZGB_APP_FFD | S_ZGB_SKELETON_FFD)" Name="ST/STM32_WPAN/zigbee/stack/ZigBeeProFFD.lib" Version=""/>
-
-            <File Category="library" Condition="GCC;SIiTcompilerIiGCC &amp; (S_ZGB_APP_RFD | S_ZGB_SKELETON_RFD)" Name="ST/STM32_WPAN/zigbee/stack/ZigBeeProRFD_CubeIDE.a" Version=""/>
-            <File Category="library" Condition="IAR832;SIiTideIiEWARMOoV8Gg32 &amp; (S_ZGB_APP_RFD | S_ZGB_SKELETON_RFD)" Name="ST/STM32_WPAN/zigbee/stack/ZigbeeProRFD.a" Version=""/>
-            <File Category="library" Condition="IAR850;SIiTideIiEWARMOoV8Gg50 &amp; (S_ZGB_APP_RFD | S_ZGB_SKELETON_RFD)" Name="ST/STM32_WPAN/zigbee/stack/ZigbeeProRFD.a" Version=""/>
-            <File Category="library" Condition="IAR920;SIiTideIiEWARMOoV9Gg20 &amp; (S_ZGB_APP_RFD | S_ZGB_SKELETON_RFD)" Name="ST/STM32_WPAN/zigbee/stack/ZigbeeProRFD.a" Version=""/>
-            <File Category="library" Condition="KEIL5;(SIiTideIiMDKAaARMOoV5 | SIiTideIiMDKAaARMOoV5Gg27 | SIiTideIiMDKAaARMOoV5Gg32 | SIiTideIiMDKAaARMOoV5Gg37) &amp; (S_ZGB_APP_RFD | S_ZGB_SKELETON_RFD)" Name="ST/STM32_WPAN/zigbee/stack/ZigBeeProRFD.lib" Version=""/>
-
-            <File Category="library" Condition="GCC;SIiTcompilerIiGCC" Name="ST/STM32_WPAN/zigbee/clusters/ZigBeeClusters_CubeIDE.a" Version=""/>
-            <File Category="library" Condition="IAR832;SIiTideIiEWARMOoV8Gg32" Name="ST/STM32_WPAN/zigbee/clusters/ZigbeeClusters.a" Version=""/>
-            <File Category="library" Condition="IAR850;SIiTideIiEWARMOoV8Gg50" Name="ST/STM32_WPAN/zigbee/clusters/ZigbeeClusters.a" Version=""/>
-            <File Category="library" Condition="IAR920;SIiTideIiEWARMOoV9Gg20" Name="ST/STM32_WPAN/zigbee/clusters/ZigbeeClusters.a" Version=""/>
-            <File Category="library" Condition="KEIL5;(SIiTideIiMDKAaARMOoV5 | SIiTideIiMDKAaARMOoV5Gg27 | SIiTideIiMDKAaARMOoV5Gg32 | SIiTideIiMDKAaARMOoV5Gg37)" Name="ST/STM32_WPAN/zigbee/clusters/ZigBeeClusters.lib" Version=""/>
+            <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer15_4.a" Version=""/>
+            <File Category="library" Name="ST/STM32_WPAN/mac_802_15_4/lib/wba_mac_lib.a" Version=""/>
+            <File Category="library" Condition="(S_ZGB_APP_FFD | S_ZGB_SKELETON_FFD)" Name="ST/STM32_WPAN/zigbee/stack/ZigBeeProR23_FFD.a" Version=""/>
+            <File Category="library" Condition="(S_ZGB_APP_RFD | S_ZGB_SKELETON_RFD)" Name="ST/STM32_WPAN/zigbee/stack/ZigBeeProR23_RFD.a" Version=""/>
+            <File Category="library" Name="ST/STM32_WPAN/zigbee/clusters/ZigbeeClusters.a" Version=""/>
         </SubComponent>
 		</RefComponent>
 <!-- Zigbee RefComponents end -->
@@ -471,29 +408,13 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
     <RefComponent Cclass="Middleware" Cgroup="mac_802_15_4" Cversion="1.0.0">
         <SubComponent Csub="mac_802_15_4" Cvariant="Enabled">
             <File Category="header" Name="ST/STM32_WPAN/mac_802_15_4/core/inc/*.h"/>
-            <File Category="library" Condition="GCC;SIiTcompilerIiGCC" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer15_4_CubeIDE.a" Version=""/>
-            <File Category="library" Condition="GCC;SIiTcompilerIiGCC" Name="ST/STM32_WPAN/mac_802_15_4/lib/wba_mac_lib_CubeIDE.a" Version=""/>
-            <File Category="library" Condition="IAR832;SIiTideIiEWARMOoV8Gg32" Name="ST/STM32_WPAN/mac_802_15_4/lib/wba_mac_lib.a" Version=""/>
-            <File Category="library" Condition="IAR850;SIiTideIiEWARMOoV8Gg50" Name="ST/STM32_WPAN/mac_802_15_4/lib/wba_mac_lib.a" Version=""/>
-            <File Category="library" Condition="IAR920;SIiTideIiEWARMOoV9Gg20" Name="ST/STM32_WPAN/mac_802_15_4/lib/wba_mac_lib.a" Version=""/>
-            <File Category="library" Condition="IAR832;SIiTideIiEWARMOoV8Gg32" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer15_4.a" Version=""/>
-            <File Category="library" Condition="IAR850;SIiTideIiEWARMOoV8Gg50" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer15_4.a" Version=""/>
-            <File Category="library" Condition="IAR920;SIiTideIiEWARMOoV9Gg20" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer15_4.a" Version=""/>
-            <File Category="library" Condition="KEIL5;(SIiTideIiMDKAaARMOoV5 | SIiTideIiMDKAaARMOoV5Gg27 | SIiTideIiMDKAaARMOoV5Gg32 | SIiTideIiMDKAaARMOoV5Gg37)" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer15_4.lib" Version=""/>
-            <File Category="library" Condition="KEIL5;(SIiTideIiMDKAaARMOoV5 | SIiTideIiMDKAaARMOoV5Gg27 | SIiTideIiMDKAaARMOoV5Gg32 | SIiTideIiMDKAaARMOoV5Gg37)" Name="ST/STM32_WPAN/mac_802_15_4/lib/wba_mac_lib_KEIL.lib" Version=""/>
+            <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer15_4.a" Version=""/>
+            <File Category="library" Name="ST/STM32_WPAN/mac_802_15_4/lib/wba_mac_lib.a" Version=""/>
         </SubComponent>
         <SubComponent Csub="mac_802_15_4_SKELETON" Cvariant="Enabled">
             <File Category="header" Name="ST/STM32_WPAN/mac_802_15_4/core/inc/*.h"/>
-            <File Category="library" Condition="GCC;SIiTcompilerIiGCC" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer15_4_CubeIDE.a" Version=""/>
-            <File Category="library" Condition="GCC;SIiTcompilerIiGCC" Name="ST/STM32_WPAN/mac_802_15_4/lib/wba_mac_lib_CubeIDE.a" Version=""/>
-            <File Category="library" Condition="IAR832;SIiTideIiEWARMOoV8Gg32" Name="ST/STM32_WPAN/mac_802_15_4/lib/wba_mac_lib.a" Version=""/>
-            <File Category="library" Condition="IAR850;SIiTideIiEWARMOoV8Gg50" Name="ST/STM32_WPAN/mac_802_15_4/lib/wba_mac_lib.a" Version=""/>
-            <File Category="library" Condition="IAR920;SIiTideIiEWARMOoV9Gg20" Name="ST/STM32_WPAN/mac_802_15_4/lib/wba_mac_lib.a" Version=""/>
-            <File Category="library" Condition="IAR832;SIiTideIiEWARMOoV8Gg32" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer15_4.a" Version=""/>
-            <File Category="library" Condition="IAR850;SIiTideIiEWARMOoV8Gg50" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer15_4.a" Version=""/>
-            <File Category="library" Condition="IAR920;SIiTideIiEWARMOoV9Gg20" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer15_4.a" Version=""/>
-            <File Category="library" Condition="KEIL5;(SIiTideIiMDKAaARMOoV5 | SIiTideIiMDKAaARMOoV5Gg27 | SIiTideIiMDKAaARMOoV5Gg32 | SIiTideIiMDKAaARMOoV5Gg37)" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer15_4.lib" Version=""/>
-            <File Category="library" Condition="KEIL5;(SIiTideIiMDKAaARMOoV5 | SIiTideIiMDKAaARMOoV5Gg27 | SIiTideIiMDKAaARMOoV5Gg32 | SIiTideIiMDKAaARMOoV5Gg37)" Name="ST/STM32_WPAN/mac_802_15_4/lib/wba_mac_lib_KEIL.lib" Version=""/>
+            <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer15_4.a" Version=""/>
+            <File Category="library" Name="ST/STM32_WPAN/mac_802_15_4/lib/wba_mac_lib.a" Version=""/>
         </SubComponent>
      </RefComponent>
 <!-- mac_802_15_4 RefComponents end -->
@@ -574,6 +495,10 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="ADV_INTERVAL_MAX" GenericType="Simple"/>
         <Argument Name="ADV_INTERVAL_MIN_HEXA" GenericType="Simple"/>
         <Argument Name="ADV_INTERVAL_MAX_HEXA" GenericType="Simple"/>
+        <Argument Name="ADV_LP_INTERVAL_MIN" GenericType="Simple"/>
+        <Argument Name="ADV_LP_INTERVAL_MAX" GenericType="Simple"/>
+        <Argument Name="ADV_LP_INTERVAL_MIN_HEXA" GenericType="Simple"/>
+        <Argument Name="ADV_LP_INTERVAL_MAX_HEXA" GenericType="Simple"/>
         <Argument Name="CFG_BONDING_MODE" GenericType="Simple"/>
         <Argument Name="CFG_USED_FIXED_PIN" GenericType="Simple"/>
         <Argument Name="CFG_FIXED_PIN" GenericType="Simple"/>
@@ -610,10 +535,10 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="BLE_OPTIONS_GATT_CACHING" GenericType="Simple"/>
         <Argument Name="BLE_OPTIONS_POWER_CLASS_1" GenericType="Simple"/>
         <Argument Name="BLE_OPTIONS_APPEARANCE_WRITABLE" GenericType="Simple"/>
+        <Argument Name="BLE_OPTIONS_ENHANCED_ATT" GenericType="Simple"/>
         <!-- <Argument Name="BLE_OPTIONS_ENHANCED_ATT" GenericType="Simple"/> -->
         <Argument Name="CFG_LPM_LEVEL" GenericType="Simple"/>
         <Argument Name="CFG_LPM_STDBY_SUPPORTED" GenericType="Simple"/>
-        <Argument Name="CFG_CORE_SUPPLY" GenericType="Simple"/>
         <Argument Name="CFG_LOG_SUPPORTED" GenericType="Simple"/>
         <Argument Name="CFG_LOG_INSERT_TIME_STAMP_INSIDE_THE_TRACE" GenericType="Simple"/>
         <Argument Name="CFG_LOG_INSERT_COLOR_INSIDE_THE_TRACE" GenericType="Simple"/>
@@ -681,6 +606,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
     <RefConfigFile Description="" Name="WBA_APP_ENTRY_H" Template="stm32wba/stm32_wpan_app_entry_h.ftl" destinationFolder="Core/Inc/"> 
         <File Category="header" Condition="all" Name="app_entry.h" Version="1.0"/>
         <!-- ftl specific items begin-->
+        <Argument Name="BLE_MODE_TRANSPARENT_UART" GenericType="Simple"/>
         <Argument Name="FREERTOS_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
         <Argument Name="THREADX_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
         <Argument Name="SEQUENCER_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
@@ -888,6 +814,10 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <File Category="header" Condition="S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON" Name="ble_timer.h" Version="1.0"/>
     </RefConfigFile>
 
+    <RefConfigFile Description="" Name="CRC_CTRL_H" Template="stm32wba/stm32_wpan_crc_ctrl_h.ftl" destinationFolder="System/Modules/">
+        <File Category="header" Condition="all" Name="crc_ctrl.h" Version="1.0"/>
+    </RefConfigFile>
+
     <RefConfigFile Description="" Name="DEBUG_TRACE_H" Template="stm32wba/stm32_wpan_dbg_trace_h.ftl" destinationFolder="System/Modules/">
         <File Category="header" Condition="all" Name="dbg_trace.h" Version="1.0"/>
     </RefConfigFile>
@@ -902,6 +832,10 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
 
     <RefConfigFile Description="" Name="STM_LIST_H" Template="stm32wba/stm32_wpan_stm_list_h.ftl" destinationFolder="System/Modules/">
         <File Category="header" Condition="all" Name="stm_list.h" Version="1.0"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="TEMP_MEASUREMENT_H" Template="stm32wba/stm32_wpan_temp_measurement_h.ftl" destinationFolder="System/Modules/">
+        <File Category="header" Condition="S_USE_TEMPERATURE_BASED_RADIO_CALIBRATION" Name="temp_measurement.h" Version="1.0"/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="UTILITIES_COMMON_H" Template="stm32wba/stm32_wpan_utilities_common_h.ftl" destinationFolder="System/Modules/">
@@ -942,6 +876,10 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <!-- ftl specific items end-->
     </RefConfigFile>
 
+    <RefConfigFile Description="" Name="CRC_CTRL_C" Template="stm32wba/stm32_wpan_crc_ctrl_c.ftl" destinationFolder="System/Modules/">
+        <File Category="source" Condition="all" Name="crc_ctrl.c" Version="1.0"/>
+    </RefConfigFile>
+
     <RefConfigFile Description="" Name="OTP_C" Template="stm32wba/stm32_wpan_otp_c.ftl" destinationFolder="System/Modules/">
         <File Category="source" Condition="all" Name="otp.c" Version="1.0"/>
     </RefConfigFile>
@@ -952,6 +890,10 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
 
     <RefConfigFile Description="" Name="STM_LIST_C" Template="stm32wba/stm32_wpan_stm_list_c.ftl" destinationFolder="System/Modules/">
         <File Category="source" Condition="all" Name="stm_list.c" Version="1.0"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="TEMP_MEASUREMENT_C" Template="stm32wba/stm32_wpan_temp_measurement_c.ftl" destinationFolder="System/Modules/">
+        <File Category="source" Condition="S_USE_TEMPERATURE_BASED_RADIO_CALIBRATION" Name="temp_measurement.c" Version="1.0"/>
     </RefConfigFile>
 
 <!-- System/Modules/baes/src begin -->
@@ -1048,11 +990,11 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
 <!-- System/Modules/MemoryManager/inc begin -->
 
     <RefConfigFile Description="" Name="ADVANCED_MEMORY_MANAGER_H" Template="stm32wba/stm32_wpan_advanced_memory_manager_h.ftl" destinationFolder="System/Modules/MemoryManager/">
-        <File Category="header" Condition="S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON" Name="advanced_memory_manager.h" Version="1.0"/>
+        <File Category="header" Condition="S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_ZIGBEE | S_ZIGBEE_SKELETON" Name="advanced_memory_manager.h" Version="1.0"/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="MEMORY_MANAGER_H" Template="stm32wba/stm32_wpan_memory_manager_h.ftl" destinationFolder="System/Modules/MemoryManager/">
-        <File Category="header" Condition="!(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON)" Name="memory_manager.h" Version="1.0"/>
+        <File Category="header" Condition="!(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_ZIGBEE | S_ZIGBEE_SKELETON)" Name="memory_manager.h" Version="1.0"/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="STM32_MM_H" Template="stm32wba/stm32_wpan_stm32_mm_h.ftl" destinationFolder="System/Modules/MemoryManager/">
@@ -1062,11 +1004,11 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
 <!-- System/Modules/MemoryManager/src begin -->
 
     <RefConfigFile Description="" Name="ADVANCED_MEMORY_MANAGER_C" Template="stm32wba/stm32_wpan_advanced_memory_manager_c.ftl" destinationFolder="System/Modules/MemoryManager/">
-        <File Category="source" Condition="S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON" Name="advanced_memory_manager.c" Version="1.0"/>
+        <File Category="source" Condition="S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_ZIGBEE | S_ZIGBEE_SKELETON" Name="advanced_memory_manager.c" Version="1.0"/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="MEMORY_MANAGER_C" Template="stm32wba/stm32_wpan_memory_manager_c.ftl" destinationFolder="System/Modules/MemoryManager/">
-        <File Category="source" Condition="!(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON)" Name="memory_manager.c" Version="1.0"/>
+        <File Category="source" Condition="!(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON| S_ZIGBEE | S_ZIGBEE_SKELETON)" Name="memory_manager.c" Version="1.0"/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="STM32_MM_C" Template="stm32wba/stm32_wpan_stm32_mm_c.ftl" destinationFolder="System/Modules/MemoryManager/">
@@ -1200,6 +1142,9 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
 
     <RefConfigFile Description="" Name="PERIPHERAL_INIT_C" Template="stm32wba/stm32_wpan_peripheral_init_c.ftl" destinationFolder="System/Config/LowPower/">
         <File Category="source" Condition="all" Name="peripheral_init.c" Version="1.0"/>
+        <Argument Name="USE_SNVMA_NVM" GenericType="Simple"/>
+        <Argument Name="USE_TEMPERATURE_BASED_RADIO_CALIBRATION" GenericType="Simple"/>
+        <Argument Name="SYSTICK_SOURCE_CLOCK_SELECTION" GenericType="Simple"/>
     </RefConfigFile>
 
 <!-- System/Config/Debug_GPIO - src & inc -->
@@ -1296,6 +1241,28 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="SNVMA_NVM_ID_4_BUFFER_4_NAME" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
     </RefConfigFile>
 
+<!-- System/Config/ADC_Ctrl - src & inc -->
+
+    <RefConfigFile Description="" Name="ADC_CTRL_CONF_C" Template="stm32wba/stm32_wpan_adc_ctrl_conf_c.ftl" destinationFolder="System/Config/ADC_Ctrl/">
+        <File Category="source" Condition="S_USE_TEMPERATURE_BASED_RADIO_CALIBRATION" Name="adc_ctrl_conf.c" Version="1.0"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="ADC_CTRL_CONF_H" Template="stm32wba/stm32_wpan_adc_ctrl_conf_h.ftl" destinationFolder="System/Config/ADC_Ctrl/">
+        <File Category="header" Condition="S_USE_TEMPERATURE_BASED_RADIO_CALIBRATION" Name="adc_ctrl_conf.h" Version="1.0"/>
+    </RefConfigFile>
+    
+<!-- System/Config/CRC_Ctrl - src & inc -->
+
+    <RefConfigFile Description="" Name="CRC_CTRL_CONF_C" Template="stm32wba/stm32_wpan_crc_ctrl_conf_c.ftl" destinationFolder="System/Config/CRC_Ctrl/">
+        <File Category="source" Condition="all" Name="crc_ctrl_conf.c" Version="1.0"/>
+        <Argument Name="USE_SNVMA_NVM" GenericType="Simple"/>
+    </RefConfigFile>
+
+    <RefConfigFile Description="" Name="CRC_CTRL_CONF_H" Template="stm32wba/stm32_wpan_crc_ctrl_conf_h.ftl" destinationFolder="System/Config/CRC_Ctrl/">
+        <File Category="header" Condition="all" Name="crc_ctrl_conf.h" Version="1.0"/>
+        <Argument Name="USE_SNVMA_NVM" GenericType="Simple"/>
+    </RefConfigFile>
+
 <!-- STM32_WPAN/app begin -->
 
     <RefConfigFile Description="" Name="BLE_APP_BLE_C" Template="stm32wba/stm32_wpan_ble_app_ble_c.ftl">
@@ -1348,6 +1315,10 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="ADV_INTERVAL_MIN" GenericType="Simple"/>
         <Argument Name="ADV_INTERVAL_MAX_HEXA" GenericType="Simple"/>
         <Argument Name="ADV_INTERVAL_MAX" GenericType="Simple"/>
+        <Argument Name="ADV_LP_INTERVAL_MIN_HEXA" GenericType="Simple"/>
+        <Argument Name="ADV_LP_INTERVAL_MIN" GenericType="Simple"/>
+        <Argument Name="ADV_LP_INTERVAL_MAX_HEXA" GenericType="Simple"/>
+        <Argument Name="ADV_LP_INTERVAL_MAX" GenericType="Simple"/>
         <Argument Name="AD_TYPE_ADVERTISING_INTERVAL_LENGTH" GenericType="Simple"/>
         <Argument Name="AD_TYPE_ADVERTISING_INTERVAL" GenericType="Simple"/>
         <Argument Name="INCLUDE_AD_TYPE_LE_ROLE" GenericType="Simple"/>
@@ -1555,6 +1526,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="SERVICE0_CHAR0_GATT_NOTIFY_ATTRIBUTE_WRITE" GenericType="Simple"/>
         <Argument Name="SERVICE0_CHAR0_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
         <Argument Name="SERVICE0_CHAR0_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP" GenericType="Simple"/>
+        <Argument Name="SERVICE0_CHAR0_GATT_NOTIFY_NOTIFICATION_COMPLETION" GenericType="Simple"/>
         
         <Argument Name="FREERTOS_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
         <Argument Name="THREADX_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
@@ -2048,10 +2020,10 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="CB_METERING_SERVER_LOCALCHANGESUPPLY_ENDPOINT0" GenericType="Simple" Comment="local_change_supply:static enum ZclStatusCodeT:( struct ZbZclClusterT * pstCluster, void * arg, struct ZbZclMeterClientLocalChangeSupplyReqT *req, struct ZbZclAddrInfoT * pstSrcInfo )"/>
         <Argument Name="CB_METERING_SERVER_MIRRORREPORTATTR_ENDPOINT0" GenericType="Simple" Comment="mirror_report_attr_rsp:enum ZclStatusCodeT:( struct ZbZclClusterT * pstCluster, void * arg, struct ZbZclMeterClientMirrorReportAttrRspT *notify, struct ZbZclAddrInfoT * pstSrcInfo )"/>
         <Argument Name="CB_METERING_SERVER_OPTIONAL_ENDPOINT0" GenericType="Simple" Comment="optional:static enum ZclStatusCodeT:( struct ZbZclClusterT * pstCluster, struct ZbZclHeaderT *zclHdrPtr, struct ZbApsdeDataIndT *dataIndPtr )"/>
-        <Argument Name="CB_METERING_CLIENT_REQUESTMIRROR_ENDPOINT0" GenericType="Simple" Comment="request_mirror:static bool:( struct ZbZclClusterT * pstCluster, struct ZbZclAddrInfoT * pstSrcInfo, void * arg )"/>
+        <Argument Name="CB_METERING_CLIENT_REQUESTMIRROR_ENDPOINT0" GenericType="Simple" Comment="request_mirror:static bool:( struct ZbZclClusterT * pstCluster, struct ZbZclAddrInfoT * pstSrcInfo, uint16_t * iMirrorEndpoint, void * arg )"/>
         <Argument Name="CB_METERING_CLIENT_REMOVEMIRROR_ENDPOINT0" GenericType="Simple" Comment="remove_mirror:static bool:( struct ZbZclClusterT * pstCluster, struct ZbZclAddrInfoT * pstSrcInfo, void * arg )"/>
         <Argument Name="CB_METERING_CLIENT_CONFIGMIRROR_ENDPOINT0" GenericType="Simple" Comment="config_mirror:static bool:( struct ZbZclClusterT * pstCluster, struct ZbZclMeterServerConfigMirrorT *req, struct ZbZclAddrInfoT * pstSrcInfo, void * arg )"/>
-        <Argument Name="CB_METERING_CLIENT_MIRRORCREATED_ENDPOINT0" GenericType="Simple" Comment="mirror_created:static void:( struct ZbZclClusterT * pstCluster, struct ZbZclClusterT * pstMirror, void * arg )"/>
+        <Argument Name="CB_METERING_CLIENT_MIRRORCREATED_ENDPOINT0" GenericType="Simple" Comment="mirror_created:static void:( struct ZbZclClusterT * pstCluster, struct ZbZclClusterT * pstMirror, uint64_t lBomdExtendedAddr, uint8_t cBomdEndPoint, void * arg )"/>
 
         <Argument Name="ZCL_PRICE_ENDPOINT0" GenericType="Simple" 
                   Comment="zcl/se/zcl.price.h:price:price:static struct ZbZclPrice$ROLECallbacksT:Price$ROLECallbacks_$ENDPOINT:ZbZclPrice$ROLEAlloc:( stZigbeeAppInfo.pstZigbee, APP_ZIGBEE_ENDPOINT$ENDPOINT, &amp;stPriceClientCallbacks$ENDPOINT, NULL ):( stZigbeeAppInfo.pstZigbee, APP_ZIGBEE_ENDPOINT$ENDPOINT, &amp;stPriceServerCallbacks$ENDPOINT, NULL )"/>

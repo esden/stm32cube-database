@@ -101,17 +101,11 @@ extern osThreadId RF_ThreadId;
 
 /* Private function prototypes -----------------------------------------------*/
 static void HTSAPP_Update_TimeStamp(void);
-static uint32_t HTSAPP_Read_RTC_SSR_SS ( void );
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Functions Definition ------------------------------------------------------*/
-static uint32_t HTSAPP_Read_RTC_SSR_SS ( void )
-{
-  return ((uint32_t)(READ_BIT(RTC->SSR, RTC_SSR_SS)));
-}
-
 static void HTSAPP_UpdateMeasurement( void )
 {
 /* USER CODE BEGIN HTSAPP_UpdateMeasurement */

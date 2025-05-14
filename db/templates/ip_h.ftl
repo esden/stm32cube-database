@@ -20,7 +20,11 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 [#compress]
-#include "main.h"
+[#if (contextFolder?? && contextFolder=="ExtMemLoader/")]
+#include "extmemloader_init.h"
+[#else]
+#include "${main_h}"
+[/#if]
 
 [#if H7_ETH_NoLWIP?? && !HALCompliant??]
 #include "string.h"

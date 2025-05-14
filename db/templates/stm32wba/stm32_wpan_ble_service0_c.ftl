@@ -130,12 +130,13 @@ SERVICE_NUMBER_OF_CHARACTERISTICS: ${SERVICE_NUMBER_OF_CHARACTERISTICS}
 [#assign item_GATT_NOTIFY_ATTR_WRITE = item][#assign item = item + 1]
 [#assign item_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP = item][#assign item = item + 1]
 [#assign item_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP = item][#assign item = item + 1]
+[#assign item_GATT_NOTIFY_NOTIFICATION_COMPLETION = item][#assign item = item + 1]
 [#assign item_GATT_NOTIFY_END = item]
 
 [#assign SERVICES_CHARS_GATT_NOTIFY = {} /]
 [#if SERVICE_NUMBER_OF_CHARACTERISTICS != "0"]
   [#list 1..SERVICE_NUMBER_OF_CHARACTERISTICS?number as i]
-    [#assign SERVICES_CHARS_GATT_NOTIFY = SERVICES_CHARS_GATT_NOTIFY + {i?string: [myHash["SERVICE"+SvcNbr+"_CHAR"+i+"_GATT_NOTIFY_ATTRIBUTE_WRITE"],myHash["SERVICE"+SvcNbr+"_CHAR"+i+"_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP"],myHash["SERVICE"+SvcNbr+"_CHAR"+i+"_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP"]]}/]
+    [#assign SERVICES_CHARS_GATT_NOTIFY = SERVICES_CHARS_GATT_NOTIFY + {i?string: [myHash["SERVICE"+SvcNbr+"_CHAR"+i+"_GATT_NOTIFY_ATTRIBUTE_WRITE"],myHash["SERVICE"+SvcNbr+"_CHAR"+i+"_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP"],myHash["SERVICE"+SvcNbr+"_CHAR"+i+"_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP"],myHash["SERVICE"+SvcNbr+"_CHAR"+i+"_GATT_NOTIFY_NOTIFICATION_COMPLETION"]]}/]
   [/#list]
 [/#if]
 
@@ -310,10 +311,18 @@ do {\
             [#if SERVICE_NUMBER_OF_CHARACTERISTICS != "0"]
               [#list 1..SERVICE_NUMBER_OF_CHARACTERISTICS?number as characteristic]
                 [#if SERVICES_CHARS_INFO[characteristic?string][item_UUID_TYPE] == "0x02"]
+                  [#if myHash["SERVICE"+SvcNbr+"_UUID_TYPE"] != "0x02"]
+/*
+ The following 128bits UUIDs have been generated from the random UUID
+ generator:
+                  [/#if]
                   [#if SERVICES_CHARS_INFO[characteristic?string][item_UUID_128_INPUT_TYPE] == "0"]
  0000${SERVICES_CHARS_INFO[characteristic?string][item_UUID]?replace(" ","")}8E2245419D4C21EDAE82ED19: Characteristic 128bits UUID
                   [#else]
  ${SERVICES_CHARS_INFO[characteristic?string][item_UUID]?replace(" ","")}: Characteristic 128bits UUID
+                  [/#if]
+                  [#if myHash["SERVICE"+SvcNbr+"_UUID_TYPE"] != "0x02"]
+ */
                   [/#if]
                 [/#if]
               [/#list]
@@ -755,7 +764,7 @@ static SVCCTL_EvtAckStatus_t ${SERVICE_SHORT_NAME_UpperCase}_EventHandler(void *
 void ${SERVICE_SHORT_NAME_UpperCase}_Init(void)
 {
   Char_UUID_t  uuid;
-  tBleStatus ret = BLE_STATUS_INVALID_PARAMS;
+  tBleStatus ret;
   uint8_t max_attr_record;
 
   /* USER CODE BEGIN SVCCTL_InitService${SvcNbr}Svc_1 */
@@ -880,7 +889,11 @@ void ${SERVICE_SHORT_NAME_UpperCase}_Init(void)
    */
           [#if SERVICES_CHARS_INFO[characteristic?string][item_UUID_TYPE] == "0x01"]
               [#assign UUID_TYPE = "UUID_TYPE_16"]
+              [#if SERVICES_CHARS_INFO[characteristic?string][item_UUID]?starts_with("0x")]
   uuid.Char_UUID_16 = ${SERVICES_CHARS_INFO[characteristic?string][item_UUID]?lower_case?replace(" ","")};
+              [#else]
+  uuid.Char_UUID_16 = 0x${SERVICES_CHARS_INFO[characteristic?string][item_UUID]?lower_case?replace(" ","")};
+              [/#if]
           [/#if]
           [#if SERVICES_CHARS_INFO[characteristic?string][item_UUID_TYPE] == "0x02"]
               [#assign UUID_TYPE = "UUID_TYPE_128"]

@@ -32,8 +32,9 @@
   [/#if]
 [/#list]
 [#compress]
-#t/* Initialize leds */
+
 [#if (LED1?? && LED1 == "true")]
+#t/* Initialize leds */
   #tBSP_LED_Init(LED_GREEN);
 [/#if]
 [/#compress]

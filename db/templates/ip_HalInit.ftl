@@ -334,7 +334,11 @@
                                 [#-- [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n --]
                                 [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != [#if method.returnHAL == "true"]HAL_OK[#else]${method.returnHAL}[/#if])
                                 [#if nTab==2]#t#t[#else]#t[/#if]{
+                                [#if FamilyName=="STM32H7RS" && (inst == "USB" | inst == "USB_OTG_FS" | inst == "USB_OTG_HS")]
+                                [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
+                                [#else]
                                 [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler( );
+                                [/#if]
                                 [#if nTab==2]#t#t[#else]#t[/#if]}
                             [/#if]#n
 		    [/#if]

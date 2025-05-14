@@ -43,10 +43,13 @@ extern "C" {
 /* USER CODE END typedef */
 
 /* Exported define -----------------------------------------------------------*/
+/* USER CODE BEGIN Define */
+[#if (FREERTOS?? || THREADX??) && Secure!="true"]
+#define OS_PE_STACK_SIZE                  1024
 
-/* USER CODE BEGIN define */
-
-/* USER CODE END define */
+#define OS_CAD_STACK_SIZE                 1024
+[/#if]
+/* USER CODE END Define */
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN constants */

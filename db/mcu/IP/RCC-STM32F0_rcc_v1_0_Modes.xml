@@ -83,14 +83,15 @@
 
 	<RefParameter Comment="Cortex timer system Div" DefaultValue="SYSTICK_CLKSOURCE_HCLK" Name="TimSys_Div" Type="list" Visible="false">
         <PossibleValue Comment="1" Semaphore="HCLKDiv1" Value="SYSTICK_CLKSOURCE_HCLK"/>
-		<PossibleValue Comment="8" Value="SYSTICK_CLKSOURCE_HCLK_DIV8"/>
-      
-     
+		<PossibleValue Comment="8" Value="SYSTICK_CLKSOURCE_HCLK_DIV8"/>    
     </RefParameter>
-	   <RefParameter Comment="Cortex_DivARG" DefaultValue="HAL_RCC_GetHCLKFreq()/1000" Name="Cortex_DivARG" Type="String" Visible="false">
-        <Condition Diagnostic="" Expression="HCLKDiv1"/>
+    <RefParameter Visible="false" Comment="Cortex cLock selection" DefaultValue="+TimSys_Div" Name="CortexCLockSelectionARG" Type="list">
+        <Condition Diagnostic="" Expression="TimSys_Div=SYSTICK_CLKSOURCE_HCLK_DIV8"/>
+    </RefParameter>
+	<RefParameter Comment="Cortex_DivARG" DefaultValue="=(AHBFreq_Value/8000)" Name="Cortex_DivARG" Type="String" Visible="false">
+        <Condition Diagnostic="" Expression="TimSys_Div=SYSTICK_CLKSOURCE_HCLK_DIV8"/>
     </RefParameter>	
-    <RefParameter Comment="Cortex_DivARG" DefaultValue="HAL_RCC_GetHCLKFreq()/8000" Name="Cortex_DivARG" Type="String" Visible="false"/>
+    <RefParameter Comment="Cortex_DivARG" DefaultValue="null" Name="Cortex_DivARG" Type="String" Visible="false"/>
     <!--diviseur APB1 1..16-->
     <RefParameter Comment="APB1 Clock Divider" DefaultValue="RCC_HCLK_DIV1" Name="APB1CLKDivider" Type="list" Visible="false">
         <PossibleValue Comment="1" Value="RCC_HCLK_DIV1"/>
@@ -1184,7 +1185,6 @@
         <ConfigForMode>RCC_CRSConfig</ConfigForMode> 
      
         <!--ConfigForMode>SYSCFG_CLK_ENABLE</ConfigForMode-->   <!-- added as a workAround to enable the SYSCFG clock : it should be managed internally by the HAL-->
-         <ConfigForMode>RCC_interrupt_Time_SYSTICK_Config</ConfigForMode>
 		 <ConfigForMode>RCC_SYSTICK_CONFIG</ConfigForMode>
         <Parameter Name="PLLMUL"/>
         <Parameter Name="APB1TimCLKDivider"/>

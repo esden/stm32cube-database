@@ -40,7 +40,7 @@
 	[#if isModuleUsed(module)]
 [#compress]#define HAL_${module?replace("QUADSPI","QSPI")?replace("AES","CRYP")?replace("OCTOSPI","OSPI")}_MODULE_ENABLED[/#compress]
 	[#else]
-/* #define HAL_${module?replace("QUADSPI","QSPI")?replace("OCTOSPI","OSPI")}_MODULE_ENABLED   */
+/* #define HAL_${module?replace("QUADSPI","XSPI")?replace("OCTOSPI","XSPI")}_MODULE_ENABLED   */
 	[/#if]	
   [/#list]
   [#function isModuleUsed moduleName]
@@ -131,7 +131,7 @@
   * @brief This is the HAL system configuration section
   */     
 #define  VDD_VALUE                    ([#if vdd_value??]${vdd_value}[#else]3300[/#if]UL) /*!< Value of VDD in mv */
-#define  TICK_INT_PRIORITY            ([#if TICK_INT_PRIORITY??]${TICK_INT_PRIORITY}[#else]0x0F[/#if]UL) /*!< tick interrupt priority */
+#define  TICK_INT_PRIORITY            ([#if TICK_INT_PRIORITY??]${TICK_INT_PRIORITY}[#else]((1UL<<__NVIC_PRIO_BITS) - 1UL)[/#if]UL) /*!< tick interrupt priority */
 #define  USE_RTOS                     [#if advancedSettings?? && advancedSettings.USE_RTOS??]${advancedSettings.USE_RTOS}[#else]0[/#if]
 #define  USE_SD_TRANSCEIVER           [#if USE_SD_TRANSCEIVER??]${USE_SD_TRANSCEIVER}[#else]1U[/#if]               /*!< use uSD Transceiver */
 #define  USE_SPI_CRC	              [#if CRC_SPI??]${CRC_SPI}[#else]1U[/#if]               /*!< use CRC in SPI */

@@ -1,0 +1,106 @@
+[#ftl]
+[#assign contextFolder=""]
+[#if cpucore!=""]    
+[#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")+"/"]
+[/#if]
+/* USER CODE BEGIN Header */
+/**
+  ******************************************************************************
+  * @file   fatfs.c
+  * @brief  Code for fatfs applications
+  ******************************************************************************
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
+  ******************************************************************************
+  */
+/* USER CODE END Header */
+/* Includes ------------------------------------------------------------------*/
+#include "fatfs.h"
+#include "main.h"
+
+[@common.optinclude name=contextFolder+mxTmpFolder+"/fatfs_vars.tmp"/]
+
+[#list SWIPdatas as SWIP]  
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="_MULTI_PARTITION"]                      
+				[#if definition.value="1"]
+/* USER CODE BEGIN VolToPart */
+/* Volume - Partition resolution table should be user defined in case of Multiple partition */
+/* When multi-partition feature is enabled (1), each logical drive number is bound to arbitrary physical drive and partition
+listed in the VolToPart[] */
+PARTITION VolToPart[];
+/* USER CODE END VolToPart */  
+				[/#if] 
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+
+/* USER CODE END Includes */
+
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
+
+/* USER CODE END PTD */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+
+/* USER CODE END PD */
+
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
+
+/* Private variables ---------------------------------------------------------*/
+/* USER CODE BEGIN PV */
+
+/* USER CODE END PV */
+
+/* Private function prototypes -----------------------------------------------*/
+/* USER CODE BEGIN PFP */
+
+/* USER CODE END PFP */
+
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
+
+/* USER CODE END 0 */    
+
+void MX_FATFS_Init(void) 
+{
+[@common.optinclude name=contextFolder+mxTmpFolder+"/fatfs_HalInit.tmp"/]
+#t/* USER CODE BEGIN Init */
+#n    
+#t/* USER CODE END Init */
+}
+
+[#list SWIPdatas as SWIP]  
+	[#if SWIP.defines??]
+		[#list SWIP.defines as definition]
+			[#if definition.name="_FS_NORTC"]                           
+				[#if definition.value="0"]
+/**
+  * @brief  Gets Time from RTC 
+  * @param  None
+  * @retval Time in DWORD
+  */
+DWORD get_fattime(void)
+{
+#t/* USER CODE BEGIN get_fattime */
+  return 0;
+#t/* USER CODE END get_fattime */  
+}
+				[/#if] 
+			[/#if]
+		[/#list]
+	[/#if]
+[/#list]
+
+/* USER CODE BEGIN Application */
+     
+/* USER CODE END Application */

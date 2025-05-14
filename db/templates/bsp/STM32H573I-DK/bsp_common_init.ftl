@@ -32,7 +32,9 @@
   [/#if]
 [/#list]
 [#compress]
+[#if (LED1?? && LED1 == "true")||(LED2?? && LED2 == "true") || (LED3?? && LED3 == "true")||(LED4?? && LED4 == "true")]
 #t/* Initialize leds */
+[/#if]
 [#if (LED1?? && LED1 == "true")]
   #tBSP_LED_Init(LED_GREEN);
 [/#if]

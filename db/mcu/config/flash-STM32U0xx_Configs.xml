@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" DBVersion="V4.0" Name="flash" Version="1.0.0" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
+
+	<RefConfig Name="Activate_FlashIP">
+		<IFCondition Expression="1=1">
+			<CallLibMethod Name="HAL_FLASH_Unlock" />
+		</IFCondition>
+		
+		<IFCondition Expression="SEM_FLASH_OB_WRP1B  | SEM_FLASH_OB_WRP1A | SEM_FLASH_OB_RDP|SEM_FLASH_OB_USER | SEM_FLASH_OB_FLASH_SECURITY">
+			<CallLibMethod Name="OBSettingsSection" Type="HardCode">
+				<HardCode Text="#n#t/* Option Bytes settings */#n" />
+			</CallLibMethod>
+		</IFCondition>
+		
+		<IFCondition Expression="!SEM_FLASH_OB_WRP1B &amp; !SEM_FLASH_OB_WRP1A &amp;
+								 (SEM_FLASH_OB_RDP|SEM_FLASH_OB_USER | !SEM_OB_NRST_STOP_NULL |
+								 !SEM_OB_NRST_STDBY_NULL | !SEM_OB_NRST_SHDW_NULL | !SEM_OB_IWDGSW_NULL |
+								 !SEM_OB_IWDG_STOP_NULL | !SEM_OB_IWDG_STDBY_NULL | !SEM_OB_WWDGSW_NULL |
+								 !SEM_OB_RAM_PARITY_CHECK_NULL | !SEM_OB_nBOOT_SEL_NULL | !SEM_OB_NBOOT1_NULL
+								 | !SEM_OB_NBOOT0_NULL | !SEM_OB_NRST_MODE_NULL | !SEM_OB_INPUT_RESET_HOLDER_NULL
+								 |SEM_FLASH_OB_FLASH_SECURITY)">
+			<CallLibMethod Name="HAL_FLASH_OB_Unlock" />
+			<CallLibMethod Name="HAL_FLASHEx_OBProgram" />
+			<CallLibMethod Name="HAL_FLASH_OB_Lock" />
+		</IFCondition>
+		<IFCondition Expression="SEM_FLASH_OB_WRP1B | SEM_FLASH_OB_WRP1A">
+			<CallLibMethod Name="HAL_FLASH_OB_Unlock" />
+		</IFCondition>
+		<!-- WRP -->
+		<IFCondition Expression="SEM_FLASH_OB_WRP1A">
+			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
+				<MethodArg Name="WRPArea" ParameterName="OB_WRPAREA_ZoneA" />
+				<MethodArg Name="WRPStartOffset" ParameterName="OB_WRP1A_PSTR_Value" />
+				<MethodArg Name="WRPEndOffset" ParameterName="OB_WRP1A_PEND_Value" />
+				<MethodArg Name="WRPLock" ParameterName="OB_UNLOCK_1A" />
+			</CallLibMethod>
+		</IFCondition>
+		<IFCondition Expression="SEM_FLASH_OB_WRP1B">
+			<CallLibMethod Name="HAL_FLASHEx_OBProgram">
+				<MethodArg Name="WRPArea" ParameterName="OB_WRPAREA_ZoneB" />
+				<MethodArg Name="WRPStartOffset" ParameterName="OB_WRP1B_PSTR_Value" />
+				<MethodArg Name="WRPEndOffset" ParameterName="OB_WRP1B_PEND_Value" />
+				<MethodArg Name="WRPLock" ParameterName="OB_UNLOCK_1B" />
+			</CallLibMethod>
+		</IFCondition>
+		
+		<IFCondition Expression="SEM_FLASH_OB_WRP1B | SEM_FLASH_OB_WRP1A">
+			<CallLibMethod Name="HAL_FLASH_OB_Lock" />
+		</IFCondition>
+		
+		<IFCondition Expression="1=1">
+			<CallLibMethod Name="HAL_FLASH_Lock" />
+		</IFCondition>
+
+		<IFCondition Expression="SEM_FLASH_OB_WRP1B  | SEM_FLASH_OB_WRP1A | SEM_FLASH_OB_RDP|SEM_FLASH_OB_USER | SEM_FLASH_OB_FLASH_SECURITY">
+			<CallLibMethod Name="OBlaunch" Type="HardCode">
+				<HardCode Text="#n#t/* Launch Option Bytes Loading */
+							#n#t/*HAL_FLASH_OB_Launch(); */#n" />
+			</CallLibMethod>
+		</IFCondition>
+		
+	</RefConfig>
+
+
+	<LibMethod Comment="" Name="HAL_FLASHEx_OBProgram">
+		<Argument AddressOf="true" GenericType="struct" Name="pOBInit" TypeName="FLASH_OBProgramInitTypeDef">
+			<Argument AddressOf="false" GenericType="simple" Name="OptionType" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="WRPArea" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="WRPStartOffset" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="WRPEndOffset" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="RDPLevel" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="USERType" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="USERConfig" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="BootLock" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="HDPEndPage" OptimizationCondition="equal" />
+			<Argument AddressOf="false" GenericType="simple" Name="HDPState" OptimizationCondition="equal" />
+		</Argument>
+	</LibMethod>
+
+	<LibMethod Comment="" Name="HAL_FLASH_Unlock" />
+	<LibMethod Comment="" Name="HAL_FLASH_OB_Unlock" />
+	<LibMethod Comment="" Name="HAL_FLASH_Lock" />
+	<LibMethod Comment="" Name="HAL_FLASH_OB_Lock" />
+
+	<RefComponent Cclass="System Core" Cgroup="Flash" Cversion="1Gg0Gg0">
+		<File Category="header" Name="Drivers/STM32U0xx_HAL_Driver/Inc/stm32u0xx_hal_flash.h"/>
+		<File Category="header" Name="Drivers/STM32U0xx_HAL_Driver/Inc/stm32u0xx_hal_flash_ex.h"/>
+		<File Category="source" Name="Drivers/STM32U0xx_HAL_Driver/Src/stm32u0xx_hal_flash.c"/>
+		<File Category="source" Name="Drivers/STM32U0xx_HAL_Driver/Src/stm32u0xx_hal_flash_ex.c"/>
+	</RefComponent>
+</IP>

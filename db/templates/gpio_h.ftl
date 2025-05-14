@@ -19,7 +19,11 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
+[#if (contextFolder?? && contextFolder=="ExtMemLoader/")]
+#include "extmemloader_init.h"
+[#else]
+#include "${main_h}"
+[/#if]
 #n
 /* USER CODE BEGIN Includes */
 

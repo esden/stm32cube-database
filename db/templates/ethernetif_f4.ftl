@@ -64,7 +64,7 @@
         [#if (definition.name == "LWIP_IPV6") && (definition.value == "1")]
             [#assign lwip_ipv6 = 1]
         [/#if] 
-        [#if (definition.name == "LWIP_NETIF_HOSTNAME") && (definition.value != "valueNotSetted")]
+        [#if (definition.name == "LWIP_NETIF_HOSTNAME_NAME") && (definition.value != "valueNotSetted")]
             [#assign lwip_netif_hostname = definition.value]
         [/#if]  
 	[/#list]

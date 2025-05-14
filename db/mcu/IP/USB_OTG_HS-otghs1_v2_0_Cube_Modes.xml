@@ -19,19 +19,19 @@
 		<Condition Expression="DIE434 | DIE449" Diagnostic=""/>		
 	</RefParameter>
 	<RefParameter Comment="Device endpoints number" DefaultValue="9" Name="dev_endpoints" Min="1" Max="9" Type="integer" Group="" Visible="false">
-		<Condition Expression="DIE450 | DIE480 | DIE483| DIE481 | DIE476" Diagnostic=""/>		
+		<Condition Expression="DIE450 | DIE480 | DIE483| DIE481 | DIE476 | DIE485" Diagnostic=""/>		
 	</RefParameter>
 	<RefParameter Comment="Device endpoints number" DefaultValue="7" Name="dev_endpoints" Min="1" Max="7" Type="integer" Group="" Visible="false"/>
 	
 	<RefParameter Comment="Host Channels" DefaultValue="16" Name="Host_channels"  Min="1" Max="16" Type="integer">	
-		<Condition Expression="(DIE450 | DIE480 | DIE483| DIE481 | DIE476) &amp; ((VirtualMode = Host_HS) | (VirtualMode = Host_FS))" Diagnostic=""/>		
+		<Condition Expression="(DIE450 | DIE480 | DIE483| DIE481 | DIE476 | DIE485) &amp; ((VirtualMode = Host_HS) | (VirtualMode = Host_FS))" Diagnostic=""/>		
 	</RefParameter>
 	<RefParameter Comment="Host Channels" DefaultValue="12" Name="Host_channels"  Min="1" Max="15" Type="integer" Visible="false">	
 		<Condition Expression="(VirtualMode = Host_HS) | (VirtualMode = Host_FS)" Diagnostic=""/>		
 	</RefParameter>
         
         <RefParameter Comment="Ref Clock Selection" DefaultValue="SYSCFG_OTG_HS_PHY_CLK_SELECT_1" Name="RefClockSelection"  Type="list"  Visible="true" Group="OTG PHY reference clock selection">	
-            <Condition Expression="DIE481 | DIE476" Diagnostic=""/>
+            <Condition Expression="DIE481 | DIE476 | DIE485" Diagnostic=""/>
             <PossibleValue Value="SYSCFG_OTG_HS_PHY_CLK_SELECT_1" Comment="16 Mhz"/>
             <PossibleValue Value="SYSCFG_OTG_HS_PHY_CLK_SELECT_2" Comment="19.2 Mhz"/>
             <PossibleValue Value="SYSCFG_OTG_HS_PHY_CLK_SELECT_3" Comment="20 Mhz"/>
@@ -111,7 +111,7 @@
 	-->
 	
 	<RefParameter Comment="Physical interface" DefaultValue="USB_OTG_HS_EMBEDDED_PHY" Name="phy_itface" Type="List">
-                <Condition Expression="DIE481 | DIE476" Diagnostic="U5 4m"/>	
+                <Condition Expression="DIE481 | DIE476 | DIE485" Diagnostic="U5 4m"/>	
 		<PossibleValue Value="USB_OTG_ULPI_PHY" Comment="External Phy"/>
 		<PossibleValue Value="USB_OTG_EMBEDDED_PHY" Comment="Internal Phy"/>		
 		<PossibleValue Value="USB_OTG_HS_EMBEDDED_PHY" Comment="Internal HS Phy"/>
@@ -124,11 +124,12 @@
 	<!-- Bug356385 -->
 	<RefParameter Comment="Signal start of frame " DefaultValue="ENABLE" Name="Sof_enable" Type="List" Group="">
 		<PossibleValue Value="ENABLE" Comment="Enabled"/>
-		<Condition Expression="USB_FS_SOF" Diagnostic=""/>		
+		<Condition Expression="USB_HS_SOF" Diagnostic=""/>		
 	</RefParameter>
 	<RefParameter Comment="Signal start of frame" DefaultValue="DISABLE" Name="Sof_enable" Type="List">
 		<PossibleValue Value="ENABLE" Comment="Enabled"/>
-		<PossibleValue Value="DISABLE" Comment="Disabled"/>		
+		<PossibleValue Value="DISABLE" Comment="Disabled"/>
+		<Condition Expression="!USB_HS_SOF" Diagnostic=""/>
 	</RefParameter>
 	
 	<!-- Add Link Power Management -->
@@ -148,18 +149,19 @@
 	</RefParameter>
 	
 	<RefParameter Comment="Low power" DefaultValue="DISABLE" Name="low_power_enable" Type="List">
-	  <Condition Expression="(!MW_USB_OTG_HS_MW_HOST)&amp;(!MW_USB_OTG_HS_MW_FS_HOST)" Diagnostic=""/>			
+	<Condition Expression="(!MW_USB_OTG_HS_MW_HOST)&amp;(!MW_USB_OTG_HS_MW_FS_HOST)" Diagnostic=""/>
 		<PossibleValue Value="ENABLE" Comment="Enabled" Semaphore="$IpInstance_INTERRUPT_WAKEUP_ON"/>
 		<PossibleValue Value="DISABLE" Comment="Disabled"/>		
 	</RefParameter>
-	
+
+
 	<!-- Add Battery charging functionality for Shark (STM32H7)-->
 	<RefParameter Comment="Battery charging" DefaultValue="ENABLE" Name="battery_charging_enable" Type="List">		
-		<Condition Expression="VBUS_USED_FOR_BCD &amp; (DIE450 | DIE480 | DIE483| DIE481 | DIE476)" Diagnostic=""/>
+		<Condition Expression="VBUS_USED_FOR_BCD &amp; (DIE450 | DIE480 | DIE483| DIE481 | DIE476 | DIE485)" Diagnostic=""/>
 		<PossibleValue Value="ENABLE" Comment="Enabled"/>		
 	</RefParameter>
 	<RefParameter Comment="Battery charging" DefaultValue="ENABLE" Name="battery_charging_enable" Type="List">	
-		<Condition Expression="VBUS_SENSING_ON &amp; (DIE450 | DIE480 | DIE483| DIE481 | DIE476)" Diagnostic=""/>
+		<Condition Expression="VBUS_SENSING_ON &amp; (DIE450 | DIE480 | DIE483| DIE481 | DIE476 | DIE485)" Diagnostic=""/>
 		<PossibleValue Value="ENABLE" Comment="Enabled"/>
 		<PossibleValue Value="DISABLE" Comment="Disabled"/>	
 	</RefParameter>	
@@ -428,7 +430,7 @@
 		</Mode>
 		<!-- ModeLogicOperator for FS -->
 		<!-- Tracker 232811 -->
-		<Mode Name="Internal FS Phy" RemoveCondition="DIE483|DIE481 | DIE476">
+		<Mode Name="Internal FS Phy" RemoveCondition="DIE483 | DIE481 | DIE476 | DIE485">
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="OTG/Dual-Role-Device-FS" UserName="OTG/Dual_Role_Device">
 					<SignalLogicalOp Name="AND">
@@ -501,7 +503,7 @@
 			<Semaphore>USB_OTG_HSEmbeddedPHYUsed_ForRCC</Semaphore>
 			<Condition Expression="!$IpInstanceHS" Diagnostic=""/>			
 		</Mode>
-        <Mode Name="Internal HS Phy" RemoveCondition="!(DIE481 | DIE476)">
+        <Mode Name="Internal HS Phy" RemoveCondition="!(DIE481 | DIE476 | DIE485)">
 			<ModeLogicOperator Name="XOR">
 				<Mode Name="OTG/Dual-Role-Device-HS" UserName="OTG/Dual_Role_Device">
 					<SignalLogicalOp Name="AND">
@@ -513,7 +515,7 @@
 					<Semaphore>SEMAOoUSBOoOTGOoHSOoDRDOoFOROoUSBX</Semaphore>
 				</Mode>
 				<!-- Tracker 333854 -->
-				<Mode Name="Internal_Phy_Host" UserName="Host_Only" RemoveCondition="!(DIE481 | DIE476)">
+				<Mode Name="Internal_Phy_Host" UserName="Host_Only" RemoveCondition="!(DIE481 | DIE476 | DIE485)">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="DM" IOMode="System"/>
 						<Signal Name="DP" IOMode="System"/>
@@ -521,7 +523,7 @@
 					<Semaphore>MW_USB_OTG_HS_MW_FS_HOST</Semaphore>
 					<Semaphore>SEMAOoUSBOoOTGOoHSOoHOSTOoFOROoUSBX</Semaphore>
 				</Mode>
-				<Mode Name="Internal_Phy_Host" UserName="Host_Only" RemoveCondition="DIE481 | DIE476">
+				<Mode Name="Internal_Phy_Host" UserName="Host_Only" RemoveCondition="DIE481 | DIE476 | DIE485">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="DM"/>
 						<Signal Name="DP"/>
@@ -530,7 +532,7 @@
 					<Semaphore>SEMAOoUSBOoOTGOoHSOoHOSTOoFOROoUSBX</Semaphore>
 				</Mode>
 				<!-- Tracker 333854 -->
-				<Mode Name="Internal_Phy_Device" UserName="Device_Only" RemoveCondition="DIE481 | DIE476">
+				<Mode Name="Internal_Phy_Device" UserName="Device_Only" RemoveCondition="DIE481 | DIE476 | DIE485">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="DM"/>
 						<Signal Name="DP"/>
@@ -539,7 +541,7 @@
 					<Semaphore>SEMAOoUSBOoOTGOoHSOoDEVICEOoFOROoUSBX</Semaphore>
 				</Mode>
 				
-				<Mode Name="Internal_Phy_Device" UserName="Device_Only" RemoveCondition="!(DIE481 | DIE476)">
+				<Mode Name="Internal_Phy_Device" UserName="Device_Only" RemoveCondition="!(DIE481 | DIE476 | DIE485)">
 					<SignalLogicalOp Name="AND">
 						<Signal Name="DM" IOMode="System"/>
 						<Signal Name="DP" IOMode="System"/>
@@ -560,7 +562,7 @@
 				</Mode>			
 			</ModeLogicOperator>
 			<!-- Bug356385 -->
-			<Semaphore>USB_FS_SOF</Semaphore>
+			<Semaphore>USB_HS_SOF</Semaphore>
 			<!-- Tracker 233898 -->
 			<!--<Condition Expression=" MW_USB_OTG_HS_MW_FS_DEVICE | MW_USB_OTG_HS_MW_FS_HOST | OTG_DUAL_ROL_DEVICE_HS_FS" Diagnostic="USB External or Internal Phy Mode must be selected first"/>-->
 			<!-- Tracker 325936 -->
@@ -578,7 +580,7 @@
 					<Condition Expression="(MW_USB_OTG_HS_MW_FS_DEVICE | MW_USB_OTG_HS_MW_FS_HOST | OTG_DUAL_ROL_DEVICE_HS_FS)&amp; !USBPD_USB_SUPPORT" Diagnostic="USB Internal Phy Mode must be selected first and it should not be enabled from USBPD"/>	
 				</Mode>	
 				<!-- Thicket 33380, The STM32H7 support the mode BCD -->
-				<Mode Name="Activate_VBUS_BCD" UserName="BCD (Battery Charging Detection)" RemoveCondition="!DIE450 &amp; !DIE480 &amp; !DIE483 &amp; !DIE481 &amp; !DIE476">
+				<Mode Name="Activate_VBUS_BCD" UserName="BCD (Battery Charging Detection)" RemoveCondition="!DIE450 &amp; !DIE480 &amp; !DIE483 &amp; !DIE481 &amp; !DIE476 &amp; !DIE485">
 					<SignalLogicalOp Name="AND">				
 						<Signal Name="VBUS"  IOMode="EXTIRisingFalling"/>								
 					</SignalLogicalOp>

@@ -196,30 +196,40 @@ static void MX_${data.ipName}_GPIO_Init(void)
 [#compress]
 [#assign irqNum = 0]
 [#list InitNvic as initVector]
+
+    [#-- Request in Ticket 170461 Begin--]
+    [#if initVector.label?? && initVector.label != "" && DIE == "DIE485"]
+        [#assign vectorName = initVector.label]
+    [#else]
+        [#assign vectorName = initVector.vector]
+    [/#if]
+    [#-- Request in Ticket 170461 End--]
+
+
         [#if initVector.codeInMspInit]
                 [#assign irqNum = irqNum+1]
                 [#if irqNum==1]#n#t/* EXTI interrupt init*/[/#if]
 [#if !usedDriver?? || (usedDriver?? && usedDriver == "HAL")]
    [#if DIE != "DIE501"]
-                #tHAL_NVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority}, ${initVector.subPriority});
+                #tHAL_NVIC_SetPriority(${vectorName}, ${initVector.preemptionPriority}, ${initVector.subPriority});
      [#else]
-                #tIRQ_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
+                #tIRQ_SetPriority(${vectorName}, ${initVector.preemptionPriority});
     [/#if]
 [#if initVector.enableIRQ]
    [#if DIE != "DIE501"]
-                #tHAL_NVIC_EnableIRQ(${initVector.vector});#n
+                #tHAL_NVIC_EnableIRQ(${vectorName});#n
                 [#else]
-                 #tIRQ_Enable(${initVector.vector});#n
+                 #tIRQ_Enable(${vectorName});#n
    [/#if]
 [/#if]
 [#else]
     [#if NVICPriorityGroup??]
-                #tNVIC_SetPriority(${initVector.vector}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),${initVector.preemptionPriority}, ${initVector.subPriority}));
+                #tNVIC_SetPriority(${vectorName}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),${initVector.preemptionPriority}, ${initVector.subPriority}));
     [#else]
-                #tNVIC_SetPriority(${initVector.vector}, ${initVector.preemptionPriority});
+                #tNVIC_SetPriority(${vectorName}, ${initVector.preemptionPriority});
     [/#if]
 [#if EnableCode??]
-                #tNVIC_EnableIRQ(${initVector.vector});
+                #tNVIC_EnableIRQ(${vectorName});
 [/#if]
 [/#if]
         [/#if]

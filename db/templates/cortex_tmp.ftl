@@ -4,6 +4,7 @@
 [#assign useGpio = false]
 [#assign useDma = false]
 [#assign useNvic = false]
+[#assign familyName=FamilyName?lower_case]
 
 [#assign initServicesList = {"test0":"test1"}]
 [#-- Section1: Create the void mx_<IpInstance>_<HalMode>_init() function for each ip instance --]
@@ -14,7 +15,11 @@
 [#if instanceData.isMWUsed=="false" && instanceData.isBusDriverUSed=="false"]
      [#assign instName = instanceData.instanceName]
         [#assign halMode= instanceData.halMode]
+    [#if  FamilyName=="STM32H7RS"]
+#nstatic void MPU_Config(void)
+    [#else]
 #nvoid MPU_Config(void)
+    [/#if]
 {
         [#-- assign ipInstanceIndex = instName?replace(name,"")--]
         [#assign args = ""]

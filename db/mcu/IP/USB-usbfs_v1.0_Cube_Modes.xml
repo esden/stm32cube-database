@@ -68,6 +68,7 @@
     <RefParameter Comment="vbus_sensing_enable" DefaultValue="DISABLE" Name="vbus_sensing_enable" Group="Basic Parameters"  Type="List">			
         <PossibleValue Value="ENABLE" Comment="Enabled"/>
         <PossibleValue Value="DISABLE" Comment="Disabled"/>	
+	<Condition Expression="!DIE489" Diagnostic=""/>
     </RefParameter>
   
     <RefParameter Comment="Bulk double buffer" DefaultValue="DISABLE" Name="bulk_doublebuffer_enable" Group="EndPoint Parameters" Type="List">			
@@ -96,8 +97,12 @@
         <Parameter Name="Sof_enable">
             <Condition Expression="!USB_FS_SOF" Diagnostic=""/>
         </Parameter>
-        <Parameter Name="bulk_doublebuffer_enable"/>
-        <Parameter Name="iso_singlebuffer_enable"/>
+        <Parameter Name="bulk_doublebuffer_enable">
+            <Condition Expression="!DIE489" Diagnostic=""/>
+        </Parameter>
+        <Parameter Name="iso_singlebuffer_enable">
+            <Condition Expression="!DIE489" Diagnostic=""/>
+        </Parameter>
     </RefMode>
 	
     <RefMode Name="Host" HalMode="HCD">
@@ -126,7 +131,7 @@
     <ModeLogicOperator Name="OR">
         <Mode Name="Mode">
             <ModeLogicOperator Name="XOR">
-                <Mode Name="Device" UserName="Device_Only">
+                <Mode Name="Device" UserName="Device_Only" RemoveCondition ="DIE489 | DIE478 | DIE474 | DIE484">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="DM"/>
                         <Signal Name="DP"/>
@@ -134,10 +139,26 @@
                     <Semaphore>MW_USB_MW_DEVICE</Semaphore>
 					<Semaphore>SEMAOoUSBOoOTGOoFSOoDEVICEOoFOROoUSBX</Semaphore>
                 </Mode>
-                <Mode Name="Host" UserName="Host_Only">
+                <Mode Name="Host" UserName="Host_Only" RemoveCondition ="DIE489 | DIE478 | DIE474 | DIE484">
                     <SignalLogicalOp Name="AND">
                         <Signal Name="DM"/>
                         <Signal Name="DP"/>
+                    </SignalLogicalOp>
+                    <Semaphore>MW_USB_MW_HOST</Semaphore>
+					<Semaphore>SEMAOoUSBOoOTGOoFSOoHOSTOoFOROoUSBX</Semaphore>
+                </Mode>
+				<Mode Name="Device" UserName="Device_Only" RemoveCondition ="!(DIE489 | DIE478 | DIE474 | DIE484)">
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="System" Name="DM"/>
+                        <Signal IOMode="System" Name="DP"/>
+                    </SignalLogicalOp>
+                    <Semaphore>MW_USB_MW_DEVICE</Semaphore>
+					<Semaphore>SEMAOoUSBOoOTGOoFSOoDEVICEOoFOROoUSBX</Semaphore>
+                </Mode>
+                <Mode Name="Host" UserName="Host_Only" RemoveCondition ="DIE489 &amp; !(DIE478 | DIE474 | DIE484)"> 
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="System" Name="DM"/>
+                        <Signal IOMode="System" Name="DP"/>
                     </SignalLogicalOp>
                     <Semaphore>MW_USB_MW_HOST</Semaphore>
 					<Semaphore>SEMAOoUSBOoOTGOoFSOoHOSTOoFOROoUSBX</Semaphore>

@@ -758,11 +758,10 @@ static void appe_Tl_Init(void)
 [#if THREADX_STATUS = 1]
   UINT ThreadXStatus;
   CHAR * pTempBuf = TX_NULL;
-[/#if]  
-
+[/#if]
   /**< Reference table initialization */
   TL_Init();
-  
+
 [#if FREERTOS_STATUS = 1]
 
   MtxShciId = osMutexNew(NULL);
@@ -823,6 +822,9 @@ static void appe_Tl_Init(void)
   /**< Memory Manager channel initialization */
 [#if (BLE = 1)]
   tl_mm_config.p_BleSpareEvtBuffer = BleSpareEvtBuffer;
+[/#if]
+[#if ZIGBEE = 1]
+  memset(&tl_mm_config, 0, sizeof(TL_MM_Config_t));
 [/#if]
 [#if THREAD = 1 || ZIGBEE = 1]
   tl_mm_config.p_BleSpareEvtBuffer = 0;
@@ -1277,9 +1279,9 @@ void HAL_Delay(uint32_t Delay)
     /**
      * This option is used to ensure that store operations are completed
      */
-  #if defined (__CC_ARM)
+  #if defined (__CC_ARM) || defined (__ARMCC_VERSION)
     __force_stores();
-  #endif /* __CC_ARM */
+  #endif /* __ARMCC_VERSION */
 
     __WFI();
   }

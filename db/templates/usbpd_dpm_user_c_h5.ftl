@@ -69,6 +69,7 @@
 #include "stdio.h"
 #endif /* _TRACE */
 /* USER CODE BEGIN Includes */
+[@common.optinclude name=mxTmpFolder+"/usbpd_dpm_user_c_Include.tmp"/]
 
 /* USER CODE END Includes */
 
@@ -82,6 +83,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN Private_Typedef */
+[@common.optinclude name=mxTmpFolder+"/usbpd_dpm_user_c_Typedef.tmp"/]
 
 /* USER CODE END Private_Typedef */
 
@@ -163,7 +165,7 @@ GUI_SAVE_INFO                 DPM_GUI_SaveInfo                  = NULL;
 [/#if]
 
 /* USER CODE BEGIN Private_Variables */
-
+[@common.optinclude name=mxTmpFolder+"/usbpd_dpm_user_c_Variables.tmp"/]
 
 /* USER CODE END Private_Variables */
 /**
@@ -175,6 +177,7 @@ GUI_SAVE_INFO                 DPM_GUI_SaveInfo                  = NULL;
   * @{
   */
 /* USER CODE BEGIN USBPD_USER_PRIVATE_FUNCTIONS_Prototypes */
+[@common.optinclude name=mxTmpFolder+"/usbpd_dpm_user_c_Prototypes.tmp"/]
 
 /* USER CODE END USBPD_USER_PRIVATE_FUNCTIONS_Prototypes */
 /**
@@ -204,6 +207,7 @@ GUI_SAVE_INFO                 DPM_GUI_SaveInfo                  = NULL;
 USBPD_StatusTypeDef USBPD_DPM_UserInit(void)
 {
 /* USER CODE BEGIN USBPD_DPM_UserInit */
+[@common.optinclude name=mxTmpFolder+"/usbpd_dpm_user_c_Init.tmp"/]
   return USBPD_OK;
 /* USER CODE END USBPD_DPM_UserInit */
 }
@@ -296,6 +300,13 @@ void USBPD_DPM_UserCableDetection(uint8_t PortNum, USBPD_CAD_EVENT State)
 [/#if]
 [/#if]
 /* USER CODE BEGIN USBPD_DPM_UserCableDetection */
+[#assign name=mxTmpFolder+"/usbpd_dpm_user_c_CableDetection.tmp"]
+[#assign objectConstructor = "freemarker.template.utility.ObjectConstructor"?new()]
+[#assign file = objectConstructor("java.io.File",workspace+"/"+name)]
+[#assign exist = file.exists()]
+[#if exist]
+  [#include "${name}"]
+[#else]
 DPM_USER_DEBUG_TRACE(PortNum, "ADVICE: update USBPD_DPM_UserCableDetection");
 [#if SRC || DRP]
   // switch(State)
@@ -323,6 +334,7 @@ DPM_USER_DEBUG_TRACE(PortNum, "ADVICE: update USBPD_DPM_UserCableDetection");
       // break;
     // }
   // }
+[/#if]
 [/#if]
 /* USER CODE END USBPD_DPM_UserCableDetection */
 }
@@ -419,7 +431,15 @@ void USBPD_DPM_Notification(uint8_t PortNum, USBPD_NotifyEventValue_TypeDef Even
 void USBPD_DPM_HardReset(uint8_t PortNum, USBPD_PortPowerRole_TypeDef CurrentRole, USBPD_HR_Status_TypeDef Status)
 {
 /* USER CODE BEGIN USBPD_DPM_HardReset */
+[#assign name=mxTmpFolder+"/usbpd_dpm_user_c_Hardreset.tmp"]
+[#assign objectConstructor = "freemarker.template.utility.ObjectConstructor"?new()]
+[#assign file = objectConstructor("java.io.File",workspace+"/"+name)]
+[#assign exist = file.exists()]
+[#if exist]
+  [#include "${name}"]
+[#else]
   DPM_USER_DEBUG_TRACE(PortNum, "ADVICE: update USBPD_DPM_HardReset");
+[/#if]
 /* USER CODE END USBPD_DPM_HardReset */
 }
 
@@ -466,6 +486,13 @@ void USBPD_DPM_GetDataInfo(uint8_t PortNum, USBPD_CORE_DataInfoType_TypeDef Data
   /* Check type of information targeted by request */
   switch(DataId)
   {
+[#assign name=mxTmpFolder+"/usbpd_dpm_user_c_GetDataInfo.tmp"]
+[#assign objectConstructor = "freemarker.template.utility.ObjectConstructor"?new()]
+[#assign file = objectConstructor("java.io.File",workspace+"/"+name)]
+[#assign exist = file.exists()]
+[#if exist]
+  [#include "${name}"]
+[#else]
 [#if SNK || DRP]
 //  case USBPD_CORE_DATATYPE_SNK_PDO:           /*!< Handling of port Sink PDO, requested by get sink capa*/
     // break;
@@ -493,6 +520,8 @@ void USBPD_DPM_GetDataInfo(uint8_t PortNum, USBPD_CORE_DataInfoType_TypeDef Data
   default:
     DPM_USER_DEBUG_TRACE(PortNum, "ADVICE: update USBPD_DPM_GetDataInfo:%d", DataId);
     break;
+[/#if]	
+
   }
 /* USER CODE END USBPD_DPM_GetDataInfo */
 }
@@ -511,6 +540,13 @@ void USBPD_DPM_SetDataInfo(uint8_t PortNum, USBPD_CORE_DataInfoType_TypeDef Data
   /* Check type of information targeted by request */
   switch(DataId)
   {
+[#assign name=mxTmpFolder+"/usbpd_dpm_user_c_SetDataInfo.tmp"]
+[#assign objectConstructor = "freemarker.template.utility.ObjectConstructor"?new()]
+[#assign file = objectConstructor("java.io.File",workspace+"/"+name)]
+[#assign exist = file.exists()]
+[#if exist]
+  [#include "${name}"]
+[#else]
 //  case USBPD_CORE_DATATYPE_RDO_POSITION:      /*!< Reset the PDO position selected by the sink only */
     // break;
 //  case USBPD_CORE_DATATYPE_RCV_SRC_PDO:       /*!< Storage of Received Source PDO values        */
@@ -546,6 +582,7 @@ void USBPD_DPM_SetDataInfo(uint8_t PortNum, USBPD_CORE_DataInfoType_TypeDef Data
   default:
     DPM_USER_DEBUG_TRACE(PortNum, "ADVICE: update USBPD_DPM_SetDataInfo:%d", DataId);
     break;
+[/#if]
   }
 /* USER CODE END USBPD_DPM_SetDataInfo */
 
@@ -568,6 +605,13 @@ void USBPD_DPM_SetDataInfo(uint8_t PortNum, USBPD_CORE_DataInfoType_TypeDef Data
 USBPD_StatusTypeDef USBPD_DPM_EvaluateRequest(uint8_t PortNum, USBPD_CORE_PDO_Type_TypeDef *PtrPowerObject)
 {
 /* USER CODE BEGIN USBPD_DPM_EvaluateRequest */
+[#assign name=mxTmpFolder+"/usbpd_dpm_user_c_EvaluateRequest.tmp"]
+[#assign objectConstructor = "freemarker.template.utility.ObjectConstructor"?new()]
+[#assign file = objectConstructor("java.io.File",workspace+"/"+name)]
+[#assign exist = file.exists()]
+[#if exist]
+  [#include "${name}"]
+[#else]
   /* 
     Set power data object to initialize value.
     This parameter is used by the stack to start or not tPPSTimeout
@@ -578,6 +622,7 @@ USBPD_StatusTypeDef USBPD_DPM_EvaluateRequest(uint8_t PortNum, USBPD_CORE_PDO_Ty
   
   DPM_USER_DEBUG_TRACE(PortNum, "ADVICE: update USBPD_DPM_EvaluateRequest");
   return USBPD_REJECT;
+[/#if]
 /* USER CODE END USBPD_DPM_EvaluateRequest */
 }
 [/#if]
@@ -593,7 +638,15 @@ USBPD_StatusTypeDef USBPD_DPM_EvaluateRequest(uint8_t PortNum, USBPD_CORE_PDO_Ty
 void USBPD_DPM_SNK_EvaluateCapabilities(uint8_t PortNum, uint32_t *PtrRequestData, USBPD_CORE_PDO_Type_TypeDef *PtrPowerObjectType)
 {
 /* USER CODE BEGIN USBPD_DPM_SNK_EvaluateCapabilities */
+[#assign name=mxTmpFolder+"/usbpd_dpm_user_c_EvaluateCapa.tmp"]
+[#assign objectConstructor = "freemarker.template.utility.ObjectConstructor"?new()]
+[#assign file = objectConstructor("java.io.File",workspace+"/"+name)]
+[#assign exist = file.exists()]
+[#if exist]
+  [#include "${name}"]
+[#else]
   DPM_USER_DEBUG_TRACE(PortNum, "ADVICE: update USBPD_DPM_SNK_EvaluateCapabilities");
+[/#if]
 /* USER CODE END USBPD_DPM_SNK_EvaluateCapabilities */
 }
 [/#if]
@@ -609,7 +662,15 @@ void USBPD_DPM_SNK_EvaluateCapabilities(uint8_t PortNum, uint32_t *PtrRequestDat
 void USBPD_DPM_PowerRoleSwap(uint8_t PortNum, USBPD_PortPowerRole_TypeDef CurrentRole, USBPD_PRS_Status_TypeDef Status)
 {
 /* USER CODE BEGIN USBPD_DPM_PowerRoleSwap */
+[#assign name=mxTmpFolder+"/usbpd_dpm_user_c_PowerRoleSwap.tmp"]
+[#assign objectConstructor = "freemarker.template.utility.ObjectConstructor"?new()]
+[#assign file = objectConstructor("java.io.File",workspace+"/"+name)]
+[#assign exist = file.exists()]
+[#if exist]
+  [#include "${name}"]
+[#else]
   DPM_USER_DEBUG_TRACE(PortNum, "ADVICE: update USBPD_DPM_PowerRoleSwap");
+[/#if]
 /* USER CODE END USBPD_DPM_PowerRoleSwap */
 }
 [/#if]
@@ -801,12 +862,20 @@ USBPD_StatusTypeDef USBPD_DPM_RequestMessageRequest(uint8_t PortNum, uint8_t Ind
 {
   USBPD_StatusTypeDef _status = USBPD_ERROR;
 /* USER CODE BEGIN USBPD_DPM_RequestMessageRequest */
+[#assign name=mxTmpFolder+"/usbpd_dpm_user_c_RequestMessage.tmp"]
+[#assign objectConstructor = "freemarker.template.utility.ObjectConstructor"?new()]
+[#assign file = objectConstructor("java.io.File",workspace+"/"+name)]
+[#assign exist = file.exists()]
+[#if exist]
+  [#include "${name}"]
+[#else]
   /* To be adapted to call the PE function */
   /*       _status = USBPD_PE_Send_Request(PortNum, rdo.d32, pdo_object);*/
   DPM_USER_DEBUG_TRACE(PortNum, "ADVICE: update USBPD_DPM_RequestMessageRequest");
 /* USER CODE END USBPD_DPM_RequestMessageRequest */
   DPM_USER_ERROR_TRACE(PortNum, _status, "REQUEST not accepted by the stack");
   return _status;
+[/#if]
 }
 
 /**
@@ -1236,6 +1305,7 @@ USBPD_StatusTypeDef USBPD_DPM_RequestSecurityRequest(uint8_t PortNum)
   */
 
 /* USER CODE BEGIN USBPD_USER_PRIVATE_FUNCTIONS */
+[@common.optinclude name=mxTmpFolder+"/usbpd_dpm_user_c_Functions.tmp"/]
 
 /* USER CODE END USBPD_USER_PRIVATE_FUNCTIONS */
 

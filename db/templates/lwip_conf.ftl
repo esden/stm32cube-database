@@ -601,7 +601,7 @@ extern ${variable.value} ${variable.name};
 /*----- Value in opt.h for ${definition.name}: 1 -----*/
 #define ${definition.name}   ${definition.value}
             [/#if]
-            [#if (series == "stm32h7")]
+            [#if (series == "stm32h7") || (series == "stm32h7rs")]
                 [#if (definition.name=="LWIP_SUPPORT_CUSTOM_PBUF") && (definition.value != "valueNotSetted") && (definition.value == "1")]
 /*----- Value supported for H7 devices: 1 -----*/
 #define ${definition.name}   ${definition.value}

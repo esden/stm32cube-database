@@ -30,22 +30,13 @@ Key: ${key}; Value: ${myHash[key]}
 #include "app_conf.h"
 #include "timer_if.h"
 #include "stm32_lpm.h"
-[#if (myHash["BLE"] == "Enabled")]
-[#if myHash["SEQUENCER_STATUS"]?number == 1 ]
-#include "stm32_seq.h"
-[#elseif myHash["THREADX_STATUS"]?number == 1 ]
-#include "app_threadx.h"
-[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
-#include "cmsis_os.h"
-[/#if]
-[/#if]
 #include "ll_intf.h"
 #include "ll_sys.h"
 
 [#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled")]
 void APP_SYS_BLE_EnterDeepSleep(void)
 {
-  ble_stat_t cmd_status = GENERAL_FAILURE;
+  ble_stat_t cmd_status;
   uint32_t radio_remaining_time = 0;
 
   if (ll_sys_dp_slp_get_state() == LL_SYS_DP_SLP_DISABLED)

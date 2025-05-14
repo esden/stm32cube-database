@@ -78,7 +78,8 @@ Key: ${key}; Value: ${myHash[key]}
 #define CFG_TX_POWER                      ${myHash["CFG_TX_POWER"]}
 
 /**
- * Define Advertising parameters
+ * Definition of public BD Address,
+ * when CFG_BD_ADDRESS = 0x000000000000 the BD address is generated based on Unique Device Number.
  */
 #define CFG_BD_ADDRESS                    (${myHash["CFG_BD_ADDRESS"]})
 
@@ -114,8 +115,8 @@ Key: ${key}; Value: ${myHash[key]}
 [#if (myHash["BLE_MODE_PERIPHERAL"] == "Enabled")]
 #define ADV_INTERVAL_MIN                  (${myHash["ADV_INTERVAL_MIN_HEXA"]})
 #define ADV_INTERVAL_MAX                  (${myHash["ADV_INTERVAL_MAX_HEXA"]})
-#define ADV_LP_INTERVAL_MIN               (0x0640)
-#define ADV_LP_INTERVAL_MAX               (0x0FA0)
+#define ADV_LP_INTERVAL_MIN               (${myHash["ADV_LP_INTERVAL_MIN_HEXA"]})
+#define ADV_LP_INTERVAL_MAX               (${myHash["ADV_LP_INTERVAL_MAX_HEXA"]})
 #define ADV_TYPE                          ${myHash["ADV_TYPE"]}
 #define ADV_FILTER                        ${myHash["ADV_FILTER"]}
 [/#if]
@@ -211,7 +212,8 @@ Key: ${key}; Value: ${myHash[key]}
                                      ${myHash["BLE_OPTIONS_REDUCED_DB_IN_NVM"]} | \
                                      ${myHash["BLE_OPTIONS_GATT_CACHING"]} | \
                                      ${myHash["BLE_OPTIONS_POWER_CLASS_1"]} | \
-                                     ${myHash["BLE_OPTIONS_APPEARANCE_WRITABLE"]})
+                                     ${myHash["BLE_OPTIONS_APPEARANCE_WRITABLE"]} | \
+                                     ${myHash["BLE_OPTIONS_ENHANCED_ATT"]})
 
 /**
  * Maximum number of simultaneous connections and advertising that the device will support.
@@ -340,11 +342,6 @@ typedef enum
 
 /* USER CODE END Low_Power 1 */
 
-[#if McuName?starts_with("STM32WBA55")]
-/* Core voltage supply selection, it can be PWR_LDO_SUPPLY or PWR_SMPS_SUPPLY */
-#define CFG_CORE_SUPPLY          (PWR_${myHash["CFG_CORE_SUPPLY"]}_SUPPLY)
-
-[/#if]
 /******************************************************************************
  * RTC
  ******************************************************************************/
@@ -473,6 +470,9 @@ typedef enum
 [/#if]
 [#if (myHash["ZIGBEE"] == "Enabled") || (myHash["ZIGBEE_SKELETON"] == "Enabled") || (myHash["mac_802_15_4_SKELETON"] == "Enabled")]
   CFG_TASK_MAC_LAYER,
+[#if (myHash["CFG_AMM_VIRTUAL_MEMORY_NUMBER"]?number != 0)]
+  CFG_TASK_AMM_BCKGND,            /* AMM background task */
+[/#if]  
 [#if (myHash["ZIGBEE"] == "Enabled")]
   CFG_TASK_ZIGBEE_LAYER,
   CFG_TASK_ZIGBEE_NETWORK_FORM,   /* Tasks linked to Zigbee Start. */
@@ -767,28 +767,27 @@ typedef enum
 
 /* USER CODE END HW_RNG_Configuration */
 
-[#if (myHash["USE_SNVMA_NVM"]?number != 0)]
+[#if (myHash["CFG_AMM_VIRTUAL_MEMORY_NUMBER"]?number != 0)]
 /******************************************************************************
  * MEMORY MANAGER
  ******************************************************************************/
 
-#define CFG_MM_POOL_SIZE                          (${myHash["CFG_MM_POOL_SIZE"]})
-#define CFG_PWR_VOS2_SUPPORTED                    (0)   /* VOS2 power configuration not currently supported with radio activity */
-#define CFG_AMM_VIRTUAL_MEMORY_NUMBER             (${myHash["CFG_AMM_VIRTUAL_MEMORY_NUMBER"]}u)
+#define CFG_MM_POOL_SIZE                                  (${myHash["CFG_MM_POOL_SIZE"]}U)  /* bytes */
+#define CFG_AMM_VIRTUAL_MEMORY_NUMBER                     (${myHash["CFG_AMM_VIRTUAL_MEMORY_NUMBER"]}U)
 [#if PG_SKIP_LIST == "False"]
 [#assign i = 0]
 [#list 1..(myHash["CFG_AMM_VIRTUAL_MEMORY_NUMBER"]?number) as i]
-#define CFG_AMM_VIRTUAL_${myHash["CFG_AMM_VIRTUAL_ID_NAME_"+i?string]}                   (${myHash["CFG_AMM_VIRTUAL_ID_NBR_"+i?string]}U)
-#define CFG_AMM_VIRTUAL_${myHash["CFG_AMM_VIRTUAL_ID_NAME_"+i?string]}_BUFFER_SIZE       (${myHash["CFG_AMM_VIRTUAL_BUFFER_SIZE_"+i?string]}U)
+#define CFG_AMM_VIRTUAL_${myHash["CFG_AMM_VIRTUAL_ID_NAME_"+i?string]?right_pad(34)}(${myHash["CFG_AMM_VIRTUAL_ID_NBR_"+i?string]}U)  
+#define CFG_AMM_VIRTUAL_${myHash["CFG_AMM_VIRTUAL_ID_NAME_"+i?string]+"_BUFFER_SIZE"?right_pad(17)}(${myHash["CFG_AMM_VIRTUAL_BUFFER_SIZE_"+i?string]}U)  /* words (32 bits) */
 [/#list]
 [#else]
-#define CFG_AMM_VIRTUAL_STACK_BLE                 (1U)
-#define CFG_AMM_VIRTUAL_STACK_BLE_BUFFER_SIZE     (400U)
-#define CFG_AMM_VIRTUAL_APP_BLE                   (2U)
-#define CFG_AMM_VIRTUAL_APP_BLE_BUFFER_SIZE       (200U)
+#define CFG_AMM_VIRTUAL_STACK_BLE                         (1U)
+#define CFG_AMM_VIRTUAL_STACK_BLE_BUFFER_SIZE             (400U)  /* words (32 bits) */
+#define CFG_AMM_VIRTUAL_APP_BLE                           (2U)
+#define CFG_AMM_VIRTUAL_APP_BLE_BUFFER_SIZE               (200U)  /* words (32 bits) */
 [/#if]
-#define CFG_AMM_POOL_SIZE                      DIVC(CFG_MM_POOL_SIZE, sizeof (uint32_t)) \
-                                               + (AMM_VIRTUAL_INFO_ELEMENT_SIZE * CFG_AMM_VIRTUAL_MEMORY_NUMBER)
+#define CFG_AMM_POOL_SIZE                                 DIVC(CFG_MM_POOL_SIZE, sizeof (uint32_t)) \
+                                                          + (AMM_VIRTUAL_INFO_ELEMENT_SIZE * CFG_AMM_VIRTUAL_MEMORY_NUMBER)
 
 /* USER CODE BEGIN MEMORY_MANAGER_Configuration */
 

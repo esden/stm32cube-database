@@ -104,6 +104,7 @@ nbInstance : ${nbInstance}
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
+#define IRQ_BADIRQ       ((IRQn_Type)(-666))
 /* USER CODE BEGIN PD */
 
 /* USER CODE END PD */
@@ -260,40 +261,47 @@ UTIL_ADV_TRACE_Status_t UART_Init(  void (*cb)(void *))
 
   /* USER CODE END UART_Init 3 */
 
-  return UTIL_ADV_TRACE_OK;
-
   /* USER CODE BEGIN UART_Init 4 */
 
   /* USER CODE END UART_Init 4 */
+
+  return UTIL_ADV_TRACE_OK;
 }
 	[/#if]
 [/#if]
 
 UTIL_ADV_TRACE_Status_t UART_DeInit( void )
 {
+[#if !BspIpDatas??]
   /* USER CODE BEGIN UART_DeInit 1 */
 
   /* USER CODE END UART_DeInit 1 */
-[#if !BspIpDatas??]
-
-  return UTIL_ADV_TRACE_UNKNOWN_ERROR;
 
   /* USER CODE BEGIN UART_DeInit 2 */
 
   /* USER CODE END UART_DeInit 2 */
+
+  return UTIL_ADV_TRACE_UNKNOWN_ERROR;
 }
 [#else]
 	[#if is_for_BLE_TM_and_BLE_Skeleton_only != 0]
+  /* USER CODE BEGIN UART_DeInit 1 */
 
-  return UTIL_ADV_TRACE_UNKNOWN_ERROR;
+  /* USER CODE END UART_DeInit 1 */
 
   /* USER CODE BEGIN UART_DeInit 2 */
 
   /* USER CODE END UART_DeInit 2 */
+
+  return UTIL_ADV_TRACE_UNKNOWN_ERROR;
 }
 	[#else]	
-
+  IRQn_Type use_dma;
   HAL_StatusTypeDef result;
+
+  /* USER CODE BEGIN UART_DeInit 1 */
+
+  /* USER CODE END UART_DeInit 1 */
 
 		[#list 0..(nbInstance-1) as i]
 			[#if myHash["bspName"+i] == "Serial Link for Logs"]
@@ -321,7 +329,6 @@ UTIL_ADV_TRACE_Status_t UART_DeInit( void )
 
   /* USER CODE END UART_DeInit 3 */
 
-  IRQn_Type use_dma;
 		[#list 0..(nbInstance-1) as i]
 			[#if myHash["bspName"+i] == "Serial Link for Logs"]
   use_dma = get_IRQn_Type_from_DMA_HandleTypeDef(h${myHash["IpInstance"+i]?lower_case?replace("s","")}.hdmatx);
@@ -368,38 +375,44 @@ UTIL_ADV_TRACE_Status_t UART_DeInit( void )
 
   /* USER CODE END UART_DeInit 5 */
 
-  return UTIL_ADV_TRACE_OK;
-
   /* USER CODE BEGIN UART_DeInit 6 */
 
   /* USER CODE END UART_DeInit 6 */
+
+  return UTIL_ADV_TRACE_OK;
 }
 	[/#if]
 [/#if]
 
 UTIL_ADV_TRACE_Status_t UART_StartRx(void (*cb)(uint8_t *pdata, uint16_t size, uint8_t error))
 {
+[#if !BspIpDatas??]
   /* USER CODE BEGIN UART_StartRx 1 */
 
   /* USER CODE END UART_StartRx 1 */
-[#if !BspIpDatas??]
-
-  return UTIL_ADV_TRACE_UNKNOWN_ERROR;
 
   /* USER CODE BEGIN UART_StartRx 2 */
 
   /* USER CODE END UART_StartRx 2 */
+
+  return UTIL_ADV_TRACE_UNKNOWN_ERROR;
 }
 [#else]
 	[#if is_for_BLE_TM_and_BLE_Skeleton_only != 0]
+  /* USER CODE BEGIN UART_StartRx 1 */
 
-  return UTIL_ADV_TRACE_UNKNOWN_ERROR;
+  /* USER CODE END UART_StartRx 1 */
 
   /* USER CODE BEGIN UART_StartRx 2 */
 
   /* USER CODE END UART_StartRx 2 */
+
+  return UTIL_ADV_TRACE_UNKNOWN_ERROR;
 }
 	[#else]
+  /* USER CODE BEGIN UART_StartRx 1 */
+
+  /* USER CODE END UART_StartRx 1 */
 
 		[#list 0..(nbInstance-1) as i]
 			[#if myHash["bspName"+i] == "Serial Link for Logs"]
@@ -418,62 +431,61 @@ UTIL_ADV_TRACE_Status_t UART_StartRx(void (*cb)(uint8_t *pdata, uint16_t size, u
 
   /* USER CODE END UART_StartRx 2 */
 
-  return UTIL_ADV_TRACE_OK;
-
   /* USER CODE BEGIN UART_StartRx 3 */
 
   /* USER CODE END UART_StartRx 3 */
+
+  return UTIL_ADV_TRACE_OK;
 }
 	[/#if]
 [/#if]
 
 UTIL_ADV_TRACE_Status_t UART_TransmitDMA ( uint8_t *pdata, uint16_t size )
 {
+[#if !BspIpDatas??]
   /* USER CODE BEGIN UART_TransmitDMA 1 */
 
   /* USER CODE END UART_TransmitDMA 1 */
-[#if !BspIpDatas??]
-
-  return UTIL_ADV_TRACE_UNKNOWN_ERROR;
 
   /* USER CODE BEGIN UART_TransmitDMA 2 */
 
   /* USER CODE END UART_TransmitDMA 2 */
+
+  return UTIL_ADV_TRACE_UNKNOWN_ERROR;
 }
 [#else]
 	[#if is_for_BLE_TM_and_BLE_Skeleton_only != 0]
+  /* USER CODE BEGIN UART_TransmitDMA 1 */
+
+  /* USER CODE END UART_TransmitDMA 1 */
+
+  /* USER CODE BEGIN UART_TransmitDMA 2 */
+
+  /* USER CODE END UART_TransmitDMA 2 */
 
   return UTIL_ADV_TRACE_UNKNOWN_ERROR;
-
-  /* USER CODE BEGIN UART_TransmitDMA 2 */
-
-  /* USER CODE END UART_TransmitDMA 2 */
 }
 	[#else]
-
+  HAL_StatusTypeDef result;
+  IRQn_Type use_dma_tx;
   UTIL_ADV_TRACE_Status_t status = UTIL_ADV_TRACE_OK;
+
+  /* USER CODE BEGIN UART_TransmitDMA 1 */
+
+  /* USER CODE END UART_TransmitDMA 1 */
 
   /* USER CODE BEGIN UART_TransmitDMA 2 */
 
   /* USER CODE END UART_TransmitDMA 2 */
-
-  HAL_StatusTypeDef result;
-  IRQn_Type use_dma_tx;
-  IRQn_Type use_dma_rx;
 
 		[#list 0..(nbInstance-1) as i]
 			[#if myHash["bspName"+i] == "Serial Link for Logs"]
   use_dma_tx = get_IRQn_Type_from_DMA_HandleTypeDef(h${myHash["IpInstance"+i]?lower_case?replace("s","")}.hdmatx);
-  use_dma_rx = get_IRQn_Type_from_DMA_HandleTypeDef(h${myHash["IpInstance"+i]?lower_case?replace("s","")}.hdmarx);
 
-  if (use_dma_tx == GPDMA1_Channel0_IRQn || use_dma_tx == GPDMA1_Channel1_IRQn
-      || use_dma_tx == GPDMA1_Channel2_IRQn || use_dma_tx == GPDMA1_Channel3_IRQn
-      || use_dma_tx == GPDMA1_Channel4_IRQn || use_dma_tx == GPDMA1_Channel5_IRQn
-      || use_dma_tx == GPDMA1_Channel6_IRQn || use_dma_tx == GPDMA1_Channel7_IRQn
-      || use_dma_rx == GPDMA1_Channel0_IRQn || use_dma_rx == GPDMA1_Channel1_IRQn
-      || use_dma_rx == GPDMA1_Channel2_IRQn || use_dma_rx == GPDMA1_Channel3_IRQn
-      || use_dma_rx == GPDMA1_Channel4_IRQn || use_dma_rx == GPDMA1_Channel5_IRQn
-      || use_dma_rx == GPDMA1_Channel6_IRQn || use_dma_rx == GPDMA1_Channel7_IRQn)
+  if ( (use_dma_tx == GPDMA1_Channel0_IRQn ) || ( use_dma_tx == GPDMA1_Channel1_IRQn )
+      || ( use_dma_tx == GPDMA1_Channel2_IRQn ) || ( use_dma_tx == GPDMA1_Channel3_IRQn )
+      || ( use_dma_tx == GPDMA1_Channel4_IRQn ) || ( use_dma_tx == GPDMA1_Channel5_IRQn )
+      || ( use_dma_tx == GPDMA1_Channel6_IRQn ) || ( use_dma_tx == GPDMA1_Channel7_IRQn ) )
   {
     result = HAL_UART_Transmit_DMA(&h${myHash["IpInstance"+i]?lower_case?replace("s","")}, pdata, size);
   }
@@ -499,11 +511,11 @@ UTIL_ADV_TRACE_Status_t UART_TransmitDMA ( uint8_t *pdata, uint16_t size )
 
   /* USER CODE END UART_TransmitDMA 3 */
 
-  return status;
-
   /* USER CODE BEGIN UART_TransmitDMA 4 */
 
   /* USER CODE END UART_TransmitDMA 4 */
+
+  return status;
 }
 	[/#if]
 [/#if]
@@ -515,6 +527,8 @@ UTIL_ADV_TRACE_Status_t UART_TransmitDMA ( uint8_t *pdata, uint16_t size )
 			[#if myHash["bspName"+i] == "Serial Link for Logs"]
 static void ${myHash["IpInstance"+i]}_DMA_MspDeInit(void)
 {
+  IRQn_Type use_dma_tx;
+
   /* USER CODE BEGIN ${myHash["IpInstance"+i]}_DMA_MspDeInit 1 */
 
   /* USER CODE END ${myHash["IpInstance"+i]}_DMA_MspDeInit 1 */
@@ -529,7 +543,12 @@ static void ${myHash["IpInstance"+i]}_DMA_MspDeInit(void)
   __HAL_RCC_GPDMA1_CLK_DISABLE();
 
   /* DMA interrupt init */
-  HAL_NVIC_DisableIRQ(get_IRQn_Type_from_DMA_HandleTypeDef(h${myHash["IpInstance"+i]?lower_case?replace("s","")}.hdmatx));
+  use_dma_tx = get_IRQn_Type_from_DMA_HandleTypeDef(h${myHash["IpInstance"+i]?lower_case?replace("s","")}.hdmatx);
+
+  if ( use_dma_tx != IRQ_BADIRQ )
+  {
+    HAL_NVIC_DisableIRQ(use_dma_tx);
+  }
 
   /* USER CODE BEGIN ${myHash["IpInstance"+i]}_DMA_MspDeInit 2 */
 
@@ -594,7 +613,7 @@ static IRQn_Type get_IRQn_Type_from_DMA_HandleTypeDef(DMA_HandleTypeDef * dma_ha
 
   /* Values from (-1) to (-15) are already in used. This value isn't used so it should be safe.
      So, if you see this value, it means you used an invalid DMA handler as input. */
-  return (IRQn_Type)(-666);
+  return IRQ_BADIRQ;
 }
 	[/#if]
 [/#if]

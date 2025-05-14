@@ -12,6 +12,7 @@
 /* USER CODE END Header */
 
 [#assign AZRTOS_APP_MEM_ALLOCATION_METHOD_VAL = "1" ]
+[#assign AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE_VAL = "1" ]
 [#compress]
 [#list SWIPdatas as SWIP]
 [#if SWIP.defines??]
@@ -48,6 +49,13 @@
     [#if name == "REG_UX_HOST_THREAD"]
       [#assign REG_UX_HOST_THREAD_value = value]
     [/#if]
+    [#if name == "AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE"]
+      [#assign AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE_VAL = value]
+    [/#if]
+    [#if name == "UX_STANDALONE"]
+      [#assign UX_STANDALONE_ENABLED_Value = value]
+    [/#if]
+
 
    [/#list]
 [/#if]
@@ -77,7 +85,17 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-[#if REG_UX_HOST_THREAD_value == "1"]
+[#if UX_STANDALONE_ENABLED_Value == "1" && AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE_VAL  != "0" ]
+
+/* USER CODE BEGIN UX_Host_Memory_Buffer */
+
+/* USER CODE END UX_Host_Memory_Buffer */
+#if defined ( __ICCARM__ )
+#pragma data_alignment=4
+#endif
+__ALIGN_BEGIN static UCHAR ux_host_byte_pool_buffer[UX_HOST_APP_MEM_POOL_SIZE] __ALIGN_END;
+[/#if]
+[#if REG_UX_HOST_THREAD_value == "1" && UX_STANDALONE_ENABLED_Value == "0"]
 static TX_THREAD ux_host_app_thread;
 [/#if]
 /* USER CODE BEGIN PV */
@@ -85,7 +103,7 @@ static TX_THREAD ux_host_app_thread;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
-[#if REG_UX_HOST_THREAD_value == "1"]
+[#if REG_UX_HOST_THREAD_value == "1" && UX_STANDALONE_ENABLED_Value == "0"]
 static VOID ${USBX_HOST_APP_THREAD_NAME_value}(ULONG thread_input);
 [/#if]
 [#if REG_UX_HOST_CORE_value == "true"]
@@ -98,22 +116,38 @@ static VOID ux_host_error_callback(UINT system_level, UINT system_context, UINT 
 
 /**
   * @brief  Application USBX Host Initialization.
+[#if UX_STANDALONE_ENABLED_Value == "1"]
+  * @param  none
+[#else]
   * @param  memory_ptr: memory pointer
+[/#if]
   * @retval status
   */
+[#if UX_STANDALONE_ENABLED_Value == "1"]
+UINT MX_USBX_Host_Init(VOID)
+[#else]
 UINT MX_USBX_Host_Init(VOID *memory_ptr)
+[/#if]
 {
   UINT ret = UX_SUCCESS;
-[#if (REG_UX_HOST_CORE_value  == "true" || REG_UX_HOST_THREAD_value == "1") && AZRTOS_APP_MEM_ALLOCATION_METHOD_VAL  != "0" ]
+[#if REG_UX_HOST_CORE_value  == "true" && UX_STANDALONE_ENABLED_Value == "1" && AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE_VAL  != "0" ]
+  UCHAR *pointer;
+[/#if]
+[#if (REG_UX_HOST_CORE_value  == "true" || REG_UX_HOST_THREAD_value == "1") && UX_STANDALONE_ENABLED_Value == "0" && AZRTOS_APP_MEM_ALLOCATION_METHOD_VAL  != "0" ]
   UCHAR *pointer;
   TX_BYTE_POOL *byte_pool = (TX_BYTE_POOL*)memory_ptr;
 [/#if]
 
   /* USER CODE BEGIN MX_USBX_Host_Init0 */
+[#if REG_UX_HOST_CORE_value  == "false" && UX_STANDALONE_ENABLED_Value == "1"]
+  UX_PARAMETER_NOT_USED(ux_host_byte_pool_buffer);
+[#else]
 
+[/#if]
   /* USER CODE END MX_USBX_Host_Init0 */
 
 [#if REG_UX_HOST_CORE_value  == "true"]
+[#if UX_STANDALONE_ENABLED_Value == "0"]
   /* Allocate the stack for USBX Memory */
   if (tx_byte_allocate(byte_pool, (VOID **) &pointer,
                        USBX_HOST_MEMORY_STACK_SIZE, TX_NO_WAIT) != TX_SUCCESS)
@@ -122,6 +156,9 @@ UINT MX_USBX_Host_Init(VOID *memory_ptr)
     return TX_POOL_ERROR;
     /* USER CODE END USBX_ALLOCATE_STACK_ERROR */
   }
+[#else]
+  pointer = ux_host_byte_pool_buffer;
+[/#if]
 
   /* Initialize USBX Memory */
   if (ux_system_initialize(pointer, USBX_HOST_MEMORY_STACK_SIZE, UX_NULL, 0) != UX_SUCCESS)
@@ -220,7 +257,8 @@ UINT MX_USBX_Host_Init(VOID *memory_ptr)
   }
 [/#if]
 
-[#if REG_UX_HOST_THREAD_value == "1"]
+[/#if]
+[#if REG_UX_HOST_THREAD_value == "1" && UX_STANDALONE_ENABLED_Value == "0"]
   /* Allocate the stack for host application main thread */
   if (tx_byte_allocate(byte_pool, (VOID **) &pointer, UX_HOST_APP_THREAD_STACK_SIZE,
                        TX_NO_WAIT) != TX_SUCCESS)
@@ -247,11 +285,10 @@ UINT MX_USBX_Host_Init(VOID *memory_ptr)
   /* USER CODE END MX_USBX_Host_Init1 */
 
   return ret;
-[/#if]
 }
 
 
-[#if REG_UX_HOST_THREAD_value == "1"]
+[#if REG_UX_HOST_THREAD_value == "1" && UX_STANDALONE_ENABLED_Value == "0"]
 /**
   * @brief  Function implementing ${USBX_HOST_APP_THREAD_NAME_value}.
   * @param  thread_input: User thread input parameter.
@@ -262,6 +299,51 @@ static VOID ${USBX_HOST_APP_THREAD_NAME_value}(ULONG thread_input)
   /* USER CODE BEGIN ${USBX_HOST_APP_THREAD_NAME_value} */
   TX_PARAMETER_NOT_USED(thread_input);
   /* USER CODE END ${USBX_HOST_APP_THREAD_NAME_value} */
+}
+[/#if]
+
+[#if UX_STANDALONE_ENABLED_Value == "1"]
+/**
+  * @brief  _ux_utility_interrupt_disable
+  *         USB utility interrupt disable.
+  * @param  none
+  * @retval none
+  */
+ALIGN_TYPE _ux_utility_interrupt_disable(VOID)
+{
+  /* USER CODE BEGIN _ux_utility_interrupt_disable */
+  return(0);
+  /* USER CODE END _ux_utility_interrupt_disable */
+}
+
+/**
+  * @brief  _ux_utility_interrupt_restore
+  *         USB utility interrupt restore.
+  * @param  flags
+  * @retval none
+  */
+VOID _ux_utility_interrupt_restore(ALIGN_TYPE flags)
+{
+  /* USER CODE BEGIN _ux_utility_interrupt_restore */
+  UX_PARAMETER_NOT_USED(flags);
+  /* USER CODE END _ux_utility_interrupt_restore */
+}
+
+/**
+  * @brief  _ux_utility_time_get
+  *         Get Time Tick for host timing.
+  * @param  none
+  * @retval time tick
+  */
+ULONG _ux_utility_time_get(VOID)
+{
+  ULONG time_tick = 0U;
+
+  /* USER CODE BEGIN _ux_utility_time_get */
+
+  /* USER CODE END _ux_utility_time_get */
+
+  return time_tick;
 }
 [/#if]
 

@@ -17,8 +17,6 @@
   * @file    stm32h5xx_nucleo_conf.h
   * @author  MCD Application Team
   * @brief   STM32H5xx_Nucleo board configuration file.
-  *          This file should be copied to the application folder and renamed
-  *          to stm32h5xx_nucleo_conf.h
   ******************************************************************************
   * @attention
   *

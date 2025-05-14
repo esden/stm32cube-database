@@ -1,0 +1,49 @@
+[#ftl]
+[#assign RefParam_ELOADER_ADDRESS_value = 0]
+[#assign RefParam_ELOADER_END_ADDRESS_value = 0]
+[#assign RefParam_ELOADER_SIZE_value = 0]
+[#assign RefParam_SECTORS_NBR_value = 0]
+[#assign RefParam_SECTORS_SIZE_value = 0]
+
+[#compress]
+[#list SWIPdatas as SWIP]
+[#if SWIP.defines??]
+  [#list SWIP.defines as definition]
+    [#assign Value = definition.value]
+    [#assign Name = definition.name]
+
+    [#if Name == "RefParam_ELOADER_ADDRESS"]
+      [#assign RefParam_ELOADER_ADDRESS_value = Value]
+    [/#if]
+    [#if Name == "RefParam_ELOADER_END_ADDRESS"]
+      [#assign RefParam_ELOADER_END_ADDRESS_value = Value]
+    [/#if]
+    [#if Name == "RefParam_SECTORS_NBR"]
+      [#assign RefParam_SECTORS_NBR_value = Value]
+    [/#if]
+	[#if Name == "RefParam_SECTORS_SIZE"]
+      [#assign RefParam_SECTORS_SIZE_value = Value]
+    [/#if]
+    [#if Name == "RefParam_PAGE_SIZE"]
+      [#assign RefParam_PAGE_SIZE_value = Value]
+    [/#if]
+
+  [/#list]
+[/#if]
+[/#list]
+[/#compress]
+
+	[#list configs as mxMcuDataModel]
+		[#--Project Name --]
+		[#assign mx_projectName = mxMcuDataModel.projectName?lower_case]
+	[/#list]
+
+<?xml version="1.0" encoding="iso-8859-1"?>
+<flash_device>
+  <exe>$PROJ_DIR$/../ExtMemLoader/${mx_projectName}_ExtMemLoader/Exe/${mx_projectName}_ExtMemLoader.out</exe>
+  <page>${RefParam_PAGE_SIZE_value}</page>
+  <block>${RefParam_SECTORS_NBR_value} ${RefParam_SECTORS_SIZE_value}</block>
+  <flash_base>${RefParam_ELOADER_ADDRESS_value}</flash_base>
+  <macro>$PROJ_DIR$/../../ExtMemLoader/config/ExternalFlasherVerify.mac</macro>
+  <aggregate>1</aggregate>
+</flash_device>

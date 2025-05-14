@@ -29,6 +29,9 @@ Key: ${key}; Value: ${myHash[key]}
 [#if myHash["THREADX_STATUS"]?number == 1 ]
 #include "app_common.h"
 #include "main.h"
+[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+#include "app_common.h"
+#include "main.h"
 [/#if]
 #include "stm32wbaxx.h"
 #include "blestack.h"
@@ -43,6 +46,8 @@ Key: ${key}; Value: ${myHash[key]}
 #include "stm32_seq.h"
 [#elseif myHash["THREADX_STATUS"]?number == 1 ]
 #include "app_threadx.h"
+[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+#include "cmsis_os2.h"
 [/#if]
 
 /* Private typedef -----------------------------------------------------------*/
@@ -56,9 +61,13 @@ typedef struct
 /* Private defines -----------------------------------------------------------*/
 [#if myHash["THREADX_STATUS"]?number == 1 ]
 /* BLE_TIMER_TASK related defines */
-#define BLE_TIMER_TASK_STACK_SIZE    (256*7)
+#define BLE_TIMER_TASK_STACK_SIZE    (256)
 #define BLE_TIMER_TASK_PRIO          (15)
 #define BLE_TIMER_TASK_PREEM_TRES    (0)
+[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+/* BLE_TIMER_TASK related defines */
+#define BLE_TIMER_TASK_STACK_SIZE    (128 * 4)
+#define BLE_TIMER_TASK_PRIO          (osPriorityNormal)
 [/#if]
 
 /* Private variables ---------------------------------------------------------*/
@@ -70,13 +79,20 @@ static BLE_TIMER_t* BLE_TIMER_timer;
 TX_THREAD BLE_TIMER_Thread;
 TX_SEMAPHORE BLE_TIMER_Thread_Sem;
 
+[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+/* BLE_TIMER_TASK related resources */
+osSemaphoreId_t     BleTimerSemaphore;
+osThreadId_t        BleTimerThread;
+
 [/#if]
 /* Private functions prototype------------------------------------------------*/
 void BLE_TIMER_Background(void);
 static void BLE_TIMER_Callback(void* arg);
-static BLE_TIMER_t* BLE_TIMER_GetFromList(tListNode * listHead, uint8_t id);
+static BLE_TIMER_t* BLE_TIMER_GetFromList(tListNode * listHead, uint16_t id);
 [#if myHash["THREADX_STATUS"]?number == 1 ]
 static void BLE_TIMER_Background_Entry(unsigned long thread_input);
+[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+static void BleTimer_Task_Entry(void* thread_input);
 [/#if]
 
 void BLE_TIMER_Init(void)
@@ -106,13 +122,32 @@ void BLE_TIMER_Init(void)
     Error_Handler();
   }
 [#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+  const osSemaphoreAttr_t BleTimerSemaphore_attributes = {
+    .name = "BLE timer Semaphore"
+  };
+  BleTimerSemaphore = osSemaphoreNew(1U, 0U, &BleTimerSemaphore_attributes);
+  if (BleTimerSemaphore == NULL)
+  {
+    Error_Handler();
+  }
+  const osThreadAttr_t BleTimerTask_attributes = {
+    .name = "BLE timer Task",
+    .priority = (osPriority_t)BLE_TIMER_TASK_PRIO,
+    .stack_size = BLE_TIMER_TASK_STACK_SIZE
+  };
+
+  BleTimerThread = osThreadNew(BleTimer_Task_Entry, NULL, &BleTimerTask_attributes);
+  if (BleTimerThread == NULL)
+  {
+    Error_Handler();
+  }
 [/#if]
 
   /* Initialize the Timer Server */
   UTIL_TIMER_Init();
 }
 
-uint8_t BLE_TIMER_Start(uint8_t id, uint32_t timeout)
+uint8_t BLE_TIMER_Start(uint16_t id, uint32_t timeout)
 {
   /* If the timer's id already exists, stop it */
   BLE_TIMER_Stop(id);
@@ -148,7 +183,7 @@ uint8_t BLE_TIMER_Start(uint8_t id, uint32_t timeout)
   return BLE_STATUS_SUCCESS;
 }
 
-void BLE_TIMER_Stop(uint8_t id){
+void BLE_TIMER_Stop(uint16_t id){
   /* Search for the id in the timers list */
   BLE_TIMER_t* timer = BLE_TIMER_GetFromList(&BLE_TIMER_List, id);
 
@@ -164,7 +199,7 @@ void BLE_TIMER_Stop(uint8_t id){
 
 void BLE_TIMER_Background(void)
 {
-  BLEPLATCB_TimerExpiry( (uint8_t)BLE_TIMER_timer->id);
+  BLEPLATCB_TimerExpiry( (uint16_t)BLE_TIMER_timer->id);
   HostStack_Process( );
 
   /* Delete the BLE_TIMER_timer from the list */
@@ -185,6 +220,18 @@ static void BLE_TIMER_Background_Entry(unsigned long thread_input)
     tx_thread_relinquish();
   }
 }
+[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+static void BleTimer_Task_Entry(void* thread_input)
+{
+  (void)(thread_input);
+
+  while(1)
+  {
+    osSemaphoreAcquire(BleTimerSemaphore, osWaitForever);
+    BLE_TIMER_Background();
+    osThreadYield();
+  }
+}
 [/#if]
 
 static void BLE_TIMER_Callback(void* arg)
@@ -196,10 +243,11 @@ static void BLE_TIMER_Callback(void* arg)
 [#elseif myHash["THREADX_STATUS"]?number == 1 ]
   tx_semaphore_put(&BLE_TIMER_Thread_Sem);
 [#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+  osSemaphoreRelease(BleTimerSemaphore);
 [/#if]
 }
 
-static BLE_TIMER_t* BLE_TIMER_GetFromList(tListNode * listHead, uint8_t id)
+static BLE_TIMER_t* BLE_TIMER_GetFromList(tListNode * listHead, uint16_t id)
 {
   BLE_TIMER_t* currentNode = (BLE_TIMER_t*)listHead->next;
   while((tListNode *)currentNode != listHead)

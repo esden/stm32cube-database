@@ -64,13 +64,18 @@ Key: ${key}; Value: ${myHash[key]}
 [/#if]
 #include "app_entry.h"
 [#if (myHash["ZIGBEE"] == "Enabled") || (myHash["ZIGBEE_SKELETON"] == "Enabled") || (myHash["THREAD"] == "Enabled") || (myHash["THREAD_SKELETON"] == "Enabled") || (myHash["mac_802_15_4_SKELETON"] == "Enabled")]
+[#if (myHash["CFG_AMM_VIRTUAL_MEMORY_NUMBER"]?number != 0)]
+#include "advanced_memory_manager.h"
+[/#if]
 [#else]
 [#if myHash["SEQUENCER_STATUS"]?number == 1 ]
 #include "stm32_seq.h"
 [#elseif myHash["THREADX_STATUS"]?number == 1 ]
 #include "app_threadx.h"
 [#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
-#include "cmsis_os.h"
+#include "cmsis_os2.h"
+#include "app_freertos.h"
+#include "task.h"
 [/#if]
 [/#if]
 [#if (myHash["BLE_MODE_TRANSPARENT_UART"] == "Enabled")]
@@ -118,6 +123,7 @@ Key: ${key}; Value: ${myHash[key]}
 [#if (myHash["USE_TEMPERATURE_BASED_RADIO_CALIBRATION"]?number == 1)]
 #if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)
 #include "adc_ctrl.h"
+#include "temp_measurement.h"
 #endif /* USE_TEMPERATURE_BASED_RADIO_CALIBRATION */
 [/#if]
 [#if (myHash["ZIGBEE"] == "Enabled") || (myHash["ZIGBEE_SKELETON"] == "Enabled") || (myHash["THREAD"] == "Enabled") || (myHash["THREAD_SKELETON"] == "Enabled") || (myHash["mac_802_15_4_SKELETON"] == "Enabled")]
@@ -128,6 +134,11 @@ Key: ${key}; Value: ${myHash[key]}
 [/#if]
 [#if (myHash["THREAD"] == "Enabled") || (myHash["THREAD_SKELETON"] == "Enabled")]
 #include "ll_sys.h"
+[/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+#include "timer_if.h"
+extern void xPortSysTickHandler (void);
+extern void vPortSetupTimerInterrupt(void);
 [/#if]
 
 /* Private includes -----------------------------------------------------------*/
@@ -162,34 +173,48 @@ typedef struct
 /* USER CODE END PTD */
 
 /* Private defines -----------------------------------------------------------*/
-[#if (myHash["ZIGBEE"] == "Enabled") || (myHash["ZIGBEE_SKELETON"] == "Enabled") || (myHash["mac_802_15_4_SKELETON"] == "Enabled")]
-/* Heap size for System (used by Low-Layers) */
-#define C_SYS_MEMORY_HEAP_SIZE_BYTES          60000U
-
-[/#if]
 [#if (myHash["BLE"] == "Enabled")]
 [#if myHash["THREADX_STATUS"]?number == 1 ]
 /* AMM_BCKGND_TASK related defines */
-#define AMM_BCKGND_TASK_STACK_SIZE    (256*7)
-#define AMM_BCKGND_TASK_PRIO          (15)
-#define AMM_BCKGND_TASK_PREEM_TRES    (0)
+#define AMM_BCKGND_TASK_STACK_SIZE              (256)
+#define AMM_BCKGND_TASK_PRIO                    (15)
+#define AMM_BCKGND_TASK_PREEM_TRES              (0)
 
 [#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled")]
 /* BPKA_TASK related defines */
-#define BPKA_TASK_STACK_SIZE    (256*7)
-#define BPKA_TASK_PRIO          (15)
-#define BPKA_TASK_PREEM_TRES    (0)
+#define BPKA_TASK_STACK_SIZE                    (256)
+#define BPKA_TASK_PRIO                          (15)
+#define BPKA_TASK_PREEM_TRES                    (0)
 
 [/#if]
 /* HW_RNG_TASK related defines */
-#define HW_RNG_TASK_STACK_SIZE    (256*7)
-#define HW_RNG_TASK_PRIO          (15)
-#define HW_RNG_TASK_PREEM_TRES    (0)
+#define HW_RNG_TASK_STACK_SIZE                  (256)
+#define HW_RNG_TASK_PRIO                        (15)
+#define HW_RNG_TASK_PREEM_TRES                  (0)
 
 /* FLASH_MANAGER_BCKGND_TASK related defines */
-#define FLASH_MANAGER_BCKGND_TASK_STACK_SIZE    (256*7)
+#define FLASH_MANAGER_BCKGND_TASK_STACK_SIZE    (1024)
 #define FLASH_MANAGER_BCKGND_TASK_PRIO          (15)
 #define FLASH_MANAGER_BCKGND_TASK_PREEM_TRES    (0)
+
+[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+/* AMM_BCKGND_TASK related defines */
+#define AMM_TASK_STACK_SIZE                     (128 * 4)
+#define AMM_TASK_PRIO                           (osPriorityNormal)
+
+[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled")]
+/* BPKA_TASK related defines */
+#define BPKA_TASK_STACK_SIZE                    (128 * 4)
+#define BPKA_TASK_PRIO                          (osPriorityNormal)
+
+[/#if]
+/* HW_RNG_TASK related defines */
+#define HW_RNG_TASK_STACK_SIZE                  (128 * 4)
+#define HW_RNG_TASK_PRIO                        (osPriorityNormal)
+
+/* FLASH_MANAGER_TASK related defines */
+#define FLASH_MANAGER_TASK_STACK_SIZE           (256 * 4)
+#define FLASH_MANAGER_TASK_PRIO                 (osPriorityNormal)
 
 [/#if]
 [/#if]
@@ -216,22 +241,30 @@ typedef struct
 /* USER CODE END PC */
 
 /* Private variables ---------------------------------------------------------*/
-[#if (myHash["ZIGBEE"] == "Enabled") || (myHash["ZIGBEE_SKELETON"] == "Enabled")]
-static uint8_t        SYS_MEMORY_HEAP[C_SYS_MEMORY_HEAP_SIZE_BYTES];
+[#if (myHash["BLE_MODE_TRANSPARENT_UART"] == "Enabled")]
+const uint32_t FW_Version = (CFG_FW_MAJOR_VERSION << 24) + (CFG_FW_MINOR_VERSION << 16) + (CFG_FW_SUBVERSION << 8)
++ (CFG_FW_BRANCH << 4) + CFG_FW_BUILD;
 
 [/#if]
-[#if myHash["SEQUENCER_STATUS"]?number == 1 ]
+[#if (myHash["SEQUENCER_STATUS"]?number == 1)]
 #if ( CFG_LPM_LEVEL != 0)
 static bool system_startup_done = FALSE;
 #endif /* ( CFG_LPM_LEVEL != 0) */
-
+[#elseif (myHash["FREERTOS_STATUS"]?number == 1)]
+#if ( CFG_LPM_LEVEL != 0)
+static bool system_startup_done = FALSE;
+/* Holds maximum number of FreeRTOS tick periods that can be suppressed */
+static uint32_t maximumPossibleSuppressedTicks = 0;
+#endif /* ( CFG_LPM_LEVEL != 0) */
 [/#if]
+
 #if (CFG_LOG_SUPPORTED != 0)
 /* Log configuration */
 static Log_Module_t Log_Module_Config = { .verbose_level = APPLI_CONFIG_LOG_LEVEL, .region = LOG_REGION_ALL_REGIONS };
 #endif /* (CFG_LOG_SUPPORTED != 0) */
 
-[#if (myHash["USE_SNVMA_NVM"]?number != 0)]
+[#if (myHash["CFG_AMM_VIRTUAL_MEMORY_NUMBER"]?number != 0)]
+/* AMM configuration */
 static uint32_t AMM_Pool[CFG_AMM_POOL_SIZE];
 static AMM_VirtualMemoryConfig_t vmConfig[CFG_AMM_VIRTUAL_MEMORY_NUMBER] =
 {
@@ -265,8 +298,10 @@ static AMM_InitParameters_t ammInitConfig =
   .p_VirtualMemoryConfigList = vmConfig
 };
 
-[#if myHash["THREADX_STATUS"]?number == 1 ]
+[/#if]
 [#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled")]
+[#if myHash["THREADX_STATUS"]?number == 1 ]
+
 /* AMM_BCKGND_TASK related resources */
 TX_THREAD AMM_BCKGND_Thread;
 TX_SEMAPHORE AMM_BCKGND_Thread_Sem;
@@ -275,7 +310,6 @@ TX_SEMAPHORE AMM_BCKGND_Thread_Sem;
 TX_THREAD BPKA_Thread;
 TX_SEMAPHORE BPKA_Thread_Sem;
 
-[/#if]
 /* HW_RNG_TASK related resources */
 TX_THREAD HW_RNG_Thread;
 TX_SEMAPHORE HW_RNG_Thread_Sem;
@@ -285,12 +319,46 @@ TX_THREAD FLASH_MANAGER_BCKGND_Thread;
 TX_SEMAPHORE FLASH_MANAGER_BCKGND_Thread_Sem;
 
 [/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+osSemaphoreId_t       HwRngSemaphore;
+osThreadId_t          HwRngThread;
+
+osSemaphoreId_t       AmmSemaphore;
+osThreadId_t          AmmThread;
+
+osSemaphoreId_t       BpkaSemaphore;
+osThreadId_t          BpkaThread;
+
+osSemaphoreId_t       FlashManagerSemaphore;
+osThreadId_t          FlashManagerThread;
+
+static UTIL_TIMER_Object_t  TimerOStick_Id;
+static UTIL_TIMER_Object_t  TimerOSwakeup_Id;
 [/#if]
+[#else]
 [#if myHash["THREADX_STATUS"]?number == 1 ]
-TX_SEMAPHORE          AppliStartEndSemaphore, HwRngSemaphore;
+TX_SEMAPHORE          HwRngSemaphore;
 TX_THREAD             AppliStartThread, HwRngThread;
 
+[#if (myHash["CFG_AMM_VIRTUAL_MEMORY_NUMBER"]?number != 0)]
+TX_THREAD             AmmBackgroundThread;
+TX_SEMAPHORE          AmmBackgroundSemaphore;
 [/#if]
+[/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+osSemaphoreId_t       HwRngSemaphore;
+osThreadId_t          AppliStartThread, HwRngThread;
+
+[#if (myHash["CFG_AMM_VIRTUAL_MEMORY_NUMBER"]?number != 0)]
+osSemaphoreId_t       AmmSemaphore;
+osThreadId_t          AmmThread;
+
+[/#if]
+static UTIL_TIMER_Object_t  TimerOStick_Id;
+static UTIL_TIMER_Object_t  TimerOSwakeup_Id;
+[/#if]
+[/#if]
+
 /* USER CODE BEGIN PV */
 [#if PG_FILL_UCS == "True"]
 [#if PG_BSP_NUCLEO_WBA52CG == 1]
@@ -327,9 +395,17 @@ void ThreadXLowPowerUserEnter( void );
 #ifndef TX_LOW_POWER_USER_EXIT
 void ThreadXLowPowerUserExit( void );
 #endif
+[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+static void TimerOStickCB(void *arg);
+static void TimerOSwakeupCB(void *arg);
+#if ( CFG_LPM_LEVEL != 0)
+static void preOSsleepProcessing(uint32_t expectedIdleTime);
+static void postOSsleepProcessing(uint32_t expectedIdleTime);
+static uint32_t getCurrentTime(void);
+#endif /* CFG_LPM_LEVEL */
 [/#if]
 
-[#if (myHash["USE_SNVMA_NVM"]?number != 0)]
+[#if (myHash["CFG_AMM_VIRTUAL_MEMORY_NUMBER"]?number != 0)]
 /**
  * @brief Wrapper for init function of the MM for the AMM
  *
@@ -358,12 +434,24 @@ static uint32_t * AMM_WrapperAllocate (const uint32_t BufferSize);
  */
 static void AMM_WrapperFree (uint32_t * const p_BufferAddr);
 
-[#if myHash["THREADX_STATUS"]?number == 1 ]
-[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled")]
-static void BPKA_BG_Process_Entry(unsigned long thread_input);
 [/#if]
+[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled")]
+[#if myHash["THREADX_STATUS"]?number == 1 ]
+static void BPKA_BackgroundProcess_Entry(unsigned long thread_input);
 static void AMM_BackgroundProcess_Entry(unsigned long thread_input);
 static void FM_BackgroundProcess_Entry(unsigned long thread_input);
+[/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+static void BPKA_Task_Entry(void* thread_input);
+static void AMM_Task_Entry(void* thread_input);
+static void FM_Task_Entry(void* thread_input);
+[/#if]
+[#else]
+[#if myHash["THREADX_STATUS"]?number == 1 ]
+void AMM_BackgroundProcessTask  (unsigned long lArgument);
+[/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+void AMM_BackgroundProcessTask  (void * argument);
 [/#if]
 [/#if]
 
@@ -398,7 +486,7 @@ void MX_APPE_Config(void)
 
 [#if myHash["ZIGBEE"] == "Enabled" || (myHash["ZIGBEE_SKELETON"] == "Enabled") || (myHash["mac_802_15_4_SKELETON"] == "Enabled")]
 /**
- *
+ * @brief   LinkLayer & MAC Initialisation.
  */
 void MX_APPE_LinkLayerInit(void)
 {
@@ -430,13 +518,15 @@ void MX_APPE_InitTask( ULONG lArgument )
   MX_APPE_LinkLayerInit();
 
   /* Initialization of the Zigbee Application */
+  /* Must be called in thread context 
+     due to dependency of ZbInit() on MAC layer semaphore */
   APP_ZIGBEE_ApplicationInit();
   
   /* USER CODE BEGIN APPE_Init_Task_2 */
   /* USER CODE END APPE_Init_Task_2 */
   
-  /* Wait unlimited */
-  tx_semaphore_get( &AppliStartEndSemaphore, TX_WAIT_FOREVER );
+  /* Free allocated stack before entering completed state */
+  tx_byte_release(AppliStartThread.tx_thread_stack_start);
 }
 
 [/#if]
@@ -465,8 +555,15 @@ uint32_t MX_APPE_Init(void *p_param)
   /* Configure the system Power Mode */
   SystemPower_Config();
 
+[#if (myHash["USE_TEMPERATURE_BASED_RADIO_CALIBRATION"]?number == 1)]
+#if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)
+  /* Initialize the Temperature measurement */
+  TEMPMEAS_Init ();
+#endif /* (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1) */
+[/#if]
+
 [#if (myHash["BLE"] == "Enabled")]
-[#if (myHash["USE_SNVMA_NVM"]?number != 0)]
+[#if (myHash["CFG_AMM_VIRTUAL_MEMORY_NUMBER"]?number != 0)]
   /* Initialize the Advance Memory Manager */
   AMM_Init (&ammInitConfig);
 
@@ -490,15 +587,31 @@ uint32_t MX_APPE_Init(void *p_param)
     Error_Handler();
   }
 [#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+  const osSemaphoreAttr_t AmmSemaphore_attributes = {
+    .name = "AMM Semaphore"
+  };
+  AmmSemaphore = osSemaphoreNew(1U, 0U, &AmmSemaphore_attributes);
+  if (AmmSemaphore == NULL)
+  {
+    Error_Handler();
+  }
 
+  const osThreadAttr_t AmmTask_attributes = {
+    .name = "AMM Task",
+    .priority = (osPriority_t)AMM_TASK_PRIO,
+    .stack_size = AMM_TASK_STACK_SIZE
+  };
+  AmmThread = osThreadNew(AMM_Task_Entry, NULL, &AmmTask_attributes);
+  if (AmmThread == NULL)
+  {
+    Error_Handler();
+  }
 [/#if]
 [/#if]
 [#if (myHash["USE_SNVMA_NVM"]?number != 0)]
   /* Initialize the Simple NVM Arbiter */
   SNVMA_Init ((uint32_t *)CFG_SNVMA_START_ADDRESS);
 
-[/#if]
-[#if (myHash["USE_SNVMA_NVM"]?number != 0)]
   /* Register the flash manager task */
 [#if myHash["SEQUENCER_STATUS"]?number == 1 ]
   UTIL_SEQ_RegTask(1U << CFG_TASK_FLASH_MANAGER_BCKGND, UTIL_SEQ_RFU, FM_BackgroundProcess);
@@ -518,10 +631,73 @@ uint32_t MX_APPE_Init(void *p_param)
   {
     Error_Handler();
   }
-[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+[/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+  const osSemaphoreAttr_t FlashManagerSemaphore_attributes = {
+    .name = "Flash Manager Semaphore"
+  };
+  FlashManagerSemaphore = osSemaphoreNew(1U, 0U, &FlashManagerSemaphore_attributes);
+  if (FlashManagerSemaphore == NULL)
+  {
+    Error_Handler();
+  }
 
+  const osThreadAttr_t FlashManagerTask_attributes = {
+    .name = "Flash Manager Task",
+    .priority = (osPriority_t)FLASH_MANAGER_TASK_PRIO,
+    .stack_size = FLASH_MANAGER_TASK_STACK_SIZE
+  };
+  FlashManagerThread = osThreadNew(FM_Task_Entry, NULL, &FlashManagerTask_attributes);
+  if (FlashManagerThread == NULL)
+  {
+    Error_Handler();
+  }
 [/#if]
 [/#if]
+[#else]
+[#if (myHash["CFG_AMM_VIRTUAL_MEMORY_NUMBER"]?number != 0)]
+  /* Initialize the Advance Memory Manager */
+  AMM_Init(&ammInitConfig);
+  
+[#if myHash["SEQUENCER_STATUS"]?number == 1 ]
+  /* Register the AMM background task */
+  UTIL_SEQ_RegTask(1U << CFG_TASK_AMM_BCKGND, UTIL_SEQ_RFU, AMM_BackgroundProcess);
+[/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+  /* Create semaphore */
+  AmmBackgroundSemaphore = osSemaphoreNew( 1, 0, NULL );
+
+  /* Create AMM background task thread */
+  AmmBackgroundThread = osThreadNew(AMM_BackgroundProcessTask, NULL, &stAmmBackgroundThreadAttributes);
+  
+  if ((AmmBackgroundThread == NULL) || (AmmBackgroundSemaphore == NULL))
+  {
+    LOG_ERROR_APP( "ERROR FREERTOS : AMM BACKGROUND THREAD CREATION FAILED");
+    Error_Handler();
+  }
+[/#if]
+[#if myHash["THREADX_STATUS"]?number == 1 ]
+  /* Create semaphore */
+  ThreadXStatus = tx_semaphore_create(&AmmBackgroundSemaphore, "AMM background Semaphore", 0);
+  if (ThreadXStatus == TX_SUCCESS)
+  {
+    /* allocate stack */
+    ThreadXStatus = tx_byte_allocate(pBytePool, (VOID**) &pStack, TASK_AMM_BCKGND_STACK_SIZE, TX_NO_WAIT);
+  }
+  if (ThreadXStatus == TX_SUCCESS)
+  {
+    /* Create AMM background task thread */
+    ThreadXStatus = tx_thread_create(&AmmBackgroundThread, "AMM background thread", AMM_BackgroundProcessTask, 0, pStack,
+                                     TASK_AMM_BCKGND_STACK_SIZE, CFG_TASK_PRIO_AMM_BCKGND, CFG_TASK_PREEMP_AMM_BCKGND,
+                                     TX_NO_TIME_SLICE, TX_AUTO_START);
+  }
+  if ( ThreadXStatus != TX_SUCCESS )
+  {
+    LOG_ERROR_APP( "ERROR THREADX : AMM BACKGROUND THREAD CREATION FAILED (%d)", ThreadXStatus );
+    Error_Handler();
+  } 
+[/#if]
+[/#if]  
 [/#if]
 
   /* USER CODE BEGIN APPE_Init_1 */
@@ -540,7 +716,8 @@ uint32_t MX_APPE_Init(void *p_param)
 [#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled")]
 [#if myHash["SEQUENCER_STATUS"]?number == 1 ]
   UTIL_SEQ_RegTask(1U << CFG_TASK_BPKA, UTIL_SEQ_RFU, BPKA_BG_Process);
-[#elseif myHash["THREADX_STATUS"]?number == 1 ]
+[/#if]  
+[#if myHash["THREADX_STATUS"]?number == 1 ]
   if (tx_byte_allocate(pBytePool, (void **) &pStack, BPKA_TASK_STACK_SIZE,TX_NO_WAIT) != TX_SUCCESS)
   {
     Error_Handler();
@@ -549,15 +726,34 @@ uint32_t MX_APPE_Init(void *p_param)
   {
     Error_Handler();
   }
-  if (tx_thread_create(&BPKA_Thread, "BPKA Thread", BPKA_BG_Process_Entry, 0,
+  if (tx_thread_create(&BPKA_Thread, "BPKA Thread", BPKA_BackgroundProcess_Entry, 0,
                          pStack, BPKA_TASK_STACK_SIZE,
                          BPKA_TASK_PRIO, BPKA_TASK_PREEM_TRES,
                          TX_NO_TIME_SLICE, TX_AUTO_START) != TX_SUCCESS)
   {
     Error_Handler();
   }
-[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+[/#if]  
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+  const osSemaphoreAttr_t BpkaSemaphore_attributes = {
+    .name = "BPKA Semaphore"
+  };
+  BpkaSemaphore = osSemaphoreNew(1U, 0U, &BpkaSemaphore_attributes);
+  if (BpkaSemaphore == NULL)
+  {
+    Error_Handler();
+  }
 
+  const osThreadAttr_t BpkaTask_attributes = {
+    .name = "BPKA Task",
+    .priority = (osPriority_t)BPKA_TASK_PRIO,
+    .stack_size = BPKA_TASK_STACK_SIZE
+  };
+  BpkaThread = osThreadNew(BPKA_Task_Entry, NULL, &BpkaTask_attributes);
+  if (BpkaThread == NULL)
+  {
+    Error_Handler();
+  }
 [/#if]
 
   BPKA_Reset( );
@@ -581,20 +777,30 @@ uint32_t MX_APPE_Init(void *p_param)
   {
     Error_Handler();
   }
-[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+[/#if]  
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
 [/#if]
   APP_BLE_Init();
 [/#if]
 [#if (myHash["THREAD"] == "Enabled") || (myHash["THREAD_SKELETON"] == "Enabled")]
   RNG_Init();
+[/#if]
 
 [#if (myHash["THREAD"] == "Enabled")]
   /* Thread Initialisation */
   APP_THREAD_Init();
   ll_sys_config_params();
+[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+  /* create a SW timer to wakeup system from low power */
+  UTIL_TIMER_Create(&TimerOSwakeup_Id,
+                    0,
+                    UTIL_TIMER_ONESHOT,
+                    &TimerOSwakeupCB, 0);
+#if ( CFG_LPM_LEVEL != 0)
+  maximumPossibleSuppressedTicks = UINT32_MAX;// TODO check this value
+#endif /* ( CFG_LPM_LEVEL != 0) */
+[/#if]
 
-[/#if]
-[/#if]
 [#if (myHash["USE_SNVMA_NVM"]?number != 0)]
   /* Disable RFTS Bypass for flash operation - Since LL has not started yet */
   FD_SetStatus (FD_FLASHACCESS_RFTS_BYPASS, LL_FLASH_DISABLE);
@@ -613,11 +819,8 @@ uint32_t MX_APPE_Init(void *p_param)
 [/#if]
 [/#if]
 [#if (myHash["ZIGBEE"] == "Enabled") && (myHash["THREADX_STATUS"]?number == 1)]
-  /* Register Semaphore to Stop the Application Startup */
-  ThreadXStatus = tx_semaphore_create( &AppliStartEndSemaphore, "AppliStart Semaphore", 0 );
-
   /* Create the Application Startup Thread and this Stack */
-  ThreadXStatus |= tx_byte_allocate( pBytePool, (VOID**) &pStack, TASK_ZIGBEE_APP_START_STACK_SIZE, TX_NO_WAIT);
+  ThreadXStatus = tx_byte_allocate( pBytePool, (VOID**) &pStack, TASK_ZIGBEE_APP_START_STACK_SIZE, TX_NO_WAIT);
   if ( ThreadXStatus == TX_SUCCESS )
   {
     ThreadXStatus = tx_thread_create( &AppliStartThread, "AppliStart Thread", MX_APPE_InitTask, 0, pStack,
@@ -728,11 +931,6 @@ static void Config_HSE(void)
  */
 static void System_Init( void )
 {
-[#if (myHash["ZIGBEE"] == "Enabled") || (myHash["ZIGBEE_SKELETON"] == "Enabled")]
-  /* Initialize System Heap used by Zigbee Stack */
-  UTIL_MM_Init( SYS_MEMORY_HEAP, C_SYS_MEMORY_HEAP_SIZE_BYTES );
-
-[/#if]
   /* Clear RCC RESET flag */
   LL_RCC_ClearResetFlags();
 
@@ -763,10 +961,10 @@ static void System_Init( void )
 [#if (myHash["USE_TEMPERATURE_BASED_RADIO_CALIBRATION"]?number == 1)]
 
 #if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)
-  adc_ctrl_init();
+  ADCCTRL_Init ();
 #endif /* USE_TEMPERATURE_BASED_RADIO_CALIBRATION */
 [/#if]
-[#if myHash["SEQUENCER_STATUS"]?number == 1 ]
+[#if ( (myHash["SEQUENCER_STATUS"]?number == 1) || (myHash["FREERTOS_STATUS"]?number == 1) )]
 
 #if ( CFG_LPM_LEVEL != 0)
   system_startup_done = TRUE;
@@ -797,22 +995,16 @@ static void SystemPower_Config(void)
   DbgIOsInit.Mode = GPIO_MODE_ANALOG;
   DbgIOsInit.Pull = GPIO_NOPULL;
   DbgIOsInit.Pin = GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15;
+  __HAL_RCC_GPIOA_CLK_ENABLE();
   HAL_GPIO_Init(GPIOA, &DbgIOsInit);
 
   DbgIOsInit.Mode = GPIO_MODE_ANALOG;
   DbgIOsInit.Pull = GPIO_NOPULL;
   DbgIOsInit.Pin = GPIO_PIN_3|GPIO_PIN_4;
+  __HAL_RCC_GPIOB_CLK_ENABLE();
   HAL_GPIO_Init(GPIOB, &DbgIOsInit);
 #endif /* CFG_DEBUGGER_LEVEL */
 
-[#if McuName?starts_with("STM32WBA55")]
-  /* Configure Vcore supply */
-  if ( HAL_PWREx_ConfigSupply( CFG_CORE_SUPPLY ) != HAL_OK )
-  {
-    Error_Handler();
-  }
-
-[/#if]
 [#if (myHash["ZIGBEE"] == "Enabled") || (myHash["ZIGBEE_SKELETON"] == "Enabled")]
 #if (CFG_SCM_SUPPORTED == 1)
   /* Set the HSE clock to 32MHz */
@@ -842,6 +1034,10 @@ static void SystemPower_Config(void)
   UTIL_LPM_SetOffMode(1U << CFG_LPM_APP, UTIL_LPM_DISABLE);
 [/#if]
 #endif /* (CFG_LPM_LEVEL != 0)  */
+
+  /* USER CODE BEGIN SystemPower_Config */
+
+  /* USER CODE END SystemPower_Config */
 }
 
 [#if myHash["THREADX_STATUS"]?number == 1 ]
@@ -860,7 +1056,20 @@ static void HW_RNG_Process_Task( ULONG lArgument )
 [#else]
     tx_semaphore_get( &HwRngSemaphore, TX_WAIT_FOREVER );
     HW_RNG_Process();
+    tx_thread_relinquish();
 [/#if]
+  }
+}
+[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+static void HW_RNG_Process_Task(void *argument)
+{
+  for(;;)
+  {
+    osSemaphoreAcquire(HwRngSemaphore, osWaitForever);
+    osMutexAcquire(LinkLayerMutex, osWaitForever);
+    HW_RNG_Process();
+    osMutexRelease(LinkLayerMutex);
+    osThreadYield();
   }
 }
 [/#if]
@@ -878,7 +1087,8 @@ static void RNG_Init(void)
 
 [#if myHash["SEQUENCER_STATUS"]?number == 1 ]
   UTIL_SEQ_RegTask(1U << CFG_TASK_HW_RNG, UTIL_SEQ_RFU, (void (*)(void))HW_RNG_Process);
-[#elseif myHash["THREADX_STATUS"]?number == 1 ]
+[/#if]  
+[#if myHash["THREADX_STATUS"]?number == 1 ]
 [#if (myHash["BLE"] == "Enabled")]
   if (tx_byte_allocate(pBytePool, (void **) &pStack, HW_RNG_TASK_STACK_SIZE,TX_NO_WAIT) != TX_SUCCESS)
   {
@@ -919,10 +1129,11 @@ static void RNG_Init(void)
     APP_DBG( "ERROR THREADX : RANDOM PROCESS THREAD CREATION FAILED (%d)", ThreadXStatus );
     while(1);
   }
-[/#if]  
-[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+[/#if]
+[/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
   /* Register Semaphore to launch the Random Process */
-  HwRngSemaphore = osSemaphoreNew( 1, 0, NULL );
+  HwRngSemaphore = osSemaphoreNew(1U, 0U, NULL );
   if ( HwRngSemaphore == NULL )
   { 
     APP_DBG( "ERROR FREERTOS : RANDOM PROCESS SEMAPHORE CREATION FAILED" );
@@ -930,7 +1141,12 @@ static void RNG_Init(void)
   }
 
   /* Create the Random Process Thread */
-  HwRngThread = osThreadNew( HW_RNG_Process_Task, NULL, &stHwRngThreadAttributes );
+  const osThreadAttr_t HwRngTask_attributes = {
+    .name = "RNG Task",
+    .priority = (osPriority_t) HW_RNG_TASK_PRIO,
+    .stack_size = HW_RNG_TASK_STACK_SIZE
+  };
+  HwRngThread = osThreadNew( HW_RNG_Process_Task, NULL, &HwRngTask_attributes );
   if ( HwRngThread == NULL )
   { 
     APP_DBG( "ERROR FREERTOS : RANDOM PROCESS THREAD CREATION FAILED" );
@@ -939,7 +1155,7 @@ static void RNG_Init(void)
 [/#if]
 }
 
-[#if (myHash["USE_SNVMA_NVM"]?number != 0)]
+[#if (myHash["CFG_AMM_VIRTUAL_MEMORY_NUMBER"]?number != 0)]
 static void AMM_WrapperInit (uint32_t * const p_PoolAddr, const uint32_t PoolSize)
 {
   UTIL_MM_Init ((uint8_t *)p_PoolAddr, ((size_t)PoolSize * sizeof(uint32_t)));
@@ -956,6 +1172,67 @@ static void AMM_WrapperFree (uint32_t * const p_BufferAddr)
 }
 
 [/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+/* OS tick callback */
+static void TimerOStickCB(void *arg)
+{
+  xPortSysTickHandler();
+  /* USER CODE BEGIN TimerOStickCB */
+
+  /* USER CODE END TimerOStickCB */
+
+  return;
+}
+
+/* OS wakeup callback */
+static void TimerOSwakeupCB(void *arg)
+{
+  /* USER CODE BEGIN TimerOSwakeupCB */
+
+  /* USER CODE END TimerOSwakeupCB */
+  return;
+}
+
+#if ( CFG_LPM_LEVEL != 0)
+static void preOSsleepProcessing(uint32_t expectedIdleTime)
+{
+  LL_PWR_ClearFlag_STOP();
+
+  if ( ( system_startup_done != FALSE ) && ( UTIL_LPM_GetMode() == UTIL_LPM_OFFMODE ) )
+  {
+    APP_SYS_BLE_EnterDeepSleep();
+  }
+
+  LL_RCC_ClearResetFlags();
+
+#if defined(STM32WBAXX_SI_CUT1_0)
+  /* Wait until HSE is ready */
+  while (LL_RCC_HSE_IsReady() == 0);
+
+  UTILS_ENTER_LIMITED_CRITICAL_SECTION(RCC_INTR_PRIO << 4U);
+  scm_hserdy_isr();
+  UTILS_EXIT_LIMITED_CRITICAL_SECTION();
+#endif /* STM32WBAXX_SI_CUT1_0 */
+
+  UTIL_LPM_EnterLowPower(); /* WFI instruction call is inside this API */
+}
+
+static void postOSsleepProcessing(uint32_t expectedIdleTime)
+{
+  UTIL_TIMER_Stop(&TimerOSwakeup_Id);
+
+  LL_AHB5_GRP1_EnableClock(LL_AHB5_GRP1_PERIPH_RADIO);
+  ll_sys_dp_slp_exit();
+}
+
+/* return current time since boot, continue to count in standby low power mode */
+static uint32_t getCurrentTime(void)
+{
+  return TIMER_IF_GetTimerValue();
+}
+#endif /* ( CFG_LPM_LEVEL != 0) */
+[/#if]
+
 /* USER CODE BEGIN FD_LOCAL_FUNCTIONS */
 [#if PG_FILL_UCS == "True"]
 [#if PG_BSP_NUCLEO_WBA52CG == 1]
@@ -992,6 +1269,56 @@ static void Button_Init( void )
   UTIL_SEQ_RegTask(1U << TASK_BUTTON_2, UTIL_SEQ_RFU, APPE_Button2Action);
   UTIL_SEQ_RegTask(1U << TASK_BUTTON_3, UTIL_SEQ_RFU, APPE_Button3Action);
 [#elseif myHash["THREADX_STATUS"]?number == 1 ]
+  CHAR * pStack;
+
+  /* Register tasks associated to buttons */
+  if (tx_byte_allocate(pBytePool, (void **) &pStack, PB1_BUTTON_PUSHED_TASK_STACK_SIZE,TX_NO_WAIT) != TX_SUCCESS)
+  {
+    Error_Handler();
+  }
+  if (tx_semaphore_create(&PB1_BUTTON_PUSHED_Thread_Sem, "PB1_BUTTON_PUSHED_Thread_Sem", 0)!= TX_SUCCESS )
+  {
+    Error_Handler();
+  }
+  if (tx_thread_create(&PB1_BUTTON_PUSHED_Thread, "PB1_BUTTON_PUSHED Thread", APPE_Button1Action_Entry, 0,
+                         pStack, PB1_BUTTON_PUSHED_TASK_STACK_SIZE,
+                         PB1_BUTTON_PUSHED_TASK_PRIO, PB1_BUTTON_PUSHED_TASK_PREEM_TRES,
+                         TX_NO_TIME_SLICE, TX_AUTO_START) != TX_SUCCESS)
+  {
+    Error_Handler();
+  }
+  
+  if (tx_byte_allocate(pBytePool, (void **) &pStack, PB2_BUTTON_PUSHED_TASK_STACK_SIZE,TX_NO_WAIT) != TX_SUCCESS)
+  {
+    Error_Handler();
+  }
+  if (tx_semaphore_create(&PB2_BUTTON_PUSHED_Thread_Sem, "PB2_BUTTON_PUSHED_Thread_Sem", 0)!= TX_SUCCESS )
+  {
+    Error_Handler();
+  }
+  if (tx_thread_create(&PB2_BUTTON_PUSHED_Thread, "PB2_BUTTON_PUSHED Thread", APPE_Button2Action_Entry, 0,
+                         pStack, PB2_BUTTON_PUSHED_TASK_STACK_SIZE,
+                         PB2_BUTTON_PUSHED_TASK_PRIO, PB2_BUTTON_PUSHED_TASK_PREEM_TRES,
+                         TX_NO_TIME_SLICE, TX_AUTO_START) != TX_SUCCESS)
+  {
+    Error_Handler();
+  }
+  
+  if (tx_byte_allocate(pBytePool, (void **) &pStack, PB3_BUTTON_PUSHED_TASK_STACK_SIZE,TX_NO_WAIT) != TX_SUCCESS)
+  {
+    Error_Handler();
+  }
+  if (tx_semaphore_create(&PB3_BUTTON_PUSHED_Thread_Sem, "PB3_BUTTON_PUSHED_Thread_Sem", 0)!= TX_SUCCESS )
+  {
+    Error_Handler();
+  }
+  if (tx_thread_create(&PB3_BUTTON_PUSHED_Thread, "PB3_BUTTON_PUSHED Thread", APPE_Button3Action_Entry, 0,
+                         pStack, PB3_BUTTON_PUSHED_TASK_STACK_SIZE,
+                         PB3_BUTTON_PUSHED_TASK_PRIO, PB3_BUTTON_PUSHED_TASK_PREEM_TRES,
+                         TX_NO_TIME_SLICE, TX_AUTO_START) != TX_SUCCESS)
+  {
+    Error_Handler();
+  }
 [#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
 [/#if]
 
@@ -1001,7 +1328,7 @@ static void Button_Init( void )
   {
     UTIL_TIMER_Create( &buttonDesc[buttonIndex].longTimerId,
                        0,
-                       (UTIL_TIMER_Mode_t)hw_ts_SingleShot,
+                       UTIL_TIMER_ONESHOT,
                        &Button_TriggerActions,
                        &buttonDesc[buttonIndex] );
   }
@@ -1155,14 +1482,14 @@ void BPKACB_Process( void )
 [#elseif myHash["THREADX_STATUS"]?number == 1 ]
   tx_semaphore_put(&BPKA_Thread_Sem);
 [#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
-
+  osSemaphoreRelease(BpkaSemaphore);
 [/#if]
 }
 
 [/#if]
-[#if myHash["THREADX_STATUS"]?number == 1 ]
 [#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled")]
-void BPKA_BG_Process_Entry(unsigned long thread_input)
+[#if myHash["THREADX_STATUS"]?number == 1 ]
+void BPKA_BackgroundProcess_Entry(unsigned long thread_input)
 {
   (void)(thread_input);
 
@@ -1177,6 +1504,20 @@ void BPKA_BG_Process_Entry(unsigned long thread_input)
 }
 
 [/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+static void BPKA_Task_Entry(void *argument)
+{
+  for(;;)
+  {
+    osSemaphoreAcquire(BpkaSemaphore, osWaitForever);
+    osMutexAcquire(LinkLayerMutex, osWaitForever);
+    BPKA_BG_Process();
+    osMutexRelease(LinkLayerMutex);
+    osThreadYield();
+  }
+}
+
+[/#if]
 [/#if]
 /**
  * @brief Callback used by 'Random Generator' to launch Task to generate Random Numbers
@@ -1185,14 +1526,23 @@ void HWCB_RNG_Process( void )
 {
 [#if myHash["SEQUENCER_STATUS"]?number == 1 ]
   UTIL_SEQ_SetTask(1U << CFG_TASK_HW_RNG, CFG_TASK_PRIO_HW_RNG);
-[#elseif myHash["THREADX_STATUS"]?number == 1 ]
-  tx_semaphore_put(&HwRngSemaphore);
-[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
-
+[/#if]  
+[#if myHash["THREADX_STATUS"]?number == 1 ]
+[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled")]
+  tx_semaphore_put(&HW_RNG_Thread_Sem);
+[#else]
+  if (HwRngSemaphore.tx_semaphore_count == 0)
+  {
+    tx_semaphore_put(&HwRngSemaphore);
+  }
+[/#if]
+[/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+  osSemaphoreRelease(HwRngSemaphore);
 [/#if]
 }
 
-[#if (myHash["USE_SNVMA_NVM"]?number != 0)]
+[#if (myHash["CFG_AMM_VIRTUAL_MEMORY_NUMBER"]?number != 0)]
 void AMM_RegisterBasicMemoryManager (AMM_BasicMemoryManagerFunctions_t * const p_BasicMemoryManagerFunctions)
 {
   /* Fulfill the function handle */
@@ -1206,17 +1556,24 @@ void AMM_ProcessRequest (void)
   /* Ask for AMM background task scheduling */
 [#if myHash["SEQUENCER_STATUS"]?number == 1 ]
   UTIL_SEQ_SetTask(1U << CFG_TASK_AMM_BCKGND, CFG_SEQ_PRIO_0);
-[#elseif myHash["THREADX_STATUS"]?number == 1 ]
+[/#if]  
+[#if myHash["THREADX_STATUS"]?number == 1 ]
+[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled")]
   tx_semaphore_put(&AMM_BCKGND_Thread_Sem);
-[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
-
+[#else]
+  tx_semaphore_put(&AmmBackgroundSemaphore);
+[/#if]
+[/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+  osSemaphoreRelease(AmmSemaphore);
 [/#if]
 }
 
+[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled")]
 [#if myHash["THREADX_STATUS"]?number == 1 ]
-void AMM_BackgroundProcess_Entry(unsigned long thread_input)
+static void AMM_BackgroundProcess_Entry(unsigned long thread_input)
 {
-  (void)(thread_input);
+  UNUSED(thread_input);
 
   while(1)
   {
@@ -1228,7 +1585,52 @@ void AMM_BackgroundProcess_Entry(unsigned long thread_input)
   }
 }
 [/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+static void AMM_Task_Entry(void* argument)
+{
+  UNUSED(argument);
 
+  while(1)
+  {
+    osSemaphoreAcquire(AmmSemaphore, osWaitForever);
+    osMutexAcquire(LinkLayerMutex, osWaitForever);
+    AMM_BackgroundProcess();
+    osMutexRelease(LinkLayerMutex);
+    osThreadYield();
+  }
+}
+[/#if]
+[#else]
+[#if myHash["THREADX_STATUS"]?number == 1 ]
+void AMM_BackgroundProcessTask(unsigned long lArgument)
+{
+  UNUSED(lArgument);
+
+  while(1)
+  {
+    tx_semaphore_get(&AmmBackgroundSemaphore, TX_WAIT_FOREVER);
+    AMM_BackgroundProcess();
+    tx_thread_relinquish();
+  }
+}
+[/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+void AMM_BackgroundProcessTask(void * argument)
+{
+  UNUSED(argument);
+
+  while(1)
+  {
+    osSemaphoreAcquire(AmmBackgroundSemaphore, osWaitForever);
+    AMM_BackgroundProcess();
+    osThreadYield();
+  }
+}
+[/#if]
+[/#if]
+
+[/#if]
+[#if (myHash["USE_SNVMA_NVM"]?number != 0)]
 void FM_ProcessRequest (void)
 {
   /* Schedule the background process */
@@ -1237,14 +1639,14 @@ void FM_ProcessRequest (void)
 [#elseif myHash["THREADX_STATUS"]?number == 1 ]
   tx_semaphore_put(&FLASH_MANAGER_BCKGND_Thread_Sem);
 [#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
-
+  osSemaphoreRelease(FlashManagerSemaphore);
 [/#if]
 }
 
 [#if myHash["THREADX_STATUS"]?number == 1 ]
-void FM_BackgroundProcess_Entry(unsigned long thread_input)
+static void FM_BackgroundProcess_Entry(unsigned long thread_input)
 {
-  (void)(thread_input);
+  UNUSED(thread_input);
 
   while(1)
   {
@@ -1255,34 +1657,51 @@ void FM_BackgroundProcess_Entry(unsigned long thread_input)
     tx_thread_relinquish();
   }
 }
+[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+static void FM_Task_Entry(void* argument)
+{
+  UNUSED(argument);
+
+  while(1)
+  {
+    osSemaphoreAcquire(FlashManagerSemaphore, osWaitForever);
+    osMutexAcquire(LinkLayerMutex, osWaitForever);
+    FM_BackgroundProcess();
+    osMutexRelease(LinkLayerMutex);
+    osThreadYield();
+  }
+}
 [/#if]
 
 [/#if]
 [#if (myHash["BLE_MODE_TRANSPARENT_UART"] == "Disabled")]
-#if (CFG_LOG_SUPPORTED != 0)
-[/#if]
-/**
- *
- */
+#if ((CFG_LOG_SUPPORTED == 0) && (CFG_LPM_LEVEL != 0))
+/* RNG module turn off HSI clock when traces are not used and low power used */
 void RNG_KERNEL_CLK_OFF(void)
 {
-  /* RNG module may not switch off HSI clock when traces are used */
+  /* USER CODE BEGIN RNG_KERNEL_CLK_OFF_1 */
 
-  /* USER CODE BEGIN RNG_KERNEL_CLK_OFF */
+  /* USER CODE END RNG_KERNEL_CLK_OFF_1 */
+  LL_RCC_HSI_Disable();    
+  /* USER CODE BEGIN RNG_KERNEL_CLK_OFF_2 */
 
-  /* USER CODE END RNG_KERNEL_CLK_OFF */
+  /* USER CODE END RNG_KERNEL_CLK_OFF_2 */
 }
 
+/* SCM module turn off HSI clock when traces are not used and low power used */
 void SCM_HSI_CLK_OFF(void)
 {
-  /* SCM module may not switch off HSI clock when traces are used */
+  /* USER CODE BEGIN SCM_HSI_CLK_OFF_1 */
 
-  /* USER CODE BEGIN SCM_HSI_CLK_OFF */
+  /* USER CODE END SCM_HSI_CLK_OFF_1 */
+  LL_RCC_HSI_Disable();
+  /* USER CODE BEGIN SCM_HSI_CLK_OFF_2 */
 
-  /* USER CODE END SCM_HSI_CLK_OFF */
+  /* USER CODE END SCM_HSI_CLK_OFF_2 */
 }
+#endif /* ((CFG_LOG_SUPPORTED == 0) && (CFG_LPM_LEVEL != 0)) */
 
-[#if (myHash["BLE_MODE_TRANSPARENT_UART"] == "Disabled")]
+#if (CFG_LOG_SUPPORTED != 0)
 void UTIL_ADV_TRACE_PreSendHook(void)
 {
 #if (CFG_LPM_LEVEL != 0)
@@ -1366,8 +1785,124 @@ void ThreadXLowPowerUserExit( void )
   return;
 }
 
-[/#if]
+[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+/* Implement weak function to setup a timer that will trig OS ticks */
+void vPortSetupTimerInterrupt( void )
+{
+  UTIL_TIMER_Create(&TimerOStick_Id,
+                    portTICK_PERIOD_MS,
+                    UTIL_TIMER_PERIODIC,
+                    &TimerOStickCB, 0);
+  
+  UTIL_TIMER_StartWithPeriod(&TimerOStick_Id, portTICK_PERIOD_MS);
+  /* USER CODE BEGIN vPortSetupTimerInterrupt */
 
+  /* USER CODE END vPortSetupTimerInterrupt */
+  return;
+}
+#if ( CFG_LPM_LEVEL != 0)
+void vPortSuppressTicksAndSleep( uint32_t xExpectedIdleTime )
+{
+  uint32_t lowPowerTimeBeforeSleep, lowPowerTimeAfterSleep;
+  eSleepModeStatus eSleepStatus;
+
+  /* Stop the timer that is generating the OS tick interrupt. */
+  UTIL_TIMER_Stop(&TimerOStick_Id);
+  
+  
+  /* Make sure the SysTick reload value does not overflow the counter. */
+  if( xExpectedIdleTime > maximumPossibleSuppressedTicks )
+  {
+    xExpectedIdleTime = maximumPossibleSuppressedTicks;
+  }
+  
+  /* Enter a critical section but don't use the taskENTER_CRITICAL()
+   * method as that will mask interrupts that should exit sleep mode. */
+  __asm volatile ( "cpsid i" ::: "memory" );
+  __asm volatile ( "dsb" );
+  __asm volatile ( "isb" );
+
+  eSleepStatus = eTaskConfirmSleepModeStatus();
+  
+  /* If a context switch is pending or a task is waiting for the scheduler
+   * to be unsuspended then abandon the low power entry. */
+  if( eSleepStatus == eAbortSleep )
+  {
+    /* Restart the timer that is generating the OS tick interrupt. */
+    UTIL_TIMER_StartWithPeriod(&TimerOStick_Id, portTICK_PERIOD_MS);
+     
+    /* Re-enable interrupts - see comments above the cpsid instruction above. */
+    __asm volatile ( "cpsie i" ::: "memory" );
+  }
+  else
+  {
+    if( eSleepStatus == eNoTasksWaitingTimeout )
+    {
+      /* It is not necessary to configure an interrupt to bring the
+         microcontroller out of its low power state at a fixed time in the
+         future. */
+      preOSsleepProcessing(xExpectedIdleTime); /* WFI instruction call is inside this API */
+      postOSsleepProcessing(xExpectedIdleTime);
+    }
+    else
+    {
+      /* Configure an interrupt to bring the microcontroller out of its low
+         power state at the time the kernel next needs to execute. The
+         interrupt must be generated from a source that remains operational
+         when the microcontroller is in a low power state. */
+      UTIL_TIMER_StartWithPeriod(&TimerOSwakeup_Id, (xExpectedIdleTime - 1) * portTICK_PERIOD_MS);
+
+      /* Read the current time from RTC, maintainned in standby */
+      lowPowerTimeBeforeSleep = getCurrentTime();
+
+      /* Enter the low power state. */
+      preOSsleepProcessing(xExpectedIdleTime); /* WFI instruction call is inside this API */
+      postOSsleepProcessing(xExpectedIdleTime);
+
+      /* Determine how long the microcontroller was actually in a low power
+         state for, which will be less than xExpectedIdleTime if the
+         microcontroller was brought out of low power mode by an interrupt
+         other than that configured by the vSetWakeTimeInterrupt() call.
+         Note that the scheduler is suspended before
+         portSUPPRESS_TICKS_AND_SLEEP() is called, and resumed when
+         portSUPPRESS_TICKS_AND_SLEEP() returns.  Therefore no other tasks will
+         execute until this function completes. */
+      lowPowerTimeAfterSleep = getCurrentTime();
+
+      /* Correct the kernel tick count to account for the time spent in its low power state. */
+      vTaskStepTick( TIMER_IF_Convert_Tick2ms(lowPowerTimeAfterSleep - lowPowerTimeBeforeSleep) / portTICK_PERIOD_MS );
+
+    }
+    /* Re-enable interrupts to allow the interrupt that brought the MCU
+     * out of sleep mode to execute immediately.  See comments above
+     * the cpsid instruction above. */
+    __asm volatile ( "cpsie i" ::: "memory" );
+    __asm volatile ( "dsb" );
+    __asm volatile ( "isb" );
+
+    /* Restart the timer that is generating the OS tick interrupt. */
+    UTIL_TIMER_StartWithPeriod(&TimerOStick_Id, portTICK_PERIOD_MS);
+  }
+  return;
+}
+#else
+void vPortSuppressTicksAndSleep( uint32_t xExpectedIdleTime )
+{
+  return;
+}
+#endif /* ( CFG_LPM_LEVEL != 0) */
+
+[/#if]
+[#if (myHash["ZIGBEE"] == "Enabled") || (myHash["ZIGBEE_SKELETON"] == "Enabled") || (myHash["THREAD"] == "Enabled") || (myHash["THREAD_SKELETON"] == "Enabled")]
+/**
+ * @brief Function Assert AEABI in case of not described on 'libc' libraries.
+ */
+__WEAK void __aeabi_assert(const char * szExpression, const char * szFile, int iLine)
+{
+  Error_Handler();
+}
+
+[/#if]
 /* USER CODE BEGIN FD_WRAP_FUNCTIONS */
 [#if PG_FILL_UCS == "True"]
 [#if PG_BSP_NUCLEO_WBA52CG == 1]

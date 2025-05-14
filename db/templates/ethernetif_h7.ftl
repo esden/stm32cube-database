@@ -64,7 +64,7 @@
         [#if (definition.name == "LWIP_IPV6") && (definition.value == "1")]
             [#assign lwip_ipv6 = 1]
         [/#if] 
-        [#if (definition.name == "LWIP_NETIF_HOSTNAME") && (definition.value != "valueNotSetted")]
+        [#if (definition.name == "LWIP_NETIF_HOSTNAME_NAME") && (definition.value != "valueNotSetted")]
             [#assign lwip_netif_hostname = definition.value]
         [/#if]  
 	[/#list]
@@ -88,6 +88,11 @@
 [/#list]
 [/#if][#-- end "BspComponentDatas??" --]
 
+[#if cpucore?? && cpucore != ""]
+    [#assign CPUCORE = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")+"/"]
+[#elseif cpucore?? && cpucore == ""]
+    [#assign CPUCORE = ""]
+[/#if]
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "lwip/opt.h"
@@ -100,6 +105,7 @@
 #include "netif/etharp.h"
 #include "lwip/ethip6.h"
 #include "ethernetif.h"
+[#assign series = FamilyName?lower_case]
 [#if bsp == 1]
 #include "${BspComponent?lower_case}.h"
 [#else]
@@ -109,7 +115,9 @@
 [/#if][#-- endif bsp --]
 #include <string.h>
 [#if with_rtos == 1]
+[#if series != "stm32h7rs"]
 #include "cmsis_os.h"
+[/#if]
 #include "lwip/tcpip.h"
 [/#if][#-- endif with_rtos --]
 
@@ -123,7 +131,11 @@
 [#if with_rtos == 1]
 
 /* The time to block waiting for input. */
+[#if series != "stm32h7rs"]
 #define TIME_WAITING_FOR_INPUT                 ( portMAX_DELAY )
+[#else]
+#define TIME_WAITING_FOR_INPUT                 ( osWaitForever )
+[/#if]
 /* USER CODE BEGIN OS_THREAD_STACK_SIZE_WITH_RTOS */
 /* Stack size of the interface thread */
 #define INTERFACE_THREAD_STACK_SIZE            ( 350 )
@@ -198,10 +210,17 @@ ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptor
 __attribute__((at(${rx_descr_address}))) ETH_DMADescTypeDef  DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
 __attribute__((at(${tx_descr_address}))) ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
 
+[#if series != "stm32h7rs"]
 #elif defined ( __GNUC__ ) /* GNU Compiler */ 
 
 ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT] __attribute__((section(".RxDecripSection"))); /* Ethernet Rx DMA Descriptors */
 ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT] __attribute__((section(".TxDecripSection")));   /* Ethernet Tx DMA Descriptors */
+[#else]
+#elif (defined ( __GNUC__ ) || defined ( __ARMCC_VERSION )) /* GNU Compiler */
+
+ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT] __attribute__((section(".RxDescripSection"))); /* Ethernet Rx DMA Descriptors */
+ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT] __attribute__((section(".TxDescripSection")));   /* Ethernet Tx DMA Descriptors */
+[/#if]
 
 #endif
 
@@ -210,13 +229,22 @@ ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT] __attribute__((section(".TxDecr
 /* USER CODE END 2 */
 
 [#if with_rtos == 1]
+[#if series != "stm32h7rs"]
 osSemaphoreId RxPktSemaphore = NULL;   /* Semaphore to signal incoming packets */
 osSemaphoreId TxPktSemaphore = NULL;   /* Semaphore to signal transmit packet complete */
+[#else]
+osSemaphoreId_t RxPktSemaphore = NULL;   /* Semaphore to signal incoming packets */
+osSemaphoreId_t TxPktSemaphore = NULL;   /* Semaphore to signal transmit packet complete */
+[/#if]
 [/#if][#-- endif with_rtos --]
 
 /* Global Ethernet handle */
 ETH_HandleTypeDef heth;
+[#if FamilyName=="STM32H7RS"]
+ETH_TxPacketConfigTypeDef TxConfig;
+[#else]
 ETH_TxPacketConfig TxConfig;
+[/#if]
 
 /* Private function prototypes -----------------------------------------------*/
 [#if with_rtos == 1][#-- rtos used --]
@@ -1001,9 +1029,11 @@ void HAL_ETH_RxLinkCallback(void **pStart, void **pEnd, uint8_t *buff, uint16_t 
     p->tot_len += Length;
   }
 
+[#if (cpucore?? && CPUCORE != "CM4/")]
   /* Invalidate data cache because Rx DMA's writing to physical memory makes it stale. */
   SCB_InvalidateDCache_by_Addr((uint32_t *)buff, Length);
-  
+
+[/#if]
 /* USER CODE END HAL ETH RxLinkCallback */  
 }
 

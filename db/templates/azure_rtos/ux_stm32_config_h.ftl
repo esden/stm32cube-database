@@ -52,7 +52,23 @@ extern "C" {
 #define UX_HCD_STM32_MAX_NB_CHANNELS          8
 [/#if]
 
-/* USER CODE BEGIN Private defines */
+[#if FamilyName?lower_case == "stm32u0" && DIE=="DIE489"]
+#define UX_DCD_STM32_MAX_ED                   6
+#define UX_HCD_STM32_MAX_NB_CHANNELS          8
+[/#if]
+
+
+[#list SWIPdatas as SWIP]
+[#if SWIP.variables??]
+[#list SWIP.variables as define]
+    [#assign def_value = define.value]
+    [#assign def_name = define.name]
+[#if def_name?contains("UX_DEVICE_VIDEO") && def_value == "1"]
+#define USBD_HAL_ISOINCOMPLETE_CALLBACK
+[/#if]
+[/#list]
+[/#if]
+[/#list]/* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
 

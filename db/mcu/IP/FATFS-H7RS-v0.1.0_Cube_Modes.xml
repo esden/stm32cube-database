@@ -1,0 +1,1393 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+    ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
+    xmlns="http://mcd.rou.st.com/modules.php?name=mcu"
+    DBVersion="V4.0"
+    IPType="middleware"
+    IpGroup="Middleware"
+    Name="FATFS"
+    Version="v0.1.0_Cube">
+    <About>FATFS: FAT File System</About>
+    <RefParameter Name="FATFS_version" Comment="FATFS version" DefaultValue="12" Type="uniqueElementList" Group="Version" TabName="Set Defines">
+        <PossibleValue Comment="R0.15" Value="15"/>
+        <Condition Diagnostic="Version available for H7R/S" Expression="STM32H7"/>
+    </RefParameter>	
+    <!-- In case we want to support multi-versions on a single series, could be like that:
+    <RefParameter Name="FATFS_version" Comment="FATFS version" DefaultValue="12" Type="list" Group="Version" TabName="Set Defines">
+        <PossibleValue Comment="R0.11" Value="11"/>
+        <PossibleValue Comment="R0.12c" Value="12"/>
+        <PossibleValue Comment="R0.13" Value="13"/>
+        <Condition Diagnostic="Multi-versions available for F4" Expression="STM32F4"/>
+    </RefParameter>
+    -->
+    
+    <!--  
+    <RefParameter Name="RTOS_IN_USE" Comment="RTOS_IN_USE" DefaultValue="1" Type="integer" Visible="false">
+    	<Condition Diagnostic="Version available for test purpose" Expression="S_FREERTOS$context"/>
+    	<PossibleValue Comment="In use" Value="1"/>
+    </RefParameter>
+    <RefParameter Name="RTOS_IN_USE" Comment="RTOS_IN_USE" DefaultValue="0" Type="integer" Visible="false">
+    	<PossibleValue Comment="Not in use" Value="0"/>
+    </RefParameter>
+    -->
+
+    <!-- Since R0.11, max value for VOLUMEs is 9 (no more 10) -->
+    <RefParameter Name="MAX_VOLUMES_VALUE" Comment="Max value for the volumes parameter" DefaultValue="9" Type="integer" Visible="false">
+        <PossibleValue Comment="Since R0.11, max is 9" Value="9"/>
+    </RefParameter>
+
+    <RefParameter Name="SD_MODE" Comment="SD MODE" DefaultValue="4" Type="integer" Visible="false">
+        <Condition Diagnostic="SDIO 4 bits" Expression="SDIO_SD_Card &amp; SDIO_Bus4Bits"/>
+    </RefParameter>	
+    <RefParameter Name="SD_MODE" Comment="SD MODE" DefaultValue="1" Type="integer" Visible="false">
+        <Condition Diagnostic="SDIO 1 bit" Expression="SDIO_SD_Card &amp; SDIO_Bus1Bit"/>
+    </RefParameter>
+    <RefParameter Name="SD_MODE" Comment="SD MODE" DefaultValue="null" Type="integer" Visible="false"/>
+
+    <RefParameter Name="SDMMC1_MODE" Comment="SD MODE" DefaultValue="4" Type="integer" Visible="false">
+        <Condition Diagnostic="SDIO 4 bits" Expression="SDMMC1_SD_Card &amp; SDMMC1_Bus4Bits"/>
+    </RefParameter>	
+    <RefParameter Name="SDMMC1_MODE" Comment="SD MODE" DefaultValue="1" Type="integer" Visible="false">
+        <Condition Diagnostic="SDIO 1 bit" Expression="SDMMC1_SD_Card &amp; SDMMC1_Bus1Bit"/>
+    </RefParameter>
+    <RefParameter Name="SDMMC1_MODE" Comment="SD MODE" DefaultValue="null" Type="integer" Visible="false"/>
+    <RefParameter Name="SDMMC2_MODE" Comment="SD MODE" DefaultValue="4" Type="integer" Visible="false">
+        <Condition Diagnostic="SDIO 4 bits" Expression="SDMMC2_SD_Card &amp; SDMMC2_Bus4Bits"/>
+    </RefParameter>	
+    <RefParameter Name="SDMMC2_MODE" Comment="SD MODE" DefaultValue="1" Type="integer" Visible="false">
+        <Condition Diagnostic="SDIO 1 bit" Expression="SDMMC2_SD_Card &amp; SDMMC2_Bus1Bit"/>
+    </RefParameter>
+    <RefParameter Name="SDMMC2_MODE" Comment="SD MODE" DefaultValue="null" Type="integer" Visible="false"/>
+
+    <RefParameter Name="Instance" DefaultValue="FATFS" Comment="Instance" Type="" Visible="false"/>
+    <!-- #322733 -->
+    
+    <RefParameter Name="_HSD" Comment="SDMMC instance" DefaultValue="hsd1" Type="list" Group="SDIO/SDMMC" TabName="Advanced Settings">
+        <!-- <Condition Diagnostic="2 SDMMC available and selected" Expression="(SD_Card | SD_Card_4) &amp; (SDMMC1Used_ForRCC &amp; SDMMC2Used_ForRCC)"/>\  -->
+        <Condition Diagnostic="2 SDMMC available and selected" Expression="SDMMC1_SD_Card &amp; SDMMC2_SD_Card"/>    
+        <PossibleValue Comment="SDMMC1" Value="hsd1"/>
+        <PossibleValue Comment="SDMMC2" Value="hsd2"/>
+    </RefParameter>
+    <RefParameter Name="_HSD" Comment="SDMMC instance" DefaultValue="hsd1" Type="list" Group="SDIO/SDMMC" TabName="Advanced Settings">
+        <Condition Diagnostic="SDMMC1 available and selected" Expression="SDMMC1_SD_Card"/>
+        <PossibleValue Comment="SDMMC1" Value="hsd1"/>
+    </RefParameter>
+    <RefParameter Name="_HSD" Comment="SDMMC instance" DefaultValue="hsd2" Type="list" Group="SDIO/SDMMC" TabName="Advanced Settings">
+        <Condition Diagnostic="SDMMC2 available and selected" Expression="SDMMC2_SD_Card"/>
+        <PossibleValue Comment="SDMMC2" Value="hsd2"/>
+    </RefParameter>
+    <RefParameter Name="_HSD" Comment="SDIO instance" DefaultValue="hsd" Type="list" Group="SDIO/SDMMC" TabName="Advanced Settings">
+        <Condition Diagnostic="SDIO available and selected" Expression="SDIO_SD_Card"/>
+        <PossibleValue Comment="SDIO" Value="hsd"/>
+    </RefParameter>
+    <RefParameter Name="_HSD" Comment="SDIO/SDMMC instance" DefaultValue="null" Type="list" Group="SDIO/SDMMC" TabName="Advanced Settings">
+    </RefParameter>
+	
+    <RefParameter Name="_HUSBH" Comment="USBH instance" DefaultValue="hUsbHostFS" Type="list" Group="USBH" TabName="Advanced Settings">
+        <Condition Diagnostic="MSC class selected for both USB" Expression="MSC_HOST_HS &amp; MSC_HOST_FS &amp; S_FATFS_USB"/>
+        <PossibleValue Comment="USB Host MSC FS" Value="hUsbHostFS"/>
+        <PossibleValue Comment="USB Host MSC HS" Value="hUsbHostHS"/>
+    </RefParameter>
+    <RefParameter Name="_HUSBH" Comment="USBH instance" DefaultValue="hUsbHostFS" Type="list" Group="USBH" TabName="Advanced Settings">
+        <Condition Diagnostic="MSC class selected only for USB FS" Expression="MSC_HOST_FS &amp; S_FATFS_USB"/>
+        <PossibleValue Comment="USB Host MSC FS" Value="hUsbHostFS"/>
+    </RefParameter>
+    <RefParameter Name="_HUSBH" Comment="USBH instance" DefaultValue="hUsbHostHS" Type="list" Group="USBH" TabName="Advanced Settings">
+        <Condition Diagnostic="MSC class selected only for USB HS" Expression="MSC_HOST_HS &amp; S_FATFS_USB"/>
+        <PossibleValue Comment="USB Host MSC HS" Value="hUsbHostHS"/>
+    </RefParameter>
+
+    <RefParameter Name="_HNAND" Comment="NandFlash instance" DefaultValue="hnand1" Type="list" Group="Nand" TabName="Advanced Settings">
+        <Condition Diagnostic="Both Nand selected in IP tree" Expression="NandFlash1 &amp; NandFlash2"/>
+        <PossibleValue Comment="Nand Flash1" Value="hnand1"/>
+        <PossibleValue Comment="Nand Flash2" Value="hnand2"/>
+    </RefParameter>
+    <RefParameter Name="_HNAND" Comment="NandFlash instance" DefaultValue="hnand1" Type="list" Group="Nand" TabName="Advanced Settings">
+        <Condition Diagnostic="Only Nand Flash1 selected in IP tree" Expression="NandFlash1"/>
+        <PossibleValue Comment="Nand Flash1" Value="hnand1"/>
+    </RefParameter>
+    <RefParameter Name="_HNAND" Comment="NandFlash instance" DefaultValue="hnand2" Type="list" Group="Nand" TabName="Advanced Settings">
+        <Condition Diagnostic="Only Nand Flash2 selected in IP tree" Expression="NandFlash2"/>
+        <PossibleValue Comment="Nand Flash2" Value="hnand2"/>
+    </RefParameter>
+    <RefParameter Name="_HNAND" Comment="NandFlash instance" DefaultValue="null" Type="list" Group="Nand" TabName="Advanced Settings" Visible="false">
+    </RefParameter>
+
+    <!-- choose one instance in the selected SDRAM ones -->
+    <RefParameter Name="_HSDRAM" Comment="SDRAM instance" DefaultValue="hsdram1" Type="list" Group="SDRAM" TabName="Advanced Settings">
+        <Condition Diagnostic="Both SDRAM selected in IP tree" Expression="SdramChipSelect1 &amp; SdramChipSelect2 &amp; S_FATFS_SDRAM"/>
+        <PossibleValue Comment="SDRAM1" Value="hsdram1"/>
+        <PossibleValue Comment="SDRAM2" Value="hsdram2"/>
+    </RefParameter>
+    <RefParameter Name="_HSDRAM" Comment="SDRAM instance " DefaultValue="hsdram1" Type="list" Group="SDRAM" TabName="Advanced Settings">
+        <Condition Diagnostic="Only SDRAM1 selected in IP tree" Expression="SdramChipSelect1 &amp; S_FATFS_SDRAM"/>
+        <PossibleValue Comment="SDRAM1" Value="hsdram1"/>
+    </RefParameter>
+    <RefParameter Name="_HSDRAM" Comment="SDRAM instance" DefaultValue="hsdram2" Type="list" Group="SDRAM" TabName="Advanced Settings">
+        <Condition Diagnostic="Only SDRAM2 selected in IP tree" Expression="SdramChipSelect2 &amp; S_FATFS_SDRAM"/>
+        <PossibleValue Comment="SDRAM2" Value="hsdram2"/>
+    </RefParameter>
+    <RefParameter Name="_HSDRAM" Comment="SDRAM instance" DefaultValue="null" Type="list" Group="SDRAM" TabName="Advanced Settings" Visible="false">
+    </RefParameter>
+
+    <!-- choose one instance in the selected SRAM ones -->
+    <RefParameter Name="VIRTUAL_SRAM1" Type="integer" Comment="SRAM1 on" DefaultValue="1" Group="SRAM" Visible="false">
+        <Condition Expression="(Sram1|Psram1|MuxedPsram1|Lcd1)" Diagnostic=""/>
+    </RefParameter>	
+    <RefParameter Name="VIRTUAL_SRAM1" Type="integer" Comment="SRAM1 off" DefaultValue="0" Group="SRAM" Visible="false"/>
+
+    <RefParameter Name="VIRTUAL_SRAM2" Type="integer" Comment="SRAM2 on" DefaultValue="1" Group="SRAM" Visible="false">
+        <Condition Expression="(Sram2|Psram2|MuxedPsram2|Lcd2)" Diagnostic=""/>
+    </RefParameter>	
+    <RefParameter Name="VIRTUAL_SRAM2" Type="integer" Comment="SRAM2 off" DefaultValue="0" Group="SRAM" Visible="false"/>
+
+    <RefParameter Name="VIRTUAL_SRAM3" Type="integer" Comment="SRAM3 on" DefaultValue="1" Group="SRAM" Visible="false">
+        <Condition Expression="(Sram3|Psram3|MuxedPsram3|Lcd3)" Diagnostic=""/>
+    </RefParameter>	
+    <RefParameter Name="VIRTUAL_SRAM3" Type="integer" Comment="SRAM2 off" DefaultValue="0" Group="SRAM" Visible="false"/>
+
+    <RefParameter Name="VIRTUAL_SRAM4" Type="integer" Comment="SRAM4 on" DefaultValue="1" Group="SRAM" Visible="false">
+        <Condition Expression="(Sram4|Psram4|MuxedPsram4|Lcd4)" Diagnostic=""/>
+    </RefParameter>	
+    <RefParameter Name="VIRTUAL_SRAM4" Type="integer" Comment="SRAM4 off" DefaultValue="0" Group="SRAM" Visible="false"/>
+
+    <RefParameter Name="_HSRAM" Comment="SRAM instance" DefaultValue="hsram1" Type="list" Group="SRAM" TabName="Advanced Settings">
+        <Condition Diagnostic="The four SRAM set in IP tree" 
+                   Expression="(VIRTUAL_SRAM1=1) &amp; (VIRTUAL_SRAM2=1) &amp; (VIRTUAL_SRAM3=1) &amp; (VIRTUAL_SRAM4=1) &amp; S_FATFS_SRAM"/>
+        <PossibleValue Comment="SRAM1" Value="hsram1"/>
+        <PossibleValue Comment="SRAM2" Value="hsram2"/>
+        <PossibleValue Comment="SRAM3" Value="hsram3"/>
+        <PossibleValue Comment="SRAM4" Value="hsram4"/>
+    </RefParameter>
+    <RefParameter Name="_HSRAM" Comment="SRAM instance" DefaultValue="hsram1" Type="list" Group="SRAM" TabName="Advanced Settings">
+        <Condition Diagnostic="SRAM 1, 2 and 3 set in IP tree" 
+                   Expression="(VIRTUAL_SRAM1=1) &amp; (VIRTUAL_SRAM2=1) &amp; (VIRTUAL_SRAM3=1) &amp; (VIRTUAL_SRAM4=0) &amp; S_FATFS_SRAM"/>
+        <PossibleValue Comment="SRAM1" Value="hsram1"/>
+        <PossibleValue Comment="SRAM2" Value="hsram2"/>
+        <PossibleValue Comment="SRAM3" Value="hsram3"/>
+    </RefParameter>
+    <RefParameter Name="_HSRAM" Comment="SRAM instance" DefaultValue="hsram1" Type="list" Group="SRAM" TabName="Advanced Settings">
+        <Condition Diagnostic="SRAM 1, 2 and 4 set in IP tree" 
+                   Expression="(VIRTUAL_SRAM1=1) &amp; (VIRTUAL_SRAM2=1) &amp; (VIRTUAL_SRAM3=0) &amp; (VIRTUAL_SRAM4=1) &amp; S_FATFS_SRAM"/>
+        <PossibleValue Comment="SRAM1" Value="hsram1"/>
+        <PossibleValue Comment="SRAM2" Value="hsram2"/>
+        <PossibleValue Comment="SRAM4" Value="hsram4"/>
+    </RefParameter>
+    <RefParameter Name="_HSRAM" Comment="SRAM instance" DefaultValue="hsram1" Type="list" Group="SRAM" TabName="Advanced Settings">
+        <Condition Diagnostic="SRAM 1, 3 and 4 set in IP tree" 
+                   Expression="(VIRTUAL_SRAM1=1) &amp; (VIRTUAL_SRAM2=0) &amp; (VIRTUAL_SRAM3=1) &amp; (VIRTUAL_SRAM4=1) &amp; S_FATFS_SRAM"/>
+        <PossibleValue Comment="SRAM1" Value="hsram1"/>
+        <PossibleValue Comment="SRAM3" Value="hsram3"/>
+        <PossibleValue Comment="SRAM4" Value="hsram4"/>
+    </RefParameter>
+    <RefParameter Name="_HSRAM" Comment="SRAM instance" DefaultValue="hsram2" Type="list" Group="SRAM" TabName="Advanced Settings">
+        <Condition Diagnostic="SRAM 2, 3 and 4 set in IP tree" 
+                   Expression="(VIRTUAL_SRAM1=0) &amp; (VIRTUAL_SRAM2=1) &amp; (VIRTUAL_SRAM3=1) &amp; (VIRTUAL_SRAM4=1) &amp; S_FATFS_SRAM"/>
+        <PossibleValue Comment="SRAM2" Value="hsram2"/>
+        <PossibleValue Comment="SRAM3" Value="hsram3"/>
+        <PossibleValue Comment="SRAM4" Value="hsram4"/>
+    </RefParameter>
+    <RefParameter Name="_HSRAM" Comment="SRAM instance" DefaultValue="hsram1" Type="list" Group="SRAM" TabName="Advanced Settings">
+        <Condition Diagnostic="Both SRAM 1 and 2 set in IP tree" 
+                   Expression="(VIRTUAL_SRAM1=1) &amp; (VIRTUAL_SRAM2=1) &amp; (VIRTUAL_SRAM3=0) &amp; (VIRTUAL_SRAM4=0) &amp; S_FATFS_SRAM"/>
+        <PossibleValue Comment="SRAM1" Value="hsram1"/>
+        <PossibleValue Comment="SRAM2" Value="hsram2"/>
+    </RefParameter>
+    <RefParameter Name="_HSRAM" Comment="SRAM instance" DefaultValue="hsram1" Type="list" Group="SRAM" TabName="Advanced Settings">
+        <Condition Diagnostic="Both SRAM 1 and 3 set in IP tree" 
+                   Expression="(VIRTUAL_SRAM1=1) &amp; (VIRTUAL_SRAM2=0) &amp; (VIRTUAL_SRAM3=1) &amp; (VIRTUAL_SRAM4=0) &amp; S_FATFS_SRAM"/>
+        <PossibleValue Comment="SRAM1" Value="hsram1"/>
+        <PossibleValue Comment="SRAM3" Value="hsram3"/>
+    </RefParameter>
+    <RefParameter Name="_HSRAM" Comment="SRAM instance" DefaultValue="hsram1" Type="list" Group="SRAM" TabName="Advanced Settings">
+        <Condition Diagnostic="Both SRAM 1 and 4 set in IP tree" 
+                   Expression="(VIRTUAL_SRAM1=1) &amp; (VIRTUAL_SRAM2=0) &amp; (VIRTUAL_SRAM3=0) &amp; (VIRTUAL_SRAM4=1) &amp; S_FATFS_SRAM"/>
+        <PossibleValue Comment="SRAM1" Value="hsram1"/>
+        <PossibleValue Comment="SRAM4" Value="hsram4"/>
+    </RefParameter>
+    <RefParameter Name="_HSRAM" Comment="SRAM instance" DefaultValue="hsram2" Type="list" Group="SRAM" TabName="Advanced Settings">
+        <Condition Diagnostic="Both SRAM 2 and 3 set in IP tree" 
+                   Expression="(VIRTUAL_SRAM1=0) &amp; (VIRTUAL_SRAM2=1) &amp; (VIRTUAL_SRAM3=1) &amp; (VIRTUAL_SRAM4=0) &amp; S_FATFS_SRAM"/>
+        <PossibleValue Comment="SRAM2" Value="hsram2"/>
+        <PossibleValue Comment="SRAM3" Value="hsram3"/>
+    </RefParameter>
+    <RefParameter Name="_HSRAM" Comment="SRAM instance" DefaultValue="hsram2" Type="list" Group="SRAM" TabName="Advanced Settings">
+        <Condition Diagnostic="Both SRAM 2 and 4 set in IP tree" 
+                   Expression="(VIRTUAL_SRAM1=0) &amp; (VIRTUAL_SRAM2=1) &amp; (VIRTUAL_SRAM3=0) &amp; (VIRTUAL_SRAM4=1) &amp; S_FATFS_SRAM"/>
+        <PossibleValue Comment="SRAM2" Value="hsram2"/>
+        <PossibleValue Comment="SRAM4" Value="hsram4"/>
+    </RefParameter>
+    <RefParameter Name="_HSRAM" Comment="SRAM instance" DefaultValue="hsram3" Type="list" Group="SRAM" TabName="Advanced Settings">
+        <Condition Diagnostic="Both SRAM 3 and 4 set in IP tree" 
+                   Expression="(VIRTUAL_SRAM1=0) &amp; (VIRTUAL_SRAM2=0) &amp; (VIRTUAL_SRAM3=1) &amp; (VIRTUAL_SRAM4=1) &amp; S_FATFS_SRAM"/>
+        <PossibleValue Comment="SRAM3" Value="hsram3"/>
+        <PossibleValue Comment="SRAM4" Value="hsram4"/>
+    </RefParameter>
+    <RefParameter Name="_HSRAM" Comment="SRAM instance" DefaultValue="hsram1" Type="list" Group="SRAM" TabName="Advanced Settings">
+        <Condition Diagnostic="Only SRAM 1 set in IP tree" 
+                   Expression="(VIRTUAL_SRAM1=1) &amp; (VIRTUAL_SRAM2=0) &amp; (VIRTUAL_SRAM3=0) &amp; (VIRTUAL_SRAM4=0) &amp; S_FATFS_SRAM"/>
+        <PossibleValue Comment="SRAM1" Value="hsram1"/>
+    </RefParameter>
+    <RefParameter Name="_HSRAM" Comment="SRAM instance" DefaultValue="hsram2" Type="list" Group="SRAM" TabName="Advanced Settings">
+        <Condition Diagnostic="Only SRAM 2 set in IP tree" 
+                   Expression="(VIRTUAL_SRAM1=0) &amp; (VIRTUAL_SRAM2=1) &amp; (VIRTUAL_SRAM3=0) &amp; (VIRTUAL_SRAM4=0) &amp; S_FATFS_SRAM"/>
+        <PossibleValue Comment="SRAM2" Value="hsram2"/>
+    </RefParameter>
+    <RefParameter Name="_HSRAM" Comment="SRAM instance" DefaultValue="hsram3" Type="list" Group="SRAM" TabName="Advanced Settings">
+        <Condition Diagnostic="Only SRAM 3 set in IP tree" 
+                   Expression="(VIRTUAL_SRAM1=0) &amp; (VIRTUAL_SRAM2=0) &amp; (VIRTUAL_SRAM3=1) &amp; (VIRTUAL_SRAM4=0) &amp; S_FATFS_SRAM"/>
+        <PossibleValue Comment="SRAM3" Value="hsram3"/>
+    </RefParameter>
+    <RefParameter Name="_HSRAM" Comment="SRAM instance" DefaultValue="hsram4" Type="list" Group="SRAM" TabName="Advanced Settings">
+        <Condition Diagnostic="Only SRAM 4 set in IP tree" 
+                   Expression="(VIRTUAL_SRAM1=0) &amp; (VIRTUAL_SRAM2=0) &amp; (VIRTUAL_SRAM3=0) &amp; (VIRTUAL_SRAM4=1) &amp; S_FATFS_SRAM"/>
+        <PossibleValue Comment="SRAM4" Value="hsram4"/>
+    </RefParameter>
+    <RefParameter Name="_HSRAM" Comment="SRAM instance" DefaultValue="null" Type="list" Group="SRAM" TabName="Advanced Settings" Visible="false">
+    </RefParameter>
+
+    <!-- Parameters for SD Diskio (added in v0.15) -->
+    <RefParameter Name="SD_DISKIO_INTERFACE" Type="list" DefaultValue="0" Comment="SD Diskio Interface" Group="SDIO/SDMMC" TabName="Advanced Settings">
+    	<Condition Diagnostic="Used only for Standallone mode (FreeRTOS is disabled)." Expression="S_FATFS_SDIO"/>
+    	<PossibleValue Value="0" Comment="SD Diskio Polling mode" Semaphore="S_SD_DISKIO_POLLING"/>
+    	<PossibleValue Value="1" Comment="DMA Standalone mode" Semaphore="S_SD_DISKIO_DMA_STANDALONE"/>
+    	<PossibleValue Value="2" Comment="DMA RTOS mode" Semaphore="S_SD_DISKIO_DMA_RTOS"/>
+    </RefParameter>
+    <RefParameter Name="SD_TIMEOUT" Type="integer" Comment="SD Timeout" DefaultValue="30000" Min="1000" Max="1000000" Group="SDIO/SDMMC" TabName="Advanced Settings">
+        <Condition Diagnostic="Used only for Standallone mode (FreeRTOS is disabled)." Expression="S_FATFS_SDIO"/>
+    </RefParameter>
+    <RefParameter Name="ENABLE_SD_INIT" Type="list" Comment="Enable SD Init" Group="SDIO/SDMMC" TabName="Advanced Settings">
+        <Condition Diagnostic="Used only for Standallone mode (FreeRTOS is disabled)." Expression="S_FATFS_SDIO"/>
+        <PossibleValue Value="0" Comment="Disabled"/>
+    	<PossibleValue Value="1" Comment="Enabled"/>
+    	<Description>Let the Low-level Diskio driver initialize the SD driver.</Description>
+    </RefParameter>
+    <RefParameter Name="ENABLE_SD_DMA_CACHE_MAINTENANCE" Type="list" Comment="Enable SD DMA Cache Maintenance" Group="SDIO/SDMMC" TabName="Advanced Settings">
+        <Condition Diagnostic="Used only for Standallone mode (FreeRTOS is disabled)." Expression="S_FATFS_SDIO"/>
+        <PossibleValue Value="0" Comment="Disabled"/>
+    	<PossibleValue Value="1" Comment="Enabled"/>
+    	<Description>Enable the define below to activate a cache maintenance at each read and write operation.&lt;br&gt;Requires: Under condition (DMA RTOS) mode or (DMA Standlone) mode</Description>
+    </RefParameter>
+    
+    <!-- Parameters for SRAM Diskio (added in v0.15) -->
+    <RefParameter Name="BLOCK_SIZE" Type="list" Comment="Block size" DefaultValue="512" Group="SRAM" TabName="Advanced Settings">
+    	<Condition Diagnostic="" Expression="S_FATFS_SRAM"/>
+    	<PossibleValue Value="512" Comment="512"/>
+    	<PossibleValue Value="1024" Comment="1024"/>
+    	<PossibleValue Value="2048" Comment="2048"/>
+    	<PossibleValue Value="4096" Comment="4096"/>
+    </RefParameter>
+    <RefParameter Name="SRAM_DISK_BASE_ADDR" Type="integer" Comment="SRAM device Base address" DefaultValue="0x24000000" Group="SRAM" TabName="Advanced Settings">
+        <Condition Diagnostic="" Expression="S_FATFS_SRAM"/>
+    </RefParameter>
+    <RefParameter Name="SRAM_DISK_SIZE" Type="integer" Comment="SRAM device size in bytes" DefaultValue="32768" Group="SRAM" TabName="Advanced Settings">
+        <Condition Diagnostic="" Expression="S_FATFS_SRAM"/>
+    </RefParameter>
+
+    <!-- Parameters for USB Host Diskio (added in v0.15) -->
+    <RefParameter Name="USB_BLOCK_SIZE" Type="list" Comment="Block size" DefaultValue="512" Group="USBH" TabName="Advanced Settings">
+    	<Condition Diagnostic="" Expression="S_FATFS_USB"/>
+    	<PossibleValue Value="512" Comment="512"/>
+    	<PossibleValue Value="1024" Comment="1024"/>
+    	<PossibleValue Value="2048" Comment="2048"/>
+    	<PossibleValue Value="4096" Comment="4096"/>
+    </RefParameter>
+    <RefParameter Name="HUSB_HOST" Type="" Comment="hUsb_Host">
+    	<Condition Diagnostic="" Expression="S_FATFS_USBH"/>
+    </RefParameter>
+    
+    <RefParameter Name="FF_STR_VOLUME_ID" Type="list" Comment="String volume ID" DefaultValue="0">
+    	<PossibleValue Value="0" Comment="Only DOS/Windows style drive prefix in numeric ID"/>
+    	<PossibleValue Value="1" Comment="Also DOS/Windows style drive prefix in string ID"/>
+    	<PossibleValue Value="2" Comment="Also Unix style drive prefix in string ID "/>
+    </RefParameter>
+    <RefParameter Name="FF_VOLUME_STRS" Type="list" Comment="String volume ID" DefaultValue="3">
+    	<PossibleValue Value="0" Comment="ANSI/OEM in current code page"/>
+    	<PossibleValue Value="1" Comment="Unicode in UTF-16LE"/>
+    	<PossibleValue Value="2" Comment="Unicode in UTF-16BE"/>
+    	<PossibleValue Value="3" Comment="Unicode in UTF-8"/>
+    </RefParameter>
+
+    <!-- Ticket 51476 - [FatFS-SD Card-DMA] Disable dma template use by default (when FreeRTOS is disabled) -->
+    <RefParameter Name="USE_DMA_CODE_SD" Comment="Use dma template" DefaultValue="0" Type="list" Group="SDIO/SDMMC" TabName="Advanced Settings">
+        <Condition Diagnostic="Choice possible when FreeRTOS is disabled." Expression="S_FATFS_SDIO"/>
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>When enabled, generate code based on sd_diskio_dma_template.* files (recommended choice). Please ensure that the DMA controller to be used is properly configured.&lt;br&gt;When disabled, generate code based on sd_diskio_template.* files</Description>
+    </RefParameter>
+
+    <RefParameter Name="USE_DMA_CODE_SD" Comment="Use dma template" DefaultValue="0" Type="list" Group="SDIO/SDMMC" TabName="Advanced Settings" Visible="false"> 
+        <PossibleValue Comment="Disabled" Value="0"/>
+    </RefParameter>
+
+    <!--  Board should be detected by CubeMx in the future (no need for the user to select it again (as already selected in the current project) -->
+    <!--
+    <RefParameter Name="BOARD_NAME" Type="list" Comment="Name" DefaultValue="0" Group="Board" TabName="Advanced Settings">
+        <Condition Diagnostic="TO DO " Expression="STM32G081B_EVAL"/>
+        <PossibleValue Comment="STM32G081B-EVAL" Value="0" />
+    </RefParameter>
+    <RefParameter Name="BOARD_NAME" Type="list" Comment="Name" DefaultValue="1" Group="Board" TabName="Advanced Settings">
+        <Condition Diagnostic="TO DO " Expression="NUCLEO_G071RB"/>
+        <PossibleValue Comment="NUCLEO-G071RB" Value="1" />
+    </RefParameter>
+    <RefParameter Name="BOARD_NAME" Type="list" Comment="Name" DefaultValue="2" Group="Board" TabName="Advanced Settings">
+        <Condition Diagnostic="TO DO " Expression="NUCLEO_G070RB"/>
+        <PossibleValue Comment="NUCLEO-G070RB" Value="2" />
+    </RefParameter>
+    <RefParameter Name="BOARD_NAME" Type="list" Comment="Name" Group="Board" TabName="Advanced Settings" Visible="false"/>
+    -->
+
+    <!-- BZ 48303  --> <!--  User defined can be used for generating sd_diskio.* or user_diskio.* -->
+        <RefParameter Name="DISKIO_CODE" Comment="Diskio code" DefaultValue="0" Type="list" Group="UserDefined" TabName="Advanced Settings" Visible="false"> 
+        <PossibleValue Comment="User" Value="0"/>
+        <Description>TO DO</Description>
+    </RefParameter>
+    
+    <!-- no more boards to be added (waiting for a better support of BSP in Mx -->
+    <!-- default case -->
+    <RefParameter Name="BOARD_NAME" Type="list" Comment="Name" DefaultValue="None" Group="Board" TabName="Advanced Settings" Visible="false">
+        <PossibleValue Comment="None" Value="none"/>
+        <Description>No board available, as no custom configuration on-going/possible on that series</Description>
+    </RefParameter>
+
+    <!-- Detect if CS are set or not (to know if FMC/FSMC is itself on or not) -->
+
+    <RefParameter Name="VIRTUAL_CS" Type="integer" Comment="At least one CS set" DefaultValue="1" Group="CS" Visible="false">
+        <Condition Expression="(NorPsramChipSelect1|NorPsramChipSelect2|NorPsramChipSelect3|NorPsramChipSelect4)" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Name="VIRTUAL_CS" Type="integer" Comment="No CS set" DefaultValue="0" Group="CS" Visible="false"/>
+
+    <!-- #define to be generated in ffconf.h -->
+    <RefParameter Name="FF_FS_READONLY" Comment="FS_READONLY (Read-only mode)" DefaultValue="0" Type="list" Group="Function Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="_FS_LOCK=0"/>
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>Setting FS_READONLY to 1 defines read only configuration.&lt;br&gt;
+                     This removes writing functions: f_write, f_sync, f_unlink, f_mkdir, f_chmod, f_rename, f_truncate and useless f_getfree.&lt;br&gt;
+                     &lt;b&gt;Dependency&lt;/b&gt;: FS_READONLY = 1 (Enabled) possible as FS_LOCK = 0.</Description>
+    </RefParameter>
+    <RefParameter Name="FF_FS_READONLY" Comment="FS_READONLY (Read-only mode)" DefaultValue="0" Type="list" Group="Function Parameters" TabName="Set Defines">
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>Setting FS_READONLY to 1 defines read only configuration.&lt;br&gt;
+                     This removes writing functions: f_write, f_sync, f_unlink, f_mkdir, f_chmod, f_rename, f_truncate and useless f_getfree.&lt;br&gt;
+                     &lt;b&gt;Dependency&lt;/b&gt;: FS_READONLY = 1 (Enabled) not possible: it requires FS_LOCK = 0.</Description>
+    </RefParameter>
+
+    <!-- Updated for R0.12 support (33566) -->
+    <RefParameter Name="FF_FS_MINIMIZE" Comment="FS_MINIMIZE (Minimization level)" DefaultValue="0" Type="list" Group="Function Parameters" TabName="Set Defines">
+    	<Condition Diagnostic="Function list updated for R0.12" Expression="FATFS_version &gt; 11"/>
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled with 6 functions removed" Value="1"/>
+        <PossibleValue Comment="Enabled with 9 functions removed" Value="2"/>
+        <PossibleValue Comment="Enabled with 10 functions removed" Value="3"/>
+        <Description>The FS_MINIMIZE option defines minimization level to remove some functions.&lt;br&gt; 
+                     0: All basic functions are enabled.&lt;br&gt;
+                     1: f_stat(), f_getfree(), f_unlink(), f_mkdir(), f_truncate() and f_rename() functions are removed.&lt;br&gt;
+                     2: f_opendir(), f_readdir() and f_closedir() are removed in addition to 1.&lt;br&gt;
+                     3: f_lseek() function is removed in addition to 2.</Description>
+    </RefParameter>
+    <RefParameter Name="FF_FS_MINIMIZE" Comment="FS_MINIMIZE (Minimization level)" DefaultValue="0" Type="list" Group="Function Parameters" TabName="Set Defines">
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled with 8 functions removed" Value="1"/>
+        <PossibleValue Comment="Enabled with 11 functions removed" Value="2"/>
+        <PossibleValue Comment="Enabled with 12 functions removed" Value="3"/>
+        <Description>The FS_MINIMIZE option defines minimization level to remove some functions.&lt;br&gt; 
+                     0: All basic functions are enabled.&lt;br&gt;
+                     1: f_stat(), f_getfree(), f_unlink(), f_mkdir(), f_chmod(), f_utime(), f_truncate() and f_rename() functions are removed.&lt;br&gt;
+                     2: f_opendir(), f_readdir() and f_closedir() are removed in addition to 1.&lt;br&gt;
+                     3: f_lseek() function is removed in addition to 2.</Description>
+    </RefParameter>
+
+    <RefParameter Name="FF_USE_STRFUNC" Comment="USE_STRFUNC (String functions)" DefaultValue="2" Type="list" Group="Function Parameters" TabName="Set Defines">
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled without LF -> CRLF conversion" Value="1"/>
+        <PossibleValue Comment="Enabled with LF -> CRLF conversion" Value="2"/>
+        <Description>To enable string functions (f_gets, f_putc, f_puts, ...), set USE_STRFUNC to 1 or 2.&lt;br&gt;When set to 2, makes a LF -> CRLF conversion.</Description>
+    </RefParameter>
+
+    <!--  New in Fatfs R0.11 -->
+    <RefParameter Name="FF_USE_FIND" Comment="USE_FIND (Find functions)" DefaultValue="0" Type="list" Group="Function Parameters" TabName="Set Defines">
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>This option switches filtered directory read feature and related functions, f_findfirst() and f_findnext(). (0:Disable or 1:Enable).</Description>
+    </RefParameter>
+    <RefParameter Name="FF_PRINT_LLI" Comment="FF_PRINT_LLI (PRINT functions)" DefaultValue="1" Type="list" Group="Function Parameters" TabName="Set Defines">
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>This option switches support for long integer argument in f_printf. When this feature is enabled, C standard needs to be C99 or later and math.h is included in ff.c.</Description>
+    </RefParameter>
+    <RefParameter Name="FF_PRINT_FLOAT" Comment="FF_PRINT_FLOAT (PRINT functions)" DefaultValue="1" Type="list" Group="Function Parameters" TabName="Set Defines">
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enable floating point argument in type 'f', 'e' and 'E'" Value="1"/>
+        <PossibleValue Comment="Enableit with decimal separator ',' instead of '.' " Value="2"/>
+        <Description>This option switches support for floating point argument in f_printf. When this feature is enabled, C standard needs to be C99 or later.</Description>
+    </RefParameter>
+    <!--  New in Fatfs R0.11 -->
+
+    <RefParameter Name="FF_USE_MKFS" Comment="USE_MKFS (Make filesystem function)" DefaultValue="1" Type="list" Group="Function Parameters" TabName="Set Defines">
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>To enable f_mkfs function, set USE_MKFS to 1 (Enabled) and set FS_READONLY to 0 (Disabled)</Description>
+    </RefParameter>
+
+    <RefParameter Name="FF_USE_FORWARD" Comment="USE_FORWARD (Forward function)" DefaultValue="0" Type="list" Group="Function Parameters" TabName="Set Defines">
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>To enable f_forward function, set USE_FORWARD to 1 (Enabled) and set FS_TINY to 1 (Enabled).</Description>
+    </RefParameter>
+
+    <RefParameter Name="FF_USE_LABEL" Comment="USE_LABEL (Volume label functions)" DefaultValue="0" Type="list" Group="Function Parameters" TabName="Set Defines">
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>To enable volume label functions, set USE_LABEL to 1 (Enabled).</Description>
+    </RefParameter>
+
+    <RefParameter Name="FF_USE_FASTSEEK" Comment="USE_FASTSEEK (Fast seek function)" DefaultValue="1" Type="list" Group="Function Parameters" TabName="Set Defines">
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>To enable fast seek feature, set USE_FASTSEEK to 1 (Enabled).</Description>
+    </RefParameter>
+
+    <!--  New in Fatfs R0.11 -->
+    <RefParameter Name="HS_DMA_ENABLED" Type="integer" Comment="" DefaultValue="1" Group="Function Parameters" Visible="false">
+        <Condition Expression="S_FATFS_USB &amp; (_HUSBH = hUsbHostHS) &amp; (SEM_HS_USE_BUFF_WO_ALIGNMENT=1)" Diagnostic=""/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+    </RefParameter>
+    <RefParameter Name="HS_DMA_ENABLED" Type="integer" Comment="" DefaultValue="0" Group="Function Parameters" Visible="false">
+        <PossibleValue Comment="Disabled" Value="0"/>
+    </RefParameter>
+
+    <RefParameter Name="FS_DMA_ENABLED" Type="integer" Comment="" DefaultValue="1" Group="Function Parameters" Visible="false">
+        <Condition Expression="S_FATFS_USB &amp; (_HUSBH = hUsbHostFS) &amp; (SEM_FS_USE_BUFF_WO_ALIGNMENT=1)" Diagnostic=""/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+    </RefParameter>
+    <RefParameter Name="FS_DMA_ENABLED" Type="integer" Comment="" DefaultValue="0" Group="Function Parameters" Visible="false">
+        <PossibleValue Comment="Disabled" Value="0"/>
+    </RefParameter>
+
+    <!--  Added in R011. Removed in Fatfs R0.12c -->
+
+    <!-- VIRTUAL FF_CODE_PAGE is used by the code generation (to copy the right file, if any to copy) -->
+    <RefParameter Name="VIRTUAL_CODE_PAGE" Type="uniqueElementList" Comment="VIRTUAL_CODE_PAGE" DefaultValue="932" Group="Locale and Namespace Parameters" TabName="Set Defines" Visible="false">
+        <Condition Expression="FF_CODE_PAGE=932 &amp; !FF_USE_LFN=0" Diagnostic=""/>
+        <PossibleValue Comment="Value 932" Value="932"/>
+    </RefParameter>
+    <RefParameter Name="VIRTUAL_CODE_PAGE" Type="uniqueElementList" Comment="VIRTUAL_CODE_PAGE" DefaultValue="936" Group="Locale and Namespace Parameters" TabName="Set Defines" Visible="false">
+        <Condition Expression="FF_CODE_PAGE=936 &amp; !FF_USE_LFN=0" Diagnostic=""/>
+        <PossibleValue Comment="Value 936" Value="936"/>
+    </RefParameter>
+    <RefParameter Name="VIRTUAL_CODE_PAGE" Type="uniqueElementList" Comment="VIRTUAL_CODE_PAGE" DefaultValue="949" Group="Locale and Namespace Parameters" TabName="Set Defines" Visible="false">
+        <Condition Expression="FF_CODE_PAGE=949 &amp; !FF_USE_LFN=0" Diagnostic=""/>
+        <PossibleValue Comment="Value 949" Value="949"/>
+    </RefParameter>
+    <RefParameter Name="VIRTUAL_CODE_PAGE" Type="uniqueElementList" Comment="VIRTUAL_CODE_PAGE" DefaultValue="950" Group="Locale and Namespace Parameters" TabName="Set Defines" Visible="false">
+        <Condition Expression="FF_CODE_PAGE=950 &amp; !FF_USE_LFN=0" Diagnostic=""/>
+        <PossibleValue Comment="Value 950" Value="950"/>
+    </RefParameter>
+    <RefParameter Name="VIRTUAL_CODE_PAGE" Type="uniqueElementList" Comment="VIRTUAL_CODE_PAGE" DefaultValue="850" Group="Locale and Namespace Parameters" TabName="Set Defines" Visible="false">
+        <Condition Expression="!FF_USE_LFN=0" Diagnostic=""/>
+        <PossibleValue Comment="Value 850" Value="850"/>
+    </RefParameter>
+    <!-- BZ 61999 (2019-07-31) -->
+    <RefParameter Name="VIRTUAL_CODE_PAGE" Type="uniqueElementList" Comment="VIRTUAL_CODE_PAGE" DefaultValue="12345" Group="Locale and Namespace Parameters" TabName="Set Defines" Visible="false">
+        <PossibleValue Comment="Value 12345" Value="12345"/> <!-- dummy value for default case (cannot match anything in config file, which is the goal)-->  
+    </RefParameter>
+
+    <RefParameter Name="FF_CODE_PAGE" Comment="CODE_PAGE (Code page on target)" DefaultValue="932" Type="list" Group="Locale and Namespace Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="FATFS_version=15"/>
+        <PossibleValue Comment="All code pages included" Value="0"/>
+        <PossibleValue Comment="U.S." Value="437"/>
+        <PossibleValue Comment="Arabic" Value="720"/>
+        <PossibleValue Comment="Greek" Value="737"/>
+        <PossibleValue Comment="KBL" Value="771"/>
+        <PossibleValue Comment="Baltic" Value="775"/>
+        <PossibleValue Comment="Latin 1" Value="850"/>
+        <PossibleValue Comment="Latin 2" Value="852"/>
+        <PossibleValue Comment="Cyrillic" Value="855"/>
+        <PossibleValue Comment="Turkish" Value="857"/>
+        <PossibleValue Comment="Portuguese" Value="860"/>
+        <PossibleValue Comment="Icelandic" Value="861"/>
+        <PossibleValue Comment="Hebrew" Value="862"/>
+        <PossibleValue Comment="Canadian French" Value="863"/>
+        <PossibleValue Comment="Arabic" Value="864"/>
+        <PossibleValue Comment="Nordic" Value="865"/>		
+        <PossibleValue Comment="Russian" Value="866"/>
+        <PossibleValue Comment="Greek 2" Value="869"/>		
+        <PossibleValue Comment="Japanese (DBCS)" Value="932"/>	
+        <PossibleValue Comment="Simplified Chinese (DBCS)" Value="936"/>
+        <PossibleValue Comment="Korean (DBCS)" Value="949"/>
+        <PossibleValue Comment="Traditional Chinese (DBCS)" Value="950"/>
+        <Description>The CODE_PAGE specifies the OEM code page to be used on the target system. 
+                     Incorrect setting of the code page can cause a file open failure.
+        </Description>
+    </RefParameter>
+    <RefParameter Name="FF_CODE_PAGE" Comment="CODE_PAGE (Code page on target)" DefaultValue="850" Type="list" Group="Locale and Namespace Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="FATFS_version=12 &amp; FF_USE_LFN=0"/>
+        <PossibleValue Comment="ASCII only" Value="1"/>
+        <PossibleValue Comment="U.S." Value="437"/>
+        <PossibleValue Comment="Arabic" Value="720"/>
+        <PossibleValue Comment="Greek" Value="737"/>
+        <PossibleValue Comment="KBL" Value="771"/>
+        <PossibleValue Comment="Baltic" Value="775"/>
+        <PossibleValue Comment="Latin 1" Value="850"/>
+        <PossibleValue Comment="Latin 2" Value="852"/>
+        <PossibleValue Comment="Cyrillic" Value="855"/>
+        <PossibleValue Comment="Turkish" Value="857"/>
+        <PossibleValue Comment="Portuguese" Value="860"/>
+        <PossibleValue Comment="Icelandic" Value="861"/>
+        <PossibleValue Comment="Hebrew" Value="862"/>
+        <PossibleValue Comment="Canadian French" Value="863"/>
+        <PossibleValue Comment="Arabic" Value="864"/>
+        <PossibleValue Comment="Nordic" Value="865"/>		
+        <PossibleValue Comment="Russian" Value="866"/>
+        <PossibleValue Comment="Greek 2" Value="869"/>		
+        <PossibleValue Comment="Japanese (DBCS)" Value="932"/>	
+        <PossibleValue Comment="Simplified Chinese (DBCS)" Value="936"/>
+        <PossibleValue Comment="Korean (DBCS)" Value="949"/>
+        <PossibleValue Comment="Traditional Chinese (DBCS)" Value="950"/>
+        <Description>The CODE_PAGE specifies the OEM code page to be used on the target system. 
+                     Incorrect setting of the code page can cause a file open failure.&lt;br&gt;
+                     &lt;b&gt; Dependencies&lt;/b&gt;: CODE_PAGE = 1 (ASCII only) possible as USE_LFN = 0 (Disabled).
+        </Description>
+    </RefParameter>
+    <RefParameter Name="FF_CODE_PAGE" Comment="CODE_PAGE (Code page on target)" DefaultValue="850" Type="list" Group="Locale and Namespace Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="FATFS_version=12"/>
+        <PossibleValue Comment="U.S." Value="437"/>
+        <PossibleValue Comment="Arabic" Value="720"/>
+        <PossibleValue Comment="Greek" Value="737"/>
+        <PossibleValue Comment="KBL" Value="771"/>
+        <PossibleValue Comment="Baltic" Value="775"/>
+        <PossibleValue Comment="Latin 1" Value="850"/>
+        <PossibleValue Comment="Latin 2" Value="852"/>
+        <PossibleValue Comment="Cyrillic" Value="855"/>
+        <PossibleValue Comment="Turkish" Value="857"/>
+        <PossibleValue Comment="Portuguese" Value="860"/>
+        <PossibleValue Comment="Icelandic" Value="861"/>
+        <PossibleValue Comment="Hebrew" Value="862"/>
+        <PossibleValue Comment="Canadian French" Value="863"/>
+        <PossibleValue Comment="Arabic" Value="864"/>
+        <PossibleValue Comment="Nordic" Value="865"/>		
+        <PossibleValue Comment="Russian" Value="866"/>
+        <PossibleValue Comment="Greek 2" Value="869"/>		
+        <PossibleValue Comment="Japanese (DBCS)" Value="932"/>	
+        <PossibleValue Comment="Simplified Chinese (DBCS)" Value="936"/>
+        <PossibleValue Comment="Korean (DBCS)" Value="949"/>
+        <PossibleValue Comment="Traditional Chinese (DBCS)" Value="950"/>
+        <Description>The CODE_PAGE specifies the OEM code page to be used on the target system. 
+                     Incorrect setting of the code page can cause a file open failure.&lt;br&gt;
+                     &lt;b&gt; Dependencies&lt;/b&gt;: CODE_PAGE = 1 (ASCII only) possible as USE_LFN = 0 (Disabled).
+        </Description>
+    </RefParameter>	
+    <RefParameter Name="FF_CODE_PAGE" Comment="CODE_PAGE (Code page on target)" DefaultValue="850" Type="list" Group="Locale and Namespace Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="FF_USE_LFN=0"/>
+        <PossibleValue Comment="ASCII only" Value="1"/>
+        <PossibleValue Comment="U.S.(OEM)" Value="437"/>
+        <PossibleValue Comment="Arabic (OEM)" Value="720"/>
+        <PossibleValue Comment="Greek (OEM)" Value="737"/>
+        <PossibleValue Comment="Baltic (OEM)" Value="775"/>
+        <PossibleValue Comment="Multilingual Latin 1 (OEM)" Value="850"/>
+        <PossibleValue Comment="Latin 2 (OEM)" Value="852"/>
+        <PossibleValue Comment="Cyrillic (OEM)" Value="855"/>
+        <PossibleValue Comment="Turkish (OEM)" Value="857"/>
+        <PossibleValue Comment="Multilingual Latin 1 + Euro (OEM)" Value="858"/>
+        <PossibleValue Comment="Hebrew (OEM)" Value="862"/>
+        <PossibleValue Comment="Russian (OEM)" Value="866"/>
+        <PossibleValue Comment="Thai (OEM, Windows)" Value="874"/>
+        <PossibleValue Comment="Japanese Shift-JIS (DBCS, OEM, Windows)" Value="932"/>	
+        <PossibleValue Comment="Simplified Chinese GBK (DBCS, OEM, Windows)" Value="936"/>
+        <PossibleValue Comment="Korean (DBCS, OEM, Windows)" Value="949"/>
+        <PossibleValue Comment="Traditional Chinese Big5 (DBCS, OEM, Windows)" Value="950"/>
+        <PossibleValue Comment="Central Europe (Windows)" Value="1250"/>
+        <PossibleValue Comment="Cyrillic (Windows)" Value="1251"/>
+        <PossibleValue Comment="Latin 1 (Windows)" Value="1252"/>
+        <PossibleValue Comment="Greek (Windows)" Value="1253"/>
+        <PossibleValue Comment="Turkish (Windows)" Value="1254"/>
+        <PossibleValue Comment="Hebrew (Windows)" Value="1255"/>
+        <PossibleValue Comment="Arabic (Windows)" Value="1256"/>
+        <PossibleValue Comment="Baltic (Windows)" Value="1257"/>
+        <PossibleValue Comment="Vietnam (OEM, Windows)" Value="1258"/>
+        <Description>The CODE_PAGE specifies the OEM code page to be used on the target system. 
+                 Incorrect setting of the code page can cause a file open failure.
+                 &lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: CODE_PAGE = 1 (ASCII only) possible as USE_LFN = 0 (Disabled).
+        </Description>
+    </RefParameter>
+    <RefParameter Name="FF_CODE_PAGE" Comment="CODE_PAGE (Code page on target)" DefaultValue="850" Type="list" Group="Locale and Namespace Parameters" TabName="Set Defines">
+        <PossibleValue Comment="U.S.(OEM)" Value="437"/>
+        <PossibleValue Comment="Arabic (OEM)" Value="720"/>
+        <PossibleValue Comment="Greek (OEM)" Value="737"/>
+        <PossibleValue Comment="Baltic (OEM)" Value="775"/>
+        <PossibleValue Comment="Multilingual Latin 1 (OEM)" Value="850"/>
+        <PossibleValue Comment="Latin 2 (OEM)" Value="852"/>
+        <PossibleValue Comment="Cyrillic (OEM)" Value="855"/>
+        <PossibleValue Comment="Turkish (OEM)" Value="857"/>
+        <PossibleValue Comment="Multilingual Latin 1 + Euro (OEM)" Value="858"/>
+        <PossibleValue Comment="Hebrew (OEM)" Value="862"/>
+        <PossibleValue Comment="Russian (OEM)" Value="866"/>
+        <PossibleValue Comment="Thai (OEM, Windows)" Value="874"/>
+        <PossibleValue Comment="Japanese Shift-JIS (DBCS, OEM, Windows)" Value="932"/>	
+        <PossibleValue Comment="Simplified Chinese GBK (DBCS, OEM, Windows)" Value="936"/>
+        <PossibleValue Comment="Korean (DBCS, OEM, Windows)" Value="949"/>
+        <PossibleValue Comment="Traditional Chinese Big5 (DBCS, OEM, Windows)" Value="950"/>
+        <PossibleValue Comment="Central Europe (Windows)" Value="1250"/>
+        <PossibleValue Comment="Cyrillic (Windows)" Value="1251"/>
+        <PossibleValue Comment="Latin 1 (Windows)" Value="1252"/>
+        <PossibleValue Comment="Greek (Windows)" Value="1253"/>
+        <PossibleValue Comment="Turkish (Windows)" Value="1254"/>
+        <PossibleValue Comment="Hebrew (Windows)" Value="1255"/>
+        <PossibleValue Comment="Arabic (Windows)" Value="1256"/>
+        <PossibleValue Comment="Baltic (Windows)" Value="1257"/>
+        <PossibleValue Comment="Vietnam (OEM, Windows)" Value="1258"/>
+        <Description>The CODE_PAGE specifies the OEM code page to be used on the target system. 
+                     Incorrect setting of the code page can cause a file open failure.
+                     &lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: CODE_PAGE = 1 (ASCII only) not possible: it requires USE_LFN = 0 (Disabled).
+        </Description>
+    </RefParameter>
+
+    <RefParameter Name="FF_USE_LFN" Comment="FF_USE_LFN (Use Long Filename)" DefaultValue="3" Type="list" Group="Locale and Namespace Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="(FF_LFN_UNICODE &gt; 0) &amp; (!FF_FS_REENTRANT)"/>
+        <PossibleValue Comment="Enabled with static working buffer on the BSS" Value="1" Semaphore="S_USE_LFN_1"/>
+        <PossibleValue Comment="Enabled with dynamic working buffer on the STACK" Value="2"/>
+        <PossibleValue Comment="Enabled with dynamic working buffer on the HEAP" Value="3"/>
+        <Description>The USE_LFN option switches the LFN feature.&lt;br&gt;
+                     - 0: Disable LFN feature. MAX_LFN has no effect.&lt;br&gt;
+                     - 1: Enable LFN with static working buffer on the BSS. Always NOT reentrant.&lt;br&gt;
+                     - 2: Enable LFN with dynamic working buffer on the STACK.&lt;br&gt;
+                     - 3: Enable LFN with dynamic working buffer on the HEAP.&lt;br&gt;
+                     To enable LFN feature, Unicode handling functions ff_convert() and ff_wtoupper() function must be added to the project.&lt;br&gt;
+                     The LFN working buffer occupies (MAX_LFN + 1) * 2 bytes. When use stack for the working buffer, take care on stack overflow. &lt;br&gt;
+                     When use heap memory for the working buffer, memory management functions, ff_memalloc() and ff_memfree(), must be added to the project.&lt;br&gt;
+                     &lt;b&gt;Dependency&lt;/b&gt;: &lt;br&gt;
+                     USE_LFN = 0 (Disabled) not possible : it requires LFN_UNICODE = 0 (ANSI/OEM).
+        </Description>
+    </RefParameter>
+
+    <RefParameter Name="FF_USE_LFN" Comment="FF_USE_LFN (Use Long Filename)" DefaultValue="3" Type="list" Group="Locale and Namespace Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="(FF_LFN_UNICODE &gt; 0) &amp; (FF_FS_REENTRANT)"/>
+        <PossibleValue Comment="Enabled with static working buffer on the BSS" Value="1" Semaphore="S_USE_LFN_1"/>
+        <PossibleValue Comment="Enabled with dynamic working buffer on the STACK" Value="2"/>
+        <PossibleValue Comment="Enabled with dynamic working buffer on the HEAP" Value="3"/>
+        <Description>The USE_LFN option switches the LFN feature.&lt;br&gt;
+                     - 0: Disable LFN feature. MAX_LFN has no effect.&lt;br&gt;
+                     - 1: Enable LFN with static working buffer on the BSS. Always NOT reentrant.&lt;br&gt;
+                     - 2: Enable LFN with dynamic working buffer on the STACK.&lt;br&gt;
+                     - 3: Enable LFN with dynamic working buffer on the HEAP.&lt;br&gt;
+                     To enable LFN feature, Unicode handling functions ff_convert() and ff_wtoupper() function must be added to the project.&lt;br&gt;
+                     The LFN working buffer occupies (MAX_LFN + 1) * 2 bytes. When use stack for the working buffer, take care on stack overflow. &lt;br&gt;
+                     When use heap memory for the working buffer, memory management functions, ff_memalloc() and ff_memfree(), must be added to the project.&lt;br&gt;
+                     &lt;b&gt; Dependencies&lt;/b&gt;: &lt;br&gt;
+                     1) USE_LFN = 0 (Disabled) not possible : it requires LFN_UNICODE = 0 (ANSI/OEM). &lt;br&gt;
+                     2) USE_LFN = 1 (Enabled with static working buffer on the BSS) not possible when FF_FS_REENTRANT = 1 (Enabled).
+        </Description>
+	</RefParameter>
+
+    <RefParameter Name="FF_USE_LFN" Comment="FF_USE_LFN (Use Long Filename)" DefaultValue="0" Type="list" Group="Locale and Namespace Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="(FF_LFN_UNICODE = 0) &amp; (FF_FS_REENTRANT)"/>
+		<PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled with static working buffer on the BSS" Value="1" Semaphore="S_USE_LFN_1"/>
+		<PossibleValue Comment="Enabled with dynamic working buffer on the STACK" Value="2"/>
+		<PossibleValue Comment="Enabled with dynamic working buffer on the HEAP" Value="3"/>
+        <Description>The USE_LFN option switches the LFN feature.&lt;br&gt;
+                     - 0: Disable LFN feature. MAX_LFN has no effect.&lt;br&gt;
+                     - 1: Enable LFN with static working buffer on the BSS. Always NOT reentrant.&lt;br&gt;
+                     - 2: Enable LFN with dynamic working buffer on the STACK.&lt;br&gt;
+                     - 3: Enable LFN with dynamic working buffer on the HEAP.&lt;br&gt;
+                     To enable LFN feature, Unicode handling functions ff_convert() and ff_wtoupper() function must be added to the project.&lt;br&gt;
+                     The LFN working buffer occupies (MAX_LFN + 1) * 2 bytes. When use stack for the working buffer, take care on stack overflow. &lt;br&gt;
+                     When use heap memory for the working buffer, memory management functions, ff_memalloc() and ff_memfree(), must be added to the project.
+                     &lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: &lt;br&gt;
+                     USE_LFN = 1 (Enabled with static working buffer on the BSS) not possible when FF_FS_REENTRANT = 1 (Enabled).
+        </Description>
+    </RefParameter>
+
+    <RefParameter Name="FF_USE_LFN" Comment="FF_USE_LFN (Use Long Filename)" DefaultValue="0" Type="list" Group="Locale and Namespace Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="FF_FS_REENTRANT"/>
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled with static working buffer on the BSS" Value="1" Semaphore="S_USE_LFN_1"/>
+        <PossibleValue Comment="Enabled with dynamic working buffer on the STACK" Value="2"/>
+        <PossibleValue Comment="Enabled with dynamic working buffer on the HEAP" Value="3" Semaphore="S_USE_LFN_3_FS_REENTRANT"/>
+        <Description>The USE_LFN option switches the LFN feature.&lt;br&gt;
+                     - 0: Disable LFN feature. MAX_LFN has no effect.&lt;br&gt;
+                     - 1: Enable LFN with static working buffer on the BSS. Always NOT reentrant.&lt;br&gt;
+                     - 2: Enable LFN with dynamic working buffer on the STACK.&lt;br&gt;
+                     - 3: Enable LFN with dynamic working buffer on the HEAP.&lt;br&gt;
+                     To enable LFN feature, Unicode handling functions ff_convert() and ff_wtoupper() function must be added to the project.&lt;br&gt;
+                     The LFN working buffer occupies (MAX_LFN + 1) * 2 bytes. When use stack for the working buffer, take care on stack overflow. &lt;br&gt;
+                     When use heap memory for the working buffer, memory management functions, ff_memalloc() and ff_memfree(), must be added to the project.
+                     &lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: &lt;br&gt;
+                     All choices available as FF_FS_REENTRANT = 0 (disabled) and LFN_UNICODE = 0 (ANSI/OEM).
+        </Description>
+    </RefParameter>
+    <RefParameter Name="FF_USE_LFN" Comment="FF_USE_LFN (Use Long Filename)" DefaultValue="0" Type="list" Group="Locale and Namespace Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="!FF_FS_REENTRANT"/>
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled with static working buffer on the BSS" Value="1" Semaphore="S_USE_LFN_1"/>
+        <PossibleValue Comment="Enabled with dynamic working buffer on the STACK" Value="2"/>
+        <PossibleValue Comment="Enabled with dynamic working buffer on the HEAP" Value="3" Semaphore="S_USE_LFN_3_FS_Not_REENTRANT"/>
+        <Description>The USE_LFN option switches the LFN feature.&lt;br&gt;
+                     - 0: Disable LFN feature. MAX_LFN has no effect.&lt;br&gt;
+                     - 1: Enable LFN with static working buffer on the BSS. Always NOT reentrant.&lt;br&gt;
+                     - 2: Enable LFN with dynamic working buffer on the STACK.&lt;br&gt;
+                     - 3: Enable LFN with dynamic working buffer on the HEAP.&lt;br&gt;
+                     To enable LFN feature, Unicode handling functions ff_convert() and ff_wtoupper() function must be added to the project.&lt;br&gt;
+                     The LFN working buffer occupies (MAX_LFN + 1) * 2 bytes. When use stack for the working buffer, take care on stack overflow. &lt;br&gt;
+                     When use heap memory for the working buffer, memory management functions, ff_memalloc() and ff_memfree(), must be added to the project.
+                     &lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: &lt;br&gt;
+                     All choices available as FF_FS_REENTRANT = 0 (disabled) and LFN_UNICODE = 0 (ANSI/OEM).
+        </Description>
+    </RefParameter>
+    <RefParameter Name="FF_USE_LFN" Comment="FF_USE_LFN (Use Long Filename)" DefaultValue="0" Type="list" Group="Locale and Namespace Parameters" TabName="Set Defines">
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled with static working buffer on the BSS" Value="1" Semaphore="S_USE_LFN_1"/>
+        <PossibleValue Comment="Enabled with dynamic working buffer on the STACK" Value="2"/>
+        <PossibleValue Comment="Enabled with dynamic working buffer on the HEAP" Value="3"/>
+        <Description>The USE_LFN option switches the LFN feature.&lt;br&gt;
+                     - 0: Disable LFN feature. MAX_LFN has no effect.&lt;br&gt;
+                     - 1: Enable LFN with static working buffer on the BSS. Always NOT reentrant.&lt;br&gt;
+                     - 2: Enable LFN with dynamic working buffer on the STACK.&lt;br&gt;
+                     - 3: Enable LFN with dynamic working buffer on the HEAP.&lt;br&gt;
+                     To enable LFN feature, Unicode handling functions ff_convert() and ff_wtoupper() function must be added to the project.&lt;br&gt;
+                     The LFN working buffer occupies (MAX_LFN + 1) * 2 bytes. When use stack for the working buffer, take care on stack overflow. &lt;br&gt;
+                     When use heap memory for the working buffer, memory management functions, ff_memalloc() and ff_memfree(), must be added to the project.
+                     &lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: &lt;br&gt;
+                     All choices available as FF_FS_REENTRANT = 0 (disabled) and LFN_UNICODE = 0 (ANSI/OEM).
+        </Description>
+    </RefParameter>
+
+    <RefParameter Name="FF_MAX_LFN" Comment="MAX_LFN (Max Long Filename)" DefaultValue="255" Max="255" Min="12"  Type="integer" Group="Locale and Namespace Parameters" TabName="Set Defines">
+        <Description>Maximum LFN length to handle.</Description>
+    </RefParameter>
+    <!-- Change for R0.13b (three values for Unicode) -->
+    <RefParameter Name="FF_LFN_UNICODE" Comment="LFN_UNICODE (Enable Unicode)" DefaultValue="0" Type="list" Group="Locale and Namespace Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="!(FF_USE_LFN = 0) &amp; (FATFS_version &gt; 12)"/>
+        <PossibleValue Comment="ANSI/OEM in current CP (TCHAR = char)" Value="0"/>
+        <PossibleValue Comment="Unicode in UTF-16 (TCHAR = WCHAR)" Value="1"/>
+        <PossibleValue Comment="Unicode in UTF-8 (TCHAR = char)" Value="2"/>
+        <PossibleValue Comment="Unicode in UTF-32 (TCHAR = DWORD)" Value="3"/>
+        <Description>This option switches the character encoding on the API when LFN is enabled (FF_USE_LFN = 1).</Description>
+    </RefParameter>
+    <RefParameter Name="FF_LFN_UNICODE" Comment="LFN_UNICODE (Enable Unicode)" DefaultValue="0" Type="list" Group="Locale and Namespace Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="!(FF_USE_LFN = 0) "/>
+        <PossibleValue Comment="ANSI/OEM" Value="0"/>
+        <PossibleValue Comment="Unicode in UTF-16" Value="1"/>
+        <PossibleValue Comment="Unicode in UTF-8" Value="2"/>
+        <PossibleValue Comment="Unicode in UTF-32" Value="3"/>
+        <Description>To switch the character encoding on the FatFs API to Unicode, enable LFN feature (USE_LFN set to Enabled) and set LFN_UNICODE to 1 (Unicode).</Description>
+    </RefParameter>
+    <RefParameter Name="FF_LFN_UNICODE" Comment="LFN_UNICODE (Enable Unicode)" DefaultValue="0" Type="list" Group="Locale and Namespace Parameters" TabName="Set Defines">
+        <PossibleValue Comment="ANSI/OEM" Value="0"/>
+        <Description>To switch the character encoding on the FatFs API to Unicode, enable LFN feature (USE_LFN set to Enabled) and set LFN_UNICODE to 1 (Unicode). &lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;:&lt;br&gt;Must be set to 0 (ANSI/OEM) as USE_LFN is set to 0 (Disabled)</Description>
+    </RefParameter>
+
+    <RefParameter Name="FF_STRF_ENCODE" Comment="STRF_ENCODE (Character encoding)" DefaultValue="3" Type="list" Group="Locale and Namespace Parameters" TabName="Set Defines">
+        <PossibleValue Comment="ANSI/OEM" Value="0"/>
+        <PossibleValue Comment="UTF-16LE" Value="1"/>
+        <PossibleValue Comment="UTF-16BE" Value="2"/>
+        <PossibleValue Comment="UTF-8" Value="3"/>
+        <Description>When Unicode API is enabled, character encoding on the all FatFs API is switched to Unicode.&lt;br&gt; STRF_ENCODE option selects the character encoding on the file to be read/written via string functions, f_gets(), f_putc(), f_puts and f_printf().&lt;br&gt; - 0: Read/Write a character in ANSI/OEM.&lt;br&gt; - 1: Read/Write a character in UTF-16LE.&lt;br&gt; - 2: Read/Write a character in UTF-16BE,&lt;br&gt; - 3: Read/Write a character in UTF-8&lt;br&gt; &lt;b&gt;Dependency&lt;/b&gt;: This option has no effect when LFN_UNICODE is 0 (ANSI/OEM).</Description>
+    </RefParameter>
+
+    <RefParameter Name="FF_FS_RPATH" Comment="FS_RPATH (Relative Path)" DefaultValue="0" Type="list" Group="Locale and Namespace Parameters" TabName="Set Defines">
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled without f_getcwd" Value="1"/>
+        <PossibleValue Comment="Enabled with f_getcwd" Value="2"/>
+        <Description>The FS_RPATH option configures relative path feature.&lt;br&gt; - 0: Disable relative path feature and remove related functions.&lt;br&gt; - 1: Enable relative path. f_chdrive() and f_chdir() function are available.&lt;br&gt; - 2: f_getcwd() function is available in addition to 1.&lt;br&gt; Note that output of the f_readdir() function is affected by this option.</Description>
+    </RefParameter>
+
+    <RefParameter Name="FF_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="5" Max="=MAX_VOLUMES_VALUE" Min="5"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="S_FATFS_SDIO &amp; S_FATFS_SDRAM &amp; S_FATFS_USB &amp; S_FATFS_SRAM &amp; S_FATFS_Generic"/>
+        <Description>Number of volumes (logical drives) to be used.</Description>
+    </RefParameter>
+    <RefParameter Name="FF_LBA64" Comment="Logical Block Addressing (LBA64)" DefaultValue="0" Max="1" Min="0"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+        <Description>Support for 64-bit LBA (Logical Block Addressing).</Description>
+    </RefParameter>
+    <RefParameter Name="FF_MIN_GPT" Comment="MIN_GPT" DefaultValue="0x10000000" Max="0x100000000" Type="hex" Group="Physical Drive Parameters" TabName="Set Defines">
+        <Condition Diagnostic="Requires: FF_LBA64 = 1" Expression="FF_LBA64 = 1"/>
+        <Description>Minimum number of sectors to switch GPT format to create partition in f_mkfs() and f_fdisk().</Description>
+    </RefParameter>
+
+    <RefParameter Name="FF_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="4" Max="=MAX_VOLUMES_VALUE" Min="4"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="S_FATFS_SDIO &amp; S_FATFS_SDRAM &amp; S_FATFS_USB &amp; S_FATFS_SRAM &amp; !S_FATFS_Generic"/>
+        <Description>Number of volumes (logical drives) to be used.</Description>
+    </RefParameter>
+    <RefParameter Name="FF_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="4" Max="=MAX_VOLUMES_VALUE" Min="4"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="S_FATFS_SDIO &amp; S_FATFS_SDRAM &amp; S_FATFS_USB &amp; !S_FATFS_SRAM &amp; S_FATFS_Generic"/>
+        <Description>Number of volumes (logical drives) to be used.</Description>
+    </RefParameter>
+    <RefParameter Name="FF_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="4" Max="=MAX_VOLUMES_VALUE" Min="4"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="S_FATFS_SDIO &amp; S_FATFS_SDRAM &amp; !S_FATFS_USB &amp; S_FATFS_SRAM &amp; S_FATFS_Generic"/>
+        <Description>Number of volumes (logical drives) to be used.</Description>
+    </RefParameter>
+    <RefParameter Name="FF_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="4" Max="=MAX_VOLUMES_VALUE" Min="4"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="S_FATFS_SDIO &amp; !S_FATFS_SDRAM &amp; S_FATFS_USB &amp; S_FATFS_SRAM &amp; S_FATFS_Generic"/>
+        <Description>Number of volumes (logical drives) to be used.</Description>
+    </RefParameter>
+    <RefParameter Name="FF_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="4" Max="=MAX_VOLUMES_VALUE" Min="4"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="!S_FATFS_SDIO &amp; S_FATFS_SDRAM &amp; S_FATFS_USB &amp; S_FATFS_SRAM &amp; S_FATFS_Generic"/>
+        <Description>Number of volumes (logical drives) to be used.</Description>
+    </RefParameter>
+
+    <RefParameter Name="FF_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="3" Max="=MAX_VOLUMES_VALUE" Min="3"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="S_FATFS_SDIO &amp; S_FATFS_SDRAM &amp; S_FATFS_USB &amp; !S_FATFS_SRAM &amp; !S_FATFS_Generic"/>
+        <Description>Number of volumes (logical drives) to be used.</Description>
+    </RefParameter>
+    <RefParameter Name="FF_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="3" Max="=MAX_VOLUMES_VALUE" Min="3"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="S_FATFS_SDIO &amp; S_FATFS_SDRAM &amp; !S_FATFS_USB &amp; !S_FATFS_SRAM &amp; S_FATFS_Generic"/>
+        <Description>Number of volumes (logical drives) to be used.</Description>
+    </RefParameter>
+    <RefParameter Name="FF_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="3" Max="=MAX_VOLUMES_VALUE" Min="3"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="S_FATFS_SDIO &amp; !S_FATFS_SDRAM &amp; !S_FATFS_USB &amp; S_FATFS_SRAM &amp; S_FATFS_Generic"/>
+        <Description>Number of volumes (logical drives) to be used.</Description>
+    </RefParameter>
+    <RefParameter Name="FF_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="3" Max="=MAX_VOLUMES_VALUE" Min="3"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="!S_FATFS_SDIO &amp; !S_FATFS_SDRAM &amp; S_FATFS_USB &amp; S_FATFS_SRAM &amp; S_FATFS_Generic"/>
+        <Description>Number of volumes (logical drives) to be used.</Description>
+    </RefParameter>
+    <RefParameter Name="FF_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="3" Max="=MAX_VOLUMES_VALUE" Min="3"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="!S_FATFS_SDIO &amp; S_FATFS_SDRAM &amp; !S_FATFS_USB &amp; S_FATFS_SRAM &amp; S_FATFS_Generic"/>
+        <Description>Number of volumes (logical drives) to be used.</Description>
+    </RefParameter>
+    <RefParameter Name="FF_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="3" Max="=MAX_VOLUMES_VALUE" Min="3"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="!S_FATFS_SDIO &amp; S_FATFS_SDRAM &amp; S_FATFS_USB &amp; !S_FATFS_SRAM &amp; S_FATFS_Generic"/>
+        <Description>Number of volumes (logical drives) to be used.</Description>
+    </RefParameter>
+    <RefParameter Name="FF_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="3" Max="=MAX_VOLUMES_VALUE" Min="3"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="!S_FATFS_SDIO &amp; S_FATFS_SDRAM &amp; S_FATFS_USB &amp; S_FATFS_SRAM &amp; !S_FATFS_Generic"/>
+        <Description>Number of volumes (logical drives) to be used.</Description>
+    </RefParameter>		
+    <RefParameter Name="FF_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="3" Max="=MAX_VOLUMES_VALUE" Min="3"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="S_FATFS_SDIO &amp; !S_FATFS_SDRAM &amp; S_FATFS_USB &amp; !S_FATFS_SRAM &amp; S_FATFS_Generic"/>
+        <Description>Number of volumes (logical drives) to be used.</Description>
+    </RefParameter>		
+    <RefParameter Name="FF_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="3" Max="=MAX_VOLUMES_VALUE" Min="3"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="S_FATFS_SDIO &amp; !S_FATFS_SDRAM &amp; S_FATFS_USB &amp; S_FATFS_SRAM &amp; !S_FATFS_Generic"/>
+        <Description>Number of volumes (logical drives) to be used.</Description>
+    </RefParameter>		
+    <RefParameter Name="FF_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="3" Max="=MAX_VOLUMES_VALUE" Min="3"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="S_FATFS_SDIO &amp; S_FATFS_SDRAM &amp; !S_FATFS_USB &amp; S_FATFS_SRAM &amp; !S_FATFS_Generic"/>
+        <Description>Number of volumes (logical drives) to be used.</Description>
+    </RefParameter>		
+
+    <RefParameter Name="FF_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="2" Max="=MAX_VOLUMES_VALUE" Min="2"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="!S_FATFS_SDIO &amp; !S_FATFS_SDRAM &amp; !S_FATFS_USB &amp; S_FATFS_SRAM &amp; S_FATFS_Generic"/>
+        <Description>Number of volumes (logical drives) to be used.</Description>
+    </RefParameter>
+    <RefParameter Name="FF_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="2" Max="=MAX_VOLUMES_VALUE" Min="2"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="!S_FATFS_SDIO &amp; !S_FATFS_SDRAM &amp; S_FATFS_USB &amp; S_FATFS_SRAM &amp; !S_FATFS_Generic"/>
+        <Description>Number of volumes (logical drives) to be used.</Description>
+    </RefParameter>
+    <RefParameter Name="FF_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="2" Max="=MAX_VOLUMES_VALUE" Min="2"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="!S_FATFS_SDIO &amp; S_FATFS_SDRAM &amp; S_FATFS_USB &amp; !S_FATFS_SRAM &amp; !S_FATFS_Generic"/>
+        <Description>Number of volumes (logical drives) to be used.</Description>
+    </RefParameter>
+    <RefParameter Name="FF_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="2" Max="=MAX_VOLUMES_VALUE" Min="2"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="S_FATFS_SDIO &amp; S_FATFS_SDRAM &amp; !S_FATFS_USB &amp; !S_FATFS_SRAM &amp; !S_FATFS_Generic"/>
+        <Description>Number of volumes (logical drives) to be used.</Description>
+    </RefParameter>
+    <RefParameter Name="FF_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="2" Max="=MAX_VOLUMES_VALUE" Min="2"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="S_FATFS_SDIO &amp; !S_FATFS_SDRAM &amp; S_FATFS_USB &amp; !S_FATFS_SRAM &amp; !S_FATFS_Generic"/>
+        <Description>Number of volumes (logical drives) to be used.</Description>
+    </RefParameter>	
+    <RefParameter Name="FF_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="2" Max="=MAX_VOLUMES_VALUE" Min="2"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="S_FATFS_SDIO &amp; !S_FATFS_SDRAM &amp; !S_FATFS_USB &amp; S_FATFS_SRAM &amp; !S_FATFS_Generic"/>
+        <Description>Number of volumes (logical drives) to be used.</Description>
+    </RefParameter>	
+    <RefParameter Name="FF_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="2" Max="=MAX_VOLUMES_VALUE" Min="2"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="S_FATFS_SDIO &amp; !S_FATFS_SDRAM &amp; !S_FATFS_USB &amp; !S_FATFS_SRAM &amp; S_FATFS_Generic"/>
+        <Description>Number of volumes (logical drives) to be used.</Description>
+    </RefParameter>		
+    <RefParameter Name="FF_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="2" Max="=MAX_VOLUMES_VALUE" Min="2"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="!S_FATFS_SDIO &amp; S_FATFS_SDRAM &amp; !S_FATFS_USB &amp; S_FATFS_SRAM &amp; !S_FATFS_Generic"/>
+        <Description>Number of volumes (logical drives) to be used.</Description>
+    </RefParameter>		
+    <RefParameter Name="FF_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="2" Max="=MAX_VOLUMES_VALUE" Min="2"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="!S_FATFS_SDIO &amp; S_FATFS_SDRAM &amp; !S_FATFS_USB &amp; !S_FATFS_SRAM &amp; S_FATFS_Generic"/>
+        <Description>Number of volumes (logical drives) to be used.</Description>
+    </RefParameter>		
+    <RefParameter Name="FF_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="2" Max="=MAX_VOLUMES_VALUE" Min="2"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+        <Condition Diagnostic="" Expression="!S_FATFS_SDIO &amp; !S_FATFS_SDRAM &amp; S_FATFS_USB &amp; !S_FATFS_SRAM &amp; S_FATFS_Generic"/>
+        <Description>Number of volumes (logical drives) to be used.</Description>
+    </RefParameter>		
+
+    <RefParameter Name="FF_VOLUMES" Comment="VOLUMES (Logical drives)" DefaultValue="1" Max="=MAX_VOLUMES_VALUE" Min="1"  Type="integer" Group="Physical Drive Parameters" TabName="Set Defines">
+        <Description>Number of volumes (logical drives) to be used.</Description>
+    </RefParameter>
+
+    <RefParameter Name="FF_MAX_SS" Comment="MAX_SS (Maximum Sector Size)" DefaultValue="512" Type="list" Group="Physical Drive Parameters" TabName="Set Defines">
+        <PossibleValue Comment="512" Value="512"/>
+        <PossibleValue Comment="1024" Value="1024"/>
+        <PossibleValue Comment="2048" Value="2048"/>
+        <PossibleValue Comment="4096" Value="4096"/>
+        <Description>Maximum sector size to be handled.&lt;br&gt;
+                     Four possible values: 512, 1024, 2048, 4096.&lt;br&gt;
+                     Always set &lt;b&gt;512&lt;/b&gt; for memory card and hard disk but a larger value may be required for on-board flash memory, floppy disk and optical disk.&lt;br&gt; 
+                     When MAX_SS is larger than 512, it configures FatFs to variable sector size and GET_SECTOR_SIZE command must be implemented to the disk_ioctl() function.
+        </Description>
+    </RefParameter>
+
+	<!--  Tracker 316293 -->
+    <RefParameter Name="FF_MIN_SS" Comment="MIN_SS (Minimum Sector Size)" DefaultValue="512" Type="list" Group="Physical Drive Parameters" TabName="Set Defines">
+        <Condition Diagnostic="Four possible values: 512, 1024, 2048 and 4096."  Expression="FF_MAX_SS = 4096"/>
+        <PossibleValue Comment="512" Value="512"/>
+        <PossibleValue Comment="1024" Value="1024"/>
+        <PossibleValue Comment="2048" Value="2048"/>
+        <PossibleValue Comment="4096" Value="4096"/>
+        <Description>Minimum sector size to be handled.&lt;br&gt; Note: must be less than or equal to FF_MAX_SS.</Description>
+    </RefParameter>
+    <RefParameter Name="FF_MIN_SS" Comment="MIN_SS (Minimum Sector Size)" DefaultValue="512" Type="list" Group="Physical Drive Parameters" TabName="Set Defines">
+        <Condition Diagnostic="Three possible values: 512, 1024 and 2048."  Expression="FF_MAX_SS = 2048"/>
+        <PossibleValue Comment="512" Value="512"/>
+        <PossibleValue Comment="1024" Value="1024"/>
+        <PossibleValue Comment="2048" Value="2048"/>
+        <Description>Minimum sector size to be handled.&lt;br&gt; Note: must be less than or equal to FF_MAX_SS.</Description>
+    </RefParameter>
+    <RefParameter Name="FF_MIN_SS" Comment="MIN_SS (Minimum Sector Size)" DefaultValue="512" Type="list" Group="Physical Drive Parameters" TabName="Set Defines">
+        <Condition Diagnostic="Two possible values: 512 and 1024."  Expression="FF_MAX_SS = 1024"/>
+        <PossibleValue Comment="512" Value="512"/>
+        <PossibleValue Comment="1024" Value="1024"/>
+        <Description>Minimum sector size to be handled.&lt;br&gt; Note: must be less than or equal to FF_MAX_SS.</Description>
+    </RefParameter>
+
+    <RefParameter Name="FF_MIN_SS" Comment="MIN_SS (Minimum Sector Size)" DefaultValue="512" Type="list" Group="Physical Drive Parameters" TabName="Set Defines">
+        <PossibleValue Comment="512" Value="512"/>
+        <Description>Minimum sector size to be handled.&lt;br&gt; Note: must be less than or equal to FF_MAX_SS.</Description>
+    </RefParameter>
+		
+    <RefParameter Name="FF_MULTI_PARTITION" Comment="MULTI_PARTITION (Volume partitions feature)" DefaultValue="0" Type="list" Group="Physical Drive Parameters" TabName="Set Defines">
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>When set to 0 (Disabled), each volume is bound to the same physical drive number and it can mount only first primaly partition. &lt;br&gt;
+		             When it is set to 1 (Enabled), each volume is tied to the partitions listed in VolToPart[].&lt;br&gt;
+		             &lt;b&gt;Warning: &lt;/b&gt; &lt;br&gt;
+		             The volToPart variable contains the "volume management table" defined by the user (&lt;b&gt;required&lt;/b&gt; when FF_MULTI_PARTITION != 0). &lt;br&gt;
+		             It is generated in a USER SECTION so that it can be completed by the user.
+        </Description>
+    </RefParameter>
+
+    <RefParameter Name="FF_USE_TRIM" Comment="USE_TRIM (Erase feature)" DefaultValue="0" Type="list" Group="Physical Drive Parameters" TabName="Set Defines">
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>This option switches ATA-TRIM feature. (0:Disable or 1:Enable) To enable Trim feature, also CTRL_TRIM command should be implemented to the disk_ioctl() function.</Description>
+    </RefParameter>
+
+    <RefParameter Name="FF_FS_NOFSINFO" Comment="FS_NOFSINFO (Force full FAT scan)" DefaultValue="0" Type="list" Group="Physical Drive Parameters" TabName="Set Defines">
+        <PossibleValue Comment="0" Value="0"/>
+        <PossibleValue Comment="1" Value="1"/>
+        <PossibleValue Comment="2" Value="2"/>
+        <PossibleValue Comment="3" Value="3"/>
+        <Description>If you need to know correct free space on the FAT32 volume, set bit 0 of this option and f_getfree() function at first time after volume mount will force a full FAT scan.&lt;br&gt;
+                     Bit 1 controls the last allocated cluster number as bit 0.&lt;br&gt;
+                      - bit0=0: Use free cluster count in the FSINFO if available.&lt;br&gt;
+                      - bit0=1: Do not trust free cluster count in the FSINFO.&lt;br&gt;
+                      - bit1=0: Use last allocated cluster number in the FSINFO if available. &lt;br&gt;
+                      - bit1=1: Do not trust last allocated cluster number in the FSINFO.
+        </Description>
+    </RefParameter>
+
+    <!-- FF_FS_TINY Moved to System parameters in R0.12 -->
+    <RefParameter Name="FF_FS_TINY" Comment="FS_TINY (Tiny mode)" DefaultValue="0" Type="list" Group="System Parameters" TabName="Set Defines">
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>When FS_TINY is set to 1, FatFs uses the sector buffer in the file system object instead of the sector buffer in the individual file object for file data transfer.&lt;br&gt;
+                     This reduces memory consumption 512 bytes each file object.
+        </Description>
+    </RefParameter>
+
+    <!--  New in Fatfs R0.11 -->
+    <RefParameter Name="FF_FS_NORTC" Comment="FS_NORTC (Timestamp feature)" DefaultValue="0" Type="list" Group="System Parameters" TabName="Set Defines">
+        <PossibleValue Comment="Fixed timestamp" Value="1"/>
+        <PossibleValue Comment="Dynamic timestamp" Value="0"/>
+        <Description>The FF_FS_NORTC option switches timestamp feature. &lt;br&gt;
+                     - If the system does not have an RTC function or valid timestamp is not needed, set FF_FS_NORTC to 1 (Fixed timestamp) to disable the timestamp feature. 
+                     All objects modified by FatFs will have a fixed timestamp defined by FF_NORTC_MON, FF_NORTC_MDAY and FF_NORTC_YEAR. &lt;br&gt;
+                     - When timestamp feature is enabled (Dynamic timestamp), get_fattime() function need to be added to the project to read current time form RTC and generate a timestamp. 
+                     FF_NORTC_MON, FF_NORTC_MDAY and FF_NORTC_YEAR have no effect. </Description>
+    </RefParameter>
+
+
+    <RefParameter Name="FF_NORTC_YEAR" Comment="      NORTC_YEAR (Year for timestamp)" DefaultValue="2018" Max="2107" Min="1980" Type="integer" Group="System Parameters" TabName="Set Defines">
+        <Condition Diagnostic="New default value since R0.13 version" Expression="(FF_FS_NORTC = 1) &amp; (FATFS_version &gt; 12)"/>
+        <Description>As FS_NORTC is enabled, it is the year part of the timestamps used by Fatfs. </Description>
+    </RefParameter>
+    <RefParameter Name="FF_NORTC_YEAR" Comment="      NORTC_YEAR (Year for timestamp)" DefaultValue="2015" Max="2107" Min="1980" Type="integer" Group="System Parameters" TabName="Set Defines">
+        <Condition Diagnostic="Available in CubeMx since R0.11 version" Expression="(FF_FS_NORTC = 1) &amp; !(FATFS_version &gt; 12)"/>
+        <Description>As FS_NORTC is enabled, it is the year part of the timestamps used by Fatfs. </Description>
+    </RefParameter>
+    <RefParameter Name="FF_NORTC_YEAR" Comment="      NORTC_YEAR (Year for timestamp)" DefaultValue="2015" Max="2107" Min="1980" Type="integer" Group="System Parameters" TabName="Set Defines" Visible="false">
+        <Description>Useless as FS_NORTC is disabled (otherwise, it is the year part of the timestamps used by Fatfs). </Description>
+    </RefParameter><!-- uniqueElementList removed in 5.5.0 -->
+
+    <RefParameter Name="FF_NORTC_MON" Comment="      NORTC_MON (Month for timestamp)" DefaultValue="1" Max="12" Min="1" Type="integer" Group="System Parameters" TabName="Set Defines">
+        <Condition Diagnostic="New default value since R0.13 version" Expression="(FF_FS_NORTC = 1) &amp; (FATFS_version &gt; 12)"/>
+        <Description>As FS_NORTC is enabled, it is the month part of the timestamps used by Fatfs.</Description>
+    </RefParameter>
+    <RefParameter Name="FF_NORTC_MON" Comment="      NORTC_MON (Month for timestamp)" DefaultValue="6" Max="12" Min="1" Type="integer" Group="System Parameters" TabName="Set Defines">
+        <Condition Diagnostic="Available in CubeMx since R0.11 version" Expression="(FF_FS_NORTC = 1) &amp; !(FATFS_version &gt; 12)"/>
+        <Description>As FS_NORTC is enabled, it is the month part of the timestamps used by Fatfs.</Description>
+    </RefParameter>
+    <RefParameter Name="FF_NORTC_MON" Comment="      NORTC_MON (Month for timestamp)" DefaultValue="6" Max="12" Min="1" Type="integer" Group="System Parameters" TabName="Set Defines" Visible="false">
+        <Description>Useless as FS_NORTC is disabled (otherwise, it is the month part of the timestamps used by Fatfs). </Description>
+    </RefParameter><!-- uniqueElementList removed in 5.5.0 -->
+
+    <RefParameter Name="FF_NORTC_MDAY" Comment="      NORTC_MDAY (Day for timestamp)" DefaultValue="4" Max="30" Min="1" Type="integer" Group="System Parameters" TabName="Set Defines">
+        <Condition Diagnostic="Available in CubeMx since R0.11 version" Expression="(FF_FS_NORTC = 1) &amp; (FF_NORTC_MON = 4 | FF_NORTC_MON = 6 | FF_NORTC_MON = 9 | FF_NORTC_MON = 11)"/>
+        <Description>As FS_NORTC is enabled, it is the day part of the timestamps used by Fatfs. </Description>
+    </RefParameter>
+    <RefParameter Name="FF_NORTC_MDAY" Comment="      NORTC_MDAY (Day for timestamp)" DefaultValue="4" Max="28" Min="1" Type="integer" Group="System Parameters" TabName="Set Defines">
+        <Condition Diagnostic="Available in CubeMx since R0.11 version" Expression="(FF_FS_NORTC = 1) &amp; (FF_NORTC_MON = 2)"/>
+        <Description>As FS_NORTC is enabled, it is the day part of the timestamps used by Fatfs. </Description>
+    </RefParameter>
+    <RefParameter Name="FF_NORTC_MDAY" Comment="      NORTC_MDAY (Day for timestamp)" DefaultValue="4" Max="31" Min="1" Type="integer" Group="System Parameters" TabName="Set Defines">
+        <Condition Diagnostic="Available in CubeMx since R0.11 version" Expression="(FF_FS_NORTC = 1)"/>
+        <Description>As FS_NORTC is enabled, it is the day part of the timestamps used by Fatfs. </Description>
+    </RefParameter>
+    <RefParameter Name="FF_NORTC_MDAY" Comment="      NORTC_MDAY (Day for timestamp)" DefaultValue="4" Max="31" Min="1" Type="integer" Group="System Parameters" TabName="Set Defines" Visible="false">
+        <Description>Useless as FS_NORTC is disabled (otherwise, it is the day part of the timestamps used by Fatfs). </Description>
+    </RefParameter>
+    <!--  New in Fatfs R0.11 -->
+
+
+
+    <!-- BZ 94134: remove the dependency FS_REENTRANT - FreeRTOS (when FreeERTOS is enabled) -->
+    <RefParameter Name="FF_FS_REENTRANT" Comment="FS_REENTRANT (Re-Entrancy)" DefaultValue="1" Type="list" Group="System Parameters" TabName="Set Defines">
+        <Condition Diagnostic="Can be changed when FreeRTOS is enabled (not forced to 1)" Expression="S_FREERTOS"/>
+        <PossibleValue Comment="Disabled" Value="0" />
+        <PossibleValue Comment="Enabled" Value="1" Semaphore="S_DO_NOT_COPY"/>
+        <Description>The FS_REENTRANT option switches the re-entrancy (thread safe) of the FatFs module.&lt;br&gt;
+        			&lt;B&gt;Baremetal mode&lt;/B&gt;: value read-only set to 0
+        			&lt;B&gt;RTOS mode&lt;/B&gt; is configurable as below: 
+                     - 0: Disable re-entrancy. FS_TIMEOUT have no effect.&lt;br&gt; 
+                     - 1: Enable re-entrancy. Also user provided synchronization handlers, ff_mutex_create(), ff_mutex_delete(), ff_mutex_take(), and ff_mutex_give() Sync functions must be added to the project. Samples are available in ffsystem.C        
+        </Description>
+    </RefParameter>
+    <RefParameter Name="FF_FS_REENTRANT" Comment="FS_REENTRANT (Re-Entrancy)" DefaultValue="0" Type="list" Group="System Parameters" TabName="Set Defines">
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>The FS_REENTRANT option switches the re-entrancy (thread safe) of the FatFs module.&lt;br&gt; 
+                     - 0: Disable re-entrancy. FS_TIMEOUT have no effect.&lt;br&gt;
+                     &lt;b&gt;Dependency&lt;/b&gt;: &lt;br&gt;
+                     Forced to disabled when FreeRTOS is disabled.
+        </Description>
+    </RefParameter>    
+
+    <RefParameter Name="FF_FS_TIMEOUT" Comment="FS_TIMEOUT (Timeout ticks)" DefaultValue="1000" Max="100000000" Min="1"  Type="integer" Group="System Parameters" TabName="Set Defines">
+        <Description>Timeout period in unit of time ticks</Description>
+    </RefParameter>
+
+    <!-- ADDED/REWORKED FOR BETTER SUPPORT OF  CMSIS_RTOS V2 (cf syscall.c file) -->
+    <!-- ADDED/REWORKED FOR BETTER SUPPORT OF CMSIS_RTOS V2 -->
+
+    <RefParameter Name="FF_FS_LOCK" Comment="FS_LOCK (Number of files opened simultaneously)" DefaultValue="2" Max="255" Min="0"  Type="integer" Group="System Parameters" TabName="Set Defines">
+        <Description>To enable file lock control feature, set FS_LOCK to 1 or greater. The value defines how many files can be opened simultaneously. </Description>
+    </RefParameter>
+
+    <!-- New in R0.12  -->
+    <RefParameter Name="FF_USE_EXPAND" Comment="USE_EXPAND (Use f_expand function)" DefaultValue="0" Type="list" Group="Function Parameters" TabName="Set Defines">
+        <Condition Diagnostic="Available in CubeMx since R0.12 version" Expression="(FATFS_version &gt; 11) &amp; (FF_FS_READONLY = 0)"/>
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>Flag to enable the f_expand function (0:Disabled or 1:Enabled).&lt;br&gt;
+                     The f_expand function prepares or allocates a contiguous data area to the file.&lt;br&gt;
+                     Note: can be enabled as FF_FS_READONLY equals to 0 (Disabled)</Description>
+    </RefParameter>
+    <RefParameter Name="FF_USE_EXPAND" Comment="USE_EXPAND (Use f_expand function)" DefaultValue="0" Type="list" Group="Function Parameters" TabName="Set Defines">
+        <Condition Diagnostic="Available in CubeMx since R0.12 version" Expression="(FATFS_version &gt; 11)"/>
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>Flag to enable the f_expand function (0:Disabled or 1:Enabled).&lt;br&gt;
+                     The f_expand function prepares or allocates a contiguous data area to the file.&lt;br&gt;
+                     Note: forced to disabled as FF_FS_READONLY equals to 1 (Enabled)</Description>
+    </RefParameter>
+    <RefParameter Name="FF_USE_EXPAND" Comment="USE_EXPAND (Use f_expand function)" DefaultValue="0" Type="list" Group="Function Parameters" TabName="Set Defines" Visible="false">
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>Hidden parameter when version less than 12.</Description>
+    </RefParameter>
+
+    <RefParameter Name="FF_USE_CHMOD" Comment="USE_CHMOD (Change attributes function)" DefaultValue="0" Type="list" Group="Function Parameters" TabName="Set Defines">
+        <Condition Diagnostic="Available in CubeMx since R0.12 version" Expression="(FATFS_version &gt; 11) &amp; (FF_FS_READONLY = 0)"/>
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>Flag to enable the f_chmod function (0:Disabled or 1:Enabled).&lt;br&gt;
+                     The f_chmod function changes the attribute of a file or sub-directory.&lt;br&gt;
+                     Note: can be enabled as FF_FS_READONLY equals to 0 (Disabled)</Description>
+    </RefParameter>
+    <RefParameter Name="FF_USE_CHMOD" Comment="USE_CHMOD (Change attributes function)" DefaultValue="0" Type="list" Group="Function Parameters" TabName="Set Defines">
+        <Condition Diagnostic="Available in CubeMx since R0.12 version" Expression="(FATFS_version &gt; 11)"/>
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>Flag to enable the f_chmod function (0:Disabled or 1:Enabled).&lt;br&gt;
+                     The f_chmod function changes the attribute of a file or sub-directory.&lt;br&gt;
+                     Note: forced to disabled as FF_FS_READONLY equals to 1 (Enabled)</Description>
+    </RefParameter>
+    <RefParameter Name="FF_USE_CHMOD" Comment="USE_CHMOD (Change attributes function)" DefaultValue="0" Type="list" Group="Function Parameters" TabName="Set Defines" Visible="false">
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>Hidden parameter when version less than 12.</Description>
+    </RefParameter>
+
+    <!-- Ticket 98283 - [MX-FatFS] ExFAT: Add a warning about MS license to the Parameter Description  -->
+    <RefParameter Name="FF_FS_EXFAT" Comment="FS_EXFAT (Support of exFAT file system)" DefaultValue="0" Type="list" Group="System Parameters" TabName="Set Defines">
+        <Condition Diagnostic="Available in CubeMx since R0.12 version" Expression="(FATFS_version &gt; 11) &amp; (!FF_USE_LFN=0)" />
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>This option switches support of exFAT file system. (0:Disabled or 1:Enabled).&lt;br&gt;
+                     When enable exFAT, also LFN needs to be enabled. (FF_USE_LFN >= 1).&lt;br&gt;
+                     Note that enabling exFAT discards C89 compatibility.&lt;br&gt;
+                     &lt;b&gt;Warning: &lt;/b&gt; &lt;br&gt;
+                     &lt;i&gt;Extracted from http://elm-chan.org/fsw/ff/doc/appnote.html#exfat &lt;/i&gt; &lt;br&gt;
+                     The exFAT filesystem is a patent of Microsoft Corporation. &lt;br&gt;
+                     - the exFAT feature of FatFs is an implementation based on US. Pat. App. Pub. No. 2009/0164440 A1. &lt;br&gt;
+                     - when enable the exFAT for the commercial products, a license by Microsoft will be needed depends on the final destination of the products.
+        </Description>
+    </RefParameter>
+    <RefParameter Name="FF_FS_EXFAT" Comment="FS_EXFAT (Support of exFAT file system)" DefaultValue="0" Type="list" Group="System Parameters" TabName="Set Defines">
+        <Condition Diagnostic="Forced to disabled as FF_USE_LFN equals to 0 (Disabled)" Expression="FATFS_version &gt; 11"/>
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>This option switches support of exFAT file system. (0:Disabled or 1:Enabled).&lt;br&gt;
+                     When enable exFAT, also LFN needs to be enabled. (FF_USE_LFN >= 1).&lt;br&gt;
+                     Note that enabling exFAT discards C89 compatibility.&lt;br&gt;
+                     &lt;b&gt;Warning: &lt;/b&gt; &lt;br&gt;
+                     &lt;i&gt;Extracted from http://elm-chan.org/fsw/ff/doc/appnote.html#exfat &lt;/i&gt; &lt;br&gt;
+                     The exFAT filesystem is a patent of Microsoft Corporation. &lt;br&gt;
+                     - the exFAT feature of FatFs is an implementation based on US. Pat. App. Pub. No. 2009/0164440 A1. &lt;br&gt;
+                     - when enable the exFAT for the commercial products, a license by Microsoft will be needed depends on the final destination of the products.
+        </Description>
+    </RefParameter>
+    
+    <RefParameter Name="FF_FS_EXFAT" Comment="FS_EXFAT (Support of exFAT file system)" DefaultValue="0" Type="list" Group="System Parameters" TabName="Set Defines" Visible="false">
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <Description>Hidden parameter when version != 12.</Description>
+    </RefParameter>
+    <!--  Added in Fatfs R0.13a -->
+    <RefParameter Name="FF_LFN_BUF" Comment="LFN_BUF" DefaultValue="255" Max="255" Min="12" Type="integer" Group="Locale and Namespace Parameters" TabName="Set Defines">
+        <Condition Diagnostic="Available in R0.15" Expression="!(_USE_LFN = 0) &amp; (FATFS_version &gt; 12)"/>
+        <Description>Buffer size to store "long filename".</Description>
+    </RefParameter>
+    <RefParameter Name="FF_LFN_BUF" Comment="LFN_BUF" DefaultValue="255" Max="255" Min="12" Type="integer" Group="Locale and Namespace Parameters" TabName="Set Defines" Visible="false">
+        <PossibleValue Comment="255 (fixed)" Value="255"/>
+        <Description>Hidden parameter when USE_LFN=0 or when Fatfs version is older than 15.</Description>
+    </RefParameter>
+
+    <RefParameter Name="FF_SFN_BUF" Comment="SFN_BUF" DefaultValue="12" Max="=_LFN_BUF" Min="12" Type="integer" Group="Locale and Namespace Parameters" TabName="Set Defines">
+        <Condition Diagnostic="Available in R0.15: maximum value is LFN_BUF" Expression="!(_USE_LFN = 0) &amp; (FATFS_version &gt; 12)"/>
+        <Description>Buffer size to store ""alternate filename" (short filename).</Description>
+    </RefParameter>
+    <RefParameter Name="FF_SFN_BUF" Comment="SFN_BUF" DefaultValue="12" Max="=_LFN_BUF" Min="12" Type="integer" Group="Locale and Namespace Parameters" TabName="Set Defines" Visible="false">
+        <Description>Hidden parameter when USE_LFN=0 or when Fatfs version is older than 15.</Description>
+    </RefParameter>
+    <!-- Internal parameters for detecting the enabled modes and include the right files in ffconf.h -->
+    <RefParameter Name="_FS_FATFS_SDIO" Comment="SD mode" DefaultValue="1" Type="integer" Visible="false">
+        <Condition Diagnostic="Equals to 1 if SDIO mode on" Expression="S_FATFS_SDIO"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+    </RefParameter>
+    <RefParameter Name="_FS_FATFS_SDIO" Comment="SD mode" DefaultValue="0" Type="integer" Visible="false">
+        <PossibleValue Comment="Disabled" Value="0"/>
+    </RefParameter>
+
+    <RefParameter Name="_FS_FATFS_SDRAM" Comment="SDRAM mode" DefaultValue="1" Type="integer" Visible="false">
+        <Condition Diagnostic="Equals to 1 if SDRAM mode on" Expression="S_FATFS_SDRAM"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+    </RefParameter>
+    <RefParameter Name="_FS_FATFS_SDRAM" Comment="SDRAM mode" DefaultValue="0" Type="integer" Visible="false">
+        <PossibleValue Comment="Disabled" Value="0"/>
+    </RefParameter>
+
+    <RefParameter Name="_FS_FATFS_SRAM" Comment="SRAM mode" DefaultValue="1" Type="integer" Visible="false">
+        <Condition Diagnostic="Equals to 1 if SRAM mode on" Expression="S_FATFS_SRAM"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+    </RefParameter>
+    <RefParameter Name="_FS_FATFS_SRAM" Comment="SRAM mode" DefaultValue="0" Type="integer" Visible="false">
+        <PossibleValue Comment="Disabled" Value="0"/>
+    </RefParameter>
+
+    <RefParameter Name="_FS_FATFS_USB" Comment="USB mode" DefaultValue="1" Type="integer" Visible="false">
+        <Condition Diagnostic="Equals to 1 if USB mode on" Expression="S_FATFS_USB"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+    </RefParameter>
+    <RefParameter Name="_FS_FATFS_USB" Comment="USB mode" DefaultValue="0" Type="integer" Visible="false">
+        <PossibleValue Comment="Disabled" Value="0"/>
+    </RefParameter>
+
+    <RefParameter Name="_FS_FATFS_USER" Comment="USER mode" DefaultValue="1" Type="integer" Visible="false">
+        <Condition Diagnostic="Equals to 1 if USER mode on" Expression="S_FATFS_Generic"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+    </RefParameter>
+    <RefParameter Name="_FS_FATFS_USER" Comment="USER mode" DefaultValue="0" Type="integer" Visible="false">
+        <PossibleValue Comment="Disabled" Value="0"/>
+    </RefParameter>
+
+    <!-- Basemode for FATFS -->
+    <RefMode Name="FatFS_Basemode" Comment="Internal basemode for FATFS" Abstract="true">
+        <Parameter Name="FATFS_version"/>
+        <!-- Parameters for Function and Buffer Configurations -->
+        <Parameter Name="FF_FS_READONLY"/>
+        <Parameter Name="FF_FS_MINIMIZE"/>
+        <Parameter Name="FF_USE_STRFUNC"/>
+        <Parameter Name="FF_USE_FIND"/>
+        <Parameter Name="FF_PRINT_FLOAT"/>
+        <Parameter Name="FF_PRINT_LLI"/>
+        <Parameter Name="FF_USE_MKFS"/>
+        <Parameter Name="FF_USE_FASTSEEK"/>
+        <Parameter Name="FF_USE_EXPAND"/>     <!-- R12 -->
+        <Parameter Name="FF_USE_CHMOD"/>      <!-- R12 -->
+        <Parameter Name="FF_USE_LABEL"/>
+        <Parameter Name="FF_USE_FORWARD"/>
+        <!-- Parameters for Locale and Namespace Configurations -->
+        <Parameter Name="FF_CODE_PAGE"/>
+        <Parameter Name="FF_USE_LFN"/>
+        <Parameter Name="FF_MAX_LFN"/>
+        <Parameter Name="FF_LFN_UNICODE"/>
+        <Parameter Name="FF_LFN_BUF"/>     <!-- R13a -->
+        <Parameter Name="FF_SFN_BUF"/>     <!-- R13a -->
+        <Parameter Name="FF_STRF_ENCODE"/>
+        <Parameter Name="FF_FS_RPATH"/>
+        <!-- Parameters for Physical Drive Configurations  -->
+        <Parameter Name="FF_LBA64"/>
+        <Parameter Name="FF_MIN_GPT"/>
+        <Parameter Name="FF_VOLUMES"/>
+        <Parameter Name="FF_MAX_SS"/>
+        <Parameter Name="FF_MIN_SS"/>
+        <Parameter Name="FF_MULTI_PARTITION"/>
+        <Parameter Name="FF_USE_TRIM"/>
+        <Parameter Name="FF_FS_NOFSINFO"/>
+        <!-- Parameters for System Configurations   -->
+        <Parameter Name="FF_FS_TINY"/>       <!-- Moved in System Config with R0.12  -->
+        <Parameter Name="FF_FS_EXFAT"/>      <!-- R12 -->
+        <Parameter Name="FF_FS_NORTC"/>
+        <Parameter Name="FF_NORTC_YEAR"/>
+        <Parameter Name="FF_NORTC_MON"/>
+        <Parameter Name="FF_NORTC_MDAY"/>	
+        <Parameter Name="FF_FS_REENTRANT"/>
+        <Parameter Name="FF_FS_TIMEOUT"/>
+        <Parameter Name="FF_FS_LOCK"/>
+        <!-- R12 + FW pack update (possible use of DMA templates)-->
+        <Parameter Name="BOARD_NAME"/>       
+        <Parameter Name="VIRTUAL_CODE_PAGE"/>
+    </RefMode>
+
+    <!-- RefMode for SDIO FATFS -->
+    <RefMode Name="SDIO" BaseMode="FatFS_Basemode" Abstract="false">
+        <ConfigForMode>FATFS_SDIO_Init</ConfigForMode>
+        <Parameter Name="_HSD"/>
+        <Parameter Name="SD_MODE"/>
+        <Parameter Name="SD_DISKIO_INTERFACE"/>
+        <Parameter Name="SD_TIMEOUT"/>
+        <Parameter Name="ENABLE_SD_INIT"/>
+        <Parameter Name="ENABLE_SD_DMA_CACHE_MAINTENANCE"/>
+    </RefMode>
+
+    <!-- RefMode for FSMC NAND16 FATFS -->
+    <RefMode Name="FSMC_NAND16" BaseMode="FatFS_Basemode" Abstract="false">
+        <ConfigForMode>FATFS_FSMC_NAND16_Init</ConfigForMode>
+        <Parameter Name="_HNAND"/>
+    </RefMode>
+
+    <!-- RefMode for FMC SDRAM FATFS -->
+    <RefMode Name="FMC_SDRAM" BaseMode="FatFS_Basemode" Abstract="false">
+        <ConfigForMode>FATFS_FMC_SDRAM_Init</ConfigForMode>
+        <Parameter Name="_HSDRAM"/>
+    </RefMode>
+
+    <!-- RefMode for SRAM, PSRAM and Muxed PSRAM FATFS -->
+    <RefMode Name="SRAM" BaseMode="FatFS_Basemode" Abstract="false">
+        <ConfigForMode>FATFS_SRAM_Init</ConfigForMode>
+        <Parameter Name="_HSRAM"/>
+        <Parameter Name="BLOCK_SIZE"/>
+        <Parameter Name="SRAM_DISK_BASE_ADDR"/>
+        <Parameter Name="SRAM_DISK_SIZE"/>
+        <!-- <Parameter Name="BOARD_NAME"/> -->
+    </RefMode>
+
+    <!-- RefMode for USB FATFS -->
+    <RefMode Name="USB" BaseMode="FatFS_Basemode" Abstract="false">
+        <ConfigForMode>FATFS_USB_Init</ConfigForMode>
+        <Parameter Name="_HUSBH"/>
+        <Parameter Name="USB_BLOCK_SIZE"/>  
+    </RefMode>
+
+    <!-- RefMode for GENERIC FATFS -->
+    <RefMode Name="User_defined" BaseMode="FatFS_Basemode" Abstract="false">
+        <ConfigForMode>FATFS_USER_DEFINED_Init</ConfigForMode>
+        <!-- <Parameter Name="NEW_DISKIO_API"/> -->
+        <Parameter Name="DISKIO_CODE"/>
+        <!-- <Parameter Name="BOARD_NAME"/>  -->
+    </RefMode>
+
+
+    <!-- ModeLogicOperator for FATFS -->
+    <ModeLogicOperator Name="OR">
+        <!-- <Mode Name="FSMC_NAND16" UserName="NAND">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="FSMC_NAND16">
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="" Name="VS_FSMC_NAND16"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Condition Expression="NandFlash1|NandFlash2" Diagnostic="Active only with at least one FMC NAND Flash IP configured)"/>
+        </Mode> -->
+
+        <Mode Name="SRAM" UserName="Internal RAM" RemoveCondition="!FMC:$modeexist_Sram1 &amp; !FSMC:$modeexist_Sram1 &amp; !FMC:$modeexist_Psram1 &amp; !FSMC:$modeexist_Psram1 &amp; !FMC:$modeexist_MuxedPsram1 &amp; !FSMC:$modeexist_MuxedPsram1 &amp; !FSMC_NOR_RAM:$modeexist_8-bit-PSRAM  &amp; !FSMC:$modeexist_Lcd1">
+            <ModeLogicOperator Name="NONE">
+                <Mode Name="SRAM">
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="" Name="VS_SRAM"/>
+                    </SignalLogicalOp>
+                    <Semaphore>S_FATFS_SRAM</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+            <Condition Expression="!(S_AzureRTOS$context|S_AzureRTOS)" Diagnostic="Active only when the AzureRTOS (ThreadX,FileX,..) are deactivated"/>
+            <Condition Expression="(Sram1|Sram2|Sram3|Sram4|Psram1|Psram2|Psram3|Psram4|MuxedPsram1|MuxedPsram2|MuxedPsram3|MuxedPsram4|Lcd1|Lcd2|Lcd3|Lcd4)" Diagnostic="Active only with at least one SRAM / PSRAM / Muxed PSRAM / LCD Interface configured and FreeRTOS not in native mode"/>            
+            <!--<Condition Expression="(!S_FREERTOS_NATIVE &amp; (Sram1|Sram2|Sram3|Sram4|Psram1|Psram2|Psram3|Psram4|MuxedPsram1|MuxedPsram2|MuxedPsram3|MuxedPsram4|Lcd1|Lcd2|Lcd3|Lcd4)) &amp; (!S_AzureRTOS$context) " Diagnostic="Active only with at least one SRAM / PSRAM / Muxed PSRAM / LCD Interface configured and FreeRTOS not in native mode"/>-->
+        </Mode>
+
+        <Mode Name="SDIO" UserName="SD Card">
+            <ModeLogicOperator Name="NONE">
+                <Mode Name="SDIO">
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="" Name="VS_SDIO"/>
+                    </SignalLogicalOp>
+                    <Semaphore>S_FATFS_SDIO</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+            <!-- <Condition Expression="!S_FREERTOS_NATIVE &amp; !S_CMSIS_RTOS_V2 &amp; (SDIO_SD_Card|SDMMC1_SD_Card|SDMMC2_SD_Card)" Diagnostic="Active only with SDIO/SDMMC IP configured in a SD mode and CMSIS_RTOS V2 not enabled"/>  -->
+            <Condition Expression="!(S_AzureRTOS$context|S_AzureRTOS)" Diagnostic="Active only when the AzureRTOS (ThreadX,FileX,..) are deactivated"/>
+            <Condition Expression="($IpInstance_SD_Card|SDMMC1_SD_Card|SDMMC2_SD_Card)" Diagnostic="Active only with SDIO/SDMMC IP configured in a SD mode" />            
+            <!--<Condition Expression="(!S_FREERTOS_NATIVE &amp; (SDIO_SD_Card|SDMMC1_SD_Card|SDMMC2_SD_Card)) &amp; (!S_AzureRTOS$context)" Diagnostic="Active only with SDIO/SDMMC IP configured in a SD mode" />-->
+        </Mode>
+
+        <Mode Name="USB" UserName="USB Disk" RemoveCondition="!(USB_HOST$context:$modeexist_MSC_HS |USB_HOST:$modeexist_MSC_HS) &amp; !(USB_HOST$context:$modeexist_MSC_FS|USB_HOST:$modeexist_MSC_FS)">
+            <ModeLogicOperator Name="NONE">
+                <Mode Name="USB">
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="" Name="VS_USB"/>
+                    </SignalLogicalOp>
+                    <Semaphore>S_FATFS_USB</Semaphore>   <!-- to avoid some troubles with use dma template, for instance -->
+                </Mode>
+            </ModeLogicOperator>
+            <Condition Expression="!S_AzureRTOS$context|!S_AzureRTOS" Diagnostic="Active only when the AzureRTOS (ThreadX,FileX,..) are deactivated"/>
+            <Condition Expression="(MSC_HOST_FS|MSC_HOST_HS)" Diagnostic="Active only with USB Host (class MSC) middleware and FreeRTOS not in native mode"/>
+            <!--<Condition Expression="(!S_FREERTOS_NATIVE &amp; (USB_HOST_MSC_FS$context|USB_HOST_MSC_HS$context|ALL_Classes_FS$context|ALL_Classes_HS$context)) &amp; (!S_AzureRTOS$context)" Diagnostic="Active only with USB Host (class MSC) middleware and FreeRTOS not in native mode"/>-->
+        </Mode>
+
+        <Mode Name="User_defined" UserName="User-defined">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="User_defined">
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="" Name="VS_Generic"/>
+                    </SignalLogicalOp>
+                    <Semaphore>S_FATFS_Generic</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+            <Condition Expression="!(S_AzureRTOS$context|S_AzureRTOS)" Diagnostic="Active only when the AzureRTOS (ThreadX,FileX,..) are deactivated"/>
+            <Condition Expression="(!S_FREERTOS_NATIVE)" Diagnostic="Active only if FreeRTOS interface is not Native"/>
+            <!--<Condition Expression="(!S_FREERTOS_NATIVE) &amp; (!S_AzureRTOS$context)" Diagnostic="Active only if FreeRTOS interface is not Native"/>-->
+        </Mode>
+    </ModeLogicOperator>
+
+    <!-- RefSignal for FATFS (if not defined, the mode does not appear in the tree -->
+    <RefSignal Name="VS_SDIO" Virtual="true"/>
+    <!--  <RefSignal Name="VS_FSMC_NAND16" Virtual="true"/> -->
+    <RefSignal Name="VS_FMC_SDRAM" Virtual="true"/>
+    <RefSignal Name="VS_SRAM" Virtual="true"/>
+    <RefSignal Name="VS_USB" Virtual="true"/>
+    <RefSignal Name="VS_Generic" Virtual="true"/>
+
+    <Semaphore>S_FATFS_ENABLED</Semaphore>  <!-- only used by LIBJPEG (not on L5) -->
+
+</IP>

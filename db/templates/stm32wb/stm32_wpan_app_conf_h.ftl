@@ -476,8 +476,7 @@
  * Application Config
  ******************************************************************************/
 [#if (BLE = 1)]
-
-[#if (BT_SIG_BEACON != "0") || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_P2P_CLIENT = 1)|| (CUSTOM_P2P_ROUTER = 1)|| (CUSTOM_TEMPLATE = 1)]
+[#if (BLE = 1) && ( BLE_TRANSPARENT_MODE_UART != 1) && ( BLE_TRANSPARENT_MODE_VCP != 1)]
 /**< generic parameters ******************************************************/
 
 /**
@@ -518,13 +517,13 @@
 #define CFG_BLE_ADDRESS_TYPE              ${BLE_ADDR_TYPE}
 [/#if]
 
-[#if (BT_SIG_BEACON != "0") || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_TEMPLATE = 1)]
+[#if (BLE = 1) && ( CUSTOM_P2P_CLIENT != 1) && ( CUSTOM_P2P_ROUTER != 1) && ( BLE_TRANSPARENT_MODE_UART != 1) && ( BLE_TRANSPARENT_MODE_VCP != 1)]
 #define CFG_FAST_CONN_ADV_INTERVAL_MIN    (${CFG_FAST_CONN_ADV_INTERVAL_MIN_HEXA})      /**< 80ms */
 #define CFG_FAST_CONN_ADV_INTERVAL_MAX    (${CFG_FAST_CONN_ADV_INTERVAL_MAX_HEXA})      /**< 100ms */
 #define CFG_LP_CONN_ADV_INTERVAL_MIN      (${CFG_LP_CONN_ADV_INTERVAL_MIN_HEXA})     /**< 1s */
 #define CFG_LP_CONN_ADV_INTERVAL_MAX      (${CFG_LP_CONN_ADV_INTERVAL_MAX_HEXA})     /**< 2.5s */
 [/#if]
-[#if (CUSTOM_TEMPLATE = 1)]
+[#if (BLE = 1) && (BT_SIG_BEACON = "0") && (BT_SIG_BLOOD_PRESSURE_SENSOR != 1) && (BT_SIG_HEALTH_THERMOMETER_SENSOR != 1) && (BT_SIG_HEART_RATE_SENSOR != 1) && (CUSTOM_OTA != 1) && (CUSTOM_P2P_SERVER != 1)&& (CUSTOM_P2P_CLIENT != 1) && (CUSTOM_P2P_ROUTER != 1) && (BLE_TRANSPARENT_MODE_UART != 1)&& (BLE_TRANSPARENT_MODE_VCP != 1)]
 #define ADV_TYPE                          ${ADV_TYPE}
 #define BLE_ADDR_TYPE                     ${BLE_ADDR_TYPE}
 #define ADV_FILTER                        ${ADV_FILTER}
@@ -534,8 +533,7 @@
 #define LEDBUTTON_CONN_ADV_INTERVAL_MAX   (0x3E8)
 
 [/#if]
-[#if (BT_SIG_BEACON != "0") || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_P2P_CLIENT = 1)|| (CUSTOM_P2P_ROUTER = 1)|| (CUSTOM_TEMPLATE = 1)]
-
+[#if (BLE = 1) && ( BLE_TRANSPARENT_MODE_UART != 1) && ( BLE_TRANSPARENT_MODE_VCP != 1)]
 /**
  * Define IO Authentication
  */
@@ -602,8 +600,8 @@
 #define CFG_GAP_DEVICE_NAME             "${CFG_GAP_DEVICE_NAME}"
 #define CFG_GAP_DEVICE_NAME_LENGTH      (${CFG_GAP_DEVICE_NAME_LENGTH})
 
-[#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)
- || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_TEMPLATE = 1)]
+[#if (BT_SIG_BEACON = "0") && (CUSTOM_OTA != 1) && (CUSTOM_P2P_ROUTER != 1) && (CUSTOM_P2P_CLIENT != 1) && (BLE_TRANSPARENT_MODE_UART != 1) && (BLE_TRANSPARENT_MODE_VCP != 1) ]
+
 /**
  * Define PHY
  */
@@ -616,7 +614,7 @@
 #define RX_2M                                           0x02 
 [/#if]
 
-[#if (BT_SIG_BEACON != "0") || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_P2P_CLIENT = 1)|| (CUSTOM_P2P_ROUTER = 1)|| ( BLE_TRANSPARENT_MODE_UART = 1)|| ( BLE_TRANSPARENT_MODE_VCP = 1)|| (CUSTOM_TEMPLATE = 1)]
+[#if BLE = 1]
 /**
 *   Identity root key used to derive IRK and DHK(Legacy)
 */
@@ -876,7 +874,7 @@
 #define CFG_FW_BUILD              (0)
 
 [/#if]
-[#if (BT_SIG_BEACON != "0") || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_P2P_CLIENT = 1)|| (CUSTOM_P2P_ROUTER = 1)|| ( BLE_TRANSPARENT_MODE_UART = 1 )|| ( BLE_TRANSPARENT_MODE_VCP = 1)|| (CUSTOM_TEMPLATE = 1)]
+[#if BLE = 1]
 
 /******************************************************************************
  * BLE Stack
@@ -885,7 +883,7 @@
  * Maximum number of simultaneous connections that the device will support.
  * Valid values are from 1 to 8
  */
-[#if (BT_SIG_BEACON != "0") || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_P2P_CLIENT = 1)|| (CUSTOM_P2P_ROUTER = 1)|| ( BLE_TRANSPARENT_MODE_UART = 1 )|| ( BLE_TRANSPARENT_MODE_VCP = 1)|| (CUSTOM_TEMPLATE = 1)]
+[#if BLE = 1]
 #define CFG_BLE_NUM_LINK            ${CFG_BLE_NUM_LINK}
 [/#if]
 
@@ -923,7 +921,7 @@
  */
 #define CFG_BLE_ATT_VALUE_ARRAY_SIZE    (${CFG_BLE_ATT_VALUE_ARRAY_SIZE})
 
-[#if (BT_SIG_BEACON != "0") || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1)|| (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1)|| (BT_SIG_HEART_RATE_SENSOR = 1)|| (CUSTOM_OTA = 1)|| (CUSTOM_P2P_SERVER = 1)|| (CUSTOM_P2P_CLIENT = 1)|| (CUSTOM_P2P_ROUTER = 1)|| ( BLE_TRANSPARENT_MODE_UART = 1 )|| ( BLE_TRANSPARENT_MODE_VCP = 1)|| (CUSTOM_TEMPLATE = 1)]
+[#if BLE = 1]
 /**
  * Prepare Write List size in terms of number of packet
  * This parameter is ignored by the CPU2 when CFG_BLE_OPTIONS has SHCI_C2_BLE_INIT_OPTIONS_LL_ONLY flag set
@@ -1639,7 +1637,7 @@ typedef enum
   CFG_TASK_CONN_DEV_6_ID,
   CFG_TASK_SEARCH_SERVICE_ID,
 [/#if]
-[#if (BT_SIG_BEACON != "0") || (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) || (CUSTOM_OTA = 1) || (CUSTOM_P2P_SERVER = 1) || (CUSTOM_P2P_ROUTER = 1) || (CUSTOM_P2P_CLIENT = 1) || (CUSTOM_TEMPLATE = 1)]
+[#if (BLE = 1) && ( BLE_TRANSPARENT_MODE_UART != 1) && ( BLE_TRANSPARENT_MODE_VCP != 1)]
   CFG_TASK_HCI_ASYNCH_EVT_ID,
 [/#if]
 [#if (BLE_TRANSPARENT_MODE_UART = 1) || (BLE_TRANSPARENT_MODE_VCP = 1)]
@@ -1938,4 +1936,3 @@ typedef enum
 [/#if]
 [/#if]
 #endif /*APP_CONF_H */
-

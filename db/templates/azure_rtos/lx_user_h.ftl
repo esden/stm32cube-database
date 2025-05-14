@@ -102,6 +102,10 @@
 
     [#if name == "LX_NOR_DISABLE_EXTENDED_CACHE"]
       [#assign LX_NOR_DISABLE_EXTENDED_CACHE_value = value]
+    [/#if]    
+	
+	[#if name == "LX_NAND_FLASH_MAX_METADATA_BLOCKS"]
+      [#assign LX_NAND_FLASH_MAX_METADATA_BLOCKS_value = value]
     [/#if]
 
     [#if name == "LX_NOR_EXTENDED_CACHE_SIZE"]
@@ -140,6 +144,18 @@
 #define LX_FREE_SECTOR_DATA_VERIFY
 [#else]
 /* #define LX_FREE_SECTOR_DATA_VERIFY */
+[/#if]
+[#if FamilyName?lower_case == "stm32u0"]
+[#if LX_NAND_FLASH_MAX_METADATA_BLOCKS_value??]
+/* By default this value is 4, which represents a maximum of 4 blocks that 
+   can be allocated for metadata.
+*/
+[#if LX_NAND_FLASH_MAX_METADATA_BLOCKS_value == "4"]
+/* #define LX_NAND_FLASH_MAX_METADATA_BLOCKS         4 */
+[#else]
+#define LX_NAND_FLASH_MAX_METADATA_BLOCKS         ${LX_NAND_FLASH_MAX_METADATA_BLOCKS_value}
+[/#if]
+[/#if]
 [/#if]
 
 [#if LX_NOR_DISABLE_EXTENDED_CACHE_value == "1"]

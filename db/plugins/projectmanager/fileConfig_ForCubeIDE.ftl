@@ -129,6 +129,9 @@
             [#if dataKey=="bootmode"]
                [#assign bootmode =  elem[dataKey]]
             [/#if]
+            [#if dataKey=="flasher"]
+                [#assign flasher =  elem[dataKey]]
+            [/#if]
             [#if dataKey=="Secure"]
                [#assign Secure =  elem[dataKey]]
             [/#if]
@@ -201,31 +204,60 @@
 [#if Context??]<Context>${Context}</Context>[/#if]
  <device>${project.deviceId}</device>		 [#--  STM32 selected device. Ex: STM32F407ZE --]    
     [#if IdeMode?? || ide=="STM32CubeIDE" || family=="STM32MP1xx"]
-    <cpucore>${cpuCore}</cpucore>    
-    [#else]
-    <cpucore>[#if ((multiConfig == "true") && (TrustZone=="0"))|| multiToSingleCore=="true"]${cpuCore?replace("ARM Cortex-", "C")}[#else][/#if]</cpucore>
+        <cpucore>${cpuCore}</cpucore>    
+        [#else]
+        <cpucore>[#if ((multiConfig == "true") && TrustZone=="0")|| multiToSingleCore=="true"]${cpuCore?replace("ARM Cortex-", "C")}[#else][/#if]</cpucore>
     [/#if]
     <fpu>${fpu}</fpu>  [#--add FPU for UC30 --]
-    [#if !IdeMode?? && (multiConfig == "true")]
+    [#if (multiConfig == "true")]
     <bootmode>${bootmode}</bootmode>  [#-- for boot mode could be equals to SRAM or FLASH --]
     [/#if]
-     [#if TrustZone == "1" && prj_ctx??  && prj_ctx=="1"]
+    [#if flasher?? && !IdeMode?? && (multiConfig == "true") && mainSourceRepo = "Appli"]
+    <flasher>${flasher}</flasher>  [#-- for appli project, set the flashloader --]
+    [/#if]
+     [#if TrustZone == "1" && prj_ctx=="1"]
     <ExePath>${ExePath}</ExePath>
     [/#if]
-    [#if OutputFilesFormat??]
+    [#if OutputFilesFormat?? && (family!="STM32H7RSxx" || family=="STM32H7RSxx" && Context=="App")]
     <OutputFilesFormat>${OutputFilesFormat}</OutputFilesFormat>
     [/#if]
-    [#if ReinitLink??]
+    [#if ReinitLink?? && (family!="STM32H7RSxx" || family=="STM32H7RSxx" && Context=="App")]
     <ReInitLinkerFile>true</ReInitLinkerFile>
     [/#if]
     <memories>  [#-- add MemoriesList for UC30 --] 
     [#list memoriesList as memory]
         <memory ${memory} />
     [/#list]
+    [#if LinkerFilesUpdate?? && (family!="STM32H7RSxx" || family=="STM32H7RSxx" && Context=="App")]
+		<BootPathConfig>
+	[#------------------------ BootPath Linker Updates ------------------]
+    [#list LinkerFilesUpdate?keys as linkerContext]     
+        [#if (Secure=="1" && linkerContext=="Secure") || (Secure=="0" && linkerContext=="NonSecure") || (Secure=="0" && Context=="App")]        
+            [#assign ctxData = LinkerFilesUpdate[linkerContext]]
+            [#list ctxData?keys as linkerData]
+                <linkerSymbol name="${linkerData}" value="${ctxData[linkerData]}" />        
+            [/#list]
+        [/#if]
+    [/#list] 
+    [#if SmakSymbol??] 	
+ 	[#list SmakSymbol?keys as SmakSymbolContext] 	
+ 		[#if (Secure=="1" && SmakSymbolContext=="Secure") || (Secure=="0" && SmakSymbolContext=="NonSecure") || (SmakSymbolContext=="Application")] 
+ 			[#assign ctxData = SmakSymbol[SmakSymbolContext]]
+ 		 	[#list ctxData?keys as SmakSymbolData]
+ 	 <BootPathSymbol name="${SmakSymbolData}" value="${ctxData[SmakSymbolData]}" /> 
+ 	 		[/#list]
+ 	 	[/#if]
+ 	[/#list] 
+ 	[/#if]   
+		</BootPathConfig>
+	[/#if]
+	[#------------------------ BootPath Linker Updates ------------------]
         </memories>
-[#if LinkerUpdate??]
+     [#------------------------ Used for MMT Updates ------------------]
+[#if LinkerUpdate?? && Context!= "ExtMemLoader"]
 <ForceLinkerUpdate>true</ForceLinkerUpdate>
 <ReInitLinkerFile>true</ReInitLinkerFile>
+<isMMTEnabled>true</isMMTEnabled>
 [/#if]
 [#if ota?? && ota=="true"]
 <ota>true</ota>
@@ -233,27 +265,16 @@
 [#if bootinfo?? && bootinfo=="true"]
 <bootinfo>true</bootinfo>
 [/#if]
-[#if isISRRegion?? && isISRRegion=="true"]
+[#if isISRRegion?? && isISRRegion=="true" && Context!= "ExtMemLoader"]
 <RemoveIsrVector>true</RemoveIsrVector>
 [/#if]
-[#if LinkerFilesUpdate??]
+[#if LinkerFilesUpdate?? && ide=="STM32CubeIDE" && (family!="STM32H7RSxx" || family=="STM32H7RSxx" && Context=="App")]
 <ForceLinkerUpdate>true</ForceLinkerUpdate> 
-
-<BootPathConfig>
-[#------------------------ BootPath Linker Updates ------------------]
-    [#list LinkerFilesUpdate?keys as linkerContext]
-        [#if (Secure=="1" && linkerContext=="Secure") || (Secure=="0" && linkerContext=="NonSecure")]        
-            [#assign ctxData = LinkerFilesUpdate[linkerContext]]
-            [#list ctxData?keys as linkerData]
-                <linkerSymbol name="${linkerData}" value="${ctxData[linkerData]}" />        
-            [/#list]
-        [/#if]
-    [/#list]    
-</BootPathConfig>
+[/#if]
 [#if ReInitLinkerFile??]
 <ReInitLinkerFile>true</ReInitLinkerFile>
 [/#if]
-[/#if]
+
 [#------------------------ BootPath Linker Updates ------------------]
 
 
@@ -261,7 +282,7 @@
 <BuildAction>
 [#------------------------ BootPath Linker Updates ------------------]
     [#list PostBuildCommand?keys as postBuildContext]
-        [#if (Secure=="1" && postBuildContext=="Secure") || (Secure=="0" && postBuildContext=="NonSecure")]        
+        [#if (Secure=="1" && postBuildContext=="Secure") || (Secure=="0" && postBuildContext=="NonSecure") || (Context=="App" && postBuildContext=="Application") || (Context=="ExtMemLoader" && postBuildContext=="ExtMemLoader")]
             [#assign ctxData = PostBuildCommand[postBuildContext]]
             <PostBuildCmd>${PostBuildCommand[postBuildContext]}</PostBuildCmd>
         [/#if]
@@ -535,22 +556,22 @@
     [/#if]
 
 [#--/#list--]
-<Project>
+[#--if ide!="STM32CubeIDE" --]
+<Project>    
 [#-- <ProjectPath>${ProjectPath}</ProjectPath>  --][#-- added to give project path --]
 [#if family!="STM32H7RSxx"]
     <ProjectName>${Configuration}[#if TrustZone=="1"][#if ConfigSecure=="1"]_S[#else]_NS[/#if][/#if][#if (MultiProject == "1")][#if MultiProject=="1" && cpuCore??]_${cpuCore?replace("ARM Cortex-", "C")?replace("+", "PLUS")}[#else]_CM4[/#if][/#if]</ProjectName> [#-- modified to give only the project name without path --]
 [#else]
     <ProjectName>${Configuration}</ProjectName>
 [/#if]
-
 [#if active?? && active]
     <Excluded>false</Excluded>
 [#else]
     <Excluded>true</Excluded>
 [/#if]
     <ProjectNature>${ProjectNature}</ProjectNature> [#-- Cpp --]
- [#if TrustZone == "1"]     
-<Secure>${ConfigSecure}</Secure>
+[#if TrustZone == "1"]     
+    <Secure>${ConfigSecure}</Secure>
 [#else]
 <Secure/>
  [/#if]
@@ -1172,8 +1193,7 @@
                 [/#list]
             [/#if]
         </group>		   
-
-			[#if family!="STM32L5xx" && family!="STM32U5xx" && family!="STM32H7RSxx" && family!="STM32H5xx" && family!="STM32WBAxx" && cmsisSourceFileNameList?size>0]
+			[#if family!="STM32L5xx" && family!="STM32U5xx" && family!="STM32H7RSxx" && family!="STM32H5xx" && family!="STM32WBAxx"&& cmsisSourceFileNameList?size>0]
             <group>			
                 <name>CMSIS</name>
                 [#assign cmsisFilesAdded = ""]
@@ -1639,6 +1659,7 @@
 [/#if] [#-- End if Non under root --]
 
 </Project>
+[#--/#if--]
 [/#macro]
 [#function isExcludedFromBuild(file)]
 [#if excludedFilesFromBuild?? && excludedFilesFromBuild?size>0]

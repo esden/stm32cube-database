@@ -39,12 +39,18 @@
     /* -- Sample board code for User push-button in interrupt mode ---- */
     if (BspButtonState == BUTTON_PRESSED)
     {
+      /* Update button state */
+      BspButtonState = BUTTON_RELEASED;
+      /* -- Sample board code to toggle leds ---- */
+      BSP_LED_Toggle(LED_GREEN);
       /* ..... Perform your action ..... */
     }
     [#elseif BUTTON == "2"]
     /* -- Sample board code for User push-button without interrupt mode ---- */
     if (BSP_PB_GetState(BUTTON_USER) == BUTTON_PRESSED)
     {
+      /* -- Sample board code to toggle leds ---- */
+      BSP_LED_Toggle(LED_GREEN);
       /* ..... Perform your action ..... */
     }
     [/#if]

@@ -442,7 +442,7 @@ extern ${variable.value} ${variable.name};
 #define FF_NORTC_MON	${valueNoRtcMonth}
 #define FF_NORTC_MDAY	${valueNoRtcDay}
 #define FF_NORTC_YEAR	${valueNoRtcYear}      /* default value: 2018 in R13b */
-/* The option FF_FS_NORTC switches timestamp functiton. If the system does not have
+/* The option FF_FS_NORTC switches timestamp function. If the system does not have
 /  any RTC function or valid timestamp is not needed, set FF_FS_NORTC = 1 to disable
 /  the timestamp function. Every object modified by FatFs will have a fixed timestamp
 /  defined by FF_NORTC_MON, FF_NORTC_MDAY and FF_NORTC_YEAR in local time.

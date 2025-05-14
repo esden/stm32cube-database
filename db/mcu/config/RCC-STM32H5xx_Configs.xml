@@ -1,28 +1,25 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 <IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" DBVersion="V4.0" Name="RCC" Version="STM32Cube_FW_H5_V0.1.0" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu file:///C:/Dev_Build8/MicroXplorer/doc/V4/Development/Specifications/db/IP_Configs.xsd">
-    <RefConfig Comment="Configure LSE Drive Capability" Name="RCC_LSEDRIVE_CONFIG">
+    <RefConfig Comment="Configure LSE Drive Capability#n#t*#tWarning : Only applied when the LSE is disabled." Name="RCC_LSEDRIVE_CONFIG">
    
         <IFCondition Expression="LSEOscillator &amp; (LSEUsed=1)">
-            <CallLibMethod Name="HAL_PWR_EnableBkUpAccess" ReturnHAL="false">
-                   
+            <CallLibMethod Name="HAL_PWR_EnableBkUpAccess" ReturnHAL="false">                  
             </CallLibMethod>
-        </IFCondition>
-
-      
+        </IFCondition>     
         <IFCondition Expression="1=1">
             <CallLibMethod Name="__HAL_RCC_LSEDRIVE_CONFIG" ReturnHAL="false">
                 <MethodArg Name="__RCC_LSEDRIVE__" ParameterName="LSE_Drive_Capability"/>
             </CallLibMethod>
-        </IFCondition>
-			
+        </IFCondition>			
     </RefConfig>
-    <RefConfig Comment="Macro to configure the PLL clock source" Name="RCC_PLL_PLLSOURCE_CONFIG">
-     
+
+    <RefConfig Comment="Macro to configure the PLL clock source" Name="RCC_PLL_PLLSOURCE_CONFIG">    
         <CallLibMethod Name="__HAL_RCC_PLL1_PLLSOURCE_CONFIG" ReturnHAL="false">
             <MethodArg Name="__PLLSOURCE__" ParameterName="PLLSourceMARGForMacro"/>
         </CallLibMethod>
     </RefConfig>
-    <RefConfig Comment="Configures CRS" Name="RCC_CRSConfig">
+    
+	<RefConfig Comment="Configures CRS" Name="RCC_CRSConfig">
         <CallLibMethod Name="HAL_RCCEx_CRSConfig" ReturnHAL="false">
             <MethodArg Name="Prescaler" ParameterName="Prescaler"/>
             <MethodArg Name="Source" ParameterName="Source"/>
@@ -32,12 +29,29 @@
             <MethodArg Name="HSI48CalibrationValue" ParameterName="HSI48CalibrationValue"/>
         </CallLibMethod>
     </RefConfig>
+	
+    <RefConfig Comment="" Name="RCC_SYSTICK_Clock">
+	<IFCondition Expression="Systick_External">
+        <CallLibMethod Name="" Type="HardCode">
+            <HardCode Text="#n#t /* Select SysTick source clock */"/>
+        </CallLibMethod>
+        <CallLibMethod Name="HAL_SYSTICK_CLKSourceConfig" ReturnHAL="false">
+            <MethodArg Name="CLKSource" ParameterName="CortexCLockSelectionARG"/>
+        </CallLibMethod>
+        <CallLibMethod Name="" Type="HardCode">
+            <HardCode Text="#n#t /* Re-Initialize Tick with new clock source */"/>
+        </CallLibMethod>
+        <CallLibMethod Name="" Type="HardCode">
+            <HardCode Text="#tif (HAL_InitTick(TICK_INT_PRIORITY) != HAL_OK)#n#t{#n#t#tError_Handler();#t#n#t}"/>
+        </CallLibMethod>
+	</IFCondition>
+    </RefConfig>
+
     <RefConfig Comment="Enable the CRS APB clock" Name="CRS_CLK_ENABLE">
         <CallLibMethod Name="__HAL_RCC_CRS_CLK_ENABLE" ReturnHAL="false"/>
     </RefConfig>
 
-    <RefConfig Comment="Configure the main internal regulator output voltage" Name="RCC_ConfigVoltageScaling">
-        
+    <RefConfig Comment="Configure the main internal regulator output voltage" Name="RCC_ConfigVoltageScaling">        
         <CallLibMethod Name="__HAL_PWR_VOLTAGESCALING_CONFIG" ReturnHAL="false">
             <MethodArg Name="REGULATOR" ParameterName="PWR_Regulator_Voltage_Scale"/>
         </CallLibMethod>
@@ -45,6 +59,7 @@
             <HardCode Text="#n#twhile(!__HAL_PWR_GET_FLAG(PWR_FLAG_VOSRDY)) {}"/>
         </CallLibMethod>
     </RefConfig>
+
     <RefConfig Name="RCC_MCO1Config">
         <CallLibMethod Name="HAL_RCC_MCOConfig" ReturnHAL="false">
             <MethodArg Name="RCC_MCOx" ParameterName="RCC_MCO"/>
@@ -52,31 +67,36 @@
             <MethodArg Name="RCC_MCODiv" ParameterName="RCC_MCODiv"/>
         </CallLibMethod>
     </RefConfig>
+
     <RefConfig Name="RCC_MCO2Config">
         <CallLibMethod Name="HAL_RCC_MCOConfig" ReturnHAL="false">
-            <MethodArg Name="RCC_MCOSource" ParameterName="RCC_MCO2Source"/>
             <MethodArg Name="RCC_MCOx" ParameterName="RCC_MCO2"/>
+            <MethodArg Name="RCC_MCOSource" ParameterName="RCC_MCO2Source"/>
             <MethodArg Name="RCC_MCODiv" ParameterName="RCC_MCO2Div"/>
         </CallLibMethod>
     </RefConfig>
+
     <RefConfig Comment="LSCO configuration" Name="RCC_LSCOConfig">
         <CallLibMethod Name="HAL_RCCEx_EnableLSCO" ReturnHAL="false">
             <MethodArg Name="LSCOSource" ParameterName="LSCOSource1ARG"/>            
         </CallLibMethod>
     </RefConfig>
+
     <RefConfig Comment="Enables the Clock Security System" Name="RCC_CSS_Enable">
         <CallLibMethod Name="HAL_RCC_EnableCSS" ReturnHAL="false"/>
     </RefConfig>
+
     <RefConfig Comment="Enables the Clock Security System" Name="RCC_CSS_EnableLSE">
         <CallLibMethod Name="HAL_RCCEx_EnableLSECSS" ReturnHAL="false"/>
     </RefConfig>
+
     <RefConfig Comment="Initializes the RCC Oscillators according to the specified parameters#n#t*  in the RCC_OscInitTypeDef structure." Name="RCC_OSCConfig">
         <CallLibMethod Name="HAL_RCC_OscConfig">
-            <MethodArg Name="HSICalibrationValue" ParameterName="HSICalibrationValueARG"/>
             <MethodArg Name="HSEState" ParameterName="HSEStateARG"/>
             <MethodArg Name="LSEState" ParameterName="LSEStateARG"/>
             <MethodArg Name="HSIState" ParameterName="HSIStateARG"/>
             <MethodArg Name="HSIDiv" ParameterName="HSIDivARG"/>
+            <MethodArg Name="HSICalibrationValue" ParameterName="HSICalibrationValueARG"/>
             <MethodArg Name="LSIState" ParameterName="LSIStateARG"/>
             <MethodArg Name="CSIState" ParameterName="CSIStateARG"/>
             <MethodArg Name="CSICalibrationValue" ParameterName="CSICalibrationValueARG"/>
@@ -93,6 +113,7 @@
             <MethodArg Name="PLLFRACN" ParameterName="PLLFRACNARG"/>
         </CallLibMethod>
     </RefConfig>
+
     <RefConfig Comment="Initializes the CPU, AHB and APB buses clocks" Name="RCC_ClockConfig">
         <CallLibMethod Name="HAL_RCC_ClockConfig">
             <MethodArg Name="ClockType" ParameterName="ClockTypeARG"/>
@@ -103,6 +124,7 @@
             <MethodArg Name="APB2CLKDivider" ParameterName="APB2CLKDividerARG"/>
         </CallLibMethod>
     </RefConfig>
+
     <RefConfig Comment="Initializes the peripherals clock" Name="RCC_PeriphClockConfig">
         <CallLibMethod Name="HAL_RCCEx_PeriphCLKConfig">
             <MethodArg Name="PeriphClockSelection" ParameterName="PeriphClockSelectionARG"/> 
@@ -175,7 +197,8 @@
             <MethodArg Name="PLL2ClockOut" ParameterName="PLL2ClockOutARGP"/>              
         </CallLibMethod>
     </RefConfig>
-    <RefConfig Comment="Initializes the peripherals clock" Name="RCC_CommonPeriphClockConfig">
+    
+	<RefConfig Comment="Initializes the peripherals clock" Name="RCC_CommonPeriphClockConfig">
         <CallLibMethod Name="HAL_RCCEx_PeriphCLKConfig">
             <MethodArg Name="PeriphClockSelection" ParameterName="C_PeriphClockSelectionARG"/>      
             <MethodArg Name="CkperClockSelection" ParameterName="C_CkperClockSelectionARG"/>
@@ -251,6 +274,7 @@
     <RefConfig Comment=" Enable USB Voltage detector" Name="PWREx_EnableUSBVoltageDetector">
         <CallLibMethod Name="HAL_PWREx_EnableUSBVoltageDetector" ReturnHAL="false"/>
     </RefConfig>
+
     <RefConfig Comment=" Enables PLL2P clock output" Name="PLL2P_FOR_MCO">
         <IFCondition Expression="PLL2Used=1 &amp; ((PLL2NbUsed=1) &amp; (MCO2_PLL2PCLK&amp; (MCO2Config)))" >
             <CallLibMethod Name="__HAL_RCC_PLL2_CONFIG" ReturnHAL="false">                 
@@ -284,7 +308,8 @@
             </CallLibMethod>
         </IFCondition>
     </RefConfig>
-    <RefConfig Name="ConfigAttributesSECPRIV">
+    
+	<RefConfig Name="ConfigAttributesSECPRIV">
         <CallLibMethod Name="HAL_RCC_ConfigAttributes" ReturnHAL="false">
             <MethodArg Name="Item" ParameterName="ItemSECPRIV"/>
             <MethodArg Name="Attributes" ParameterName="AttributesSECPRIV"/>
@@ -312,8 +337,8 @@
             </CallLibMethod>
         </IFCondition>
     </RefConfig>
-    <LibMethod Comment="Enable the CRS" Name="__HAL_RCC_CRS_CLK_ENABLE">  
-    </LibMethod>
+    
+	<LibMethod Comment="Enable the CRS" Name="__HAL_RCC_CRS_CLK_ENABLE"/>  
 
     <LibMethod Comment="" Name="HAL_RCCEx_CRSConfig">
         <Argument AddressOf="true" GenericType="struct" Name="RCC_CRSInitStruct" TypeName="RCC_CRSInitTypeDef">
@@ -325,13 +350,16 @@
             <Argument AddressOf="false" GenericType="simple" Name="HSI48CalibrationValue" OptimizationCondition="equal"/>
         </Argument>
     </LibMethod>
-    <LibMethod Comment="" Name="__HAL_RCC_PLL2_CLKOUT_ENABLE">
+    
+	<LibMethod Comment="" Name="__HAL_RCC_PLL2_CLKOUT_ENABLE">
         <Argument AddressOf="false" GenericType="simple" Name="__PLL2_CLOCKOUT__" OptimizationCondition="equal"/>
     </LibMethod>    
-    <LibMethod Comment="" Name="__HAL_RCC_PLL2_FRACN_CONFIG">
+    
+	<LibMethod Comment="" Name="__HAL_RCC_PLL2_FRACN_CONFIG">
         <Argument AddressOf="false" GenericType="simple" Name="__PLL2FRACN__" OptimizationCondition="equal"/>
     </LibMethod>
-    <LibMethod Comment="" Name="__HAL_RCC_PLL2_CONFIG">
+    
+	<LibMethod Comment="" Name="__HAL_RCC_PLL2_CONFIG">
         <Argument AddressOf="false" GenericType="simple" Name="__PLL2SOURCE__" OptimizationCondition="equal"/>
         <Argument AddressOf="false" GenericType="simple" Name="__PLL2M__" OptimizationCondition="equal"/>
         <Argument AddressOf="false" GenericType="simple" Name="__PLL2N__" OptimizationCondition="equal"/>
@@ -339,26 +367,32 @@
         <Argument AddressOf="false" GenericType="simple" Name="__PLL2Q__" OptimizationCondition="equal"/>
         <Argument AddressOf="false" GenericType="simple" Name="__PLL2R__" OptimizationCondition="equal"/>
     </LibMethod>
-    <LibMethod Comment="" Name="__HAL_RCC_TIMIC_ENABLE">
-    </LibMethod>
-    <LibMethod Comment="" Name="__HAL_RCC_PLL2_VCIRANGE">
+    
+	<LibMethod Comment="" Name="__HAL_RCC_TIMIC_ENABLE"/>
+    
+	<LibMethod Comment="" Name="__HAL_RCC_PLL2_VCIRANGE">
         <Argument AddressOf="false" GenericType="simple" Name="__RCC_PLL2VCIRange__" OptimizationCondition="equal"/>
     </LibMethod>
-    <LibMethod Comment="" Name="__HAL_RCC_PLL2_VCORANGE">
+    
+	<LibMethod Comment="" Name="__HAL_RCC_PLL2_VCORANGE">
         <Argument AddressOf="false" GenericType="simple" Name="__RCC_PLL2VCORange__" OptimizationCondition="equal"/>
     </LibMethod>
-    <LibMethod Comment="" Name="__HAL_RCC_PLL2_ENABLE"/>
-    <LibMethod Comment="" Name="HAL_RCC_EnableCSS">
-    </LibMethod>
+    
+	<LibMethod Comment="" Name="__HAL_RCC_PLL2_ENABLE"/>
+    
+	<LibMethod Comment="" Name="HAL_RCC_EnableCSS"/>
+
     <LibMethod Comment="" Name="HAL_RCCEx_EnableLSECSS"/>
-    <LibMethod Comment="" Name="HAL_PWREx_EnableUSBVoltageDetector"/>  
-    <LibMethod Comment="" Name="__HAL_RCC_PWR_CLK_ENABLE">
-    </LibMethod>
+    
+	<LibMethod Comment="" Name="HAL_PWREx_EnableUSBVoltageDetector"/>  
+    
+	<LibMethod Comment="" Name="__HAL_RCC_PWR_CLK_ENABLE"/>
 	
     <LibMethod Comment="" Name="__HAL_RCC_PLL1_PLLSOURCE_CONFIG">
         <Argument AddressOf="false" GenericType="simple" Name="__PLLSOURCE__" OptimizationCondition="equal"/>
     </LibMethod>
-    <LibMethod Comment="" Name="__HAL_PWR_VOLTAGESCALING_CONFIG">
+    
+	<LibMethod Comment="" Name="__HAL_PWR_VOLTAGESCALING_CONFIG">
         <Argument AddressOf="false" GenericType="simple" Name="REGULATOR" OptimizationCondition="equal"/>
     </LibMethod>
 
@@ -369,16 +403,18 @@
     <LibMethod Comment="" Name="HAL_SYSTICK_Config">
         <Argument AddressOf="false" GenericType="simple" Name="TicksNumb" OptimizationCondition="equal"/>
     </LibMethod>
-    <LibMethod Comment="" Name="HAL_SYSTICK_CLKSourceConfig">
+    
+	<LibMethod Comment="" Name="HAL_SYSTICK_CLKSourceConfig">
         <Argument AddressOf="false" GenericType="simple" Name="CLKSource" OptimizationCondition="equal"/>
     </LibMethod>
-    <LibMethod Comment="" Name="__HAL_RCC_LSEDRIVE_CONFIG">
+    
+	<LibMethod Comment="" Name="__HAL_RCC_LSEDRIVE_CONFIG">
         <Argument AddressOf="false" GenericType="simple" Name="__RCC_LSEDRIVE__" OptimizationCondition="equal"/>
-
     </LibMethod> 
-    <LibMethod Comment="" Name="HAL_PWR_EnableBkUpAccess">
-    </LibMethod>
-    <LibMethod Comment="" Name="HAL_RCC_ConfigAttributes">
+    
+	<LibMethod Comment="" Name="HAL_PWR_EnableBkUpAccess"/>
+    
+	<LibMethod Comment="" Name="HAL_RCC_ConfigAttributes">
 	 <Argument AddressOf="false" GenericType="simple" Name="Item" OptimizationCondition="equal"/>
          <Argument AddressOf="false" GenericType="simple" Name="Attributes" OptimizationCondition="equal"/>
     </LibMethod>
@@ -409,7 +445,8 @@
             </Argument>
         </Argument>
     </LibMethod>
-    <LibMethod Comment="" Name="HAL_RCC_ClockConfig">
+    
+	<LibMethod Comment="" Name="HAL_RCC_ClockConfig">
         <Argument AddressOf="true" GenericType="struct" Name="RCC_ClkInitStruct" TypeName="RCC_ClkInitTypeDef">
             <Argument AddressOf="false" GenericType="simple" Name="ClockType" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="SYSCLKSource" OptimizationCondition="equal"/>
@@ -426,10 +463,12 @@
         <Argument AddressOf="false" GenericType="simple" Name="RCC_MCOSource" OptimizationCondition="equal"/>
         <Argument AddressOf="false" GenericType="simple" Name="RCC_MCODiv" OptimizationCondition="equal"/>
     </LibMethod>
-    <LibMethod Comment="" Name="HAL_RCCEx_EnableLSCO">
+    
+	<LibMethod Comment="" Name="HAL_RCCEx_EnableLSCO">
         <Argument AddressOf="false" GenericType="simple" Name="LSCOSource" OptimizationCondition="equal"/>      
     </LibMethod>
-    <LibMethod Comment="" Name="HAL_RCCEx_PeriphCLKConfig">
+    
+	<LibMethod Comment="" Name="HAL_RCCEx_PeriphCLKConfig">
         <Argument AddressOf="true" GenericType="struct" Name="PeriphClkInitStruct" TypeName="RCC_PeriphCLKInitTypeDef">
             <Argument AddressOf="false" GenericType="simple" Name="PeriphClockSelection" OptimizationCondition="equal"/>
             <Argument AddressOf="true" GenericType="struct" Name="PLL2" TypeName="RCC_PLL2InitTypeDef">

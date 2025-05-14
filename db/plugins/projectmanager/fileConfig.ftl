@@ -165,6 +165,9 @@
             [#if dataKey=="bootmode"]
                [#assign bootmode =  elem[dataKey]]
             [/#if]
+            [#if dataKey=="flasher"]
+                [#assign flasher =  elem[dataKey]]
+            [/#if]
             [#if dataKey=="Secure"]
                [#assign Secure =  elem[dataKey]]
             [/#if]
@@ -228,7 +231,10 @@
     [#if !IdeMode?? && (multiConfig == "true")]
     <bootmode>${bootmode}</bootmode>  [#-- for boot mode could be equals to SRAM or FLASH --]
     [/#if]
-     [#if TrustZone == "1" &&prj_ctx?? && prj_ctx=="1"]
+    [#if flasher?? && !IdeMode?? && (multiConfig == "true") && mainSourceRepo = "Appli"]
+    <flasher>${flasher}</flasher>  [#-- for appli project, set the flashloader --]
+    [/#if]
+    [#if TrustZone == "1" &&prj_ctx?? && prj_ctx=="1"]
     <ExePath>${ExePath}</ExePath>
     [/#if]
    [#if OutputFilesFormat??]
@@ -245,17 +251,42 @@
 [#if LinkerFilesUpdate??]
 <BootPathConfig>
 [#------------------------ BootPath Linker Updates ------------------]
-    [#list LinkerFilesUpdate?keys as linkerContext]
+    [#list LinkerFilesUpdate?keys as linkerContext]    
         [#if (Secure=="1" && linkerContext=="Secure") || (Secure=="0" && linkerContext=="NonSecure")]        
             [#assign ctxData = LinkerFilesUpdate[linkerContext]]
             [#list ctxData?keys as linkerData]
                 <linkerSymbol name="${linkerData}" value="${ctxData[linkerData]}" />        
             [/#list]
-        [/#if]
-    [/#list]    
+        [/#if]      
+    [/#list] 
+    
+          
+    [#if SmakLinkerFilePath??]
+    	[#list SmakLinkerFilePath?keys as SmakFilePathContext]    	
+    		[#if (Secure=="1" && SmakFilePathContext=="Secure") || (Secure=="0" && SmakFilePathContext=="NonSecure")] 
+    	  	[#assign ctxData1 = SmakLinkerFilePath[SmakFilePathContext]]
+    	   		[#list ctxData1?keys as SmakLinkerFilePathData]
+    		<SmakLinkerFilePath>${ctxData1[SmakLinkerFilePathData]}</SmakLinkerFilePath>
+    			[/#list]
+    		[/#if]
+    	[/#list]
+ 	[/#if]
+ 	
+ 	
+ 	[#if SmakSymbol??]
+ 	[#list SmakSymbol?keys as SmakSymbolContext]
+ 		[#if (Secure=="1" && SmakSymbolContext=="Secure") || (Secure=="0" && SmakSymbolContext=="NonSecure")] 
+ 			[#assign ctxData = SmakSymbol[SmakSymbolContext]]
+ 		 	[#list ctxData?keys as SmakSymbolData]
+ 	 <SmakSymbol name="${SmakSymbolData}" value="${ctxData[SmakSymbolData]}" /> 
+ 	 		[/#list]
+ 	 	[/#if]
+ 	[/#list] 
+ 	[/#if]
+ 	
 </BootPathConfig>
-
-[/#if]
+[/#if] 
+ 
 [#------------------------ BootPath Linker Updates ------------------]
 
     </memories>

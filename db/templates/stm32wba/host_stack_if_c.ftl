@@ -37,6 +37,7 @@ Key: ${key}; Value: ${myHash[key]}
 [#elseif myHash["THREADX_STATUS"]?number == 1 ]
 #include "app_threadx.h"
 [#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+#include "cmsis_os2.h"
 [/#if]
 
 /* External function prototypes -----------------------------------------------*/
@@ -85,6 +86,9 @@ void BleStackCB_Process(void)
 
 [#elseif myHash["THREADX_STATUS"]?number == 1 ]
   tx_semaphore_put(&BLE_HOST_Thread_Sem);
+
+[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+  osSemaphoreRelease(BleStackSemaphore);
 
 [/#if]
 [/#if]

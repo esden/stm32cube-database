@@ -169,11 +169,12 @@
 
     <RefParameter Comment="Access Permission" DefaultValue="RW_all" Group="Current application region attributes" Name="AP" Type="list">
         <PossibleValue Comment="RW by privileged code only" Value="RW_priv_only"/>
-        <PossibleValue Comment="RW by privileged code and RO by unprivileged code" Value="RW_priv_RO_unpriv" Condition="!DIE450&amp;!DIE480&amp;!DIE483" Action="Remove"/>
         <PossibleValue Comment="RW by any privilege level" Value="RW_all"/>
         <PossibleValue Comment="RO by privileged code only" Value="RO_priv_only"/>
         <PossibleValue Comment="RO by any privilege level" Value="RO_all"/>
-	<Description>Define if this region is accessible by privileged or unprivileged mode</Description>
+        <PossibleValue Comment="RW by privileged code and RO by unprivileged code" Value="RW_priv_RO_unpriv" Condition="!DIE450&amp;!DIE480&amp;!DIE483&amp;!DIE485" Action="Remove"/>
+        <PossibleValue Comment="All access not permitted" Value="All_Not_perm" Condition="!DIE485" Action="Remove"/>
+        <Description>Define if this region is accessible by privileged or unprivileged mode</Description>
     </RefParameter>
 
     <RefParameter Comment="Code execution" DefaultValue="Permitted" Group="Current application region attributes" Name="XN" Type="list">
@@ -188,33 +189,64 @@
 	<Description>Define if this region is shared by different masters (cores, DMAs)</Description>
     </RefParameter>
 
-    <!-- 1) different recommanded values for different memories: done by the builder
+     <!-- Depending DIE, give the list of context to remove from current list of existing context -->
+    <RefParameter Comment="ExcludedContext" DefaultValue="" Group="Current application region attributes" Name="ExcludedContext" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="DIE485"/>
+        <PossibleValue Comment="ExtMemLoader" Value="ExtMemLoader"/>
+    </RefParameter>
+	
+    <RefParameter Comment="ExcludedContext" DefaultValue="" Group="Current application region attributes" Name="ExcludedContext" Type="list" Visible="false">
+    </RefParameter>
+
+	<!-- ContextLink informs that this AppReg is linked to another AppReg with same same address and same size in another Context
+	     The possibleValue indicates that the region is reserved for the 'master' AppReg or shared with the 'master' AppReg
+	-->
+    <RefParameter Comment="ContextLink" DefaultValue="disable" Group="Current application region attributes" Name="ContextLink" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="DIE485"/>
+        <PossibleValue Comment="disable" Value="disable"/>
+        <PossibleValue Comment="reserved" Value="reserved"/>
+        <PossibleValue Comment="shared" Value="shared"/>
+    </RefParameter>
+    <RefParameter Comment="ContextLink" DefaultValue="disable" Group="Current application region attributes" Name="ContextLink" Type="list" Visible="false">
+    </RefParameter>
+
+   <!-- 1) different recommanded values for different memories: done by the builder
     2) "Advanced settings" (DONE)
     3) "Trensient" is only available for MPU armv8 -->
-    <RefParameter Comment="Cacheability" DefaultValue="WBRAWA" Group="Current application region attributes" Name="Cacheability" Type="list">
+   <RefParameter Comment="Cacheability" DefaultValue="WBRAWA" Group="Current application region attributes" Name="Cacheability" Type="list">
         <!-- allow user to turn back to the default value for the zones [0x4000 0000 : 0x6000 0000] and [0xA000 0000 : 0xC000 0000](HSPI) -->
         <PossibleValue Comment="Device, Non-Cacheable" Value="Device_NGNRE" Condition="!(StartAddress&gt;=0x40000000&amp;StartAddress&lt;=0x60000000|StartAddress&gt;=0xA0000000&amp;StartAddress&lt;=0xC0000000)" Action="Remove"/>
         <PossibleValue Comment="Non-Cacheable (recommended for multimaster/DMA)" Value="NonCacheable"/>
         <PossibleValue Comment="Write-Through Read Allocate for ROM/Flash (not recommened for multimaster/DMA)" Value="WTRA"/>
         <PossibleValue Comment="Write-Back Read Write Allocate for RAM (not recommended for multimaster/DMA)" Value="WBRAWA"/>
         <PossibleValue Comment="Advanced Settings" Value="Advanced" Semaphore="S_MMT_CurReg_AdvancedSettings"/>
-	<Description>Configure the cacheability of this region</Description>
+        <Description>Configure the cacheability of this region</Description>
     </RefParameter>
+
     <RefParameter Comment="Write policy" DefaultValue="WB" Group="Current application region attributes" Name="WritePolicy" Type="list">
         <Condition Diagnostic="" Expression="S_MMT_CurReg_AdvancedSettings"/>
-        <PossibleValue Comment="Write-Through" Value="WT"/>
+        <PossibleValue Comment="Write-Through" Value="WT" Semaphore="S_MMT_CurReg_WT"/>
         <PossibleValue Comment="Write-Back" Value="WB"/>
     </RefParameter>
     <RefParameter Comment="Write policy" DefaultValue="null" Group="Current application region attributes" Name="WritePolicy" Type="list" Visible="false">
         <Condition Diagnostic="" Expression="!S_MMT_CurReg_AdvancedSettings"/>
     </RefParameter>
     <RefParameter Comment="Read allocate" DefaultValue="Y" Group="Current application region attributes" Name="ReadAllocate" Type="list">
-        <Condition Diagnostic="" Expression="S_MMT_CurReg_AdvancedSettings"/>
-        <PossibleValue Comment="Yes" Value="Y" Semaphore="S_MMT_CurReg_RA"/>
+        <Condition Diagnostic="" Expression="S_MMT_CurReg_AdvancedSettings&amp;DIE485"/>
+        <PossibleValue Comment="Yes" Value="Y" />
+    </RefParameter>
+    <RefParameter Comment="Read allocate" DefaultValue="Y" Group="Current application region attributes" Name="ReadAllocate" Type="list">
+        <Condition Diagnostic="" Expression="S_MMT_CurReg_AdvancedSettings&amp;!DIE485"/>
+        <PossibleValue Comment="Yes" Value="Y" Semaphore="S_MMT_CurReg_RA" />
         <PossibleValue Comment="No" Value="N"/>
     </RefParameter>
+
     <RefParameter Comment="Read allocate" DefaultValue="null" Group="Current application region attributes" Name="ReadAllocate" Type="list" Visible="false">
         <Condition Diagnostic="" Expression="!S_MMT_CurReg_AdvancedSettings"/>
+    </RefParameter>
+    <RefParameter Comment="Write allocate" DefaultValue="N" Group="Current application region attributes" Name="WriteAllocate" Type="list">
+        <Condition Diagnostic="" Expression="S_MMT_CurReg_AdvancedSettings&amp;DIE485&amp;S_MMT_CurReg_WT"/>
+        <PossibleValue Comment="No" Value="N"/>
     </RefParameter>
     <RefParameter Comment="Write allocate" DefaultValue="Y" Group="Current application region attributes" Name="WriteAllocate" Type="list">
         <Condition Diagnostic="" Expression="S_MMT_CurReg_AdvancedSettings"/>
@@ -223,6 +255,9 @@
     </RefParameter>
     <RefParameter Comment="Write allocate" DefaultValue="null" Group="Current application region attributes" Name="WriteAllocate" Type="list" Visible="false">
         <Condition Diagnostic="" Expression="!S_MMT_CurReg_AdvancedSettings"/>
+    </RefParameter>
+    <RefParameter Comment="Transient" DefaultValue="null" Group="Current application region attributes" Name="Transient" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="DIE485"/>
     </RefParameter>
     <RefParameter Comment="Transient" DefaultValue="Y" Group="Current application region attributes" Name="Transient" Type="list">
         <Condition Diagnostic="" Expression="S_MMT_CurReg_AdvancedSettings&amp;(S_MMT_CurReg_RA|S_MMT_CurReg_WA)"/>
@@ -263,6 +298,8 @@
         <Parameter Name="InvalidRegion"/>
         <Parameter Name="LockedRegion"/>
         <Parameter Name="IgnoreAlignmentCheck"/>
+        <Parameter Name="ExcludedContext"/>
+        <Parameter Name="ContextLink"/>
     </RefMode>
 
     <!-- ModeLogicOperator for DTS -->

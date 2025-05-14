@@ -206,7 +206,7 @@
 #define MAC_ADDR5   0U
 
 /* Definition of the Ethernet driver buffers size and count */   
-#define ETH_RX_BUF_SIZE                [#if RxBuffLen??]${RxBuffLen}[/#if] /* buffer size for receive               */
+#define ETH_RX_BUF_SIZE                [#if RxBuffLen??]${RxBuffLen}[#else]ETH_MAX_PACKET_SIZE[/#if] /* buffer size for receive               */
 #define ETH_TX_BUF_SIZE                ETH_MAX_PACKET_SIZE /* buffer size for transmit              */
 #define ETH_RXBUFNB                    [#if ETH_RXBUFNB??]${ETH_RXBUFNB}[#if ETH_RXBUFNB?matches("(0x[0-9]*[a-f]*[A-F]*)|([0-9]*)")]U[/#if][#else]4U[/#if]       /* 4 Rx buffers of size ETH_RX_BUF_SIZE  */
 #define ETH_TXBUFNB                    [#if ETH_TXBUFNB??]${ETH_TXBUFNB}[#if ETH_TXBUFNB?matches("(0x[0-9]*[a-f]*[A-F]*)|([0-9]*)")]U[/#if][#else]4U[/#if]       /* 4 Tx buffers of size ETH_TX_BUF_SIZE  */

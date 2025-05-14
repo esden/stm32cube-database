@@ -36,7 +36,5 @@
 COM_InitTypeDef BspCOMInit;
 [/#if]
 [#if Bsp_Common_DEMO?? && Bsp_Common_DEMO == "true"]
-  [#if BUTTON == "1"][#--EXTI--]
 __IO uint32_t BspButtonState = BUTTON_RELEASED;
-  [/#if]
 [/#if]
