@@ -475,12 +475,13 @@ uint32_t MX_APPE_Init(void *p_param)
 [/#if]
   APP_BLE_Init();
 [/#if]
+[#if myHash["THREADX_STATUS"]?number == 0]
   ll_sys_config_params();
+[/#if]
 [#if myHash["SEQUENCER_STATUS"]?number == 1 ]
 #if ( CFG_LPM_SUPPORTED == 1)
   system_startup_done = TRUE;
 #endif /* CFG_LPM_SUPPORTED */
-
 [/#if]
   /* Disable RFTS Bypass for flash operation - Since LL has not started yet */
   FD_SetStatus (FD_FLASHACCESS_RFTS_BYPASS, LL_FLASH_DISABLE);

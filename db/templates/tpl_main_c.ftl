@@ -407,7 +407,8 @@ ${dHandle};
 static void NonSecure_Init(void);
 [/#if]
 [/#if]
-[#if rccFctName?? && ((!McuDualCore?? && TZEN=="0") || ((TZEN=="1" && Secure=="true") && rccIsSecure??) || ((TZEN=="1" && Secure=="false") && !rccIsSecure??)|| (bootMode?? && bootMode=="boot0" && cpucore=="ARM_CORTEX_M7" && McuDualCore??) || (cpucore=="ARM_CORTEX_M4" && McuDualCore?? && FamilyName=="STM32WL"))]
+[#if rccFctName?? && ((!McuDualCore?? && TZEN=="0") || ((TZEN=="1" && Secure=="true") && rccIsSecure??) || ((TZEN=="1" && Secure=="false") && !rccIsSecure??)|| (bootMode?? && bootMode=="boot0" && cpucore=="ARM_CORTEX_M7" && McuDualCore??) || (cpucore=="ARM_CORTEX_M4" && McuDualCore?? && FamilyName=="STM32WL"))
+|| ((TZEN=="1" && Secure=="false") && (bootPathType?? && (bootPathType == "ST_IROT_UROT_SECURE_MANAGER")))]
 void SystemClock_Config(void); [#-- remove static --]
 [#if commonClockConfig??]
 void PeriphCommonClock_Config(void);
@@ -735,7 +736,8 @@ int main(void)
     [#if void.functionName?? && void.functionName?contains("SystemClock_Config") && !void.isNotGenerated]
 
 [#if rccFctName??]
-[#if (!McuDualCore?? && TZEN=="0") ||  ((TZEN=="1" && Secure=="true") && rccIsSecure??) || ((TZEN=="1" && Secure=="false") && !rccIsSecure??) || (bootMode?? && bootMode=="boot0" && cpucore=="ARM_CORTEX_M7" && McuDualCore??) || (cpucore=="ARM_CORTEX_M4" && McuDualCore?? && FamilyName=="STM32WL")]
+[#if (!McuDualCore?? && TZEN=="0") ||  ((TZEN=="1" && Secure=="true") && rccIsSecure??) || ((TZEN=="1" && Secure=="false") && !rccIsSecure??) || (bootMode?? && bootMode=="boot0" && cpucore=="ARM_CORTEX_M7" && McuDualCore??) || (cpucore=="ARM_CORTEX_M4" && McuDualCore?? && FamilyName=="STM32WL")
+|| ((TZEN=="1" && Secure=="false") && (bootPathType?? && (bootPathType == "ST_IROT_UROT_SECURE_MANAGER")))]
 [#if FamilyName=="STM32MP1"]
 #tif(IS_ENGINEERING_BOOT_MODE())
 #t{
@@ -1070,7 +1072,9 @@ static void NonSecure_Init(void)
 [/#if]
 [/#if]
 [#compress]
-[#if clockConfig?? && rccFctName?? && ((!McuDualCore?? && TZEN=="0") ||  ((TZEN=="1" && Secure=="true") && rccIsSecure??) || ((TZEN=="1" && Secure=="false") && !rccIsSecure??) ||(bootMode?? && bootMode=="boot0" && cpucore=="ARM_CORTEX_M7") ||(cpucore=="ARM_CORTEX_M4" && FamilyName=="STM32WL"))]
+
+[#if clockConfig?? && rccFctName?? && ((!McuDualCore?? && TZEN=="0") ||  ((TZEN=="1" && Secure=="true") && rccIsSecure??) || ((TZEN=="1" && Secure=="false") && !rccIsSecure??) || (bootMode?? && bootMode=="boot0" && cpucore=="ARM_CORTEX_M7") ||(cpucore=="ARM_CORTEX_M4" && FamilyName=="STM32WL")
+|| ((TZEN=="1" && Secure=="false") && (bootPathType?? && (bootPathType == "ST_IROT_UROT_SECURE_MANAGER")))) ]
 
 #n/**
 #t* @brief System Clock Configuration

@@ -67,6 +67,9 @@ set secure_code_size=%code_size%
 	[#if NonSecure_Code_Image??]
 set ns_code_xml="%provisioningdir%\${ProvisioningFolderName}\Images\${NonSecure_Code_Image}"
 	[/#if]
+	[#if NonSecure_Bin_Code_Image??]
+set ns_code_bin_xml="%provisioningdir%\${ProvisioningFolderName}\Images\${NonSecure_Bin_Code_Image}"
+	[/#if]
 [/#if]
 
 
@@ -94,7 +97,12 @@ goto :continue
 if %signing% == "nonsecure" (
 echo Creating only one image >> %projectdir%\output.txt 2>&1
 %python%%applicfg% oneimage -fb "%appli_secure_path%\%appli_secure%" -sb "%appli_non_secure_path%\%appli_non_secure%" -o %secure_code_size% -ob "%appli_assembly_path%\%appli_assembly%" --vb
+[#if BootPathType?? && (BootPathType=="ST_IROT_UROT_SECURE_MANAGER")]
+%stm32tpccli% -pb %ns_code_xml%
+%stm32tpccli% -pb %ns_code_bin_xml%
+[#else]
 "%stm32tpccli%" -pb %ns_code_xml%
+[/#if]
 if !errorlevel! neq 0 goto :error
 )
 
@@ -102,13 +110,22 @@ if !errorlevel! neq 0 goto :error
 :continue
 if %signing% == "secure" (
 echo Creating secure image  >> %projectdir%\output.txt 2>&1
+[#if BootPathType?? && (BootPathType=="ST_IROT_UROT_SECURE_MANAGER")]
+%stm32tpccli% -pb %s_code_xml% >> %projectdir%\output.txt 2>&1
+[#else]
 "%stm32tpccli%" -pb %s_code_xml% >> %projectdir%\output.txt 2>&1
+[/#if]
 if !errorlevel! neq 0 goto :error
 )
 
 if %signing% == "nonsecure" (
 echo Creating nonsecure image  >> %projectdir%\output.txt 2>&1
+[#if BootPathType?? && (BootPathType=="ST_IROT_UROT_SECURE_MANAGER")]
+%stm32tpccli% -pb %ns_code_xml% >> "%projectdir%"\output.txt 2>&1
+%stm32tpccli% -pb %ns_code_bin_xml% >> "%projectdir%"\output.txt 2>&1
+[#else]
 "%stm32tpccli%" -pb %ns_code_xml% >> %projectdir%\output.txt 2>&1
+[/#if]
 if !errorlevel! neq 0 goto :error
 )
 

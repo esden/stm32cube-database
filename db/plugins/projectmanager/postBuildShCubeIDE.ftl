@@ -69,6 +69,9 @@ secure_code_size=$code_size
 	[#if NonSecure_Code_Image??]
 ns_code_xml="$provisioningdir/${ProvisioningFolderName}/Images/${NonSecure_Code_Image}"
 	[/#if]
+	[#if NonSecure_Bin_Code_Image??]
+ns_code_bin_xml="$provisioningdir/${ProvisioningFolderName}/Images/${NonSecure_Bin_Code_Image}"
+	[/#if]
 [/#if]
 
 applicfg="$cube_fw_path/Utilities/PC_Software/ROT_AppliConfig/dist/AppliCfg.exe"
@@ -109,6 +112,13 @@ if [ $signing == "nonsecure" ]; then
   if [ $? != 0 ]; then 
   	echo "Error with TPC see $current_log_file"
   fi
+[#if BootPathType?? && (BootPathType=="ST_IROT_UROT_SECURE_MANAGER")]
+  echo "Creating nonsecure binary image"  >> $current_log_file
+  "$stm32tpccli" -pb $ns_code_bin_xml >> $current_log_file
+  if [ $? != 0 ]; then 
+  	echo "Error with TPC see $current_log_file"
+  fi
+[/#if]
 fi
 
 exit 0

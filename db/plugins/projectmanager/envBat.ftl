@@ -4,7 +4,11 @@
 ::                               General
 :: ==============================================================================
 set stm32programmercli="C:\Program Files\STMicroelectronics\STM32Cube\STM32CubeProgrammer\bin\STM32_Programmer_CLI.exe"
+[#if BootPathType?? && (BootPathType=="ST_IROT_UROT_SECURE_MANAGER")]
+set stm32tpccli="${tpcPath}"
+[#else]
 set stm32tpccli=${tpcPath}
+[/#if]
 ::~dp0 = represent the folder where the env.bat is started
 :: ==============================================================================
 ::               !!!! DOT NOT EDIT --- UPDATED AUTOMATICALLY !!!!
