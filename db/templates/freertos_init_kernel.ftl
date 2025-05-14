@@ -10,7 +10,8 @@
     [/#list]
   [/#if]
 [/#list]
-[#if CMSIS_version == "2.00"]  [#--Nothing was generated in CMSI-RTOS v1 --]
+[#assign CMSIS_version_integer=Integer.parseInt(CMSIS_version?substring(0,1)) ]
+[#if CMSIS_version_integer gte 2]  [#--Nothing was generated in CMSI-RTOS v1 --]
 #t/* Init scheduler */
 #tosKernelInitialize();
 [/#if]

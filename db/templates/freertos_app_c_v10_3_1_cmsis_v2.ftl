@@ -77,6 +77,9 @@
         [#if mw == "SubGHz_Phy"]
 #include "app_subghz_phy.h"
         [/#if]
+		[#if mw == "USB_Device"]
+#include "usb_device.h"
+        [/#if]
       [/#if] [#-- end if variable.name=="MiddlewareInUse"--]  
     [/#list]
   [/#if]

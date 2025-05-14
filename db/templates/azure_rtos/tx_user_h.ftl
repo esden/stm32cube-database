@@ -655,8 +655,11 @@
 [#if TX_LOW_POWER_TIMER_SETUP_value == " " || TX_LOW_POWER_TIMER_SETUP_value == "" || TX_LOW_POWER_TIMER_SETUP_value="valueNotSetted"]
 /*#define TX_LOW_POWER_TIMER_SETUP */
 [#else]
+   [#if ((FamilyName=="STM32N6") || ((FamilyName!="STM32N6") && (ide=="Makefile" || ide=="CMake")))]
+   [#else]
 void ${TX_LOW_POWER_TIMER_SETUP_value}(unsigned long count);
 #define TX_LOW_POWER_TIMER_SETUP(_count) ${TX_LOW_POWER_TIMER_SETUP_value}(_count)
+   [/#if]
 [/#if]
 
 /* Define the TX_LOW_POWER_TICKLESS to disable the internal ticks */
@@ -670,25 +673,33 @@ void ${TX_LOW_POWER_TIMER_SETUP_value}(unsigned long count);
 [#if TX_LOW_POWER_USER_ENTER_value == " " || TX_LOW_POWER_USER_ENTER_value == ""]
 /*#define TX_LOW_POWER_USER_ENTER */
 [#else]
+   [#if ((FamilyName=="STM32N6") || ((FamilyName!="STM32N6") && (ide=="Makefile" || ide=="CMake")))]
+   [#else]
 void ${TX_LOW_POWER_USER_ENTER_value}(void);
 #define TX_LOW_POWER_USER_ENTER ${TX_LOW_POWER_USER_ENTER_value}()
+   [/#if]
 [/#if]
-
 
 /* A user defined macro to make the system exit low power mode */
 [#if TX_LOW_POWER_USER_EXIT_value == " " || TX_LOW_POWER_USER_EXIT_value == ""]
 /*#define TX_LOW_POWER_USER_EXIT */
 [#else]
+   [#if ((FamilyName=="STM32N6") || ((FamilyName!="STM32N6") && (ide=="Makefile" || ide=="CMake")))]
+   [#else]
 void ${TX_LOW_POWER_USER_EXIT_value}(void);
 #define TX_LOW_POWER_USER_EXIT ${TX_LOW_POWER_USER_EXIT_value}()
+   [/#if]
 [/#if]
 
 /* User's low-power macro to obtain the amount of time (in ticks) the system has been in low power mode */
 [#if TX_LOW_POWER_USER_TIMER_ADJUST_value == " " || TX_LOW_POWER_USER_TIMER_ADJUST_value == "" || TX_LOW_POWER_USER_TIMER_ADJUST_value == "valueNotSetted"]
 /*#define TX_LOW_POWER_USER_TIMER_ADJUST */
 [#else]
+   [#if ((FamilyName=="STM32N6") || ((FamilyName!="STM32N6") && (ide=="Makefile" || ide=="CMake")))]
+   [#else]
 unsigned long ${TX_LOW_POWER_USER_TIMER_ADJUST_value}(void);
 #define TX_LOW_POWER_USER_TIMER_ADJUST ${TX_LOW_POWER_USER_TIMER_ADJUST_value}()
+    [/#if]
 [/#if]
 
 [/#if]

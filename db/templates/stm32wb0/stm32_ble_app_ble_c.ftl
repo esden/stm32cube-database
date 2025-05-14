@@ -451,6 +451,8 @@ Key: ${key}; Value: ${myHash[key]}
 [#if  (myHash["BLE_MODE_TRANSPARENT_UART"] == "Enabled")]
 /* Add aci_blue_initialized_event() prototype */
 void aci_blue_initialized_event(uint8_t Reason_Code);
+/* aci_blue_initialized_event with with legacy format (not extended) */
+void aci_blue_initialized_legacy_event(uint8_t Reason_Code);
 
 /* Add aci_blue_crash_info_event() prototype */
 void aci_blue_crash_info_event(uint8_t Crash_Type,
@@ -515,7 +517,7 @@ typedef struct
    * the security, wait for pairing or does not have any security
    * requirements.
    * 0x00 : no security required
-   * 0x01 : host should initiate security by sending the slave security
+   * 0x01 : host should initiate security by sending the security
    *        request command
    * 0x02 : host need not send the clave security request but it
    * has to wait for paiirng to complete before doing any other
@@ -574,6 +576,7 @@ typedef struct
 [/#if]
 /* Private define ------------------------------------------------------------*/
 [#if  (myHash["BLE_MODE_TRANSPARENT_UART"] == "Enabled")]
+#define RESET_REASON_NRST       ((uint8_t)0x01)
 #define RESET_REASON_WDG        ((uint8_t)0x05)
 #define RESET_REASON_LOCKUP     ((uint8_t)0x06)
 #define RESET_REASON_POR_BOR    ((uint8_t)0x07)
@@ -939,28 +942,7 @@ void BLE_Init(void)
   }
 
 [/#if]
-[#if (myHash["BLE_MODE_PERIPHERAL"] == "Enabled")&&(myHash["BLE_MODE_PERIPHERAL_CENTRAL"] == "Disabled")]
-
-#if CFG_BLE_CONTROLLER_2M_CODED_PHY_ENABLED
-[/#if]
-[#if (myHash["BLE_MODE_PERIPHERAL"] == "Enabled")]
-  /* Initialize Default PHY */
-  ret = hci_le_set_default_phy(0x00, HCI_TX_PHYS_LE_2M_PREF, HCI_RX_PHYS_LE_2M_PREF);
-  if (ret != BLE_STATUS_SUCCESS)
-  {
-    APP_DBG_MSG("  Fail   : hci_le_set_default_phy command, result: 0x%02X\n", ret);
-  }
-  else
-  {
-    APP_DBG_MSG("  Success: hci_le_set_default_phy command\n");
-  }
-
-[#if (myHash["BLE_MODE_PERIPHERAL"] == "Enabled")&&(myHash["BLE_MODE_PERIPHERAL_CENTRAL"] == "Disabled")]
-#endif
-[/#if]
-[/#if]
 [#if (myHash["BLE_MODE_BROADCASTER"] != "Enabled")]
-  [#if myHash["LITE_SERVER_STATUS"]?number == 0 ]
   /**
    * Initialize IO capability
    */
@@ -982,11 +964,10 @@ void BLE_Init(void)
   bleAppContext.BleApplicationContext_legacy.bleSecurityParam.encryptionKeySizeMin  = CFG_ENCRYPTION_KEY_SIZE_MIN;
   bleAppContext.BleApplicationContext_legacy.bleSecurityParam.encryptionKeySizeMax  = CFG_ENCRYPTION_KEY_SIZE_MAX;
   bleAppContext.BleApplicationContext_legacy.bleSecurityParam.bonding_mode          = CFG_BONDING_MODE;
-  [/#if]
+
   /* USER CODE BEGIN Ble_Hci_Gap_Gatt_Init_1*/
 
   /* USER CODE END Ble_Hci_Gap_Gatt_Init_1*/
-  [#if myHash["LITE_SERVER_STATUS"]?number == 0 ]
   ret = aci_gap_set_security_requirements(bleAppContext.BleApplicationContext_legacy.bleSecurityParam.bonding_mode,
                                                bleAppContext.BleApplicationContext_legacy.bleSecurityParam.mitm_mode,
                                                CFG_SC_SUPPORT,
@@ -1019,11 +1000,10 @@ void BLE_Init(void)
       APP_DBG_MSG("  Success: aci_gap_configure_filter_accept_and_resolving_list command\n");
     }
   }
-  [/#if]
   APP_DBG_MSG("==>> End BLE_Init function\n");
-  
 [/#if]
 [/#if]
+
 }
 
 [#if myHash["LITE_SERVER_STATUS"]?number == 0 ]
@@ -1519,7 +1499,7 @@ void BLEEVT_App_Notification(const hci_pckt *hci_pckt)
 
         /* USER CODE END RADIO_ACTIVITY_EVENT*/
         break;
-[#if ((myHash["BLE_MODE_PERIPHERAL"] == "Enabled") || (myHash["BLE_MODE_CENTRAL"] == "Enabled") || (myHash["BLE_MODE_PERIPHERAL_CENTRAL"] == "Enabled")) && (myHash["LITE_SERVER_STATUS"]?number == 0)]
+[#if ((myHash["BLE_MODE_PERIPHERAL"] == "Enabled") || (myHash["BLE_MODE_CENTRAL"] == "Enabled") || (myHash["BLE_MODE_PERIPHERAL_CENTRAL"] == "Enabled"))]
       case ACI_GAP_KEYPRESS_NOTIFICATION_VSEVT_CODE:
         {
           APP_DBG_MSG(">>== ACI_GAP_KEYPRESS_NOTIFICATION_VSEVT_CODE\n");
@@ -1684,6 +1664,12 @@ static void connection_complete_event(uint8_t Status,
                                       uint16_t Supervision_Timeout)
 {
 [/#if]
+  if(Status != 0)
+  {
+    APP_DBG_MSG("==>> connection_complete_event Fail, Status: 0x%02X\n", Status);
+    bleAppContext.Device_Connection_Status = APP_BLE_IDLE;
+    return;
+  }
   /* USER CODE BEGIN HCI_EVT_LE_CONN_COMPLETE_1 */
 
   /* USER CODE END HCI_EVT_LE_CONN_COMPLETE_1 */
@@ -2011,6 +1997,9 @@ void APP_BLE_Procedure_Gap_Peripheral(ProcGapPeripheralId_t ProcGapPeripheralId)
     }
     /* PROC_GAP_PERIPH_CONN_TERMINATE */
     [/#if]
+    /* USER CODE BEGIN GAP_PERIPHERAL_1 */
+    
+    /* USER CODE END GAP_PERIPHERAL_1 */
     default:
       break;
   }
@@ -2051,6 +2040,9 @@ void APP_BLE_Procedure_Gap_Central(ProcGapCentralId_t ProcGapCentralId)
       /* USER CODE END PROC_GAP_CENTRAL_SCAN_TERMINATE */
       break;
     }/* PROC_GAP_CENTRAL_SCAN_TERMINATE */
+    /* USER CODE BEGIN GAP_CENTRAL_1 */
+    
+    /* USER CODE END GAP_CENTRAL_1 */
     default:
       break;
   }
@@ -2126,11 +2118,11 @@ void APP_BLE_Procedure_Gap_Central(ProcGapCentralId_t ProcGapCentralId)
       status = aci_gap_set_advertising_enable(DISABLE, 0, NULL);
       if (status != BLE_STATUS_SUCCESS)
       {
-        bleAppContext.Device_Connection_Status = (APP_BLE_ConnStatus_t)paramC;
         APP_DBG_MSG("Disable advertising - fail, result: 0x%02X\n",status);
       }
       else
       {
+        bleAppContext.Device_Connection_Status = (APP_BLE_ConnStatus_t)paramC;
         APP_DBG_MSG("==>> Disable advertising - Success\n");
       }
       break;
@@ -2160,6 +2152,9 @@ void APP_BLE_Procedure_Gap_Central(ProcGapCentralId_t ProcGapCentralId)
 
       break;
     }/* PROC_GAP_PERIPH_SET_BROADCAST_MODE */
+    /* USER CODE BEGIN GAP_PERIPHERAL_2 */
+    
+    /* USER CODE END GAP_PERIPHERAL_2 */
     default:
       break;
   }
@@ -2197,6 +2192,9 @@ void APP_BLE_Procedure_Gap_Central(ProcGapCentralId_t ProcGapCentralId)
 
       break;
     }/* PROC_GAP_CENTRAL_SCAN_TERMINATE */
+    /* USER CODE BEGIN GAP_CENTRAL_1 */
+    
+    /* USER CODE END GAP_CENTRAL_1 */
     default:
       break;
   }
@@ -2244,7 +2242,9 @@ void APP_BLE_Procedure_Gap_Central(ProcGapCentralId_t ProcGapCentralId)
       }
       break;
     }/* PROC_GAP_CENTRAL_SCAN_TERMINATE */
-
+    /* USER CODE BEGIN GAP_CENTRAL_2 */
+    
+    /* USER CODE END GAP_CENTRAL_2 */
     default:
       break;
   }
@@ -2273,9 +2273,7 @@ void APP_BLE_Procedure_Gap_Central(ProcGapCentralId_t ProcGapCentralId)
     send_event(buffer_out,7,-1);
   }
 
-#if (BLESTACK_CONTROLLER_ONLY == 0)
-
-  uint8_t reset_reason = 0x01;
+  uint8_t reset_reason = RESET_REASON_NRST;
 
   /* EVT_BLUE_INITIALIZED */  
   /* Check the reset reason */
@@ -2289,13 +2287,26 @@ void APP_BLE_Procedure_Gap_Central(ProcGapCentralId_t ProcGapCentralId)
     reset_reason = RESET_REASON_POR_BOR;
   }
 
-  if((crash_info.signature&0xFFFF0000) == CRASH_SIGNATURE_BASE) {  
+  if(RAM_VR.ResetReason & RCC_CSR_SFTRSTF && (crash_info.signature&0xFFFF0000) == CRASH_SIGNATURE_BASE) { 
     reset_reason = RESET_REASON_CRASH;
   }
 
+#if (BLESTACK_CONTROLLER_ONLY == 1)  
+    /* In controller-only mode, let's send the aci_blue_initialized_event only
+     for HW reset or if there is a relevant reset reason. */    
+  else if(RAM_VR.ResetReason & RCC_CSR_SFTRSTF){
+    reset_reason = 0;
+  }
+  
+  if(reset_reason) {  
+    aci_blue_initialized_legacy_event(reset_reason);
+  }
+
+#else
+  
   aci_blue_initialized_event(reset_reason);
 
-#endif
+#endif /* (BLESTACK_CONTROLLER_ONLY == 1) */
 
   if((crash_info.signature&0xFFFF0000) == CRASH_SIGNATURE_BASE) { 
     aci_blue_crash_info_event(crash_info.signature&0xFF,

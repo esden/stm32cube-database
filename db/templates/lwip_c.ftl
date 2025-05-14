@@ -570,8 +570,13 @@ void MX_LWIP_Init(void)
 [/#if][#-- endif lwip_ipv4 --]
 [#else][#-- case with_rtos == 1 --]
 [#if lwip_ipv4 == 1]
+[#if (series != "stm32h7rs")]
 #t/* add the network interface (IPv4/IPv6) with RTOS */
 #tnetif_add(&gnetif, &ipaddr, &netmask, &gw, NULL, &ethernetif_init, &tcpip_input);
+[#else]
+#t/* Add the network interface (IPv4/IPv6) with RTOS */
+#tnetifapi_netif_add(&gnetif, &ipaddr, &netmask, &gw, NULL, &ethernetif_init, &tcpip_input);
+[/#if]
 [#else][#-- case lwip_ipv4 == 0 --]
 [#if lwip_ipv6 == 1]
 #t/* add the network interface (IPv6) with RTOS */
@@ -590,7 +595,12 @@ void MX_LWIP_Init(void)
 [/#if][#-- endif lwip_ipv6 --]
 #n 
 #t/*  Registers the default network interface */
+[#if ((series != "stm32h7rs") || ((series == "stm32h7rs") && (with_rtos == 0)))]
 #tnetif_set_default(&gnetif);
+[/#if]
+[#if ((series == "stm32h7rs") && (with_rtos == 1))]
+#tnetifapi_netif_set_default(&gnetif);
+[/#if]
 #n
 [#if (series != "stm32h7rs")]
 #t/* We must always bring the network interface up connection or not... */
@@ -656,7 +666,7 @@ void MX_LWIP_Init(void)
 [/#if][#-- endif series --]
 [/#if][#-- endif netif_callback --]
 #n
-[#if (lwip_dhcp == 1) && (lwip_ipv4 == 1)]
+[#if (series != "stm32h7rs") && (lwip_dhcp == 1) && (lwip_ipv4 == 1)]
 #t/* Start DHCP negotiation for a network interface (IPv4) */
 #tdhcp_start(&gnetif);
 [/#if][#-- endif lwip_dhcp && lwip_ipv4 --]

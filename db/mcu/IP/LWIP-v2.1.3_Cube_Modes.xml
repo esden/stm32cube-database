@@ -22,6 +22,16 @@
         <PossibleValue Comment="Disabled" Value="0"/>
         <Description>When this parameter is enabled, DHCP (Dynamic Host Configuration Protocol) module is enabled.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Use LWIP_DHCP requires both LWIP_UDP and LWIP_IPV4 enabled.</Description>
     </RefParameter>
+    <RefParameter Name="LWIP_NETIF_API" Comment="LWIP_NETIF_API (Network Interfaces API)" Type="list" Group="Network Interfaces Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" >
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Use LWIP_NETIF_API requires NO_SYS=0" Expression="NO_SYS"/>
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>This option enables the use of NETIF API.</Description>
+    </RefParameter>
+    <RefParameter Name="LWIP_NETIF_API" Comment="LWIP_NETIF_API (NETIF API)" Type="list" Group="Network Interfaces Options" DefaultValue="1" TabName="Key Options" Mode="Advanced" >
+        <PossibleValue Comment="Enabled" Value="1"/>
+        <Description>This option enables the use of NETIF API.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Since NO_SYS=1, you can use NETIF API.</Description>
+    </RefParameter>
     <RefParameter Name="ETH_RX_BUFFER_SIZE" Comment="ETH_RX_BUFFER_SIZE (ETH Rx Buffer Size)" Type="Integer" Group="ETH Options" DefaultValue="=ETH:RxBuffLen" TabName="General Settings" Visible="false">
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: STM32H7, STM32F4 or STM32F7." Expression="STM32H7|STM32F4|STM32F7"/>
         <Description>Ethernet Rx buffer size</Description>
@@ -309,10 +319,10 @@
         <Description>Enable this option if you want to free PBUF_RAM pbufs (or call mem_free()) from interrupt context (or another context that doesn't allow waiting for a semaphore).&lt;br&gt;If set to 1, mem_malloc will be protected by a semaphore and SYS_ARCH_PROTECT, while mem_free will only use SYS_ARCH_PROTECT. mem_malloc SYS_ARCH_UNPROTECTs with each loop so that mem_free can run.&lt;br&gt;&lt;b&gt;Warning&lt;/b&gt;: As you can see from the above description, this leads to dis-/ enabling interrupts often, which can be slow! Also, on low memory, mem_malloc can need longer.&lt;br&gt;If you don't want that, at least for NO_SYS=0, you can still use the following functions to enqueue a deallocation call which then runs in the tcpip_thread context:&lt;br&gt;- pbuf_free_callback(p)&lt;br&gt;- mem_free_callback(m);.&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: None.</Description>
     </RefParameter>
     <RefParameter Name="LWIP_RAM_HEAP_POINTER" Comment="LWIP_RAM_HEAP_POINTER (RAM Heap Pointer)" Type="hex" Group="Infrastructure - Heap and Memory Pools Options" DefaultValue="0x24040000" TabName="Key Options" Mode="Basic" Min="0x00000000" Max="0xFFFFFFFF" Visible="true">
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: STM32H7." Expression="STM32H7"/>
+        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: STM32H7RS." Expression="STM32H7RS"/>
         <Description>If you want to relocate the heap to external memory, simply set a void-pointer to that location and make sure the memory at that location is big enough.</Description>
     </RefParameter>
-    <RefParameter Name="LWIP_RAM_HEAP_POINTER" Comment="LWIP_RAM_HEAP_POINTER (RAM Heap Pointer)" Type="hex" Group="Infrastructure - Heap and Memory Pools Options" DefaultValue="0x30044000" TabName="Key Options" Mode="Basic" Min="0x00000000" Max="0xFFFFFFFF" Visible="false">
+    <RefParameter Name="LWIP_RAM_HEAP_POINTER" Comment="LWIP_RAM_HEAP_POINTER (RAM Heap Pointer)" Type="hex" Group="Infrastructure - Heap and Memory Pools Options" DefaultValue="0x24040000" TabName="Key Options" Mode="Basic" Min="0x00000000" Max="0xFFFFFFFF" Visible="false">
         <Description>If you want to relocate the heap to external memory, simply set a void-pointer to that location and make sure the memory at that location is big enough.</Description>
     </RefParameter>
     <RefParameter Name="ETH_RX_BUFFER_CNT" Comment="ETH_RX_BUFFER_CNT" Type="integer" Group="Infrastructure - Heap and Memory Pools Options" DefaultValue="12" TabName="Key Options" Mode="Basic" Min="=ETH:ETH_RX_DESC_CNT" Max="1024" >
@@ -847,16 +857,6 @@
     <RefParameter Name="LWIP_NETIF_HOSTNAME_NAME" Comment="LWIP_NETIF_HOSTNAME_NAME (LWIP_NETIF_HOSTNAME_NAME (LWIP NETIF Hostname))" Type="stringRW" Group="Network Interfaces Options" DefaultValue="lwip" TabName="Key Options" Mode="Advanced" >
         <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: LWIP_NETIF_HOSTNAME should be enabled to set a hostname." Expression="LWIP_NETIF_HOSTNAME"/>
         <Description>User can specify the LwIP NETIF Hostname. Default name is "lwip".</Description>
-    </RefParameter>
-    <RefParameter Name="LWIP_NETIF_API" Comment="LWIP_NETIF_API (Network Interfaces API)" Type="list" Group="Network Interfaces Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" >
-        <Condition Diagnostic="&lt;b&gt;Dependency&lt;/b&gt;: Use LWIP_NETIF_API requires NO_SYS=0" Expression="!NO_SYS"/>
-        <PossibleValue Comment="Disabled" Value="0"/>
-        <PossibleValue Comment="Enabled" Value="1"/>
-        <Description>When this parameter is set, netif api is supported (in netifapi.c).</Description>
-    </RefParameter>
-    <RefParameter Name="LWIP_NETIF_API" Comment="LWIP_NETIF_API (NETIF API)" Type="list" Group="Network Interfaces Options" DefaultValue="0" TabName="Key Options" Mode="Advanced" >
-        <PossibleValue Comment="Disabled" Value="0"/>
-        <Description>When this parameter is not set, netif api is not supported (in netifapi.c).&lt;br&gt;&lt;b&gt;Dependency&lt;/b&gt;: Since NO_SYS=1, you cannot use NETIF API.</Description>
     </RefParameter>
     <RefParameter Name="LWIP_NETIF_STATUS_CALLBACK" Comment="LWIP_NETIF_STATUS_CALLBACK (Callback Function on Interface Status Changes)" Type="list" Group="Network Interfaces Options" DefaultValue="0" TabName="Key Options" Mode="Basic" >
         <PossibleValue Comment="Disabled" Value="0"/>
@@ -3109,6 +3109,7 @@
         <ConfigForMode>LWIP_Init</ConfigForMode>
         <Parameter Name="LwIP Version"/>
         <Parameter Name="LWIP_DHCP"/>
+        <Parameter Name="LWIP_NETIF_API"/>
         <Parameter Name="ETH_RX_BUFFER_SIZE"/>
         <Parameter Name="IP_ADDRESS"/>
         <Parameter Name="NETMASK_ADDRESS"/>
@@ -3271,7 +3272,6 @@
         <Parameter Name="LWIP_SINGLE_NETIF"/>
         <Parameter Name="LWIP_NETIF_HOSTNAME"/>
         <Parameter Name="LWIP_NETIF_HOSTNAME_NAME"/>
-        <Parameter Name="LWIP_NETIF_API"/>
         <Parameter Name="LWIP_NETIF_STATUS_CALLBACK"/>
         <Parameter Name="LWIP_NETIF_EXT_STATUS_CALLBACK"/>
         <Parameter Name="LWIP_NETIF_LINK_CALLBACK"/>
@@ -3621,7 +3621,7 @@
                 </Mode>
             </ModeLogicOperator>
             <Condition Expression="(!S_AzureRTOS$context)" Diagnostic="Active only when the AzureRTOS (ThreadX,FileX,..) are deactivated."/>
-            <Condition Expression="(IF(MW_ETH_MW, IF(!S_MBEDTLS | (S_MBEDTLS &amp; S_FREERTOS),1,0),0)) &amp; (!S_AzureRTOS$context)" Diagnostic="Active only if: ETH IP configured / FREERTOS is enabled when MBEDTLS is enabled."/>
+            <Condition Expression="(IF(MW_ETH_MW,1,0)) &amp; (!S_AzureRTOS$context)" Diagnostic="Active only if: ETH IP configured."/>
         </Mode>
     </ModeLogicOperator>
 <RefSignal Name="VS_Enabled" Virtual="true"/>

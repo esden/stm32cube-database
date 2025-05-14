@@ -1381,7 +1381,7 @@ void TRC_BackgroundProcess_Entry(void* thread_input)
 #endif
 [/#if]
 [#if (SEQUENCER_STATUS = 1)]
-
+[#if BLE != 1]
 /**
   * @brief  This function is called by the scheduler each time an event
   *         is pending.
@@ -1437,11 +1437,8 @@ void UTIL_SEQ_EvtIdle(UTIL_SEQ_bm_t task_id_bm, UTIL_SEQ_bm_t evt_waited_bm)
     break;
   }
 [/#if]      
-[#if BLE = 1]
-  UTIL_SEQ_Run(UTIL_SEQ_DEFAULT);
-  return;
-[/#if]
 }
+[/#if]
 [/#if]
 
 [#if (THREAD = 1) &&(FREERTOS_STATUS = 0)]

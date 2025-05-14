@@ -17,8 +17,14 @@
 
 [#assign inclusion_protection = toto?upper_case]
 /* Define to prevent recursive inclusion -------------------------------------*/
+[#if FamilyName="STM32H7RS"]
+#ifndef __USBH_CONF_H
+#define __USBH_CONF_H
+[#else]
 #ifndef __${inclusion_protection}__
 #define __${inclusion_protection}__
+[/#if]
+
 #ifdef __cplusplus
  extern "C" {
 #endif
@@ -220,6 +226,8 @@ extern ${variable.value} ${variable.name};
 #ifdef __cplusplus
 }
 #endif
-
+[#if FamilyName="STM32H7RS"]
+#endif /* __USBH_CONF_H */
+[#else]
 #endif /* __${inclusion_protection}__ */
-
+[/#if]

@@ -318,7 +318,7 @@ void Error_Handler(void);
 [#if HALCompliant??]
 [#list voids as void]
   [#if (void.isStatic?? && !void.isStatic) && ((void.bspUsed?? && void.bspUsed && !void.isNotGenerated)||(void.functionName!="SystemClock_Config"))]
-[#if !void.ipType?contains("thirdparty")&&!void.ipType?contains("middleware")&&!void.functionName?contains("VREFBUF")&&void.functionName!="Init" && !void.functionName?contains("MotorControl") && !void.functionName?contains("ETZPC") && !void.functionName?contains("TRACER_EMB") && !void.functionName?contains("GUI_INTERFACE")]
+[#if !void.ipType?contains("thirdparty")&&!void.ipType?contains("middleware")&&!void.functionName?contains("VREFBUF")&&void.functionName!="Init" && !void.functionName?contains("MotorControl") && !void.functionName?contains("ETZPC") && !void.functionName?contains("TRACER_EMB") && !void.functionName?contains("GUI_INTERFACE")&& !void.functionName?contains("USB_OTG_HS1")]
 void ${void.functionName}(void);
 [/#if]
   [/#if]

@@ -26,6 +26,11 @@
     <RefParameter Comment="Hour Format" DefaultValue="null" Group="General" Name="HourFormat" Type="list" Visible="false">
     </RefParameter>
 
+    <RefParameter Comment="Binary AutoControl" DefaultValue="RTC_ALARMSUBSECONDBIN_AUTOCLR_NO" Group="Alarm A" Name="BinaryAutoClr_A" Type="list">
+        <Condition Diagnostic="" Expression="(Bin_smodeonly) &amp; S_STM32_WPAN"/>
+        <PossibleValue Comment="RTC_ALARMSUBSECONDBIN_AUTOCLR_YES" Value="RTC_ALARMSUBSECONDBIN_AUTOCLR_YES"  /> 
+        <PossibleValue Comment="RTC_ALARMSUBSECONDBIN_AUTOCLR_NO" Value="RTC_ALARMSUBSECONDBIN_AUTOCLR_NO"/>
+    </RefParameter>
     <RefParameter Comment="Binary AutoControl" DefaultValue="RTC_ALARMSUBSECONDBIN_AUTOCLR_YES" Group="Alarm A" Name="BinaryAutoClr_A" Type="list">
         <Condition Diagnostic="" Expression="(Bin_smodeonly)"/>
         <PossibleValue Comment="RTC_ALARMSUBSECONDBIN_AUTOCLR_YES" Value="RTC_ALARMSUBSECONDBIN_AUTOCLR_YES"  /> 
@@ -72,16 +77,25 @@
 	<RefParameter Comment="Asynchronous Predivider value" DefaultValue="127" Group="General" Max="127" Min="127" Name="AsynchPrediv" Type="integer">
 		<Condition Diagnostic="" Expression="Prediv_With_REFIN"/>
 	</RefParameter>
-    <RefParameter Comment="Asynchronous Predivider value" DefaultValue="60" Group="General" Max="60" Min="60" Name="AsynchPrediv" Type="integer">
-		<Condition Diagnostic="" Expression="RF_Used &amp; RST_HSE &amp; (DIE492 | DIE4B0)"/>
+    <RefParameter Comment="Asynchronous Predivider value" DefaultValue="31" Group="General" Max="127" Min="0" Name="AsynchPrediv" Type="integer">
+        <Condition Diagnostic="" Expression="S_STM32_WPAN"/>
 	</RefParameter>
-	<RefParameter Comment="Asynchronous Predivider value" DefaultValue="127" Group="General" Max="127" Min="0" Name="AsynchPrediv" Type="integer"/>
+    <RefParameter Comment="Asynchronous Predivider value" DefaultValue="60" Group="General" Name="AsynchPrediv" Type="uniqueElementList">
+		<Condition Diagnostic="" Expression="RF_Used &amp; RST_HSE &amp; (DIE492 | DIE4B0)"/>
+        <PossibleValue Comment="60" Value="60"/>
+	</RefParameter>
+    <RefParameter Comment="Asynchronous Predivider value" DefaultValue="31" Group="General" Max="127" Min="0" Name="AsynchPrediv" Type="integer">
+        <Condition Diagnostic="" Expression="S_STM32_WPAN"/>
+	</RefParameter>
+    <RefParameter Comment="Asynchronous Predivider value" DefaultValue="127" Group="General" Max="127" Min="0" Name="AsynchPrediv" Type="integer"/>
 
 	<RefParameter Comment="Synchronous Predivider value" DefaultValue="255" Group="General" Max="255" Min="255" Name="SynchPrediv" Type="integer">
 		<Condition Diagnostic="" Expression="(!Bin_smodeonly) &amp; Prediv_With_REFIN"/>
 	</RefParameter>
     <RefParameter Comment="Synchronous Predivider value" DefaultValue="255" Group="General" Max="32767" Min="0" Name="SynchPrediv" Type="integer">
         <Condition Diagnostic="" Expression="!Bin_smodeonly"/>
+    </RefParameter>
+    <RefParameter Comment="Synchronous Predivider value" DefaultValue="null" Group="General" Name="SynchPrediv" Type="integer" Visible="false">
     </RefParameter>
     
     <RefParameter Name="maskk" Comment="mask" DefaultValue="0x0" Type="hex" Min="0x0" Max="0x3F"  Group="General" Visible="false">
@@ -202,6 +216,12 @@
 		<!--PossibleValue Comment="Output Type Pushpull" Value="RTC_OUTPUT_TYPE_PUSHPULL"/-->
     </RefParameter>
 	
+    <RefParameter Comment="Bin Mode" DefaultValue="RTC_BINARY_ONLY" Group="General" Name="BinMode" Type="list">
+		<Condition Diagnostic="" Expression="S_STM32_WPAN"/>
+        <PossibleValue Comment="Free running BCD calender mode" Value="RTC_BINARY_NONE" Semaphore="Bin_smodenone" />
+        <PossibleValue Comment="Free running Binary mode" Value="RTC_BINARY_ONLY"    Semaphore="Bin_smodeonly" />
+        <PossibleValue Comment="Free running BCD calender and binary mode" Value="RTC_BINARY_MIX" Semaphore="Bin_mix_BcdU"  />
+	</RefParameter>
     <RefParameter Comment="Bin Mode" DefaultValue="RTC_FORMAT_BCD" Group="General" Name="BinMode" Type="list">
         <PossibleValue Comment="Free running BCD calender mode" Value="RTC_BINARY_NONE" Semaphore="Bin_smodenone" />
         <PossibleValue Comment="Free running Binary mode" Value="RTC_BINARY_ONLY"    Semaphore="Bin_smodeonly" />
@@ -247,6 +267,8 @@
 	<RefParameter Comment="Hours" DefaultValue="0" Group="Calendar Time" Max="23" Min="0" Name="Hours" Type="decimal" >
          <Condition Diagnostic="" Expression="!Bin_smodeonly"/>
 	</RefParameter>
+	<RefParameter Comment="Hours" DefaultValue="null" Group="Calendar Time" Name="Hours" Type="decimal" Visible="false">
+	</RefParameter>
 
 	<RefParameter Comment="Hours" DefaultValue="+0x+Hours" Group="Calendar Time" Name="HoursARG" Type="string" Visible="false">
         <Condition Diagnostic="" Expression="!Bin_smodeonly &amp; Format=RTC_FORMAT_BCD"/>
@@ -259,18 +281,22 @@
 	<RefParameter Comment="Minutes" DefaultValue="0" Group="Calendar Time" Max="59" Min="0" Name="Minutes" Type="decimal">
            <Condition Diagnostic="" Expression="!Bin_smodeonly"/>
 	</RefParameter>
+	<RefParameter Comment="Minutes" DefaultValue="null" Group="Calendar Time" Name="Minutes" Type="decimal" Visible="false">
+	</RefParameter>
 
 	<RefParameter Comment="Minutes" DefaultValue="+0x+Minutes" Group="Calendar Time" Name="MinutesARG" Type="string" Visible="false">
 		<Condition Diagnostic="" Expression="!Bin_smodeonly &amp;Format=RTC_FORMAT_BCD"/>
-	</RefParameter>
-
-	<RefParameter Comment="Minutes" DefaultValue="+Minutes" Group="Calendar Time" Name="MinutesARG" Type="string" Visible="false">
+	</RefParameter>	<RefParameter Comment="Minutes" DefaultValue="+Minutes" Group="Calendar Time" Name="MinutesARG" Type="string" Visible="false">
         <Condition Diagnostic="" Expression="!Bin_smodeonly"/>
+  	</RefParameter>
+	<RefParameter Comment="Minutes" DefaultValue="null" Group="Calendar Time" Name="MinutesARG" Type="string" Visible="false">
   	</RefParameter>
 
 	<!-- Seconds -->
 	<RefParameter Comment="Seconds" DefaultValue="0" Group="Calendar Time" Max="59" Min="0" Name="Seconds" Type="decimal">
         <Condition Diagnostic="" Expression="!Bin_smodeonly"/>
+   	</RefParameter>
+	<RefParameter Comment="Seconds" DefaultValue="null" Group="Calendar Time" Name="Seconds" Type="decimal" Visible="false">
    	</RefParameter>
 
 	<RefParameter Comment="Seconds" DefaultValue="+0x+Seconds" Group="Calendar Time" Name="SecondsARG" Type="string" Visible="false">
@@ -290,18 +316,24 @@
 	<RefParameter Comment="Time Format" DefaultValue="null" Group="Calendar Time" Name="TimeFormat" Type="list" Visible="false">
         <Condition Diagnostic="" Expression="!Bin_smodeonly"/>
     </RefParameter>
-	
+	<RefParameter Comment="Time Format" DefaultValue="null" Group="Calendar Time" Name="TimeFormat" Type="list" Visible="false">
+    </RefParameter>
+
 	<RefParameter Comment="Day Light Saving: value of hour adjustment" DefaultValue="RTC_DAYLIGHTSAVING_NONE" Group="Calendar Time" Name="DayLightSaving" Type="list">
         <Condition Diagnostic="" Expression="!Bin_smodeonly"/>
 		<PossibleValue Comment="Daylightsaving None" Value="RTC_DAYLIGHTSAVING_NONE"/>
 		<PossibleValue Comment="Daylightsaving Sub1h" Value="RTC_DAYLIGHTSAVING_SUB1H"/>
 		<PossibleValue Comment="Daylightsaving Add1h" Value="RTC_DAYLIGHTSAVING_ADD1H"/>
 	</RefParameter>
+	<RefParameter Comment="Day Light Saving: value of hour adjustment" DefaultValue="null" Group="Calendar Time" Name="DayLightSaving" Type="list" Visible="false">
+	</RefParameter>
 
 	<RefParameter Comment="Store Operation" DefaultValue="RTC_STOREOPERATION_RESET" Group="Calendar Time" Name="StoreOperation" Type="list">
         <Condition Diagnostic="" Expression="!Bin_smodeonly"/>
 		<PossibleValue Comment="Storeoperation Reset" Value="RTC_STOREOPERATION_RESET"/>
 		<PossibleValue Comment="Storeoperation Set" Value="RTC_STOREOPERATION_SET"/>
+	</RefParameter>
+	<RefParameter Comment="Store Operation" DefaultValue="null" Group="Calendar Time" Name="StoreOperation" Type="list" Visible="false">
 	</RefParameter>
 
 	<!-- Calendar Date parameters -->
@@ -314,6 +346,8 @@
 		<PossibleValue Comment="Friday" Value="RTC_WEEKDAY_FRIDAY"/>
 		<PossibleValue Comment="Saturday" Value="RTC_WEEKDAY_SATURDAY"/>
 		<PossibleValue Comment="Sunday" Value="RTC_WEEKDAY_SUNDAY"/>
+	</RefParameter>
+	<RefParameter Comment="Week Day" DefaultValue="null" Group="Calendar Date" Name="WeekDay" Type="list" Visible="false">
 	</RefParameter>
 
 	<RefParameter Comment="Month" DefaultValue="RTC_MONTH_JANUARY" Group="Calendar Date" Name="Month" Type="list">
@@ -331,6 +365,8 @@
 		<PossibleValue Comment="November" Value="RTC_MONTH_NOVEMBER" Semaphore="Nov"/>
 		<PossibleValue Comment="December" Value="RTC_MONTH_DECEMBER" Semaphore="Dec"/>
 	</RefParameter>
+	<RefParameter Comment="Month" DefaultValue="null" Group="Calendar Date" Name="Month" Type="list" Visible="false">
+	</RefParameter>
 
 	<RefParameter Comment="Date" DefaultValue="1" Group="Calendar Date" Max="29" Min="1" Name="Date" Type="decimal">
 		<!-- To check the bissextile year -->
@@ -344,9 +380,10 @@
 	<RefParameter Comment="Date" DefaultValue="1" Group="Calendar Date" Max="30" Min="1" Name="Date" Type="decimal">
 		<Condition Diagnostic="" Expression="!Bin_smodeonly&amp; Apr | Jun | Sep | Nov"/>
 	</RefParameter>
-	
 	<RefParameter Comment="Date" DefaultValue="1" Group="Calendar Date" Max="31" Min="1" Name="Date" Type="decimal">
         <Condition Diagnostic="" Expression="!Bin_smodeonly"/>
+	</RefParameter>
+	<RefParameter Comment="Date" DefaultValue="null" Group="Calendar Date" Name="Date" Type="decimal" Visible="false">
 	</RefParameter>
 
 	<RefParameter Comment="Date" DefaultValue="+0x+Date" Group="Calendar Date" Name="DateARG" Type="string" Visible="false">
@@ -358,6 +395,8 @@
 
 	<RefParameter Comment="Year" DefaultValue="0" Group="Calendar Date" Max="99" Min="0" Name="Year" Type="decimal">
         <Condition Diagnostic="" Expression="!Bin_smodeonly"/>
+	</RefParameter>
+	<RefParameter Comment="Year" DefaultValue="null" Group="Calendar Date" Name="Year" Type="decimal" Visible="false">
 	</RefParameter>
 
 	<RefParameter Comment="Year" DefaultValue="+0x+Year" Group="Calendar Date" Name="YearARG" Type="string" Visible="false">
@@ -390,6 +429,8 @@
     <RefParameter Comment="Hours" DefaultValue="1" Group="Alarm A" Max="12" Min="1" Name="Hours_A" Type="decimal">
         <Condition Diagnostic="Hour Format is 12H" Expression="!Bin_smodeonly &amp; HourFormat=RTC_HOURFORMAT_12"/>
     </RefParameter>
+    <RefParameter Comment="Hours" DefaultValue="null" Group="Alarm A" Name="Hours_A" Type="decimal" Visible="false">
+    </RefParameter>
 
     <RefParameter Comment="Hours" DefaultValue="+0x+Hours_A" Group="Alarm A" Name="HoursARG_A" Type="string" Visible="false">
         <Condition Diagnostic="" Expression="!Bin_smodeonly &amp; Format=RTC_FORMAT_BCD"/>
@@ -402,6 +443,8 @@
 	<RefParameter Comment="Minutes" DefaultValue="0" Group="Alarm A" Max="59" Min="0" Name="Minutes_A" Type="decimal">
         <Condition Diagnostic="Hour Format is 12H" Expression="!Bin_smodeonly"/>
     </RefParameter>
+	<RefParameter Comment="Minutes" DefaultValue="null" Group="Alarm A" Name="Minutes_A" Type="decimal" Visible="false">
+    </RefParameter>
 
 	<RefParameter Comment="Minutes" DefaultValue="+0x+Minutes_A" Group="Alarm A" Name="MinutesARG_A" Type="string" Visible="false">
 		<Condition Diagnostic="" Expression="!Bin_smodeonly &amp; Format=RTC_FORMAT_BCD"/>
@@ -413,6 +456,8 @@
 	<!-- Seconds -->
 	<RefParameter Comment="Seconds" DefaultValue="0" Group="Alarm A" Max="59" Min="0" Name="Seconds_A" Type="decimal">
         <Condition Diagnostic="Hour Format is 12H" Expression="!Bin_smodeonly"/>
+    </RefParameter>
+	<RefParameter Comment="Seconds" DefaultValue="null" Group="Alarm A" Name="Seconds_A" Type="decimal" Visible="false">
     </RefParameter>
 
 	<RefParameter Comment="Seconds" DefaultValue="+0x+Seconds_A" Group="Alarm A" Name="SecondsARG_A" Type="string" Visible="false">
@@ -461,12 +506,13 @@
 		<Condition Diagnostic="" Expression="((AlarmMaskDateWeekDay=RTC_ALARMMASK_DATEWEEKDAY) &amp; (AlarmMaskHours=RTC_ALARMMASK_HOURS) &amp; (AlarmMaskMinutes=RTC_ALARMMASK_MINUTES) &amp; (AlarmMaskSeconds=RTC_ALARMMASK_SECONDS))|(BinMode=RTC_BINARY_ONLY)"/>
 	</RefParameter>
 	<RefParameter Comment="Alarm Mask" DefaultValue="+AlarmMaskDateWeekDay+|AlarmMaskHours+|AlarmMaskMinutes+|AlarmMaskSeconds" Group="Alarm A" Name="AlarmMask" Type="list" Visible="false"/>
-	
-	
+		
 	<RefParameter Comment="Alarm Mask Date Week day" DefaultValue="" Group="Alarm A" Name="AlarmMaskDateWeekDay" Type="list">
         <Condition Diagnostic="" Expression="!Bin_smodeonly"/>
 		<PossibleValue Comment="Disable" Value=""/>
         <PossibleValue Comment="Enable" Value="RTC_ALARMMASK_DATEWEEKDAY"/>
+    </RefParameter>
+	<RefParameter Comment="Alarm Mask Date Week day" DefaultValue="null" Group="Alarm A" Name="AlarmMaskDateWeekDay" Type="list" Visible="false">
     </RefParameter>
 	
     <RefParameter Comment="Alarm Mask Hours" DefaultValue="" Group="Alarm A" Name="AlarmMaskHours" Type="list">
@@ -474,17 +520,23 @@
         <PossibleValue Comment="Disable" Value=""/>
         <PossibleValue Comment="Enable" Value="RTC_ALARMMASK_HOURS"/>
     </RefParameter>
+    <RefParameter Comment="Alarm Mask Hours" DefaultValue="null" Group="Alarm A" Name="AlarmMaskHours" Type="list" Visible="false">
+    </RefParameter>
 	
     <RefParameter Comment="Alarm Mask Minutes" DefaultValue="" Group="Alarm A" Name="AlarmMaskMinutes" Type="list">
         <Condition Diagnostic="" Expression="!Bin_smodeonly"/>
         <PossibleValue Comment="Disable" Value=""/>
         <PossibleValue Comment="Enable" Value="RTC_ALARMMASK_MINUTES"/>
     </RefParameter>
+    <RefParameter Comment="Alarm Mask Minutes" DefaultValue="null" Group="Alarm A" Name="AlarmMaskMinutes" Type="list" Visible="false">
+    </RefParameter>
 	
     <RefParameter Comment="Alarm Mask Seconds" DefaultValue="" Group="Alarm A" Name="AlarmMaskSeconds" Type="list">
         <Condition Diagnostic="" Expression="!Bin_smodeonly"/>
         <PossibleValue Comment="Disable" Value=""/>
         <PossibleValue Comment="Enable" Value="RTC_ALARMMASK_SECONDS"/>
+    </RefParameter>
+    <RefParameter Comment="Alarm Mask Seconds" DefaultValue="null" Group="Alarm A" Name="AlarmMaskSeconds" Type="list" Visible="false">
     </RefParameter>
 
     <RefParameter Comment="Alarm Sub Second Mask" DefaultValue="RTC_ALARMSUBSECONDMASK_ALL" Group="Alarm A" Name="AlarmSubSecondMask" Type="list">
@@ -511,6 +563,8 @@
 		<PossibleValue Comment="Date" Value="RTC_ALARMDATEWEEKDAYSEL_DATE"/>
 		<PossibleValue Comment="Weekday" Value="RTC_ALARMDATEWEEKDAYSEL_WEEKDAY"/>
 	</RefParameter>
+	<RefParameter Comment="Alarm Date Week Day Sel" DefaultValue="null" Group="Alarm A" Name="AlarmDateWeekDaySel" Type="list" Visible="false">
+	</RefParameter>
 
 	<RefParameter Comment="Alarm Week Day" DefaultValue="RTC_WEEKDAY_MONDAY" Group="Alarm A" Name="AlarmDateWeekDay" Type="list">
 		<Condition Diagnostic="" Expression="!Bin_smodeonly &amp; (AlarmDateWeekDaySel=RTC_ALARMDATEWEEKDAYSEL_WEEKDAY)"/>
@@ -522,16 +576,19 @@
 		<PossibleValue Comment="Saturday" Value="RTC_WEEKDAY_SATURDAY"/>
 		<PossibleValue Comment="Sunday" Value="RTC_WEEKDAY_SUNDAY"/>
 	</RefParameter>
-
     <RefParameter Comment="Alarm Date" DefaultValue="1" Group="Alarm A" Max="31" Min="1" Name="AlarmDateWeekDay" Type="decimal">
         <Condition Diagnostic="" Expression="!Bin_smodeonly"/>
     </RefParameter>
+	<RefParameter Comment="Alarm Week Day" DefaultValue="null" Group="Alarm A" Name="AlarmDateWeekDay" Type="list" Visible="false">
+	</RefParameter>
 
 	<RefParameter Comment="Alarm Date" DefaultValue="+0x+AlarmDateWeekDay" Group="Alarm A" Name="AlarmDateWeekDayARG" Type="string" Visible="false">
 		<Condition Diagnostic="" Expression="(Format=RTC_FORMAT_BCD &amp; AlarmDateWeekDaySel=RTC_ALARMDATEWEEKDAYSEL_DATE)"/>
 	</RefParameter>
 	<RefParameter Comment="Alarm Date" DefaultValue="+AlarmDateWeekDay" Group="Alarm A" Name="AlarmDateWeekDayARG" Type="string" Visible="false">
         <Condition Diagnostic="" Expression="!Bin_smodeonly"/>
+    </RefParameter>	
+	<RefParameter Comment="Alarm Date" DefaultValue="null" Group="Alarm A" Name="AlarmDateWeekDayARG" Type="string" Visible="false">
     </RefParameter>	
 	
 	<RefParameter Comment="Alarm" DefaultValue="RTC_ALARM_A" Group="Alarm A" Name="Alarm" Type="list" Visible="false">
@@ -751,6 +808,11 @@
     <!-- ********************************************-->
      <RefParameter Comment=" RTC full secure" DefaultValue="__NULL" Group="Secure RTC" TabName="RTC Security"  Visible="false" Name="rtcSecureFull" Type="list">
      	<Condition Diagnostic="" Expression="S_SECURE &amp; S_LPBAM_CONF"/>
+    </RefParameter>
+    <RefParameter Comment=" RTC full secure" DefaultValue="RTC_SECURE_FULL_NO" Group="Secure RTC" TabName="RTC Security"  Name="rtcSecureFull" Type="list">
+        <Condition Diagnostic="" Expression="S_SECURE &amp; S_STM32_WPAN"/>
+        <PossibleValue Comment="Enable" Value="RTC_SECURE_FULL_YES" />
+        <PossibleValue Comment="Disable" Value="RTC_SECURE_FULL_NO" Semaphore="Semaphore_privelege1_$IpInstance" />
     </RefParameter>
     <RefParameter Comment=" RTC full secure" DefaultValue="RTC_SECURE_FULL_YES" Group="Secure RTC" TabName="RTC Security"  Name="rtcSecureFull" Type="list">
         <Condition Diagnostic="" Expression="S_SECURE"/>

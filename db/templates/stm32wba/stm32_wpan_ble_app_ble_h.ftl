@@ -10,8 +10,6 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
-[#assign PG_FILL_UCS = "False"]
-[#assign PG_BSP_NUCLEO_WBA52CG = 0]
 [#assign myHash = {}]
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]

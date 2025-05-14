@@ -184,6 +184,9 @@ extern "C" {
 #define TASK_PRIO_SEND                          (13u) 
 #define TASK_PREEMP_PRIO_SEND                   (13u)
 [/#if]
+
+#define TASK_PRIO_IDLE                          (31u) 
+#define TASK_PREEMP_IDLE                        (0u)
 [/#if]
 
 /* USER CODE BEGIN TASK_Priority_Define */
@@ -208,9 +211,9 @@ extern "C" {
 [/#if]
 #define TASK_STACK_SIZE_RNG                     RTOS_STACK_SIZE_REDUCED
 [#if (myHash["BLE"] == "Enabled")]
-#define TASK_STACK_SIZE_FLASH_MANAGER           RTOS_STACK_SIZE_NORMAL
+#define TASK_STACK_SIZE_FLASH_MANAGER           (RTOS_STACK_SIZE_NORMAL + RTOS_STACK_SIZE_REDUCED)
 #define TASK_STACK_SIZE_BLE_HOST                RTOS_STACK_SIZE_MODERATE
-#define TASK_STACK_SIZE_HCI_ASYNC_EVENT         RTOS_STACK_SIZE_NORMAL
+#define TASK_STACK_SIZE_HCI_ASYNC_EVENT         (RTOS_STACK_SIZE_NORMAL + RTOS_STACK_SIZE_SMALL)
 #define TASK_STACK_SIZE_BLE_TIMER               RTOS_STACK_SIZE_REDUCED
 #define TASK_STACK_SIZE_BPKA                    RTOS_STACK_SIZE_REDUCED
 [#if (myHash["BLE_MODE_TRANSPARENT_UART"] == "Enabled")]
@@ -231,6 +234,9 @@ extern "C" {
 #define TASK_STACK_SIZE_SEND                    RTOS_STACK_SIZE_NORMAL 
 #define TASK_STACK_SIZE_PKA                     RTOS_STACK_SIZE_NORMAL  
 #define TASK_STACK_SIZE_RCP_SPINEL_RX           RTOS_STACK_SIZE_NORMAL 
+[/#if]
+[#if (myHash["THREADX_STATUS"]?number == 1) ]
+#define TASK_STACK_SIZE_IDLE                    RTOS_STACK_SIZE_REDUCED
 [/#if]
 /* USER CODE BEGIN TASK_Size_Define */
 

@@ -62,6 +62,7 @@
 /*
 //-------- <<< Use Configuration Wizard in Context Menu >>> -----------------
 */
+/* USER CODE BEGIN 0 */
 /*
 // <e>Initialize Security Attribution Unit (SAU) CTRL register
 */
@@ -80,7 +81,7 @@
 //   <i> Value for SAU->CTRL register bit ALLNS
 //   <i> When all Memory is Non-Secure (ALLNS is 1), IDAU can override memory map configuration.
 */
-#define SAU_INIT_CTRL_ALLNS  1
+#define SAU_INIT_CTRL_ALLNS    0
 
 /*
 // </e>
@@ -130,11 +131,13 @@
 /*
 //     <o>Start Address <0-0xFFFFFFE0>
 */
-#define SAU_INIT_START1       ${SauInitAllRegion["1"]["START"]}      /* end address of SAU region 0 */
+#define SAU_INIT_START1     ${SauInitAllRegion["1"]["START"]}      /* start address of SAU region 1 */
+
 /*
 //     <o>End Address <0x1F-0xFFFFFFFF>
 */
 #define SAU_INIT_END1       ${SauInitAllRegion["1"]["END"]}      /* end address of SAU region 1 */
+
 /*
 //     <o>Region is
 //         <0=>Non-Secure

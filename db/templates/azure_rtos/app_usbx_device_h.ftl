@@ -177,7 +177,7 @@ extern "C" {
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
-[#if !FamilyName?lower_case?starts_with("stm32n6")]
+[#if !FamilyName?lower_case?starts_with("stm32n6") && !FamilyName?lower_case?starts_with("stm32wba")]
 [#if UX_STANDALONE_ENABLED_Value == "1" && AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE_VAL  != "0" ]
 #define UX_DEVICE_APP_MEM_POOL_SIZE         ${UX_DEVICE_APP_MEM_POOL_SIZE_STANDALONE_value}
 [/#if]
@@ -206,6 +206,10 @@ extern "C" {
 UINT MX_USBX_Device_Init(VOID);
 [#else]
 UINT MX_USBX_Device_Init(VOID *memory_ptr);
+[/#if]
+[#if FamilyName?lower_case?starts_with("stm32wba")]
+UINT MX_USBX_Device_Stack_Init(void);
+UINT MX_USBX_Device_Stack_DeInit(void);
 [/#if]
 
 /* USER CODE BEGIN EFP */

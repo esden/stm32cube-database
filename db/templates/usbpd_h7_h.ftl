@@ -12,8 +12,8 @@
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __usbpd_H
-#define __usbpd_H
+#ifndef __USBPD_H
+#define __USBPD_H
 #ifdef __cplusplus
  extern "C" {
 #endif
@@ -53,7 +53,7 @@ const uint8_t*  BSP_GetBoardID(void);
 #ifdef __cplusplus
 }
 #endif
-#endif /*__usbpd_H */
+#endif /*__USBPD_H */
 
 /**
   * @}

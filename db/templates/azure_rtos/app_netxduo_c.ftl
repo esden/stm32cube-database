@@ -285,9 +285,6 @@ static VOID ip_address_change_notify_callback(NX_IP *ip_instance, VOID *ptr)
   /* USER CODE BEGIN ip_address_change_notify_callback */
 
   /* USER CODE END ip_address_change_notify_callback */
-
-  /* release the semaphore as soon as an IP address is available */
-  tx_semaphore_put(&DHCPSemaphore);
 }
 
 [/#if]
@@ -329,7 +326,7 @@ static VOID ${Nx_App_Thread_Name_value} (ULONG thread_input)
   }
 
   /* wait until an IP address is ready */
-  if(tx_semaphore_get(&DHCPSemaphore, NX_APP_DEFAULT_TIMEOUT) != TX_SUCCESS)
+  if(tx_semaphore_get(&DHCPSemaphore, TX_WAIT_FOREVER) != TX_SUCCESS)
   {
     /* USER CODE BEGIN DHCPSemaphore get error */
 

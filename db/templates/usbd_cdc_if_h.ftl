@@ -13,8 +13,14 @@
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
+
+[#if FamilyName="STM32H7RS"]
+#ifndef __USBD_CDC_IF_H
+#define __USBD_CDC_IF_H
+[#else]
 #ifndef __USBD_CDC_IF_H__
 #define __USBD_CDC_IF_H__
+[/#if]
 
 [#assign handleNameFS = ""]
 [#assign handleNameUSB_FS = ""]
@@ -179,5 +185,9 @@ uint8_t CDC_Transmit_HS(uint8_t* Buf, uint16_t Len);
 }
 #endif
 
+[#if FamilyName="STM32H7RS"]
+#endif /* __USBD_CDC_IF_H */
+[#else]
 #endif /* __USBD_CDC_IF_H__ */
+[/#if]
 

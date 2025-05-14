@@ -19,6 +19,7 @@ extern "C" {
 #endif
 
 [#assign AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE_VAL = "1" ]
+[#assign UX_Host_Controller_value = "0" ]
 [#compress]
 [#list SWIPdatas as SWIP]
 [#if SWIP.defines??]
@@ -67,7 +68,9 @@ extern "C" {
     [#if name == "UX_STANDALONE"]
       [#assign UX_STANDALONE_ENABLED_Value = value]
     [/#if]
-
+	[#if name == "UX_Host_Controller"]
+      [#assign UX_Host_Controller_value = value]
+    [/#if]
    [/#list]
 [/#if]
 [/#list]
@@ -99,9 +102,12 @@ extern "C" {
 [/#if]
 [/#if]
 
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+[#if UX_Host_Controller_value == "1"]
+#include "ux_hcd_stm32.h"
+[/#if]
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -110,9 +116,9 @@ extern "C" {
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
-[#if !FamilyName?lower_case?starts_with("stm32n6")]
+[#if !FamilyName?lower_case?starts_with("stm32n6") && !FamilyName?lower_case?starts_with("stm32wba")]
 [#if UX_STANDALONE_ENABLED_Value == "1" && AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE_VAL  != "0" ]
-#define UX_HOST_APP_MEM_POOL_SIZE  ${UX_HOST_APP_MEM_POOL_SIZE_STANDALONE_value}
+#define UX_HOST_APP_MEM_POOL_SIZE       ${UX_HOST_APP_MEM_POOL_SIZE_STANDALONE_value}
 [/#if]
 [#if REG_UX_HOST_CORE_value == "true"]
 #define USBX_HOST_MEMORY_STACK_SIZE     ${USBX_HOST_SYS_SIZE_value}
@@ -138,6 +144,10 @@ extern "C" {
 UINT MX_USBX_Host_Init(VOID);
 [#else]
 UINT MX_USBX_Host_Init(VOID *memory_ptr);
+[/#if]
+[#if FamilyName?lower_case?starts_with("stm32wba")]
+UINT MX_USBX_Host_Stack_Init(VOID);
+UINT MX_USBX_Host_Stack_DeInit(VOID);
 [/#if]
 
 /* USER CODE BEGIN EFP */

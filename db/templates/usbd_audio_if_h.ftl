@@ -12,9 +12,13 @@
   */
 /* USER CODE END Header */
 /* Define to prevent recursive inclusion -------------------------------------*/
+[#if FamilyName="STM32H7RS"]
+#ifndef __USBD_AUDIO_IF_H
+#define __USBD_AUDIO_IF_H
+[#else]
 #ifndef __USBD_AUDIO_IF_H__
 #define __USBD_AUDIO_IF_H__
-
+[/#if]
 [#assign handleNameFS = ""]
 [#assign handleNameUSB_FS = ""]
 [#assign handleNameHS = ""]
@@ -173,4 +177,8 @@ void HalfTransfer_CallBack_HS(void);
 }
 #endif
 
+[#if FamilyName="STM32H7RS"]
+#endif /* __USBD_AUDIO_IF_H */
+[#else]
 #endif /* __USBD_AUDIO_IF_H__ */
+[/#if]

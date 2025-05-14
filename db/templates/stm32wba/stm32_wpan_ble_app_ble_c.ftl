@@ -10,8 +10,6 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
-[#assign PG_FILL_UCS = "False"]
-[#assign PG_SKIP_LIST = "False"]
 [#assign myHash = {}]
 [#assign CFG_GAP_DEVICE_NAME = ""]
 [#assign AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST_INV = ""]
@@ -445,8 +443,8 @@ Key: ${key}; Value: ${BSP_myHash[key]}
 #include "advanced_memory_manager.h"
 [/#if]
 #include "blestack.h"
-[#if (myHash["USE_SNVMA_NVM"]?number != 0)]
 #include "nvm.h"
+[#if (myHash["USE_SNVMA_NVM"]?number != 0)]
 #include "simple_nvm_arbiter.h"
 [/#if]
 [#if (myHash["BLE_MODE_TRANSPARENT_UART"] == "Enabled")]
@@ -459,43 +457,17 @@ Key: ${key}; Value: ${BSP_myHash[key]}
 #include "${SERVICES_NAMES[service?string][item_SHORT_NAME]?lower_case}_app.h"
     [/#list]
   [/#if]
-  [#if (PG_SKIP_LIST == "True") && (myHash["NUMBER_OF_SERVICES"] == "2")]
-#include "${SERVICES_NAMES[service2?string][item_SHORT_NAME]?lower_case}.h"
-#include "${SERVICES_NAMES[service2?string][item_SHORT_NAME]?lower_case}_app.h"
-  [/#if]
 [/#if]
 [#if  (myHash["BLE_MODE_CENTRAL"] == "Enabled")]
 #include "gatt_client_app.h"
 [/#if]
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-[#if PG_FILL_UCS == "True"]
-[#if (myHash["BLE_MODE_TRANSPARENT_UART"] == "Enabled")]
-#include "stm32_lpm.h"
-[/#if]
-[#if (RF_APPLICATION == "BEACON")]
-#include "eddystone_beacon.h"
-#include "eddystone_uid_service.h"
-#include "eddystone_url_service.h"
-#include "eddystone_tlm_service.h"
-#include "ibeacon_service.h"
-#include "ibeacon.h"
-[/#if]
-[/#if]
 
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-[#if PG_FILL_UCS == "True"]
-[#if (myHash["BLE_MODE_TRANSPARENT_UART"] == "Enabled")]
-typedef enum
-{
-  LOW_POWER_MODE_DISABLE,
-  LOW_POWER_MODE_ENABLE,
-}LowPowerModeStatus_t;
-[/#if]
-[/#if]
 
 /* USER CODE END PTD */
 
@@ -645,15 +617,6 @@ typedef struct
 
 [/#if]
 /* USER CODE BEGIN PD */
-[#if PG_FILL_UCS == "True"]
-[#if ((RF_APPLICATION == "HEARTRATE")||(RF_APPLICATION == "P2PSERVER"))]
-#define ADV_TIMEOUT_MS                 (60 * 1000)
-[/#if]
-[#if (RF_APPLICATION == "P2PSERVER")]
-#define LED_ON_TIMEOUT_MS              (5)
-
-[/#if]
-[/#if]
 
 /* USER CODE END PD */
 
@@ -690,21 +653,14 @@ BleCoCEATTContext_t BleCoCEATTContext;
 ${SERVICES_NAMES[service?string][item_SHORT_NAME]?upper_case}_APP_ConnHandleNotEvt_t ${SERVICES_NAMES[service?string][item_SHORT_NAME]?upper_case}HandleNotification;
   [/#list]
 [/#if]
-[#if (PG_SKIP_LIST == "True") && (myHash["NUMBER_OF_SERVICES"] == "2")]
-${SERVICES_NAMES[service2?string][item_SHORT_NAME]?upper_case}_APP_ConnHandleNotEvt_t ${SERVICES_NAMES[service2?string][item_SHORT_NAME]?upper_case}HandleNotification;
-[/#if]
 [/#if]
 [#if (myHash["BLE_MODE_CENTRAL"] == "Enabled")]
 GATT_CLIENT_APP_ConnHandle_Notif_evt_t clientHandleNotification;
 [/#if]
 
 [#if ((myHash["BLE_MODE_TRANSPARENT_UART"] != "Enabled") && (myHash["BLE_OPTIONS_LL_ONLY"] != "BLE_OPTIONS_LL_ONLY"))]
-[#if PG_SKIP_LIST == "False"]
 static char a_GapDeviceName[] = { [#rt] [#list "${CFG_GAP_DEVICE_NAME}"?split("(?!^)", "r") as char][#t][#lt]'${char}'<#sep>, [#rt]
     [/#list][#lt] }; /* Gap Device Name */
-[#else]
-static char a_GapDeviceName[] = {  ${CFG_GAP_DEVICE_NAME} }; /* Gap Device Name */
-[/#if]
 [/#if]
 
 [#if  (myHash["BLE_MODE_PERIPHERAL"] == "Enabled")]
@@ -715,24 +671,16 @@ uint8_t a_AdvData[${myHash["AD_DATA_LENGTH"]}] =
   ${myHash["AD_TYPE_TX_POWER_LEVEL_LENGTH"]}, AD_TYPE_TX_POWER_LEVEL, ${myHash["AD_TYPE_TX_POWER_LEVEL_DBM"]}, /* Transmission Power */
 [/#if]
 [#if  (myHash["INCLUDE_AD_TYPE_COMPLETE_LOCAL_NAME"] == "1")]
-[#if PG_SKIP_LIST == "False"]
   ${myHash["AD_TYPE_COMPLETE_LOCAL_NAME_LENGTH"]}, AD_TYPE_COMPLETE_LOCAL_NAME, [#rt]
     [#list myHash["AD_TYPE_COMPLETE_LOCAL_NAME"]?split("(?!^)", "r") as char][#t]
         [#lt]'${char}', [#rt]
     [/#list][#lt] /* Complete name */
-[#else]
-  ${myHash["AD_TYPE_COMPLETE_LOCAL_NAME_LENGTH"]}, AD_TYPE_COMPLETE_LOCAL_NAME, ${myHash["AD_TYPE_COMPLETE_LOCAL_NAME"]?split("(?!^)", "r")}  /* Complete name */
-[/#if]
 [/#if]
 [#if  (myHash["INCLUDE_AD_TYPE_SHORTENED_LOCAL_NAME"]  == "1")]
-[#if PG_SKIP_LIST == "False"]
   ${myHash["AD_TYPE_SHORTENED_LOCAL_NAME_LENGTH"]}, AD_TYPE_SHORTENED_LOCAL_NAME , [#rt]
     [#list myHash["AD_TYPE_SHORTENED_LOCAL_NAME"]?split("(?!^)", "r") as char][#t]
         [#lt]'${char}', [#rt]
     [/#list][#lt] /* Shortened name */
-[#else]
-  ${myHash["AD_TYPE_SHORTENED_LOCAL_NAME_LENGTH"]}, AD_TYPE_SHORTENED_LOCAL_NAME, ${myHash["AD_TYPE_SHORTENED_LOCAL_NAME"]?split("(?!^)", "r")}   /* Shortened name */
-[/#if]
 [/#if]
 [#if  (myHash["INCLUDE_AD_TYPE_APPEARANCE"] == "1")]
   ${myHash["AD_TYPE_APPEARANCE_LENGTH"]}, AD_TYPE_APPEARANCE, ${myHash["AD_TYPE_APPEARANCE"]},
@@ -744,7 +692,6 @@ uint8_t a_AdvData[${myHash["AD_DATA_LENGTH"]}] =
   ${myHash["AD_TYPE_LE_ROLE_LENGTH"]}, AD_TYPE_LE_ROLE, ${myHash["AD_TYPE_LE_ROLE"]},
 [/#if]
 [#if  (myHash["INCLUDE_AD_TYPE_16_BIT_SERV_UUID_CMPLT_LIST"] == "1")]
-[#if PG_SKIP_LIST == "False"]
   ${myHash["AD_TYPE_16_BIT_SERV_UUID_CMPLT_LIST_LENGTH"]}, AD_TYPE_16_BIT_SERV_UUID_CMPLT_LIST, [#rt]
 [#assign size = myHash["AD_SERVICE_CLASS_UUID_NBR"]?number-1]
 [#list 0..size as i]
@@ -752,9 +699,6 @@ uint8_t a_AdvData[${myHash["AD_DATA_LENGTH"]}] =
 0x${AD_SERVICE_CLASS_UUID_TABLE[j]?replace(", ",", 0x")?replace("[","")?replace("]","")}, [#rt]
 [/#list]
 
-[#else]
-  ${myHash["AD_TYPE_16_BIT_SERV_UUID_CMPLT_LIST_LENGTH"]}, AD_TYPE_16_BIT_SERV_UUID_CMPLT_LIST, 0x${AD_SERVICE_CLASS_UUID_TABLE[j]?replace(", ",", 0x")?replace("[","")?replace("]","")}
-[/#if]
 [/#if]
 [#if  (myHash["INCLUDE_AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST"] == "1")]
   ${myHash["AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST_LENGTH"]}, AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST, 0x${AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST_INV?replace(", ",", 0x")?replace("[","")?replace("]","")},
@@ -767,34 +711,24 @@ uint8_t a_AdvData[${myHash["AD_DATA_LENGTH"]}] =
 [/#if]
 [/#if]
 [#if  (myHash["INCLUDE_AD_TYPE_URI"] == "1")]
-[#if PG_SKIP_LIST == "False"]
   ${myHash["AD_TYPE_URI_LENGTH"]}, AD_TYPE_URI, 0x${myHash["AD_TYPE_URI_CODE_POINT"]?replace(",",", 0x")}, '/', '/', [#rt]
     [#list myHash["AD_TYPE_URI_DATA"]?split("(?!^)", "r") as char][#t]
         [#lt]'${char}', [#rt]
     [/#list][#lt]
 
-[#else]
-  ${myHash["AD_TYPE_URI_LENGTH"]}, AD_TYPE_URI, 0x${myHash["AD_TYPE_URI_CODE_POINT"]?replace(",",", 0x")}, '/', '/', myHash["AD_TYPE_URI_DATA"]?split("(?!^)", "r")
-[/#if]
 [/#if]
 [#if  (myHash["INCLUDE_AD_TYPE_MANUFACTURER_SPECIFIC_DATA"] == "1")]
-[#if PG_SKIP_LIST == "False"]
   ${myHash["AD_TYPE_MANUFACTURER_SPECIFIC_DATA_LENGTH"]}, AD_TYPE_MANUFACTURER_SPECIFIC_DATA, 0x${myHash["AD_TYPE_MANUFACTURER_SPECIFIC_DATA_COMPANY_IDENTIFIER"]?replace(",",", 0x")}, [#rt]
 [#assign size = (myHash["AD_TYPE_MANUFACTURER_DATA_NBR"]?number-1)]
 [#list 0..size as i]
 0x${AD_TYPE_MANUFACTURER_DATA_TABLE[2*i]?replace(" ",", 0x")} /* ${AD_TYPE_MANUFACTURER_DATA_TABLE[2*i+1]} */, [#rt]
 [/#list]
 
-[#else]
-  ${myHash["AD_TYPE_MANUFACTURER_SPECIFIC_DATA_LENGTH"]}, AD_TYPE_MANUFACTURER_SPECIFIC_DATA, 0x${myHash["AD_TYPE_MANUFACTURER_SPECIFIC_DATA_COMPANY_IDENTIFIER"]?replace(",",", 0x")},
-[/#if]
 [/#if]
 };
 [/#if]
-[#if (myHash["USE_SNVMA_NVM"]?number != 0)]
 uint64_t buffer_nvm[CFG_BLEPLAT_NVM_MAX_SIZE] = {0};
 
-[/#if]
 [#if (myHash["BLE_MODE_TRANSPARENT_UART"] != "Enabled") && (myHash["CFG_MM_TYPE"]?number == 2)]
 static AMM_VirtualMemoryCallbackFunction_t APP_BLE_ResumeFlowProcessCb;
 
@@ -865,11 +799,6 @@ static TX_SEMAPHORE     TxToHostSemaphore;
 [/#if]
 
 /* USER CODE BEGIN PV */
-[#if PG_FILL_UCS == "True"]
-[#if (myHash["BLE_MODE_TRANSPARENT_UART"] == "Enabled")]
-static LowPowerModeStatus_t LowPowerModeStatus;
-[/#if]
-[/#if]
 
 /* USER CODE END PV */
 
@@ -961,22 +890,6 @@ static void TM_TxToHost_Entry(ULONG lArgument);
 [/#if]
 [/#if]
 /* USER CODE BEGIN PFP */
-[#if PG_FILL_UCS == "True"]
-[#if (RF_APPLICATION == "HEARTRATE")]
-void fill_advData(uint8_t *p_adv_data, uint8_t tab_size, const uint8_t*p_bd_addr);
-[/#if]
-[#if (RF_APPLICATION == "P2PSERVER")]
-static void Adv_Cancel_Req(void *arg);
-static void Adv_Cancel(void);
-static void Switch_OFF_GPIO(void *arg);
-static void fill_advData(uint8_t *p_adv_data, uint8_t tab_size, const uint8_t*p_bd_addr);
-[/#if]
-[/#if]
-[#if PG_FILL_UCS == "True"]
-[#if (myHash["BLE_MODE_TRANSPARENT_UART"] == "Enabled")]
-static void TM_SetLowPowerMode( void );
-[/#if]
-[/#if]
 
 /* USER CODE END PFP */
 
@@ -1092,11 +1005,10 @@ void APP_BLE_Init(void)
 
 [/#if]
 
-[#if (myHash["USE_SNVMA_NVM"]?number != 0)]
-
   /* NVM emulation in RAM initialization */
   NVM_Init(buffer_nvm, 0, CFG_BLEPLAT_NVM_MAX_SIZE);
 
+[#if (myHash["USE_SNVMA_NVM"]?number != 0)]
   /* First register the APP BLE buffer */
   SNVMA_Register (APP_BLE_NvmBuffer,
                   (uint32_t *)buffer_nvm,
@@ -1108,14 +1020,12 @@ void APP_BLE_Init(void)
   /* USER CODE BEGIN APP_BLE_Init_Buffers */
 
   /* USER CODE END APP_BLE_Init_Buffers */
-[#if (myHash["USE_SNVMA_NVM"]?number != 0)]
 
   /* Check consistency */
   if (NVM_Get (NVM_FIRST, 0xFF, 0, 0, 0) != NVM_EOF)
   {
     NVM_Discard (NVM_ALL);
   }
-[/#if]
 
   /* Initialize the BLE Host */
   if (HOST_BLE_Init() == 0u)
@@ -1146,25 +1056,6 @@ void APP_BLE_Init(void)
     /* From here, all initialization are BLE application specific */
 
     /* USER CODE BEGIN APP_BLE_Init_4 */
-[#if PG_FILL_UCS == "True"]
-[#if (RF_APPLICATION == "P2PSERVER")]
-    UTIL_SEQ_RegTask(1U << CFG_TASK_ADV_CANCEL_ID, UTIL_SEQ_RFU, Adv_Cancel);
-
-    /* Create timer to handle the Advertising Stop */
-    UTIL_TIMER_Create(&(bleAppContext.Advertising_mgr_timer_Id),
-                      0,
-                      UTIL_TIMER_ONESHOT,
-                      &Adv_Cancel_Req,
-                      NULL);
-    /* Create timer to handle the Led Switch OFF */
-    UTIL_TIMER_Create(&(bleAppContext.SwitchOffGPIO_timer_Id),
-                      0,
-                      UTIL_TIMER_ONESHOT,
-                      &Switch_OFF_GPIO,
-                      NULL);
-
-[/#if]
-[/#if]
 
     /* USER CODE END APP_BLE_Init_4 */
 
@@ -1175,24 +1066,11 @@ void APP_BLE_Init(void)
     [#list 1..myHash["NUMBER_OF_SERVICES"]?number as service]
     ${SERVICES_NAMES[service?string][item_SHORT_NAME]?upper_case}_APP_Init();
     [/#list]
-   [#if (PG_SKIP_LIST == "True") && (myHash["NUMBER_OF_SERVICES"] == "2")]
-    ${SERVICES_NAMES[service2?string][item_SHORT_NAME]?upper_case}_APP_Init();
-   [/#if]
     LOG_INFO_APP("End of Services and Characteristics creation\n");
     LOG_INFO_APP("\n");
 [/#if]
 
     /* USER CODE BEGIN APP_BLE_Init_3 */
-[#if PG_FILL_UCS == "True"]
-[#if (RF_APPLICATION == "HEARTRATE")||(RF_APPLICATION == "P2PSERVER")||(RF_APPLICATION == "HEALTH_THERMOMETER")]
-    /* Start to Advertise to accept a connection */
-    APP_BLE_Procedure_Gap_Peripheral(PROC_GAP_PERIPH_ADVERTISE_START_FAST);
-
-    /* Start a timer to stop advertising after a while */
-    UTIL_TIMER_StartWithPeriod(&bleAppContext.Advertising_mgr_timer_Id, ADV_TIMEOUT_MS);
-
-[/#if]
-[/#if]
 
     /* USER CODE END APP_BLE_Init_3 */
 
@@ -1210,33 +1088,6 @@ void APP_BLE_Init(void)
 [/#if]
   }
   /* USER CODE BEGIN APP_BLE_Init_2 */
-[#if PG_FILL_UCS == "True"]
-[#if (RF_APPLICATION == "BEACON")]
-  /**
-   * Make device discoverable
-   */
-  if (CFG_BEACON_TYPE & CFG_EDDYSTONE_UID_BEACON_TYPE)
-  {
-    LOG_INFO_APP("Eddystone UID beacon advertise\n");
-    EddystoneUID_Process();
-  }
-  else if (CFG_BEACON_TYPE & CFG_EDDYSTONE_URL_BEACON_TYPE)
-  {
-    LOG_INFO_APP("Eddystone URL beacon advertise\n");
-    EddystoneURL_Process();
-  }
-  else if (CFG_BEACON_TYPE & CFG_EDDYSTONE_TLM_BEACON_TYPE)
-  {
-    LOG_INFO_APP("Eddystone TLM beacon advertise\n");
-    EddystoneTLM_Process();
-  }
-  else if (CFG_BEACON_TYPE & CFG_IBEACON)
-  {
-    LOG_INFO_APP("Ibeacon advertise\n");
-    IBeacon_Process();
-  }
-[/#if]
-[/#if]
 
   /* USER CODE END APP_BLE_Init_2 */
 
@@ -1295,25 +1146,16 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *p_Pckt)
   [#list 1..myHash["NUMBER_OF_SERVICES"]?number as service]
       ${SERVICES_NAMES[service?string][item_SHORT_NAME]?upper_case}HandleNotification.EvtOpcode = ${SERVICES_NAMES[service?string][item_SHORT_NAME]?upper_case}_DISCON_HANDLE_EVT;
   [/#list]
-  [#if (PG_SKIP_LIST == "True") && (myHash["NUMBER_OF_SERVICES"] == "2")]
-      ${SERVICES_NAMES[service2?string][item_SHORT_NAME]?upper_case}HandleNotification.EvtOpcode = ${SERVICES_NAMES[service2?string][item_SHORT_NAME]?upper_case}_DISCON_HANDLE_EVT;
-  [/#if]
 [/#if]
 [#if myHash["NUMBER_OF_SERVICES"] != "0"]
   [#list 1..myHash["NUMBER_OF_SERVICES"]?number as service]
       ${SERVICES_NAMES[service?string][item_SHORT_NAME]?upper_case}HandleNotification.ConnectionHandle = p_disconnection_complete_event->Connection_Handle;
   [/#list]
-  [#if (PG_SKIP_LIST == "True") && (myHash["NUMBER_OF_SERVICES"] == "2")]
-      ${SERVICES_NAMES[service2?string][item_SHORT_NAME]?upper_case}HandleNotification.ConnectionHandle = p_disconnection_complete_event->Connection_Handle;
-  [/#if]
 [/#if]
 [#if myHash["NUMBER_OF_SERVICES"] != "0"]
   [#list 1..myHash["NUMBER_OF_SERVICES"]?number as service]
       ${SERVICES_NAMES[service?string][item_SHORT_NAME]?upper_case}_APP_EvtRx(&${SERVICES_NAMES[service?string][item_SHORT_NAME]?upper_case}HandleNotification);
   [/#list]
-  [#if (PG_SKIP_LIST == "True") && (myHash["NUMBER_OF_SERVICES"] == "2")]
-      ${SERVICES_NAMES[service2?string][item_SHORT_NAME]?upper_case}_APP_EvtRx(&${SERVICES_NAMES[service2?string][item_SHORT_NAME]?upper_case}HandleNotification);
-  [/#if]
 [/#if]
 [#if (myHash["BLE_MODE_CENTRAL"] == "Enabled")&&(myHash["BLE_MODE_PERIPHERAL_CENTRAL"] == "Disabled")]
      clientHandleNotification.P2P_Evt_Opcode = P2PSC_DISCON_HANDLE_EVT;
@@ -1321,12 +1163,6 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *p_Pckt)
      P2PC_APP_Notification(&clientHhandleNotification);
 [/#if]
       /* USER CODE BEGIN EVT_DISCONN_COMPLETE */
-[#if PG_FILL_UCS == "True"]
-[#if (RF_APPLICATION == "P2PSERVER")]
-      APP_BLE_Procedure_Gap_Peripheral(PROC_GAP_PERIPH_ADVERTISE_START_FAST);
-      UTIL_TIMER_StartWithPeriod(&bleAppContext.Advertising_mgr_timer_Id, ADV_TIMEOUT_MS);
-[/#if]
-[/#if]
 
       /* USER CODE END EVT_DISCONN_COMPLETE */
 [/#if]
@@ -1433,25 +1269,16 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *p_Pckt)
   [#list 1..myHash["NUMBER_OF_SERVICES"]?number as service]
           ${SERVICES_NAMES[service?string][item_SHORT_NAME]?upper_case}HandleNotification.EvtOpcode = ${SERVICES_NAMES[service?string][item_SHORT_NAME]?upper_case}_CONN_HANDLE_EVT;
   [/#list]
-  [#if (PG_SKIP_LIST == "True") && (myHash["NUMBER_OF_SERVICES"] == "2")]
-          ${SERVICES_NAMES[service2?string][item_SHORT_NAME]?upper_case}HandleNotification.EvtOpcode = ${SERVICES_NAMES[service2?string][item_SHORT_NAME]?upper_case}_CONN_HANDLE_EVT;
-  [/#if]
 [/#if]
 [#if myHash["NUMBER_OF_SERVICES"] != "0"]
   [#list 1..myHash["NUMBER_OF_SERVICES"]?number as service]
           ${SERVICES_NAMES[service?string][item_SHORT_NAME]?upper_case}HandleNotification.ConnectionHandle = p_enhanced_conn_complete->Connection_Handle;
   [/#list]
-  [#if (PG_SKIP_LIST == "True") && (myHash["NUMBER_OF_SERVICES"] == "2")]
-          ${SERVICES_NAMES[service2?string][item_SHORT_NAME]?upper_case}HandleNotification.ConnectionHandle = p_enhanced_conn_complete->Connection_Handle;
-  [/#if]
 [/#if]
 [#if myHash["NUMBER_OF_SERVICES"] != "0"]
   [#list 1..myHash["NUMBER_OF_SERVICES"]?number as service]
           ${SERVICES_NAMES[service?string][item_SHORT_NAME]?upper_case}_APP_EvtRx(&${SERVICES_NAMES[service?string][item_SHORT_NAME]?upper_case}HandleNotification);
   [/#list]
-  [#if (PG_SKIP_LIST == "True") && (myHash["NUMBER_OF_SERVICES"] == "2")]
-          ${SERVICES_NAMES[service2?string][item_SHORT_NAME]?upper_case}_APP_EvtRx(&${SERVICES_NAMES[service2?string][item_SHORT_NAME]?upper_case}HandleNotification);
-  [/#if]
 [/#if]
 [#else]
           UNUSED(p_enhanced_conn_complete);
@@ -1506,25 +1333,16 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *p_Pckt)
   [#list 1..myHash["NUMBER_OF_SERVICES"]?number as service]
           ${SERVICES_NAMES[service?string][item_SHORT_NAME]?upper_case}HandleNotification.EvtOpcode = ${SERVICES_NAMES[service?string][item_SHORT_NAME]?upper_case}_CONN_HANDLE_EVT;
   [/#list]
-  [#if (PG_SKIP_LIST == "True") && (myHash["NUMBER_OF_SERVICES"] == "2")]
-          ${SERVICES_NAMES[service2?string][item_SHORT_NAME]?upper_case}HandleNotification.EvtOpcode = ${SERVICES_NAMES[service2?string][item_SHORT_NAME]?upper_case}_CONN_HANDLE_EVT;
-  [/#if]
 [/#if]
 [#if myHash["NUMBER_OF_SERVICES"] != "0"]
   [#list 1..myHash["NUMBER_OF_SERVICES"]?number as service]
           ${SERVICES_NAMES[service?string][item_SHORT_NAME]?upper_case}HandleNotification.ConnectionHandle = p_conn_complete->Connection_Handle;
   [/#list]
-  [#if (PG_SKIP_LIST == "True") && (myHash["NUMBER_OF_SERVICES"] == "2")]
-          ${SERVICES_NAMES[service2?string][item_SHORT_NAME]?upper_case}HandleNotification.ConnectionHandle = p_conn_complete->Connection_Handle;
-  [/#if]
 [/#if]
 [#if myHash["NUMBER_OF_SERVICES"] != "0"]
   [#list 1..myHash["NUMBER_OF_SERVICES"]?number as service]
           ${SERVICES_NAMES[service?string][item_SHORT_NAME]?upper_case}_APP_EvtRx(&${SERVICES_NAMES[service?string][item_SHORT_NAME]?upper_case}HandleNotification);
   [/#list]
-  [#if (PG_SKIP_LIST == "True") && (myHash["NUMBER_OF_SERVICES"] == "2")]
-          ${SERVICES_NAMES[service2?string][item_SHORT_NAME]?upper_case}_APP_EvtRx(&${SERVICES_NAMES[service2?string][item_SHORT_NAME]?upper_case}HandleNotification);
-  [/#if]
 [/#if]
 [#else]
           UNUSED(p_conn_complete);
@@ -1549,8 +1367,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *p_Pckt)
           /* USER CODE END HCI_EVT_LE_ADVERTISING_REPORT */
           break; /* HCI_LE_ADVERTISING_REPORT_SUBEVT_CODE */
         }
-[/#if]
-[#if  (myHash["BLE_STACK_TYPE"] == "BLE_STACK_TYPE_FULL") && (myHash["BLE_MODE_CENTRAL"] == "Enabled")]
+[#if (myHash["BLE_STACK_TYPE"] == "BLE_STACK_TYPE_FULL") || (myHash["BLE_STACK_TYPE"] == "BLE_STACK_TYPE_BASIC_PLUS")]
         case HCI_LE_EXTENDED_ADVERTISING_REPORT_SUBEVT_CODE:
         {
           hci_le_extended_advertising_report_event_rp0 *p_ext_adv_report;
@@ -1561,6 +1378,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *p_Pckt)
           /* USER CODE END HCI_LE_EXTENDED_ADVERTISING_REPORT_SUBEVT_CODE */
           break; /* HCI_LE_EXTENDED_ADVERTISING_REPORT_SUBEVT_CODE */
         }
+[/#if]
 [/#if]
         /* USER CODE BEGIN SUBEVENT */
 
@@ -2424,13 +2242,7 @@ static void TM_Init(void)
 [/#if]
 
 /* USER CODE BEGIN TM_Init */
-[#if PG_FILL_UCS == "True"]
-[#if (myHash["BLE_MODE_TRANSPARENT_UART"] == "Enabled")]
-  UTIL_LPM_SetOffMode(1 << CFG_LPM_APP_BLE, UTIL_LPM_DISABLE);
-  UTIL_LPM_SetStopMode(1<<CFG_LPM_APP_BLE, UTIL_LPM_DISABLE);
-  LowPowerModeStatus = LOW_POWER_MODE_DISABLE;
-[/#if]
-[/#if]
+
 /* USER CODE END TM_Init */
 
   os_enable_isr();
@@ -3534,26 +3346,6 @@ void COC_EATT_CENTRAL_APP_Notification(COC_EATT_APP_ConnHandle_Not_evt_t *pNotif
 
 [/#if]
 /* USER CODE BEGIN FD_LOCAL_FUNCTION */
-[#if PG_FILL_UCS == "True"]
-[#if (myHash["BLE_MODE_TRANSPARENT_UART"] == "Enabled")]
-static void TM_SetLowPowerMode(void)
-{
-  if(LowPowerModeStatus == LOW_POWER_MODE_DISABLE)
-  {
-    BSP_LED_Off(LED_GREEN);
-    LowPowerModeStatus = LOW_POWER_MODE_ENABLE;
-    UTIL_LPM_SetStopMode(1<<CFG_LPM_APP_BLE, UTIL_LPM_ENABLE);
-  }
-  else
-  {
-    BSP_LED_On(LED_GREEN);
-    LowPowerModeStatus = LOW_POWER_MODE_DISABLE;
-    UTIL_LPM_SetStopMode(1<<CFG_LPM_APP_BLE, UTIL_LPM_DISABLE);
-  }
-  return;
-}
-[/#if]
-[/#if]
 
 /* USER CODE END FD_LOCAL_FUNCTION */
 
@@ -3719,7 +3511,6 @@ static void BLE_HOST_Task_Entry(void* argument)
   {
     osSemaphoreAcquire(BleHostSemaphore, osWaitForever);
     BleStack_Process_BG();
-    osThreadYield();
   }
 }
 
@@ -3730,10 +3521,7 @@ static void HciAsyncEvt_Task_Entry(void* argument)
   while(1)
   {
     osSemaphoreAcquire(HciAsyncEvtSemaphore, osWaitForever);
-
     Ble_UserEvtRx();
-
-    osThreadYield();
   }
 }
 [/#if]
@@ -3751,17 +3539,5 @@ void NVMCB_Store( const uint32_t* ptr, uint32_t size )
 
 [/#if]
 /* USER CODE BEGIN FD_WRAP_FUNCTIONS */
-[#if PG_FILL_UCS == "True"]
-[#if (RF_APPLICATION == "P2PROUTER")]
-#if (CFG_BUTTON_SUPPORTED == 1)
-void APPE_Button1Action(void)
-{
-  BSP_LED_On(LED_BLUE);
-  APP_BLE_Procedure_Gap_Central(PROC_GAP_CENTRAL_SCAN_START);
-  return;
-}
-#endif
-[/#if]
-[/#if]
 
 /* USER CODE END FD_WRAP_FUNCTIONS */

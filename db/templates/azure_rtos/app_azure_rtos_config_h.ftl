@@ -157,7 +157,7 @@ extern "C" {
 [#if NX_ENABLED == "true" && NX_APP_MEM_POOL_SIZE_VAL != "valueNotSetted"]
 #define NX_APP_MEM_POOL_SIZE                     ${NX_APP_MEM_POOL_SIZE_VAL}
 [/#if]
-[#if FamilyName?lower_case?starts_with("stm32n6")]
+[#if FamilyName?lower_case?starts_with("stm32n6") || FamilyName?lower_case?starts_with("stm32wba")]
 [#if UX_ENABLED == "true" && UX_APP_MEM_POOL_SIZE_VAL != "valueNotSetted"]
 #define UX_APP_MEM_POOL_SIZE                     ${UX_APP_MEM_POOL_SIZE_VAL}
 [/#if]
@@ -214,7 +214,7 @@ extern "C" {
 /* #define NX_APP_MEM_POOL_SIZE                    <Add the NX memory pool Size> */
 [/#if]
 
-[#if !FamilyName?lower_case?starts_with("stm32n6")]
+[#if !FamilyName?lower_case?starts_with("stm32n6") && !FamilyName?lower_case?starts_with("stm32wba")]
 [#if UX_HOST_ENABLED == "true"]
 /* #define UX_HOST_APP_MEM_POOL_SIZE                <Add the UXHost memory pool Size> */
 [/#if]
@@ -223,7 +223,7 @@ extern "C" {
 [/#if]
 [#else]
 [#if UX_ENABLED == "true"]
-/* #define UX_APP_MEM_POOL_SIZE                    <Add the UX memory pool Size> */
+/* #define UX_APP_MEM_POOL_SIZE                      <Add the UX memory pool Size> */
 [/#if]
 [/#if]
 
@@ -270,6 +270,4 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
 #endif /* APP_AZURE_RTOS_CONFIG_H */
-

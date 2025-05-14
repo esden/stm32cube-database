@@ -498,6 +498,9 @@ uint8_t *USBD_Get_Device_Framework_Speed(uint8_t Speed, ULONG *Length)
   [#if usbd_builder_enabled == "1"]
   if (USBD_FULL_SPEED == Speed)
   {
+  [#if FamilyName?lower_case?starts_with("stm32wba")]
+	_ux_utility_memory_set(&USBD_Device_FS, 0U, sizeof(USBD_Device_FS));
+  [/#if]
     USBD_Device_Framework_Builder(&USBD_Device_FS, pDevFrameWorkDesc_FS,
                                   UserClassInstance, Speed);
 
@@ -508,6 +511,9 @@ uint8_t *USBD_Get_Device_Framework_Speed(uint8_t Speed, ULONG *Length)
   }
   else
   {
+    [#if FamilyName?lower_case?starts_with("stm32wba")]
+    _ux_utility_memory_set(&USBD_Device_HS, 0U, sizeof(USBD_Device_HS));
+    [/#if]
     USBD_Device_Framework_Builder(&USBD_Device_HS, pDevFrameWorkDesc_HS,
                                   UserClassInstance, Speed);
 

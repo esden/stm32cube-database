@@ -10,8 +10,6 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
-[#assign PG_FILL_UCS = "False"]
-[#assign PG_BSP_NUCLEO_WBA52CG = 0]
 [#assign myHash = {}]
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
@@ -55,6 +53,17 @@ extern "C" {
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
+[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled")  || (myHash["BLE_MODE_SIMPLEST_BLE"] == "Enabled")]
+#define DRIFT_TIME_DEFAULT                      (13)
+#define DRIFT_TIME_EXTRA_LSI2                   (9)
+#define DRIFT_TIME_EXTRA_GCC_DEBUG              (6)
+
+#define EXEC_TIME_DEFAULT                       (10)
+#define EXEC_TIME_EXTRA_LSI2                    (3)
+#define EXEC_TIME_EXTRA_GCC_DEBUG               (4)
+
+#define SCHDL_TIME_DEFAULT                      (20)
+[/#if]
 /* USER CODE BEGIN EC */
 
 /* USER CODE END EC */

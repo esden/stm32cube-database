@@ -1661,14 +1661,20 @@
       <Description></Description>
     </RefParameter>
 
-    <RefParameter Name="CFG_BLE_NUM_GATT_ATTRIBUTES" Comment="CFG_BLE_NUM_GATT_ATTRIBUTES" DefaultValue="20" Min="2" Type="integer" TabName="Configuration" Group="Application configuration - BLE stack">
+    <RefParameter Name="CFG_BLE_NUM_GATT_ATTRIBUTES" Comment="CFG_BLE_NUM_GATT_ATTRIBUTES" DefaultValue="20" Min="0" Type="integer" TabName="Configuration" Group="Application configuration - BLE stack">
         <Condition Diagnostic="" Expression="(S_BLE_LSP|S_BLE_SP|S_BLE_RP)&amp; (NUMBER_OF_SERVICES &gt; 0) | S_BLE_TM"/>
-        <Description>Maximum number of Attributes that can be stored in the GATT database
-		&lt;br&gt;When a GATT characteristic is added to the database a minimum of 2 attribute records are needed: one for the characteristic declaration and one for the characteristic value. On top of this, additional records may be needed based on the characteristic properties, in particular:
-		&lt;br&gt; - If the characteristic has the notify or indicate property set, then one additional attribute record is needed.
-		&lt;br&gt; - If the characteristic has the broadcast property set, then one additional attribute record is needed.
-		&lt;br&gt; - If the characteristic has the extended property set, then one additional attribute record is needed.
-		&lt;br&gt;In summary, one characteristic may need from 2 to 5 attribute records depending on the characteristic properties.
+        <Description>Maximum number of attributes that can be stored in the GATT database in addition to the attributes number already defined for the GATT and GAP services (BLE_STACK_NUM_GATT_MANDATORY_ATTRIBUTES value on STM32_BLE middleware, ble_stack.h header file).
+	        &lt;br&gt;
+	        &lt;br&gt;One attribute is required for each:
+		&lt;br&gt;service declaration
+		&lt;br&gt;characteristic declaration
+		&lt;br&gt;characteristic value
+		&lt;br&gt;characteristic descriptor
+                &lt;br&gt;
+		&lt;br&gt;NOTES:
+		&lt;br&gt; - if a characteristic has the notify or indicate property set, then a client characteristic configuration descriptor is required.
+		&lt;br&gt; - if a characteristic has the broadcast property set, then a server characteristic configuration descriptor is required. 
+		&lt;br&gt; - if a characteristic has the extended property set, then a characteristic extended property descriptor is required. 
 		</Description>
     </RefParameter>
     <RefParameter Name="CFG_BLE_NUM_GATT_ATTRIBUTES" Comment="CFG_BLE_NUM_GATT_ATTRIBUTES" DefaultValue="0" Type="UniqueElementList" TabName="Configuration" Group="Application configuration - BLE stack">
@@ -2110,7 +2116,13 @@
     </RefParameter>
     
    <RefParameter Name="CFG_LPM_SUPPORTED" Comment="CFG_LPM_SUPPORTED" DefaultValue="0" Type="list" Group="Application configuration - Low Power" TabName="Configuration">
-        <Description> Low Power mode:&lt;br&gt;When set to 1, the low power mode is Enable &lt;br&gt; When set to 0, the device stays in RUN mode</Description>
+        <Description> Low Power mode:&lt;br&gt;When set to 1, the low power mode is Enabled &lt;br&gt; When set to 0, the device stays in RUN mode</Description>
+        <PossibleValue Value="0" Comment="Disabled" />
+        <PossibleValue Value="1" Comment="Enabled"/>
+   </RefParameter>
+
+    <RefParameter Name="CFG_LPM_EMULATED" Comment="CFG_LPM_EMULATED" DefaultValue="0" Type="list" Group="Application configuration - Low Power" TabName="Configuration">
+        <Description> Low Power mode emulated (DeepStop2):&lt;br&gt;When set to 1, the low power mode emulated is Enabled,  provided that CFG_LPM_SUPPORTED is set to 1.&lt;br&gt; When set to 0, the low power mode emulated is not Enabled.</Description>
         <PossibleValue Value="0" Comment="Disabled" />
         <PossibleValue Value="1" Comment="Enabled"/>
     </RefParameter>
@@ -4379,6 +4391,7 @@
         <Parameter Name="CFG_BLE_CONTROLLER_CIS_ENABLED"/>
         <Parameter Name="CFG_FULL_LOW_POWER"/>
         <Parameter Name="CFG_LPM_SUPPORTED"/>
+	<Parameter Name="CFG_LPM_EMULATED"/>
         <Parameter Name="CFG_DEBUG_APP_TRACE"/>
         <Parameter Name="CFG_DEBUG_APP_ADV_TRACE"/>
         <Parameter Name="ADV_TRACE_TIMESTAMP_ENABLE"/>

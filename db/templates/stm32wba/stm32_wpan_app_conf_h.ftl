@@ -10,9 +10,6 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
-[#assign PG_FILL_UCS = "False"]
-[#assign PG_BSP_NUCLEO_WBA52CG = 0]
-[#assign PG_SKIP_LIST = "False"]
 [#assign myHash = {}]
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
@@ -186,22 +183,6 @@ Key: ${key}; Value: ${myHash[key]}
 /*****************************************************/
 
 /* USER CODE BEGIN Specific_Parameters */
-[#if PG_FILL_UCS == "True"]
-[#if (RF_APPLICATION == "BEACON")]
-
-/**
- * Beacon selection
- * Beacons are all exclusive
- */
-#define CFG_EDDYSTONE_UID_BEACON_TYPE   (1<<0)
-#define CFG_EDDYSTONE_URL_BEACON_TYPE   (1<<1)
-#define CFG_EDDYSTONE_TLM_BEACON_TYPE   (1<<2)
-#define CFG_IBEACON                     (1<<3)
-
-#define CFG_BEACON_TYPE                 (CFG_EDDYSTONE_URL_BEACON_TYPE)
-
-[/#if]
-[/#if]
 
 /* USER CODE END Specific_Parameters */
 
@@ -306,17 +287,26 @@ Key: ${key}; Value: ${myHash[key]}
  *
  *  When CFG_LPM_LEVEL is set to:
  *   - 0 : Low Power Mode is not activated, RUN mode will be used.
- *   - 1 : Low power active, the one selected with CFG_LPM_STDBY_SUPPORTED
- *   - 2 : In addition, force to disable modules to reach lowest power figures.
+ *   - 1 : Low power active, mode selected with CFG_LPM_STDBY_SUPPORTED
+ *   - 2 : In addition log and debug are disabled to reach lowest power figures.
  *
  * When CFG_LPM_STDBY_SUPPORTED is set to:
+ *   - 2 : Stop mode 2 is used as low power mode (if supported by target)
  *   - 1 : Standby is used as low power mode.
- *   - 0 : Standby is not used, so stop mode 1 is used as low power mode.
+ *   - 0 : Stop mode 1 is used as low power mode.
  *
  ******************************************************************************/
 #define CFG_LPM_LEVEL            (${myHash["CFG_LPM_LEVEL"]})
 #define CFG_LPM_STDBY_SUPPORTED  (${myHash["CFG_LPM_STDBY_SUPPORTED"]})
 
+[#if (myHash["THREADX_STATUS"]?number == 1) ]
+/**
+ * If Standby is enabled we need to disable ThreadX low power Framework, 
+ * TX_LOW_POWER must not be defined in assembly preprocessor configuration.
+ * IDLE task approach is used to manage Standby low power properly.
+ */
+
+[/#if]
 /* Defines time to wake up from standby before radio event to meet timings */
 #define CFG_LPM_STDBY_WAKEUP_TIME (${myHash["CFG_LPM_STDBY_WAKEUP_TIME"]})
 
@@ -376,18 +366,25 @@ typedef enum
 /**
  * Enable or disable LOG over UART in the application.
  * Low power level(CFG_LPM_LEVEL) above 1 will disable LOG.
- * Standby low power mode(CFG_LPM_STDBY_SUPPORTED) will disable LOG.
+ * Standby low power mode(CFG_LPM_STDBY_SUPPORTED) above 0 will disable LOG.
  */
 #define CFG_LOG_SUPPORTED           (${myHash["CFG_LOG_SUPPORTED"]}U)
 
+[#if (myHash["BLE_MODE_TRANSPARENT_UART"] != "Enabled") && (myHash["BLE_MODE_SIMPLEST_BLE"] != "Enabled")]
 /* Usart used by LOG */
+[#assign uartFound = 0]
 [#if nbInstanceCli != 0 ]
     [#list 0..(nbInstanceCli-1) as i]
         [#if myHashCli["bspName"+i] == "Serial Link for Logs"]
+        [#assign uartFound = 1]
 extern UART_HandleTypeDef           h${myHashCli["IpInstance"+i]?lower_case?replace("s","")};
 #define LOG_UART_HANDLER            h${myHashCli["IpInstance"+i]?lower_case?replace("s","")}
         [/#if]
     [/#list]
+[/#if]
+[#if uartFound == 0 ]
+#error "ERROR : you need to indicate an (LP)UART for the Log on CubeMX."
+[/#if]
 [/#if]
 
 /* Configure Log display settings */
@@ -422,6 +419,18 @@ extern UART_HandleTypeDef           h${myHashCli["IpInstance"+i]?lower_case?repl
 
 /******************************************************************************
  * Configure Log level for Application
+ *
+ * APPLI_CONFIG_LOG_LEVEL can be any value of the Log_Verbose_Level_t enum.
+ *
+ * APPLI_CONFIG_LOG_REGION can either be :
+ * - LOG_REGION_ALL_REGIONS to enable all regions
+ * or
+ * - One or several specific regions (any value except LOG_REGION_ALL_REGIONS)
+ *   from the Log_Region_t enum and matching the mask value.
+ *
+ *   For example, to enable both LOG_REGION_BLE and LOG_REGION_APP,
+ *   the value assigned to the define is :
+ *   (1U << LOG_REGION_BLE | 1U << LOG_REGION_APP)
  ******************************************************************************/
 #define APPLI_CONFIG_LOG_LEVEL      ${myHash["CFG_LOG_VERBOSE_LEVEL"]}
 [#assign listLog = ""]
@@ -502,15 +511,14 @@ typedef enum
 [/#if]
 [#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled")]
   CFG_TASK_BPKA,
-  CFG_TASK_FLASH_MANAGER,
   CFG_TASK_BLE_TIMER_BCKGND,
+[/#if]
+[#if (myHash["USE_FLASH_MANAGER"]?number != 0)]
+  CFG_TASK_FLASH_MANAGER,
 [/#if]
 [#if (myHash["ZIGBEE"] == "Enabled") || (myHash["ZIGBEE_SKELETON"] == "Enabled") || (myHash["mac_802_15_4_SKELETON"] == "Enabled")]
   CFG_TASK_MAC_LAYER,
 [#if (myHash["ZIGBEE"] == "Enabled")]
-[#if (myHash["USE_SNVMA_NVM"]?number != 0)]
-  CFG_TASK_FLASH_MANAGER,
-[/#if]
   CFG_TASK_ZIGBEE_LAYER,
   CFG_TASK_ZIGBEE_NETWORK_FORM,   /* Tasks linked to Zigbee Start. */
   CFG_TASK_ZIGBEE_APP_START,
@@ -530,38 +538,7 @@ typedef enum
   CFG_TASK_PKA,
 [/#if]
   /* USER CODE BEGIN CFG_Task_Id_t */
-[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled")]
-[#if PG_FILL_UCS == "True"]
-[#if PG_BSP_NUCLEO_WBA52CG == 1]
-  TASK_BUTTON_1,
-  TASK_BUTTON_2,
-  TASK_BUTTON_3,
-[/#if]
-[#if (RF_APPLICATION == "HEARTRATE")]
-  CFG_TASK_MEAS_REQ_ID,
-  CFG_TASK_ADV_LP_REQ_ID,
-[/#if]
-[#if (RF_APPLICATION == "P2PCLIENT")]
-  CFG_TASK_CONN_DEV_ID,
-  CFG_TASK_P2PC_WRITE_CHAR_ID,
-[/#if]
-[#if (RF_APPLICATION == "P2PSERVER")]
-  CFG_TASK_ADV_CANCEL_ID,
-  CFG_TASK_SEND_NOTIF_ID,
-[/#if]
-[#if (RF_APPLICATION == "HEALTH_THERMOMETER")]
-  CFG_TASK_HTS_MEAS_REQ_ID,
-  CFG_TASK_HTS_INTERMEDIATE_TEMPERATURE_REQ_ID,
-  CFG_TASK_HTS_MEAS_INTERVAL_REQ_ID,
-[/#if]
-[#if (RF_APPLICATION == "P2PROUTER")]
-  CFG_TASK_FORWARD_NOTIF_ID,
-  CFG_TASK_FORWARD_WRITE_ID,
-  CFG_TASK_DEV_TABLE_NOTIF_ID,
-  CFG_TASK_CONN_DEV_ID,
-[/#if]
-[/#if]
-[/#if]
+
   /* USER CODE END CFG_Task_Id_t */
   CFG_TASK_NBR /* Shall be LAST in the list */
 } CFG_Task_Id_t;
@@ -600,21 +577,6 @@ typedef enum
   CFG_IDLEEVT_PROC_GATT_COMPLETE,
 [/#if]
   /* USER CODE BEGIN CFG_IdleEvt_Id_t */
-[#if PG_FILL_UCS == "True"]
-[#if (RF_APPLICATION == "HEARTRATE")]
-[/#if]
-[#if (RF_APPLICATION == "P2PCLIENT")]
-  CFG_IDLEEVT_CONNECTION_COMPLETE,
-[/#if]
-[#if (RF_APPLICATION == "P2PSERVER")]
-[/#if]
-[#if (RF_APPLICATION == "HEALTH_THERMOMETER")]
-[/#if]
-[#if (RF_APPLICATION == "P2PROUTER")]
-  CFG_IDLEEVT_NODE_CONNECTION_COMPLETE,
-  CFG_IDLEEVT_NODE_MTU_EXCHANGED_COMPLETE,
-[/#if]
-[/#if]
 
   /* USER CODE END CFG_IdleEvt_Id_t */
 } CFG_IdleEvt_Id_t;
@@ -624,13 +586,13 @@ typedef enum
 /* Sequencer defines */
 #define TASK_HW_RNG                         ( 1u << CFG_TASK_HW_RNG )
 #define TASK_LINK_LAYER                     ( 1u << CFG_TASK_LINK_LAYER )
+[#if (myHash["USE_FLASH_MANAGER"]?number != 0)]
+#define TASK_FLASH_MNGR                     ( 1u << CFG_TASK_FLASH_MANAGER )
+[/#if]
 [#if (myHash["ZIGBEE"] == "Enabled") || (myHash["ZIGBEE_SKELETON"] == "Enabled") || (myHash["mac_802_15_4_SKELETON"] == "Enabled")]
 #define TASK_MAC_LAYER                      ( 1u << CFG_TASK_MAC_LAYER )
 [/#if]
 [#if (myHash["ZIGBEE"] == "Enabled")]
-[#if (myHash["USE_SNVMA_NVM"]?number != 0)]
-#define TASK_FLASH_MNGR                     ( 1u << CFG_TASK_FLASH_MANAGER )
-[/#if]
 #define TASK_ZIGBEE_LAYER                   ( 1u << CFG_TASK_ZIGBEE_LAYER )
 #define TASK_ZIGBEE_NETWORK_FORM            ( 1u << CFG_TASK_ZIGBEE_NETWORK_FORM )
 #define TASK_ZIGBEE_APP_START               ( 1u << CFG_TASK_ZIGBEE_APP_START )
@@ -721,10 +683,8 @@ typedef enum
 /******************************************************************************
  * BLEPLAT configuration
  ******************************************************************************/
-[#if (myHash["USE_SNVMA_NVM"]?number != 0)]
 /* Number of 64-bit words in NVM flash area */
 #define CFG_BLEPLAT_NVM_MAX_SIZE            ((2048/8)-4)
-[/#if]
 
 /* USER CODE BEGIN BLEPLAT_Configuration */
 
@@ -760,12 +720,6 @@ typedef enum
 /******************************************************************************
  * HW RADIO configuration
  ******************************************************************************/
-/* Do not modify - must be 1 */
-#define USE_RADIO_LOW_ISR                   (${myHash["USE_RADIO_LOW_ISR"]})
-
-/* Do not modify - must be 1 */
-#define NEXT_EVENT_SCHEDULING_FROM_ISR      (${myHash["NEXT_EVENT_SCHEDULING_FROM_ISR"]})
-
 [#if (myHash["USE_TEMPERATURE_BASED_RADIO_CALIBRATION"]?number == 1)]
 /* Link Layer uses temperature based calibration (0 --> NO ; 1 --> YES) */
 #define USE_TEMPERATURE_BASED_RADIO_CALIBRATION  (${myHash["USE_TEMPERATURE_BASED_RADIO_CALIBRATION"]})
@@ -775,13 +729,8 @@ typedef enum
 #define RADIO_INTR_PRIO_HIGH                (${myHash["RADIO_INTR_PRIO_HIGH"]})            /* 2.4GHz RADIO interrupt priority when radio is Active */
 #define RADIO_INTR_PRIO_LOW                 (${myHash["RADIO_INTR_PRIO_LOW"]})            /* 2.4GHz RADIO interrupt priority when radio is Not Active - Sleep Timer Only */
 
-#if (USE_RADIO_LOW_ISR == 1)
 #define RADIO_SW_LOW_INTR_NUM               ${myHash["RADIO_SW_LOW_INTR_NUM"]}      /* Selected interrupt vector for 2.4GHz RADIO low ISR */
 #define RADIO_SW_LOW_INTR_PRIO              (${myHash["RADIO_SW_LOW_INTR_PRIO"]})           /* 2.4GHz RADIO low ISR priority */
-#endif /* USE_RADIO_LOW_ISR */
-
-/* Link Layer supported number of antennas */
-#define RADIO_NUM_OF_ANTENNAS               (4)
 
 #define RCC_INTR_PRIO                       (1)           /* HSERDY and PLL1RDY */
 
@@ -798,13 +747,11 @@ typedef enum
 #define CFG_EXTERNAL_PA_ENABLE              (${myHash["CFG_EXTERNAL_PA_ENABLE"]})
 
 #define CFG_BLE_AOA_AOD_ENABLE              (${myHash["CFG_AOA_AOD_ENABLE"]})
+#define CFG_RADIO_NUM_OF_ANTENNAS           (${myHash["CFG_RADIO_NUM_OF_ANTENNAS"]})           /* Link Layer supported number of antennas */
 
 [/#if]
-/* Custom LSE sleep clock accuracy to use if both conditions are met: 
- * - LSE is selected as Link Layer sleep clock source
- * - the LSE used is different from the default one.
- */
-#define CFG_RADIO_LSE_SLEEP_TIMER_CUSTOM_SCA_RANGE (0)
+/* Radio sleep clock LSE accuracy configuration */
+#define CFG_RADIO_LSE_SLEEP_TIMER_CUSTOM_SCA_RANGE (${myHash["CFG_RADIO_LSE_SLEEP_TIMER_CUSTOM_SCA_RANGE"]})
 
 /* USER CODE BEGIN Radio_Configuration */
 
@@ -829,18 +776,11 @@ typedef enum
 #define CFG_MM_POOL_SIZE                                  (${myHash["CFG_MM_POOL_SIZE"]}U)  /* bytes */
 [#if (myHash["CFG_AMM_VIRTUAL_MEMORY_NUMBER"]?number != 0)]
 #define CFG_AMM_VIRTUAL_MEMORY_NUMBER                     (${myHash["CFG_AMM_VIRTUAL_MEMORY_NUMBER"]}U)
-[#if PG_SKIP_LIST == "False"]
 [#assign i = 0]
 [#list 1..(myHash["CFG_AMM_VIRTUAL_MEMORY_NUMBER"]?number) as i]
 #define CFG_AMM_VIRTUAL_${myHash["CFG_AMM_VIRTUAL_ID_NAME_"+i?string]?right_pad(34)}(${myHash["CFG_AMM_VIRTUAL_ID_NBR_"+i?string]}U)  
 #define CFG_AMM_VIRTUAL_${myHash["CFG_AMM_VIRTUAL_ID_NAME_"+i?string]+"_BUFFER_SIZE"?right_pad(17)}(${myHash["CFG_AMM_VIRTUAL_BUFFER_SIZE_"+i?string]}U)  /* words (32 bits) */
 [/#list]
-[#else]
-#define CFG_AMM_VIRTUAL_STACK_BLE                         (1U)
-#define CFG_AMM_VIRTUAL_STACK_BLE_BUFFER_SIZE             (400U)  /* words (32 bits) */
-#define CFG_AMM_VIRTUAL_APP_BLE                           (2U)
-#define CFG_AMM_VIRTUAL_APP_BLE_BUFFER_SIZE               (200U)  /* words (32 bits) */
-[/#if]
 #define CFG_AMM_POOL_SIZE                                 ( DIVC(CFG_MM_POOL_SIZE, sizeof (uint32_t)) \
                                                           + (AMM_VIRTUAL_INFO_ELEMENT_SIZE * CFG_AMM_VIRTUAL_MEMORY_NUMBER) )
 [/#if]
@@ -851,30 +791,6 @@ typedef enum
 
 [/#if]
 /* USER CODE BEGIN Defines */
-[#if PG_FILL_UCS == "True"]
-/**
- * User interaction
- * When CFG_LED_SUPPORTED is set, LEDS are activated if requested
- * When CFG_BUTTON_SUPPORTED is set, the push button are activated if requested
- */
-
-[#if (RF_APPLICATION == "HEARTRATE")]
-#define CFG_LED_SUPPORTED                       (0)
-[#else]
-#define CFG_LED_SUPPORTED                       (1)
-[/#if]
-#define CFG_BUTTON_SUPPORTED                    (1)
-
-/**
- * Overwrite some configuration imposed by Low Power level selected.
- */
-#if (CFG_LPM_LEVEL > 1)
-  #if CFG_LED_SUPPORTED
-    #undef  CFG_LED_SUPPORTED
-    #define CFG_LED_SUPPORTED       (0)
-  #endif /* CFG_LED_SUPPORTED */
-#endif /* CFG_LPM_LEVEL */
-[/#if]
 
 /* USER CODE END Defines */
 
@@ -892,12 +808,12 @@ typedef enum
   #endif /* CFG_DEBUGGER_LEVEL */
 #endif /* CFG_LPM_LEVEL */
 
-#if (CFG_LPM_STDBY_SUPPORTED == 1)
+#if (CFG_LPM_STDBY_SUPPORTED != 0) && (CFG_LPM_LEVEL != 0)
   #if CFG_LOG_SUPPORTED
     #undef  CFG_LOG_SUPPORTED
     #define CFG_LOG_SUPPORTED       (0)
   #endif /* CFG_LOG_SUPPORTED */
-#endif /* CFG_LPM_STDBY_SUPPORTED */
+#endif /* (CFG_LPM_STDBY_SUPPORTED > 0) && (CFG_LPM_LEVEL != 0) */
 
 /* USER CODE BEGIN Defines_2 */
 

@@ -102,9 +102,6 @@ void BLE_TIMER_Init(void)
 {
   /* This function initializes the timer Queue */
   LST_init_head(&BLE_TIMER_List);
-  
-  /* Initialize the Timer Server */
-  UTIL_TIMER_Init();
 
 [#if myHash["SEQUENCER_STATUS"]?number == 1 ]
   /* Register BLE Timer task */
@@ -239,7 +236,6 @@ static void BLE_TIMER_Task_Entry(void* argument)
   {
     osSemaphoreAcquire(BleTimerSemaphore, osWaitForever);
     BLE_TIMER_Background();
-    osThreadYield();
   }
 }
 

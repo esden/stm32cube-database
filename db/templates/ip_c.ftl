@@ -22,7 +22,7 @@
 [#assign ipvar = IP]
 /* Includes ------------------------------------------------------------------*/
 #include "${name?lower_case}.h"
-[#if name=="ETH" && (F4_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || H5_ETH_NoLWIP?? || MP13_ETH_NoLWIP?? || H7RS_ETH_NoLWIP?? || MP2_ETH_NoLWIP?? || N6_ETH_NoLWIP??)]
+[#if name=="ETH" && (F4_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || MP13_ETH_NoLWIP?? || H7RS_ETH_NoLWIP?? || MP2_ETH_NoLWIP?? || N6_ETH_NoLWIP?? || H5_ETH_NoTHREADX?? )]
 #include "string.h"
 [/#if]
 
@@ -126,7 +126,7 @@ __attribute__((at([#if RxDescAddress??]${RxDescAddress}[#else]0x30040000[/#if]))
 __attribute__((at([#if TxDescAddress??]${TxDescAddress}[#else]0x30040060[/#if]))) ETH_DMADescTypeDef  DMATxDscrTab[#if N6_ETH_NoLWIP??][ETH_DMA_TX_CH_CNT][/#if][ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
 
 [#if H7RS_ETH_NoLWIP??]
-#elif defined ( __GNUC__ ) || defined ( __ARMCC_VERSION )) /* GNU Compiler */ 
+#elif (defined ( __GNUC__ ) || defined ( __ARMCC_VERSION )) /* GNU Compiler */
 
 ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT] __attribute__((section(".RxDescripSection"))); /* Ethernet Rx DMA Descriptors */
 ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT] __attribute__((section(".TxDescripSection")));   /* Ethernet Tx DMA Descriptors */
@@ -977,6 +977,10 @@ ETH_TxPacketConfig TxConfig;
 	#t#tHAL_PWREx_EnableVddUSB();
 	#t#t}
 	[/#if]
+	[#if ipName?contains("USB") && (FamilyName=="STM32H5")]
+	#n#t#t/* Enable VDDUSB */
+	#t#tHAL_PWREx_EnableVddUSB();
+	[/#if]
            [#if initService.clock??]
             [#if initService.clock!="none"]
                #t#t/* ${ipName} clock enable */
@@ -1016,7 +1020,8 @@ ETH_TxPacketConfig TxConfig;
     #t#t#tHAL_PWREx_EnableVddUSB();
   #t#t}
 [/#if]
-[#if ipName?contains("OTG_HS")&&FamilyName=="STM32U5"]
+[#if ipName?contains("OTG_HS")]
+[#if FamilyName=="STM32U5"]
 #n#t#t/* Enable VDDUSB */
   #t#tif(__HAL_RCC_PWR_IS_CLK_DISABLED())
   #t#t{
@@ -1037,6 +1042,21 @@ ETH_TxPacketConfig TxConfig;
 #n#t#t/*Configuring the SYSCFG registers OTG_HS PHY*/
 #t#t/*OTG_HS PHY enable*/
 #t#t#tHAL_SYSCFG_EnableOTGPHY(SYSCFG_OTG_HS_PHY_ENABLE);
+[/#if]
+[#if FamilyName=="STM32WBA"]
+    #t#tif(__HAL_RCC_PWR_IS_CLK_ENABLED())
+    #t#t{
+    #t#t#t__HAL_RCC_PWR_CLK_ENABLE();
+    #t#t#tHAL_PWREx_EnableVddUSB();
+    #t#t#tHAL_PWREx_EnableUSBPWR();
+    #t#t#t__HAL_RCC_PWR_CLK_DISABLE();
+    #t#t}
+    #t#telse
+    #t#t{
+    #t#t#tHAL_PWREx_EnableVddUSB();
+    #t#t}
+    #t#tHAL_SYSCFG_EnableOTGPHY(SYSCFG_OTG_HS_PHY_ENABLE);
+[/#if]
 [/#if]
 [#-- bug 322189 Init End--]
     [#if nvicExist]

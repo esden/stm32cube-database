@@ -3777,10 +3777,10 @@ void SVCCTL_InitCustomSvc(void)
    */
   max_attr_record = ${SERVICES_INFO[service?string][item_MAX_ATTRIBUTES_RECORDS]};
 
-  /* USER CODE BEGIN SVCCTL_InitService */
+  /* USER CODE BEGIN SVCCTL_InitService${service} */
   /* max_attr_record to be updated if descriptors have been added */
 
-  /* USER CODE END SVCCTL_InitService */
+  /* USER CODE END SVCCTL_InitService${service} */
 
       [#if SERVICES_INFO[service?string][item_UUID_TYPE] == "0x01"]
           [#assign UUID_TYPE = "UUID_TYPE_16"]
@@ -4020,8 +4020,16 @@ tBleStatus Custom_STM_App_Update_Char_Ext(uint16_t Connection_Handle, Custom_STM
       /* USER CODE BEGIN Updated_Length_Service_${service?string}_Char_${characteristic?string}*/
 
       /* USER CODE END Updated_Length_Service_${service?string}_Char_${characteristic?string}*/
-	  Generic_STM_App_Update_Char_Ext(Connection_Handle, CustomContext.Custom[@serviceShortNameCapitalized service/]Hdle, CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle, Size[@characteristicShortNameCapitalized service characteristic/], pPayload);
-
+      ret = Generic_STM_App_Update_Char_Ext(Connection_Handle, CustomContext.Custom[@serviceShortNameCapitalized service/]Hdle, CustomContext.Custom[@characteristicShortNameCapitalized service characteristic/]Hdle, Size[@characteristicShortNameCapitalized service characteristic/], pPayload);
+    
+      if (ret != BLE_STATUS_SUCCESS)
+      {
+        APP_DBG_MSG("  Fail   : Generic_STM_App_Update_Char_Ext command, result : 0x%x \n\r", ret);
+      }
+      else
+      {
+        APP_DBG_MSG("  Success: Generic_STM_App_Update_Char_Ext command\n\r");
+      }
       break;
 
         [/#list]

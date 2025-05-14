@@ -8,7 +8,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2024 STMicroelectronics.
+  * Copyright (c) 2025 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -57,6 +57,41 @@ extern void mac_baremetal_run(void);
 static TX_SEMAPHORE     stMacLayerTaskSemaphore, stMacLayerEventSemaphore;
 static TX_THREAD        stMacLayerThread;
 [/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+/* FreeRTOS objects declaration */
+
+static osThreadId_t     stMacLayerTaskHandle;
+static osSemaphoreId_t  stMacLayerTaskSemaphore, stMacLayerEventSemaphore;
+
+/* FreeRtos MacLayer stacks attributes */
+const osThreadAttr_t stMacLayerTask_attributes = 
+{
+  .name         = "MacLayer Task",
+  .priority     = TASK_PRIO_MAC_LAYER,
+  .stack_size   = TASK_STACK_SIZE_MAC_LAYER,
+  .attr_bits    = TASK_DEFAULT_ATTR_BITS,
+  .cb_mem       = TASK_DEFAULT_CB_MEM,
+  .cb_size      = TASK_DEFAULT_CB_SIZE,
+  .stack_mem    = TASK_DEFAULT_STACK_MEM
+};
+
+const osSemaphoreAttr_t stMacLayerTaskSemaphore_attributes = 
+{
+  .name         = "MacLayer Task Semaphore",
+  .attr_bits    = SEMAPHORE_DEFAULT_ATTR_BITS,
+  .cb_mem       =  SEMAPHORE_DEFAULT_CB_MEM,
+  .cb_size      =  SEMAPHORE_DEFAULT_CB_SIZE
+};
+
+const osSemaphoreAttr_t stMacLayerEventSemaphore_attributes = 
+{
+  .name         = "MacLayer Event Semaphore",
+  .attr_bits    = SEMAPHORE_DEFAULT_ATTR_BITS,
+  .cb_mem       = SEMAPHORE_DEFAULT_CB_MEM,
+  .cb_size      = SEMAPHORE_DEFAULT_CB_SIZE
+};
+
+[/#if]
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -81,6 +116,24 @@ static void MacSys_Process( ULONG lArgument )
   for (;;)
   {
     tx_semaphore_get( &stMacLayerTaskSemaphore, TX_WAIT_FOREVER );
+    mac_baremetal_run();
+  }
+}
+
+[/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+/**
+ * @brief  Mac Layer Task for FreeRTOS
+ * @param  void *argument
+ * @retval None
+ */
+static void MacSys_Task_Entry( void * argument )
+{
+  UNUSED( argument );
+  
+  for (;;)
+  {
+    osSemaphoreAcquire( stMacLayerTaskSemaphore, osWaitForever );
     mac_baremetal_run();
   }
 }
@@ -130,7 +183,20 @@ void MacSys_Init(void)
     LOG_ERROR_APP( "ERROR THREADX : EVENT MAC LAYER EVENT SEMAPHORE CREATION FAILED (%d)", lThreadXStatus );
     Error_Handler();
   }
-[/#if]  
+[/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+  /* Create MacLayer FreeRTOS objects */
+  stMacLayerTaskSemaphore = osSemaphoreNew( 1, 0, &stMacLayerTaskSemaphore_attributes ); 
+  stMacLayerEventSemaphore = osSemaphoreNew( 1, 0, &stMacLayerEventSemaphore_attributes ); 
+  
+  stMacLayerTaskHandle = osThreadNew( MacSys_Task_Entry, NULL, &stMacLayerTask_attributes );
+  
+  if ( ( stMacLayerTaskHandle == NULL ) || ( stMacLayerTaskSemaphore == NULL ) || ( stMacLayerEventSemaphore == NULL ) )
+  {
+    LOG_ERROR_APP( "MacLayer FreeRTOS objects creation FAILED" );
+    Error_Handler();
+  }
+[/#if]
 }
 
 /**
@@ -145,6 +211,9 @@ void MacSys_Resume(void)
 [/#if]
 [#if myHash["THREADX_STATUS"]?number == 1 ]
   tx_thread_resume( &stMacLayerThread );
+[/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+  osThreadResume( stMacLayerTaskHandle );
 [/#if]
 }
 
@@ -164,6 +233,12 @@ void MacSys_SemaphoreSet(void)
     tx_semaphore_put( &stMacLayerTaskSemaphore );
   }
 [/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+  if ( osSemaphoreGetCount( stMacLayerTaskSemaphore ) == 0 )
+  {
+    osSemaphoreRelease( stMacLayerTaskSemaphore );
+  }
+[/#if]
 }
 
 /**
@@ -178,6 +253,9 @@ void MacSys_SemaphoreWait( void )
 [/#if]
 [#if myHash["THREADX_STATUS"]?number == 1 ]
   tx_semaphore_get( &stMacLayerTaskSemaphore, TX_WAIT_FOREVER );
+[/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+  osSemaphoreAcquire( stMacLayerTaskSemaphore, osWaitForever );
 [/#if]
 }
 
@@ -197,6 +275,12 @@ void MacSys_EventSet( void )
     tx_semaphore_put( &stMacLayerEventSemaphore );
   }
 [/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+  if ( osSemaphoreGetCount( stMacLayerEventSemaphore ) == 0 )
+  {
+    osSemaphoreRelease( stMacLayerEventSemaphore );
+  }
+[/#if]
 }
 
 /**
@@ -211,6 +295,9 @@ void MacSys_EventWait( void )
 [/#if]
 [#if myHash["THREADX_STATUS"]?number == 1 ]
   tx_semaphore_get( &stMacLayerEventSemaphore, TX_WAIT_FOREVER );
+[/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+  osSemaphoreAcquire( stMacLayerEventSemaphore, osWaitForever );
 [/#if]
 }
 

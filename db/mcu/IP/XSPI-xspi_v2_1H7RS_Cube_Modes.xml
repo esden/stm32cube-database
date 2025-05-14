@@ -68,7 +68,11 @@
 	</RefParameter>
 
 	<!-- ChipSelectHighTimeCycle -->
+	<RefParameter Comment="Chip Select High Time Cycle" DefaultValue="5" Max="64" Min="5" Name="ChipSelectHighTimeCycle" Type="integer" Group="Generic" >
+		<Condition Diagnostic="" Expression="($IpInstance=XSPI1 &amp; MemoryType=HAL_XSPI_MEMTYPE_APMEM_16BITS)" />
+	</RefParameter>
 	<RefParameter Comment="Chip Select High Time Cycle" DefaultValue="1" Max="64" Min="1" Name="ChipSelectHighTimeCycle" Type="integer" Group="Generic" />
+
 
 	<!-- FreeRunningClock -->
 	<RefParameter Comment="Free Running Clock" DefaultValue="HAL_XSPI_FREERUNCLK_DISABLE" Name="FreeRunningClock" Type="list" Group="Generic">
@@ -108,31 +112,29 @@
 	<RefParameter Comment="Clock Prescaler" DefaultValue="0" Max="255" Min="0" Name="ClockPrescaler" Type="integer" Group="Generic" />
 
     <!-- DeviceType -->
-	<RefParameter Comment="Device Type" DefaultValue="SPI_DEVICE_FLASH" Name="DeviceType" Type="list" Group="Generic" TabName="MMT">
+	<RefParameter Comment="Device Type" DefaultValue="SPI_DEVICE_FLASH" Name="DeviceType" Type="list" Group="Generic" TabName="MMT" Visible="false">
 		<Condition Diagnostic="" Expression="SEMA_Activate_EXTMEM &amp; (($IpInstance=XSPI1) &amp; ((Memory1_XSPI1 &amp; Flash_Memory1)|(Memory2_XSPI1 &amp; Flash_Memory2)))" />
 		<PossibleValue Comment="Flash" Value="SPI_DEVICE_FLASH"/>
 	</RefParameter>
-	<RefParameter Comment="Device Type" DefaultValue="SPI_DEVICE_FLASH" Name="DeviceType" Type="list" Group="Generic" TabName="MMT">
+	<RefParameter Comment="Device Type" DefaultValue="SPI_DEVICE_FLASH" Name="DeviceType" Type="list" Group="Generic" TabName="MMT" Visible="false">
 		<Condition Diagnostic="" Expression="SEMA_Activate_EXTMEM &amp; (($IpInstance=XSPI2) &amp; ((Memory1_XSPI2 &amp; Flash_Memory1)|(Memory2_XSPI2 &amp; Flash_Memory2)))" />
 		<PossibleValue Comment="Flash" Value="SPI_DEVICE_FLASH"/>
 	</RefParameter>
-	<RefParameter Comment="Device Type" DefaultValue="SPI_DEVICE_RAM" Name="DeviceType" Type="list" Group="Generic" TabName="MMT">
+	<RefParameter Comment="Device Type" DefaultValue="SPI_DEVICE_RAM" Name="DeviceType" Type="list" Group="Generic" TabName="MMT" Visible="false">
 		<Condition Diagnostic="" Expression="SEMA_Activate_EXTMEM &amp; (($IpInstance=XSPI1) &amp; ((Memory1_XSPI1 &amp; Ram_Memory1)|(Memory2_XSPI1 &amp; Ram_Memory2)))" />
 		<PossibleValue Comment="RAM" Value="SPI_DEVICE_RAM"/>
 	</RefParameter>
-	<RefParameter Comment="Device Type" DefaultValue="SPI_DEVICE_RAM" Name="DeviceType" Type="list" Group="Generic" TabName="MMT">
+	<RefParameter Comment="Device Type" DefaultValue="SPI_DEVICE_RAM" Name="DeviceType" Type="list" Group="Generic" TabName="MMT" Visible="false">
 		<Condition Diagnostic="" Expression="SEMA_Activate_EXTMEM &amp; (($IpInstance=XSPI2) &amp; ((Memory1_XSPI2 &amp; Ram_Memory1)|(Memory2_XSPI2 &amp; Ram_Memory2)))" />
 		<PossibleValue Comment="RAM" Value="SPI_DEVICE_RAM"/>
 	</RefParameter>
-	<RefParameter Comment="Device Type" DefaultValue="SPI_DEVICE_0" Name="DeviceType" Type="list" Group="Generic" TabName="MMT">
-		<Condition Diagnostic="" Expression="SEMA_Activate_EXTMEM" />
-		<PossibleValue Comment="Not defined" Value="SPI_DEVICE_0"/>
-	</RefParameter>
-	<RefParameter Comment="Device Type" DefaultValue="SPI_DEVICE_0" Name="DeviceType" Type="list" Group="Generic" TabName="MMT">
+	<RefParameter Comment="Device Type" DefaultValue="SPI_DEVICE_RAM" Name="DeviceType" Type="list" Group="Generic" TabName="MMT" Visible="false">
 		<PossibleValue Comment="Not defined" Value="SPI_DEVICE_0"/>
 		<PossibleValue Comment="Flash" Value="SPI_DEVICE_FLASH"/>
 		<PossibleValue Comment="RAM" Value="SPI_DEVICE_RAM"/>
 	</RefParameter>
+
+
 
 	<!-- SampleShifting -->
 	<RefParameter Comment="Sample Shifting" DefaultValue="HAL_XSPI_SAMPLE_SHIFT_NONE" Name="SampleShifting" Type="list" Group="Generic">
@@ -986,6 +988,7 @@
 						<Signal Name="VS_quad_mx" />
 					</SignalLogicalOp>
 					<Semaphore>s_o1_quadmx</Semaphore>
+					<Semaphore>Sem_$IpInstance_quadmx</Semaphore>
 				</Mode>
 				<Mode Name="dual_single_mode" UserName="Dual-Single SPI">
 				<Condition Expression="!VFQFPN68" Diagnostic="Only Quad SPI is supported for this package"/>
@@ -1041,6 +1044,7 @@
 						<Signal Name="VS_octo_mx" />
 					</SignalLogicalOp>
 					<Semaphore>s_o1_octomx</Semaphore>
+					<Semaphore>Sem_$IpInstance_octomx</Semaphore>
 				</Mode>
 				<Mode Name="hexa_mode" UserName="Hexa SPI">
 					<Condition Expression="TFBGA225_HEXA_SMPS &amp; !Sem_Port1CLK_XSPI2_Port &amp; !VFQFPN68" Diagnostic="Available only with TFBGA225HEXA Package OR Port1 is already used" />
@@ -1055,6 +1059,7 @@
 						<Signal Name="VS_hexa_mx" />
 					</SignalLogicalOp>
 					<Semaphore>s_o1_hexamx</Semaphore>
+					<Semaphore>Sem_$IpInstance_hexamx</Semaphore>
 				</Mode>
 				<Mode Name="hyperbus_mode" UserName="HyperBus(TM)">
 			    <Condition Expression="!VFQFPN68" Diagnostic="Only Quad SPI is supported for this package"/>

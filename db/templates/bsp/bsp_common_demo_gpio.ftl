@@ -27,6 +27,12 @@
                 [#break]
             [/#list]
         [/#if]
+        [#if pinNumber?split("(")?size >1 ]
+                    [#list pinNumber?split("(") as pins]
+                        [#assign pinNumber = pins]
+                        [#break]
+                    [/#list]
+        [/#if]
         [#-- end  --]
 
         [#switch  port]

@@ -723,6 +723,13 @@ void Pre_OtCmdProcessing(void)
 [#if FREERTOS_STATUS = 0 ]
   UTIL_SEQ_WaitEvt(EVENT_SYNCHRO_BYPASS_IDLE);
 [#else]
+  /* OT command not be sent in interrupt context */
+  if (__get_IPSR() != 0U)
+  {
+    /* 'assert' endless loop */
+    for( ; ; );
+  }
+
   osMutexAcquire(MtxOtCmdId, osWaitForever);
 }
 

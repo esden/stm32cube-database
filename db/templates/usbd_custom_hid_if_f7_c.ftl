@@ -394,7 +394,7 @@ static int8_t CUSTOM_HID_OutEvent_HS(uint8_t event_idx, uint8_t state)
 
   return (USBD_OK);
   /* USER CODE END 10 */
-
+}
 
 #ifdef USBD_CUSTOMHID_CTRL_REQ_COMPLETE_CALLBACK_ENABLED
 /**

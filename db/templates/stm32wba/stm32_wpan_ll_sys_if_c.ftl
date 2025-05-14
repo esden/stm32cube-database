@@ -46,9 +46,13 @@ Key: ${key}; Value: ${myHash[key]}
 [/#if]
 [#if myHash["BLE_MODE_SIMPLEST_BLE"] == "Enabled"]
 #include "skel_ble.h"
+#include "stm32wbaxx_ll_system.h"
 [/#if]
 
 /* Private defines -----------------------------------------------------------*/
+/* Radio event scheduling method - must be set at 1 */
+#define USE_RADIO_LOW_ISR                   (1)
+#define NEXT_EVENT_SCHEDULING_FROM_ISR      (1)
 
 /* USER CODE BEGIN PD */
 
@@ -160,12 +164,10 @@ static void ll_sys_bg_temperature_measurement_init(void);
 #endif /* USE_TEMPERATURE_BASED_RADIO_CALIBRATION */
 [/#if]
 static void ll_sys_sleep_clock_source_selection(void);
-[#if (myHash["BLE"] == "Enabled")]
-#if (CFG_RADIO_LSE_SLEEP_TIMER_CUSTOM_SCA_RANGE == 0)
+[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled")  || (myHash["BLE_MODE_SIMPLEST_BLE"] == "Enabled")]
 static uint8_t ll_sys_BLE_sleep_clock_accuracy_selection(void);
-#endif /* CFG_RADIO_LSE_SLEEP_TIMER_CUSTOM_SCA_RANGE */
 [/#if]
-[#if !((myHash["ZIGBEE"] == "Enabled") || (myHash["ZIGBEE_SKELETON"] == "Enabled"))]
+[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled")  || (myHash["BLE_MODE_SIMPLEST_BLE"] == "Enabled")]
 void ll_sys_reset(void);
 [/#if]
 
@@ -197,7 +199,6 @@ static void LinkLayer_Task_Entry(void *argument)
     osMutexAcquire(LinkLayerMutex, osWaitForever);
     ll_sys_bg_process();
     osMutexRelease(LinkLayerMutex);
-    osThreadYield();
 [#else]
     osSemaphoreAcquire(LinkLayerSemaphore, osWaitForever);
     ll_sys_bg_process();
@@ -246,16 +247,16 @@ void ll_sys_bg_process_init(void)
 [#if myHash["FREERTOS_STATUS"]?number == 1 ]
   /* Create Link Layer FreeRTOS objects */
 
-  LinkLayerTaskHandle = osThreadNew(LinkLayer_Task_Entry, NULL, &LinkLayerTask_attributes);
-
   LinkLayerSemaphore = osSemaphoreNew(1U, 0U, &LinkLayerSemaphore_attributes);
+
+  LinkLayerTaskHandle = osThreadNew(LinkLayer_Task_Entry, NULL, &LinkLayerTask_attributes);
 
 [#if (myHash["BLE"] == "Enabled") ]
   LinkLayerMutex = osMutexNew(&LinkLayerMutex_attributes);
 
-  if((LinkLayerTaskHandle == NULL) || (LinkLayerSemaphore == NULL) || (LinkLayerMutex == NULL))
+  if ((LinkLayerTaskHandle == NULL) || (LinkLayerSemaphore == NULL) || (LinkLayerMutex == NULL))
 [#else]
-  if((LinkLayerTaskHandle == NULL) || (LinkLayerSemaphore == NULL))  
+  if ((LinkLayerTaskHandle == NULL) || (LinkLayerSemaphore == NULL))
 [/#if]
   {
     LOG_ERROR_APP( "Link Layer FreeRTOS objects creation FAILED");
@@ -304,7 +305,14 @@ void ll_sys_schedule_bg_process(void)
   UTIL_SEQ_SetTask(1U << CFG_TASK_LINK_LAYER, TASK_PRIO_LINK_LAYER);
 [/#if]
 [#if myHash["FREERTOS_STATUS"]?number == 1 ]
+[#if (myHash["BLE"] == "Enabled")]
   osSemaphoreRelease(LinkLayerSemaphore);
+[#else]
+  if ( osSemaphoreGetCount(LinkLayerSemaphore) == 0 )
+  {
+    osSemaphoreRelease( LinkLayerSemaphore );
+  }
+[/#if]
 [/#if]
 [#if myHash["THREADX_STATUS"]?number == 1 ]
 [#if (myHash["BLE"] == "Enabled")]
@@ -333,7 +341,14 @@ void ll_sys_schedule_bg_process_isr(void)
   UTIL_SEQ_SetTask(1U << CFG_TASK_LINK_LAYER, TASK_PRIO_LINK_LAYER);
 [/#if]
 [#if myHash["FREERTOS_STATUS"]?number == 1 ]
+[#if (myHash["BLE"] == "Enabled")]
   osSemaphoreRelease(LinkLayerSemaphore);
+[#else]  
+  if ( osSemaphoreGetCount(LinkLayerSemaphore) == 0 )
+  {
+    osSemaphoreRelease( LinkLayerSemaphore );
+  }
+[/#if]
 [/#if]
 [#if myHash["THREADX_STATUS"]?number == 1 ]
 [#if (myHash["BLE"] == "Enabled")]
@@ -404,16 +419,8 @@ void ll_sys_config_params(void)
 
   for(;;)
   {
-[#if (myHash["BLE"] == "Enabled")]
-    osSemaphoreAcquire(TempMeasLLSemaphore, osWaitForever);
-
-    TEMPMEAS_RequestTemperatureMeasurement();
-
-    osThreadYield();
-[#else]
     osSemaphoreAcquire(TempMeasLLSemaphore, osWaitForever);
     TEMPMEAS_RequestTemperatureMeasurement();
-[/#if]
   }
 }
 
@@ -522,12 +529,13 @@ void ll_sys_bg_temperature_measurement(void)
 #endif /* USE_TEMPERATURE_BASED_RADIO_CALIBRATION */
 [/#if]
 
-[#if (myHash["BLE"] == "Enabled")]
-#if (CFG_RADIO_LSE_SLEEP_TIMER_CUSTOM_SCA_RANGE == 0)
+[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled")  || (myHash["BLE_MODE_SIMPLEST_BLE"] == "Enabled")]
 uint8_t ll_sys_BLE_sleep_clock_accuracy_selection(void)
 {
   uint8_t BLE_sleep_clock_accuracy = 0;
+#if (CFG_RADIO_LSE_SLEEP_TIMER_CUSTOM_SCA_RANGE == 0)
   uint32_t RevID = LL_DBGMCU_GetRevisionID();
+#endif
   uint32_t linklayer_slp_clk_src = LL_RCC_RADIO_GetSleepTimerClockSource();
   
   if(linklayer_slp_clk_src == LL_RCC_RADIOSLEEPSOURCE_LSE)
@@ -535,6 +543,7 @@ uint8_t ll_sys_BLE_sleep_clock_accuracy_selection(void)
     /* LSE selected as Link Layer sleep clock source. 
        Sleep clock accuracy is different regarding the WBA device ID and revision 
      */
+#if (CFG_RADIO_LSE_SLEEP_TIMER_CUSTOM_SCA_RANGE == 0)  	 
 #if defined(STM32WBA52xx) || defined(STM32WBA54xx) || defined(STM32WBA55xx)
     if(RevID == REV_ID_A)
     {
@@ -549,24 +558,24 @@ uint8_t ll_sys_BLE_sleep_clock_accuracy_selection(void)
       /* Revision ID not supported, default value of 500ppm applied */
       BLE_sleep_clock_accuracy = STM32WBA5x_DEFAULT_SCA_RANGE;
     }
-[#if DIE=="DIE4B0"]
 #elif defined(STM32WBA65xx)
     BLE_sleep_clock_accuracy = STM32WBA6x_SCA_RANGE;
     UNUSED(RevID);
-[/#if]
 #else
     UNUSED(RevID);
 #endif /* defined(STM32WBA52xx) || defined(STM32WBA54xx) || defined(STM32WBA55xx) */
+#else /* CFG_RADIO_LSE_SLEEP_TIMER_CUSTOM_SCA_RANGE */  
+    BLE_sleep_clock_accuracy = CFG_RADIO_LSE_SLEEP_TIMER_CUSTOM_SCA_RANGE;
+#endif /* CFG_RADIO_LSE_SLEEP_TIMER_CUSTOM_SCA_RANGE */  	
   }
   else
   {
     /* LSE is not the Link Layer sleep clock source, sleep clock accurcay default value is 500 ppm */
     BLE_sleep_clock_accuracy = STM32WBA5x_DEFAULT_SCA_RANGE;
   }
-  
-  return BLE_sleep_clock_accuracy;
+
+  return BLE_sleep_clock_accuracy;  
 }
-#endif /* CFG_RADIO_LSE_SLEEP_TIMER_CUSTOM_SCA_RANGE */
 [/#if]
 
 void ll_sys_sleep_clock_source_selection(void)
@@ -597,34 +606,49 @@ void ll_sys_sleep_clock_source_selection(void)
   ll_intf_cmn_le_select_slp_clk_src((uint8_t)linklayer_slp_clk_src, &freq_value);
 }
 
-[#if !((myHash["ZIGBEE"] == "Enabled") || (myHash["ZIGBEE_SKELETON"] == "Enabled"))]
+[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled")  || (myHash["BLE_MODE_SIMPLEST_BLE"] == "Enabled")]
 void ll_sys_reset(void)
 {
+  uint8_t bsca = 0;
+  /* Link layer timings */
+  uint8_t drift_time = DRIFT_TIME_DEFAULT;
+  uint8_t exec_time = EXEC_TIME_DEFAULT;
+
 /* USER CODE BEGIN ll_sys_reset_0 */
 
 /* USER CODE END ll_sys_reset_0 */
-#if (CFG_RADIO_LSE_SLEEP_TIMER_CUSTOM_SCA_RANGE == 0)
-  uint8_t bsca = 0;
-#endif /* CFG_RADIO_LSE_SLEEP_TIMER_CUSTOM_SCA_RANGE */  
-  
+
   /* Apply the selected link layer sleep timer source */
   ll_sys_sleep_clock_source_selection();
-  
-  /* Configure the link layer sleep clock accuracy if different from the default one */
-#if (CFG_RADIO_LSE_SLEEP_TIMER_CUSTOM_SCA_RANGE != 0)
-  ll_intf_le_set_sleep_clock_accuracy(CFG_RADIO_LSE_SLEEP_TIMER_CUSTOM_SCA_RANGE);
-#else
-[#if (myHash["BLE"] == "Enabled")]
+
+  /* Configure the link layer sleep clock accuracy */
   bsca = ll_sys_BLE_sleep_clock_accuracy_selection();
-[/#if]  
-  if(bsca != STM32WBA5x_DEFAULT_SCA_RANGE)
+  ll_intf_le_set_sleep_clock_accuracy(bsca);
+
+  /* Update link layer timings depending on selected configuration */
+  if(LL_RCC_RADIO_GetSleepTimerClockSource() == LL_RCC_RADIOSLEEPSOURCE_LSI)
   {
-    ll_intf_le_set_sleep_clock_accuracy(bsca);
+    drift_time += DRIFT_TIME_EXTRA_LSI2;
+    exec_time += EXEC_TIME_EXTRA_LSI2;
   }
-#endif /* CFG_RADIO_LSE_SLEEP_TIMER_CUSTOM_SCA_RANGE */
+  else
+  {
+#if defined(__GNUC__) && defined(DEBUG)
+    drift_time += DRIFT_TIME_EXTRA_GCC_DEBUG;
+    exec_time += EXEC_TIME_EXTRA_GCC_DEBUG;
+#endif
+  }
 
-/* USER CODE BEGIN ll_sys_reset_1 */
+  /* USER CODE BEGIN ll_sys_reset_1 */
 
-/* USER CODE END ll_sys_reset_1 */
+  /* USER CODE END ll_sys_reset_1 */
+
+  if((drift_time != DRIFT_TIME_DEFAULT) || (exec_time != EXEC_TIME_DEFAULT))
+  {
+    ll_sys_config_BLE_schldr_timings(drift_time, exec_time);
+  }
+  /* USER CODE BEGIN ll_sys_reset_2 */
+
+  /* USER CODE END ll_sys_reset_2 */
 }
 [/#if]

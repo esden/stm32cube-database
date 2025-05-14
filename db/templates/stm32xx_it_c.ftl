@@ -98,7 +98,7 @@
     [#if STM32_WPAN??]
         #include "stm32wbaxx_hal.h"
     [/#if]
-    [#if STM32_WPAN?? && rccIrqEnabled]
+    [#if STM32_WPAN?? && S_BLE_HOST_SIMPLE=="false" && rccIrqEnabled]
         #include "scm.h"
     [/#if]
     [#if STM32_WPAN?? && radioIrqEnabled]
@@ -316,10 +316,13 @@ void ${vector.irqHandler}(void)
 [#-- BSP interrupts --]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/bsp_common_it.tmp"/]
 
-
+[#assign UsbHostDriver = true]
 [#list nvic as vector]
 
-[#if vector?? && !vector.systemHandler && vector.irqHandlerGenerated]
+[#if vector?? && !vector.systemHandler && vector.irqHandlerGenerated && (UsbHostDriver||!vector.isUsbHostDriver())]
+[#if vector.isUsbHostDriver()]
+[#assign UsbHostDriver = false]
+[/#if]
 /**
 #t* @brief  This function handles ${vector.comment}.  
 #t*/

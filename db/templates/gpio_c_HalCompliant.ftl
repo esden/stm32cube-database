@@ -60,9 +60,9 @@ static void MX_GPIO_Init(void)
         [/#list]
         
     [#else]
-/* USER CODE BEGIN MX_GPIO_Init_1 */
-
-/* USER CODE END MX_GPIO_Init_1 */
+#t/* USER CODE BEGIN MX_GPIO_Init_1 */
+#n
+#t/* USER CODE END MX_GPIO_Init_1 */
 
   		[#if clock?size >0 ]#n#t/* GPIO Ports Clock Enable */[/#if]
   		 [#if RESMGR_UTILITY?? && FamilyName=="STM32MP2"]
@@ -261,9 +261,9 @@ static void MX_${data.ipName}_GPIO_Init(void)
 #n
 [@common.optinclude name=contextFolderBsp+mxTmpFolder+"/bsp_common_demo_gpio.tmp"/][#--BSP functions and callbacks --]
 
-/* USER CODE BEGIN MX_GPIO_Init_2 */
-
-/* USER CODE END MX_GPIO_Init_2 */
+#t/* USER CODE BEGIN MX_GPIO_Init_2 */
+#n
+#t/* USER CODE END MX_GPIO_Init_2 */
 [/#if]
 }
 

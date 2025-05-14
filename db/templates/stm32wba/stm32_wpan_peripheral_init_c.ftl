@@ -10,9 +10,6 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
-[#assign PG_FILL_UCS = "False"]
-[#assign PG_BSP_NUCLEO_WBA52CG = 0]
-[#assign PG_SKIP_LIST = "False"]
 [#assign myHash = {}]
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
@@ -31,7 +28,30 @@ Key: ${key}; Value: ${myHash[key]}
 /* Includes ------------------------------------------------------------------*/
 #include "app_conf.h"
 #include "peripheral_init.h"
+[#assign hdlnbr = 0]
+[#if !HALCompliant??]
+[#if handlersList??]
+  [#list handlersList as handler]
+    [#list handler.entrySet() as entry]
+      [#list entry.value as ipHandler]
+        [#if ((ipHandler.handler == "huart1")
+      || (ipHandler.handler == "huart2")
+      || (ipHandler.handler == "huart3")
+      || (ipHandler.handler == "hlpuart1"))
+      && (hdlnbr = 0)]
+#include "usart.h"
+        [#assign hdlnbr = hdlnbr + 1]
+        [/#if]
+    [/#list]
+  [/#list]
+[/#list]
+[/#if]
+#include "icache.h"
+#include "ramcfg.h"
+#include "rng.h"
+[#else]
 #include "${main_h}"
+[/#if]
 [#if (myHash["USE_SNVMA_NVM"]?number != 0)]
 #include "crc_ctrl.h"
 [/#if]
@@ -89,6 +109,7 @@ extern ${ipHandler.handlerType} ${ipHandler.handler};
 
 /* Functions Definition ------------------------------------------------------*/
 
+[#if (myHash["CFG_LPM_STDBY_SUPPORTED"]?number != 2)]
 /**
   * @brief  Configure the SoC peripherals at Standby mode exit.
   * @param  None
@@ -179,14 +200,69 @@ ${""?right_pad(2)}${void.functionName}();
   HAL_GPIO_Init(GPIOB, &DbgIOsInit);
 #endif /* CFG_DEBUGGER_LEVEL */
   /* USER CODE BEGIN MX_STANDBY_EXIT_PERIPHERAL_INIT_2 */
-[#if PG_FILL_UCS == "True"]
-[#if PG_BSP_NUCLEO_WBA52CG == 1]
-#if (CFG_BUTTON_SUPPORTED == 1)
-  BSP_PB_Init(B1, BUTTON_MODE_EXTI);
-  BSP_PB_Init(B2, BUTTON_MODE_EXTI);
-  BSP_PB_Init(B3, BUTTON_MODE_EXTI);
-#endif
-[/#if]
-[/#if]
+
   /* USER CODE END MX_STANDBY_EXIT_PERIPHERAL_INIT_2 */
 }
+
+[#else]
+void MX_Stop2Exit_PeripheralInit(void)
+{
+  /* USER CODE BEGIN MX_STOP2_EXIT_PERIPHERAL_INIT_1 */
+  /* USER CODE END MX_STOP2_EXIT_PERIPHERAL_INIT_1 */
+  
+[#assign PreviousIpHandler = ""]
+[#if handlersList??]
+  [#list handlersList as handler]
+    [#list handler.entrySet() as entry]
+      [#list entry.value as ipHandler]
+    [#if (ipHandler.handler != "hrtc")
+      && (ipHandler.handler != "handle_GPDMA1_Channel1")
+      && (ipHandler.handler != "handle_GPDMA1_Channel0")
+      && (ipHandler.handler != "huart1")
+	  && (ipHandler.handler != "hramcfg_SRAM1")
+    ]
+      [#if ipHandler.handler != PreviousIpHandler]
+        [#if ((ipHandler.handler != "hadc4") && (ipHandler.handler != "hcrc"))]
+${""?right_pad(2)}memset(&${ipHandler.handler}, 0, sizeof(${ipHandler.handler}));
+                [/#if]
+        [#assign PreviousIpHandler = ipHandler.handler]
+      [/#if]
+    [/#if]
+    [/#list]
+  [/#list]
+[/#list]
+[/#if]
+
+[#if voidsList??]
+  [#list voidsList as void]
+  [#if void.functionName?? && void.genCode && !void.isStatic]
+    [#if (void.functionName != "SystemClock_Config") 
+      && (void.functionName != "SystemPower_Config")
+      && (void.functionName != "MX_RTC_Init")
+      && (void.functionName != "APPE_Init")
+      && (void.functionName != "MX_RF_Init")
+      && (void.functionName != "MX_CORTEX_M33_Init")
+      && (void.functionName != "MX_CORTEX_M33_NS_Init")
+      && (void.functionName != "MX_GPDMA1_Init")
+      && (void.functionName != "MX_USART1_UART_Init")
+      && (void.functionName != "MX_USART2_UART_Init")
+      && (void.functionName != "MX_HSEM_Init")
+      && (void.functionName != "MX_ADC4_Init")
+      && (void.functionName != "MX_CRC_Init")
+	  && (void.functionName != "MX_GPIO_Init")
+	  && (void.functionName != "MX_RAMCFG_Init")
+	  && (void.functionName != "MX_ICACHE_Init")
+    ]
+${""?right_pad(2)}${void.functionName}();
+    [/#if]
+  [/#if]
+  [/#list]
+[/#if]
+#if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)
+  ADCCTRL_Init();
+#endif /* USE_TEMPERATURE_BASED_RADIO_CALIBRATION */
+  
+  /* USER CODE BEGIN MX_STOP2_EXIT_PERIPHERAL_INIT_2 */
+  /* USER CODE END MX_STOP2_EXIT_PERIPHERAL_INIT_2 */
+}
+[/#if]

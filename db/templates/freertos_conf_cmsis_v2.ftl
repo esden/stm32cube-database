@@ -1,7 +1,11 @@
 [#ftl]
 /* USER CODE BEGIN Header */
+[#list SWIPdatas as SWIP]
+[#assign instName = SWIP.ipName]
+[#assign fileName = SWIP.fileName]
+[#assign version = SWIP.version]
 /*
- * FreeRTOS Kernel V10.0.1
+ * FreeRTOS Kernel V${version}
  * Copyright (C) 2017 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -33,10 +37,6 @@
 
 [#assign familyName=FamilyName?lower_case]
 [#-- SWIPdatas is a list of SWIPconfigModel --]
-[#list SWIPdatas as SWIP]
-[#assign instName = SWIP.ipName]
-[#assign fileName = SWIP.fileName]
-[#assign version = SWIP.version]
 [#assign valueMemoryAllocation = "0"]
 
 [#assign CMSIS_version = "1.00"]
@@ -528,7 +528,15 @@ header file. */
 standard names. */
 #define vPortSVCHandler    SVC_Handler
 #define xPortPendSVHandler PendSV_Handler
-
+[#if (version=="10.0.1") || (version=="10.2.1")] [#-- version of  Freertos --]
+/* IMPORTANT: This define is commented when used with STM32Cube firmware, when the timebase source is SysTick,
+              to prevent overwriting SysTick_Handler defined within STM32Cube HAL */
+  [#if timeBaseSource?? && timeBaseSource!="SysTick"]
+#define xPortSysTickHandler SysTick_Handler
+  [#else] [#-- timeBaseSource="SysTick--]
+/* #define xPortSysTickHandler SysTick_Handler */
+  [/#if]
+[#else] [#-- version of  Freertos>10.2.1 --]
 /* IMPORTANT: After 10.3.1 update, Systick_Handler comes from NVIC (if SYS timebase = systick), otherwise from cmsis_os2.c */
 [#if (familyName=="stm32h7")] [#-- for dual core, need to check the right timebase (for others, keep previous check --]
  [#assign timeBaseTreated = "0"]
@@ -562,7 +570,7 @@ standard names. */
 #define USE_CUSTOM_SYSTICK_HANDLER_IMPLEMENTATION 1
  [/#if]
 [/#if]
-
+[/#if][#-- version of  Freertos>10.2.1 --]
 [#if USE_Touch_GFX_STACK??]
 /* To measure mcu load by measure time used in the dummy idle task */
 #define traceTASK_SWITCHED_OUT() xTaskCallApplicationTaskHook( pxCurrentTCB, (void*)1 )

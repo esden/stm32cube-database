@@ -12,8 +12,13 @@
   */
 /* USER CODE END Header */ 
 /* Define to prevent recursive inclusion -------------------------------------*/
+[#if (FamilyName != "STM32H7RS")]
 #ifndef __mx_${name?lower_case}_H
 #define __mx_${name?lower_case}_H
+[#else]
+#ifndef __${name?upper_case}_H
+#define __${name?upper_case}_H
+[/#if]
 #ifdef __cplusplus
  extern "C" {
 #endif
@@ -93,7 +98,11 @@ void MX_LWIP_Process(void);
 #ifdef __cplusplus
 }
 #endif
+[#if (FamilyName != "STM32H7RS")]
 #endif /*__ mx_${name?lower_case}_H */
+[#else]
+#endif /* __${name?upper_case}_H */
+[/#if]
 
 /**
   * @}

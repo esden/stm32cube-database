@@ -98,7 +98,7 @@ void TimerPE1function(void *pArg);
 #endif /* USE_STM32_UTILITY_OS */
 
 /* Private typedef -----------------------------------------------------------*/
-[#if FREERTOS?? && Secure!="true"]
+[#if (FREERTOS??||XCUBEFREERTOS??)  && Secure!="true"]
 #define OS_PE_PRIORITY                    osPriorityAboveNormal
 
 #define OS_CAD_PRIORITY                   osPriorityRealtime
@@ -398,7 +398,7 @@ error:
   * @brief  Initialize the OS parts (port power role, PWR_IF, CAD and PE Init procedures)
   * @retval None
   */
-[#if FREERTOS?? && Secure!="true"]
+[#if (FREERTOS?? ||XCUBEFREERTOS??) && Secure!="true"]
 void USBPD_DPM_Run(void)
 {
   OS_KERNEL_START();

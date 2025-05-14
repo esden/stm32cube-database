@@ -1,916 +1,461 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<IP DBVersion="V4.0" IPType="peripheral" IpGroup="Multimedia" Name="LTDC" Version="lcdtft1_v1_1" 
-	xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
- 	ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
- 	xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
-  <About>LTDC: LCD-TFT controller</About>
-	<!-- Remark: covers F46x/F47x , F7 series adding DSI Host/LTDC interface -->
-	<!-- Generic RefParameters for LTDC --> 
-	<RefParameter Name="Instance" DefaultValue="LTDC$Index" Comment="Instance" Type="" Visible="false"/>
-	
-	
-	
-	<!-- Synchronization RefParameters for LTDC -->
-	<!-- Width Synchronization RefParameters for LTDC. Default is for 640 x 480 screen. Maximum is for 800 x 600 screen -->
-	<RefParameter Comment="Horizontal Synchronization Width" DefaultValue="8" Max="4095" Min="1" Name="HSync" Type="integer" Unit="pixels" Group="Synchronization for Width"/>
-	<RefParameter Comment="Horizontal Back Porch" DefaultValue="7" Max="4095" Min="0" Name="HBP" Type="integer" Unit="pixels" Group="Synchronization for Width"/>
-	<RefParameter Comment="Active Width" DefaultValue="640" Max="=4095-(HBP+HSync+HFP)" Min="0" Name="ActiveW" Type="integer" Unit="pixels" Group="Synchronization for Width">
-           <Description> When the graphics is enabled this register value will be devided by zone value(the parameter zone is in graphics parameters settings).</Description>
-        </RefParameter>
-	<RefParameter Comment="Horizontal Front Porch" DefaultValue="6" Max="4095" Min="0" Name="HFP" Type="integer" Unit="pixels" Group="Synchronization for Width"/>
-	
-	<!-- Calculated Values. Normally, Read Only -->
-	<RefParameter Comment="HSync Width" DefaultValue="=HSync-1" Max="4095" Name="HorizontalSync" Type="string" Group="Synchronization for Width">
-		<Description> This register value is equal to (Horizontal Synchronization Width - 1)</Description>
-	</RefParameter>
-	<RefParameter Comment="Accumulated Horizontal Back Porch Width" DefaultValue="=HorizontalSync+HBP" Max="4095" Name="AccumulatedHBP" Type="string" Group="Synchronization for Width">
-		<Description> This register value is equal to the (Horizontal Synchronization Width + Horizontal Back Porch - 1)</Description>
-	</RefParameter>
-	
-	<RefParameter Comment="Accumulated Active Width" DefaultValue="=AccumulatedHBP+ActiveW" Max="4095" Name="AccumulatedActiveW" Type="string" Group="Synchronization for Width">
-		<Description> This register value is equal to (Horizontal Synchronization Width + Horizontal Back Porch + Active Width - 1)  </Description>
-	</RefParameter>
-	<RefParameter Comment="Total Width" DefaultValue="=AccumulatedActiveW+HFP" Max="4095" Name="TotalWidth" Type="string" Group="Synchronization for Width">
-		<Description> This register value is equal to (Horizontal Synchronization Width + Horizontal Back Porch + Active Width + Horizontal Front Porch - 1) </Description>
-	</RefParameter>
-	
-	<!-- Height Synchronization RefParameters for LTDC -->
-	<RefParameter Comment="Vertical Synchronization Height" DefaultValue="4" Max="2047" Min="1" Name="VSync" Type="integer" Unit="lines" Group="Synchronization for Height"/>
-	<RefParameter Comment="Vertical Back Porch" DefaultValue="2" Max="2047" Min="0" Name="VBP" Type="integer" Unit="lines" Group="Synchronization for Height"/>
-	<RefParameter Comment="Active Height" DefaultValue="480" Max="=2047-(VBP+VSync+VFP)" Min="0" Name="ActiveH" Type="integer" Unit="lines" Group="Synchronization for Height"/>
-	<RefParameter Comment="Vertical Front Porch" DefaultValue="2" Max="2047" Min="0" Name="VFP" Type="integer" Unit="lines" Group="Synchronization for Height"/>
-	
-	<!-- Calculated Values. Normally, Read Only -->
-	<RefParameter Comment="VSync Height" DefaultValue="=VSync-1" Max="2047" Name="VerticalSync" Type="string" Group="Synchronization for Height">
-		<Description> This register value is equal to (Vertical Synchronization Height - 1)  </Description>
-	</RefParameter>
-	<RefParameter Comment="Accumulated Vertical Back Porch Height" DefaultValue="=VerticalSync+VBP" Max="2047" Name="AccumulatedVBP" Type="string" Group="Synchronization for Height">
-		<Description> This register value is equal to the (Vertical Synchronization Height + Vertical Back Porch - 1) </Description>
-	</RefParameter>
-	<RefParameter Comment="Accumulated Active Height" DefaultValue="=AccumulatedVBP+ActiveH" Max="2047" Name="AccumulatedActiveH" Type="string" Group="Synchronization for Height">
-		<Description> This register value is equal to the (Vertical Synchronization Height + Vertical Back Porch + Active Height - 1) </Description>
-	</RefParameter>
-	<RefParameter Comment="Total Height" DefaultValue="=AccumulatedActiveH+VFP" Max="2047" Name="TotalHeigh" Type="string" Group="Synchronization for Height">
-		<Description> This register value is equal to the (Vertical Synchronization Height + Vertical Back Porch + Active Height + Vertical Front Porch - 1) </Description>
-	</RefParameter>
+<IP DBVersion="V4.0" IPType="peripheral" IpGroup="Multimedia" Name="LTDC" Version="lcdtft1_v1_1"
+    xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+    ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
+    xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+    <About>LTDC: LCD-TFT controller</About>
+    <!-- Remark: covers F46x/F47x , F7 series adding DSI Host/LTDC interface -->
+    <!-- Generic RefParameters for LTDC -->
+    <RefParameter Name="Instance" DefaultValue="LTDC$Index" Comment="Instance" Type="" Visible="false"/>
 
 
-	<!-- Polarity RefParameters for LTDC -->
-	<RefParameter Comment="Horizontal Synchronization Polarity" DefaultValue="LTDC_HSPOLARITY_AL" Name="HSPolarity" Type="list" Group="Signal Polarity">
-		<PossibleValue Comment="Active Low" Value="LTDC_HSPOLARITY_AL"/>
-		<PossibleValue Comment="Active High" Value="LTDC_HSPOLARITY_AH"/>
-	</RefParameter>
-	
-	<RefParameter Comment="Vertical Synchronization Polarity" DefaultValue="LTDC_VSPOLARITY_AL" Name="VSPolarity" Type="list" Group="Signal Polarity">
-		<PossibleValue Comment="Active Low" Value="LTDC_VSPOLARITY_AL"/>
-		<PossibleValue Comment="Active High" Value="LTDC_VSPOLARITY_AH"/>
-	</RefParameter>
-	
-	<RefParameter Comment="Not Data Enable Polarity" DefaultValue="LTDC_DEPOLARITY_AL" Name="DEPolarity" Type="list" Group="Signal Polarity">
-		<PossibleValue Comment="Active Low" Value="LTDC_DEPOLARITY_AL"/>
-		<!-- add the condition: if DSI is used, then (Action=) remove the value from the list -->
-		<PossibleValue Comment="Active High" Value="LTDC_DEPOLARITY_AH" Condition="DSIUsed_ForRCC" Action="Remove" />
-	</RefParameter>
-	
-	<RefParameter Comment="Pixel Clock Polarity" DefaultValue="LTDC_PCPOLARITY_IPC" Name="PCPolarity" Type="list" Group="Signal Polarity">
-		<PossibleValue Comment="Normal Input" Value="LTDC_PCPOLARITY_IPC"/>
-		<PossibleValue Comment="Inverted Input" Value="LTDC_PCPOLARITY_IIPC"/>
-	</RefParameter>
-	
-	
-	<!-- Layer Default Color RefParameters for LTDC -->
-	<RefParameter Comment="Red" DefaultValue="0" Max="255" Min="0" Name="Red" Type="integer" Group="Layer Default Color"/>
-	<RefParameter Comment="Green" DefaultValue="0" Max="255" Min="0" Name="Green" Type="integer" Group="Layer Default Color"/>
-	<RefParameter Comment="Blue" DefaultValue="0" Max="255" Min="0" Name="Blue" Type="integer" Group="Layer Default Color"/>
-	<RefParameter Comment="Reserved" DefaultValue="null" Max="255" Min="0" Name="Reserved" Type="integer" Visible="false"/>
-	
-	<!-- *************** START OF LAYER SETTINGS **************** -->
-	<RefParameter Comment="Number of Layers" Name="Layers" DefaultValue="1" Max="2" Min="1" Type="list" Visible="true" Group="Number of Layers" TabName="Layer Settings">
-		<Description> Select the number of layers to configure (max of 2) </Description>
-		<PossibleValue Value="0" Comment="1 layer"/>
-		<PossibleValue Value="1" Comment="2 layers" Semaphore="layers_$IpInstance"/>
-	</RefParameter>
-	
-	<!-- *************** START OF LAYER 0 SETTINGS **************** -->
-	<!-- Layer Default Color Layer 0 RefParameters for LTDC -->
-	
-	<RefParameter Comment="LayerIdx" DefaultValue="0" Visible="false" Max="1" Min="0" Name="LayerIdx_L0" Type="integer" Group="Layer Default Color" TabName="Layer Settings"/>
-	
-	<RefParameter Comment="Layer 0 - Red" DefaultValue="0" Max="255" Min="0" Name="Red_L0" Type="integer" Group="Layer Default Color" TabName="Layer Settings"/>
-	<RefParameter Comment="Layer 0 - Green" DefaultValue="0" Max="255" Min="0" Name="Green_L0" Type="integer" Group="Layer Default Color" TabName="Layer Settings"/>
-	<RefParameter Comment="Layer 0 - Blue" DefaultValue="0" Max="255" Min="0" Name="Blue_L0" Type="integer" Group="Layer Default Color" TabName="Layer Settings"/>
+
+    <!-- Synchronization RefParameters for LTDC -->
+    <!-- Width Synchronization RefParameters for LTDC. Default is for 640 x 480 screen. Maximum is for 800 x 600 screen -->
+    <RefParameter Comment="Horizontal Synchronization Width" DefaultValue="8" Max="4095" Min="1" Name="HSync" Type="integer" Unit="pixels" Group="Synchronization for Width"/>
+    <RefParameter Comment="Horizontal Back Porch" DefaultValue="7" Max="4095" Min="0" Name="HBP" Type="integer" Unit="pixels" Group="Synchronization for Width"/>
+    <RefParameter Comment="Active Width" DefaultValue="640" Max="=4095-(HBP+HSync+HFP)" Min="0" Name="ActiveW" Type="integer" Unit="pixels" Group="Synchronization for Width">
+        <Description> When the graphics is enabled this register value will be devided by zone value(the parameter zone is in graphics parameters settings).</Description>
+    </RefParameter>
+    <RefParameter Comment="Horizontal Front Porch" DefaultValue="6" Max="4095" Min="0" Name="HFP" Type="integer" Unit="pixels" Group="Synchronization for Width"/>
+
+    <!-- Calculated Values. Normally, Read Only -->
+    <RefParameter Comment="HSync Width" DefaultValue="=HSync-1" Max="4095" Name="HorizontalSync" Type="string" Group="Synchronization for Width">
+        <Description> This register value is equal to (Horizontal Synchronization Width - 1)</Description>
+    </RefParameter>
+    <RefParameter Comment="Accumulated Horizontal Back Porch Width" DefaultValue="=HorizontalSync+HBP" Max="4095" Name="AccumulatedHBP" Type="string" Group="Synchronization for Width">
+        <Description> This register value is equal to the (Horizontal Synchronization Width + Horizontal Back Porch - 1)</Description>
+    </RefParameter>
+
+    <RefParameter Comment="Accumulated Active Width" DefaultValue="=AccumulatedHBP+ActiveW" Max="4095" Name="AccumulatedActiveW" Type="string" Group="Synchronization for Width">
+        <Description> This register value is equal to (Horizontal Synchronization Width + Horizontal Back Porch + Active Width - 1)  </Description>
+    </RefParameter>
+    <RefParameter Comment="Total Width" DefaultValue="=AccumulatedActiveW+HFP" Max="4095" Name="TotalWidth" Type="string" Group="Synchronization for Width">
+        <Description> This register value is equal to (Horizontal Synchronization Width + Horizontal Back Porch + Active Width + Horizontal Front Porch - 1) </Description>
+    </RefParameter>
+
+    <!-- Height Synchronization RefParameters for LTDC -->
+    <RefParameter Comment="Vertical Synchronization Height" DefaultValue="4" Max="2047" Min="1" Name="VSync" Type="integer" Unit="lines" Group="Synchronization for Height"/>
+    <RefParameter Comment="Vertical Back Porch" DefaultValue="2" Max="2047" Min="0" Name="VBP" Type="integer" Unit="lines" Group="Synchronization for Height"/>
+    <RefParameter Comment="Active Height" DefaultValue="480" Max="=2047-(VBP+VSync+VFP)" Min="0" Name="ActiveH" Type="integer" Unit="lines" Group="Synchronization for Height"/>
+    <RefParameter Comment="Vertical Front Porch" DefaultValue="2" Max="2047" Min="0" Name="VFP" Type="integer" Unit="lines" Group="Synchronization for Height"/>
+
+    <!-- Calculated Values. Normally, Read Only -->
+    <RefParameter Comment="VSync Height" DefaultValue="=VSync-1" Max="2047" Name="VerticalSync" Type="string" Group="Synchronization for Height">
+        <Description> This register value is equal to (Vertical Synchronization Height - 1)  </Description>
+    </RefParameter>
+    <RefParameter Comment="Accumulated Vertical Back Porch Height" DefaultValue="=VerticalSync+VBP" Max="2047" Name="AccumulatedVBP" Type="string" Group="Synchronization for Height">
+        <Description> This register value is equal to the (Vertical Synchronization Height + Vertical Back Porch - 1) </Description>
+    </RefParameter>
+    <RefParameter Comment="Accumulated Active Height" DefaultValue="=AccumulatedVBP+ActiveH" Max="2047" Name="AccumulatedActiveH" Type="string" Group="Synchronization for Height">
+        <Description> This register value is equal to the (Vertical Synchronization Height + Vertical Back Porch + Active Height - 1) </Description>
+    </RefParameter>
+    <RefParameter Comment="Total Height" DefaultValue="=AccumulatedActiveH+VFP" Max="2047" Name="TotalHeigh" Type="string" Group="Synchronization for Height">
+        <Description> This register value is equal to the (Vertical Synchronization Height + Vertical Back Porch + Active Height + Vertical Front Porch - 1) </Description>
+    </RefParameter>
+
+
+    <!-- Polarity RefParameters for LTDC -->
+    <RefParameter Comment="Horizontal Synchronization Polarity" DefaultValue="LTDC_HSPOLARITY_AL" Name="HSPolarity" Type="list" Group="Signal Polarity">
+        <PossibleValue Comment="Active Low" Value="LTDC_HSPOLARITY_AL"/>
+        <PossibleValue Comment="Active High" Value="LTDC_HSPOLARITY_AH"/>
+    </RefParameter>
+
+    <RefParameter Comment="Vertical Synchronization Polarity" DefaultValue="LTDC_VSPOLARITY_AL" Name="VSPolarity" Type="list" Group="Signal Polarity">
+        <PossibleValue Comment="Active Low" Value="LTDC_VSPOLARITY_AL"/>
+        <PossibleValue Comment="Active High" Value="LTDC_VSPOLARITY_AH"/>
+    </RefParameter>
+
+    <RefParameter Comment="Data Enable Polarity" DefaultValue="LTDC_DEPOLARITY_AL" Name="DEPolarity" Type="list" Group="Signal Polarity">
+        <PossibleValue Comment="Active Low" Value="LTDC_DEPOLARITY_AL"/>
+        <!-- add the condition: if DSI is used, then (Action=) remove the value from the list -->
+        <PossibleValue Comment="Active High" Value="LTDC_DEPOLARITY_AH" Condition="DSIUsed_ForRCC" Action="Remove" />
+    </RefParameter>
+
+    <RefParameter Comment="Pixel Clock Polarity" DefaultValue="LTDC_PCPOLARITY_IPC" Name="PCPolarity" Type="list" Group="Signal Polarity">
+        <PossibleValue Comment="Normal Input" Value="LTDC_PCPOLARITY_IPC"/>
+        <PossibleValue Comment="Inverted Input" Value="LTDC_PCPOLARITY_IIPC"/>
+    </RefParameter>
+
+
+    <!-- Layer Default Color RefParameters for LTDC -->
+    <RefParameter Comment="Red" DefaultValue="0" Max="255" Min="0" Name="Red" Type="integer" Group="Layer Default Color"/>
+    <RefParameter Comment="Green" DefaultValue="0" Max="255" Min="0" Name="Green" Type="integer" Group="Layer Default Color"/>
+    <RefParameter Comment="Blue" DefaultValue="0" Max="255" Min="0" Name="Blue" Type="integer" Group="Layer Default Color"/>
+    <RefParameter Comment="Reserved" DefaultValue="null" Max="255" Min="0" Name="Reserved" Type="integer" Visible="false"/>
+
+    <!-- *************** START OF LAYER SETTINGS **************** -->
+    <RefParameter Comment="Number of Layers" Name="Layers" DefaultValue="1" Max="2" Min="1" Type="list" Visible="true" Group="Number of Layers" TabName="Layer Settings">
+        <Description> Select the number of layers to configure (max of 2) </Description>
+        <PossibleValue Value="0" Comment="1 layer"/>
+        <PossibleValue Value="1" Comment="2 layers" Semaphore="layers_$IpInstance"/>
+    </RefParameter>
+
+    <!-- *************** START OF LAYER 0 SETTINGS **************** -->
+    <!-- Layer Default Color Layer 0 RefParameters for LTDC -->
+
+    <RefParameter Comment="LayerIdx" DefaultValue="0" Visible="false" Max="1" Min="0" Name="LayerIdx_L0" Type="integer" Group="Layer Default Color" TabName="Layer Settings"/>
+
+    <RefParameter Comment="Layer 0 - Red" DefaultValue="0" Max="255" Min="0" Name="Red_L0" Type="integer" Group="Layer Default Color" TabName="Layer Settings"/>
+    <RefParameter Comment="Layer 0 - Green" DefaultValue="0" Max="255" Min="0" Name="Green_L0" Type="integer" Group="Layer Default Color" TabName="Layer Settings"/>
+    <RefParameter Comment="Layer 0 - Blue" DefaultValue="0" Max="255" Min="0" Name="Blue_L0" Type="integer" Group="Layer Default Color" TabName="Layer Settings"/>
     <RefParameter Comment="Layer 0 - Alpha" DefaultValue="0" Max="255" Min="0" Name="Alpha0_L0" Type="integer" Group="Layer Default Color" TabName="Layer Settings"/>
-	
-	
-	<!-- Layer 0 Windows Position -->
-	<RefParameter Comment="Layer 0 - Window Horizontal Start" DefaultValue="0" Max="4095" Min="0" Name="WindowX0_L0" Type="integer" Group="Windows Position" TabName="Layer Settings">
+
+
+    <!-- Layer 0 Windows Position -->
+    <RefParameter Comment="Layer 0 - Window Horizontal Start" DefaultValue="0" Max="4095" Min="0" Name="WindowX0_L0" Type="integer" Group="Windows Position" TabName="Layer Settings">
         <Description>Configures the Window Horizontal Start Position Window X0.</Description>
     </RefParameter>
-	<RefParameter Comment="Layer 0 - Window Horizontal Stop" DefaultValue="0" Max="4095" Min="0" Name="WindowX1_L0" Type="integer" Group="Windows Position" TabName="Layer Settings">
+    <RefParameter Comment="Layer 0 - Window Horizontal Stop" DefaultValue="0" Max="4095" Min="0" Name="WindowX1_L0" Type="integer" Group="Windows Position" TabName="Layer Settings">
         <Description>Configures the Window Horizontal Stop Position Window X1.
             &lt;br&gt; &lt; For information : &lt;/b&gt; &lt;br&gt;
-         When the graphics is enabled the Window Horizontal Stop value will be devided by zone value(the parameter zone is in graphics parameters settings).
+            When the graphics is enabled the Window Horizontal Stop value will be devided by zone value(the parameter zone is in graphics parameters settings).
         </Description>
     </RefParameter>
-	<RefParameter Comment="Layer 0 - Window Vertical Start" DefaultValue="0" Max="2047" Min="0" Name="WindowY0_L0" Type="integer" Group="Windows Position" TabName="Layer Settings">
+    <RefParameter Comment="Layer 0 - Window Vertical Start" DefaultValue="0" Max="2047" Min="0" Name="WindowY0_L0" Type="integer" Group="Windows Position" TabName="Layer Settings">
         <Description>Configures the Window vertical Start Position Window Y0.</Description>
     </RefParameter>
-	<RefParameter Comment="Layer 0 - Window Vertical Stop" DefaultValue="0" Max="2047" Min="0" Name="WindowY1_L0" Type="integer" Group="Windows Position"  TabName="Layer Settings">
+    <RefParameter Comment="Layer 0 - Window Vertical Stop" DefaultValue="0" Max="2047" Min="0" Name="WindowY1_L0" Type="integer" Group="Windows Position"  TabName="Layer Settings">
         <Description>Configures the Window vertical Stop Position Window Y1.</Description>
     </RefParameter>
-	
-	<!-- Layer 0 Pixel Format for RGB888-->
-	
-	<RefParameter Comment="Layer 0 - Pixel Format" DefaultValue="LTDC_PIXEL_FORMAT_ARGB8888" Name="PixelFormat_L0" Type="list" Group="Pixel Parameters" TabName="Layer Settings">
+
+    <!-- Layer 0 Pixel Format for RGB888-->
+
+    <RefParameter Comment="Layer 0 - Pixel Format" DefaultValue="LTDC_PIXEL_FORMAT_ARGB8888" Name="PixelFormat_L0" Type="list" Group="Pixel Parameters" TabName="Layer Settings">
         <Description>Specifies the pixel format.</Description>
         <PossibleValue Comment="ARGB8888" Value="LTDC_PIXEL_FORMAT_ARGB8888" />
-        <PossibleValue Comment="ABGR8888" Value="LTDC_PIXEL_FORMAT_ABGR8888" />
-        <PossibleValue Comment="RGBA8888" Value="LTDC_PIXEL_FORMAT_RGBA8888" />
-        <PossibleValue Comment="BGRA8888" Value="LTDC_PIXEL_FORMAT_BGRA8888" />
-        <PossibleValue Comment="RGB565" Value="LTDC_PIXEL_FORMAT_RGB565" />
-        <PossibleValue Comment="BGR565" Value="LTDC_PIXEL_FORMAT_BGR565" />
         <PossibleValue Comment="RGB888" Value="LTDC_PIXEL_FORMAT_RGB888" Semaphore="Semaphore_LTDC_UsedFor_GFXMMU"
-			Condition="Semaphore_GFXMMU_256BLOCKS"
-			Diagnostic="RGB888 format not available when GFXMMU used in 256 blocks mode"
-		/>
+                       Condition="Semaphore_GFXMMU_256BLOCKS"
+                       Diagnostic="RGB888 format not available when GFXMMU used in 256 blocks mode"
+        />
+        <PossibleValue Comment="RGB565" Value="LTDC_PIXEL_FORMAT_RGB565" />
         <PossibleValue Comment="ARGB1555" Value="LTDC_PIXEL_FORMAT_ARGB1555" />
         <PossibleValue Comment="ARGB4444" Value="LTDC_PIXEL_FORMAT_ARGB4444" />
         <PossibleValue Comment="L8" Value="LTDC_PIXEL_FORMAT_L8" />
         <PossibleValue Comment="AL44" Value="LTDC_PIXEL_FORMAT_AL44" />
         <PossibleValue Comment="AL88" Value="LTDC_PIXEL_FORMAT_AL88" />
-        <PossibleValue Comment="Flexible ARGB" Value="LTDC_PIXEL_FORMAT_FLEXIBLE_ARGB" />
-        <PossibleValue Comment="Flexible YUV 422 CoPlanar" Value="LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_COPLANAR" />
-        <PossibleValue Comment="Flexible YUV 420 SemiPlanar" Value="LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_SEMIPLANAR" />
-        <PossibleValue Comment="Flexible YUV 420 FullPlanar" Value="LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_FULLPLANAR" />
-    </RefParameter>
-	
-	<!-- Layer 0 Flexible ARGB  -->
-    <RefParameter Comment="Layer 0 - Pixel Size" DefaultValue="0" Min="0" Max ="31" Name="PixelSize_L0" Type="integer" Group="Flexible ARGB" TabName="Layer Settings">
-        <Description>Specifies the ARGB Pixel size.</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_ARGB)" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Pixel Size" DefaultValue="0"  Name="PixelSize_L0" Type="string" Group="Flexible ARGB" TabName="Layer Settings" Visible="false">
-        <Description>Specifies the ARGB Pixel size.</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Alpha Position" DefaultValue="0" Min="0" Max ="31" Name="AlphaPos_L0" Type="integer" Group="Flexible ARGB" TabName="Layer Settings">
-        <Description>Specifies the position of the Alpha component inside the pixel memory word (in bits)</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_ARGB)" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Alpha Position" DefaultValue="0" Name="AlphaPos_L0" Type="string" Group="Flexible ARGB" TabName="Layer Settings" Visible="false">
-        <Description>Specifies the position of the Alpha component inside the pixel memory word (in bits)</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Red Position" DefaultValue="0" Min="0" Max ="31" Name="RedPos_L0" Type="integer" Group="Flexible ARGB" TabName="Layer Settings">
-        <Description>Specifies the position of the Red component inside the pixel memory word (in bits)</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_ARGB)" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Red Position" DefaultValue="0" Name="RedPos_L0" Type="string" Group="Flexible ARGB" TabName="Layer Settings"  Visible="false">
-        <Description>Specifies the position of the Red component inside the pixel memory word (in bits)</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Green Position" DefaultValue="0" Min="0" Max ="31" Name="GreenPos_L0" Type="integer" Group="Flexible ARGB" TabName="Layer Settings">
-        <Description>Specifies the position of the Green component inside the pixel memory word (in bits)</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_ARGB)" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Green Position" DefaultValue="0"  Name="GreenPos_L0" Type="string" Group="Flexible ARGB" TabName="Layer Settings" Visible="false">
-        <Description>Specifies the position of the Green component inside the pixel memory word (in bits)</Description>
-    </RefParameter>
-     <RefParameter Comment="Layer 0 - Blue Position" DefaultValue="0" Min="0" Max ="31" Name="BluePos_L0" Type="integer" Group="Flexible ARGB" TabName="Layer Settings">
-        <Description>Specifies the position of the Blue component inside the pixel memory word (in bits)</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_ARGB)" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Blue Position" DefaultValue="0"  Name="BluePos_L0" Type="string" Group="Flexible ARGB" TabName="Layer Settings" Visible="false">
-        <Description>Specifies the position of the Blue component inside the pixel memory word (in bits)</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Alpha Width" DefaultValue="0" Min="0" Max ="15" Name="AlphaWidth_L0" Type="integer" Group="Flexible ARGB" TabName="Layer Settings">
-        <Description>Specifies the Width of the Alpha component in bits</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_ARGB)" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Alpha Width" DefaultValue="0" Name="AlphaWidth_L0" Type="string" Group="Flexible ARGB" TabName="Layer Settings" Visible="false">
-        <Description>Specifies the Width of the Alpha component in bits</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Red Width" DefaultValue="0" Min="0" Max ="15" Name="RedWidth_L0" Type="integer" Group="Flexible ARGB" TabName="Layer Settings">
-        <Description>Specifies the Width of the Red component in bits</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_ARGB)" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Red Width" DefaultValue="0"  Name="RedWidth_L0" Type="string" Group="Flexible ARGB" TabName="Layer Settings" Visible="false">
-        <Description>Specifies the Width of the Red component in bits</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Green Width" DefaultValue="0" Min="0" Max ="15" Name="GreenWidth_L0" Type="integer" Group="Flexible ARGB" TabName="Layer Settings">
-        <Description>Specifies the Width of the Green component in bits</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_ARGB)" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Green Width" DefaultValue="0"  Name="GreenWidth_L0" Type="string" Group="Flexible ARGB" TabName="Layer Settings" Visible="false">
-        <Description>Specifies the Width of the Green component in bits</Description>
-    </RefParameter>
-       <RefParameter Comment="Layer 0 - Blue Width" DefaultValue="0" Min="0" Max ="15" Name="BlueWidth_L0" Type="integer" Group="Flexible ARGB" TabName="Layer Settings">
-        <Description>Specifies the Width of the Blue component in bits</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_ARGB)" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Blue Width" DefaultValue="0" Name="BlueWidth_L0" Type="string" Group="Flexible ARGB" TabName="Layer Settings" Visible="false">
-        <Description>Specifies the Width of the Blue component in bits</Description>
-    </RefParameter>
-    <!-- Layer 0 Flexible YUV FullPlanar  -->
-    <RefParameter Comment="Layer 0 - Y/U/V Address" DefaultValue="0" Name="YuvAddress_L0" Type="String" Group="Flexible YUV FullPlanar" TabName="Layer Settings">
-        <Description>Specifies the Y/U/V address.</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_FULLPLANAR)" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Y/U/V Address" DefaultValue="0" Name="YuvAddress_L0" Type="string" Group="Flexible YUV FullPlanar" TabName="Layer Settings" Visible="false">
-        <Description>Specifies the Y/U/V address.</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Y Address" DefaultValue="0" Name="YAddress_L0" Type="StringRW" Group="Flexible YUV FullPlanar" TabName="Layer Settings">
-        <Description>Specifies the Y address.</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_FULLPLANAR)" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Y Address" DefaultValue="0" Name="YAddress_L0" Type="String" Group="Flexible YUV FullPlanar" TabName="Layer Settings" Visible="false">
-        <Description>Specifies the Y address.</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - U Address" DefaultValue="0" Name="UAddress_L0" Type="StringRW" Group="Flexible YUV FullPlanar" TabName="Layer Settings">
-        <Description>Specifies the Y address.</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_FULLPLANAR)" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - U Address" DefaultValue="0" Name="UAddress_L0" Type="String" Group="Flexible YUV FullPlanar" TabName="Layer Settings" Visible="false">
-        <Description>Specifies the Y address.</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - V Address" DefaultValue="0" Name="VAddress_L0" Type="StringRW" Group="Flexible YUV FullPlanar" TabName="Layer Settings">
-        <Description>Specifies the V address.</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_FULLPLANAR)" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - V Address" DefaultValue="0" Name="VAddress_L0" Type="string" Group="Flexible YUV FullPlanar" TabName="Layer Settings" Visible="false">
-        <Description>Specifies the V address.</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - U/V Address" DefaultValue="0" Name="UvAddress_L0" Type="String" Group="Flexible YUV FullPlanar" TabName="Layer Settings">
-        <Description>Specifies the U/V address.</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_FULLPLANAR)" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - U/V Address" DefaultValue="0" Name="UvAddress_L0" Type="String" Group="Flexible YUV FullPlanar" TabName="Layer Settings" Visible="false">
-        <Description>Specifies the U/V address.</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Chrominance Order"  Name="ChrominanceOrder_L0" Type="string" Group="Flexible YUV FullPlanar" TabName="Layer Settings" DefaultValue="0">
-        <Description>Specifies the Chrominance Order.</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_FULLPLANAR)" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Chrominance Order"  Name="ChrominanceOrder_L0" Type="String" Group="Flexible YUV FullPlanar" TabName="Layer Settings"  DefaultValue="0" Visible="false">
-        <Description>Specifies the Chrominance Order.</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Luminance Order"  Name="LuminanceOrder_L0" Type="List" Group="Flexible YUV FullPlanar" TabName="Layer Settings" DefaultValue="LTDC_YUV_LUMINANCE_ORDER_ODD_FIRST">
-        <Description>Specifies the Luminance Order.</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_FULLPLANAR)" Diagnostic=""/>
-		<PossibleValue Comment="Odd First (from LSB)" Value="LTDC_YUV_LUMINANCE_ORDER_ODD_FIRST"/>
-        <PossibleValue Comment="Even First (from LSB)" Value="LTDC_YUV_LUMINANCE_ORDER_EVEN_FIRST"/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Luminance Order"  Name="LuminanceOrder_L0" Type="String" Group="Flexible YUV FullPlanar" TabName="Layer Settings" DefaultValue="0" Visible="false">
-        <Description>Specifies the Luminance Order.</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Luminance Rescale"  Name="LuminanceRescale_L0" Type="List" Group="Flexible YUV FullPlanar" TabName="Layer Settings" DefaultValue="LTDC_YUV_LUMINANCE_RESCALE_ENABLE">
-        <Description>Specifies the Luminance Rescale.</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_FULLPLANAR)" Diagnostic=""/>
-		<PossibleValue Comment="Enable" Value="LTDC_YUV_LUMINANCE_RESCALE_ENABLE"/>
-        <PossibleValue Comment="Disable" Value="LTDC_YUV_LUMINANCE_RESCALE_DISABLE"/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Luminance Rescale"  Name="LuminanceRescale_L0" Type="String" Group="Flexible YUV FullPlanar" TabName="Layer Settings" DefaultValue="0" Visible="false">
-        <Description>Specifies the Luminance Rescale.</Description>
-    </RefParameter>
-     <RefParameter Comment="Layer 0 - YUV Order" Name="YuvOrder_L0" Type="String" Group="Flexible YUV FullPlanar" TabName="Layer Settings" DefaultValue="0">
-        <Description>Specifies the YUV Order.</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_FULLPLANAR)" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - YUV Order" Name="YuvOrder_L0" Type="String" Group="Flexible YUV FullPlanar" TabName="Layer Settings" DefaultValue="0" Visible="false">
-        <Description>Specifies the YUV Order.</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Color Converter"  Name="ColorConverter_L0" Type="List" Group="Flexible YUV FullPlanar" TabName="Layer Settings" DefaultValue="LTDC_YUV2RGBCONVERTOR_BT601_REDUCED_RANGE">
-        <Description>Specifies Color Converter.</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_FULLPLANAR)" Diagnostic=""/>
-		<PossibleValue Comment="YUV BT601 reduced range to RGB" Value="LTDC_YUV2RGBCONVERTOR_BT601_REDUCED_RANGE"/>
-        <PossibleValue Comment="YUV BT709 reduced range to RGB" Value="LTDC_YUV2RGBCONVERTOR_BT709_REDUCED_RANGE"/>
-        <PossibleValue Comment="YUV BT601 full range to RGB" Value="LTDC_YUV2RGBCONVERTOR_BT601_FULL_RANGE"/>
-        <PossibleValue Comment="YUV BT709 full range  to RGB" Value="LTDC_YUV2RGBCONVERTOR_BT709_FULL_RANGE"/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Color Converter"  Name="ColorConverter_L0" Type="String" Group="Flexible YUV FullPlanar" TabName="Layer Settings" DefaultValue="0" Visible="false">
-        <Description>Specifies Color Converter.</Description>
-    </RefParameter>
-    
-    <!-- Layer 0 Flexible YUV SemiPlanar  -->
-    <RefParameter Comment="Layer 0 - Y/U/V Address" DefaultValue="0" Name="YuvAddress_SemiPlanar_L0" Type="String" Group="Flexible YUV SemiPlanar" TabName="Layer Settings">
-        <Description>Specifies the Y/U/V address.</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_SEMIPLANAR)" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Y/U/V Address" DefaultValue="0" Name="YuvAddress_SemiPlanar_L0" Type="String" Group="Flexible YUV SemiPlanar" TabName="Layer Settings"  Visible="false">
-        <Description>Specifies the Y/U/V address.</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Y Address" DefaultValue="0" Name="YAddress_SemiPlanar_L0" Type="StringRW" Group="Flexible YUV SemiPlanar" TabName="Layer Settings">
-        <Description>Specifies the Y address.</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_SEMIPLANAR)" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Y Address" DefaultValue="0" Name="YAddress_SemiPlanar_L0" Type="String" Group="Flexible YUV SemiPlanar" TabName="Layer Settings"  Visible="false">
-        <Description>Specifies the Y address.</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - U Address" DefaultValue="0" Name="UAddress_SemiPlanar_L0" Type="String" Group="Flexible YUV SemiPlanar" TabName="Layer Settings">
-        <Description>Specifies the Y address.</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_SEMIPLANAR)" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - U Address" DefaultValue="0" Name="UAddress_SemiPlanar_L0" Type="String" Group="Flexible YUV SemiPlanar" TabName="Layer Settings"  Visible="false">
-        <Description>Specifies the Y address.</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - V Address" DefaultValue="0" Name="VAddress_SemiPlanar_L0" Type="String" Group="Flexible YUV SemiPlanar" TabName="Layer Settings">
-        <Description>Specifies the V address.</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_SEMIPLANAR)" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - V Address" DefaultValue="0" Name="VAddress_SemiPlanar_L0" Type="String" Group="Flexible YUV SemiPlanar" TabName="Layer Settings" Visible="false">
-        <Description>Specifies the V address.</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - U/V Address" DefaultValue="0" Name="UvAddress_SemiPlanar_L0" Type="StringRW" Group="Flexible YUV SemiPlanar" TabName="Layer Settings">
-        <Description>Specifies the U/V address.</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_SEMIPLANAR)" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - U/V Address" DefaultValue="0" Name="UvAddress_SemiPlanar_L0" Type="String" Group="Flexible YUV SemiPlanar" TabName="Layer Settings" Visible="false">
-        <Description>Specifies the U/V address.</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Chrominance Order" Name="ChrominanceOrder_SemiPlanar_L0" Type="List" Group="Flexible YUV SemiPlanar" TabName="Layer Settings" DefaultValue="LTDC_YUV_CHROMIANCE_ORDER_U_FIRST">
-    <Description>Specifies the Chrominance Order.</Description>
-    <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_SEMIPLANAR)" Diagnostic=""/>
-    <PossibleValue Comment="U First (from LSB)" Value="LTDC_YUV_CHROMIANCE_ORDER_U_FIRST"/>
-    <PossibleValue Comment="V First (from LSB)" Value="LTDC_YUV_CHROMIANCE_ORDER_V_FIRST"/>
-</RefParameter>
-    <RefParameter Comment="Layer 0 - Chrominance Order" Name="ChrominanceOrder_SemiPlanar_L0" Type="String" Group="Flexible YUV SemiPlanar" TabName="Layer Settings"  DefaultValue="0" Visible="false">
-        <Description>Specifies the Chrominance Order.</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Luminance Order" Name="LuminanceOrder_SemiPlanar_L0" Type="List" Group="Flexible YUV SemiPlanar" TabName="Layer Settings" DefaultValue="LTDC_YUV_LUMINANCE_ORDER_ODD_FIRST">
-        <Description>Specifies the Luminance Order.</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_SEMIPLANAR)" Diagnostic=""/>
-		<PossibleValue Comment="Odd First (from LSB)" Value="LTDC_YUV_LUMINANCE_ORDER_ODD_FIRST"/>
-        <PossibleValue Comment="Even First (from LSB)" Value="LTDC_YUV_LUMINANCE_ORDER_EVEN_FIRST"/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Luminance Order" Name="LuminanceOrder_SemiPlanar_L0" Type="String" Group="Flexible YUV SemiPlanar" TabName="Layer Settings" DefaultValue="0" Visible="false">
-        <Description>Specifies the Luminance Order.</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Luminance Rescale" Name="LuminanceRescale_SemiPlanar_L0" Type="List" Group="Flexible YUV SemiPlanar" TabName="Layer Settings" DefaultValue="LTDC_YUV_LUMINANCE_ORDER_ODD_FIRST" >
-        <Description>Specifies the Luminance Rescale.</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_SEMIPLANAR)" Diagnostic=""/>
-		<PossibleValue Comment="Odd First (from LSB)" Value="LTDC_YUV_LUMINANCE_ORDER_ODD_FIRST"/>
-        <PossibleValue Comment="Even First (from LSB)" Value="LTDC_YUV_LUMINANCE_ORDER_EVEN_FIRST"/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Luminance Rescale" Name="LuminanceRescale_SemiPlanar_L0" Type="String" Group="Flexible YUV SemiPlanar" TabName="Layer Settings" DefaultValue="0" Visible="false">
-        <Description>Specifies the Luminance Rescale.</Description>
-    </RefParameter>
-     <RefParameter Comment="Layer 0 - YUV Order" Name="YuvOrder_SemiPlanar_L0" Type="String" Group="Flexible YUV SemiPlanar" TabName="Layer Settings" DefaultValue="0" >
-        <Description>Specifies the YUV Order.</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_SEMIPLANAR)" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - YUV Order" Name="YuvOrder_SemiPlanar_L0" Type="String" Group="Flexible YUV SemiPlanar" TabName="Layer Settings" DefaultValue="0" Visible="false">
-        <Description>Specifies the YUV Order.</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Color Converter" Name="ColorConverter_SemiPlanar_L0" Type="List" Group="Flexible YUV SemiPlanar" TabName="Layer Settings" DefaultValue="LTDC_YUV2RGBCONVERTOR_BT601_REDUCED_RANGE">
-        <Description>Specifies Color Converter.</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_SEMIPLANAR)" Diagnostic=""/>
-		<PossibleValue Comment="YUV BT601 reduced range to RGB" Value="LTDC_YUV2RGBCONVERTOR_BT601_REDUCED_RANGE"/>
-        <PossibleValue Comment="YUV BT709 reduced range to RGB" Value="LTDC_YUV2RGBCONVERTOR_BT709_REDUCED_RANGE"/>
-        <PossibleValue Comment="YUV BT601 full range to RGB" Value="LTDC_YUV2RGBCONVERTOR_BT601_FULL_RANGE"/>
-        <PossibleValue Comment="YUV BT709 full range  to RGB" Value="LTDC_YUV2RGBCONVERTOR_BT709_FULL_RANGE"/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Color Converter" Name="ColorConverter_SemiPlanar_L0" Type="String" Group="Flexible YUV SemiPlanar" TabName="Layer Settings" DefaultValue="0" Visible="false">
-        <Description>Specifies Color Converter.</Description>
-    </RefParameter>
-<!-- Layer 0 Flexible YUV CoPlanar  -->
-    <RefParameter Comment="Layer 0 - Y/U/V Address" DefaultValue="0" Name="YuvAddress_CoPlanar_L0" Type="StringRW" Group="Flexible YUV CoPlanar" TabName="Layer Settings">
-        <Description>Specifies the Y/U/V address.</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_COPLANAR)" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Y/U/V Address" DefaultValue="0" Name="YuvAddress_CoPlanar_L0" Type="String" Group="Flexible YUV CoPlanar" TabName="Layer Settings" Visible="false">
-        <Description>Specifies the Y/U/V address.</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Y Address" DefaultValue="0" Name="YAddress_CoPlanar_L0" Type="String" Group="Flexible YUV CoPlanar" TabName="Layer Settings">
-        <Description>Specifies the Y address.</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_COPLANAR)" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Y Address" DefaultValue="0" Name="YAddress_CoPlanar_L0" Type="String" Group="Flexible YUV CoPlanar" TabName="Layer Settings" Visible="false">
-        <Description>Specifies the Y address.</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - U Address" DefaultValue="0" Name="UAddress_CoPlanar_L0" Type="String" Group="Flexible YUV CoPlanar" TabName="Layer Settings">
-        <Description>Specifies the Y address.</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_COPLANAR)" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - U Address" DefaultValue="0" Name="UAddress_CoPlanar_L0" Type="String" Group="Flexible YUV CoPlanar" TabName="Layer Settings" Visible="false">
-        <Description>Specifies the Y address.</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - V Address" DefaultValue="0" Name="VAddress_CoPlanar_L0" Type="String" Group="Flexible YUV CoPlanar" TabName="Layer Settings">
-        <Description>Specifies the V address.</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_COPLANAR)" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - V Address" DefaultValue="0" Name="VAddress_CoPlanar_L0" Type="String" Group="Flexible YUV CoPlanar" TabName="Layer Settings" Visible="false">
-        <Description>Specifies the V address.</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - U/V Address" DefaultValue="0" Name="UvAddress_CoPlanar_L0" Type="String" Group="Flexible YUV CoPlanar" TabName="Layer Settings">
-        <Description>Specifies the U/V address.</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_COPLANAR)" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - U/V Address" DefaultValue="0" Name="UvAddress_CoPlanar_L0" Type="String" Group="Flexible YUV CoPlanar" TabName="Layer Settings" Visible="false">
-        <Description>Specifies the U/V address.</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Chrominance Order" DefaultValue="LTDC_YUV_CHROMIANCE_ORDER_U_FIRST" Name="ChrominanceOrder_CoPlanar_L0" Type="List" Group="Flexible YUV CoPlanar" TabName="Layer Settings">
-        <Description>Specifies the Chrominance Order.</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_COPLANAR)" Diagnostic=""/>
-        <PossibleValue Comment="U First (from LSB)" Value="LTDC_YUV_CHROMIANCE_ORDER_U_FIRST"/>
-        <PossibleValue Comment="V First (from LSB)" Value="LTDC_YUV_CHROMIANCE_ORDER_V_FIRST"/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Chrominance Order" Name="ChrominanceOrder_CoPlanar_L0" Type="String" Group="Flexible YUV CoPlanar" TabName="Layer Settings" Visible="false" DefaultValue="0">
-        <Description>Specifies the Chrominance Order.</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Luminance Order"  Name="LuminanceOrder_CoPlanar_L0" Type="List" Group="Flexible YUV CoPlanar" TabName="Layer Settings" DefaultValue="LTDC_YUV_LUMINANCE_ORDER_ODD_FIRST">
-        <Description>Specifies the Luminance Order.</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_COPLANAR)" Diagnostic=""/>
-        <PossibleValue Comment="Odd First (from LSB)" Value="LTDC_YUV_LUMINANCE_ORDER_ODD_FIRST"/>
-        <PossibleValue Comment="Even First (from LSB)" Value="LTDC_YUV_LUMINANCE_ORDER_EVEN_FIRST"/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Luminance Order"  Name="LuminanceOrder_CoPlanar_L0" Type="String" Group="Flexible YUV CoPlanar" TabName="Layer Settings" Visible="false" DefaultValue="0">
-        <Description>Specifies the Luminance Order.</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Luminance Rescale" Name="LuminanceRescale_CoPlanar_L0" Type="List" Group="Flexible YUV CoPlanar" TabName="Layer Settings" DefaultValue="LTDC_YUV_LUMINANCE_RESCALE_DISABLE">
-        <Description>Specifies the Luminance Rescale.</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_COPLANAR)" Diagnostic=""/>
-        <PossibleValue Comment="Enable" Value="LTDC_YUV_LUMINANCE_RESCALE_ENABLE"/>
-        <PossibleValue Comment="Disable" Value="LTDC_YUV_LUMINANCE_RESCALE_DISABLE"/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Luminance Rescale" Name="LuminanceRescale_CoPlanar_L0" Type="String" Group="Flexible YUV CoPlanar" TabName="Layer Settings"  Visible="false" DefaultValue="0">
-        <Description>Specifies the Luminance Rescale.</Description>
-    </RefParameter>
-     <RefParameter Comment="Layer 0 - YUV Order"  Name="YuvOrder_CoPlanar_L0" Type="List" Group="Flexible YUV CoPlanar" TabName="Layer Settings" DefaultValue="LTDC_YUV_ORDER_LUMINANCE_FIRST">
-        <Description>Specifies the YUV Order.</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_COPLANAR)" Diagnostic=""/>
-         <PossibleValue Comment="Luminance First (from LSB)" Value="LTDC_YUV_ORDER_LUMINANCE_FIRST"/>
-         <PossibleValue Comment="Chrominance First (from LSB)" Value="LTDC_YUV_ORDER_CHROMINANCE_FIRST"/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Color Converter" Name="ColorConverter_CoPlanar_L0" Type="List" Group="Flexible YUV CoPlanar" TabName="Layer Settings" DefaultValue="LTDC_YUV2RGBCONVERTOR_BT601_REDUCED_RANGE">
-        <Description>Specifies Color Converter.</Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_COPLANAR)" Diagnostic=""/>
-        <PossibleValue Comment="YUV BT601 reduced range to RGB" Value="LTDC_YUV2RGBCONVERTOR_BT601_REDUCED_RANGE"/>
-        <PossibleValue Comment="YUV BT709 reduced range to RGB" Value="LTDC_YUV2RGBCONVERTOR_BT709_REDUCED_RANGE"/>
-        <PossibleValue Comment="YUV BT601 full range to RGB" Value="LTDC_YUV2RGBCONVERTOR_BT601_FULL_RANGE"/>
-        <PossibleValue Comment="YUV BT709 full range  to RGB" Value="LTDC_YUV2RGBCONVERTOR_BT709_FULL_RANGE"/>
-    </RefParameter>
-	
-	<RefParameter Comment="Layer 0 - Pixel Format " DefaultValue="LTDC_PIXEL_FORMAT_RGB565" Name="PixelFormat_L0_not888" Type="list" Group="Pixel Parameters" TabName="Layer Settings" >
-		<Description>Specifies the pixel format.</Description>
-		<PossibleValue Comment="RGB565" Value="LTDC_PIXEL_FORMAT_RGB565"/>
-		<PossibleValue Comment="ARGB1555" Value="LTDC_PIXEL_FORMAT_ARGB1555"/>
-		<PossibleValue Comment="ARGB4444" Value="LTDC_PIXEL_FORMAT_ARGB4444"/>
-		<PossibleValue Comment="L8" Value="LTDC_PIXEL_FORMAT_L8"/>
-		<PossibleValue Comment="AL44" Value="LTDC_PIXEL_FORMAT_AL44"/>
-		<PossibleValue Comment="AL88" Value="LTDC_PIXEL_FORMAT_AL88"/>
-	</RefParameter>
-	
-	
-	<!-- Layer 0 Blending  -->
-	
-	<RefParameter Comment="Layer 0 - Alpha constant for blending" DefaultValue="0" Max="255" Min="0" Name="Alpha_L0" Type="integer" Group="Blending" TabName="Layer Settings">
-        <Description>Specifies the constant alpha used for blending.</Description>
-    </RefParameter>
-	<RefParameter Comment="Layer 0 - Blending Factor1" DefaultValue="LTDC_BLENDING_FACTOR1_CA" Name="BlendingFactor1_L0" Type="list" Group="Blending" TabName="Layer Settings">
-        <Description>Select the blending factor 1:
-		 &lt;br&gt; LTDC_BLENDING_FACTOR1_CA: blending factor is Alpha constant 
-		 &lt;br&gt; LTDC_BLENDING_FACTOR1_PAxCA: blending factor is Alpha constant x Pixel Alpha 
-		</Description>
-		<PossibleValue Comment="Alpha constant " Value="LTDC_BLENDING_FACTOR1_CA"/>
-		<PossibleValue Comment="Alpha constant x Pixel Alpha " Value="LTDC_BLENDING_FACTOR1_PAxCA"/>
-    </RefParameter>
-	<RefParameter Comment="Layer 0 - Blending Factor2" DefaultValue="LTDC_BLENDING_FACTOR2_CA" Name="BlendingFactor2_L0" Type="list" Group="Blending" TabName="Layer Settings">
-        <Description>Select the blending factor 2.
-		 &lt;br&gt; LTDC_BLENDING_FACTOR2_CA: blending factor is Alpha constant 
-		 &lt;br&gt; LTDC_BLENDING_FACTOR2_PAxCA: blending factor is Alpha constant x Pixel Alpha 
-		</Description>
-		<PossibleValue Comment="Alpha constant " Value="LTDC_BLENDING_FACTOR2_CA"/>
-		<PossibleValue Comment="Alpha constant x Pixel Alpha " Value="LTDC_BLENDING_FACTOR2_PAxCA"/>
-    </RefParameter>
-	
-	<!-- Layer 0 - Frame Buffer RefParameters for LTDC -->
-	<RefParameter Comment="Layer 0 - Color Frame Buffer Start Adress" DefaultValue="0" Name="FBStartAdress_L0" Type="string" Group="Frame Buffer" TabName="Layer Settings">
-        <Description>Configures the color frame buffer address </Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_COPLANAR | PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_SEMIPLANAR | PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_FULLPLANAR)" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="Layer 0 - Color Frame Buffer Start Adress" DefaultValue="0" Name="FBStartAdress_L0" Type="string" Group="Frame Buffer" TabName="Layer Settings" Visible="false">
-        <Description>Configures the color frame buffer address </Description>
     </RefParameter>
 
-	<RefParameter Comment="Layer 0 - Color Frame Buffer Start Adress" DefaultValue="0" Max="4294967295" Min="0" Name="FBStartAdress_L0" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
-        <Description>Configures the color frame buffer address </Description>
-		<Condition Expression="(!Semaphore_GFXMMU_used_forLTDC)" Diagnostic=""/>
-    </RefParameter> 
-	<RefParameter Comment="Layer 0 - Color Frame Buffer Start Adress" DefaultValue="GFXMMU_VIRTUAL_BUFFER0_BASE" Name="FBStartAdress_L0" Type="list" Group="Frame Buffer" TabName="Layer Settings">
-        <Description>Configures the color frame buffer address </Description>
-		<Condition Expression="(Semaphore_GFXMMU_used_forLTDC)" Diagnostic=""/>
-		<PossibleValue Comment="GFXMMU_VIRTUAL_BUFFER0_BASE" Value="GFXMMU_VIRTUAL_BUFFER0_BASE"/>
-		<PossibleValue Comment="GFXMMU_VIRTUAL_BUFFER1_BASE" Value="GFXMMU_VIRTUAL_BUFFER1_BASE"/>
-		<PossibleValue Comment="GFXMMU_VIRTUAL_BUFFER2_BASE" Value="GFXMMU_VIRTUAL_BUFFER2_BASE"/>
-		<PossibleValue Comment="GFXMMU_VIRTUAL_BUFFER3_BASE" Value="GFXMMU_VIRTUAL_BUFFER3_BASE"/>
+
+    <RefParameter Comment="Layer 0 - Pixel Format " DefaultValue="LTDC_PIXEL_FORMAT_RGB565" Name="PixelFormat_L0_not888" Type="list" Group="Pixel Parameters" TabName="Layer Settings">
+        <Description>Specifies the pixel format.</Description>
+        <PossibleValue Comment="RGB565" Value="LTDC_PIXEL_FORMAT_RGB565"/>
+        <PossibleValue Comment="ARGB1555" Value="LTDC_PIXEL_FORMAT_ARGB1555"/>
+        <PossibleValue Comment="ARGB4444" Value="LTDC_PIXEL_FORMAT_ARGB4444"/>
+        <PossibleValue Comment="L8" Value="LTDC_PIXEL_FORMAT_L8"/>
+        <PossibleValue Comment="AL44" Value="LTDC_PIXEL_FORMAT_AL44"/>
+        <PossibleValue Comment="AL88" Value="LTDC_PIXEL_FORMAT_AL88"/>
     </RefParameter>
-	
-	<!-- Color Frame Buffer Line Length  w/ max value set to the pitch value when GFXMMU used -->
-	<RefParameter Comment="Layer 0 - Color Frame Buffer Line Length (Image Width)" DefaultValue="0" Max="8191" Min="0" Name="ImageWidth_L0" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
-        <Description>Configures the color frame buffer line length.
-         &lt;br&gt; &lt; For information : &lt;/b&gt; &lt;br&gt;
-        When the graphics is enabled the color frame buffer line length value will be devided by zone value(the parameter zone is in Graphics parameters settings).
-        </Description>
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_COPLANAR | PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_SEMIPLANAR | PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_FULLPLANAR)" Diagnostic=""/>
-    </RefParameter> 
-	<RefParameter Comment="Layer 0 - Color Frame Buffer Line Length (Image Width)" DefaultValue="0" Max="8191" Min="0" Name="ImageWidth_L0" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
-        <Description>Configures the color frame buffer line length.
-         &lt;br&gt; &lt; For information : &lt;/b&gt; &lt;br&gt;
-        When the graphics is enabled the color frame buffer line length value will be devided by zone value(the parameter zone is in Graphics parameters settings).
-        </Description>
-		<Condition Expression="(!Semaphore_GFXMMU_used_forLTDC)" Diagnostic=""/>
-    </RefParameter> 
-	<RefParameter Comment="Layer 0 - Color Frame Buffer Line Length (Image Width)" DefaultValue="0" Max="=Pitch_L0" Min="0" Name="ImageWidth_L0" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
-        <Description>Configures the color frame buffer line length.
-        &lt;br&gt; &lt; For information : &lt;/b&gt; &lt;br&gt;
-        When the graphics is enabled the color frame buffer line length value will be devided by zone value(the parameter zone is in Graphics parameters settings).
-        </Description>
-		<Condition Expression="(Semaphore_GFXMMU_used_forLTDC)" Diagnostic=""/>
+
+
+    <!-- Layer 0 Blending  -->
+
+    <RefParameter Comment="Layer 0 - Alpha constant for blending" DefaultValue="0" Max="255" Min="0" Name="Alpha_L0" Type="integer" Group="Blending" TabName="Layer Settings">
+        <Description>Specifies the constant alpha used for blending.</Description>
     </RefParameter>
-	
-	<!-- Color Frame Buffer Number of Lines  -->
-	
-	<RefParameter Comment="Layer 0 - Color Frame Buffer Number of Lines (Image Height)" DefaultValue="0" Max="2047" Min="0" Name="ImageHeight_L0" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
-        <Condition Expression="(PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_COPLANAR | PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_SEMIPLANAR | PixelFormat_L0 = LTDC_PIXEL_FORMAT_FLEXIBLE_YUV_FULLPLANAR)" Diagnostic=""/>
+    <RefParameter Comment="Layer 0 - Blending Factor1" DefaultValue="LTDC_BLENDING_FACTOR1_CA" Name="BlendingFactor1_L0" Type="list" Group="Blending" TabName="Layer Settings">
+        <Description>Select the blending factor 1:
+            &lt;br&gt; LTDC_BLENDING_FACTOR1_CA: blending factor is Alpha constant
+            &lt;br&gt; LTDC_BLENDING_FACTOR1_PAxCA: blending factor is Alpha constant x Pixel Alpha
+        </Description>
+        <PossibleValue Comment="Alpha constant " Value="LTDC_BLENDING_FACTOR1_CA"/>
+        <PossibleValue Comment="Alpha constant x Pixel Alpha " Value="LTDC_BLENDING_FACTOR1_PAxCA"/>
+    </RefParameter>
+    <RefParameter Comment="Layer 0 - Blending Factor2" DefaultValue="LTDC_BLENDING_FACTOR2_CA" Name="BlendingFactor2_L0" Type="list" Group="Blending" TabName="Layer Settings">
+        <Description>Select the blending factor 2.
+            &lt;br&gt; LTDC_BLENDING_FACTOR2_CA: blending factor is Alpha constant
+            &lt;br&gt; LTDC_BLENDING_FACTOR2_PAxCA: blending factor is Alpha constant x Pixel Alpha
+        </Description>
+        <PossibleValue Comment="Alpha constant " Value="LTDC_BLENDING_FACTOR2_CA"/>
+        <PossibleValue Comment="Alpha constant x Pixel Alpha " Value="LTDC_BLENDING_FACTOR2_PAxCA"/>
+    </RefParameter>
+
+    <!-- Layer 0 - Frame Buffer RefParameters for LTDC -->
+
+    <RefParameter Comment="Layer 0 - Color Frame Buffer Start Adress" DefaultValue="0" Max="4294967295" Min="0" Name="FBStartAdress_L0" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
+        <Description>Configures the color frame buffer address </Description>
+        <Condition Expression="(!Semaphore_GFXMMU_used_forLTDC)" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Comment="Layer 0 - Color Frame Buffer Start Adress" DefaultValue="GFXMMU_VIRTUAL_BUFFER0_BASE" Name="FBStartAdress_L0" Type="list" Group="Frame Buffer" TabName="Layer Settings">
+        <Description>Configures the color frame buffer address </Description>
+        <Condition Expression="(Semaphore_GFXMMU_used_forLTDC)" Diagnostic=""/>
+        <PossibleValue Comment="GFXMMU_VIRTUAL_BUFFER0_BASE" Value="GFXMMU_VIRTUAL_BUFFER0_BASE"/>
+        <PossibleValue Comment="GFXMMU_VIRTUAL_BUFFER1_BASE" Value="GFXMMU_VIRTUAL_BUFFER1_BASE"/>
+        <PossibleValue Comment="GFXMMU_VIRTUAL_BUFFER2_BASE" Value="GFXMMU_VIRTUAL_BUFFER2_BASE"/>
+        <PossibleValue Comment="GFXMMU_VIRTUAL_BUFFER3_BASE" Value="GFXMMU_VIRTUAL_BUFFER3_BASE"/>
+    </RefParameter>
+
+    <!-- Color Frame Buffer Line Length  w/ max value set to the pitch value when GFXMMU used -->
+
+    <RefParameter Comment="Layer 0 - Color Frame Buffer Line Length (Image Width)" DefaultValue="0" Max="8191" Min="0" Name="ImageWidth_L0" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
+        <Description>Configures the color frame buffer line length.
+            &lt;br&gt; &lt; For information : &lt;/b&gt; &lt;br&gt;
+            When the graphics is enabled the color frame buffer line length value will be devided by zone value(the parameter zone is in Graphics parameters settings).
+        </Description>
+        <Condition Expression="(!Semaphore_GFXMMU_used_forLTDC)" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Comment="Layer 0 - Color Frame Buffer Line Length (Image Width)" DefaultValue="0" Max="=Pitch_L0" Min="0" Name="ImageWidth_L0" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
+        <Description>Configures the color frame buffer line length.
+            &lt;br&gt; &lt; For information : &lt;/b&gt; &lt;br&gt;
+            When the graphics is enabled the color frame buffer line length value will be devided by zone value(the parameter zone is in Graphics parameters settings).
+        </Description>
+        <Condition Expression="(Semaphore_GFXMMU_used_forLTDC)" Diagnostic=""/>
+    </RefParameter>
+
+    <!-- Color Frame Buffer Number of Lines  -->
+
+    <RefParameter Comment="Layer 0 - Color Frame Buffer Number of Lines (Image Height)" DefaultValue="0" Max="2047" Min="0" Name="ImageHeight_L0" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
         <Description>Specifies the number of line in frame buffer.</Description>
     </RefParameter>
-	<RefParameter Comment="Layer 0 - Color Frame Buffer Number of Lines (Image Height)" DefaultValue="0" Max="2047" Min="0" Name="ImageHeight_L0" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
-        <Description>Specifies the number of line in frame buffer.</Description>
-    </RefParameter>
-	<!-- Layer 0 Line Pitch - no GFXMMU used -->
-	<!--
-	<RefParameter Comment="Layer 0 - Color Frame Line Pitch" DefaultValue="=ImageWidth_L0" Name="Pitch_L0" Type="string" Group="Frame Buffer" TabName="Layer Settings">
+
+    <!-- Layer 0 Line Pitch - no GFXMMU used -->
+    <!--
+    <RefParameter Comment="Layer 0 - Color Frame Line Pitch" DefaultValue="=ImageWidth_L0" Name="Pitch_L0" Type="string" Group="Frame Buffer" TabName="Layer Settings">
         <Description>Specifies in pixel the line pitch (maximum number of line in frame buffer).</Description>
-		<Condition Expression="(Layers = 1)&amp;(!GFXMMU_used_forLTDC)" Diagnostic=""/>
+        <Condition Expression="(Layers = 1)&amp;(!GFXMMU_used_forLTDC)" Diagnostic=""/>
     </RefParameter>
-	-->
-	
-	<!-- Layer 0 Line Pitch - GFXMMU used in 192 blocks mode -->
-	<RefParameter Comment="Layer 0 - Color Frame Line Pitch" DefaultValue="0" Name="Pitch_L0" Type="string" Group="Frame Buffer" TabName="Layer Settings">
+    -->
+
+    <!-- Layer 0 Line Pitch - GFXMMU used in 192 blocks mode -->
+    <RefParameter Comment="Layer 0 - Color Frame Line Pitch" DefaultValue="0" Name="Pitch_L0" Type="string" Group="Frame Buffer" TabName="Layer Settings">
         <Description>Specifies in pixel the line pitch (maximum number of line in frame buffer).</Description>
-		<PossibleValue Comment="768" Value="768" Action="Disable"/>
-		<Condition Expression="(Semaphore_GFXMMU_used_forLTDC)&amp;(Semaphore_GFXMMU_192BLOCKS)&amp;((PixelFormat_L0 = LTDC_PIXEL_FORMAT_ARGB8888))" Diagnostic=""/>
+        <PossibleValue Comment="768" Value="768" Action="Disable"/>
+        <Condition Expression="(Semaphore_GFXMMU_used_forLTDC)&amp;(Semaphore_GFXMMU_192BLOCKS)&amp;((PixelFormat_L0 = LTDC_PIXEL_FORMAT_ARGB8888))" Diagnostic=""/>
     </RefParameter>
-	<RefParameter Comment="Layer 0 - Color Frame Line Pitch" DefaultValue="0" Name="Pitch_L0" Type="string" Group="Frame Buffer" TabName="Layer Settings">
+    <RefParameter Comment="Layer 0 - Color Frame Line Pitch" DefaultValue="0" Name="Pitch_L0" Type="string" Group="Frame Buffer" TabName="Layer Settings">
         <Description>Specifies in pixel the line pitch (maximum number of line in frame buffer).</Description>
-		<PossibleValue Comment="1024" Value="1024" Action="Disable"/>
-		<Condition Expression="(Semaphore_GFXMMU_used_forLTDC)&amp;(Semaphore_GFXMMU_192BLOCKS)&amp;((PixelFormat_L0 = LTDC_PIXEL_FORMAT_RGB888))" Diagnostic=""/>
+        <PossibleValue Comment="1024" Value="1024" Action="Disable"/>
+        <Condition Expression="(Semaphore_GFXMMU_used_forLTDC)&amp;(Semaphore_GFXMMU_192BLOCKS)&amp;((PixelFormat_L0 = LTDC_PIXEL_FORMAT_RGB888))" Diagnostic=""/>
     </RefParameter>
-	
-	<RefParameter Comment="Layer 0 - Color Frame Line Pitch" DefaultValue="0" Name="Pitch_L0" Type="string" Group="Frame Buffer" TabName="Layer Settings">
+
+    <RefParameter Comment="Layer 0 - Color Frame Line Pitch" DefaultValue="0" Name="Pitch_L0" Type="string" Group="Frame Buffer" TabName="Layer Settings">
         <Description>Specifies in pixel the line pitch (maximum number of line in frame buffer).</Description>
-		<PossibleValue Comment="1536" Value="1536" Action="Disable"/>
-		<Condition Expression="(Semaphore_GFXMMU_used_forLTDC)&amp;(Semaphore_GFXMMU_192BLOCKS)&amp;((PixelFormat_L0 = LTDC_PIXEL_FORMAT_RGB565)|(PixelFormat_L0 = LTDC_PIXEL_FORMAT_ARGB1555)|(PixelFormat_L0 = LTDC_PIXEL_FORMAT_ARGB4444)|(PixelFormat_L0 = LTDC_PIXEL_FORMAT_AL88))" Diagnostic=""/>
+        <PossibleValue Comment="1536" Value="1536" Action="Disable"/>
+        <Condition Expression="(Semaphore_GFXMMU_used_forLTDC)&amp;(Semaphore_GFXMMU_192BLOCKS)&amp;((PixelFormat_L0 = LTDC_PIXEL_FORMAT_RGB565)|(PixelFormat_L0 = LTDC_PIXEL_FORMAT_ARGB1555)|(PixelFormat_L0 = LTDC_PIXEL_FORMAT_ARGB4444)|(PixelFormat_L0 = LTDC_PIXEL_FORMAT_AL88))" Diagnostic=""/>
     </RefParameter>
-	<RefParameter Comment="Layer 0 - Color Frame Line Pitch" DefaultValue="0" Name="Pitch_L0" Type="string" Group="Frame Buffer" TabName="Layer Settings">
+    <RefParameter Comment="Layer 0 - Color Frame Line Pitch" DefaultValue="0" Name="Pitch_L0" Type="string" Group="Frame Buffer" TabName="Layer Settings">
         <Description>Specifies in pixel the line pitch (maximum number of line in frame buffer).</Description>
-		<PossibleValue Comment="3072" Value="3072" Action="Disable"/>
-		<Condition Expression="(Semaphore_GFXMMU_used_forLTDC)&amp;(Semaphore_GFXMMU_192BLOCKS)&amp;((PixelFormat_L0 = LTDC_PIXEL_FORMAT_L8)|(PixelFormat_L0 = LTDC_PIXEL_FORMAT_AL44))" Diagnostic=""/>
+        <PossibleValue Comment="3072" Value="3072" Action="Disable"/>
+        <Condition Expression="(Semaphore_GFXMMU_used_forLTDC)&amp;(Semaphore_GFXMMU_192BLOCKS)&amp;((PixelFormat_L0 = LTDC_PIXEL_FORMAT_L8)|(PixelFormat_L0 = LTDC_PIXEL_FORMAT_AL44))" Diagnostic=""/>
     </RefParameter>
-	
-	<!-- Layer 0 Line Pitch - GFXMMU used in 256 blocks mode -->
-	
-	<RefParameter Comment="Layer 0 - Color Frame Line Pitch" DefaultValue="0" Name="Pitch_L0" Type="string" Group="Frame Buffer" TabName="Layer Settings">
+
+    <!-- Layer 0 Line Pitch - GFXMMU used in 256 blocks mode -->
+
+    <RefParameter Comment="Layer 0 - Color Frame Line Pitch" DefaultValue="0" Name="Pitch_L0" Type="string" Group="Frame Buffer" TabName="Layer Settings">
         <Description>Specifies in pixel the line pitch (maximum number of line in frame buffer).</Description>
-		<PossibleValue Comment="1024" Value="1024" Action="Disable"/>
-		<Condition Expression="(Semaphore_GFXMMU_used_forLTDC)&amp;(Semaphore_GFXMMU_256BLOCKS)&amp;((PixelFormat_L0 = LTDC_PIXEL_FORMAT_ARGB8888))" Diagnostic=""/>
-    </RefParameter> 	
-	<RefParameter Comment="Layer 0 - Color Frame Line Pitch" DefaultValue="0" Name="Pitch_L0" Type="string" Group="Frame Buffer" TabName="Layer Settings">
-        <Description>Specifies in pixel the line pitch (maximum number of line in frame buffer).</Description>
-		<PossibleValue Comment="2048" Value="2048" Action="Disable"/>
-		<Condition Expression="(Semaphore_GFXMMU_used_forLTDC)&amp;(Semaphore_GFXMMU_256BLOCKS)&amp;((PixelFormat_L0 = LTDC_PIXEL_FORMAT_RGB565)|(PixelFormat_L0 = LTDC_PIXEL_FORMAT_ARGB1555)|(PixelFormat_L0 = LTDC_PIXEL_FORMAT_ARGB4444)|(PixelFormat_L0 = LTDC_PIXEL_FORMAT_AL88))" Diagnostic=""/>
+        <PossibleValue Comment="1024" Value="1024" Action="Disable"/>
+        <Condition Expression="(Semaphore_GFXMMU_used_forLTDC)&amp;(Semaphore_GFXMMU_256BLOCKS)&amp;((PixelFormat_L0 = LTDC_PIXEL_FORMAT_ARGB8888))" Diagnostic=""/>
     </RefParameter>
-	<RefParameter Comment="Layer 0 - Color Frame Line Pitch" DefaultValue="0" Name="Pitch_L0" Type="string" Group="Frame Buffer" TabName="Layer Settings">
+    <RefParameter Comment="Layer 0 - Color Frame Line Pitch" DefaultValue="0" Name="Pitch_L0" Type="string" Group="Frame Buffer" TabName="Layer Settings">
         <Description>Specifies in pixel the line pitch (maximum number of line in frame buffer).</Description>
-		<PossibleValue Comment="4096" Value="4096" Action="Disable"/>
-		<Condition Expression="(Semaphore_GFXMMU_used_forLTDC)&amp;(Semaphore_GFXMMU_256BLOCKS)&amp;((PixelFormat_L0 = LTDC_PIXEL_FORMAT_L8)|(PixelFormat_L0 = LTDC_PIXEL_FORMAT_AL44))" Diagnostic=""/>
+        <PossibleValue Comment="2048" Value="2048" Action="Disable"/>
+        <Condition Expression="(Semaphore_GFXMMU_used_forLTDC)&amp;(Semaphore_GFXMMU_256BLOCKS)&amp;((PixelFormat_L0 = LTDC_PIXEL_FORMAT_RGB565)|(PixelFormat_L0 = LTDC_PIXEL_FORMAT_ARGB1555)|(PixelFormat_L0 = LTDC_PIXEL_FORMAT_ARGB4444)|(PixelFormat_L0 = LTDC_PIXEL_FORMAT_AL88))" Diagnostic=""/>
     </RefParameter>
-	
+    <RefParameter Comment="Layer 0 - Color Frame Line Pitch" DefaultValue="0" Name="Pitch_L0" Type="string" Group="Frame Buffer" TabName="Layer Settings">
+        <Description>Specifies in pixel the line pitch (maximum number of line in frame buffer).</Description>
+        <PossibleValue Comment="4096" Value="4096" Action="Disable"/>
+        <Condition Expression="(Semaphore_GFXMMU_used_forLTDC)&amp;(Semaphore_GFXMMU_256BLOCKS)&amp;((PixelFormat_L0 = LTDC_PIXEL_FORMAT_L8)|(PixelFormat_L0 = LTDC_PIXEL_FORMAT_AL44))" Diagnostic=""/>
+    </RefParameter>
+
     <!-- Layer 0 Line Pitch - no condition -->
     <RefParameter Comment="Layer 0 - Color Frame Line Pitch" Visible="false" DefaultValue="0" Name="Pitch_L0" Type="string" Group="Frame Buffer" TabName="Layer Settings">
-    </RefParameter> 
-    
-	<!-- RGB888 not available for 256 blocks] -->
-	<!--
-	<RefParameter Comment="Layer 0 - Line Pitch" DefaultValue="0" Name="Pitch_L0" Type="string" Group="Frame Buffer" TabName="Layer Settings">
-        <Description>Specifies in pixel the line pitch (maximum number of line in frame buffer).</Description>
-		<PossibleValue Comment="2048" Value="2048" Action="Disable"/>
-		<Condition Expression="(Layers = 1)&amp;(GFXMMU_used_forLTDC)&amp;(GFXMMU_256BLOCKS)&amp;((RGB565)|(ARGB555)|(ARGB)|(AL88))" Diagnostic=""/>
     </RefParameter>
-	<RefParameter Comment="Layer 0 - Line Pitch" DefaultValue="0" Name="Pitch_L0" Type="string" Group="Frame Buffer" TabName="Layer Settings">
+
+    <!-- RGB888 not available for 256 blocks] -->
+    <!--
+    <RefParameter Comment="Layer 0 - Line Pitch" DefaultValue="0" Name="Pitch_L0" Type="string" Group="Frame Buffer" TabName="Layer Settings">
         <Description>Specifies in pixel the line pitch (maximum number of line in frame buffer).</Description>
-		<PossibleValue Comment="4096" Value="4096" Action="Disable"/>
-		<Condition Expression="(Layers = 1)&amp;(GFXMMU_used_forLTDC)&amp;(GFXMMU_256BLOCKS)&amp;((L8)|(AL44))" Diagnostic=""/>
+        <PossibleValue Comment="2048" Value="2048" Action="Disable"/>
+        <Condition Expression="(Layers = 1)&amp;(GFXMMU_used_forLTDC)&amp;(GFXMMU_256BLOCKS)&amp;((RGB565)|(ARGB555)|(ARGB)|(AL88))" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Comment="Layer 0 - Line Pitch" DefaultValue="0" Name="Pitch_L0" Type="string" Group="Frame Buffer" TabName="Layer Settings">
+        <Description>Specifies in pixel the line pitch (maximum number of line in frame buffer).</Description>
+        <PossibleValue Comment="4096" Value="4096" Action="Disable"/>
+        <Condition Expression="(Layers = 1)&amp;(GFXMMU_used_forLTDC)&amp;(GFXMMU_256BLOCKS)&amp;((L8)|(AL44))" Diagnostic=""/>
     </RefParameter>
 -->
-	<!-- *************** END OF LAYER 0 SETTINGS *************** -->
-    
-	<!-- *************** START OF LAYER 1 SETTINGS *************** -->
-	<!-- Layer Default Color Layer 1 RefParameters for LTDC -->
-	
-	<RefParameter Comment="Layer 1 - LayerIdx" DefaultValue="1" Visible="false" Max="1" Min="0" Name="LayerIdx_L1" Type="integer" Group="Layer Default Color" TabName="Layer Settings">
-		<Condition Expression="(Layers = 1)" Diagnostic=""/>
-	</RefParameter>
+    <!-- *************** END OF LAYER 0 SETTINGS *************** -->
+
+    <!-- *************** START OF LAYER 1 SETTINGS *************** -->
+    <!-- Layer Default Color Layer 1 RefParameters for LTDC -->
+
+    <RefParameter Comment="Layer 1 - LayerIdx" DefaultValue="1" Visible="false" Max="1" Min="0" Name="LayerIdx_L1" Type="integer" Group="Layer Default Color" TabName="Layer Settings">
+        <Condition Expression="(Layers = 1)" Diagnostic=""/>
+    </RefParameter>
     <!-- this RefParameter without condition must be commented or Layer 1 init code will be generated systematically (even when number of layers =1)
     <RefParameter Comment="Layer 1 - LayerIdx" Visible="false" DefaultValue="1" Max="1" Min="0" Name="LayerIdx_L1" Type="integer" Group="Layer Default Color" TabName="Layer Settings">
     </RefParameter>
     -->
-    <!-- Layer 1 Flexible ARGB  -->
-    <RefParameter Comment="Layer 1 - Pixel Size" DefaultValue="0" Min="0" Max ="31" Name="PixelSize_L1" Type="integer" Group="Flexible ARGB" TabName="Layer Settings">
-        <Description>Specifies the ARGB Pixel size.</Description>
-        <Condition Expression="(Layers = 1)&amp;(PixelFormat_L1 = LTDC_PIXEL_FORMAT_FLEXIBLE_ARGB)" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="Layer 1 - Pixel Size" DefaultValue="0"  Name="PixelSize_L1" Type="String" Group="Flexible ARGB" TabName="Layer Settings" Visible="false">
-        <Description>Specifies the ARGB Pixel size.</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 1 - Alpha Position" DefaultValue="0" Min="0" Max ="31" Name="AlphaPos_L1" Type="integer" Group="Flexible ARGB" TabName="Layer Settings">
-        <Description>Specifies the position of the Alpha component inside the pixel memory word (in bits)</Description>
-        <Condition Expression="(Layers = 1)&amp;(PixelFormat_L1 = LTDC_PIXEL_FORMAT_FLEXIBLE_ARGB)" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="Layer 1 - Alpha Position" DefaultValue="0"  Name="AlphaPos_L1" Type="String" Group="Flexible ARGB" TabName="Layer Settings"  Visible="false">
-        <Description>Specifies the position of the Alpha component inside the pixel memory word (in bits)</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 1 - Red Position" DefaultValue="0" Min="0" Max ="31" Name="RedPos_L1" Type="integer" Group="Flexible ARGB" TabName="Layer Settings">
-        <Description>Specifies the position of the Red component inside the pixel memory word (in bits)</Description>
-        <Condition Expression="(Layers = 1)&amp;(PixelFormat_L1 = LTDC_PIXEL_FORMAT_FLEXIBLE_ARGB)" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="Layer 1 - Red Position" DefaultValue="0"  Name="RedPos_L1" Type="String" Group="Flexible ARGB" TabName="Layer Settings" Visible="false">
-        <Description>Specifies the position of the Red component inside the pixel memory word (in bits)</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 1 - Green Position" DefaultValue="0" Min="0" Max ="31" Name="GreenPos_L1" Type="integer" Group="Flexible ARGB" TabName="Layer Settings">
-        <Description>Specifies the position of the Green component inside the pixel memory word (in bits)</Description>
-        <Condition Expression="(Layers = 1)&amp;(PixelFormat_L1 = LTDC_PIXEL_FORMAT_FLEXIBLE_ARGB)" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="Layer 1 - Green Position" DefaultValue="0"  Name="GreenPos_L1" Type="String" Group="Flexible ARGB" TabName="Layer Settings" Visible="false">
-        <Description>Specifies the position of the Green component inside the pixel memory word (in bits)</Description>
-    </RefParameter>
-     <RefParameter Comment="Layer 1 - Blue Position" DefaultValue="0" Min="0" Max ="31" Name="BluePos_L1" Type="integer" Group="Flexible ARGB" TabName="Layer Settings">
-        <Description>Specifies the position of the Blue component inside the pixel memory word (in bits)</Description>
-        <Condition Expression="(Layers = 1)&amp;(PixelFormat_L1 = LTDC_PIXEL_FORMAT_FLEXIBLE_ARGB)" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="Layer 1 - Blue Position" DefaultValue="0"  Name="BluePos_L1" Type="String" Group="Flexible ARGB" TabName="Layer Settings" Visible="false">
-        <Description>Specifies the position of the Blue component inside the pixel memory word (in bits)</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 1 - Alpha Width" DefaultValue="0" Min="0" Max ="15" Name="AlphaWidth_L1" Type="integer" Group="Flexible ARGB" TabName="Layer Settings">
-        <Description>Specifies the Width of the Alpha component in bits</Description>
-        <Condition Expression="(Layers = 1)&amp;(PixelFormat_L1 = LTDC_PIXEL_FORMAT_FLEXIBLE_ARGB)" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="Layer 1 - Alpha Width" DefaultValue="0" Name="AlphaWidth_L1" Type="String" Group="Flexible ARGB" TabName="Layer Settings" Visible="false">
-        <Description>Specifies the Width of the Alpha component in bits</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 1 - Red Width" DefaultValue="0" Min="0" Max ="15" Name="RedWidth_L1" Type="integer" Group="Flexible ARGB" TabName="Layer Settings">
-        <Description>Specifies the Width of the Red component in bits</Description>
-        <Condition Expression="(Layers = 1)&amp;(PixelFormat_L1 = LTDC_PIXEL_FORMAT_FLEXIBLE_ARGB)" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="Layer 1 - Red Width" DefaultValue="0"  Name="RedWidth_L1" Type="String" Group="Flexible ARGB" TabName="Layer Settings" Visible="false">
-        <Description>Specifies the Width of the Red component in bits</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 1 - Green Width" DefaultValue="0" Min="0" Max ="15" Name="GreenWidth_L1" Type="integer" Group="Flexible ARGB" TabName="Layer Settings">
-        <Description>Specifies the Width of the Green component in bits</Description>
-        <Condition Expression="(Layers = 1)&amp;(PixelFormat_L1 = LTDC_PIXEL_FORMAT_FLEXIBLE_ARGB)" Diagnostic=""/>
-    </RefParameter>
-       <RefParameter Comment="Layer 1 - Blue Width" DefaultValue="0" Min="0" Max ="15" Name="BlueWidth_L1" Type="integer" Group="Flexible ARGB" TabName="Layer Settings">
-        <Description>Specifies the Width of the Blue component in bits</Description>
-        <Condition Expression="(Layers = 1)&amp;(PixelFormat_L1 = LTDC_PIXEL_FORMAT_FLEXIBLE_ARGB)" Diagnostic=""/>
-    </RefParameter>
 
-	<RefParameter Comment="Layer 1 - Red" DefaultValue="0" Max="255" Min="0" Name="Red_L1" Type="integer" Group="Layer Default Color" TabName="Layer Settings">
-		<Condition Expression="(Layers = 1)" Diagnostic=""/>	
-	</RefParameter>
+    <RefParameter Comment="Layer 1 - Red" DefaultValue="0" Max="255" Min="0" Name="Red_L1" Type="integer" Group="Layer Default Color" TabName="Layer Settings">
+        <Condition Expression="(Layers = 1)" Diagnostic=""/>
+    </RefParameter>
     <RefParameter Comment="Layer 1 - Red"  Visible="false" DefaultValue="0" Max="255" Min="0" Name="Red_L1" Type="integer" Group="Layer Default Color" TabName="Layer Settings">
     </RefParameter>
-    
-	<RefParameter Comment="Layer 1 - Green" DefaultValue="0" Max="255" Min="0" Name="Green_L1" Type="integer" Group="Layer Default Color" TabName="Layer Settings">
-		<Condition Expression="(Layers = 1)" Diagnostic=""/>	
-	</RefParameter>
+
+    <RefParameter Comment="Layer 1 - Green" DefaultValue="0" Max="255" Min="0" Name="Green_L1" Type="integer" Group="Layer Default Color" TabName="Layer Settings">
+        <Condition Expression="(Layers = 1)" Diagnostic=""/>
+    </RefParameter>
     <RefParameter Comment="Layer 1 - Green" Visible="false" DefaultValue="0" Max="255" Min="0" Name="Green_L1" Type="integer" Group="Layer Default Color" TabName="Layer Settings">
     </RefParameter>
-    
-	<RefParameter Comment="Layer 1 - Blue" DefaultValue="0" Max="255" Min="0" Name="Blue_L1" Type="integer" Group="Layer Default Color" TabName="Layer Settings">
-		<Condition Expression="(Layers = 1)" Diagnostic=""/>	
-	</RefParameter>
+
+    <RefParameter Comment="Layer 1 - Blue" DefaultValue="0" Max="255" Min="0" Name="Blue_L1" Type="integer" Group="Layer Default Color" TabName="Layer Settings">
+        <Condition Expression="(Layers = 1)" Diagnostic=""/>
+    </RefParameter>
     <RefParameter Comment="Layer 1 - Blue" Visible="false" DefaultValue="0" Max="255" Min="0" Name="Blue_L1" Type="integer" Group="Layer Default Color" TabName="Layer Settings">
     </RefParameter>
     <RefParameter Comment="Layer 1 - Alpha" DefaultValue="0" Max="255" Min="0" Name="Alpha0_L1" Type="integer" Group="Layer Default Color" TabName="Layer Settings">
-        <Condition Expression="(Layers = 1)" Diagnostic=""/>	
+        <Condition Expression="(Layers = 1)" Diagnostic=""/>
     </RefParameter>
     <RefParameter Comment="Layer 1 - Alpha" Visible="false" DefaultValue="0" Max="255" Min="0" Name="Alpha0_L1" Type="integer" Group="Layer Default Color" TabName="Layer Settings">
     </RefParameter>
-   
-	
-	
-	<!-- Layer 1 Windows Position -->
-	<RefParameter Comment="Layer 1 - Window Horizontal Start" DefaultValue="0" Max="4095" Min="0" Name="WindowX0_L1" Type="integer" Group="Windows Position" TabName="Layer Settings">
-		<Description>Configures the Window Horizontal Start Position Window X0.</Description>
-		<Condition Expression="(Layers = 1)" Diagnostic=""/>
-	</RefParameter>
-    
+
+
+
+    <!-- Layer 1 Windows Position -->
+    <RefParameter Comment="Layer 1 - Window Horizontal Start" DefaultValue="0" Max="4095" Min="0" Name="WindowX0_L1" Type="integer" Group="Windows Position" TabName="Layer Settings">
+        <Description>Configures the Window Horizontal Start Position Window X0.</Description>
+        <Condition Expression="(Layers = 1)" Diagnostic=""/>
+    </RefParameter>
+
     <RefParameter Comment="Layer 1 - Window Horizontal Start" Visible="false" DefaultValue="0" Max="4095" Min="0" Name="WindowX0_L1" Type="integer" Group="Windows Position" TabName="Layer Settings">
     </RefParameter>
-	<RefParameter Comment="Layer 1 - Window Horizontal Stop" DefaultValue="0" Max="4095" Min="0" Name="WindowX1_L1" Type="integer" Group="Windows Position" TabName="Layer Settings">
-		<Description>Configures the Window Horizontal Stop Position Window X1.
-                &lt;br&gt; &lt; For information : &lt;/b&gt; &lt;br&gt;
-         When the graphics is enabled the Window Horizontal Stop value will be devided by zone value(the parameter zone is in graphics parameters settings).
-                </Description>
-		<Condition Expression="(Layers = 1)" Diagnostic=""/>
-	</RefParameter>
-    
+    <RefParameter Comment="Layer 1 - Window Horizontal Stop" DefaultValue="0" Max="4095" Min="0" Name="WindowX1_L1" Type="integer" Group="Windows Position" TabName="Layer Settings">
+        <Description>Configures the Window Horizontal Stop Position Window X1.
+            &lt;br&gt; &lt; For information : &lt;/b&gt; &lt;br&gt;
+            When the graphics is enabled the Window Horizontal Stop value will be devided by zone value(the parameter zone is in graphics parameters settings).
+        </Description>
+        <Condition Expression="(Layers = 1)" Diagnostic=""/>
+    </RefParameter>
+
     <RefParameter Comment="Layer 1 - Window Horizontal Stop" Visible="false" DefaultValue="0" Max="4095" Min="0" Name="WindowX1_L1" Type="integer" Group="Windows Position" TabName="Layer Settings">
     </RefParameter>
-	<RefParameter Comment="Layer 1 - Window Vertical Start" DefaultValue="0" Max="2047" Min="0" Name="WindowY0_L1" Type="integer" Group="Windows Position" TabName="Layer Settings">
-		<Description>Configures the Window vertical Start Position Window Y0.</Description>
-		<Condition Expression="(Layers = 1)" Diagnostic=""/>
-	</RefParameter>
+    <RefParameter Comment="Layer 1 - Window Vertical Start" DefaultValue="0" Max="2047" Min="0" Name="WindowY0_L1" Type="integer" Group="Windows Position" TabName="Layer Settings">
+        <Description>Configures the Window vertical Start Position Window Y0.</Description>
+        <Condition Expression="(Layers = 1)" Diagnostic=""/>
+    </RefParameter>
     <RefParameter Comment="Layer 1 - Window Vertical Start" Visible="false" DefaultValue="0" Max="2047" Min="0" Name="WindowY0_L1" Type="integer" Group="Windows Position" TabName="Layer Settings">
     </RefParameter>
-    
-	<RefParameter Comment="Layer 1 - Window Vertical Stop" DefaultValue="0" Max="2047" Min="0" Name="WindowY1_L1" Type="integer" Group="Windows Position"  TabName="Layer Settings">
-		<Description>Configures the Window vertical Stop Position Window Y1.</Description>
-		<Condition Expression="(Layers = 1)" Diagnostic=""/>
-	</RefParameter>
+
+    <RefParameter Comment="Layer 1 - Window Vertical Stop" DefaultValue="0" Max="2047" Min="0" Name="WindowY1_L1" Type="integer" Group="Windows Position"  TabName="Layer Settings">
+        <Description>Configures the Window vertical Stop Position Window Y1.</Description>
+        <Condition Expression="(Layers = 1)" Diagnostic=""/>
+    </RefParameter>
     <RefParameter Comment="Layer 1 - Window Vertical Stop" Visible="false" DefaultValue="0" Max="2047" Min="0" Name="WindowY1_L1" Type="integer" Group="Windows Position"  TabName="Layer Settings">
     </RefParameter>
-    
-    
-	<!-- Layer 1 Pixel Format for RGB888 -->
-	
-	<RefParameter Comment="Layer 1 - Pixel Format" DefaultValue="LTDC_PIXEL_FORMAT_ARGB8888" Name="PixelFormat_L1" Type="list" Group="Pixel Parameters" TabName="Layer Settings">
-		<Description>Specifies the pixel format.</Description>
-		<Condition Expression="(Layers = 1)" Diagnostic=""/>
-		<PossibleValue Comment="ARGB8888" Value="LTDC_PIXEL_FORMAT_ARGB8888"/>
-		<PossibleValue Comment="ABGR8888" Value="LTDC_PIXEL_FORMAT_ABGR8888"/>
-        <PossibleValue Comment="RGBA8888" Value="LTDC_PIXEL_FORMAT_RGBA8888"/>
-        <PossibleValue Comment="BGRA8888" Value="LTDC_PIXEL_FORMAT_BGRA8888"/>
+
+
+    <!-- Layer 1 Pixel Format for RGB888 -->
+
+    <RefParameter Comment="Layer 1 - Pixel Format" DefaultValue="LTDC_PIXEL_FORMAT_ARGB8888" Name="PixelFormat_L1" Type="list" Group="Pixel Parameters" TabName="Layer Settings">
+        <Description>Specifies the pixel format.</Description>
+        <Condition Expression="(Layers = 1)" Diagnostic=""/>
+        <PossibleValue Comment="ARGB8888" Value="LTDC_PIXEL_FORMAT_ARGB8888"/>
+        <PossibleValue Comment="RGB888" Value="LTDC_PIXEL_FORMAT_RGB888" Semaphore="Semaphore_LTDC_UsedFor_GFXMMU"
+                       Condition="Semaphore_GFXMMU_256BLOCKS"
+                       Diagnostic="RGB888 format not available when GFXMMU used in 256 blocks mode"
+        />
         <PossibleValue Comment="RGB565" Value="LTDC_PIXEL_FORMAT_RGB565"/>
-        <PossibleValue Comment="BGR565" Value="LTDC_PIXEL_FORMAT_RGB565"/>
-		<PossibleValue Comment="RGB888" Value="LTDC_PIXEL_FORMAT_RGB888" Semaphore="Semaphore_LTDC_UsedFor_GFXMMU"
-			Condition="Semaphore_GFXMMU_256BLOCKS"
-			Diagnostic="RGB888 format not available when GFXMMU used in 256 blocks mode"
-		/>
-		<PossibleValue Comment="ARGB1555" Value="LTDC_PIXEL_FORMAT_ARGB1555"/>
-		<PossibleValue Comment="ARGB4444" Value="LTDC_PIXEL_FORMAT_ARGB4444"/>
-		<PossibleValue Comment="L8" Value="LTDC_PIXEL_FORMAT_L8"/>
-		<PossibleValue Comment="AL44" Value="LTDC_PIXEL_FORMAT_AL44"/>
-		<PossibleValue Comment="AL88" Value="LTDC_PIXEL_FORMAT_AL88"/>
-		<PossibleValue Comment="Flexible ARGB" Value="LTDC_PIXEL_FORMAT_FLEXIBLE_ARGB"/>
-        <PossibleValue Comment="Flexible YUV CoPlanar" Value="LTDC_PIXEL_FORMAT_YUV_COPLANAR"/>
-	</RefParameter>
+        <PossibleValue Comment="ARGB1555" Value="LTDC_PIXEL_FORMAT_ARGB1555"/>
+        <PossibleValue Comment="ARGB4444" Value="LTDC_PIXEL_FORMAT_ARGB4444"/>
+        <PossibleValue Comment="L8" Value="LTDC_PIXEL_FORMAT_L8"/>
+        <PossibleValue Comment="AL44" Value="LTDC_PIXEL_FORMAT_AL44"/>
+        <PossibleValue Comment="AL88" Value="LTDC_PIXEL_FORMAT_AL88"/>
+    </RefParameter>
     <RefParameter Comment="Layer 1 - Pixel Format" Visible="false" DefaultValue="LTDC_PIXEL_FORMAT_ARGB8888" Name="PixelFormat_L1" Type="list" Group="Pixel Parameters" TabName="Layer Settings">
     </RefParameter>
-	<!-- Layer 1 Pixel Format for RGB666 and RGB565 : was a bug... -->
-	
-	<RefParameter Comment="Layer 1 - Pixel Format" DefaultValue="LTDC_PIXEL_FORMAT_RGB565" Name="PixelFormat_L1_not888" Type="list" Group="Pixel Parameters" TabName="Layer Settings">
-		<Description>Specifies the pixel format.</Description>
-		<Condition Expression="(Layers = 1)" Diagnostic=""/>
-		<PossibleValue Comment="RGB565" Value="LTDC_PIXEL_FORMAT_RGB565"    />
-		<PossibleValue Comment="ARGB1555" Value="LTDC_PIXEL_FORMAT_ARGB1555"    />
-		<PossibleValue Comment="ARGB4444" Value="LTDC_PIXEL_FORMAT_ARGB4444"  />
-		<PossibleValue Comment="L8" Value="LTDC_PIXEL_FORMAT_L8"    />
-		<PossibleValue Comment="AL44" Value="LTDC_PIXEL_FORMAT_AL44"  />
-		<PossibleValue Comment="AL88" Value="LTDC_PIXEL_FORMAT_AL88"   />
-	</RefParameter>
+    <!-- Layer 1 Pixel Format for RGB666 and RGB565 : was a bug...
 
-	<!-- Layer 1 Flexible YUV CoPlanar  -->
-    <RefParameter Comment="Layer 1 - Y/U/V Address" DefaultValue="0" Name="YuvAddress_L1" Type="StringRW" Group="Flexible YUV" TabName="Layer Settings">
-        <Description>Specifies the Y/U/V address.</Description>
-        <Condition Expression="(PixelFormat_L1 = LTDC_PIXEL_FORMAT_YUV_COPLANAR)" Diagnostic=""/>
+    <RefParameter Comment="Layer 1 - Pixel Format" DefaultValue="LTDC_PIXEL_FORMAT_RGB565" Name="PixelFormat_L1_not888" Type="list" Group="Pixel Parameters" TabName="Layer Settings">
+        <Description>Specifies the pixel format.</Description>
+        <Condition Expression="(Layers = 1)" Diagnostic=""/>
+        <PossibleValue Comment="RGB565" Value="LTDC_PIXEL_FORMAT_RGB565"    />
+        <PossibleValue Comment="ARGB1555" Value="LTDC_PIXEL_FORMAT_ARGB1555"    />
+        <PossibleValue Comment="ARGB4444" Value="LTDC_PIXEL_FORMAT_ARGB4444"  />
+        <PossibleValue Comment="L8" Value="LTDC_PIXEL_FORMAT_L8"    />
+        <PossibleValue Comment="AL44" Value="LTDC_PIXEL_FORMAT_AL44"  />
+        <PossibleValue Comment="AL88" Value="LTDC_PIXEL_FORMAT_AL88"   />
     </RefParameter>
-    <RefParameter Comment="Layer 1 - Y/U/V Address" DefaultValue="0" Name="YuvAddress_L1" Type="String" Group="Flexible YUV" TabName="Layer Settings"  Visible="false">
-        <Description>Specifies the Y/U/V address.</Description>
+    -->
+
+    <!-- Layer 1 Blending  -->
+
+    <RefParameter Comment="Layer 1 - Alpha constant for blending" DefaultValue="0" Max="255" Min="0" Name="Alpha_L1" Type="integer" Group="Blending" TabName="Layer Settings">
+        <Description>Specifies the constant alpha used for blending.</Description>
+        <Condition Expression="(Layers = 1)" Diagnostic=""/>
     </RefParameter>
-    <RefParameter Comment="Layer 1 - Chrominance Order" Name="ChrominanceOrder_L1" Type="List" Group="Flexible YUV" TabName="Layer Settings" DefaultValue="LTDC_YUV_CHROMIANCE_ORDER_U_FIRST">
-        <Description>Specifies the Chrominance Order.</Description>
-        <Condition Expression="(PixelFormat_L1 = LTDC_PIXEL_FORMAT_YUV_COPLANAR)" Diagnostic=""/>
-		<PossibleValue Comment="U First (from LSB)" Value="LTDC_YUV_CHROMIANCE_ORDER_U_FIRST"/>
-        <PossibleValue Comment="V First (from LSB)" Value="LTDC_YUV_CHROMIANCE_ORDER_V_FIRST"/>
-    </RefParameter>
-    <RefParameter Comment="Layer 1 - Chrominance Order" Name="ChrominanceOrder_L1" Type="String" Group="Flexible YUV" TabName="Layer Settings" Visible="false">
-        <Description>Specifies the Chrominance Order.</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 1 - Luminance Order" Name="LuminanceOrder_L1" Type="List" Group="Flexible YUV" TabName="Layer Settings" DefaultValue="LTDC_YUV_LUMINANCE_ORDER_ODD_FIRST">
-        <Description>Specifies the Luminance Order.</Description>
-        <Condition Expression="(PixelFormat_L1 = LTDC_PIXEL_FORMAT_YUV_COPLANAR)" Diagnostic=""/>
-		<PossibleValue Comment="Odd First (from LSB)" Value="LTDC_YUV_LUMINANCE_ORDER_ODD_FIRST"/>
-        <PossibleValue Comment="Even First (from LSB)" Value="LTDC_YUV_LUMINANCE_ORDER_EVEN_FIRST"/>
-    </RefParameter>
-    <RefParameter Comment="Layer 1 - Luminance Order" Name="LuminanceOrder_L1" Type="String" Group="Flexible YUV" TabName="Layer Settings" DefaultValue="LTDC_YUV_LUMINANCE_ORDER_ODD_FIRST" Visible="false">
-        <Description>Specifies the Luminance Order.</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 1 - Luminance Rescale" Name="LuminanceRescale_L1" Type="List" Group="Flexible YUV" TabName="Layer Settings" DefaultValue="LTDC_YUV_LUMINANCE_RESCALE_DISABLE">
-        <Description>Specifies the Luminance Rescale.</Description>
-        <Condition Expression="(PixelFormat_L1 = LTDC_PIXEL_FORMAT_YUV_COPLANAR)" Diagnostic=""/>
-		<PossibleValue Comment="Enable" Value="LTDC_YUV_LUMINANCE_RESCALE_ENABLE"/>
-        <PossibleValue Comment="Disable" Value="LTDC_YUV_LUMINANCE_RESCALE_DISABLE"/>
-    </RefParameter>
-    <RefParameter Comment="Layer 1 - Luminance Rescale" Name="LuminanceRescale_L1" Type="String" Group="Flexible YUV" TabName="Layer Settings"  DefaultValue="0" Visible="false">
-        <Description>Specifies the Luminance Rescale.</Description>
-    </RefParameter>
-     <RefParameter Comment="Layer 1 - YUV Order" Name="YuvOrder_L1" Type="List" Group="Flexible YUV" TabName="Layer Settings" DefaultValue="LTDC_YUV_ORDER_LUMINANCE_FIRST">
-        <Description>Specifies the YUV Order.</Description>
-        <Condition Expression="(PixelFormat_L1 = LTDC_PIXEL_FORMAT_YUV_COPLANAR)" Diagnostic=""/>
-		<PossibleValue Comment="Luminance First (from LSB)" Value="LTDC_YUV_ORDER_LUMINANCE_FIRST"/>
-        <PossibleValue Comment="Chrominance First (from LSB)" Value="LTDC_YUV_ORDER_CHROMINANCE_FIRST"/>
-    </RefParameter>
-    <RefParameter Comment="Layer 1 - YUV Order" Name="YuvOrder_L1" Type="String" Group="Flexible YUV" TabName="Layer Settings" DefaultValue="0" Visible="false">
-        <Description>Specifies the YUV Order.</Description>
-    </RefParameter>
-    <RefParameter Comment="Layer 1 - Color Converter" Name="ColorConverter_L1" Type="List" Group="Flexible YUV" TabName="Layer Settings" DefaultValue="LTDC_YUV2RGBCONVERTOR_BT601_REDUCED_RANGE">
-        <Description>Specifies Color Converter.</Description>
-        <Condition Expression="(PixelFormat_L1 = LTDC_PIXEL_FORMAT_YUV_COPLANAR)" Diagnostic=""/>
-		 <PossibleValue Comment="YUV BT601 reduced range to RGB" Value="LTDC_YUV2RGBCONVERTOR_BT601_REDUCED_RANGE"/>
-        <PossibleValue Comment="YUV BT709 reduced range to RGB" Value="LTDC_YUV2RGBCONVERTOR_BT709_REDUCED_RANGE"/>
-        <PossibleValue Comment="YUV BT601 full range to RGB" Value="LTDC_YUV2RGBCONVERTOR_BT601_FULL_RANGE"/>
-        <PossibleValue Comment="YUV BT709 full range  to RGB" Value="LTDC_YUV2RGBCONVERTOR_BT709_FULL_RANGE"/>
-    </RefParameter>
-    <RefParameter Comment="Layer 1 - Color Converter" Name="ColorConverter_L1" Type="String" Group="Flexible YUV" TabName="Layer Settings" DefaultValue="0" >
-        <Description>Specifies Color Converter.</Description>
-    </RefParameter>
-	
-	<!-- Layer 1 Blending  -->
-	
-	<RefParameter Comment="Layer 1 - Alpha constant for blending" DefaultValue="0" Max="255" Min="0" Name="Alpha_L1" Type="integer" Group="Blending" TabName="Layer Settings">
-		<Description>Specifies the constant alpha used for blending.</Description>
-		<Condition Expression="(Layers = 1)" Diagnostic=""/>
-	</RefParameter>
     <RefParameter Comment="Layer 1 - Alpha constant for blending" Visible="false" DefaultValue="0" Max="255" Min="0" Name="Alpha_L1" Type="integer" Group="Blending" TabName="Layer Settings">
     </RefParameter>
-	<RefParameter Comment="Layer 1 - Blending Factor1" DefaultValue="LTDC_BLENDING_FACTOR1_CA" Name="BlendingFactor1_L1" Type="list" Group="Blending" TabName="Layer Settings">
-		<Description>Select the blending factor 1:
-			&lt;br&gt; LTDC_BLENDING_FACTOR1_CA: blending factor is Alpha constant 
-			&lt;br&gt; LTDC_BLENDING_FACTOR1_PAxCA: blending factor is Alpha constant x Pixel Alpha 
-		</Description>
-		<Condition Expression="(Layers = 1)" Diagnostic=""/>
-		<PossibleValue Comment="Alpha constant " Value="LTDC_BLENDING_FACTOR1_CA"/>
-		<PossibleValue Comment="Alpha constant x Pixel Alpha " Value="LTDC_BLENDING_FACTOR1_PAxCA"/>
-	</RefParameter>
+    <RefParameter Comment="Layer 1 - Blending Factor1" DefaultValue="LTDC_BLENDING_FACTOR1_CA" Name="BlendingFactor1_L1" Type="list" Group="Blending" TabName="Layer Settings">
+        <Description>Select the blending factor 1:
+            &lt;br&gt; LTDC_BLENDING_FACTOR1_CA: blending factor is Alpha constant
+            &lt;br&gt; LTDC_BLENDING_FACTOR1_PAxCA: blending factor is Alpha constant x Pixel Alpha
+        </Description>
+        <Condition Expression="(Layers = 1)" Diagnostic=""/>
+        <PossibleValue Comment="Alpha constant " Value="LTDC_BLENDING_FACTOR1_CA"/>
+        <PossibleValue Comment="Alpha constant x Pixel Alpha " Value="LTDC_BLENDING_FACTOR1_PAxCA"/>
+    </RefParameter>
     <RefParameter Comment="Layer 1 - Blending Factor1" Visible="false" DefaultValue="LTDC_BLENDING_FACTOR1_CA" Name="BlendingFactor1_L1" Type="list" Group="Blending" TabName="Layer Settings">
     </RefParameter>
-	<RefParameter Comment="Layer 1 - Blending Factor2" DefaultValue="LTDC_BLENDING_FACTOR2_CA" Name="BlendingFactor2_L1" Type="list" Group="Blending" TabName="Layer Settings">
-		<Description>Select the blending factor 2.
-			&lt;br&gt; LTDC_BLENDING_FACTOR2_CA: blending factor is Alpha constant 
-			&lt;br&gt; LTDC_BLENDING_FACTOR2_PAxCA: blending factor is Alpha constant x Pixel Alpha 
-		</Description>
-		<Condition Expression="(Layers = 1)" Diagnostic=""/>
-		<PossibleValue Comment="Alpha constant " Value="LTDC_BLENDING_FACTOR2_CA"/>
-		<PossibleValue Comment="Alpha constant x Pixel Alpha " Value="LTDC_BLENDING_FACTOR2_PAxCA"/>
-	</RefParameter>
+    <RefParameter Comment="Layer 1 - Blending Factor2" DefaultValue="LTDC_BLENDING_FACTOR2_CA" Name="BlendingFactor2_L1" Type="list" Group="Blending" TabName="Layer Settings">
+        <Description>Select the blending factor 2.
+            &lt;br&gt; LTDC_BLENDING_FACTOR2_CA: blending factor is Alpha constant
+            &lt;br&gt; LTDC_BLENDING_FACTOR2_PAxCA: blending factor is Alpha constant x Pixel Alpha
+        </Description>
+        <Condition Expression="(Layers = 1)" Diagnostic=""/>
+        <PossibleValue Comment="Alpha constant " Value="LTDC_BLENDING_FACTOR2_CA"/>
+        <PossibleValue Comment="Alpha constant x Pixel Alpha " Value="LTDC_BLENDING_FACTOR2_PAxCA"/>
+    </RefParameter>
     <RefParameter Comment="Layer 1 - Blending Factor2" Visible="false" DefaultValue="LTDC_BLENDING_FACTOR2_CA" Name="BlendingFactor2_L1" Type="list" Group="Blending" TabName="Layer Settings">
     </RefParameter>
-	<!-- Layer 1 - Frame Buffer RefParameters for LTDC -->
-	<RefParameter Comment="Layer 1 - Color Frame Buffer Start Adress" DefaultValue="0" Max="4294967295" Min="0" Name="FBStartAdress_L1" Type="String" Group="Frame Buffer" TabName="Layer Settings">
+    <!-- Layer 1 - Frame Buffer RefParameters for LTDC -->
+
+    <RefParameter Comment="Layer 1 - Color Frame Buffer Start Adress" DefaultValue="0" Max="4294967295" Min="0" Name="FBStartAdress_L1" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
         <Description>Configures the color frame buffer address </Description>
-        <Condition Expression="(Layers = 1)&amp;(PixelFormat_L1=LTDC_PIXEL_FORMAT_YUV_COPLANAR)" Diagnostic=""/>
+        <Condition Expression="(Layers = 1)&amp;(!Semaphore_GFXMMU_used_forLTDC)" Diagnostic=""/>
     </RefParameter>
-	<RefParameter Comment="Layer 1 - Color Frame Buffer Start Adress" DefaultValue="0" Max="4294967295" Min="0" Name="FBStartAdress_L1" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
-		<Description>Configures the color frame buffer address </Description>
-		<Condition Expression="(Layers = 1)&amp;(!Semaphore_GFXMMU_used_forLTDC)" Diagnostic=""/>
-    </RefParameter>
-	<RefParameter Comment="Layer 1 - Color Frame Buffer Start Adress" DefaultValue="GFXMMU_VIRTUAL_BUFFER0_BASE" Name="FBStartAdress_L1" Type="list" Group="Frame Buffer" TabName="Layer Settings">
+    <RefParameter Comment="Layer 1 - Color Frame Buffer Start Adress" DefaultValue="GFXMMU_VIRTUAL_BUFFER0_BASE" Name="FBStartAdress_L1" Type="list" Group="Frame Buffer" TabName="Layer Settings">
         <Description>Configures the color frame buffer address </Description>
-		<Condition Expression="(Layers = 1)&amp;(Semaphore_GFXMMU_used_forLTDC)" Diagnostic=""/>
-		<PossibleValue Comment="GFXMMU_VIRTUAL_BUFFER0_BASE" Value="GFXMMU_VIRTUAL_BUFFER0_BASE"/>
-		<PossibleValue Comment="GFXMMU_VIRTUAL_BUFFER1_BASE" Value="GFXMMU_VIRTUAL_BUFFER1_BASE"/>
-		<PossibleValue Comment="GFXMMU_VIRTUAL_BUFFER2_BASE" Value="GFXMMU_VIRTUAL_BUFFER2_BASE"/>
-		<PossibleValue Comment="GFXMMU_VIRTUAL_BUFFER3_BASE" Value="GFXMMU_VIRTUAL_BUFFER3_BASE"/>
+        <Condition Expression="(Layers = 1)&amp;(Semaphore_GFXMMU_used_forLTDC)" Diagnostic=""/>
+        <PossibleValue Comment="GFXMMU_VIRTUAL_BUFFER0_BASE" Value="GFXMMU_VIRTUAL_BUFFER0_BASE"/>
+        <PossibleValue Comment="GFXMMU_VIRTUAL_BUFFER1_BASE" Value="GFXMMU_VIRTUAL_BUFFER1_BASE"/>
+        <PossibleValue Comment="GFXMMU_VIRTUAL_BUFFER2_BASE" Value="GFXMMU_VIRTUAL_BUFFER2_BASE"/>
+        <PossibleValue Comment="GFXMMU_VIRTUAL_BUFFER3_BASE" Value="GFXMMU_VIRTUAL_BUFFER3_BASE"/>
     </RefParameter>
-    <RefParameter Comment="" Visible="false" DefaultValue="0" Max="4294967295" Min="0" Name="FBStartAdress_L1" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
+    <RefParameter Comment="Layer 1 - Color Frame Buffer Start Adress" Visible="false" DefaultValue="0" Max="4294967295" Min="0" Name="FBStartAdress_L1" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
     </RefParameter>
-	<!-- replaced w/ next statement. to be confirmed
-	
+    <!-- replaced w/ next statement. to be confirmed
+
     <RefParameter Comment="Layer 1 - Color Frame Buffer Line Length (Image Width)" DefaultValue="0" Max="8191" Min="0" Name="ImageWidth_L1" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
             <Description>Configures the color frame buffer line length.</Description>
-             <Condition Expression="(Layers = 1)" Diagnostic=""/>
+            <Condition Expression="(Layers = 1)" Diagnostic=""/>
     </RefParameter>
     -->
     <!-- max value is set to the pitch value -->
     <RefParameter Comment="Layer 1 - Color Frame Buffer Line Length (Image Width)" DefaultValue="0" Max="8191" Min="0" Name="ImageWidth_L1" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
         <Description>Configures the color frame buffer line length.
-        &lt;br&gt; &lt; For information : &lt;/b&gt; &lt;br&gt;
-            When the graphics is enabled the color frame buffer line length value will be devided by zone value(the parameter zone is in Graphics parameters settings).
-        </Description>
-        <Condition Expression="(Layers = 1)&amp;(PixelFormat_L1 = LTDC_PIXEL_FORMAT_YUV_COPLANAR)" Diagnostic="" />
-    </RefParameter> 
-    <RefParameter Comment="Layer 1 - Color Frame Buffer Line Length (Image Width)" DefaultValue="0" Max="8191" Min="0" Name="ImageWidth_L1" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
-        <Description>Configures the color frame buffer line length.
-        &lt;br&gt; &lt; For information : &lt;/b&gt; &lt;br&gt;
+            &lt;br&gt; &lt; For information : &lt;/b&gt; &lt;br&gt;
             When the graphics is enabled the color frame buffer line length value will be devided by zone value(the parameter zone is in Graphics parameters settings).
         </Description>
         <Condition Expression="(Layers = 1)&amp;(!Semaphore_GFXMMU_used_forLTDC)" Diagnostic=""/>
-    </RefParameter> 
-    <RefParameter Comment="Layer 1 - Color Frame Buffer Line Length (Image Width)" DefaultValue="0" Max="8191" Min="0" Name="ImageWidth_L1" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
+    </RefParameter>
+    <RefParameter Comment="Layer 1 - Color Frame Buffer Line Length (Image Width)" DefaultValue="0" Max="=Pitch_L1" Min="0" Name="ImageWidth_L1" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
         <Description>Configures the color frame buffer line length.
-         &lt;br&gt; &lt; For information : &lt;/b&gt; &lt;br&gt;
+            &lt;br&gt; &lt; For information : &lt;/b&gt; &lt;br&gt;
             When the graphics is enabled the color frame buffer line length value will be devided by zone value(the parameter zone is in Graphics parameters settings).</Description>
         <Condition Expression="(Layers = 1)&amp;(Semaphore_GFXMMU_used_forLTDC)" Diagnostic=""/>
     </RefParameter>
-    <RefParameter Comment="Layer 1 - Color Frame Buffer Line Length (Image Width)" Visible="false" DefaultValue="0" Max="8191" Min="0" Name="ImageWidth_L1" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
+    <RefParameter Comment="Layer 1 - Color Frame Buffer Line Length (Image Width)" Visible="false" DefaultValue="0" Max="=Pitch_L1" Min="0" Name="ImageWidth_L1" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
     </RefParameter>
-        
+
     <RefParameter Comment="Layer 1 - Color Frame Buffer Number of Lines (Image Height)" DefaultValue="0" Max="2047" Min="0" Name="ImageHeight_L1" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
         <Description>Specifies the number of line in frame buffer.</Description>
         <Condition Expression="(Layers = 1)" Diagnostic=""/>
     </RefParameter>
     <RefParameter Comment="Layer 1 - Color Frame Buffer Number of Lines (Image Height)" Visible="false" DefaultValue="0" Max="2047" Min="0" Name="ImageHeight_L1" Type="integer" Group="Frame Buffer" TabName="Layer Settings">
     </RefParameter>
-    
-	
+
+
     <!-- Layer 1 Line Pitch - GXMMU not used -->
     <!--
     <RefParameter Comment="Layer 1 - Color Frame Line Pitch" DefaultValue="=ImageWidth_L1" Name="Pitch_L1" Type="string" Group="Frame Buffer" TabName="Layer Settings">
@@ -918,9 +463,9 @@
             <Condition Expression="(Layers = 1)&amp;(!GFXMMU_used_forLTDC)" Diagnostic=""/>
 </RefParameter>
     -->
-	
+
     <!-- Layer 1 Line Pitch - GFXMMU used in 192 blocks mode -->
-	
+
     <RefParameter Comment="Layer 1 - Color Frame Line Pitch" DefaultValue="0" Name="Pitch_L1" Type="string" Group="Frame Buffer" TabName="Layer Settings">
         <Description>Specifies in pixel the line pitch (maximum number of line in frame buffer).</Description>
         <PossibleValue Comment="768" Value="768" Action="Disable"/>
@@ -941,17 +486,14 @@
         <PossibleValue Comment="3072" Value="3072" Action="Disable"/>
         <Condition Expression="(Layers = 1)&amp;(Semaphore_GFXMMU_used_forLTDC)&amp;(Semaphore_GFXMMU_192BLOCKS)&amp;((PixelFormat_L1 = LTDC_PIXEL_FORMAT_L8)|(PixelFormat_L1 = LTDC_PIXEL_FORMAT_AL44))" Diagnostic=""/>
     </RefParameter>
-    <RefParameter Comment="Layer 1 - Color Frame Line Pitch" DefaultValue="0" Name="Pitch_L1" Type="string" Group="Frame Buffer" TabName="Layer Settings" Visible="false">
-        <Description>Specifies in pixel the line pitch (maximum number of line in frame buffer).</Description>
-    </RefParameter>
-	
+
     <!-- Layer 1 Line Pitch - GFXMMU used in 256 blocks mode -->
-	
+
     <RefParameter Comment="Layer 1 - Color Frame Line Pitch" DefaultValue="0" Name="Pitch_L1" Type="string" Group="Frame Buffer" TabName="Layer Settings">
         <Description>Specifies in pixel the line pitch (maximum number of line in frame buffer).</Description>
         <PossibleValue Comment="1024" Value="1024" Action="Disable"/>
         <Condition Expression="(Layers = 1)&amp;(Semaphore_GFXMMU_used_forLTDC)&amp;(Semaphore_GFXMMU_256BLOCKS)&amp;((PixelFormat_L1 = LTDC_PIXEL_FORMAT_ARGB8888))" Diagnostic=""/>
-    </RefParameter> 	
+    </RefParameter>
     <RefParameter Comment="Layer 1 - Color Frame Line Pitch" DefaultValue="0" Name="Pitch_L1" Type="string" Group="Frame Buffer" TabName="Layer Settings">
         <Description>Specifies in pixel the line pitch (maximum number of line in frame buffer).</Description>
         <PossibleValue Comment="2048" Value="2048" Action="Disable"/>
@@ -967,24 +509,9 @@
     <RefParameter Comment="Layer 1 - Color Frame Line Pitch" Visible="false" DefaultValue="0" Name="Pitch_L1" Type="string" Group="Frame Buffer" TabName="Layer Settings">
     </RefParameter>
 
-    <!-- Display -->
-    <RefParameter Comment="YUV HDTV" Visible="false" DefaultValue="LTDC_OUT_YUV_HDTV" Name="Display" Type="string" >
-        <Condition Expression="Semaphore_LTDC_YUV_HDTV_16_bits" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="YUV SDTV" Visible="false" DefaultValue="LTDC_OUT_YUV_SDTV" Name="Display" Type="string" >
-        <Condition Expression="Semaphore_LTDC_YUV_SDTV_16_bits" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="YVU HDTV" Visible="false" DefaultValue="LTDC_OUT_YVU_HDTV" Name="Display" Type="string" >
-        <Condition Expression="Semaphore_LTDC_YVU_HDTV_16_bits" Diagnostic=""/>
-    </RefParameter>
-    <RefParameter Comment="YVU SDTV" Visible="false" DefaultValue="LTDC_OUT_YVU_SDTV" Name="Display" Type="string" >
-        <Condition Expression="Semaphore_LTDC_YVU_SDTV_16_bits" Diagnostic=""/>
-    </RefParameter>
-    <!-- end Display -->
-    
     <!-- ***************  END OF LAYER 1 SETTINGS *************** -->
-	
-	
+
+
     <!-- RefModes 'RGB888' for LTDC -->
     <RefMode Name="RGB888">
         <ConfigForMode>Ltdc_Init</ConfigForMode>
@@ -992,161 +519,94 @@
         <ConfigForMode>LTDC_ConfigLayer1</ConfigForMode>
         <ConfigForMode>LTDC_setPitch_Layer0</ConfigForMode>
         <ConfigForMode>LTDC_setPitch_Layer1</ConfigForMode>
-        <ConfigForMode>LTDC_pixel_format_argb</ConfigForMode>
-        <ConfigForMode>LTDC_pixel_format_FlexYUVSemiPlanar</ConfigForMode>
-        <ConfigForMode>LTDC_pixel_format_FlexYUVFullPlanar</ConfigForMode>
-        <ConfigForMode>LTDC_pixel_format_FlexYUVCoPlanar</ConfigForMode>
-        <ConfigForMode>LTDC_PIXEL_FORMAT_FLEXIBLE_ARGB_L1</ConfigForMode>
-        <ConfigForMode>LTDC_pixel_format_FlexYUVCoPlanar_L1</ConfigForMode>
-		
-		
+
+
         <!-- Width Synchronization RefParameters for LTDC -->
         <Parameter Name="HSync"/>
         <Parameter Name="HBP"/>
-              <!-- WARNING : ActiveW parameter is also used by X-CUBE-TOUCHGFX -->
+        <!-- WARNING : ActiveW parameter is also used by X-CUBE-TOUCHGFX -->
         <Parameter Name="ActiveW"/>
         <Parameter Name="HFP"/>
         <Parameter Name="HorizontalSync"/>
         <Parameter Name="AccumulatedHBP"/>
         <Parameter Name="AccumulatedActiveW"/>
         <Parameter Name="TotalWidth"/>
-		
+
         <!-- Height Synchronization RefParameters for LTDC -->
         <Parameter Name="VSync"/>
         <Parameter Name="VBP"/>
-              <!-- WARNING : ActiveH parameter is also used by X-CUBE-TOUCHGFX -->
+        <!-- WARNING : ActiveH parameter is also used by X-CUBE-TOUCHGFX -->
         <Parameter Name="ActiveH"/>
         <Parameter Name="VFP"/>
         <Parameter Name="VerticalSync"/>
         <Parameter Name="AccumulatedVBP"/>
         <Parameter Name="AccumulatedActiveH"/>
         <Parameter Name="TotalHeigh"/>
-		
+
         <!-- Polarity RefParameter -->
         <Parameter Name="HSPolarity"/>
         <Parameter Name="VSPolarity"/>
         <Parameter Name="DEPolarity"/>
         <Parameter Name="PCPolarity"/>
-		
+
         <!-- Layer Default Color RefParameters -->
         <Parameter Name="Red"/>
         <Parameter Name="Green"/>
         <Parameter Name="Blue"/>
-		
+
         <!-- LTDC Layer settings start here -->
         <Parameter Name="Layers"/>
         <!-- LTDC L0 (Background) parameters -->
         <Parameter Name="LayerIdx_L0" />
-		
+
         <Parameter Name="WindowX0_L0" />
         <Parameter Name="WindowX1_L0" />
         <Parameter Name="WindowY0_L0" />
         <Parameter Name="WindowY1_L0" />
-		
-              <!-- WARNING : PixelFormat_L0 parameter is also used by X-CUBE-TOUCHGFX -->
+
+        <!-- WARNING : PixelFormat_L0 parameter is also used by X-CUBE-TOUCHGFX -->
         <Parameter Name="PixelFormat_L0" />
-         <!-- Flexible ARGB -->
-        <Parameter Name="PixelSize_L0" />
-        <Parameter Name="AlphaPos_L0" />
-        <Parameter Name="RedPos_L0" />
-        <Parameter Name="GreenPos_L0" />
-        <Parameter Name="BluePos_L0" />
-        <Parameter Name="AlphaWidth_L0" />
-        <Parameter Name="RedWidth_L0" />
-        <Parameter Name="GreenWidth_L0" />
-        <Parameter Name="BlueWidth_L0" />
-         <!-- Flexible YUV Full Planar -->
-        <Parameter Name="YuvAddress_L0" />
-        <Parameter Name="YAddress_L0" />
-        <Parameter Name="UAddress_L0" />
-         <Parameter Name="VAddress_L0" />
-         <Parameter Name="UvAddress_L0" />
-         <Parameter Name="ChrominanceOrder_L0" />
-         <Parameter Name="LuminanceOrder_L0" />
-         <Parameter  Name="LuminanceRescale_L0" />
-        <Parameter Name="YuvOrder_L0" />
-        <Parameter  Name="ColorConverter_L0" />
-        <!-- Flexible YUV  SemiPlanar-->
-        <Parameter Name="YuvAddress_SemiPlanar_L0" />
-        <Parameter Name="YAddress_SemiPlanar_L0" />
-        <Parameter Name="UAddress_SemiPlanar_L0" />
-         <Parameter Name="VAddress_SemiPlanar_L0" />
-         <Parameter Name="UvAddress_SemiPlanar_L0" />
-         <Parameter Name="ChrominanceOrder_SemiPlanar_L0" />
-         <Parameter Name="LuminanceOrder_SemiPlanar_L0" />
-         <Parameter  Name="LuminanceRescale_SemiPlanar_L0" />
-        <Parameter Name="YuvOrder_SemiPlanar_L0" />
-        <Parameter  Name="ColorConverter_SemiPlanar_L0" />
-        <!-- Flexible YUV  CoPlanar-->
-        <Parameter Name="YuvAddress_CoPlanar_L0" />
-        <Parameter Name="YAddress_CoPlanar_L0" />
-        <Parameter Name="UAddress_CoPlanar_L0" />
-         <Parameter Name="VAddress_CoPlanar_L0" />
-         <Parameter Name="UvAddress_CoPlanar_L0" />
-         <Parameter Name="ChrominanceOrder_CoPlanar_L0" />
-         <Parameter Name="LuminanceOrder_CoPlanar_L0" />
-         <Parameter  Name="LuminanceRescale_CoPlanar_L0" />
-        <Parameter Name="YuvOrder_CoPlanar_L0" />
-        <Parameter  Name="ColorConverter_CoPlanar_L0" />
-		
+
         <Parameter Name="Alpha_L0" />
         <Parameter Name="Alpha0_L0" />
         <Parameter Name="BlendingFactor1_L0" />
-        <Parameter Name="BlendingFactor2_L0" />	
-		
+        <Parameter Name="BlendingFactor2_L0" />
+
         <Parameter Name="FBStartAdress_L0" />
         <Parameter Name="ImageWidth_L0" />
         <Parameter Name="ImageHeight_L0" />
         <Parameter Name="Pitch_L0" />
-		
+
         <Parameter Name="Blue_L0" />
         <Parameter Name="Green_L0" />
         <Parameter Name="Red_L0" />
-		
+
         <!-- LTDC L1 (Foreground) parameters -->
         <Parameter Name="LayerIdx_L1" />
-        <!-- Layer 1 Flexible YUV CoPlanar  -->
-        <Parameter Name="YuvAddress_L1" />
-        <Parameter  Name="ChrominanceOrder_L1" />
-        <Parameter Name="LuminanceOrder_L1" />
-        <Parameter Name="LuminanceRescale_L1" />
-        <Parameter  Name="YuvOrder_L1" />
-         <Parameter Name="ColorConverter_L1" />
-        
-        <!-- Flexible ARGB -->
-        <Parameter Name="PixelSize_L1" />
-        <Parameter Name="AlphaPos_L1" />
-        <Parameter Name="RedPos_L1" />
-        <Parameter Name="GreenPos_L1" />
-        <Parameter Name="BluePos_L1" />
-        <Parameter Name="AlphaWidth_L1" />
-        <Parameter Name="RedWidth_L1" />
-        <Parameter Name="GreenWidth_L1" />
-        <Parameter Name="BlueWidth_L1" />
-		
+
         <Parameter Name="WindowX0_L1" />
         <Parameter Name="WindowX1_L1" />
         <Parameter Name="WindowY0_L1" />
         <Parameter Name="WindowY1_L1" />
-		
+
         <Parameter Name="PixelFormat_L1" />
-		
+
         <Parameter Name="Alpha_L1" />
         <Parameter Name="Alpha0_L1" />
         <Parameter Name="BlendingFactor1_L1" />
-        <Parameter Name="BlendingFactor2_L1" />	
-		
+        <Parameter Name="BlendingFactor2_L1" />
+
         <Parameter Name="FBStartAdress_L1" />
         <Parameter Name="ImageWidth_L1" />
         <Parameter Name="ImageHeight_L1" />
         <Parameter Name="Pitch_L1" />
-		
+
         <Parameter Name="Blue_L1" />
         <Parameter Name="Green_L1" />
         <Parameter Name="Red_L1" />
-	
+
     </RefMode>
-	
+
     <!-- RefModes 'RGB666' for LTDC -->
     <RefMode Name="RGB666">
         <ConfigForMode>Ltdc_Init</ConfigForMode>
@@ -1154,165 +614,96 @@
         <ConfigForMode>LTDC_ConfigLayer1</ConfigForMode>
         <ConfigForMode>LTDC_setPitch_Layer0</ConfigForMode>
         <ConfigForMode>LTDC_setPitch_Layer1</ConfigForMode>
-        <ConfigForMode>LTDC_pixel_format_argb</ConfigForMode>
-        <ConfigForMode>LTDC_pixel_format_FlexYUVSemiPlanar</ConfigForMode>
-        <ConfigForMode>LTDC_pixel_format_FlexYUVFullPlanar</ConfigForMode>
-        <ConfigForMode>LTDC_pixel_format_FlexYUVCoPlanar</ConfigForMode>
-        <ConfigForMode>LTDC_PIXEL_FORMAT_FLEXIBLE_ARGB_L1</ConfigForMode>
-        <ConfigForMode>LTDC_pixel_format_FlexYUVCoPlanar_L1</ConfigForMode>
-        
         <!-- LTDC init parameters -->
 
         <!-- Width Synchronization RefParameters for LTDC -->
         <Parameter Name="HSync"/>
         <Parameter Name="HBP"/>
-              <!-- WARNING : ActiveW parameter is also used by X-CUBE-TOUCHGFX -->
+        <!-- WARNING : ActiveW parameter is also used by X-CUBE-TOUCHGFX -->
         <Parameter Name="ActiveW"/>
         <Parameter Name="HFP"/>
         <Parameter Name="HorizontalSync"/>
         <Parameter Name="AccumulatedHBP"/>
         <Parameter Name="AccumulatedActiveW"/>
         <Parameter Name="TotalWidth"/>
-		
+
         <!-- Height Synchronization RefParameters for LTDC -->
         <Parameter Name="VSync"/>
         <Parameter Name="VBP"/>
-              <!-- WARNING : ActiveH parameter is also used by X-CUBE-TOUCHGFX -->
+        <!-- WARNING : ActiveH parameter is also used by X-CUBE-TOUCHGFX -->
         <Parameter Name="ActiveH"/>
         <Parameter Name="VFP"/>
         <Parameter Name="VerticalSync"/>
         <Parameter Name="AccumulatedVBP"/>
         <Parameter Name="AccumulatedActiveH"/>
         <Parameter Name="TotalHeigh"/>
-		
+
         <!-- Polarity RefParameter -->
         <Parameter Name="HSPolarity"/>
         <Parameter Name="VSPolarity"/>
         <Parameter Name="DEPolarity"/>
         <Parameter Name="PCPolarity"/>
-		
+
         <!-- Layer Default Color RefParameters -->
         <Parameter Name="Red"/>
         <Parameter Name="Green"/>
         <Parameter Name="Blue"/>
-		
+
         <!-- LTDC Layer settings start here -->
         <Parameter Name="Layers"/>
         <!-- LTDC Config L0 (Background) parameters -->
         <Parameter Name="LayerIdx_L0" />
-        <!-- Flexible ARGB -->
-        <Parameter Name="PixelSize_L0" />
-        <Parameter Name="AlphaPos_L0" />
-        <Parameter Name="RedPos_L0" />
-        <Parameter Name="GreenPos_L0" />
-        <Parameter Name="BluePos_L0" />
-        <Parameter Name="AlphaWidth_L0" />
-        <Parameter Name="RedWidth_L0" />
-        <Parameter Name="GreenWidth_L0" />
-        <Parameter Name="BlueWidth_L0" />
-         <!-- Flexible YUV Full Planar -->
-        <Parameter Name="YuvAddress_L0" />
-        <Parameter Name="YAddress_L0" />
-        <Parameter Name="UAddress_L0" />
-         <Parameter Name="VAddress_L0" />
-         <Parameter Name="UvAddress_L0" />
-         <Parameter Name="ChrominanceOrder_L0" />
-         <Parameter Name="LuminanceOrder_L0" />
-         <Parameter  Name="LuminanceRescale_L0" />
-        <Parameter Name="YuvOrder_L0" />
-        <Parameter  Name="ColorConverter_L0" />
-        <!-- Flexible YUV  SemiPlanar-->
-        <Parameter Name="YuvAddress_SemiPlanar_L0" />
-        <Parameter Name="YAddress_SemiPlanar_L0" />
-        <Parameter Name="UAddress_SemiPlanar_L0" />
-         <Parameter Name="VAddress_SemiPlanar_L0" />
-         <Parameter Name="UvAddress_SemiPlanar_L0" />
-         <Parameter Name="ChrominanceOrder_SemiPlanar_L0" />
-         <Parameter Name="LuminanceOrder_SemiPlanar_L0" />
-         <Parameter  Name="LuminanceRescale_SemiPlanar_L0" />
-        <Parameter Name="YuvOrder_SemiPlanar_L0" />
-        <Parameter  Name="ColorConverter_SemiPlanar_L0" />
-        <!-- Flexible YUV  CoPlanar-->
-        <Parameter Name="YuvAddress_CoPlanar_L0" />
-        <Parameter Name="YAddress_CoPlanar_L0" />
-        <Parameter Name="UAddress_CoPlanar_L0" />
-         <Parameter Name="VAddress_CoPlanar_L0" />
-         <Parameter Name="UvAddress_CoPlanar_L0" />
-         <Parameter Name="ChrominanceOrder_CoPlanar_L0" />
-         <Parameter Name="LuminanceOrder_CoPlanar_L0" />
-         <Parameter  Name="LuminanceRescale_CoPlanar_L0" />
-        <Parameter Name="YuvOrder_CoPlanar_L0" />
-        <Parameter  Name="ColorConverter_CoPlanar_L0" />
-		
+
         <Parameter Name="WindowX0_L0" />
         <Parameter Name="WindowX1_L0" />
         <Parameter Name="WindowY0_L0" />
         <Parameter Name="WindowY1_L0" />
-		
-              <!-- WARNING : PixelFormat_L0 parameter is also used by X-CUBE-TOUCHGFX -->
+
+        <!-- WARNING : PixelFormat_L0 parameter is also used by X-CUBE-TOUCHGFX -->
         <Parameter Name="PixelFormat_L0" />
-        <Parameter Name="PixelSize_L0" />
-        <Parameter Name="AlphaPos_L0" />
-		
+
         <Parameter Name="Alpha_L0" />
         <Parameter Name="Alpha0_L0" />
         <Parameter Name="BlendingFactor1_L0" />
-        <Parameter Name="BlendingFactor2_L0" />	
-		
+        <Parameter Name="BlendingFactor2_L0" />
+
         <Parameter Name="FBStartAdress_L0" />
         <Parameter Name="ImageWidth_L0" />
         <Parameter Name="ImageHeight_L0" />
         <Parameter Name="Pitch_L0" />
-		
+
         <Parameter Name="Blue_L0" />
         <Parameter Name="Green_L0" />
         <Parameter Name="Red_L0" />
-		
-		
+
+
         <!-- LTDC Config L1 (Foreground) parameters -->
         <Parameter Name="LayerIdx_L1" />
-		
+
         <Parameter Name="WindowX0_L1" />
         <Parameter Name="WindowX1_L1" />
         <Parameter Name="WindowY0_L1" />
         <Parameter Name="WindowY1_L1" />
-		
+
         <Parameter Name="PixelFormat_L1" />
-        <!-- Layer 1 Flexible YUV CoPlanar  -->
-        <Parameter Name="YuvAddress_L1" />
-        <Parameter  Name="ChrominanceOrder_L1" />
-        <Parameter Name="LuminanceOrder_L1" />
-        <Parameter Name="LuminanceRescale_L1" />
-        <Parameter  Name="YuvOrder_L1" />
-         <Parameter Name="ColorConverter_L1" />
-        <!-- Flexible ARGB -->
-        <Parameter Name="PixelSize_L1" />
-        <Parameter Name="AlphaPos_L1" />
-        <Parameter Name="RedPos_L1" />
-        <Parameter Name="GreenPos_L1" />
-        <Parameter Name="BluePos_L1" />
-        <Parameter Name="AlphaWidth_L1" />
-        <Parameter Name="RedWidth_L1" />
-        <Parameter Name="GreenWidth_L1" />
-        <Parameter Name="BlueWidth_L1" />
-		
+
         <Parameter Name="Alpha_L1" />
         <Parameter Name="Alpha0_L1" />
         <Parameter Name="BlendingFactor1_L1" />
-        <Parameter Name="BlendingFactor2_L1" />	
-		
+        <Parameter Name="BlendingFactor2_L1" />
+
         <Parameter Name="FBStartAdress_L1" />
         <Parameter Name="ImageWidth_L1" />
         <Parameter Name="ImageHeight_L1" />
         <Parameter Name="Pitch_L1" />
-		
+
         <Parameter Name="Blue_L1" />
         <Parameter Name="Green_L1" />
         <Parameter Name="Red_L1" />
-		
-		
+
+
     </RefMode>
-	
+
     <!-- RefModes 'RGB565' for LTDC -->
     <RefMode Name="RGB565">
         <ConfigForMode>Ltdc_Init</ConfigForMode>
@@ -1322,819 +713,96 @@
         <ConfigForMode>LTDC_ConfigLayer1</ConfigForMode>
         <ConfigForMode>LTDC_setPitch_Layer0</ConfigForMode>
         <ConfigForMode>LTDC_setPitch_Layer1</ConfigForMode>
-        <ConfigForMode>LTDC_pixel_format_argb</ConfigForMode>
-        <ConfigForMode>LTDC_pixel_format_FlexYUVSemiPlanar</ConfigForMode>
-        <ConfigForMode>LTDC_pixel_format_FlexYUVFullPlanar</ConfigForMode>
-        <ConfigForMode>LTDC_pixel_format_FlexYUVCoPlanar</ConfigForMode>
-        <ConfigForMode>LTDC_PIXEL_FORMAT_FLEXIBLE_ARGB_L1</ConfigForMode>
-        <ConfigForMode>LTDC_pixel_format_FlexYUVCoPlanar_L1</ConfigForMode>
-        
-		
+
         <!-- Width Synchronization RefParameters for LTDC -->
         <Parameter Name="HSync"/>
         <Parameter Name="HBP"/>
-              <!-- WARNING : ActiveW parameter is also used by X-CUBE-TOUCHGFX -->
+        <!-- WARNING : ActiveW parameter is also used by X-CUBE-TOUCHGFX -->
         <Parameter Name="ActiveW"/>
         <Parameter Name="HFP"/>
         <Parameter Name="HorizontalSync"/>
         <Parameter Name="AccumulatedHBP"/>
         <Parameter Name="AccumulatedActiveW"/>
         <Parameter Name="TotalWidth"/>
-		
+
         <!-- Height Synchronization RefParameters for LTDC -->
         <Parameter Name="VSync"/>
         <Parameter Name="VBP"/>
-              <!-- WARNING : ActiveH parameter is also used by X-CUBE-TOUCHGFX -->
+        <!-- WARNING : ActiveH parameter is also used by X-CUBE-TOUCHGFX -->
         <Parameter Name="ActiveH"/>
         <Parameter Name="VFP"/>
         <Parameter Name="VerticalSync"/>
         <Parameter Name="AccumulatedVBP"/>
         <Parameter Name="AccumulatedActiveH"/>
         <Parameter Name="TotalHeigh"/>
-		
+
         <!-- Polarity RefParameter -->
         <Parameter Name="HSPolarity"/>
         <Parameter Name="VSPolarity"/>
         <Parameter Name="DEPolarity"/>
         <Parameter Name="PCPolarity"/>
-		
+
         <!-- Layer Default Color RefParameters -->
         <Parameter Name="Red"/>
         <Parameter Name="Green"/>
         <Parameter Name="Blue"/>
-		
-				
+
+
         <!-- LTDC Config L0 (Background) parameters -->
         <Parameter Name="LayerIdx_L0" />
-        <!-- Flexible ARGB -->
-        <Parameter Name="PixelSize_L0" />
-        <Parameter Name="AlphaPos_L0" />
-        <Parameter Name="RedPos_L0" />
-        <Parameter Name="GreenPos_L0" />
-        <Parameter Name="BluePos_L0" />
-        <Parameter Name="AlphaWidth_L0" />
-        <Parameter Name="RedWidth_L0" />
-        <Parameter Name="GreenWidth_L0" />
-        <Parameter Name="BlueWidth_L0" />
-         <!-- Flexible YUV Full Planar -->
-        <Parameter Name="YuvAddress_L0" />
-        <Parameter Name="YAddress_L0" />
-        <Parameter Name="UAddress_L0" />
-         <Parameter Name="VAddress_L0" />
-         <Parameter Name="UvAddress_L0" />
-         <Parameter Name="ChrominanceOrder_L0" />
-         <Parameter Name="LuminanceOrder_L0" />
-         <Parameter  Name="LuminanceRescale_L0" />
-        <Parameter Name="YuvOrder_L0" />
-        <Parameter  Name="ColorConverter_L0" />
-        <!-- Flexible YUV  SemiPlanar-->
-        <Parameter Name="YuvAddress_SemiPlanar_L0" />
-        <Parameter Name="YAddress_SemiPlanar_L0" />
-        <Parameter Name="UAddress_SemiPlanar_L0" />
-         <Parameter Name="VAddress_SemiPlanar_L0" />
-         <Parameter Name="UvAddress_SemiPlanar_L0" />
-         <Parameter Name="ChrominanceOrder_SemiPlanar_L0" />
-         <Parameter Name="LuminanceOrder_SemiPlanar_L0" />
-         <Parameter  Name="LuminanceRescale_SemiPlanar_L0" />
-        <Parameter Name="YuvOrder_SemiPlanar_L0" />
-        <Parameter  Name="ColorConverter_SemiPlanar_L0" />
-        <!-- Flexible YUV  CoPlanar-->
-        <Parameter Name="YuvAddress_CoPlanar_L0" />
-        <Parameter Name="YAddress_CoPlanar_L0" />
-        <Parameter Name="UAddress_CoPlanar_L0" />
-         <Parameter Name="VAddress_CoPlanar_L0" />
-         <Parameter Name="UvAddress_CoPlanar_L0" />
-         <Parameter Name="ChrominanceOrder_CoPlanar_L0" />
-         <Parameter Name="LuminanceOrder_CoPlanar_L0" />
-         <Parameter  Name="LuminanceRescale_CoPlanar_L0" />
-        <Parameter Name="YuvOrder_CoPlanar_L0" />
-        <Parameter  Name="ColorConverter_CoPlanar_L0" />
-		
+
         <Parameter Name="WindowX0_L0" />
         <Parameter Name="WindowX1_L0" />
         <Parameter Name="WindowY0_L0" />
         <Parameter Name="WindowY1_L0" />
-		
+
         <!-- <Parameter Name="PixelFormat_L0_not888" /> -->
-              <!-- WARNING : PixelFormat_L0 parameter is also used by X-CUBE-TOUCHGFX -->
+        <!-- WARNING : PixelFormat_L0 parameter is also used by X-CUBE-TOUCHGFX -->
         <Parameter Name="PixelFormat_L0" />
-        <Parameter Name="PixelSize_L0" />
         <Parameter Name="Alpha_L0" />
         <Parameter Name="Alpha0_L0" />
         <Parameter Name="BlendingFactor1_L0" />
         <Parameter Name="BlendingFactor2_L0" />
-		
+
         <Parameter Name="FBStartAdress_L0" />
         <Parameter Name="ImageWidth_L0" />
         <Parameter Name="ImageHeight_L0" />
         <Parameter Name="Pitch_L0" />
-		
+
         <Parameter Name="Blue_L0" />
         <Parameter Name="Green_L0" />
         <Parameter Name="Red_L0" />
-		
+
         <!-- LTDC Layer settings start here -->
         <Parameter Name="Layers"/>
         <!-- LTDC Config L1 (Foreground) parameters -->
         <Parameter Name="LayerIdx_L1" />
-		
+
         <Parameter Name="WindowX0_L1" />
         <Parameter Name="WindowX1_L1" />
         <Parameter Name="WindowY0_L1" />
         <Parameter Name="WindowY1_L1" />
-		
+
         <!-- <Parameter Name="PixelFormat_L1_not888" /> -->
         <Parameter Name="PixelFormat_L1" />
-        <!-- Layer 1 Flexible YUV CoPlanar  -->
-        <Parameter Name="YuvAddress_L1" />
-        <Parameter  Name="ChrominanceOrder_L1" />
-        <Parameter Name="LuminanceOrder_L1" />
-        <Parameter Name="LuminanceRescale_L1" />
-        <Parameter  Name="YuvOrder_L1" />
-         <Parameter Name="ColorConverter_L1" />
-        <!-- Flexible ARGB -->
-        <Parameter Name="PixelSize_L1" />
-        <Parameter Name="AlphaPos_L1" />
-        <Parameter Name="RedPos_L1" />
-        <Parameter Name="GreenPos_L1" />
-        <Parameter Name="BluePos_L1" />
-        <Parameter Name="AlphaWidth_L1" />
-        <Parameter Name="RedWidth_L1" />
-        <Parameter Name="GreenWidth_L1" />
-        <Parameter Name="BlueWidth_L1" />
-		
+
         <Parameter Name="Alpha_L1" />
         <Parameter Name="Alpha0_L1" />
         <Parameter Name="BlendingFactor1_L1" />
-        <Parameter Name="BlendingFactor2_L1" />	
-		
+        <Parameter Name="BlendingFactor2_L1" />
+
         <Parameter Name="FBStartAdress_L1" />
         <Parameter Name="ImageWidth_L1" />
         <Parameter Name="ImageHeight_L1" />
         <Parameter Name="Pitch_L1" />
-		
+
         <Parameter Name="Blue_L1" />
         <Parameter Name="Green_L1" />
         <Parameter Name="Red_L1" />
-		
+
     </RefMode>
-    
-		<!-- RefModes 'RGB565' for LTDC -->
-    <RefMode Name="YUV HDTV (16 bits)">
-        <ConfigForMode>Ltdc_Init</ConfigForMode>
-        <ConfigForMode>LTDC_SetOutputDisplay</ConfigForMode>
-        <ConfigForMode>LTDC_ConfigLayer0</ConfigForMode>
-        <ConfigForMode>LTDC_ConfigLayer1</ConfigForMode>
-        <ConfigForMode>LTDC_setPitch_Layer0</ConfigForMode>
-        <ConfigForMode>LTDC_setPitch_Layer1</ConfigForMode>
-        <ConfigForMode>LTDC_pixel_format_argb</ConfigForMode>
-        <ConfigForMode>LTDC_pixel_format_FlexYUVSemiPlanar</ConfigForMode>
-        <ConfigForMode>LTDC_pixel_format_FlexYUVFullPlanar</ConfigForMode>
-        <ConfigForMode>LTDC_pixel_format_FlexYUVCoPlanar</ConfigForMode>
-        <ConfigForMode>LTDC_PIXEL_FORMAT_FLEXIBLE_ARGB_L1</ConfigForMode>
-        <ConfigForMode>LTDC_pixel_format_FlexYUVCoPlanar_L1</ConfigForMode>
 
-        <Parameter Name="Display"/>
-        <!-- Width Synchronization RefParameters for LTDC -->
-        <Parameter Name="HSync"/>
-        <Parameter Name="HBP"/>
-              <!-- WARNING : ActiveW parameter is also used by X-CUBE-TOUCHGFX -->
-        <Parameter Name="ActiveW"/>
-        <Parameter Name="HFP"/>
-        <Parameter Name="HorizontalSync"/>
-        <Parameter Name="AccumulatedHBP"/>
-        <Parameter Name="AccumulatedActiveW"/>
-        <Parameter Name="TotalWidth"/>
-        
-        <!-- Height Synchronization RefParameters for LTDC -->
-        <Parameter Name="VSync"/>
-        <Parameter Name="VBP"/>
-              <!-- WARNING : ActiveH parameter is also used by X-CUBE-TOUCHGFX -->
-        <Parameter Name="ActiveH"/>
-        <Parameter Name="VFP"/>
-        <Parameter Name="VerticalSync"/>
-        <Parameter Name="AccumulatedVBP"/>
-        <Parameter Name="AccumulatedActiveH"/>
-        <Parameter Name="TotalHeigh"/>
-        
-        <!-- Polarity RefParameter -->
-        <Parameter Name="HSPolarity"/>
-        <Parameter Name="VSPolarity"/>
-        <Parameter Name="DEPolarity"/>
-        <Parameter Name="PCPolarity"/>
-        
-        <!-- Layer Default Color RefParameters -->
-        <Parameter Name="Red"/>
-        <Parameter Name="Green"/>
-        <Parameter Name="Blue"/>
-        
-                
-        <!-- LTDC Config L0 (Background) parameters -->
-        <Parameter Name="LayerIdx_L0" />
-        
-        <Parameter Name="WindowX0_L0" />
-        <Parameter Name="WindowX1_L0" />
-        <Parameter Name="WindowY0_L0" />
-        <Parameter Name="WindowY1_L0" />
-        
-        <!-- <Parameter Name="PixelFormat_L0_not888" /> -->
-              <!-- WARNING : PixelFormat_L0 parameter is also used by X-CUBE-TOUCHGFX -->
-        <Parameter Name="PixelFormat_L0" />
-        <!-- Flexible ARGB -->
-        <Parameter Name="PixelSize_L0" />
-        <Parameter Name="AlphaPos_L0" />
-        <Parameter Name="RedPos_L0" />
-        <Parameter Name="GreenPos_L0" />
-        <Parameter Name="BluePos_L0" />
-        <Parameter Name="AlphaWidth_L0" />
-        <Parameter Name="RedWidth_L0" />
-        <Parameter Name="GreenWidth_L0" />
-        <Parameter Name="BlueWidth_L0" />
-        <!-- Flexible YUV Full Planar -->
-        <Parameter Name="YuvAddress_L0" />
-        <Parameter Name="YAddress_L0" />
-        <Parameter Name="UAddress_L0" />
-         <Parameter Name="VAddress_L0" />
-         <Parameter Name="UvAddress_L0" />
-         <Parameter Name="ChrominanceOrder_L0" />
-         <Parameter Name="LuminanceOrder_L0" />
-         <Parameter  Name="LuminanceRescale_L0" />
-        <Parameter Name="YuvOrder_L0" />
-        <Parameter  Name="ColorConverter_L0" />
-        <!-- Flexible YUV  SemiPlanar-->
-        <Parameter Name="YuvAddress_SemiPlanar_L0" />
-        <Parameter Name="YAddress_SemiPlanar_L0" />
-        <Parameter Name="UAddress_SemiPlanar_L0" />
-         <Parameter Name="VAddress_SemiPlanar_L0" />
-         <Parameter Name="UvAddress_SemiPlanar_L0" />
-         <Parameter Name="ChrominanceOrder_SemiPlanar_L0" />
-         <Parameter Name="LuminanceOrder_SemiPlanar_L0" />
-         <Parameter  Name="LuminanceRescale_SemiPlanar_L0" />
-        <Parameter Name="YuvOrder_SemiPlanar_L0" />
-        <Parameter  Name="ColorConverter_SemiPlanar_L0" />
-        <!-- Flexible YUV  CoPlanar-->
-        <Parameter Name="YuvAddress_CoPlanar_L0" />
-        <Parameter Name="YAddress_CoPlanar_L0" />
-        <Parameter Name="UAddress_CoPlanar_L0" />
-         <Parameter Name="VAddress_CoPlanar_L0" />
-         <Parameter Name="UvAddress_CoPlanar_L0" />
-         <Parameter Name="ChrominanceOrder_CoPlanar_L0" />
-         <Parameter Name="LuminanceOrder_CoPlanar_L0" />
-         <Parameter  Name="LuminanceRescale_CoPlanar_L0" />
-        <Parameter Name="YuvOrder_CoPlanar_L0" />
-        <Parameter  Name="ColorConverter_CoPlanar_L0" />
 
-        
-        <Parameter Name="Alpha_L0" />
-        <Parameter Name="Alpha0_L0" />
-        <Parameter Name="BlendingFactor1_L0" />
-        <Parameter Name="BlendingFactor2_L0" />
-        
-        <Parameter Name="FBStartAdress_L0" />
-        <Parameter Name="ImageWidth_L0" />
-        <Parameter Name="ImageHeight_L0" />
-        <Parameter Name="Pitch_L0" />
-        
-        <Parameter Name="Blue_L0" />
-        <Parameter Name="Green_L0" />
-        <Parameter Name="Red_L0" />
-        
-        <!-- LTDC Layer settings start here -->
-        <Parameter Name="Layers"/>
-        <!-- LTDC Config L1 (Foreground) parameters -->
-        <Parameter Name="LayerIdx_L1" />
-        
-        <Parameter Name="WindowX0_L1" />
-        <Parameter Name="WindowX1_L1" />
-        <Parameter Name="WindowY0_L1" />
-        <Parameter Name="WindowY1_L1" />
-        
-        <!-- <Parameter Name="PixelFormat_L1_not888" /> -->
-        <Parameter Name="PixelFormat_L1" />
-        <!-- Layer 1 Flexible YUV CoPlanar  -->
-        <Parameter Name="YuvAddress_L1" />
-        <Parameter  Name="ChrominanceOrder_L1" />
-        <Parameter Name="LuminanceOrder_L1" />
-        <Parameter Name="LuminanceRescale_L1" />
-        <Parameter  Name="YuvOrder_L1" />
-         <Parameter Name="ColorConverter_L1" />
-        <!-- Flexible ARGB -->
-        <Parameter Name="PixelSize_L1" />
-        <Parameter Name="AlphaPos_L1" />
-        <Parameter Name="RedPos_L1" />
-        <Parameter Name="GreenPos_L1" />
-        <Parameter Name="BluePos_L1" />
-        <Parameter Name="AlphaWidth_L1" />
-        <Parameter Name="RedWidth_L1" />
-        <Parameter Name="GreenWidth_L1" />
-        <Parameter Name="BlueWidth_L1" />
-        <Parameter Name="Alpha_L1" />
-        <Parameter Name="Alpha0_L1" />
-        <Parameter Name="BlendingFactor1_L1" />
-        <Parameter Name="BlendingFactor2_L1" /> 
-        
-        <Parameter Name="FBStartAdress_L1" />
-        <Parameter Name="ImageWidth_L1" />
-        <Parameter Name="ImageHeight_L1" />
-        <Parameter Name="Pitch_L1" />
-        
-        <Parameter Name="Blue_L1" />
-        <Parameter Name="Green_L1" />
-        <Parameter Name="Red_L1" />
-        
-    </RefMode>
-    <RefMode Name="YUV SDTV (16 bits)">
-        <ConfigForMode>Ltdc_Init</ConfigForMode>
-        <ConfigForMode>LTDC_SetOutputDisplay</ConfigForMode>
-        <ConfigForMode>LTDC_ConfigLayer0</ConfigForMode>
-        <ConfigForMode>LTDC_ConfigLayer1</ConfigForMode>
-        <ConfigForMode>LTDC_setPitch_Layer0</ConfigForMode>
-        <ConfigForMode>LTDC_setPitch_Layer1</ConfigForMode>
-        <ConfigForMode>LTDC_pixel_format_argb</ConfigForMode>
-        <ConfigForMode>LTDC_pixel_format_FlexYUVSemiPlanar</ConfigForMode>
-        <ConfigForMode>LTDC_pixel_format_FlexYUVFullPlanar</ConfigForMode>
-        <ConfigForMode>LTDC_pixel_format_FlexYUVCoPlanar</ConfigForMode>
-        <ConfigForMode>LTDC_PIXEL_FORMAT_FLEXIBLE_ARGB_L1</ConfigForMode>
-        <ConfigForMode>LTDC_pixel_format_FlexYUVCoPlanar_L1</ConfigForMode>
-
-        <Parameter Name="Display"/>
-
-        <!-- Width Synchronization RefParameters for LTDC -->
-        <Parameter Name="HSync"/>
-        <Parameter Name="HBP"/>
-              <!-- WARNING : ActiveW parameter is also used by X-CUBE-TOUCHGFX -->
-        <Parameter Name="ActiveW"/>
-        <Parameter Name="HFP"/>
-        <Parameter Name="HorizontalSync"/>
-        <Parameter Name="AccumulatedHBP"/>
-        <Parameter Name="AccumulatedActiveW"/>
-        <Parameter Name="TotalWidth"/>
-        
-        <!-- Height Synchronization RefParameters for LTDC -->
-        <Parameter Name="VSync"/>
-        <Parameter Name="VBP"/>
-              <!-- WARNING : ActiveH parameter is also used by X-CUBE-TOUCHGFX -->
-        <Parameter Name="ActiveH"/>
-        <Parameter Name="VFP"/>
-        <Parameter Name="VerticalSync"/>
-        <Parameter Name="AccumulatedVBP"/>
-        <Parameter Name="AccumulatedActiveH"/>
-        <Parameter Name="TotalHeigh"/>
-        
-        <!-- Polarity RefParameter -->
-        <Parameter Name="HSPolarity"/>
-        <Parameter Name="VSPolarity"/>
-        <Parameter Name="DEPolarity"/>
-        <Parameter Name="PCPolarity"/>
-        
-        <!-- Layer Default Color RefParameters -->
-        <Parameter Name="Red"/>
-        <Parameter Name="Green"/>
-        <Parameter Name="Blue"/>
-        
-                
-        <!-- LTDC Config L0 (Background) parameters -->
-        <Parameter Name="LayerIdx_L0" />
-        
-        <Parameter Name="WindowX0_L0" />
-        <Parameter Name="WindowX1_L0" />
-        <Parameter Name="WindowY0_L0" />
-        <Parameter Name="WindowY1_L0" />
-        
-        <!-- <Parameter Name="PixelFormat_L0_not888" /> -->
-              <!-- WARNING : PixelFormat_L0 parameter is also used by X-CUBE-TOUCHGFX -->
-        <Parameter Name="PixelFormat_L0" />
-         <!-- Flexible ARGB -->
-        <Parameter Name="PixelSize_L0" />
-        <Parameter Name="AlphaPos_L0" />
-        <Parameter Name="RedPos_L0" />
-        <Parameter Name="GreenPos_L0" />
-        <Parameter Name="BluePos_L0" />
-        <Parameter Name="AlphaWidth_L0" />
-        <Parameter Name="RedWidth_L0" />
-        <Parameter Name="GreenWidth_L0" />
-        <Parameter Name="BlueWidth_L0" />
-         <!-- Flexible YUV -->
-        <Parameter Name="YuvAddress_L0" />
-        <Parameter Name="YAddress_L0" />
-        <Parameter Name="UAddress_L0" />
-         <Parameter Name="VAddress_L0" />
-         <Parameter Name="UvAddress_L0" />
-         <Parameter Name="ChrominanceOrder_L0" />
-         <Parameter Name="LuminanceOrder_L0" />
-         <Parameter  Name="LuminanceRescale_L0" />
-        <Parameter Name="YuvOrder_L0" />
-        <Parameter  Name="ColorConverter_L0" />
-        <!-- Flexible YUV  SemiPlanar-->
-        <Parameter Name="YuvAddress_SemiPlanar_L0" />
-        <Parameter Name="YAddress_SemiPlanar_L0" />
-        <Parameter Name="UAddress_SemiPlanar_L0" />
-         <Parameter Name="VAddress_SemiPlanar_L0" />
-         <Parameter Name="UvAddress_SemiPlanar_L0" />
-         <Parameter Name="ChrominanceOrder_SemiPlanar_L0" />
-         <Parameter Name="LuminanceOrder_SemiPlanar_L0" />
-         <Parameter  Name="LuminanceRescale_SemiPlanar_L0" />
-        <Parameter Name="YuvOrder_SemiPlanar_L0" />
-        <Parameter  Name="ColorConverter_SemiPlanar_L0" />
-        <!-- Flexible YUV  CoPlanar-->
-        <Parameter Name="YuvAddress_CoPlanar_L0" />
-        <Parameter Name="YAddress_CoPlanar_L0" />
-        <Parameter Name="UAddress_CoPlanar_L0" />
-         <Parameter Name="VAddress_CoPlanar_L0" />
-         <Parameter Name="UvAddress_CoPlanar_L0" />
-         <Parameter Name="ChrominanceOrder_CoPlanar_L0" />
-         <Parameter Name="LuminanceOrder_CoPlanar_L0" />
-         <Parameter  Name="LuminanceRescale_CoPlanar_L0" />
-        <Parameter Name="YuvOrder_CoPlanar_L0" />
-        <Parameter  Name="ColorConverter_CoPlanar_L0" />
-        
-        
-        <Parameter Name="Alpha_L0" />
-        <Parameter Name="Alpha0_L0" />
-        <Parameter Name="BlendingFactor1_L0" />
-        <Parameter Name="BlendingFactor2_L0" />
-        
-        <Parameter Name="FBStartAdress_L0" />
-        <Parameter Name="ImageWidth_L0" />
-        <Parameter Name="ImageHeight_L0" />
-        <Parameter Name="Pitch_L0" />
-        
-        <Parameter Name="Blue_L0" />
-        <Parameter Name="Green_L0" />
-        <Parameter Name="Red_L0" />
-        
-        <!-- LTDC Layer settings start here -->
-        <Parameter Name="Layers"/>
-        <!-- LTDC Config L1 (Foreground) parameters -->
-        <Parameter Name="LayerIdx_L1" />
-        
-        <Parameter Name="WindowX0_L1" />
-        <Parameter Name="WindowX1_L1" />
-        <Parameter Name="WindowY0_L1" />
-        <Parameter Name="WindowY1_L1" />
-        
-        <!-- <Parameter Name="PixelFormat_L1_not888" /> -->
-        <Parameter Name="PixelFormat_L1" />
-        <!-- Layer 1 Flexible YUV CoPlanar  -->
-        <Parameter Name="YuvAddress_L1" />
-        <Parameter  Name="ChrominanceOrder_L1" />
-        <Parameter Name="LuminanceOrder_L1" />
-        <Parameter Name="LuminanceRescale_L1" />
-        <Parameter  Name="YuvOrder_L1" />
-         <Parameter Name="ColorConverter_L1" />
-        <!-- Flexible ARGB -->
-        <Parameter Name="PixelSize_L1" />
-        <Parameter Name="AlphaPos_L1" />
-        <Parameter Name="RedPos_L1" />
-        <Parameter Name="GreenPos_L1" />
-        <Parameter Name="BluePos_L1" />
-        <Parameter Name="AlphaWidth_L1" />
-        <Parameter Name="RedWidth_L1" />
-        <Parameter Name="GreenWidth_L1" />
-        <Parameter Name="BlueWidth_L1" />
-        
-        <Parameter Name="Alpha_L1" />
-        <Parameter Name="Alpha0_L1" />
-        <Parameter Name="BlendingFactor1_L1" />
-        <Parameter Name="BlendingFactor2_L1" /> 
-        
-        <Parameter Name="FBStartAdress_L1" />
-        <Parameter Name="ImageWidth_L1" />
-        <Parameter Name="ImageHeight_L1" />
-        <Parameter Name="Pitch_L1" />
-        
-        <Parameter Name="Blue_L1" />
-        <Parameter Name="Green_L1" />
-        <Parameter Name="Red_L1" />
-        
-    </RefMode>
-    <RefMode Name="YVU HDTV (16 bits)">
-        <ConfigForMode>Ltdc_Init</ConfigForMode>
-        <ConfigForMode>LTDC_SetOutputDisplay</ConfigForMode>
-        <ConfigForMode>LTDC_ConfigLayer0</ConfigForMode>
-        <ConfigForMode>LTDC_ConfigLayer1</ConfigForMode>
-        <ConfigForMode>LTDC_setPitch_Layer0</ConfigForMode>
-        <ConfigForMode>LTDC_setPitch_Layer1</ConfigForMode>
-        <ConfigForMode>LTDC_pixel_format_argb</ConfigForMode>
-        <ConfigForMode>LTDC_pixel_format_FlexYUVSemiPlanar</ConfigForMode>
-        <ConfigForMode>LTDC_pixel_format_FlexYUVFullPlanar</ConfigForMode>
-        <ConfigForMode>LTDC_pixel_format_FlexYUVCoPlanar</ConfigForMode>
-        <ConfigForMode>LTDC_PIXEL_FORMAT_FLEXIBLE_ARGB_L1</ConfigForMode>
-        <ConfigForMode>LTDC_pixel_format_FlexYUVCoPlanar_L1</ConfigForMode>
-
-        <Parameter Name="Display"/>
-
-        <!-- Width Synchronization RefParameters for LTDC -->
-        <Parameter Name="HSync"/>
-        <Parameter Name="HBP"/>
-              <!-- WARNING : ActiveW parameter is also used by X-CUBE-TOUCHGFX -->
-        <Parameter Name="ActiveW"/>
-        <Parameter Name="HFP"/>
-        <Parameter Name="HorizontalSync"/>
-        <Parameter Name="AccumulatedHBP"/>
-        <Parameter Name="AccumulatedActiveW"/>
-        <Parameter Name="TotalWidth"/>
-        
-        <!-- Height Synchronization RefParameters for LTDC -->
-        <Parameter Name="VSync"/>
-        <Parameter Name="VBP"/>
-              <!-- WARNING : ActiveH parameter is also used by X-CUBE-TOUCHGFX -->
-        <Parameter Name="ActiveH"/>
-        <Parameter Name="VFP"/>
-        <Parameter Name="VerticalSync"/>
-        <Parameter Name="AccumulatedVBP"/>
-        <Parameter Name="AccumulatedActiveH"/>
-        <Parameter Name="TotalHeigh"/>
-        
-        <!-- Polarity RefParameter -->
-        <Parameter Name="HSPolarity"/>
-        <Parameter Name="VSPolarity"/>
-        <Parameter Name="DEPolarity"/>
-        <Parameter Name="PCPolarity"/>
-        
-        <!-- Layer Default Color RefParameters -->
-        <Parameter Name="Red"/>
-        <Parameter Name="Green"/>
-        <Parameter Name="Blue"/>
-        
-                
-        <!-- LTDC Config L0 (Background) parameters -->
-        <Parameter Name="LayerIdx_L0" />
-        
-        <Parameter Name="WindowX0_L0" />
-        <Parameter Name="WindowX1_L0" />
-        <Parameter Name="WindowY0_L0" />
-        <Parameter Name="WindowY1_L0" />
-        
-        <!-- <Parameter Name="PixelFormat_L0_not888" /> -->
-              <!-- WARNING : PixelFormat_L0 parameter is also used by X-CUBE-TOUCHGFX -->
-        <Parameter Name="PixelFormat_L0" />
-         <!-- Flexible ARGB -->
-        <Parameter Name="PixelSize_L0" />
-        <Parameter Name="AlphaPos_L0" />
-        <Parameter Name="RedPos_L0" />
-        <Parameter Name="GreenPos_L0" />
-        <Parameter Name="BluePos_L0" />
-        <Parameter Name="AlphaWidth_L0" />
-        <Parameter Name="RedWidth_L0" />
-        <Parameter Name="GreenWidth_L0" />
-        <Parameter Name="BlueWidth_L0" />
-         <!-- Flexible YUV Full Planar -->
-        <Parameter Name="YuvAddress_L0" />
-        <Parameter Name="YAddress_L0" />
-        <Parameter Name="UAddress_L0" />
-         <Parameter Name="VAddress_L0" />
-         <Parameter Name="UvAddress_L0" />
-         <Parameter Name="ChrominanceOrder_L0" />
-         <Parameter Name="LuminanceOrder_L0" />
-         <Parameter  Name="LuminanceRescale_L0" />
-        <Parameter Name="YuvOrder_L0" />
-        <Parameter  Name="ColorConverter_L0" />
-       <!-- Flexible YUV  SemiPlanar-->
-        <Parameter Name="YuvAddress_SemiPlanar_L0" />
-        <Parameter Name="YAddress_SemiPlanar_L0" />
-        <Parameter Name="UAddress_SemiPlanar_L0" />
-         <Parameter Name="VAddress_SemiPlanar_L0" />
-         <Parameter Name="UvAddress_SemiPlanar_L0" />
-         <Parameter Name="ChrominanceOrder_SemiPlanar_L0" />
-         <Parameter Name="LuminanceOrder_SemiPlanar_L0" />
-         <Parameter  Name="LuminanceRescale_SemiPlanar_L0" />
-        <Parameter Name="YuvOrder_SemiPlanar_L0" />
-        <Parameter  Name="ColorConverter_SemiPlanar_L0" />
-        <!-- Flexible YUV  CoPlanar-->
-        <Parameter Name="YuvAddress_CoPlanar_L0" />
-        <Parameter Name="YAddress_CoPlanar_L0" />
-        <Parameter Name="UAddress_CoPlanar_L0" />
-         <Parameter Name="VAddress_CoPlanar_L0" />
-         <Parameter Name="UvAddress_CoPlanar_L0" />
-         <Parameter Name="ChrominanceOrder_CoPlanar_L0" />
-         <Parameter Name="LuminanceOrder_CoPlanar_L0" />
-         <Parameter  Name="LuminanceRescale_CoPlanar_L0" />
-        <Parameter Name="YuvOrder_CoPlanar_L0" />
-        <Parameter  Name="ColorConverter_CoPlanar_L0" />
-        
-        <Parameter Name="Alpha_L0" />
-        <Parameter Name="Alpha0_L0" />
-        <Parameter Name="BlendingFactor1_L0" />
-        <Parameter Name="BlendingFactor2_L0" />
-        
-        <Parameter Name="FBStartAdress_L0" />
-        <Parameter Name="ImageWidth_L0" />
-        <Parameter Name="ImageHeight_L0" />
-        <Parameter Name="Pitch_L0" />
-        
-        <Parameter Name="Blue_L0" />
-        <Parameter Name="Green_L0" />
-        <Parameter Name="Red_L0" />
-        
-        <!-- LTDC Layer settings start here -->
-        <Parameter Name="Layers"/>
-        <!-- LTDC Config L1 (Foreground) parameters -->
-        <Parameter Name="LayerIdx_L1" />
-        
-        <Parameter Name="WindowX0_L1" />
-        <Parameter Name="WindowX1_L1" />
-        <Parameter Name="WindowY0_L1" />
-        <Parameter Name="WindowY1_L1" />
-        
-        <!-- <Parameter Name="PixelFormat_L1_not888" /> -->
-        <Parameter Name="PixelFormat_L1" />
-           <!-- Layer 1 Flexible YUV CoPlanar  -->
-        <Parameter Name="YuvAddress_L1" />
-        <Parameter  Name="ChrominanceOrder_L1" />
-        <Parameter Name="LuminanceOrder_L1" />
-        <Parameter Name="LuminanceRescale_L1" />
-        <Parameter  Name="YuvOrder_L1" />
-         <Parameter Name="ColorConverter_L1" />
-        <!-- Flexible ARGB -->
-        <Parameter Name="PixelSize_L1" />
-        <Parameter Name="AlphaPos_L1" />
-        <Parameter Name="RedPos_L1" />
-        <Parameter Name="GreenPos_L1" />
-        <Parameter Name="BluePos_L1" />
-        <Parameter Name="AlphaWidth_L1" />
-        <Parameter Name="RedWidth_L1" />
-        <Parameter Name="GreenWidth_L1" />
-        <Parameter Name="BlueWidth_L1" />
-        
-        <Parameter Name="Alpha_L1" />
-        <Parameter Name="Alpha0_L1" />
-        <Parameter Name="BlendingFactor1_L1" />
-        <Parameter Name="BlendingFactor2_L1" /> 
-        
-        <Parameter Name="FBStartAdress_L1" />
-        <Parameter Name="ImageWidth_L1" />
-        <Parameter Name="ImageHeight_L1" />
-        <Parameter Name="Pitch_L1" />
-        
-        <Parameter Name="Blue_L1" />
-        <Parameter Name="Green_L1" />
-        <Parameter Name="Red_L1" />
-        
-    </RefMode>
-    <RefMode Name="YVU SDTV (16 bits)">
-        <ConfigForMode>Ltdc_Init</ConfigForMode>
-        <ConfigForMode>LTDC_SetOutputDisplay</ConfigForMode>
-        <ConfigForMode>LTDC_ConfigLayer0</ConfigForMode>
-        <ConfigForMode>LTDC_ConfigLayer1</ConfigForMode>
-        <ConfigForMode>LTDC_setPitch_Layer0</ConfigForMode>
-        <ConfigForMode>LTDC_setPitch_Layer1</ConfigForMode>
-        <ConfigForMode>LTDC_pixel_format_argb</ConfigForMode>
-        <ConfigForMode>LTDC_pixel_format_FlexYUVSemiPlanar</ConfigForMode>
-        <ConfigForMode>LTDC_pixel_format_FlexYUVFullPlanar</ConfigForMode>
-        <ConfigForMode>LTDC_pixel_format_FlexYUVCoPlanar</ConfigForMode>
-        <ConfigForMode>LTDC_PIXEL_FORMAT_FLEXIBLE_ARGB_L1</ConfigForMode>
-        <ConfigForMode>LTDC_pixel_format_FlexYUVCoPlanar_L1</ConfigForMode>
-
-        <Parameter Name="Display"/>
- 
-        <!-- Width Synchronization RefParameters for LTDC -->
-        <Parameter Name="HSync"/>
-        <Parameter Name="HBP"/>
-              <!-- WARNING : ActiveW parameter is also used by X-CUBE-TOUCHGFX -->
-        <Parameter Name="ActiveW"/>
-        <Parameter Name="HFP"/>
-        <Parameter Name="HorizontalSync"/>
-        <Parameter Name="AccumulatedHBP"/>
-        <Parameter Name="AccumulatedActiveW"/>
-        <Parameter Name="TotalWidth"/>
-        
-        <!-- Height Synchronization RefParameters for LTDC -->
-        <Parameter Name="VSync"/>
-        <Parameter Name="VBP"/>
-              <!-- WARNING : ActiveH parameter is also used by X-CUBE-TOUCHGFX -->
-        <Parameter Name="ActiveH"/>
-        <Parameter Name="VFP"/>
-        <Parameter Name="VerticalSync"/>
-        <Parameter Name="AccumulatedVBP"/>
-        <Parameter Name="AccumulatedActiveH"/>
-        <Parameter Name="TotalHeigh"/>
-        
-        <!-- Polarity RefParameter -->
-        <Parameter Name="HSPolarity"/>
-        <Parameter Name="VSPolarity"/>
-        <Parameter Name="DEPolarity"/>
-        <Parameter Name="PCPolarity"/>
-        
-        <!-- Layer Default Color RefParameters -->
-        <Parameter Name="Red"/>
-        <Parameter Name="Green"/>
-        <Parameter Name="Blue"/>
-        
-                
-        <!-- LTDC Config L0 (Background) parameters -->
-        <Parameter Name="LayerIdx_L0" />
-        
-        <Parameter Name="WindowX0_L0" />
-        <Parameter Name="WindowX1_L0" />
-        <Parameter Name="WindowY0_L0" />
-        <Parameter Name="WindowY1_L0" />
-        
-        <!-- <Parameter Name="PixelFormat_L0_not888" /> -->
-              <!-- WARNING : PixelFormat_L0 parameter is also used by X-CUBE-TOUCHGFX -->
-        <Parameter Name="PixelFormat_L0" />
-        <!-- Flexible ARGB -->
-        <Parameter Name="PixelSize_L0" />
-        <Parameter Name="AlphaPos_L0" />
-        <Parameter Name="RedPos_L0" />
-        <Parameter Name="GreenPos_L0" />
-        <Parameter Name="BluePos_L0" />
-        <Parameter Name="AlphaWidth_L0" />
-        <Parameter Name="RedWidth_L0" />
-        <Parameter Name="GreenWidth_L0" />
-        <Parameter Name="BlueWidth_L0" />
-        <Parameter Name="Alpha_L0" />
-        <Parameter Name="Alpha0_L0" />
-        <Parameter Name="BlendingFactor1_L0" />
-        <Parameter Name="BlendingFactor2_L0" />
-         <!-- Flexible YUV Full Planar -->
-        <Parameter Name="YuvAddress_L0" />
-        <Parameter Name="YAddress_L0" />
-        <Parameter Name="UAddress_L0" />
-         <Parameter Name="VAddress_L0" />
-         <Parameter Name="UvAddress_L0" />
-         <Parameter Name="ChrominanceOrder_L0" />
-         <Parameter Name="LuminanceOrder_L0" />
-         <Parameter  Name="LuminanceRescale_L0" />
-        <Parameter Name="YuvOrder_L0" />
-        <Parameter  Name="ColorConverter_L0" />
-        <!-- Flexible YUV  SemiPlanar-->
-        <Parameter Name="YuvAddress_SemiPlanar_L0" />
-        <Parameter Name="YAddress_SemiPlanar_L0" />
-        <Parameter Name="UAddress_SemiPlanar_L0" />
-         <Parameter Name="VAddress_SemiPlanar_L0" />
-         <Parameter Name="UvAddress_SemiPlanar_L0" />
-         <Parameter Name="ChrominanceOrder_SemiPlanar_L0" />
-         <Parameter Name="LuminanceOrder_SemiPlanar_L0" />
-         <Parameter  Name="LuminanceRescale_SemiPlanar_L0" />
-        <Parameter Name="YuvOrder_SemiPlanar_L0" />
-        <Parameter  Name="ColorConverter_SemiPlanar_L0" />
-        <!-- Flexible YUV  CoPlanar-->
-        <Parameter Name="YuvAddress_CoPlanar_L0" />
-        <Parameter Name="YAddress_CoPlanar_L0" />
-        <Parameter Name="UAddress_CoPlanar_L0" />
-         <Parameter Name="VAddress_CoPlanar_L0" />
-         <Parameter Name="UvAddress_CoPlanar_L0" />
-         <Parameter Name="ChrominanceOrder_CoPlanar_L0" />
-         <Parameter Name="LuminanceOrder_CoPlanar_L0" />
-         <Parameter  Name="LuminanceRescale_CoPlanar_L0" />
-        <Parameter Name="YuvOrder_CoPlanar_L0" />
-        <Parameter  Name="ColorConverter_CoPlanar_L0" />
-        
-        <Parameter Name="FBStartAdress_L0" />
-        <Parameter Name="ImageWidth_L0" />
-        <Parameter Name="ImageHeight_L0" />
-        <Parameter Name="Pitch_L0" />
-        
-        <Parameter Name="Blue_L0" />
-        <Parameter Name="Green_L0" />
-        <Parameter Name="Red_L0" />
-        
-        <!-- LTDC Layer settings start here -->
-        <Parameter Name="Layers"/>
-        <!-- LTDC Config L1 (Foreground) parameters -->
-        <Parameter Name="LayerIdx_L1" />
-        <!-- <Parameter Name="PixelFormat_L1_not888" /> -->
-        <Parameter Name="PixelFormat_L1" />
-        <!-- Layer 1 Flexible YUV CoPlanar  -->
-        <Parameter Name="YuvAddress_L1" />
-        <Parameter Name="ChrominanceOrder_L1" />
-        <Parameter Name="LuminanceOrder_L1" />
-        <Parameter Name="LuminanceRescale_L1" />
-        <Parameter Name="YuvOrder_L1" />
-         <Parameter Name="ColorConverter_L1" />
-        <!-- Flexible ARGB -->
-        <Parameter Name="PixelSize_L1" />
-        <Parameter Name="AlphaPos_L1" />
-        <Parameter Name="RedPos_L1" />
-        <Parameter Name="GreenPos_L1" />
-        <Parameter Name="BluePos_L1" />
-        <Parameter Name="AlphaWidth_L1" />
-        <Parameter Name="RedWidth_L1" />
-        <Parameter Name="GreenWidth_L1" />
-        <Parameter Name="BlueWidth_L1" />
-        
-        <Parameter Name="WindowX0_L1" />
-        <Parameter Name="WindowX1_L1" />
-        <Parameter Name="WindowY0_L1" />
-        <Parameter Name="WindowY1_L1" />
-         
-        <Parameter Name="Alpha_L1" />
-        <Parameter Name="Alpha0_L1" />
-        <Parameter Name="BlendingFactor1_L1" />
-        <Parameter Name="BlendingFactor2_L1" /> 
-        
-        <Parameter Name="FBStartAdress_L1" />
-        <Parameter Name="ImageWidth_L1" />
-        <Parameter Name="ImageHeight_L1" />
-        <Parameter Name="Pitch_L1" />
-        
-        <Parameter Name="Blue_L1" />
-        <Parameter Name="Green_L1" />
-        <Parameter Name="Red_L1" />
-        
-    </RefMode>
-		
     <!-- ModeLogicOperator for LTDC -->
     <ModeLogicOperator Name="OR">
         <Mode Name="Display" UserName="Display Type">
@@ -2148,7 +816,7 @@
                 </Mode>
                 <Mode Name="RGB888" UserName="RGB888 (24 bits)">
                     <Semaphore>Semaphore_LTDC</Semaphore>
-                    <Condition Diagnostic="DSI Host Video mode or Adapted Command Mode must be disabled" Expression="!(Semaphore_MODEVIDEODSIHOST|Semaphore_MODEADAPTEDDSIHOST|Semaphore_MODEADAPTEDTEDSIHOST)"/> 
+                    <Condition Diagnostic="DSI Host Video mode or Adapted Command Mode must be disabled" Expression="!(Semaphore_MODEVIDEODSIHOST|Semaphore_MODEADAPTEDDSIHOST|Semaphore_MODEADAPTEDTEDSIHOST)"/>
                     <SignalLogicalOp Name="AND">
                         <Signal Name="R0" />
                         <Signal Name="R1" />
@@ -2158,7 +826,7 @@
                         <Signal Name="R5" />
                         <Signal Name="R6" />
                         <Signal Name="R7" />
-						
+
                         <Signal Name="G0" />
                         <Signal Name="G1" />
                         <Signal Name="G2" />
@@ -2167,7 +835,7 @@
                         <Signal Name="G5" />
                         <Signal Name="G6" />
                         <Signal Name="G7" />
-						
+
                         <Signal Name="B0" />
                         <Signal Name="B1" />
                         <Signal Name="B2" />
@@ -2176,7 +844,7 @@
                         <Signal Name="B5" />
                         <Signal Name="B6" />
                         <Signal Name="B7" />
-						
+
                         <Signal Name="HSYNC" />
                         <Signal Name="VSYNC" />
                         <Signal Name="CLK" />
@@ -2192,33 +860,33 @@
                 </Mode>
                 <Mode Name="RGB666" UserName="RGB666 (18 bits)">
                     <Semaphore>Semaphore_LTDC</Semaphore>
-                    <Condition Diagnostic="DSI Host Video mode or Adapted Command Mode must be disabled" Expression="!(Semaphore_MODEVIDEODSIHOST|Semaphore_MODEADAPTEDDSIHOST|Semaphore_MODEADAPTEDTEDSIHOST)"/> 
+                    <Condition Diagnostic="DSI Host Video mode or Adapted Command Mode must be disabled" Expression="!(Semaphore_MODEVIDEODSIHOST|Semaphore_MODEADAPTEDDSIHOST|Semaphore_MODEADAPTEDTEDSIHOST)"/>
                     <SignalLogicalOp Name="AND">
                         <Signal Name="R2" />
-                         <Signal Name="R3" />
-                         <Signal Name="R4" />
-                         <Signal Name="R5" />
-                         <Signal Name="R6" />
-                         <Signal Name="R7" />
+                        <Signal Name="R3" />
+                        <Signal Name="R4" />
+                        <Signal Name="R5" />
+                        <Signal Name="R6" />
+                        <Signal Name="R7" />
 
-                         <Signal Name="G2" />
-                         <Signal Name="G3" />
-                         <Signal Name="G4" />
-                         <Signal Name="G5" />
-                         <Signal Name="G6" />
-                         <Signal Name="G7" />
- 						
-                         <Signal Name="B2" />
-                         <Signal Name="B3" />
-                         <Signal Name="B4" />
-                         <Signal Name="B5" />
-                         <Signal Name="B6" />
-                         <Signal Name="B7" />
- 						
-                         <Signal Name="HSYNC" />
-                         <Signal Name="VSYNC" />
-                         <Signal Name="CLK" />
-                         <Signal Name="DE" />
+                        <Signal Name="G2" />
+                        <Signal Name="G3" />
+                        <Signal Name="G4" />
+                        <Signal Name="G5" />
+                        <Signal Name="G6" />
+                        <Signal Name="G7" />
+
+                        <Signal Name="B2" />
+                        <Signal Name="B3" />
+                        <Signal Name="B4" />
+                        <Signal Name="B5" />
+                        <Signal Name="B6" />
+                        <Signal Name="B7" />
+
+                        <Signal Name="HSYNC" />
+                        <Signal Name="VSYNC" />
+                        <Signal Name="CLK" />
+                        <Signal Name="DE" />
                     </SignalLogicalOp>
                 </Mode>
                 <Mode Name="RGB565" UserName="RGB565 (16 bits) - DSI mode" RemoveCondition="!(DSIHOST:$modeexist_DSIHost_Video|DSIHOST:$modeexist_DSIHost_Video2|DSIHOST:$modeexist_DSIHost_Video_onelane|DSIHOST:$modeexist_DSIHost_Adapted|DSIHOST:$modeexist_DSIHost_Adapted_onelane|DSIHOST:$modeexist_DSIHost_Adapted_TE|DSIHOST:$modeexist_DSIHost_Adapted_TE_onelane)">
@@ -2230,171 +898,27 @@
                 </Mode>
                 <Mode Name="RGB565" UserName="RGB565 (16 bits)">
                     <Semaphore>Semaphore_LTDC</Semaphore>
-                    <Condition Diagnostic="DSI Host Video mode or Adapted Command Mode must be disabled" Expression="!(Semaphore_MODEVIDEODSIHOST|Semaphore_MODEADAPTEDDSIHOST|Semaphore_MODEADAPTEDTEDSIHOST)"/> 
+                    <Condition Diagnostic="DSI Host Video mode or Adapted Command Mode must be disabled" Expression="!(Semaphore_MODEVIDEODSIHOST|Semaphore_MODEADAPTEDDSIHOST|Semaphore_MODEADAPTEDTEDSIHOST)"/>
                     <SignalLogicalOp Name="AND">
                         <Signal Name="R3" />
                         <Signal Name="R4" />
                         <Signal Name="R5" />
                         <Signal Name="R6" />
                         <Signal Name="R7" />
-						
+
                         <Signal Name="G2" />
                         <Signal Name="G3" />
                         <Signal Name="G4" />
                         <Signal Name="G5" />
                         <Signal Name="G6" />
                         <Signal Name="G7" />
-						
+
                         <Signal Name="B3" />
                         <Signal Name="B4" />
                         <Signal Name="B5" />
                         <Signal Name="B6" />
                         <Signal Name="B7" />
-						
-                        <Signal Name="HSYNC" />
-                        <Signal Name="VSYNC" />
-                        <Signal Name="CLK" />
-                        <Signal Name="DE" />
-                    </SignalLogicalOp>
-                </Mode>
-                <Mode Name="YUV HDTV (16 bits)" UserName="YUV HDTV (16 bits) - DSI mode" RemoveCondition="!(DSIHOST:$modeexist_DSIHost_Video|DSIHOST:$modeexist_DSIHost_Video2|DSIHOST:$modeexist_DSIHost_Video_onelane|DSIHOST:$modeexist_DSIHost_Adapted|DSIHOST:$modeexist_DSIHost_Adapted_onelane|DSIHOST:$modeexist_DSIHost_Adapted_TE|DSIHOST:$modeexist_DSIHost_Adapted_TE_onelane)">
-                    <Semaphore>Semaphore_LTDC</Semaphore>
-                    <SignalLogicalOp Name="AND">
-                        <Signal Name="DSIMode" />
-                    </SignalLogicalOp>
-                    <Semaphore>Semaphore_LTDC_ConfiguredforDSI_16bits</Semaphore>
-                </Mode>
-                <Mode Name="YUV HDTV (16 bits)" UserName="YUV HDTV (16 bits)">
-                    <Semaphore>Semaphore_LTDC</Semaphore>
-                    <Semaphore>Semaphore_LTDC_YUV_HDTV_16_bits</Semaphore>
-                    <Condition Diagnostic="DSI Host Video mode or Adapted Command Mode must be disabled" Expression="!(Semaphore_MODEVIDEODSIHOST|Semaphore_MODEADAPTEDDSIHOST|Semaphore_MODEADAPTEDTEDSIHOST)"/> 
-                    <SignalLogicalOp Name="AND">
-                        <Signal Name="R0" />
-                        <Signal Name="R1" />
-                        <Signal Name="R2" />
-                        <Signal Name="R3" />
-                        <Signal Name="R4" />
-                        <Signal Name="R5" />
-                        <Signal Name="R6" />
-                        <Signal Name="R7" />
-                        
-                        <Signal Name="G0" />
-                        <Signal Name="G1" />
-                        <Signal Name="G2" />
-                        <Signal Name="G3" />
-                        <Signal Name="G4" />
-                        <Signal Name="G5" />
-                        <Signal Name="G6" />
-                        <Signal Name="G7" />
-                        
-                        <Signal Name="HSYNC" />
-                        <Signal Name="VSYNC" />
-                        <Signal Name="CLK" />
-                        <Signal Name="DE" />
-                    </SignalLogicalOp>
-                </Mode>
-                <Mode Name="YUV SDTV (16 bits)" UserName="YUV SDTV (16 bits) - DSI mode" RemoveCondition="!(DSIHOST:$modeexist_DSIHost_Video|DSIHOST:$modeexist_DSIHost_Video2|DSIHOST:$modeexist_DSIHost_Video_onelane|DSIHOST:$modeexist_DSIHost_Adapted|DSIHOST:$modeexist_DSIHost_Adapted_onelane|DSIHOST:$modeexist_DSIHost_Adapted_TE|DSIHOST:$modeexist_DSIHost_Adapted_TE_onelane)">
-                    <Semaphore>Semaphore_LTDC</Semaphore>
-                    <SignalLogicalOp Name="AND">
-                        <Signal Name="DSIMode" />
-                    </SignalLogicalOp>
-                    <Semaphore>Semaphore_LTDC_ConfiguredforDSI_16bits</Semaphore>
-                </Mode>
-                <Mode Name="YUV SDTV (16 bits)" UserName="YUV SDTV (16 bits)">
-                    <Semaphore>Semaphore_LTDC</Semaphore>
-                    <Semaphore>Semaphore_LTDC_YUV_SDTV_16_bits</Semaphore>
-                    <Condition Diagnostic="DSI Host Video mode or Adapted Command Mode must be disabled" Expression="!(Semaphore_MODEVIDEODSIHOST|Semaphore_MODEADAPTEDDSIHOST|Semaphore_MODEADAPTEDTEDSIHOST)"/> 
-                    <SignalLogicalOp Name="AND">
-                        <Signal Name="R0" />
-                        <Signal Name="R1" />
-                        <Signal Name="R2" />
-                        <Signal Name="R3" />
-                        <Signal Name="R4" />
-                        <Signal Name="R5" />
-                        <Signal Name="R6" />
-                        <Signal Name="R7" />
-                        
-                        <Signal Name="G0" />
-                        <Signal Name="G1" />
-                        <Signal Name="G2" />
-                        <Signal Name="G3" />
-                        <Signal Name="G4" />
-                        <Signal Name="G5" />
-                        <Signal Name="G6" />
-                        <Signal Name="G7" />
-                        
-                        <Signal Name="HSYNC" />
-                        <Signal Name="VSYNC" />
-                        <Signal Name="CLK" />
-                        <Signal Name="DE" />
-                    </SignalLogicalOp>
-                </Mode>
-                <Mode Name="YVU HDTV (16 bits)" UserName="YVU HDTV (16 bits) - DSI mode" RemoveCondition="!(DSIHOST:$modeexist_DSIHost_Video|DSIHOST:$modeexist_DSIHost_Video2|DSIHOST:$modeexist_DSIHost_Video_onelane|DSIHOST:$modeexist_DSIHost_Adapted|DSIHOST:$modeexist_DSIHost_Adapted_onelane|DSIHOST:$modeexist_DSIHost_Adapted_TE|DSIHOST:$modeexist_DSIHost_Adapted_TE_onelane)">
-                    <Semaphore>Semaphore_LTDC</Semaphore>
-                    <SignalLogicalOp Name="AND">
-                        <Signal Name="DSIMode" />
-                    </SignalLogicalOp>
-                    <Semaphore>Semaphore_LTDC_ConfiguredforDSI_16bits</Semaphore>
-                </Mode>
-                <Mode Name="YVU HDTV (16 bits)" UserName="YVU HDTV (16 bits)">
-                    <Semaphore>Semaphore_LTDC</Semaphore>
-                    <Semaphore>Semaphore_LTDC_YVU_HDTV_16_bits</Semaphore>
-                    <Condition Diagnostic="DSI Host Video mode or Adapted Command Mode must be disabled" Expression="!(Semaphore_MODEVIDEODSIHOST|Semaphore_MODEADAPTEDDSIHOST|Semaphore_MODEADAPTEDTEDSIHOST)"/> 
-                    <SignalLogicalOp Name="AND">
-                        <Signal Name="R0" />
-                        <Signal Name="R1" />
-                        <Signal Name="R2" />
-                        <Signal Name="R3" />
-                        <Signal Name="R4" />
-                        <Signal Name="R5" />
-                        <Signal Name="R6" />
-                        <Signal Name="R7" />
-                        
-                        <Signal Name="G0" />
-                        <Signal Name="G1" />
-                        <Signal Name="G2" />
-                        <Signal Name="G3" />
-                        <Signal Name="G4" />
-                        <Signal Name="G5" />
-                        <Signal Name="G6" />
-                        <Signal Name="G7" />
-                        
-                        <Signal Name="HSYNC" />
-                        <Signal Name="VSYNC" />
-                        <Signal Name="CLK" />
-                        <Signal Name="DE" />
-                    </SignalLogicalOp>
-                </Mode>
-                <Mode Name="YVU SDTV (16 bits)" UserName="YVU SDTV (16 bits) - DSI mode" RemoveCondition="!(DSIHOST:$modeexist_DSIHost_Video|DSIHOST:$modeexist_DSIHost_Video2|DSIHOST:$modeexist_DSIHost_Video_onelane|DSIHOST:$modeexist_DSIHost_Adapted|DSIHOST:$modeexist_DSIHost_Adapted_onelane|DSIHOST:$modeexist_DSIHost_Adapted_TE|DSIHOST:$modeexist_DSIHost_Adapted_TE_onelane)">
-                    <Semaphore>Semaphore_LTDC</Semaphore>
-                    <SignalLogicalOp Name="AND">
-                        <Signal Name="DSIMode" />
-                    </SignalLogicalOp>
-                    <Semaphore>Semaphore_LTDC_ConfiguredforDSI_16bits</Semaphore>
-                </Mode>
-                <Mode Name="YVU SDTV (16 bits)" UserName="YVU SDTV (16 bits)">
-                    <Semaphore>Semaphore_LTDC</Semaphore>
-                    <Semaphore>Semaphore_LTDC_YVU_SDTV_16_bits</Semaphore>
-                    <Condition Diagnostic="DSI Host Video mode or Adapted Command Mode must be disabled" Expression="!(Semaphore_MODEVIDEODSIHOST|Semaphore_MODEADAPTEDDSIHOST|Semaphore_MODEADAPTEDTEDSIHOST)"/> 
-                    <SignalLogicalOp Name="AND">
-                        <Signal Name="R0" />
-                        <Signal Name="R1" />
-                        <Signal Name="R2" />
-                        <Signal Name="R3" />
-                        <Signal Name="R4" />
-                        <Signal Name="R5" />
-                        <Signal Name="R6" />
-                        <Signal Name="R7" />
-                        
-                        <Signal Name="G0" />
-                        <Signal Name="G1" />
-                        <Signal Name="G2" />
-                        <Signal Name="G3" />
-                        <Signal Name="G4" />
-                        <Signal Name="G5" />
-                        <Signal Name="G6" />
-                        <Signal Name="G7" />
-                        
+
                         <Signal Name="HSYNC" />
                         <Signal Name="VSYNC" />
                         <Signal Name="CLK" />
@@ -2402,12 +926,12 @@
                     </SignalLogicalOp>
                 </Mode>
             </ModeLogicOperator>
-              <!-- WARNING : MW_LTDC_MW semaphore is also used by X-CUBE-TOUCHGFX -->
+            <!-- WARNING : MW_LTDC_MW semaphore is also used by X-CUBE-TOUCHGFX -->
             <Semaphore>MW_LTDC_MW</Semaphore>
         </Mode>
     </ModeLogicOperator>
-	
-	
+
+
     <!-- RefSignal for LCD-TFT -->
     <RefSignal Name="R0" IOMode="AlternateFunctionPushPull"/>
     <RefSignal Name="R1" IOMode="AlternateFunctionPushPull"/>
@@ -2417,7 +941,7 @@
     <RefSignal Name="R5" IOMode="AlternateFunctionPushPull"/>
     <RefSignal Name="R6" IOMode="AlternateFunctionPushPull"/>
     <RefSignal Name="R7" IOMode="AlternateFunctionPushPull"/>
-	
+
     <RefSignal Name="G0" IOMode="AlternateFunctionPushPull"/>
     <RefSignal Name="G1" IOMode="AlternateFunctionPushPull"/>
     <RefSignal Name="G2" IOMode="AlternateFunctionPushPull"/>
@@ -2426,7 +950,7 @@
     <RefSignal Name="G5" IOMode="AlternateFunctionPushPull"/>
     <RefSignal Name="G6" IOMode="AlternateFunctionPushPull"/>
     <RefSignal Name="G7" IOMode="AlternateFunctionPushPull"/>
-	
+
     <RefSignal Name="B0" IOMode="AlternateFunctionPushPull"/>
     <RefSignal Name="B1" IOMode="AlternateFunctionPushPull"/>
     <RefSignal Name="B2" IOMode="AlternateFunctionPushPull"/>
@@ -2435,7 +959,7 @@
     <RefSignal Name="B5" IOMode="AlternateFunctionPushPull"/>
     <RefSignal Name="B6" IOMode="AlternateFunctionPushPull"/>
     <RefSignal Name="B7" IOMode="AlternateFunctionPushPull"/>
-	
+
     <RefSignal Name="HSYNC" IOMode="AlternateFunctionPushPull"/>
     <RefSignal Name="VSYNC" IOMode="AlternateFunctionPushPull"/>
     <RefSignal Name="CLK" IOMode="AlternateFunctionPushPull"/>

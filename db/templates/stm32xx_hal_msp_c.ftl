@@ -145,6 +145,9 @@ RCC_OscInitTypeDef RCC_OscInitStruct = {0};
 [/#list]
 [/#if]
 #n
+[#if FamilyName == "STM32WBA" && (instName?? && (instName?starts_with("USB")))]
+	#t__HAL_RCC_SYSCFG_CLK_ENABLE();
+[/#if]
 [#if clock??]
     [#list clock as clk]
         [#if clk!="none"]
@@ -152,7 +155,7 @@ RCC_OscInitTypeDef RCC_OscInitStruct = {0};
         [/#if]
     [/#list]
 [/#if]
-[#if isSBS_XSPIM1_Used?? || isSBS_XSPIM2_Used?? || isSBS_IO_Used??]
+[#if (isSBS_Used?? || isSBS_XSPIM1_Used?? || isSBS_XSPIM2_Used?? || isSBS_IO_Used??)]
 #t__HAL_RCC_SBS_CLK_ENABLE();
 [/#if]
 [#if FamilyName == "STM32U5" && ((instName?? && (instName?starts_with("USB"))) || USBUsed??)]
@@ -1300,7 +1303,7 @@ RCC_OscInitTypeDef RCC_OscInitStruct = {0};
             [#if initService.clock!="none"]
                 #t#t/* Peripheral clock disable */
                 [#list initService.clock?split(';') as clock]     
-                    [#if ipvar.clkCommonResource.entrySet()?contains(clock?trim)]
+                    [#if ipvar.clkCommonResource.entrySet()?contains(clock?trim) && DIE != "DIE4B0"]
                         [#if (ipvar.usedDriver == "HAL")]
                             #t#t${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED--;
                             #t#tif(${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED==0){                                    
@@ -1350,6 +1353,12 @@ RCC_OscInitTypeDef RCC_OscInitStruct = {0};
     [/#if]
 [/#if]
 
+[#if ipName?contains("USB") && (FamilyName=="STM32WBA") ]
+[#if serviceType=="Init"]
+[#else]
+#t#t__HAL_RCC_SYSCFG_CLK_DISABLE();
+[/#if]
+[/#if]
 [#if ipName?contains("DRD_FS") && (FamilyName=="STM32U5") ]
 [#if serviceType=="Init"]
 #n#t#t/* Enable VDDUSB */
@@ -1382,7 +1391,7 @@ RCC_OscInitTypeDef RCC_OscInitStruct = {0};
 [/#if]
 [/#if]
 
-[#if ipName?contains("OTG_HS") && FamilyName=="STM32N6" && !contextFolder?contains("NonSecure")]
+[#if ipName?contains("OTG_HS") && ((FamilyName=="STM32N6" && !contextFolder?contains("NonSecure"))|| FamilyName=="STM32WBA")]
 [#if serviceType=="Init"]
 #n#t#t/* Enable VDDUSB */
 	#t#tif(__HAL_RCC_PWR_IS_CLK_ENABLED())
@@ -1390,13 +1399,18 @@ RCC_OscInitTypeDef RCC_OscInitStruct = {0};
 	#t#t#t__HAL_RCC_PWR_CLK_ENABLE();
 
 	#t#t#tHAL_PWREx_EnableVddUSB();
-
+	[#if FamilyName=="STM32WBA"]
+	#t#t#tHAL_PWREx_EnableUSBPWR();
+	[/#if]
 	#t#t#t__HAL_RCC_PWR_CLK_DISABLE();
 	#t#t}
 	#t#telse
 	#t#t{
 	#t#t#tHAL_PWREx_EnableVddUSB();
 	#t#t}
+	[#if ipName?contains("OTG_HS") && (FamilyName=="STM32WBA")]
+    #t#tHAL_SYSCFG_EnableOTGPHY(SYSCFG_OTG_HS_PHY_ENABLE);
+	[/#if]
 [#else]
 #n#t#t/* Disable VDDUSB */
 	#t#tif(__HAL_RCC_PWR_IS_CLK_ENABLED())
@@ -1428,7 +1442,7 @@ RCC_OscInitTypeDef RCC_OscInitStruct = {0};
             [#if initService.clock!="none"]
                #t#t/* Peripheral clock enable */
                 [#list initService.clock?split(';') as clock]
-                    [#if ipvar.usedDriver?contains("HAL") &&  ipvar.clkCommonResource.entrySet()?contains(clock?trim)]#t#t${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED++;
+                    [#if ipvar.usedDriver?contains("HAL") &&  ipvar.clkCommonResource.entrySet()?contains(clock?trim) && DIE != "DIE4B0"]#t#t${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED++;
                     #t#tif(${clock?trim?replace("__","")?replace("_ENABLE","")}_ENABLED==1){          
                         #t#t#t${clock?trim}[#if !clock?contains('(')]()[/#if];
                     [#if ipvar.usedDriver?contains("HAL") &&  ipvar.clkCommonResource.entrySet()?contains(clock?trim)]#t#t}[/#if]  
@@ -1446,7 +1460,7 @@ RCC_OscInitTypeDef RCC_OscInitStruct = {0};
 
     [#if serviceType=="Init"] 
 [#-- bug 322189 Init--]
-[#if ipName?contains("USB")&&(FamilyName=="STM32L4")]
+[#if ipName?contains("USB")&&(FamilyName=="STM32L4"||FamilyName=="STM32L5")]
 #n#t#t/* Enable VDDUSB */
   #t#tif(__HAL_RCC_PWR_IS_CLK_DISABLED())
   #t#t{
@@ -1706,7 +1720,7 @@ RCC_OscInitTypeDef RCC_OscInitStruct = {0};
                 #t#tIRQ_Disable(${initVector.vector});
                 [/#if] 
                 [#else]
-#t/* USER CODE BEGIN ${ipName}:${initVector.vector} disable */
+#t#t/* USER CODE BEGIN ${ipName}:${initVector.vector} disable */
 #t#t/**
 #t#t* Uncomment the line below to disable the "${initVector.vector}" interrupt 
 #t#t*        Be aware, disabling shared interrupt may affect other IPs
@@ -1716,7 +1730,7 @@ RCC_OscInitTypeDef RCC_OscInitStruct = {0};
 [#else]
 #t#t/* IRQ_Disable(${initVector.vector}); */
 [/#if]
-#t/* USER CODE END ${ipName}:${initVector.vector} disable */
+#t#t/* USER CODE END ${ipName}:${initVector.vector} disable */
 #n
                 [/#if]
             [/#list]
@@ -1793,7 +1807,7 @@ RCC_OscInitTypeDef RCC_OscInitStruct = {0};
 
 [#-- End macro add service code --]
 [#--------------DMA DFSDM --]
-[#if ipvar.usedDriver?contains("HAL") && ipvar.clkCommonResource??]
+[#if ipvar.usedDriver?contains("HAL") && ipvar.clkCommonResource?? && DIE != "DIE4B0"]
     [#list ipvar.clkCommonResource.entrySet() as entry]
 static uint32_t ${entry.value}=0;
     [/#list]
@@ -1823,11 +1837,11 @@ static uint32_t ${entry.value}=0;
 [/#if]
 [#compress]
 /**
-  * @brief ${mode} MSP Initialization
-  *        This function configures the hardware resources used in this example
-  * @param h${mode?lower_case}: ${mode} handle pointer
-  * @retval None
-  */
+#t* @brief ${mode} MSP Initialization
+#t* This function configures the hardware resources used in this example
+#t* @param h${mode?lower_case}: ${mode} handle pointer
+#t* @retval None
+#t*/
 [/#compress]
 [#-- #nvoid HAL_${mode}_MspInit(${mode}_HandleTypeDef* h${mode?lower_case}){--] 
 [#if !mode?contains("TIM")||mode?contains("LPTIM")||mode?contains("HRTIM")||mode?contains("GFXTIM")]
@@ -1984,10 +1998,10 @@ static uint32_t ${entry.value}=0;
             [/#if]
         [/#if]
     [/#if]
-[#if words?size > 1] [#-- Check if there is more than one ip instance--]    
-#t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 0 */
+[#if words?size > 1] [#-- Check if there is more than one ip instance--]
+#t#t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 0 */
 
-#n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 0 */
+#n#t#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 0 */
 [#if RESMGR_UTILITY?? && FamilyName=="STM32MP2"]
  [@common.optinclude name=contextFolder+mxTmpFolder+"/resmgrutilityrequest_"+ words[0]+".tmp"/][#-- ADD RESMGR_UTILITY Code--]
 [/#if]
@@ -2013,9 +2027,9 @@ static uint32_t ${entry.value}=0;
 
  
         [@generateServiceCode ipName=words[0] serviceType="Init" modeName=mode instHandler=ipHandler tabN=2/] 
-#t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 1 */
+#t#t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 1 */
 
-#n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 1 */  
+#n#t#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 1 */
 [#if  words[0]?starts_with("DFSDM")]
 #t${words[0]}_Init++;
 [/#if]
@@ -2041,9 +2055,9 @@ static uint32_t ${entry.value}=0;
         [/#if]
     [/#if]
     #t{
-#t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspInit 0 */
+#t#t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspInit 0 */
 
-#n#t/* USER CODE END ${words[i]?replace("I2S","SPI")}_MspInit 0 */
+#n#t#t/* USER CODE END ${words[i]?replace("I2S","SPI")}_MspInit 0 */
 [#if RESMGR_UTILITY?? && FamilyName=="STM32MP2"]
  [@common.optinclude name=contextFolder+mxTmpFolder+"/resmgrutilityrequest_"+ words[i]+".tmp"/][#-- ADD RESMGR_UTILITY Code--]
 [/#if]
@@ -2066,9 +2080,9 @@ static uint32_t ${entry.value}=0;
 [/#if]
 [/#list]
         [@generateServiceCode ipName=words[i] serviceType="Init" modeName=mode instHandler=ipHandler tabN=2/] 
-#t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspInit 1 */
+#t#t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspInit 1 */
 
-#n#t/* USER CODE END ${words[i]?replace("I2S","SPI")}_MspInit 1 */    
+#n#t#t/* USER CODE END ${words[i]?replace("I2S","SPI")}_MspInit 1 */
 [#if  words[i]?starts_with("DFSDM")]
 #t${words[i]}_Init++;
 [/#if]
@@ -2082,11 +2096,18 @@ static uint32_t ${entry.value}=0;
     [/#list]
 [#else]
     [#if words[0]??]
-#t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 0 */
+[#if (words[0].contains("USB")) && ( DIE == "DIE4B0")] 
+#t#t/* USER CODE BEGIN ${words[0]}_${mode}_MspInit 0 */
+
+#n#t#t/* USER CODE END ${words[0]}_${mode}_MspInit 0 */
+[#else]
+#t#t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 0 */
 [#if (words[0].contains("USB")) && ( DIE == "DIE476" ||  DIE == "DIE481")] 
 #n#t#t__HAL_RCC_SYSCFG_CLK_ENABLE(); 
 [/#if]
-#n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 0 */
+#n#t#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 0 */
+[/#if]
+
 [#if RESMGR_UTILITY?? && FamilyName=="STM32MP2"]
  [@common.optinclude name=contextFolder+mxTmpFolder+"/resmgrutilityrequest_"+ words[0]+".tmp"/][#-- ADD RESMGR_UTILITY Code--]
 [/#if]
@@ -2123,10 +2144,16 @@ static uint32_t ${entry.value}=0;
 [/#if]
 [/#list]
     [@generateServiceCode ipName=words[0] serviceType="Init" modeName=mode instHandler=ipHandler tabN=2/] 
-    
-#t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 1 */
+[#if (words[0].contains("USB")) && ( DIE == "DIE4B0")] 
+#t#t/* USER CODE BEGIN ${words[0]}_${mode}_MspInit 1 */
 
-#n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 1 */
+#n#t#t/* USER CODE END ${words[0]}_${mode}_MspInit 1 */
+[#else]
+#t#t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 1 */
+
+#n#t#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 1 */
+[/#if]
+
 
 #n
 [#if RESMGR_UTILITY?? && FamilyName=="STM32MP2"]
@@ -2308,13 +2335,13 @@ uint32_t DFSDM_Init = 0;
     [/#if]
 [/#if]
 [#if words?size > 1] [#-- Check if there is more than one ip instance--]    
-#t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspPostInit 0 */
+#t#t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspPostInit 0 */
 
-#n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspPostInit 0 */    
+#n#t#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspPostInit 0 */
         [@generateConfigCode ipName=words[0] type="Init" serviceName="gpioOut" instHandler=ipHandler tabN=2/]  
-#t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspPostInit 1 */
+#t#t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspPostInit 1 */
 
-#n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspPostInit 1 */  
+#n#t#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspPostInit 1 */
 [#if !words[0]?contains("HASH") &&  !words[0].contains("SUBGHZ") ] 
     #t}
 [/#if]
@@ -2338,27 +2365,27 @@ uint32_t DFSDM_Init = 0;
             [/#if]
 
             #t{
-            #t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspPostInit 0 */
+            #t#t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspPostInit 0 */
 
-            #n#t/* USER CODE END ${words[i]?replace("I2S","SPI")}_MspPostInit 0 */
+            #n#t#t/* USER CODE END ${words[i]?replace("I2S","SPI")}_MspPostInit 0 */
                    #t[@generateConfigCode ipName=words[i] type="Init" serviceName="gpioOut" instHandler=ipHandler tabN=2/] 
-            #t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspPostInit 1 */
+            #t#t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspPostInit 1 */
 
-            #n#t/* USER CODE END ${words[i]?replace("I2S","SPI")}_MspPostInit 1 */    
+            #n#t#t/* USER CODE END ${words[i]?replace("I2S","SPI")}_MspPostInit 1 */
             #t}
         [/#if]
         [#assign i = i + 1]
     [/#list]
 [#else]
     [#if words[0]??]
-        #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspPostInit 0 */
+        #t#t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspPostInit 0 */
 
-        #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspPostInit 0 */
-        #t[@generateConfigCode ipName=words[0] type="Init" serviceName="gpioOut" instHandler=ipHandler tabN=2/]
+        #n#t#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspPostInit 0 */
+        #t#t[@generateConfigCode ipName=words[0] type="Init" serviceName="gpioOut" instHandler=ipHandler tabN=2/]
     
-        #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspPostInit 1 */
+        #t#t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspPostInit 1 */
 
-        #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspPostInit 1 */
+        #n#t#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspPostInit 1 */
     [/#if]
     [#if ipvar.instanceNbre > 1 || words[0]?contains("DFSDM")] [#-- IF number of IP instances greater than 0--]
           [#if !words[0].contains("HASH") &&  !words[0].contains("SUBGHZ")] 
@@ -2383,11 +2410,11 @@ uint32_t DFSDM_Init = 0;
 [#assign ipHandler = "h" + mode?lower_case]
 [#compress]
 /**
-  * @brief ${mode} MSP De-Initialization
-  *        This function freeze the hardware resources used in this example
-  * @param h${mode?lower_case}: ${mode} handle pointer
-  * @retval None
-  */
+#t* @brief ${mode} MSP De-Initialization
+#t* This function freeze the hardware resources used in this example
+#t* @param h${mode?lower_case}: ${mode} handle pointer
+#t* @retval None
+#t*/
 [/#compress]
 [#if !mode?contains("TIM")||mode?contains("LPTIM")||mode?contains("HRTIM")||mode?contains("GFXTIM")]
 #nvoid ${entry.key}(${mode}_HandleTypeDef* h${mode?lower_case})
@@ -2430,16 +2457,16 @@ uint32_t DFSDM_Init = 0;
 [/#if]
 [#if words?size > 1] [#-- Check if there is more than one ip instance--]
  [#assign deInitService = getDeInitServiceMode(words[0])]    
-#t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspDeInit 0 */
+#t#t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspDeInit 0 */
 
-#n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspDeInit 0 */ 
+#n#t#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspDeInit 0 */
 [@generateServiceCode ipName=words[0] serviceType="DeInit" modeName=mode instHandler=ipHandler tabN=2/]
 [#if words[0]?contains("DFSDM")]
 [@generateServiceCodeDFSDM ipName=words[0] serviceType="DeInit" modeName=mode instHandler=ipHandler tabN=2/]
 [/#if]
-#t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspDeInit 1 */
+#t#t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspDeInit 1 */
 
-#n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspDeInit 1 */
+#n#t#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspDeInit 1 */
   [#if RESMGR_UTILITY?? && FamilyName=="STM32MP2"]
  [@common.optinclude name=contextFolder+mxTmpFolder+"/resmgrutilityrelease_"+ words[0]+".tmp"/][#-- ADD RESMGR_UTILITY Code--]
  [/#if]
@@ -2479,16 +2506,16 @@ uint32_t DFSDM_Init = 0;
 [#else]
 #t{
 [/#if]
-#t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspDeInit 0 */
+#t#t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspDeInit 0 */
 
-#n#t/* USER CODE END ${words[i]?replace("I2S","SPI")}_MspDeInit 0 */    
+#n#t#t/* USER CODE END ${words[i]?replace("I2S","SPI")}_MspDeInit 0 */
 [@generateServiceCode ipName=words[i] serviceType="DeInit" modeName=mode instHandler=ipHandler tabN=2/]
 [#if words[i]?contains("DFSDM")]
 [@generateServiceCodeDFSDM ipName=words[i] serviceType="DeInit" modeName=mode instHandler=ipHandler tabN=2/]
 [/#if]
-#t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspDeInit 1 */
+#t#t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspDeInit 1 */
 
-#n#t/* USER CODE END ${words[i]?replace("I2S","SPI")}_MspDeInit 1 */
+#n#t#t/* USER CODE END ${words[i]?replace("I2S","SPI")}_MspDeInit 1 */
   [#if RESMGR_UTILITY?? && FamilyName=="STM32MP2"]
  [@common.optinclude name=contextFolder+mxTmpFolder+"/resmgrutilityrelease_"+ words[i]+".tmp"/][#-- ADD RESMGR_UTILITY Code--]
  [/#if]
@@ -2507,17 +2534,31 @@ uint32_t DFSDM_Init = 0;
 [#else]
     [#-- only one ip instance ${instanceList}--]
 [#if words[0]??]
-#t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspDeInit 0 */
+[#if (words[0].contains("USB")) && ( DIE == "DIE4B0")] 
+#t#t/* USER CODE BEGIN ${words[0]}_${mode}_MspDeInit 0 */
 
-#n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspDeInit 0 */
+#n#t#t/* USER CODE END ${words[0]}_${mode}_MspDeInit 0 */
+[#else]
+#t#t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspDeInit 0 */
+
+#n#t#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspDeInit 0 */
+[/#if]
+
 [@generateServiceCode ipName=words[0] serviceType="DeInit" modeName=mode instHandler=ipHandler tabN=2/]
 
 [#if words[0]?contains("DFSDM")]
 [@generateServiceCodeDFSDM ipName=words[0] serviceType="DeInit" modeName=mode instHandler=ipHandler tabN=2/]
 [/#if]
-#t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspDeInit 1 */
+[#if (words[0].contains("USB")) && ( DIE == "DIE4B0")] 
+#t#t/* USER CODE BEGIN ${words[0]}_${mode}_MspDeInit 1 */
 
-#n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspDeInit 1 */
+#n#t#t/* USER CODE END ${words[0]}_${mode}_MspDeInit 1 */
+[#else]
+#t#t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspDeInit 1 */
+
+#n#t#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspDeInit 1 */
+[/#if]
+
   [#if RESMGR_UTILITY?? && FamilyName=="STM32MP2"]
  [@common.optinclude name=contextFolder+mxTmpFolder+"/resmgrutilityrelease_"+ words[0]+".tmp"/][#-- ADD RESMGR_UTILITY Code--]
  [/#if]

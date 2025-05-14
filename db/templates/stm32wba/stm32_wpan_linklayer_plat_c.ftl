@@ -50,7 +50,9 @@ Key: ${key}; Value: ${myHash[key]}
 
 #if (CFG_LPM_LEVEL != 0)
 #include "stm32_lpm.h"
+#include "stm32_lpm_if.h"
 #endif /* (CFG_LPM_LEVEL != 0) */
+
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
@@ -98,7 +100,6 @@ uint32_t radio_sleep_timer_val = 0;
   */
 void LINKLAYER_PLAT_ClockInit()
 {
-[#if (myHash["BLE"] == "Enabled") ]
   uint32_t linklayer_slp_clk_src = LL_RCC_RADIOSLEEPSOURCE_NONE;
 
   /* Get the Link Layer sleep timer clock source */
@@ -108,10 +109,6 @@ void LINKLAYER_PLAT_ClockInit()
     /* If there is no clock source defined, should be selected before */
     assert_param(0);
   }
-[#else]
-  /* Select ${myHash["HAL_RCC_RADIOSLPTIM_CONFIG"]?substring(21)} as Sleep CLK */
-  __HAL_RCC_RADIOSLPTIM_CONFIG(${myHash["HAL_RCC_RADIOSLPTIM_CONFIG"]});
-[/#if]
 
   /* Enable AHB5ENR peripheral clock (bus CLK) */
   __HAL_RCC_RADIO_CLK_ENABLE();
@@ -551,16 +548,15 @@ void LINKLAYER_PLAT_StopRadioEvt(void)
   */
 void LINKLAYER_PLAT_RCOStartClbr(void)
 {
-#if (CFG_SCM_SUPPORTED == 1)
 #if (CFG_LPM_LEVEL != 0)
-#if (CFG_LPM_STDBY_SUPPORTED == 1)
-  UTIL_LPM_SetOffMode(1U << CFG_LPM_LL_HW_RCO_CLBR, UTIL_LPM_DISABLE);
-#endif /* (CFG_LPM_STDBY_SUPPORTED == 1) */
+  PWR_DisableSleepMode();
+  /* Disabling stop mode prevents also from entering in standby */
   UTIL_LPM_SetStopMode(1U << CFG_LPM_LL_HW_RCO_CLBR, UTIL_LPM_DISABLE);
 #endif /* (CFG_LPM_LEVEL != 0) */
+#if (CFG_SCM_SUPPORTED == 1)
   scm_setsystemclock(SCM_USER_LL_HW_RCO_CLBR, HSE_32MHZ);
   while (LL_PWR_IsActiveFlag_VOS() == 0);
-#endif /* CFG_SCM_SUPPORTED */
+#endif /* (CFG_SCM_SUPPORTED == 1) */
 }
 
 /**
@@ -570,16 +566,14 @@ void LINKLAYER_PLAT_RCOStartClbr(void)
   */
 void LINKLAYER_PLAT_RCOStopClbr(void)
 {
-#if (CFG_SCM_SUPPORTED == 1)
 #if (CFG_LPM_LEVEL != 0)
-#if (CFG_LPM_STDBY_SUPPORTED == 1)
-  UTIL_LPM_SetOffMode(1U << CFG_LPM_LL_HW_RCO_CLBR, UTIL_LPM_ENABLE);
-#endif /* (CFG_LPM_STDBY_SUPPORTED == 1) */
+  PWR_EnableSleepMode();
   UTIL_LPM_SetStopMode(1U << CFG_LPM_LL_HW_RCO_CLBR, UTIL_LPM_ENABLE);
 #endif /* (CFG_LPM_LEVEL != 0) */
+#if (CFG_SCM_SUPPORTED == 1)
   scm_setsystemclock(SCM_USER_LL_HW_RCO_CLBR, HSE_16MHZ);
   while (LL_PWR_IsActiveFlag_VOS() == 0);
-#endif /* CFG_SCM_SUPPORTED */
+#endif /* (CFG_SCM_SUPPORTED == 1) */
 }
 
 /**
@@ -606,9 +600,6 @@ void LINKLAYER_PLAT_EnableOSContextSwitch(void)
   /* USER CODE BEGIN LINKLAYER_PLAT_EnableOSContextSwitch_0 */
 
   /* USER CODE END LINKLAYER_PLAT_EnableOSContextSwitch_0 */
-[#if myHash["FREERTOS_STATUS"]?number == 1 ]
-  osKernelUnlock();
-[/#if]
 [#if myHash["THREADX_STATUS"]?number == 1 ]
   tx_interrupt_control(TX_INT_ENABLE);
 [/#if]
@@ -627,9 +618,6 @@ void LINKLAYER_PLAT_DisableOSContextSwitch(void)
   /* USER CODE BEGIN LINKLAYER_PLAT_DisableOSContextSwitch_0 */
 
   /* USER CODE END LINKLAYER_PLAT_DisableOSContextSwitch_0 */
-[#if myHash["FREERTOS_STATUS"]?number == 1 ]
-  osKernelLock();
-[/#if]
 [#if myHash["THREADX_STATUS"]?number == 1 ]
   tx_interrupt_control(TX_INT_DISABLE);
 [/#if]

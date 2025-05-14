@@ -10,9 +10,6 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
-[#assign PG_FILL_UCS = "False"]
-[#assign PG_BSP_NUCLEO_WBA52CG = 0]
-[#assign PG_SKIP_LIST = "False"]
 [#assign myHash = {}]
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
@@ -72,7 +69,7 @@ extern "C" {
 #define CFG_FW_BUILD              (0)
 #define CFG_FW_BRANCH             (0)
 #define CFG_FW_SUBVERSION         (0)
-#define CFG_FW_MINOR_VERSION      (5)
+#define CFG_FW_MINOR_VERSION      (6)
 #define CFG_FW_MAJOR_VERSION      (1)
 
 [/#if]
@@ -106,16 +103,6 @@ void MX_APPE_Process(void);
 [/#if]
 
 /* USER CODE BEGIN EFP */
-[#if PG_FILL_UCS == "True"]
-[#if PG_BSP_NUCLEO_WBA52CG == 1]
-#if (CFG_BUTTON_SUPPORTED == 1)
-uint8_t APPE_ButtonIsLongPressed(uint16_t btnIdx);
-void APPE_Button1Action(void);
-void APPE_Button2Action(void);
-void APPE_Button3Action(void);
-#endif
-[/#if]
-[/#if]
 
 /* USER CODE END EFP */
 

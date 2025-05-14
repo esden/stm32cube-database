@@ -37,7 +37,7 @@
   * @brief This is the list of modules to be used in the HAL driver 
   */
 #define HAL_MODULE_ENABLED  
-[#assign allModules = ["ADC","CEC", "CORDIC","CRC" ,"CRYP", "DCMIPP","DMA2D","DTS","ETH","FDCAN","GFXMMU","GFXTIM","GPU2D","HASH","HCD","I2C","I2S","I3C","ICACHE","IRDA","IWDG","JPEG","LPTIM","LTDC","MCE","MDF","MMC","NAND","NOR","PCD","PKA","PSSI","RAMECC","RCC","RNG","RTC", "SAI", "SD","SDRAM","SMARTCARD","SMBUS","SPDIFRX","SPI","SRAM","TIM","UART","USART","WWDG","XSPI"]]
+[#assign allModules = ["ADC","CEC", "CORDIC","CRC" ,"CRYP", "DCMIPP","DMA2D","DTS","ETH","FDCAN","GFXMMU","GFXTIM","GPU2D","HASH","HCD","I2C","I2S","I3C","ICACHE","IRDA","IWDG","JPEG","LPTIM","LTDC","MCE","MDF","MMC","NAND","NOR","PCD","PKA","PSSI","RAMECC","RCC","RNG","RTC", "SAI", "SD", "SDIO","SDRAM","SMARTCARD","SMBUS","SPDIFRX","SPI","SRAM","TIM","UART","USART","WWDG","XSPI"]]
   [#list allModules as module]
 	[#if isModuleUsed(module)]
 [#compress]#define HAL_${module?replace("QUADSPI","QSPI")?replace("AES","CRYP")?replace("OCTOSPI","OSPI")}_MODULE_ENABLED[/#compress]
@@ -190,6 +190,7 @@
 #define USE_HAL_RTC_REGISTER_CALLBACKS        0U
 #define USE_HAL_SAI_REGISTER_CALLBACKS        0U
 #define USE_HAL_SD_REGISTER_CALLBACKS         0U
+#define USE_HAL_SDIO_REGISTER_CALLBACKS       0U
 #define USE_HAL_SDRAM_REGISTER_CALLBACKS      0U
 #define USE_HAL_SMARTCARD_REGISTER_CALLBACKS  0U
 #define USE_HAL_SMBUS_REGISTER_CALLBACKS      0U
@@ -231,6 +232,11 @@
 /* ################## SDMMC peripheral configuration ######################### */
 		  
 #define USE_SD_TRANSCEIVER            0U
+
+/* ################## SDIO peripheral configuration ######################### */
+
+#define USE_SDIO_TRANSCEIVER          [#if USE_SD_TRANSCEIVER??]${USE_SD_TRANSCEIVER}[#else]0U[/#if]
+#define SDIO_MAX_IO_NUMBER            [#if SD_MAX_IO_NUMBER??]${SD_MAX_IO_NUMBER}[#else]7U[/#if]
 
 /* Includes ------------------------------------------------------------------*/
 /**
@@ -412,6 +418,10 @@
 #ifdef HAL_SD_MODULE_ENABLED
   #include "stm32h7rsxx_hal_sd.h"
 #endif /* HAL_SD_MODULE_ENABLED */
+
+#ifdef HAL_SDIO_MODULE_ENABLED
+#include "stm32h7rsxx_hal_sdio.h"
+#endif /* HAL_SDIO_MODULE_ENABLED */
 
 #ifdef HAL_SDRAM_MODULE_ENABLED
   #include "stm32h7rsxx_hal_sdram.h"

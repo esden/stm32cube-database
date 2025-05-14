@@ -6,7 +6,7 @@ DBVersion="V4.0"
 IncludeFile=""
 Name="STM32_WPAN"
 RootFolder="Middlewares/"
-Version="STM32Cube_FW_WBA_V1.5.0"
+Version="STM32Cube_FW_WBA_V1.6.0"
 usedHierachicalGroup="true"
 ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Configs.xsd">
 
@@ -16,6 +16,8 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <CallLibMethod Name="APPE_Init" Phase="preOS"/>
         <Component Name="HAL:PKA"/>
         <Component Name="HAL:TIM"/>
+        <Component Name="HAL:ADC"/>
+        <Component Name="HAL:RNG"/>
         <Component Name="Middleware:WPAN_COMMON"/>
         <Component Name="Middleware:LinkLayer"/>
         <Component Name="Middleware:Mac_802_15_4"/>
@@ -221,6 +223,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Defines Name="OPENTHREAD_PROJECT_CORE_CONFIG_FILE" Value="&lt;stm32wba-openthread-rcp-config.h&gt;" Condition=" (S_THREAD &amp; S_RCP)"/>
         <Defines Name="MAC" Value="" Condition="S_THREAD | S_THREAD_SKELETON | S_ZIGBEE | S_ZIGBEE_SKELETON | S_mac_802_15_4 | S_mac_802_15_4_SKELETON"/>
         <Defines Name="MAC_LAYER" Value="" Condition="S_ZIGBEE | S_ZIGBEE_SKELETON | S_mac_802_15_4 | S_mac_802_15_4_SKELETON"/>
+        <Defines Name="DISABLE_RFTS_EXT_EVNT_HNDLR=1" Value="" Condition="!(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE)"/>
     </RefConfig>
 
     <LibMethod Name="APPE_Init" Comment="Initialize the STM32_WPAN stack">
@@ -232,8 +235,17 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <File Category="header" Name="Drivers/STM32WBAxx_HAL_Driver/Inc/stm32wbaxx_ll_pka.h"/>
     </RefComponent>
 	
+    <RefComponent Cclass="HAL" Cgroup="RNG" Cversion="1.0.0">
+        <File Category="header" Name="Drivers/STM32WBAxx_HAL_Driver/Inc/stm32wbaxx_ll_rng.h"/>
+    </RefComponent>
+
     <RefComponent Cclass="HAL" Cgroup="TIM" Cversion="1.0.0">
         <File Category="source" Name="Drivers/STM32WBAxx_HAL_Driver/Src/stm32wbaxx_ll_tim.c"/>
+        <File Category="header" Name="Drivers/STM32WBAxx_HAL_Driver/Inc/stm32wbaxx_ll_tim.h"/>
+    </RefComponent>
+
+    <RefComponent Cclass="HAL" Cgroup="ADC" Cversion="1.0.0">
+        <File Category="source" Name="Drivers/STM32WBAxx_HAL_Driver/Src/stm32wbaxx_ll_adc.c" Condition="S_USE_TEMPERATURE_BASED_RADIO_CALIBRATION"/>
     </RefComponent>
 
     <RefComponent Cclass="Middleware" Cgroup="WPAN_COMMON" Cversion="1.0.0">
@@ -243,14 +255,15 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
 
     <RefComponent Cclass="Middleware" Cgroup="LinkLayer" Cversion="1.0.0">
         <!-- Header files for link_layer -->
-        <File Category="header" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/config/ble_basic/ll_fw_config.h" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE) &amp; Semaphore_BLE_STACK_TYPE_BASIC &amp; !( S_THREAD | S_THREAD_SKELETON | S_ZIGBEE | S_ZIGBEE_SKELETON)"/>
-        <File Category="header" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/config/ble_basic_20_links/ll_fw_config.h" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE) &amp; Semaphore_BLE_STACK_TYPE_BASIC_8 &amp; !( S_THREAD | S_THREAD_SKELETON | S_ZIGBEE | S_ZIGBEE_SKELETON)"/>
-        <File Category="header" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/config/ble_full/ll_fw_config.h" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE) &amp; Semaphore_BLE_STACK_TYPE_FULL &amp; !( S_THREAD | S_THREAD_SKELETON | S_ZIGBEE | S_ZIGBEE_SKELETON)"/>
-        <File Category="header" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/config/ble_peripheral_only/ll_fw_config.h" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE) &amp; Semaphore_BLE_STACK_TYPE_PO &amp; !( S_THREAD | S_THREAD_SKELETON | S_ZIGBEE | S_ZIGBEE_SKELETON)"/>
+        <File Category="header" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/config/ble_basic/ll_fw_config.h" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE) &amp; !(S_ZIGBEE | S_ZIGBEE_SKELETON | S_THREAD | S_THREAD_SKELETON | S_mac_802_15_4 | S_mac_802_15_4_SKELETON) &amp; Semaphore_BLE_STACK_TYPE_BASIC"/>
+        <File Category="header" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/config/ble_basic_plus/ll_fw_config.h" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE) &amp; !(S_ZIGBEE | S_ZIGBEE_SKELETON | S_THREAD | S_THREAD_SKELETON | S_mac_802_15_4 | S_mac_802_15_4_SKELETON) &amp; Semaphore_BLE_STACK_TYPE_BASIC_PLUS"/>
+        <File Category="header" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/config/ble_basic_20_links/ll_fw_config.h" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE)&amp; !(S_ZIGBEE | S_ZIGBEE_SKELETON | S_THREAD | S_THREAD_SKELETON | S_mac_802_15_4 | S_mac_802_15_4_SKELETON) &amp; Semaphore_BLE_STACK_TYPE_BASIC_8"/>
+        <File Category="header" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/config/ble_full/ll_fw_config.h" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE) &amp; !(S_ZIGBEE | S_ZIGBEE_SKELETON | S_THREAD | S_THREAD_SKELETON | S_mac_802_15_4 | S_mac_802_15_4_SKELETON) &amp; Semaphore_BLE_STACK_TYPE_FULL"/>
+        <File Category="header" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/config/ble_peripheral_only/ll_fw_config.h" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE) &amp; !(S_ZIGBEE | S_ZIGBEE_SKELETON | S_THREAD | S_THREAD_SKELETON | S_mac_802_15_4 | S_mac_802_15_4_SKELETON) &amp; Semaphore_BLE_STACK_TYPE_PO"/>
         <File Category="header" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/config/thread/ll_fw_config.h" Condition="(S_THREAD | S_THREAD_SKELETON) &amp; !(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE)"/>
-        <File Category="header" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/config/concurrent/ll_fw_config.h" Condition="(S_THREAD | S_THREAD_SKELETON) &amp; (S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE)"/>
+        <File Category="header" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/config/concurrent/ble_thread/ll_fw_config.h" Condition="(S_THREAD | S_THREAD_SKELETON) &amp; (S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE)"/>
         <File Category="header" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/config/ieee_15_4_basic/ll_fw_config.h" Condition="(S_ZIGBEE | S_ZIGBEE_SKELETON | S_mac_802_15_4 | S_mac_802_15_4_SKELETON) &amp; !(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE)"/>
-        <File Category="header" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/config/concurrent/ll_fw_config.h" Condition="(S_ZIGBEE | S_ZIGBEE_SKELETON) &amp; (S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE)"/>
+        <File Category="header" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/config/concurrent/ble_15_4/ll_fw_config.h" Condition="(S_ZIGBEE | S_ZIGBEE_SKELETON | S_mac_802_15_4 | S_mac_802_15_4_SKELETON) &amp; (S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE)"/>
         <File Category="header" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/inc/*.h"/>
         <File Category="header" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/inc/*"/>
         <File Category="header" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/inc/_40nm_reg_files/*.h"/>
@@ -267,19 +280,25 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <File Category="source" Name="ST/STM32_WPAN/link_layer/ll_sys/src/ll_sys_startup.c"/>       
 
         <!-- Library files for link_layer -->
-        <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer_BLE_Basic_lib.a" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE) &amp; Semaphore_BLE_STACK_TYPE_BASIC &amp; DIE492"/>
-        <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer_BLE_Basic_20_links_lib.a" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE) &amp; Semaphore_BLE_STACK_TYPE_BASIC_8 &amp; DIE492"/>
-        <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer_BLE_Full_lib.a" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE) &amp; Semaphore_BLE_STACK_TYPE_FULL &amp; DIE492"/>
-        <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer_BLE_Peripheral_Only_lib.a" Condition="(S_BLE_HOST_SIMPLE) &amp; Semaphore_BLE_STACK_TYPE_PO &amp; DIE492"/>
-        <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer_Thread_lib.a" Condition="(S_THREAD | S_THREAD_SKELETON) &amp; DIE492"/>
-        <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer15_4.a" Condition="(S_ZIGBEE | S_ZIGBEE_SKELETON | S_mac_802_15_4 | S_mac_802_15_4_SKELETON) &amp; DIE492" />
+        <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer_BLE_Basic_lib.a" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE) &amp; !(S_ZIGBEE | S_ZIGBEE_SKELETON | S_THREAD | S_THREAD_SKELETON | S_mac_802_15_4 | S_mac_802_15_4_SKELETON) &amp; Semaphore_BLE_STACK_TYPE_BASIC &amp; DIE492"/>
+        <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer_BLE_Basic_Plus_lib.a" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE) &amp; !(S_ZIGBEE | S_ZIGBEE_SKELETON | S_THREAD | S_THREAD_SKELETON | S_mac_802_15_4 | S_mac_802_15_4_SKELETON) &amp; Semaphore_BLE_STACK_TYPE_BASIC_PLUS &amp; DIE492"/>
+        <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer_BLE_Basic_20_links_lib.a" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE) &amp; !(S_ZIGBEE | S_ZIGBEE_SKELETON | S_THREAD | S_THREAD_SKELETON | S_mac_802_15_4 | S_mac_802_15_4_SKELETON) &amp; Semaphore_BLE_STACK_TYPE_BASIC_8 &amp; DIE492"/>
+        <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer_BLE_Full_lib.a" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE) &amp; !(S_ZIGBEE | S_ZIGBEE_SKELETON | S_THREAD | S_THREAD_SKELETON | S_mac_802_15_4 | S_mac_802_15_4_SKELETON) &amp; Semaphore_BLE_STACK_TYPE_FULL &amp; DIE492"/>
+        <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer_BLE_Peripheral_Only_lib.a" Condition="(S_BLE_HOST_SIMPLE) &amp; !(S_ZIGBEE | S_ZIGBEE_SKELETON | S_THREAD | S_THREAD_SKELETON | S_mac_802_15_4 | S_mac_802_15_4_SKELETON) &amp; Semaphore_BLE_STACK_TYPE_PO &amp; DIE492"/>
+        <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer_Thread_lib.a" Condition="(S_THREAD | S_THREAD_SKELETON) &amp; !(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE) &amp; DIE492"/>
+        <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer_BLE_Thread_lib.a" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE) &amp; (S_THREAD | S_THREAD_SKELETON) &amp; DIE492" />
+        <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer15_4.a" Condition="(S_ZIGBEE | S_ZIGBEE_SKELETON | S_mac_802_15_4 | S_mac_802_15_4_SKELETON) &amp; !(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE) &amp; DIE492" />
+        <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/LinkLayer_BLE_Mac_lib.a" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE) &amp; (S_ZIGBEE | S_ZIGBEE_SKELETON | S_mac_802_15_4 | S_mac_802_15_4_SKELETON) &amp; DIE492" />
 
-        <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/WBA6_LinkLayer_BLE_Basic_lib.a" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE) &amp; Semaphore_BLE_STACK_TYPE_BASIC &amp; DIE4B0"/>
-        <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/WBA6_LinkLayer_BLE_Basic_20_links_lib.a" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE) &amp; Semaphore_BLE_STACK_TYPE_BASIC_8 &amp; DIE4B0"/>
-        <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/WBA6_LinkLayer_BLE_Full_lib.a" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE) &amp; Semaphore_BLE_STACK_TYPE_FULL &amp; DIE4B0"/>
-        <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/WBA6_LinkLayer_BLE_Peripheral_Only_lib.a" Condition="(S_BLE_HOST_SIMPLE) &amp; Semaphore_BLE_STACK_TYPE_PO &amp; DIE4B0"/>
-        <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/WBA6_LinkLayer_Thread_lib.a" Condition="(S_THREAD | S_THREAD_SKELETON) &amp; DIE4B0"/>
-        <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/WBA6_LinkLayer15_4.a" Condition="(S_ZIGBEE | S_ZIGBEE_SKELETON | S_mac_802_15_4 | S_mac_802_15_4_SKELETON) &amp; DIE4B0" />
+        <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/WBA6_LinkLayer_BLE_Basic_lib.a" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE) &amp; !(S_ZIGBEE | S_ZIGBEE_SKELETON | S_THREAD | S_THREAD_SKELETON | S_mac_802_15_4 | S_mac_802_15_4_SKELETON) &amp; Semaphore_BLE_STACK_TYPE_BASIC &amp; DIE4B0"/>
+        <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/WBA6_LinkLayer_BLE_Basic_Plus_lib.a" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE) &amp; !(S_ZIGBEE | S_ZIGBEE_SKELETON | S_THREAD | S_THREAD_SKELETON | S_mac_802_15_4 | S_mac_802_15_4_SKELETON) &amp; Semaphore_BLE_STACK_TYPE_BASIC_PLUS &amp; DIE4B0"/>
+        <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/WBA6_LinkLayer_BLE_Basic_20_links_lib.a" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE) &amp; !(S_ZIGBEE | S_ZIGBEE_SKELETON | S_THREAD | S_THREAD_SKELETON | S_mac_802_15_4 | S_mac_802_15_4_SKELETON) &amp; Semaphore_BLE_STACK_TYPE_BASIC_8 &amp; DIE4B0"/>
+        <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/WBA6_LinkLayer_BLE_Full_lib.a" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE) &amp; !(S_ZIGBEE | S_ZIGBEE_SKELETON | S_THREAD | S_THREAD_SKELETON | S_mac_802_15_4 | S_mac_802_15_4_SKELETON) &amp; Semaphore_BLE_STACK_TYPE_FULL &amp; DIE4B0"/>
+        <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/WBA6_LinkLayer_BLE_Peripheral_Only_lib.a" Condition="(S_BLE_HOST_SIMPLE) &amp; !(S_ZIGBEE | S_ZIGBEE_SKELETON | S_THREAD | S_THREAD_SKELETON | S_mac_802_15_4 | S_mac_802_15_4_SKELETON) &amp; Semaphore_BLE_STACK_TYPE_PO &amp; DIE4B0"/>
+        <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/WBA6_LinkLayer_Thread_lib.a" Condition="(S_THREAD | S_THREAD_SKELETON) &amp; !(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE) &amp; DIE4B0"/>
+        <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/WBA6_LinkLayer_BLE_Thread_lib.a" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE) &amp; (S_THREAD | S_THREAD_SKELETON) &amp; DIE4B0" />
+        <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/WBA6_LinkLayer15_4.a" Condition="(S_ZIGBEE | S_ZIGBEE_SKELETON | S_mac_802_15_4 | S_mac_802_15_4_SKELETON) &amp; !(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE) &amp; DIE4B0" />
+        <File Category="library" Name="ST/STM32_WPAN/link_layer/ll_cmd_lib/lib/WBA6_LinkLayer_BLE_Mac_lib.a" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE) &amp; (S_ZIGBEE | S_ZIGBEE_SKELETON | S_mac_802_15_4 | S_mac_802_15_4_SKELETON) &amp; DIE4B0" />
     </RefComponent>
     
 <!-- Mac_802_15_4 RefComponents begin -->
@@ -302,8 +321,8 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
             <File Category="header" Name="ST/STM32_WPAN/ble/stack/include/auto/*.h" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE)"/>
             <File Category="source" Name="ST/STM32_WPAN/ble/stack/include/auto/ble_wrap.c" ExcludedFromBuild="true" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE)"/>
         <!-- Header files for ble/stack/lib -->
-            <!-- <File Category="library" Name="ST/STM32_WPAN/ble/stack/lib/*.a"/> MAX en standby pour la step 2.1 -->
             <File Category="library" Name="ST/STM32_WPAN/ble/stack/lib/stm32wba_ble_stack_basic.a" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE) &amp; Semaphore_BLE_STACK_TYPE_BASIC &amp; !(S_BLE_OPTIONS_LL_ONLY)"/>
+            <File Category="library" Name="ST/STM32_WPAN/ble/stack/lib/stm32wba_ble_stack_basic_plus.a" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE) &amp; Semaphore_BLE_STACK_TYPE_BASIC_PLUS &amp; !(S_BLE_OPTIONS_LL_ONLY)"/>
             <File Category="library" Name="ST/STM32_WPAN/ble/stack/lib/stm32wba_ble_stack_llobasic.a" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE) &amp; Semaphore_BLE_STACK_TYPE_BASIC &amp; S_BLE_OPTIONS_LL_ONLY"/>
             <File Category="library" Name="ST/STM32_WPAN/ble/stack/lib/stm32wba_ble_stack_full.a" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE) &amp; Semaphore_BLE_STACK_TYPE_FULL &amp; !(S_BLE_OPTIONS_LL_ONLY)"/>
             <File Category="library" Name="ST/STM32_WPAN/ble/stack/lib/stm32wba_ble_stack_llo.a" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE) &amp; Semaphore_BLE_STACK_TYPE_FULL &amp; S_BLE_OPTIONS_LL_ONLY"/>
@@ -311,7 +330,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <!-- Header files for ble/svc/Inc -->
             <File Category="header" Name="ST/STM32_WPAN/ble/svc/Inc/*.h" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE)"/>
        <!-- Source files for ble/svc/Src -->
-            <File Category="source" Name="ST/STM32_WPAN/ble/svc/Src/svc_ctl.c" Condition="!(S_BLE_TM) &amp; (S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE)"/>
+            <File Category="source" Name="ST/STM32_WPAN/ble/svc/Src/svc_ctl.c" Condition="!(S_BLE_TM) &amp; (S_BLE_HOST | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE)"/>
             <File Category="header" Name="ST/STM32_WPAN/ble/svc/Src/uuid.h" Condition="(S_BLE_HOST | S_BLE_SKELETON | S_BLE_HOST_SKELETON | S_BLE_HOST_SIMPLE)"/>
     </RefComponent>
 <!-- BLE RefComponents end -->
@@ -525,8 +544,6 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="CFG_LOG_TRACE_BUF_SIZE" GenericType="Simple"/>
         <Argument Name="CFG_DEBUGGER_LEVEL" GenericType="Simple"/>
         <Argument Name="CFG_RT_DEBUG_GPIO_MODULE" GenericType="Simple"/>
-        <Argument Name="USE_RADIO_LOW_ISR" GenericType="Simple"/>
-        <Argument Name="NEXT_EVENT_SCHEDULING_FROM_ISR" GenericType="Simple"/>
         <Argument Name="USE_TEMPERATURE_BASED_RADIO_CALIBRATION" GenericType="Simple"/>
         <Argument Name="RADIO_INTR_PRIO_HIGH" GenericType="Simple"/>
         <Argument Name="RADIO_INTR_PRIO_LOW" GenericType="Simple"/>
@@ -535,9 +552,12 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="CFG_RF_TX_POWER_TABLE_ID" GenericType="Simple"/>
         <Argument Name="CFG_EXTERNAL_PA_ENABLE" GenericType="Simple"/>
         <Argument Name="CFG_AOA_AOD_ENABLE" GenericType="Simple"/>
+        <Argument Name="CFG_RADIO_NUM_OF_ANTENNAS" GenericType="Simple"/>
+        <Argument Name="CFG_RADIO_LSE_SLEEP_TIMER_CUSTOM_SCA_RANGE" GenericType="Simple"/>
         <Argument Name="CFG_HW_RNG_POOL_SIZE" GenericType="Simple"/>
         <Argument Name="CFG_MM_POOL_SIZE" GenericType="Simple"/>
         <Argument Name="USE_SNVMA_NVM" GenericType="Simple"/>
+        <Argument Name="USE_FLASH_MANAGER" GenericType="Simple"/>
         <Argument Name="CFG_MM_TYPE" GenericType="Simple"/>
         <Argument Name="CFG_AMM_VIRTUAL_MEMORY_NUMBER" GenericType="Simple"/>
         <Argument Name="CFG_AMM_VIRTUAL_ID_NBR_1" GenericType="Simple"/>
@@ -670,6 +690,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="mac_802_15_4_SKELETON" GenericType="Simple"/>
         <Argument Name="USE_TEMPERATURE_BASED_RADIO_CALIBRATION" GenericType="Simple"/>
         <Argument Name="USE_SNVMA_NVM" GenericType="Simple"/>
+        <Argument Name="USE_FLASH_MANAGER" GenericType="Simple"/>
         <Argument Name="CFG_MM_TYPE" GenericType="Simple"/>
         <Argument Name="CFG_AMM_VIRTUAL_MEMORY_NUMBER" GenericType="Simple"/>
         <Argument Name="CFG_AMM_VIRTUAL_ID_NBR_1" GenericType="Simple"/>
@@ -714,6 +735,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
     
     <RefConfigFile Description="" Name="STM32_LMP_IF_H" Template="stm32wba/stm32_wpan_stm32_lpm_if_h.ftl" destinationFolder="System/Interfaces/">
         <File Category="header" Condition="!(S_BLE_HOST_SIMPLE)" Name="stm32_lpm_if.h" Version="1.0"/>
+        <Argument Name="CFG_LPM_STDBY_SUPPORTED" GenericType="Simple"/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="TIMER_IF_H" Template="stm32wba/stm32_wpan_timer_if_h.ftl" destinationFolder="System/Interfaces/">
@@ -790,6 +812,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="mac_802_15_4" GenericType="Simple"/>
         <Argument Name="mac_802_15_4_SKELETON" GenericType="Simple"/>
         <Argument Name="USE_TEMPERATURE_BASED_RADIO_CALIBRATION" GenericType="Simple"/>
+        <Argument Name="CFG_LPM_STDBY_SUPPORTED" GenericType="Simple"/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="TIMER_IF_C" Template="stm32wba/stm32_wpan_timer_if_c.ftl" destinationFolder="System/Interfaces/">
@@ -1012,13 +1035,13 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
 <!-- System/Modules/Nvm/inc begin -->
 
     <RefConfigFile Description="" Name="NVM_H" Template="stm32wba/stm32_wpan_nvm_h.ftl" destinationFolder="System/Modules/Nvm/">
-        <File Category="header" Condition="(S_USE_SNVMA_NVM) &amp; !(S_COMMON_WPAN)" Name="nvm.h" Version="1.0"/>
+        <File Category="header" Condition="(!S_BLE_HOST_SIMPLE) &amp; !(S_COMMON_WPAN)" Name="nvm.h" Version="1.0"/>
     </RefConfigFile>
 
 <!-- System/Modules/Nvm/src begin -->
 
     <RefConfigFile Description="" Name="NVM_EMUL_C" Template="stm32wba/stm32_wpan_nvm_emul_c.ftl" destinationFolder="System/Modules/Nvm/">
-        <File Category="source" Condition="(S_USE_SNVMA_NVM) &amp; !(S_COMMON_WPAN)" Name="nvm_emul.c" Version="1.0"/>
+        <File Category="source" Condition="(!S_BLE_HOST_SIMPLE) &amp; !(S_COMMON_WPAN)" Name="nvm_emul.c" Version="1.0"/>
     </RefConfigFile>
 
 <!-- System/Modules/RTDebug - src & inc -->
@@ -1147,6 +1170,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
 
     <RefConfigFile Description="" Name="PERIPHERAL_INIT_H" Template="stm32wba/stm32_wpan_peripheral_init_h.ftl" destinationFolder="System/Config/LowPower/">
         <File Category="header" Condition="!(S_BLE_HOST_SIMPLE)" Name="peripheral_init.h" Version="1.0"/>
+        <Argument Name="CFG_LPM_STDBY_SUPPORTED" GenericType="Simple"/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="PERIPHERAL_INIT_C" Template="stm32wba/stm32_wpan_peripheral_init_c.ftl" destinationFolder="System/Config/LowPower/">
@@ -1154,6 +1178,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="USE_SNVMA_NVM" GenericType="Simple"/>
         <Argument Name="USE_TEMPERATURE_BASED_RADIO_CALIBRATION" GenericType="Simple"/>
         <Argument Name="SYSTICK_SOURCE_CLOCK_SELECTION" GenericType="Simple"/>
+        <Argument Name="CFG_LPM_STDBY_SUPPORTED" GenericType="Simple"/>
     </RefConfigFile>
 
 <!-- System/Config/Debug_GPIO - src & inc -->
@@ -1263,12 +1288,12 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
 <!-- System/Config/CRC_Ctrl - src & inc -->
 
     <RefConfigFile Description="" Name="CRC_CTRL_CONF_C" Template="stm32wba/stm32_wpan_crc_ctrl_conf_c.ftl" destinationFolder="System/Config/CRC_Ctrl/">
-        <File Category="source" Condition="!(S_BLE_HOST_SIMPLE)" Name="crc_ctrl_conf.c" Version="1.0"/>
+        <File Category="source" Condition="!(S_BLE_HOST_SIMPLE) &amp; S_USE_SNVMA_NVM" Name="crc_ctrl_conf.c" Version="1.0"/>
         <Argument Name="USE_SNVMA_NVM" GenericType="Simple"/>
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="CRC_CTRL_CONF_H" Template="stm32wba/stm32_wpan_crc_ctrl_conf_h.ftl" destinationFolder="System/Config/CRC_Ctrl/">
-        <File Category="header" Condition="!(S_BLE_HOST_SIMPLE)" Name="crc_ctrl_conf.h" Version="1.0"/>
+        <File Category="header" Condition="!(S_BLE_HOST_SIMPLE) &amp; S_USE_SNVMA_NVM" Name="crc_ctrl_conf.h" Version="1.0"/>
         <Argument Name="USE_SNVMA_NVM" GenericType="Simple"/>
     </RefConfigFile>
 
@@ -1717,6 +1742,9 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="SEQUENCER_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
         <Argument Name="USE_TEMPERATURE_BASED_RADIO_CALIBRATION" GenericType="Simple"/>
         <Argument Name="BLE" GenericType="Simple"/>
+        <Argument Name="BLE_MODE_SKELETON" GenericType="Simple"/>
+        <Argument Name="BLE_MODE_HOST_SKELETON" GenericType="Simple"/>
+        <Argument Name="BLE_MODE_SIMPLEST_BLE" GenericType="Simple"/>
     </RefConfigFile>
 
 	<RefConfigFile Description="" Name="HOST_STACK_IF_C" Template="stm32wba/host_stack_if_c.ftl" destinationFolder="STM32_WPAN/Target/">
@@ -1822,6 +1850,15 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
     <RefBspComponent BspIpName="GPIO" BspModeName="Output" Name="DEBUG_LOW_POWER_STOP_MODE_ACTIVE">
         <File Category="template" Name="stm32wba/debug_config_h.ftl" src="/System/Config/Debug_GPIO/"/>
     </RefBspComponent>
+    <RefBspComponent BspIpName="GPIO" BspModeName="Output" Name="DEBUG_LOW_POWER_STOP2_MODE_ENTER">
+        <File Category="template" Name="stm32wba/debug_config_h.ftl" src="/System/Config/Debug_GPIO/"/>
+    </RefBspComponent>
+    <RefBspComponent BspIpName="GPIO" BspModeName="Output" Name="DEBUG_LOW_POWER_STOP2_MODE_EXIT">
+        <File Category="template" Name="stm32wba/debug_config_h.ftl" src="/System/Config/Debug_GPIO/"/>
+    </RefBspComponent>
+    <RefBspComponent BspIpName="GPIO" BspModeName="Output" Name="DEBUG_LOW_POWER_STOP2_MODE_ACTIVE">
+        <File Category="template" Name="stm32wba/debug_config_h.ftl" src="/System/Config/Debug_GPIO/"/>
+    </RefBspComponent>
      <RefBspComponent BspIpName="GPIO" BspModeName="Output" Name="DEBUG_LOW_POWER_STANDBY_MODE_ENTER">
         <File Category="template" Name="stm32wba/debug_config_h.ftl" src="/System/Config/Debug_GPIO/"/>
     </RefBspComponent>
@@ -1880,6 +1917,9 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <File Category="template" Name="stm32wba/debug_config_h.ftl" src="/System/Config/Debug_GPIO/"/>
     </RefBspComponent>
     <RefBspComponent BspIpName="GPIO" BspModeName="Output" Name="DEBUG_SCHDLR_EXEC_EVNT_TRACE">
+        <File Category="template" Name="stm32wba/debug_config_h.ftl" src="/System/Config/Debug_GPIO/"/>
+    </RefBspComponent>
+	<RefBspComponent BspIpName="GPIO" BspModeName="Output" Name="DEBUG_SCHDLR_EXEC_EVNT_PROFILE">
         <File Category="template" Name="stm32wba/debug_config_h.ftl" src="/System/Config/Debug_GPIO/"/>
     </RefBspComponent>
     <RefBspComponent BspIpName="GPIO" BspModeName="Output" Name="DEBUG_SCHDLR_EXEC_EVNT_ERROR">
@@ -2287,6 +2327,55 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
     <RefBspComponent BspIpName="GPIO" BspModeName="Output" Name="DEBUG_OS_TMR_EVNT_CBK">
         <File Category="template" Name="stm32wba/debug_config_h.ftl" src="/System/Config/Debug_GPIO/"/>
     </RefBspComponent>
+	<RefBspComponent BspIpName="GPIO" BspModeName="Output" Name="DEBUG_PROFILE_MARKER_PHY_WAKEUP_TIME">
+        <File Category="template" Name="stm32wba/debug_config_h.ftl" src="/System/Config/Debug_GPIO/"/>
+    </RefBspComponent>
+    <RefBspComponent BspIpName="GPIO" BspModeName="Output" Name="DEBUG_PROFILE_END_DRIFT_TIME">
+        <File Category="template" Name="stm32wba/debug_config_h.ftl" src="/System/Config/Debug_GPIO/"/>
+    </RefBspComponent>
+    <RefBspComponent BspIpName="GPIO" BspModeName="Output" Name="DEBUG_PROC_RADIO_RCV">
+        <File Category="template" Name="stm32wba/debug_config_h.ftl" src="/System/Config/Debug_GPIO/"/>
+    </RefBspComponent>
+    <RefBspComponent BspIpName="GPIO" BspModeName="Output" Name="DEBUG_EVNT_TIME_UPDT">
+        <File Category="template" Name="stm32wba/debug_config_h.ftl" src="/System/Config/Debug_GPIO/"/>
+    </RefBspComponent>
+	<RefBspComponent BspIpName="GPIO" BspModeName="Output" Name="DEBUG_MAC_RECEIVE_DONE">
+        <File Category="template" Name="stm32wba/debug_config_h.ftl" src="/System/Config/Debug_GPIO/"/>
+    </RefBspComponent>
+    <RefBspComponent BspIpName="GPIO" BspModeName="Output" Name="DEBUG_MAC_TX_DONE">
+        <File Category="template" Name="stm32wba/debug_config_h.ftl" src="/System/Config/Debug_GPIO/"/>
+    </RefBspComponent>
+    <RefBspComponent BspIpName="GPIO" BspModeName="Output" Name="DEBUG_RADIO_APPLY_CSMA">
+        <File Category="template" Name="stm32wba/debug_config_h.ftl" src="/System/Config/Debug_GPIO/"/>
+    </RefBspComponent>
+    <RefBspComponent BspIpName="GPIO" BspModeName="Output" Name="DEBUG_RADIO_TRANSMIT">
+        <File Category="template" Name="stm32wba/debug_config_h.ftl" src="/System/Config/Debug_GPIO/"/>
+    </RefBspComponent>
+	<RefBspComponent BspIpName="GPIO" BspModeName="Output" Name="DEBUG_PROC_RADIO_TX">
+        <File Category="template" Name="stm32wba/debug_config_h.ftl" src="/System/Config/Debug_GPIO/"/>
+    </RefBspComponent>
+    <RefBspComponent BspIpName="GPIO" BspModeName="Output" Name="DEBUG_RAL_TX_DONE">
+        <File Category="template" Name="stm32wba/debug_config_h.ftl" src="/System/Config/Debug_GPIO/"/>
+    </RefBspComponent>
+    <RefBspComponent BspIpName="GPIO" BspModeName="Output" Name="DEBUG_RAL_TX_DONE_INCREMENT_BACKOFF_COUNT">
+        <File Category="template" Name="stm32wba/debug_config_h.ftl" src="/System/Config/Debug_GPIO/"/>
+    </RefBspComponent>
+    <RefBspComponent BspIpName="GPIO" BspModeName="Output" Name="DEBUG_RAL_TX_DONE_RST_BACKOFF_COUNT">
+        <File Category="template" Name="stm32wba/debug_config_h.ftl" src="/System/Config/Debug_GPIO/"/>
+    </RefBspComponent>
+	<RefBspComponent BspIpName="GPIO" BspModeName="Output" Name="DEBUG_RAL_CONTINUE_RX">
+        <File Category="template" Name="stm32wba/debug_config_h.ftl" src="/System/Config/Debug_GPIO/"/>
+    </RefBspComponent>
+    <RefBspComponent BspIpName="GPIO" BspModeName="Output" Name="DEBUG_RAL_PERFORM_CCA">
+        <File Category="template" Name="stm32wba/debug_config_h.ftl" src="/System/Config/Debug_GPIO/"/>
+    </RefBspComponent>
+    <RefBspComponent BspIpName="GPIO" BspModeName="Output" Name="DEBUG_RAL_ENABLE_TRANSMITTER">
+        <File Category="template" Name="stm32wba/debug_config_h.ftl" src="/System/Config/Debug_GPIO/"/>
+    </RefBspComponent>
+    <RefBspComponent BspIpName="GPIO" BspModeName="Output" Name="DEBUG_LLHWC_GET_CH_IDX_ALGO_2">
+        <File Category="template" Name="stm32wba/debug_config_h.ftl" src="/System/Config/Debug_GPIO/"/>
+    </RefBspComponent>
+	
     <!-- BSP Virtual PortCom end -->
 
     <RefConfigFile Description="" Name="ZIGBEE_APP_ZIGBEE_ENDPOINT_C" Template="stm32wba/stm32_wpan_zigbee_app_zigbee_endpoint_c.ftl">

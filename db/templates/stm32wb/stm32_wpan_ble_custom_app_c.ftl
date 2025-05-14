@@ -1247,15 +1247,21 @@ uint16_t Connection_Handle;
                 SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_NOTIFY] != "" ||
                 SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE]?? &&
                 SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE] != ""]
+[#if SERVICES_CHARS_VALUE_LENGTH[service?string][characteristic?string]?number < 249]
 static void Custom_[@capitalizeServChar service characteristic/]_Update_Char(void);
+[/#if]
             [/#if]
             [#if SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_NOTIFY]?? &&
                 SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_NOTIFY] != ""]
+[#if SERVICES_CHARS_VALUE_LENGTH[service?string][characteristic?string]?number < 249]                
 static void Custom_[@capitalizeServChar service characteristic/]_Send_Notification(void);
+[/#if]
             [/#if]
             [#if SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE]?? &&
                 SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE] != ""]
+[#if SERVICES_CHARS_VALUE_LENGTH[service?string][characteristic?string]?number < 249]                
 static void Custom_[@capitalizeServChar service characteristic/]_Send_Indication(void);
+[/#if]
             [/#if]
         [/#list]
     [/#list]
@@ -1371,6 +1377,7 @@ void Custom_APP_Init(void)
                 SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_NOTIFY] != "" ||
                 SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE]?? &&
                 SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE] != ""]
+[#if SERVICES_CHARS_VALUE_LENGTH[service?string][characteristic?string]?number < 249]
 __USED void Custom_[@capitalizeServChar service characteristic/]_Update_Char(void) /* Property Read */
 { 
   uint8_t updateflag = 0;
@@ -1381,11 +1388,7 @@ __USED void Custom_[@capitalizeServChar service characteristic/]_Update_Char(voi
 
   if (updateflag != 0)
   {
-    [#if SERVICES_CHARS_VALUE_LENGTH[service?string][characteristic?string]?number > 243]
-	Custom_STM_App_Update_Char_Ext(Connection_Handle, [@customServChar service characteristic/], (uint8_t *)UpdateCharData);
-	[#else]
     Custom_STM_App_Update_Char([@customServChar service characteristic/], (uint8_t *)UpdateCharData);
-	[/#if]
   }
   
   /* USER CODE BEGIN [@capitalizeServChar service characteristic/]_UC_Last*/
@@ -1393,10 +1396,12 @@ __USED void Custom_[@capitalizeServChar service characteristic/]_Update_Char(voi
   /* USER CODE END [@capitalizeServChar service characteristic/]_UC_Last*/
   return;
 }
+[/#if]
 
             [/#if]
             [#if SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_NOTIFY]?? &&
                 SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_NOTIFY] != ""]
+[#if SERVICES_CHARS_VALUE_LENGTH[service?string][characteristic?string]?number < 249]               
 void Custom_[@capitalizeServChar service characteristic/]_Send_Notification(void) /* Property Notification */
 { 
   uint8_t updateflag = 0;
@@ -1407,11 +1412,7 @@ void Custom_[@capitalizeServChar service characteristic/]_Send_Notification(void
 
   if (updateflag != 0)
   {
-    [#if SERVICES_CHARS_VALUE_LENGTH[service?string][characteristic?string]?number > 243]
-	Custom_STM_App_Update_Char_Ext(Connection_Handle, [@customServChar service characteristic/], (uint8_t *)NotifyCharData);
-	[#else]
     Custom_STM_App_Update_Char([@customServChar service characteristic/], (uint8_t *)NotifyCharData);
-	[/#if]
   }
   
   /* USER CODE BEGIN [@capitalizeServChar service characteristic/]_NS_Last*/
@@ -1420,10 +1421,12 @@ void Custom_[@capitalizeServChar service characteristic/]_Send_Notification(void
 
   return;
 }
+[/#if]
 
             [/#if]
             [#if SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE]?? &&
                 SERVICES_CHARS_PROP[service?string][characteristic?string][item_PROP_INDICATE] != ""]
+[#if SERVICES_CHARS_VALUE_LENGTH[service?string][characteristic?string]?number < 249]                
 void Custom_[@capitalizeServChar service characteristic/]_Send_Indication(void) /* Property Indication */
 { 
   uint8_t updateflag = 0;
@@ -1434,11 +1437,7 @@ void Custom_[@capitalizeServChar service characteristic/]_Send_Indication(void) 
 
   if (updateflag != 0)
   {
-	[#if SERVICES_CHARS_VALUE_LENGTH[service?string][characteristic?string]?number > 243]
-    Custom_STM_App_Update_Char_Ext(Connection_Handle, [@customServChar service characteristic/], (uint8_t *)NotifyCharData);
-	[#else]
-	Custom_STM_App_Update_Char([@customServChar service characteristic/], (uint8_t *)NotifyCharData);
-	[/#if]
+    Custom_STM_App_Update_Char([@customServChar service characteristic/], (uint8_t *)NotifyCharData);
   }
   
   /* USER CODE BEGIN [@capitalizeServChar service characteristic/]_IS_Last*/
@@ -1447,6 +1446,7 @@ void Custom_[@capitalizeServChar service characteristic/]_Send_Indication(void) 
 
   return;
 }
+[/#if]
 
             [/#if]
         [/#list]

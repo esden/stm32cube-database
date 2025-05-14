@@ -24,7 +24,7 @@
 #define STM32WBAxx_HAL_CONF_H
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Exported types ------------------------------------------------------------*/
@@ -35,7 +35,11 @@
   * @brief This is the list of modules to be used in the HAL driver
   */
 #define HAL_MODULE_ENABLED
+[#if DIE=="DIE4B0"]
+[#assign allModules = ["ADC", "COMP", "CRC","AES","GTZC","HASH","HSEM","I2C", "ICACHE","IRDA", "IWDG", "LPTIM", "PKA", "RAMCFG", "RNG", "RTC", "SAI", "SMBUS", "SMARTCARD", "SPI", "TIM", "TSC", "UART", "USART", "WWDG","PCD","HCD"]]
+[#else]
 [#assign allModules = ["ADC", "COMP", "CRC","AES","GTZC","HASH","HSEM","I2C", "ICACHE","IRDA", "IWDG", "LPTIM", "PKA", "RAMCFG", "RNG", "RTC", "SAI", "SMBUS", "SMARTCARD", "SPI", "TIM", "TSC", "UART", "USART", "WWDG"]]
+[/#if]
   [#list allModules as module]
   [#if isModuleUsed(module)]
 [#compress]#define HAL_${module?replace("QUADSPI","QSPI")?replace("AES","CRYP")}_MODULE_ENABLED[/#compress]
@@ -67,12 +71,12 @@
   *        This value is used by the RCC HAL module to compute the system frequency
   *        (when HSE is used as system clock source, directly or through the PLL).
   */
-#if !defined  (HSE_VALUE) 
-#define HSE_VALUE    [#if hse_value??]${hse_value}[#else]32000000[/#if]UL             /*!< Value of the External oscillator in Hz */
+#if !defined (HSE_VALUE)
+#define HSE_VALUE              [#if hse_value??]${hse_value}[#else]32000000[/#if]UL /*!< Value of the External oscillator in Hz */
 #endif /* HSE_VALUE */
 
-#if !defined  (HSE_STARTUP_TIMEOUT)
-  #define HSE_STARTUP_TIMEOUT    [#if HSE_Timout??]${HSE_Timout}[#else]100[/#if]UL   /*!< Time out for HSE start up, in ms */
+#if !defined (HSE_STARTUP_TIMEOUT)
+#define HSE_STARTUP_TIMEOUT    [#if HSE_Timout??]${HSE_Timout}[#else]100[/#if]UL   /*!< Time out for HSE start up, in ms */
 #endif /* HSE_STARTUP_TIMEOUT */
 
 /**
@@ -80,37 +84,44 @@
   *        This value is used by the RCC HAL module to compute the system frequency
   *        (when HSI is used as system clock source, directly or through the PLL).
   */
-#if !defined  (HSI_VALUE)
-#define HSI_VALUE    16000000UL            /*!< Value of the Internal oscillator in Hz*/
+#if !defined (HSI_VALUE)
+#define HSI_VALUE              16000000UL /*!< Value of the Internal oscillator in Hz*/
 #endif /* HSI_VALUE */
 
 /**
   * @brief Internal Low Speed oscillator (LSI) value.
   */
-#if !defined  (LSI_VALUE)
+#if !defined (LSI_VALUE)
 #define LSI_VALUE               32000UL    /*!< LSI Typical Value in Hz*/
 #endif /* LSI_VALUE */                     /*!< Value of the Internal Low Speed oscillator in Hz
-                                                The real value may vary depending on the variations in voltage 
+                                                The real value may vary depending on the variations in voltage
                                                 and temperature.*/
+
+#if defined (RCC_LSI2_SUPPORT)
+#if !defined (LSI2_VALUE)
+#define LSI2_VALUE              32000UL    /*!< LSI2 Typical Value in Hz*/
+#endif /* LSI2_VALUE */
+#endif
+
 /**
   * @brief External Low Speed oscillator (LSE) value.
   *        This value is used by the UART, RTC HAL module to compute the system frequency
   */
-#if !defined  (LSE_VALUE)
-#define LSE_VALUE    [#if lse_value??]${lse_value}[#else]32768[/#if]UL              /*!< Value of the External oscillator in Hz*/
+#if !defined (LSE_VALUE)
+#define LSE_VALUE              [#if lse_value??]${lse_value}[#else]32768[/#if]UL   /*!< Value of the External oscillator in Hz*/
 #endif /* LSE_VALUE */
 
-#if !defined  (LSE_STARTUP_TIMEOUT)
-#define LSE_STARTUP_TIMEOUT    [#if LSE_Timout??]${LSE_Timout}[#else]5000[/#if]UL      /*!< Time out for LSE start up, in ms */
+#if !defined (LSE_STARTUP_TIMEOUT)
+#define LSE_STARTUP_TIMEOUT    [#if LSE_Timout??]${LSE_Timout}[#else]5000[/#if]UL     /*!< Time out for LSE start up, in ms */
 #endif /* HSE_STARTUP_TIMEOUT */
 
 /**
   * @brief External clock source for SAI1 peripheral
-  *        This value is used by the RCC HAL module to compute the SAI1 & SAI2 clock source 
+  *        This value is used by the RCC HAL module to compute the SAI1 & SAI2 clock source
   *        frequency.
   */
 #if !defined (EXTERNAL_SAI1_CLOCK_VALUE)
-  #define EXTERNAL_SAI1_CLOCK_VALUE    [#if sai1_value??]${sai1_value}[#else]48000[/#if]UL /*!< Value of the SAI1 External clock source in Hz*/
+#define EXTERNAL_SAI1_CLOCK_VALUE  [#if sai1_value??]${sai1_value}[#else]48000[/#if]UL /*!< Value of the SAI1 External clock source in Hz*/
 #endif /* EXTERNAL_SAI1_CLOCK_VALUE */
 
 /* Tip: To avoid modifying this file each time you need to use different HSE,
@@ -119,13 +130,13 @@
 /* ########################### System Configuration ######################### */
 /**
   * @brief This is the HAL system configuration section
-  */     
+  */
 [#if advancedSettings??][#assign advancedSettings = advancedSettings[0]][/#if]
   
-#define  VDD_VALUE                    [#if vdd_value??]${vdd_value}[#else]3300[/#if]UL    /*!< Value of VDD in mv */           
-#define  TICK_INT_PRIORITY            ([#if TICK_INT_PRIORITY??]${TICK_INT_PRIORITY}UL[#else](1UL<<__NVIC_PRIO_BITS) - 1UL[/#if])    /*!< tick interrupt priority (lowest by default)  */            
+#define  VDD_VALUE                    [#if vdd_value??]${vdd_value}[#else]3300[/#if]UL /*!< Value of VDD in mv */
+#define  TICK_INT_PRIORITY            ([#if TICK_INT_PRIORITY??]${TICK_INT_PRIORITY}UL[#else](1UL<<__NVIC_PRIO_BITS) - 1UL[/#if])  /*!< tick interrupt priority (lowest by default) */
 #define  USE_RTOS                     [#if advancedSettings?? && advancedSettings.USE_RTOS??]${advancedSettings.USE_RTOS}[#else]0[/#if]U     
-#define  PREFETCH_ENABLE              [#if PREFETCH_ENABLE??]${PREFETCH_ENABLE}[#else]0[/#if]U
+#define  PREFETCH_ENABLE              [#if PREFETCH_ENABLE??]${PREFETCH_ENABLE}[#else]0[/#if]U               /*!< Enable prefetch */
 
 /* ########################## Assert Selection ############################## */
 /**
@@ -148,10 +159,12 @@
 #define  USE_HAL_COMP_REGISTER_CALLBACKS       0U /* COMP register callback disabled      */
 #define  USE_HAL_CRYP_REGISTER_CALLBACKS       0U /* CRYP register callback disabled      */
 #define  USE_HAL_HASH_REGISTER_CALLBACKS       0U /* HASH register callback disabled      */
+[#if DIE=="DIE4B0"]#define  USE_HAL_HCD_REGISTER_CALLBACKS        0U /* HCD register callback disabled       */[/#if]
 #define  USE_HAL_I2C_REGISTER_CALLBACKS        0U /* I2C register callback disabled       */
-#define  USE_HAL_IWDG_REGISTER_CALLBACKS       0U /* IWDG register callback disabled      */
 #define  USE_HAL_IRDA_REGISTER_CALLBACKS       0U /* IRDA register callback disabled      */
+#define  USE_HAL_IWDG_REGISTER_CALLBACKS       0U /* IWDG register callback disabled      */
 #define  USE_HAL_LPTIM_REGISTER_CALLBACKS      0U /* LPTIM register callback disabled     */
+[#if DIE=="DIE4B0"]#define  USE_HAL_PCD_REGISTER_CALLBACKS        0U /* PCD register callback disabled       */[/#if]
 #define  USE_HAL_PKA_REGISTER_CALLBACKS        0U /* PKA register callback disabled       */
 #define  USE_HAL_RAMCFG_REGISTER_CALLBACKS     0U /* RAMCFG register callback disabled    */
 #define  USE_HAL_RNG_REGISTER_CALLBACKS        0U /* RNG register callback disabled       */
@@ -174,15 +187,13 @@
  */
 #define USE_SPI_CRC                   [#if CRC_SPI??]${CRC_SPI}[#else]1U[/#if]
 
+/* ################## CRYP peripheral configuration ########################## */
+
+#define USE_HAL_CRYP_SUSPEND_RESUME   [#if HAL_CRYP_SUSPEND_RESUME??]${HAL_CRYP_SUSPEND_RESUME}[#else]0U[/#if]
 
 /* ################## HASH peripheral configuration ########################## */
 
-#define USE_HAL_HASH_SUSPEND_RESUME    [#if HAL_HASH_SUSPEND_RESUME??]${HAL_HASH_SUSPEND_RESUME}[#else]0U[/#if]
-
-/* ################## CRYP peripheral configuration ########################## */
-
-#define USE_HAL_CRYP_SUSPEND_RESUME    [#if HAL_CRYP_SUSPEND_RESUME??]${HAL_CRYP_SUSPEND_RESUME}[#else]0U[/#if]
-
+#define USE_HAL_HASH_SUSPEND_RESUME   [#if HAL_HASH_SUSPEND_RESUME??]${HAL_HASH_SUSPEND_RESUME}[#else]0U[/#if]
 
 /* Includes ------------------------------------------------------------------*/
 /**
@@ -232,6 +243,12 @@
 #include "stm32wbaxx_hal_hash.h"
 #endif /* HAL_HASH_MODULE_ENABLED */
 
+[#if DIE=="DIE4B0"]
+#ifdef HAL_HCD_MODULE_ENABLED
+#include "stm32wbaxx_hal_hcd.h"
+#endif /* HAL_HCD_MODULE_ENABLED */
+
+[/#if]
 #ifdef HAL_HSEM_MODULE_ENABLED
 #include "stm32wbaxx_hal_hsem.h"
 #endif /* HAL_HSEM_MODULE_ENABLED */
@@ -256,6 +273,12 @@
 #include "stm32wbaxx_hal_lptim.h"
 #endif /* HAL_LPTIM_MODULE_ENABLED */
 
+[#if DIE=="DIE4B0"]
+#ifdef HAL_PCD_MODULE_ENABLED
+#include "stm32wbaxx_hal_pcd.h"
+#endif /* HAL_PCD_MODULE_ENABLED */
+
+[/#if]
 #ifdef HAL_PKA_MODULE_ENABLED
 #include "stm32wbaxx_hal_pka.h"
 #endif /* HAL_PKA_MODULE_ENABLED */
@@ -321,17 +344,17 @@
 #ifdef  USE_FULL_ASSERT
 /**
   * @brief  The assert_param macro is used for function's parameters check.
-  * @param expr If expr is false, it calls assert_failed function
+  * @param  expr: If expr is false, it calls assert_failed function
   *         which reports the name of the source file and the source
   *         line number of the call that failed.
   *         If expr is true, it returns no value.
   * @retval None
   */
-  #define assert_param(expr) ((expr) ? (void)0U : assert_failed((uint8_t *)__FILE__, __LINE__))
+#define assert_param(expr) ((expr) ? (void)0U : assert_failed((uint8_t *)__FILE__, __LINE__))
 /* Exported functions ------------------------------------------------------- */
-  void assert_failed(uint8_t* file, uint32_t line);
+void assert_failed(uint8_t *file, uint32_t line);
 #else
-  #define assert_param(expr) ((void)0U)
+#define assert_param(expr) ((void)0U)
 #endif /* USE_FULL_ASSERT */
 
 #ifdef __cplusplus
@@ -339,3 +362,4 @@
 #endif
 
 #endif /* STM32WBAxx_HAL_CONF_H */
+

@@ -13,9 +13,14 @@
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
+
+[#if FamilyName="STM32H7RS"]
+#ifndef __USBD_STORAGE_IF_H
+#define __USBD_STORAGE_IF_H
+[#else]
 #ifndef __USBD_STORAGE_IF_H__
 #define __USBD_STORAGE_IF_H__
-
+[/#if]
 [#assign handleNameFS = ""]
 [#assign handleNameUSB_FS = ""]
 [#assign handleNameHS = ""]
@@ -147,5 +152,9 @@ extern USBD_StorageTypeDef USBD_Storage_Interface_fops_HS;
 }
 #endif
 
+[#if FamilyName="STM32H7RS"]
+#endif /* __USBD_STORAGE_IF_H */
+[#else]
 #endif /* __USBD_STORAGE_IF_H__ */
+[/#if]
 

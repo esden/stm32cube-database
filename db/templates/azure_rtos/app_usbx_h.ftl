@@ -70,7 +70,7 @@ extern "C" {
 
 /* Exported constants --------------------------------------------------------*/
 [#if UX_STANDALONE_ENABLED_Value == "1" && AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE_VAL  != "0" ]
-#define UX_APP_MEM_POOL_SIZE         ${UX_APP_MEM_POOL_SIZE_STANDALONE_value}
+#define USBX_APP_MEM_POOL_SIZE       ${UX_APP_MEM_POOL_SIZE_STANDALONE_value}
 [/#if]
 #define USBX_MEMORY_STACK_SIZE       ${USBX_SYS_SIZE_value}
 

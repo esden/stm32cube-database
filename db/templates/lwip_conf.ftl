@@ -12,12 +12,21 @@
 /* USER CODE END Header */ 
  
 [#assign s_ori = name]
+[#if (FamilyName != "STM32H7RS")]
 [#assign s1 = s_ori?replace(".","__")]
+[#else]
+[#assign s1 = s_ori?replace(".","_")]
+[/#if]
 [#assign s2 = s1?replace("Target/","")]
 [#assign inclusion_protection = s2?upper_case]
 /* Define to prevent recursive inclusion --------------------------------------*/
+[#if FamilyName=="STM32H7RS" ]
+#ifndef __${inclusion_protection}
+#define __${inclusion_protection}
+[#else]
 #ifndef __${inclusion_protection}__
 #define __${inclusion_protection}__
+[/#if]
 
 #include "main.h"
 
@@ -76,7 +85,7 @@ extern ${variable.value} ${variable.name};
 [#-- Special parameters LWIP_SUPPORT_CUSTOM_PBUF (for H7) >> generate only for h7 --]
 [#-- Special parameters LWIP_RAM_HEAP_POINTER (for H7) >> generate only for h7 --]
 [#-- Special parameters HTTPD_USE_CUSTOM_FSDATA >> limitation to force to 1 when HTTPD is used --]
-[#assign specialList = ["LWIP_DNS_SECURE", "LWIP_DHCP", "CHECKSUM_BY_HARDWARE", "LWIP_NETIF_LINK_CALLBACK", "RECV_BUFSIZE_DEFAULT", "TCP_RCV_SCALE", "LWIP_SUPPORT_CUSTOM_PBUF", "LWIP_RAM_HEAP_POINTER", "LWIP_TCP", "HTTPD_USE_CUSTOM_FSDATA"]]
+[#assign specialList = ["LWIP_DNS_SECURE", "LWIP_DHCP", "LWIP_NETIF_API", "CHECKSUM_BY_HARDWARE", "LWIP_NETIF_LINK_CALLBACK", "RECV_BUFSIZE_DEFAULT", "TCP_RCV_SCALE", "LWIP_SUPPORT_CUSTOM_PBUF", "LWIP_RAM_HEAP_POINTER", "LWIP_TCP", "HTTPD_USE_CUSTOM_FSDATA"]]
 
 [#-- Checksum parameters enabled (in opt.h) and disabled in CubeMx --]
 [#assign checksumList = ["CHECKSUM_GEN_IP", "CHECKSUM_GEN_UDP", "CHECKSUM_GEN_TCP", "CHECKSUM_GEN_ICMP", "CHECKSUM_GEN_ICMP6", "CHECKSUM_CHECK_IP", "CHECKSUM_CHECK_UDP", "CHECKSUM_CHECK_TCP", "CHECKSUM_CHECK_ICMP", "CHECKSUM_CHECK_ICMP6"]]
@@ -244,7 +253,11 @@ extern ${variable.value} ${variable.name};
             [#if (definition.name=="LWIP_DHCP") && (definition.value == "1")]
 /*----- Value in opt.h for ${definition.name}: 0 -----*/
 #define ${definition.name}   ${definition.value}
-            [/#if]     
+            [/#if]
+            [#if (definition.name=="LWIP_NETIF_API") && (definition.value == "1")]
+/*----- LWIP_NETIF_API==1: Enable NETIF API -----*/
+#define ${definition.name}   ${definition.value}
+            [/#if]
             [#if (definition.name=="LWIP_TCP") && (definition.value == "0")]
 /*----- Value in opt.h for ${definition.name}: 1 -----*/
 #define ${definition.name}   ${definition.value}
@@ -609,7 +622,11 @@ extern ${variable.value} ${variable.name};
                     [/#if]
                 [/#if]
                 [#if (definition.name=="LWIP_RAM_HEAP_POINTER") && (definition.value != "valueNotSetted")]
-/*----- Default Value for F7/H7 devices: 0x30044000 -----*/
+                [#if (series == "stm32f7")]
+/*----- Default Value for F7 devices: 0x20048000 -----*/
+                [#else]
+/*----- Default Value for H7 devices: 0x30004000 -----*/
+                [/#if]
 #define ${definition.name}   ${definition.value}
                 [/#if]
                 [#if (series != "stm32f7")]
@@ -633,4 +650,8 @@ extern ${variable.value} ${variable.name};
 #ifdef __cplusplus
 }
 #endif
+[#if (FamilyName != "STM32H7RS")]
 #endif /*__${inclusion_protection}__ */
+[#else]
+#endif /*__${inclusion_protection} */
+[/#if]

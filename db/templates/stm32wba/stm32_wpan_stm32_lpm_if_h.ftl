@@ -11,6 +11,20 @@
   */
 /* USER CODE END Header */
 
+[#assign myHash = {}]
+[#list SWIPdatas as SWIP]
+    [#if SWIP.defines??]
+        [#list SWIP.defines as definition]
+            [#assign myHash = {definition.name:definition.value} + myHash]
+        [/#list]
+    [/#if]
+[/#list]
+[#--
+Key & Value:
+[#list myHash?keys as key]
+Key: ${key}; Value: ${myHash[key]}
+[/#list]
+--]
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef STM32_TINY_LPM_IF_H
 #define STM32_TINY_LPM_IF_H
@@ -70,6 +84,7 @@ extern "C" {
 /* USER CODE END PFP */
 
 /* Exported functions prototypes ---------------------------------------------*/
+[#if (myHash["CFG_LPM_STDBY_SUPPORTED"]?number != 2)]
 /**
   * @brief Enters Low Power Off Mode
   */
@@ -78,6 +93,16 @@ void PWR_EnterOffMode( void );
   * @brief Exits Low Power Off Mode
   */
 void PWR_ExitOffMode( void );
+[#else]
+/**
+  * @brief Enters Low Power Stop2 Mode
+  */
+void PWR_EnterStop2Mode( void );
+/**
+  * @brief Exits Low Power Stop2 Mode
+  */
+void PWR_ExitStop2Mode( void );  
+[/#if]
 
 /**
   * @brief Enters Low Power Stop Mode
@@ -97,6 +122,16 @@ void PWR_EnterSleepMode( void );
   * @brief Exits Low Power Sleep Mode
   */
 void PWR_ExitSleepMode( void );
+
+/**
+  * @brief Enable Low Power Sleep Mode
+  */
+void PWR_EnableSleepMode( void );
+
+/**
+  * @brief Disable Low Power Sleep Mode
+  */
+void PWR_DisableSleepMode( void );
 
 /**
   * @brief Check if the system is waking-up from standby low power mode.

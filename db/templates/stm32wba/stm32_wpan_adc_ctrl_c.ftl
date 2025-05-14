@@ -84,12 +84,9 @@ static uint32_t CurrentConfig = ADCCTRL_NO_CONFIG;
 static uint32_t MaxRegisteredId = ADCCTRL_NO_CONFIG;
 
 /**
- * @brief Handle of the HAL ADC
+ * @brief Handle of the ADC
  */
-static ADC_HandleTypeDef ADCHandle =
-{
-  .Instance = ADCCTRL_HWADDR,
-};
+static ADC_TypeDef * p_ADCHandle = ADCCTRL_HWADDR;
 
 /* Global variables ----------------------------------------------------------*/
 /* Error Handler */
@@ -123,12 +120,12 @@ static inline void AdcDeactivate (void);
   * @param  p_Handle: Handle to work with
   * @retval State of the configuration
   */
-static inline HAL_StatusTypeDef AdcConfigure (const ADCCTRL_Handle_t * const p_Handle);
+static inline ADCCTRL_Cmd_Status_t AdcConfigure (const ADCCTRL_Handle_t * const p_Handle);
 
 /**
  * @brief Read the raw value
  * @param  p_Handle: Handle to work with
- * @return Raw value 
+ * @return Raw value
  */
 static inline uint16_t AdcReadRaw (const ADCCTRL_Handle_t * const p_Handle);
 
@@ -148,7 +145,7 @@ static inline uint16_t AdcReadRaw (const ADCCTRL_Handle_t * const p_Handle);
 static inline void ConversionStartPoll_ADC_GrpRegular (void);
 
 /* Functions Definition ------------------------------------------------------*/
-__WEAK ADCCTRL_Cmd_Status_t ADCCTRL_Init(void) 
+__WEAK ADCCTRL_Cmd_Status_t ADCCTRL_Init (void)
 {
   ADCCTRL_Cmd_Status_t error = ADCCTRL_UNKNOWN;
 
@@ -158,11 +155,9 @@ __WEAK ADCCTRL_Cmd_Status_t ADCCTRL_Init(void)
   if (ADCCTRL_OK == error)
   {
     CurrentConfig = ADCCTRL_NO_CONFIG;
-    
-    ADCHandle.State = HAL_ADC_STATE_RESET;
 
-    ADCHandle.Instance = ADCCTRL_HWADDR;
-    
+    p_ADCHandle = ADCCTRL_HWADDR;
+
     /* Reset ADC Client list */
     ClientList = 0x00u;
 
@@ -210,7 +205,7 @@ __WEAK ADCCTRL_Cmd_Status_t ADCCTRL_RegisterHandle (ADCCTRL_Handle_t * const p_H
   return error;
 }
 
-__WEAK ADCCTRL_Cmd_Status_t ADCCTRL_RequestIpState (const ADCCTRL_Handle_t * const p_Handle, 
+__WEAK ADCCTRL_Cmd_Status_t ADCCTRL_RequestIpState (const ADCCTRL_Handle_t * const p_Handle,
                                                     const ADCCTRL_Ip_State_t State)
 {
   ADCCTRL_Cmd_Status_t error = ADCCTRL_UNKNOWN;
@@ -220,13 +215,13 @@ __WEAK ADCCTRL_Cmd_Status_t ADCCTRL_RequestIpState (const ADCCTRL_Handle_t * con
   if (ADC_OFF == State)
   {
     ClientList &= (~(1U << p_Handle->Uid));
-    
+
     error = ADCCTRL_OK;
   }
   else if (ADC_ON == State)
   {
     ClientList |= (1U << p_Handle->Uid);
-    
+
     error = ADCCTRL_OK;
   }
   else
@@ -246,7 +241,7 @@ __WEAK ADCCTRL_Cmd_Status_t ADCCTRL_RequestIpState (const ADCCTRL_Handle_t * con
   }
 
   UTILS_EXIT_CRITICAL_SECTION();
-  
+
   return error;
 }
 
@@ -254,7 +249,6 @@ __WEAK ADCCTRL_Cmd_Status_t ADCCTRL_RequestRawValue (const ADCCTRL_Handle_t * co
                                                      uint16_t * const p_ReadValue)
 {
   ADCCTRL_Cmd_Status_t error = ADCCTRL_UNKNOWN;
-  HAL_StatusTypeDef eReturn = HAL_OK;
 
   /* Null pointer for handle or payload */
   if ((NULL == p_Handle) || (NULL == p_ReadValue))
@@ -288,13 +282,13 @@ __WEAK ADCCTRL_Cmd_Status_t ADCCTRL_RequestRawValue (const ADCCTRL_Handle_t * co
       if (CurrentConfig != p_Handle->Uid)
       {
         /* Configure the ADC before use */
-        eReturn = AdcConfigure (p_Handle);
-        
+        error = AdcConfigure (p_Handle);
+
         /* Enable ADC */
-        LL_ADC_Enable(ADCCTRL_HWADDR);
+        LL_ADC_Enable(p_ADCHandle);
       }
 
-      if (eReturn == HAL_OK)
+      if (ADCCTRL_OK == error)
       {
         /* Return the read value */
         *p_ReadValue = AdcReadRaw (p_Handle);
@@ -316,7 +310,6 @@ __WEAK ADCCTRL_Cmd_Status_t ADCCTRL_RequestTemperature (const ADCCTRL_Handle_t *
                                                         uint16_t * const p_ReadValue)
 {
   ADCCTRL_Cmd_Status_t error = ADCCTRL_UNKNOWN;
-  HAL_StatusTypeDef eReturn = HAL_OK;
 
   /* Variables for ADC conversion data */
   __IO uint16_t uhADCxConvertedData = 0x00;
@@ -353,15 +346,15 @@ __WEAK ADCCTRL_Cmd_Status_t ADCCTRL_RequestTemperature (const ADCCTRL_Handle_t *
     {
       /* Is the current config IS NOT the same as the one requested ? */
       if (CurrentConfig != p_Handle->Uid)
-      { 
+      {
         /* Configure the ADC before use */
-        eReturn = AdcConfigure (p_Handle);
-        
+        error = AdcConfigure (p_Handle);
+
         /* Enable ADC */
-        LL_ADC_Enable(ADCCTRL_HWADDR);
+        LL_ADC_Enable(p_ADCHandle);
       }
 
-      if (eReturn == HAL_OK)
+      if (ADCCTRL_OK == error)
       {
         /* Return the read value */
         uhADCxConvertedData = AdcReadRaw (p_Handle);
@@ -376,14 +369,14 @@ __WEAK ADCCTRL_Cmd_Status_t ADCCTRL_RequestTemperature (const ADCCTRL_Handle_t *
                                                                TEMPSENSOR_CAL1_TEMP,
                                                                VDDA_APPLI,
                                                                uhADCxConvertedData,
-                                                               p_Handle->InitConf.Resolution);
+                                                               p_Handle->InitConf.ConvParams.Resolution);
         }
         else
         {
           /* Case of samples calibrated in production */
           *p_ReadValue = __LL_ADC_CALC_TEMPERATURE (VDDA_APPLI,
                                                     uhADCxConvertedData,
-                                                    p_Handle->InitConf.Resolution);
+                                                    p_Handle->InitConf.ConvParams.Resolution);
         }
       }
       else
@@ -403,7 +396,6 @@ __WEAK ADCCTRL_Cmd_Status_t ADCCTRL_RequestCoreVoltage (const ADCCTRL_Handle_t *
                                                         uint16_t * const p_ReadValue)
 {
   ADCCTRL_Cmd_Status_t error = ADCCTRL_UNKNOWN;
-  HAL_StatusTypeDef eReturn = HAL_OK;
 
   /* Variables for ADC conversion data */
   __IO uint16_t uhADCxConvertedData = 0x00;
@@ -442,13 +434,13 @@ __WEAK ADCCTRL_Cmd_Status_t ADCCTRL_RequestCoreVoltage (const ADCCTRL_Handle_t *
       if (CurrentConfig != p_Handle->Uid)
       {
         /* Configure the ADC before use */
-        eReturn = AdcConfigure (p_Handle);
-        
+        error = AdcConfigure (p_Handle);
+
         /* Enable ADC */
-        LL_ADC_Enable(ADCCTRL_HWADDR);
+        LL_ADC_Enable(p_ADCHandle);
       }
 
-      if (eReturn == HAL_OK)
+      if (ADCCTRL_OK == error)
       {
         /* Return the read value */
         uhADCxConvertedData = AdcReadRaw (p_Handle);
@@ -457,7 +449,7 @@ __WEAK ADCCTRL_Cmd_Status_t ADCCTRL_RequestCoreVoltage (const ADCCTRL_Handle_t *
         /* using LL ADC driver helper macro.                                      */
         *p_ReadValue = __LL_ADC_CALC_DATA_TO_VOLTAGE (VDDA_APPLI,
                                                       uhADCxConvertedData,
-                                                      p_Handle->InitConf.Resolution);
+                                                      p_Handle->InitConf.ConvParams.Resolution);
       }
       else
       {
@@ -476,7 +468,6 @@ __WEAK ADCCTRL_Cmd_Status_t ADCCTRL_RequestRefVoltage (const ADCCTRL_Handle_t * 
                                                        uint16_t * const p_ReadValue)
 {
   ADCCTRL_Cmd_Status_t error = ADCCTRL_UNKNOWN;
-  HAL_StatusTypeDef eReturn = HAL_OK;
 
   /* Variables for ADC conversion data */
   __IO uint16_t uhADCxConvertedData = 0x00;
@@ -515,13 +506,13 @@ __WEAK ADCCTRL_Cmd_Status_t ADCCTRL_RequestRefVoltage (const ADCCTRL_Handle_t * 
       if (CurrentConfig != p_Handle->Uid)
       {
         /* Configure the ADC before use */
-        eReturn = AdcConfigure (p_Handle);
+        error = AdcConfigure (p_Handle);
 
         /* Enable ADC */
-        LL_ADC_Enable(ADCCTRL_HWADDR);
+        LL_ADC_Enable(p_ADCHandle);
       }
 
-      if (eReturn == HAL_OK)
+      if (ADCCTRL_OK == error)
       {
         /* Return the read value */
         uhADCxConvertedData = AdcReadRaw (p_Handle);
@@ -529,7 +520,7 @@ __WEAK ADCCTRL_Cmd_Status_t ADCCTRL_RequestRefVoltage (const ADCCTRL_Handle_t * 
         /* Computation of ADC conversions raw data to physical values             */
         /* using LL ADC driver helper macro.                                      */
         *p_ReadValue = __LL_ADC_CALC_VREFANALOG_VOLTAGE (uhADCxConvertedData,
-                                                         p_Handle->InitConf.Resolution);
+                                                         p_Handle->InitConf.ConvParams.Resolution);
       }
       else
       {
@@ -552,7 +543,7 @@ void AdcActivate (void)
   SYSTEM_DEBUG_SIGNAL_SET(ADC_ACTIVATION);
 
   UTILS_ENTER_CRITICAL_SECTION();
-  
+
   /*## Operation on ADC hierarchical scope: ADC instance #####################*/
 
   /* Note: Hardware constraint (refer to description of the functions         */
@@ -566,16 +557,19 @@ void AdcActivate (void)
   /*       Software can be optimized by removing some of these checks, if     */
   /*       they are not relevant considering previous settings and actions    */
   /*       in user application.                                               */
-  if (LL_ADC_IsEnabled(ADCCTRL_HWADDR) == 0)
+  if (LL_ADC_IsEnabled(p_ADCHandle) == 0)
   {
+    /* Select clock source */
+    ADCTCTRL_SET_CLOCK_SOURCE ();
+
     /* Peripheral clock enable */
     ADCCTRL_ENABLE_CLOCK ();
 
     /* Enable ADC internal voltage regulator */
-    LL_ADC_EnableInternalRegulator(ADCCTRL_HWADDR);
+    LL_ADC_EnableInternalRegulator(p_ADCHandle);
 
     /* Waiting for ADC internal voltage regulator stabilization. */
-    while(LL_ADC_IsInternalRegulatorEnabled(ADCCTRL_HWADDR) == 0);
+    while(LL_ADC_IsInternalRegulatorEnabled(p_ADCHandle) == 0);
 
     /* Disable ADC DMA transfer request during calibration */
     /* Note: Specificity of this STM32 series: Calibration factor is          */
@@ -583,17 +577,17 @@ void AdcActivate (void)
     /*       To not insert ADC calibration factor among ADC conversion data   */
     /*       in DMA destination address, DMA transfer must be disabled during */
     /*       calibration.                                                     */
-    backup_setting_adc_dma_transfer = LL_ADC_REG_GetDMATransfer(ADCCTRL_HWADDR);
-    LL_ADC_REG_SetDMATransfer(ADCCTRL_HWADDR, LL_ADC_REG_DMA_TRANSFER_NONE);
+    backup_setting_adc_dma_transfer = LL_ADC_REG_GetDMATransfer(p_ADCHandle);
+    LL_ADC_REG_SetDMATransfer(p_ADCHandle, LL_ADC_REG_DMA_TRANSFER_NONE);
 
     /* Run ADC self calibration */
-    LL_ADC_StartCalibration(ADCCTRL_HWADDR);
+    LL_ADC_StartCalibration(p_ADCHandle);
 
     /* Poll for ADC effectively calibrated */
-    while (LL_ADC_IsCalibrationOnGoing(ADCCTRL_HWADDR) != 0);
+    while (LL_ADC_IsCalibrationOnGoing(p_ADCHandle) != 0);
 
     /* Restore ADC DMA transfer request after calibration */
-    LL_ADC_REG_SetDMATransfer(ADCCTRL_HWADDR, backup_setting_adc_dma_transfer);
+    LL_ADC_REG_SetDMATransfer(p_ADCHandle, backup_setting_adc_dma_transfer);
 
     /* Delay required between ADC end of calibration and ADC enable */
     /* LL_ADC_DELAY_CALIB_ENABLE_ADC_CYCLES --> 2 cycles */
@@ -601,10 +595,10 @@ void AdcActivate (void)
     __asm("mov r0, r0");
 
     /* Enable ADC */
-    LL_ADC_Enable(ADCCTRL_HWADDR);
+    LL_ADC_Enable(p_ADCHandle);
 
     /* Poll for ADC ready to convert */
-    while (LL_ADC_IsActiveFlag_ADRDY(ADCCTRL_HWADDR) == 0);
+    while (LL_ADC_IsActiveFlag_ADRDY(p_ADCHandle) == 0);
 
     /* Note: ADC flag ADRDY is not cleared here to be able to check ADC       */
     /*       status afterwards.                                               */
@@ -622,90 +616,138 @@ void AdcActivate (void)
   /* Note: Feature not available on this STM32 series */
 
   UTILS_EXIT_CRITICAL_SECTION();
-  
+
   SYSTEM_DEBUG_SIGNAL_RESET(ADC_ACTIVATION);
 }
 
 void AdcDeactivate (void)
 {
   SYSTEM_DEBUG_SIGNAL_SET(ADC_DEACTIVATION);
-  
+
   UTILS_ENTER_CRITICAL_SECTION();
-  
-  if(LL_ADC_IsEnabled(ADCCTRL_HWADDR))
+
+  if(LL_ADC_IsEnabled(p_ADCHandle))
   {
     /* Disable ADC */
-    LL_ADC_Disable(ADCCTRL_HWADDR);
-    
+    LL_ADC_Disable(p_ADCHandle);
+
     /* Clear flag ADC ready */
-    LL_ADC_ClearFlag_ADRDY(ADCCTRL_HWADDR);
+    LL_ADC_ClearFlag_ADRDY(p_ADCHandle);
 
     /* Wait until ADC_CR_ADEN bit is reset before turning off ADC internal regulator */
-    while(LL_ADC_IsEnabled(ADCCTRL_HWADDR) == 1UL);
+    while(LL_ADC_IsEnabled(p_ADCHandle) == 1UL);
 
     /* Wait until ADC_CR_ADSTP bit is reset before turning off ADC internal regulator */
-    while(LL_ADC_REG_IsStopConversionOngoing(ADCCTRL_HWADDR) == 1U);
+    while(LL_ADC_REG_IsStopConversionOngoing(p_ADCHandle) == 1U);
 
     /* Disable ADC internal voltage regulator */
-    LL_ADC_DisableInternalRegulator(ADCCTRL_HWADDR);
-    while(LL_ADC_IsInternalRegulatorEnabled(ADCCTRL_HWADDR) == 1U);
+    LL_ADC_DisableInternalRegulator(p_ADCHandle);
+    while(LL_ADC_IsInternalRegulatorEnabled(p_ADCHandle) == 1U);
 
     /* Peripharal clock disable */
     ADCCTRL_DISABLE_CLOCK ();
   }
-  
+
   UTILS_EXIT_CRITICAL_SECTION();
-  
+
   SYSTEM_DEBUG_SIGNAL_RESET(ADC_DEACTIVATION);
 }
 
-HAL_StatusTypeDef AdcConfigure (const ADCCTRL_Handle_t * const p_Handle)
+ADCCTRL_Cmd_Status_t AdcConfigure (const ADCCTRL_Handle_t * const p_Handle)
 {
-  HAL_StatusTypeDef error = HAL_OK;
+  ADCCTRL_Cmd_Status_t error = ADCCTRL_OK;
+
+  LL_ADC_InitTypeDef ADC_InitStruct = {0};
+  LL_ADC_REG_InitTypeDef ADC_REG_InitStruct = {0};
 
   /* No need to DeInit if the ADC if it is not yet initialized */
-  if (HAL_ADC_STATE_RESET != ADCHandle.State)
+  if (0u != LL_ADC_IsEnabled (p_ADCHandle))
   {
     /* DeInit the ADC module */
-    error = HAL_ADC_DeInit(&ADCHandle);
+    if (SUCCESS != LL_ADC_DeInit (p_ADCHandle))
+    {
+      error = ADCCTRL_NOK;
+    }
   }
 
   /* All OK ? */
-  if (HAL_OK == error)
+  if (ADCCTRL_OK == error)
   {
-    /* Fulfill the configuration part */
-    memcpy ((void *)&ADCHandle.Init,
-            (void *)&p_Handle->InitConf,
-            sizeof (ADC_InitTypeDef));
-
-    /* Apply the requested ADC configuration */
-    error = HAL_ADC_Init(&ADCHandle);
-
-    if (HAL_OK == error)
+    /* Update init and configuration parameters with requested values */
+    ADC_InitStruct.Resolution = p_Handle->InitConf.ConvParams.Resolution;
+    ADC_InitStruct.DataAlignment = p_Handle->InitConf.ConvParams.DataAlign;
+    
+    ADC_REG_InitStruct.TriggerSource = p_Handle->InitConf.ConvParams.TriggerStart;
+    ADC_REG_InitStruct.SequencerLength = p_Handle->InitConf.SeqParams.Length;
+    ADC_REG_InitStruct.SequencerDiscont = p_Handle->InitConf.SeqParams.DiscMode;
+    ADC_REG_InitStruct.ContinuousMode = p_Handle->InitConf.ConvParams.ConversionMode;
+    ADC_REG_InitStruct.DMATransfer = p_Handle->InitConf.ConvParams.DmaTransfer;
+    ADC_REG_InitStruct.Overrun = p_Handle->InitConf.ConvParams.Overrun;
+    
+    /* Configure Regular Channel - Only for internal channels */
+    if (LL_ADC_CHANNEL_VREFINT == p_Handle->ChannelConf.Channel)
     {
-      /* Apply channel configuration */
-      error = HAL_ADC_ConfigChannel(&ADCHandle,
-                                    (ADC_ChannelConfTypeDef *)&p_Handle->ChannelConf);
-      
-      if (HAL_OK == error)
-      {
-        /* Update the current configuration */
-        CurrentConfig = p_Handle->Uid;
-      }
-      else
-      {
-        /* There must be an issue with configuration, clean the configuration */
-        memset ((void *)(&ADCHandle.Init),
-                0x00,
-                sizeof (ADC_InitTypeDef));
-      }
+      LL_ADC_SetCommonPathInternalCh(__LL_ADC_COMMON_INSTANCE(p_ADCHandle),
+                                     LL_ADC_PATH_INTERNAL_VREFINT);
     }
-    else
+    else if (LL_ADC_CHANNEL_TEMPSENSOR == p_Handle->ChannelConf.Channel)
     {
-      /* There must be an issue with configuration, clean the configuration */
-      memset ((void *)(&ADCHandle.Init),
-              0x00,
-              sizeof (ADC_InitTypeDef));
+      LL_ADC_SetCommonPathInternalCh(__LL_ADC_COMMON_INSTANCE(p_ADCHandle),
+                                     LL_ADC_PATH_INTERNAL_TEMPSENSOR);
+    }
+    else 
+    {
+      LL_ADC_SetCommonPathInternalCh(__LL_ADC_COMMON_INSTANCE(p_ADCHandle),
+                                     LL_ADC_PATH_INTERNAL_NONE);
+    }
+    
+    
+    /* Set Sequencer if configurable */
+    LL_ADC_REG_SetSequencerConfigurable(p_ADCHandle, 
+                                        p_Handle->InitConf.SeqParams.Setup);
+    
+    /* Apply the requested ADC configuration - Init part */
+    if (SUCCESS != LL_ADC_Init(p_ADCHandle, 
+                               &ADC_InitStruct))
+    {
+      error = ADCCTRL_NOK;
+    }    
+    /* Apply the requested ADC configuration - Register init part */
+    else if (SUCCESS != LL_ADC_REG_Init(p_ADCHandle, 
+                                        &ADC_REG_InitStruct))
+    {      
+      error = ADCCTRL_NOK;
+    }
+    else 
+    {      
+      /* Set trigger frequency */
+      LL_ADC_SetTriggerFrequencyMode(p_ADCHandle, 
+                                     p_Handle->InitConf.ConvParams.TriggerFrequencyMode);
+      
+      /* Set Low power characteristics */
+      LL_ADC_SetLPModeAutoPowerOff(p_ADCHandle, 
+                                   p_Handle->InitConf.LowPowerParams.AutoPowerOff);
+      LL_ADC_SetLPModeAutonomousDPD(p_ADCHandle, 
+                                    p_Handle->InitConf.LowPowerParams.AutonomousDPD);
+
+      /* Set Sampling time for channels */
+      LL_ADC_SetSamplingTimeCommonChannels(p_ADCHandle, 
+                                           LL_ADC_SAMPLINGTIME_COMMON_1, 
+                                           p_Handle->InitConf.ConvParams.SamplingTimeCommon1);
+      LL_ADC_SetSamplingTimeCommonChannels(p_ADCHandle, 
+                                           LL_ADC_SAMPLINGTIME_COMMON_2, 
+                                           p_Handle->InitConf.ConvParams.SamplingTimeCommon2);
+      
+      /* Configure the channel */
+      LL_ADC_REG_SetSequencerRanks(p_ADCHandle, 
+                                   p_Handle->ChannelConf.Rank, 
+                                   p_Handle->ChannelConf.Channel);
+      LL_ADC_SetChannelSamplingTime(p_ADCHandle, 
+                                    p_Handle->ChannelConf.Channel, 
+                                    p_Handle->ChannelConf.SamplingTime);
+      
+      /* Update the current configuration */
+      CurrentConfig = p_Handle->Uid; 
     }
   }
 
@@ -722,13 +764,13 @@ uint16_t AdcReadRaw (const ADCCTRL_Handle_t * const p_Handle)
   ConversionStartPoll_ADC_GrpRegular ();
 
   /* Retrieve ADC conversion data */
-  switch (p_Handle->InitConf.Resolution)
+  switch (p_Handle->InitConf.ConvParams.Resolution)
   {
     case LL_ADC_RESOLUTION_12B:
     {
       uhADCxConvertedData = VAR_CONVERTED_DATA_INIT_VALUE_12B;
 
-      uhADCxConvertedData = LL_ADC_REG_ReadConversionData12(ADCCTRL_HWADDR);
+      uhADCxConvertedData = LL_ADC_REG_ReadConversionData12(p_ADCHandle);
 
       break;
     }
@@ -736,7 +778,7 @@ uint16_t AdcReadRaw (const ADCCTRL_Handle_t * const p_Handle)
     {
       uhADCxConvertedData = VAR_CONVERTED_DATA_INIT_VALUE_10B;
 
-      uhADCxConvertedData = LL_ADC_REG_ReadConversionData10(ADCCTRL_HWADDR);
+      uhADCxConvertedData = LL_ADC_REG_ReadConversionData10(p_ADCHandle);
 
       break;
     }
@@ -744,7 +786,7 @@ uint16_t AdcReadRaw (const ADCCTRL_Handle_t * const p_Handle)
     {
       uhADCxConvertedData = VAR_CONVERTED_DATA_INIT_VALUE_8B;
 
-      uhADCxConvertedData = LL_ADC_REG_ReadConversionData8(ADCCTRL_HWADDR);
+      uhADCxConvertedData = LL_ADC_REG_ReadConversionData8(p_ADCHandle);
 
       break;
     }
@@ -752,7 +794,7 @@ uint16_t AdcReadRaw (const ADCCTRL_Handle_t * const p_Handle)
     {
       uhADCxConvertedData = VAR_CONVERTED_DATA_INIT_VALUE_6B;
 
-      uhADCxConvertedData = LL_ADC_REG_ReadConversionData6(ADCCTRL_HWADDR);
+      uhADCxConvertedData = LL_ADC_REG_ReadConversionData6(p_ADCHandle);
 
       break;
     }
@@ -766,7 +808,7 @@ uint16_t AdcReadRaw (const ADCCTRL_Handle_t * const p_Handle)
   return uhADCxConvertedData;
 }
 
-void ConversionStartPoll_ADC_GrpRegular(void)
+void ConversionStartPoll_ADC_GrpRegular (void)
 {
 
   /* Start ADC group regular conversion */
@@ -782,11 +824,11 @@ void ConversionStartPoll_ADC_GrpRegular(void)
   /*       Software can be optimized by removing some of these checks, if     */
   /*       they are not relevant considering previous settings and actions    */
   /*       in user application.                                               */
-  if ((LL_ADC_IsEnabled(ADCCTRL_HWADDR) == 1)               &&
-      (LL_ADC_IsDisableOngoing(ADCCTRL_HWADDR) == 0)        &&
-      (LL_ADC_REG_IsConversionOngoing(ADCCTRL_HWADDR) == 0)   )
+  if ((LL_ADC_IsEnabled(p_ADCHandle) == 1)               &&
+      (LL_ADC_IsDisableOngoing(p_ADCHandle) == 0)        &&
+      (LL_ADC_REG_IsConversionOngoing(p_ADCHandle) == 0)   )
   {
-    LL_ADC_REG_StartConversion(ADCCTRL_HWADDR);
+    LL_ADC_REG_StartConversion(p_ADCHandle);
   }
   else
   {
@@ -794,7 +836,7 @@ void ConversionStartPoll_ADC_GrpRegular(void)
     Error_Handler();
   }
 
-  while (LL_ADC_IsActiveFlag_EOC(ADCCTRL_HWADDR) == 0);
+  while (LL_ADC_IsActiveFlag_EOC(p_ADCHandle) == 0);
 
   /* Clear flag ADC group regular end of unitary conversion */
   /* Note: This action is not needed here, because flag ADC group regular   */
@@ -804,7 +846,7 @@ void ConversionStartPoll_ADC_GrpRegular(void)
   /*       this flag, needed if conversion data is not always read          */
   /*       or if group injected end of unitary conversion is used (for      */
   /*       devices with group injected available).                          */
-  LL_ADC_ClearFlag_EOC(ADCCTRL_HWADDR);
+  LL_ADC_ClearFlag_EOC(p_ADCHandle);
 }
 
 /* Weak function Definition --------------------------------------------------*/

@@ -118,11 +118,11 @@ Key: ${key}; Value: ${myHash[key]}
 [#macro generateZgbCallbacks cluster step]
     [#assign endpoint  = allHashCluster_GP[cluster]["epNb"]]
     [#if zigbeeGenericParamHash_GP["ZGB_NB_ENDPOINTS"]?number == 1 ]
-        [#assign endpointName  = ""]
-        [#assign endpointNameCbk  = endpointName]
+        [#assign localEndpointName  = ""]
+        [#assign localEndpointNameCbk  = localEndpointName]
     [#else]
-        [#assign endpointName  = endpoint?string ]
-        [#assign endpointNameCbk  = "_" + endpointName]
+        [#assign localEndpointName  = endpoint?string ]
+        [#assign localEndpointNameCbk  = "_" + localEndpointName]
     [/#if]
     [#assign clusterValue  = allHashCluster_GP[cluster]["clusterValue"]?split("_")]
     [#list clusterValue as seqElement]
@@ -143,7 +143,7 @@ Key: ${key}; Value: ${myHash[key]}
         [/#list]
         [#if cbToRegister[0]??]
             [#if step == "declaration"]
-                [#lt]/* ${clusterNameForCBName} ${clusterRoleForCBName}${endpointName} Callbacks */
+                [#lt]/* ${clusterNameForCBName} ${clusterRoleForCBName}${localEndpointName} Callbacks */
             [/#if]
             [#assign allCallbackName = ""]
             [#list cbToRegister as activatedCallback]
@@ -162,7 +162,7 @@ Key: ${key}; Value: ${myHash[key]}
                         [#list cbPtNameList as cbPtName]
                             [#assign cbFinalPointerName = cbFinalPointerName + cbPtName?cap_first ]
                         [/#list]
-                        [#assign cbName = "APP_ZIGBEE_" + clusterNameForCBName + clusterRoleForCBName + cbFinalPointerName + "Callback" + endpointNameCbk]
+                        [#assign cbName = "APP_ZIGBEE_" + clusterNameForCBName + clusterRoleForCBName + cbFinalPointerName + "Callback" + localEndpointNameCbk]
                     [/#if]
                     [#assign callbackDefStruct = activatedCallback["key1cbStruct"]]
                     [#assign callbackDefArg = activatedCallback["key2cbParams"]]
@@ -199,8 +199,8 @@ Key: ${key}; Value: ${myHash[key]}
                             [#assign retVar = "return status;"]
                         [/#if]
                         [#lt]/**
-                        [#if endpointName != ""]
-                            [#lt] * @brief  ${clusterNameForCBName} ${clusterRoleForCBName?cap_first} '${cbFinalPointerName}' ${endpointName} command Callback
+                        [#if localEndpointName != ""]
+                            [#lt] * @brief  ${clusterNameForCBName} ${clusterRoleForCBName?cap_first} '${cbFinalPointerName}' ${localEndpointName} command Callback
                         [#else]
                             [#lt] * @brief  ${clusterNameForCBName} ${clusterRoleForCBName?cap_first} '${cbFinalPointerName}' command Callback
                         [/#if]
@@ -220,7 +220,7 @@ Key: ${key}; Value: ${myHash[key]}
             [#if (step == "declaration") && (clusterNameForCBName != "OTA")]
                 [#if cbName != ""]
                     [#if isAlone == "false" ]
-                        [#assign masterCbName = "st" + clusterNameForCBName + clusterRoleForCBName + "Callbacks" + endpointNameCbk]
+                        [#assign masterCbName = "st" + clusterNameForCBName + clusterRoleForCBName + "Callbacks" + localEndpointNameCbk]
                         [#lt]${masterCbTypeName} ${masterCbName} =
                         [#lt]{
                         [#--lt] //----------------------  generateZgbCallbacks : allCallbackName = ${allCallbackName} --]
@@ -235,7 +235,7 @@ Key: ${key}; Value: ${myHash[key]}
                                         [#assign cbFinalCallbackName = cbFinalCallbackName + cbPtName?cap_first ]
                                     [/#list]
                                     [#assign allCallbackNameToAdd = cbPointerName]
-                                    [#assign cbName2 = "APP_ZIGBEE_" + clusterNameForCBName + clusterRoleForCBName + cbFinalCallbackName + "Callback" + endpointNameCbk]
+                                    [#assign cbName2 = "APP_ZIGBEE_" + clusterNameForCBName + clusterRoleForCBName + cbFinalCallbackName + "Callback" + localEndpointNameCbk]
                                     [#lt]  .${currentCallBackName?lower_case} = ${cbName2},
                                 [/#if]
                             [/#list]
@@ -249,7 +249,7 @@ Key: ${key}; Value: ${myHash[key]}
             [#if step == "configcode"]
                 [#if cbName != ""]
                     [#if isAlone == "false" ]
-                        [#assign masterCbName = "st" + clusterNameForCBName + clusterRoleForCBName + "Config" + endpointNameCbk]
+                        [#assign masterCbName = "st" + clusterNameForCBName + clusterRoleForCBName + "Config" + localEndpointNameCbk]
                         [#if clusterRoleForCBName == "Client" ]
                             [#assign masterCbName = masterCbName + ".callbacks"]
                         [/#if]
@@ -264,7 +264,7 @@ Key: ${key}; Value: ${myHash[key]}
                                         [#assign cbFinalCallbackName = cbFinalCallbackName + cbPtName?cap_first ]
                                     [/#list]
                                     [#assign allCallbackNameToAdd = cbPointerName]
-                                    [#assign cbName2 = "APP_ZIGBEE_" + clusterNameForCBName + clusterRoleForCBName + cbFinalCallbackName + "Callback" + endpointNameCbk]
+                                    [#assign cbName2 = "APP_ZIGBEE_" + clusterNameForCBName + clusterRoleForCBName + cbFinalCallbackName + "Callback" + localEndpointNameCbk]
                                     [#lt]  ${masterCbName}.${currentCallBackName?lower_case} = ${cbName2};
                                 [/#if]
                             [/#list]
@@ -702,7 +702,7 @@ void APP_ZIGBEE_ApplicationStart( void )
 #if ( CFG_LPM_LEVEL != 0)
   /* Authorize LowPower now */
   UTIL_LPM_SetStopMode( 1 << CFG_LPM_APP, UTIL_LPM_ENABLE );
-#if (CFG_LPM_STDBY_SUPPORTED == 1)  
+#if (CFG_LPM_STDBY_SUPPORTED > 0)  
   UTIL_LPM_SetOffMode( 1 << CFG_LPM_APP, UTIL_LPM_ENABLE );
 #endif /* CFG_LPM_STDBY_SUPPORTED */
 #endif /* CFG_LPM_LEVEL */
@@ -761,7 +761,18 @@ void APP_ZIGBEE_GetStartupConfig( struct ZbStartupT * pstConfig )
 {
   /* Attempt to join a zigbee network */
   ZbStartupConfigGetProDefaults( pstConfig );
-  
+
+[#if ZigBeeMode == "DISTRIBUTED"]
+  /* Set the TC address to be distributed. */
+  pstConfig->security.trustCenterAddress = ZB_DISTRIBUTED_TC_ADDR;
+
+  /* Using the Uncertified Distributed Global Key */
+  memcpy( pstConfig->security.distributedGlobalKey, sec_key_distrib_uncert, ZB_SEC_KEYSIZE );
+[#else]
+  /* Using the default HA preconfigured Link Key */
+  memcpy( pstConfig->security.preconfiguredLinkKey, sec_key_ha, ZB_SEC_KEYSIZE );
+[/#if]
+
   /* Setting up additional startup configuration parameters */
   pstConfig->startupControl = stZigbeeAppInfo.eStartupControl;
   pstConfig->channelList.count = 1;

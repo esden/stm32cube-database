@@ -32,6 +32,9 @@ ZigBeeMode : ${ZigBeeMode}
 
 #include "app_common.h"
 #include "app_conf.h"
+[#if myHash["THREADX_STATUS"]?number == 1 ]
+#include "main.h"
+[/#if]
 #include "log_module.h"
 #include "app_entry.h"
 #include "app_zigbee.h"
@@ -101,6 +104,10 @@ static enum zb_msg_filter_rc APP_ZIGBEE_DeviceJointCallback   ( struct ZigBeeT *
 static void APP_ZIGBEE_NwkFormOrJoinTask      ( ULONG lArgument );
 
 [/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+static void APP_ZIGBEE_NwkFormOrJoinTask      ( void *argument );
+
+[/#if]
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -113,7 +120,25 @@ static UTIL_TIMER_Object_t      stNwkFormWaitTimer, stNwkFormWaitJoinTimer;
 TX_SEMAPHORE                    NwkFormStartSemaphore;
 TX_SEMAPHORE                    StartupWaitEndSemaphore;
 TX_SEMAPHORE                    NwkFormWaitEndSemaphore;
-TX_THREAD                       NwkFormThread;
+TX_THREAD                       NwkFormJoinTask;
+
+[/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+osSemaphoreId_t                 NwkFormStartSemaphore;
+osSemaphoreId_t                 StartupWaitEndSemaphore;
+osSemaphoreId_t                 NwkFormWaitEndSemaphore;
+osThreadId_t                    NwkFormJoinTask;
+
+static const osThreadAttr_t stNwkFormJoinTask_attributes = 
+{
+  .name         = "NwkFormJoin Task",
+  .priority     = TASK_PRIO_ZIGBEE_NETWORK_FORM,
+  .stack_size   = TASK_STACK_SIZE_ZIGBEE_NETWORK_FORM,
+  .attr_bits    = TASK_DEFAULT_ATTR_BITS,
+  .cb_mem       = TASK_DEFAULT_CB_MEM,
+  .cb_size      = TASK_DEFAULT_CB_SIZE,
+  .stack_mem    = TASK_DEFAULT_STACK_MEM
+};
 
 [/#if]
 /* USER CODE BEGIN PV */
@@ -166,7 +191,7 @@ void APP_ZIGBEE_NwkFormOrJoinTaskInit( void )
   }
   if ( ThreadXStatus == TX_SUCCESS )
   {
-    ThreadXStatus |= tx_thread_create(  &NwkFormThread, "NwkFormThread", APP_ZIGBEE_NwkFormOrJoinTask, 0, pStack,
+    ThreadXStatus |= tx_thread_create(  &NwkFormJoinTask, "NwkFormJoinTask", APP_ZIGBEE_NwkFormOrJoinTask, 0, pStack,
                                         TASK_STACK_SIZE_ZIGBEE_NETWORK_FORM, TASK_PRIO_ZIGBEE_NETWORK_FORM, TASK_PRIO_ZIGBEE_NETWORK_FORM,
                                         TX_NO_TIME_SLICE, TX_AUTO_START );
   }
@@ -174,12 +199,29 @@ void APP_ZIGBEE_NwkFormOrJoinTaskInit( void )
   /* Verify if it's OK */
   if ( ThreadXStatus != TX_SUCCESS )
   { 
-    LOG_ERROR_APP( "ERROR THREADX : NETWORK JOIN THREAD CREATION FAILED (%d)", ThreadXStatus );
-    while(1);
+    LOG_ERROR_APP( "Network Join ThreadX objects creation FAILED (%d)", ThreadXStatus );
+    Error_Handler();
   }
 
   /* launch the startup of the mesh network setup */
   tx_semaphore_put( &NwkFormStartSemaphore );
+[/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+  /* Create Application FreeRTOS objects */
+  NwkFormStartSemaphore = osSemaphoreNew( 1U, 0U, NULL ); 
+  StartupWaitEndSemaphore = osSemaphoreNew( 1U, 0U, NULL ); 
+  NwkFormWaitEndSemaphore = osSemaphoreNew( 1U, 0U, NULL ); 
+  
+  NwkFormJoinTask = osThreadNew( APP_ZIGBEE_NwkFormOrJoinTask, NULL, &stNwkFormJoinTask_attributes );
+  
+  if ( ( NwkFormJoinTask == NULL ) || ( NwkFormStartSemaphore == NULL ) || ( StartupWaitEndSemaphore == NULL ) || ( NwkFormWaitEndSemaphore == NULL ) )
+  { 
+    LOG_ERROR_APP( "Network Join FreeRtos objects creation FAILED" );
+    Error_Handler();
+  }
+
+  /* launch the startup of the mesh network setup */
+  osSemaphoreRelease( NwkFormStartSemaphore );
 [/#if]
 [#if myHash["SEQUENCER_STATUS"]?number == 1 ]
   /* Create the Task associated with network creation process */
@@ -301,6 +343,9 @@ static void APP_ZIGBEE_NwkFormWaitElapsed( void * arg )
 [#if myHash["THREADX_STATUS"]?number == 1 ]
   tx_semaphore_put( &NwkFormWaitEndSemaphore );
 [/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+  osSemaphoreRelease( NwkFormWaitEndSemaphore );
+[/#if]
 [#if myHash["SEQUENCER_STATUS"]?number == 1 ]
   UTIL_SEQ_SetTask( 1U << CFG_TASK_ZIGBEE_NETWORK_FORM, TASK_PRIO_ZIGBEE_NETWORK_FORM );
 [/#if]
@@ -344,17 +389,6 @@ void APP_ZIGBEE_NwkFormOrJoin(void)
     /* Application configure Startup */
     APP_ZIGBEE_GetStartupConfig( &stConfig );
 
-[#if ZigBeeMode == "DISTRIBUTED"]
-    /* Set the TC address to be distributed. */
-    stConfig.security.trustCenterAddress = ZB_DISTRIBUTED_TC_ADDR;
-
-    /* Using the Uncertified Distributed Global Key */
-    memcpy( stConfig.security.distributedGlobalKey, sec_key_distrib_uncert, ZB_SEC_KEYSIZE );
-[#else]
-    /* Using the default HA preconfigured Link Key */
-    memcpy( stConfig.security.preconfiguredLinkKey, sec_key_ha, ZB_SEC_KEYSIZE );
-[/#if]
-
     /* Using ZbStartupWait (blocking) */
     stZigbeeAppInfo.eJoinStatus = ZbStartupWait( stZigbeeAppInfo.pstZigbee, &stConfig );
 
@@ -397,6 +431,9 @@ void APP_ZIGBEE_NwkFormOrJoin(void)
 [#if myHash["THREADX_STATUS"]?number == 1 ]
     tx_semaphore_put( &NwkFormStartSemaphore );
 [/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+    osSemaphoreRelease( NwkFormStartSemaphore );
+[/#if]
 [#if myHash["SEQUENCER_STATUS"]?number == 1 ]
     UTIL_TIMER_Start( &stNwkFormWaitTimer );
 [/#if]
@@ -428,6 +465,31 @@ static void APP_ZIGBEE_NwkFormOrJoinTask( ULONG lArgument )
       tx_semaphore_get( &NwkFormWaitEndSemaphore, TX_WAIT_FOREVER );
     }
     
+    APP_ZIGBEE_NwkFormOrJoin();
+  }
+}
+
+[/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+/**
+ * @brief  Handle Zigbee network forming and joining task for FreeRtos
+ * @param  None
+ * @retval None
+ */
+static void APP_ZIGBEE_NwkFormOrJoinTask( void * argument )
+{
+  UNUSED( argument );
+
+  for(;;)
+  {
+    osSemaphoreAcquire( NwkFormStartSemaphore, osWaitForever );
+
+    if ( stZigbeeAppInfo.eJoinStatus != ZB_STATUS_SUCCESS )
+    {
+      UTIL_TIMER_Start( &stNwkFormWaitTimer );
+      osSemaphoreAcquire( NwkFormWaitEndSemaphore, osWaitForever );
+    }
+
     APP_ZIGBEE_NwkFormOrJoin();
   }
 }
@@ -474,6 +536,9 @@ static void ZbStartupWaitCallback( enum ZbStatusCodeT eZbStatus, void * pCallBac
 [#if myHash["THREADX_STATUS"]?number == 1 ]
   tx_semaphore_put( &StartupWaitEndSemaphore );
 [/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+  osSemaphoreRelease( StartupWaitEndSemaphore );
+[/#if]
 [#if myHash["SEQUENCER_STATUS"]?number == 1 ]
   UTIL_SEQ_SetEvt( EVENT_ZIGBEE_STARTUP_ENDED );
 [/#if]
@@ -507,6 +572,9 @@ static enum ZbStatusCodeT ZbStartupWait( struct ZigBeeT * pstZigbee, struct ZbSt
   /* Wait ZB Join finished */
 [#if myHash["THREADX_STATUS"]?number == 1 ]
   tx_semaphore_get( &StartupWaitEndSemaphore, TX_WAIT_FOREVER );
+[/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+  osSemaphoreAcquire( StartupWaitEndSemaphore, osWaitForever );
 [/#if]
 [#if myHash["SEQUENCER_STATUS"]?number == 1 ]
   UTIL_SEQ_WaitEvt( EVENT_ZIGBEE_STARTUP_ENDED );

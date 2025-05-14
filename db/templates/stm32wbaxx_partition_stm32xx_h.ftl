@@ -1,10 +1,12 @@
 [#ftl]
+[#assign McuFamilly=McuName?substring(0,10)]
+[#assign specific_Familly= McuName?matches("STM32WBA(54|55|5M|52|62|63|64|65).*")]
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file    partition_[#if McuName?starts_with("STM32WBA55")]stm32wba55xx.h[/#if][#if McuName?starts_with("STM32WBA52")]stm32wba52xx.h[/#if][#if McuName?starts_with("STM32WBA54")]stm32wba54xx.h[/#if]
+  * @file    partition_${McuFamilly?lower_case}xx.h
   * @author  MCD Application Team
-  * @brief   CMSIS [#if McuName?starts_with("STM32WBA55")]STM32WBA55xx[/#if][#if McuName?starts_with("STM32WBA52")]STM32WBA52xx[/#if][#if McuName?starts_with("STM32WBA54")]STM32WBA54xx[/#if] Device Initial Setup for Secure / Non-Secure Zones
+  * @brief   CMSIS ${McuFamilly?upper_case}xx Device Initial Setup for Secure / Non-Secure Zones
   *          for ARMCM33 based on CMSIS CORE V5.4.0 partition_ARMCM33.h Template.
   *
   *          This file contains:
@@ -14,6 +16,9 @@
   *           - Setup Interrupt Target
   *
   ******************************************************************************
+  * @attention
+  *
+[#if McuName?starts_with("STM32WBA5")]
   * Copyright (c) 2009-2019 Arm Limited. All rights reserved.
   * Copyright (c) 2022 STMicroelectronics. All rights reserved.  
   *
@@ -30,6 +35,16 @@
   * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   * See the License for the specific language governing permissions and
   * limitations under the License.
+[/#if]
+[#if McuName?starts_with("STM32WBA6")]
+  * Copyright (c) 2023 STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+[/#if]
   ******************************************************************************
  */
 /* USER CODE END Header */
@@ -48,25 +63,17 @@
 [/#if]
 [/#list]
 [/#if]
-[#if McuName?starts_with("STM32WBA52")]
-#ifndef PARTITION_STM32WBA52XX_H
-#define PARTITION_STM32WBA52XX_H
-[/#if]
-[#if McuName?starts_with("STM32WBA55")]
-#ifndef PARTITION_STM32WBA55XX_H
-#define PARTITION_STM32WBA55XX_H
-[/#if]
-[#if McuName?starts_with("STM32WBA54")]
-#ifndef PARTITION_STM32WBA54XX_H
-#define PARTITION_STM32WBA54XX_H
-[/#if]
 
+#ifndef PARTITION_${McuFamilly?upper_case}XX_H
+#define PARTITION_${McuFamilly?upper_case}XX_H
 [#assign nonSecureIT0 = "100, 100"/]
 [#assign nonSecureIT1 = "100, 100"/]
 [#assign nonSecureIT2 = "100, 100"/]
 [#assign nonSecureIT3 = "100, 100"/]
 [#assign nonSecureIT4 = "100, 100"/]
-
+[#if SAU??]
+[@common.optinclude name=contextFolder+mxTmpFolder+"/sau_partition.tmp"/][#-- ADD SAU init Code--]
+[#else]
 /*
 //-------- <<< Use Configuration Wizard in Context Menu >>> -----------------
 */
@@ -318,6 +325,7 @@
 /*
 // </h>
 */
+[/#if]
 
 /*
 // <e>Setup behaviour of Sleep and Exception Handling
@@ -420,7 +428,7 @@
 //   <o.5>  RAMCFG_IRQn           [#if enabledIT?contains("RAMCFG_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="RAMCFG_IRQn")]<1=> Non-Secure state[#assign nonSecureIT0 = nonSecureIT0+", "+"5"/][#else]<0=> Secure state[/#if]
 //   <o.6>  FLASH_IRQn            [#if enabledIT?contains("FLASH_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="FLASH_IRQn")]<1=> Non-Secure state[#assign nonSecureIT0 = nonSecureIT0+", "+"6"/][#else]<0=> Secure state[/#if]
 //   <o.7>  FLASH_S_IRQn          [#if enabledIT?contains("FLASH_S_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="FLASH_S_IRQn")]<1=> Non-Secure state[#assign nonSecureIT0 = nonSecureIT0+", "+"7"/][#else]<0=> Secure state[/#if]
-[#if McuName?starts_with("STM32WBA54") || McuName?starts_with("STM32WBA55") || McuName?starts_with("STM32WBA52")]
+[#if specific_Familly]
 //   <o.8>  GTZC_IRQn             [#if enabledIT?contains("GTZC_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="GTZC_IRQn")]<1=> Non-Secure state[#assign nonSecureIT0 = nonSecureIT0+", "+"8"/][#else]<0=> Secure state[/#if]
 [/#if]
 //   <o.9>  RCC_IRQn              [#if enabledIT?contains("RCC_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="RCC_IRQn")]<1=> Non-Secure state[#assign nonSecureIT0 = nonSecureIT0+", "+"9"/][#else]<0=> Secure state[/#if]
@@ -442,7 +450,7 @@
 //   <o.25> EXTI14_IRQn           [#if enabledIT?contains("EXTI14_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="EXTI14_IRQn")]<1=> Non-Secure state[#assign nonSecureIT0 = nonSecureIT0+", "+"25"/][#else]<0=> Secure state[/#if]
 //   <o.26> EXTI15_IRQn           [#if enabledIT?contains("EXTI15_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="EXTI15_IRQn")]<1=> Non-Secure state[#assign nonSecureIT0 = nonSecureIT0+", "+"26"/][#else]<0=> Secure state[/#if]
 //   <o.27> IWDG_IRQn             [#if enabledIT?contains("IWDG_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="IWDG_IRQn")]<1=> Non-Secure state[#assign nonSecureIT0 = nonSecureIT0+", "+"27"/][#else]<0=> Secure state[/#if]
-[#if McuName?starts_with("STM32WBA54") || McuName?starts_with("STM32WBA55") || McuName?starts_with("STM32WBA52")]
+[#if specific_Familly]
 //   <o.28> SAES_IRQn             [#if enabledIT?contains("SAES_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="SAES_IRQn")]<1=> Non-Secure state[#assign nonSecureIT0 = nonSecureIT0+", "+"28"/][#else]<0=> Secure state[/#if]
 [/#if]
 //   <o.29> GPDMA_Channel0_IRQn   [#if enabledIT?contains("GPDMA1_Channel0_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="GPDMA1_Channel0_IRQn")]<1=> Non-Secure state[#assign nonSecureIT0 = nonSecureIT0+", "+"29"/][#else]<0=> Secure state[/#if]
@@ -473,62 +481,60 @@
 
 /*
 // Interrupts 32..63
-//   <o.0>  GPDMA_Channel3_IRQn   [#if enabledIT?contains("GPDMA1_Channel3_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="GPDMA1_Channel3_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"0"/][#assign nonSecureIT4 = nonSecureIT4+", "+"0"/][#else]<0=> Secure state[/#if]
-//   <o.1>  GPDMA_Channel4_IRQn   [#if enabledIT?contains("GPDMA1_Channel4_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="GPDMA1_Channel4_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"1"/][#assign nonSecureIT4 = nonSecureIT4+", "+"1"/][#else]<0=> Secure state[/#if]
-//   <o.2>  GPDMA_Channel5_IRQn   [#if enabledIT?contains("GPDMA1_Channel5_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="GPDMA1_Channel5_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"2"/][#assign nonSecureIT4 = nonSecureIT4+", "+"2"/][#else]<0=> Secure state[/#if]
-//   <o.3>  GPDMA_Channel6_IRQn   [#if enabledIT?contains("GPDMA1_Channel6_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="GPDMA1_Channel6_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"3"/][#assign nonSecureIT4 = nonSecureIT4+", "+"3"/][#else]<0=> Secure state[/#if]
-//   <o.4>  GPDMA_Channel7_IRQn   [#if enabledIT?contains("GPDMA1_Channel7_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="GPDMA1_Channel7_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"4"/][#assign nonSecureIT4 = nonSecureIT4+", "+"4"/][#else]<0=> Secure state[/#if]
-//   <o.5>  TIM1_BRK_IRQn         [#if enabledIT?contains("TIM1_BRK_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="TIM1_BRK_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"9"/][#assign nonSecureIT4 = nonSecureIT4+", "+"5"/][#else]<0=> Secure state[/#if]
-//   <o.6>  TIM1_UP_IRQn          [#if enabledIT?contains("TIM1_UP_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="TIM1_UP_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"10"/][#assign nonSecureIT4 = nonSecureIT4+", "+"6"/][#else]<0=> Secure state[/#if]
-//   <o.7>  TIM1_TRG_COM_IRQn     [#if enabledIT?contains("TIM1_TRG_COM_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="TIM1_TRG_COM_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"11"/][#assign nonSecureIT4 = nonSecureIT4+", "+"7"/][#else]<0=> Secure state[/#if]
-//   <o.8>  TIM1_CC_IRQn          [#if enabledIT?contains("TIM1_CC_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="TIM1_CC_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"12"/][#assign nonSecureIT4 = nonSecureIT4+", "+"8"/][#else]<0=> Secure state[/#if]
-//   <o.9>  TIM2_IRQn             [#if enabledIT?contains("TIM2_IRQn") ||(swlowRadioInterruptExist && namelowradioInterrupt=="TIM2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"13"/][#assign nonSecureIT4 = nonSecureIT4+", "+"9"/][#else]<0=> Secure state[/#if]
-[#if McuName?starts_with("STM32WBA54") || McuName?starts_with("STM32WBA55") || McuName?starts_with("STM32WBA52")]
-//   <o.10> TIM3_IRQn             [#if enabledIT?contains("TIM3_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="TIM3_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"14"/][#assign nonSecureIT4 = nonSecureIT4+", "+"10"/][#else]<0=> Secure state[/#if]
-//   <o.11> I2C1_EV_IRQn          [#if enabledIT?contains("I2C1_EV_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="I2C1_EV_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"23"/][#assign nonSecureIT4 = nonSecureIT4+", "+"11"/][#else]<0=> Secure state[/#if]
-//   <o.12> I2C1_ER_IRQn          [#if enabledIT?contains("I2C1_ER_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="I2C1_ER_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"24"/][#assign nonSecureIT4 = nonSecureIT4+", "+"12"/][#else]<0=> Secure state[/#if]
+//   <o.0>  GPDMA_Channel3_IRQn   [#if enabledIT?contains("GPDMA1_Channel3_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="GPDMA1_Channel3_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"0"/][#else]<0=> Secure state[/#if]
+//   <o.1>  GPDMA_Channel4_IRQn   [#if enabledIT?contains("GPDMA1_Channel4_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="GPDMA1_Channel4_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"1"/][#else]<0=> Secure state[/#if]
+//   <o.2>  GPDMA_Channel5_IRQn   [#if enabledIT?contains("GPDMA1_Channel5_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="GPDMA1_Channel5_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"2"/][#else]<0=> Secure state[/#if]
+//   <o.3>  GPDMA_Channel6_IRQn   [#if enabledIT?contains("GPDMA1_Channel6_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="GPDMA1_Channel6_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"3"/][#else]<0=> Secure state[/#if]
+//   <o.4>  GPDMA_Channel7_IRQn   [#if enabledIT?contains("GPDMA1_Channel7_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="GPDMA1_Channel7_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"4"/][#else]<0=> Secure state[/#if]
+//   <o.5>  TIM1_BRK_IRQn         [#if enabledIT?contains("TIM1_BRK_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="TIM1_BRK_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"5"/][#else]<0=> Secure state[/#if]
+//   <o.6>  TIM1_UP_IRQn          [#if enabledIT?contains("TIM1_UP_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="TIM1_UP_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"6"/][#else]<0=> Secure state[/#if]
+//   <o.7>  TIM1_TRG_COM_IRQn     [#if enabledIT?contains("TIM1_TRG_COM_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="TIM1_TRG_COM_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"7"/][#else]<0=> Secure state[/#if]
+//   <o.8>  TIM1_CC_IRQn          [#if enabledIT?contains("TIM1_CC_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="TIM1_CC_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"8"/][#else]<0=> Secure state[/#if]
+//   <o.9>  TIM2_IRQn             [#if enabledIT?contains("TIM2_IRQn") ||(swlowRadioInterruptExist && namelowradioInterrupt=="TIM2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"9"/][#else]<0=> Secure state[/#if]
+[#if specific_Familly]
+//   <o.10> TIM3_IRQn             [#if enabledIT?contains("TIM3_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="TIM3_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"10"/][#else]<0=> Secure state[/#if]
+//   <o.11> I2C1_EV_IRQn          [#if enabledIT?contains("I2C1_EV_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="I2C1_EV_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"11"/][#else]<0=> Secure state[/#if]
+//   <o.12> I2C1_ER_IRQn          [#if enabledIT?contains("I2C1_ER_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="I2C1_ER_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"12"/][#else]<0=> Secure state[/#if]
 [/#if]
-[#if McuName?starts_with("STM32WBA54") || McuName?starts_with("STM32WBA55") || McuName?starts_with("STM32WBA52")]
-//   <o.13> SPI1_IRQn             [#if enabledIT?contains("SPI1_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="SPI1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"27"/][#assign nonSecureIT4 = nonSecureIT4+", "+"13"/][#else]<0=> Secure state[/#if]
+[#if specific_Familly]
+//   <o.13> SPI1_IRQn             [#if enabledIT?contains("SPI1_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="SPI1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"13"/][#else]<0=> Secure state[/#if]
 [/#if]
-//   <o.14> USART1_IRQn           [#if enabledIT?contains("USART1_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="USART1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"29"/][#assign nonSecureIT4 = nonSecureIT4+", "+"14"/][#else]<0=> Secure state[/#if]
-[#if McuName?starts_with("STM32WBA54") || McuName?starts_with("STM32WBA55") || McuName?starts_with("STM32WBA52")]
-//   <o.15> USART2_IRQn           [#if enabledIT?contains("USART2_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="USART2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#assign nonSecureIT4 = nonSecureIT4+", "+"15"/][#else]<0=> Secure state[/#if]
+//   <o.14> USART1_IRQn           [#if enabledIT?contains("USART1_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="USART1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"14"/][#else]<0=> Secure state[/#if]
+[#if specific_Familly]
+//   <o.15> USART2_IRQn           [#if enabledIT?contains("USART2_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="USART2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"15"/][#else]<0=> Secure state[/#if]
 [/#if]
-//   <o.16> LPUART1_IRQn          [#if enabledIT?contains("LPUART1_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="LPUART1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#assign nonSecureIT4 = nonSecureIT4+", "+"16"/][#else]<0=> Secure state[/#if]
-//   <o.17> LPTIM1_IRQn           [#if enabledIT?contains("LPTIM1_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="LPTIM1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#assign nonSecureIT4 = nonSecureIT4+", "+"17"/][#else]<0=> Secure state[/#if]
-[#if McuName?starts_with("STM32WBA54") || McuName?starts_with("STM32WBA55") || McuName?starts_with("STM32WBA52")]
-//   <o.18> LPTIM2_IRQn           [#if enabledIT?contains("LPTIM2_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="LPTIM2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#assign nonSecureIT4 = nonSecureIT4+", "+"18"/][#else]<0=> Secure state[/#if]
+//   <o.16> LPUART1_IRQn          [#if enabledIT?contains("LPUART1_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="LPUART1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"16"/][#else]<0=> Secure state[/#if]
+//   <o.17> LPTIM1_IRQn           [#if enabledIT?contains("LPTIM1_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="LPTIM1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"17"/][#else]<0=> Secure state[/#if]
+[#if McuName?matches("STM32WBA(54|55|5M|52|62|63|64|65).*")]
+//   <o.18> LPTIM2_IRQn           [#if enabledIT?contains("LPTIM2_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="LPTIM2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"18"/][#else]<0=> Secure state[/#if]
 [/#if]
-//   <o.19> TIM16_IRQn            [#if enabledIT?contains("TIM16_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="TIM16_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#assign nonSecureIT4 = nonSecureIT4+", "+"19"/][#else]<0=> Secure state[/#if]
-[#if McuName?starts_with("STM32WBA54") || McuName?starts_with("STM32WBA55") || McuName?starts_with("STM32WBA52")]
-//   <o.20> TIM17_IRQn            [#if enabledIT?contains("TIM17_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="TIM17_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#assign nonSecureIT4 = nonSecureIT4+", "+"20"/][#else]<0=> Secure state[/#if]
+//   <o.19> TIM16_IRQn            [#if enabledIT?contains("TIM16_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="TIM16_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"19"/][#else]<0=> Secure state[/#if]
+[#if specific_Familly]
+//   <o.20> TIM17_IRQn            [#if enabledIT?contains("TIM17_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="TIM17_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"20"/][#else]<0=> Secure state[/#if]
 [/#if]
-[#if McuName?starts_with("STM32WBA54") || McuName?starts_with("STM32WBA55")]
-//   <o.21> COMP_IRQn             [#if enabledIT?contains("COMP_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="COMP_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#assign nonSecureIT4 = nonSecureIT4+", "+"21"/][#else]<0=> Secure state[/#if]
+[#if McuName?matches("STM32WBA(54|55|5M|62|63|64|65).*")]
+//   <o.21> COMP_IRQn             [#if enabledIT?contains("COMP_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="COMP_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"21"/][#else]<0=> Secure state[/#if]
 [/#if]
-//   <o.22> I2C3_EV_IRQn          [#if enabledIT?contains("I2C3_EV_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="I2C3_EV_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"24"/][#assign nonSecureIT4 = nonSecureIT4+", "+"22"/][#else]<0=> Secure state[/#if]
-//   <o.23> I2C3_ER_IRQn          [#if enabledIT?contains("I2C3_ER_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="I2C3_ER_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"24"/][#assign nonSecureIT4 = nonSecureIT4+", "+"23"/][#else]<0=> Secure state[/#if]
-[#if McuName?starts_with("STM32WBA54") || McuName?starts_with("STM32WBA55")]
-//   <o.24> SAI1_IRQn             [#if enabledIT?contains("SAI1_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="SAI1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#assign nonSecureIT4 = nonSecureIT4+", "+"24"/][#else]<0=> Secure state[/#if]
+//   <o.22> I2C3_EV_IRQn          [#if enabledIT?contains("I2C3_EV_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="I2C3_EV_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"22"/][#else]<0=> Secure state[/#if]
+//   <o.23> I2C3_ER_IRQn          [#if enabledIT?contains("I2C3_ER_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="I2C3_ER_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"23"/][#else]<0=> Secure state[/#if]
+[#if McuName?matches("STM32WBA(54|55|5M|62|63|64|65).*")]
+//   <o.24> SAI1_IRQn             [#if enabledIT?contains("SAI1_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="SAI1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"24"/][#else]<0=> Secure state[/#if]
 [/#if]
-//   <o.25> TSC_IRQn              [#if enabledIT?contains("TSC_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="TSC_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#assign nonSecureIT4 = nonSecureIT4+", "+"25"/][#else]<0=> Secure state[/#if]
-[#if McuName?starts_with("STM32WBA54") || McuName?starts_with("STM32WBA55") || McuName?starts_with("STM32WBA52")]
-//   <o.26> AES_IRQn              [#if enabledIT?contains("AES_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="AES_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#assign nonSecureIT4 = nonSecureIT4+", "+"26"/][#else]<0=> Secure state[/#if]
+//   <o.25> TSC_IRQn              [#if enabledIT?contains("TSC_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="TSC_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"25"/][#else]<0=> Secure state[/#if]
+[#if specific_Familly]
+//   <o.26> AES_IRQn              [#if enabledIT?contains("AES_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="AES_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"26"/][#else]<0=> Secure state[/#if]
 [/#if]
-//   <o.27> RNG_IRQn              [#if enabledIT?contains("RNG_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="RNG_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#assign nonSecureIT4 = nonSecureIT4+", "+"27"/][#else]<0=> Secure state[/#if]
-//   <o.28> FPU_IRQn              [#if enabledIT?contains("FPU_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="FPU_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#assign nonSecureIT4 = nonSecureIT4+", "+"28"/][#else]<0=> Secure state[/#if]
-//   <o.29> HASH_IRQn             [#if enabledIT?contains("HASH_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="HASH_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#assign nonSecureIT4 = nonSecureIT4+", "+"29"/][#else]<0=> Secure state[/#if]
-//   <o.30> PKA_IRQn              [#if enabledIT?contains("PKA_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="PKA_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#assign nonSecureIT4 = nonSecureIT4+", "+"30"/][#else]<0=> Secure state[/#if]
-//   <o.31> SPI3_IRQn             [#if enabledIT?contains("SPI3_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="SPI3_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#assign nonSecureIT4 = nonSecureIT4+", "+"31"/][#else]<0=> Secure state[/#if]
+//   <o.27> RNG_IRQn              [#if enabledIT?contains("RNG_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="RNG_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"27"/][#else]<0=> Secure state[/#if]
+//   <o.28> FPU_IRQn              [#if enabledIT?contains("FPU_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="FPU_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"28"/][#else]<0=> Secure state[/#if]
+//   <o.29> HASH_IRQn             [#if enabledIT?contains("HASH_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="HASH_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"29"/][#else]<0=> Secure state[/#if]
+//   <o.30> PKA_IRQn              [#if enabledIT?contains("PKA_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="PKA_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#else]<0=> Secure state[/#if]
+//   <o.31> SPI3_IRQn             [#if enabledIT?contains("SPI3_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="SPI3_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"31"/][#else]<0=> Secure state[/#if]
 */
-
-
 [#assign decVal1 = 0/]
-[#if nonSecureIT4??]
-[#assign lll4 = nonSecureIT4?split(", ")/]
-[#list lll4 as it4]
-[#assign index1 = Integer.parseInt(it4)/]
+[#if nonSecureIT1??]
+[#assign lll1 = nonSecureIT1?split(", ")/]
+[#list lll1 as it1]
+[#assign index1 = Integer.parseInt(it1)/]
 [#if index1!=100]
 [#assign decVal1 = decVal1 +  Math.pow(2, index1)]
 [/#if]
@@ -548,42 +554,43 @@
 
 /*
 // Interrupts 64..95
-//   <o.0>  ICACHE_IRQn          [#if enabledIT?contains("ICACHE_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="ICACHE_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#assign nonSecureIT2 = nonSecureIT2+", "+"1000"/][#else]<0=> Secure state[/#if]
-//   <o.1>  ADC4_IRQn            [#if enabledIT?contains("ADC4_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="ADC4_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#assign nonSecureIT2 = nonSecureIT2+", "+"10000"/][#else]<0=> Secure state[/#if]
-//   <o.2>  RADIO_IRQn           [#if enabledIT?contains("RADIO_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="RADIO_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#assign nonSecureIT2 = nonSecureIT2+", "+"100000"/][#else]<0=> Secure state[/#if]
-//   <o.3>  WKUP_IRQn            [#if enabledIT?contains("WKUP_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="WKUP_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#assign nonSecureIT2 = nonSecureIT2+", "+"1000000"/][#else]<0=> Secure state[/#if]
-//   <o.4>  HSEM_IRQn            [#if enabledIT?contains("HSEM_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="HSEM_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#assign nonSecureIT2 = nonSecureIT2+", "+"10000000"/][#else]<0=> Secure state[/#if]
-//   <o.5>  HSEM_S_IRQn          [#if enabledIT?contains("HSEM_S_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="HSEM_S_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#assign nonSecureIT2 = nonSecureIT2+", "+"100000000"/][#else]<0=> Secure state[/#if]
-//   <o.6>  WKUP_S_IRQn          [#if enabledIT?contains("WKUP_S_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="WKUP_S_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#assign nonSecureIT2 = nonSecureIT2+", "+"1000000000"/][#else]<0=> Secure state[/#if]
+//   <o.0>  ICACHE_IRQn           [#if enabledIT?contains("ICACHE_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="ICACHE_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"0"/][#else]<0=> Secure state[/#if]
+//   <o.1>  ADC4_IRQn             [#if enabledIT?contains("ADC4_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="ADC4_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"1"/][#else]<0=> Secure state[/#if]
+//   <o.2>  RADIO_IRQn            [#if enabledIT?contains("RADIO_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="RADIO_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"2"/][#else]<0=> Secure state[/#if]
+//   <o.3>  WKUP_IRQn             [#if enabledIT?contains("WKUP_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="WKUP_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"3"/][#else]<0=> Secure state[/#if]
+//   <o.4>  HSEM_IRQn             [#if enabledIT?contains("HSEM_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="HSEM_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"4"/][#else]<0=> Secure state[/#if]
+//   <o.5>  HSEM_S_IRQn           [#if enabledIT?contains("HSEM_S_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="HSEM_S_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"5"/][#else]<0=> Secure state[/#if]
+//   <o.6>  WKUP_S_IRQn           [#if enabledIT?contains("WKUP_S_IRQn")||(swlowRadioInterruptExist && namelowradioInterrupt=="WKUP_S_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"6"/][#else]<0=> Secure state[/#if]
+[#if McuName?matches("STM32WBA(54|55|5M|62|63|64|65).*")]
+//   <o.7>  RCC_AUDIOSYNC_IRQn    [#if enabledIT?contains("RCC_AUDIOSYNC_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"7"/][#else]<0=> Secure state[/#if]
+[/#if]
+[#if McuName?matches("STM32WBA(62|64|65).*")]
+//   <o.8>  TIM4_IRQn             [#if enabledIT?contains("TIM4_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"8"/][#else]<0=> Secure state[/#if]
+//   <o.9>  I2C2_EV_IRQn          [#if enabledIT?contains("I2C2_EV_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"9"/][#else]<0=> Secure state[/#if]
+//   <o.10> I2C2_ER_IRQn          [#if enabledIT?contains("I2C2_ER_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"10"/][#else]<0=> Secure state[/#if]
+//   <o.11> SPI2_IRQn             [#if enabledIT?contains("SPI2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"11"/][#else]<0=> Secure state[/#if]
+//   <o.12> OTG_HS_IRQn           [#if enabledIT?contains("OTG_HS_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"12"/][#else]<0=> Secure state[/#if]
+//   <o.13> I2C4_EV_IRQn          [#if enabledIT?contains("I2C4_EV_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"13"/][#else]<0=> Secure state[/#if]
+//   <o.14> I2C4_ER_IRQn          [#if enabledIT?contains("I2C4_ER_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"14"/][#else]<0=> Secure state[/#if]
+//   <o.15> USART3_IRQn           [#if enabledIT?contains("USART3_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"15"/][#else]<0=> Secure state[/#if]
+[/#if]
+[#if McuName?matches("STM32WBA(62|63|64|65).*")]
+//   <o.16> EXTI19_RADIO_IO_IRQn  [#if enabledIT?contains("EXTI19_RADIO_IO_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"16"/][#else]<0=> Secure state[/#if]
+//   <o.17> EXTI20_RADIO_IO_IRQn  [#if enabledIT?contains("EXTI20_RADIO_IO_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"17"/][#else]<0=> Secure state[/#if]
+[/#if]
 */
-
 [#assign decVal2 = 0/]
 [#if nonSecureIT2??]
 [#assign lll2 = nonSecureIT2?split(", ")/]
 [#list lll2 as it2]
 [#assign index2 = Integer.parseInt(it2)/]
 [#if index2!=100]
-[#assign decVal2 = decVal2 +(index2/1000)]
+[#assign decVal2 = decVal2 +  Math.pow(2, index2)]
 [/#if]
 [/#list]
 [/#if]
-[#assign res2 = String.format("0x%08X" , Integer.parseInt(String.valueOf(decVal2), 2)) /]
+[#assign res2 = String.format("0x%08X" , Integer.valueOf(Integer.parseInt(String.valueOf(decVal2), 10))) /]
 #define NVIC_INIT_ITNS2_VAL      ${res2}
-
-
-
-[#assign decVal3 = 0/]
-[#if nonSecureIT3??]
-[#assign lll3 = nonSecureIT3?split(", ")/]
-[#list lll3 as it3]
-[#assign index3 = Integer.parseInt(it3)/]
-[#if index3!=100]
-[#assign decVal3 = decVal3 +  Math.pow(2, index3)]
-[/#if]
-[/#list]
-[/#if]
-
-[#assign res3 = String.format("0x%08X" , Math.round(decVal3)) /]
 
 /*
 //   </e>
@@ -594,7 +601,6 @@
 */
 
 /* USER CODE BEGIN 2 */
-
 /*
     max 8 SAU regions.
     SAU regions are defined in partition.h
@@ -696,14 +702,4 @@ __STATIC_INLINE void TZ_SAU_Setup (void)
 
 }
 /* USER CODE END 2 */
-[#if McuName?starts_with("STM32WBA55")]
-#endif  /* PARTITION_STM32WBA55XX_H */
-[/#if]
-
-[#if McuName?starts_with("STM32WBA54")]
-#endif  /* PARTITION_STM32WBA54XX_H */
-[/#if]
-
-[#if McuName?starts_with("STM32WBA52")]
-#endif  /* PARTITION_STM32WBA52XX_H */
-[/#if]
+#endif  /* PARTITION_${McuFamilly?upper_case}XX_H */

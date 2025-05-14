@@ -186,8 +186,8 @@
         <PossibleValue Comment="RW by any privilege level" Value="RW_all"/>
         <PossibleValue Comment="RO by privileged code only" Value="RO_priv_only"/>
         <PossibleValue Comment="RO by any privilege level" Value="RO_all"/>
-        <PossibleValue Comment="RW by privileged code and RO by unprivileged code" Value="RW_priv_RO_unpriv" Condition="!DIE450&amp;!DIE480&amp;!DIE483&amp;!DIE485" Action="Remove"/>
-        <PossibleValue Comment="All access not permitted" Value="All_Not_perm" Condition="!DIE485" Action="Remove"/>
+        <PossibleValue Comment="RW by privileged code and RO by unprivileged code" Value="RW_priv_RO_unpriv" Condition="!DIE480&amp;!DIE450&amp;!DIE483&amp;!DIE485&amp;!DIE032&amp;!DIE01E&amp;!DIE028" Action="Remove"/>
+        <PossibleValue Comment="All access not permitted" Value="All_Not_perm" Condition="!DIE480&amp;!DIE450&amp;!DIE483&amp;!DIE485&amp;!DIE032&amp;!DIE01E&amp;!DIE028" Action="Remove"/>
         <Description>Define if this region is accessible by privileged or unprivileged mode</Description>
     </RefParameter>
 
@@ -216,23 +216,31 @@
 	     The possibleValue indicates that the region is reserved for the 'master' AppReg or shared with the 'master' AppReg
 	-->
     <RefParameter Comment="ContextLink" DefaultValue="disable" Group="Current application region attributes" Name="ContextLink" Type="list" Visible="false">
-        <Condition Diagnostic="" Expression="DIE485"/>
+        <Condition Diagnostic="" Expression="DIE480|DIE450|DIE483|DIE485|DIE032|DIE01E|DIE028"/>
         <PossibleValue Comment="disable" Value="disable"/>
         <PossibleValue Comment="reserved" Value="reserved"/>
         <PossibleValue Comment="shared" Value="shared"/>
     </RefParameter>
     <RefParameter Comment="ContextLink" DefaultValue="disable" Group="Current application region attributes" Name="ContextLink" Type="list" Visible="false">
     </RefParameter>
-     <RefParameter Comment="Cacheability" DefaultValue="NonCacheable" Group="Current application region attributes" Name="Cacheability" Type="list">
-        <Condition Diagnostic="" Expression="ContextName=CortexM4"/>
-        <PossibleValue Comment="Non-Cacheable" Value="NonCacheable"/>
-        <Description>Configure the cacheability of this region</Description>
-    </RefParameter>
+     
    <!-- 1) different recommanded values for different memories: done by the builder
     2) "Advanced settings" (DONE)
     3) "Trensient" is only available for MPU armv8 -->
+
+	 <RefParameter Comment="Cacheability" DefaultValue="WBRAWA" Group="Current application region attributes" Name="Cacheability" Type="list">
+	 <!-- allow user to choose Device Memory of all memory in case of ARMv7 and ARMv6 -->
+        <Condition Diagnostic="" Expression="DIE480|DIE450|DIE483|DIE485|DIE032|DIE01E|DIE028"/>
+        <PossibleValue Comment="Device memory" Value="Device_NGNRE" />
+        <PossibleValue Comment="Non-Cacheable (recommended for multimaster/DMA and for not-remapped external memories)" Value="NonCacheable"/>
+        <PossibleValue Comment="Write-Through Read Allocate for code or RO data (not recommened for multimaster/DMA)" Value="WTRA"/>
+        <PossibleValue Comment="Write-Back Read Write Allocate for RW data (not recommended for multimaster/DMA)" Value="WBRAWA"/>
+        <PossibleValue Comment="Advanced Settings" Value="Advanced" Semaphore="S_MMT_CurReg_AdvancedSettings"/>
+        <Description>Configure the cacheability of this region</Description>
+    </RefParameter>
    <RefParameter Comment="Cacheability" DefaultValue="WBRAWA" Group="Current application region attributes" Name="Cacheability" Type="list">
-        <!-- allow user to turn back to the default value for the zones [0x4000 0000 : 0x6000 0000] and [0xA000 0000 : 0xC000 0000](HSPI) -->
+        <Condition Diagnostic="" Expression="!DIE480&amp;!DIE450&amp;!DIE483&amp;!DIE485&amp;!DIE032&amp;!DIE01E&amp;!DIE028"/>
+		<!-- allow user to turn back to the default value for the zones [0x4000 0000 : 0x6000 0000] and [0xA000 0000 : 0xC000 0000](HSPI) -->
         <PossibleValue Comment="Device, Non-Cacheable" Value="Device_NGNRE" Condition="!(StartAddress&gt;=0x40000000&amp;StartAddress&lt;0x60000000|StartAddress&gt;=0xA0000000&amp;StartAddress&lt;0xE0000000)" Action="Remove"/>
         <PossibleValue Comment="Non-Cacheable (recommended for multimaster/DMA and for not-remapped external memories)" Value="NonCacheable"/>
         <PossibleValue Comment="Write-Through Read Allocate for code or RO data (not recommened for multimaster/DMA)" Value="WTRA"/>
@@ -240,7 +248,11 @@
         <PossibleValue Comment="Advanced Settings" Value="Advanced" Semaphore="S_MMT_CurReg_AdvancedSettings"/>
         <Description>Configure the cacheability of this region</Description>
     </RefParameter>
-
+	<RefParameter Comment="Cacheability" DefaultValue="NonCacheable" Group="Current application region attributes" Name="Cacheability" Type="list">
+        <Condition Diagnostic="" Expression="ContextName=CortexM4"/>
+        <PossibleValue Comment="Non-Cacheable" Value="NonCacheable"/>
+        <Description>Configure the cacheability of this region</Description>
+    </RefParameter>
     <RefParameter Comment="Write policy" DefaultValue="WB" Group="Current application region attributes" Name="WritePolicy" Type="list">
         <Condition Diagnostic="" Expression="S_MMT_CurReg_AdvancedSettings"/>
         <PossibleValue Comment="Write-Through" Value="WT" Semaphore="S_MMT_CurReg_WT"/>
@@ -250,11 +262,11 @@
         <Condition Diagnostic="" Expression="!S_MMT_CurReg_AdvancedSettings"/>
     </RefParameter>
     <RefParameter Comment="Read allocate" DefaultValue="Y" Group="Current application region attributes" Name="ReadAllocate" Type="list">
-        <Condition Diagnostic="" Expression="S_MMT_CurReg_AdvancedSettings&amp;DIE485"/>
+        <Condition Diagnostic="" Expression="S_MMT_CurReg_AdvancedSettings&amp;(DIE480|DIE450|DIE483|DIE485|DIE032|DIE01E|DIE028)"/>
         <PossibleValue Comment="Yes" Value="Y" />
     </RefParameter>
     <RefParameter Comment="Read allocate" DefaultValue="Y" Group="Current application region attributes" Name="ReadAllocate" Type="list">
-        <Condition Diagnostic="" Expression="S_MMT_CurReg_AdvancedSettings&amp;!DIE485"/>
+        <Condition Diagnostic="" Expression="S_MMT_CurReg_AdvancedSettings&amp;!DIE480&amp;!DIE450&amp;!DIE483&amp;!DIE485&amp;!DIE032&amp;!DIE01E&amp;!DIE028"/>
         <PossibleValue Comment="Yes" Value="Y" Semaphore="S_MMT_CurReg_RA" />
         <PossibleValue Comment="No" Value="N"/>
     </RefParameter>
@@ -263,7 +275,7 @@
         <Condition Diagnostic="" Expression="!S_MMT_CurReg_AdvancedSettings"/>
     </RefParameter>
     <RefParameter Comment="Write allocate" DefaultValue="N" Group="Current application region attributes" Name="WriteAllocate" Type="list">
-        <Condition Diagnostic="" Expression="S_MMT_CurReg_AdvancedSettings&amp;DIE485&amp;S_MMT_CurReg_WT"/>
+        <Condition Diagnostic="" Expression="S_MMT_CurReg_AdvancedSettings&amp;(DIE480|DIE450|DIE483|DIE485|DIE032|DIE01E|DIE028)&amp;S_MMT_CurReg_WT"/>
         <PossibleValue Comment="No" Value="N"/>
     </RefParameter>
     <RefParameter Comment="Write allocate" DefaultValue="Y" Group="Current application region attributes" Name="WriteAllocate" Type="list">
@@ -274,8 +286,9 @@
     <RefParameter Comment="Write allocate" DefaultValue="null" Group="Current application region attributes" Name="WriteAllocate" Type="list" Visible="false">
         <Condition Diagnostic="" Expression="!S_MMT_CurReg_AdvancedSettings"/>
     </RefParameter>
+	<!-- "Trensient" is not available for MPU armv7 and armv6 -->
     <RefParameter Comment="Transient" DefaultValue="null" Group="Current application region attributes" Name="Transient" Type="list" Visible="false">
-        <Condition Diagnostic="" Expression="DIE485"/>
+        <Condition Diagnostic="" Expression="DIE480|DIE450|DIE483|DIE485|DIE032|DIE01E|DIE028"/>
     </RefParameter>
     <RefParameter Comment="Transient" DefaultValue="Y" Group="Current application region attributes" Name="Transient" Type="list">
         <Condition Diagnostic="" Expression="S_MMT_CurReg_AdvancedSettings&amp;(S_MMT_CurReg_RA|S_MMT_CurReg_WA)"/>
@@ -285,6 +298,7 @@
     <RefParameter Comment="Transient" DefaultValue="null" Group="Current application region attributes" Name="Transient" Type="list" Visible="false">
         <Condition Diagnostic="" Expression="!S_MMT_CurReg_AdvancedSettings&amp;!(S_MMT_CurReg_RA|S_MMT_CurReg_WA)"/>
     </RefParameter>
+	<!-- "Context sharing" is available for H7 dual core -->
     <RefParameter Comment="Context sharing" DefaultValue="false" Group="Current application region attributes" Name="Shared" Type="boolean">
         <Condition Diagnostic="" Expression="DIE450&amp;S_DUALCORE"/>
         <PossibleValue Comment="true" Value="true"/>

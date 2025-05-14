@@ -134,6 +134,9 @@ static void APP_THREAD_ProcessUart(void *argument);
 static void APP_THREAD_RCPInit(otInstance *aInstance);
 
 [/#if]
+
+static void APP_THREAD_PersistenceStartup(void);
+
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -594,6 +597,8 @@ void Thread_Init(void)
   uint8_t *otInstanceBuffer = NULL;
 #endif // OPENTHREAD_CONFIG_MULTIPLE_INSTANCE_ENABLE
 
+  APP_THREAD_PersistenceStartup();
+  
   otSysInit(0, NULL);
 
 [#if myHash["THREADX_STATUS"]?number == 1 ]
@@ -1107,6 +1112,19 @@ static void APP_THREAD_RCPInit(otInstance *aInstance)
 
 [/#if]
 [/#if]
+
+/**
+ * @brief  Thread persistence startup
+ * @param  None
+ * @retval None
+ */
+static void APP_THREAD_PersistenceStartup(void)
+{
+  /* USER CODE BEGIN APP_THREAD_PersistenceStartup */
+
+  /* USER CODE END APP_THREAD_PersistenceStartup */
+}
+
 /* USER CODE BEGIN FD_LOCAL_FUNCTIONS */
 
 /* USER CODE END FD_LOCAL_FUNCTIONS */

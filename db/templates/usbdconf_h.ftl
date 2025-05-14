@@ -17,8 +17,13 @@
 
 [#assign inclusion_protection = toto?upper_case]
 /* Define to prevent recursive inclusion -------------------------------------*/
+[#if FamilyName="STM32H7RS"]
+#ifndef __USBD_CONF_H
+#define __USBD_CONF_H
+[#else]
 #ifndef __${inclusion_protection}__
 #define __${inclusion_protection}__
+[/#if]
 
 #ifdef __cplusplus
  extern "C" {
@@ -226,6 +231,9 @@ void USBD_static_free(void *p);
 #ifdef __cplusplus
 }
 #endif
-
+[#if FamilyName="STM32H7RS"]
+#endif /* __USBD_CONF_H */
+[#else]
 #endif /* __${inclusion_protection}__ */
+[/#if]
 

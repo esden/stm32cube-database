@@ -77,9 +77,13 @@
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 [#assign familyName=FamilyName?lower_case]
+[#if (familyName?starts_with("stm32u5")||familyName?starts_with("stm32u0"))]
+#ifndef __APP_THREADX_H__
+#define __APP_THREADX_H__
+[#else]
 #ifndef __APP_THREADX_H
 #define __APP_THREADX_H
-
+[/#if]
 #ifdef __cplusplus
 [#if (familyName?starts_with("stm32u3")||familyName?starts_with("stm32u5")||familyName?starts_with("stm32h5")||familyName?starts_with("stm32c0")||familyName?starts_with("stm32wba"))]
 extern "C" {
@@ -173,8 +177,4 @@ void ${TX_APP_THREAD_ENTRY_value}(ULONG thread_input);
 #ifdef __cplusplus
 }
 #endif
-[#if (!familyName?starts_with("stm32wba"))]
 #endif /* __APP_THREADX_H */
-[#else]
-#endif /* __APP_THREADX_H__ */
-[/#if]

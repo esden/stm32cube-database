@@ -34,7 +34,7 @@
 [#assign RefParam_BOOT_enable_value = "not defined"]
 [#assign RefParam_XIP_memory_value = "not defined"]
 [#assign RefParam_XIP_ApplicationOffset_value = "not defined"]
-[#assign RefParam_XIP_HeaderOffset_value = "not defined"]
+[#assign RefParam_HeaderOffset_value = "not defined"]
 [#assign RefParam_LRUN_SRC_memory_value = "not defined"]
 [#assign RefParam_LRUN_SRC_offset_value = "not defined"]
 [#assign RefParam_LRUN_SRC_size_value = "not defined"]
@@ -134,8 +134,8 @@
 	[#if Name == "RefParam_XIP_ApplicationOffset"]
       [#assign RefParam_XIP_ApplicationOffset_value = Value]
     [/#if]
-	[#if Name == "RefParam_XIP_HeaderOffset"]
-      [#assign RefParam_XIP_HeaderOffset_value = Value]
+	[#if Name == "RefParam_HeaderOffset"]
+      [#assign RefParam_HeaderOffset_value = Value]
     [/#if]
     [#if Name == "RefParam_LRUN_SRC_memory"]
       [#assign RefParam_LRUN_SRC_memory_value = Value]
@@ -382,10 +382,10 @@
 #include "stm32_extmem.h"
 #include "stm32_extmem_type.h"
 [#if RefParam_BOOT_enable_value == "true"]
-    [#if RefParam_BOOT_selection_value == "XIP" && !(contextFolder=="ExtMemLoader/")]
+    [#if RefParam_BOOT_selection_value == "XIP" && (FamilyName!="STM32N6" || (contextFolder!="ExtMemLoader/" && FamilyName=="STM32N6"))]
 #include "boot/stm32_boot_xip.h"
     [/#if]
-    [#if RefParam_BOOT_selection_value == "LRUN" && !(contextFolder=="ExtMemLoader/")]
+    [#if RefParam_BOOT_selection_value == "LRUN" && (FamilyName!="STM32N6" || (contextFolder!="ExtMemLoader/" && FamilyName=="STM32N6"))]
 #include "boot/stm32_boot_lrun.h"
     [/#if]
 [/#if]
@@ -424,11 +424,13 @@ extern XSPI_HandleTypeDef h${RefParam_MEMORY_1_Instance_value?lower_case};
    [#assign RefParam_MEMORY_2_Instance_value = "sd1"]
 extern SD_HandleTypeDef hsd1;
  [#else]
-   [#if RefParam_MEMORY_2_Instance_value == "SDMMC2" ]
+   [#if RefParam_MEMORY_2_Instance_value!="valueNotSetted"]
+     [#if RefParam_MEMORY_2_Instance_value == "SDMMC2" ]
      [#assign RefParam_MEMORY_2_Instance_value = "sd2"]
 extern SD_HandleTypeDef hsd2;
-   [#else]
+     [#else]
 extern XSPI_HandleTypeDef h${RefParam_MEMORY_2_Instance_value?lower_case};
+     [/#if]
    [/#if]
  [/#if]
 [/#if]
@@ -444,12 +446,12 @@ extern XSPI_HandleTypeDef h${RefParam_MEMORY_2_Instance_value?lower_case};
 /** @defgroup EXTMEM_CONF_Exported_constants EXTMEM_CONF exported constants
   * @{
   */
-[#if RefParam_EXTMEM_Number_of_Memory_value == "1"]
+[#if RefParam_EXTMEM_Number_of_Memory_value == "1" || RefParam_MEMORY_2_Instance_value=="valueNotSetted"]
 enum {
   EXTMEMORY_1  = 0 /*!< ID=0 for the first memory  */
 };
 [/#if]
-[#if RefParam_EXTMEM_Number_of_Memory_value == "2"]
+[#if RefParam_EXTMEM_Number_of_Memory_value == "2" && RefParam_MEMORY_2_Instance_value!="valueNotSetted"]
 enum {
   EXTMEMORY_1  = 0, /*!< ID=0 for the first external memory  */
   EXTMEMORY_2  = 1, /*!< ID=1 for the second external memory */
@@ -467,10 +469,12 @@ enum {
    [#if RefParam_XIP_memory_value == "EXTMEM2"]
 #define EXTMEM_MEMORY_BOOTXIP  EXTMEMORY_2
    [/#if]
-   [#if RefParam_XIP_ApplicationOffset_value!="not defined" && RefParam_XIP_HeaderOffset_value!="not defined"]
+   [#if RefParam_XIP_ApplicationOffset_value!="not defined"]
 #define EXTMEM_XIP_IMAGE_OFFSET ${RefParam_XIP_ApplicationOffset_value}
-#define EXTMEM_HEADER_OFFSET ${RefParam_XIP_HeaderOffset_value}
    [/#if]
+[/#if]
+[#if RefParam_HeaderOffset_value!="not defined"] 
+#define EXTMEM_HEADER_OFFSET ${RefParam_HeaderOffset_value}
 [/#if]
 
 [#if RefParam_BOOT_selection_value == "LRUN"]
@@ -495,16 +499,19 @@ enum {
  [/#if]
 [/#if]
 
-/* USER CODE BEGIN PV */
+/* USER CODE BEGIN EC */
 
-/* USER CODE END PV */
+/* USER CODE END EC */
 
 
 /* Exported configuration --------------------------------------------------------*/
 /** @defgroup EXTMEM_CONF_Exported_configuration EXTMEM_CONF exported configuration definition
   * @{
   */
+[#assign extmem_list_size = "1"]
+[#if RefParam_MEMORY_2_Instance_value!="valueNotSetted"]
 [#assign extmem_list_size = RefParam_EXTMEM_Number_of_Memory_value]
+[/#if]
 [#if (contextFolder=="ExtMemLoader/" && extmem_list_size == "2")]
 [#assign extmem_list_size = "1"]
 [/#if]

@@ -489,8 +489,8 @@
 	
 	<RefParameter Comment="    Master Clock No Divider" DefaultValue="SAI_MASTERDIVIDER_ENABLE" Group="Clock Parameters" Name="NoDivider" Type="list">
 		<Condition Diagnostic="" Expression="(!((Protocol=SAI_AC97_PROTOCOL)))"/>
-		<PossibleValue Comment="Enabled" Value="SAI_MASTERDIVIDER_ENABLE"/>
-		<PossibleValue Comment="Disabled" Value="SAI_MASTERDIVIDER_DISABLE"/>
+		<PossibleValue Comment="Enabled" Value="SAI_MASTERDIVIDER_DISABLE"/>
+		<PossibleValue Comment="Disabled" Value="SAI_MASTERDIVIDER_ENABLE"/>
 	</RefParameter>
 	
 	<RefParameter Comment="    Master Clock Oversampling" DefaultValue="SAI_MCK_OVERSAMPLING_DISABLE" Group="Clock Parameters" Name="MckOverSampling" Type="list">
@@ -1768,7 +1768,8 @@
 								<Signal Name="FS_A"/>
 							</SignalLogicalOp>
 							<Semaphore>$IpInstance_SAIA_Master</Semaphore>								
-							<Semaphore>SAI_Master$noContext</Semaphore>	
+							<Semaphore>SAI_Master$noContext</Semaphore>
+							<Semaphore>SAI_Master</Semaphore>
 						</Mode>						
 						<Mode Name="SAI_A_MasterWithClock" UserName="Master with Master Clock Out">
 							<SignalLogicalOp Name="AND">
@@ -1779,6 +1780,7 @@
 							</SignalLogicalOp>
 							<Semaphore>$IpInstance_SAIA_Master</Semaphore>								
 							<Semaphore>SAI_Master$noContext</Semaphore>
+							<Semaphore>SAI_Master</Semaphore>
 						</Mode>
 						<Mode Name="SAI_A_AsyncSlave" UserName="Asynchronous Slave">
 							<SignalLogicalOp Name="AND">
@@ -1788,16 +1790,19 @@
 							</SignalLogicalOp>
 							<Semaphore>$IpInstance_SAIA_AsyncSlave</Semaphore>
 							<Semaphore>$IpInstance_SAIA_Slave</Semaphore>							
-							<Semaphore>SAI_AsyncSlave$noContext</Semaphore>							
+							<Semaphore>SAI_AsyncSlave$noContext</Semaphore>
+							<Semaphore>SAIA_Slave</Semaphore>
+							<Semaphore>SAI_AsyncSlave</Semaphore>
 						</Mode>						
 							<Mode Name="SAI_A_SyncSlave" ShrinkName="SAI_A in Synchronous Slave Mode" UserName="Synchronous Slave"> 								
 							<SignalLogicalOp Name="AND">
 								<Signal Name="SD_A"/>
 							</SignalLogicalOp>
-                                                         <Semaphore>$IpInstance_SAIA_SyncSlave</Semaphore>
+								<Semaphore>$IpInstance_SAIA_SyncSlave</Semaphore>
 							<Semaphore>$IpInstance_SAIA_AsyncSlave</Semaphore>
 							<Semaphore>$IpInstance_SAIA_Slave</Semaphore>
-                                                       <Condition Diagnostic="Need to have SAI_B on 'Master' or 'Asynchronous Slave' Mode" Expression="($IpInstance_SAIB_Master | $IpInstance_SAIB_AsyncSlave)"/>
+								<Semaphore>SAIA_Slave</Semaphore>
+								<Condition Diagnostic="Need to have SAI_B on 'Master' or 'Asynchronous Slave' Mode" Expression="(SAI_Master | SAI_AsyncSlave)"/>
                                                      							
 							<!--Condition Diagnostic="Need to have SAI_B on 'Master' or 'Asynchronous Slave' Mode" Expression="($IpInstance_SAIB_AsyncSlave | $IpInstance_SAIB_Slave)"/-->
 						</Mode>							
@@ -1816,6 +1821,7 @@
 							<Semaphore>$IpInstance_PDM$noContext</Semaphore>
 							<Semaphore>$IpInstance_PDM_CK1$noContext</Semaphore>							
 							<Semaphore>SEM_CK1$noContext</Semaphore>
+							<Semaphore>SEM_MIC_1</Semaphore>
 						</Mode>	
 						<!-- 69799 ThePDM must be activate if we have at least D1 and CK1 or CK2 avaialble -->						
 						<Mode Name="PDM_Master_Mode_CK2" UserName="Pulse Density Modulation using MicroPhones pairs (1-2) and CK2 as clock"  RemoveCondition="($IpNumber=2) | ($IpNumber=3)">
@@ -1826,6 +1832,7 @@
 							<Semaphore>$IpInstance_PDM$noContext</Semaphore>
 							<Semaphore>$IpInstance_PDM_CK2$noContext</Semaphore>
 							<Semaphore>SEM_CK2$noContext</Semaphore>
+							<Semaphore>SEM_MIC_1</Semaphore>
 						</Mode>
 					</ModeLogicOperator>
 					<Semaphore>$IpInstance_SAIA_Mode</Semaphore>
@@ -1896,7 +1903,9 @@
 								<Signal Name="FS_B"/>
 							</SignalLogicalOp>
 							<Semaphore>$IpInstance_SAIB_Master</Semaphore>									
-							<Semaphore>SAI_Master$noContext</Semaphore>	
+							<Semaphore>SAI_Master$noContext</Semaphore>
+							<Semaphore>SAIB_Master</Semaphore>
+							<Semaphore>SAI_Master</Semaphore>
 						</Mode>						
 						<Mode Name="SAI_B_MasterWithClock" UserName="Master with Master Clock Out">
 							<SignalLogicalOp Name="AND">
@@ -1907,6 +1916,7 @@
 							</SignalLogicalOp>
 							<Semaphore>$IpInstance_SAIB_Master</Semaphore>								
 							<Semaphore>SAI_Master$noContext</Semaphore>
+							<Semaphore>SAI_Master</Semaphore>
 						</Mode>
 						<Mode Name="SAI_B_AsyncSlave" UserName="Asynchronous Slave">
 							<SignalLogicalOp Name="AND">
@@ -1914,19 +1924,21 @@
 								<Signal Name="SCK_B"/>
 								<Signal Name="FS_B"/>
 							</SignalLogicalOp>
-                                                        <Semaphore>$IpInstance_SAIB_Slave</Semaphore>
+							<Semaphore>$IpInstance_SAIB_Slave</Semaphore>
 							<Semaphore>$IpInstance_SAIB_AsyncSlave</Semaphore>
-                                                        <Semaphore>SAI_AsyncSlave$noContext</Semaphore>
+							<Semaphore>SAI_AsyncSlave$noContext</Semaphore>
+							<Semaphore>SAI_AsyncSlave</Semaphore>
 							<!--<Condition Expression="!$IpInstance_SAIB_SPDIF" Diagnostic=""/>-->
 						</Mode>						
 						<Mode Name="SAI_B_SyncSlave" ShrinkName="SAI_B in Synchronous Slave Mode" UserName="Synchronous Slave"> 								
 							<SignalLogicalOp Name="AND">
 								<Signal Name="SD_B"/>
 							</SignalLogicalOp>
-                                                        <Semaphore>$IpInstance_SAIB_AsyncSlave</Semaphore>
-                                                        <Semaphore>$IpInstance_SAIB_Slave</Semaphore>
+							<Semaphore>$IpInstance_SAIB_AsyncSlave</Semaphore>
+							<Semaphore>$IpInstance_SAIB_Slave</Semaphore>
 							<Semaphore>$IpInstance_SAIB_SyncSlave</Semaphore>
-                                                        <Condition Diagnostic="Need to have SAI_A on 'Master' or 'Asynchronous Slave' Mode" Expression="($IpInstance_SAIA_Master | $IpInstance_SAIA_AsyncSlave)"/>							
+							<Semaphore>SAIB_Slave</Semaphore>
+							<Condition Diagnostic="Need to have SAI_A on 'Master' or 'Asynchronous Slave' Mode" Expression="(SAI_Master | SAI_AsyncSlave)"/>
 							<!--Condition Diagnostic="Need to have SAI_A on 'Master' or 'Asynchronous Slave' Mode" Expression="($IpInstance_SAIA_Slave | $IpInstance_SAIA_AsyncSlave)"/-->
 						</Mode>							
 						<Mode Name="SAI_B_SPDIF" UserName="SPDIF TX Transmitter (IEC60958)">

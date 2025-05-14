@@ -96,6 +96,12 @@
  [#if ProjectType?? ]
     <ProjectType>${ProjectType}</ProjectType>
  [/#if]
+ [#if ide=="CMake" && CompilerLinker??]
+  <CompilerLinker>${CompilerLinker}</CompilerLinker>
+  [/#if]
+  [#if IsMigrated??]
+      <IsMigrated>true</IsMigrated>
+  [/#if]
 [#-- list of toolchains to be generated: EWARM,MDK-ARM,TrueSTUDIO,RIDE: This tag can contain one or more than one toolchain: EWARM,MDK-ARM,TrueSTUDIO,RIDE --]
 
     <Toolchain>${ide}</Toolchain>
@@ -214,6 +220,9 @@
             [/#if]
             [#if dataKey=="Context"]
                [#assign Context =  elem[dataKey]]
+            [/#if]
+            [#if dataKey=="IsMigrated"]
+              [#assign IsMigrated =  elem[dataKey]]
             [/#if]
             [#if dataKey=="threadsafeCore"]
                [#assign threadsafeCore =  elem[dataKey]]
@@ -371,8 +380,8 @@
     [/#if]
 
     <Aincludes>
-        [#if usedfreeRTOS=="true" || (multiConfig == "true" && cpuCore=="ARM Cortex-M4" && usedfreeRTOS_M4?? && usedfreeRTOS_M4=="true")|| (multiConfig == "true" && cpuCore=="ARM Cortex-M7" && usedfreeRTOS_M7?? && usedfreeRTOS_M7=="true")]
-	   		[#if ide=="EWARM" ]
+        [#if usedfreeRTOS=="true" || (multiConfig == "true" && cpuCore=="ARM Cortex-M4" && usedfreeRTOS_M4?? && usedfreeRTOS_M4=="true")|| (multiConfig == "true" && cpuCore=="ARM Cortex-M7" && usedfreeRTOS_M7?? && usedfreeRTOS_M7=="true")|| usedThreadX=="true"]
+	   		[#--[#if ide=="EWARM" ]
         <include>$PROJ_DIR$\${RelativePath}[#if mxIncDir??]${mxIncDir}[#else]Inc[/#if]</include>
 	   		[#elseif ide=="MDK-ARM" ]
         <include>${RelativePath}[#if mxIncDir??]${mxIncDir}[#else]Inc[/#if]</include>
@@ -380,9 +389,27 @@
         <include>${RelativePath}[#if mxIncDir??]${mxIncDir}[#else]Inc[/#if]</include>
                         [#else]
         <include></include>
-                        [/#if]
+         [/#if]
 		[#else]
-        <include></include>
+        <include></include>--]
+        [#list mxIncludePaths as mxIncludePath]
+                         [#if ide=="EWARM" ]
+                             <include>$PROJ_DIR$\${mxIncludePath}</include>
+                             [#elseif ide=="MDK-ARM"  || ide=="Makefile" || ide=="CMake" || ide=="STM32CubeIDE"]
+                             <include>${mxIncludePath}</include>
+                              [#else]
+                                <include></include>
+                          [/#if]
+                          [/#list]
+                          [#list halIncludePaths as halIncludePath]
+                               [#if ide=="EWARM" ]
+                                     <include>$PROJ_DIR$\${halIncludePath}</include>
+                               [#elseif ide=="MDK-ARM"  || ide=="Makefile" || ide=="CMake" || ide=="STM32CubeIDE"]
+                                      <include>${halIncludePath}</include>
+                               [#else]
+                                      <include></include>
+                               [/#if]
+                          [/#list]
     	[/#if]
 
         </Aincludes>
@@ -392,12 +419,12 @@
         [/#list]
         </Adefines>  
     <Cdefines>
-        [#assign deflist =""]
-	[#list CdefinesList as define]
-        [#if !deflist?contains(define)]
+        [#assign deflist =[]]
+       	[#list CdefinesList as define]
+           [#if !deflist?seq_contains(define)]
         <define>${define}</define>
-            [#assign deflist = deflist + " - " + define]
-        [/#if]
+           [#assign deflist = deflist + [define]]
+         [/#if]
         [/#list]
 	   [#-- <define>__weak=__attribute__((weak))</define> --]
         </Cdefines>
@@ -731,6 +758,11 @@
         <sourceEntry>
 	<name>${HALDriver}</name>
     	</sourceEntry>
+    	 [#if CommonGroup??]
+            <sourceEntry>
+                <name>Common</name>
+                 </sourceEntry>
+             [/#if]
     	[#if atLeastOneMiddlewareIsUsed]   
         <sourceEntry>
                     <name>Middlewares</name>
@@ -834,7 +866,7 @@
                                                         [#assign removeFromConfig = "1"]
                                         [/#if]
                                     [/#if]
-                                    [#if removeFromConfig == "0"]
+                                    [#if !isExcludedFromBuild(filesName) && removeFromConfig == "0"]
                                                     <file>
                                                         <name>${filesName!''}</name>
                                         [#if  multiConfigurationProject?? && ConfigsAndFiles??]
@@ -862,7 +894,7 @@
             [@getGroups groupArg=grp  prtGrpexcluded="0" isApplicationGroup="0"/]
         [/#list]
     <group>
-        <name>Drivers</name> 
+        <name>Drivers</name>
          
         [#if atLeastDeviceDriverIsUsed]        
         <group>					
@@ -1141,7 +1173,12 @@
          [/#if]
         <sourceEntry>
             <name>${HALDriver}</name>
-        </sourceEntry>        
+        </sourceEntry>
+         [#if CommonGroup??]
+             <sourceEntry>
+                <name>Projects</name>
+              </sourceEntry>
+          [/#if]
 	[#if atLeastOneMiddlewareIsUsed]   
         [#-- ************************* --]
        
@@ -1258,10 +1295,22 @@
         [/#if]
         [#-- ************************* --]
 	[/#if]
-        [#if ResMgr_Utility?? || (UtilitiesGroup?? && UtilitiesGroup.sourceFilesNameList?size>0)]
-            <sourceEntry>
-                <name>Utilities</name>
-            </sourceEntry>
+        [#if (ResMgr_Utility?? || (UtilitiesGroup?? && UtilitiesGroup.sourceFilesNameList?size>0)) && TrustZone=="0"]
+        <sourceEntry>
+        <name>Utilities</name>
+                   [#if excludedFilesFromBuild?? && excludedFilesFromBuild?size>0]
+                       [#list excludedFilesFromBuild as exFile]
+                           [#if exFile?replace("\\","/")?starts_with("Utilities")]
+        <file>
+        <name>${exFile?replace("Utilities/","")}</name>
+        <excluded>
+        <configuration>${Configuration}</configuration>
+        </excluded>
+        </file>
+                           [/#if]
+                       [/#list]
+                   [/#if]
+        </sourceEntry>
         [/#if]
         [#if ThirdPartyPackList??]        
             [#list ThirdPartyPackList as pack]

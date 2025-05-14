@@ -521,6 +521,19 @@
         
     </RefParameter>
     
+    <RefParameter Comment="SamplingTime Common 1" DefaultValue="ADC_SAMPLETIME_814CYCLES_5" Group="ADCgroup" Name="SamplingTimeCommon1" Type="list"  >
+        <Condition Diagnostic="" Expression="S_USE_TEMPERATURE_BASED_RADIO_CALIBRATION"/>
+        <PossibleValue Comment="1.5 Cycles" Value="ADC_SAMPLETIME_1CYCLE_5"/>
+        <PossibleValue Comment="3.5 Cycles" Value="ADC_SAMPLETIME_3CYCLES_5"/>
+        <PossibleValue Comment="7.5 Cycles" Value="ADC_SAMPLETIME_7CYCLES_5"/>
+        <PossibleValue Comment="12.5 Cycles" Value="ADC_SAMPLETIME_12CYCLES_5"/>
+        <PossibleValue Comment="19.5 Cycles" Value="ADC_SAMPLETIME_19CYCLES_5"/>
+        <PossibleValue Comment="39.5 Cycles" Value="ADC_SAMPLETIME_39CYCLES_5"/>
+        <PossibleValue Comment="79.5 Cycles" Value="ADC_SAMPLETIME_79CYCLES_5"/>
+        <PossibleValue Comment="814.5 Cycles" Value="ADC_SAMPLETIME_814CYCLES_5"/>
+        <Description>Set sampling time common to a group of channels.</Description>
+    </RefParameter>  
+
     <RefParameter Comment="SamplingTime Common 1" DefaultValue="ADC_SAMPLETIME_1CYCLE_5" Group="ADCgroup" Name="SamplingTimeCommon1" Type="list"  >
         <PossibleValue Comment="1.5 Cycles" Value="ADC_SAMPLETIME_1CYCLE_5"/>
         <PossibleValue Comment="3.5 Cycles" Value="ADC_SAMPLETIME_3CYCLES_5"/>
@@ -1779,7 +1792,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         <ConfigForMode>ADC_AnalogWDGConfig</ConfigForMode>
         <Parameter Name="EnableAnalogWatchDog"/>
         <Parameter Name="WatchdogMode"/>
-        <Parameter Name="WatchdogChannel"/>
+        <Parameter Name="AnalogwatchdogChannel"/>
         <Parameter Name="HighThreshold"/>
         <Parameter Name="LowThreshold"/>
         <Parameter Name="ITMode"/>
@@ -1790,7 +1803,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         <Parameter Name="EnableAnalogWatchDog1"/>
         <Parameter Name="AWD1WatchdogNumber"/>
         <Parameter Name="WatchdogMode"/>
-        <Parameter Name="WatchdogChannel"/>
+        <Parameter Name="AnalogwatchdogChannel"/>
         <Parameter Name="AWD1HighThreshold"/>
         <Parameter Name="AWD1LowThreshold"/>
         <Parameter Name="AWD1ITMode"/>
@@ -1898,15 +1911,15 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
 
     <!-- ADC selected channels through mode list -->
     <RefParameter Comment="ADC selected channels through mode list" DefaultValue="null" Group="ADCgroup" Name="SelectedChannel" Type="String"/>
-    <!-- Possible value of WatchdogChannel parameter -->
-    <RefParameter Comment="Analog WatchDog Channel" DefaultValue="null" Group="ADCChannel" Name="WatchdogChannel" Type="list" Visible="false">
+    <!-- Possible value of AnalogwatchdogChannel parameter -->
+    <RefParameter Comment="Analog WatchDog Channel" DefaultValue="null" Group="ADCChannel" Name="AnalogwatchdogChannel" Type="list" Visible="false">
         <Condition Diagnostic="" Expression="EnableAnalogWatchDog1=false"/>
     </RefParameter>
-    <RefParameter Comment="Analog WatchDog Channel" DefaultValue="null" Group="ADCChannel" Name="WatchdogChannel" Type="list" Visible="false">
+    <RefParameter Comment="Analog WatchDog Channel" DefaultValue="null" Group="ADCChannel" Name="AnalogwatchdogChannel" Type="list" Visible="false">
         <Condition Diagnostic="" Expression="AllRegular"/>
     </RefParameter>
    
-    <RefParameter Comment="Analog WatchDog Channel" DefaultValue="" Group="ADCChannel" Name="WatchdogChannel" Type="list">
+    <RefParameter Comment="Analog WatchDog Channel" DefaultValue="" Group="ADCChannel" Name="AnalogwatchdogChannel" Type="list">
         <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"  Condition="!SHANNEL0ISSELECTED" Diagnostic=" " Action="Disable" />
         <PossibleValue Comment="Channel 1" Value="ADC_CHANNEL_1"  Condition="!SHANNEL1ISSELECTED" Diagnostic="" Action="Disable"  />
         <PossibleValue Comment="Channel 2" Value="ADC_CHANNEL_2" Condition="!SHANNEL2ISSELECTED" Diagnostic="" Action="Disable" />
@@ -1932,7 +1945,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
      
         <Description>ADC channel for the analog watchdog</Description> 
     </RefParameter>
-    <RefParameter Comment="Analog WatchDog Channel" Visible="false" DefaultValue="" Group="ADCChannel" Name="WatchdogChannel" Type="list"/>
+    <RefParameter Comment="Analog WatchDog Channel" Visible="false" DefaultValue="" Group="ADCChannel" Name="AnalogwatchdogChannel" Type="list"/>
 
         
     <!-- Possible value of HighThreshold parameter -->
@@ -2487,7 +2500,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
             <Semaphore>SHANNEL4ISSELECTED</Semaphore>
 
         </Mode>
-        <Mode Name="IN5" RemoveCondition="(!UFBGA59)">
+        <Mode Name="IN5" RemoveCondition="((!UFBGA59) &amp; (!DIE4B0))">
             <ModeLogicOperator Name="OR">
                 <Mode Name="IN5">
                     <SignalLogicalOp Name="AND">
@@ -2499,7 +2512,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
             <Semaphore>SHANNEL5ISSELECTED</Semaphore>
 
         </Mode>
-        <Mode Name="IN6" RemoveCondition="(!UFBGA59 ) &amp; (!UFQFPN48)">
+        <Mode Name="IN6" RemoveCondition="((!UFBGA59 ) &amp; (!UFQFPN48) &amp; (!DIE4B0))">
             <ModeLogicOperator Name="OR">
                 <Mode Name="IN6">
                     <SignalLogicalOp Name="AND">

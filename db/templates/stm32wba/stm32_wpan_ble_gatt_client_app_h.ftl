@@ -10,7 +10,6 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
-[#assign PG_FILL_UCS = "False"]
 [#assign myHash = {}]
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
@@ -98,14 +97,6 @@ typedef struct
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
-[#if PG_FILL_UCS == "True"]
-[#if (RF_APPLICATION == "P2PCLIENT")]
-#define ST_P2P_SERVICE_UUID                                           (0xFE40)
-#define ST_P2P_WRITE_CHAR_UUID                                        (0xFE41)
-#define ST_P2P_NOTIFY_CHAR_UUID                                       (0xFE42)
-#define ST_P2P_WRITE_WITH_RES_CHAR_UUID                               (0xFE43)
-[/#if]
-[/#if]
 
 /* USER CODE END EC */
 

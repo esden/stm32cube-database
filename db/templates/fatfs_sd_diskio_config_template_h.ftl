@@ -5,7 +5,19 @@
   * @brief   Template for the sd_diskio_config.h. This file should be copied and
              under project.
   ******************************************************************************
+  [#if FamilyName=="STM32H7RS"]
+* @attention
+  *
+  * Copyright (c) 2024 STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+[#else]
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
+[/#if]
   ******************************************************************************
   */
 
@@ -30,9 +42,13 @@
 [/#list]
 
 [#assign familyName=FamilyName?lower_case]
-
+[#if FamilyName=="STM32H7RS"]
+#ifndef __SD_DISKIO_CONFIG_H
+#define __SD_DISKIO_CONFIG_H
+[#else]
 #ifndef SD_DISKIO_CONFIG_H
 #define SD_DISKIO_CONFIG_H
+[/#if]
 
 
 #ifdef __cplusplus
@@ -80,4 +96,8 @@ extern void MX_SDMMC1_SD_Init(void);
 }
 #endif
 
+[#if FamilyName=="STM32H7RS"]
+#endif /* __SD_DISKIO_CONFIG_H */
+[#else]
 #endif /* SD_DISKIO_CONFIG_H */
+[/#if]

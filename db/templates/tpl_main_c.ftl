@@ -17,6 +17,7 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
+[#assign isTmpRifExist = common.fileExist(contextFolder+mxTmpFolder+"/RIFInit.tmp")]  [#-- Check if RIF TMP  file exists --]
 [#assign IpInit_ToIgnore = "VREFBUF CORTEX_M4 CORTEX_M7 CORTEX_M0+ CORTEX_M33_S CORTEX_M33_NS HSEM PWR RCC CORTEX_M7_BOOT CORTEX_M7_APPLI"]
 [#assign azureMW_list = "threadx levelx filex netxduo usbx"]
 [#assign staticVoids =""]
@@ -36,7 +37,7 @@
     #include "app_threadx.h"
 [/#if]
 #include "${main_h}"
-[#if (H7_ETH_NoLWIP?? || F4_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || H5_ETH_NoLWIP?? || MP13_ETH_NoLWIP?? || H7RS_ETH_NoLWIP?? || MP2_ETH_NoLWIP?? || N6_ETH_NoLWIP??) && HALCompliant??]
+[#if (H7_ETH_NoLWIP?? || F4_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || MP13_ETH_NoLWIP?? || H7RS_ETH_NoLWIP?? || MP2_ETH_NoLWIP?? || N6_ETH_NoLWIP?? || H5_ETH_NoTHREADX?? ) && HALCompliant??]
 #include "string.h"
 [/#if]
 [#if jpeg_utils_conf_h??]
@@ -217,12 +218,10 @@
 #define VTOR_TABLE_NS_START_ADDR  0x08010000UL
 [#elseif McuName?starts_with("STM32U5A") || McuName?starts_with("STM32U595QJ") || McuName?starts_with("STM32U595RJ")|| McuName?starts_with("STM32U595VJ")|| McuName?starts_with("STM32U595ZJ")|| McuName?starts_with("STM32U5G7")|| McuName?starts_with("STM32U5G9")|| McuName?starts_with("STM32U5F7VJ")|| McuName?starts_with("STM32U5F9BJ")|| McuName?starts_with("STM32U5F9NJ")|| McuName?starts_with("STM32U5F9VJ")|| McuName?starts_with("STM32U5F9ZJ")]
 #define VTOR_TABLE_NS_START_ADDR  0x08200000UL
-[#elseif FamilyName=="STM32WBA"]
-  [#if McuName?matches("^STM32WBA5..[E]..")]
+[#elseif McuName?matches("^STM32WBA5..[E]..")]
 #define VTOR_TABLE_NS_START_ADDR  0x08040000UL
-  [#else]
+[#elseif McuName?starts_with("STM32WBA5")]
 #define VTOR_TABLE_NS_START_ADDR  0x08080000UL
-  [/#if]
 [#elseif isMMTApplyed?? && isMMTApplyed=="true" &&  NS_Start_Code??]
 #define VTOR_TABLE_NS_START_ADDR  ${NS_Start_Code}UL
 [#else]
@@ -510,13 +509,19 @@ static void MPU_Config(void);
 [#if (FREERTOS?? && !HALCompliant??)|| XCUBEFREERTOS??]
  void MX_FREERTOS_Init(void); 
 [/#if]
+[#if !HALCompliant??&& isTmpRifExist=="true"]
+static void SystemIsolation_Config(void);
+[/#if]
 [#if HALCompliant??]
     [#list voids as void]
         [#if void.genCode && !(IpInit_ToIgnore?contains(void.ipName)) && !void.ipType?contains("thirdparty")&&!void.ipType?contains("middleware")&&!void.functionName?contains("VREFBUF")&&void.functionName!="Init" && !void.functionName?contains("MotorControl") && !void.functionName?contains("ETZPC") && !void.functionName?contains("TRACER_EMB")&&!void.functionName?contains("CORTEX_M55") && !void.functionName?contains("GUI_INTERFACE")]
             [#if !((void.functionName?contains("RF") && FamilyName!="STM32WB") || void.functionName?contains("PTA")) ]
-                [#if void.isStatic && !void.functionName?contains("XSPIM")]
+                [#if void.isStatic && !void.functionName?contains("XSPIM")&& !void.functionName?contains("USB_OTG_HS1")]
                     static void ${""?right_pad(2)}${void.functionName}(void);
                     [#assign staticVoids =staticVoids + " "+ '${void.functionName}']
+				[#elseif void.isStatic && void.functionName?contains("USB_OTG_HS1")]
+					   static void MX_USB_OTG_HS_HCD_Init(void);
+                       [#assign staticVoids =staticVoids + " "+ 'MX_USB_OTG_HS_HCD_Init']
                 [#else]
                     [#-- void ${""?right_pad(2)}${void.functionName}(void);--]
                 [/#if]
@@ -640,7 +645,7 @@ int main(void)
 [/#if]
 #t/* MCU Configuration--------------------------------------------------------*/
 [#if clockConfig??]
-[#if contextFolder?? && contextFolder=="Appli/"]
+[#if contextFolder?? && contextFolder=="Appli/" && FamilyName !="STM32N6"]
 #n#t/* Update SystemCoreClock variable according to RCC registers values. */
 #tSystemCoreClockUpdate(); 
 [/#if]
@@ -915,7 +920,7 @@ int main(void)
    
 [/#if]
 
-[#if (cpucore=="ARM_CORTEX_M0+" && McuDualCore?? && FamilyName=="STM32WL" && !isHALUsed??) || (FamilyName=="STM32N6" && !contextFolder?contains("FSBL"))]
+[#if (cpucore=="ARM_CORTEX_M0+" && McuDualCore?? && FamilyName=="STM32WL" && !isHALUsed??)]
 #t/* Update SystemCoreClock variable */
   #tSystemCoreClockUpdate();
 [/#if] 
@@ -1044,6 +1049,7 @@ int main(void)
    [#else]
    [#if (!(void.functionName?contains("RF") && FamilyName!="STM32WB") && !void.functionName?contains("PTA")) && !void.functionName?contains("CORTEX_M55")]
    [#if void.functionName?contains("USBX")]
+   [#if FamilyName!="STM32U3"]
    [#if UsbxDeviceHost?? && UsbxDeviceHost?contains("Host")&& UsbxDeviceHost?contains("Device")]
    #tMX_USBX_Host_Init();
    #tMX_USBX_Device_Init();
@@ -1052,13 +1058,16 @@ int main(void)
    [#elseif UsbxDeviceHost?? && UsbxDeviceHost?contains("Device")]
    #tMX_USBX_Device_Init();
    [/#if]
+   [/#if]
    [#else]
    [#if void.functionName?contains("EXTMEM_MANAGER_APPLI")]
   #tMX_EXTMEM_MANAGER_Init();
    [#else]
-	[#if !void.functionName?contains("XSPIM")]
+	[#if !void.functionName?contains("XSPIM") && !void.functionName?contains("USB_OTG_HS1")]
   #t${void.functionName}();
-	[/#if]
+  [#elseif void.functionName?contains("USB_OTG_HS1")]
+  #tMX_USB_OTG_HS_HCD_Init();
+ [/#if]
    [/#if]
   [/#if]
 
@@ -1070,6 +1079,21 @@ int main(void)
 [/#if]
 [/#if]
 [/#list]
+[#if FamilyName=="STM32U3"]
+ [#list voids as void]
+ [#if !void.isNotGenerated && void.genCode && void.functionName?contains("USBX")]
+   [#if UsbxDeviceHost?? && UsbxDeviceHost?contains("Host")&& UsbxDeviceHost?contains("Device")]
+    #tMX_USBX_Host_Init();
+    #tMX_USBX_Device_Init();
+   [#elseif UsbxDeviceHost?? && UsbxDeviceHost?contains("Host")]
+    #tMX_USBX_Host_Init();
+   [#elseif UsbxDeviceHost?? && UsbxDeviceHost?contains("Device")]
+    #tMX_USBX_Device_Init();
+   [/#if]
+  [/#if]
+ [/#list]
+[/#if]
+
 [#if preOsInitFct?? && preOsInitFct?size > 0]
 #t/* Call PreOsInit function */
 [#list preOsInitFct as preOsInit]
@@ -1084,7 +1108,11 @@ int main(void)
 [/#compress]
 
   /* USER CODE BEGIN 2 */
+[#if CALIBRATION_512HZ_OUT2??]
+  RTC->OR=1;
+[#else]
 
+[/#if]
   /* USER CODE END 2 */
 #n
 [#compress]
@@ -1654,17 +1682,16 @@ static void MX_NVIC_Init(void)
 		[#assign halMode= "USB"]
 		[/#if]
 
-        [#if ipName == "RIF" && SystemIsolation_Config?? && SystemIsolation_Config == "false" ]
-        [#continue]
-        [/#if]
-
 [#if instName!=("XSPIM")]
+[#if instName == "USB_OTG_HS1"]
+[#assign instName= "USB_OTG_HS"]
+[/#if]
 /**
 #t* @brief  ${instName} Initialization Function
 #t* @param  None
 #t* @retval None
 #t*/
-            [#if instName == "RIF" &&  SystemIsolation_Config?? && SystemIsolation_Config== "true"]
+            [#if instName == "RIF" &&  FamilyName=="STM32N6" && isTmpRifExist=="true"]
             #tstatic void SystemIsolation_Config(void)
             [#elseif halMode!=ipName&&!ipName?contains("TIM")&&!ipName?contains("CEC")][#if staticVoids?contains('MX_${instName}_${halMode}_Init')]static[/#if] void MX_${instName}_${halMode}_Init(void)[#else][#if staticVoids?contains('MX_${instName}_Init')]static[/#if] void MX_${instName}_Init(void)[/#if]
             {
@@ -1732,9 +1759,17 @@ static void MX_NVIC_Init(void)
     [@common.optinclude name=contextFolder+mxTmpFolder+"/resmgrutility_"+instName+".tmp"/][#-- ADD RESMGR_UTILITY Code--]
 [/#if]
       
+
+[#if DIE=="DIE4B0" && ipName?contains("USB")]
+#t/* USER CODE BEGIN ${instName}_${halMode}_Init 0 */
+#n
+#t/* USER CODE END ${instName}_${halMode}_Init 0 */
+[#else]
 #t/* USER CODE BEGIN ${instName}_Init 0 */
 #n
  #t/* USER CODE END ${instName}_Init 0 */
+[/#if]	
+     
      
 #n
         [#-- assign ipInstanceIndex = instName?replace(name,"")--]
@@ -1844,9 +1879,16 @@ static void MX_NVIC_Init(void)
 [#if instName == "RIF"]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/RIFInit.tmp"/] [#--RIF functions and callbacks --]
 [/#if]
+[#if DIE=="DIE4B0" && ipName?contains("USB")]
+#t/* USER CODE BEGIN ${instName}_${halMode}_Init 1 */
+#n
+#t/* USER CODE END ${instName}_${halMode}_Init 1 */
+[#else]
  #t/* USER CODE BEGIN ${instName}_Init 1 */
 #n
  #t/* USER CODE END ${instName}_Init 1 */
+[/#if]
+
 [#if ipName?contains("SPI")]
 #t/* ${instName}   parameter configuration*/
 [/#if]
@@ -1880,10 +1922,15 @@ static void MX_NVIC_Init(void)
 #t __HAL_RCC_SYSCFG_CLK_ENABLE();
 #t HAL_SYSCFG_DisableSRAMCached();
 [/#if]
-
+[#if DIE=="DIE4B0" && ipName?contains("USB")]
+#t/* USER CODE BEGIN ${instName}_${halMode}_Init 2 */
+#n
+#t/* USER CODE END ${instName}_${halMode}_Init 2 */
+[#else]
  #t/* USER CODE BEGIN ${instName}_Init 2 */
 #n
  #t/* USER CODE END ${instName}_Init 2 */
+[/#if]
 
 
 [#-- MspPostInit callBack if needed for output gpio config --]
@@ -1921,6 +1968,27 @@ static void MX_NVIC_Init(void)
 [@common.optinclude name=contextFolder+mxTmpFolder+"/linkedlist.tmp"/][#-- ADD LINKEDLIST Code--]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/mx_fmc_HC.tmp"/][#-- FMC Init --]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/gpio.tmp"/][#-- ADD GPIO Code--] 
+[#elseif isTmpRifExist=="true"]
+/**
+  * @brief RIF Initialization Function
+  * @param None
+  * @retval None
+  */
+  static void SystemIsolation_Config(void)
+{
+
+/* USER CODE BEGIN RIF_Init 0 */
+
+/* USER CODE END RIF_Init 0 */#n
+[@common.optinclude name=contextFolder+mxTmpFolder+"/RIFInit.tmp"/] [#--RIF functions and callbacks --]
+/* USER CODE BEGIN RIF_Init 1 */
+
+/* USER CODE END RIF_Init 1 */
+/* USER CODE BEGIN RIF_Init 2 */
+
+/* USER CODE END RIF_Init 2 */
+
+}
 [/#if] [#-- if HALCompliant End --]
 #n
 
@@ -2027,7 +2095,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   /* USER CODE BEGIN Callback 0 */
 
   /* USER CODE END Callback 0 */
-  if (htim->Instance == ${timeBaseSource}) {
+  if (htim->Instance == ${timeBaseSource})
+  {
     HAL_IncTick();
   }
   /* USER CODE BEGIN Callback 1 */

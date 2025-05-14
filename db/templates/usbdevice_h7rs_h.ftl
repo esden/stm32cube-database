@@ -13,8 +13,8 @@
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __${name?upper_case}__H__
-#define __${name?upper_case}__H__
+#ifndef __${name?upper_case}_H
+#define __${name?upper_case}_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -123,4 +123,4 @@ void MX_USB_DEVICE_Init(void);
 }
 #endif
 
-#endif /* __${name?upper_case}__H__ */
+#endif /* __${name?upper_case}_H */

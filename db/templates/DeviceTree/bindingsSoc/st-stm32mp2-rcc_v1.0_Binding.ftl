@@ -12,6 +12,8 @@
 [#assign T5 = "\t\t\t\t\t"] [#-- 5 Tab --]
 [#t]
 [#t]
+[#if !(mx_tdcidContext?starts_with("A35") && srvcmx_isTargetedFw_inDTS("TF-M"))]
+&rcc {
 [#-- Clock Tree configuration (rcc node)--]
 [#list peripheralParams.get("RCC").entrySet() as paramEntry]
     [#if paramEntry.key == "LSE_STATUS"][#assign lse_status="${paramEntry.value}"][/#if]
@@ -156,5 +158,9 @@
 	[/#if]
 [/#list]
 [/#if]
+#n
+${T1}/* USER CODE BEGIN rcc */
+${T1}/* USER CODE END rcc */
+};
+[/#if]
 [/#list]
-

@@ -179,7 +179,7 @@ static TX_BYTE_POOL ${FILEX_MEM_POOL_VAR_NAME_value};
 __ALIGN_BEGIN static UCHAR  nx_byte_pool_buffer[NX_APP_MEM_POOL_SIZE] __ALIGN_END;
 static TX_BYTE_POOL ${NETXDUO_MEM_POOL_VAR_NAME_value};
 [/#if]
-[#if UX_HOST_ENABLED == "true" && !FamilyName?lower_case?starts_with("stm32n6")]
+[#if UX_HOST_ENABLED == "true" && !FamilyName?lower_case?starts_with("stm32n6") && !FamilyName?lower_case?starts_with("stm32wba")]
 /* USER CODE BEGIN UX_HOST_Pool_Buffer */
 /* USER CODE END UX_HOST_Pool_Buffer */
 #if defined ( __ICCARM__ ) 
@@ -189,7 +189,7 @@ __ALIGN_BEGIN static UCHAR  ux_host_byte_pool_buffer[UX_HOST_APP_MEM_POOL_SIZE] 
 static TX_BYTE_POOL ${USBX_HOST_MEM_POOL_VAR_NAME_value};
 [/#if]
 
-[#if UX_DEVICE_ENABLED == "true" && !FamilyName?lower_case?starts_with("stm32n6")]
+[#if UX_DEVICE_ENABLED == "true" && !FamilyName?lower_case?starts_with("stm32n6") && !FamilyName?lower_case?starts_with("stm32wba")]
 /* USER CODE BEGIN UX_Device_Pool_Buffer */
 /* USER CODE END UX_Device_Pool_Buffer */
 #if defined ( __ICCARM__ ) 
@@ -199,7 +199,7 @@ __ALIGN_BEGIN static UCHAR  ux_device_byte_pool_buffer[UX_DEVICE_APP_MEM_POOL_SI
 static TX_BYTE_POOL ${USBX_DEVICE_MEM_POOL_VAR_NAME_value};
 [/#if]
 
-[#if UX_ENABLED == "true" && FamilyName?lower_case?starts_with("stm32n6")]
+[#if UX_ENABLED == "true" && (FamilyName?lower_case?starts_with("stm32n6") || FamilyName?lower_case?starts_with("stm32wba"))]
 /* USER CODE BEGIN UX_Pool_Buffer */
 /* USER CODE END UX_Pool_Buffer */
 #if defined ( __ICCARM__ ) 
@@ -373,7 +373,7 @@ VOID tx_application_define(VOID *first_unused_memory)
   }
 [/#if]
 
-[#if UX_HOST_ENABLED == "true" && !FamilyName?lower_case?starts_with("stm32n6")]
+[#if UX_HOST_ENABLED == "true" && !FamilyName?lower_case?starts_with("stm32n6") && !FamilyName?lower_case?starts_with("stm32wba")]
   if (tx_byte_pool_create(&${USBX_HOST_MEM_POOL_VAR_NAME_value}, "Ux App memory pool", ux_host_byte_pool_buffer, UX_HOST_APP_MEM_POOL_SIZE) != TX_SUCCESS)
   {
     /* USER CODE BEGIN UX_Byte_Pool_Error */
@@ -402,7 +402,7 @@ VOID tx_application_define(VOID *first_unused_memory)
 
   }
 [/#if]
-[#if UX_DEVICE_ENABLED == "true"  && !FamilyName?lower_case?starts_with("stm32n6")]
+[#if UX_DEVICE_ENABLED == "true"  && !FamilyName?lower_case?starts_with("stm32n6") && !FamilyName?lower_case?starts_with("stm32wba")]
   if (tx_byte_pool_create(&${USBX_DEVICE_MEM_POOL_VAR_NAME_value}, "Ux App memory pool", ux_device_byte_pool_buffer, UX_DEVICE_APP_MEM_POOL_SIZE) != TX_SUCCESS)
   {
     /* USER CODE BEGIN UX_Device_Byte_Pool_Error */
@@ -431,7 +431,7 @@ VOID tx_application_define(VOID *first_unused_memory)
   }
 [/#if]
 
-[#if UX_ENABLED == "true" && FamilyName?lower_case?starts_with("stm32n6")]
+[#if UX_ENABLED == "true" && (FamilyName?lower_case?starts_with("stm32n6") || FamilyName?lower_case?starts_with("stm32wba"))]
   if (tx_byte_pool_create(&${USBX_MEM_POOL_VAR_NAME_value}, "Ux App memory pool", ux_byte_pool_buffer, UX_APP_MEM_POOL_SIZE) != TX_SUCCESS)
   {
     /* USER CODE BEGIN UX_Byte_Pool_Error */

@@ -28,10 +28,14 @@
  * 1 tab == 4 spaces!
  */
 /* USER CODE END Header */
-
+[#assign familyName=FamilyName?lower_case]
+[#if (familyName=="stm32h7rs")]
+#ifndef __FREERTOS_CONFIG_H
+#define __FREERTOS_CONFIG_H
+[#else]
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
-[#assign familyName=FamilyName?lower_case]
+[/#if]
 [#-- SWIPdatas is a list of SWIPconfigModel --]
 [#list SWIPdatas as SWIP]
 [#assign instName = SWIP.ipName]
@@ -728,12 +732,22 @@ allow the application writer to add additional code before and after the MCU is
 placed into the low power state respectively. */
 #if configUSE_TICKLESS_IDLE == 1 
 #define configPRE_SLEEP_PROCESSING(__x__)                           \
+[#if (familyName=="stm32h7rs")]
+                                       do {                         \
+                                         PreSleepProcessing(__x__); \
+                                         __x__ = 0;                 \
+                                      }while(0)
+ [#else]
                                        do {                         \
                                          __x__ = 0;                 \
                                          PreSleepProcessing(__x__); \
                                       }while(0)
+ [/#if]
 #define configPOST_SLEEP_PROCESSING                       PostSleepProcessing
 #endif /* configUSE_TICKLESS_IDLE == 1 */
 [/#if]
-
+[#if (familyName=="stm32h7rs")]
+#endif /* __FREERTOS_CONFIG_H */
+[#else]
 #endif /* FREERTOS_CONFIG_H */
+[/#if]

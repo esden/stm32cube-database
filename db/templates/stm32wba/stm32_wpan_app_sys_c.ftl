@@ -10,20 +10,7 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
-[#assign myHash = {}]
-[#list SWIPdatas as SWIP]
-    [#if SWIP.defines??]
-        [#list SWIP.defines as definition]
-            [#assign myHash = {definition.name:definition.value} + myHash]
-        [/#list]
-    [/#if]
-[/#list]
-[#--
-Key & Value:
-[#list myHash?keys as key]
-Key: ${key}; Value: ${myHash[key]}
-[/#list]
---]
+
 /* Includes ------------------------------------------------------------------*/
 
 #include "app_sys.h"
@@ -33,7 +20,9 @@ Key: ${key}; Value: ${myHash[key]}
 #include "ll_intf.h"
 #include "ll_sys.h"
 
+#if MAC
 #include "ral.h"
+#endif
 
 /* External functions ----------------------------------------------------------*/
 extern uint32_t             llhwc_cmn_is_dp_slp_enabled(void);
@@ -41,8 +30,10 @@ extern uint32_t             llhwc_cmn_is_dp_slp_enabled(void);
 /* External variables ----------------------------------------------------------*/
 
 /* Functions Definition ------------------------------------------------------*/
-
-[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled")]
+/**
+ *
+ */
+#if BLE
 void APP_SYS_BLE_EnterDeepSleep(void)
 {
   ble_stat_t cmd_status;
@@ -74,8 +65,12 @@ void APP_SYS_BLE_EnterDeepSleep(void)
 
   }
 }
-[#else]
 
+#else /* BLE */
+
+/**
+ *
+ */
 void APP_SYS_LPM_EnterLowPowerMode(void)
 {
   ral_instance_t radio_instance;
@@ -102,4 +97,4 @@ void APP_SYS_LPM_EnterLowPowerMode(void)
   }
 }
 
-[/#if]
+#endif /* BLE */

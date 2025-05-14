@@ -803,10 +803,6 @@
       [#assign NX_DHCPV6_PACKET_WAIT_OPTION_value = value]
     [/#if]	
 
-	[#if name == "NX_DHCPV6_SERVER_DUID_TYPE"]
-      [#assign NX_DHCPV6_SERVER_DUID_TYPE_value = value]
-    [/#if]
-
 	[#if name == "NX_DHCPV6_PREFERENCE_VALUE"]
       [#assign NX_DHCPV6_PREFERENCE_VALUE_value = value]
     [/#if]	
@@ -1685,6 +1681,7 @@
 */
 [/#if]
 
+[#if FamilyName!="STM32H5"]
 /* If defined, the packet chain feature is removed. */
 [#if NX_DISABLE_PACKET_CHAIN_value == "true"]
 #define NX_DISABLE_PACKET_CHAIN
@@ -1692,6 +1689,7 @@
 /*
 #define NX_DISABLE_PACKET_CHAIN
 */
+[/#if]
 [/#if]
 
 /* Defined, disables packet pool information gathering. */
@@ -3410,17 +3408,6 @@
 /*
 #define NX_DHCPV6_PACKET_WAIT_OPTION            NX_IP_PERIODIC_RATE
 */
-
-/* This defines the Server DUID type which the Server includes in all messages
-   to Clients. The default value is link layer plus time
-   (NX_DHCPV6_SERVER_DUID_TYPE_LINK_TIME). */
-[#if NX_DHCPV6_SERVER_DUID_TYPE_value == "1"]
-/*
-#define NX_DHCPV6_SERVER_DUID_TYPE            	NX_DHCPV6_DUID_TYPE_LINK_TIME
-*/
-[#else]
-#define NX_DHCPV6_SERVER_DUID_TYPE 				${NX_DHCPV6_SERVER_DUID_TYPE_value}
-[/#if]
 
 /* This defines the preference option value between 0 and 255, where the higher
    the value the higher the preference, in the DHCPv6 option of the same name.

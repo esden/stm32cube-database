@@ -37,6 +37,11 @@
 		<CallLibMethod Name="" Type="HardCode">
             <HardCode Text="#tif (HAL_RCC_OscConfig(&amp;RCC_OscInitStruct) != HAL_OK)#n#t{#n#t#tError_Handler();#n#t}"/>
         </CallLibMethod>
+        <IFCondition Expression="((PLL1SOURCE_HSE &amp; PLL1Used=1)|(PLL2SOURCE_HSE &amp; PLL2Used=1)|(PLL3SOURCE_HSE &amp; PLL3Used=1)|(PLL4SOURCE_HSE &amp; PLL4Used=1))&amp;(HSEByPass|HSEDIGByPass|HSEOscillator)">
+        <CallLibMethod Name="" Type="HardCode">
+            <HardCode Text="#n#t/* Wait HSE stabilization time before its selection as PLL source. */#n#tHAL_Delay(HSE_STARTUP_TIMEOUT);"/>
+        </CallLibMethod>
+        </IFCondition>
     </RefConfig>
 	
     <RefConfig Comment="Get current CPU/System buses clocks configuration and if necessary switch #n to intermediate HSI clock to ensure target clock can be set" Name="RCC_GetClockConfig">

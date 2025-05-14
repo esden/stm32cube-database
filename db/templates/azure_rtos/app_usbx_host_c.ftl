@@ -132,7 +132,7 @@ UINT MX_USBX_Host_Init(VOID *memory_ptr)
 [/#if]
 {
   UINT ret = UX_SUCCESS;
-[#if REG_UX_HOST_CORE_value  == "true" && UX_STANDALONE_ENABLED_Value == "1" && AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE_VAL  != "0" ]
+[#if REG_UX_HOST_CORE_value  == "true" && UX_STANDALONE_ENABLED_Value == "1" && AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE_VAL  != "0" && !FamilyName?lower_case?starts_with("stm32n6")]
   UCHAR *pointer;
 [/#if]
 
@@ -165,7 +165,7 @@ UINT MX_USBX_Host_Init(VOID *memory_ptr)
 [#else]
   pointer = ux_host_byte_pool_buffer;
 [/#if]
-
+[#if !FamilyName?lower_case?starts_with("stm32n6")]
   /* Initialize USBX Memory */
   if (ux_system_initialize(pointer, USBX_HOST_MEMORY_STACK_SIZE, UX_NULL, 0) != UX_SUCCESS)
   {
@@ -173,7 +173,7 @@ UINT MX_USBX_Host_Init(VOID *memory_ptr)
     return UX_ERROR;
     /* USER CODE END USBX_SYSTEM_INITIALIZE_ERROR */
   }
-
+[/#if]
 [/#if]
   /* Install the host portion of USBX */
   if (ux_host_stack_initialize(ux_host_event_callback) != UX_SUCCESS)
@@ -185,7 +185,7 @@ UINT MX_USBX_Host_Init(VOID *memory_ptr)
 
   /* Register a callback error function */
   ux_utility_error_callback_register(&ux_host_error_callback);
-
+[#if !FamilyName?lower_case?starts_with("stm32n6")]
 [#if REG_UX_HOST_HUB_value??]
 [#if REG_UX_HOST_HUB_value == "1"]
   /* Initialize the host hub class */
@@ -263,7 +263,7 @@ UINT MX_USBX_Host_Init(VOID *memory_ptr)
     /* USER CODE END USBX_HOST_CDC_ACM_REGISTER_ERROR */
   }
 [/#if]
-
+[/#if]
 [/#if]
 
 [#if REG_UX_HOST_THREAD_value == "1" && UX_STANDALONE_ENABLED_Value == "0"]
@@ -310,7 +310,7 @@ static VOID ${USBX_HOST_APP_THREAD_NAME_value}(ULONG thread_input)
 }
 [/#if]
 
-[#if UX_STANDALONE_ENABLED_Value == "1"]
+[#if UX_STANDALONE_ENABLED_Value == "1" && !FamilyName?lower_case?starts_with("stm32n6")]
 /**
   * @brief  _ux_utility_interrupt_disable
   *         USB utility interrupt disable.
@@ -491,7 +491,6 @@ VOID ux_host_error_callback(UINT system_level, UINT system_context, UINT error_c
   /* USER CODE END ux_host_error_callback1 */
 }
 [/#if]
-
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */

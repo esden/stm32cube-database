@@ -11,7 +11,6 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
-[#assign PG_SKIP_LIST = "False"]
 [#assign myHash = {}]
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]

@@ -291,7 +291,11 @@ void ${TX_APP_THREAD_ENTRY_value}(ULONG thread_input)
 [/#if]
 
   /**
+[#if (familyName?starts_with("stm32wba") || familyName?starts_with("stm32u3") || familyName?starts_with("stm32u5") || familyName?starts_with("stm32u0") || familyName?starts_with("stm32h5") || familyName?starts_with("stm32c0"))]
   * @brief  Function that implements the kernel's initialization.
+[#else]
+  * @brief  MX_ThreadX_Init
+[/#if]
   * @param  None 
   * @retval None
   */

@@ -337,9 +337,8 @@
         </RefConfig>
 
     <RefConfig Name="ADC_RegularChannelConfig" Comment="Configure Regular Channel">
-           
+        <IFCondition  Expression="!DIE4B0" >
          <IFCondition  Expression="$Index=1|$Index=2">
-
                 <CallLibMethod Name="LL_ADC_REG_SetSequencerRanks">
                     <MethodArg Name="ADCx" ParameterName="Instance" />
                     <MethodArg Name="Rank" ParameterName="Rank" />
@@ -349,7 +348,6 @@
                     <MethodArg Name="ADCx" ParameterName="Instance" />
                     <MethodArg Name="Channel" ParameterName="Channel" />
                     <MethodArg Name="SamplingTime" ParameterName="SamplingTime" />
-                   
                 </CallLibMethod> 
                 <CallLibMethod Name="LL_ADC_SetChannelPreselection">
                     <MethodArg Name="ADCx" ParameterName="Instance" />
@@ -392,7 +390,8 @@
 				</MethodArg>
 				<MethodArg Name="PathInternal" ParameterName="ChannelVREF|ChannelTS" />
 			</CallLibMethod>
-           
+        </IFCondition>
+
 	</RefConfig>
        <RefConfig Name="ADC_RegularChannelRankConfig" Comment="Configure Regular Channel">
         <IFCondition Expression="Sequencer = FULLY_CONFIGURABLE">
@@ -421,7 +420,16 @@
                     <MethodArg Name="OffsetSignedSaturation" ParameterName="OffsetSignedSaturation" />
                 </CallLibMethod>		
             </IFCondition>
-                     
+            <IFCondition Expression="DIE4B0">
+            <CallLibMethod Name="LL_ADC_SetCommonPathInternalCh">
+                <MethodArg Name="ADCxy_COMMON">
+                    <CallLibMethod Name="__LL_ADC_COMMON_INSTANCE">
+                        <MethodArg Name="ADCx" ParameterName="Instance" />
+                    </CallLibMethod>
+                </MethodArg>
+                <MethodArg Name="PathInternal" ParameterName="ChannelVREF|ChannelTS" />
+            </CallLibMethod>
+          </IFCondition>
         </IFCondition>
         
     </RefConfig>
@@ -504,7 +512,7 @@
             <CallLibMethod Name="LL_ADC_SetAnalogWDMonitChannels">
                 <MethodArg Name="ADCx" ParameterName="Instance" />
                 <MethodArg Name="AWDy" ParameterName="AWD1WatchdogNumber" />
-                <MethodArg Name="AWDChannelGroup" ParameterName="WatchdogMode,WatchdogChannel" />
+                <MethodArg Name="AWDChannelGroup" ParameterName="WatchdogMode,AnalogwatchdogChannel" />
             </CallLibMethod>
             <CallLibMethod Name="LL_ADC_ConfigAnalogWDThresholds">
             <MethodArg Name="ADCx" ParameterName="Instance" />

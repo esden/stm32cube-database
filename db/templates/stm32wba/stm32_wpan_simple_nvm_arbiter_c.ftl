@@ -11,7 +11,6 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
-[#assign PG_SKIP_LIST = "False"]
 [#assign myHash = {}]
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
@@ -712,6 +711,15 @@ SNVMA_Cmd_Status_t SNVMA_Write (const SNVMA_BufferId_t BufferId,
 
       /* Set that a command is pending */
       SNVMA_CommandPending = TRUE;
+      
+      /* Flash op started */
+      SNVMA_FlashInfo.NvmId = nvmId;
+      SNVMA_FlashInfo.BufferId = idxBuf;
+      SNVMA_FlashInfo.FlashOpState = SNVMA_HEADER_WRITE;
+
+      /* Set request active */
+      SNVMA_NvmConfiguration[nvmId].PendingBufferWriteOp =
+        (SNVMA_NvmConfiguration[nvmId].PendingBufferWriteOp << SNVMA_MAX_NUMBER_BUFFER) & 0xF0u;
 
       /* Leave critical section */
       UTILS_EXIT_CRITICAL_SECTION ();
@@ -728,6 +736,11 @@ SNVMA_Cmd_Status_t SNVMA_Write (const SNVMA_BufferId_t BufferId,
         /* Clean flags */
         SNVMA_IdBitmask &= ~(1u << nvmId);
         SNVMA_NvmConfiguration[nvmId].PendingBufferWriteOp = 0u;
+        
+        /* Clean flash operation information */
+        memset ((void *)&SNVMA_FlashInfo,
+                0x00,
+                sizeof (SNVMA_FlashOpInfo_t));
 
         for (uint8_t cnt = 0x00;
              cnt < SNVMA_MAX_NUMBER_BUFFER;
@@ -742,22 +755,7 @@ SNVMA_Cmd_Status_t SNVMA_Write (const SNVMA_BufferId_t BufferId,
         error = SNVMA_ERROR_FLASH_ERROR;
       }
       else
-      {
-        /* Enter critical section */
-        UTILS_ENTER_CRITICAL_SECTION();
-
-        /* Flash op started */
-        SNVMA_FlashInfo.NvmId = nvmId;
-        SNVMA_FlashInfo.BufferId = idxBuf;
-        SNVMA_FlashInfo.FlashOpState = SNVMA_HEADER_WRITE;
-
-        /* Set request active */
-        SNVMA_NvmConfiguration[nvmId].PendingBufferWriteOp =
-          (SNVMA_NvmConfiguration[nvmId].PendingBufferWriteOp << SNVMA_MAX_NUMBER_BUFFER) & 0xF0u;
-
-        /* Leave critical section */
-        UTILS_EXIT_CRITICAL_SECTION ();
-
+      {  
         LOG_INFO_SYSTEM("\r\nSNVMA_Write - Flash operation started (Header write request) : %d", (uint8_t)SNVMA_NvmConfiguration[nvmId].PendingBufferWriteOp);
 
         error = SNVMA_ERROR_OK;

@@ -14,8 +14,13 @@
   */
 /* USER CODE END Header */
 /* Define to prevent recursive inclusion -------------------------------------*/
+[#if FamilyName=="STM32H7RS"]
+#ifndef __FATFS_H
+#define __FATFS_H
+[#else]
 #ifndef __fatfs_H
 #define __fatfs_H
+[/#if]
 #ifdef __cplusplus
  extern "C" {
 #endif
@@ -60,4 +65,8 @@ void MX_FATFS_Init(void);
 #ifdef __cplusplus
 }
 #endif
+[#if FamilyName=="STM32H7RS"]
+#endif /*__FATFS_H */
+[#else]
 #endif /*__fatfs_H */
+[/#if]

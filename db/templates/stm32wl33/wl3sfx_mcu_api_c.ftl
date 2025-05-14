@@ -56,6 +56,8 @@
 #include "sigfox_api.h"
 #include "mcu_api.h"
 
+#define DL_WKUP_SETUP_MS 37 //Value used for reducing GENERIC timer (in milliseconds)
+
 [#if BspIpDatas??]
 [#list BspIpDatas as SWIP]
     [#if SWIP.variables??]
@@ -209,7 +211,7 @@ sfx_u8 MCU_API_timer_start(sfx_u32 time_duration_in_s)
   wl3sfx_log(WL3SFX_SEV_TRACE, "called");
   wl3sfx_log(WL3SFX_SEV_INFO, "duration: %d s", time_duration_in_s);
 
-  wl3sfx_timer_start_milliseconds(WL3SFX_TIMER_GENERIC, time_duration_in_s * 1000, NULL);
+  wl3sfx_timer_start_milliseconds(WL3SFX_TIMER_GENERIC, (time_duration_in_s * 1000) - DL_WKUP_SETUP_MS, NULL);
 
   return SFX_ERR_NONE;
 }

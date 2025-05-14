@@ -39,12 +39,20 @@
 [/#if]
 [/#list]
 [#assign series = FamilyName?lower_case]
-
+[#if (series != "stm32h7rs")]
 #ifndef __ETHERNETIF_H__
 #define __ETHERNETIF_H__
-
+[#else]
+#ifndef __ETHERNETIF_H
+#define __ETHERNETIF_H
+[/#if]
 #include "lwip/err.h"
+[#if ((series != "stm32h7rs") || ((series == "stm32h7rs") && (use_rtos == 0)))]
 #include "lwip/netif.h"
+[/#if]
+[#if ((series == "stm32h7rs") && (use_rtos == 1))]
+#include "lwip/netifapi.h"
+[/#if]
 [#if use_rtos == 1][#-- rtos used --]
 [#if series != "stm32h7rs"]
 #include "cmsis_os.h"
@@ -112,4 +120,8 @@ u32_t sys_now(void);
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
+[#if (series != "stm32h7rs")]
 #endif
+[#else]
+#endif /* __ETHERNETIF_H */
+[/#if]

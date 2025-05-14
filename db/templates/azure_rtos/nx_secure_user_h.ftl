@@ -27,7 +27,11 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    nx_secure_user.h                                    PORTABLE C      */
+[#if FamilyName=="STM32H5"]
+/*                                                           6.2.0       */
+[#else]
 /*                                                           6.1.9        */
+[/#if]
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -56,6 +60,11 @@
 /*                                            initiated renegotiation for */
 /*                                            TLS server instances,       */
 /*                                            resulting in version 6.1.9  */
+[#if FamilyName=="STM32H5"]
+/*  10-31-2022     Yanwu Cai                Modified comment(s), added    */
+/*                                            macro to custom secret size,*/
+/*                                            resulting in version 6.2.0  */
+[/#if]
 /*                                                                        */
 /**************************************************************************/
 

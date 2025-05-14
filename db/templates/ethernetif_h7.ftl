@@ -123,7 +123,11 @@
 #include "ethernetif.h"
 [#assign series = FamilyName?lower_case]
 [#if bsp == 1]
+[#if BspComponent?? && BspComponent?lower_case =="user_phy"]
+#include "eth_custom_phy_interface.h"
+[#else]
 #include "${BspComponent?lower_case}.h"
+[/#if][#-- BspComponent user_phy --]
 [#else]
 /* USER CODE BEGIN Include for User BSP */
 
@@ -215,7 +219,6 @@ LWIP_MEMPOOL_DECLARE(RX_POOL, ETH_RX_BUFFER_CNT, sizeof(RxBuff_t), "Zero-copy RX
 
 /* Variable Definitions */
 static uint8_t RxAllocStatus;
-
 #if defined ( __ICCARM__ ) /*!< IAR Compiler */
 
 #pragma location=${rx_descr_address}
@@ -254,7 +257,12 @@ __attribute__((section(".Rx_PoolSection"))) extern u8_t memp_memory_RX_POOL_base
 __attribute__((section(".Rx_PoolSection"))) u8_t memp_memory_RX_POOL_base[];
 
 [/#if]
+[#if series != "stm32h7rs"]
 #elif defined ( __GNUC__ ) /* GNU */
+[/#if]
+[#if series == "stm32h7rs"]
+#elif defined ( __GNUC__ ) /* GNU Compiler */
+[/#if]
 __attribute__((section(".Rx_PoolSection"))) extern u8_t memp_memory_RX_POOL_base[];
 #endif
 
@@ -287,6 +295,7 @@ static void ethernetif_input(void const * argument);
 [/#if][#-- endif cmsis_version v1 --]
 [/#if][#-- rtos used --]
 [#if bsp == 1]
+[#if BspComponent?? && BspComponent?lower_case !="user_phy"]
 int32_t ETH_PHY_IO_Init(void);
 int32_t ETH_PHY_IO_DeInit (void);
 int32_t ETH_PHY_IO_ReadReg(uint32_t DevAddr, uint32_t RegAddr, uint32_t *pRegVal);
@@ -299,6 +308,7 @@ ${BspComponent?lower_case}_IOCtx_t  ${BspComponent}_IOCtx = {ETH_PHY_IO_Init,
                                   ETH_PHY_IO_WriteReg,
                                   ETH_PHY_IO_ReadReg,
                                   ETH_PHY_IO_GetTick};
+[/#if]
 [#else]
 /* USER CODE BEGIN Private function prototypes for User BSP */
 
@@ -394,8 +404,11 @@ static void low_level_init(struct netif *netif)
   
 [/#if] [#-- endif lwip_ipv6 --]
 #if LWIP_ARP || LWIP_ETHERNET 
-
+[#if (series != "stm32h7rs")]
   /* set MAC hardware address length */
+[#else]
+  /* Set MAC hardware address length */
+[/#if]
   netif->hwaddr_len = ETH_HWADDR_LEN;
   
   /* set MAC hardware address */
@@ -427,7 +440,11 @@ static void low_level_init(struct netif *netif)
       
 [#if with_rtos == 1]
 [#if cmsis_version = "v1"]
+[#if (series != "stm32h7rs")]
   /* create a binary semaphore used for informing ethernetif of frame reception */
+[#else]
+  /* Create a binary semaphore used for informing ethernetif of frame reception */
+[/#if]
   osSemaphoreDef(RxSem);
   RxPktSemaphore = osSemaphoreCreate(osSemaphore(RxSem), 1);
 
@@ -439,7 +456,11 @@ static void low_level_init(struct netif *netif)
   osSemaphoreWait(RxPktSemaphore, 0);
   osSemaphoreWait(TxPktSemaphore, 0);
 [#else][#-- else cmsis_version --]
+  [#if (series != "stm32h7rs")]
   /* create a binary semaphore used for informing ethernetif of frame reception */
+  [#else]
+  /* Create a binary semaphore used for informing ethernetif of frame reception */
+  [/#if]
   RxPktSemaphore = osSemaphoreNew(1, 0, NULL);
 
   /* create a binary semaphore used for informing ethernetif of frame transmission */
@@ -467,6 +488,10 @@ static void low_level_init(struct netif *netif)
 /* USER CODE BEGIN PHY_PRE_CONFIG */ 
     
 /* USER CODE END PHY_PRE_CONFIG */
+[#if BspComponent?? && BspComponent?lower_case =="user_phy"]
+   /* initialize the ETH PHY */
+   eth_phy_init();
+[#else]
   /* Set PHY IO functions */
   ${BspComponent}_RegisterBusIO(&${BspComponent}, &${BspComponent}_IOCtx);
 
@@ -477,6 +502,7 @@ static void low_level_init(struct netif *netif)
     netif_set_down(netif);
     return;
   }
+[/#if]  [#-- endif user_phy --]
 [#else]
 /* USER CODE BEGIN low_level_init Code 1 for User BSP */ 
     
@@ -487,6 +513,7 @@ static void low_level_init(struct netif *netif)
   {
 [#if with_rtos == 1]
 [#if bsp == 1]
+[#if BspComponent?? && BspComponent?lower_case !="user_phy"]
     PHYLinkState = ${BspComponent}_GetLinkState(&${BspComponent});
   
     /* Get link state */  
@@ -530,11 +557,11 @@ static void low_level_init(struct netif *netif)
     HAL_ETH_Start_IT(&heth);
     netif_set_up(netif);
     netif_set_link_up(netif);
-    
 /* USER CODE BEGIN PHY_POST_CONFIG */ 
     
 /* USER CODE END PHY_POST_CONFIG */
     }
+[/#if][#-- end user_phy --]
 [#else][#-- endif bsp --]
 /* USER CODE BEGIN low_level_init Code 2 for User BSP */ 
     
@@ -772,8 +799,10 @@ err_t ethernetif_init(struct netif *netif)
    * The last argument should be replaced with your link speed, in units
    * of bits per second.
    */
+[#if (series != "stm32h7rs")]
   // MIB2_INIT_NETIF(netif, snmp_ifType_ethernet_csmacd, LINK_SPEED_OF_YOUR_NETIF_IN_BPS);
-    
+  
+[/#if]
   netif->name[0] = IFNAME0;
   netif->name[1] = IFNAME1;
   /* We directly use etharp_output() here to save a function call.
@@ -861,10 +890,15 @@ u32_t sys_now(void)
   * @retval 0 if OK, -1 if ERROR
   */
 int32_t ETH_PHY_IO_Init(void)
-{  
+{
+[#if (series != "stm32h7rs")]
   /* We assume that MDIO GPIO configuration is already done
      in the ETH_MspInit() else it should be done here 
   */
+[#else]
+  /* We assume that MDIO GPIO configuration is already done
+     in the ETH_MspInit() else it should be done here */
+[/#if]
   
   /* Configure the MDIO Clock */
   HAL_ETH_SetMDIOClockRange(&heth);
@@ -962,20 +996,66 @@ void ethernet_link_check_state(struct netif *netif)
   {
 [/#if][#-- endif with_rtos --]
 [#if bsp == 1]
+[#if BspComponent?? && BspComponent?lower_case =="user_phy"]
+  PHYLinkState = eth_phy_get_link_state();
+  
+  if(netif_is_link_up(netif) && (PHYLinkState <= ETH_PHY_STATUS_LINK_DOWN))
+[#else]
   PHYLinkState = ${BspComponent}_GetLinkState(&${BspComponent});
   
   if(netif_is_link_up(netif) && (PHYLinkState <= ${BspComponent}_STATUS_LINK_DOWN))
+[/#if][#-- endif user_phy--] 
   {
 [#if with_rtos == 1 || eth_it = "true"]
     HAL_ETH_Stop_IT(&heth);
 [#else]
     HAL_ETH_Stop(&heth);
 [/#if][#-- endif with_rtos --]
+[#if ((series != "stm32h7rs") || ((series == "stm32h7rs") && (with_rtos == 0)))]
     netif_set_down(netif);
     netif_set_link_down(netif);
+[/#if]
+[#if ((series == "stm32h7rs") && (with_rtos == 1))]
+    netifapi_netif_set_down(netif);
+    netifapi_netif_set_link_down(netif);
+[/#if]
   }
+ [#if BspComponent?? && BspComponent?lower_case =="user_phy"]
+  else if(!netif_is_link_up(netif) && (PHYLinkState > ETH_PHY_STATUS_LINK_DOWN))
+ [#else]
   else if(!netif_is_link_up(netif) && (PHYLinkState > ${BspComponent}_STATUS_LINK_DOWN))
+ [/#if][#-- endif user_phy--] 
   {
+  
+  [#if BspComponent?? && BspComponent?lower_case =="user_phy"]
+     switch (PHYLinkState)
+    {
+    case ETH_PHY_STATUS_100MBITS_FULLDUPLEX:
+      duplex = ETH_FULLDUPLEX_MODE;
+      speed = ETH_SPEED_100M;
+      linkchanged = 1;
+      break;
+    case ETH_PHY_STATUS_100MBITS_HALFDUPLEX:
+      duplex = ETH_HALFDUPLEX_MODE;
+      speed = ETH_SPEED_100M;
+      linkchanged = 1;
+      break;
+    case ETH_PHY_STATUS_10MBITS_FULLDUPLEX:
+      duplex = ETH_FULLDUPLEX_MODE;
+      speed = ETH_SPEED_10M;
+      linkchanged = 1;
+      break;
+    case ETH_PHY_STATUS_10MBITS_HALFDUPLEX:
+      duplex = ETH_HALFDUPLEX_MODE;
+      speed = ETH_SPEED_10M;
+      linkchanged = 1;
+      break;
+    default:
+      break;      
+    }
+    
+[#else]   
+
     switch (PHYLinkState)
     {
     case ${BspComponent}_STATUS_100MBITS_FULLDUPLEX:
@@ -1001,7 +1081,8 @@ void ethernet_link_check_state(struct netif *netif)
     default:
       break;      
     }
-    
+ [/#if][#-- endif user_phy--]  
+ 
     if(linkchanged)
     {
       /* Get MAC Config MAC */
@@ -1014,8 +1095,14 @@ void ethernet_link_check_state(struct netif *netif)
     [#else]
       HAL_ETH_Start(&heth);
     [/#if][#-- endif with_rtos --]
+ [#if ((series != "stm32h7rs") || ((series == "stm32h7rs") && (with_rtos == 0)))]
       netif_set_up(netif);
       netif_set_link_up(netif);
+ [/#if]
+ [#if ((series == "stm32h7rs") && (with_rtos == 1))]
+      netifapi_netif_set_up(netif);
+      netifapi_netif_set_link_up(netif);
+ [/#if]
     }
   }
 [/#if][#-- endif bsp --]

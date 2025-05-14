@@ -46,12 +46,6 @@
          <Parameter Added="true" Name="NX_APP_MEM_POOL_SIZE">
          <Condition Diagnostic="" Expression="SEMNetXDuoCcNetworkJjNetXDuoJjNXOoCore"/>
         </Parameter>
-        <Parameter Added="true" Name="UX_DEVICE_APP_MEM_POOL_SIZE">
-         <Condition Diagnostic="" Expression="SEMUSBXCcUSBJjUSBXJjUXOoDeviceOoCoreStackJjRTOSIiMODE_HS | SEMUSBXCcUSBJjUSBXJjUXOoDeviceOoCoreStackJjRTOSIiMODE_FS"/>
-        </Parameter>
-        <Parameter Added="true" Name="UX_HOST_APP_MEM_POOL_SIZE">
-         <Condition Diagnostic="" Expression="SEMUSBXCcUSBJjUSBXJjUXOoHostOoCoreStackJjRTOSIiMODE_HS | SEMUSBXCcUSBJjUSBXJjUXOoHostOoCoreStackJjRTOSIiMODE_FS"/>
-        </Parameter>
         <Parameter Added="true" Name="USBPD_DEVICE_APP_MEM_POOL_SIZE">
          <Condition Diagnostic="" Expression="USBPD_P0U1"/>
         </Parameter>
@@ -73,6 +67,7 @@
 		<Parameter Added="true" Name="NETXDUO_ENABLED"/>
 		<Parameter Added="true" Name="USBXDEVICE_ENABLED"/>
 		<Parameter Added="true" Name="USBXHOST_ENABLED"/>
+		<Parameter Added="true" Name="USBX_ENABLED"/>
 		<Parameter Added="true" Name="USBPD_ENABLED"/>
 		<Parameter Added="true" Name="TSC_ENABLED"/>
         <Parameter Added="true" Name="GUI_INTERFACE_ENABLED"/>
@@ -328,7 +323,7 @@ TX_TIMER_ENABLE_PERFORMANCE_INFO must not be defined.</Description>
 		<Condition Diagnostic="" Expression="USBPD_P0U1 &amp; !USBPD_TYPECONLY"/>
 		<Description>Define the common timer tick reference for use by other middleware components. This is forced to 1000 for USBPD stack constraints</Description>
 	</RefParameter>
-	<RefParameter Added="true" Comment="ThreadX version" DefaultValue="6.2.0" Group="Version" Name="ThreadX_Version" TabName="ThreadX" Type="string">
+	<RefParameter Added="true" Comment="ThreadX version" DefaultValue="6.2.1" Group="Version" Name="ThreadX_Version" TabName="ThreadX" Type="string">
         <Description>Current ThreadX version</Description>
     </RefParameter>
         <RefParameter Added="true" Comment="Enable LowPower Support" DefaultValue="0" Group="Low Power" Name="TX_LOW_POWER" TabName="ThreadX" Type="list">
@@ -337,11 +332,11 @@ TX_TIMER_ENABLE_PERFORMANCE_INFO must not be defined.</Description>
         <PossibleValue Comment="Enabled" Value="1" Semaphore="Low_Power_ENABLED"/>
     </RefParameter>
     <RefParameter Added="true" Comment="TX_LOW_POWER_TIMER_SETUP" DefaultValue="App_ThreadX_LowPower_Timer_Setup" Group="Low Power" Name="TX_LOW_POWER_TIMER_SETUP" TabName="ThreadX" Type="stringRW">
-        <Condition Diagnostic="" Expression="(TX_LOW_POWER = 1) &amp; TX_LOW_POWER_TIMER_SETUP_ENABLE=true &amp; DIE492"/>
+        <Condition Diagnostic="" Expression="(TX_LOW_POWER = 1) &amp; TX_LOW_POWER_TIMER_SETUP_ENABLE=true &amp; (DIE492 | DIE4B0)"/>
         <Description>A macro used to track the current time.&lt;br&gt; &lt;font color=&quot;red&quot;&gt; &lt;b&gt;This is a variable name. It should be C compliant declaration, Otherwise compilation errors will be generated in the project. &lt;/b&gt; &lt;/font&gt;</Description>
     </RefParameter>
 	<RefParameter Added="true" Comment="TX_LOW_POWER_TIMER_SETUP" DefaultValue="App_ThreadX_LowPower_Timer_Setup" Group="Low Power" Name="TX_LOW_POWER_TIMER_SETUP" TabName="ThreadX" Type="stringRW">
-        <Condition Diagnostic="" Expression="(TX_LOW_POWER = 1) &amp; !DIE492"/>
+        <Condition Diagnostic="" Expression="(TX_LOW_POWER = 1) &amp; !DIE492 &amp; !DIE4B0"/>
         <Description>A macro used to track the current time.&lt;br&gt; &lt;font color=&quot;red&quot;&gt; &lt;b&gt;This is a variable name. It should be C compliant declaration, Otherwise compilation errors will be generated in the project. &lt;/b&gt; &lt;/font&gt;</Description>
     </RefParameter>
     <RefParameter Added="true" Comment="TX_LOW_POWER_TICKLESS" DefaultValue="1" Group="Low Power" Name="TX_LOW_POWER_TICKLESS" TabName="ThreadX" Type="list">
@@ -363,7 +358,7 @@ TX_TIMER_ENABLE_PERFORMANCE_INFO must not be defined.</Description>
         <Description>A macro to retrieve the number of ticks the system was in low power mode.&lt;br&gt; &lt;font color=&quot;red&quot;&gt; &lt;b&gt;This is a variable name. It should be C compliant declaration, Otherwise compilation errors will be generated in the project. &lt;/b&gt; &lt;/font&gt;</Description>
     </RefParameter>
 	<RefParameter Added="true" Comment="TX_LOW_POWER_USER_TIMER_ADJUST" DefaultValue="App_ThreadX_LowPower_Timer_Adjust" Group="Low Power" Name="TX_LOW_POWER_USER_TIMER_ADJUST" TabName="ThreadX" Type="stringRW">
-        <Condition Diagnostic="" Expression="(TX_LOW_POWER = 1)&amp; !DIE492"/>
+        <Condition Diagnostic="" Expression="(TX_LOW_POWER = 1)&amp; !DIE492 &amp; !DIE4B0"/>
         <Description>A macro to retrieve the number of ticks the system was in low power mode.&lt;br&gt; &lt;font color=&quot;red&quot;&gt; &lt;b&gt;This is a variable name. It should be C compliant declaration, Otherwise compilation errors will be generated in the project. &lt;/b&gt; &lt;/font&gt;</Description>
     </RefParameter>
         <RefParameter Added="true" Comment="TX_NO_FILEX_POINTER" DefaultValue="0" Group="Core" Name="TX_NO_FILEX_POINTER" TabName="ThreadX" Type="list">
@@ -422,12 +417,8 @@ This is automatically generated by STM32CubeMX under the &lt;b&gt;USE_DYNAMIC_ME
         <Description>Default memory pool size for the FileX application.</Description>
         <Condition Diagnostic="" Expression="(AZRTOS_APP_MEM_ALLOCATION_METHOD = 1)"/>
     </RefParameter>
-     <RefParameter Added="true" Comment="UXHost memory pool size" DefaultValue="=USBX:UX_HOST_APP_MEM_POOL_SIZE" Group="Memory Configuration" Max="262144" Min="512" Name="UX_HOST_APP_MEM_POOL_SIZE" TabName="ThreadX" Type="integer" Unit="" Visible="false">
-        <Description>Default memory pool size for the USBXHost application.</Description>
-        <Condition Diagnostic="" Expression="(ThreadX:AZRTOS_APP_MEM_ALLOCATION_METHOD = 1)"/>
-    </RefParameter>
-      <RefParameter Added="true" Comment="UXDevice memory pool size" DefaultValue="=USBX:UX_DEVICE_APP_MEM_POOL_SIZE" Group="Memory Configuration" Max="262144" Min="512" Name="UX_DEVICE_APP_MEM_POOL_SIZE" TabName="ThreadX" Type="integer" Unit="" Visible="false">
-        <Description>Default memory pool size for the USBXDevice application.</Description>
+	<RefParameter Added="true" Comment="UX memory pool size" DefaultValue="=USBX:UX_APP_MEM_POOL_SIZE" Group="Memory Configuration" Max="262144" Min="512" Name="UX_APP_MEM_POOL_SIZE" TabName="ThreadX" Type="integer" Unit="" Visible="false">
+        <Description>Default memory pool size for the USBX application.</Description>
         <Condition Diagnostic="" Expression="(ThreadX:AZRTOS_APP_MEM_ALLOCATION_METHOD = 1)"/>
     </RefParameter>
       <RefParameter Added="true" Comment="USBPD memory pool size" DefaultValue="=USBPD:USBPD_DEVICE_APP_MEM_POOL_SIZE" Group="Memory Configuration" Max="262144" Min="512" Name="USBPD_DEVICE_APP_MEM_POOL_SIZE" TabName="ThreadX" Type="integer" Unit="" Visible="false">
@@ -489,6 +480,14 @@ This is automatically generated by STM32CubeMX under the &lt;b&gt;USE_DYNAMIC_ME
     <RefParameter Added="true" Comment="USBXHOST_ENABLED" DefaultValue="false" Group="Memory Configuration"  Name="USBXHOST_ENABLED" TabName="ThreadX" Type="boolean" Visible="false">
         <Description></Description>
 		<Condition Diagnostic="" Expression="!SEMUSBXCcUSBJjUSBXJjUXOoHostOoCoreStackJjRTOSIiMODE_FS &amp; !SEMUSBXCcUSBJjUSBXJjUXOoHostOoCoreStackJjRTOSIiMODE_HS"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="USBX_ENABLED" DefaultValue="false" Group="Memory Configuration"  Name="USBX_ENABLED" TabName="ThreadX" Type="boolean" Visible="false">
+        <Description></Description>
+        <Condition Diagnostic="" Expression="!SEMUSBXCcUSBJjUSBXJjUXOoHostOoCoreStackJjRTOSIiMODE_HS &amp; !SEMUSBXCcUSBJjUSBXJjUXOoDeviceOoCoreStackJjRTOSIiMODE_HS"/>
+    </RefParameter>
+    <RefParameter Added="true" Comment="USBX_ENABLED" DefaultValue="true" Group="Memory Configuration"  Name="USBX_ENABLED" TabName="ThreadX" Type="boolean" Visible="false">
+        <Description></Description>
+        <Condition Diagnostic="" Expression="SEMUSBXCcUSBJjUSBXJjUXOoHostOoCoreStackJjRTOSIiMODE_HS | SEMUSBXCcUSBJjUSBXJjUXOoDeviceOoCoreStackJjRTOSIiMODE_HS"/>
     </RefParameter>
     <RefParameter Added="true" Comment="USBXHOST_ENABLED" DefaultValue="true" Group="Memory Configuration"  Name="USBXHOST_ENABLED" TabName="ThreadX" Type="boolean" Visible="false">
         <Description></Description>
@@ -558,13 +557,13 @@ This is automatically generated by STM32CubeMX under the &lt;b&gt;USE_DYNAMIC_ME
         <Description></Description>
 		<PossibleValue Comment="false" Value="false"/>
         <PossibleValue Comment="true" Value="true"/>
-		<Condition Diagnostic="" Expression="(TX_LOW_POWER = 1) &amp; DIE492"/>
+		<Condition Diagnostic="" Expression="(TX_LOW_POWER = 1) &amp; (DIE492 | DIE4B0)"/>
     </RefParameter>
 	<RefParameter Added="true" Comment="TX_LOW_POWER_USER_TIMER_ADJUST_ENABLE" DefaultValue="false" Group="Low Power"  Name="TX_LOW_POWER_USER_TIMER_ADJUST_ENABLE" TabName="ThreadX" Type="boolean">
         <Description></Description>
 		<PossibleValue Comment="false" Value="false"/>
         <PossibleValue Comment="true" Value="true"/>
-		<Condition Diagnostic="" Expression="(TX_LOW_POWER = 1) &amp; DIE492"/>
+		<Condition Diagnostic="" Expression="(TX_LOW_POWER = 1) &amp; (DIE492 | DIE4B0)"/>
     </RefParameter>
 	<RefParameter Added="true" Comment="ThreadX MemPool Name" DefaultValue="tx_app_byte_pool" Group="Memory Configuration" Name="THREADX_MEM_POOL_VAR_NAME" TabName="ThreadX" Type="stringRW">
 		<Description>Default ThreadX memory pool var name.&lt;br&gt; &lt;font color=&quot;red&quot;&gt; &lt;b&gt;This is a variable name. It should be C compliant declaration, Otherwise compilation errors will be generated in the project. &lt;/b&gt; &lt;/font&gt; </Description>
@@ -574,14 +573,10 @@ This is automatically generated by STM32CubeMX under the &lt;b&gt;USE_DYNAMIC_ME
 		<Description>Default memory pool size for the FileX application.</Description>
 		<Condition Diagnostic="" Expression="(ThreadX:AZRTOS_APP_MEM_ALLOCATION_METHOD = 1)" />
 	</RefParameter>
-	<RefParameter Added="true" Comment="USBXHost MemPool Name" DefaultValue="+USBX:USBX_HOST_MEM_POOL_VAR_NAME" Group="Memory Configuration" Name="USBX_HOST_MEM_POOL_VAR_NAME" TabName="ThreadX" Type="string" Visible="false">
-		<Description>Default memory pool size for the USBXHost application.</Description>
-		<Condition Diagnostic="" Expression="(ThreadX:AZRTOS_APP_MEM_ALLOCATION_METHOD = 1)" />
-	</RefParameter>
-	<RefParameter Added="true" Comment="USBXDevice MemPool Name" DefaultValue="+USBX:USBX_DEVICE_MEM_POOL_VAR_NAME" Group="Memory Configuration" Name="USBX_DEVICE_MEM_POOL_VAR_NAME" TabName="ThreadX" Type="string" Visible="false">
-		<Description>Default memory pool size for the USBXDevice application.</Description>
-		<Condition Diagnostic="" Expression="(ThreadX:AZRTOS_APP_MEM_ALLOCATION_METHOD = 1)" />
-	</RefParameter>
+	<RefParameter Added="true" Comment="USBX MemPool Name" DefaultValue="+USBX:USBX_MEM_POOL_VAR_NAME" Group="Memory Configuration" Name="USBX_MEM_POOL_VAR_NAME" TabName="ThreadX" Type="string" Visible="false">
+        <Description>Default memory pool size for the USBX application.</Description>
+        <Condition Diagnostic="" Expression="(ThreadX:AZRTOS_APP_MEM_ALLOCATION_METHOD = 1)" />
+    </RefParameter>
 	<RefParameter Added="true" Comment="NetXDuo MemPool Name" DefaultValue="+NetXDuo:NETXDUO_MEM_POOL_VAR_NAME" Group="Memory Configuration" Name="NETXDUO_MEM_POOL_VAR_NAME" TabName="ThreadX" Type="string" Visible="false">
 		<Description>Default memory pool size for the USBXDevice application.</Description>
 		<Condition Diagnostic="" Expression="(ThreadX:AZRTOS_APP_MEM_ALLOCATION_METHOD = 1)" />

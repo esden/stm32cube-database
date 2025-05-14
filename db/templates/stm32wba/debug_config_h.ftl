@@ -23,6 +23,9 @@
 [#assign useSCMMODEN  = false]
 [#assign useSCMMODEX  = false]
 [#assign useSCMMODAC  = false]
+[#assign useSCMSSEN   = false]
+[#assign useSCMSSEX   = false]
+[#assign useSCMSSAC   = false]
 [#assign useSCMSTEN   = false]
 [#assign useSCMSTEX   = false]
 [#assign useSCMSTAC   = false]
@@ -34,7 +37,7 @@
 [#assign useSCMSCPY   = false]
 [#assign useSCMSCEVS  = false]
 [#assign useSCMSCHN   = false]
-[#assign useSCMACN   = false]
+[#assign useSCMACN    = false]
 [#assign useSCMACNC   = false]
 [#assign useSCMACNT   = false]
 [#assign useSCMACNR   = false]
@@ -43,6 +46,7 @@
 [#assign useSCMSCHM   = false]
 [#assign useSCMSCUE   = false]
 [#assign useSCMSCET   = false]
+[#assign useSCMSCEP   = false]
 [#assign useSCMSCEE   = false]
 [#assign useSCMSCWI   = false]
 [#assign useSCMLLCM   = false]
@@ -177,6 +181,22 @@
 [#assign useSCMOSTM   = false]
 [#assign useSCMPYRC   = false]
 [#assign useSCMPYCI   = false]
+[#assign useSCMMAPH   = false]
+[#assign useSCMENDR   = false]
+[#assign useSCMPRRC   = false]
+[#assign useSCMTIUP   = false]
+[#assign useSCMMARE   = false]
+[#assign useSCMMATX   = false]
+[#assign useSCMAPCS   = false]
+[#assign useSCMRATM   = false]
+[#assign useSCMPRTX   = false]
+[#assign useSCMRATD   = false]
+[#assign useSCMRAIB   = false]
+[#assign useSCMRARB   = false]
+[#assign useSCMRACR   = false]
+[#assign useSCMRAPC   = false]
+[#assign useSCMRAET   = false]
+[#assign useSCMLLG2   = false]
 [#assign SYS_PORT  = ""]
 [#assign SYS_PIN   = ""]
 [#assign SET_PORT  = ""]
@@ -201,6 +221,12 @@
 [#assign MODEX_PIN  = ""]
 [#assign MODAC_PORT = ""]
 [#assign MODAC_PIN  = ""]
+[#assign SSEN_PORT = ""]
+[#assign SSEN_PIN  = ""]
+[#assign SSEX_PORT = ""]
+[#assign SSEX_PIN  = ""]
+[#assign SSAC_PORT = ""]
+[#assign SSAC_PIN  = ""]
 [#assign STEN_PORT = ""]
 [#assign STEN_PIN  = ""]
 [#assign STEX_PORT = ""]
@@ -237,6 +263,8 @@
 [#assign SCUE_PIN   = ""]
 [#assign SCET_PORT  = ""]
 [#assign SCET_PIN   = ""]
+[#assign SCEP_PORT  = ""]
+[#assign SCEP_PIN   = ""]
 [#assign SCEE_PORT  = ""]
 [#assign SCEE_PIN   = ""]
 [#assign SCWI_PORT  = ""]
@@ -505,6 +533,38 @@
 [#assign PYCT_PIN   = ""]
 [#assign PYCI_PORT  = ""]
 [#assign PYCI_PIN   = ""]
+[#assign MAPH_PORT  = ""]
+[#assign MAPH_PIN   = ""]
+[#assign ENDR_PORT  = ""]
+[#assign ENDR_PIN   = ""]
+[#assign PRRC_PORT  = ""]
+[#assign PRRC_PIN   = ""]
+[#assign TIUP_PORT  = ""]
+[#assign TIUP_PIN   = ""]
+[#assign MARE_PORT  = ""]
+[#assign MARE_PIN   = ""]
+[#assign MATX_PORT  = ""]
+[#assign MATX_PIN   = ""]
+[#assign APCS_PORT  = ""]
+[#assign APCS_PIN   = ""]
+[#assign RATM_PORT  = ""]
+[#assign RATM_PIN   = ""]
+[#assign PRTX_PORT  = ""]
+[#assign PRTX_PIN   = ""]
+[#assign RATD_PORT  = ""]
+[#assign RATD_PIN   = ""]
+[#assign RAIB_PORT  = ""]
+[#assign RAIB_PIN   = ""]
+[#assign RARB_PORT  = ""]
+[#assign RARB_PIN   = ""]
+[#assign RACR_PORT  = ""]
+[#assign RACR_PIN   = ""]
+[#assign RAPC_PORT  = ""]
+[#assign RAPC_PIN   = ""]
+[#assign RAET_PORT  = ""]
+[#assign RAET_PIN   = ""]
+[#assign LLG2_PORT  = ""]
+[#assign LLG2_PIN   = ""]
 [#assign bspName    = ""]
 
 /* USER CODE END Header */
@@ -595,6 +655,18 @@ extern "C" {
                     [#assign MODAC_PORT = IpName]
                     [#assign MODAC_PIN  = IpInstance]
             [/#if]
+            [#if variables.value?contains("DEBUG_LOW_POWER_STOP2_MODE_ENTER")]
+                    [#assign SSEN_PORT = IpName]
+                    [#assign SSEN_PIN  = IpInstance]
+            [/#if]
+            [#if variables.value?contains("DEBUG_LOW_POWER_STOP2_MODE_EXIT")]
+                    [#assign SSEX_PORT = IpName]
+                    [#assign SSEX_PIN  = IpInstance]
+            [/#if]
+            [#if variables.value?contains("DEBUG_LOW_POWER_STOP2_MODE_ACTIVE")]
+                    [#assign SSAC_PORT = IpName]
+                    [#assign SSAC_PIN  = IpInstance]
+            [/#if]			
             [#if variables.value?contains("DEBUG_LOW_POWER_STANDBY_MODE_ENTER")]
                     [#assign STEN_PORT = IpName]
                     [#assign STEN_PIN  = IpInstance]
@@ -674,6 +746,10 @@ extern "C" {
             [#if variables.value?contains("DEBUG_SCHDLR_EXEC_EVNT_TRACE")]
                     [#assign SCET_PORT = IpName]
                     [#assign SCET_PIN  = IpInstance]
+            [/#if]
+			[#if variables.value?contains("DEBUG_SCHDLR_EXEC_EVNT_PROFILE")]
+                    [#assign SCEP_PORT = IpName]
+                    [#assign SCEP_PIN  = IpInstance]
             [/#if]
             [#if variables.value?contains("DEBUG_SCHDLR_EXEC_EVNT_ERROR")]
                     [#assign SCEE_PORT = IpName]
@@ -1211,6 +1287,70 @@ extern "C" {
                     [#assign OSTM_PORT = IpName]
                     [#assign OSTM_PIN  = IpInstance]
             [/#if]
+			[#if variables.value?contains("DEBUG_PROFILE_MARKER_PHY_WAKEUP_TIME")]
+                    [#assign MAPH_PORT = IpName]
+                    [#assign MAPH_PIN  = IpInstance]
+            [/#if]
+            [#if variables.value?contains("DEBUG_PROFILE_END_DRIFT_TIME")]
+                    [#assign ENDR_PORT = IpName]
+                    [#assign ENDR_PIN  = IpInstance]
+            [/#if]
+            [#if variables.value?contains("DEBUG_PROC_RADIO_RCV")]
+                    [#assign PRRC_PORT = IpName]
+                    [#assign PRRC_PIN  = IpInstance]
+            [/#if]
+            [#if variables.value?contains("DEBUG_EVNT_TIME_UPDT")]
+                    [#assign TIUP_PORT = IpName]
+                    [#assign TIUP_PIN  = IpInstance]
+            [/#if]
+			[#if variables.value?contains("DEBUG_MAC_RECEIVE_DONE")]
+                    [#assign MARE_PORT = IpName]
+                    [#assign MARE_PIN  = IpInstance]
+            [/#if]
+            [#if variables.value?contains("DEBUG_MAC_TX_DONE")]
+                    [#assign MATX_PORT = IpName]
+                    [#assign MATX_PIN  = IpInstance]
+            [/#if]
+            [#if variables.value?contains("DEBUG_RADIO_APPLY_CSMA")]
+                    [#assign APCS_PORT = IpName]
+                    [#assign APCS_PIN  = IpInstance]
+            [/#if]
+            [#if variables.value?contains("DEBUG_RADIO_TRANSMIT")]
+                    [#assign RATM_PORT = IpName]
+                    [#assign RATM_PIN  = IpInstance]
+            [/#if]	
+			[#if variables.value?contains("DEBUG_PROC_RADIO_TX")]
+                    [#assign PRTX_PORT = IpName]
+                    [#assign PRTX_PIN  = IpInstance]
+            [/#if]
+            [#if variables.value?contains("DEBUG_RAL_TX_DONE")]
+                    [#assign RATD_PORT = IpName]
+                    [#assign RATD_PIN  = IpInstance]
+            [/#if]
+            [#if variables.value?contains("DEBUG_RAL_TX_DONE_INCREMENT_BACKOFF_COUNT")]
+                    [#assign RAIB_PORT = IpName]
+                    [#assign RAIB_PIN  = IpInstance]
+            [/#if]
+            [#if variables.value?contains("DEBUG_RAL_TX_DONE_RST_BACKOFF_COUNT")]
+                    [#assign RARB_PORT = IpName]
+                    [#assign RARB_PIN  = IpInstance]
+            [/#if]	
+			[#if variables.value?contains("DEBUG_RAL_CONTINUE_RX")]
+                    [#assign RACR_PORT = IpName]
+                    [#assign RACR_PIN  = IpInstance]
+            [/#if]
+            [#if variables.value?contains("DEBUG_RAL_PERFORM_CCA")]
+                    [#assign RAPC_PORT = IpName]
+                    [#assign RAPC_PIN  = IpInstance]
+            [/#if]
+            [#if variables.value?contains("DEBUG_RAL_ENABLE_TRANSMITTER")]
+                    [#assign RAET_PORT = IpName]
+                    [#assign RAET_PIN  = IpInstance]
+            [/#if]
+            [#if variables.value?contains("DEBUG_LLHWC_GET_CH_IDX_ALGO_2")]
+                    [#assign LLG2_PORT = IpName]
+                    [#assign LLG2_PIN  = IpInstance]
+            [/#if]		
         [/#list]
     [/#if]
     [#if SWIP.bsp??]
@@ -1250,6 +1390,15 @@ extern "C" {
             [/#if]
             [#if bsp.bspName?contains("DEBUG_LOW_POWER_STOP_MODE_ACTIVE")]
                  [#assign useSCMMODAC = true]
+            [/#if]
+			[#if bsp.bspName?contains("DEBUG_LOW_POWER_STOP2_MODE_ENTER")]
+                 [#assign useSCMSSEN = true]
+            [/#if]
+            [#if bsp.bspName?contains("DEBUG_LOW_POWER_STOP2_MODE_EXIT")]
+                 [#assign useSCMSSEX = true]
+            [/#if]
+            [#if bsp.bspName?contains("DEBUG_LOW_POWER_STOP2_MODE_ACTIVE")]
+                 [#assign useSCMSSAC = true]
             [/#if]
             [#if bsp.bspName?contains("DEBUG_LOW_POWER_STANDBY_MODE_ENTER")]
                  [#assign useSCMSTEN = true]
@@ -1310,6 +1459,9 @@ extern "C" {
             [/#if]
             [#if bsp.bspName?contains("DEBUG_SCHDLR_EXEC_EVNT_TRACE")]
                 [#assign useSCMSCET = true]
+            [/#if]
+			[#if bsp.bspName?contains("DEBUG_SCHDLR_EXEC_EVNT_PROFILE")]
+                [#assign useSCMSCEP = true]
             [/#if]
             [#if bsp.bspName?contains("DEBUG_SCHDLR_EXEC_EVNT_ERROR")]
                 [#assign useSCMSCEE = true]
@@ -1713,6 +1865,54 @@ extern "C" {
             [#if bsp.bspName?contains("DEBUG_OS_TMR_EVNT_CBK")]
                 [#assign useSCMOSTM = true]
             [/#if]
+			[#if bsp.bspName?contains("DEBUG_PROFILE_MARKER_PHY_WAKEUP_TIME")]
+                [#assign useSCMMAPH = true]
+            [/#if]
+            [#if bsp.bspName?contains("DEBUG_PROFILE_END_DRIFT_TIME")]
+                [#assign useSCMENDR = true]
+            [/#if]
+            [#if bsp.bspName?contains("DEBUG_PROC_RADIO_RCV")]
+                [#assign useSCMPRRC = true]
+            [/#if]
+            [#if bsp.bspName?contains("DEBUG_EVNT_TIME_UPDT")]
+                [#assign useSCMTIUP = true]
+            [/#if]
+			[#if bsp.bspName?contains("DEBUG_MAC_RECEIVE_DONE")]
+                [#assign useSCMMARE = true]
+            [/#if]
+            [#if bsp.bspName?contains("DEBUG_MAC_TX_DONE")]
+                [#assign useSCMMATX = true]
+            [/#if]
+            [#if bsp.bspName?contains("DEBUG_RADIO_APPLY_CSMA")]
+                [#assign useSCMAPCS = true]
+            [/#if]
+            [#if bsp.bspName?contains("DEBUG_RADIO_TRANSMIT")]
+                [#assign useSCMRATM = true]
+            [/#if]
+			[#if bsp.bspName?contains("DEBUG_PROC_RADIO_TX")]
+                [#assign useSCMPRTX = true]
+            [/#if]
+            [#if bsp.bspName?contains("DEBUG_RAL_TX_DONE")]
+                [#assign useSCMRATD = true]
+            [/#if]
+            [#if bsp.bspName?contains("DEBUG_RAL_TX_DONE_INCREMENT_BACKOFF_COUNT")]
+                [#assign useSCMRAIB = true]
+            [/#if]
+            [#if bsp.bspName?contains("DEBUG_RAL_TX_DONE_RST_BACKOFF_COUNT")]
+                [#assign useSCMRARB = true]
+            [/#if]
+			[#if bsp.bspName?contains("DEBUG_RAL_CONTINUE_RX")]
+                [#assign useSCMRACR = true]
+            [/#if]
+            [#if bsp.bspName?contains("DEBUG_RAL_PERFORM_CCA")]
+                [#assign useSCMRAPC = true]
+            [/#if]
+            [#if bsp.bspName?contains("DEBUG_RAL_ENABLE_TRANSMITTER")]
+                [#assign useSCMRAET = true]
+            [/#if]
+            [#if bsp.bspName?contains("DEBUG_LLHWC_GET_CH_IDX_ALGO_2")]
+                [#assign useSCMLLG2 = true]
+            [/#if]
         [/#list]
     [/#if]
 [/#list]
@@ -1795,7 +1995,7 @@ extern "C" {
 [/#if]
 
 [#if useSCMMODEN]
-#define USE_RT_DEBUG_LOW_POWER_STOP_MODE_ENTER                (0)
+#define USE_RT_DEBUG_LOW_POWER_STOP_MODE_ENTER                (1)
 #define GPIO_DEBUG_LOW_POWER_STOP_MODE_ENTER                  {${MODEN_PORT}, ${MODEN_PIN}}
 [#else]
 #define USE_RT_DEBUG_LOW_POWER_STOP_MODE_ENTER                (0)
@@ -1803,7 +2003,7 @@ extern "C" {
 [/#if]
 
 [#if useSCMMODEX]
-#define USE_RT_DEBUG_LOW_POWER_STOP_MODE_EXIT                 (0)
+#define USE_RT_DEBUG_LOW_POWER_STOP_MODE_EXIT                 (1)
 #define GPIO_DEBUG_LOW_POWER_STOP_MODE_EXIT                   {${MODEX_PORT}, ${MODEX_PIN}}
 [#else]
 #define USE_RT_DEBUG_LOW_POWER_STOP_MODE_EXIT                 (0)
@@ -1811,11 +2011,35 @@ extern "C" {
 [/#if]
 
 [#if useSCMMODAC]
-#define USE_RT_DEBUG_LOW_POWER_STOP_MODE_ACTIVE               (0)
+#define USE_RT_DEBUG_LOW_POWER_STOP_MODE_ACTIVE               (1)
 #define GPIO_DEBUG_LOW_POWER_STOP_MODE_ACTIVE                 {${MODAC_PORT}, ${MODAC_PIN}}
 [#else]
 #define USE_RT_DEBUG_LOW_POWER_STOP_MODE_ACTIVE               (0)
 #define GPIO_DEBUG_LOW_POWER_STOP_MODE_ACTIVE                 {GPIOA, GPIO_PIN_0}
+[/#if]
+
+[#if useSCMSSEN]
+#define USE_RT_DEBUG_LOW_POWER_STOP2_MODE_ENTER               (1)
+#define GPIO_DEBUG_LOW_POWER_STOP2_MODE_ENTER                 {${SSEN_PORT}, ${SSEN_PIN}}
+[#else]
+#define USE_RT_DEBUG_LOW_POWER_STOP2_MODE_ENTER               (0)
+#define GPIO_DEBUG_LOW_POWER_STOP2_MODE_ENTER                 {GPIOA, GPIO_PIN_0}
+[/#if]
+
+[#if useSCMSSEX]
+#define USE_RT_DEBUG_LOW_POWER_STOP2_MODE_EXIT                (1)
+#define GPIO_DEBUG_LOW_POWER_STOP2_MODE_EXIT                  {${SSEX_PORT}, ${SSEX_PIN}}
+[#else]
+#define USE_RT_DEBUG_LOW_POWER_STOP2_MODE_EXIT                (0)
+#define GPIO_DEBUG_LOW_POWER_STOP2_MODE_EXIT                  {GPIOA, GPIO_PIN_0}
+[/#if]
+
+[#if useSCMSSAC]
+#define USE_RT_DEBUG_LOW_POWER_STOP2_MODE_ACTIVE              (1)
+#define GPIO_DEBUG_LOW_POWER_STOP2_MODE_ACTIVE                {${SSAC_PORT}, ${SSAC_PIN}}
+[#else]
+#define USE_RT_DEBUG_LOW_POWER_STOP2_MODE_ACTIVE              (0)
+#define GPIO_DEBUG_LOW_POWER_STOP2_MODE_ACTIVE                {GPIOA, GPIO_PIN_0}
 [/#if]
 
 [#if useSCMSTEN]
@@ -1976,6 +2200,14 @@ extern "C" {
 [#else]
 #define USE_RT_DEBUG_SCHDLR_EXEC_EVNT_TRACE                   (0)
 #define GPIO_DEBUG_SCHDLR_EXEC_EVNT_TRACE                     {GPIOA, GPIO_PIN_0}
+[/#if]
+
+[#if useSCMSCEP]
+#define USE_RT_DEBUG_SCHDLR_EXEC_EVNT_PROFILE                 (1)
+#define GPIO_DEBUG_SCHDLR_EXEC_EVNT_PROFILE                   {${SCEP_PORT}, ${SCEP_PIN}}
+[#else]
+#define USE_RT_DEBUG_SCHDLR_EXEC_EVNT_PROFILE                 (0)
+#define GPIO_DEBUG_SCHDLR_EXEC_EVNT_PROFILE                   {GPIOA, GPIO_PIN_0}
 [/#if]
 
 [#if useSCMSCEE]
@@ -3049,6 +3281,135 @@ extern "C" {
 #define USE_RT_DEBUG_OS_TMR_EVNT_CBK                          (0)
 #define GPIO_DEBUG_OS_TMR_EVNT_CBK                            {GPIOA, GPIO_PIN_0}
 [/#if]
+
+[#if useSCMMAPH]
+#define USE_RT_DEBUG_PROFILE_MARKER_PHY_WAKEUP_TIME           (1)
+#define GPIO_DEBUG_PROFILE_MARKER_PHY_WAKEUP_TIME             {${MAPH_PORT}, ${MAPH_PIN}}
+[#else]
+#define USE_RT_DEBUG_PROFILE_MARKER_PHY_WAKEUP_TIME           (0)
+#define GPIO_DEBUG_PROFILE_MARKER_PHY_WAKEUP_TIME             {GPIOA, GPIO_PIN_0}
+[/#if]
+
+[#if useSCMENDR]
+#define USE_RT_DEBUG_PROFILE_END_DRIFT_TIME                   (1)
+#define GPIO_DEBUG_PROFILE_END_DRIFT_TIME                     {${ENDR_PORT}, ${ENDR_PIN}}
+[#else]
+#define USE_RT_DEBUG_PROFILE_END_DRIFT_TIME                   (0)
+#define GPIO_DEBUG_PROFILE_END_DRIFT_TIME                     {GPIOA, GPIO_PIN_0}
+[/#if]
+
+[#if useSCMPRRC]
+#define USE_RT_DEBUG_PROC_RADIO_RCV                           (1)
+#define GPIO_DEBUG_PROC_RADIO_RCV                             {${PRRC_PORT}, ${PRRC_PIN}}
+[#else]
+#define USE_RT_DEBUG_PROC_RADIO_RCV                           (0)
+#define GPIO_DEBUG_PROC_RADIO_RCV                             {GPIOA, GPIO_PIN_0}
+[/#if]
+
+[#if useSCMTIUP]
+#define USE_RT_DEBUG_EVNT_TIME_UPDT                           (1)
+#define GPIO_DEBUG_EVNT_TIME_UPDT                             {${TIUP_PORT}, ${TIUP_PIN}}
+[#else]
+#define USE_RT_DEBUG_EVNT_TIME_UPDT                           (0)
+#define GPIO_DEBUG_EVNT_TIME_UPDT                             {GPIOA, GPIO_PIN_0}
+[/#if]
+
+[#if useSCMMARE]
+#define USE_RT_DEBUG_MAC_RECEIVE_DONE                         (1)
+#define GPIO_DEBUG_MAC_RECEIVE_DONE                           {${MARE_PORT}, ${MARE_PIN}}
+[#else]
+#define USE_RT_DEBUG_MAC_RECEIVE_DONE                         (0)
+#define GPIO_DEBUG_MAC_RECEIVE_DONE                           {GPIOA, GPIO_PIN_0}
+[/#if]
+
+[#if useSCMMATX]
+#define USE_RT_DEBUG_MAC_TX_DONE                              (1)
+#define GPIO_DEBUG_MAC_TX_DONE                                {${MATX_PORT}, ${MATX_PIN}}
+[#else]
+#define USE_RT_DEBUG_MAC_TX_DONE                              (0)
+#define GPIO_DEBUG_MAC_TX_DONE                                {GPIOA, GPIO_PIN_0}
+[/#if]
+
+[#if useSCMAPCS]
+#define USE_RT_DEBUG_RADIO_APPLY_CSMA                         (1)
+#define GPIO_DEBUG_RADIO_APPLY_CSMA                           {${APCS_PORT}, ${APCS_PIN}}
+[#else]
+#define USE_RT_DEBUG_RADIO_APPLY_CSMA                         (0)
+#define GPIO_DEBUG_RADIO_APPLY_CSMA                           {GPIOA, GPIO_PIN_0}
+[/#if]
+
+[#if useSCMRATM]
+#define USE_RT_DEBUG_RADIO_TRANSMIT                           (1)
+#define GPIO_DEBUG_RADIO_TRANSMIT                             {${RATM_PORT}, ${RATM_PIN}}
+[#else]
+#define USE_RT_DEBUG_RADIO_TRANSMIT                           (0)
+#define GPIO_DEBUG_RADIO_TRANSMIT                             {GPIOA, GPIO_PIN_0}
+[/#if]
+
+[#if useSCMPRTX]
+#define USE_RT_DEBUG_PROC_RADIO_TX                            (1)
+#define GPIO_DEBUG_PROC_RADIO_TX                              {${PRTX_PORT}, ${PRTX_PIN}}
+[#else]
+#define USE_RT_DEBUG_PROC_RADIO_TX                            (0)
+#define GPIO_DEBUG_PROC_RADIO_TX                              {GPIOA, GPIO_PIN_0}
+[/#if]
+
+[#if useSCMRATD]
+#define USE_RT_DEBUG_RAL_TX_DONE                              (1)
+#define GPIO_DEBUG_RAL_TX_DONE                                {${RATD_PORT}, ${RATD_PIN}}
+[#else]
+#define USE_RT_DEBUG_RAL_TX_DONE                              (0)
+#define GPIO_DEBUG_RAL_TX_DONE                                {GPIOA, GPIO_PIN_0}
+[/#if]
+
+[#if useSCMRAIB]
+#define USE_RT_DEBUG_RAL_TX_DONE_INCREMENT_BACKOFF_COUNT      (1)
+#define GPIO_DEBUG_RAL_TX_DONE_INCREMENT_BACKOFF_COUNT        {${RAIB_PORT}, ${RAIB_PIN}}
+[#else]
+#define USE_RT_DEBUG_RAL_TX_DONE_INCREMENT_BACKOFF_COUNT      (0)
+#define GPIO_DEBUG_RAL_TX_DONE_INCREMENT_BACKOFF_COUNT        {GPIOA, GPIO_PIN_0}
+[/#if]
+
+[#if useSCMRARB]
+#define USE_RT_DEBUG_RAL_TX_DONE_RST_BACKOFF_COUNT            (1)
+#define GPIO_DEBUG_RAL_TX_DONE_RST_BACKOFF_COUNT              {${RARB_PORT}, ${RARB_PIN}}
+[#else]
+#define USE_RT_DEBUG_RAL_TX_DONE_RST_BACKOFF_COUNT            (0)
+#define GPIO_DEBUG_RAL_TX_DONE_RST_BACKOFF_COUNT              {GPIOA, GPIO_PIN_0}
+[/#if]
+
+[#if useSCMRACR]
+#define USE_RT_DEBUG_RAL_CONTINUE_RX                          (1)
+#define GPIO_DEBUG_RAL_CONTINUE_RX                            {${RACR_PORT}, ${RACR_PIN}}
+[#else]
+#define USE_RT_DEBUG_RAL_CONTINUE_RX                          (0)
+#define GPIO_DEBUG_RAL_CONTINUE_RX                            {GPIOA, GPIO_PIN_0}
+[/#if]
+
+[#if useSCMRAPC]
+#define USE_RT_DEBUG_RAL_PERFORM_CCA                          (1)
+#define GPIO_DEBUG_RAL_PERFORM_CCA                            {${RAPC_PORT}, ${RAPC_PIN}}
+[#else]
+#define USE_RT_DEBUG_RAL_PERFORM_CCA                          (0)
+#define GPIO_DEBUG_RAL_PERFORM_CCA                            {GPIOA, GPIO_PIN_0}
+[/#if]
+
+[#if useSCMRAET]
+#define USE_RT_DEBUG_RAL_ENABLE_TRANSMITTER                   (1)
+#define GPIO_DEBUG_RAL_ENABLE_TRANSMITTER                     {${RAET_PORT}, ${RAET_PIN}}
+[#else]
+#define USE_RT_DEBUG_RAL_ENABLE_TRANSMITTER                   (0)
+#define GPIO_DEBUG_RAL_ENABLE_TRANSMITTER                     {GPIOA, GPIO_PIN_0}
+[/#if]
+
+[#if useSCMLLG2]
+#define USE_RT_DEBUG_LLHWC_GET_CH_IDX_ALGO_2                  (1)
+#define GPIO_DEBUG_LLHWC_GET_CH_IDX_ALGO_2                    {${LLG2_PORT}, ${LLG2_PIN}}
+[#else]
+#define USE_RT_DEBUG_LLHWC_GET_CH_IDX_ALGO_2                  (0)
+#define GPIO_DEBUG_LLHWC_GET_CH_IDX_ALGO_2                    {GPIOA, GPIO_PIN_0}
+[/#if]
+
 [#else]
 
 /* System clock manager - System clock config */
@@ -3089,6 +3450,15 @@ extern "C" {
 
 #define USE_RT_DEBUG_LOW_POWER_STOP_MODE_ACTIVE               (0)
 #define GPIO_DEBUG_LOW_POWER_STOP_MODE_ACTIVE                 {GPIOB, GPIO_PIN_3}
+
+#define USE_RT_DEBUG_LOW_POWER_STOP2_MODE_ENTER               (0)
+#define GPIO_DEBUG_LOW_POWER_STOP2_MODE_ENTER                 {GPIOA, GPIO_PIN_0}
+
+#define USE_RT_DEBUG_LOW_POWER_STOP2_MODE_EXIT                (0)
+#define GPIO_DEBUG_LOW_POWER_STOP2_MODE_EXIT                  {GPIOA, GPIO_PIN_0}
+
+#define USE_RT_DEBUG_LOW_POWER_STOP2_MODE_ACTIVE              (0)
+#define GPIO_DEBUG_LOW_POWER_STOP2_MODE_ACTIVE                {GPIOA, GPIO_PIN_0}
 
 #define USE_RT_DEBUG_LOW_POWER_STANDBY_MODE_ENTER             (0)
 #define GPIO_DEBUG_LOW_POWER_STANDBY_MODE_ENTER               {GPIOA, GPIO_PIN_0}
@@ -3607,7 +3977,7 @@ extern "C" {
 /* Application signal selection and GPIO assignment.
    CAN BE MODIFIED BY USER */
 
-#define USE_RT_DEBUG_APP_APPE_INIT                            (1)
+#define USE_RT_DEBUG_APP_APPE_INIT                            (0)
 #define GPIO_DEBUG_APP_APPE_INIT                              {GPIOA, GPIO_PIN_0}
 
 /********************************/
@@ -3777,7 +4147,7 @@ extern "C" {
 
 #include "debug_signals.h"
 
-#if(CFG_RT_DEBUG_GPIO_MODULE == 1)
+#if (CFG_RT_DEBUG_GPIO_MODULE == 1)
 
 #include "stm32wbaxx_hal.h"
 
@@ -3786,747 +4156,7 @@ typedef struct {
   uint16_t GPIO_pin;
 } st_gpio_debug_t;
 
-static const st_gpio_debug_t general_debug_table[] = {
-#if (USE_RT_DEBUG_SCM_SYSTEM_CLOCK_CONFIG == 1)
-  [RT_DEBUG_SCM_SYSTEM_CLOCK_CONFIG] = GPIO_DEBUG_SCM_SYSTEM_CLOCK_CONFIG,
-#endif /* USE_RT_DEBUG_SCM_SYSTEM_CLOCK_CONFIG */
-
-#if (USE_RT_DEBUG_SCM_SETUP == 1)
-  [RT_DEBUG_SCM_SETUP] = GPIO_DEBUG_SCM_SETUP,
-#endif /* USE_RT_DEBUG_SCM_SETUP */
-
-#if (USE_RT_DEBUG_SCM_HSERDY_ISR == 1)
-  [RT_DEBUG_SCM_HSERDY_ISR] = GPIO_DEBUG_SCM_HSERDY_ISR,
-#endif /* USE_RT_DEBUG_SCM_HSERDY_ISR */
-
-#if (USE_RT_DEBUG_ADC_ACTIVATION == 1)
-  [RT_DEBUG_ADC_ACTIVATION] = GPIO_DEBUG_ADC_ACTIVATION,
-#endif /* USE_RT_DEBUG_ADC_ACTIVATION */
-
-#if (USE_RT_DEBUG_ADC_DEACTIVATION == 1)
-  [RT_DEBUG_ADC_DEACTIVATION] = GPIO_DEBUG_ADC_DEACTIVATION,
-#endif /* USE_RT_DEBUG_ADC_DEACTIVATION */
-
-#if (USE_RT_DEBUG_ADC_TEMPERATURE_ACQUISITION == 1)
-  [RT_DEBUG_ADC_TEMPERATURE_ACQUISITION] = GPIO_DEBUG_ADC_TEMPERATURE_ACQUISITION,
-#endif /* USE_RT_DEBUG_ADC_TEMPERATURE_ACQUISITION */
-
-#if (USE_RT_DEBUG_RNG_ENABLE == 1)
-  [RT_DEBUG_RNG_ENABLE] = GPIO_DEBUG_RNG_ENABLE,
-#endif /* USE_RT_DEBUG_RNG_ENABLE */
-
-#if (USE_RT_DEBUG_RNG_DISABLE == 1)
-  [RT_DEBUG_RNG_DISABLE] = GPIO_DEBUG_RNG_DISABLE,
-#endif /* USE_RT_DEBUG_RNG_DISABLE */
-
-#if (USE_RT_DEBUG_RNG_GEN_RAND_NUM == 1)
-  [RT_DEBUG_RNG_GEN_RAND_NUM] = GPIO_DEBUG_RNG_GEN_RAND_NUM,
-#endif /* USE_RT_DEBUG_RNG_GEN_RAND_NUM */
-
-#if (USE_RT_DEBUG_LOW_POWER_STOP_MODE_ENTER == 1)
-  [RT_DEBUG_LOW_POWER_STOP_MODE_ENTER] = GPIO_DEBUG_LOW_POWER_STOP_MODE_ENTER,
-#endif /* USE_RT_DEBUG_LOW_POWER_STOP_MODE_ENTER */
-
-#if (USE_RT_DEBUG_LOW_POWER_STOP_MODE_EXIT == 1)
-  [RT_DEBUG_LOW_POWER_STOP_MODE_EXIT] = GPIO_DEBUG_LOW_POWER_STOP_MODE_EXIT,
-#endif /* USE_RT_DEBUG_LOW_POWER_STOP_MODE_EXIT */
-
-#if (USE_RT_DEBUG_LOW_POWER_STOP_MODE_ACTIVE == 1)
-  [RT_DEBUG_LOW_POWER_STOP_MODE_ACTIVE] = GPIO_DEBUG_LOW_POWER_STOP_MODE_ACTIVE,
-#endif /* USE_RT_DEBUG_LOW_POWER_STOP_MODE_ACTIVE */
-
-#if (USE_RT_DEBUG_LOW_POWER_STANDBY_MODE_ENTER == 1)
-  [RT_DEBUG_LOW_POWER_STANDBY_MODE_ENTER] = GPIO_DEBUG_LOW_POWER_STANDBY_MODE_ENTER,
-#endif /* USE_RT_DEBUG_LOW_POWER_STANDBY_MODE_ENTER */
-
-#if (USE_RT_DEBUG_LOW_POWER_STANDBY_MODE_EXIT == 1)
-  [RT_DEBUG_LOW_POWER_STANDBY_MODE_EXIT] = GPIO_DEBUG_LOW_POWER_STANDBY_MODE_EXIT,
-#endif /* USE_RT_DEBUG_LOW_POWER_STANDBY_MODE_EXIT */
-
-#if (USE_RT_DEBUG_LOW_POWER_STANDBY_MODE_ACTIVE == 1)
-  [RT_DEBUG_LOW_POWER_STANDBY_MODE_ACTIVE] = GPIO_DEBUG_LOW_POWER_STANDBY_MODE_ACTIVE,
-#endif /* USE_RT_DEBUG_LOW_POWER_STANDBY_MODE_ACTIVE */
-
-#if (USE_RT_DEBUG_HCI_READ_DONE == 1)
-  [RT_DEBUG_HCI_READ_DONE] = GPIO_DEBUG_HCI_READ_DONE,
-#endif /* USE_RT_DEBUG_HCI_READ_DONE */
-
-#if (USE_RT_DEBUG_HCI_RCVD_CMD == 1)
-  [RT_DEBUG_HCI_RCVD_CMD] = GPIO_DEBUG_HCI_RCVD_CMD,
-#endif /* USE_RT_DEBUG_HCI_RCVD_CMD */
-
-#if (USE_RT_DEBUG_HCI_WRITE_DONE == 1)
-  [RT_DEBUG_HCI_WRITE_DONE] = GPIO_DEBUG_HCI_WRITE_DONE,
-#endif /* USE_RT_DEBUG_HCI_WRITE_DONE */
-
-#if (USE_RT_DEBUG_SCHDLR_EVNT_UPDATE == 1)
-  [RT_DEBUG_SCHDLR_EVNT_UPDATE] = GPIO_DEBUG_SCHDLR_EVNT_UPDATE,
-#endif /* USE_RT_DEBUG_SCHDLR_EVNT_UPDATE */
-
-#if (USE_RT_DEBUG_SCHDLR_TIMER_SET == 1)
-  [RT_DEBUG_SCHDLR_TIMER_SET] = GPIO_DEBUG_SCHDLR_TIMER_SET,
-#endif /* USE_RT_DEBUG_SCHDLR_TIMER_SET */
-
-#if (USE_RT_DEBUG_SCHDLR_PHY_CLBR_TIMER == 1)
-  [RT_DEBUG_SCHDLR_PHY_CLBR_TIMER] = GPIO_DEBUG_SCHDLR_PHY_CLBR_TIMER,
-#endif /* USE_RT_DEBUG_SCHDLR_PHY_CLBR_TIMER */
-
-#if (USE_RT_DEBUG_SCHDLR_EVNT_SKIPPED == 1)
-  [RT_DEBUG_SCHDLR_EVNT_SKIPPED] = GPIO_DEBUG_SCHDLR_EVNT_SKIPPED,
-#endif /* USE_RT_DEBUG_SCHDLR_EVNT_SKIPPED */
-
-#if (USE_RT_DEBUG_SCHDLR_HNDL_NXT_TRACE == 1)
-  [RT_DEBUG_SCHDLR_HNDL_NXT_TRACE] = GPIO_DEBUG_SCHDLR_HNDL_NXT_TRACE,
-#endif /* USE_RT_DEBUG_SCHDLR_HNDL_NXT_TRACE */
-
-#if (USE_RT_DEBUG_ACTIVE_SCHDLR_NEAR_DETEDTED == 1)
-  [RT_DEBUG_ACTIVE_SCHDLR_NEAR_DETEDTED] = GPIO_DEBUG_ACTIVE_SCHDLR_NEAR_DETEDTED,
-#endif /* USE_RT_DEBUG_ACTIVE_SCHDLR_NEAR_DETEDTED */
-
-#if (USE_RT_DEBUG_ACTIVE_SCHDLR_NEAR_GAP_CHECK == 1)
-  [RT_DEBUG_ACTIVE_SCHDLR_NEAR_GAP_CHECK] = GPIO_DEBUG_ACTIVE_SCHDLR_NEAR_GAP_CHECK,
-#endif /* USE_RT_DEBUG_ACTIVE_SCHDLR_NEAR_GAP_CHECK */
-
-#if (USE_RT_DEBUG_ACTIVE_SCHDLR_NEAR_TIME_CHECK == 1)
-  [RT_DEBUG_ACTIVE_SCHDLR_NEAR_TIME_CHECK] = GPIO_DEBUG_ACTIVE_SCHDLR_NEAR_TIME_CHECK,
-#endif /* USE_RT_DEBUG_ACTIVE_SCHDLR_NEAR_TIME_CHECK */
-
-#if (USE_RT_DEBUG_ACTIVE_SCHDLR_NEAR_TRACE == 1)
-  [RT_DEBUG_ACTIVE_SCHDLR_NEAR_TRACE] = GPIO_DEBUG_ACTIVE_SCHDLR_NEAR_TRACE,
-#endif /* USE_RT_DEBUG_ACTIVE_SCHDLR_NEAR_TRACE */
-
-#if (USE_RT_DEBUG_SCHDLR_EVNT_RGSTR == 1)
-  [RT_DEBUG_SCHDLR_EVNT_RGSTR] = GPIO_DEBUG_SCHDLR_EVNT_RGSTR,
-#endif /* USE_RT_DEBUG_SCHDLR_EVNT_RGSTR */
-
-#if (USE_RT_DEBUG_SCHDLR_ADD_CONFLICT_Q == 1)
-  [RT_DEBUG_SCHDLR_ADD_CONFLICT_Q] = GPIO_DEBUG_SCHDLR_ADD_CONFLICT_Q,
-#endif /* USE_RT_DEBUG_SCHDLR_ADD_CONFLICT_Q */
-
-#if (USE_RT_DEBUG_SCHDLR_HNDL_MISSED_EVNT == 1)
-  [RT_DEBUG_SCHDLR_HNDL_MISSED_EVNT] = GPIO_DEBUG_SCHDLR_HNDL_MISSED_EVNT,
-#endif /* USE_RT_DEBUG_SCHDLR_HNDL_MISSED_EVNT */
-
-#if (USE_RT_DEBUG_SCHDLR_UNRGSTR_EVNT == 1)
-  [RT_DEBUG_SCHDLR_UNRGSTR_EVNT] = GPIO_DEBUG_SCHDLR_UNRGSTR_EVNT,
-#endif /* USE_RT_DEBUG_SCHDLR_UNRGSTR_EVNT */
-
-#if (USE_RT_DEBUG_SCHDLR_EXEC_EVNT_TRACE == 1)
-  [RT_DEBUG_SCHDLR_EXEC_EVNT_TRACE] = GPIO_DEBUG_SCHDLR_EXEC_EVNT_TRACE,
-#endif /* USE_RT_DEBUG_SCHDLR_EXEC_EVNT_TRACE */
-
-#if (USE_RT_DEBUG_SCHDLR_EXEC_EVNT_PROFILE == 1)
-  [RT_DEBUG_SCHDLR_EXEC_EVNT_PROFILE] = GPIO_DEBUG_SCHDLR_EXEC_EVNT_PROFILE,
-#endif /* USE_RT_DEBUG_SCHDLR_EXEC_EVNT_PROFILE */
-
-#if (USE_RT_DEBUG_SCHDLR_EXEC_EVNT_ERROR == 1)
-  [RT_DEBUG_SCHDLR_EXEC_EVNT_ERROR] = GPIO_DEBUG_SCHDLR_EXEC_EVNT_ERROR,
-#endif /* USE_RT_DEBUG_SCHDLR_EXEC_EVNT_ERROR */
-
-#if (USE_RT_DEBUG_SCHDLR_EXEC_EVNT_WINDOW_WIDENING == 1)
-  [RT_DEBUG_SCHDLR_EXEC_EVNT_WINDOW_WIDENING] = GPIO_DEBUG_SCHDLR_EXEC_EVNT_WINDOW_WIDENING,
-#endif /* USE_RT_DEBUG_SCHDLR_EXEC_EVNT_WINDOW_WIDENING */
-
-#if (USE_RT_DEBUG_LLHWC_CMN_CLR_ISR == 1)
-  [RT_DEBUG_LLHWC_CMN_CLR_ISR] = GPIO_DEBUG_LLHWC_CMN_CLR_ISR,
-#endif /* USE_RT_DEBUG_LLHWC_CMN_CLR_ISR */
-
-#if (USE_RT_DEBUG_LLWCC_CMN_HG_ISR == 1)
-  [RT_DEBUG_LLWCC_CMN_HG_ISR] = GPIO_DEBUG_LLWCC_CMN_HG_ISR,
-#endif /* USE_RT_DEBUG_LLWCC_CMN_HG_ISR */
-
-#if (USE_RT_DEBUG_LLHWC_CMN_LW_ISR == 1)
-  [RT_DEBUG_LLHWC_CMN_LW_ISR] = GPIO_DEBUG_LLHWC_CMN_LW_ISR,
-#endif /* USE_RT_DEBUG_LLHWC_CMN_LW_ISR */
-
-#if (USE_RT_DEBUG_LLHWC_CMN_CLR_TIMER_ERROR == 1)
-  [RT_DEBUG_LLHWC_CMN_CLR_TIMER_ERROR] = GPIO_DEBUG_LLHWC_CMN_CLR_TIMER_ERROR,
-#endif /* USE_RT_DEBUG_LLHWC_CMN_CLR_TIMER_ERROR */
-
-#if (USE_RT_DEBUG_LLHWC_LL_ISR == 1)
-  [RT_DEBUG_LLHWC_LL_ISR] = GPIO_DEBUG_LLHWC_LL_ISR,
-#endif /* USE_RT_DEBUG_LLHWC_LL_ISR */
-
-#if (USE_RT_DEBUG_LLHWC_SPLTMR_SET == 1)
-  [RT_DEBUG_LLHWC_SPLTMR_SET] = GPIO_DEBUG_LLHWC_SPLTMR_SET,
-#endif /* USE_RT_DEBUG_LLHWC_SPLTMR_SET */
-
-#if (USE_RT_DEBUG_LLHWC_SPLTMR_GET == 1)
-  [RT_DEBUG_LLHWC_SPLTMR_GET] = GPIO_DEBUG_LLHWC_SPLTMR_GET,
-#endif /* USE_RT_DEBUG_LLHWC_SPLTMR_GET */
-
-#if (USE_RT_DEBUG_LLHWC_LOW_ISR == 1)
-  [RT_DEBUG_LLHWC_LOW_ISR] = GPIO_DEBUG_LLHWC_LOW_ISR,
-#endif /* USE_RT_DEBUG_LLHWC_LOW_ISR */
-
-#if (USE_RT_DEBUG_LLHWC_STOP_SCN == 1)
-  [RT_DEBUG_LLHWC_STOP_SCN] = GPIO_DEBUG_LLHWC_STOP_SCN,
-#endif /* USE_RT_DEBUG_LLHWC_STOP_SCN */
-
-#if (USE_RT_DEBUG_LLHWC_WAIT_ENVT_ON_AIR == 1)
-  [RT_DEBUG_LLHWC_WAIT_ENVT_ON_AIR] = GPIO_DEBUG_LLHWC_WAIT_ENVT_ON_AIR,
-#endif /* USE_RT_DEBUG_LLHWC_WAIT_ENVT_ON_AIR */
-
-#if (USE_RT_DEBUG_LLHWC_SET_CONN_EVNT_PARAM == 1)
-  [RT_DEBUG_LLHWC_SET_CONN_EVNT_PARAM] = GPIO_DEBUG_LLHWC_SET_CONN_EVNT_PARAM,
-#endif /* USE_RT_DEBUG_LLHWC_SET_CONN_EVNT_PARAM */
-
-#if (USE_RT_DEBUG_POST_EVNT == 1)
-  [RT_DEBUG_POST_EVNT] = GPIO_DEBUG_POST_EVNT,
-#endif /* USE_RT_DEBUG_POST_EVNT */
-
-#if (USE_RT_DEBUG_HNDL_ALL_EVNTS == 1)
-  [RT_DEBUG_HNDL_ALL_EVNTS] = GPIO_DEBUG_HNDL_ALL_EVNTS,
-#endif /* USE_RT_DEBUG_HNDL_ALL_EVNTS */
-
-#if (USE_RT_DEBUG_PROCESS_EVNT == 1)
-  [RT_DEBUG_PROCESS_EVNT] = GPIO_DEBUG_PROCESS_EVNT,
-#endif /* USE_RT_DEBUG_PROCESS_EVNT */
-
-#if (USE_RT_DEBUG_PROCESS_ISO_DATA == 1)
-  [RT_DEBUG_PROCESS_ISO_DATA] = GPIO_DEBUG_PROCESS_ISO_DATA,
-#endif /* USE_RT_DEBUG_PROCESS_ISO_DATA */
-
-#if (USE_RT_DEBUG_ALLOC_TX_ISO_EMPTY_PKT == 1)
-  [RT_DEBUG_ALLOC_TX_ISO_EMPTY_PKT] = GPIO_DEBUG_ALLOC_TX_ISO_EMPTY_PKT,
-#endif /* USE_RT_DEBUG_ALLOC_TX_ISO_EMPTY_PKT */
-
-#if (USE_RT_DEBUG_BIG_FREE_EMPTY_PKTS == 1)
-  [RT_DEBUG_BIG_FREE_EMPTY_PKTS] = GPIO_DEBUG_BIG_FREE_EMPTY_PKTS,
-#endif /* USE_RT_DEBUG_BIG_FREE_EMPTY_PKTS */
-
-#if (USE_RT_DEBUG_RECOMBINE_UNFRMD_DATA_OK == 1)
-  [RT_DEBUG_RECOMBINE_UNFRMD_DATA_OK] = GPIO_DEBUG_RECOMBINE_UNFRMD_DATA_OK,
-#endif /* USE_RT_DEBUG_RECOMBINE_UNFRMD_DATA_OK */
-
-#if (USE_RT_DEBUG_RECOMBINE_UNFRMD_DATA_CRC == 1)
-  [RT_DEBUG_RECOMBINE_UNFRMD_DATA_CRC] = GPIO_DEBUG_RECOMBINE_UNFRMD_DATA_CRC,
-#endif /* USE_RT_DEBUG_RECOMBINE_UNFRMD_DATA_CRC */
-
-#if (USE_RT_DEBUG_RECOMBINE_UNFRMD_DATA_NoRX == 1)
-  [RT_DEBUG_RECOMBINE_UNFRMD_DATA_NoRX] = GPIO_DEBUG_RECOMBINE_UNFRMD_DATA_NoRX,
-#endif /* USE_RT_DEBUG_RECOMBINE_UNFRMD_DATA_NoRX */
-
-#if (USE_RT_DEBUG_RECOMBINE_UNFRMD_DATA_TRACE == 1)
-  [RT_DEBUG_RECOMBINE_UNFRMD_DATA_TRACE] = GPIO_DEBUG_RECOMBINE_UNFRMD_DATA_TRACE,
-#endif /* USE_RT_DEBUG_RECOMBINE_UNFRMD_DATA_TRACE */
-
-#if (USE_RT_DEBUG_ISO_HNDL_SDU == 1)
-  [RT_DEBUG_ISO_HNDL_SDU] = GPIO_DEBUG_ISO_HNDL_SDU,
-#endif /* USE_RT_DEBUG_ISO_HNDL_SDU */
-
-#if (USE_RT_DEBUG_LL_INTF_INIT == 1)
-  [RT_DEBUG_LL_INTF_INIT] = GPIO_DEBUG_LL_INTF_INIT,
-#endif /* USE_RT_DEBUG_LL_INTF_INIT */
-
-#if (USE_RT_DEBUG_DATA_TO_CNTRLR == 1)
-  [RT_DEBUG_DATA_TO_CNTRLR] = GPIO_DEBUG_DATA_TO_CNTRLR,
-#endif /* USE_RT_DEBUG_DATA_TO_CNTRLR */
-
-#if (USE_RT_DEBUG_FREE_LL_PKT_HNDLR == 1)
-  [RT_DEBUG_FREE_LL_PKT_HNDLR] = GPIO_DEBUG_FREE_LL_PKT_HNDLR,
-#endif /* USE_RT_DEBUG_FREE_LL_PKT_HNDLR */
-
-#if (USE_RT_DEBUG_PHY_INIT_CLBR_TRACE == 1)
-  [RT_DEBUG_PHY_INIT_CLBR_TRACE] = GPIO_DEBUG_PHY_INIT_CLBR_TRACE,
-#endif /* USE_RT_DEBUG_PHY_INIT_CLBR_TRACE */
-
-#if (USE_RT_DEBUG_PHY_RUNTIME_CLBR_TRACE == 1)
-  [RT_DEBUG_PHY_RUNTIME_CLBR_TRACE] = GPIO_DEBUG_PHY_RUNTIME_CLBR_TRACE,
-#endif /* USE_RT_DEBUG_PHY_RUNTIME_CLBR_TRACE */
-
-#if (USE_RT_DEBUG_PHY_CLBR_ISR == 1)
-  [RT_DEBUG_PHY_CLBR_ISR] = GPIO_DEBUG_PHY_CLBR_ISR,
-#endif /* USE_RT_DEBUG_PHY_CLBR_ISR */
-
-#if (USE_RT_DEBUG_PHY_INIT_CLBR_SINGLE_CH == 1)
-  [RT_DEBUG_PHY_INIT_CLBR_SINGLE_CH] = GPIO_DEBUG_PHY_INIT_CLBR_SINGLE_CH,
-#endif /* USE_RT_DEBUG_PHY_INIT_CLBR_SINGLE_CH */
-
-#if (USE_RT_DEBUG_PHY_CLBR_STRTD == 1)
-  [RT_DEBUG_PHY_CLBR_STRTD] = GPIO_DEBUG_PHY_CLBR_STRTD,
-#endif /* USE_RT_DEBUG_PHY_CLBR_STRTD */
-
-#if (USE_RT_DEBUG_PHY_CLBR_EXEC == 1)
-  [RT_DEBUG_PHY_CLBR_EXEC] = GPIO_DEBUG_PHY_CLBR_EXEC,
-#endif /* USE_RT_DEBUG_PHY_CLBR_EXEC */
-
-#if (USE_RT_DEBUG_RCO_STRT_STOP_RUNTIME_CLBR_ACTV == 1)
-  [RT_DEBUG_RCO_STRT_STOP_RUNTIME_CLBR_ACTV] = GPIO_DEBUG_RCO_STRT_STOP_RUNTIME_CLBR_ACTV,
-#endif /* USE_RT_DEBUG_RCO_STRT_STOP_RUNTIME_CLBR_ACTV */
-
-#if (USE_RT_DEBUG_RCO_STRT_STOP_RUNTIME_RCO_CLBR == 1)
-  [RT_DEBUG_RCO_STRT_STOP_RUNTIME_RCO_CLBR] = GPIO_DEBUG_RCO_STRT_STOP_RUNTIME_RCO_CLBR,
-#endif /* USE_RT_DEBUG_RCO_STRT_STOP_RUNTIME_RCO_CLBR */
-
-#if (USE_RT_DEBUG_STRT_STOP_RUNTIME_RCO_CLBR_SWT == 1)
-  [RT_DEBUG_STRT_STOP_RUNTIME_RCO_CLBR_SWT] = GPIO_DEBUG_STRT_STOP_RUNTIME_RCO_CLBR_SWT,
-#endif /* USE_RT_DEBUG_STRT_STOP_RUNTIME_RCO_CLBR_SWT */
-
-#if (USE_RT_DEBUG_STRT_STOP_RUNTIME_RCO_CLBR_TRACE == 1)
-  [RT_DEBUG_STRT_STOP_RUNTIME_RCO_CLBR_TRACE] = GPIO_DEBUG_STRT_STOP_RUNTIME_RCO_CLBR_TRACE,
-#endif /* USE_RT_DEBUG_STRT_STOP_RUNTIME_RCO_CLBR_TRACE */
-
-#if (USE_RT_DEBUG_RCO_ISR_TRACE == 1)
-  [RT_DEBUG_RCO_ISR_TRACE] = GPIO_DEBUG_RCO_ISR_TRACE,
-#endif /* USE_RT_DEBUG_RCO_ISR_TRACE */
-
-#if (USE_RT_DEBUG_RCO_ISR_COMPENDATE == 1)
-  [RT_DEBUG_RCO_ISR_COMPENDATE] = GPIO_DEBUG_RCO_ISR_COMPENDATE,
-#endif /* USE_RT_DEBUG_RCO_ISR_COMPENDATE */
-
-#if (USE_RT_DEBUG_RAL_STRT_TX == 1)
-  [RT_DEBUG_RAL_STRT_TX] = GPIO_DEBUG_RAL_STRT_TX,
-#endif /* USE_RT_DEBUG_RAL_STRT_TX */
-
-#if (USE_RT_DEBUG_RAL_ISR_TIMER_ERROR == 1)
-  [RT_DEBUG_RAL_ISR_TIMER_ERROR] = GPIO_DEBUG_RAL_ISR_TIMER_ERROR,
-#endif /* USE_RT_DEBUG_RAL_ISR_TIMER_ERROR */
-
-#if (USE_RT_DEBUG_RAL_ISR_TRACE == 1)
-  [RT_DEBUG_RAL_ISR_TRACE] = GPIO_DEBUG_RAL_ISR_TRACE,
-#endif /* USE_RT_DEBUG_RAL_ISR_TRACE */
-
-#if (USE_RT_DEBUG_RAL_STOP_OPRTN == 1)
-  [RT_DEBUG_RAL_STOP_OPRTN] = GPIO_DEBUG_RAL_STOP_OPRTN,
-#endif /* USE_RT_DEBUG_RAL_STOP_OPRTN */
-
-#if (USE_RT_DEBUG_RAL_STRT_RX == 1)
-  [RT_DEBUG_RAL_STRT_RX] = GPIO_DEBUG_RAL_STRT_RX,
-#endif /* USE_RT_DEBUG_RAL_STRT_RX */
-
-#if (USE_RT_DEBUG_RAL_DONE_CLBK_TX == 1)
-  [RT_DEBUG_RAL_DONE_CLBK_TX] = GPIO_DEBUG_RAL_DONE_CLBK_TX,
-#endif /* USE_RT_DEBUG_RAL_DONE_CLBK_TX */
-
-#if (USE_RT_DEBUG_RAL_DONE_CLBK_RX == 1)
-  [RT_DEBUG_RAL_DONE_CLBK_RX] = GPIO_DEBUG_RAL_DONE_CLBK_RX,
-#endif /* USE_RT_DEBUG_RAL_DONE_CLBK_RX */
-
-#if (USE_RT_DEBUG_RAL_DONE_CLBK_ED == 1)
-  [RT_DEBUG_RAL_DONE_CLBK_ED] = GPIO_DEBUG_RAL_DONE_CLBK_ED,
-#endif /* USE_RT_DEBUG_RAL_DONE_CLBK_ED */
-
-#if (USE_RT_DEBUG_RAL_ED_SCAN == 1)
-  [RT_DEBUG_RAL_ED_SCAN] = GPIO_DEBUG_RAL_ED_SCAN,
-#endif /* USE_RT_DEBUG_RAL_ED_SCAN */
-
-#if (USE_RT_DEBUG_ERROR_MEM_CAP_EXCED == 1)
-  [RT_DEBUG_ERROR_MEM_CAP_EXCED] = GPIO_DEBUG_ERROR_MEM_CAP_EXCED,
-#endif /* USE_RT_DEBUG_ERROR_MEM_CAP_EXCED */
-
-#if (USE_RT_DEBUG_ERROR_COMMAND_DISALLOWED == 1)
-  [RT_DEBUG_ERROR_COMMAND_DISALLOWED] = GPIO_DEBUG_ERROR_COMMAND_DISALLOWED,
-#endif /* USE_RT_DEBUG_ERROR_COMMAND_DISALLOWED */
-
-#if (USE_RT_DEBUG_PTA_INIT == 1)
-  [RT_DEBUG_PTA_INIT] = GPIO_DEBUG_PTA_INIT,
-#endif /* USE_RT_DEBUG_PTA_INIT */
-
-#if (USE_RT_DEBUG_PTA_EN == 1)
-  [RT_DEBUG_PTA_EN] = GPIO_DEBUG_PTA_EN,
-#endif /* USE_RT_DEBUG_PTA_EN */
-
-#if (USE_RT_DEBUG_LLHWC_PTA_SET_EN == 1)
-  [RT_DEBUG_LLHWC_PTA_SET_EN] = GPIO_DEBUG_LLHWC_PTA_SET_EN,
-#endif /* USE_RT_DEBUG_LLHWC_PTA_SET_EN */
-
-#if (USE_RT_DEBUG_LLHWC_PTA_SET_PARAMS == 1)
-  [RT_DEBUG_LLHWC_PTA_SET_PARAMS] = GPIO_DEBUG_LLHWC_PTA_SET_PARAMS,
-#endif /* USE_RT_DEBUG_LLHWC_PTA_SET_PARAMS */
-
-#if (USE_RT_DEBUG_COEX_STRT_ON_IDLE == 1)
-  [RT_DEBUG_COEX_STRT_ON_IDLE] = GPIO_DEBUG_COEX_STRT_ON_IDLE,
-#endif /* USE_RT_DEBUG_COEX_STRT_ON_IDLE */
-
-#if (USE_RT_DEBUG_COEX_ASK_FOR_AIR == 1)
-  [RT_DEBUG_COEX_ASK_FOR_AIR] = GPIO_DEBUG_COEX_ASK_FOR_AIR,
-#endif /* USE_RT_DEBUG_COEX_ASK_FOR_AIR */
-
-#if (USE_RT_DEBUG_COEX_TIMER_EVNT_CLBK == 1)
-  [RT_DEBUG_COEX_TIMER_EVNT_CLBK] = GPIO_DEBUG_COEX_TIMER_EVNT_CLBK,
-#endif /* USE_RT_DEBUG_COEX_TIMER_EVNT_CLBK */
-
-#if (USE_RT_DEBUG_COEX_STRT_ONE_SHOT == 1)
-  [RT_DEBUG_COEX_STRT_ONE_SHOT] = GPIO_DEBUG_COEX_STRT_ONE_SHOT,
-#endif /* USE_RT_DEBUG_COEX_STRT_ONE_SHOT */
-
-#if (USE_RT_DEBUG_COEX_FORCE_STOP_RX == 1)
-  [RT_DEBUG_COEX_FORCE_STOP_RX] = GPIO_DEBUG_COEX_FORCE_STOP_RX,
-#endif /* USE_RT_DEBUG_COEX_FORCE_STOP_RX */
-
-#if (USE_RT_DEBUG_LLHWC_ADV_DONE == 1)
-  [RT_DEBUG_LLHWC_ADV_DONE] = GPIO_DEBUG_LLHWC_ADV_DONE,
-#endif /* USE_RT_DEBUG_LLHWC_ADV_DONE */
-
-#if (USE_RT_DEBUG_LLHWC_SCN_DONE == 1)
-  [RT_DEBUG_LLHWC_SCN_DONE] = GPIO_DEBUG_LLHWC_SCN_DONE,
-#endif /* USE_RT_DEBUG_LLHWC_SCN_DONE */
-
-#if (USE_RT_DEBUG_LLHWC_INIT_DONE == 1)
-  [RT_DEBUG_LLHWC_INIT_DONE] = GPIO_DEBUG_LLHWC_INIT_DONE,
-#endif /* USE_RT_DEBUG_LLHWC_INIT_DONE */
-
-#if (USE_RT_DEBUG_LLHWC_CONN_DONE == 1)
-  [RT_DEBUG_LLHWC_CONN_DONE] = GPIO_DEBUG_LLHWC_CONN_DONE,
-#endif /* USE_RT_DEBUG_LLHWC_CONN_DONE */
-
-#if (USE_RT_DEBUG_LLHWC_CIG_DONE == 1)
-  [RT_DEBUG_LLHWC_CIG_DONE] = GPIO_DEBUG_LLHWC_CIG_DONE,
-#endif /* USE_RT_DEBUG_LLHWC_CIG_DONE */
-
-#if (USE_RT_DEBUG_LLHWC_BIG_DONE == 1)
-  [RT_DEBUG_LLHWC_BIG_DONE] = GPIO_DEBUG_LLHWC_BIG_DONE,
-#endif /* USE_RT_DEBUG_LLHWC_BIG_DONE */
-
-#if (USE_RT_DEBUG_OS_TMR_CREATE == 1)
-  [RT_DEBUG_OS_TMR_CREATE] = GPIO_DEBUG_OS_TMR_CREATE,
-#endif /* USE_RT_DEBUG_OS_TMR_CREATE */
-
-#if (USE_RT_DEBUG_ADV_EXT_TIMEOUT_CBK == 1)
-  [RT_DEBUG_ADV_EXT_TIMEOUT_CBK] = GPIO_DEBUG_ADV_EXT_TIMEOUT_CBK,
-#endif /* USE_RT_DEBUG_ADV_EXT_TIMEOUT_CBK */
-
-#if (USE_RT_DEBUG_ADV_EXT_SCN_DUR_CBK == 1)
-  [RT_DEBUG_ADV_EXT_SCN_DUR_CBK] = GPIO_DEBUG_ADV_EXT_SCN_DUR_CBK,
-#endif /* USE_RT_DEBUG_ADV_EXT_SCN_DUR_CBK */
-
-#if (USE_RT_DEBUG_ADV_EXT_SCN_PERIOD_CBK == 1)
-  [RT_DEBUG_ADV_EXT_SCN_PERIOD_CBK] = GPIO_DEBUG_ADV_EXT_SCN_PERIOD_CBK,
-#endif /* USE_RT_DEBUG_ADV_EXT_SCN_PERIOD_CBK */
-
-#if (USE_RT_DEBUG_ADV_EXT_PRDC_SCN_TIMEOUT_CBK == 1)
-  [RT_DEBUG_ADV_EXT_PRDC_SCN_TIMEOUT_CBK] = GPIO_DEBUG_ADV_EXT_PRDC_SCN_TIMEOUT_CBK,
-#endif /* USE_RT_DEBUG_ADV_EXT_PRDC_SCN_TIMEOUT_CBK */
-
-#if (USE_RT_DEBUG_BIS_SYNC_TIMEOUT_TMR_CBK == 1)
-  [RT_DEBUG_BIS_SYNC_TIMEOUT_TMR_CBK] = GPIO_DEBUG_BIS_SYNC_TIMEOUT_TMR_CBK,
-#endif /* USE_RT_DEBUG_BIS_SYNC_TIMEOUT_TMR_CBK */
-
-#if (USE_RT_DEBUG_BIS_TERM_TMR_CBK == 1)
-  [RT_DEBUG_BIS_TERM_TMR_CBK] = GPIO_DEBUG_BIS_TERM_TMR_CBK,
-#endif /* USE_RT_DEBUG_BIS_TERM_TMR_CBK */
-
-#if (USE_RT_DEBUG_BIS_TST_MODE_CBK == 1)
-  [RT_DEBUG_BIS_TST_MODE_CBK] = GPIO_DEBUG_BIS_TST_MODE_CBK,
-#endif /* USE_RT_DEBUG_BIS_TST_MODE_CBK */
-
-#if (USE_RT_DEBUG_BIS_TST_MODE_TMR_CBK == 1)
-  [RT_DEBUG_BIS_TST_MODE_TMR_CBK] = GPIO_DEBUG_BIS_TST_MODE_TMR_CBK,
-#endif /* USE_RT_DEBUG_BIS_TST_MODE_TMR_CBK */
-
-#if (USE_RT_DEBUG_ISO_POST_TMR_CBK == 1)
-  [RT_DEBUG_ISO_POST_TMR_CBK] = GPIO_DEBUG_ISO_POST_TMR_CBK,
-#endif /* USE_RT_DEBUG_ISO_POST_TMR_CBK */
-
-#if (USE_RT_DEBUG_ISO_TST_MODE_TMR_CBK == 1)
-  [RT_DEBUG_ISO_TST_MODE_TMR_CBK] = GPIO_DEBUG_ISO_TST_MODE_TMR_CBK,
-#endif /* USE_RT_DEBUG_ISO_TST_MODE_TMR_CBK */
-
-#if (USE_RT_DEBUG_CONN_POST_TMR_CBK == 1)
-  [RT_DEBUG_CONN_POST_TMR_CBK] = GPIO_DEBUG_CONN_POST_TMR_CBK,
-#endif /* USE_RT_DEBUG_CONN_POST_TMR_CBK */
-
-#if (USE_RT_DEBUG_EVNT_SCHDLR_TMR_CBK == 1)
-  [RT_DEBUG_EVNT_SCHDLR_TMR_CBK] = GPIO_DEBUG_EVNT_SCHDLR_TMR_CBK,
-#endif /* USE_RT_DEBUG_EVNT_SCHDLR_TMR_CBK */
-
-#if (USE_RT_DEBUG_HCI_POST_TMR_CBK == 1)
-  [RT_DEBUG_HCI_POST_TMR_CBK] = GPIO_DEBUG_HCI_POST_TMR_CBK,
-#endif /* USE_RT_DEBUG_HCI_POST_TMR_CBK */
-
-#if (USE_RT_DEBUG_LLCP_POST_TMR_CBK == 1)
-  [RT_DEBUG_LLCP_POST_TMR_CBK] = GPIO_DEBUG_LLCP_POST_TMR_CBK,
-#endif /* USE_RT_DEBUG_LLCP_POST_TMR_CBK */
-
-#if (USE_RT_DEBUG_LLHWC_ENRGY_DETECT_CBK == 1)
-  [RT_DEBUG_LLHWC_ENRGY_DETECT_CBK] = GPIO_DEBUG_LLHWC_ENRGY_DETECT_CBK,
-#endif /* USE_RT_DEBUG_LLHWC_ENRGY_DETECT_CBK */
-
-#if (USE_RT_DEBUG_PRVCY_POST_TMR_CBK == 1)
-  [RT_DEBUG_PRVCY_POST_TMR_CBK] = GPIO_DEBUG_PRVCY_POST_TMR_CBK,
-#endif /* USE_RT_DEBUG_PRVCY_POST_TMR_CBK */
-
-#if (USE_RT_DEBUG_ANT_PRPR_TMR_CBK == 1)
-  [RT_DEBUG_ANT_PRPR_TMR_CBK] = GPIO_DEBUG_ANT_PRPR_TMR_CBK,
-#endif /* USE_RT_DEBUG_ANT_PRPR_TMR_CBK */
-
-#if (USE_RT_DEBUG_COEX_TMR_FRC_STOP_AIR_GRANT_CBK == 1)
-  [RT_DEBUG_COEX_TMR_FRC_STOP_AIR_GRANT_CBK] = GPIO_DEBUG_COEX_TMR_FRC_STOP_AIR_GRANT_CBK,
-#endif /* USE_RT_DEBUG_COEX_TMR_FRC_STOP_AIR_GRANT_CBK */
-
-#if (USE_RT_DEBUG_MLME_RX_EN_TMR_CBK == 1)
-  [RT_DEBUG_MLME_RX_EN_TMR_CBK] = GPIO_DEBUG_MLME_RX_EN_TMR_CBK,
-#endif /* USE_RT_DEBUG_MLME_RX_EN_TMR_CBK */
-
-#if (USE_RT_DEBUG_MLME_GNRC_TMR_CBK == 1)
-  [RT_DEBUG_MLME_GNRC_TMR_CBK] = GPIO_DEBUG_MLME_GNRC_TMR_CBK,
-#endif /* USE_RT_DEBUG_MLME_GNRC_TMR_CBK */
-
-#if (USE_RT_DEBUG_MIB_JOIN_LST_TMR_CBK == 1)
-  [RT_DEBUG_MIB_JOIN_LST_TMR_CBK] = GPIO_DEBUG_MIB_JOIN_LST_TMR_CBK,
-#endif /* USE_RT_DEBUG_MIB_JOIN_LST_TMR_CBK */
-
-#if (USE_RT_DEBUG_MLME_PWR_PRES_TMR_CBK == 1)
-  [RT_DEBUG_MLME_PWR_PRES_TMR_CBK] = GPIO_DEBUG_MLME_PWR_PRES_TMR_CBK,
-#endif /* USE_RT_DEBUG_MLME_PWR_PRES_TMR_CBK */
-
-#if (USE_RT_DEBUG_PRESISTENCE_TMR_CBK == 1)
-  [RT_DEBUG_PRESISTENCE_TMR_CBK] = GPIO_DEBUG_PRESISTENCE_TMR_CBK,
-#endif /* USE_RT_DEBUG_PRESISTENCE_TMR_CBK */
-
-#if (USE_RT_DEBUG_RADIO_PHY_PRDC_CLBK_TMR_CBK == 1)
-  [RT_DEBUG_RADIO_PHY_PRDC_CLBK_TMR_CBK] = GPIO_DEBUG_RADIO_PHY_PRDC_CLBK_TMR_CBK,
-#endif /* USE_RT_DEBUG_RADIO_PHY_PRDC_CLBK_TMR_CBK */
-
-#if (USE_RT_DEBUG_RADIO_CSMA_TMR_CBK == 1)
-  [RT_DEBUG_RADIO_CSMA_TMR_CBK] = GPIO_DEBUG_RADIO_CSMA_TMR_CBK,
-#endif /* USE_RT_DEBUG_RADIO_CSMA_TMR_CBK */
-
-#if (USE_RT_DEBUG_RADIO_CSL_RCV_TMR_CBK == 1)
-  [RT_DEBUG_RADIO_CSL_RCV_TMR_CBK] = GPIO_DEBUG_RADIO_CSL_RCV_TMR_CBK,
-#endif /* USE_RT_DEBUG_RADIO_CSL_RCV_TMR_CBK */
-
-#if (USE_RT_DEBUG_ED_TMR_CBK == 1)
-  [RT_DEBUG_ED_TMR_CBK] = GPIO_DEBUG_ED_TMR_CBK,
-#endif /* USE_RT_DEBUG_ED_TMR_CBK */
-
-#if (USE_RT_DEBUG_DIO_EXT_TMR_CBK == 1)
-  [RT_DEBUG_DIO_EXT_TMR_CBK] = GPIO_DEBUG_DIO_EXT_TMR_CBK,
-#endif /* USE_RT_DEBUG_DIO_EXT_TMR_CBK */
-
-#if (USE_RT_DEBUG_RCO_CLBR_TMR_CBK == 1)
-  [RT_DEBUG_RCO_CLBR_TMR_CBK] = GPIO_DEBUG_RCO_CLBR_TMR_CBK,
-#endif /* USE_RT_DEBUG_RCO_CLBR_TMR_CBK */
-
-#if (USE_RT_DEBUG_ADV_EXT_MNGR_ADV_CBK == 1)
-  [RT_DEBUG_ADV_EXT_MNGR_ADV_CBK] = GPIO_DEBUG_ADV_EXT_MNGR_ADV_CBK,
-#endif /* USE_RT_DEBUG_ADV_EXT_MNGR_ADV_CBK */
-
-#if (USE_RT_DEBUG_ADV_EXT_MNGR_SCN_CBK == 1)
-  [RT_DEBUG_ADV_EXT_MNGR_SCN_CBK] = GPIO_DEBUG_ADV_EXT_MNGR_SCN_CBK,
-#endif /* USE_RT_DEBUG_ADV_EXT_MNGR_SCN_CBK */
-
-#if (USE_RT_DEBUG_ADV_EXT_MNGR_SCN_ERR_CBK == 1)
-  [RT_DEBUG_ADV_EXT_MNGR_SCN_ERR_CBK] = GPIO_DEBUG_ADV_EXT_MNGR_SCN_ERR_CBK,
-#endif /* USE_RT_DEBUG_ADV_EXT_MNGR_SCN_ERR_CBK */
-
-#if (USE_RT_DEBUG_ADV_EXT_MNGR_PRDC_SCN_CBK == 1)
-  [RT_DEBUG_ADV_EXT_MNGR_PRDC_SCN_CBK] = GPIO_DEBUG_ADV_EXT_MNGR_PRDC_SCN_CBK,
-#endif /* USE_RT_DEBUG_ADV_EXT_MNGR_PRDC_SCN_CBK */
-
-#if (USE_RT_DEBUG_ADV_EXT_MNGR_PRDC_SCN_ERR_CBK == 1)
-  [RT_DEBUG_ADV_EXT_MNGR_PRDC_SCN_ERR_CBK] = GPIO_DEBUG_ADV_EXT_MNGR_PRDC_SCN_ERR_CBK,
-#endif /* USE_RT_DEBUG_ADV_EXT_MNGR_PRDC_SCN_ERR_CBK */
-
-#if (USE_RT_DEBUG_BIG_ADV_CBK == 1)
-  [RT_DEBUG_BIG_ADV_CBK] = GPIO_DEBUG_BIG_ADV_CBK,
-#endif /* USE_RT_DEBUG_BIG_ADV_CBK */
-
-#if (USE_RT_DEBUG_BIG_ADV_ERR_CBK == 1)
-  [RT_DEBUG_BIG_ADV_ERR_CBK] = GPIO_DEBUG_BIG_ADV_ERR_CBK,
-#endif /* USE_RT_DEBUG_BIG_ADV_ERR_CBK */
-
-#if (USE_RT_DEBUG_BIG_SYNC_CBK == 1)
-  [RT_DEBUG_BIG_SYNC_CBK] = GPIO_DEBUG_BIG_SYNC_CBK,
-#endif /* USE_RT_DEBUG_BIG_SYNC_CBK */
-
-#if (USE_RT_DEBUG_BIG_SYNC_ERR_CBK == 1)
-  [RT_DEBUG_BIG_SYNC_ERR_CBK] = GPIO_DEBUG_BIG_SYNC_ERR_CBK,
-#endif /* USE_RT_DEBUG_BIG_SYNC_ERR_CBK */
-
-#if (USE_RT_DEBUG_ISO_CIS_PKT_TRNSM_RECEIVED_CBK == 1)
-  [RT_DEBUG_ISO_CIS_PKT_TRNSM_RECEIVED_CBK] = GPIO_DEBUG_ISO_CIS_PKT_TRNSM_RECEIVED_CBK,
-#endif /* USE_RT_DEBUG_ISO_CIS_PKT_TRNSM_RECEIVED_CBK */
-
-#if (USE_RT_DEBUG_ISO_CIG_ERR_CBK == 1)
-  [RT_DEBUG_ISO_CIG_ERR_CBK] = GPIO_DEBUG_ISO_CIG_ERR_CBK,
-#endif /* USE_RT_DEBUG_ISO_CIG_ERR_CBK */
-
-#if (USE_RT_DEBUG_CONN_PKT_TRNSM_RECEIVED_CBK == 1)
-  [RT_DEBUG_CONN_PKT_TRNSM_RECEIVED_CBK] = GPIO_DEBUG_CONN_PKT_TRNSM_RECEIVED_CBK,
-#endif /* USE_RT_DEBUG_CONN_PKT_TRNSM_RECEIVED_CBK */
-
-#if (USE_RT_DEBUG_PRDC_CLBR_EXTRL_CBK == 1)
-  [RT_DEBUG_PRDC_CLBR_EXTRL_CBK] = GPIO_DEBUG_PRDC_CLBR_EXTRL_CBK,
-#endif /* USE_RT_DEBUG_PRDC_CLBR_EXTRL_CBK */
-
-#if (USE_RT_DEBUG_PTR_PRDC_ADV_SYNC_CBK == 1)
-  [RT_DEBUG_PTR_PRDC_ADV_SYNC_CBK] = GPIO_DEBUG_PTR_PRDC_ADV_SYNC_CBK,
-#endif /* USE_RT_DEBUG_PTR_PRDC_ADV_SYNC_CBK */
-
-#if (USE_RT_DEBUG_NCONN_SCN_CBK == 1)
-  [RT_DEBUG_NCONN_SCN_CBK] = GPIO_DEBUG_NCONN_SCN_CBK,
-#endif /* USE_RT_DEBUG_NCONN_SCN_CBK */
-
-#if (USE_RT_DEBUG_NCONN_ADV_CBK == 1)
-  [RT_DEBUG_NCONN_ADV_CBK] = GPIO_DEBUG_NCONN_ADV_CBK,
-#endif /* USE_RT_DEBUG_NCONN_ADV_CBK */
-
-#if (USE_RT_DEBUG_NCONN_INIT_CBK == 1)
-  [RT_DEBUG_NCONN_INIT_CBK] = GPIO_DEBUG_NCONN_INIT_CBK,
-#endif /* USE_RT_DEBUG_NCONN_INIT_CBK */
-
-#if (USE_RT_DEBUG_ANT_RADIO_CMPLT_EVNT_CBK == 1)
-  [RT_DEBUG_ANT_RADIO_CMPLT_EVNT_CBK] = GPIO_DEBUG_ANT_RADIO_CMPLT_EVNT_CBK,
-#endif /* USE_RT_DEBUG_ANT_RADIO_CMPLT_EVNT_CBK */
-
-#if (USE_RT_DEBUG_ANT_STACK_EVNT_CBK == 1)
-  [RT_DEBUG_ANT_STACK_EVNT_CBK] = GPIO_DEBUG_ANT_STACK_EVNT_CBK,
-#endif /* USE_RT_DEBUG_ANT_STACK_EVNT_CBK */
-
-#if (USE_RT_DEBUG_ADV_EXT_PROCESS_TMOUT_EVNT_CBK == 1)
-  [RT_DEBUG_ADV_EXT_PROCESS_TMOUT_EVNT_CBK] = GPIO_DEBUG_ADV_EXT_PROCESS_TMOUT_EVNT_CBK,
-#endif /* USE_RT_DEBUG_ADV_EXT_PROCESS_TMOUT_EVNT_CBK */
-
-#if (USE_RT_DEBUG_ADV_EXT_MNGR_SCN_DUR_EVNT == 1)
-  [RT_DEBUG_ADV_EXT_MNGR_SCN_DUR_EVNT] = GPIO_DEBUG_ADV_EXT_MNGR_SCN_DUR_EVNT,
-#endif /* USE_RT_DEBUG_ADV_EXT_MNGR_SCN_DUR_EVNT */
-
-#if (USE_RT_DEBUG_ADV_EXT_MNGR_SCN_PERIODIC_EVNT == 1)
-  [RT_DEBUG_ADV_EXT_MNGR_SCN_PERIODIC_EVNT] = GPIO_DEBUG_ADV_EXT_MNGR_SCN_PERIODIC_EVNT,
-#endif /* USE_RT_DEBUG_ADV_EXT_MNGR_SCN_PERIODIC_EVNT */
-
-#if (USE_RT_DEBUG_ADV_EXT_MNGR_PRDC_SCN_TMOUT_EVNT == 1)
-  [RT_DEBUG_ADV_EXT_MNGR_PRDC_SCN_TMOUT_EVNT] = GPIO_DEBUG_ADV_EXT_MNGR_PRDC_SCN_TMOUT_EVNT,
-#endif /* USE_RT_DEBUG_ADV_EXT_MNGR_PRDC_SCN_TMOUT_EVNT */
-
-#if (USE_RT_DEBUG_ADV_EXT_MNGR_PRDC_SCN_CNCEL_EVNT == 1)
-  [RT_DEBUG_ADV_EXT_MNGR_PRDC_SCN_CNCEL_EVNT] = GPIO_DEBUG_ADV_EXT_MNGR_PRDC_SCN_CNCEL_EVNT,
-#endif /* USE_RT_DEBUG_ADV_EXT_MNGR_PRDC_SCN_CNCEL_EVNT */
-
-#if (USE_RT_DEBUG_BIS_MNGR_BIG_TERM_CBK == 1)
-  [RT_DEBUG_BIS_MNGR_BIG_TERM_CBK] = GPIO_DEBUG_BIS_MNGR_BIG_TERM_CBK,
-#endif /* USE_RT_DEBUG_BIS_MNGR_BIG_TERM_CBK */
-
-#if (USE_RT_DEBUG_BIS_MNGR_SYNC_TMOUT_CBK == 1)
-  [RT_DEBUG_BIS_MNGR_SYNC_TMOUT_CBK] = GPIO_DEBUG_BIS_MNGR_SYNC_TMOUT_CBK,
-#endif /* USE_RT_DEBUG_BIS_MNGR_SYNC_TMOUT_CBK */
-
-#if (USE_RT_DEBUG_ISOAL_MNGR_SDU_GEN == 1)
-  [RT_DEBUG_ISOAL_MNGR_SDU_GEN] = GPIO_DEBUG_ISOAL_MNGR_SDU_GEN,
-#endif /* USE_RT_DEBUG_ISOAL_MNGR_SDU_GEN */
-
-#if (USE_RT_DEBUG_ISO_MNGR_CIS_PROCESS_EVNT_CBK == 1)
-  [RT_DEBUG_ISO_MNGR_CIS_PROCESS_EVNT_CBK] = GPIO_DEBUG_ISO_MNGR_CIS_PROCESS_EVNT_CBK,
-#endif /* USE_RT_DEBUG_ISO_MNGR_CIS_PROCESS_EVNT_CBK */
-
-#if (USE_RT_DEBUG_CONN_MNGR_PROCESS_EVNT_CLBK == 1)
-  [RT_DEBUG_CONN_MNGR_PROCESS_EVNT_CLBK] = GPIO_DEBUG_CONN_MNGR_PROCESS_EVNT_CLBK,
-#endif /* USE_RT_DEBUG_CONN_MNGR_PROCESS_EVNT_CLBK */
-
-#if (USE_RT_DEBUG_CONN_MNGR_UPDT_CONN_PARAM_CBK == 1)
-  [RT_DEBUG_CONN_MNGR_UPDT_CONN_PARAM_CBK] = GPIO_DEBUG_CONN_MNGR_UPDT_CONN_PARAM_CBK,
-#endif /* USE_RT_DEBUG_CONN_MNGR_UPDT_CONN_PARAM_CBK */
-
-#if (USE_RT_DEBUG_EVNT_SCHDLR_HW_EVNT_CMPLT == 1)
-  [RT_DEBUG_EVNT_SCHDLR_HW_EVNT_CMPLT] = GPIO_DEBUG_EVNT_SCHDLR_HW_EVNT_CMPLT,
-#endif /* USE_RT_DEBUG_EVNT_SCHDLR_HW_EVNT_CMPLT */
-
-#if (USE_RT_DEBUG_HCI_EVENT_HNDLR == 1)
-  [RT_DEBUG_HCI_EVENT_HNDLR] = GPIO_DEBUG_HCI_EVENT_HNDLR,
-#endif /* USE_RT_DEBUG_HCI_EVENT_HNDLR */
-
-#if (USE_RT_DEBUG_MLME_TMRS_CBK == 1)
-  [RT_DEBUG_MLME_TMRS_CBK] = GPIO_DEBUG_MLME_TMRS_CBK,
-#endif /* USE_RT_DEBUG_MLME_TMRS_CBK */
-
-#if (USE_RT_DEBUG_DIRECT_TX_EVNT_CBK == 1)
-  [RT_DEBUG_DIRECT_TX_EVNT_CBK] = GPIO_DEBUG_DIRECT_TX_EVNT_CBK,
-#endif /* USE_RT_DEBUG_DIRECT_TX_EVNT_CBK */
-
-#if (USE_RT_DEBUG_INDIRECT_PKT_TOUR_CBK == 1)
-  [RT_DEBUG_INDIRECT_PKT_TOUR_CBK] = GPIO_DEBUG_INDIRECT_PKT_TOUR_CBK,
-#endif /* USE_RT_DEBUG_INDIRECT_PKT_TOUR_CBK */
-
-#if (USE_RT_DEBUG_RADIO_CSMA_TMR == 1)
-  [RT_DEBUG_RADIO_CSMA_TMR] = GPIO_DEBUG_RADIO_CSMA_TMR,
-#endif /* USE_RT_DEBUG_RADIO_CSMA_TMR */
-
-#if (USE_RT_DEBUG_RAL_SM_DONE_EVNT_CBK == 1)
-  [RT_DEBUG_RAL_SM_DONE_EVNT_CBK] = GPIO_DEBUG_RAL_SM_DONE_EVNT_CBK,
-#endif /* USE_RT_DEBUG_RAL_SM_DONE_EVNT_CBK */
-
-#if (USE_RT_DEBUG_ED_TMR_HNDL == 1)
-  [RT_DEBUG_ED_TMR_HNDL] = GPIO_DEBUG_ED_TMR_HNDL,
-#endif /* USE_RT_DEBUG_ED_TMR_HNDL */
-
-#if (USE_RT_DEBUG_OS_TMR_EVNT_CBK == 1)
-  [RT_DEBUG_OS_TMR_EVNT_CBK] = GPIO_DEBUG_OS_TMR_EVNT_CBK,
-#endif /* USE_RT_DEBUG_OS_TMR_EVNT_CBK */
-
-#if (USE_RT_DEBUG_PROFILE_MARKER_PHY_WAKEUP_TIME == 1)
-  [RT_DEBUG_PROFILE_MARKER_PHY_WAKEUP_TIME] = GPIO_DEBUG_PROFILE_MARKER_PHY_WAKEUP_TIME,
-#endif /* USE_RT_DEBUG_PROFILE_MARKER_PHY_WAKEUP_TIME */
-
-#if (USE_RT_DEBUG_PROFILE_END_DRIFT_TIME == 1)
-  [RT_DEBUG_PROFILE_END_DRIFT_TIME] = GPIO_DEBUG_PROFILE_END_DRIFT_TIME,
-#endif /* USE_RT_DEBUG_PROFILE_END_DRIFT_TIME */
-
-#if (USE_RT_DEBUG_PROC_RADIO_RCV == 1)
-  [RT_DEBUG_PROC_RADIO_RCV] = GPIO_DEBUG_PROC_RADIO_RCV,
-#endif /* USE_RT_DEBUG_PROC_RADIO_RCV */
-
-#if (USE_RT_DEBUG_EVNT_TIME_UPDT == 1)
-  [RT_DEBUG_EVNT_TIME_UPDT] = GPIO_DEBUG_EVNT_TIME_UPDT,
-#endif /* USE_RT_DEBUG_EVNT_TIME_UPDT */
-
-#if (USE_RT_DEBUG_MAC_RECEIVE_DONE == 1)
-  [RT_DEBUG_MAC_RECEIVE_DONE] = GPIO_DEBUG_MAC_RECEIVE_DONE,
-#endif /* USE_RT_DEBUG_MAC_RECEIVE_DONE */
-
-#if (USE_RT_DEBUG_MAC_TX_DONE == 1)
-  [RT_DEBUG_MAC_TX_DONE] = GPIO_DEBUG_MAC_TX_DONE,
-#endif /* USE_RT_DEBUG_MAC_TX_DONE */
-
-#if (USE_RT_DEBUG_RADIO_APPLY_CSMA == 1)
-  [RT_DEBUG_RADIO_APPLY_CSMA] = GPIO_DEBUG_RADIO_APPLY_CSMA,
-#endif /* USE_RT_DEBUG_RADIO_APPLY_CSMA */
-
-#if (USE_RT_DEBUG_RADIO_TRANSMIT == 1)
-  [RT_DEBUG_RADIO_TRANSMIT] = GPIO_DEBUG_RADIO_TRANSMIT,
-#endif /* USE_RT_DEBUG_RADIO_TRANSMIT */
-
-#if (USE_RT_DEBUG_PROC_RADIO_TX == 1)
-  [RT_DEBUG_PROC_RADIO_TX] = GPIO_DEBUG_PROC_RADIO_TX,
-#endif /* USE_RT_DEBUG_PROC_RADIO_TX */
-
-#if (USE_RT_DEBUG_RAL_TX_DONE == 1)
-  [RT_DEBUG_RAL_TX_DONE] = GPIO_DEBUG_RAL_TX_DONE,
-#endif /* USE_RT_DEBUG_RAL_TX_DONE */
-
-#if (USE_RT_DEBUG_RAL_TX_DONE_INCREMENT_BACKOFF_COUNT == 1)
-  [RT_DEBUG_RAL_TX_DONE_INCREMENT_BACKOFF_COUNT] = GPIO_DEBUG_RAL_TX_DONE_INCREMENT_BACKOFF_COUNT,
-#endif /* USE_RT_DEBUG_RAL_TX_DONE_INCREMENT_BACKOFF_COUNT */
-
-#if (USE_RT_DEBUG_RAL_TX_DONE_RST_BACKOFF_COUNT == 1)
-  [RT_DEBUG_RAL_TX_DONE_RST_BACKOFF_COUNT] = GPIO_DEBUG_RAL_TX_DONE_RST_BACKOFF_COUNT,
-#endif /* USE_RT_DEBUG_RAL_TX_DONE_RST_BACKOFF_COUNT */
-
-#if (USE_RT_DEBUG_RAL_CONTINUE_RX == 1)
-  [RT_DEBUG_RAL_CONTINUE_RX] = GPIO_DEBUG_RAL_CONTINUE_RX,
-#endif /* USE_RT_DEBUG_RAL_CONTINUE_RX */
-
-#if (USE_RT_DEBUG_RAL_PERFORM_CCA == 1)
-  [RT_DEBUG_RAL_PERFORM_CCA] = GPIO_DEBUG_RAL_PERFORM_CCA,
-#endif /* USE_RT_DEBUG_RAL_PERFORM_CCA */
-
-#if (USE_RT_DEBUG_RAL_ENABLE_TRANSMITTER == 1)
-  [RT_DEBUG_RAL_ENABLE_TRANSMITTER] = GPIO_DEBUG_RAL_ENABLE_TRANSMITTER,
-#endif /* USE_RT_DEBUG_RAL_ENABLE_TRANSMITTER */
-
-#if (USE_RT_DEBUG_LLHWC_GET_CH_IDX_ALGO_2 == 1)
-  [RT_DEBUG_LLHWC_GET_CH_IDX_ALGO_2] = GPIO_DEBUG_LLHWC_GET_CH_IDX_ALGO_2,
-#endif /* USE_RT_DEBUG_LLHWC_GET_CH_IDX_ALGO_2 */
-
-/************************************************/
-/** Application signals in general debug table **/
-/************************************************/
-
-#if (USE_RT_DEBUG_APP_APPE_INIT == 1)
-  [RT_DEBUG_APP_APPE_INIT] = GPIO_DEBUG_APP_APPE_INIT,
-#endif /* USE_RT_DEBUG_OS_TMR_EVNT_CBK */
-};
+extern const st_gpio_debug_t general_debug_table[RT_DEBUG_SIGNALS_TOTAL_NUM];
 
 #endif /* CFG_RT_DEBUG_GPIO_MODULE */
 

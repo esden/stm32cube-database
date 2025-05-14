@@ -15,7 +15,7 @@
 #define __${FamilyName}[#if FamilyName=="STM32WB0" || FamilyName=="STM32WL3"]x[#else]xx[/#if]_IT_H
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif 
 
 /* Private includes ----------------------------------------------------------*/

@@ -54,6 +54,12 @@
  [/#if]
 <HAL_Driver>${HAL_Driver}</HAL_Driver>[#-- modified to give only the hal driver path --]
 <CMSIS>${CMSISPath}</CMSIS> [#-- modified to give only the relatif path to cmsis folder --]
+ [#if ide=="CMake" && CompilerLinker??]
+  <CompilerLinker>${CompilerLinker}</CompilerLinker>
+  [/#if]
+  [#if IsMigrated??]
+      <IsMigrated>true</IsMigrated>
+  [/#if]
 [#-- list of toolchains to be generated: EWARM,MDK-ARM,TrueSTUDIO,RIDE: This tag can contain one or more than one toolchain: EWARM,MDK-ARM,TrueSTUDIO,RIDE --]
 
     <Toolchain>${ide}</Toolchain>

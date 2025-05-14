@@ -10,10 +10,6 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
-[#assign PG_FILL_UCS = "False"]
-[#assign PG_BSP_NUCLEO_WBA52CG = 0]
-[#assign PG_VALIDATION = 0]
-[#assign PG_SKIP_LIST = "False"]
 [#assign myHash = {}]
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
@@ -31,10 +27,8 @@ Key: ${key}; Value: ${myHash[key]}
 
 #include "app_common.h"
 #include "bleplat.h"
-[#if (myHash["USE_SNVMA_NVM"]?number != 0)]
-#include "nvm.h"
-[/#if]
 [#if (myHash["BLE_MODE_SIMPLEST_BLE"] != "Enabled")]
+#include "nvm.h"
 #include "baes.h"
 #include "bpka.h"
 #include "ble_timer.h"
@@ -68,7 +62,7 @@ int BLEPLAT_NvmAdd( uint8_t type,
                     const uint8_t* extra_data,
                     uint16_t extra_size )
 {
-[#if (myHash["USE_SNVMA_NVM"]?number != 0)]
+[#if (myHash["BLE_MODE_SIMPLEST_BLE"] != "Enabled")]
   return NVM_Add( type, data, size, extra_data, extra_size );
 [#else]
   return 0;
@@ -84,13 +78,9 @@ int BLEPLAT_NvmGet( uint8_t mode,
                     uint16_t size )
 {
 [#if (myHash["BLE_MODE_SIMPLEST_BLE"] != "Enabled")]
-[#if (myHash["USE_SNVMA_NVM"]?number != 0)]
   return NVM_Get( mode, type, offset, data, size );
 [#else]
-  return 0;
-[/#if]
-[#else]
-  return -3; // Simulate end of NVM  
+  return -3; /* Simulate end of NVM  */
 [/#if]
 }
 
@@ -100,7 +90,7 @@ int BLEPLAT_NvmCompare( uint16_t offset,
                         const uint8_t* data,
                         uint16_t size )
 {
-[#if (myHash["USE_SNVMA_NVM"]?number != 0)]
+[#if (myHash["BLE_MODE_SIMPLEST_BLE"] != "Enabled")]
   return NVM_Compare( offset, data, size );
 [#else]
   return 0;
@@ -111,7 +101,7 @@ int BLEPLAT_NvmCompare( uint16_t offset,
 
 void BLEPLAT_NvmDiscard( uint8_t mode )
 {
-[#if (myHash["USE_SNVMA_NVM"]?number != 0)]
+[#if (myHash["BLE_MODE_SIMPLEST_BLE"] != "Enabled")]
   NVM_Discard( mode );
 [#else]
   return;
@@ -253,11 +243,11 @@ void BPKACB_Complete( void )
 [/#if]
 /*****************************************************************************/
 
-uint8_t BLEPLAT_TimerStart( uint16_t layer,
+uint8_t BLEPLAT_TimerStart( uint16_t id,
                             uint32_t timeout )
 {
 [#if (myHash["BLE_MODE_SIMPLEST_BLE"] != "Enabled")]
-  return BLE_TIMER_Start( layer, timeout );
+  return BLE_TIMER_Start( id, timeout );
 [#else]
   return 0;
 [/#if]
@@ -265,10 +255,10 @@ uint8_t BLEPLAT_TimerStart( uint16_t layer,
 
 /*****************************************************************************/
 
-void BLEPLAT_TimerStop( uint16_t layer )
+void BLEPLAT_TimerStop( uint16_t id )
 {
 [#if (myHash["BLE_MODE_SIMPLEST_BLE"] != "Enabled")]
-  BLE_TIMER_Stop( layer );
+  BLE_TIMER_Stop( id );
 [#else]
   return;
 [/#if]

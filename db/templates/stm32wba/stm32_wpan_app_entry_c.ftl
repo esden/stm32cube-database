@@ -10,10 +10,6 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
-[#assign PG_FILL_UCS = "False"]
-[#assign PG_BSP_NUCLEO_WBA52CG = 0]
-[#assign PG_VALIDATION = 0]
-[#assign PG_SKIP_LIST = "False"]
 [#assign myHash = {}]
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
@@ -113,12 +109,12 @@ Key: ${key}; Value: ${myHash[key]}
 [#if (myHash["BLE"] == "Enabled")]
 #include "bpka.h"
 [/#if]
-[#if (myHash["BLE"] == "Enabled") || ((myHash["ZIGBEE"] == "Enabled") && (myHash["USE_SNVMA_NVM"]?number != 0))]
+[#if (myHash["USE_FLASH_MANAGER"]?number != 0)]
 #include "flash_driver.h"
 #include "flash_manager.h"
+[/#if]
 [#if (myHash["USE_SNVMA_NVM"]?number != 0)]
 #include "simple_nvm_arbiter.h"
-[/#if]
 [/#if]
 [#if (myHash["BLE"] == "Enabled")]
 #include "app_debug.h"
@@ -158,43 +154,18 @@ extern void vPortSetupTimerInterrupt(void);
 extern void ll_sys_mac_cntrl_init( void );
 [/#if]
 /* USER CODE BEGIN Includes */
-[#if PG_FILL_UCS == "True"]
-[#if PG_BSP_NUCLEO_WBA52CG == 1]
-#include "stm32wbaxx_nucleo.h"
-[/#if]
-[/#if]
 
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 
 /* USER CODE BEGIN PTD */
-[#if PG_FILL_UCS == "True"]
-[#if PG_BSP_NUCLEO_WBA52CG == 1]
-#if (CFG_BUTTON_SUPPORTED == 1)
-typedef struct
-{
-  Button_TypeDef      button;
-  UTIL_TIMER_Object_t longTimerId;
-  uint8_t             longPressed;
-} ButtonDesc_t;
-#endif /* (CFG_BUTTON_SUPPORTED == 1) */
-[/#if]
-[/#if]
 
 /* USER CODE END PTD */
 
 /* Private defines -----------------------------------------------------------*/
 
 /* USER CODE BEGIN PD */
-[#if PG_FILL_UCS == "True"]
-[#if PG_BSP_NUCLEO_WBA52CG == 1]
-#if (CFG_BUTTON_SUPPORTED == 1)
-#define BUTTON_LONG_PRESS_THRESHOLD_MS   (500u)
-#define BUTTON_NB_MAX                    (B3 + 1u)
-#endif
-[/#if]
-[/#if]
 
 /* USER CODE END PD */
 
@@ -214,20 +185,29 @@ const uint32_t FW_Version = (CFG_FW_MAJOR_VERSION << 24) + (CFG_FW_MINOR_VERSION
 + (CFG_FW_BRANCH << 4) + CFG_FW_BUILD;
 
 [/#if]
-[#if (myHash["SEQUENCER_STATUS"]?number == 1)]
 #if ( CFG_LPM_LEVEL != 0)
 static bool system_startup_done = FALSE;
 #endif /* ( CFG_LPM_LEVEL != 0) */
-[#elseif (myHash["FREERTOS_STATUS"]?number == 1)]
+[#if (myHash["FREERTOS_STATUS"]?number == 1)]
 #if ( CFG_LPM_LEVEL != 0)
-static bool system_startup_done = FALSE;
 /* Holds maximum number of FreeRTOS tick periods that can be suppressed */
 static uint32_t maximumPossibleSuppressedTicks = 0;
 #endif /* ( CFG_LPM_LEVEL != 0) */
 [/#if]
 
 #if (CFG_LOG_SUPPORTED != 0)
-/* Log configuration */
+/* Log configuration
+ * .verbose_level can be any value of the Log_Verbose_Level_t enum.
+ * .region_mask can either be :
+ * - LOG_REGION_ALL_REGIONS to enable all regions
+ * or
+ * - One or several specific regions (any value except LOG_REGION_ALL_REGIONS)
+ *   from the Log_Region_t enum and matching the mask value.
+ *
+ *   For example, to enable both LOG_REGION_BLE and LOG_REGION_APP,
+ *   the value assigned to the define is :
+ *   (1U << LOG_REGION_BLE | 1U << LOG_REGION_APP)
+ */
 static Log_Module_t Log_Module_Config = { .verbose_level = APPLI_CONFIG_LOG_LEVEL, .region_mask = APPLI_CONFIG_LOG_REGION };
 #endif /* (CFG_LOG_SUPPORTED != 0) */
 
@@ -236,7 +216,6 @@ static Log_Module_t Log_Module_Config = { .verbose_level = APPLI_CONFIG_LOG_LEVE
 static uint32_t AMM_Pool[CFG_AMM_POOL_SIZE];
 static AMM_VirtualMemoryConfig_t vmConfig[CFG_AMM_VIRTUAL_MEMORY_NUMBER] =
 {
-[#if PG_SKIP_LIST == "False"]
 [#list 1..(myHash["CFG_AMM_VIRTUAL_MEMORY_NUMBER"]?number) as i]
   /* Virtual Memory #${i} */
   {
@@ -244,18 +223,6 @@ static AMM_VirtualMemoryConfig_t vmConfig[CFG_AMM_VIRTUAL_MEMORY_NUMBER] =
     .BufferSize = CFG_AMM_VIRTUAL_${myHash["CFG_AMM_VIRTUAL_ID_NAME_"+i?string]}_BUFFER_SIZE
   },
 [/#list]
-[#else]
-  /* Virtual Memory #1 */
-  {
-    .Id = CFG_AMM_VIRTUAL_STACK_BLE,
-    .BufferSize = CFG_AMM_VIRTUAL_STACK_BLE_BUFFER_SIZE
-  },
-  /* Virtual Memory #2 */
-  {
-    .Id = CFG_AMM_VIRTUAL_APP_BLE,
-    .BufferSize = CFG_AMM_VIRTUAL_APP_BLE_BUFFER_SIZE
-  },
-[/#if]
 };
 
 static AMM_InitParameters_t ammInitConfig =
@@ -318,7 +285,22 @@ static const osSemaphoreAttr_t RngSemaphore_attributes = {
   .cb_size      = TASK_DEFAULT_CB_SIZE
 };
 
-[#if (myHash["BLE"] == "Enabled")]
+[#if (myHash["ZIGBEE"] == "Enabled") ]
+osThreadId_t          AppliTaskHandle;
+
+const osThreadAttr_t AppliTask_attributes = 
+{
+  .name         = "Application Task",
+  .priority     = TASK_PRIO_ZIGBEE_APP_START,
+  .stack_size   = TASK_STACK_SIZE_ZIGBEE_APP_START,
+  .attr_bits    = TASK_DEFAULT_ATTR_BITS,
+  .cb_mem       = TASK_DEFAULT_CB_MEM,
+  .cb_size      = TASK_DEFAULT_CB_SIZE,
+  .stack_mem    = TASK_DEFAULT_STACK_MEM,
+};
+
+[/#if]
+[#if (myHash["USE_FLASH_MANAGER"]?number != 0)]
 static osThreadId_t     FlashManagerTaskHandle;
 static osSemaphoreId_t  FlashManagerSemaphore;
 
@@ -346,8 +328,8 @@ static osSemaphoreId_t  BpkaSemaphore;
 
 static const osThreadAttr_t BpkaTask_attributes = {
   .name         = "BPKA Task",
-  .priority     = TASK_PRIO_RNG,
-  .stack_size   = TASK_STACK_SIZE_RNG,
+  .priority     = TASK_PRIO_BPKA,
+  .stack_size   = TASK_STACK_SIZE_BPKA,
   .attr_bits    = TASK_DEFAULT_ATTR_BITS,
   .cb_mem       = TASK_DEFAULT_CB_MEM,
   .cb_size      = TASK_DEFAULT_CB_SIZE,
@@ -373,6 +355,7 @@ static const osMutexAttr_t crcCtrlMutex_attributes = {
 };
 
 [/#if]
+[#if (myHash["USE_TEMPERATURE_BASED_RADIO_CALIBRATION"]?number == 1)]
 #if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)
 static osMutexId_t      adcCtrlMutex;
 
@@ -383,6 +366,7 @@ static const osMutexAttr_t adcCtrlMutex_attributes = {
   .cb_size      = TASK_DEFAULT_CB_SIZE
 };
 #endif /* USE_TEMPERATURE_BASED_RADIO_CALIBRATION */
+[/#if]
 [/#if]
 [#if myHash["THREADX_STATUS"]?number == 1 ]
 /* ThreadX objects declaration */
@@ -396,10 +380,10 @@ static TX_THREAD      RngTaskHandle;
 static TX_SEMAPHORE   RngSemaphore;
 
 [#if myHash["ZIGBEE"] == "Enabled" || (myHash["ZIGBEE_SKELETON"] == "Enabled") || (myHash["mac_802_15_4_SKELETON"] == "Enabled")]
-static TX_THREAD      AppliStartThread;
+static TX_THREAD      AppliTaskHandle;
 
 [/#if]
-[#if (myHash["BLE"] == "Enabled")]
+[#if (myHash["USE_FLASH_MANAGER"]?number != 0)]
 static TX_THREAD      FlashManagerTaskHandle;
 static TX_SEMAPHORE   FlashManagerSemaphore;
 
@@ -417,18 +401,14 @@ static TX_MUTEX       crcCtrlMutex;
 #if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)
 static TX_MUTEX       adcCtrlMutex;
 #endif /* USE_TEMPERATURE_BASED_RADIO_CALIBRATION */
+
 [/#if]
+#if (CFG_LPM_STDBY_SUPPORTED > 0)
+static TX_THREAD      IdleTaskHandle;
+#endif
 [/#if]
 
 /* USER CODE BEGIN PV */
-[#if PG_FILL_UCS == "True"]
-[#if PG_BSP_NUCLEO_WBA52CG == 1]
-#if (CFG_BUTTON_SUPPORTED == 1)
-/* Button management */
-static ButtonDesc_t buttonDesc[BUTTON_NB_MAX];
-#endif
-[/#if]
-[/#if]
 
 /* USER CODE END PV */
 
@@ -479,7 +459,7 @@ static void RNG_Task_Entry(void* argument);
 static void RNG_Task_Entry(ULONG lArgument);
 [/#if]
 
-[#if (myHash["BLE"] == "Enabled") || ((myHash["ZIGBEE"] == "Enabled") && (myHash["USE_SNVMA_NVM"]?number != 0))]
+[#if (myHash["USE_FLASH_MANAGER"]?number != 0)]
 static void APPE_FLASH_MANAGER_Init( void );
 [#if myHash["FREERTOS_STATUS"]?number == 1 ]
 static void FLASH_Manager_Task_Entry(void* argument);
@@ -502,6 +482,10 @@ static void BPKA_Task_Entry(ULONG lArgument);
 [/#if]
 
 [#if myHash["THREADX_STATUS"]?number == 1 ]
+#if (CFG_LPM_STDBY_SUPPORTED > 0)
+static void IDLE_Task_Entry(ULONG lArgument);
+#endif
+
 #ifndef TX_LOW_POWER_USER_ENTER
 void ThreadXLowPowerUserEnter( void );
 #endif
@@ -518,15 +502,7 @@ static uint32_t getCurrentTime(void);
 [/#if]
 
 /* USER CODE BEGIN PFP */
-[#if PG_FILL_UCS == "True"]
-#if (CFG_LED_SUPPORTED == 1)
-static void Led_Init(void);
-#endif
-#if (CFG_BUTTON_SUPPORTED == 1)
-static void Button_Init(void);
-static void Button_TriggerActions(void *arg);
-#endif
-[/#if]
+
 /* USER CODE END PFP */
 
 /* External variables --------------------------------------------------------*/
@@ -562,22 +538,18 @@ void MX_APPE_LinkLayerInit(void)
 
 }
 
-[#if myHash["THREADX_STATUS"]?number == 1 ]
+[#if (myHash["THREADX_STATUS"]?number == 1) || (myHash["FREERTOS_STATUS"]?number == 1)]
 /**
  * @brief   System Tasks Initialisations
  */
+[#if myHash["THREADX_STATUS"]?number == 1]
 void MX_APPE_InitTask( ULONG lArgument )
+[/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1]
+void MX_APPE_InitTask( void * argument )
+[/#if]
 {
   /* USER CODE BEGIN APPE_Init_Task_1 */
-[#if PG_FILL_UCS == "True"]  
-  /* Initialize Peripherals */
-#if (CFG_LED_SUPPORTED == 1)
-  Led_Init();
-#endif // (CFG_LED_SUPPORTED == 1)
-#if (CFG_BUTTON_SUPPORTED == 1)
-  Button_Init();
-#endif // (CFG_BUTTON_SUPPORTED == 1)
-[/#if]
 
   /* USER CODE END APPE_Init_Task_1 */
 
@@ -585,15 +557,21 @@ void MX_APPE_InitTask( ULONG lArgument )
   MX_APPE_LinkLayerInit();
 
   /* Initialization of the Zigbee Application */
-  /* Must be called in thread context
+  /* Must be called in RTOS context
      due to dependency of ZbInit() on MAC layer semaphore */
   APP_ZIGBEE_ApplicationInit();
 
   /* USER CODE BEGIN APPE_Init_Task_2 */
   /* USER CODE END APPE_Init_Task_2 */
 
+[#if myHash["THREADX_STATUS"]?number == 1]
   /* Free allocated stack before entering completed state */
-  tx_byte_release(AppliStartThread.tx_thread_stack_start);
+  tx_byte_release(AppliTaskHandle.tx_thread_stack_start);
+[/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1]
+  /* FreeRTOS hard fault if task simply returns... */
+  osThreadExit();
+[/#if]
 }
 
 [/#if]
@@ -645,29 +623,12 @@ uint32_t MX_APPE_Init(void *p_param)
   /* Initialize the Random Number Generator module */
   APPE_RNG_Init();
 
-[#if (myHash["BLE"] == "Enabled") || ((myHash["ZIGBEE"] == "Enabled") && (myHash["USE_SNVMA_NVM"]?number != 0))]
+[#if (myHash["USE_FLASH_MANAGER"]?number != 0)]
   /* Initialize the Flash Manager module */
   APPE_FLASH_MANAGER_Init();
 
-  /* Disable flash before any use - RFTS */
-  FD_SetStatus (FD_FLASHACCESS_RFTS, LL_FLASH_DISABLE);
-  /* Enable RFTS Bypass for flash operation - Since LL has not started yet */
-  FD_SetStatus (FD_FLASHACCESS_RFTS_BYPASS, LL_FLASH_ENABLE);
-  /* Enable flash system flag */
-  FD_SetStatus (FD_FLASHACCESS_SYSTEM, LL_FLASH_ENABLE);
-
 [/#if]
   /* USER CODE BEGIN APPE_Init_1 */
-[#if PG_FILL_UCS == "True"]
-[#if PG_BSP_NUCLEO_WBA52CG == 1]
-#if (CFG_LED_SUPPORTED == 1)
-  Led_Init();
-#endif
-#if (CFG_BUTTON_SUPPORTED == 1)
-  Button_Init();
-#endif
-[/#if]
-[/#if]
 
   /* USER CODE END APPE_Init_1 */
 
@@ -714,7 +675,8 @@ uint32_t MX_APPE_Init(void *p_param)
   /* Initialize the Ble Public Key Accelerator module */
   APPE_BPKA_Init();
 
-[#if ((myHash["BLE"] == "Enabled") && (myHash["USE_SNVMA_NVM"]?number != 0)) || ((myHash["ZIGBEE"] == "Enabled") && (myHash["USE_SNVMA_NVM"]?number != 0))]
+[/#if]
+[#if (myHash["USE_SNVMA_NVM"]?number != 0)]
   /* Initialize the Simple Non Volatile Memory Arbiter */
   if( SNVMA_Init((uint32_t *)CFG_SNVMA_START_ADDRESS) != SNVMA_ERROR_OK )
   {
@@ -722,17 +684,19 @@ uint32_t MX_APPE_Init(void *p_param)
   }
 
 [/#if]
+[#if (myHash["BLE"] == "Enabled")]
 
   APP_BLE_Init();
 
+[#if (myHash["USE_FLASH_MANAGER"]?number != 0)]
   /* Disable RFTS Bypass for flash operation - Since LL has not started yet */
   FD_SetStatus (FD_FLASHACCESS_RFTS_BYPASS, LL_FLASH_DISABLE);
+[/#if]
 [/#if]
 
 [#if (myHash["THREAD"] == "Enabled")]
   /* Thread Initialisation */
   APP_THREAD_Init();
-  ll_sys_config_params();
 [/#if]
 [#if myHash["FREERTOS_STATUS"]?number == 1 ]
   /* create a SW timer to wakeup system from low power */
@@ -741,7 +705,7 @@ uint32_t MX_APPE_Init(void *p_param)
                     UTIL_TIMER_ONESHOT,
                     &TimerOSwakeupCB, 0);
 #if ( CFG_LPM_LEVEL != 0)
-  maximumPossibleSuppressedTicks = UINT32_MAX;// TODO check this value
+  maximumPossibleSuppressedTicks = UINT32_MAX;
 #endif /* ( CFG_LPM_LEVEL != 0) */
 [/#if]
 
@@ -761,7 +725,7 @@ uint32_t MX_APPE_Init(void *p_param)
   TXstatus = tx_byte_allocate( pBytePool, (VOID**) &pStack, TASK_STACK_SIZE_ZIGBEE_APP_START, TX_NO_WAIT);
   if ( TXstatus == TX_SUCCESS )
   {
-    TXstatus = tx_thread_create( &AppliStartThread, "AppliStart Thread", MX_APPE_InitTask, 0, pStack,
+    TXstatus = tx_thread_create( &AppliTaskHandle, "AppliStart Thread", MX_APPE_InitTask, 0, pStack,
                                        TASK_STACK_SIZE_ZIGBEE_APP_START, TASK_PRIO_ZIGBEE_APP_START, TASK_PREEMP_ZIGBEE_APP_START,
                                        TX_NO_TIME_SLICE, TX_AUTO_START);
   }
@@ -770,6 +734,16 @@ uint32_t MX_APPE_Init(void *p_param)
     LOG_ERROR_APP( "ERROR THREADX : APPLICATION START THREAD CREATION FAILED (%d)", TXstatus );
     Error_Handler();
   }
+[/#if]
+[#if (myHash["ZIGBEE"] == "Enabled") && (myHash["FREERTOS_STATUS"]?number == 1)]
+  /* Create the Appli Task Thread  */
+  AppliTaskHandle = osThreadNew( MX_APPE_InitTask, NULL, &AppliTask_attributes );
+  if ( AppliTaskHandle == NULL )
+  { 
+    APP_DBG( "ERROR FREERTOS : APPLICATION START THREAD CREATION FAILED" );
+    while(1);
+  }
+
 [/#if]
 [/#if]
 [#if (myHash["BLE_MODE_TRANSPARENT_UART"] == "Enabled")]
@@ -810,60 +784,6 @@ void MX_APPE_Process(void)
 [/#if]
 
 /* USER CODE BEGIN FD */
-[#if PG_FILL_UCS == "True"]
-[#if PG_BSP_NUCLEO_WBA52CG == 1]
-#if (CFG_BUTTON_SUPPORTED == 1)
-/**
- * @brief   Indicate if the selected button was pressedn during a 'long time' or not.
- *
- * @param   btnIdx    Button to test, listed in enum Button_TypeDef
- * @return  '1' if pressed during a 'long time', else '0'.
- */
-uint8_t APPE_ButtonIsLongPressed(uint16_t btnIdx)
-{
-  uint8_t pressStatus;
-
-  if ( btnIdx < BUTTON_NB_MAX )
-  {
-    pressStatus = buttonDesc[btnIdx].longPressed;
-  }
-  else
-  {
-    pressStatus = 0;
-  }
-
-  return pressStatus;
-}
-
-/**
- * @brief  Action of button 1 when pressed, to be implemented by user.
- * @param  None
- * @retval None
- */
-__WEAK void APPE_Button1Action(void)
-{
-}
-
-/**
- * @brief  Action of button 2 when pressed, to be implemented by user.
- * @param  None
- * @retval None
- */
-__WEAK void APPE_Button2Action(void)
-{
-}
-
-/**
- * @brief  Action of button 3 when pressed, to be implemented by user.
- * @param  None
- * @retval None
- */
-__WEAK void APPE_Button3Action(void)
-{
-}
-#endif
-[/#if]
-[/#if]
 
 /* USER CODE END FD */
 
@@ -902,6 +822,7 @@ static void System_Init( void )
   /* Clear RCC RESET flag */
   LL_RCC_ClearResetFlags();
 
+  /* Initialize the Timer Server */
   UTIL_TIMER_Init();
 
   /* Enable wakeup out of standby from RTC ( UTIL_TIMER )*/
@@ -951,12 +872,15 @@ ${""?right_pad(2)}${void.functionName}();
   RT_DEBUG_DTBInit();
   RT_DEBUG_DTBConfig();
 #endif /* CFG_RT_DEBUG_DTB */
+#if(CFG_RT_DEBUG_GPIO_MODULE == 1)
+  /* RT DEBUG GPIO_Init */
+  RT_DEBUG_GPIO_Init();
+#endif /* (CFG_RT_DEBUG_GPIO_MODULE == 1) */
 
-[#if ( (myHash["SEQUENCER_STATUS"]?number == 1) || (myHash["FREERTOS_STATUS"]?number == 1) )]
 #if ( CFG_LPM_LEVEL != 0)
   system_startup_done = TRUE;
+  UNUSED(system_startup_done);
 #endif /* ( CFG_LPM_LEVEL != 0) */
-[/#if]
 
   return;
 }
@@ -1003,22 +927,42 @@ static void SystemPower_Config(void)
   /* Initialize low Power Manager. By default enabled */
   UTIL_LPM_Init();
 
-#if (CFG_LPM_STDBY_SUPPORTED == 1)
+#if (CFG_LPM_STDBY_SUPPORTED > 0)
   /* Enable SRAM1, SRAM2 and RADIO retention*/
   LL_PWR_SetSRAM1SBRetention(LL_PWR_SRAM1_SB_FULL_RETENTION);
   LL_PWR_SetSRAM2SBRetention(LL_PWR_SRAM2_SB_FULL_RETENTION);
   LL_PWR_SetRadioSBRetention(LL_PWR_RADIO_SB_FULL_RETENTION); /* Retain sleep timer configuration */
 
 [#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled")]
-#else /* (CFG_LPM_STDBY_SUPPORTED == 1) */
+#else /* (CFG_LPM_STDBY_SUPPORTED > 0) */
   UTIL_LPM_SetOffMode(1U << CFG_LPM_APP, UTIL_LPM_DISABLE);
-#endif /* (CFG_LPM_STDBY_SUPPORTED == 1) */
+#endif /* (CFG_LPM_STDBY_SUPPORTED > 0) */
 [#else]
-#endif /* (CFG_LPM_STDBY_SUPPORTED == 1) */
+#endif /* (CFG_LPM_STDBY_SUPPORTED > 0) */
 
   /* Disable LowPower during Init */
   UTIL_LPM_SetStopMode(1U << CFG_LPM_APP, UTIL_LPM_DISABLE);
   UTIL_LPM_SetOffMode(1U << CFG_LPM_APP, UTIL_LPM_DISABLE);
+[/#if]
+[#if myHash["THREADX_STATUS"]?number == 1]
+
+#if (CFG_LPM_STDBY_SUPPORTED > 0)
+  UINT TXstatus = tx_byte_allocate(pBytePool, (void **)&pStack, TASK_STACK_SIZE_IDLE, TX_NO_WAIT);
+
+  if( TXstatus == TX_SUCCESS )
+  {
+    TXstatus = tx_thread_create(&IdleTaskHandle, "IDLE Task", IDLE_Task_Entry, 0,
+                                 pStack, TASK_STACK_SIZE_IDLE,
+                                 TASK_PRIO_IDLE, TASK_PREEMP_IDLE,
+                                 TX_NO_TIME_SLICE, TX_AUTO_START);
+  }
+
+  if( TXstatus != TX_SUCCESS )
+  {
+    LOG_ERROR_APP( "IDLE ThreadX objects creation FAILED, status: %d", TXstatus);
+    Error_Handler();
+  }
+#endif /* (CFG_LPM_STDBY_SUPPORTED > 0) */
 [/#if]
 #endif /* (CFG_LPM_LEVEL != 0)  */
 
@@ -1037,7 +981,6 @@ static void RNG_Task_Entry(void *argument)
   {
     osSemaphoreAcquire(RngSemaphore, osWaitForever);
     HW_RNG_Process();
-    osThreadYield();
   }
 }
 [/#if]
@@ -1072,9 +1015,9 @@ static void APPE_RNG_Init(void)
 
   /* Create Random Number Generator FreeRTOS objects */
 
-  RngTaskHandle = osThreadNew(RNG_Task_Entry, NULL, &RngTask_attributes);
-
   RngSemaphore = osSemaphoreNew(1U, 0U, &RngSemaphore_attributes);
+
+  RngTaskHandle = osThreadNew(RNG_Task_Entry, NULL, &RngTask_attributes);
 
   if ((RngTaskHandle == NULL) || (RngSemaphore == NULL))
   {
@@ -1112,7 +1055,7 @@ static void APPE_RNG_Init(void)
 }
 [/#if]
 
-[#if (myHash["BLE"] == "Enabled") || ((myHash["ZIGBEE"] == "Enabled") && (myHash["USE_SNVMA_NVM"]?number != 0))]
+[#if (myHash["USE_FLASH_MANAGER"]?number != 0)]
 /**
  * @brief Initialize Flash Manager module
  */
@@ -1121,13 +1064,14 @@ static void APPE_FLASH_MANAGER_Init(void)
 [#if myHash["SEQUENCER_STATUS"]?number == 1 ]
   /* Register Flash Manager task */
   UTIL_SEQ_RegTask(1U << CFG_TASK_FLASH_MANAGER, UTIL_SEQ_RFU, FM_BackgroundProcess);
+
 [/#if]
 [#if myHash["FREERTOS_STATUS"]?number == 1 ]
   /* Create Flash Manager FreeRTOS objects */
 
-  FlashManagerTaskHandle = osThreadNew(FLASH_Manager_Task_Entry, NULL, &FlashManagerTask_attributes);
-
   FlashManagerSemaphore = osSemaphoreNew(1U, 0U, &FlashManagerSemaphore_attributes);
+
+  FlashManagerTaskHandle = osThreadNew(FLASH_Manager_Task_Entry, NULL, &FlashManagerTask_attributes);
 
   if ((FlashManagerTaskHandle == NULL) || (FlashManagerSemaphore == NULL))
   {
@@ -1139,11 +1083,11 @@ static void APPE_FLASH_MANAGER_Init(void)
 [#if myHash["THREADX_STATUS"]?number == 1 ]
   UINT TXstatus;
   CHAR *pStack;
-  
+
   /* Create Flash Manager ThreadX objects */
-  
+
   TXstatus = tx_byte_allocate(pBytePool, (void **)&pStack, TASK_STACK_SIZE_FLASH_MANAGER, TX_NO_WAIT);
-  
+
   if( TXstatus == TX_SUCCESS )
   {
     TXstatus = tx_thread_create(&FlashManagerTaskHandle, "FLASH Manager Task", FLASH_Manager_Task_Entry, 0,
@@ -1153,13 +1097,22 @@ static void APPE_FLASH_MANAGER_Init(void)
                                  
     TXstatus |= tx_semaphore_create(&FlashManagerSemaphore, "FLASH Manager Semaphore", 0);
   }
-  
+
   if( TXstatus != TX_SUCCESS )
   {
     LOG_ERROR_APP( "FLASH ThreadX objects creation FAILED, status: %d", TXstatus);
     Error_Handler();
   }
+
 [/#if]
+  /* Disable flash before any use - RFTS */
+  FD_SetStatus (FD_FLASHACCESS_RFTS, LL_FLASH_DISABLE);
+  /* Enable RFTS Bypass for flash operation - Since LL has not started yet */
+  FD_SetStatus (FD_FLASHACCESS_RFTS_BYPASS, LL_FLASH_ENABLE);
+  /* Enable flash system flag */
+  FD_SetStatus (FD_FLASHACCESS_SYSTEM, LL_FLASH_ENABLE);
+
+  return;
 }
 [/#if]
 
@@ -1176,9 +1129,9 @@ static void APPE_BPKA_Init(void)
 [#if myHash["FREERTOS_STATUS"]?number == 1 ]
   /* Create Ble Public Key Accelerator FreeRTOS objects */
   
-  BpkaTaskHandle = osThreadNew(BPKA_Task_Entry, NULL, &BpkaTask_attributes);
-  
   BpkaSemaphore = osSemaphoreNew(1U, 0U, &BpkaSemaphore_attributes);
+  
+  BpkaTaskHandle = osThreadNew(BPKA_Task_Entry, NULL, &BpkaTask_attributes);
 
   if ((BpkaTaskHandle == NULL) || (BpkaSemaphore == NULL))
   {
@@ -1236,9 +1189,9 @@ static void APPE_AMM_Init(void)
 
   /* Create Advance Memory Manager FreeRTOS objects */
 
-  AmmTaskHandle = osThreadNew(AMM_Task_Entry, NULL, &AmmTask_attributes);
-
   AmmSemaphore = osSemaphoreNew(1U, 0U, &AmmSemaphore_attributes);
+
+  AmmTaskHandle = osThreadNew(AMM_Task_Entry, NULL, &AmmTask_attributes);
   
   if ((AmmTaskHandle == NULL) || (AmmSemaphore == NULL))
   {
@@ -1287,7 +1240,6 @@ static void AMM_Task_Entry(void* argument)
   {
     osSemaphoreAcquire(AmmSemaphore, osWaitForever);
     AMM_BackgroundProcess();
-    osThreadYield();
   }
 }
 [/#if]
@@ -1306,7 +1258,7 @@ static void AMM_Task_Entry(ULONG lArgument)
 [/#if]
 [/#if]
 
-[#if (myHash["BLE"] == "Enabled")]
+[#if (myHash["USE_FLASH_MANAGER"]?number != 0)]
 [#if myHash["FREERTOS_STATUS"]?number == 1 ]
 static void FLASH_Manager_Task_Entry(void* argument)
 {
@@ -1316,7 +1268,6 @@ static void FLASH_Manager_Task_Entry(void* argument)
   {
     osSemaphoreAcquire(FlashManagerSemaphore, osWaitForever);
     FM_BackgroundProcess();
-    osThreadYield();
   }
 }
 [/#if]
@@ -1345,7 +1296,6 @@ static void BPKA_Task_Entry(void *argument)
   {
     osSemaphoreAcquire(BpkaSemaphore, osWaitForever);
     BPKA_BG_Process();
-    osThreadYield();
   }
 }
 
@@ -1364,6 +1314,27 @@ static void BPKA_Task_Entry(ULONG lArgument)
 }
 
 [/#if]
+[/#if]
+[#if myHash["THREADX_STATUS"]?number == 1 ]
+#if (CFG_LPM_STDBY_SUPPORTED > 0)
+static void IDLE_Task_Entry(ULONG lArgument)
+{
+  UNUSED(lArgument);
+
+  while(1)
+  {
+    /* When no other activities to be done we decide to go in low power 
+       This mechansim is in charge to mange low power at application level
+       without the support of ThreadX low power framework */
+    UTILS_ENTER_CRITICAL_SECTION();
+    ThreadXLowPowerUserEnter();
+    ThreadXLowPowerUserExit();
+    UTILS_EXIT_CRITICAL_SECTION();
+    tx_thread_relinquish();
+  }
+}
+#endif
+
 [/#if]
 [#if myHash["FREERTOS_STATUS"]?number == 1 ]
 /* OS tick callback */
@@ -1396,152 +1367,6 @@ static uint32_t getCurrentTime(void)
 [/#if]
 
 /* USER CODE BEGIN FD_LOCAL_FUNCTIONS */
-[#if PG_FILL_UCS == "True"]
-[#if PG_BSP_NUCLEO_WBA52CG == 1]
-#if (CFG_LED_SUPPORTED == 1)
-static void Led_Init( void )
-{
-  /* Leds Initialization */
-  BSP_LED_Init(LED_BLUE);
-  BSP_LED_Init(LED_GREEN);
-  BSP_LED_Init(LED_RED);
-
-  BSP_LED_On(LED_GREEN);
-
-  return;
-}
-#endif
-
-[#if PG_FILL_UCS == "True"]
-#if (CFG_BUTTON_SUPPORTED == 1)
-static void Button_Init( void )
-{
-[#if PG_BSP_NUCLEO_WBA52CG == 1]
-  /* Button Initialization */
-  buttonDesc[B1].button = B1;
-  buttonDesc[B2].button = B2;
-  buttonDesc[B3].button = B3;
-  BSP_PB_Init(B1, BUTTON_MODE_EXTI);
-  BSP_PB_Init(B2, BUTTON_MODE_EXTI);
-  BSP_PB_Init(B3, BUTTON_MODE_EXTI);
-
-[#if myHash["SEQUENCER_STATUS"]?number == 1 ]
-  /* Register tasks associated to buttons */
-  UTIL_SEQ_RegTask(1U << TASK_BUTTON_1, UTIL_SEQ_RFU, APPE_Button1Action);
-  UTIL_SEQ_RegTask(1U << TASK_BUTTON_2, UTIL_SEQ_RFU, APPE_Button2Action);
-  UTIL_SEQ_RegTask(1U << TASK_BUTTON_3, UTIL_SEQ_RFU, APPE_Button3Action);
-[#elseif myHash["THREADX_STATUS"]?number == 1 ]
-  CHAR * pStack;
-
-  /* Register tasks associated to buttons */
-  if (tx_byte_allocate(pBytePool, (void **) &pStack, PB1_BUTTON_PUSHED_TASK_STACK_SIZE,TX_NO_WAIT) != TX_SUCCESS)
-  {
-    Error_Handler();
-  }
-  if (tx_semaphore_create(&PB1_BUTTON_PUSHED_Thread_Sem, "PB1_BUTTON_PUSHED_Thread_Sem", 0)!= TX_SUCCESS )
-  {
-    Error_Handler();
-  }
-  if (tx_thread_create(&PB1_BUTTON_PUSHED_Thread, "PB1_BUTTON_PUSHED Thread", APPE_Button1Action_Entry, 0,
-                         pStack, PB1_BUTTON_PUSHED_TASK_STACK_SIZE,
-                         PB1_BUTTON_PUSHED_TASK_PRIO, PB1_BUTTON_PUSHED_TASK_PREEM_TRES,
-                         TX_NO_TIME_SLICE, TX_AUTO_START) != TX_SUCCESS)
-  {
-    Error_Handler();
-  }
-
-  if (tx_byte_allocate(pBytePool, (void **) &pStack, PB2_BUTTON_PUSHED_TASK_STACK_SIZE,TX_NO_WAIT) != TX_SUCCESS)
-  {
-    Error_Handler();
-  }
-  if (tx_semaphore_create(&PB2_BUTTON_PUSHED_Thread_Sem, "PB2_BUTTON_PUSHED_Thread_Sem", 0)!= TX_SUCCESS )
-  {
-    Error_Handler();
-  }
-  if (tx_thread_create(&PB2_BUTTON_PUSHED_Thread, "PB2_BUTTON_PUSHED Thread", APPE_Button2Action_Entry, 0,
-                         pStack, PB2_BUTTON_PUSHED_TASK_STACK_SIZE,
-                         PB2_BUTTON_PUSHED_TASK_PRIO, PB2_BUTTON_PUSHED_TASK_PREEM_TRES,
-                         TX_NO_TIME_SLICE, TX_AUTO_START) != TX_SUCCESS)
-  {
-    Error_Handler();
-  }
-
-  if (tx_byte_allocate(pBytePool, (void **) &pStack, PB3_BUTTON_PUSHED_TASK_STACK_SIZE,TX_NO_WAIT) != TX_SUCCESS)
-  {
-    Error_Handler();
-  }
-  if (tx_semaphore_create(&PB3_BUTTON_PUSHED_Thread_Sem, "PB3_BUTTON_PUSHED_Thread_Sem", 0)!= TX_SUCCESS )
-  {
-    Error_Handler();
-  }
-  if (tx_thread_create(&PB3_BUTTON_PUSHED_Thread, "PB3_BUTTON_PUSHED Thread", APPE_Button3Action_Entry, 0,
-                         pStack, PB3_BUTTON_PUSHED_TASK_STACK_SIZE,
-                         PB3_BUTTON_PUSHED_TASK_PRIO, PB3_BUTTON_PUSHED_TASK_PREEM_TRES,
-                         TX_NO_TIME_SLICE, TX_AUTO_START) != TX_SUCCESS)
-  {
-    Error_Handler();
-  }
-[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
-[/#if]
-
-  /* Create timers to detect button long press (one for each button) */
-  Button_TypeDef buttonIndex;
-  for ( buttonIndex = B1; buttonIndex < BUTTON_NB_MAX; buttonIndex++ )
-  {
-    UTIL_TIMER_Create( &buttonDesc[buttonIndex].longTimerId,
-                       0,
-                       UTIL_TIMER_ONESHOT,
-                       &Button_TriggerActions,
-                       &buttonDesc[buttonIndex] );
-  }
-[/#if]
-
-  return;
-}
-
-[#if PG_BSP_NUCLEO_WBA52CG == 1]
-static void Button_TriggerActions(void *arg)
-{
-  ButtonDesc_t *p_buttonDesc = arg;
-
-  p_buttonDesc->longPressed = BSP_PB_GetState(p_buttonDesc->button);
-
-  LOG_INFO_APP("Button %d pressed\n", (p_buttonDesc->button + 1));
-  switch (p_buttonDesc->button)
-  {
-    case B1:
-[#if myHash["SEQUENCER_STATUS"]?number == 1 ]
-      UTIL_SEQ_SetTask(1U << TASK_BUTTON_1, CFG_SEQ_PRIO_0);
-[#elseif myHash["THREADX_STATUS"]?number == 1 ]
-[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
-[/#if]
-      break;
-    case B2:
-[#if myHash["SEQUENCER_STATUS"]?number == 1 ]
-      UTIL_SEQ_SetTask(1U << TASK_BUTTON_2, CFG_SEQ_PRIO_0);
-[#elseif myHash["THREADX_STATUS"]?number == 1 ]
-[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
-[/#if]
-      break;
-    case B3:
-[#if myHash["SEQUENCER_STATUS"]?number == 1 ]
-      UTIL_SEQ_SetTask(1U << TASK_BUTTON_3, CFG_SEQ_PRIO_0);
-[#elseif myHash["THREADX_STATUS"]?number == 1 ]
-[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
-[/#if]
-      break;
-    default:
-      break;
-  }
-
-  return;
-}
-[/#if]
-
-#endif
-[/#if]
-[/#if]
-[/#if]
 
 /* USER CODE END FD_LOCAL_FUNCTIONS */
 
@@ -1713,7 +1538,7 @@ static void AMM_WrapperFree (uint32_t * const p_BufferAddr)
 }
 
 [/#if]
-[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || ((myHash["ZIGBEE"] == "Enabled") && (myHash["USE_SNVMA_NVM"]?number != 0))]
+[#if (myHash["USE_FLASH_MANAGER"]?number != 0)]
 void FM_ProcessRequest(void)
 {
   /* Trigger to call Flash Manager process function */
@@ -1813,14 +1638,31 @@ void ThreadXLowPowerUserEnter( void )
 #if ( CFG_LPM_LEVEL != 0 )
   LL_PWR_ClearFlag_STOP();
 
+#if (CFG_LPM_STDBY_SUPPORTED > 0) 
+  if ( ( system_startup_done != FALSE ) && ( UTIL_LPM_GetMode() == UTIL_LPM_OFFMODE ) )
+  {
+    APP_SYS_BLE_EnterDeepSleep();
+  }
+#endif
+
   LL_RCC_ClearResetFlags();
 
+#if defined(STM32WBAXX_SI_CUT1_0)
   /* Wait until HSE is ready */
-  while ( LL_RCC_HSE_IsReady() == 0 );
+#if (CFG_SCM_SUPPORTED == 1)
+  /* SCM HSE BEGIN */
+  SCM_HSE_WaitUntilReady();
+  /* SCM HSE END */
+#else
+  while (LL_RCC_HSE_IsReady() == 0);
+#endif /* CFG_SCM_SUPPORTED */
 
-  UTILS_ENTER_LIMITED_CRITICAL_SECTION( RCC_INTR_PRIO << 4U );
+  UTILS_ENTER_LIMITED_CRITICAL_SECTION(RCC_INTR_PRIO << 4U);
+
   scm_hserdy_isr();
   UTILS_EXIT_LIMITED_CRITICAL_SECTION();
+#endif /* STM32WBAXX_SI_CUT1_0 */
+
   HAL_SuspendTick();
 
   /* Disable SysTick Interrupt */
@@ -1861,7 +1703,8 @@ void ThreadXLowPowerUserExit( void )
   return;
 }
 
-[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
+[/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
 /* Implement weak function to setup a timer that will trig OS ticks */
 void vPortSetupTimerInterrupt( void )
 {
@@ -1932,9 +1775,11 @@ void vPortSuppressTicksAndSleep( uint32_t xExpectedIdleTime )
       APP_SYS_BLE_EnterDeepSleep();
     }
     
-    LL_RCC_ClearResetFlags();/* TODO check if its necessary -----------------------------------------------------*/
+    LL_RCC_ClearResetFlags();
 
+    HAL_SuspendTick();
     UTIL_LPM_EnterLowPower(); /* WFI instruction call is inside this API */
+    HAL_ResumeTick();
     
     /* Stop the timer that may wakeup us as wakeup source can be another one */
     UTIL_TIMER_Stop(&TimerOSwakeup_Id);
@@ -2222,18 +2067,5 @@ ADCCTRL_Cmd_Status_t ADCCTRL_MutexRelease(void)
 [/#if]
 [/#if]
 /* USER CODE BEGIN FD_WRAP_FUNCTIONS */
-[#if PG_FILL_UCS == "True"]
-[#if PG_BSP_NUCLEO_WBA52CG == 1]
-#if (CFG_BUTTON_SUPPORTED == 1)
-void BSP_PB_Callback(Button_TypeDef Button)
-{
-  buttonDesc[Button].longPressed = 0;
-  UTIL_TIMER_StartWithPeriod(&buttonDesc[Button].longTimerId, BUTTON_LONG_PRESS_THRESHOLD_MS);
-
-  return;
-}
-#endif
-[/#if]
-[/#if]
 
 /* USER CODE END FD_WRAP_FUNCTIONS */

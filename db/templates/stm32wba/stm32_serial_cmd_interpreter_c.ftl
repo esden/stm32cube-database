@@ -10,8 +10,6 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
-[#assign PG_FILL_UCS = "False"]
-[#assign PG_VALIDATION = 0]
 
 /* Includes ------------------------------------------------------------------*/
 #include "log_module.h"
@@ -22,11 +20,6 @@
 
 /* Private includes -----------------------------------------------------------*/
 /* USER CODE BEGIN PI */
-[#if PG_FILL_UCS == "True"]
-[#if PG_VALIDATION == 1]
-#include "stm32wbaxx_nucleo.h"
-[/#if]
-[/#if]
 
 /* USER CODE END PI */
 

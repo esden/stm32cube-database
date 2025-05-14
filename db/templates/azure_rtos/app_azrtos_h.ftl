@@ -91,7 +91,7 @@ extern "C" {
 [#if NX_ENABLED == "true"]
 #include "app_netxduo.h"
 [/#if]
-[#if !FamilyName?lower_case?starts_with("stm32n6")]
+[#if !FamilyName?lower_case?starts_with("stm32n6") && !FamilyName?lower_case?starts_with("stm32wba")]
 [#if UX_HOST_ENABLED == "true"]
 #include "app_usbx_host.h"
 [/#if]
@@ -99,7 +99,7 @@ extern "C" {
 #include "app_usbx_device.h"
 [/#if]
 [/#if]
-[#if FamilyName?lower_case?starts_with("stm32n6")]
+[#if FamilyName?lower_case?starts_with("stm32n6") || FamilyName?lower_case?starts_with("stm32wba")]
 [#if UX_ENABLED == "true"]
 #include "app_usbx.h"
 [/#if]
@@ -155,4 +155,3 @@ extern "C" {
 }
 #endif
 #endif /* APP_AZURE_RTOS_H */
-

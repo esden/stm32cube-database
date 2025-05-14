@@ -321,13 +321,14 @@ static UINT USBD_ChangeFunction(ULONG Device_State);
 [/#if]
   * @retval status
   */
+
 [#if UX_STANDALONE_ENABLED_Value == "1"]
 UINT MX_USBX_Device_Init(VOID)
 [#else]
 UINT MX_USBX_Device_Init(VOID *memory_ptr)
 [/#if]
 {
-  UINT ret = UX_SUCCESS;
+   UINT ret = UX_SUCCESS;
 [#if (REG_UX_DEVICE_CORE_value  == "true") && (USBX_DEVICE_CLASS_NB != 0)]
   UCHAR *device_framework_high_speed;
   UCHAR *device_framework_full_speed;
@@ -339,20 +340,20 @@ UINT MX_USBX_Device_Init(VOID *memory_ptr)
   UCHAR *language_id_framework;
 [/#if]
 
-[#if ((REG_UX_DEVICE_CORE_value  == "true") && (USBX_DEVICE_CLASS_NB != 0) && (UX_STANDALONE_ENABLED_Value == "1") && (AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE_VAL  != "0"))]
+[#if (REG_UX_DEVICE_CORE_value  == "true") && (USBX_DEVICE_CLASS_NB != 0) && (UX_STANDALONE_ENABLED_Value == "1") && !FamilyName?lower_case?starts_with("stm32n6")]
   UCHAR *pointer;
 [/#if]
-[#if AZRTOS_APP_MEM_ALLOCATION_METHOD_VAL  != "0" && UX_STANDALONE_ENABLED_Value == "0" && (((REG_UX_DEVICE_CORE_value == "true") && (USBX_DEVICE_CLASS_NB != 0)) || REG_UX_DEVICE_THREAD_value == "1")]
+[#if (UX_STANDALONE_ENABLED_Value == "0")]
+[#if (REG_UX_DEVICE_CORE_value  == "true" && USBX_DEVICE_CLASS_NB != 0 && !FamilyName?lower_case?starts_with("stm32n6")) || (REG_UX_DEVICE_THREAD_value == "1")]
   UCHAR *pointer;
   TX_BYTE_POOL *byte_pool = (TX_BYTE_POOL*)memory_ptr;
+[/#if]
 [/#if]
 
   /* USER CODE BEGIN MX_USBX_Device_Init0 */
 [#if !FamilyName?lower_case?starts_with("stm32n6")]
 [#if (REG_UX_DEVICE_CORE_value  == "false" && UX_STANDALONE_ENABLED_Value == "1")  ||  (USBX_DEVICE_CLASS_NB == 0 && UX_STANDALONE_ENABLED_Value == "1")]
   UX_PARAMETER_NOT_USED(ux_device_byte_pool_buffer);
-[#else]
-
 [/#if]
 [/#if]
 
@@ -372,6 +373,7 @@ UINT MX_USBX_Device_Init(VOID *memory_ptr)
   pointer = ux_device_byte_pool_buffer;
 [/#if]
 
+[#if !FamilyName?lower_case?starts_with("stm32n6")]
   /* Initialize USBX Memory */
   if (ux_system_initialize(pointer, USBX_DEVICE_MEMORY_STACK_SIZE, UX_NULL, 0) != UX_SUCCESS)
   {
@@ -379,6 +381,8 @@ UINT MX_USBX_Device_Init(VOID *memory_ptr)
     return UX_ERROR;
     /* USER CODE END USBX_SYSTEM_INITIALIZE_ERROR */
   }
+[/#if]
+
 [/#if]
 
   /* Get Device Framework High Speed and get the length */
@@ -422,11 +426,7 @@ UINT MX_USBX_Device_Init(VOID *memory_ptr)
   hid_mouse_parameter.ux_slave_class_hid_instance_deactivate       = USBD_HID_Mouse_Deactivate;
   hid_mouse_parameter.ux_device_class_hid_parameter_report_address = USBD_HID_ReportDesc(INTERFACE_HID_MOUSE);
   hid_mouse_parameter.ux_device_class_hid_parameter_report_length  = USBD_HID_ReportDesc_length(INTERFACE_HID_MOUSE);
-  [#if FamilyName?lower_case?starts_with("stm32c0") || FamilyName?lower_case?starts_with("stm32u5") || FamilyName?lower_case?starts_with("stm32h5")]
   hid_mouse_parameter.ux_device_class_hid_parameter_report_id      = UX_FALSE;
-  [#else]
-  hid_mouse_parameter.ux_device_class_hid_parameter_report_id      = UX_TRUE;
-  [/#if]
   hid_mouse_parameter.ux_device_class_hid_parameter_callback       = USBD_HID_Mouse_SetReport;
   hid_mouse_parameter.ux_device_class_hid_parameter_get_callback   = USBD_HID_Mouse_GetReport;
 
@@ -492,11 +492,7 @@ UINT MX_USBX_Device_Init(VOID *memory_ptr)
   custom_hid_parameter.ux_slave_class_hid_instance_deactivate       = USBD_Custom_HID_Deactivate;
   custom_hid_parameter.ux_device_class_hid_parameter_report_address = USBD_HID_ReportDesc(INTERFACE_HID_CUSTOM);
   custom_hid_parameter.ux_device_class_hid_parameter_report_length  = USBD_HID_ReportDesc_length(INTERFACE_HID_CUSTOM);
-  [#if FamilyName?lower_case?starts_with("stm32c0")]
   custom_hid_parameter.ux_device_class_hid_parameter_report_id      = UX_FALSE;
-  [#else]
-  custom_hid_parameter.ux_device_class_hid_parameter_report_id      = UX_TRUE;
-  [/#if]
   custom_hid_parameter.ux_device_class_hid_parameter_callback       = USBD_Custom_HID_SetFeature;
   custom_hid_parameter.ux_device_class_hid_parameter_get_callback   = USBD_Custom_HID_GetReport;
 #ifdef UX_DEVICE_CLASS_HID_INTERRUPT_OUT_SUPPORT
@@ -1013,7 +1009,7 @@ static VOID ${USBX_DEVICE_APP_THREAD_NAME_value}(ULONG thread_input)
 }
 [/#if]
 
-[#if UX_STANDALONE_ENABLED_Value == "1"]
+[#if UX_STANDALONE_ENABLED_Value == "1" && !FamilyName?lower_case?starts_with("stm32n6")]
 /**
   * @brief  _ux_utility_interrupt_disable
   *         USB utility interrupt disable.
@@ -1067,6 +1063,7 @@ ULONG _ux_utility_time_get(VOID)
 }
 
 [/#if]
+
 [#if (REG_USBX_DEVICE_CON_CK_value  == "1") && (REG_UX_DEVICE_CORE_value  == "true") && (USBX_DEVICE_CLASS_NB != 0)]
 /**
   * @brief  USBD_ChangeFunction

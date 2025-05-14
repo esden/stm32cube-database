@@ -27,10 +27,12 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    ux_user.h                                           PORTABLE C      */
-[#if !FamilyName?lower_case?starts_with("stm32mp13")]
-/*                                                           6.3.0        */
-[#else]
+[#if FamilyName?lower_case?starts_with("stm32mp13")]
 /*                                                           6.2.0        */
+[#elseif FamilyName?lower_case?starts_with("stm32wba")]
+/*                                                           6.2.1        */
+[#else]
+/*                                                           6.3.0        */
 [/#if]
 /*                                                                        */
 /*  AUTHOR                                                                */
@@ -105,6 +107,7 @@
 /*                                            added option to enable      */
 /*                                            basic USBX error checking,  */
 /*                                            resulting in version 6.2.1  */
+[#if !FamilyName?lower_case?starts_with("stm32wba")]
 /*  10-31-2023     Xiuwen Cai, CQ Xiao      Modified comment(s),          */
 /*                                            refined memory management,  */
 /*                                            added zero copy support     */
@@ -114,6 +117,7 @@
 /*                                            added option for get string */
 /*                                            requests with zero wIndex,  */
 /*                                            resulting in version 6.3.0  */
+[/#if]
 /*                                                                        */
 [/#if]
 /**************************************************************************/
@@ -591,12 +595,22 @@
    also refer to ux_port.h for descriptions on each of these options.  */
 
 [#if UX_ALIGN_MIN_value??]
+[#if FamilyName?lower_case?starts_with("stm32wba")]
+/* Defined, this value represents minimal allocated memory alignment in number of bytes.
+   The default is UX_ALIGN_16 (0x0f) to align allocated memory to 16 bytes.  */
+[#if UX_ALIGN_MIN_value == "UX_ALIGN_16"]
+/* #define UX_ALIGN_MIN                      UX_ALIGN_16 */
+[#else]
+#define UX_ALIGN_MIN                         ${UX_ALIGN_MIN_value}
+[/#if]
+[#else]
 /* Defined, this value represents minimal allocated memory alignment in number of bytes.
    The default is UX_ALIGN_8 (0x07) to align allocated memory to 8 bytes.  */
 [#if UX_ALIGN_MIN_value == "UX_ALIGN_8"]
 /* #define UX_ALIGN_MIN                      UX_ALIGN_8 */
 [#else]
 #define UX_ALIGN_MIN                         ${UX_ALIGN_MIN_value}
+[/#if]
 [/#if]
 [/#if]
 
@@ -810,7 +824,7 @@
 
 [#if UX_DEVICE_ENABLE_GET_STRING_WITH_ZERO_LANGUAGE_ID_value??]
 /* Defined, this enables processing of Get String Descriptor requests with zero Language ID.
-   The first language ID in the language ID framwork will be used if the request has a zero
+   The first language ID in the language ID framework will be used if the request has a zero
    Language ID.  */
 
 [#if UX_DEVICE_ENABLE_GET_STRING_WITH_ZERO_LANGUAGE_ID_value == "0"]

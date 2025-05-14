@@ -8,8 +8,8 @@
 [#assign RISUP_IP_RENAME="CRYP1:CRYP,GPU:GPU2D,LTDC_L1:LTDCL1,LTDC_L2:LTDCL2,LTDC_CMN:LTDC,OTG1_HS:OTG1HS,OTG2_HS:OTG2HS,CSI2HOST:CSI,SPI1/I2S1:SPI1,SPI2/I2S2:SPI2,SPI3/I2S3:SPI3,SPI6/I2S6:SPI6"]
 [#assign RISAF_TABLE_RENAME="TCM:RISAF1,CPUAXI_RAM0:RISAF2,CPUAXI_RAM1:RISAF3,NPU_master0:RISAF4,NPU_master1:RISAF5,CPU_master:RISAF6,FLEXRAM:RISAF7,CACHEAXI_RAM:RISAF8,VENCRAM:RISAF9,XSPI1:RISAF11,XSPI2:RISAF12,XSPI3:RISAF13,FMC:RISAF14,CACHEAXI_configuration_port:RISAF15,AHB_RAM1:RISAF21,AHB_RAM2:RISAF22,Backup_RAM:RISAF23"]
 [#assign RIFAWARE_PWR_FEATURE="System supply:PWR_ITEM_0,Programmable:PWR_ITEM_1,VDDCORE:PWR_ITEM_2,I-TCM:PWR_ITEM_3,Voltage scaling:PWR_ITEM_4,Backup:PWR_ITEM_5,CPU:PWR_ITEM_6,Peripheral:PWR_ITEM_7,WKUP1:PWR_ITEM_WKUP1,WKUP2:PWR_ITEM_WKUP2,WKUP3:PWR_ITEM_WKUP3,WKUP4:PWR_ITEM_WKUP4"]
-[#assign RIFAWARE_RCC_FEATURE="PLL1:RCC_ITEM_PLL1,PLL2:RCC_ITEM_PLL2,PLL3:RCC_ITEM_PLL3,PLL4:RCC_ITEM_PLL4,IC1:RCC_ITEM_IC1,IC2:RCC_ITEM_IC2,IC3:RCC_ITEM_IC3,IC4:RCC_ITEM_IC4,IC5:RCC_ITEM_IC5,IC6:RCC_ITEM_IC6,IC7:RCC_ITEM_IC7,IC8:RCC_ITEM_IC8,IC9:RCC_ITEM_IC9,IC10:RCC_ITEM_IC10,IC11:RCC_ITEM_IC11,IC12:RCC_ITEM_IC12"]
-[#assign RIFAWARE_RCC_FEATURE+=",IC13:RCC_ITEM_IC13,IC14:RCC_ITEM_IC14,IC15:RCC_ITEM_IC15,IC16:RCC_ITEM_IC16,IC17:RCC_ITEM_IC17,IC18:RCC_ITEM_IC18,IC19:RCC_ITEM_IC19,IC20:RCC_ITEM_IC20,DFT:RCC_ITEM_DFT,RST:RCC_ITEM_RST,INT:RCC_ITEM_INT,PER:RCC_ITEM_PER,BUS:RCC_ITEM_BUS,SYS:RCC_ITEM_SYS,MOD:RCC_ITEM_MOD,ACLKN:RCC_ITEM_ACLKN,ACLKNC:RCC_ITEM_ACLKNC"]
+[#assign RIFAWARE_RCC_FEATURE="IC20:RCC_ITEM_IC20,IC19:RCC_ITEM_IC19,IC18:RCC_ITEM_IC18,IC17:RCC_ITEM_IC17,IC16:RCC_ITEM_IC16,IC15:RCC_ITEM_IC15,IC14:RCC_ITEM_IC14,IC13:RCC_ITEM_IC13,IC12:RCC_ITEM_IC12,IC11:RCC_ITEM_IC11,IC10:RCC_ITEM_IC10,DFT:RCC_ITEM_DFT,RST:RCC_ITEM_RST,INT:RCC_ITEM_INT,PER:RCC_ITEM_PER,BUS:RCC_ITEM_BUS,SYS:RCC_ITEM_SYS,MOD:RCC_ITEM_MOD,ACLKNC:RCC_ITEM_ACLKNC,ACLKN:RCC_ITEM_ACLKN"]
+[#assign RIFAWARE_RCC_FEATURE+=",PLL1:RCC_ITEM_PLL1,PLL2:RCC_ITEM_PLL2,PLL3:RCC_ITEM_PLL3,PLL4:RCC_ITEM_PLL4,IC1:RCC_ITEM_IC1,IC2:RCC_ITEM_IC2,IC3:RCC_ITEM_IC3,IC4:RCC_ITEM_IC4,IC5:RCC_ITEM_IC5,IC6:RCC_ITEM_IC6,IC7:RCC_ITEM_IC7,IC8:RCC_ITEM_IC8,IC9:RCC_ITEM_IC9"]
 [#assign RIFAWARE_RCC_FEATURE+=",AHBM:RCC_ITEM_AHBM,AHB1:RCC_ITEM_AHB1,AHB2:RCC_ITEM_AHB2,AHB3:RCC_ITEM_AHB3,AHB4:RCC_ITEM_AHB4,AHB5:RCC_ITEM_AHB5,APB1:RCC_ITEM_APB1,APB2:RCC_ITEM_APB2,APB3:RCC_ITEM_APB3,APB4:RCC_ITEM_APB4,APB5:RCC_ITEM_APB5,NOC:RCC_ITEM_NOC"]
 [#assign RIFAWARE_RTC_FEATURE="Alarm A:ALRA,Alarm B:ALRB,Wake-up:WUT,Timestamp:TS,calibration:CAL,Initialization:INIT"]
 
@@ -41,7 +41,7 @@
 [#assign lock = "false"]
 [#if RISUP??]
     [#list RISUP as risup ]
-            [#if (risup.secure?? && risup.secure == "true") || risup.privilege == "true"]
+            [#if (risup.secure?? && risup.secure == "true") || risup.privilege == "true" || risup.look == "true"]
                 [#if lock == "false"]
                     #n#t/*RISUP configuration*/
                     [#assign lock = "true"]
@@ -59,6 +59,9 @@
                 [/#if]
                 [#assign ipName=Rename(RISUP_IP_RENAME,risup.ipName)]
                 #tHAL_RIF_RISC_SetSlaveSecureAttributes(RIF_RISC_PERIPH_INDEX_${ipName} , ${secure_attrebut} | ${privilege_attrebut});
+                [#if risup.look == "true"]
+                #tHAL_RIF_RISC_SlaveConfigLock(RIF_RISC_PERIPH_INDEX_${ipName});
+                [/#if]
             [/#if]
     [/#list]
 [/#if ]
@@ -170,7 +173,14 @@
 
             [#if ipName=="GPIO"]
                 #n#t/* set up GPIO configuration */
+                [#assign listPort=""]
                 [#list ipData  as value]
+                    [#assign Porte=value.Feature?substring(1,2)]
+                    [#if value.Secure!="true"&&!listPort?contains(Porte)]
+                        #t/* GPIO${Porte} Non Secure Ports Clock Enable */
+                        #t__HAL_RCC_GPIO${Porte}_CLK_ENABLE();
+                        [#assign listPort+=Porte]
+                    [/#if]
                     #tHAL_GPIO_ConfigPinAttributes(GPIO${value.Feature?substring(1,2)},GPIO_PIN_${value.Feature?substring(2)},${getRefernce("GPIO_SecPriv",value.Secure+","+value.Privilege,"")});
                 [/#list]
                 #n
@@ -193,8 +203,8 @@
                 #n
             [/#if]
 
-            [#if ipName?matches("HPDMA|GPDMA")]
-                #n#t/* set up ${ipName} configuration */
+            [#if ipName?matches("HPDMA1|GPDMA1")]
+                #n#t/* set up ${ipName?substring(0,(ipName?length)-1)} configuration */
                 [#list ipData  as value]
                     #t/* set ${value.Feature} */
                     [#assign Channel =value.Feature?split(" ")]
@@ -268,6 +278,7 @@
     [/#list]
     [#return oldName]
 [/#function]
+[#--------------------------------------------------------------------------------------------Rename--]
 
 [#-- The purpose of this macro is to fill a structure --]
 [#-- and ensure that the instruction is not repeated twice. --]
@@ -276,21 +287,31 @@
     [#list struct.entrySet() as key_S]
         [#local key=key_S.key]
         [#local value=key_S.value]
-        [#if structRef == "" || (value != structRef.get(key))]
+
+        [#--out of region case--]
+        [#local dispatch=false]
+        [#if key?matches("EndAddress")&&structRef != ""&&value == structRef.get(key) && structRef.get("StartAddress")!=struct.get("StartAddress") ]
+            [#local dispatch=true]
+        [/#if]
+
+        [#if structRef == "" || (value != structRef.get(key)) || dispatch]
             [#if key?matches("id|Region|name|CID|DelegatedCID|Delegation")]
                 [#-- No think to do --]
             [#elseif key?matches("EndAddress")]
                 [#--struct.get("StartAddress") waiting to fix startAdress --]
-                #t${instanceName}.${key} = ${getEndAddress("0x00",value)};
+                [#local startAdress=struct.get("StartAddress")]
+                #t${instanceName}.${key} = ${getEndAddress(startAdress,value)};
             [#else]
                 #t${instanceName}.${key} = ${getRefernce(key,value,"")};
             [/#if]
         [/#if]
     [/#list]
     [#assign structRef=struct ]
-[/#macro]
+    [#local dispatch=false]
 
-[#--  --]
+[/#macro]
+[#--------------------------------------------------------------------------------------GenerateCode--]
+
 [#function getRefernce key value value2]
     [#if key == "Filtering"]
         [#return "RISAF_FILTER_"+(value=="true")?then("ENABLE", "DISABLE")]
@@ -329,6 +350,7 @@
         [#return value]
     [/#if]
 [/#function]
+[#---------------------------------------------------------------------------------------getRefernce--]
 
 [#--The purpose of this macro is to calculate the sum--]
 [#--of the starting address and the region size.--]
@@ -336,9 +358,10 @@
 [#function getEndAddress startAddress ReginSize]
         [#assign  intStartAddress =Integer.parseInt( startAddress?substring(2), 16)]
         [#assign  intReginSize =Integer.parseInt(ReginSize?substring(2), 16)]
-        [#assign resultValue = intStartAddress + intReginSize]
+        [#assign resultValue = intStartAddress + intReginSize -1]
         [#return "0x"+Integer.toHexString(resultValue)]
 [/#function]
+[#-------------------------------------------------------------------------------------getEndAddress--]
 
 [#function getInstance struct]
     [#local mappings=struct?split(",") ]
@@ -349,6 +372,7 @@
         [/#if]
     [/#list]
 [/#function]
+[#---------------------------------------------------------------------------------------getInstance--]
 
 [#macro printS struct]
     [#assign instance=""]
@@ -362,9 +386,8 @@
         [/#if]
     [/#list]
 [/#macro]
+[#--------------------------------------------------------------------------------------------printS--]
 
-
-[#--    ************** --]
 [#function getRTC_Value Ip global key]
     [#local various=(key?contains("privilege"))?then("Privilege","Secure")]
     [#local various2=(key?contains("privilege"))?then("Privilege","NonSecure")]
@@ -445,5 +468,6 @@
 
     [#return ""]
 [/#function]
+[#--------------------------------------------------------------------------------------getRTC_Value--]
 
 

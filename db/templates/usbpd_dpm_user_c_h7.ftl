@@ -188,12 +188,12 @@ GUI_SAVE_INFO                 DPM_GUI_SaveInfo                  = NULL;
 /* USER CODE BEGIN USBPD_USER_EXPORTED_FUNCTIONS_GROUP1 */
 
 /* USER CODE END USBPD_USER_EXPORTED_FUNCTIONS_GROUP1 */
-
+[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
 /**
   * @brief  Initialize DPM (port power role, PWR_IF, CAD and PE Init procedures)
   * @retval USBPD Status
   */
-[#if USBPD_CoreLib != "USBPDCORE_LIB_NO_PD"]
+
 USBPD_StatusTypeDef USBPD_DPM_UserInit(void)
 {
 /* USER CODE BEGIN USBPD_DPM_UserInit */

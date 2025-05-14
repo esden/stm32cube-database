@@ -10,7 +10,6 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
-[#assign PG_SKIP_LIST = "False"]
 [#assign myHash = {}]
 [#list SWIPdatas as SWIP]
     [#if SWIP.defines??]
@@ -131,11 +130,6 @@ typedef enum SNVMA_BufferId
   ${myHash["SNVMA_NVM_ID_${nvm_number}_BUFFER_${buffer_nbr}_NAME"]},
   [/#list]
 [/#list]
-[/#if]
-[#if (PG_SKIP_LIST == "True")]
-  SNVMA_BufferId_1,
-  SNVMA_BufferId_2,
-  SNVMA_BufferId_3,
 [/#if]
   SNVMA_BufferId_Max  /* End of the enumeration */
 }SNVMA_BufferId_t;

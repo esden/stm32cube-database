@@ -144,7 +144,7 @@ void                USBPD_DPM_SetNotification_GUI(GUI_NOTIFICATION_FORMAT_SEND P
 [/#if]
 [/#if]
 void                USBPD_DPM_WaitForTime(uint32_t Time);
-[#if FREERTOS?? && Secure!="true"]
+[#if (FREERTOS?? ||XCUBEFREERTOS??) && Secure!="true"]
 [#else]
 void                USBPD_DPM_UserExecute(void const *argument);
 [/#if]

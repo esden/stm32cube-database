@@ -44,14 +44,14 @@ void ${instance}_IRQHandler(void);
 /* Private functions ---------------------------------------------------------*/
 
 /**
-  * @brief  This function configures the ${instance} as a time base source. 
-  *         The time source is configured  to have 1ms time base with a dedicated 
-  *         Tick interrupt priority. 
-  * @note   This function is called  automatically at the beginning of program after
-  *         reset by HAL_Init() or at any time when clock is configured, by HAL_RCC_ClockConfig(). 
-  * @param  TickPriority: Tick interrupt priority.
-  * @retval HAL status
-  */
+#t* @brief  This function configures the ${instance} as a time base source.
+#t*         The time source is configured  to have 1ms time base with a dedicated
+#t*         Tick interrupt priority.
+#t* @note   This function is called  automatically at the beginning of program after
+#t*         reset by HAL_Init() or at any time when clock is configured, by HAL_RCC_ClockConfig().
+#t* @param  TickPriority: Tick interrupt priority.
+#t* @retval HAL status
+#t*/
 [#assign APB = "APB2"]
 [#if instance=="TIM2"||instance=="TIM3"||instance=="TIM4"||instance=="TIM5"||instance=="TIM6"||instance=="TIM7"||instance=="TIM12"||instance=="TIM13"||instance=="TIM14"||instance=="TIM18"]
 [#assign APB = "APB1"]
@@ -163,10 +163,10 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
 [/#if]
 
 [#if FamilyName="STM32N6"]
- /* Get clock configuration */
+#t/* Get clock configuration */
   HAL_RCC_GetClockConfig(&clkconfig);
 [#elseif FamilyName!="STM32WL3"]
-/* Get clock configuration */
+#t/* Get clock configuration */
   HAL_RCC_GetClockConfig(&clkconfig, &pFLatency);
 [/#if]  
   
@@ -290,21 +290,20 @@ uwTimclock = HAL_RCC_GetSysClockFreq();
   h${instance?lower_case}.Instance = ${instance};
   
   /* Initialize TIMx peripheral as follow:
-  
 [#if FamilyName!="STM32WBA"]
-  + Period = [(${instance}CLK/1000) - 1]. to have a (1/1000) s time base.
+#t * Period = [(${instance}CLK/1000) - 1]. to have a (1/1000) s time base.
 [/#if]
 [#if FamilyName=="STM32H5"]
-  + Prescaler = (uwTimclock/100000 - 1) to have a 100KHz counter clock.
+#t * Prescaler = (uwTimclock/100000 - 1) to have a 100KHz counter clock.
 [#elseif FamilyName=="STM32WBA"]
-  + Period = [(TIM_CNT_FREQ/TIM_FREQ) - 1]. to have a (1/TIM_FREQ) s time base.
-  + Prescaler = (uwTimclock/TIM_CNT_FREQ - 1) to have a TIM_CNT_FREQ counter clock.
+#t * Period = [(TIM_CNT_FREQ/TIM_FREQ) - 1]. to have a (1/TIM_FREQ) s time base.
+#t * Prescaler = (uwTimclock/TIM_CNT_FREQ - 1) to have a TIM_CNT_FREQ counter clock.
 [#else]
-  + Prescaler = (uwTimclock/1000000 - 1) to have a 1MHz counter clock.
+#t * Prescaler = (uwTimclock/1000000 - 1) to have a 1MHz counter clock.
 [/#if]
-  + ClockDivision = 0
-  + Counter direction = Up
-  */
+#t * ClockDivision = 0
+#t * Counter direction = Up
+#t */
 [#if FamilyName=="STM32H5"]
   h${instance?lower_case}.Init.Period = (100000U / 1000U) - 1U;
 [#elseif FamilyName=="STM32WBA"]
@@ -409,18 +408,18 @@ uwTimclock = HAL_RCC_GetSysClockFreq();
     Status = HAL_TIM_Base_Start_IT(&h${instance?lower_case});
     if (Status == HAL_OK)
     {
-        if (TickPriority < (1UL << __NVIC_PRIO_BITS))
-        {
-          /* Enable the ${instance} global Interrupt */
-          HAL_NVIC_SetPriority(${timeBaseInterrupt}, TickPriority, 0U);
-          uwTickPrio = TickPriority;
+      if (TickPriority < (1UL << __NVIC_PRIO_BITS))
+      {
+        /* Enable the ${instance} global Interrupt */
+        HAL_NVIC_SetPriority(${timeBaseInterrupt}, TickPriority, 0U);
+        uwTickPrio = TickPriority;
       }
       else
       {
         Status = HAL_ERROR;
       }
     }
-}
+  }
 #if (USE_HAL_TIM_REGISTER_CALLBACKS == 1U)
   HAL_TIM_RegisterCallback(&h${instance?lower_case}, HAL_TIM_PERIOD_ELAPSED_CB_ID, TimeBase_TIM_PeriodElapsedCallback);
 #endif

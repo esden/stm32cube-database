@@ -499,7 +499,12 @@
 [#if config.ipName?contains("CORTEX")]
 [#if config.comments?? && config.comments!=""]#t/** ${config.comments}#n#t*/[/#if]
 [#else]
-[#if config.comments?? && config.comments!="" && config.ipName?contains("PWR") && config.comments?contains("UCPD")]#t/** ${config.comments?replace("#t","#t")}#n#t*/
+[#if config.comments?? && config.comments!="" && config.ipName?contains("PWR") && config.comments?contains("UCPD")]
+[#if FamilyName=="STM32H5"]
+#t/* ${config.comments?replace("#t","#t")} */
+[#else]
+#t#t/** ${config.comments?replace("#t","#t")}#n#t*/
+[/#if]
 [#else]
 [#if config.comments?? && config.comments!=""]#n#t/** ${config.comments?replace("#t","#t")}#n#t*/[/#if]
 [/#if]
@@ -2039,7 +2044,7 @@ ${bufferType} ${bufferName}[${bufferSize}];
         [/#if]
         [/#list]
         [/#list] 	[/#if]
-[#if tabN == 2]#t[/#if]#t${clock?trim}[#if !clock?contains('(')]()[/#if];
+[#if tabN == 2]#t[/#if][#if !(FamilyName=="STM32MP2" && clock?trim?contains("DCACHE"))]#t${clock?trim}[#if !clock?contains('(')]()[/#if];[/#if]
                         [#--[/#if]--][#-- remove control on common clock for sevral IP instances--]
                     [/#list]
                 [/#if]

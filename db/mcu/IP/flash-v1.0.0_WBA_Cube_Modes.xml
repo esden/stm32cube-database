@@ -77,9 +77,15 @@
 		</Parameter>
 
 		<Parameter Name="OB_Write_ProtectionA_active" />
+        <Parameter Name="OB_WRPA_PSTR">
+            <Condition Expression="OB_Write_ProtectionA_active=true" Diagnostic="" />
+        </Parameter>
 		<Parameter Name="OB_WRPA_PSTR_Value">
 			<Condition Expression="OB_Write_ProtectionA_active=true" Diagnostic="" />
 		</Parameter>
+        <Parameter Name="OB_WRPA_PEND">
+            <Condition Expression="OB_Write_ProtectionA_active=true" Diagnostic="" />
+        </Parameter>
 		<Parameter Name="OB_WRPA_PEND_Value">
 			<Condition Expression="OB_Write_ProtectionA_active=true" Diagnostic="" />
 		</Parameter>
@@ -87,9 +93,15 @@
 			<Condition Expression="OB_Write_ProtectionA_active=true" Diagnostic="" />
 		</Parameter>
 		<Parameter Name="OB_Write_ProtectionB_active" />
+        <Parameter Name="OB_WRPB_PSTR">
+            <Condition Expression="OB_Write_ProtectionB_active=true" Diagnostic="" />
+        </Parameter>
 		<Parameter Name="OB_WRPB_PSTR_Value">
 			<Condition Expression="OB_Write_ProtectionB_active=true" Diagnostic="" />
 		</Parameter>
+        <Parameter Name="OB_WRPB_PEND">
+            <Condition Expression="OB_Write_ProtectionB_active=true" Diagnostic="" />
+        </Parameter>
 		<Parameter Name="OB_WRPB_PEND_Value">
 			<Condition Expression="OB_Write_ProtectionB_active=true" Diagnostic="" />
 		</Parameter>
@@ -490,7 +502,7 @@ checked: SRAM2 not erased when a system reset occurs.</Description>
 		<PossibleValue Comment="false" Value="false" />
 		<PossibleValue Semaphore="SEM_FLASH_OB_BOOTADDR0" Comment="true" Value="true" />
 	</RefParameter>
-	<RefParameter Comment="          Address" DefaultValue="0x0800007F" Group="Boot Configuration" TabName="HAL Option Bytes Settings" Max="0xFFFFFF00" Min="0x00000000" Name="OB_NSBOOTADD0_Address" Type="hex">
+	<RefParameter Comment="          Address" DefaultValue="0x08000000" Group="Boot Configuration" TabName="HAL Option Bytes Settings" Max="0xFFFFFF00" Min="0x00000000" Name="OB_NSBOOTADD0_Address" Type="hex">
 		<Description>Non-secure Boot base addess 0</Description>
 		<Condition Expression="OB_Boot_Configuration_active_NS0=true" Diagnostic="" />
 	</RefParameter>
@@ -500,7 +512,7 @@ checked: SRAM2 not erased when a system reset occurs.</Description>
 		<PossibleValue Comment="false" Value="false" />
 		<PossibleValue Semaphore="SEM_FLASH_OB_BOOTADDR1" Comment="true" Value="true" />
 	</RefParameter>
-	<RefParameter Comment="          Address" DefaultValue="0x0BF9007F" Group="Boot Configuration" TabName="HAL Option Bytes Settings" Max="0xFFFFFF00" Min="0x00000000" Name="OB_NSBOOTADD1_Address" Type="hex">
+	<RefParameter Comment="          Address" DefaultValue="0x0BF90000" Group="Boot Configuration" TabName="HAL Option Bytes Settings" Max="0xFFFFFF00" Min="0x00000000" Name="OB_NSBOOTADD1_Address" Type="hex">
 		<Description>Non-secure Boot base addess 1</Description>
 		<Condition Expression="OB_Boot_Configuration_active_NS1=true" Diagnostic="" />
 	</RefParameter>
@@ -510,7 +522,7 @@ checked: SRAM2 not erased when a system reset occurs.</Description>
 		<PossibleValue Comment="false" Value="false" />
 		<PossibleValue Semaphore="SEM_FLASH_OB_BOOTADDRSEC0" Comment="true" Value="true" />
 	</RefParameter>
-	<RefParameter Comment="          Address" DefaultValue="0x0C00007C" Group="Boot Configuration" TabName="HAL Option Bytes Settings" Max="0xFFFFFF00" Min="0x00000000" Name="OB_SECBOOTADD0_Address" Type="hex">
+	<RefParameter Comment="          Address" DefaultValue="0x0C000000" Group="Boot Configuration" TabName="HAL Option Bytes Settings" Max="0xFFFFFF00" Min="0x00000000" Name="OB_SECBOOTADD0_Address" Type="hex">
 		<Description>Secure Boot base addess 0</Description>
 		<Condition Expression="OB_Boot_Configuration_active_SEC0=true" Diagnostic="" />
 	</RefParameter>
@@ -571,14 +583,27 @@ checked: SRAM2 not erased when a system reset occurs.</Description>
 		<PossibleValue Comment="false" Value="false" />
 		<PossibleValue Semaphore="SEM_FLASH_OB_WRPA" Comment="true" Value="true" />
 	</RefParameter>
-	<RefParameter Comment="          Start page" DefaultValue="0" Group="Write Protection" TabName="HAL Option Bytes Settings" Max="=OB_WRPA_PEND_Value" Min="0" Name="OB_WRPA_PSTR_Value" Type="integer">
+
+    <RefParameter Comment="bank Base Address" Name="bankBaseAddress" DefaultValue="0x00" Type="hex" Visible="false"/>
+
+	<RefParameter Comment="          Start value" Name="OB_WRPA_PSTR" DefaultValue="0x7F"  Min="0x00" Max="0x7F" Group="Write Protection" TabName="HAL Option Bytes Settings" Type="hex">
 		<Description>WPR first area A start page</Description>
 		<Condition Expression="OB_Write_ProtectionA_active=true &amp; OB_UNLOCK_A=ENABLE" Diagnostic="" />
 	</RefParameter>
-	<RefParameter Comment="          End page" DefaultValue="=numberOfPages-1" Group="Write Protection" TabName="HAL Option Bytes Settings" Max="=numberOfPages-1" Min="=OB_WRPA_PSTR_Value" Name="OB_WRPA_PEND_Value" Type="integer">
-		<Description>WPR first area A end page</Description>
-		<Condition Expression="OB_Write_ProtectionA_active=true &amp; OB_UNLOCK_A=ENABLE" Diagnostic="" />
-	</RefParameter>
+    <RefParameter Comment="          Start adress" Name="OB_WRPA_PSTR_Value" DefaultValue="=(bankBaseAddress + (OB_WRPA_PSTR * 0x2000))" Group="Write Protection" TabName="HAL Option Bytes Settings" Type="StringHex">
+        <Description>WPR first area A start page</Description>
+        <Condition Expression="OB_Write_ProtectionA_active=true &amp; OB_UNLOCK_A=ENABLE" Diagnostic="" />
+    </RefParameter>
+
+    <RefParameter Comment="          End value" Name="OB_WRPA_PEND" DefaultValue="0x00"  Min="0x00" Max="0x7F" Group="Write Protection" TabName="HAL Option Bytes Settings" Type="hex">
+        <Description>WPR first area A start page</Description>
+        <Condition Expression="OB_Write_ProtectionA_active=true &amp; OB_UNLOCK_A=ENABLE" Diagnostic="" />
+    </RefParameter>
+    <RefParameter Comment="          End adress" Name="OB_WRPA_PEND_Value" DefaultValue="=(bankBaseAddress + ((OB_WRPA_PEND+1) * 0x2000))" Group="Write Protection" TabName="HAL Option Bytes Settings" Type="StringHex">
+        <Description>WPR first area A start page</Description>
+        <Condition Expression="OB_Write_ProtectionA_active=true &amp; OB_UNLOCK_A=ENABLE" Diagnostic="" />
+    </RefParameter>
+
 	<RefParameter Comment="          UNLOCK" DefaultValue="ENABLE" Group="Write Protection" TabName="HAL Option Bytes Settings" Name="OB_UNLOCK_A" Type="list">
 		<Description>&lt;font color=&quot;red&quot;&gt;Bit 0&lt;/font&gt; &lt;b&gt; UNLOCK_A:&lt;/b&gt; UNLOCK_A.&lt;br&gt;
 		WPR first area A unlock&lt;br&gt;
@@ -594,14 +619,25 @@ checked: SRAM2 not erased when a system reset occurs.</Description>
 		<PossibleValue Comment="false" Value="false" />
 		<PossibleValue Semaphore="SEM_FLASH_OB_WRPB" Comment="true" Value="true" />
 	</RefParameter>
-	<RefParameter Comment="          Start page" DefaultValue="0" Group="Write Protection" TabName="HAL Option Bytes Settings" Max="=OB_WRPB_PEND_Value" Min="0" Name="OB_WRPB_PSTR_Value" Type="integer">
-		<Description>WPR first area B start page</Description>
-		<Condition Expression="OB_Write_ProtectionB_active=true &amp; OB_UNLOCK_B=ENABLE" Diagnostic="" />
-	</RefParameter>
-	<RefParameter Comment="          End page" DefaultValue="=numberOfPages-1" Group="Write Protection" TabName="HAL Option Bytes Settings" Max="=numberOfPages-1" Min="=OB_WRPB_PSTR_Value" Name="OB_WRPB_PEND_Value" Type="integer">
-		<Description>WPR first area B end page</Description>
-		<Condition Expression="OB_Write_ProtectionB_active=true &amp; OB_UNLOCK_B=ENABLE" Diagnostic="" />
-	</RefParameter>
+
+    <RefParameter Comment="          Start value" Name="OB_WRPB_PSTR" DefaultValue="0x7F"  Min="0x00" Max="0x7F" Group="Write Protection" TabName="HAL Option Bytes Settings" Type="hex">
+        <Description>WPR first area B start page</Description>
+        <Condition Expression="OB_Write_ProtectionB_active=true &amp; OB_UNLOCK_B=ENABLE" Diagnostic="" />
+    </RefParameter>
+    <RefParameter Comment="          Start adress" Name="OB_WRPB_PSTR_Value" DefaultValue="=(bankBaseAddress + (OB_WRPB_PSTR * 0x2000))" Group="Write Protection" TabName="HAL Option Bytes Settings" Type="StringHex">
+        <Description>WPR first area B start page</Description>
+        <Condition Expression="OB_Write_ProtectionB_active=true &amp; OB_UNLOCK_B=ENABLE" Diagnostic="" />
+    </RefParameter>
+
+    <RefParameter Comment="          End value" Name="OB_WRPB_PEND" DefaultValue="0x00"  Min="0x00" Max="0x7F" Group="Write Protection" TabName="HAL Option Bytes Settings" Type="hex">
+        <Description>WPR first area B start page</Description>
+        <Condition Expression="OB_Write_ProtectionB_active=true &amp; OB_UNLOCK_B=ENABLE" Diagnostic="" />
+    </RefParameter>
+    <RefParameter Comment="          End adress" Name="OB_WRPB_PEND_Value" DefaultValue="=(bankBaseAddress + ((OB_WRPB_PEND+1) * 0x2000))" Group="Write Protection" TabName="HAL Option Bytes Settings" Type="StringHex">
+        <Description>WPR first area B start page</Description>
+        <Condition Expression="OB_Write_ProtectionB_active=true &amp; OB_UNLOCK_B=ENABLE" Diagnostic="" />
+    </RefParameter>
+
 	<RefParameter Comment="          UNLOCK" DefaultValue="ENABLE" Group="Write Protection" TabName="HAL Option Bytes Settings" Name="OB_UNLOCK_B" Type="list">
 		<Description>&lt;font color=&quot;red&quot;&gt;Bit 0&lt;/font&gt; &lt;b&gt; UNLOCK_B:&lt;/b&gt; UNLOCK_B.&lt;br&gt;
 		WPR first area B unlock&lt;br&gt;

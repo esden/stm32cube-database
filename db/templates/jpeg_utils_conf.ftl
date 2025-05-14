@@ -1,4 +1,23 @@
 [#ftl]
+[#if (DIE=="DIE485")]
+/**
+  ******************************************************************************
+  * @file    jpeg_utils_conf.h
+  * @author  MCD Application Team
+  * @brief   jpeg_utils configuration file.
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2019 STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+  */
+[#else]
 /*
  * jpeg_utils_conf.h
  *
@@ -10,6 +29,7 @@
  * This file contains additional configuration options that customize the
  * JPEG HW configuration.  Most users will not need to touch this file.
  */
+[/#if]
 
  /* Define to prevent recursive inclusion -------------------------------------*/
 

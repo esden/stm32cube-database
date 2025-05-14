@@ -85,8 +85,13 @@
   [#if ProjectType?? ]
     <ProjectType>${ProjectType}</ProjectType>
  [/#if]
+  [#if ide=="CMake" && CompilerLinker??]
+   <CompilerLinker>${CompilerLinker}</CompilerLinker>
+   [/#if]
+    [#if IsMigrated??]
+       <IsMigrated>true</IsMigrated>
+    [/#if]
 [#-- list of toolchains to be generated: EWARM,MDK-ARM,TrueSTUDIO,RIDE: This tag can contain one or more than one toolchain: EWARM,MDK-ARM,TrueSTUDIO,RIDE --]
-
     <Toolchain>${ide}</Toolchain>
 [#if ide=="EWARM" || ide=="MDK-ARM"]
    [#if Toolversion??]
@@ -96,6 +101,7 @@
 [#if staticLibraryProject??]<StaticLibraryProject>true</StaticLibraryProject> [#-- Static Library Project --][/#if]
 
     [#--<Version>${version}</Version>--]
+
 [/#compress]
 <IocFile>${projectName}.ioc</IocFile>
 [#if MultiProject=="0" || family=="STM32MP1xx" &&  DeviceTree?? || family=="STM32MP2xx"  && TrustZone=="0"]
@@ -203,6 +209,9 @@
             [#if dataKey=="Context"]
                [#assign Context =  elem[dataKey]]
             [/#if]
+             [#if dataKey=="IsMigrated"]
+                [#assign IsMigrated =  elem[dataKey]]
+             [/#if]
         [/#list]   
     [/#if]
 [/#if]
@@ -345,8 +354,8 @@
     [/#if]
 
     <Aincludes>
-        [#if usedfreeRTOS=="true" || (multiConfig == "true" && cpuCore=="ARM Cortex-M4" && usedfreeRTOS_M4?? && usedfreeRTOS_M4=="true")|| (multiConfig == "true" && cpuCore=="ARM Cortex-M7" && usedfreeRTOS_M7?? && usedfreeRTOS_M7=="true")]
-	   		[#if ide=="EWARM" ]
+        [#if usedfreeRTOS=="true" || (multiConfig == "true" && cpuCore=="ARM Cortex-M4" && usedfreeRTOS_M4?? && usedfreeRTOS_M4=="true")|| (multiConfig == "true" && cpuCore=="ARM Cortex-M7" && usedfreeRTOS_M7?? && usedfreeRTOS_M7=="true")|| usedThreadX=="true"]
+	   		[#--[#if ide=="EWARM" ]
         <include>$PROJ_DIR$\${RelativePath}[#if mxIncDir??]${mxIncDir}[#else]Inc[/#if]</include>
 	   		[#elseif ide=="MDK-ARM" ]
         <include>${RelativePath}[#if mxIncDir??]${mxIncDir}[#else]Inc[/#if]</include>
@@ -356,23 +365,40 @@
         <include></include>
                         [/#if]
 		[#else]
-        <include></include>
-    	[/#if]
-
-        </Aincludes>
+        <include></include>--]
+    	  [#list mxIncludePaths as mxIncludePath]
+                         [#if ide=="EWARM" ]
+                             <include>$PROJ_DIR$\${mxIncludePath}</include>
+                             [#elseif ide=="MDK-ARM"  || ide=="Makefile" || ide=="CMake" || ide=="STM32CubeIDE" ]
+                             <include>${mxIncludePath}</include>
+                              [#else]
+                                <include></include>
+                          [/#if]
+                          [/#list]
+                          [#list halIncludePaths as halIncludePath]
+                               [#if ide=="EWARM" ]
+                                     <include>$PROJ_DIR$\${halIncludePath}</include>
+                               [#elseif ide=="MDK-ARM"  || ide=="Makefile" || ide=="CMake" || ide=="STM32CubeIDE"]
+                                      <include>${halIncludePath}</include>
+                               [#else]
+                                      <include></include>
+                               [/#if]
+                          [/#list]
+            	[/#if]
+                </Aincludes>
     <Adefines>
         [#list AdefinesList as define]
         <define>${define?replace("+","PLUS")}</define>
         [/#list]
         </Adefines>  
     <Cdefines>
-        [#assign deflist =""]
-	[#list CdefinesList as define]
-        [#if !deflist?contains(define)]
-        <define>${define?replace("+","PLUS")}</define>
-            [#assign deflist = deflist + " - " + define]
-        [/#if]
-        [/#list]
+     [#assign deflist =[]]
+           	[#list CdefinesList as define]
+               [#if !deflist?seq_contains(define)]
+            <define>${define}</define>
+               [#assign deflist = deflist + [define]]
+             [/#if]
+            [/#list]
 	   [#-- <define>__weak=__attribute__((weak))</define> --]
         </Cdefines>
     <Ldefines>
@@ -680,7 +706,12 @@
         [/#if]
         <sourceEntry>
             <name>${HALDriver}</name>
-        </sourceEntry>        
+        </sourceEntry>
+         [#if CommonGroup?? && ConfigSecure?? &&  ConfigSecure=="0"]
+                    <sourceEntry>
+                    <name>Common</name>
+                   </sourceEntry>
+         [/#if]
 	[#if atLeastOneMiddlewareIsUsed]
         [#-- ************************* --]       
             [#if  multiConfigurationProject?? && usedMWPerCore??  && MultiProject=="0"] 
@@ -749,9 +780,19 @@
         [#-- ************************* --]
 	[/#if]
         [#if ResMgr_Utility?? || (UtilitiesGroup?? && UtilitiesGroup.sourceFilesNameList?size>0)]
-            <sourceEntry>
-                <name>Utilities</name>
-            </sourceEntry>
+         [#if WorkspaceType=="Multi-project"]
+                                  [#assign exist = fileExist(WorkspacePath+mainSourceRepo+"/"+"Utilities")]
+                                        [#if exist?contains("true")]
+                                          <sourceEntry>
+                                              <name>Utilities</name>
+                                          </sourceEntry>
+                                        [#else]
+                                         <sourceEntry>
+                                             <name>Utilities</name>
+                                         </sourceEntry>
+                                        [/#if]
+
+         [/#if]
         [/#if]
         [#if ThirdPartyPackList??]
             [#list ThirdPartyPackList as pack]
@@ -772,7 +813,7 @@
 [#-- HAL Drivers --]
     [#-- if WorkspaceType=="Multi-project" --]
     <group>
-        <name>Drivers</name>          
+        <name>Drivers</name>
         [#if atLeastDeviceDriverIsUsed]        
         <group>					
             [#if deviceDriverGroups??]	
@@ -1104,7 +1145,12 @@
         [/#if]
         <sourceEntry>
             <name>${HALDriver}</name>
-        </sourceEntry>     
+        </sourceEntry>
+         [#if CommonGroup?? && ConfigSecure?? &&  ConfigSecure=="0"]
+            <sourceEntry>
+            <name>Projects</name>
+           </sourceEntry>
+           [/#if]
 	[#if atLeastOneMiddlewareIsUsed]   
         [#-- ************************* --]
        
@@ -1188,9 +1234,18 @@
                 [/#list]
                 [/#if]
               [#if ResMgr_Utility?? || (UtilitiesGroup?? && UtilitiesGroup.sourceFilesNameList?size>0 && !(found=="true" && TrustZone=="1" && !atLeastOneBspComponentIsUsed) )]
-                    <sourceEntry>
-                    <name>Utilities</name>
-                    </sourceEntry>
+                [#if WorkspaceType=="Multi-project"]
+                          [#assign exist = fileExist(WorkspacePath+mainSourceRepo+"/"+"Utilities")]
+                                [#if exist?contains("true")]
+                                  <sourceEntry>
+                                      <name>Utilities</name>
+                                  </sourceEntry>
+                                [#else]
+                                 <sourceEntry>
+                                     <name>Utilities</name>
+                                 </sourceEntry>
+                                [/#if]
+                [/#if]
               [/#if]
     [#-- workaround for Ticket 195742 ends--]
         [#if ThirdPartyPackList??]

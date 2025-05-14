@@ -8,7 +8,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2024 STMicroelectronics.
+  * Copyright (c) 2025 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -56,6 +56,33 @@ Key: ${key}; Value: ${myHash[key]}
 static TX_SEMAPHORE     stZigbeeLayerSemaphore;
 static TX_THREAD        stZigbeeLayerThread;
 [/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+/* FreeRTOS objects declaration */
+
+static osThreadId_t     stZigbeeLayerTaskHandle;
+static osSemaphoreId_t  stZigbeeLayerSemaphore;
+
+/* FreeRtos stacks attributes */
+const osThreadAttr_t stZigbeeLayerTask_attributes = 
+{
+  .name         = "ZigbeeLayer Task",
+  .priority     = TASK_PRIO_ZIGBEE_LAYER,
+  .stack_size   = TASK_STACK_SIZE_ZIGBEE_LAYER,
+  .attr_bits    = TASK_DEFAULT_ATTR_BITS,
+  .cb_mem       = TASK_DEFAULT_CB_MEM,
+  .cb_size      = TASK_DEFAULT_CB_SIZE,
+  .stack_mem    = TASK_DEFAULT_STACK_MEM
+};
+
+const osSemaphoreAttr_t  stZigbeeLayerSemaphore_attributes = 
+{
+  .name         = "ZigbeeLayer Semaphore",
+  .attr_bits    = SEMAPHORE_DEFAULT_ATTR_BITS,
+  .cb_mem       = SEMAPHORE_DEFAULT_CB_MEM,
+  .cb_size      = SEMAPHORE_DEFAULT_CB_SIZE,
+};
+
+[/#if]
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -92,6 +119,24 @@ static void ZigbeeSys_ProcessTask( ULONG lArgument )
   {
     tx_semaphore_get( &stZigbeeLayerSemaphore, TX_WAIT_FOREVER );
     APP_ZIGBEE_Task();
+  }
+}
+[/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+/**
+ * @brief  Zigbee Layer Task for FreeRTOS
+ * @param  void *argument
+ * @retval None
+ */
+static void ZigbeeSys_Task_Entry( void * argument )
+{
+  UNUSED( argument );
+
+  for (;;)
+  {
+    osSemaphoreAcquire( stZigbeeLayerSemaphore, osWaitForever );
+    APP_ZIGBEE_Task();
+    osThreadYield();
   }
 }
 [/#if]
@@ -134,6 +179,18 @@ void ZigbeeSys_Init(void)
     Error_Handler();
   }
 [/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+  /* Create Zigbee Layer FreeRTOS objects */
+  stZigbeeLayerSemaphore = osSemaphoreNew( 1U, 0U, &stZigbeeLayerSemaphore_attributes );
+  
+  stZigbeeLayerTaskHandle = osThreadNew( ZigbeeSys_Task_Entry, NULL, &stZigbeeLayerTask_attributes );
+  
+  if ( ( stZigbeeLayerTaskHandle == NULL ) || ( stZigbeeLayerSemaphore == NULL ) )
+  {
+    LOG_ERROR_APP( "Zigbee Layer FreeRTOS objects creation FAILED" );
+    Error_Handler();
+  }
+[/#if]
 
   /* Register Event is not needed */
 }
@@ -150,6 +207,9 @@ void ZigbeeSys_Resume(void)
 [/#if]
 [#if myHash["THREADX_STATUS"]?number == 1 ]
   tx_thread_resume( &stZigbeeLayerThread );
+[/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+  osThreadResume( stZigbeeLayerTaskHandle );
 [/#if]
 }
 
@@ -169,6 +229,12 @@ void ZigbeeSys_SemaphoreSet(void)
     tx_semaphore_put( &stZigbeeLayerSemaphore );
   }
 [/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+  if ( osSemaphoreGetCount ( stZigbeeLayerSemaphore ) == 0 )
+  {
+    osSemaphoreRelease( stZigbeeLayerSemaphore );
+  }
+[/#if]
 }
 
 /**
@@ -183,6 +249,9 @@ void ZigbeeSys_SemaphoreWait( void )
 [/#if]
 [#if myHash["THREADX_STATUS"]?number == 1 ]
   tx_semaphore_get( &stZigbeeLayerSemaphore, TX_WAIT_FOREVER );
+[/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+  osSemaphoreAcquire( stZigbeeLayerSemaphore, osWaitForever );
 [/#if]
 }
 
