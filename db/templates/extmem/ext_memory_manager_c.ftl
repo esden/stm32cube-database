@@ -2,7 +2,7 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file           : mx_extmem.c
+  * @file           : extmem_manager.c
   * @version        : ${version}
 [#--  * @packageVersion : ${fwVersion} --]
   * @brief          : This file implements the extmem configuration
@@ -310,10 +310,12 @@ void MX_EXTMEM_MANAGER_Init(void)
 [#if RefParam_ClockProtection_value != ""]
 [#if RefParam_MEMORY_1_Driver_Selection_value = "EXTMEM_USER" && RefParam_MEMORY_2_Driver_Selection_value = "EXTMEM_USER"] 
 [#else]
+[#if FamilyName != "STM32N6"]
 [#if contextFolder=="ExtMemLoader/"]
 #tHAL_RCCEx_DisableClockProtection(${RefParam_ClockProtection_value});
 [#else]
 #tHAL_RCCEx_EnableClockProtection(${RefParam_ClockProtection_value});
+[/#if]
 [/#if]
 [/#if]
 [/#if]

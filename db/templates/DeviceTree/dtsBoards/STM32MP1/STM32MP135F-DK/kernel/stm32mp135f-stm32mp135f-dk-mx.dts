@@ -12,14 +12,14 @@
 /* USER CODE END includes */
 
 /{
-	model = "STMicroelectronics STM32MP135F-DK STM32CubeMX board - openstlinux-6.1-yocto-mickledore-mp1-v23.06.21";
+	model = "STMicroelectronics STM32MP135F-DK STM32CubeMX board - openstlinux-6.1-yocto-mickledore-mpu-v24.06.26";
 	compatible = "st,stm32mp135f-board_135f-dk-mx", "st,stm32mp135f-dk", "st,stm32mp135";
 
 	/* USER CODE BEGIN root */
 
 	aliases{
-		ethernet0 = &eth1;
-		ethernet1 = &eth2;
+		ethernet0 = &ethernet1;
+		ethernet1 = &ethernet2;
 		serial0 = &uart4;
 		serial1 = &usart1;
 		serial2 = &uart8;
@@ -42,10 +42,16 @@
 	gpio-keys{
 		compatible = "gpio-keys";
 
-		user-pa13{
+		button-user{
 			label = "User-PA13";
 			linux,code = <BTN_1>;
 			gpios = <&gpioa 13 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+		};
+
+		button-wakeup{
+			label = "wake-up";
+			linux,code = <KEY_WAKEUP>;
+			interrupts-extended = <&optee 0>;
 		};
 	};
 
@@ -70,7 +76,7 @@
 	};
 
 	panel_rgb:panel-rgb{
-		compatible = "rocktech,rk043fn48h", "panel-dpi";
+		compatible = "panel-dpi";
 		enable-gpios = <&gpioi 7 GPIO_ACTIVE_HIGH>;
 		backlight = <&panel_backlight>;
 		power-supply = <&scmi_v3v3_sw>;
@@ -109,18 +115,6 @@
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
 		regulator-always-on;
-	};
-
-	wake_up{
-		compatible = "gpio-keys";
-		status = "okay";
-
-		button{
-			label = "wake-up";
-			linux,code = <KEY_WAKEUP>;
-			interrupts-extended = <&optee 0>;
-			status = "okay";
-		};
 	};
 
 	wifi_pwrseq:wifi-pwrseq{
@@ -167,7 +161,7 @@
 	};
 };
 
-&pinctrl{
+&pinctrl {
 
 	adc1_pins_mx:adc1_mx-0{
 
@@ -582,11 +576,12 @@
 					<STM32_PINMUX('H', 12, ANALOG)>;
 		};
 	};
+
 	/* USER CODE BEGIN pinctrl */
 	/* USER CODE END pinctrl */
 };
 
-&adc_1{
+&adc_1 {
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&adc1_pins_mx>;
 	pinctrl-1 = <&adc1_sleep_pins_mx>;
@@ -612,19 +607,19 @@
 	/* USER CODE END adc_1 */
 };
 
-&bsec{
+&bsec {
 	status = "okay";
 };
 
-&crc1{
+&crc1 {
 	status = "okay";
 };
 
-&cryp{
+&cryp {
 	status = "okay";
 };
 
-&dcmipp{
+&dcmipp {
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&dcmipp_pins_mx>;
 	pinctrl-1 = <&dcmipp_sleep_pins_mx>;
@@ -646,38 +641,38 @@
 	/* USER CODE END dcmipp */
 };
 
-&dma1{
+&dma1 {
 	status = "okay";
 };
 
-&dma2{
+&dma2 {
 	status = "okay";
 };
 
-&dmamux1{
+&dmamux1 {
 	status = "okay";
 	dma-masters = <&dma1 &dma2>;
 	dma-channels = <16>;
 };
 
-&dts{
+&dts {
 	status = "okay";
 };
 
-&eth1{
+&ethernet1 {
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&eth1_pins_mx>;
 	pinctrl-1 = <&eth1_sleep_pins_mx>;
 	status = "okay";
 
-	/* USER CODE BEGIN eth1 */
+	/* USER CODE BEGIN ethernet1 */
 	phy-mode = "rmii";
 	max-speed = <100>;
 	phy-handle = <&phy0_eth1>;
 	nvmem-cells = <&ethernet_mac1_address>;
 	nvmem-cell-names = "mac-address";
 
-	mdio1{
+	mdio{
 		#address-cells = <1>;
 		#size-cells = <0>;
 		compatible = "snps,dwmac-mdio";
@@ -685,20 +680,22 @@
 		phy0_eth1:ethernet-phy@0{
 			compatible = "ethernet-phy-id0007.c131";
 			reset-gpios = <&mcp23017 9 GPIO_ACTIVE_LOW>;
+			reset-assert-us = <1000>;
+			reset-deassert-us = <30000>;
 			reg = <0>;
 			wakeup-source;
 		};
 	};
-	/* USER CODE END eth1 */
+	/* USER CODE END ethernet1 */
 };
 
-&eth2{
+&ethernet2 {
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&eth2_pins_mx>;
 	pinctrl-1 = <&eth2_sleep_pins_mx>;
 	status = "okay";
 
-	/* USER CODE BEGIN eth2 */
+	/* USER CODE BEGIN ethernet2 */
 	phy-mode = "rmii";
 	max-speed = <100>;
 	phy-handle = <&phy0_eth2>;
@@ -707,7 +704,7 @@
 	nvmem-cells = <&ethernet_mac2_address>;
 	nvmem-cell-names = "mac-address";
 
-	mdio1{
+	mdio{
 		#address-cells = <1>;
 		#size-cells = <0>;
 		compatible = "snps,dwmac-mdio";
@@ -715,13 +712,15 @@
 		phy0_eth2:ethernet-phy@0{
 			compatible = "ethernet-phy-id0007.c131";
 			reset-gpios = <&mcp23017 10 GPIO_ACTIVE_LOW>;
+			reset-assert-us = <1000>;
+			reset-deassert-us = <30000>;
 			reg = <0>;
 		};
 	};
-	/* USER CODE END eth2 */
+	/* USER CODE END ethernet2 */
 };
 
-&i2c1{
+&i2c1 {
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&i2c1_pins_mx>;
 	pinctrl-1 = <&i2c1_sleep_pins_mx>;
@@ -770,7 +769,7 @@
 	/* USER CODE END i2c1 */
 };
 
-&i2c5{
+&i2c5 {
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&i2c5_pins_mx>;
 	pinctrl-1 = <&i2c5_sleep_pins_mx>;
@@ -825,9 +824,9 @@
 		compatible = "galaxycore,gc2145";
 		reg = <0x3c>;
 		clocks = <&clk_ext_camera>;
-		IOVDD-supply = <&scmi_v3v3_sw>;
-		AVDD-supply = <&scmi_v3v3_sw>;
-		DVDD-supply = <&scmi_v3v3_sw>;
+		iovdd-supply = <&scmi_v3v3_sw>;
+		avdd-supply = <&scmi_v3v3_sw>;
+		dvdd-supply = <&scmi_v3v3_sw>;
 		powerdown-gpios = <&mcp23017 3 (GPIO_ACTIVE_LOW | GPIO_PUSH_PULL)>;
 		reset-gpios = <&mcp23017 4 (GPIO_ACTIVE_LOW | GPIO_PUSH_PULL)>;
 		status = "okay";
@@ -838,6 +837,7 @@
 				remote-endpoint = <&mipid02_0>;
 				clock-lanes = <0>;
 				data-lanes = <1 2>;
+				link-frequencies = /bits/ 64 <120000000 192000000 240000000>;
 			};
 		};
 	};
@@ -867,8 +867,7 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&goodix_pins_a>;
 		interrupt-parent = <&gpiof>;
-		interrupts = <5 IRQ_TYPE_NONE>;
-		reset-gpios = <&gpioh 2 GPIO_ACTIVE_LOW>;
+		interrupts = <5 IRQ_TYPE_EDGE_FALLING>;
 		AVDD28-supply = <&scmi_v3v3_sw>;
 		VDDIO-supply = <&scmi_v3v3_sw>;
 		touchscreen-size-x = <480>;
@@ -878,7 +877,7 @@
 	/* USER CODE END i2c5 */
 };
 
-&ltdc{
+&ltdc {
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&ltdc_pins_mx>;
 	pinctrl-1 = <&ltdc_sleep_pins_mx>;
@@ -896,15 +895,15 @@
 	/* USER CODE END ltdc */
 };
 
-&mdma{
+&mdma {
 	status = "okay";
 };
 
-&rcc{
+&rcc {
 	status = "okay";
 };
 
-&rtc{
+&rtc {
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&rtc_pins_mx>;
 	pinctrl-1 = <&rtc_sleep_pins_mx>;
@@ -915,7 +914,7 @@
 	/* USER CODE END rtc */
 };
 
-&sdmmc1{
+&sdmmc1 {
 	pinctrl-names = "default", "opendrain", "sleep";
 	pinctrl-0 = <&sdmmc1_pins_mx>;
 	pinctrl-1 = <&sdmmc1_opendrain_pins_mx>;
@@ -931,7 +930,7 @@
 	/* USER CODE END sdmmc1 */
 };
 
-&sdmmc2{
+&sdmmc2 {
 	pinctrl-names = "default", "opendrain", "sleep";
 	pinctrl-0 = <&sdmmc2_pins_mx>;
 	pinctrl-1 = <&sdmmc2_opendrain_pins_mx>;
@@ -955,7 +954,7 @@
 	/* USER CODE END sdmmc2 */
 };
 
-&uart4{
+&uart4 {
 	pinctrl-names = "default", "idle", "sleep";
 	pinctrl-0 = <&uart4_pins_mx>;
 	pinctrl-1 = <&uart4_idle_pins_mx>;
@@ -967,7 +966,7 @@
 	/* USER CODE END uart4 */
 };
 
-&usart2{
+&usart2 {
 	pinctrl-names = "default", "idle", "sleep";
 	pinctrl-0 = <&usart2_pins_mx>;
 	pinctrl-1 = <&usart2_idle_pins_mx>;
@@ -986,7 +985,7 @@
 	/* USER CODE END usart2 */
 };
 
-&usbh_ehci{
+&usbh_ehci {
 	status = "okay";
 
 	/* USER CODE BEGIN usbh_ehci */
@@ -1002,11 +1001,11 @@
 	/* USER CODE END usbh_ehci */
 };
 
-&usbh_ohci{
+&usbh_ohci {
 	status = "okay";
 };
 
-&usbotg_hs{
+&usbotg_hs {
 	status = "okay";
 
 	/* USER CODE BEGIN usbotg_hs */
@@ -1023,11 +1022,11 @@
 	/* USER CODE END usbotg_hs */
 };
 
-&usbphyc{
+&usbphyc {
 	status = "okay";
 };
 
-&usbphyc_port0{
+&usbphyc_port0 {
 	status = "okay";
 
 	/* USER CODE BEGIN usbphyc_port0 */
@@ -1045,7 +1044,7 @@
 	/* USER CODE END usbphyc_port0 */
 };
 
-&usbphyc_port1{
+&usbphyc_port1 {
 	status = "okay";
 
 	/* USER CODE BEGIN usbphyc_port1 */
@@ -1065,12 +1064,12 @@
 
 /* USER CODE BEGIN addons */
 
-&arm_wdt{
+&arm_wdt {
 	timeout-sec = <32>;
 	status = "okay";
 };
 
-&scmi_regu{
+&scmi_regu {
 
 	scmi_vddcpu:regulator@6{
 		reg = <VOLTD_SCMI_STPMIC1_BUCK1>;

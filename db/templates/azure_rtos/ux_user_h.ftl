@@ -27,7 +27,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    ux_user.h                                           PORTABLE C      */
-[#if FamilyName?lower_case?starts_with("stm32c0")]
+[#if !FamilyName?lower_case?starts_with("stm32mp13")]
 /*                                                           6.3.0        */
 [#else]
 /*                                                           6.2.0        */
@@ -94,21 +94,7 @@
 /*                                            added host stack instance   */
 /*                                            creation strategy control,  */
 /*                                            resulting in version 6.2.0  */
-/*                                                                        */
-[#if FamilyName?lower_case == "stm32u0"]
-/*  03-08-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added option to disable dev */
-/*                                            alternate setting support,  */
-/*                                            added option to disable dev */
-/*                                            framework initialize scan,  */
-/*                                            added option to reference   */
-/*                                            names by pointer to chars,  */
-/*                                            added option to enable      */
-/*                                            basic USBX error checking,  */
-/*                                            resulting in version 6.2.1  */
-/*                                                                        */
-[/#if]
-[#if FamilyName?lower_case?starts_with("stm32c0")]
+[#if !FamilyName?lower_case?starts_with("stm32mp13")]
 /*  03-08-2023     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added option to disable dev */
 /*                                            alternate setting support,  */
@@ -606,9 +592,9 @@
 
 [#if UX_ALIGN_MIN_value??]
 /* Defined, this value represents minimal allocated memory alignment in number of bytes.
-   The default is UX_ALIGN_16 (0x0f) to align allocated memory to 16 bytes.  */
-[#if UX_ALIGN_MIN_value == "UX_ALIGN_16"]
-/* #define UX_ALIGN_MIN                      UX_ALIGN_16 */
+   The default is UX_ALIGN_8 (0x07) to align allocated memory to 8 bytes.  */
+[#if UX_ALIGN_MIN_value == "UX_ALIGN_8"]
+/* #define UX_ALIGN_MIN                      UX_ALIGN_8 */
 [#else]
 #define UX_ALIGN_MIN                         ${UX_ALIGN_MIN_value}
 [/#if]
@@ -645,13 +631,12 @@
 [/#if]
 [/#if]
 
-
+[#if UX_MAX_CLASSES_value??]
 /* Defined, this value is the maximum number of classes that can be loaded by USBX. This value
    represents the class container and not the number of instances of a class. For instance, if a
    particular implementation of USBX needs the hub class, the printer class, and the storage
    class, then the UX_MAX_CLASSES value can be set to 3 regardless of the number of devices
    that belong to these classes.  */
-[#if UX_MAX_CLASSES_value??]
 [#if UX_MAX_CLASSES_value == "2"]
 /* #define UX_MAX_CLASSES    2 */
 [#else]
@@ -660,8 +645,8 @@
 [/#if]
 
 
-[#if UX_MAX_CLASS_DRIVER_value == "2"]
-/* #define UX_MAX_CLASS_DRIVER    2 */
+[#if UX_MAX_CLASS_DRIVER_value == "3"]
+/* #define UX_MAX_CLASS_DRIVER    3 */
 [#else]
 #define UX_MAX_CLASS_DRIVER       ${UX_MAX_CLASS_DRIVER_value}
 [/#if]
@@ -670,14 +655,6 @@
    USBX.  */
 
 #define UX_MAX_SLAVE_CLASS_DRIVER    ${UX_MAX_SLAVE_CLASS_DRIVER_value}
-
-/* Defined, this value is the maximum number of interfaces in the device framework.  */
-
-[#if UX_MAX_SLAVE_INTERFACES_value == "16"]
-/* #define UX_MAX_SLAVE_INTERFACES    16 */
-[#else]
-#define UX_MAX_SLAVE_INTERFACES       ${UX_MAX_SLAVE_INTERFACES_value}
-[/#if]
 
 /* Defined, this value represents the number of different host controllers available in the system.
    For USB 1.1 support, this value will usually be 1. For USB 2.0 support, this value can be more
@@ -700,6 +677,14 @@
 /* #define UX_MAX_DEVICES    127 */
 [#else]
 #define UX_MAX_DEVICES       ${UX_MAX_DEVICES_value}
+[/#if]
+
+/* Defined, this value is the maximum number of interfaces in the device framework.  */
+
+[#if UX_MAX_SLAVE_INTERFACES_value == "16"]
+/* #define UX_MAX_SLAVE_INTERFACES    16 */
+[#else]
+#define UX_MAX_SLAVE_INTERFACES       ${UX_MAX_SLAVE_INTERFACES_value}
 [/#if]
 
 /* Defined, this value represents the current number of SCSI logical units represented in the device
@@ -729,80 +714,85 @@
 #define UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH                 ${UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH_value}
 [/#if]
 
-[#if FamilyName?lower_case?starts_with("stm32c0")]
+[#if UX_DEVICE_ENDPOINT_BUFFER_OWNER_value??]
 /* Defined, this value represents the endpoint buffer owner.
    0 - The default, endpoint buffer is managed by core stack. Each endpoint takes UX_SLAVE_REQUEST_DATA_MAX_LENGTH bytes.
-   1 - Endpoint buffer managed by classes. In this case not all endpoints consume UX_SLAVE_REQUEST_DATA_MAX_LENGTH bytes.
-*/
+   1 - Endpoint buffer managed by classes. In this case not all endpoints consume UX_SLAVE_REQUEST_DATA_MAX_LENGTH bytes.  */
+   
 [#if UX_DEVICE_ENDPOINT_BUFFER_OWNER_value == "0"]
-#define UX_DEVICE_ENDPOINT_BUFFER_OWNER      0
+/* #define UX_DEVICE_ENDPOINT_BUFFER_OWNER      0 */
 [#else]
 #define UX_DEVICE_ENDPOINT_BUFFER_OWNER      1
 [/#if]
 
+[#if UX_DEVICE_CLASS_CDC_ACM_ZERO_COPY_value??]
 /* Defined, it enables device CDC ACM zero copy for bulk in/out endpoints (write/read).
-    Enabled, the endpoint buffer is not allocated in class, application must
-    provide the buffer for read/write, and the buffer must meet device controller driver (DCD)
-    buffer requirements (e.g., aligned and cache safe).
-    It only works if UX_DEVICE_ENDPOINT_BUFFER_OWNER is 1 (endpoint buffer managed by class).
- */
+   Enabled, the endpoint buffer is not allocated in class, application must provide the buffer for read/write,
+   and the buffer must meet device controller driver (DCD) buffer requirements (e.g., aligned and cache safe).
+   It only works if  UX_DEVICE_ENDPOINT_BUFFER_OWNER is 1 (endpoint buffer managed by class).  */
 
 [#if UX_DEVICE_CLASS_CDC_ACM_ZERO_COPY_value == "1" && UX_DEVICE_ENDPOINT_BUFFER_OWNER_value == "1"]
 #define UX_DEVICE_CLASS_CDC_ACM_ZERO_COPY
 [#else]
 /* #define UX_DEVICE_CLASS_CDC_ACM_ZERO_COPY  */
 [/#if]
+[/#if]
 
+[#if UX_DEVICE_CLASS_HID_ZERO_COPY_value??]
 /* Defined, it enables device HID zero copy and flexible queue support (works if HID owns endpoint buffer).
     Enabled, the internal queue buffer is directly used for transfer, the APIs are kept to keep
-    backword compatibility, to AVOID KEEPING BUFFERS IN APPLICATION.
+    backward compatibility, to AVOID KEEPING BUFFERS IN APPLICATION.
     Flexible queue introduces initialization parameter _event_max_number and _event_max_length,
     so each HID function could have different queue settings.
     _event_max_number could be 2 ~ UX_DEVICE_CLASS_HID_MAX_EVENTS_QUEUE.
     Max of _event_max_length could be UX_DEVICE_CLASS_HID_EVENT_BUFFER_LENGTH.
     If the initialization parameters are invalid (are 0s or exceed upper mentioned definition),
     UX_DEVICE_CLASS_HID_MAX_EVENTS_QUEUE and UX_DEVICE_CLASS_HID_EVENT_BUFFER_LENGTH are used to
-    calculate and allocate the queue.
- */
+    calculate and allocate the queue.  */
+	
 [#if UX_DEVICE_CLASS_HID_ZERO_COPY_value == "1" && UX_DEVICE_ENDPOINT_BUFFER_OWNER_value == "1"]
 #define UX_DEVICE_CLASS_HID_ZERO_COPY
 [#else]
 /* #define UX_DEVICE_CLASS_HID_ZERO_COPY  */
 [/#if]
+[/#if]
 
+[#if UX_DEVICE_CLASS_CDC_ECM_ZERO_COPY_value??]
 /* Defined, it enables device CDC_ECM zero copy support (works if CDC_ECM owns endpoint buffer).
     Enabled, it requires that the NX IP default packet pool is in cache safe area, and buffer max
-    size is larger than UX_DEVICE_CLASS_CDC_ECM_ETHERNET_PACKET_SIZE (1536).
- */
+    size is larger than UX_DEVICE_CLASS_CDC_ECM_ETHERNET_PACKET_SIZE (1536).  */
 
 [#if UX_DEVICE_CLASS_CDC_ECM_ZERO_COPY_value == "1" && UX_DEVICE_ENDPOINT_BUFFER_OWNER_value == "1"]
 #define UX_DEVICE_CLASS_CDC_ECM_ZERO_COPY
 [#else]
 /* #define UX_DEVICE_CLASS_CDC_ECM_ZERO_COPY  */
 [/#if]
+[/#if]
 
+[#if UX_DEVICE_CLASS_RNDIS_ZERO_COPY_value??]
 /* Defined, it enables device RNDIS zero copy support (works if RNDIS owns endpoint buffer).
     Enabled, it requires that the NX IP default packet pool is in cache safe area, and buffer max
-    size is larger than UX_DEVICE_CLASS_RNDIS_MAX_PACKET_TRANSFER_SIZE (1600).
- */
+    size is larger than UX_DEVICE_CLASS_RNDIS_MAX_PACKET_TRANSFER_SIZE (1600).  */
 
 [#if UX_DEVICE_CLASS_RNDIS_ZERO_COPY_value == "1" && UX_DEVICE_ENDPOINT_BUFFER_OWNER_value == "1"]
 #define UX_DEVICE_CLASS_RNDIS_ZERO_COPY
 [#else]
 /* #define UX_DEVICE_CLASS_RNDIS_ZERO_COPY  */
 [/#if]
+[/#if]
 
+[#if UX_DEVICE_CLASS_PRINTER_ZERO_COPY_value??]
 /* Defined, it enables zero copy support (works if PRINTER owns endpoint buffer).
     Defined, it enables zero copy for bulk in/out endpoints (write/read). In this case, the endpoint
     buffer is not allocated in class, application must provide the buffer for read/write, and the
     buffer must meet device controller driver (DCD) buffer requirements (e.g., aligned and cache
-    safe if buffer is for DMA).
- */
+    safe if buffer is for DMA).  */
 
 [#if UX_DEVICE_CLASS_PRINTER_ZERO_COPY_value == "1" && UX_DEVICE_ENDPOINT_BUFFER_OWNER_value == "1"]
 #define UX_DEVICE_CLASS_PRINTER_ZERO_COPY
 [#else]
 /* #define UX_DEVICE_CLASS_PRINTER_ZERO_COPY  */
+[/#if]
 [/#if]
 [/#if]
 
@@ -818,7 +808,7 @@
 #define UX_SLAVE_REQUEST_DATA_MAX_LENGTH                    ${UX_SLAVE_REQUEST_DATA_MAX_LENGTH_value}
 [/#if]
 
-[#if FamilyName?lower_case?starts_with("stm32c0")]
+[#if UX_DEVICE_ENABLE_GET_STRING_WITH_ZERO_LANGUAGE_ID_value??]
 /* Defined, this enables processing of Get String Descriptor requests with zero Language ID.
    The first language ID in the language ID framwork will be used if the request has a zero
    Language ID.  */
@@ -828,7 +818,6 @@
 [#else]
 #define UX_DEVICE_ENABLE_GET_STRING_WITH_ZERO_LANGUAGE_ID
 [/#if]
-
 [/#if]
 
 
@@ -1123,20 +1112,19 @@
 /* #define UX_DEVICE_CLASS_CDC_ACM_TRANSMISSION_DISABLE */
 [/#if]
 
-/* Defined, device HID interrupt OUT transfer is supported.  */
-
-[#if UX_DEVICE_CLASS_HID_INTERRUPT_OUT_SUPPORT_value == "1" && UX_DEVICE_HID_CUSTOM_ENABLED_Value == "true"]
-#define UX_DEVICE_CLASS_HID_INTERRUPT_OUT_SUPPORT
-[#else]
-/* #define UX_DEVICE_CLASS_HID_INTERRUPT_OUT_SUPPORT */
-[/#if]
-
-/* defined, this macro enables device audio feedback endpoint support.  */
+/* Defined, this macro enables device audio feedback endpoint support.  */
 
 [#if UX_DEVICE_CLASS_AUDIO_FEEDBACK_SUPPORT_value == "1"]
 #define UX_DEVICE_CLASS_AUDIO_FEEDBACK_SUPPORT
 [#else]
 /* #define UX_DEVICE_CLASS_AUDIO_FEEDBACK_SUPPORT  */
+[/#if]
+
+/* Defined, this macro enables device audio interrupt endpoint support.  */
+[#if UX_DEVICE_CLASS_AUDIO_INTERRUPT_SUPPORT_value == "1"]
+#define UX_DEVICE_CLASS_AUDIO_INTERRUPT_SUPPORT
+[#else]
+/* #define UX_DEVICE_CLASS_AUDIO_INTERRUPT_SUPPORT  */
 [/#if]
 
 /* Defined, class _write is pending ZLP automatically (complete transfer) after buffer is sent.  */
@@ -1153,11 +1141,12 @@
 /* #define UX_DEVICE_CLASS_PRINTER_WRITE_AUTO_ZLP  */
 [/#if]
 
-/* defined, this macro enables device audio interrupt endpoint support.  */
-[#if UX_DEVICE_CLASS_AUDIO_INTERRUPT_SUPPORT_value == "1"]
-#define UX_DEVICE_CLASS_AUDIO_INTERRUPT_SUPPORT
+/* Defined, device HID interrupt OUT transfer is supported.  */
+
+[#if UX_DEVICE_CLASS_HID_INTERRUPT_OUT_SUPPORT_value == "1" && UX_DEVICE_HID_CUSTOM_ENABLED_Value == "true"]
+#define UX_DEVICE_CLASS_HID_INTERRUPT_OUT_SUPPORT
 [#else]
-/* #define UX_DEVICE_CLASS_AUDIO_INTERRUPT_SUPPORT  */
+/* #define UX_DEVICE_CLASS_HID_INTERRUPT_OUT_SUPPORT */
 [/#if]
 
 /* Defined, this macro enables device bi-directional endpoint support. */
@@ -1183,13 +1172,22 @@
 /* Defined, this macro disables device framework scan, where max number of endpoints (except EP0)
    and max number of interfaces are calculated at runtime, as a base to allocate memory for
    interfaces and endpoints structures and their buffers.
-   Undefined, the following two macros must be defined to initialize memory structures. */
+   Undefined, the following two macros must be defined to initialize memory structures.
+ */
    
 [#if UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE_value == "1"]
 #define UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE
 [#else]
 /* #define UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE */
 [/#if]
+[/#if]
+
+/* Defined, host HID interrupt OUT transfer is supported.  */
+
+[#if UX_HOST_CLASS_HID_INTERRUPT_OUT_SUPPORT_value == "0"]
+/* #define UX_HOST_CLASS_HID_INTERRUPT_OUT_SUPPORT  */
+[#else]
+#define UX_HOST_CLASS_HID_INTERRUPT_OUT_SUPPORT
 [/#if]
 
 /* Defined, this macro enables device/host PIMA MTP support.  */
@@ -1212,13 +1210,6 @@
 #define UX_HOST_DEVICE_CLASS_CODE_VALIDATION_ENABLE
 [/#if]
 
-/* Defined, host HID interrupt OUT transfer is supported.  */
-
-[#if UX_HOST_CLASS_HID_INTERRUPT_OUT_SUPPORT_value == "0"]
-/* #define UX_HOST_CLASS_HID_INTERRUPT_OUT_SUPPORT  */
-[#else]
-#define UX_HOST_CLASS_HID_INTERRUPT_OUT_SUPPORT
-[/#if]
 
 /* Define HID report transfer timeout value in millisecond.
    The default is 10000 milliseconds.  */
@@ -1256,19 +1247,20 @@
    Possible settings:
     UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_ALL (0) - The default, create all inside configuration.
     UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_OWNED (1) - Create things owned by class driver.
-   Not defined, default setting is applied. */
-
+   Not defined, default setting is applied.
+ */
 [#if UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_CONTROL_value == "UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_ALL"]
 /* #define UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_CONTROL        UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_ALL */
 [#else]
-#define UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_CONTROL           ${UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_CONTROL_value}
+#define UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_CONTROL           UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_OWNED
 [/#if]
 [/#if]
 
 [#if UX_NAME_REFERENCED_BY_POINTER_value??]
 /* Defined, the _name in structs are referenced by pointer instead of by contents.
    By default the _name is an array of string that saves characters, the contents are compared to confirm match.
-   If referenced by pointer the address pointer to const string is saved, the pointers are compared to confirm match. */
+   If referenced by pointer the address pointer to const string is saved, the pointers are compared to confirm match.
+ */
 [#if UX_NAME_REFERENCED_BY_POINTER_value == "0"]
 /* #define UX_NAME_REFERENCED_BY_POINTER  */
 [#else]
@@ -1301,7 +1293,7 @@
 */
 #ifndef UX_HOST_SIDE_ONLY
 #ifndef UX_DEVICE_SIDE_ONLY
-[#if (DIE=="DIE455" || DIE=="DIE474" || DIE=="DIE484"  || DIE=="DIE478"  || DIE=="DIE489" || DIE=="DIE493" || (UX_OTG_SUPPORT_value?? && UX_OTG_SUPPORT_value == "0" ))]
+[#if (DIE=="DIE455" || DIE=="DIE474" || DIE=="DIE484"  || DIE=="DIE478"  || DIE=="DIE489" || DIE=="DIE493" ||  DIE=="DIE454" || (UX_OTG_SUPPORT_value?? && UX_OTG_SUPPORT_value == "0" ))]
 /* #define UX_OTG_SUPPORT */
 [#else]
 #define UX_OTG_SUPPORT
@@ -1315,6 +1307,18 @@
 [#else]
 /* #define UX_STANDALONE  */
 [/#if]
+
+/* Defined, this macro will remove the FileX dependency of host storage.
+   In this mode, sector access is offered instead of directly FileX FX_MEDIA support.
+   Use following APIs for media obtain and access:
+   - ux_host_class_storage_media_get : get instance of UX_HOST_CLASS_STORAGE_MEDIA
+   - ux_host_class_storage_media_lock : lock specific media for further read/write
+   - ux_host_class_storage_media_read : read sectors on locked media
+   - ux_host_class_storage_media_write : write sectors on locked media
+   - ux_host_class_storage_media_unlock : unlock media
+   Note it's forced defined/enabled in standalone mode of usbx.
+*/
+/* #define UX_HOST_CLASS_STORAGE_NO_FILEX  */
 
 /* Defined, this value represents the maximum size of single transfers for the SCSI data phase.
    By default it's 1024.
@@ -1367,13 +1371,17 @@
 [/#if]
 [/#if]
 
-/* Defined, this defines the assert action taken when failure detected. By default
-   it halts without any output.  */
 [#if UX_ENABLE_ASSERT_value??]
 [#if UX_ENABLE_ASSERT_value == "0"]
+/* Defined, this defines the assert action taken when failure detected. By default
+   it halts without any output.  */
 /* #define UX_ASSERT_FAIL  for (;;) {tx_thread_sleep(UX_WAIT_FOREVER); }  */
 [#else]
+[#if UX_STANDALONE_ENABLED_Value=="0"]
+/* Defined, this defines the assert action taken when failure detected. By default
+   it halts without any output.  */
 #define UX_ASSERT_FAIL  for (;;) {tx_thread_sleep(UX_WAIT_FOREVER); }
+[/#if]
 [/#if]
 [/#if]
 

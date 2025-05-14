@@ -40,6 +40,7 @@ extern "C"{
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <inttypes.h>
 
 #include "app_conf.h"
 [#if (myHash["BLE_MODE_SIMPLEST_BLE"] != "Enabled")]

@@ -6,8 +6,8 @@
     <About>RCC: Reset and Clock Control</About>
 
     <RefParameter Visible="false" Comment="Oscillator Type" DefaultValue="+OscillatorTypeHSI+|OscillatorTypeLSI+|OscillatorTypeHSE+|OscillatorTypeLSE" Name="OscillatorType" Type="list"/>
-    <RefParameter Name="HSE_Timout"   Comment="HSE Startup Timout Value (ms)" Type="integer" DefaultValue="100" Min="1"  Max="4294967295" Group="RCC Parameters"/>
-    <RefParameter Name="LSE_Timout"   Comment="LSE Startup Timout Value (ms)" Type="integer" DefaultValue="5000" Min="1" Max="4294967295"  Group="RCC Parameters"/>
+    <RefParameter Name="HSE_Timout"   Comment="HSE Startup Timeout Value (ms)" Type="integer" DefaultValue="100" Min="1"  Max="4294967295" Group="RCC Parameters"/>
+    <RefParameter Name="LSE_Timout"   Comment="LSE Startup Timeout Value (ms)" Type="integer" DefaultValue="5000" Min="1" Max="4294967295"  Group="RCC Parameters"/>
     <!--Les multiplicateurs-->
 
     <!--APB1 MUL for TIM-->
@@ -655,6 +655,9 @@
 	
     <!--frequence Values --> 
     <!--Source frequency Values -->
+    <RefParameter Visible="false" Comment="HSE OSC" Name="HSE_VALUE" DefaultValue="32000000" Max="32000000" Min="32000000" Type="double" Display="value/1000000" Unit="MHz">
+        <Condition Diagnostic="HSE in Crystal/Bypass Mode" Expression="(STM32WBA5MJGHx)"/>
+    </RefParameter>
     <RefParameter Visible="false" Comment="HSE OSC" Name="HSE_VALUE" DefaultValue="16000000" Max="32000000" Min="0" Type="double" Display="value/1000000" Unit="MHz"><!--HSE bypass and !PLL and !CSS-->
         <Condition Diagnostic="HSE in Crystal/Bypass Mode" Expression="(HSEOscillator|HSEByPass)"/>
     </RefParameter>
@@ -2297,7 +2300,7 @@
             </ModeLogicOperator>
         </Mode-->
         <!-- Modes for Oscillators & Clocks -->
-        <Mode Name="OSC" UserName="High Speed Clock (HSE)">
+        <Mode Name="OSC" UserName="High Speed Clock (HSE)" RemoveCondition="STM32WBA5MJGHx">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="HSE-External-Clock-Source" UserName="BYPASS Clock Source">
                     <SignalLogicalOp Name="AND">
@@ -2315,7 +2318,7 @@
                 </Mode>
             </ModeLogicOperator>            
         </Mode>
-        <Mode Name="OSC32" UserName="Low Speed Clock (LSE) ">
+        <Mode Name="OSC32" UserName="Low Speed Clock (LSE) " RemoveCondition="STM32WBA5MJGHx">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="LSE-External-Clock-Source" UserName="BYPASS Clock Source">
                     <SignalLogicalOp Name="AND">
@@ -2342,6 +2345,33 @@
                     <SignalLogicalOp Name="AND">
                         <Signal Name="OSC32_IN"/>
                         <Signal Name="OSC32_OUT"/>
+                    </SignalLogicalOp>
+                    <Semaphore>LSEOscillatorRTC</Semaphore>
+                </Mode>            
+            </ModeLogicOperator>
+        </Mode>
+
+        <Mode Name="OSC" UserName="High Speed Clock (HSE)" RemoveCondition="!STM32WBA5MJGHx">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="HSE-External-Oscillator" UserName="Crystal/Ceramic Resonator">
+                    <SignalLogicalOp Name="AND">
+						<Signal Name="V_OSC_IN"/>
+                    </SignalLogicalOp>
+                    <Semaphore>HSEOscillator</Semaphore>
+                </Mode>
+            </ModeLogicOperator>            
+        </Mode>
+        <Mode Name="OSC32" UserName="Low Speed Clock (LSE) " RemoveCondition="!STM32WBA5MJGHx">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="LSE-External-Oscillator" UserName="Crystal/Ceramic Resonator">
+                      <SignalLogicalOp Name="AND">
+                        <Signal Name="V_OSC32_IN"/>
+                    </SignalLogicalOp>
+                    <Semaphore>LSEOscillator</Semaphore>
+                </Mode>
+                <Mode Name="LSE-External-Oscillator-for-RTC" UserName="RTC only Crystal/Ceramic Resonator">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="V_OSC32_IN"/>
                     </SignalLogicalOp>
                     <Semaphore>LSEOscillatorRTC</Semaphore>
                 </Mode>            
@@ -2407,6 +2437,8 @@
     <RefSignal Virtual="true" Name="RMVFSEC"/>
     <RefSignal IOMode="AlternateFunctionPushPull" Name="OSC_EN"/>
     <RefSignal IOMode="AlternateFunctionPushPull" Name="OSC32_EN"/>
-
+    
+    <RefSignal Name="V_OSC_IN"  Virtual="true"/>
+    <RefSignal Name="V_OSC32_IN" Virtual="true"/>
    
 </IP>

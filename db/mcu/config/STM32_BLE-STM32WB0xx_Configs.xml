@@ -236,9 +236,12 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="CFG_BLE_ISR0_FIFO_SIZE" GenericType="Simple"/>
         <Argument Name="CFG_BLE_ISR1_FIFO_SIZE" GenericType="Simple"/>
         <Argument Name="CFG_BLE_USER_FIFO_SIZE" GenericType="Simple"/>
+        <Argument Name="CFG_BLE_GAP_PERIPH_PREF_CONN_PARAM_CHARACTERISTIC" GenericType="Simple"/>
+        <Argument Name="CFG_BLE_GAP_ENCRYPTED_KEY_MATERIAL_CHARACTERISTIC" GenericType="Simple"/>
         <Argument Name="CFG_BLE_ATT_QUEUED_WRITE_SIZE" GenericType="Simple"/>
         <Argument Name="CFG_BLE_GATT_NWK_BUFFER_SIZE" GenericType="Simple"/>
         <Argument Name="CFG_BLE_ADV_NWK_BUFFER_SIZE" GenericType="Simple"/>
+        <Argument Name="CFG_BLE_GATT_CLT_NUM_CHARAC_SUBSCRIPTIONS_MAX" GenericType="Simple"/>
         <Argument Name="CFG_BLE_CONTROLLER_SCAN_ENABLED" GenericType="Simple"/>
         <Argument Name="CFG_BLE_CONTROLLER_PRIVACY_ENABLED" GenericType="Simple"/>
         <Argument Name="CFG_BLE_SECURE_CONNECTIONS_ENABLED" GenericType="Simple"/>
@@ -287,6 +290,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="BLE_MODE_BROADCASTER" GenericType="Simple"/>
         <Argument Name="FREERTOS_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
         <Argument Name="SEQUENCER_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
+        <Argument Name="LITE_SERVER_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
 	</RefConfigFile>
 
     <RefConfigFile Description="" Name="WB0_BLE_CONF_H" Template="stm32wb0/stm32_ble_ble_conf_h.ftl" destinationFolder="STM32_BLE/App">
@@ -303,10 +307,11 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="WB0_APP_BLE_C" Template="stm32wb0/stm32_ble_app_ble_c.ftl" destinationFolder="STM32_BLE/App">
-        <File Category="source" Condition="(S_BLE_CP | S_BLE_SP | S_BLE_RP | S_BLE_TM | S_BLE_TMCO | S_BLE_BC) &amp; S_BLE_HOST" Name="app_ble.c" Version="1.0"/>
+        <File Category="source" Condition="(S_BLE_CP | S_BLE_LSP | S_BLE_SP | S_BLE_RP | S_BLE_TM | S_BLE_TMCO | S_BLE_BC) &amp; (S_BLE_HOST | S_BLE_HOST_LITE)" Name="app_ble.c" Version="1.0"/>
         <Argument Name="NUMBER_OF_SERVICES" GenericType="Simple"/>
         <Argument Name="FREERTOS_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
         <Argument Name="SEQUENCER_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
+        <Argument Name="LITE_SERVER_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
         <Argument Name="BLE_MODE_SKELETON" GenericType="Simple"/>
         <Argument Name="BLE_MODE_HOST_SKELETON" GenericType="Simple"/>
         <Argument Name="BLE_MODE_TRANSPARENT_UART" GenericType="Simple"/>
@@ -437,7 +442,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="WB0_APP_BLE_H" Template="stm32wb0/stm32_ble_app_ble_h.ftl" destinationFolder="STM32_BLE/App">
-      <File Category="header" Condition="(S_BLE_CP | S_BLE_SP | S_BLE_RP | S_BLE_TM | S_BLE_TMCO | S_BLE_BC) &amp; S_BLE_HOST" Name="app_ble.h" Version="1.0"/>
+      <File Category="header" Condition="(S_BLE_CP | S_BLE_LSP | S_BLE_SP | S_BLE_RP | S_BLE_TM | S_BLE_TMCO | S_BLE_BC) &amp; (S_BLE_HOST | S_BLE_HOST_LITE)" Name="app_ble.h" Version="1.0"/>
         <Argument Name="BLE_MODE_SKELETON" GenericType="Simple"/>
         <Argument Name="BLE_MODE_HOST_SKELETON" GenericType="Simple"/>
         <Argument Name="BLE_MODE_PERIPHERAL" GenericType="Simple"/>
@@ -448,10 +453,11 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="BLE_MODE_BROADCASTER" GenericType="Simple"/>
         <Argument Name="FREERTOS_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
         <Argument Name="SEQUENCER_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
+        <Argument Name="LITE_SERVER_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
 	</RefConfigFile>
 
     <RefConfigFile Description="" Name="WB0_STM32_LPM_IF_C" Template="stm32wb0/stm32_ble_stm32_lpm_if_c.ftl" destinationFolder="System/Interfaces">
-		<File Category="source" Condition="all" Name="stm32_lpm_if.c" Version="1.0"/>
+		<File Category="source" Condition="!(S_COMMON_BLE)" Name="stm32_lpm_if.c" Version="1.0"/>
 		<Argument Name="FREERTOS_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
         <Argument Name="SEQUENCER_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
 	</RefConfigFile>
@@ -466,52 +472,52 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
     <RefConfigFile Description="" Name="WB0_APP_DEBUG_H" Template="stm32wb0/stm32_ble_app_debug_h.ftl" destinationFolder="System/Config/Debug_GPIO"><File Category="header" Condition="all" Name="app_debug.h" Version="1.0"/></RefConfigFile>
     <RefConfigFile Description="" Name="WB0_APP_DEBUG_SIGNAL_DEF_H" Template="stm32wb0/stm32_ble_app_debug_signal_def_h.ftl" destinationFolder="System/Config/Debug_GPIO"><File Category="header" Condition="all" Name="app_debug_signal_def.h" Version="1.0"/></RefConfigFile>
     <RefConfigFile Description="" Name="WB0_DEBUG_CONFIG_H" Template="stm32wb0/stm32_ble_debug_config_h.ftl" destinationFolder="System/Config/Debug_GPIO"><File Category="header" Condition="all" Name="debug_config.h" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_CRYPTOLIB_HW_AES_C" Template="stm32wb0/stm32_ble_cryptolib_hw_aes_c.ftl" destinationFolder="System/Interfaces"><File Category="source" Condition="all" Name="cryptolib_hw_aes.c" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_HW_AES_C" Template="stm32wb0/stm32_ble_hw_aes_c.ftl" destinationFolder="System/Interfaces"><File Category="source" Condition="all" Name="hw_aes.c" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_HW_AES_H" Template="stm32wb0/stm32_ble_hw_aes_h.ftl" destinationFolder="System/Interfaces"><File Category="header" Condition="all" Name="hw_aes.h" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_HW_PKA_C" Template="stm32wb0/stm32_ble_hw_pka_c.ftl" destinationFolder="System/Interfaces"><File Category="source" Condition="all" Name="hw_pka.c" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_HW_PKA_H" Template="stm32wb0/stm32_ble_hw_pka_h.ftl" destinationFolder="System/Interfaces"><File Category="header" Condition="all" Name="hw_pka.h" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_HW_RNG_C" Template="stm32wb0/stm32_ble_hw_rng_c.ftl" destinationFolder="System/Interfaces"><File Category="source" Condition="all" Name="hw_rng.c" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_HW_RNG_H" Template="stm32wb0/stm32_ble_hw_rng_h.ftl" destinationFolder="System/Interfaces"><File Category="header" Condition="all" Name="hw_rng.h" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_STM32_LPM_IF_H" Template="stm32wb0/stm32_ble_stm32_lpm_if_h.ftl" destinationFolder="System/Interfaces"><File Category="header" Condition="all" Name="stm32_lpm_if.h" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_CRYPTOLIB_HW_AES_C" Template="stm32wb0/stm32_ble_cryptolib_hw_aes_c.ftl" destinationFolder="System/Interfaces"><File Category="source" Condition="!(S_COMMON_BLE)" Name="cryptolib_hw_aes.c" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_HW_AES_C" Template="stm32wb0/stm32_ble_hw_aes_c.ftl" destinationFolder="System/Interfaces"><File Category="source" Condition="!(S_COMMON_BLE)" Name="hw_aes.c" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_HW_AES_H" Template="stm32wb0/stm32_ble_hw_aes_h.ftl" destinationFolder="System/Interfaces"><File Category="header" Condition="!(S_COMMON_BLE)" Name="hw_aes.h" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_HW_PKA_C" Template="stm32wb0/stm32_ble_hw_pka_c.ftl" destinationFolder="System/Interfaces"><File Category="source" Condition="!(S_COMMON_BLE)" Name="hw_pka.c" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_HW_PKA_H" Template="stm32wb0/stm32_ble_hw_pka_h.ftl" destinationFolder="System/Interfaces"><File Category="header" Condition="!(S_COMMON_BLE)" Name="hw_pka.h" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_HW_RNG_C" Template="stm32wb0/stm32_ble_hw_rng_c.ftl" destinationFolder="System/Interfaces"><File Category="source" Condition="!(S_COMMON_BLE)" Name="hw_rng.c" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_HW_RNG_H" Template="stm32wb0/stm32_ble_hw_rng_h.ftl" destinationFolder="System/Interfaces"><File Category="header" Condition="!(S_COMMON_BLE)" Name="hw_rng.h" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_STM32_LPM_IF_H" Template="stm32wb0/stm32_ble_stm32_lpm_if_h.ftl" destinationFolder="System/Interfaces"><File Category="header" Condition="!(S_COMMON_BLE)" Name="stm32_lpm_if.h" Version="1.0"/></RefConfigFile>
     <RefConfigFile Description="" Name="WB0_USART_IF_C" Template="stm32wb0/usart_if_c.ftl" destinationFolder="System/Interfaces"><File Category="source" Condition="all" Name="usart_if.c" Version="1.0"/></RefConfigFile>
     <RefConfigFile Description="" Name="WB0_USART_IF_H" Template="stm32wb0/usart_if_h.ftl" destinationFolder="System/Interfaces"><File Category="header" Condition="all" Name="usart_if.h" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_ASM_H" Template="stm32wb0/stm32_ble_asm_h.ftl" destinationFolder="System/Modules"><File Category="header" Condition="all" Name="asm.h" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_BLUE_UNIT_CONVERSION_S" Template="stm32wb0/stm32_ble_blue_unit_conversion_s.ftl" destinationFolder="System/Modules"><File Category="header" Condition="all" Name="blue_unit_conversion.s" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_COMPILER_H" Template="stm32wb0/stm32_ble_compiler_h.ftl" destinationFolder="System/Modules"><File Category="header" Condition="all" Name="compiler.h" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_CRASH_HANDLER_H" Template="stm32wb0/stm32_ble_crash_handler_h.ftl" destinationFolder="System/Modules"><File Category="header" Condition="all" Name="crash_handler.h" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_MISCUTIL_C" Template="stm32wb0/stm32_ble_miscutil_c.ftl" destinationFolder="System/Modules"><File Category="source" Condition="all" Name="miscutil.c" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_MISCUTIL_H" Template="stm32wb0/stm32_ble_miscutil_h.ftl" destinationFolder="System/Modules"><File Category="header" Condition="all" Name="miscutil.h" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_OSAL_C" Template="stm32wb0/stm32_ble_osal_c.ftl" destinationFolder="System/Modules"><File Category="source" Condition="all" Name="osal.c" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_OSAL_H" Template="stm32wb0/stm32_ble_osal_h.ftl" destinationFolder="System/Modules"><File Category="header" Condition="all" Name="osal.h" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_OSAL_MEMCPY_S" Template="stm32wb0/stm32_ble_osal_memcpy_s.ftl" destinationFolder="System/Modules"><File Category="header" Condition="all" Name="osal_memcpy.s" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_STM_LIST_C" Template="stm32wb0/stm32_ble_stm_list_c.ftl" destinationFolder="System/Modules"><File Category="source" Condition="all" Name="stm_list.c" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_STM_LIST_H" Template="stm32wb0/stm32_ble_stm_list_h.ftl" destinationFolder="System/Modules"><File Category="header" Condition="all" Name="stm_list.h" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_UTILITIES_COMMON_H" Template="stm32wb0/stm32_ble_utilities_common_h.ftl" destinationFolder="System/Modules"><File Category="header" Condition="all" Name="utilities_common.h" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_FLASH_DRIVER_C" Template="stm32wb0/stm32_ble_flash_driver_c.ftl" destinationFolder="System/Modules/Flash"><File Category="source" Condition="all" Name="flash_driver.c" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_FLASH_DRIVER_H" Template="stm32wb0/stm32_ble_flash_driver_h.ftl" destinationFolder="System/Modules/Flash"><File Category="header" Condition="all" Name="flash_driver.h" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_FLASH_MANAGER_C" Template="stm32wb0/stm32_ble_flash_manager_c.ftl" destinationFolder="System/Modules/Flash"><File Category="source" Condition="all" Name="flash_manager.c" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_FLASH_MANAGER_H" Template="stm32wb0/stm32_ble_flash_manager_h.ftl" destinationFolder="System/Modules/Flash"><File Category="header" Condition="all" Name="flash_manager.h" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_NVM_DB_CONF_H" Template="stm32wb0/stm32_ble_nvm_db_conf_h.ftl" destinationFolder="System/Modules/NVMDB/Inc"><File Category="header" Condition="all" Name="nvm_db_conf.h" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_NVM_DB_H" Template="stm32wb0/stm32_ble_nvm_db_h.ftl" destinationFolder="System/Modules/NVMDB/Inc"><File Category="header" Condition="all" Name="nvm_db.h" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_NVM_H" Template="stm32wb0/stm32_ble_nvm_h.ftl" destinationFolder="System/Modules/NVMDB/Inc"><File Category="header" Condition="all" Name="nvm.h" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_NVM_DB_C" Template="stm32wb0/stm32_ble_nvm_db_c.ftl" destinationFolder="System/Modules/NVMDB/Src"><File Category="source" Condition="all" Name="nvm_db.c" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_NVM_DB_CONF_C" Template="stm32wb0/stm32_ble_nvm_db_conf_c.ftl" destinationFolder="System/Modules/NVMDB/Src"><File Category="source" Condition="all" Name="nvm_db_conf.c" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_PKA_MANAGER_H" Template="stm32wb0/stm32_ble_pka_manager_h.ftl" destinationFolder="System/Modules/PKAMGR/Inc"><File Category="header" Condition="all" Name="pka_manager.h" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_PKA_MANAGER_C" Template="stm32wb0/stm32_ble_pka_manager_c.ftl" destinationFolder="System/Modules/PKAMGR/Src"><File Category="source" Condition="all" Name="pka_manager.c" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_GAP_PROFILE_H" Template="stm32wb0/stm32_ble_gap_profile_h.ftl" destinationFolder="System/Modules/Profiles/Inc"><File Category="header" Condition="all" Name="gap_profile.h" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_GATT_PROFILE_H" Template="stm32wb0/stm32_ble_gatt_profile_h.ftl" destinationFolder="System/Modules/Profiles/Inc"><File Category="header" Condition="all" Name="gatt_profile.h" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_GAP_PROFILE_C" Template="stm32wb0/stm32_ble_gap_profile_c.ftl" destinationFolder="System/Modules/Profiles/Src"><File Category="source" Condition="all" Name="gap_profile.c" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_GATT_PROFILE_C" Template="stm32wb0/stm32_ble_gatt_profile_c.ftl" destinationFolder="System/Modules/Profiles/Src"><File Category="source" Condition="all" Name="gatt_profile.c" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_RADIO_UTILS_H" Template="stm32wb0/stm32_ble_RADIO_utils_h.ftl" destinationFolder="System/Modules/RADIO_utils/Inc"><File Category="header" Condition="all" Name="RADIO_utils.h" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_RADIO_UTILS_C" Template="stm32wb0/stm32_ble_RADIO_utils_c.ftl" destinationFolder="System/Modules/RADIO_utils/Src"><File Category="source" Condition="all" Name="RADIO_utils.c" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_DEBUG_SIGNALS_H" Template="stm32wb0/stm32_ble_debug_signals_h.ftl" destinationFolder="System/Modules/RTDebug"><File Category="header" Condition="all" Name="debug_signals.h" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_LOCAL_DEBUG_TABLES_H" Template="stm32wb0/stm32_ble_local_debug_tables_h.ftl" destinationFolder="System/Modules/RTDebug"><File Category="header" Condition="all" Name="local_debug_tables.h" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_RTDEBUG_C" Template="stm32wb0/stm32_ble_RTDebug_c.ftl" destinationFolder="System/Modules/RTDebug"><File Category="source" Condition="all" Name="RTDebug.c" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_RTDEBUG_H" Template="stm32wb0/stm32_ble_RTDebug_h.ftl" destinationFolder="System/Modules/RTDebug"><File Category="header" Condition="all" Name="RTDebug.h" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_CPU_CONTEXT_SWITCH_S" Template="stm32wb0/stm32_ble_cpu_context_switch_s.ftl" destinationFolder="System/Startup"><File Category="header" Condition="all" Name="cpu_context_switch.s" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_DEVICE_CONTEXT_SWITCH_C" Template="stm32wb0/stm32_ble_device_context_switch_c.ftl" destinationFolder="System/Startup"><File Category="source" Condition="all" Name="device_context_switch.c" Version="1.0"/></RefConfigFile>
-    <RefConfigFile Description="" Name="WB0_DEVICE_CONTEXT_SWITCH_H" Template="stm32wb0/stm32_ble_device_context_switch_h.ftl" destinationFolder="System/Startup"><File Category="header" Condition="all" Name="device_context_switch.h" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_ASM_H" Template="stm32wb0/stm32_ble_asm_h.ftl" destinationFolder="System/Modules"><File Category="header" Condition="!(S_COMMON_BLE)" Name="asm.h" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_BLUE_UNIT_CONVERSION_S" Template="stm32wb0/stm32_ble_blue_unit_conversion_s.ftl" destinationFolder="System/Modules"><File Category="source" Condition="!(S_COMMON_BLE)" Name="blue_unit_conversion.s" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_COMPILER_H" Template="stm32wb0/stm32_ble_compiler_h.ftl" destinationFolder="System/Modules"><File Category="header" Condition="!(S_COMMON_BLE)" Name="compiler.h" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_CRASH_HANDLER_H" Template="stm32wb0/stm32_ble_crash_handler_h.ftl" destinationFolder="System/Modules"><File Category="header" Condition="!(S_COMMON_BLE)" Name="crash_handler.h" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_MISCUTIL_C" Template="stm32wb0/stm32_ble_miscutil_c.ftl" destinationFolder="System/Modules"><File Category="source" Condition="!(S_COMMON_BLE)" Name="miscutil.c" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_MISCUTIL_H" Template="stm32wb0/stm32_ble_miscutil_h.ftl" destinationFolder="System/Modules"><File Category="header" Condition="!(S_COMMON_BLE)" Name="miscutil.h" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_OSAL_C" Template="stm32wb0/stm32_ble_osal_c.ftl" destinationFolder="System/Modules"><File Category="source" Condition="!(S_COMMON_BLE)" Name="osal.c" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_OSAL_H" Template="stm32wb0/stm32_ble_osal_h.ftl" destinationFolder="System/Modules"><File Category="header" Condition="!(S_COMMON_BLE)" Name="osal.h" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_OSAL_MEMCPY_S" Template="stm32wb0/stm32_ble_osal_memcpy_s.ftl" destinationFolder="System/Modules"><File Category="source" Condition="!(S_COMMON_BLE)" Name="osal_memcpy.s" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_STM_LIST_C" Template="stm32wb0/stm32_ble_stm_list_c.ftl" destinationFolder="System/Modules"><File Category="source" Condition="!(S_COMMON_BLE)" Name="stm_list.c" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_STM_LIST_H" Template="stm32wb0/stm32_ble_stm_list_h.ftl" destinationFolder="System/Modules"><File Category="header" Condition="!(S_COMMON_BLE)" Name="stm_list.h" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_UTILITIES_COMMON_H" Template="stm32wb0/stm32_ble_utilities_common_h.ftl" destinationFolder="System/Modules"><File Category="header" Condition="!(S_COMMON_BLE)" Name="utilities_common.h" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_FLASH_DRIVER_C" Template="stm32wb0/stm32_ble_flash_driver_c.ftl" destinationFolder="System/Modules/Flash"><File Category="source" Condition="!(S_COMMON_BLE)" Name="flash_driver.c" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_FLASH_DRIVER_H" Template="stm32wb0/stm32_ble_flash_driver_h.ftl" destinationFolder="System/Modules/Flash"><File Category="header" Condition="!(S_COMMON_BLE)" Name="flash_driver.h" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_FLASH_MANAGER_C" Template="stm32wb0/stm32_ble_flash_manager_c.ftl" destinationFolder="System/Modules/Flash"><File Category="source" Condition="!(S_COMMON_BLE)" Name="flash_manager.c" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_FLASH_MANAGER_H" Template="stm32wb0/stm32_ble_flash_manager_h.ftl" destinationFolder="System/Modules/Flash"><File Category="header" Condition="!(S_COMMON_BLE)" Name="flash_manager.h" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_NVM_DB_CONF_H" Template="stm32wb0/stm32_ble_nvm_db_conf_h.ftl" destinationFolder="System/Modules/NVMDB/Inc"><File Category="header" Condition="!(S_COMMON_BLE)" Name="nvm_db_conf.h" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_NVM_DB_H" Template="stm32wb0/stm32_ble_nvm_db_h.ftl" destinationFolder="System/Modules/NVMDB/Inc"><File Category="header" Condition="!(S_COMMON_BLE)" Name="nvm_db.h" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_NVM_H" Template="stm32wb0/stm32_ble_nvm_h.ftl" destinationFolder="System/Modules/NVMDB/Inc"><File Category="header" Condition="!(S_COMMON_BLE)" Name="nvm.h" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_NVM_DB_C" Template="stm32wb0/stm32_ble_nvm_db_c.ftl" destinationFolder="System/Modules/NVMDB/Src"><File Category="source" Condition="!(S_COMMON_BLE)" Name="nvm_db.c" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_NVM_DB_CONF_C" Template="stm32wb0/stm32_ble_nvm_db_conf_c.ftl" destinationFolder="System/Modules/NVMDB/Src"><File Category="source" Condition="!(S_COMMON_BLE)" Name="nvm_db_conf.c" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_PKA_MANAGER_H" Template="stm32wb0/stm32_ble_pka_manager_h.ftl" destinationFolder="System/Modules/PKAMGR/Inc"><File Category="header" Condition="!(S_COMMON_BLE)" Name="pka_manager.h" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_PKA_MANAGER_C" Template="stm32wb0/stm32_ble_pka_manager_c.ftl" destinationFolder="System/Modules/PKAMGR/Src"><File Category="source" Condition="!(S_COMMON_BLE)" Name="pka_manager.c" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_GAP_PROFILE_H" Template="stm32wb0/stm32_ble_gap_profile_h.ftl" destinationFolder="System/Modules/Profiles/Inc"><File Category="header" Condition="!(S_COMMON_BLE)" Name="gap_profile.h" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_GATT_PROFILE_H" Template="stm32wb0/stm32_ble_gatt_profile_h.ftl" destinationFolder="System/Modules/Profiles/Inc"><File Category="header" Condition="!(S_COMMON_BLE)" Name="gatt_profile.h" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_GAP_PROFILE_C" Template="stm32wb0/stm32_ble_gap_profile_c.ftl" destinationFolder="System/Modules/Profiles/Src"><File Category="source" Condition="!(S_COMMON_BLE)" Name="gap_profile.c" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_GATT_PROFILE_C" Template="stm32wb0/stm32_ble_gatt_profile_c.ftl" destinationFolder="System/Modules/Profiles/Src"><File Category="source" Condition="!(S_COMMON_BLE)" Name="gatt_profile.c" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_RADIO_UTILS_H" Template="stm32wb0/stm32_ble_RADIO_utils_h.ftl" destinationFolder="System/Modules/RADIO_utils/Inc"><File Category="header" Condition="!(S_COMMON_BLE)" Name="RADIO_utils.h" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_RADIO_UTILS_C" Template="stm32wb0/stm32_ble_RADIO_utils_c.ftl" destinationFolder="System/Modules/RADIO_utils/Src"><File Category="source" Condition="!(S_COMMON_BLE)" Name="RADIO_utils.c" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_DEBUG_SIGNALS_H" Template="stm32wb0/stm32_ble_debug_signals_h.ftl" destinationFolder="System/Modules/RTDebug"><File Category="header" Condition="!(S_COMMON_BLE)" Name="debug_signals.h" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_LOCAL_DEBUG_TABLES_H" Template="stm32wb0/stm32_ble_local_debug_tables_h.ftl" destinationFolder="System/Modules/RTDebug"><File Category="header" Condition="!(S_COMMON_BLE)" Name="local_debug_tables.h" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_RTDEBUG_C" Template="stm32wb0/stm32_ble_RTDebug_c.ftl" destinationFolder="System/Modules/RTDebug"><File Category="source" Condition="!(S_COMMON_BLE)" Name="RTDebug.c" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_RTDEBUG_H" Template="stm32wb0/stm32_ble_RTDebug_h.ftl" destinationFolder="System/Modules/RTDebug"><File Category="header" Condition="!(S_COMMON_BLE)" Name="RTDebug.h" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_CPU_CONTEXT_SWITCH_S" Template="stm32wb0/stm32_ble_cpu_context_switch_s.ftl" destinationFolder="System/Startup"><File Category="header" Condition="!(S_COMMON_BLE)" Name="cpu_context_switch.s" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_DEVICE_CONTEXT_SWITCH_C" Template="stm32wb0/stm32_ble_device_context_switch_c.ftl" destinationFolder="System/Startup"><File Category="source" Condition="!(S_COMMON_BLE)" Name="device_context_switch.c" Version="1.0"/></RefConfigFile>
+    <RefConfigFile Description="" Name="WB0_DEVICE_CONTEXT_SWITCH_H" Template="stm32wb0/stm32_ble_device_context_switch_h.ftl" destinationFolder="System/Startup"><File Category="header" Condition="!(S_COMMON_BLE)" Name="device_context_switch.h" Version="1.0"/></RefConfigFile>
     <RefConfigFile Description="" Name="WB0_ACI_ADV_NWK_C" Template="stm32wb0/stm32_ble_aci_adv_nwk_c.ftl" destinationFolder="STM32_BLE/App"><File Category="source" Condition="(S_BLE_TM | S_BLE_TMCO)" Name="aci_adv_nwk.c" Version="1.0"/></RefConfigFile>
     <RefConfigFile Description="" Name="WB0_ACI_ADV_NWK_H" Template="stm32wb0/stm32_ble_aci_adv_nwk_h.ftl" destinationFolder="STM32_BLE/App"><File Category="header" Condition="(S_BLE_TM | S_BLE_TMCO)" Name="aci_adv_nwk.h" Version="1.0"/></RefConfigFile>
     <RefConfigFile Description="" Name="WB0_ACI_GATT_NWK_C" Template="stm32wb0/stm32_ble_aci_gatt_nwk_c.ftl" destinationFolder="STM32_BLE/App"><File Category="source" Condition="(S_BLE_TM | S_BLE_TMCO)" Name="aci_gatt_nwk.c" Version="1.0"/></RefConfigFile>
@@ -545,7 +551,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
     <RefConfigFile Description="" Name="WB0_TRANSPORT_LAYER_H" Template="stm32wb0/stm32_ble_transport_layer_h.ftl" destinationFolder="STM32_BLE/App"><File Category="header" Condition="(S_BLE_TM | S_BLE_TMCO)" Name="transport_layer.h" Version="1.0"/></RefConfigFile>
 
     <RefConfigFile Description="" Name="WB0_BLE_SERVICE0_C" Template="stm32wb0/stm32_ble_ble_service0_c.ftl">
-        <File Category="source" Name="App/%service0%.c" Version="1.0" Condition="(S_BLE_SP | S_BLE_RP) &amp; S_SERVICE0"/>
+        <File Category="source" Name="App/%service0%.c" Version="1.0" Condition="(S_BLE_LSP | S_BLE_SP | S_BLE_RP) &amp; S_SERVICE0"/>
         <Argument Name="SERVICE0" GenericType="Simple"/>
         <Argument Name="SERVICE0_NUMBER_OF_CHARACTERISTICS" GenericType="Simple"/>
 		<Argument Name="SERVICE0_LONG_NAME" GenericType="Simple"/>
@@ -591,10 +597,11 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="BLE_MODE_CLIENT" GenericType="Simple"/>
         <Argument Name="FREERTOS_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
         <Argument Name="SEQUENCER_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
+		<Argument Name="SERVICE0_CHAR0_NUMBER_OF_CHAR_DESCRIPTORS" GenericType="Simple"/>
 	</RefConfigFile>
 
     <RefConfigFile Description="" Name="WB0_BLE_SERVICE0_H" Template="stm32wb0/stm32_ble_ble_service0_h.ftl">
-        <File Category="header" Name="App/%service0%.h" Version="1.0" Condition="(S_BLE_SP | S_BLE_RP) &amp; S_SERVICE0"/>
+        <File Category="header" Name="App/%service0%.h" Version="1.0" Condition="(S_BLE_LSP | S_BLE_SP | S_BLE_RP) &amp; S_SERVICE0"/>
         <Argument Name="SERVICE0" GenericType="Simple"/>
         <Argument Name="SERVICE0_NUMBER_OF_CHARACTERISTICS" GenericType="Simple"/>
 		<Argument Name="SERVICE0_LONG_NAME" GenericType="Simple"/>
@@ -613,7 +620,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
     </RefConfigFile>
 
     <RefConfigFile Description="" Name="WB0_BLE_SERVICE0_APP_C" Template="stm32wb0/stm32_ble_ble_service0_app_c.ftl">
-        <File Category="source" Name="App/%service0%_app.c" Version="1.0" Condition="(S_BLE_SP | S_BLE_RP) &amp; S_SERVICE0"/>
+        <File Category="source" Name="App/%service0%_app.c" Version="1.0" Condition="(S_BLE_LSP | S_BLE_SP | S_BLE_RP) &amp; S_SERVICE0"/>
         <Argument Name="SERVICE0" GenericType="Simple"/>
         <Argument Name="SERVICE0_NUMBER_OF_CHARACTERISTICS" GenericType="Simple"/>
 		<Argument Name="SERVICE0_LONG_NAME" GenericType="Simple"/>
@@ -632,10 +639,11 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="BLE_MODE_CLIENT" GenericType="Simple"/>
         <Argument Name="FREERTOS_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
         <Argument Name="SEQUENCER_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
+        <Argument Name="LITE_SERVER_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
 	</RefConfigFile>
 
     <RefConfigFile Description="" Name="WB0_BLE_SERVICE0_APP_H" Template="stm32wb0/stm32_ble_ble_service0_app_h.ftl">
-        <File Category="header" Name="App/%service0%_app.h" Version="1.0" Condition="(S_BLE_SP | S_BLE_RP) &amp; S_SERVICE0"/>
+        <File Category="header" Name="App/%service0%_app.h" Version="1.0" Condition="(S_BLE_LSP | S_BLE_SP | S_BLE_RP) &amp; S_SERVICE0"/>
         <Argument Name="SERVICE0_SHORT_NAME" GenericType="Simple" RenameFileName="true"/>
         <Argument Name="SERVICE0" GenericType="Simple" RenameFileName="true"/>
         <Argument Name="BLE_MODE_PERIPHERAL" GenericType="Simple"/>
@@ -643,6 +651,7 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
         <Argument Name="BLE_MODE_CLIENT" GenericType="Simple"/>
         <Argument Name="FREERTOS_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
         <Argument Name="SEQUENCER_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
+        <Argument Name="LITE_SERVER_STATUS" GenericType="Simple" Comment="0 to 1 (0 by default)"/>
 	</RefConfigFile>
 
     <RefConfigFile Description="" Name="WB0_BLE_GATT_CLIENT_APP_C" Template="stm32wb0/stm32_ble_ble_gatt_client_app_c.ftl">
@@ -667,8 +676,8 @@ ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../..
     </RefConfigFile>
     <!-- BSP Virtual PortCom Begin -->
     <RefBspComponent Name="Serial Link for Traces" BspIpName="(LPU|US)ART" BspModeName="Asynchronous">
-        <File Category="template" Name="stm32wb0/usart_if_c.ftl" src="System/Interfaces/"/>
-        <File Category="template" Name="stm32wb0/usart_if_h.ftl" src="System/Interfaces/"/>
+        <File Category="template"  Name="stm32wb0/usart_if_c.ftl" src="System/Interfaces/"/>
+        <File Category="template"  Name="stm32wb0/usart_if_h.ftl" src="System/Interfaces/"/>
     </RefBspComponent>
     <!-- <RefBspComponent Name="Serial Link for CubeMonitor RF" BspIpName="(LPU|US)ART" BspModeName="Asynchronous"> -->
         <!-- <File Category="template" Name="stm32wb0/usart_if_c.ftl" src="System/Interfaces/"/> -->

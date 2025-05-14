@@ -47,11 +47,15 @@
       [#assign LX_USE_OSPI_OCTOSPI_value = value]
     [/#if]
 	
+	[#if name == "LX_STM32_OSPI_BASE_ADDRESS"]
+      [#assign LX_STM32_OSPI_BASE_ADDRESS_value = value]
+    [/#if]
+
 	[#if "${FamilyName?lower_case}" == "stm32u5"]
       [#assign  used_api= "OSPI"]
     [/#if]
 	
-    [#if "${FamilyName?lower_case}" == "stm32h5"]
+    [#if "${FamilyName?lower_case}" == "stm32h5" || "${FamilyName?lower_case}" == "stm32u3"]
       [#assign used_api = "XSPI"]
     [/#if]
 	
@@ -112,6 +116,17 @@ extern TX_SEMAPHORE ${used_api ?lower_case}_tx_semaphore;
 /* the OctoSPI instance, default value set to 0 */
 #define LX_STM32_OSPI_INSTANCE                           ${ospi_instance}
 
+[#if LX_STM32_OSPI_BASE_ADDRESS_value??]
+/* define an offset from which to start accessing the NOR Flash memory.
+ * It must be a multiple of LX_STM32_OSPI_SECTOR_SIZE, default value set to 0.
+ */
+[#if LX_STM32_OSPI_BASE_ADDRESS_value == "0"]
+#define LX_STM32_OSPI_BASE_ADDRESS                       0
+[#else]
+#define LX_STM32_OSPI_BASE_ADDRESS                       ${LX_STM32_OSPI_BASE_ADDRESS_value}
+[/#if]
+[/#if]
+
 #define LX_STM32_OSPI_DEFAULT_TIMEOUT                    10 * TX_TIMER_TICKS_PER_SECOND
 
 #define LX_STM32_DEFAULT_SECTOR_SIZE                     LX_STM32_OSPI_SECTOR_SIZE
@@ -145,16 +160,8 @@ extern TX_SEMAPHORE ${used_api ?lower_case}_tx_semaphore;
 [#if glue_api == "DMA_API" && TRANSFER_NOTIFICATION == "ThreadX_Semaphore" ]
  /* USER CODE BEGIN LX_STM32_OSPI_POST_INIT */
 
-#define LX_STM32_OSPI_POST_INIT()                        do { \
-                                                         if (tx_semaphore_create(&${used_api ?lower_case}_rx_semaphore, "${used_api ?lower_case} rx transfer semaphore", 0) != TX_SUCCESS) \
-                                                         { \
-                                                           return LX_ERROR; \
-                                                         } \
-                                                         if (tx_semaphore_create(&${used_api ?lower_case}_tx_semaphore, "${used_api ?lower_case} tx transfer semaphore", 0) != TX_SUCCESS) \
-                                                         { \
-                                                           return LX_ERROR; \
-                                                         } \
-                                                        } while(0)
+#define LX_STM32_OSPI_POST_INIT()
+
 /* USER CODE END LX_STM32_OSPI_POST_INIT */
 [#else]
 /* USER CODE BEGIN LX_STM32_OSPI_POST_INIT */
@@ -185,12 +192,7 @@ extern TX_SEMAPHORE ${used_api ?lower_case}_tx_semaphore;
 [#if glue_api == "DMA_API" && TRANSFER_NOTIFICATION == "ThreadX_Semaphore" ]
 /* USER CODE BEGIN LX_STM32_OSPI_READ_CPLT_NOTIFY */
 
-#define LX_STM32_OSPI_READ_CPLT_NOTIFY(__status__)      do { \
-                                                          if(tx_semaphore_get(&${used_api ?lower_case}_rx_semaphore, HAL_${used_api}_TIMEOUT_DEFAULT_VALUE) != TX_SUCCESS) \
-                                                          { \
-                                                            __status__ = LX_ERROR; \
-                                                          } \
-                                                        } while(0)
+#define LX_STM32_OSPI_READ_CPLT_NOTIFY(__status__)  
 
 /* USER CODE END LX_STM32_OSPI_READ_CPLT_NOTIFY */
 [#else]
@@ -230,12 +232,7 @@ extern TX_SEMAPHORE ${used_api ?lower_case}_tx_semaphore;
 [#if glue_api == "DMA_API" && TRANSFER_NOTIFICATION == "ThreadX_Semaphore" ]
 /* USER CODE BEGIN LX_STM32_OSPI_WRITE_CPLT_NOTIFY */
 
-#define LX_STM32_OSPI_WRITE_CPLT_NOTIFY(__status__)     do { \
-                                                          if(tx_semaphore_get(&${used_api ?lower_case}_tx_semaphore, HAL_${used_api}_TIMEOUT_DEFAULT_VALUE) != TX_SUCCESS) \
-                                                          { \
-                                                            __status__ = LX_ERROR; \
-                                                          } \
-                                                        } while(0)
+#define LX_STM32_OSPI_WRITE_CPLT_NOTIFY(__status__)
 
 /* USER CODE END LX_STM32_OSPI_WRITE_CPLT_NOTIFY */
 [#else]

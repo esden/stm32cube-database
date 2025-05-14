@@ -22,7 +22,7 @@
 [#assign ipvar = IP]
 /* Includes ------------------------------------------------------------------*/
 #include "${name?lower_case}.h"
-[#if name=="ETH" && (F4_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || H5_ETH_NoLWIP?? || MP13_ETH_NoLWIP?? || H7RS_ETH_NoLWIP?? || MP2_ETH_NoLWIP??)]
+[#if name=="ETH" && (F4_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || H5_ETH_NoLWIP?? || MP13_ETH_NoLWIP?? || H7RS_ETH_NoLWIP?? || MP2_ETH_NoLWIP?? || N6_ETH_NoLWIP??)]
 #include "string.h"
 [/#if]
 
@@ -111,37 +111,44 @@
 [@common.optincludeFile path=coreDir+"Inc" name="gfxmmu_lut.h"/]
 [/#if]
 [#-- WorkAround for Ticket 30863 --]
-[#if name=="ETH" && (H7_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || H5_ETH_NoLWIP?? || MP13_ETH_NoLWIP?? || H7RS_ETH_NoLWIP?? || MP2_ETH_NoLWIP??)]
+[#if name=="ETH" && (H7_ETH_NoLWIP?? || F7_ETH_NoLWIP?? || H5_ETH_NoLWIP?? || MP13_ETH_NoLWIP?? || H7RS_ETH_NoLWIP?? || MP2_ETH_NoLWIP?? || N6_ETH_NoLWIP??)]
 [#if !H5_ETH_NoLWIP??]
 #if defined ( __ICCARM__ ) /*!< IAR Compiler */
 
 #pragma location=[#if RxDescAddress??]${RxDescAddress}[#else]0x30040000[/#if]
-ETH_DMADescTypeDef  DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
+ETH_DMADescTypeDef  DMARxDscrTab[#if N6_ETH_NoLWIP??][ETH_DMA_RX_CH_CNT][/#if][ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
 #pragma location=[#if TxDescAddress??]${TxDescAddress}[#else]0x30040060[/#if]
-ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
+ETH_DMADescTypeDef  DMATxDscrTab[#if N6_ETH_NoLWIP??][ETH_DMA_TX_CH_CNT][/#if][ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
 
 #elif defined ( __CC_ARM )  /* MDK ARM Compiler */
 
-__attribute__((at([#if RxDescAddress??]${RxDescAddress}[#else]0x30040000[/#if]))) ETH_DMADescTypeDef  DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
-__attribute__((at([#if TxDescAddress??]${TxDescAddress}[#else]0x30040060[/#if]))) ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
+__attribute__((at([#if RxDescAddress??]${RxDescAddress}[#else]0x30040000[/#if]))) ETH_DMADescTypeDef  DMARxDscrTab[#if N6_ETH_NoLWIP??][ETH_DMA_RX_CH_CNT][/#if][ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
+__attribute__((at([#if TxDescAddress??]${TxDescAddress}[#else]0x30040060[/#if]))) ETH_DMADescTypeDef  DMATxDscrTab[#if N6_ETH_NoLWIP??][ETH_DMA_TX_CH_CNT][/#if][ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
 
 [#if H7RS_ETH_NoLWIP??]
 #elif defined ( __GNUC__ ) || defined ( __ARMCC_VERSION )) /* GNU Compiler */ 
 
 ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT] __attribute__((section(".RxDescripSection"))); /* Ethernet Rx DMA Descriptors */
 ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT] __attribute__((section(".TxDescripSection")));   /* Ethernet Tx DMA Descriptors */
+[#elseif H7_ETH_NoLWIP??]
+#elif defined ( __GNUC__ ) /* GNU Compiler */
+
+ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT] __attribute__((section(".RxDescripSection"))); /* Ethernet Rx DMA Descriptors */
+ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT] __attribute__((section(".TxDescripSection")));   /* Ethernet Tx DMA Descriptors */
 [#else]
 #elif defined ( __GNUC__ ) /* GNU Compiler */
 
-ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT] __attribute__((section(".RxDecripSection"))); /* Ethernet Rx DMA Descriptors */
-ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT] __attribute__((section(".TxDecripSection")));   /* Ethernet Tx DMA Descriptors */
+ETH_DMADescTypeDef DMARxDscrTab[#if N6_ETH_NoLWIP??][ETH_DMA_RX_CH_CNT][/#if][ETH_RX_DESC_CNT] __attribute__((section(".RxDecripSection"))); /* Ethernet Rx DMA Descriptors */
+ETH_DMADescTypeDef DMATxDscrTab[#if N6_ETH_NoLWIP??][ETH_DMA_TX_CH_CNT][/#if][ETH_TX_DESC_CNT] __attribute__((section(".TxDecripSection")));   /* Ethernet Tx DMA Descriptors */
 [/#if]
 
 #endif
 [/#if]
 ETH_BufferTypeDef Txbuffer[ETH_TX_DESC_CNT * 2U];
 [#if FamilyName=="STM32H5" || FamilyName=="STM32MP13" || FamilyName=="STM32H7RS" || FamilyName=="STM32MP2"]
+[#if !NETX?? || NETX =="false"]
 ETH_TxPacketConfigTypeDef TxConfig;
+[/#if]
 [#else]
 ETH_TxPacketConfig TxConfig;
 [/#if]
@@ -151,7 +158,9 @@ ETH_DMADescTypeDef  DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptor
 ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
 
 [#if FamilyName=="STM32H5" || FamilyName=="STM32MP13" || FamilyName=="STM32H7RS"]
+[#if !NETX?? || NETX =="false"]
 ETH_TxPacketConfigTypeDef TxConfig;
+[/#if]
 [#else]
 ETH_TxPacketConfig TxConfig;
 [/#if]
@@ -490,6 +499,16 @@ ETH_TxPacketConfig TxConfig;
                                         [#assign argValue="&"+argument1.name]
                                     [/#if] [#-- if genericType=Array --]
                                     [#if argument.value!="" && argument.value!="N/A"]
+                                      [#if RESMGR_UTILITY?? && FamilyName=="STM32MP2"]
+                                          [#if argument.name?contains("Pin")]
+                                          [#if argValue?? &&  argValue?contains("GPIO_PIN_")]
+                                          [#assign  seq=argValue]
+                                          #n
+                                          #tif (ResMgr_Request(RESMGR_RESOURCE_RIF_${GPIO_PORT},RESMGR_GPIO_PIN(${seq})) != RESMGR_STATUS_ACCESS_OK)
+                                          #t{
+                                          #t#tError_Handler();
+                                          #t}
+                                          [/#if]  [/#if] [/#if]
                                     [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name} = ${argValue};
                                     [#else]
                                     [#if nTab==2]#t#t[#else]#t[/#if]//[#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name} = [#if argument.value!="N/A"]${argValue}[/#if];
@@ -597,6 +616,7 @@ ETH_TxPacketConfig TxConfig;
                                                 [#assign arg = "" + adr + argValue]
                                                 [#if  argValue?matches("GPIO[A-Z]")]
                                                 [#assign RESMGR_ID=argValue]
+                                                [#assign GPIO_PORT=argValue]
                                                 [/#if]
                                             [#else]
                                                 [#assign arg = "" + adr + fargument.value]
@@ -1241,7 +1261,7 @@ ${variable.value} ${variable.name};
                [/#if]
            [/#list]
     [/#if]
-    [#if  !(instName?starts_with("GPDMA")) && !(instName?starts_with("LPDMA")) && instanceData.initServices?? && instanceData.initServices.dma?? && (FamilyName=="STM32U5" | FamilyName=="STM32H5" | FamilyName=="STM32H7RS")]
+    [#if  !(instName?starts_with("GPDMA")) && !(instName?starts_with("LPDMA")) && instanceData.initServices?? && instanceData.initServices.dma?? && (FamilyName=="STM32U5" | FamilyName=="STM32H5" | FamilyName=="STM32H7RS"| FamilyName=="STM32U3"| FamilyName=="STM32WBA"| FamilyName=="STM32N6")]
         [#assign service=instanceData.initServices.dma]
            [#list service as dmaConfig]
                 [#list dmaConfig.variables as variable] [#-- variables declaration --]
@@ -1306,9 +1326,17 @@ ${variable.value} ${variable.name};
 #t/* USER CODE BEGIN ${instName}_Init 1 */
 #n
 #t/* USER CODE END ${instName}_Init 1 */
+	[#if instanceData.instIndex??]
+	[#assign instanceIndex1 = ""]
+	[#if instName?starts_with("HPDMA") && FamilyName=="STM32N6"]
+	[#assign instanceIndex1 = ""]
+	[#else]
+	[#assign instanceIndex1 = instanceData.instIndex]
+	[/#if]
+	[/#if]
 
         [#--list instanceData.configs as config--]
-            [#if instanceData.instIndex??][@common.generateConfigModelListCode configModel=instanceData inst=instName  nTab=1 index=instanceData.instIndex/][#else][@common.generateConfigModelListCode configModel=instanceData inst=instName  nTab=1 index=""/][/#if]
+            [#if instanceData.instIndex??][@common.generateConfigModelListCode configModel=instanceData inst=instName  nTab=1 index=instanceIndex1/][#else][@common.generateConfigModelListCode configModel=instanceData inst=instName  nTab=1 index=""/][/#if]
         [#--/#list--]
 
 #t/* USER CODE BEGIN ${instName}_Init 2 */
@@ -1555,7 +1583,9 @@ static uint32_t ${entry.value}=0;
 #t/* USER CODE BEGIN ${words[i]?replace("I2S","SPI")}_MspInit 0 */
 
 #n#t/* USER CODE END ${words[i]?replace("I2S","SPI")}_MspInit 0 */
-
+[#if RESMGR_UTILITY?? && FamilyName=="STM32MP2"]
+ [@common.optinclude name=contextFolder+mxTmpFolder+"/resmgrutilityrequest_"+ words[i]+".tmp"/][#-- ADD RESMGR_UTILITY Code--]
+[/#if]
 [#list IP.configModelList as instanceData]
 [#if instanceData.initServices??]
     [#if instanceData.initServices.pclockConfig??]
@@ -1591,10 +1621,6 @@ static uint32_t ${entry.value}=0;
 #t/* USER CODE BEGIN ${words[0]?replace("I2S","SPI")}_MspInit 0 */
 
 #n#t/* USER CODE END ${words[0]?replace("I2S","SPI")}_MspInit 0 */
-    [#if RESMGR_UTILITY?? && FamilyName=="STM32MP2"]
-     [@common.optinclude name=contextFolder+mxTmpFolder+"/resmgrutilityrequest_"+ words[0]+".tmp"/][#-- ADD RESMGR_UTILITY Code--]
-     [@common.optinclude name=contextFolder+mxTmpFolder+"/resmgrutilityrelease_"+ words[0]+".tmp"/][#-- ADD RESMGR_UTILITY Code--]
-    [/#if]
 [#list IP.configModelList as instanceData]
 [#if instanceData.initServices??]
     [#if instanceData.initServices.pclockConfig??]

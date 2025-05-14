@@ -39,6 +39,8 @@ extern "C" {
 [/#if]
 [#if myHash["THREADX_STATUS"]?number == 1 ]
 #include "tx_api.h"
+#include "tx_initialize.h"
+#include "tx_thread.h"  
 #include "app_threadx.h"
 [/#if]
 [#if myHash["FREERTOS_STATUS"]?number == 1 ]
@@ -66,6 +68,7 @@ extern "C" {
 #define TASK_PRIO_TASKLETS                      CFG_SEQ_PRIO_0
 #define TASK_PRIO_UART                          CFG_SEQ_PRIO_1
 #define TASK_PRIO_PKA                           CFG_SEQ_PRIO_1
+#define TASK_PRIO_RCP_SPINEL_RX                 CFG_SEQ_PRIO_1
 [/#if]
 [#if (myHash["ZIGBEE"] == "Enabled") || (myHash["ZIGBEE_SKELETON"] == "Enabled") || (myHash["mac_802_15_4_SKELETON"] == "Enabled")]
 #define TASK_PRIO_MAC_LAYER                     CFG_SEQ_PRIO_1
@@ -97,6 +100,15 @@ extern "C" {
 #define TASK_PRIO_MAC_LAYER                     osPriorityRealtime3
 #define TASK_PRIO_ZIGBEE_NETWORK_FORM           osPriorityNormal
 #define TASK_PRIO_ZIGBEE_APP_START              osPriorityBelowNormal
+[/#if]
+[#if (myHash["THREAD"] == "Enabled")]
+#define TASK_PRIO_ALARM                         osPriorityNormal2
+#define TASK_PRIO_US_ALARM                      TASK_PRIO_ALARM
+#define TASK_PRIO_TASKLETS                      osPriorityRealtime3
+#define TASK_PRIO_PKA                           osPriorityNormal1 
+#define TASK_PRIO_CLI_UART                      osPriorityNormal
+#define TASK_PRIO_SEND                          osPriorityNormal 
+#define TASK_PRIO_RCP_SPINEL_RX                 osPriorityNormal
 [/#if]
 [/#if]
 [#if myHash["THREADX_STATUS"]?number == 1 ]
@@ -157,11 +169,14 @@ extern "C" {
 #define TASK_PRIO_US_ALARM                      TASK_PRIO_ALARM
 #define TASK_PREEMP_US_ALARM                    TASK_PRIO_ALARM
 
-#define TASK_PRIO_TASKLETS                      (7u)
-#define TASK_PREEMP_TASKLETS                    (7u)
+#define TASK_PRIO_TASKLETS                      (5u)
+#define TASK_PREEMP_TASKLETS                    (5u)
 
 #define TASK_PRIO_PKA                           (10u) 
 #define TASK_PREEMP_PRIO_PKA                    (10u)
+
+#define TASK_PRIO_RCP_SPINEL_RX					(11u)
+#define TASK_PREEMP_RCP_SPINEL_RX				(11u)
 
 #define TASK_PRIO_CLI_UART                      (12u)
 #define TASK_PREEMP_CLI_UART                    (12u)
@@ -187,17 +202,17 @@ extern "C" {
 
 /* Tasks stack sizes by default  */
 #define TASK_STACK_SIZE_LINK_LAYER              RTOS_STACK_SIZE_LARGE
-#define TASK_STACK_SIZE_TEMP_MEAS_LL            RTOS_STACK_SIZE_SMALL
+#define TASK_STACK_SIZE_TEMP_MEAS_LL            RTOS_STACK_SIZE_REDUCED
 [#if (myHash["CFG_MM_TYPE"]?number == 2)]
-#define TASK_STACK_SIZE_AMM                     RTOS_STACK_SIZE_SMALL
+#define TASK_STACK_SIZE_AMM                     RTOS_STACK_SIZE_REDUCED
 [/#if]
 #define TASK_STACK_SIZE_RNG                     RTOS_STACK_SIZE_REDUCED
 [#if (myHash["BLE"] == "Enabled")]
 #define TASK_STACK_SIZE_FLASH_MANAGER           RTOS_STACK_SIZE_NORMAL
 #define TASK_STACK_SIZE_BLE_HOST                RTOS_STACK_SIZE_MODERATE
 #define TASK_STACK_SIZE_HCI_ASYNC_EVENT         RTOS_STACK_SIZE_NORMAL
-#define TASK_STACK_SIZE_BLE_TIMER               RTOS_STACK_SIZE_SMALL
-#define TASK_STACK_SIZE_BPKA                    RTOS_STACK_SIZE_SMALL
+#define TASK_STACK_SIZE_BLE_TIMER               RTOS_STACK_SIZE_REDUCED
+#define TASK_STACK_SIZE_BPKA                    RTOS_STACK_SIZE_REDUCED
 [#if (myHash["BLE_MODE_TRANSPARENT_UART"] == "Enabled")]
 #define TASK_STACK_SIZE_TX_TO_HOST              RTOS_STACK_SIZE_NORMAL
 [/#if]
@@ -215,6 +230,7 @@ extern "C" {
 #define TASK_STACK_SIZE_CLI_UART                RTOS_STACK_SIZE_NORMAL
 #define TASK_STACK_SIZE_SEND                    RTOS_STACK_SIZE_NORMAL 
 #define TASK_STACK_SIZE_PKA                     RTOS_STACK_SIZE_NORMAL  
+#define TASK_STACK_SIZE_RCP_SPINEL_RX           RTOS_STACK_SIZE_NORMAL 
 [/#if]
 /* USER CODE BEGIN TASK_Size_Define */
 

@@ -185,8 +185,8 @@ extern volatile uint8_t radio_sw_low_isr_is_running_high_prio;
 [#assign handleList = ""]
 [#list handlers as handler] [#-- handlers is a list of ipHandlers (hashmap)  --] 
   [#list handler.entrySet() as entry]  [#-- handler is a set of handles --]
-    [#list entry.value as ipHandler]  [#-- entry.value is a list of IpHandler --] 
-        [#if ipHandler.useNvic && ipHandler.declareExtenalVariable && !(handleList?contains("(" + ipHandler.handler + ")")) && ipHandler.handlerType!="DFSDM_Channel_HandleTypeDef"]
+    [#list entry.value as ipHandler]  [#-- entry.value is a list of IpHandler --]
+        [#if ipHandler.useNvic && ipHandler.declareExtenalVariable && (!(handleList?contains("(" + ipHandler.handler + ")")))&& ipHandler.handlerType!="DFSDM_Channel_HandleTypeDef"]
 [#if !context?? || (context?? && context==ipHandler.contextName)]
 extern ${ipHandler.handlerType} ${ipHandler.handler};
 [#assign handleList = handleList + "(" + ipHandler.handler + ")"]
@@ -329,13 +329,13 @@ void ${vector.irqHandler}(void)
 
 #n#t/* USER CODE END ${vector.name} 0 */
 
-[#if vector.halHandler?? && (vector.halHandler == "NONE" || !vector.halHandlerNeeded)]
+[#if vector.halHandler?? && (vector.halHandler == "NONE" || !vector.halHandlerNeeded || vector.halHandler == "")]
 [#elseif vector.ipName=="" || vector.irregular=="true"]
   #t${vector.halHandler}
 [#elseif vector.name=="FMC_IRQn" || vector.name=="FSMC_IRQn" || vector.name=="HASH_RNG_IRQn" || vector.name=="TIM6_DAC_IRQn" || vector.name=="GPIOA_IRQn" || vector.name=="GPIOB_IRQn" || vector.bspIpsharedInterrupt]
   #t${vector.halHandler}
 [#elseif vector.ipHandle != "" && vector.halUsed]
-  #t${vector.halHandler}[#if timeBaseSource?? && timeBaseSource==vector.ipName && (FamilyName=="STM32MP1" || FamilyName=="STM32MP2"|| DIE == "DIE501")][#else](&${vector.ipHandle});[/#if]
+  #t${vector.halHandler}[#if FamilyName!="STM32N6"][#if timeBaseSource?? && timeBaseSource==vector.ipName && (FamilyName=="STM32MP1" || FamilyName=="STM32MP2"|| DIE == "DIE501")][#else](&${vector.ipHandle});[/#if][#else](&${vector.ipHandle});[/#if]
 [#elseif vector.halUsed]
   #t${vector.halHandler}();
 [/#if]

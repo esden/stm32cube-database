@@ -33,6 +33,15 @@ Key: ${key}; Value: ${myHash[key]}
 #include "ll_intf.h"
 #include "ll_sys.h"
 
+#include "ral.h"
+
+/* External functions ----------------------------------------------------------*/
+extern uint32_t             llhwc_cmn_is_dp_slp_enabled(void);
+
+/* External variables ----------------------------------------------------------*/
+
+/* Functions Definition ------------------------------------------------------*/
+
 [#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled")]
 void APP_SYS_BLE_EnterDeepSleep(void)
 {
@@ -66,15 +75,6 @@ void APP_SYS_BLE_EnterDeepSleep(void)
   }
 }
 [#else]
-#include "ral.h"
-
-/* External functions ----------------------------------------------------------*/
-extern uint32_t             llhwc_cmn_is_dp_slp_enabled(void);
-
-/* External variables ----------------------------------------------------------*/
-extern uint8_t              is_Radio_DeepSleep;
-
-/* Functions Definition ------------------------------------------------------*/
 
 void APP_SYS_LPM_EnterLowPowerMode(void)
 {
@@ -87,7 +87,9 @@ void APP_SYS_LPM_EnterLowPowerMode(void)
   LL_UNUSED(radio_instance);
   LL_UNUSED(channel);
   if (radio_state != RAL_IDLE)
+  {
     return;
+  }
 
   next_radio_evt = os_timer_get_earliest_time();
   if ( llhwc_cmn_is_dp_slp_enabled() == 0 )

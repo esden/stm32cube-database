@@ -4,6 +4,26 @@
 	ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
 	xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
 	<About>SYS: System</About>
+	<RefParameter Name="Pin_Remapping_10_12" Comment="Pin_Remapping_10_12" Type="list" DefaultValue="SYSCFG_REMAP_PA12" Visible="false">
+        <Condition Diagnostic="" Expression="PINREMAP_10_12"/>
+        <PossibleValue Value="SYSCFG_REMAP_PA12" Comment="SYSCFG_REMAP_PA12"/>
+    </RefParameter>
+    <RefParameter Name="Pin_Remapping_10_12" Comment="Pin_Remapping_10_12" Type="list" DefaultValue="__NULL" Visible="false">
+        <PossibleValue Value="__NULL" Comment="__NULL"/>
+    </RefParameter>
+    <RefParameter Name="Pin_Remapping_9_11" Comment="Pin_Remapping_9_11" Type="list" DefaultValue="SYSCFG_REMAP_PA11" Visible="false">
+        <Condition Diagnostic="" Expression="PINREMAP"/>
+        <PossibleValue Value="SYSCFG_REMAP_PA11" Comment="SYSCFG_REMAP_PA11"/>
+    </RefParameter>
+    <RefParameter Name="Pin_Remapping_9_11" Comment="Pin_Remapping_9_11" Type="list" DefaultValue="__NULL" Visible="false">
+        <PossibleValue Value="__NULL" Comment="__NULL"/>
+    </RefParameter>
+    <RefMode Name="PINREMAP">
+        <ConfigForMode>PAPinRemap_9_11</ConfigForMode>
+    </RefMode>
+    <RefMode Name="PINREMAP_10_12" >
+        <ConfigForMode>PAPinRemap_10_12</ConfigForMode>
+    </RefMode>
 	<RefParameter Name="Instance" DefaultValue="SYS" Comment="Instance" Type="" Visible="false" />
 	<RefParameter Name="instance" DefaultValue="TIM1" Comment="" Type="list" Visible="false">
 		<Condition Expression="SYS_TIM1" Diagnostic="" />
@@ -274,6 +294,28 @@
 				</Mode>
 			</ModeLogicOperator>
 		</Mode>
+		<Mode Name="PINREMAP" UserName="Pin PA9 instead of pin PA11">
+                    <ModeLogicOperator Name="OR">
+                        <Mode Name="PINREMAP" UserName="Pin PA9 instead of pin PA11">
+                            <SignalLogicalOp Name="AND">
+                                <Signal Name="VS_PINREMAP"/>
+                            </SignalLogicalOp>
+                            <Semaphore>PINREMAP</Semaphore>
+                            <Condition Expression="!$PinLocked_PA11 &amp; !$PinLocked_PA9 &amp; !$PinLocked_UCPD1_DBCC1" Diagnostic="At least one pin among PA9 or PA11 is pinned "/>
+                        </Mode>
+                    </ModeLogicOperator>
+                </Mode>
+                <Mode Name="PINREMAP_10_12" UserName="Pin PA10 instead of pin PA12">
+                    <ModeLogicOperator Name="OR">
+                        <Mode Name="PINREMAP_10_12" UserName="Pin PA10 instead of pin PA12">
+                            <SignalLogicalOp Name="AND">
+                                <Signal Name="VS_PINREMAP_10_12"/>
+                            </SignalLogicalOp>
+                            <Semaphore>PINREMAP_10_12</Semaphore>
+                            <Condition Expression="!$PinLocked_PA12 &amp; !$PinLocked_PA10 &amp; !$PinLocked_UCPD1_DBCC2" Diagnostic="At least one pin among PA10 or PA12 is pinned "/>
+                        </Mode>
+                    </ModeLogicOperator>
+                </Mode>
 	</ModeLogicOperator>
 	<!-- RefSignal for System -->
 	<RefSignal Name="VS_tim1" Virtual="true" />
@@ -286,6 +328,8 @@
 	<RefSignal Name="VS_tim8" Virtual="true" />
 	<RefSignal Name="VS_tim9" Virtual="true" />
 	<RefSignal Name="VS_tim10" Virtual="true" />
+    <RefSignal Name="VS_PINREMAP" Virtual="true"/>
+    <RefSignal Name="VS_PINREMAP_10_12" Virtual="true"/>
 	<RefSignal Name="VS_tim11" Virtual="true" />
 	<RefSignal Name="VS_tim12" Virtual="true" />
 	<RefSignal Name="VS_tim13" Virtual="true" />

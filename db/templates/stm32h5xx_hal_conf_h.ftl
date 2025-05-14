@@ -172,7 +172,7 @@
   [#if advancedSettings??][#assign advancedSettings = advancedSettings[0]][/#if]
 
 #define  VDD_VALUE                  [#if vdd_value??]${vdd_value}[#else]3300[/#if]UL /*!< Value of VDD in mv */
-#define  TICK_INT_PRIORITY          ([#if TICK_INT_PRIORITY??]${TICK_INT_PRIORITY}[#else](1UL<<__NVIC_PRIO_BITS) - 1UL[/#if]UL)  /*!< tick interrupt priority (lowest by default) */
+#define  TICK_INT_PRIORITY          ([#if TICK_INT_PRIORITY??]${TICK_INT_PRIORITY}[#else](1UL<<__NVIC_PRIO_BITS) - 1UL[/#if]UL)  /*!< tick interrupt priority [#if !TICK_INT_PRIORITY?? || TICK_INT_PRIORITY == "15"](lowest by default) [/#if]*/
 #define  USE_RTOS                   [#if advancedSettings?? && advancedSettings.USE_RTOS??]${advancedSettings.USE_RTOS}U[#else]0U[/#if]
 #define  PREFETCH_ENABLE            0U               /*!< Enable prefetch */
 

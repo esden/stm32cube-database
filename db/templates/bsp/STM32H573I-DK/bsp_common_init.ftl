@@ -97,8 +97,8 @@
   /* Initialize Touch screen with interrupts */
   BspTSInit.Orientation = TS_ORIENTATION_LANDSCAPE;
   BspTSInit.Accuracy = 5;
-  BspTSInit.Width = FT6X06_MAX_X_LENGTH;
-  BspTSInit.Height = FT6X06_MAX_Y_LENGTH;
+  BspTSInit.Width = LCD_DEFAULT_WIDTH;
+  BspTSInit.Height = LCD_DEFAULT_HEIGHT;
   if (BSP_TS_Init(0, &BspTSInit) != BSP_ERROR_NONE)
   {
     Error_Handler();

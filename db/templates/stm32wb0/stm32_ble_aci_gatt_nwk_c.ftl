@@ -69,6 +69,9 @@ struct {
     ACI_gatt_nwk_def_entry_t *head; /**< Head of definition list. */
 } aci_gatt_nwk_ctx_s;
 
+#if CFG_BLE_GATT_CLT_NUM_CHARAC_SUBSCRIPTIONS_MAX > 0
+ble_gatt_clt_sec_level_st sec_level_a[CFG_BLE_GATT_CLT_NUM_CHARAC_SUBSCRIPTIONS_MAX];
+#endif
 /*******************************************************************************
  * PRIVATE PROTOTYPES
  ******************************************************************************/
@@ -212,6 +215,9 @@ void ACI_gatt_nwk_init(uint16_t pwrq_size)
         q_wr_p = NULL;
     }
     (void)EATT_pwrq_init(pwrq_size, q_wr_p);
+#if CFG_BLE_GATT_CLT_NUM_CHARAC_SUBSCRIPTIONS_MAX > 0
+    memset(sec_level_a, 0, sizeof(sec_level_a));
+#endif
 }
 
 void ACI_gatt_nwk_proc_complete(uint16_t Connection_Handle,
@@ -230,6 +236,15 @@ void ACI_gatt_nwk_disconnection(uint16_t Connection_Handle, uint16_t CID)
      * all pending prepared write.
      */
     EATT_pwrq_flush(Connection_Handle, EATT_PWRQ_CID_ALL);
+#if CFG_BLE_GATT_CLT_NUM_CHARAC_SUBSCRIPTIONS_MAX > 0
+    for(uint16_t i = 0; i < CFG_BLE_GATT_CLT_NUM_CHARAC_SUBSCRIPTIONS_MAX; i++)
+    {
+        if (sec_level_a[i].conn_handle == Connection_Handle)
+        {
+            memset(&sec_level_a[i], 0, sizeof(ble_gatt_clt_sec_level_st));
+        }
+    }
+#endif
 }
 
 tBleStatus aci_gatt_srv_add_service_nwk(uint8_t Service_UUID_Type,
@@ -1217,7 +1232,7 @@ tBleStatus aci_gatt_srv_authorize_resp_nwk(uint16_t Conn_Handle,
                                                     Attr_Handle,
                                                     Data_Length,
                                                     def_p->val_p->buffer_va);
-              
+
             }
         }
     }
@@ -1304,7 +1319,7 @@ tBleStatus aci_gatt_clt_write_long_nwk(uint16_t Connection_Handle,
         ops_p->write_ops_p->data_len = Attribute_Val_Length;
         ops_p->write_ops_p->data_p = ops_p->buffer;
         (void)Osal_MemCpy(ops_p->buffer, Attribute_Val, Attribute_Val_Length);
-        
+
         ret = aci_gatt_clt_write_long(Connection_Handle, CID, ops_p->write_ops_p);
         if (ret != BLE_STATUS_SUCCESS)
         {
@@ -1335,7 +1350,7 @@ tBleStatus aci_gatt_clt_write_char_reliable_nwk(uint16_t Connection_Handle,
         ops_p->write_ops_p[0].data_p = &ops_p->buffer[0];
         (void)Osal_MemCpy(ops_p->write_ops_p[0].data_p, Attribute_Val,
                           Attribute_Val_Length);
-         
+
          ret = aci_gatt_clt_write_char_reliable(Connection_Handle,
                                                 CID,
                                                 1U,
@@ -1363,7 +1378,7 @@ tBleStatus aci_gatt_clt_write_nwk(uint16_t Connection_Handle,
     if (ops_p != NULL)
     {
         (void)Osal_MemCpy(ops_p->buffer, Attribute_Val, Attribute_Val_Length);
-        
+
         ret = aci_gatt_clt_write(Connection_Handle, CID, Attr_Handle,
                                       Attribute_Val_Length, ops_p->buffer);
         if (ret != BLE_STATUS_SUCCESS)
@@ -1372,6 +1387,62 @@ tBleStatus aci_gatt_clt_write_nwk(uint16_t Connection_Handle,
         }
     }
 
+    return ret;
+}
+
+tBleStatus aci_gatt_clt_add_subscription_security_level_nwk(uint16_t Conn_Handle,
+                                                            uint16_t Char_Value_Handle,
+                                                            uint8_t Sec_Level)
+{
+    tBleStatus ret = BLE_STATUS_SUCCESS;
+    
+    if(Char_Value_Handle == 0)
+    {
+      return BLE_ERROR_INVALID_HCI_CMD_PARAMS;
+    }
+    
+#if CFG_BLE_GATT_CLT_NUM_CHARAC_SUBSCRIPTIONS_MAX > 0
+    
+    for(uint16_t i = 0; i < CFG_BLE_GATT_CLT_NUM_CHARAC_SUBSCRIPTIONS_MAX; i++)
+    {
+        if ((sec_level_a[i].conn_handle == Conn_Handle) &&
+            (sec_level_a[i].attr_handle == Char_Value_Handle))
+        {
+            /*
+             * Update already present security entry.
+             */
+            sec_level_a[i].sec_level = Sec_Level;
+
+            return ret;
+        }
+    }
+
+    ret = BLE_ERROR_MEMORY_CAPACITY_EXCEEDED;
+
+    for(uint16_t i = 0; i < CFG_BLE_GATT_CLT_NUM_CHARAC_SUBSCRIPTIONS_MAX; i++)
+    {
+        if (sec_level_a[i].conn_handle == 0x0000 && sec_level_a[i].attr_handle == 0x0000)
+        {
+            sec_level_a[i].conn_handle = Conn_Handle;
+            sec_level_a[i].attr_handle = Char_Value_Handle;
+            sec_level_a[i].sec_level = Sec_Level;
+
+            ret = aci_gatt_clt_add_subscription_security_level(&sec_level_a[i]);
+            if (ret != BLE_STATUS_SUCCESS)
+            {
+                memset(&sec_level_a[i], 0, sizeof(ble_gatt_clt_sec_level_st));
+            }
+
+            return ret;
+        }
+    }
+    
+#else
+    
+    ret = BLE_ERROR_MEMORY_CAPACITY_EXCEEDED; 
+    
+#endif
+    
     return ret;
 }
 
@@ -1415,7 +1486,7 @@ int aci_gatt_srv_write_event_preprocess(uint16_t Connection_Handle,
                                              op_type,
                                              0x0000U,
                                              Data_Length, Data);
-            
+
             return 1;
         }
         else
@@ -1476,7 +1547,7 @@ int aci_gatt_srv_write_event_preprocess(uint16_t Connection_Handle,
                                                   def_p->val_p->buffer_va);
         }
     }
-    
+
     return 1;
 }
 
@@ -1552,7 +1623,7 @@ int aci_gatt_srv_read_event_preprocess(uint16_t Connection_Handle,
      */
     aci_gatt_srv_resp(Connection_Handle, CID, Attribute_Handle, att_err,
                       data_len, data_p);
-    
+
     return 1; /* Discard event */
 }
 
@@ -1582,7 +1653,7 @@ int aci_att_srv_prepare_write_req_event_preprocess(uint16_t Connection_Handle,
                                            Data_Offset,
                                            Data_Length,
                                            Data);
-          
+
             /**
              * No response has to be sent before application response.
              */

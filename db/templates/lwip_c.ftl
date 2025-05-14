@@ -103,6 +103,28 @@
 /* USER CODE BEGIN 0 */
 
 /* USER CODE END 0 */
+[#if series == "stm32h7rs"]
+
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
+
+/* USER CODE END PTD */
+
+[/#if]
+[#if series == "stm32h7rs"]
+/* Private define -----------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+
+/* USER CODE END PD */
+
+[/#if]
+[#if series == "stm32h7rs"]
+/* Private macro -----------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
+
+[/#if]
 /* Private function prototypes -----------------------------------------------*/
 [#if ((series == "stm32h7") || (series == "stm32f4") || (series == "stm32f7") || (series == "stm32h7rs")) && (netif_callback == 1) ]
 static void ethernet_link_status_updated(struct netif *netif);
@@ -110,9 +132,20 @@ static void ethernet_link_status_updated(struct netif *netif);
 static void Ethernet_Link_Periodic_Handle(struct netif *netif);
 [/#if][#-- endif with_rtos --]
 [/#if][#-- endif series && netif_callback --] 
+[#if series == "stm32h7rs"]
+/* USER CODE BEGIN PFP */
+
+/* USER CODE END PFP */
+
+[/#if][#-- endif series --]
 /* ETH Variables initialization ----------------------------------------------*/
 [#if series != "stm32h7rs"]
 [#include mxTmpFolder+"/eth_vars.tmp"]
+[/#if]
+[#if series == "stm32h7rs"]
+/* USER CODE BEGIN EVI */
+
+/* USER CODE END EVI */
 [/#if]
 
 [#compress][#if lwip_dhcp == 1]
@@ -805,3 +838,8 @@ u32_t sio_tryread(sio_fd_t fd, u8_t *data, u32_t len)
 [/#if][#-- endif keil --]
 #endif /* MDK ARM Compiler */
 
+[#if series == "stm32h7rs"]
+/* USER CODE BEGIN 11 */
+
+/* USER CODE END 11 */
+[/#if]

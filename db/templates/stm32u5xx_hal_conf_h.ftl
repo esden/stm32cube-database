@@ -34,7 +34,7 @@ extern "C" {
   */
 #define HAL_MODULE_ENABLED
 
-[#assign allModules = ["ADC", "COMP", "CORDIC", "CRC", "AES", "DAC", "DCACHE", "DCMI", "DMA2D", "DSI", "FDCAN", "FMAC", "GFXMMU", "GFXTIM", "GPU2D", "GTZC", "HASH", "HCD", "I2C", "ICACHE", "IRDA", "IWDG", "JPEG", "LPTIM", "LTDC", "MDF", "MMC", "NAND", "NOR", "OPAMP", "OCTOSPI", "OTFDEC", "PCD", "PKA", "PSSI", "RAMCFG", "RNG", "RTC", "SAI", "SD", "SMARTCARD", "SMBUS", "SPI", "SRAM", "TIM", "TSC", "UART", "USART", "WWDG", "HSPI"]]
+[#assign allModules = ["ADC", "COMP", "CORDIC", "CRC", "AES", "DAC", "DCACHE", "DCMI", "DMA2D", "DSI", "FDCAN", "FMAC", "GFXMMU", "GFXTIM", "GPU2D", "GTZC", "HASH", "HCD", "I2C", "ICACHE", "IRDA", "IWDG", "JPEG", "LPTIM", "LTDC", "MDF", "MMC", "NAND", "NOR", "OPAMP", "OCTOSPI", "OTFDEC", "PCD", "PKA", "PSSI", "RAMCFG", "RNG", "RTC", "SAI", "SD", "SDIO", "SMARTCARD", "SMBUS", "SPI", "SRAM", "TIM", "TSC", "UART", "USART", "WWDG", "HSPI"]]
 [#list allModules as module]
     [#if isModuleUsed(module)]
 [#compress]#define HAL_${module?replace("QUADSPI","QSPI")?replace("OCTOSPI","OSPI")?replace("HSPI","XSPI")?replace("AES","CRYP")?replace("SCRYP","CRYP")?replace("ADF","MDF")}_MODULE_ENABLED[/#compress]
@@ -146,7 +146,7 @@ vary depending on the variations in voltage and temperature.*/
   */     
   [#if advancedSettings??][#assign advancedSettings = advancedSettings[0]][/#if]
 #define  VDD_VALUE                    [#if vdd_value??]${vdd_value}[#else]3300[/#if]UL /*!< Value of VDD in mv */
-#define  TICK_INT_PRIORITY            ([#if TICK_INT_PRIORITY??]${TICK_INT_PRIORITY}[#else](1<<__NVIC_PRIO_BITS) - 1[/#if]UL)  /*!< tick interrupt priority (lowest by default) */
+#define  TICK_INT_PRIORITY            ([#if TICK_INT_PRIORITY??]${TICK_INT_PRIORITY}[#else](1<<__NVIC_PRIO_BITS) - 1[/#if]UL)  /*!< tick interrupt priority [#if !TICK_INT_PRIORITY?? || TICK_INT_PRIORITY == "15"](lowest by default) [/#if]*/
 #define  USE_RTOS                     [#if advancedSettings?? && advancedSettings.USE_RTOS??]${advancedSettings.USE_RTOS}U[#else]0U[/#if]
 #define  PREFETCH_ENABLE              1U               /*!< Enable prefetch */
 
@@ -201,6 +201,7 @@ vary depending on the variations in voltage and temperature.*/
 #define  USE_HAL_RTC_REGISTER_CALLBACKS        0U /* RTC register callback disabled       */
 #define  USE_HAL_SAI_REGISTER_CALLBACKS        0U /* SAI register callback disabled       */
 #define  USE_HAL_SD_REGISTER_CALLBACKS         0U /* SD register callback disabled        */
+#define  USE_HAL_SDIO_REGISTER_CALLBACKS       0U /* SDIO register callback disabled      */
 #define  USE_HAL_SDRAM_REGISTER_CALLBACKS      0U /* SDRAM register callback disabled     */
 #define  USE_HAL_SMARTCARD_REGISTER_CALLBACKS  0U /* SMARTCARD register callback disabled */
 #define  USE_HAL_SMBUS_REGISTER_CALLBACKS      0U /* SMBUS register callback disabled     */
@@ -224,6 +225,9 @@ vary depending on the variations in voltage and temperature.*/
 
 #define USE_SD_TRANSCEIVER            [#if USE_SD_TRANSCEIVER??]${USE_SD_TRANSCEIVER}[#else]0U[/#if]
 
+/* ################## SDIO peripheral configuration ########################## */
+#define USE_SDIO_TRANSCEIVER          [#if USE_SD_TRANSCEIVER??]${USE_SD_TRANSCEIVER}[#else]0U[/#if]
+#define SDIO_MAX_IO_NUMBER            [#if SD_MAX_IO_NUMBER??]${SD_MAX_IO_NUMBER}[#else]7U[/#if]
 
 /* Includes ------------------------------------------------------------------*/
 /**
@@ -361,6 +365,10 @@ vary depending on the variations in voltage and temperature.*/
 #ifdef HAL_SD_MODULE_ENABLED
 #include "stm32u5xx_hal_sd.h"
 #endif /* HAL_SD_MODULE_ENABLED */
+
+#ifdef HAL_SDIO_MODULE_ENABLED
+#include "stm32u5xx_hal_sdio.h"
+#endif /* HAL_SDIO_MODULE_ENABLED */
 
 #ifdef HAL_SMBUS_MODULE_ENABLED
 #include "stm32u5xx_hal_smbus.h"

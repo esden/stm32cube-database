@@ -470,7 +470,7 @@ static SVCCTL_EvtAckStatus_t ${SERVICE_SHORT_NAME_UpperCase}_EventHandler(void *
                 /* USER CODE END Service${SvcNbr}_Char_${characteristic?string}_default */
                 break;
             }
-          }  /* if(p_attribute_modified->Attr_Handle == (${SERVICE_SHORT_NAME_UpperCase}_Context.[@characteristicShortNameCapitalized characteristic/]CharHdle + CHARACTERISTIC_DESCRIPTOR_ATTRIBUTE_OFFSET))*/
+          }
 
             [/#if]
             [#if (SERVICES_CHARS_PROP[characteristic?string][item_PROP_NOTIFY]??  &&
@@ -524,7 +524,7 @@ static SVCCTL_EvtAckStatus_t ${SERVICE_SHORT_NAME_UpperCase}_EventHandler(void *
                 /* USER CODE END Service${SvcNbr}_Char_${characteristic?string}_default */
                 break;
             }
-          }  /* if(p_attribute_modified->Attr_Handle == (${SERVICE_SHORT_NAME_UpperCase}_Context.[@characteristicShortNameCapitalized characteristic/]CharHdle + CHARACTERISTIC_DESCRIPTOR_ATTRIBUTE_OFFSET))*/
+          }
 
             [/#if]
             [#if (SERVICES_CHARS_PROP[characteristic?string][item_PROP_NOTIFY]??  &&
@@ -579,7 +579,7 @@ static SVCCTL_EvtAckStatus_t ${SERVICE_SHORT_NAME_UpperCase}_EventHandler(void *
                 /* USER CODE END Service${SvcNbr}_Char_${characteristic?string}_default */
                 break;
             }
-          }  /* if(p_attribute_modified->Attr_Handle == (${SERVICE_SHORT_NAME_UpperCase}_Context.[@characteristicShortName characteristic/]Hdle + CHARACTERISTIC_DESCRIPTOR_ATTRIBUTE_OFFSET))*/
+          }
 
             [/#if]
         [/#list]
@@ -611,7 +611,7 @@ static SVCCTL_EvtAckStatus_t ${SERVICE_SHORT_NAME_UpperCase}_EventHandler(void *
 
             /* USER CODE END Service${SvcNbr}_Char_${characteristic?string}_ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE */
             ${SERVICE_SHORT_NAME_UpperCase}_Notification(&notification);
-          } /* if(p_attribute_modified->Attr_Handle == (${SERVICE_SHORT_NAME_UpperCase}_Context.[@characteristicShortNameCapitalized characteristic/]CharHdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))*/
+          }
             [/#if]
         [/#list]
     [/#if]
@@ -651,7 +651,7 @@ static SVCCTL_EvtAckStatus_t ${SERVICE_SHORT_NAME_UpperCase}_EventHandler(void *
             /*USER CODE BEGIN Service${SvcNbr}_Char_${characteristic?string}_ACI_GATT_READ_PERMIT_REQ_VSEVT_CODE_2 */
 #warning user shall call aci_gatt_allow_read() function if allowed
             /*USER CODE END Service${SvcNbr}_Char_${characteristic?string}_ACI_GATT_READ_PERMIT_REQ_VSEVT_CODE_2*/
-          } /* if(p_read_req->Attribute_Handle == (${SERVICE_SHORT_NAME_UpperCase}_Context.[@characteristicShortNameCapitalized characteristic/]CharHdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))*/
+          }
             [/#if]
         [/#list]
     [/#if]
@@ -689,7 +689,7 @@ static SVCCTL_EvtAckStatus_t ${SERVICE_SHORT_NAME_UpperCase}_EventHandler(void *
             /*USER CODE BEGIN Service${SvcNbr}_Char_${characteristic?string}_ACI_GATT_WRITE_PERMIT_REQ_VSEVT_CODE */
 #warning user shall call aci_gatt_write_resp() function if allowed
             /*USER CODE END Service${SvcNbr}_Char_${characteristic?string}_ACI_GATT_WRITE_PERMIT_REQ_VSEVT_CODE*/
-          } /*if(p_write_perm_req->Attribute_Handle == (${SERVICE_SHORT_NAME_UpperCase}_Context.[@characteristicShortNameCapitalized characteristic/]CharHdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))*/
+          }
 
             [/#if]
         [/#list]
@@ -722,6 +722,28 @@ static SVCCTL_EvtAckStatus_t ${SERVICE_SHORT_NAME_UpperCase}_EventHandler(void *
           /* USER CODE END ACI_ATT_EXCHANGE_MTU_RESP_VSEVT_CODE */
           break;/* ACI_ATT_EXCHANGE_MTU_RESP_VSEVT_CODE */
         }
+[#assign INDEX = 0]
+    [#if SERVICE_NUMBER_OF_CHARACTERISTICS != "0"]
+        [#list 1..SERVICE_NUMBER_OF_CHARACTERISTICS?number as characteristic]
+            [#if (SERVICES_CHARS_PROP[characteristic?string][item_PROP_INDICATE]??  &&
+                SERVICES_CHARS_PROP[characteristic?string][item_PROP_INDICATE] != " ")]
+                [#if INDEX = 0]
+        case ACI_GATT_SERVER_CONFIRMATION_VSEVT_CODE:
+        {
+          aci_gatt_server_confirmation_event_rp0 *p_server_confirmation;
+          p_server_confirmation = (aci_gatt_server_confirmation_event_rp0 *)  p_blecore_evt->data;
+          UNUSED(p_server_confirmation);
+
+          /* USER CODE BEGIN ACI_GATT_SERVER_CONFIRMATION_VSEVT_CODE */
+
+          /* USER CODE END ACI_GATT_SERVER_CONFIRMATION_VSEVT_CODE */
+          break;/* ACI_GATT_SERVER_CONFIRMATION_VSEVT_CODE */
+        }
+                    [#assign INDEX = INDEX + 1]
+                [/#if]
+            [/#if]
+        [/#list]
+    [/#if]
         /* USER CODE BEGIN BLECORE_EVT */
 
         /* USER CODE END BLECORE_EVT */
@@ -731,19 +753,19 @@ static SVCCTL_EvtAckStatus_t ${SERVICE_SHORT_NAME_UpperCase}_EventHandler(void *
           /* USER CODE END EVT_DEFAULT */
           break;
       }
-      /* USER CODE BEGIN EVT_VENDOR*/
+      /* USER CODE BEGIN EVT_VENDOR */
 
-      /* USER CODE END EVT_VENDOR*/
+      /* USER CODE END EVT_VENDOR */
       break; /* HCI_VENDOR_SPECIFIC_DEBUG_EVT_CODE */
 
-      /* USER CODE BEGIN EVENT_PCKT_CASES*/
+      /* USER CODE BEGIN EVENT_PCKT_CASES */
 
-      /* USER CODE END EVENT_PCKT_CASES*/
+      /* USER CODE END EVENT_PCKT_CASES */
 
     default:
-      /* USER CODE BEGIN EVENT_PCKT*/
+      /* USER CODE BEGIN EVENT_PCKT */
 
-      /* USER CODE END EVENT_PCKT*/
+      /* USER CODE END EVENT_PCKT */
       break;
   }
 
@@ -965,9 +987,9 @@ tBleStatus ${SERVICE_SHORT_NAME_UpperCase}_UpdateValue(${SERVICE_SHORT_NAME_Uppe
       {
         LOG_INFO_APP("  Success: aci_gatt_update_char_value [@characteristicShortName characteristic/] command\n");
       }
-      /* USER CODE BEGIN Service${SvcNbr}_Char_Value_${characteristic?string}*/
+      /* USER CODE BEGIN Service${SvcNbr}_Char_Value_${characteristic?string} */
 
-      /* USER CODE END Service${SvcNbr}_Char_Value_${characteristic?string}*/
+      /* USER CODE END Service${SvcNbr}_Char_Value_${characteristic?string} */
       break;
 
         [/#list]
@@ -1005,13 +1027,13 @@ tBleStatus ${SERVICE_SHORT_NAME_UpperCase}_UpdateValue_Ext(${SERVICE_SHORT_NAME_
         [#list 1..SERVICE_NUMBER_OF_CHARACTERISTICS?number as characteristic]
     case [@customServChar characteristic/]:
       ret = aci_gatt_update_char_value_ext(EATT_Channel,
-										${SERVICE_SHORT_NAME_UpperCase}_Context.${SERVICE_SHORT_NAME?capitalize}SvcHdle,
-										${SERVICE_SHORT_NAME_UpperCase}_Context.[@characteristicShortNameCapitalized characteristic/]CharHdle,
-										update_type, 
-										pData->Length, /* charValueLen */
-										${SERVICES_CHARS_VALUE_OFFSET[characteristic?string]}, /* charValOffset */
-										pData->Length, /* charValueLen */
-										(uint8_t *)pData->p_Payload);
+                                           ${SERVICE_SHORT_NAME_UpperCase}_Context.${SERVICE_SHORT_NAME?capitalize}SvcHdle,
+                                           ${SERVICE_SHORT_NAME_UpperCase}_Context.[@characteristicShortNameCapitalized characteristic/]CharHdle,
+                                           update_type, 
+                                           pData->Length, /* charValueLen */
+                                           ${SERVICES_CHARS_VALUE_OFFSET[characteristic?string]}, /* charValOffset */
+                                           pData->Length, /* charValueLen */
+                                           (uint8_t *)pData->p_Payload);
       if (ret != BLE_STATUS_SUCCESS)
       {
         LOG_DEBUG_APP("  Fail   : aci_gatt_update_char_value_ext [@characteristicShortName characteristic/] command, error code: 0x%2X\n", ret);
@@ -1020,9 +1042,9 @@ tBleStatus ${SERVICE_SHORT_NAME_UpperCase}_UpdateValue_Ext(${SERVICE_SHORT_NAME_
       {
         LOG_DEBUG_APP("  Success: aci_gatt_update_char_value_ext [@characteristicShortName characteristic/] command\n");
       }
-      /* USER CODE BEGIN Service${SvcNbr}_Char_Value_Ext${characteristic?string}*/
+      /* USER CODE BEGIN Service${SvcNbr}_Char_Value_Ext${characteristic?string} */
 
-      /* USER CODE END Service${SvcNbr}_Char_Value_Ext${characteristic?string}*/
+      /* USER CODE END Service${SvcNbr}_Char_Value_Ext${characteristic?string} */
       break;
 
         [/#list]

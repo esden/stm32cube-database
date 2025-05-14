@@ -94,6 +94,9 @@ typedef struct
 /* Exported functions ------------------------------------------------------- */
 void ${SERVICE_SHORT_NAME_UpperCase}_APP_Init(void);
 void ${SERVICE_SHORT_NAME_UpperCase}_APP_EvtRx(${SERVICE_SHORT_NAME_UpperCase}_APP_ConnHandleNotEvt_t *p_Notification);
+[#if myHash["LITE_SERVER_STATUS"]?number == 1 ]
+void ${SERVICE_SHORT_NAME_UpperCase}_APP_Process(void);
+[/#if]
 /* USER CODE BEGIN EF */
 
 /* USER CODE END EF */

@@ -66,15 +66,15 @@ void MX_StandbyExit_NVICPeripharalInit(void)
     [#list handler.entrySet() as entry]
       [#list entry.value as ipHandler]
         [#if (ipHandler.handler != "hrtc")
-		  && (ipHandler.handler != "handle_GPDMA1_Channel1")
-		  && (ipHandler.handler != "handle_GPDMA1_Channel0")
-		  && (ipHandler.handler != "huart1")
-		]
+      && (ipHandler.handler != "handle_GPDMA1_Channel1")
+      && (ipHandler.handler != "handle_GPDMA1_Channel0")
+      && (ipHandler.handler != "huart1")
+    ]
             [#if ipHandler.handler != PreviousHandler]
-				[#if ((ipHandler.handler != "hadc4") && (ipHandler.handler != "hcrc"))]
+              [#if ((ipHandler.handler != "hadc4") && (ipHandler.handler != "hcrc"))]
 extern ${ipHandler.handlerType} ${ipHandler.handler};
-				[/#if]
-                [#assign PreviousHandler = ipHandler.handler]
+              [/#if]
+              [#assign PreviousHandler = ipHandler.handler]
             [/#if]
         [/#if]
     [/#list]
@@ -94,7 +94,7 @@ extern ${ipHandler.handlerType} ${ipHandler.handler};
   * @param  None
   * @retval None
   */
-void MX_StandbyExit_PeripharalInit(void)
+void MX_StandbyExit_PeripheralInit(void)
 {
   HAL_StatusTypeDef hal_status;
   /* USER CODE BEGIN MX_STANDBY_EXIT_PERIPHERAL_INIT_1 */
@@ -116,18 +116,18 @@ void MX_StandbyExit_PeripharalInit(void)
   [#list handlersList as handler]
     [#list handler.entrySet() as entry]
       [#list entry.value as ipHandler]
-		[#if (ipHandler.handler != "hrtc")
-		  && (ipHandler.handler != "handle_GPDMA1_Channel1")
-		  && (ipHandler.handler != "handle_GPDMA1_Channel0")
-		  && (ipHandler.handler != "huart1")
-		]
-			[#if ipHandler.handler != PreviousIpHandler]
-				[#if ((ipHandler.handler != "hadc4") && (ipHandler.handler != "hcrc"))]
+    [#if (ipHandler.handler != "hrtc")
+      && (ipHandler.handler != "handle_GPDMA1_Channel1")
+      && (ipHandler.handler != "handle_GPDMA1_Channel0")
+      && (ipHandler.handler != "huart1")
+    ]
+      [#if ipHandler.handler != PreviousIpHandler]
+        [#if ((ipHandler.handler != "hadc4") && (ipHandler.handler != "hcrc"))]
 ${""?right_pad(2)}memset(&${ipHandler.handler}, 0, sizeof(${ipHandler.handler}));
                 [/#if]
-				[#assign PreviousIpHandler = ipHandler.handler]
-			[/#if]
-		[/#if]
+        [#assign PreviousIpHandler = ipHandler.handler]
+      [/#if]
+    [/#if]
     [/#list]
   [/#list]
 [/#list]
@@ -135,24 +135,24 @@ ${""?right_pad(2)}memset(&${ipHandler.handler}, 0, sizeof(${ipHandler.handler}))
 
 [#if voidsList??]
   [#list voidsList as void]
-	[#if void.functionName?? && void.genCode && !void.isStatic]
-		[#if (void.functionName != "SystemClock_Config") 
-		  && (void.functionName != "SystemPower_Config")
-		  && (void.functionName != "MX_RTC_Init")
-		  && (void.functionName != "APPE_Init")
-		  && (void.functionName != "MX_RF_Init")
-		  && (void.functionName != "MX_CORTEX_M33_Init")
-		  && (void.functionName != "MX_CORTEX_M33_NS_Init")
-		  && (void.functionName != "MX_GPDMA1_Init")
-		  && (void.functionName != "MX_USART1_UART_Init")
-		  && (void.functionName != "MX_USART2_UART_Init")
-		  && (void.functionName != "MX_HSEM_Init")
+  [#if void.functionName?? && void.genCode && !void.isStatic]
+    [#if (void.functionName != "SystemClock_Config") 
+      && (void.functionName != "SystemPower_Config")
+      && (void.functionName != "MX_RTC_Init")
+      && (void.functionName != "APPE_Init")
+      && (void.functionName != "MX_RF_Init")
+      && (void.functionName != "MX_CORTEX_M33_Init")
+      && (void.functionName != "MX_CORTEX_M33_NS_Init")
+      && (void.functionName != "MX_GPDMA1_Init")
+      && (void.functionName != "MX_USART1_UART_Init")
+      && (void.functionName != "MX_USART2_UART_Init")
+      && (void.functionName != "MX_HSEM_Init")
       && (void.functionName != "MX_ADC4_Init")
       && (void.functionName != "MX_CRC_Init")
-		]
+    ]
 ${""?right_pad(2)}${void.functionName}();
-		[/#if]
-	[/#if]
+    [/#if]
+  [/#if]
   [/#list]
 [/#if]
 [#if (myHash["USE_SNVMA_NVM"]?number != 0)]

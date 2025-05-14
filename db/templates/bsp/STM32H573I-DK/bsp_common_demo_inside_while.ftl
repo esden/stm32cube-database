@@ -28,6 +28,9 @@
       [#if definition.name=="Bsp_Common_DEMO"]
           [#assign Bsp_Common_DEMO = definition.value]
       [/#if]
+      [#if definition.name=="LCD_TC_ON"]
+          [#assign LCD_TC_ON = definition.value]
+      [/#if]
     [/#list]
   [/#if]
 [/#list]
@@ -53,9 +56,18 @@
         #t#t#t/* ..... Perform your action ..... */
         #t#t}
     [/#if]
+
+[#if (LCD_TC_ON?? && LCD_TC_ON == "true")]
+  #t#t/* -- Sample board code for Touch screen detection in interrupt mode ---- */
+  #t#tif (TouchPressed != 0)
+  #t#t{
+  #t#t  TouchPressed = 0;
+
+    #t#t/* Touch location available from TS_State.TouchX and TS_State.TouchY */
+  #t#t}
+[/#if]
 [/#compress]
 [/#if]
-
 [#macro toggle_Leds]
     [#if (LED1??&& LED1=="true") || (LED2??&& LED2=="true") || (LED3??&& LED3=="true") ]
         #t#t#t/* -- Sample board code to toggle leds ---- */

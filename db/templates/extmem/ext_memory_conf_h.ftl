@@ -33,6 +33,8 @@
 [#assign RefParam_BOOT_selection_value = "not defined"]
 [#assign RefParam_BOOT_enable_value = "not defined"]
 [#assign RefParam_XIP_memory_value = "not defined"]
+[#assign RefParam_XIP_ApplicationOffset_value = "not defined"]
+[#assign RefParam_XIP_HeaderOffset_value = "not defined"]
 [#assign RefParam_LRUN_SRC_memory_value = "not defined"]
 [#assign RefParam_LRUN_SRC_offset_value = "not defined"]
 [#assign RefParam_LRUN_SRC_size_value = "not defined"]
@@ -128,6 +130,12 @@
     [/#if]
     [#if Name == "RefParam_XIP_memory"]
       [#assign RefParam_XIP_memory_value = Value]
+    [/#if]
+	[#if Name == "RefParam_XIP_ApplicationOffset"]
+      [#assign RefParam_XIP_ApplicationOffset_value = Value]
+    [/#if]
+	[#if Name == "RefParam_XIP_HeaderOffset"]
+      [#assign RefParam_XIP_HeaderOffset_value = Value]
     [/#if]
     [#if Name == "RefParam_LRUN_SRC_memory"]
       [#assign RefParam_LRUN_SRC_memory_value = Value]
@@ -374,10 +382,10 @@
 #include "stm32_extmem.h"
 #include "stm32_extmem_type.h"
 [#if RefParam_BOOT_enable_value == "true"]
-    [#if RefParam_BOOT_selection_value == "XIP"]
+    [#if RefParam_BOOT_selection_value == "XIP" && !(contextFolder=="ExtMemLoader/")]
 #include "boot/stm32_boot_xip.h"
     [/#if]
-    [#if RefParam_BOOT_selection_value == "LRUN"]
+    [#if RefParam_BOOT_selection_value == "LRUN" && !(contextFolder=="ExtMemLoader/")]
 #include "boot/stm32_boot_lrun.h"
     [/#if]
 [/#if]
@@ -452,12 +460,16 @@ enum {
 /*
   @brief management of the boot layer
 */
- [#if RefParam_BOOT_selection_value == "XIP"]
+[#if RefParam_BOOT_selection_value == "XIP"]
    [#if RefParam_XIP_memory_value == "EXTMEM1"]
 #define EXTMEM_MEMORY_BOOTXIP  EXTMEMORY_1
    [/#if]
    [#if RefParam_XIP_memory_value == "EXTMEM2"]
 #define EXTMEM_MEMORY_BOOTXIP  EXTMEMORY_2
+   [/#if]
+   [#if RefParam_XIP_ApplicationOffset_value!="not defined" && RefParam_XIP_HeaderOffset_value!="not defined"]
+#define EXTMEM_XIP_IMAGE_OFFSET ${RefParam_XIP_ApplicationOffset_value}
+#define EXTMEM_HEADER_OFFSET ${RefParam_XIP_HeaderOffset_value}
    [/#if]
 [/#if]
 
@@ -471,7 +483,7 @@ enum {
 #define EXTMEM_LRUN_SOURCE_ADDRESS  ${RefParam_LRUN_SRC_offset_value}u
 #define EXTMEM_LRUN_SOURCE_SIZE     ${RefParam_LRUN_SRC_size_value}u
   [#if RefParam_LRUN_DEST_memory_value == "EXTMEM1"]
-#define EXTMEM_LRUN_DESTINATIONSOURCE EXTMEMORY_1
+#define EXTMEM_LRUN_DESTINATION EXTMEMORY_1
   [/#if]
   [#if RefParam_LRUN_DEST_memory_value == "EXTMEM2"]
 #define EXTMEM_LRUN_DESTINATION EXTMEMORY_2

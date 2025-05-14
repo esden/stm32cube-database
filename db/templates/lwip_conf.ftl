@@ -601,20 +601,24 @@ extern ${variable.value} ${variable.name};
 /*----- Value in opt.h for ${definition.name}: 1 -----*/
 #define ${definition.name}   ${definition.value}
             [/#if]
-            [#if (series == "stm32h7") || (series == "stm32h7rs")]
-                [#if (definition.name=="LWIP_SUPPORT_CUSTOM_PBUF") && (definition.value != "valueNotSetted") && (definition.value == "1")]
+            [#if (series == "stm32f7") || (series == "stm32h7") || (series == "stm32h7rs")]
+                [#if (series != "stm32f7")]
+                    [#if (definition.name=="LWIP_SUPPORT_CUSTOM_PBUF") && (definition.value != "valueNotSetted") && (definition.value == "1")]
 /*----- Value supported for H7 devices: 1 -----*/
 #define ${definition.name}   ${definition.value}
+                    [/#if]
                 [/#if]
                 [#if (definition.name=="LWIP_RAM_HEAP_POINTER") && (definition.value != "valueNotSetted")]
-/*----- Default Value for H7 devices: 0x30044000 -----*/
+/*----- Default Value for F7/H7 devices: 0x30044000 -----*/
 #define ${definition.name}   ${definition.value}
                 [/#if]
-                [#if (definition.value != "valueNotSetted") && (definition.name=="ETH_RX_BUFFER_SIZE")]
+                [#if (series != "stm32f7")]
+                    [#if (definition.value != "valueNotSetted") && (definition.name=="ETH_RX_BUFFER_SIZE")]
 /*----- Default value in ETH configuration GUI in CubeMx: 1524 -----*/
 #define ${definition.name}   ${definition.value}
+                    [/#if]
                 [/#if]
-            [/#if][#-- stm32f4 --]
+            [/#if][#-- stm32f7/H7 --]
 		[/#if][#-- definition.defaultValue --]
 	[/#list][#-- SWIP.defines line 108 --]
 /*-----------------------------------------------------------------------------*/

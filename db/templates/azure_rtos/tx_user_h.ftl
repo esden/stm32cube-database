@@ -26,7 +26,11 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    tx_user.h                                           PORTABLE C      */
+[#if FamilyName=="STM32C0" || FamilyName=="STM32N6" || FamilyName=="STM32U3" || FamilyName=="STM32U0" || FamilyName=="STM32H5" || FamilyName=="STM32U5"]
+/*                                                           6.3.0        */
+[#else]
 /*                                                           6.1.11       */
+[/#if]
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -62,7 +66,7 @@
 /*                                            optimized the definition of */
 /*                                            TX_TIMER_TICKS_PER_SECOND,  */
 /*                                            resulting in version 6.1.11 */
-[#if FamilyName?lower_case?starts_with("stm32c0")]
+[#if FamilyName=="STM32C0" || FamilyName=="STM32N6" || FamilyName=="STM32U3" || FamilyName=="STM32U0" || FamilyName=="STM32H5" || FamilyName=="STM32U5"]
 /*  10-31-2023      Xiuwen Cai              Modified comment(s),          */
 /*                                            added option for random     */
 /*                                            number stack filling,       */
@@ -116,15 +120,15 @@
 	[#if name == "TX_DISABLE_STACK_FILLING"]
       [#assign TX_DISABLE_STACK_FILLING_value = value]
     [/#if]
-	
+
 	[#if name == "TX_ENABLE_STACK_CHECKING"]
-      [#assign TX_DISABLE_STACK_FILLING_value = value]
+      [#assign TX_ENABLE_STACK_CHECKING_value = value]
     [/#if]
 
     [#if name == "TX_ENABLE_RANDOM_NUMBER_STACK_FILLING"]
       [#assign TX_ENABLE_RANDOM_NUMBER_STACK_FILLING_value = value]
     [/#if]
-	
+
 	[#if name == "TX_DISABLE_PREEMPTION_THRESHOLD"]
       [#assign TX_DISABLE_PREEMPTION_THRESHOLD_value = value]
     [/#if]
@@ -261,7 +265,7 @@
         TX_REACTIVATE_INLINE
         TX_DISABLE_STACK_FILLING
         TX_INLINE_THREAD_RESUME_SUSPEND
-	[#if FamilyName?lower_case?starts_with("stm32c0")]
+	[#if FamilyName=="STM32C0" || FamilyName=="STM32U5" || FamilyName=="STM32U3" || FamilyName=="STM32U0" || FamilyName=="STM32H5"]
         TX_DISABLE_ERROR_CHECKING
 	[/#if]
 
@@ -271,6 +275,9 @@
         TX_DISABLE_PREEMPTION_THRESHOLD
         TX_DISABLE_REDUNDANT_CLEARING
         TX_DISABLE_NOTIFY_CALLBACKS
+	[#if FamilyName=="STM32C0" || FamilyName=="STM32U5" || FamilyName=="STM32U3" || FamilyName=="STM32U0" || FamilyName=="STM32H5"]
+        TX_NO_FILEX_POINTER
+	[/#if]
         TX_NOT_INTERRUPTABLE
         TX_TIMER_PROCESS_IN_ISR
 
@@ -290,7 +297,13 @@
 [#else]
 #define TX_MAX_PRIORITIES                ${TX_MAX_PRIORITIES_value}
 [/#if]
-[#if !FamilyName?lower_case?starts_with("stm32mp2")]
+[#if (!FamilyName?lower_case?starts_with("stm32mp2")) && (!FamilyName?lower_case?starts_with("stm32wba")) ]
+[#if TX_THREAD_USER_EXTENSION_value == " " || TX_THREAD_USER_EXTENSION_value == ""]
+[#else]
+#define TX_THREAD_USER_EXTENSION                ${TX_THREAD_USER_EXTENSION_value}
+[/#if]
+[/#if]
+[#if (FamilyName?lower_case?starts_with("stm32wba")) ]
 [#if TX_THREAD_USER_EXTENSION_value == " " || TX_THREAD_USER_EXTENSION_value == ""]
 /*#define TX_THREAD_USER_EXTENSION                ????*/
 [#else]
@@ -347,7 +360,7 @@
 /*#define TX_DISABLE_STACK_FILLING*/
 [/#if]
 
-[#if FamilyName?lower_case?starts_with("stm32c0")]
+[#if FamilyName=="STM32C0" || FamilyName=="STM32U5" || FamilyName=="STM32H5" || FamilyName=="STM32U0" || FamilyName=="STM32N6" || FamilyName=="STM32U3"]
 [#if TX_ENABLE_STACK_CHECKING_value != "not defined"]
 /* Determine whether or not stack checking is enabled. By default, ThreadX stack checking is
    disabled. When the following is defined, ThreadX thread stack checking is enabled.  If stack
@@ -360,17 +373,17 @@
 [#else]
 /*#define TX_ENABLE_STACK_CHECKING*/
 [/#if]
-
-/* Determine if random number is used for stack filling. By default, ThreadX uses a fixed
-   pattern for stack filling. When the following is defined, ThreadX uses a random number
-   for stack filling. This is effective only when TX_ENABLE_STACK_CHECKING is defined.  */
-
-[#if TX_ENABLE_STACK_CHECKING_value == "1"]
-[#if TX_ENABLE_RANDOM_NUMBER_STACK_FILLING_value == "0"]
-/*#define TX_ENABLE_RANDOM_NUMBER_STACK_FILLING*/
-[#else]
-#define TX_ENABLE_RANDOM_NUMBER_STACK_FILLING
 [/#if]
+
+[#if FamilyName=="STM32C0" || FamilyName=="STM32U5" || FamilyName=="STM32U3" || FamilyName=="STM32U0" || FamilyName=="STM32H5"]
+/* Determine if random number is used for stack filling. By default, ThreadX uses a fixed pattern
+   for stack filling. When the following is defined, ThreadX uses a random number for stack filling.
+   This is effective only when TX_ENABLE_STACK_CHECKING is defined.  */
+
+[#if TX_ENABLE_STACK_CHECKING_value == "1" && TX_ENABLE_RANDOM_NUMBER_STACK_FILLING_value == "1"]   
+#define TX_ENABLE_RANDOM_NUMBER_STACK_FILLING
+[#else]
+/*#define TX_ENABLE_RANDOM_NUMBER_STACK_FILLING*/
 [/#if]
 [/#if]
 [/#if]
@@ -395,6 +408,21 @@
 /*#define TX_DISABLE_REDUNDANT_CLEARING*/
 [/#if]
 
+[#if FamilyName=="STM32C0" || FamilyName=="STM32U5" || FamilyName=="STM32U3" || FamilyName=="STM32U0" || FamilyName=="STM32H5"]
+/* Determine if no timer processing is required. This option will help eliminate the timer
+   processing when not needed. The user will also have to comment out the call to
+   tx_timer_interrupt, which is typically made from assembly language in
+   tx_initialize_low_level. Note: if TX_NO_TIMER is used, the define TX_TIMER_PROCESS_IN_ISR
+   must also be used.  */
+
+/*
+#define TX_NO_TIMER
+#ifndef TX_TIMER_PROCESS_IN_ISR
+#define TX_TIMER_PROCESS_IN_ISR
+#endif
+*/
+[/#if]
+
 /* Determine if the notify callback option should be disabled. By default, notify callbacks are
    enabled. If the application does not use notify callbacks, they may be disabled to reduce
    code size and improve performance.  */
@@ -403,6 +431,16 @@
 #define TX_DISABLE_NOTIFY_CALLBACKS
 [#else]
 /*#define TX_DISABLE_NOTIFY_CALLBACKS*/
+[/#if]
+
+[#if !(FamilyName?lower_case?starts_with("stm32wba")) ]
+/* Defined, the basic parameter error checking is disabled. */
+
+[#if TX_DISABLE_ERROR_CHECKING_value == "1"]
+#define TX_DISABLE_ERROR_CHECKING
+[#else]
+/*#define TX_DISABLE_ERROR_CHECKING*/
+[/#if]
 [/#if]
 
 /* Determine if the tx_thread_resume and tx_thread_suspend services should have their internal
@@ -532,13 +570,14 @@
 #define TX_TIMER_TICKS_PER_SECOND                ${TX_TIMER_TICKS_PER_SECOND_value}
 [/#if]
 
-
+[#if (FamilyName?lower_case?starts_with("stm32wba")) ]
 /* Defined, the basic parameter error checking is disabled. */
 
 [#if TX_DISABLE_ERROR_CHECKING_value == "1"]
 #define TX_DISABLE_ERROR_CHECKING
 [#else]
 /*#define TX_DISABLE_ERROR_CHECKING*/
+[/#if]
 [/#if]
 
 /* Determine if there is a FileX pointer in the thread control block.
@@ -591,6 +630,13 @@
 [#else]
 /*#define TX_ENABLE_IAR_LIBRARY_SUPPORT*/
 [/#if]
+#endif
+[/#if]
+
+[#if FamilyName=="STM32C0" || FamilyName=="STM32U5" || FamilyName=="STM32U3" || FamilyName=="STM32U0" || FamilyName=="STM32H5"]
+#ifdef __ICCARM__
+/* Define if the IAR library is supported. */
+/*#define TX_ENABLE_IAR_LIBRARY_SUPPORT*/
 #endif
 [/#if]
 

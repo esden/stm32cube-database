@@ -18,6 +18,7 @@
         [/#list]
     [/#if]
 [/#list]
+[#assign DIE = DIE]
 [#--
 Key & Value:
 [#list myHash?keys as key]
@@ -88,6 +89,7 @@ const osSemaphoreAttr_t LinkLayerSemaphore_attributes = {
 };
 
 [#if (myHash["USE_TEMPERATURE_BASED_RADIO_CALIBRATION"]?number == 1)]
+#if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)
 static osThreadId_t     TempMeasLLTaskHandle;
 static osSemaphoreId_t  TempMeasLLSemaphore;
 
@@ -107,6 +109,7 @@ const osSemaphoreAttr_t TempMeasLLSemaphore_attributes = {
   .cb_mem       = TASK_DEFAULT_CB_MEM,
   .cb_size      = TASK_DEFAULT_CB_SIZE
 };
+#endif /* USE_TEMPERATURE_BASED_RADIO_CALIBRATION */
 
 [/#if]
 [/#if]
@@ -247,9 +250,13 @@ void ll_sys_bg_process_init(void)
 
   LinkLayerSemaphore = osSemaphoreNew(1U, 0U, &LinkLayerSemaphore_attributes);
 
+[#if (myHash["BLE"] == "Enabled") ]
   LinkLayerMutex = osMutexNew(&LinkLayerMutex_attributes);
 
   if((LinkLayerTaskHandle == NULL) || (LinkLayerSemaphore == NULL) || (LinkLayerMutex == NULL))
+[#else]
+  if((LinkLayerTaskHandle == NULL) || (LinkLayerSemaphore == NULL))  
+[/#if]
   {
     LOG_ERROR_APP( "Link Layer FreeRTOS objects creation FAILED");
     Error_Handler();
@@ -350,6 +357,10 @@ void ll_sys_schedule_bg_process_isr(void)
   */
 void ll_sys_config_params(void)
 {
+/* USER CODE BEGIN ll_sys_config_params_0 */
+
+/* USER CODE END ll_sys_config_params_0 */
+
   /* Configure link layer behavior for low ISR use and next event scheduling method:
    * - SW low ISR is used.
    * - Next event is scheduled from ISR.
@@ -357,6 +368,10 @@ void ll_sys_config_params(void)
   ll_intf_cmn_config_ll_ctx_params(USE_RADIO_LOW_ISR, NEXT_EVENT_SCHEDULING_FROM_ISR);
   /* Apply the selected link layer sleep timer source */
   ll_sys_sleep_clock_source_selection();
+
+/* USER CODE BEGIN ll_sys_config_params_1 */
+
+/* USER CODE END ll_sys_config_params_1 */
 [#if (myHash["USE_TEMPERATURE_BASED_RADIO_CALIBRATION"]?number == 1)]
 
 #if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)
@@ -370,6 +385,9 @@ void ll_sys_config_params(void)
 
   /* Link Layer power table */
   ll_intf_cmn_select_tx_power_table(CFG_RF_TX_POWER_TABLE_ID);
+/* USER CODE BEGIN ll_sys_config_params_2 */
+
+/* USER CODE END ll_sys_config_params_2 */
 }
 
 [#if (myHash["USE_TEMPERATURE_BASED_RADIO_CALIBRATION"]?number == 1)]
@@ -388,9 +406,9 @@ void ll_sys_config_params(void)
   {
 [#if (myHash["BLE"] == "Enabled")]
     osSemaphoreAcquire(TempMeasLLSemaphore, osWaitForever);
-    osMutexAcquire(LinkLayerMutex, osWaitForever);
+
     TEMPMEAS_RequestTemperatureMeasurement();
-    osMutexRelease(LinkLayerMutex);
+
     osThreadYield();
 [#else]
     osSemaphoreAcquire(TempMeasLLSemaphore, osWaitForever);
@@ -414,9 +432,7 @@ static void TempMeasureLL_Task_Entry( ULONG lArgument )
   {
 [#if (myHash["BLE"] == "Enabled")]
     tx_semaphore_get(&TempMeasLLSemaphore, TX_WAIT_FOREVER);
-    tx_mutex_get(&LinkLayerMutex, TX_WAIT_FOREVER);
     TEMPMEAS_RequestTemperatureMeasurement();
-    tx_mutex_put(&LinkLayerMutex);
     tx_thread_relinquish();
 [#else]
     tx_semaphore_get( &TempMeasLLSemaphore, TX_WAIT_FOREVER );
@@ -533,6 +549,11 @@ uint8_t ll_sys_BLE_sleep_clock_accuracy_selection(void)
       /* Revision ID not supported, default value of 500ppm applied */
       BLE_sleep_clock_accuracy = STM32WBA5x_DEFAULT_SCA_RANGE;
     }
+[#if DIE=="DIE4B0"]
+#elif defined(STM32WBA65xx)
+    BLE_sleep_clock_accuracy = STM32WBA6x_SCA_RANGE;
+    UNUSED(RevID);
+[/#if]
 #else
     UNUSED(RevID);
 #endif /* defined(STM32WBA52xx) || defined(STM32WBA54xx) || defined(STM32WBA55xx) */
@@ -579,6 +600,9 @@ void ll_sys_sleep_clock_source_selection(void)
 [#if !((myHash["ZIGBEE"] == "Enabled") || (myHash["ZIGBEE_SKELETON"] == "Enabled"))]
 void ll_sys_reset(void)
 {
+/* USER CODE BEGIN ll_sys_reset_0 */
+
+/* USER CODE END ll_sys_reset_0 */
 #if (CFG_RADIO_LSE_SLEEP_TIMER_CUSTOM_SCA_RANGE == 0)
   uint8_t bsca = 0;
 #endif /* CFG_RADIO_LSE_SLEEP_TIMER_CUSTOM_SCA_RANGE */  
@@ -598,5 +622,9 @@ void ll_sys_reset(void)
     ll_intf_le_set_sleep_clock_accuracy(bsca);
   }
 #endif /* CFG_RADIO_LSE_SLEEP_TIMER_CUSTOM_SCA_RANGE */
+
+/* USER CODE BEGIN ll_sys_reset_1 */
+
+/* USER CODE END ll_sys_reset_1 */
 }
 [/#if]

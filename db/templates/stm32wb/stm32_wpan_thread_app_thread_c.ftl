@@ -87,7 +87,8 @@
 [/#if]
 [#if FREERTOS_STATUS = 1 ]
 
-osMutexId_t MtxOtCmdId;
+static osMutexId_t MtxOtCmdId;
+static osSemaphoreId_t OtCmdAckSem;
 
 /* FreeRtos stacks attributes */
 const osThreadAttr_t ThreadMsgM0ToM4Process_attr = {
@@ -110,11 +111,6 @@ const osThreadAttr_t ThreadCliProcess_attr = {
      .stack_size = CFG_THREAD_CLI_PROCESS_STACK_SIZE
  };
 
-typedef enum
-{
-  ot_TL_CmdBusy,
-  ot_TL_CmdAvailable
-} ot_TL_CmdStatus_t;
 
  [/#if]
 /* USER CODE BEGIN PD */
@@ -139,9 +135,6 @@ static void HostTxCb( void );
 static void Wait_Getting_Ack_From_M0(void);
 static void Receive_Ack_From_M0(void);
 static void Receive_Notification_From_M0(void);
-[#if FREERTOS_STATUS = 1 ]
-static void ot_StatusNot(ot_TL_CmdStatus_t status);
-[/#if]
 #if (CFG_HW_LPUART1_ENABLED == 1)
 extern void MX_LPUART1_UART_Init(void);
 #endif
@@ -193,10 +186,7 @@ static __IO uint16_t CptReceiveCmdFromUser = 0;
 static TL_CmdPacket_t *p_thread_otcmdbuffer;
 static TL_EvtPacket_t *p_thread_notif_M0_to_M4;
 static __IO uint32_t  CptReceiveMsgFromM0 = 0;
-[#if FREERTOS_STATUS = 1 ]
-static volatile int FlagReceiveAckFromM0 = 0;
 
- [/#if]
 PLACE_IN_SECTION("MB_MEM1") ALIGN(4) static TL_TH_Config_t ThreadConfigBuffer;
 PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static TL_CmdPacket_t ThreadOtCmdBuffer;
 PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static uint8_t ThreadNotifRspEvtBuffer[sizeof(TL_PacketHeader_t) + TL_EVT_HDR_SIZE + 255U];
@@ -256,6 +246,10 @@ void APP_THREAD_Init( void )
   /* USER CODE BEGIN APP_THREAD_INIT_TIMER */
 
   /* USER CODE END APP_THREAD_INIT_TIMER */
+
+  /* Create binary semaphores for OT command handling */
+  OtCmdAckSem = osSemaphoreNew(1, 0, NULL);
+  MtxOtCmdId = osMutexNew(NULL);
 
   /* Create the different FreeRTOS tasks requested to run this Thread application*/
   OsTaskMsgM0ToM4Id = osThreadNew(APP_THREAD_FreeRTOSProcessMsgM0ToM4Task, NULL,&ThreadMsgM0ToM4Process_attr);
@@ -646,10 +640,6 @@ Thread_OT_Cmd_Request_t* THREAD_Get_NotificationPayloadBuffer(void)
 
 static void Ot_Cmd_Transfer_Common(void)
 {
-[#if FREERTOS_STATUS = 1 ]
-  ot_StatusNot(ot_TL_CmdBusy);
-[/#if]  
-  
   /* OpenThread OT command cmdcode range 0x280 .. 0x3DF = 352 */
   p_thread_otcmdbuffer->cmdserial.cmd.cmdcode = 0x280U;
   /* Size = otCmdBuffer->Size (Number of OT cmd arguments : 1 arg = 32bits so multiply by 4 to get size in bytes)
@@ -661,10 +651,6 @@ static void Ot_Cmd_Transfer_Common(void)
 
   /* Wait completion of cmd */
   Wait_Getting_Ack_From_M0();
-  
-[#if FREERTOS_STATUS = 1 ]
-  ot_StatusNot(ot_TL_CmdAvailable);
-[/#if]
 }
 
 /**
@@ -737,7 +723,19 @@ void Pre_OtCmdProcessing(void)
 [#if FREERTOS_STATUS = 0 ]
   UTIL_SEQ_WaitEvt(EVENT_SYNCHRO_BYPASS_IDLE);
 [#else]
+  osMutexAcquire(MtxOtCmdId, osWaitForever);
+}
 
+/**
+  * @brief  This function is called at the end of any ot commands sent to the M0
+  *         core. It is the counterpart of Pre_OtCmdProcessing() function,
+  *         unlocking sending of new ot commands.
+  * @param  None
+  * @retval None
+  */
+void Post_OtCmdProcessing(void)
+{
+   osMutexRelease(MtxOtCmdId);
 [/#if]
 }
 
@@ -752,10 +750,7 @@ static void Wait_Getting_Ack_From_M0(void)
 [#if FREERTOS_STATUS = 0 ]
   UTIL_SEQ_WaitEvt(EVENT_ACK_FROM_M0_EVT);
 [#else]
-  while (FlagReceiveAckFromM0 == 0)
-  {
-  }
-  FlagReceiveAckFromM0 = 0;
+  osSemaphoreAcquire(OtCmdAckSem, osWaitForever);
 [/#if] 
 }
 
@@ -771,7 +766,7 @@ static void Receive_Ack_From_M0(void)
 [#if FREERTOS_STATUS = 0 ]
   UTIL_SEQ_SetEvt(EVENT_ACK_FROM_M0_EVT);
 [#else]
-  FlagReceiveAckFromM0 = 1;
+  osSemaphoreRelease(OtCmdAckSem);
 [/#if]
 }
 
@@ -791,26 +786,6 @@ static void Receive_Notification_From_M0(void)
 [/#if]
 }
 
-[#if FREERTOS_STATUS = 1 ]
-static void ot_StatusNot( ot_TL_CmdStatus_t status )
-{
-  switch (status)
-  {
-    case ot_TL_CmdBusy:
-      osMutexAcquire( MtxOtCmdId, osWaitForever );
-      break;
-
-    case ot_TL_CmdAvailable:
-      osMutexRelease( MtxOtCmdId );
-      break;
-
-    default:
-      break;
-  }
-  return;
-}
-[/#if]
- 
 #if (CFG_USB_INTERFACE_ENABLE != 0)
 #else
 #if (CFG_FULL_LOW_POWER == 0)

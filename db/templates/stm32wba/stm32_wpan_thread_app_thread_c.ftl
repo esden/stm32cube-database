@@ -14,7 +14,7 @@
     [#if SWIP.defines??]
         [#list SWIP.defines as definition]
             [#assign myHash = {definition.name:definition.value} + myHash]
-			[#if (definition.name == "THREAD_APPLICATION") ]
+            [#if (definition.name == "THREAD_APPLICATION") ]
                 [#assign THREAD_APPLICATION = definition.value]
             [/#if]
             [#if (definition.name == "CFG_CLI_UART")  && (definition.value != "0")]
@@ -68,9 +68,15 @@ Key: ${key}; Value: ${myHash[key]}
 #include "tasklet.h"
 #include "thread.h"
 [#if (THREAD_APPLICATION != "RCP")]
-#include "threadplat_pka.h"
+#if (OT_CLI_USE == 1)
+#include "uart.h"
+#endif
 [/#if]
 #include "joiner.h"
+#include "alarm.h"
+[#if (THREAD_APPLICATION == "RCP")]
+#include "uart.h"
+[/#if]
 #include OPENTHREAD_CONFIG_FILE
 
 /* Private includes -----------------------------------------------------------*/
@@ -122,15 +128,10 @@ static void APP_THREAD_ProcessUart(ULONG lArgument);
 static void APP_THREAD_ProcessUart(void *argument);
 [/#if]
 #endif // OT_CLI_USE
-[#if myHash["SEQUENCER_STATUS"]?number == 1 ]
-static void APP_THREAD_ProcessPka(void);
+
 [/#if]
-[#if myHash["THREADX_STATUS"]?number == 1 ]
-static void APP_THREAD_ProcessPka(ULONG lArgument);
-[/#if]
-[#if myHash["FREERTOS_STATUS"]?number == 1 ]
-static void APP_THREAD_ProcessPka(void *argument);
-[/#if]
+[#if (THREAD_APPLICATION == "RCP")]
+static void APP_THREAD_RCPInit(otInstance *aInstance);
 
 [/#if]
 /* USER CODE BEGIN PFP */
@@ -141,27 +142,35 @@ static void APP_THREAD_ProcessPka(void *argument);
 static otInstance * PtOpenThreadInstance;
 
 [#if myHash["THREADX_STATUS"]?number == 1 ]
-TX_THREAD           AlarmTask, AlarmUsTask, TaskletsTask;
-TX_SEMAPHORE        AlarmSemaphore, AlarmUsSemaphore, TaskletSemaphore;
+TX_THREAD           AlarmTask, TaskletsTask;
+TX_SEMAPHORE        AlarmSemaphore, TaskletSemaphore;
 [#if (THREAD_APPLICATION != "RCP")]
-TX_THREAD 			PkaTask;
-TX_SEMAPHORE        PkaSemaphore, PkaCompletedSemaphore;
+TX_THREAD           AlarmUsTask;
+TX_SEMAPHORE        AlarmUsSemaphore;
 #if (OT_CLI_USE == 1)
 TX_THREAD           CliUartTask;
 TX_SEMAPHORE        CliUartSemaphore;
 #endif // OT_CLI_USE
 [/#if]
+[#if (THREAD_APPLICATION == "RCP")]
+TX_THREAD           RCPSpinelRxTask;
+TX_SEMAPHORE        RCPSpinelSemaphore;
+[/#if]
 [/#if]
 [#if myHash["FREERTOS_STATUS"]?number == 1 ]
-osThreadId_t        AlarmTask, AlarmUsTask, TaskletsTask;
-osSemaphoreId_t     AlarmSemaphore, AlarmUsSemaphore, TaskletSemaphore;
+osThreadId_t        AlarmTask, TaskletsTask;
+osSemaphoreId_t     AlarmSemaphore, TaskletSemaphore;
 [#if (THREAD_APPLICATION != "RCP")]
-osThreadId_t        PkaTask;
-osSemaphoreId_t     PkaSemaphore, PkaCompletedSemaphore;
+osThreadId_t        AlarmUsTask;
+osSemaphoreId_t     AlarmUsSemaphore;
 #if (OT_CLI_USE == 1)
 osThreadId_t        CliUartTask;
 osSemaphoreId_t     CliUartSemaphore;
 #endif // OT_CLI_USE
+[/#if]
+[#if (THREAD_APPLICATION == "RCP")]
+osThreadId_t        RCPSpinelRxTask;
+osSemaphoreId_t     RCPSpinelSemaphore;
 [/#if]
 
 const osThreadAttr_t AlarmTask_attr = {
@@ -174,6 +183,7 @@ const osThreadAttr_t AlarmTask_attr = {
   .stack_size   = TASK_STACK_SIZE_ALARM
 };
 
+[#if (THREAD_APPLICATION != "RCP")]
 const osThreadAttr_t AlarmUsTask_attr = {
   .name         = "AlarmUs Task",
   .attr_bits    = TASK_DEFAULT_ATTR_BITS,
@@ -184,6 +194,7 @@ const osThreadAttr_t AlarmUsTask_attr = {
   .stack_size   = TASK_STACK_SIZE_ALARM_US
 };
 
+[/#if]
 const osThreadAttr_t TaskletsTask_attr = {
   .name         = "Tasklets Task",
   .attr_bits    = TASK_DEFAULT_ATTR_BITS,
@@ -207,15 +218,20 @@ const osThreadAttr_t CliUartTask_attr = {
 };
 #endif // OT_CLI_USE
 
-const osThreadAttr_t PkaTask_attr = {
-  .name         = "Pka Task",
+[/#if]
+[#if (THREAD_APPLICATION == "RCP")]
+
+const osThreadAttr_t RCPSpinelRxTask_attr = {
+  .name         = "RCPSpinel Task",
   .attr_bits    = TASK_DEFAULT_ATTR_BITS,
   .cb_mem       = TASK_DEFAULT_CB_MEM,
   .cb_size      = TASK_DEFAULT_CB_SIZE,
   .stack_mem    = TASK_DEFAULT_STACK_MEM,
-  .priority     = TASK_PRIO_PKA,
-  .stack_size   = TASK_STACK_SIZE_PKA
+  .priority     = TASK_PRIO_RCP_SPINEL_RX,
+  .stack_size   = TASK_STACK_SIZE_RCP_SPINEL_RX
 };
+#endif // OT_CLI_USE
+
 [/#if]
 [/#if]
 /* USER CODE BEGIN PV */
@@ -230,11 +246,13 @@ void ProcessAlarm(void)
   arcAlarmProcess(PtOpenThreadInstance);
 }
 
+[#if (THREAD_APPLICATION != "RCP")]
 void ProcessUsAlarm(void)
 {
   arcUsAlarmProcess(PtOpenThreadInstance);
 }
 
+[/#if]
 void ProcessTasklets(void)
 {
   if (otTaskletsArePending(PtOpenThreadInstance) == TRUE) 
@@ -287,6 +305,7 @@ static void APP_THREAD_ProcessAlarm(ULONG lArgument)
   }
 }
 
+[#if (THREAD_APPLICATION != "RCP")]
 static void APP_THREAD_ProcessUsAlarm(ULONG lArgument)
 {
   UNUSED(lArgument);
@@ -298,14 +317,7 @@ static void APP_THREAD_ProcessUsAlarm(ULONG lArgument)
   }
 }
 
-static void ProcessTasklets(void)
-{
-  if (otTaskletsArePending(PtOpenThreadInstance) == TRUE)
-  {
-    tx_semaphore_put(&TaskletSemaphore);
-  }
-}
-
+[/#if]
 /**
  * @brief  APP_THREAD_ProcessOpenThreadTasklets.
  * @param  ULONG lArgument (unused)
@@ -329,9 +341,7 @@ static void APP_THREAD_ProcessOpenThreadTasklets(ULONG lArgument)
 
     /* put the IP802_15_4 back to sleep mode */
     //ll_sys_radio_hclk_ctrl_req(LL_SYS_RADIO_HCLK_LL_BG, LL_SYS_RADIO_HCLK_OFF);
-
-    /* reschedule the tasklets if any */
-    ProcessTasklets();
+	
   }
 }
 
@@ -357,6 +367,7 @@ static void APP_THREAD_ProcessAlarm(void *argument)
   }
 }
 
+[#if (THREAD_APPLICATION != "RCP")]
 static void APP_THREAD_ProcessUsAlarm(void *argument)
 {
   UNUSED(argument);
@@ -368,14 +379,7 @@ static void APP_THREAD_ProcessUsAlarm(void *argument)
   }
 }
 
-static void ProcessTasklets(void)
-{
-  if (otTaskletsArePending(PtOpenThreadInstance) == TRUE)
-  {
-    osSemaphoreRelease(TaskletSemaphore);
-  }
-}
-
+[/#if]
 /**
  * @brief  APP_THREAD_ProcessOpenThreadTasklets.
  * @param  ULONG lArgument (unused)
@@ -400,8 +404,6 @@ static void APP_THREAD_ProcessOpenThreadTasklets(void *argument)
     /* put the IP802_15_4 back to sleep mode */
     //ll_sys_radio_hclk_ctrl_req(LL_SYS_RADIO_HCLK_LL_BG, LL_SYS_RADIO_HCLK_OFF);
 
-    /* reschedule the tasklets if any */
-    ProcessTasklets();
   }
 }
 
@@ -432,6 +434,7 @@ void APP_THREAD_ScheduleAlarm(void)
 [/#if]  
 }
 
+[#if (THREAD_APPLICATION != "RCP")]
 void APP_THREAD_ScheduleUsAlarm(void)
 {
 [#if myHash["THREADX_STATUS"]?number == 1 ]
@@ -448,6 +451,7 @@ void APP_THREAD_ScheduleUsAlarm(void)
 [/#if]   
 }
 
+[/#if]
 static void APP_THREAD_AlarmsInit(void)
 {
 [#if myHash["THREADX_STATUS"]?number == 1 ]
@@ -457,11 +461,13 @@ static void APP_THREAD_AlarmsInit(void)
   /* Register semaphores to launch tasks */
   ThreadXStatus = tx_semaphore_create(&AlarmSemaphore, "AlarmSemaphore", 0);
 
+[#if (THREAD_APPLICATION != "RCP")]
   if (ThreadXStatus == TX_SUCCESS)
   {
     ThreadXStatus = tx_semaphore_create(&AlarmUsSemaphore, "AlarmUsSemaphore", 0);
   }
-  
+
+[/#if]  
   /* Create associated tasks */
   if (ThreadXStatus == TX_SUCCESS)
   { 
@@ -473,7 +479,8 @@ static void APP_THREAD_AlarmsInit(void)
                                       TASK_STACK_SIZE_ALARM, TASK_PRIO_ALARM, TASK_PREEMP_ALARM,
                                       TX_NO_TIME_SLICE, TX_AUTO_START );
   }
-  
+
+[#if (THREAD_APPLICATION != "RCP")]  
   if (ThreadXStatus == TX_SUCCESS)
   { 
     ThreadXStatus = tx_byte_allocate(pBytePool, (VOID**) &pStack, TASK_STACK_SIZE_ALARM_US, TX_NO_WAIT);
@@ -484,7 +491,8 @@ static void APP_THREAD_AlarmsInit(void)
                                       TASK_STACK_SIZE_ALARM_US, TASK_PRIO_US_ALARM, TASK_PREEMP_US_ALARM,
                                       TX_NO_TIME_SLICE, TX_AUTO_START );
   }
-  
+
+[/#if]  
   /* Verify if it's OK */
   if (ThreadXStatus != TX_SUCCESS)
   { 
@@ -508,7 +516,8 @@ static void APP_THREAD_AlarmsInit(void)
     LOG_ERROR_APP("ERROR FREERTOS : ALARM TASK CREATION FAILED");
     while(1);
   }
-  
+
+[#if (THREAD_APPLICATION != "RCP")]  
   AlarmUsSemaphore = osSemaphoreNew(1, 0, NULL);
   if (AlarmUsSemaphore == NULL)
   {
@@ -522,10 +531,14 @@ static void APP_THREAD_AlarmsInit(void)
     LOG_ERROR_APP("ERROR FREERTOS : ALARM US TASK CREATION FAILED");
     while(1);
   }
+  
+[/#if]  
 [/#if]   
 [#if myHash["SEQUENCER_STATUS"]?number == 1 ]
   UTIL_SEQ_RegTask(1U << CFG_TASK_OT_ALARM, UTIL_SEQ_RFU, ProcessAlarm);
+[#if (THREAD_APPLICATION != "RCP")]  
   UTIL_SEQ_RegTask(1U << CFG_TASK_OT_US_ALARM, UTIL_SEQ_RFU, ProcessUsAlarm);
+[/#if]
   
   /* Run first time */
   UTIL_SEQ_SetTask(1U << CFG_TASK_OT_ALARM, TASK_PRIO_ALARM);
@@ -571,67 +584,6 @@ static void APP_THREAD_TaskletsInit(void)
 [/#if]  
 }
 
-[#if (THREAD_APPLICATION != "RCP")]
-static void APP_THREAD_PkaInit(void)
-{
-[#if myHash["THREADX_STATUS"]?number == 1 ]
-  UINT ThreadXStatus;
-  CHAR *pStack;
-  
-  /* Register semaphores to launch tasks */
-  ThreadXStatus = tx_semaphore_create(&PkaSemaphore, "PkaSemaphore", 0);
-  if (ThreadXStatus == TX_SUCCESS)
-  {
-	ThreadXStatus = tx_semaphore_create(&PkaCompletedSemaphore, "PkaCompletedSemaphore", 0);
-  }
-
-  if (ThreadXStatus == TX_SUCCESS)
-  {
-	/* Create associated task */
-	ThreadXStatus = tx_byte_allocate(pBytePool, (VOID**) &pStack, TASK_STACK_SIZE_PKA, TX_NO_WAIT);
-  }
-  if (ThreadXStatus == TX_SUCCESS)
-  {
-    ThreadXStatus |= tx_thread_create(&PkaTask, "PkaTask", APP_THREAD_ProcessPka, 0, pStack,
-                                      TASK_STACK_SIZE_PKA, TASK_PRIO_PKA, TASK_PREEMP_PRIO_PKA,
-                                      TX_NO_TIME_SLICE, TX_AUTO_START);
-  }
- 
-  /* Verify if it's OK */
-  if (ThreadXStatus != TX_SUCCESS)
-  { 
-    LOG_ERROR_APP( "ERROR THREADX : PKA THREAD CREATION FAILED (%d)", ThreadXStatus );
-    while(1);
-  }
-[/#if]
-[#if myHash["FREERTOS_STATUS"]?number == 1 ]
-  /* Register semaphores to launch tasks */
-  PkaSemaphore = osSemaphoreNew(1, 0, NULL);
-  if (PkaSemaphore == NULL)
-  {
-    LOG_ERROR_APP("ERROR FREERTOS : PKA SEMAPHORE CREATION FAILED");
-    while(1);
-  }
-  PkaCompletedSemaphore = osSemaphoreNew(1, 0, NULL);
-  if (PkaCompletedSemaphore == NULL)
-  {
-    LOG_ERROR_APP("ERROR FREERTOS : PKA COMPLETED SEMAPHORE CREATION FAILED");
-    while(1);
-  }
-  
-  PkaTask = osThreadNew(APP_THREAD_ProcessPka, NULL, &PkaTask_attr);
-  if (PkaTask == NULL)
-  { 
-    APP_DBG( "ERROR FREERTOS : PKA TASK CREATION FAILED" );
-    while(1);
-  } 
-[/#if]
-[#if myHash["SEQUENCER_STATUS"]?number == 1 ]
-  UTIL_SEQ_RegTask(1U << CFG_TASK_PKA, UTIL_SEQ_RFU, APP_THREAD_ProcessPka);
-[/#if]  
-}
-
-[/#if] 
 /**
  *
  */
@@ -680,9 +632,6 @@ void Thread_Init(void)
   /* Register tasks */
   APP_THREAD_AlarmsInit();
   APP_THREAD_TaskletsInit();
-[#if (THREAD_APPLICATION != "RCP")]
-  APP_THREAD_PkaInit();
-[/#if]  
 
   ll_sys_thread_init();
 
@@ -801,6 +750,9 @@ static void APP_THREAD_DeviceConfig(void)
     APP_THREAD_Error(ERR_THREAD_START,error);
   }
 [/#if]
+[#if (THREAD_APPLICATION == "RCP")]
+  APP_THREAD_RCPInit(PtOpenThreadInstance);
+[/#if]
   /* USER CODE BEGIN DEVICECONFIG */
 
   /* USER CODE END DEVICECONFIG */
@@ -879,7 +831,7 @@ void APP_THREAD_Error(uint32_t ErrId, uint32_t ErrCode)
         APP_THREAD_TraceError("ERROR : ERR_THREAD_CHECK_WIRELESS ",ErrCode);
         break;
 
-	case ERR_THREAD_SET_THRESHOLD:
+    case ERR_THREAD_SET_THRESHOLD:
         APP_THREAD_TraceError("ERROR : ERR_THREAD_SET_THRESHOLD", ErrCode);
         break;
     
@@ -1043,95 +995,118 @@ static void APP_THREAD_CliInit(otInstance *aInstance)
   }  
 [/#if]
 
-  otPlatUartEnable();
+  (void)otPlatUartEnable();
   otCliInit(aInstance, CliUartOutput, aInstance);
 }
 #endif /* OT_CLI_USE */
 
+[/#if]
+[#if (THREAD_APPLICATION == "RCP")]
 [#if myHash["SEQUENCER_STATUS"]?number == 1 ]
-static void APP_THREAD_ProcessPka(void)
+void ProcessRcpSpinel(void)
 {
-  otPlatPkaProccessLoop();
+  arcRcpSpinelRx();
 }
 
-void APP_THREAD_SchedulePka(void)
+void APP_THREAD_ScheduleRcpSpinelRx(void)
 {
-  UTIL_SEQ_SetTask(1U << CFG_TASK_PKA, TASK_PRIO_PKA);
+  UTIL_SEQ_SetTask( 1U << CFG_TASK_OT_RCP_SPINEL_RX, TASK_PRIO_RCP_SPINEL_RX);
 }
 
-void APP_THREAD_WaitPkaEndOfOperation(void)
+static void APP_THREAD_RCPInit(otInstance *aInstance)
 {
-  /* Wait for event CFG_EVENT_PKA_COMPLETED */
-  UTIL_SEQ_WaitEvt(1U << CFG_EVENT_PKA_COMPLETED);
+  UTIL_SEQ_RegTask(1U << CFG_TASK_OT_RCP_SPINEL_RX, UTIL_SEQ_RFU, ProcessRcpSpinel);
+  otAppNcpInit(aInstance);
 }
 
-void APP_THREAD_PostPkaEndOfOperation(void)
-{
-  /* Pka operation ended, set CFG_EVENT_PKA_COMPLETED event */
-  UTIL_SEQ_SetEvt(1U << CFG_EVENT_PKA_COMPLETED);
-}
 [/#if]
 [#if myHash["THREADX_STATUS"]?number == 1 ]
-static void APP_THREAD_ProcessPka(ULONG lArgument)
+static void APP_THREAD_ProcessRCPSpinelRx(ULONG lArgument)
 {
   UNUSED(lArgument);
   
   for(;;)
   {
-    tx_semaphore_get(&PkaSemaphore, TX_WAIT_FOREVER);
-    otPlatPkaProccessLoop();
+    tx_semaphore_get(&RCPSpinelSemaphore, TX_WAIT_FOREVER);
+    arcRcpSpinelRx();
   }
 }
 
-void APP_THREAD_SchedulePka(void)
+void APP_THREAD_ScheduleRCPSpinelRx(void)
 {
-  tx_semaphore_put(&PkaSemaphore);
+  tx_semaphore_put(&RCPSpinelSemaphore);
 }
 
-void APP_THREAD_WaitPkaEndOfOperation(void)
+static void APP_THREAD_RCPInit(otInstance *aInstance)
 {
-  tx_semaphore_get(&PkaCompletedSemaphore, TX_WAIT_FOREVER);
+  UINT ThreadXStatus;
+  CHAR *pStack;
+  
+  /* Register semaphore to launch task */
+  ThreadXStatus = tx_semaphore_create(&RCPSpinelSemaphore, "RCPSpinelSemaphore", 0);
+
+  /* Create RCP Spinel RX thread with this stack */
+  if (ThreadXStatus == TX_SUCCESS)
+  { 
+    ThreadXStatus |= tx_byte_allocate(pBytePool, (VOID**) &pStack, TASK_STACK_SIZE_RCP_SPINEL_RX, TX_NO_WAIT);
+  }
+  if (ThreadXStatus == TX_SUCCESS)
+  {
+    ThreadXStatus |= tx_thread_create(&RCPSpinelRxTask, "RCPSpinelRxTask", APP_THREAD_ProcessRCPSpinelRx, 0, pStack,
+                                      TASK_STACK_SIZE_RCP_SPINEL_RX, TASK_PRIO_RCP_SPINEL_RX, TASK_PREEMP_RCP_SPINEL_RX,
+                                      TX_NO_TIME_SLICE, TX_AUTO_START);
+  }
+
+  /* Verify if it's OK */
+  if (ThreadXStatus != TX_SUCCESS)
+  { 
+    LOG_ERROR_APP( "ERROR THREADX : RCP THREAD CREATION FAILED (%d)", ThreadXStatus );
+    while(1);
+  }
+  
+  otAppNcpInit(aInstance);
 }
 
-void APP_THREAD_PostPkaEndOfOperation(void)
-{
-  tx_semaphore_put(&PkaCompletedSemaphore);
-}
 [/#if]
 [#if myHash["FREERTOS_STATUS"]?number == 1 ]
-static void APP_THREAD_ProcessPka(void *argument)
+static void APP_THREAD_ProcessRCPSpinelRx(void *argument)
 {
   UNUSED(argument);
   
   for(;;)
   {
-    osSemaphoreAcquire(PkaSemaphore, osWaitForever);
-    otPlatPkaProccessLoop();
+    osSemaphoreAcquire(RCPSpinelSemaphore, osWaitForever);
+    arcRcpSpinelRx();
   }
 }
 
-void APP_THREAD_SchedulePka(void)
+void APP_THREAD_ScheduleRCPSpinelRx(void)
 {
-  osSemaphoreRelease(PkaSemaphore);
+  osSemaphoreRelease(RCPSpinelSemaphore);
 }
 
-void APP_THREAD_WaitPkaEndOfOperation(void)
+static void APP_THREAD_RCPInit(otInstance *aInstance)
 {
-  osSemaphoreAcquire(PkaCompletedSemaphore, osWaitForever);
+  /* Register semaphores to launch tasks */
+  RCPSpinelSemaphore = osSemaphoreNew(1, 0, NULL);
+  if (RCPSpinelSemaphore == NULL)
+  {
+    LOG_ERROR_APP("ERROR FREERTOS : RCP SEMAPHORE CREATION FAILED");
+    while(1);
+  }
+  
+  RCPSpinelRxTask = osThreadNew(APP_THREAD_ProcessRCPSpinelRx, NULL, &RCPSpinelRxTask_attr);
+  if (RCPSpinelRxTask == NULL)
+  { 
+    APP_DBG( "ERROR FREERTOS : RCP TASK CREATION FAILED" );
+    while(1);
+  } 
+  
+  otAppNcpInit(aInstance);
 }
 
-void APP_THREAD_PostPkaEndOfOperation(void)
-{
-  osSemaphoreRelease(PkaCompletedSemaphore);
-}
 [/#if]
 [/#if]
-
-void app_logger_write(uint8_t *buffer, uint32_t size)
-{
-  //UTIL_ADV_TRACE_COND_Send(VLEVEL_ALWAYS, ~0x0, 0, buffer, (uint16_t)size);
-}
-
 /* USER CODE BEGIN FD_LOCAL_FUNCTIONS */
 
 /* USER CODE END FD_LOCAL_FUNCTIONS */

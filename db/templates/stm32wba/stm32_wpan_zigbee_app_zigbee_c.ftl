@@ -54,8 +54,8 @@ ZigBeeMode : ${ZigBeeMode}
 
 /* USER CODE END PI */
 
-/* Public variables -----------------------------------------------*/
-ZigbeeAppInfo_t    	              stZigbeeAppInfo;
+/* Public variables -----------------------------------------------------------*/
+ZigbeeAppInfo_t                                     stZigbeeAppInfo;
 
 /* USER CODE BEGIN PV */
 
@@ -71,9 +71,9 @@ ZigbeeAppInfo_t    	              stZigbeeAppInfo;
 #define APP_ZIGBEE_CHIP_VERSION                     0x20        // Cut 2.0
 #define APP_ZIGBEE_BOARD_POWER                      0x00        // No Power
 
-#define APP_ZIGBEE_APP_DATE_CODE                    "20240112"
-#define APP_ZIGBEE_APP_BUILD_ID                     "V1.3"
-#define APP_ZIGBEE_APP_VERSION                      0x13        // Application Version v1.3
+#define APP_ZIGBEE_APP_DATE_CODE                    "20240915"
+#define APP_ZIGBEE_APP_BUILD_ID                     "V1.5"
+#define APP_ZIGBEE_APP_VERSION                      0x15        // Application Version v1.5
 #define APP_ZIGBEE_STACK_VERSION                    0x10        // Stack Version v1.0
 
 /* USER CODE BEGIN PD */
@@ -88,6 +88,7 @@ ZigbeeAppInfo_t    	              stZigbeeAppInfo;
 /* Private function prototypes -----------------------------------------------*/
 static enum ZbStatusCodeT ZbStartupWait       ( struct ZigBeeT * zb, struct ZbStartupT * pstConfig );
 
+static void APP_ZIGBEE_ConfigBasicServer      ( void );
 static void APP_ZIGBEE_TraceError             ( const char * pMess, uint32_t lErrCode );
 static void APP_ZIGBEE_ConfigMeshNetwork      ( void );
 static void APP_ZIGBEE_NwkFormWaitElapsed     ( void * arg );
@@ -194,7 +195,7 @@ void APP_ZIGBEE_NwkFormOrJoinTaskInit( void )
  * @param  None
  * @retval None
  */
-void APP_ZIGBEE_ConfigBasicServer(void)
+static void APP_ZIGBEE_ConfigBasicServer( void )
 {
   static struct ZbZclBasicServerDefaults   stBasicServerDefaults;
 
@@ -342,6 +343,17 @@ void APP_ZIGBEE_NwkFormOrJoin(void)
   {
     /* Application configure Startup */
     APP_ZIGBEE_GetStartupConfig( &stConfig );
+
+[#if ZigBeeMode == "DISTRIBUTED"]
+    /* Set the TC address to be distributed. */
+    stConfig.security.trustCenterAddress = ZB_DISTRIBUTED_TC_ADDR;
+
+    /* Using the Uncertified Distributed Global Key */
+    memcpy( stConfig.security.distributedGlobalKey, sec_key_distrib_uncert, ZB_SEC_KEYSIZE );
+[#else]
+    /* Using the default HA preconfigured Link Key */
+    memcpy( stConfig.security.preconfiguredLinkKey, sec_key_ha, ZB_SEC_KEYSIZE );
+[/#if]
 
     /* Using ZbStartupWait (blocking) */
     stZigbeeAppInfo.eJoinStatus = ZbStartupWait( stZigbeeAppInfo.pstZigbee, &stConfig );
@@ -618,6 +630,58 @@ bool APP_ZIGBEE_IsAppliJoinNetwork( void )
 }
 
 /**
+ * @brief   Indicate a Device with Install Code request a Join.
+ *          Add the LinkKey (from Install Code) on List and start a Join during 30s.
+ *
+ * @param   dlExtendedAddress   Device Extended Address
+ * @param   szInstallCode       Device Install Code
+ * @param   cPermitJoinDelay    Time to Device to Join network. If 0, PermitJoin is not called.
+ */
+void APP_ZIGBEE_AddDeviceWithInstallCode( uint64_t dlExtendedAddress, uint8_t * szInstallCode, uint8_t cPermitJoinDelay )
+{
+  uint32_t                  lTcPolicy = 0;
+  struct ZbApsmeAddKeyReqT  stAddKeyReq;
+  struct ZbApsmeAddKeyConfT stAddKeyConf;
+  static  bool              bTrustCenterDone = false;
+    
+  if ( bTrustCenterDone == false )
+  {
+    ZbApsGet( stZigbeeAppInfo.pstZigbee, ZB_APS_IB_ID_TRUST_CENTER_POLICY, &lTcPolicy, sizeof(lTcPolicy));
+    lTcPolicy |= (ZB_APSME_POLICY_IC_SUPPORTED | ZB_APSME_POLICY_TCLK_UPDATE_REQUIRED | ZB_APSME_POLICY_TC_POLICY_CHANGE);
+
+    ZbApsSet( stZigbeeAppInfo.pstZigbee, ZB_APS_IB_ID_TRUST_CENTER_POLICY, &lTcPolicy, sizeof(lTcPolicy) );
+    bTrustCenterDone = true;
+  }
+  
+  /* Register 'Application Link Key' for the Device */
+  memset( &stAddKeyConf, 0, sizeof( stAddKeyConf ) );
+  memset( &stAddKeyReq, 0, sizeof( stAddKeyReq ) );
+  
+  stAddKeyReq.keyType = ZB_SEC_KEYTYPE_TC_LINK;
+  stAddKeyReq.keySeqNumber = 0;
+  stAddKeyReq.partnerAddr = dlExtendedAddress;
+
+  /*Extract Link Key from the Install Code*/
+  ZbAesMmoHash( szInstallCode, ( ZB_SEC_KEYSIZE + 2u ), stAddKeyReq.key );
+
+  /* Add the new Link Key */
+  ZbApsmeAddKeyReq( stZigbeeAppInfo.pstZigbee, &stAddKeyReq, &stAddKeyConf );
+  if ( stAddKeyConf.status != ZB_STATUS_SUCCESS )
+  {
+    LOG_ERROR_APP( "Error Add Link Key (0x%02X)", stAddKeyConf.status );
+  }
+  else
+  {
+    LOG_INFO_APP( "Add of Device Link Key OK." );
+    if ( cPermitJoinDelay != 0 )
+    {
+      APP_ZIGBEE_PermitJoin( cPermitJoinDelay );
+      LOG_INFO_APP( "Device can now Join Network during %d seconds.", cPermitJoinDelay );
+    }
+  }
+}
+
+/**
  * @brief  Get the current RF channel
  * @param  cCurrentChannel    Current Channel
  * @retval True if Ok, else false.
@@ -670,17 +734,45 @@ bool APP_ZIGBEE_SetTxPower( uint8_t cTxPower )
 }
 
 /**
+ * @brief Display a Security Key or Install Code
+ *
+ * @param szCode  Code to display
+ * @return        String of the Code
+ */
+char * APP_ZIGBEE_GetDisplaySecKey( const uint8_t * szCode, uint16_t iLength, bool bSpace )
+{
+  uint16_t      iIndex;
+  static char   szCodeValue[( ( ZB_SEC_KEYSIZE + 2u ) * 3u ) + 1u];
+    
+  /* Initialize & verify parameters */
+  memset( szCodeValue, 0, sizeof(szCodeValue) );
+  if ( iLength > ( ZB_SEC_KEYSIZE + 2u ) )
+  {
+    iLength = ( ZB_SEC_KEYSIZE + 2u );
+  }
+       
+  for ( iIndex= 0; iIndex < iLength; iIndex++ )
+  {
+    if ( bSpace != false )
+    {
+      snprintf( &szCodeValue[iIndex * 3u], ( sizeof(szCodeValue) - ( iIndex * 3u ) ), "%02X ", szCode[iIndex] );
+    }
+    else
+    {
+      snprintf( &szCodeValue[iIndex * 2u], ( sizeof(szCodeValue) - ( iIndex * 2u ) ), "%02X", szCode[iIndex] );
+    }
+  }
+  
+  return (char *)&szCodeValue;
+}
+
+/**
  * @brief  Print standard application information (channel in use, etc..) common to all Zigbee Application
  * @param  None
  * @retval None
  */
 void APP_ZIGBEE_PrintGenericInfo( void )
 {
-  bool      bDisplayString = true;
-  uint16_t  iIndex;
-  uint8_t   szLinkKey[ZB_SEC_KEYSIZE];
-  char      szKeyValue[( ZB_SEC_KEYSIZE * 3u ) + 1u];
-  
   /* Display Application Version. */
   LOG_INFO_APP( "Application Version : %d.%d", ( APP_ZIGBEE_APP_VERSION >> 4u ), ( APP_ZIGBEE_APP_VERSION & 0x0F ) );
   
@@ -690,31 +782,15 @@ void APP_ZIGBEE_PrintGenericInfo( void )
 #else // ( CONFIG_ZB_ZCL_SE == 1 )
   LOG_INFO_APP( "Zigbee Stack version : R%02d", CONFIG_ZB_REV );
 #endif // ( CONFIG_ZB_ZCL_SE == 1 )
+
   LOG_INFO_APP( "Zigbee Extended Address : " LOG_DISPLAY64(), LOG_NUMBER64( ZbExtendedAddress( stZigbeeAppInfo.pstZigbee ) ) );
 
-  /* Obtains Link Key */
+  /* Display Link Key */
 [#if ZigBeeMode == "DISTRIBUTED"]
-  memcpy( szLinkKey, sec_key_distrib_uncert, ZB_SEC_KEYSIZE );
+  LOG_INFO_APP( "Distrib. Global Key : %s", APP_ZIGBEE_GetDisplaySecKey( sec_key_distrib_uncert, ZB_SEC_KEYSIZE, true ) );
 [#else]
-  memcpy( szLinkKey, sec_key_ha, ZB_SEC_KEYSIZE );
+  LOG_INFO_APP( "Link Key : %s", APP_ZIGBEE_GetDisplaySecKey( sec_key_ha, ZB_SEC_KEYSIZE, true ) );
 [/#if]
-
-  /* Decode Link Key to display in Hexa. */
-  for ( iIndex= 0; iIndex < ZB_SEC_KEYSIZE; iIndex++ )
-  {
-    snprintf( &szKeyValue[iIndex * 3u], ( sizeof(szKeyValue) - ( iIndex * 3u ) ), "%02x ", szLinkKey[iIndex] );
-    if ( ( szLinkKey[iIndex] < ' ' ) || ( szLinkKey[iIndex] > '~' ) )
-    { 
-      bDisplayString = false; 
-    }
-  }
-
-  /* Display Link Key Info : String (if possible) and Hexa. */
-  if ( bDisplayString != false )
-  {
-    LOG_INFO_APP( "Link Key : %.16s", szLinkKey );
-  }
-  LOG_INFO_APP( "Link Key value : %s", szKeyValue );
 }
 
 

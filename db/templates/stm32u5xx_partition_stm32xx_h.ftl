@@ -523,7 +523,8 @@
 //   <o.25> EXTI14_IRQn           [#if enabledIT?contains("EXTI14_IRQn")]<1=> Non-Secure state[#assign nonSecureIT0 = nonSecureIT0+", "+"25"/][#else]<0=> Secure state[/#if]
 //   <o.26> EXTI15_IRQn           [#if enabledIT?contains("EXTI15_IRQn")]<1=> Non-Secure state[#assign nonSecureIT0 = nonSecureIT0+", "+"26"/][#else]<0=> Secure state[/#if]
 //   <o.27> IWDG_IRQn             [#if enabledIT?contains("IWDG_IRQn")]<1=> Non-Secure state[#assign nonSecureIT0 = nonSecureIT0+", "+"27"/][#else]<0=> Secure state[/#if]
-//   <o.28> SAES_IRQn             [#if enabledIT?contains("SAES_IRQn")]<1=> Non-Secure state[#assign nonSecureIT0 = nonSecureIT0+", "+"28"/][#else]<0=> Secure state[/#if]
+[#if McuName?matches("STM32U5[4|8|a|g].*")]
+//   <o.28> SAES_IRQn             [#if enabledIT?contains("SAES_IRQn")]<1=> Non-Secure state[#assign nonSecureIT0 = nonSecureIT0+", "+"28"/][#else]<0=> Secure state[/#if][/#if]
 //   <o.29> GPDMA1_Channel0_IRQn  [#if enabledIT?contains("GPDMA1_Channel0_IRQn")]<1=> Non-Secure state[#assign nonSecureIT0 = nonSecureIT0+", "+"29"/][#else]<0=> Secure state[/#if]
 //   <o.30> GPDMA1_Channel1_IRQn  [#if enabledIT?contains("GPDMA1_Channel1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT0 = nonSecureIT0+", "+"30"/][#else]<0=> Secure state[/#if]
 //   <o.31> GPDMA1_Channel2_IRQn  [#if enabledIT?contains("GPDMA1_Channel2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT0 = nonSecureIT0+", "+"31"/][#else]<0=> Secure state[/#if]
@@ -581,7 +582,8 @@
 //   <o.27> SPI1_IRQn             [#if enabledIT?contains("SPI1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"27"/][#else]<0=> Secure state[/#if]
 //   <o.28> SPI2_IRQn             [#if enabledIT?contains("SPI2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"28"/][#else]<0=> Secure state[/#if]
 //   <o.29> USART1_IRQn           [#if enabledIT?contains("USART1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"29"/][#else]<0=> Secure state[/#if]
-//   <o.30> USART2_IRQn           [#if enabledIT?contains("USART2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#else]<0=> Secure state[/#if]
+[#if !McuName?matches("STM32U5[4|3].*")]
+//   <o.30> USART2_IRQn           [#if enabledIT?contains("USART2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#else]<0=> Secure state[/#if][/#if]
 //   <o.31> USART3_IRQn           [#if enabledIT?contains("USART3_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"31"/][#else]<0=> Secure state[/#if]
 */
 
@@ -645,7 +647,8 @@
 //   <o.9>  OTG_HS_IRQn           [#if enabledIT?contains("OTG_HS_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"9"/][#else]<0=> Secure state[/#if]
 [/#if]
 //   <o.10> CRS_IRQn              [#if enabledIT?contains("CRS_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"10"/][#else]<0=> Secure state[/#if]
-//   <o.11> FMC_IRQn              [#if enabledIT?contains("FMC_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"11"/][#else]<0=> Secure state[/#if]
+[#if !McuName?matches("STM32U5[4|3].*")]
+//   <o.11> FMC_IRQn              [#if enabledIT?contains("FMC_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"11"/][#else]<0=> Secure state[/#if][/#if]
 //   <o.12> OCTOSPI1_IRQn         [#if enabledIT?contains("OCTOSPI1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"12"/][#else]<0=> Secure state[/#if]
 //   <o.13> PWR_S3WU_IRQn         [#if enabledIT?contains("PWR_S3WU_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"13"/][#else]<0=> Secure state[/#if]
 
@@ -665,7 +668,8 @@
 //   <o.26> SAI1_IRQn             [#if enabledIT?contains("SAI1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"26"/][#else]<0=> Secure state[/#if]
 //   <o.27> SAI2_IRQn             [#if enabledIT?contains("SAI2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"27"/][#else]<0=> Secure state[/#if]
 //   <o.28> TSC_IRQn              [#if enabledIT?contains("TSC_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"28"/][#else]<0=> Secure state[/#if]
-//   <o.29> AES_IRQn              [#if enabledIT?contains("AES_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"29"/][#else]<0=> Secure state[/#if]
+[#if McuName?matches("STM32U5[4|8|a|g].*")]
+//   <o.29> AES_IRQn              [#if enabledIT?contains("AES_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"29"/][#else]<0=> Secure state[/#if][/#if]
 
 //   <o.30> RNG_IRQn              [#if enabledIT?contains("RNG_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"30"/][#else]<0=> Secure state[/#if]
 //   <o.31> FPU_IRQn              [#if enabledIT?contains("FPU_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"31"/][#else]<0=> Secure state[/#if]

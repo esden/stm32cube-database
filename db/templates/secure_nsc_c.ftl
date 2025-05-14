@@ -30,6 +30,10 @@
 [#if FamilyName=="STM32N6"]
 /** @addtogroup STM32N6xx_HAL_Examples
 [/#if]
+[#if FamilyName=="STM32U3"]
+/** @addtogroup STM32U3xx_HAL_Examples
+[/#if]
+
   * @{
   */
 

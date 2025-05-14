@@ -316,7 +316,7 @@ static void APB0periphContextRestore(apb0PeriphT *apb0)
   }
 #endif
 
-  apb0->FLASH_CONFIG_vr = FLASH->CONFIG;
+  FLASH->CONFIG = apb0->FLASH_CONFIG_vr;
 }
 
 /**

@@ -1679,6 +1679,22 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *p_Pckt)
     }
 [/#if]
 
+[#if  (CUSTOM_TEMPLATE = 1)]
+    case HCI_HARDWARE_ERROR_EVT_CODE:
+    {
+      hci_hardware_error_event_rp0 *p_hardware_error_event;
+
+      p_hardware_error_event = (hci_hardware_error_event_rp0 *)p_event_pckt->data;
+	  UNUSED(p_hardware_error_event);
+      APP_DBG_MSG(">>== HCI_HARDWARE_ERROR_EVT_CODE\n");
+      APP_DBG_MSG("Hardware Code = 0x%02X\n",p_hardware_error_event->Hardware_Code);
+      /* USER CODE BEGIN HCI_EVT_LE_HARDWARE_ERROR */
+
+      /* USER CODE END HCI_EVT_LE_HARDWARE_ERROR */
+      break; /* HCI_HARDWARE_ERROR_EVT_CODE */
+    }
+[/#if]
+
     case HCI_LE_META_EVT_CODE:
 [#if (BT_SIG_BLOOD_PRESSURE_SENSOR = 1) || (BT_SIG_HEALTH_THERMOMETER_SENSOR = 1) || (BT_SIG_HEART_RATE_SENSOR = 1) ||(CUSTOM_P2P_SERVER = 1) ||(CUSTOM_TEMPLATE = 1)]
     {
@@ -1989,6 +2005,21 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *p_Pckt)
         break;
     [/#if]
 
+    [#if (CUSTOM_TEMPLATE = 1)]
+        case ACI_HAL_FW_ERROR_VSEVT_CODE:
+        {
+          aci_hal_fw_error_event_rp0 *p_fw_error_event;
+
+	      p_fw_error_event = (aci_hal_fw_error_event_rp0 *)p_blecore_evt->data;
+		  UNUSED(p_fw_error_event);
+          APP_DBG_MSG(">>== ACI_HAL_FW_ERROR_VSEVT_CODE\n");
+          APP_DBG_MSG("FW Error Type = 0x%02X\n", p_fw_error_event->FW_Error_Type);
+	      /* USER CODE BEGIN ACI_HAL_FW_ERROR_VSEVT_CODE */
+
+          /* USER CODE END ACI_HAL_FW_ERROR_VSEVT_CODE */
+          break;
+        }
+		[/#if]
         /* USER CODE BEGIN BLUE_EVT */
 
         /* USER CODE END BLUE_EVT */

@@ -160,6 +160,9 @@
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="NX_SECURE_ENABLE_AEAD_CIPHER" OptimizationCondition="equal"/>
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="NX_SECURE_TLS_MAX_PSK_ID_SIZE" OptimizationCondition="equal"/>
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="NX_SECURE_TLS_SNI_EXTENSION_DISABLED" OptimizationCondition="equal"/>
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="NX_SECURE_TLS_MASTER_SIZE" OptimizationCondition="equal" />
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="NX_SECURE_TLS_KEY_MATERIAL_SIZE" OptimizationCondition="equal" />
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="NX_SECURE_CUSTOM_SECRET_GENERATION" OptimizationCondition="equal" />
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="NX_IP_PERIODIC_RATE" OptimizationCondition="equal"/>
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="NX_SECURE_DTLS_RETRANSMIT_RETRY_SHIFT" OptimizationCondition="equal"/>
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="NX_SECURE_DTLS_MAXIMUM_RETRANSMIT_RETRIES" OptimizationCondition="equal"/>
@@ -568,6 +571,8 @@
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="NX_DHCP_SERVER_NAME" OptimizationCondition="equal" />
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="NX_MDNS_DISABLE_CLIENT" OptimizationCondition="equal" />
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="NX_PPP_OPTION_MESSAGE_LENGTH" OptimizationCondition="equal" />
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="NX_ENABLE_IP_ID_RANDOMIZATION" OptimizationCondition="equal" />
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="NX_ENABLE_VLAN" OptimizationCondition="equal" />
     </RefConfigFile>
     <RefConfigFile Description="NetXDuo custom interface file" Name="CUSTOM_H" Template="azure_rtos/nx_custom_driver_h.ftl" destinationFolder="NetXDuo/Target">
 		<File Category="header" Condition="all" Name="./nx_stm32_custom_driver.h" />
@@ -588,12 +593,12 @@
     </RefConfigFile>
 
 
-    <RefComponent Cclass="Middleware" Cgroup="NetXDuo" Cversion="6Gg2Gg0">
-        <SubComponent Csub="NXOoCore" Cvariant="true" Cversion="6Gg2Gg0">
+    <RefComponent Cclass="Middleware" Cgroup="NetXDuo" Cversion="6Gg4Gg0">
+        <SubComponent Csub="NXOoCore" Cvariant="true" Cversion="6Gg4Gg0">
 			<File Category="header" Condition="" Name="common/inc/*"/>
 			<File Category="header" Condition="SIiTcompilerIiIAR&amp;SIiDcoreIiCortexAaM33" Name="ports/cortex_m33/iar/inc/*"/>
             <File Category="header" Condition="SIiDcoreIiCortexAaM33&amp;SIiTcompilerIiGCC" Name="ports/cortex_m33/gnu/inc/*"/>
-            <File Category="header" Condition="SIiTcompilerIiARMCC&amp;SIiDcoreIiCortexAaM33" Name="ports/cortex_m33/ac5/inc/*"/>
+            <File Category="header" Condition="SIiTcompilerIiARMCC&amp;SIiDcoreIiCortexAaM33" Name="ports/cortex_m33/ac6/inc/*"/>
             <File Category="source" Condition="" Name="common/src/nx_arp_announce_send.c"/>
             <File Category="source" Condition="" Name="common/src/nx_arp_dynamic_entries_invalidate.c"/>
             <File Category="source" Condition="" Name="common/src/nx_arp_dynamic_entry_delete.c"/>
@@ -989,6 +994,12 @@
             <File Category="source" Condition="" Name="common/src/nxe_udp_socket_send.c"/>
             <File Category="source" Condition="" Name="common/src/nxe_udp_socket_source_send.c"/>
             <File Category="source" Condition="" Name="common/src/nxe_udp_socket_unbind.c"/>
+            <File Category="source" Condition="" Name="common/src/nxe_udp_socket_vlan_priority_set.c" />
+            <File Category="source" Condition="" Name="common/src/nxe_tcp_socket_vlan_priority_set.c" />
+            <File Category="source" Condition="" Name="common/src/nxe_packet_vlan_priority_set.c" />
+            <File Category="source" Condition="" Name="common/src/nx_udp_socket_vlan_priority_set.c" />
+            <File Category="source" Condition="" Name="common/src/nx_tcp_socket_vlan_priority_set.c" />
+            <File Category="source" Condition="" Name="common/src/nx_packet_vlan_priority_set.c" />
             <File Category="source" Condition="" Name="common/src/nxe_udp_source_extract.c"/>
             <File Category="source" Condition="" Name="common/src/nx_icmp_interface_ping6.c"/>
             <File Category="source" Condition="" Name="common/src/nx_icmp_ping6.c"/>
@@ -1028,6 +1039,7 @@
             <File Category="source" Condition="" Name="common/src/nx_ipv6_process_hop_by_hop_option.c"/>
             <File Category="source" Condition="" Name="common/src/nx_ipv6_process_routing_option.c"/>
             <File Category="source" Condition="" Name="common/src/nx_ipv6_util.c"/>
+            <File Category="source" Condition="" Name="common/src/nx_link.c" />
             <File Category="source" Condition="" Name="common/src/nxd_icmpv6_ra_flag_callback_set.c"/>
             <File Category="source" Condition="" Name="common/src/nxd_ipv6_address_change_notify.c"/>
             <File Category="source" Condition="" Name="common/src/nxd_ipv6_address_delete.c"/>
@@ -1165,59 +1177,59 @@
 			
             <File Category="source" Condition="" Name="common/src/nx_http_proxy_client.c"/>
         </SubComponent>
-        <SubComponent Csub="AddonsOoAutoIP" Cvariant="true" Cversion="6Gg2Gg0">
+        <SubComponent Csub="AddonsOoAutoIP" Cvariant="true" Cversion="6Gg4Gg0">
             <File Category="header" Condition="" Name="addons/auto_ip/*"/>
             <File Category="source" Condition="" Name="addons/auto_ip/nx_auto_ip.c"/>
         </SubComponent>
-        <SubComponent Csub="AddonsOoDHCPOoClient" Cvariant="true" Cversion="6Gg2Gg0">
+        <SubComponent Csub="AddonsOoDHCPOoClient" Cvariant="true" Cversion="6Gg4Gg0">
 			<File Category="header" Condition="" Name="addons/dhcp/nxd_dhcp_client.h"/>
             <File Category="source" Condition="" Name="addons/dhcp/nxd_dhcp_client.c"/>
 			<File Category="header" Condition="" Name="addons/dhcp/nxd_dhcpv6_client.h"/>
             <File Category="source" Condition="" Name="addons/dhcp/nxd_dhcpv6_client.c"/>
         </SubComponent>
-        <SubComponent Csub="AddonsOoDHCPOoServer" Cvariant="true" Cversion="6Gg2Gg0">
+        <SubComponent Csub="AddonsOoDHCPOoServer" Cvariant="true" Cversion="6Gg4Gg0">
 			<File Category="header" Condition="" Name="addons/dhcp/nxd_dhcp_server.h"/>
             <File Category="source" Condition="" Name="addons/dhcp/nxd_dhcp_server.c"/>
 			<File Category="header" Condition="" Name="addons/dhcp/nxd_dhcpv6_server.h"/>
             <File Category="source" Condition="" Name="addons/dhcp/nxd_dhcpv6_server.c"/>
         </SubComponent>
-        <SubComponent Csub="AddonsOoDNS" Cvariant="true" Cversion="6Gg2Gg0">
+        <SubComponent Csub="AddonsOoDNS" Cvariant="true" Cversion="6Gg4Gg0">
             <File Category="header" Condition="" Name="addons/dns/*"/>
             <File Category="source" Condition="" Name="addons/dns/nxd_dns.c"/>
         </SubComponent>
-        <SubComponent Csub="AddonsOomDNS" Cvariant="true" Cversion="6Gg2Gg0">
+        <SubComponent Csub="AddonsOomDNS" Cvariant="true" Cversion="6Gg4Gg0">
             <File Category="header" Condition="" Name="addons/mdns/*"/>
             <File Category="source" Condition="" Name="addons/mdns/nxd_mdns.c"/>
         </SubComponent>
-        <SubComponent Csub="AddonsOoMQTT" Cvariant="true" Cversion="6Gg2Gg0">
+        <SubComponent Csub="AddonsOoMQTT" Cvariant="true" Cversion="6Gg4Gg0">
             <File Category="header" Condition="" Name="addons/mqtt/*"/>
             <File Category="source" Condition="" Name="addons/mqtt/nxd_mqtt_client.c"/>
         </SubComponent>
-        <SubComponent Csub="AddonsOoPPP" Cvariant="true" Cversion="6Gg2Gg0">
+        <SubComponent Csub="AddonsOoPPP" Cvariant="true" Cversion="6Gg4Gg0">
             <File Category="header" Condition="" Name="addons/ppp/*"/>
             <File Category="source" Condition="" Name="addons/ppp/nx_ppp.c"/>
         </SubComponent>
-        <SubComponent Csub="AddonsOoSNTP" Cvariant="true" Cversion="6Gg2Gg0">
+        <SubComponent Csub="AddonsOoSNTP" Cvariant="true" Cversion="6Gg4Gg0">
             <File Category="header" Condition="" Name="addons/sntp/*"/>
             <File Category="source" Condition="" Name="addons/sntp/nxd_sntp_client.c"/>
         </SubComponent>
-        <SubComponent Csub="AddonsOoWebOoClient" Cvariant="true" Cversion="6Gg2Gg0">
+        <SubComponent Csub="AddonsOoWebOoClient" Cvariant="true" Cversion="6Gg4Gg0">
 			<File Category="header" Condition="" Name="addons/web/nx_web_http_common.h"/>
             <File Category="header" Condition="" Name="addons/web/nx_web_http_client.h"/>
             <File Category="source" Condition="" Name="addons/web/nx_web_http_client.c"/>
         </SubComponent>
-        <SubComponent Csub="AddonsOoWebOoServer" Cvariant="true" Cversion="6Gg2Gg0">
+        <SubComponent Csub="AddonsOoWebOoServer" Cvariant="true" Cversion="6Gg4Gg0">
 			<File Category="header" Condition="" Name="addons/web/nx_web_http_common.h"/>
             <File Category="header" Condition="" Name="addons/web/nx_tcpserver.h"/>
             <File Category="source" Condition="" Name="addons/web/nx_tcpserver.c"/>
             <File Category="header" Condition="" Name="addons/web/nx_web_http_server.h"/>
             <File Category="source" Condition="" Name="addons/web/nx_web_http_server.c"/>
         </SubComponent>
-		<SubComponent Csub="DTLS" Cvariant="true" Cversion="6Gg2Gg0">
+		<SubComponent Csub="DTLS" Cvariant="true" Cversion="6Gg4Gg0">
 			<File Category="header" Condition="" Name="common/inc/*"/>
 			<File Category="header" Condition="SIiTcompilerIiIAR&amp;SIiDcoreIiCortexAaM33" Name="ports/cortex_m33/iar/inc/*"/>
             <File Category="header" Condition="SIiDcoreIiCortexAaM33&amp;SIiTcompilerIiGCC" Name="ports/cortex_m33/gnu/inc/*"/>
-            <File Category="header" Condition="SIiTcompilerIiARMCC&amp;SIiDcoreIiCortexAaM33" Name="ports/cortex_m33/ac5/inc/*"/>
+            <File Category="header" Condition="SIiTcompilerIiARMCC&amp;SIiDcoreIiCortexAaM33" Name="ports/cortex_m33/ac6/inc/*"/>
             <File Category="header" Condition="" Name="nx_secure/inc/*"/>
             <File Category="header" Condition="" Name="nx_secure/ports/*"/>
             <File Category="source" Condition="" Name="nx_secure/src/nx_secure_dtls_allocate_handshake_packet.c"/>
@@ -1309,11 +1321,11 @@
             <File Category="source" Condition="" Name="nx_secure/src/nxe_secure_dtls_session_trusted_certificate_add.c"/>
             <File Category="source" Condition="" Name="nx_secure/src/nxe_secure_dtls_session_trusted_certificate_remove.c"/>
         </SubComponent>
-		<SubComponent Csub="TLS" Cvariant="true" Cversion="6Gg2Gg0">
+		<SubComponent Csub="TLS" Cvariant="true" Cversion="6Gg4Gg0">
 			<File Category="header" Condition="" Name="common/inc/*"/>
 			<File Category="header" Condition="SIiTcompilerIiIAR&amp;SIiDcoreIiCortexAaM33" Name="ports/cortex_m33/iar/inc/*"/>
             <File Category="header" Condition="SIiDcoreIiCortexAaM33&amp;SIiTcompilerIiGCC" Name="ports/cortex_m33/gnu/inc/*"/>
-            <File Category="header" Condition="SIiTcompilerIiARMCC&amp;SIiDcoreIiCortexAaM33" Name="ports/cortex_m33/ac5/inc/*"/>
+            <File Category="header" Condition="SIiTcompilerIiARMCC&amp;SIiDcoreIiCortexAaM33" Name="ports/cortex_m33/ac6/inc/*"/>
             <File Category="header" Condition="" Name="nx_secure/inc/*"/>
             <File Category="header" Condition="" Name="nx_secure/ports/*"/>
 			<File Category="source" Condition="" Name="nx_secure/src/nx_secure_tls_packet_release.c"/>
@@ -1522,11 +1534,11 @@
             <File Category="source" Condition="" Name="nx_secure/src/nx_secure_verify_mac.c"/>
             <File Category="source" Condition="" Name="nx_secure/src/nxe_secure_tls_session_packet_pool_set.c"/>
         </SubComponent>
-        <SubComponent Csub="Crypto" Cvariant="true" Cversion="6Gg2Gg0">
+        <SubComponent Csub="Crypto" Cvariant="true" Cversion="6Gg4Gg0">
             <File Category="header" Condition="" Name="crypto_libraries/inc/*"/>
 			<File Category="header" Condition="SIiTcompilerIiIAR&amp;SIiDcoreIiCortexAaM33" Name="crypto_libraries/ports/cortex_m4/iar/inc/*"/>
             <File Category="header" Condition="SIiDcoreIiCortexAaM33&amp;SIiTcompilerIiGCC" Name="crypto_libraries/ports/cortex_m4/gnu/inc/*"/>
-            <File Category="header" Condition="SIiTcompilerIiARMCC&amp;SIiDcoreIiCortexAaM33" Name="crypto_libraries/ports/cortex_m4/ac5/inc/*"/>
+            <File Category="header" Condition="SIiTcompilerIiARMCC&amp;SIiDcoreIiCortexAaM33" Name="crypto_libraries/ports/cortex_m4/ac6/inc/*"/>
             <File Category="source" Condition="" Name="crypto_libraries/src/nx_crypto_3des.c"/>
             <File Category="source" Condition="" Name="crypto_libraries/src/nx_crypto_aes.c"/>
             <File Category="source" Condition="" Name="crypto_libraries/src/nx_crypto_cbc.c"/>
@@ -1571,7 +1583,7 @@
             <File Category="source" Condition="" Name="crypto_libraries/src/nx_crypto_tls_prf_sha512.c"/>
             <File Category="source" Condition="" Name="crypto_libraries/src/nx_crypto_xcbc_mac.c"/>
         </SubComponent>
-		<SubComponent Csub="AddonsOoCloud" Cvariant="true" Cversion="6Gg2Gg0">
+		<SubComponent Csub="AddonsOoCloud" Cvariant="true" Cversion="6Gg4Gg0">
             <File Category="source" Condition="" Name="addons/cloud/nx_cloud.c"/>
             <File Category="header" Condition="" Name="addons/cloud/*"/>
         </SubComponent>

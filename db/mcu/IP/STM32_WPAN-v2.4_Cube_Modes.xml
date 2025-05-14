@@ -904,6 +904,12 @@
 <!-- ************************* BLE STACK END ************************* -->
 
 <!-- ************************* LOW POWER BEGIN ************************* -->
+    <RefParameter Name="CFG_SCM_SUPPORTED" Comment="CFG_SCM_SUPPORTED" DefaultValue="1" Type="list" Group="Application configuration - Low Power" TabName="Configuration">
+        <Description>Defines if System Clock Manager is used. This module manages clocks and power configuration in order to reach best power figures.</Description>
+        <PossibleValue Value="0" Comment="Disabled"/>
+        <PossibleValue Value="1" Comment="Enabled" Semaphore="S_CFG_SCM_SUPPORTED"/>
+    </RefParameter>
+
     <RefParameter Name="CFG_LPM_LEVEL" Comment="CFG_LPM_LEVEL" DefaultValue="1" Type="list" Group="Application configuration - Low Power" TabName="Configuration">
         <Description>Low Power Module level selection :
         &lt;br&gt; - 0 : Low Power Mode is not activated, RUN mode will be used.
@@ -924,6 +930,11 @@
     <RefParameter Name="CFG_LPM_STDBY_WAKEUP_TIME" Comment="CFG_LPM_STDBY_WAKEUP_TIME" DefaultValue="1500" Type="integer" Min="100" Max="10000" Group="Application configuration - Low Power" TabName="Configuration">
         <Description>Defines time to wake up from standby before radio event to meet timings.</Description>
         <Condition Diagnostic="" Expression="S_CFG_LPM_STDBY_SUPPORTED"/>
+    </RefParameter>
+    
+    <RefParameter Name="CFG_LPM_STDBY_WAKEUP_TIME" Comment="CFG_LPM_STDBY_WAKEUP_TIME" DefaultValue="1500" Type="integer" Min="100" Max="10000" Group="Application configuration - Low Power" TabName="Configuration" Visible="false">
+        <Description>Defines time to wake up from standby before radio event to meet timings.</Description>
+        <Condition Diagnostic="" Expression="!S_CFG_LPM_STDBY_SUPPORTED"/>
     </RefParameter>
 
 <!-- ************************* LOW POWER END ************************* -->
@@ -1051,7 +1062,7 @@
     <RefParameter Name="USE_SNVMA_NVM" Comment="USE SNVMA_NVM" DefaultValue="1" Type="list" TabName="Configuration" Group="Application configuration - NVM" Visible = "true">
         <Description>Use of NVM</Description>
         <PossibleValue Value="0" Comment="NO" Condition="!((S_THREAD | S_THREAD_SKELETON | S_ZIGBEE | S_ZIGBEE_SKELETON | S_mac_802_15_4 | S_mac_802_15_4_SKELETON) | (S_BLE_OPTIONS_LL_ONLY) | (S_BLE_HOST_SIMPLE) )" Action="Disable" Diagnostic="Available only with BLE_OPTIONS_LL_ONLY or no BLE."/>
-        <PossibleValue Value="1" Comment="YES" Condition="(S_THREAD | S_THREAD_SKELETON | S_ZIGBEE | S_ZIGBEE_SKELETON | S_mac_802_15_4 | S_mac_802_15_4_SKELETON | S_BLE_HOST_SIMPLE)" Action="Disable" Diagnostic="Available only with BLE (not simplest configuration)." Semaphore="S_USE_SNVMA_NVM"/>
+        <PossibleValue Value="1" Comment="YES" Condition="(S_THREAD | S_THREAD_SKELETON | S_ZIGBEE_SKELETON | S_mac_802_15_4 | S_mac_802_15_4_SKELETON | S_BLE_HOST_SIMPLE)" Action="Disable" Diagnostic="Available only with BLE (not simplest configuration) and ZIGBEE." Semaphore="S_USE_SNVMA_NVM"/>
     </RefParameter>
 
     <RefParameter Name="SNVMA_NVM_NUMBER" Comment="SNVMA_NVM_NUMBER" DefaultValue="1" Type="integer" Min="1" Max="4" TabName="Configuration" Group="Application configuration - NVM">
@@ -8225,6 +8236,7 @@
         <Parameter Name="SEQUENCER_STATUS"/>
         <Parameter Name="SYSTICK_SOURCE_CLOCK_SELECTION"/>
         <!-- Low Power begin -->
+        <Parameter Name="CFG_SCM_SUPPORTED"/>
         <Parameter Name="CFG_LPM_LEVEL"/>
         <Parameter Name="CFG_LPM_STDBY_SUPPORTED"/>
         <Parameter Name="CFG_LPM_STDBY_WAKEUP_TIME"/>

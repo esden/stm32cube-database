@@ -25,14 +25,10 @@ extern "C" {
   [#list SWIP.defines as definition]
     [#assign value = definition.value]
     [#assign name = definition.name]
-
-    [#if name == "AZRTOS_APP_MEM_ALLOCATION_METHOD"]
-      [#assign AZRTOS_APP_MEM_ALLOCATION_METHOD_VAL = value]
-    [/#if]
     [#if name == "AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE"]
       [#assign AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE_VAL = value]
     [/#if]
-    [#if name == "USBX_HOST_SYS_SIZE"]
+	[#if name == "USBX_HOST_SYS_SIZE"]
       [#assign USBX_HOST_SYS_SIZE_value = value]
     [/#if]
     [#if name == "REG_UX_HOST_HUB"]
@@ -102,6 +98,7 @@ extern "C" {
 #include "ux_host_cdc_acm.h"
 [/#if]
 [/#if]
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -113,18 +110,20 @@ extern "C" {
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
+[#if !FamilyName?lower_case?starts_with("stm32n6")]
 [#if UX_STANDALONE_ENABLED_Value == "1" && AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE_VAL  != "0" ]
 #define UX_HOST_APP_MEM_POOL_SIZE  ${UX_HOST_APP_MEM_POOL_SIZE_STANDALONE_value}
 [/#if]
 [#if REG_UX_HOST_CORE_value == "true"]
 #define USBX_HOST_MEMORY_STACK_SIZE     ${USBX_HOST_SYS_SIZE_value}
 [/#if]
+[/#if]
+
 [#if REG_UX_HOST_THREAD_value == "1" && UX_STANDALONE_ENABLED_Value == "0"]
 
 #define UX_HOST_APP_THREAD_STACK_SIZE   ${USBX_HOST_APP_THREAD_Size_value}
 #define UX_HOST_APP_THREAD_PRIO         ${USBX_HOST_APP_THREAD_PRIO_value}
 [/#if]
-
 /* USER CODE BEGIN EC */
 
 /* USER CODE END EC */

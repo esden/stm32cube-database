@@ -23,6 +23,7 @@
 [/#list]
 [#list RisubValues as RisabElmt]
 	[#local IsSRWIAD=SupportedSRWIAD?seq_contains(RisabElmt)?then(true,false)]
+	[#local toGenAhbErrata=supportAhbErrataList?seq_contains(RisabElmt)?then(true,false)]
 	[#compress]
 		[#-- Risab Column values--]
 		[#local NameList = []]
@@ -154,6 +155,9 @@
 ${TABnode}&${RisabElmt?lower_case}{
 #n
 ${TABprop}[#if IsSRWIAD ==true]st,srwiad;[/#if]
+[#if mx_isAhbErrata && toGenAhbErrata]
+${TABprop}st,errata-ahbrisab;
+[/#if]
 ${TABprop}memory-region = ${MemoryRegion?keep_before_last(",")+";"}
 ${TABnode}};
 [#list RegionNameList as RegionNameElmt]
@@ -163,7 +167,7 @@ ${TABnode}&${RegionNameElmt?trim?replace("-","_")?lower_case}{
 #n
 [#local rifCID=""]
 	[#if (OwnerList[RegionNameElmt?index] == "TDCID")]
-	[#local rifCID="0"]
+	[#local rifCID="RIF_UNUSED"]
 		[#elseif (OwnerList[RegionNameElmt?index] == "CA35")]
 			[#local rifCID="RIF_CID1"]
 		[#elseif (OwnerList[RegionNameElmt?index] == "CM33")]
@@ -171,7 +175,7 @@ ${TABnode}&${RegionNameElmt?trim?replace("-","_")?lower_case}{
 		[#elseif (OwnerList[RegionNameElmt?index] == "CM0+")]
 			[#local rifCID="RIF_CID3"]
 	[/#if]
-${TABprop}st,protreg = <RISABPROT(${(OwnerList[RegionNameElmt?index]=="TDCID")?then("RIF_DDCID_DIS","RIF_DDCID_EN")}, ${rifCID},${(SecurityList[RegionNameElmt?index]=="true")?then("RIF_SEC","RIF_NSEC")}, ${(PrivilegeList[RegionNameElmt?index]=="true")?then("RIF_PRIV","RIF_NPRIV")}, ${(CidFilteringList[RegionNameElmt?index]=="true")?then("RIF_CFEN","RIF_CFDIS")}, ${((MasterCIDRList[RegionNameElmt?index]?length)>0)?then(MasterCIDRList[RegionNameElmt?index],"0")}, ${((MasterCIDWList[RegionNameElmt?index]?length)>0)?then(MasterCIDWList[RegionNameElmt?index],"0")}, ${((MasterCIDPList[RegionNameElmt?index]?length)>0)?then(MasterCIDPList[RegionNameElmt?index], "0")})>;
+${TABprop}st,protreg = <RISABPROT(${(OwnerList[RegionNameElmt?index]=="TDCID")?then("RIF_DDCID_DIS","RIF_DDCID_EN")}, ${rifCID},${(SecurityList[RegionNameElmt?index]=="true")?then("RIF_SEC","RIF_NSEC")}, ${(PrivilegeList[RegionNameElmt?index]=="true")?then("RIF_PRIV","RIF_NPRIV")}, ${(CidFilteringList[RegionNameElmt?index]=="true")?then("RIF_CFEN","RIF_CFDIS")}, ${((MasterCIDRList[RegionNameElmt?index]?length)>0)?then(MasterCIDRList[RegionNameElmt?index],"RIF_UNUSED")}, ${((MasterCIDWList[RegionNameElmt?index]?length)>0)?then(MasterCIDWList[RegionNameElmt?index],"RIF_UNUSED")}, ${((MasterCIDPList[RegionNameElmt?index]?length)>0)?then(MasterCIDPList[RegionNameElmt?index], "RIF_UNUSED")})>;
 ${TABnode}};
 [/#if]
 [/#list]
@@ -330,7 +334,7 @@ ${TABprop}memory-region = ${MemoryRegion?keep_before_last(",")+";"}
 [#if (RegionSizeList[RegionNameElmt?index]!="0x0")]
 ${TABnode}&${RegionNameElmt?trim?replace("-","_")?lower_case}{
 #n
-${TABprop}st,protreg = <RISAFPROT(RISAF_REG_ID(${RegionIDList[RegionNameElmt?index]}), ${((MasterCIDRList[RegionNameElmt?index]?length)>0)?then(MasterCIDRList[RegionNameElmt?index],"0")}, ${((MasterCIDWList[RegionNameElmt?index]?length)>0)?then(MasterCIDWList[RegionNameElmt?index],"0")}, ${((MasterCIDPList[RegionNameElmt?index]?length)>0)?then(MasterCIDPList[RegionNameElmt?index],"0")}, ${SecureList[RegionNameElmt?index]}, ${EncryptList[RegionNameElmt?index]}, RIF_BREN_EN)>;
+${TABprop}st,protreg = <RISAFPROT(RISAF_REG_ID(${RegionIDList[RegionNameElmt?index]}), ${((MasterCIDRList[RegionNameElmt?index]?length)>0)?then(MasterCIDRList[RegionNameElmt?index],"RIF_UNUSED")}, ${((MasterCIDWList[RegionNameElmt?index]?length)>0)?then(MasterCIDWList[RegionNameElmt?index],"RIF_UNUSED")}, ${((MasterCIDPList[RegionNameElmt?index]?length)>0)?then(MasterCIDPList[RegionNameElmt?index],"RIF_UNUSED")}, ${SecureList[RegionNameElmt?index]}, ${EncryptList[RegionNameElmt?index]}, RIF_BREN_EN)>;
 };
 [/#if]
 [/#list]
@@ -340,10 +344,11 @@ ${TABprop}st,protreg = <RISAFPROT(RISAF_REG_ID(${RegionIDList[RegionNameElmt?ind
 [#local privUIIndex=secUIIndex+1]
 [#local lockUIIndex=privUIIndex+1]
 [#assign OmmanagerProp=["OCTOSPI1","OCTOSPI2","OCTOSPIM","OTFDEC1","OTFDEC2"]]
+[#assign ommanagerIndex =0]
 #n
-&ommanager{
+&ommanager {
 #n
-${TABprop}st,protreg = <
+${TABprop}access-controllers-conf-default =
 [#list mx_RIF_Params.entrySet() as RIF_Params]
 	[#if (RIF_Params.key)?? && RIF_Params.key == "RISUP"]
 		[#local RISUP = RIF_Params.value]
@@ -353,8 +358,8 @@ ${TABprop}st,protreg = <
 		    [#local RISUP_Formatted = RISUP_Params.value[1..]]	[#--remove ID from the list, not used in code gen ("1" represents used List start index ) --]
 			[#-- RISUP_Formatted= CID_list~sem_list, sec, priv, lock --]
 			[#local isCIDmatchesInt = RISUP_Formatted[semListUIIndex]?matches("[123456789]")]
-			[#local isCIDZero = RISUP_Formatted[semListUIIndex]=="0"]
-			
+			[#local isCIDZero = RISUP_Formatted[semListUIIndex]=="-"]
+
 			[#-- Adding scid --]
 			[#if isCIDmatchesInt]
             	[#local  RISUP_Formatted =  RISUP_Formatted+["RIF_CID"+RISUP_Formatted[semListUIIndex]]]
@@ -365,7 +370,7 @@ ${TABprop}st,protreg = <
 			[#-- Formatting sem_list --]
 			[#if isCIDZero]
 				[#local RISUP_Formatted=["EMPTY_SEMWL"] + RISUP_Formatted[secUIIndex..]]
-			[#elseif RISUP_Formatted[semListUIIndex]== "-"|| isCIDmatchesInt]
+			[#elseif isCIDmatchesInt]
 				[#local RISUP_Formatted=["RIF_UNUSED"] + RISUP_Formatted[secUIIndex..]]
 			[#elseif RISUP_Formatted[semListUIIndex]?contains("&")]
 				[#local CID = ""]
@@ -413,12 +418,12 @@ ${TABprop}st,protreg = <
   					[/#if]
 			[/#list]
 [#if OmmanagerProp?seq_contains(RISUP_Params.key)]
-${TABnode}${TABprop}${TABprop}RIFPROT(STM32MP25_RIFSC_${RISUP_Params.key}_ID, ${RISUP_values})
+[#assign ommanagerIndex +=1]
+${TABnode}${TABprop}${TABprop}<&rifsc RIFPROT(STM32MP25_RIFSC_${RISUP_Params.key}_ID, ${RISUP_values})>[#if OmmanagerProp?size==ommanagerIndex];[#else],[/#if]
 [/#if]
 		[/#list]
 	[/#if]
 [/#list]
-${TABprop}>;
 #n
 ${TABprop}/* USER CODE BEGIN ommanager */
 ${TABprop}/* USER CODE END ommanager */

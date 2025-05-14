@@ -39,10 +39,12 @@ Key: ${key}; Value: ${myHash[key]}
 #include "bpka.h"
 #include "ble_timer.h"
 #include "blestack.h"
+#include "host_stack_if.h"
 [#else]
 #include "stm32wbaxx_ll_rng.h"
 #include "stm32wbaxx_ll_bus.h"
 [/#if]
+
 #include "ble_wrap.c"
 
 /*****************************************************************************/
@@ -238,18 +240,17 @@ int BLEPLAT_PkaReadDhKey( uint32_t* dh_key )
 [/#if]
 }
 
+[#if (myHash["BLE_MODE_SIMPLEST_BLE"] != "Enabled")]
 /*****************************************************************************/
 
 void BPKACB_Complete( void )
 {
-[#if (myHash["BLE_MODE_SIMPLEST_BLE"] != "Enabled")]
   BLEPLATCB_PkaComplete( );
-  HostStack_Process( );
-[#else]
-  return;
-[/#if]
+
+  BleStackCB_Process( );
 }
 
+[/#if]
 /*****************************************************************************/
 
 uint8_t BLEPLAT_TimerStart( uint16_t layer,

@@ -18,7 +18,7 @@
 #include "osal.h"
 #include "ble.h"
 
-#if (CFG_BLE_CONNECTION_ENABLED==1)
+#if (CFG_BLE_CONNECTION_ENABLED==1) && (BLESTACK_CONTROLLER_ONLY == 0)
 
 /******************************************************************************
  * LOCAL VARIABLES

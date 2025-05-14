@@ -1745,6 +1745,8 @@ uint8_t EraseSector (const uint32_t SectorId, const uint32_t SectorNumber)
   {
     /* Setup erase index */
     sectorIdx = (SectorNumber - 1u);
+    
+    HAL_FLASH_Unlock();
 
     while ((SectorNumber > sectorIdx) && (FD_FLASHOP_SUCCESS == funcError))
     {
@@ -1755,6 +1757,8 @@ uint8_t EraseSector (const uint32_t SectorId, const uint32_t SectorNumber)
         sectorIdx++;
       }
     }
+
+    HAL_FLASH_Lock();
 
     /* Check if operation OK */
     if ((SectorNumber <= sectorIdx) && 

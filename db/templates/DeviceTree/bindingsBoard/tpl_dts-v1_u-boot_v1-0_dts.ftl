@@ -32,8 +32,10 @@
 [#if mx_socDtRPN?starts_with("stm32mp2") && mx_socDtRPN?has_content && mxDtDM.dts_fileNameSuffix?has_content]
 #include "${mx_socDtRPN}${mxDtDM.dts_fileNameSuffix}.dtsi"
 [#else]
+[#if !mx_socDtRPN?starts_with("stm32mp1")]
 	[@mlog  logMod=module logType="ERR" logMsg="unknown 'U-BOOT' dtsi" varsMap={} /]
 /*#include "???.dtsi"*/
+[/#if]
 [/#if]
 [#if !srvcmx_isDbFeatureEnabled("noUBootSplSupport")]
 	[#if mx_ddrConfigs["general"]?? && mx_ddrConfigs["general"]["isConfigured"]?? && mx_ddrConfigs["general"]["isConfigured"]=="true" ]

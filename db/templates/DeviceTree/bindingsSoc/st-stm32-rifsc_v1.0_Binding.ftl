@@ -19,7 +19,7 @@ ${TABnode}st,protreg = <
 		    [#local RISUP_Formatted = RISUP_Params.value[1..]]	[#--remove ID from the list, not used in code gen ("1" represents used List start index ) --]
 			[#-- RISUP_Formatted= CID_list~sem_list, sec, priv, lock --]
 			[#local isCIDmatchesInt = RISUP_Formatted[semListUIIndex]?matches("[123456789]")]
-			[#local isCIDZero = RISUP_Formatted[semListUIIndex]=="0"]
+			[#local isCIDZero = RISUP_Formatted[semListUIIndex]=="-"]
 
 			[#-- Adding scid --]
 			[#if isCIDmatchesInt]
@@ -31,7 +31,7 @@ ${TABnode}st,protreg = <
 			[#-- Formatting sem_list --]
 			[#if isCIDZero]
 				[#local RISUP_Formatted=["EMPTY_SEMWL"] + RISUP_Formatted[secUIIndex..]]
-			[#elseif RISUP_Formatted[semListUIIndex]== "-"|| isCIDmatchesInt]
+			[#elseif isCIDmatchesInt]
 				[#local RISUP_Formatted=["RIF_UNUSED"] + RISUP_Formatted[secUIIndex..]]
 			[#elseif RISUP_Formatted[semListUIIndex]?contains("&")]
 				[#local CID = ""]
@@ -104,12 +104,15 @@ ${TABnode}st,rimu = <
 	[#if (RIF_Params.key)?? && RIF_Params.key == "RIMU"]
 		[#local RIMU_Formatted = RIF_Params.value]
 		[#list RIMU_Formatted.entrySet() as RIMU_Params]
-${TABprop}RIMUPROT(RIMU_ID(${RIMU_Params.value[RimuIdUIIndex]}), ${(RIMU_Params.value[MasterCIDUIIndex]=="-")?then("RIF_UNUSED","RIF_CID"+ RIMU_Params.value[2])}, ${(RIMU_Params.value[SecureUIIndex]=="true")?then("RIF_SEC","RIF_NSEC")}, ${(RIMU_Params.value[PrivilegeUIIndex]=="true")?then("RIF_PRIV","RIF_NPRIV")},${(RIMU_Params.value[CIDUIIndex]=="true")?then("RIF_CIDSEL_M","RIF_CIDSEL_P")}) /* RIMU IP = ${RIMU_Params.key} */
+${TABprop}RIMUPROT(RIMU_ID(${RIMU_Params.value[RimuIdUIIndex]}), ${(RIMU_Params.value[MasterCIDUIIndex]=="-" || RIMU_Params.value[CIDUIIndex]=="false")?then("RIF_UNUSED","RIF_CID"+ RIMU_Params.value[2])}, ${(RIMU_Params.value[SecureUIIndex]=="true")?then("RIF_SEC","RIF_NSEC")}, ${(RIMU_Params.value[PrivilegeUIIndex]=="true")?then("RIF_PRIV","RIF_NPRIV")},${(RIMU_Params.value[CIDUIIndex]=="true")?then("RIF_CIDSEL_M","RIF_CIDSEL_P")}) /* RIMU IP = ${RIMU_Params.key} */
 		[/#list]
 	[/#if]
 [/#list]
 
 ${TABnode}>;
+[#if mx_isAhbErrata]
+${TABnode}st,errata-ahbrisab;
+[/#if]
 [/#macro]
 
 [#macro bind_GLOCK pElmt pDtLevel]

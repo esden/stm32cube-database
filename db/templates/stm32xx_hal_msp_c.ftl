@@ -2,7 +2,6 @@
 [#if cpucore!="" && (contextFolder=="" || contextFolder=="/")]    
 [#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")+"/"]
 [/#if]
-
 [#if  cpucore!="" &&FamilyName=="STM32MP2"&& contextFolder?contains("NonSecure") ]
 [#assign contextFolder = cpucore?replace("ARM_CORTEX_","C")?replace("+","PLUS")+"/"+contextFolder]
 [/#if]
@@ -153,9 +152,14 @@ RCC_OscInitTypeDef RCC_OscInitStruct = {0};
         [/#if]
     [/#list]
 [/#if]
-
 [#if isSBS_XSPIM1_Used?? || isSBS_XSPIM2_Used?? || isSBS_IO_Used??]
 #t__HAL_RCC_SBS_CLK_ENABLE();
+[/#if]
+[#if FamilyName == "STM32U5" && ((instName?? && (instName?starts_with("USB"))) || USBUsed??)]
+    #tHAL_PWREx_EnableVddUSB();
+[/#if]
+[#if isportGUsedVDDIO??]
+    #tHAL_PWREx_EnableVddIO2();
 [/#if]
 [#if FamilyName == "STM32U5"]
 [#list IPdatas as IP]
@@ -163,6 +167,19 @@ RCC_OscInitTypeDef RCC_OscInitStruct = {0};
     #tHAL_PWREx_EnableVddA();
     [/#if]
 [/#list]
+[#if ADCUsed?? && VDDA_ISOLATION??]
+    #tHAL_PWREx_EnableVddA();
+[/#if]
+[/#if]
+[#if FamilyName == "STM32U3"]
+[#list IPdatas as IP]
+    [#if IP.ipName?? && IP.ipName?starts_with("ADC")]
+    #tHAL_PWREx_EnableVddA();
+    [/#if]
+[/#list]
+[#if ADCUsed??]
+    #tHAL_PWREx_EnableVddA();
+[/#if]
 [/#if]
 #n
 
@@ -245,7 +262,7 @@ RCC_OscInitTypeDef RCC_OscInitStruct = {0};
     [/#if]
 [/#if]
 [/#if]
-[#if initVector.vector=="RCC_IRQn" || initVector.vector=="RCC_WAKEUP_IRQn"]
+[#if initVector.vector=="RCC_IRQn" || initVector.vector=="RCC_S_IRQn"|| initVector.vector=="RCC_WAKEUP_IRQn"]
 [#if initVector.codeInMspInit]
     [#if initVector.systemHandler=="false" || initVector.preemptionPriority!="0" || initVector.subPriority!="0"]
     [#if initVector.vector!="SysTick_IRQn"]
@@ -346,6 +363,33 @@ RCC_OscInitTypeDef RCC_OscInitStruct = {0};
 #t  /* Initialization error */
 #t  Error_Handler();
 #t}
+[/#if]
+[#if isXSPIM_Port_P1_Used??]
+#tHAL_PWREx_EnableVddIO2();
+[#if VDDIO2??]
+#tHAL_PWREx_ConfigVddIORange(PWR_VDDIO2,${VDDIO2});
+[/#if]
+[/#if]
+#n
+[#if isXSPIM_Port_P2_Used??]
+#tHAL_PWREx_EnableVddIO3();
+[#if VDDIO3??]
+#tHAL_PWREx_ConfigVddIORange(PWR_VDDIO3,${VDDIO3});
+[/#if]
+[/#if]
+#n
+[#if isEMMC_Port_Used??]
+#tHAL_PWREx_EnableVddIO4();
+[#if VDDIO4??]
+#tHAL_PWREx_ConfigVddIORange(PWR_VDDIO4,${VDDIO4});
+[/#if]
+[/#if]
+#n
+[#if isSD_Card_Port_Used??]
+#tHAL_PWREx_EnableVddIO5();
+[#if VDDIO5??]
+#tHAL_PWREx_ConfigVddIORange(PWR_VDDIO5,${VDDIO5});
+[/#if]
 [/#if]
 #n
 [#-- vrefbuf configuration --]
@@ -830,19 +874,16 @@ RCC_OscInitTypeDef RCC_OscInitStruct = {0};
                                         [#assign argValue="&"+argument1.name]
                                     [/#if] [#-- if genericType=Array --]
                                       [#if RESMGR_UTILITY?? && FamilyName=="STM32MP2"]
-                                                                        [#if argument.name?contains("Pin")]
-                                                                        [#if argValue?? &&  argValue?contains("GPIO_PIN_")]
-                                                                        [#assign  seq=argValue]
-                                                                        [#list seq?split("|") as Pins]
-                                                                        [#assign Pin=Pins?replace("GPIO_PIN_","")]
-                                                                        #n
-                                                                        #tif (ResMgr_Request(RESMGR_RESOURCE_RIF_${GPIO_PORT},RESMGR_GPIO_PIN(${Pin})) != RESMGR_STATUS_ACCESS_OK)
-                                                                        #t{
-                                                                        #t#tError_Handler();
-                                                                        #t}
-                                                                        [/#list]
-                                                                        [/#if]  [/#if] [/#if]
-                                    [#if argument.value!="" && argument.value!="N/A"]
+                                          [#if argument.name?contains("Pin")]
+                                          [#if argValue?? &&  argValue?contains("GPIO_PIN_")]
+                                          [#assign  seq=argValue]
+                                          #n
+                                          #tif (ResMgr_Request(RESMGR_RESOURCE_RIF_${GPIO_PORT},RESMGR_GPIO_PIN(${seq})) != RESMGR_STATUS_ACCESS_OK)
+                                          #t{
+                                          #t#tError_Handler();
+                                          #t}
+                                          [/#if]  [/#if] [/#if]
+                                    [#if argument.value!="" && argument.value!="N/A" && ( FamilyName!="STM32N6" || (FamilyName=="STM32N6" &&  (Secure=="true" || (Secure=="false" && argument.name != "SrcSecure"&& argument.name != "DestSecure"))))]
                                     [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name} = ${argValue};
                                     [#else]
                                     [#if nTab==2]#t#t[#else]#t[/#if]//[#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if].${argument.name} = [#if argument.value!="N/A"]${argValue}[/#if];
@@ -1341,10 +1382,43 @@ RCC_OscInitTypeDef RCC_OscInitStruct = {0};
 [/#if]
 [/#if]
 
-[#if ipName?contains("USB") && (FamilyName=="STM32H5" && DIE != "DIE474")]
+[#if ipName?contains("OTG_HS") && FamilyName=="STM32N6" && !contextFolder?contains("NonSecure")]
 [#if serviceType=="Init"]
-#n#t/* Enable VDDUSB */
-#tHAL_PWREx_EnableVddUSB();
+#n#t#t/* Enable VDDUSB */
+	#t#tif(__HAL_RCC_PWR_IS_CLK_ENABLED())
+	#t#t{
+	#t#t#t__HAL_RCC_PWR_CLK_ENABLE();
+
+	#t#t#tHAL_PWREx_EnableVddUSB();
+
+	#t#t#t__HAL_RCC_PWR_CLK_DISABLE();
+	#t#t}
+	#t#telse
+	#t#t{
+	#t#t#tHAL_PWREx_EnableVddUSB();
+	#t#t}
+[#else]
+#n#t#t/* Disable VDDUSB */
+	#t#tif(__HAL_RCC_PWR_IS_CLK_ENABLED())
+	#t#t{
+	#t#t#t__HAL_RCC_PWR_CLK_ENABLE();
+
+	#t#t#tHAL_PWREx_DisableVddUSB();
+
+	#t#t#t__HAL_RCC_PWR_CLK_DISABLE();
+	#t#t}
+	#t#telse
+	#t#t{
+	#t#t#tHAL_PWREx_DisableVddUSB();
+	#t#t}
+[/#if]
+[/#if]
+
+
+[#if ipName?contains("USB") && (FamilyName=="STM32U3" || DIE = "DIE478" || DIE = "DIE484" || DIE=="DIE489" && DIE != "DIE474")]
+[#if serviceType=="Init"]
+#n#t#t/* Enable VDDUSB */
+#t#tHAL_PWREx_EnableVddUSB();
 [/#if]
 [/#if]
 
@@ -1895,7 +1969,7 @@ static uint32_t ${entry.value}=0;
     [#else] 
         [#assign word0 = words[0]]
         [#if  word0.contains("ADF")||word0.contains("MDF")]
-         [#if DIE == "DIE485"]
+         [#if DIE == "DIE485" || DIE == "DIE454"]
             #tif[#if word0.contains("ADF")](IS_MDF_ALL_INSTANCE(h${mode?lower_case}->Instance))[/#if][#if word0.contains("MDF")](IS_MDF_INSTANCE(h${mode?lower_case}->Instance))[/#if]
          [#else]
             #tif[#if word0.contains("ADF")](IS_ADF_INSTANCE(h${mode?lower_case}->Instance))[/#if][#if word0.contains("MDF")](IS_MDF_INSTANCE(h${mode?lower_case}->Instance))[/#if]
@@ -2339,7 +2413,7 @@ uint32_t DFSDM_Init = 0;
 [#else]
     [#assign word0 = words[0]]
     [#if word0.contains("ADF")||word0.contains("MDF")]
-     [#if DIE == "DIE485"]
+     [#if DIE == "DIE485" || DIE == "DIE454"]
        #tif[#if word0.contains("ADF")](IS_MDF_ALL_INSTANCE(h${mode?lower_case}->Instance))[/#if][#if word0.contains("MDF")](IS_MDF_INSTANCE(h${mode?lower_case}->Instance))[/#if]
      [#else]
        #tif[#if word0.contains("ADF")](IS_ADF_INSTANCE(h${mode?lower_case}->Instance))[/#if][#if word0.contains("MDF")](IS_MDF_INSTANCE(h${mode?lower_case}->Instance))[/#if]

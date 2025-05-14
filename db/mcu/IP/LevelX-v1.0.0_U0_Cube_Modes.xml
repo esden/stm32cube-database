@@ -12,15 +12,16 @@
         <Parameter Added="true" Name="LX_STANDALONE_ENABLE"/>
 		<Parameter Added="true" Name="LevelX_Version"/>
 		<Parameter Added="true" Name="NOR_SECTOR_MAPPING_CACHE_SIZE_NB_BIT"/>
+		<Parameter Added="true" Name="LX_NOR_ENABLE_MAPPING_BITMAP"/>
+		<Parameter Added="true" Name="LX_NOR_ENABLE_OBSOLETE_COUNT_CACHE"/>
+		<Parameter Added="true" Name="LX_NOR_OBSOLETE_COUNT_CACHE_TYPE"/>
+		<Parameter Added="true" Name="LX_NOR_SECTOR_SIZE"/>
 		<Parameter Name="LX_NOR_Flash_Support">
 			<PossibleValue>1</PossibleValue>
 		</Parameter>
     </RefMode>
 	<RefMode Abstract="true" Name="LevelX_NAND_Flash_Support">
         <ConfigForMode>FileOoSystemJjLevelXJjNAND</ConfigForMode>
-        <Parameter Added="true" Name="LX_NAND_SECTOR_MAPPING_CACHE_SIZE"/>
-        <Parameter Added="true" Name="LX_NAND_FLASH_DIRECT_MAPPING_CACHE"/>
-        <Parameter Added="true" Name="LX_NAND_FLASH_DIRECT_MAPPING_CACHE"/>
 		<Parameter Added="true" Name="LX_THREAD_SAFE_ENABLE"/>
 		<Parameter Added="true" Name="LX_STANDALONE_ENABLE"/>
 		<Parameter Added="true" Name="LevelX_Version"/>
@@ -227,18 +228,8 @@ The minimum size is 8 and all values must be a power of 2.</Description>
 		<Condition Diagnostic="" Expression="SEMThreadXCcRTOSJjThreadXJjCore" />
     </RefParameter>
 	
-	<RefParameter Added="true" Comment="LevelX version" DefaultValue="6.2.1" Group="Version" Name="LevelX_Version" TabName="LevelX" Type="string">
+	<RefParameter Added="true" Comment="LevelX version" DefaultValue="6.4.0" Group="Version" Name="LevelX_Version" TabName="LevelX" Type="string">
         <Description>LevelX version</Description>
-    </RefParameter>
-   
-	<RefParameter Added="true" Comment="LX_NAND_SECTOR_MAPPING_CACHE_SIZE" DefaultValue="=INTPOW(2,NAND_SECTOR_MAPPING_CACHE_SIZE_NB_BIT)" Group="NAND Flash Support" Name="LX_NAND_SECTOR_MAPPING_CACHE_SIZE" TabName="LevelX" Type="string">
-        <Description>It defines the logical sector mapping cache size. Large values improve performance, but cost memory. Must be a power of 2, unless direct mapping is defined.</Description>
-    </RefParameter>
-	<RefParameter Added="true" Comment="LX_NAND_FLASH_DIRECT_MAPPING_CACHE" DefaultValue="0" Group="NAND Flash Support" Name="LX_NAND_FLASH_DIRECT_MAPPING_CACHE" TabName="LevelX" Type="list">
-        <Description>Defined, this creates a direct mapping cache, such that there are no cache misses. It also requires that LX_NAND_SECTOR_MAPPING_CACHE_SIZE represents the exact number of total pages in your flash device.
-</Description>
-        <PossibleValue Comment="Disabled" Value="0"/>
-        <PossibleValue Comment="Enabled" Value="1"/>
     </RefParameter>
 	<RefParameter Added="true" Comment="NAND_SECTOR_MAPPING_CACHE_SIZE_NB_BIT" DefaultValue="7" Group="NAND Flash Support" Max="10" Min="3" Name="NAND_SECTOR_MAPPING_CACHE_SIZE_NB_BIT" TabName="LevelX" Type="integer" Unit="">
         <Description>represents the power of which LX_NAND_SECTOR_MAPPING_CACHE_SIZE is rised to</Description>
@@ -493,5 +484,29 @@ When Set the 0 the user needs to implment the following API at application level
     </RefParameter>
 	<RefParameter Added="true" Comment="NAND total blocks" DefaultValue="5" Group="NAND Simulator Driver" Max="1024" Min="0" Name="LX_NAND_SIM_TOTAL_BLOCKS" TabName="LevelX" Type="integer" Unit="">
         <Description>The number of blocks of the simulated NAND memory. This parameter along with the total pages per block and bytes per page determine the total size of the simulated memory.</Description>
+    </RefParameter>
+	
+	<RefParameter Added="true" Comment="LX_NOR_ENABLE_MAPPING_BITMAP" DefaultValue="0" Group="NOR Flash Support" Name="LX_NOR_ENABLE_MAPPING_BITMAP" TabName="LevelX" Type="list">
+        <Description>Determine if logical sector mapping bitmap should be enabled in extended cache.
+					Cache memory will be allocated to sector mapping bitmap first. One bit can be allocated for each physical sector.</Description>
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+		<Condition Diagnostic="" Expression="LX_NOR_DISABLE_EXTENDED_CACHE = 0" />
+    </RefParameter>
+	<RefParameter Added="true" Comment="LX_NOR_ENABLE_OBSOLETE_COUNT_CACHE" DefaultValue="0" Group="NOR Flash Support" Name="LX_NOR_ENABLE_OBSOLETE_COUNT_CACHE" TabName="LevelX" Type="list">
+        <Description>Determine if obsolete count cache should be enabled in extended cache.
+					Cache memory will be allocated to obsolete count cache after the mapping bitmap if enabled, and the rest of the cache memory is allocated to sector cache.
+		</Description>
+        <PossibleValue Comment="Disabled" Value="0"/>
+        <PossibleValue Comment="Enabled" Value="1"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="LX_NOR_OBSOLETE_COUNT_CACHE_TYPE" DefaultValue="UCHAR" Group="NOR Flash Support" Name="LX_NOR_OBSOLETE_COUNT_CACHE_TYPE" TabName="LevelX" Type="list">
+        <Description>Defines obsolete count cache element size. If number of sectors per block is greater than 256, use USHORT instead of UCHAR.</Description>
+        <PossibleValue Comment="UCHAR" Value="UCHAR"/>
+        <PossibleValue Comment="USHORT" Value="USHORT"/>
+    </RefParameter>
+	<RefParameter Added="true" Comment="LX_NOR_SECTOR_SIZE" DefaultValue="512" Max="=1024*4" Min="512" Group="NOR Flash Support" Name="LX_NOR_SECTOR_SIZE" TabName="LevelX" Type="integer">
+        <Description>Define the logical sector size for NOR flash. The sector size is in units of 32-bit words.
+					This sector size should match the sector size used in file system.</Description>
     </RefParameter>
 </IP>

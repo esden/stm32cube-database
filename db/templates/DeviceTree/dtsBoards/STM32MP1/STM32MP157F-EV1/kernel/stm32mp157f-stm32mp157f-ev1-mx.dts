@@ -11,10 +11,11 @@
 #include <dt-bindings/mfd/st,stpmic1.h>
 #include "stm32mp157c-ev1-scmi.dtsi"
 #include <dt-bindings/input/input.h>
+#include <dt-bindings/media/video-interfaces.h>
 /* USER CODE END includes */
 
 /{
-	model = "STMicroelectronics STM32MP157F-EV1 STM32CubeMX board - openstlinux-6.1-yocto-mickledore-mp1-v23.06.21";
+	model = "STMicroelectronics STM32MP157F-EV1 STM32CubeMX board - openstlinux-6.1-yocto-mickledore-mpu-v24.06.26";
 	compatible = "st,stm32mp157f-board_157f-ev1-mx", "st,stm32mp157f-ev1", "st,stm32mp157";
 
 	/* USER CODE BEGIN root */
@@ -31,6 +32,12 @@
 		#address-cells = <1>;
 		#size-cells = <1>;
 		ranges;
+
+		framebuffer {
+			compatible = "simple-framebuffer";
+			clocks = <&rcc LTDC_PX>, <&rcc DSI>, <&rcc DSI_PX>;
+			status = "disabled";
+		};
 	};
 
 	led{
@@ -69,6 +76,7 @@
 		compatible = "dmic-codec";
 		#sound-dai-cells = <1>;
 		sound-name-prefix = "dmic0";
+		status = "okay";
 
 		port{
 
@@ -82,6 +90,7 @@
 		compatible = "dmic-codec";
 		#sound-dai-cells = <1>;
 		sound-name-prefix = "dmic1";
+		status = "okay";
 
 		port{
 
@@ -95,6 +104,7 @@
 		compatible = "dmic-codec";
 		#sound-dai-cells = <1>;
 		sound-name-prefix = "dmic2";
+		status = "okay";
 
 		port{
 
@@ -108,6 +118,7 @@
 		compatible = "dmic-codec";
 		#sound-dai-cells = <1>;
 		sound-name-prefix = "dmic3";
+		status = "okay";
 
 		port{
 
@@ -182,6 +193,7 @@
 	spdif_in:spdif-in{
 		#sound-dai-cells = <0>;
 		compatible = "linux,spdif-dir";
+		status = "okay";
 
 		spdif_in_port:port{
 
@@ -194,6 +206,7 @@
 	spdif_out:spdif-out{
 		#sound-dai-cells = <0>;
 		compatible = "linux,spdif-dit";
+		status = "okay";
 
 		spdif_out_port:port{
 
@@ -286,7 +299,7 @@
 	};
 };
 
-&pinctrl{
+&pinctrl {
 
 	dcmi_pins_mx:dcmi_mx-0{
 
@@ -295,12 +308,16 @@
 					<STM32_PINMUX('B', 7, AF13)>,
 					<STM32_PINMUX('B', 8, AF13)>,
 					<STM32_PINMUX('E', 6, AF13)>,
+					<STM32_PINMUX('H', 7, AF13)>,
 					<STM32_PINMUX('H', 8, AF13)>,
 					<STM32_PINMUX('H', 9, AF13)>,
 					<STM32_PINMUX('H', 10, AF13)>,
 					<STM32_PINMUX('H', 11, AF13)>,
 					<STM32_PINMUX('H', 12, AF13)>,
 					<STM32_PINMUX('H', 14, AF13)>,
+					<STM32_PINMUX('H', 15, AF13)>,
+					<STM32_PINMUX('I', 1, AF13)>,
+					<STM32_PINMUX('I', 3, AF13)>,
 					<STM32_PINMUX('I', 4, AF13)>;
 			bias-disable;
 		};
@@ -313,12 +330,16 @@
 					<STM32_PINMUX('B', 7, ANALOG)>,
 					<STM32_PINMUX('B', 8, ANALOG)>,
 					<STM32_PINMUX('E', 6, ANALOG)>,
+					<STM32_PINMUX('H', 7, ANALOG)>,
 					<STM32_PINMUX('H', 8, ANALOG)>,
 					<STM32_PINMUX('H', 9, ANALOG)>,
 					<STM32_PINMUX('H', 10, ANALOG)>,
 					<STM32_PINMUX('H', 11, ANALOG)>,
 					<STM32_PINMUX('H', 12, ANALOG)>,
 					<STM32_PINMUX('H', 14, ANALOG)>,
+					<STM32_PINMUX('H', 15, ANALOG)>,
+					<STM32_PINMUX('I', 1, ANALOG)>,
+					<STM32_PINMUX('I', 3, ANALOG)>,
 					<STM32_PINMUX('I', 4, ANALOG)>;
 		};
 	};
@@ -867,12 +888,12 @@
 			pinmux = <STM32_PINMUX('A', 10, ANALOG)>;
 		};
 	};
-
+	
 	/* USER CODE BEGIN pinctrl */
 	/* USER CODE END pinctrl */
 };
 
-&pinctrl_z{
+&pinctrl_z {
 
 	i2c4_pins_z_mx:i2c4_mx-0{
 
@@ -892,12 +913,12 @@
 					<STM32_PINMUX('Z', 5, ANALOG)>;
 		};
 	};
-	
-	 /* USER CODE BEGIN pinctrl_z */
+
+	/* USER CODE BEGIN pinctrl_z */
 	/* USER CODE END pinctrl_z */
 };
 
-&m4_rproc{
+&m4_rproc {
 	mboxes = <&ipcc 0>, <&ipcc 1>, <&ipcc 2>;
 	mbox-names = "vq0", "vq1", "shutdown";
 	status = "okay";
@@ -909,32 +930,28 @@
 	interrupts = <68 1>;
 	wakeup-source;
 	/* USER CODE END m4_rproc */
-
-	m4_system_resources{
-		status = "okay";
-	};
 };
 
-&bsec{
+&bsec {
 	status = "okay";
 };
 
-&cec{
+&cec {
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&hdmi_cec_pins_mx>;
 	pinctrl-1 = <&hdmi_cec_sleep_pins_mx>;
 	status = "okay";
 };
 
-&crc1{
+&crc1 {
 	status = "okay";
 };
 
-&cryp1{
+&cryp1 {
 	status = "okay";
 };
 
-&dcmi{
+&dcmi {
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&dcmi_pins_mx>;
 	pinctrl-1 = <&dcmi_sleep_pins_mx>;
@@ -949,7 +966,7 @@
 
 		dcmi_0:endpoint{
 			remote-endpoint = <&ov5640_0>;
-			bus-type = <5>;
+			bus-type = <MEDIA_BUS_TYPE_PARALLEL>;
 			bus-width = <8>;
 			hsync-active = <0>;
 			vsync-active = <0>;
@@ -960,7 +977,7 @@
 	/* USER CODE END dcmi */
 };
 
-&dfsdm{
+&dfsdm {
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&dfsdm_pins_mx>;
 	pinctrl-1 = <&dfsdm_sleep_pins_mx>;
@@ -1071,21 +1088,21 @@
 	/* USER CODE END dfsdm */
 };
 
-&dma1{
+&dma1 {
 	status = "okay";
 };
 
-&dma2{
+&dma2 {
 	status = "okay";
 };
 
-&dmamux1{
+&dmamux1 {
 	status = "okay";
 	dma-masters = <&dma1 &dma2>;
 	dma-channels = <16>;
 };
 
-&dsi{
+&dsi {
 	status = "okay";
 
 	/* USER CODE BEGIN dsi */
@@ -1093,28 +1110,7 @@
 	#size-cells = <0>;
 	default-on;
 
-	ports{
-		#address-cells = <1>;
-		#size-cells = <0>;
-
-		port@0{
-			reg = <0>;
-
-			dsi_in:endpoint{
-				remote-endpoint = <&ltdc_ep0_out>;
-			};
-		};
-
-		port@1{
-			reg = <1>;
-
-			dsi_out:endpoint{
-				remote-endpoint = <&dsi_panel_in>;
-			};
-		};
-	};
-
-	panel_dsi:panel-dsi@0{
+	panel_dsi:panel@0{
 		compatible = "raydium,rm68200";
 		reg = <0>;
 		reset-gpios = <&gpiof 15 GPIO_ACTIVE_LOW>;
@@ -1132,11 +1128,11 @@
 	/* USER CODE END dsi */
 };
 
-&dts{
+&dts {
 	status = "okay";
 };
 
-&ethernet0{
+&ethernet0 {
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&eth1_pins_mx>;
 	pinctrl-1 = <&eth1_sleep_pins_mx>;
@@ -1147,7 +1143,7 @@
 	max-speed = <1000>;
 	phy-handle = <&phy0>;
 
-	mdio0{
+	mdio{
 		#address-cells = <1>;
 		#size-cells = <0>;
 		compatible = "snps,dwmac-mdio";
@@ -1159,7 +1155,7 @@
 	/* USER CODE END ethernet0 */
 };
 
-&fmc{
+&fmc {
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&fmc_pins_mx>;
 	pinctrl-1 = <&fmc_sleep_pins_mx>;
@@ -1180,7 +1176,7 @@
 	/* USER CODE END fmc */
 };
 
-&gpu{
+&gpu {
 	status = "okay";
 
 	/* USER CODE BEGIN gpu */
@@ -1188,15 +1184,15 @@
 	/* USER CODE END gpu */
 };
 
-&hash1{
+&hash1 {
 	status = "okay";
 };
 
-&hsem{
+&hsem {
 	status = "okay";
 };
 
-&i2c2{
+&i2c2 {
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&i2c2_pins_mx>;
 	pinctrl-1 = <&i2c2_sleep_pins_mx>;
@@ -1224,6 +1220,7 @@
 		clock-names = "MCLK1";
 		wlf,gpio-cfg = <0x8101 0xa100 0xa100 0xa100 0xa101 0xa101\
 						0xa100 0xa101 0xa101 0xa101 0xa101>;
+		status = "okay";
 
 		ports{
 			#address-cells = <1>;
@@ -1252,7 +1249,9 @@
 		reg = <0x3c>;
 		clocks = <&clk_ext_camera>;
 		clock-names = "xclk";
+		AVDD-supply = <&v2v8>;
 		DOVDD-supply = <&v2v8>;
+		DVDD-supply = <&v2v8>;
 		powerdown-gpios = <&stmfx_pinctrl 18 (GPIO_ACTIVE_HIGH | GPIO_PUSH_PULL)>;
 		reset-gpios = <&stmfx_pinctrl 19 (GPIO_ACTIVE_LOW | GPIO_PUSH_PULL)>;
 		rotation = <180>;
@@ -1308,13 +1307,13 @@
 		AVDD28-supply = <&v3v3>;
 		VDDIO-supply = <&v3v3>;
 		status = "okay";
-		interrupts = <14 IRQ_TYPE_NONE>;
+		interrupts = <14 IRQ_TYPE_EDGE_RISING>;
 		interrupt-parent = <&stmfx_pinctrl>;
 	};
 	/* USER CODE END i2c2 */
 };
 
-&i2c4{
+&i2c4 {
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&i2c4_pins_z_mx>;
 	pinctrl-1 = <&i2c4_sleep_pins_z_mx>;
@@ -1465,7 +1464,7 @@
 	/* USER CODE END i2c4 */
 };
 
-&i2c5{
+&i2c5 {
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&i2c5_pins_mx>;
 	pinctrl-1 = <&i2c5_sleep_pins_mx>;
@@ -1479,11 +1478,11 @@
 	/* USER CODE END i2c5 */
 };
 
-&ipcc{
+&ipcc {
 	status = "okay";
 };
 
-&ltdc{
+&ltdc {
 	status = "okay";
 
 	/* USER CODE BEGIN ltdc */
@@ -1498,22 +1497,18 @@
 	/* USER CODE END ltdc */
 };
 
-&m_can1{
+&m_can1 {
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&fdcan1_pins_mx>;
 	pinctrl-1 = <&fdcan1_sleep_pins_mx>;
 	status = "okay";
 };
 
-&m4_rcc{
+&mdma1 {
 	status = "okay";
 };
 
-&mdma1{
-	status = "okay";
-};
-
-&pwr_regulators{
+&pwr_regulators {
 	status = "okay";
 
 	/* USER CODE BEGIN pwr_regulators */
@@ -1522,7 +1517,7 @@
 	/* USER CODE END pwr_regulators */
 };
 
-&qspi{
+&qspi {
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&quadspi_pins_mx>;
 	pinctrl-1 = <&quadspi_sleep_pins_mx>;
@@ -1553,15 +1548,15 @@
 	/* USER CODE END qspi */
 };
 
-&rcc{
+&rcc {
 	status = "okay";
 };
 
-&rtc{
+&rtc {
 	status = "okay";
 };
 
-&sai2{
+&sai2 {
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&sai2a_pins_mx>, <&sai2b_pins_mx>;
 	pinctrl-1 = <&sai2a_sleep_pins_mx>, <&sai2b_sleep_pins_mx>;
@@ -1583,7 +1578,7 @@
 
 			sai2a_endpoint:endpoint{
 				remote-endpoint = <&wm8994_tx_endpoint>;
-				format = "i2s";
+				dai-format = "i2s";
 				mclk-fs = <256>;
 			};
 		};
@@ -1602,7 +1597,7 @@
 
 			sai2b_endpoint:endpoint{
 				remote-endpoint = <&wm8994_rx_endpoint>;
-				format = "i2s";
+				dai-format = "i2s";
 				mclk-fs = <256>;
 			};
 		};
@@ -1610,7 +1605,7 @@
 	};
 };
 
-&sai4{
+&sai4 {
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&sai4a_pins_mx>;
 	pinctrl-1 = <&sai4a_sleep_pins_mx>;
@@ -1638,7 +1633,7 @@
 	};
 };
 
-&sdmmc1{
+&sdmmc1 {
 	pinctrl-names = "default", "opendrain", "sleep";
 	pinctrl-0 = <&sdmmc1_pins_mx>;
 	pinctrl-1 = <&sdmmc1_opendrain_pins_mx>;
@@ -1661,7 +1656,7 @@
 	/* USER CODE END sdmmc1 */
 };
 
-&sdmmc2{
+&sdmmc2 {
 	pinctrl-names = "default", "opendrain", "sleep";
 	pinctrl-0 = <&sdmmc2_pins_mx>;
 	pinctrl-1 = <&sdmmc2_opendrain_pins_mx>;
@@ -1680,7 +1675,7 @@
 	/* USER CODE END sdmmc2 */
 };
 
-&spdifrx{
+&spdifrx {
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&spdifrx_pins_mx>;
 	pinctrl-1 = <&spdifrx_sleep_pins_mx>;
@@ -1697,11 +1692,11 @@
 	/* USER CODE END spdifrx */
 };
 
-&tamp{
+&tamp {
 	status = "okay";
 };
 
-&timers6{
+&timers6 {
 	status = "okay";
 
 	/* USER CODE BEGIN timers6 */
@@ -1714,7 +1709,7 @@
 	/* USER CODE END timers6 */
 };
 
-&uart4{
+&uart4 {
 	pinctrl-names = "default", "idle", "sleep";
 	pinctrl-0 = <&uart4_pins_mx>;
 	pinctrl-1 = <&uart4_idle_pins_mx>;
@@ -1726,7 +1721,7 @@
 	/* USER CODE END uart4 */
 };
 
-&usbh_ehci{
+&usbh_ehci {
 	status = "okay";
 
 	/* USER CODE BEGIN usbh_ehci */
@@ -1742,11 +1737,11 @@
 	/* USER CODE END usbh_ehci */
 };
 
-&usbh_ohci{
+&usbh_ohci {
 	status = "okay";
 };
 
-&usbotg_hs{
+&usbotg_hs {
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&usb_otg_hs_pins_mx>;
 	pinctrl-1 = <&usb_otg_hs_sleep_pins_mx>;
@@ -1759,11 +1754,11 @@
 	/* USER CODE END usbotg_hs */
 };
 
-&usbphyc{
+&usbphyc {
 	status = "okay";
 };
 
-&usbphyc_port0{
+&usbphyc_port0 {
 	status = "okay";
 
 	/* USER CODE BEGIN usbphyc_port0 */
@@ -1784,7 +1779,7 @@
 	/* USER CODE END usbphyc_port0 */
 };
 
-&usbphyc_port1{
+&usbphyc_port1 {
 	status = "okay";
 
 	/* USER CODE BEGIN usbphyc_port1 */
@@ -1802,20 +1797,28 @@
 
 /* USER CODE BEGIN addons */
 
-&arm_wdt{
+&arm_wdt {
 	timeout-sec = <32>;
 	status = "okay";
 };
 
-&cpu0{
+&cpu0 {
 	cpu-supply = <&vddcore>;
 };
 
-&cpu1{
+&cpu1 {
 	cpu-supply = <&vddcore>;
 };
 
-&sram4{
+&dsi_in {
+	remote-endpoint = <&ltdc_ep0_out>;
+};
+
+&dsi_out {
+	remote-endpoint = <&dsi_panel_in>;
+};
+
+&sram4 {
 
 	dcmi_pool:dcmi-pool@0{
 		reg = <0x0 0x8000>;

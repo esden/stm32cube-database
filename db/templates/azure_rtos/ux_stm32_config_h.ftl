@@ -32,7 +32,7 @@ extern "C" {
 #define UX_HCD_STM32_MAX_NB_CHANNELS          12
 [/#if]
 
-[#if DIE=="DIE481" || DIE=="DIE476"]
+[#if DIE=="DIE481" || DIE=="DIE476" || FamilyName?lower_case == "stm32n6" || FamilyName?lower_case == "stm32mp13"]
 #define UX_DCD_STM32_MAX_ED                   9
 #define UX_HCD_STM32_MAX_NB_CHANNELS          16
 [/#if]
@@ -42,15 +42,11 @@ extern "C" {
 #define UX_HCD_STM32_MAX_NB_CHANNELS          8
 [/#if]
 
-[#if FamilyName?lower_case == "stm32h5" || FamilyName?lower_case == "stm32c0"]
+[#if FamilyName?lower_case == "stm32h5" || FamilyName?lower_case == "stm32c0" || FamilyName?lower_case == "stm32wba" || FamilyName?lower_case == "stm32u3"]
 #define UX_DCD_STM32_MAX_ED                   8
 #define UX_HCD_STM32_MAX_NB_CHANNELS          8
 [/#if]
 
-[#if FamilyName?lower_case == "stm32wba"]
-#define UX_DCD_STM32_MAX_ED                   8
-#define UX_HCD_STM32_MAX_NB_CHANNELS          8
-[/#if]
 
 [#if FamilyName?lower_case == "stm32u0" && DIE=="DIE489"]
 #define UX_DCD_STM32_MAX_ED                   6

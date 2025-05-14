@@ -21,9 +21,10 @@ extern "C" {
 [#if THREADX?? && Secure!="true"]
 #include "tx_api.h"
 [#else]
-[#if FREERTOS?? && Secure!="true"]
-#include "cmsis_os.h"
+[#if (FREERTOS?? ||XCUBEFREERTOS??) && Secure!="true"]
+#include "cmsis_os2.h"
 #if (osCMSIS >= 0x20000U)
+#include "FreeRTOS.h"
 #include "task.h"
 #endif /* osCMSIS >= 0x20000U */
 [#else]
@@ -76,7 +77,7 @@ extern "C" {
 [#if THREADX?? && Secure!="true"]
 #define OS_QUEUE_ID TX_QUEUE
 [#else]
-#define OS_QUEUE_ID osMessageQId
+#define OS_QUEUE_ID osMessageQueueId_t
 [/#if][#-- THREADX --]
 
 /**
@@ -184,7 +185,7 @@ extern "C" {
 [#if THREADX?? && Secure!="true"]
 #define OS_TASK_ID   TX_THREAD
 [#else]
-#define OS_TASK_ID   osThreadId
+#define OS_TASK_ID   osThreadId_t
 [/#if][#-- THREADX --]
 
 /**

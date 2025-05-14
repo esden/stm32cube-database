@@ -15,6 +15,7 @@
     [/#if]   
     [#return ""]
 [/#function]
+[#assign i=0]
 /* USER CODE BEGIN Header */
 /**
   **********************************************************************************************************************
@@ -242,6 +243,9 @@ static void MX_${QName?replace(" ","_")}_Q_Build(void)
     [/#if]
     [#list methodList1 as method][#-- list methodList1 --][#if method.arguments?? && method.status!="WARNING"]
         [#list method.arguments as argument][#-- list method.arguments --]
+        [#if method.name?contains("ADV_LPBAM_DAC_Conversion") && argument.name?contains("Channel")]
+        [#assign Crrr=argument.value]
+        [/#if]
             [#if argument.genericType == "struct" && argument.typeName != "DONTCARE"][#-- if struct --]
                 [#assign ll= myListOfLocalVariables?split(" ")]
                 [#assign exist=false]
@@ -253,8 +257,16 @@ static void MX_${QName?replace(" ","_")}_Q_Build(void)
                 [#if argument.context?? && argument.typeName != "DONTCARE"][#-- if argument.context?? --]
                     [#if argument.name?? && argument.context!="global"&&argument.status!="WARNING"&&argument.status!="NULL"] [#-- if !global --]
                     [#assign varName= " "+argument.name]  
-                    [#if !myListOfLocalVariables?contains(argument.name) && !argument.typeName?ends_with("Desc_t") && !argument.name?ends_with("Desc") && !argument.typeName?ends_with("DMA_QListTypeDef")]  [#-- if exist --]                  
-                    #t${argument.typeName} ${argument.name} = {0};
+                    [#if !myListOfLocalVariables?contains(argument.name) && !argument.typeName?ends_with("Desc_t") && !argument.name?ends_with("Desc") && !argument.typeName?ends_with("DMA_QListTypeDef")]  [#-- if exist --]
+                    [#if argument.name?contains("[2U]_DAC")]
+                        [#if Crrr?? && Crrr?contains("LPBAM_DAC_CHANNEL_1|LPBAM_DAC_CHANNEL_2")]
+                                            #t${argument.typeName} ${argument.name?replace("[2U]_DAC" , "_DAC[2U]")}= {0};
+                        [#else]
+                                            #t${argument.typeName} ${argument.name?replace("[2U]_DAC" , "_DAC")}= {0};
+                        [/#if]
+                    [#else]
+                                        #t${argument.typeName} ${argument.name} = {0};
+[/#if ]
                       [#assign myListOfLocalVariables = myListOfLocalVariables + " "+ argument.name]
                       [#assign resultList = myListOfLocalVariables]
                     [/#if][#-- if exist --]
@@ -429,7 +441,7 @@ static void MX_${QName?replace(" ","_")}_Q_Build(void)
                                         [#assign indicator = varName+"."+argument.name+" = "+argValue+" "]
                                         [#assign indicatorName = varName+"."+argument.name]
                                         [#if !listofDeclaration?contains(indicator)][#-- if not repeted --]
-                                            [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global" && fargument.optional!="output"][#assign varName=fargument.name +"." +instanceIndex]${fargument.name}${instanceIndex}[#else][#assign varName=fargument.name]${fargument.name}[/#if].${argument.name} = ${argValue};
+                                            [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global" && fargument.optional!="output"][#assign varName=fargument.name +"." +instanceIndex]${fargument.name}${instanceIndex}[#else][#assign varName=fargument.name] [#if Crrr?? && Crrr?contains("LPBAM_DAC_CHANNEL_1|LPBAM_DAC_CHANNEL_2")]${fargument.name?replace("[2U]_DAC" , "_DAC[${i}U]")}[#assign i =+1][#else]${fargument.name?replace("[2U]_DAC" , "_DAC")}[/#if][/#if].${argument.name} = ${argValue};
                                             [#assign listofDeclaration = listofDeclaration?replace(indicatorName+" =","")]
                                             [#assign listofDeclaration = listofDeclaration +", "+ varName+"."+argument.name+" = "+argValue+" "]                                                                                 
                                         [/#if]
@@ -486,8 +498,9 @@ static void MX_${QName?replace(" ","_")}_Q_Build(void)
                                                         [#if instanceIndex??&&fargument.context=="global"][#assign varName=fargument.name+instanceIndex][#else][#assign varName=fargument.name][/#if]
                                                         [#assign indicator = varName+"."+argument.name+" = "+argValue+" "]
                                                         [#assign indicatorName = varName+"."+argument.name]
-                                                        [#if !listofDeclaration?contains(indicator)][#-- if not repeted --] 
-                                                            [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"&& fargument.optional!="output"][#assign varName=fargument.name +"." +instanceIndex]${fargument.name}${instanceIndex}[#else][#assign varName=fargument.name]${fargument.name}[/#if].${argument.name} = ${argValue};
+                                                        [#if !listofDeclaration?contains(indicator)][#-- if not repeted --]
+                                                        [#assign V=""]
+                                                            [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"&& fargument.optional!="output"][#assign varName=fargument.name +"." +instanceIndex]${fargument.name}${instanceIndex}[#else][#assign varName=fargument.name][#if fargument.name?contains("pConfig[2U]") && argument.name?contains("DAC_Trigger")]${V} [#else] ${fargument.name}.${argument.name}= ${argValue};[/#if] [/#if]
                                                             [#assign listofDeclaration = listofDeclaration?replace(indicatorName+" =","")]
                                                             [#assign listofDeclaration = listofDeclaration +", "+ varName+"."+argument.name+" = "+argValue+" "]                                                                                 
                                                         [/#if]
@@ -821,9 +834,9 @@ static void MX_${QName?replace(" ","_")}_Q_Build(void)
                     #t}
                     #t${sizeArg}.Size = tmp_data_size;
                 [#else]
-                    [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}(${args}) != [#if method.returnHAL == "true"]LPBAM_OK[#else]${method.returnHAL}[/#if])                
+                    [#if nTab==2]#t#t[#else]#t[/#if]if (${method.name}[#if args?contains("[2U]_DAC") && Crrr?? && Crrr?contains("LPBAM_DAC_CHANNEL_1|LPBAM_DAC_CHANNEL_2")]  (${args?replace("pConfig[2U]_DAC" , "pConfig_DAC[0U]")}) [#else] (${args?replace("[2U]_DAC" , "_DAC")}) [/#if]  [#if method.returnHAL == "true"]!= LPBAM_OK[#else]${method.returnHAL}[/#if])
                     [#if nTab==2]#t#t[#else]#t[/#if]{
-                    [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();                    
+                    [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler();
                     [#if nTab==2]#t#t[#else]#t[/#if]}
                 [/#if]
                 [#if method.optimizale??&&method.optimizale==true]

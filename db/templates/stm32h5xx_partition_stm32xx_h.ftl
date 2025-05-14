@@ -4,8 +4,9 @@
   ******************************************************************************
   * @file    partition_[#if McuName?starts_with("STM32H562")]stm32h562xx.h[/#if][#if McuName?starts_with("STM32H563")]stm32h563xx.h[/#if][#if McuName?starts_with("STM32H573")]stm32h573xx.h[/#if][#if McuName?starts_with("STM32H523")]stm32h523xx.h[/#if][#if McuName?starts_with("STM32H533")]stm32h533xx.h[/#if]
   * @author  MCD Application Team
-  * @brief   CMSIS [#if McuName?starts_with("STM32H562")]STM32H562xx[/#if] [#if McuName?starts_with("STM32H563")]STM32H563xx[/#if] [#if McuName?starts_with("STM32H573")]STM32H573xx[/#if] Device Initial Setup for Secure / Non-Secure Zones
-  *          for ARMCM33 based on CMSIS CORE partition_ARMCM33.h Template.
+  * @brief   CMSIS [#if McuName?starts_with("STM32H562")]STM32H562xx[/#if][#if McuName?starts_with("STM32H563")]STM32H563xx[/#if][#if McuName?starts_with("STM32H573")]STM32H573xx[/#if] Device Header File for Initial Setup for Secure /
+  *          Non-Secure Zones for ARMCM33 based on CMSIS CORE partition_ARMCM33.h
+  *          Template.
   *
   *          This file contains:
   *           - Initialize Security Attribution Unit (SAU) CTRL register
@@ -13,8 +14,7 @@
   *           - Setup behavior of Floating Point Unit
   *           - Setup Interrupt Target
   *
-  ******************************************************************************/
-/**
+  ******************************************************************************
   * Copyright (c) 2009-2019 Arm Limited. All rights reserved.
   * Copyright (c) 2023 STMicroelectronics. All rights reserved.  
   *
@@ -24,14 +24,15 @@
   * not use this file except in compliance with the License.
   * You may obtain a copy of the License at
   *
-  * http://www.apache.org/licenses/LICENSE-2.0
+  * www.apache.org/licenses/LICENSE-2.0
   *
   * Unless required by applicable law or agreed to in writing, software
   * distributed under the License is distributed on an AS IS BASIS, WITHOUT
   * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   * See the License for the specific language governing permissions and
   * limitations under the License.
- */
+  ******************************************************************************
+  */
 /* USER CODE END Header */
 
 [#assign enabledIT = ""]
@@ -60,10 +61,12 @@
 #ifndef PARTITION_STM32H533XX_H
 #define PARTITION_STM32H533XX_H
 [/#if]
+
 [#assign nonSecureIT0 = "100, 100"/]
 [#assign nonSecureIT1 = "100, 100"/]
 [#assign nonSecureIT2 = "100, 100"/]
 [#assign nonSecureIT3 = "100, 100"/]
+[#assign nonSecureIT4 = "100, 100"/]
 [#if SAU??]
 [@common.optinclude name=contextFolder+mxTmpFolder+"/sau_partition.tmp"/][#-- ADD SAU init Code--]
 [#else]
@@ -89,7 +92,7 @@
 //   <i> Value for SAU->CTRL register bit ALLNS
 //   <i> When all Memory is Non-Secure (ALLNS is 1), IDAU can override memory map configuration.
 */
-#define SAU_INIT_CTRL_ALLNS   1
+#define SAU_INIT_CTRL_ALLNS    1
 
 /*
 // </e>
@@ -113,13 +116,13 @@
 /*
 //     <o>Start Address <0-0xFFFFFFE0>
 */
-
 #define SAU_INIT_START0     0x0C0FE000      /* start address of SAU region 0 */
 
 /*
 //     <o>End Address <0x1F-0xFFFFFFFF>
 */
 #define SAU_INIT_END0       0x0C0FFFFF      /* end address of SAU region 0 */
+
 /*
 //     <o>Region is
 //         <0=>Non-Secure
@@ -145,6 +148,7 @@
 //     <o>End Address <0x1F-0xFFFFFFFF>
 */
 #define SAU_INIT_END1       0x081FFFFF      /* end address of SAU region 1 */
+
 /*
 //     <o>Region is
 //         <0=>Non-Secure
@@ -237,7 +241,7 @@
 //   <e>Initialize SAU Region 5
 //   <i> Setup SAU Region 5 memory attributes
 */
-#define SAU_INIT_REGION5    1
+#define SAU_INIT_REGION5    0
 
 /*
 //     <o>Start Address <0-0xFFFFFFE0>
@@ -263,7 +267,7 @@
 //   <e>Initialize SAU Region 6
 //   <i> Setup SAU Region 6 memory attributes
 */
-#define SAU_INIT_REGION6    1
+#define SAU_INIT_REGION6    0
 
 /*
 //     <o>Start Address <0-0xFFFFFFE0>
@@ -289,7 +293,7 @@
 //   <e>Initialize SAU Region 7
 //   <i> Setup SAU Region 7 memory attributes
 */
-#define SAU_INIT_REGION7    1
+#define SAU_INIT_REGION7    0
 
 /*
 //     <o>Start Address <0-0xFFFFFFE0>
@@ -314,6 +318,7 @@
 /*
 // </h>
 */
+
 [/#if]
 /*
 // <e>Setup behaviour of Sleep and Exception Handling
@@ -326,7 +331,7 @@
 //     <1=>Secure state only
 //   <i> Value for SCB->CSR register bit DEEPSLEEPS
 */
-#define SCB_CSR_DEEPSLEEPS_VAL  0
+#define SCB_CSR_DEEPSLEEPS_VAL      0
 
 /*
 //   <o>System reset request accessible from
@@ -334,7 +339,7 @@
 //     <1=> Secure state only
 //   <i> Value for SCB->AIRCR register bit SYSRESETREQS
 */
-#define SCB_AIRCR_SYSRESETREQS_VAL    0
+#define SCB_AIRCR_SYSRESETREQS_VAL  0
 /* USER CODE END 0 */
 /*
 //   <o>Priority of Non-Secure exceptions is
@@ -342,7 +347,7 @@
 //     <1=> Lowered to 0x04-0x07
 //   <i> Value for SCB->AIRCR register bit PRIS
 */
-#define SCB_AIRCR_PRIS_VAL      [#if AIRCR_PRIS??]${AIRCR_PRIS}[#else]0[/#if]
+#define SCB_AIRCR_PRIS_VAL          [#if AIRCR_PRIS??]${AIRCR_PRIS}[#else]0[/#if]
 
 /*
 //   <o>BusFault, HardFault, and NMI target
@@ -350,7 +355,7 @@
 //     <1=> Non-Secure state
 //   <i> Value for SCB->AIRCR register bit BFHFNMINS
 */
-#define SCB_AIRCR_BFHFNMINS_VAL    [#if AIRCR_BFHFNMINS??]${AIRCR_BFHFNMINS}[#else]0[/#if]
+#define SCB_AIRCR_BFHFNMINS_VAL     [#if AIRCR_BFHFNMINS??]${AIRCR_BFHFNMINS}[#else]0[/#if]
 
 /*
 // </e>
@@ -405,6 +410,7 @@
 //   <e>Initialize ITNS 0 (Interrupts 0..31)
 */
 #define NVIC_INIT_ITNS0    1
+
 /*
 // Interrupts 0..31
 //   <o.0>  WWDG_IRQn             [#if enabledIT?contains("WWDG_IRQn")]<1=> Non-Secure state[#assign nonSecureIT0 = nonSecureIT0+", "+"0"/][#else]<0=> Secure state[/#if]
@@ -434,11 +440,11 @@
 //   <o.24> EXTI13_IRQn           [#if enabledIT?contains("EXTI13_IRQn")]<1=> Non-Secure state[#assign nonSecureIT0 = nonSecureIT0+", "+"24"/][#else]<0=> Secure state[/#if]
 //   <o.25> EXTI14_IRQn           [#if enabledIT?contains("EXTI14_IRQn")]<1=> Non-Secure state[#assign nonSecureIT0 = nonSecureIT0+", "+"25"/][#else]<0=> Secure state[/#if]
 //   <o.26> EXTI15_IRQn           [#if enabledIT?contains("EXTI15_IRQn")]<1=> Non-Secure state[#assign nonSecureIT0 = nonSecureIT0+", "+"26"/][#else]<0=> Secure state[/#if]
-//   <o.27> IWDG_IRQn             [#if enabledIT?contains("IWDG_IRQn")]<1=> Non-Secure state[#assign nonSecureIT0 = nonSecureIT0+", "+"27"/][#else]<0=> Secure state[/#if]
-//   <o.28> SAES_IRQn             [#if enabledIT?contains("SAES_IRQn")]<1=> Non-Secure state[#assign nonSecureIT0 = nonSecureIT0+", "+"28"/][#else]<0=> Secure state[/#if]
-//   <o.29> GPDMA1_Channel0_IRQn  [#if enabledIT?contains("GPDMA1_Channel0_IRQn")]<1=> Non-Secure state[#assign nonSecureIT0 = nonSecureIT0+", "+"29"/][#else]<0=> Secure state[/#if]
-//   <o.30> GPDMA1_Channel1_IRQn  [#if enabledIT?contains("GPDMA1_Channel1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT0 = nonSecureIT0+", "+"30"/][#else]<0=> Secure state[/#if]
-//   <o.31> GPDMA1_Channel2_IRQn  [#if enabledIT?contains("GPDMA1_Channel2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT0 = nonSecureIT0+", "+"31"/][#else]<0=> Secure state[/#if]
+//   <o.27> GPDMA1_Channel0_IRQn  [#if enabledIT?contains("GPDMA1_Channel0_IRQn")]<1=> Non-Secure state[#assign nonSecureIT0 = nonSecureIT0+", "+"27"/][#else]<0=> Secure state[/#if]
+//   <o.28> GPDMA1_Channel1_IRQn  [#if enabledIT?contains("GPDMA1_Channel1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT0 = nonSecureIT0+", "+"28"/][#else]<0=> Secure state[/#if]
+//   <o.29> GPDMA1_Channel2_IRQn  [#if enabledIT?contains("GPDMA1_Channel2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT0 = nonSecureIT0+", "+"29"/][#else]<0=> Secure state[/#if]
+//   <o.30> GPDMA1_Channel3_IRQn  [#if enabledIT?contains("GPDMA1_Channel3_IRQn")]<1=> Non-Secure state[#assign nonSecureIT0 = nonSecureIT0+", "+"30"/][#else]<0=> Secure state[/#if]
+//   <o.31> GPDMA1_Channel4_IRQn  [#if enabledIT?contains("GPDMA1_Channel4_IRQn")]<1=> Non-Secure state[#assign nonSecureIT0 = nonSecureIT0+", "+"31"/][#else]<0=> Secure state[/#if]
 */
 [#assign decVal = 0/]
 [#if nonSecureIT0??]
@@ -452,6 +458,7 @@
 [/#if]
 [#assign res = String.format("0x%08X" , Integer.valueOf(decVal)) /]
 #define NVIC_INIT_ITNS0_VAL      ${res}
+
 /*
 //   </e>
 */
@@ -463,11 +470,10 @@
 
 /*
 // Interrupts 32..63
-//   <o.0>  GPDMA1_Channel3_IRQn  [#if enabledIT?contains("GPDMA1_Channel3_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"0"/][#else]<0=> Secure state[/#if]
-//   <o.1>  GPDMA1_Channel4_IRQn  [#if enabledIT?contains("GPDMA1_Channel4_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"1"/][#else]<0=> Secure state[/#if]
-//   <o.2>  GPDMA1_Channel5_IRQn  [#if enabledIT?contains("GPDMA1_Channel5_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"2"/][#else]<0=> Secure state[/#if]
-//   <o.3>  GPDMA1_Channel6_IRQn  [#if enabledIT?contains("GPDMA1_Channel6_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"3"/][#else]<0=> Secure state[/#if]
-//   <o.4>  GPDMA1_Channel7_IRQn  [#if enabledIT?contains("GPDMA1_Channel7_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"4"/][#else]<0=> Secure state[/#if]
+//   <o.0>  GPDMA1_Channel5_IRQn  [#if enabledIT?contains("GPDMA1_Channel5_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"0"/][#else]<0=> Secure state[/#if]
+//   <o.1>  GPDMA1_Channel6_IRQn  [#if enabledIT?contains("GPDMA1_Channel6_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"1"/][#else]<0=> Secure state[/#if]
+//   <o.2>  GPDMA1_Channel7_IRQn  [#if enabledIT?contains("GPDMA1_Channel7_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"2"/][#else]<0=> Secure state[/#if]
+//   <o.3>  IWDG_IRQn             [#if enabledIT?contains("IWDG_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"3"/][#else]<0=> Secure state[/#if][#if McuName?starts_with("STM32H533") || McuName?starts_with("STM32H573")]${'\n'}//   <o.4>  SAES_IRQn             [#if enabledIT?contains("SAES_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"4"/][#else]<0=> Secure state[/#if][/#if]
 //   <o.5>  ADC1_IRQn             [#if enabledIT?contains("ADC1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"5"/][#else]<0=> Secure state[/#if]
 //   <o.6>  DAC1_IRQn             [#if enabledIT?contains("DAC1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"6"/][#else]<0=> Secure state[/#if]
 //   <o.7>  FDCAN1_IT0_IRQn       [#if enabledIT?contains("FDCAN1_IT0_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"7"/][#else]<0=> Secure state[/#if]
@@ -482,22 +488,20 @@
 //   <o.16> TIM5_IRQn             [#if enabledIT?contains("TIM5_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"16"/][#else]<0=> Secure state[/#if]
 //   <o.17> TIM6_IRQn             [#if enabledIT?contains("TIM6_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"17"/][#else]<0=> Secure state[/#if]
 //   <o.18> TIM7_IRQn             [#if enabledIT?contains("TIM7_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"18"/][#else]<0=> Secure state[/#if]
-//   <o.19> TIM8_BRK_IRQn         [#if enabledIT?contains("TIM8_BRK_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"19"/][#else]<0=> Secure state[/#if]
-//   <o.20> TIM8_UP_IRQn          [#if enabledIT?contains("TIM8_UP_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"20"/][#else]<0=> Secure state[/#if]
-//   <o.21> TIM8_TRG_COM_IRQn     [#if enabledIT?contains("TIM8_TRG_COM_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"21"/][#else]<0=> Secure state[/#if]
-//   <o.22> TIM8_CC_IRQn          [#if enabledIT?contains("TIM8_CC_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"22"/][#else]<0=> Secure state[/#if]
-//   <o.23> I2C1_EV_IRQn          [#if enabledIT?contains("I2C1_EV_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"23"/][#else]<0=> Secure state[/#if]
-//   <o.24> I2C1_ER_IRQn          [#if enabledIT?contains("I2C1_ER_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"24"/][#else]<0=> Secure state[/#if]
-//   <o.25> I2C2_EV_IRQn          [#if enabledIT?contains("I2C2_EV_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"25"/][#else]<0=> Secure state[/#if]
-//   <o.26> I2C2_ER_IRQn          [#if enabledIT?contains("I2C2_ER_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"26"/][#else]<0=> Secure state[/#if]
-//   <o.27> SPI1_IRQn             [#if enabledIT?contains("SPI1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"27"/][#else]<0=> Secure state[/#if]
-//   <o.28> SPI2_IRQn             [#if enabledIT?contains("SPI2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"28"/][#else]<0=> Secure state[/#if]
-//   <o.29> USART1_IRQn           [#if enabledIT?contains("USART1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"29"/][#else]<0=> Secure state[/#if]
-//   <o.30> USART2_IRQn           [#if enabledIT?contains("USART2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#else]<0=> Secure state[/#if]
-//   <o.31> USART3_IRQn           [#if enabledIT?contains("USART3_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"31"/][#else]<0=> Secure state[/#if]
+//   <o.19> I2C1_EV_IRQn          [#if enabledIT?contains("I2C1_EV_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"19"/][#else]<0=> Secure state[/#if]
+//   <o.20> I2C1_ER_IRQn          [#if enabledIT?contains("I2C1_ER_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"20"/][#else]<0=> Secure state[/#if]
+//   <o.21> I2C2_EV_IRQn          [#if enabledIT?contains("I2C2_EV_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"21"/][#else]<0=> Secure state[/#if]
+//   <o.22> I2C2_ER_IRQn          [#if enabledIT?contains("I2C2_ER_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"22"/][#else]<0=> Secure state[/#if]
+//   <o.23> SPI1_IRQn             [#if enabledIT?contains("SPI1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"23"/][#else]<0=> Secure state[/#if]
+//   <o.24> SPI2_IRQn             [#if enabledIT?contains("SPI2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"24"/][#else]<0=> Secure state[/#if]
+//   <o.25> SPI3_IRQn             [#if enabledIT?contains("SPI3_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"25"/][#else]<0=> Secure state[/#if]
+//   <o.26> USART1_IRQn           [#if enabledIT?contains("USART1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"26"/][#else]<0=> Secure state[/#if]
+//   <o.27> USART2_IRQn           [#if enabledIT?contains("USART2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"27"/][#else]<0=> Secure state[/#if]
+//   <o.28> USART3_IRQn           [#if enabledIT?contains("USART3_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"28"/][#else]<0=> Secure state[/#if]
+//   <o.29> UART4_IRQn            [#if enabledIT?contains("UART4_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"29"/][#else]<0=> Secure state[/#if]
+//   <o.30> UART5_IRQn            [#if enabledIT?contains("UART5_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"30"/][#else]<0=> Secure state[/#if]
+//   <o.31> LPUART1_IRQn          [#if enabledIT?contains("LPUART1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT1 = nonSecureIT1+", "+"31"/][#else]<0=> Secure state[/#if]
 */
-
-
 [#assign decVal1 = 0/]
 [#if nonSecureIT1??]
 [#assign lll1 = nonSecureIT1?split(", ")/]
@@ -509,7 +513,6 @@
 [/#list]
 [/#if]
 [#assign res1 = String.format("0x%08X" , Integer.valueOf(decVal1)) /]
-
 #define NVIC_INIT_ITNS1_VAL      ${res1}
 
 /*
@@ -523,43 +526,31 @@
 
 /*
 // Interrupts 64..95
-//   <o.0>  UART4_IRQn            [#if enabledIT?contains("UART4_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"0"/][#else]<0=> Secure state[/#if]
-//   <o.1>  UART5_IRQn            [#if enabledIT?contains("UART5_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"1"/][#else]<0=> Secure state[/#if]
-//   <o.2>  LPUART1_IRQn          [#if enabledIT?contains("LPUART1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"2"/][#else]<0=> Secure state[/#if]
-//   <o.3>  LPTIM1_IRQn           [#if enabledIT?contains("LPTIM1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"3"/][#else]<0=> Secure state[/#if]
-//   <o.4>  LPTIM2_IRQn           [#if enabledIT?contains("LPTIM2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"4"/][#else]<0=> Secure state[/#if]
-//   <o.5>  TIM15_IRQn            [#if enabledIT?contains("TIM15_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"5"/][#else]<0=> Secure state[/#if]
-//   <o.6>  TIM16_IRQn            [#if enabledIT?contains("TIM16_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"6"/][#else]<0=> Secure state[/#if]
-//   <o.7>  TIM17_IRQn            [#if enabledIT?contains("TIM17_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"7"/][#else]<0=> Secure state[/#if]
-//   <o.8>  COMP_IRQn             [#if enabledIT?contains("COMP_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"8"/][#else]<0=> Secure state[/#if]
-//   <o.9>  OTG_FS_IRQn           [#if enabledIT?contains("OTG_FS_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"9"/][#else]<0=> Secure state[/#if]
-//   <o.10> CRS_IRQn              [#if enabledIT?contains("CRS_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"10"/][#else]<0=> Secure state[/#if]
-//   <o.11> FMC_IRQn              [#if enabledIT?contains("FMC_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"11"/][#else]<0=> Secure state[/#if]
-//   <o.12> OCTOSPI1_IRQn         [#if enabledIT?contains("OCTOSPI1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"12"/][#else]<0=> Secure state[/#if]
-//   <o.13> PWR_S3WU_IRQn         [#if enabledIT?contains("PWR_S3WU_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"13"/][#else]<0=> Secure state[/#if]
-
-//   <o.14> SDMMC1_IRQn           [#if enabledIT?contains("SDMMC1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"14"/][#else]<0=> Secure state[/#if]
-//   <o.15> SDMMC2_IRQn           [#if enabledIT?contains("SDMMC2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"15"/][#else]<0=> Secure state[/#if]
-
-//   <o.16> GPDMA1_Channel8_IRQn  [#if enabledIT?contains("GPDMA1_Channel8_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"16"/][#else]<0=> Secure state[/#if]
-//   <o.17> GPDMA1_Channel9_IRQn  [#if enabledIT?contains("GPDMA1_Channel9_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"17"/][#else]<0=> Secure state[/#if]
-//   <o.18> GPDMA1_Channel10_IRQn [#if enabledIT?contains("GPDMA1_Channel10_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"18"/][#else]<0=> Secure state[/#if]
-//   <o.19> GPDMA1_Channel11_IRQn [#if enabledIT?contains("GPDMA1_Channel11_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"19"/][#else]<0=> Secure state[/#if]
-//   <o.20> GPDMA1_Channel12_IRQn [#if enabledIT?contains("GPDMA1_Channel12_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"20"/][#else]<0=> Secure state[/#if]
-//   <o.21> GPDMA1_Channel13_IRQn [#if enabledIT?contains("GPDMA1_Channel13_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"21"/][#else]<0=> Secure state[/#if]
-//   <o.22> GPDMA1_Channel14_IRQn [#if enabledIT?contains("GPDMA1_Channel14_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"22"/][#else]<0=> Secure state[/#if]
-//   <o.23> GPDMA1_Channel15_IRQn [#if enabledIT?contains("GPDMA1_Channel15_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"23"/][#else]<0=> Secure state[/#if]
-//   <o.24> I2C3_EV_IRQn          [#if enabledIT?contains("I2C3_EV_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"24"/][#else]<0=> Secure state[/#if]
-//   <o.25> I2C3_ER_IRQn          [#if enabledIT?contains("I2C3_ER_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"25"/][#else]<0=> Secure state[/#if]
-//   <o.26> SAI1_IRQn             [#if enabledIT?contains("SAI1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"26"/][#else]<0=> Secure state[/#if]
-//   <o.27> SAI2_IRQn             [#if enabledIT?contains("SAI2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"27"/][#else]<0=> Secure state[/#if]
-//   <o.28> TSC_IRQn              [#if enabledIT?contains("TSC_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"28"/][#else]<0=> Secure state[/#if]
-//   <o.29> AES_IRQn              [#if enabledIT?contains("AES_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"29"/][#else]<0=> Secure state[/#if]
-
-//   <o.30> RNG_IRQn              [#if enabledIT?contains("RNG_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"30"/][#else]<0=> Secure state[/#if]
-//   <o.31> FPU_IRQn              [#if enabledIT?contains("FPU_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"31"/][#else]<0=> Secure state[/#if]
+//   <o.0>  LPTIM1_IRQn           [#if enabledIT?contains("LPTIM1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"0"/][#else]<0=> Secure state[/#if]
+//   <o.1>  TIM8_BRK_IRQn         [#if enabledIT?contains("TIM8_BRK_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"1"/][#else]<0=> Secure state[/#if]
+//   <o.2>  TIM8_UP_IRQn          [#if enabledIT?contains("TIM8_UP_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"2"/][#else]<0=> Secure state[/#if]
+//   <o.3>  TIM8_TRG_COM_IRQn     [#if enabledIT?contains("TIM8_TRG_COM_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"3"/][#else]<0=> Secure state[/#if]
+//   <o.4>  TIM8_CC_IRQn          [#if enabledIT?contains("TIM8_CC_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"4"/][#else]<0=> Secure state[/#if]
+//   <o.5>  ADC2_IRQn             [#if enabledIT?contains("ADC2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"5"/][#else]<0=> Secure state[/#if]
+//   <o.6>  LPTIM2_IRQn           [#if enabledIT?contains("LPTIM2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"6"/][#else]<0=> Secure state[/#if]
+//   <o.7>  TIM15_IRQn            [#if enabledIT?contains("TIM15_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"7"/][#else]<0=> Secure state[/#if][#if McuName?starts_with("STM32H562") || McuName?starts_with("STM32H563") || McuName?starts_with("STM32H573")]${'\n'}//   <o.8>  TIM16_IRQn            [#if enabledIT?contains("TIM16_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"8"/][#else]<0=> Secure state[/#if][#else][/#if][#if McuName?starts_with("STM32H562") || McuName?starts_with("STM32H563") || McuName?starts_with("STM32H573")]${'\n'}//   <o.9>  TIM17_IRQn            [#if enabledIT?contains("TIM17_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"9"/][#else]<0=> Secure state[/#if][#else][/#if]
+//   <o.10> USB_DRD_FS_IRQn       [#if enabledIT?contains("USB_DRD_FS_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"10"/][#else]<0=> Secure state[/#if]
+//   <o.11> CRS_IRQn              [#if enabledIT?contains("CRS_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"11"/][#else]<0=> Secure state[/#if]
+//   <o.12> UCPD1_IRQn            [#if enabledIT?contains("UCPD1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"12"/][#else]<0=> Secure state[/#if]
+//   <o.13> FMC_IRQn              [#if enabledIT?contains("FMC_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"13"/][#else]<0=> Secure state[/#if]
+//   <o.14> OCTOSPI1_IRQn         [#if enabledIT?contains("OCTOSPI1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"14"/][#else]<0=> Secure state[/#if]
+//   <o.15> SDMMC1_IRQn           [#if enabledIT?contains("SDMMC1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"15"/][#else]<0=> Secure state[/#if]
+//   <o.16> I2C3_EV_IRQn          [#if enabledIT?contains("I2C3_EV_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"16"/][#else]<0=> Secure state[/#if]
+//   <o.17> I2C3_ER_IRQn          [#if enabledIT?contains("I2C3_ER_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"17"/][#else]<0=> Secure state[/#if]
+//   <o.18> SPI4_IRQn             [#if enabledIT?contains("SPI4_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"18"/][#else]<0=> Secure state[/#if][#if McuName?starts_with("STM32H562") || McuName?starts_with("STM32H563") || McuName?starts_with("STM32H573")]${'\n'}//   <o.19> SPI5_IRQn             [#if enabledIT?contains("SPI5_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"19"/][#else]<0=> Secure state[/#if][#else][/#if][#if McuName?starts_with("STM32H562") || McuName?starts_with("STM32H563") || McuName?starts_with("STM32H573")]${'\n'}//   <o.20> SPI6_IRQn             [#if enabledIT?contains("SPI6_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"20"/][#else]<0=> Secure state[/#if][#else][/#if]
+//   <o.21> USART6_IRQn           [#if enabledIT?contains("USART6_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"21"/][#else]<0=> Secure state[/#if][#if McuName?starts_with("STM32H562") || McuName?starts_with("STM32H563") || McuName?starts_with("STM32H573")]${'\n'}//   <o.22> USART10_IRQn          [#if enabledIT?contains("USART10_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"22"/][#else]<0=> Secure state[/#if][#else][/#if][#if McuName?starts_with("STM32H562") || McuName?starts_with("STM32H563") || McuName?starts_with("STM32H573")]${'\n'}//   <o.23> USART11_IRQn          [#if enabledIT?contains("USART11_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"23"/][#else]<0=> Secure state[/#if][#else][/#if][#if McuName?starts_with("STM32H562") || McuName?starts_with("STM32H563") || McuName?starts_with("STM32H573")]${'\n'}//   <o.24> SAI1_IRQn             [#if enabledIT?contains("SAI1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"24"/][#else]<0=> Secure state[/#if][#else][/#if][#if McuName?starts_with("STM32H562") || McuName?starts_with("STM32H563") || McuName?starts_with("STM32H573")]${'\n'}//   <o.25> SAI2_IRQn             [#if enabledIT?contains("SAI2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"25"/][#else]<0=> Secure state[/#if][#else][/#if]
+//   <o.26> GPDMA2_Channel0_IRQn  [#if enabledIT?contains("GPDMA2_Channel0_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"26"/][#else]<0=> Secure state[/#if]
+//   <o.27> GPDMA2_Channel1_IRQn  [#if enabledIT?contains("GPDMA2_Channel1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"27"/][#else]<0=> Secure state[/#if]
+//   <o.28> GPDMA2_Channel2_IRQn  [#if enabledIT?contains("GPDMA2_Channel2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"28"/][#else]<0=> Secure state[/#if]
+//   <o.29> GPDMA2_Channel3_IRQn  [#if enabledIT?contains("GPDMA2_Channel3_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"29"/][#else]<0=> Secure state[/#if]
+//   <o.30> GPDMA2_Channel4_IRQn  [#if enabledIT?contains("GPDMA2_Channel4_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"30"/][#else]<0=> Secure state[/#if]
+//   <o.31> GPDMA2_Channel5_IRQn  [#if enabledIT?contains("GPDMA2_Channel5_IRQn")]<1=> Non-Secure state[#assign nonSecureIT2 = nonSecureIT2+", "+"31"/][#else]<0=> Secure state[/#if]
 */
-
 [#assign decVal2 = 0/]
 [#if nonSecureIT2??]
 [#assign lll2 = nonSecureIT2?split(", ")/]
@@ -570,7 +561,6 @@
 [/#if]
 [/#list]
 [/#if]
-
 [#assign res2 = String.format("0x%08X" , Integer.valueOf(decVal2)) /]
 #define NVIC_INIT_ITNS2_VAL      ${res2}
 
@@ -580,44 +570,26 @@
 */
 
 /*
-//   <e>Initialize ITNS 3 (Interrupts 96..108)
+[#if McuName?starts_with("STM32H562") || McuName?starts_with("STM32H563") || McuName?starts_with("STM32H573")]//   <e>Initialize ITNS 3 (Interrupts 96..127)[#else]//   <e>Initialize ITNS 3 (Interrupts 96..127)[/#if]
 */
 #define NVIC_INIT_ITNS3    1
 
 /*
-// Interrupts 96..125
-//   <o.0>  HASH_IRQn             [#if enabledIT?contains("HASH_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"0"/][#else]<0=> Secure state[/#if]
-//   <o.1>  PKA_IRQn              [#if enabledIT?contains("PKA_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"1"/][#else]<0=> Secure state[/#if]
-//   <o.2>  LPTIM3_IRQn           [#if enabledIT?contains("LPTIM3_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"2"/][#else]<0=> Secure state[/#if]
-//   <o.3>  SPI3_IRQn             [#if enabledIT?contains("SPI3_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"3"/][#else]<0=> Secure state[/#if]
-//   <o.4>  I2C4_ER_IRQn          [#if enabledIT?contains("I2C4_ER_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"4"/][#else]<0=> Secure state[/#if]
-//   <o.5>  I2C4_EV_IRQn          [#if enabledIT?contains("I2C4_EV_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"5"/][#else]<0=> Secure state[/#if]
-//   <o.6>  MDF1_FLT0_IRQn        [#if enabledIT?contains("MDF1_FLT0_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"6"/][#else]<0=> Secure state[/#if]
-//   <o.7>  MDF1_FLT1_IRQn        [#if enabledIT?contains("MDF1_FLT1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"7"/][#else]<0=> Secure state[/#if]
-//   <o.8>  MDF1_FLT2_IRQn        [#if enabledIT?contains("MDF1_FLT2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"8"/][#else]<0=> Secure state[/#if]
-//   <o.9>  MDF1_FLT3_IRQn        [#if enabledIT?contains("MDF1_FLT3_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"9"/][#else]<0=> Secure state[/#if]
-//   <o.10> UCPD1_IRQn            [#if enabledIT?contains("UCPD1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"10"/][#else]<0=> Secure state[/#if]
-//   <o.11> ICACHE_IRQn           [#if enabledIT?contains("ICACHE_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"11"/][#else]<0=> Secure state[/#if]
-//   <o.12> OTFDEC1_IRQn          [#if enabledIT?contains("OTFDEC1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"12"/][#else]<0=> Secure state[/#if]
-//   <o.13> OTFDEC2_IRQn          [#if enabledIT?contains("OTFDEC2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"13"/][#else]<0=> Secure state[/#if]
-//   <o.14> LPTIM4_IRQn           [#if enabledIT?contains("LPTIM4_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"14"/][#else]<0=> Secure state[/#if]
-//   <o.15> DCACHE1_IRQn          [#if enabledIT?contains("DCACHE1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"15"/][#else]<0=> Secure state[/#if]
-//   <o.16> ADF1_IRQn             [#if enabledIT?contains("ADF1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"16"/][#else]<0=> Secure state[/#if]
-//   <o.17> ADC4_IRQn             [#if enabledIT?contains("ADC4_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"17"/][#else]<0=> Secure state[/#if]
-//   <o.18> LPDMA1_Channel0_IRQn  [#if enabledIT?contains("LPDMA1_Channel0_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"18"/][#else]<0=> Secure state[/#if]
-//   <o.19> LPDMA1_Channel1_IRQn  [#if enabledIT?contains("LPDMA1_Channel1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"19"/][#else]<0=> Secure state[/#if]
-//   <o.20> LPDMA1_Channel2_IRQn  [#if enabledIT?contains("LPDMA1_Channel2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"20"/][#else]<0=> Secure state[/#if]
-//   <o.21> LPDMA1_Channel3_IRQn  [#if enabledIT?contains("LPDMA1_Channel3_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"21"/][#else]<0=> Secure state[/#if]
-//   <o.22> DMA2D_IRQn            [#if enabledIT?contains("DMA2D_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"22"/][#else]<0=> Secure state[/#if]
-//   <o.23> DCMI_PSSI_IRQn        [#if enabledIT?contains("DCMI_PSSI_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"23"/][#else]<0=> Secure state[/#if]
-//   <o.24> OCTOSPI2_IRQn         [#if enabledIT?contains("OCTOSPI2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"24"/][#else]<0=> Secure state[/#if]
-//   <o.25> MDF1_FLT4_IRQn        [#if enabledIT?contains("MDF1_FLT4_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"25"/][#else]<0=> Secure state[/#if]
-//   <o.26> MDF1_FLT5_IRQn        [#if enabledIT?contains("MDF1_FLT5_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"26"/][#else]<0=> Secure state[/#if]
-//   <o.27> CORDIC_IRQn           [#if enabledIT?contains("CORDIC_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"27"/][#else]<0=> Secure state[/#if]
-//   <o.28> FMAC_IRQn             [#if enabledIT?contains("FMAC_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"28"/][#else]<0=> Secure state[/#if]
-
+[#if McuName?starts_with("STM32H562") || McuName?starts_with("STM32H563") || McuName?starts_with("STM32H573")]// Interrupts 96..127[#else]// Interrupts 96..127[/#if]
+//   <o.0>  GPDMA2_Channel6_IRQn  [#if enabledIT?contains("GPDMA2_Channel6_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"0"/][#else]<0=> Secure state[/#if]
+//   <o.1>  GPDMA2_Channel7_IRQn  [#if enabledIT?contains("GPDMA2_Channel7_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"1"/][#else]<0=> Secure state[/#if][#if McuName?starts_with("STM32H562") || McuName?starts_with("STM32H563") || McuName?starts_with("STM32H573")]${'\n'}//   <o.2>  UART7_IRQn            [#if enabledIT?contains("UART7_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"2"/][#else]<0=> Secure state[/#if][#else][/#if][#if McuName?starts_with("STM32H562") || McuName?starts_with("STM32H563") || McuName?starts_with("STM32H573")]${'\n'}//   <o.3>  UART8_IRQn            [#if enabledIT?contains("UART8_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"3"/][#else]<0=> Secure state[/#if][#else][/#if][#if McuName?starts_with("STM32H562") || McuName?starts_with("STM32H563") || McuName?starts_with("STM32H573")]${'\n'}//   <o.4>  UART9_IRQn            [#if enabledIT?contains("UART9_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"4"/][#else]<0=> Secure state[/#if][#else][/#if][#if McuName?starts_with("STM32H562") || McuName?starts_with("STM32H563") || McuName?starts_with("STM32H573")]${'\n'}//   <o.5>  UART12_IRQn           [#if enabledIT?contains("UART12_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"5"/][#else]<0=> Secure state[/#if][#else][/#if][#if McuName?starts_with("STM32H563") || McuName?starts_with("STM32H573")]${'\n'}//   <o.6>  SDMMC2_IRQn           [#if enabledIT?contains("SDMMC2_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"6"/][#else]<0=> Secure state[/#if][#else][/#if]
+//   <o.7>  FPU_IRQn              [#if enabledIT?contains("FPU_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"7"/][#else]<0=> Secure state[/#if]
+//   <o.8>  ICACHE_IRQn           [#if enabledIT?contains("ICACHE_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"8"/][#else]<0=> Secure state[/#if]
+//   <o.9>  DCACHE_IRQn           [#if enabledIT?contains("DCACHE_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"9"/][#else]<0=> Secure state[/#if][#if McuName?starts_with("STM32H563") || McuName?starts_with("STM32H573")]${'\n'}//   <o.10> ETH_IRQn              [#if enabledIT?contains("ETH_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"10"/][#else]<0=> Secure state[/#if][#else][/#if][#if McuName?starts_with("STM32H563") || McuName?starts_with("STM32H573")]${'\n'}//   <o.11> ETH_WKUP_IRQn         [#if enabledIT?contains("ETH_WKUP_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"11"/][#else]<0=> Secure state[/#if][#else][/#if]
+//   <o.12> DCMI_PSSI_IRQn        [#if enabledIT?contains("DCMI_PSSI_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"12"/][#else]<0=> Secure state[/#if][#if McuName?starts_with("STM32H523") || McuName?starts_with("STM32H533") || McuName?starts_with("STM32H563") || McuName?starts_with("STM32H573")]${'\n'}//   <o.13> FDCAN2_IT0_IRQn       [#if enabledIT?contains("FDCAN2_IT0_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"13"/][#else]<0=> Secure state[/#if][#else][/#if][#if McuName?starts_with("STM32H523") || McuName?starts_with("STM32H533") || McuName?starts_with("STM32H563") || McuName?starts_with("STM32H573")]${'\n'}//   <o.14> FDCAN2_IT1_IRQn       [#if enabledIT?contains("FDCAN2_IT1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"14"/][#else]<0=> Secure state[/#if][#else][/#if][#if McuName?starts_with("STM32H562") || McuName?starts_with("STM32H563") || McuName?starts_with("STM32H573")]${'\n'}//   <o.15> CORDIC_IRQn           [#if enabledIT?contains("CORDIC_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"15"/][#else]<0=> Secure state[/#if][#else][/#if][#if McuName?starts_with("STM32H562") || McuName?starts_with("STM32H563") || McuName?starts_with("STM32H573")]${'\n'}//   <o.16> FMAC_IRQn             [#if enabledIT?contains("FMAC_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"16"/][#else]<0=> Secure state[/#if][#else][/#if]
+//   <o.17> DTS_IRQn              [#if enabledIT?contains("DTS_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"17"/][#else]<0=> Secure state[/#if]
+//   <o.18> RNG_IRQn              [#if enabledIT?contains("RNG_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"18"/][#else]<0=> Secure state[/#if][#if McuName?starts_with("STM32H533") || McuName?starts_with("STM32H573")]${'\n'}//   <o.19> OTFDEC1_IRQn          [#if enabledIT?contains("OTFDEC1_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"19"/][#else]<0=> Secure state[/#if][#else][/#if][#if McuName?starts_with("STM32H533") || McuName?starts_with("STM32H573")]${'\n'}//   <o.20> AES_IRQn              [#if enabledIT?contains("AES_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"20"/][#else]<0=> Secure state[/#if][#else][/#if]
+//   <o.21> HASH_IRQn             [#if enabledIT?contains("HASH_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"21"/][#else]<0=> Secure state[/#if][#if McuName?starts_with("STM32H533") || McuName?starts_with("STM32H573")]${'\n'}//   <o.22> PKA_IRQn              [#if enabledIT?contains("PKA_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"22"/][#else]<0=> Secure state[/#if][#else][/#if]
+//   <o.23> CEC_IRQn              [#if enabledIT?contains("CEC_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"23"/][#else]<0=> Secure state[/#if]
+//   <o.24> TIM12_IRQn            [#if enabledIT?contains("TIM12_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"24"/][#else]<0=> Secure state[/#if][#if McuName?starts_with("STM32H562") || McuName?starts_with("STM32H563") || McuName?starts_with("STM32H573")]${'\n'}//   <o.25> TIM13_IRQn            [#if enabledIT?contains("TIM13_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"25"/][#else]<0=> Secure state[/#if][#else][/#if][#if McuName?starts_with("STM32H562") || McuName?starts_with("STM32H563") || McuName?starts_with("STM32H573")]${'\n'}//   <o.26> TIM14_IRQn            [#if enabledIT?contains("TIM14_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"26"/][#else]<0=> Secure state[/#if][#else][/#if]
+//   <o.27> I3C1_EV_IRQn          [#if enabledIT?contains("I3C1_EV_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"27"/][#else]<0=> Secure state[/#if]
+//   <o.28> I3C1_ER_IRQn          [#if enabledIT?contains("I3C1_ER_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"28"/][#else]<0=> Secure state[/#if][#if McuName?starts_with("STM32H562") || McuName?starts_with("STM32H563") || McuName?starts_with("STM32H573")]${'\n'}//   <o.29> I2C4_EV_IRQn          [#if enabledIT?contains("I2C4_EV_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"29"/][#else]<0=> Secure state[/#if][#else][/#if][#if McuName?starts_with("STM32H562") || McuName?starts_with("STM32H563") || McuName?starts_with("STM32H573")]${'\n'}//   <o.30> I2C4_ER_IRQn          [#if enabledIT?contains("I2C4_ER_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"30"/][#else]<0=> Secure state[/#if][#else][/#if][#if McuName?starts_with("STM32H562") || McuName?starts_with("STM32H563") || McuName?starts_with("STM32H573")]${'\n'}//   <o.31> LPTIM3_IRQn           [#if enabledIT?contains("LPTIM3_IRQn")]<1=> Non-Secure state[#assign nonSecureIT3 = nonSecureIT3+", "+"31"/][#else]<0=> Secure state[/#if][#else][/#if]
 */
-
 [#assign decVal3 = 0/]
 [#if nonSecureIT3??]
 [#assign lll3 = nonSecureIT3?split(", ")/]
@@ -628,9 +600,36 @@
 [/#if]
 [/#list]
 [/#if]
-
 [#assign res3 = String.format("0x%08X" , Math.round(decVal3)) /]
 #define NVIC_INIT_ITNS3_VAL      ${res3}
+
+/*
+//   </e>
+*/
+
+/*
+[#if McuName?starts_with("STM32H562") || McuName?starts_with("STM32H563") || McuName?starts_with("STM32H573")]//   <e>Initialize ITNS 4 (Interrupts 128..130)[#else]//   <e>Initialize ITNS 4 (Interrupts 131..132)[/#if]
+*/
+#define NVIC_INIT_ITNS4    1
+
+/*
+[#if McuName?starts_with("STM32H562") || McuName?starts_with("STM32H563") || McuName?starts_with("STM32H573")]// Interrupts 128..130[#else]// Interrupts 131..132[/#if]
+[#if McuName?starts_with("STM32H562") || McuName?starts_with("STM32H563") || McuName?starts_with("STM32H573")]//   <o.0>  LPTIM4_IRQn          [#if enabledIT?contains("LPTIM4_IRQn")]<1=> Non-Secure state[#assign nonSecureIT4 = nonSecureIT4+", "+"0"/][#else]<0=> Secure state[/#if][#else]//   <o.3> I3C2_EV_IRQn          [#if enabledIT?contains("I3C2_EV_IRQn")]<1=> Non-Secure state[#assign nonSecureIT4 = nonSecureIT4+", "+"3"/][#else]<0=> Secure state[/#if][/#if]
+[#if McuName?starts_with("STM32H562") || McuName?starts_with("STM32H563") || McuName?starts_with("STM32H573")]//   <o.1>  LPTIM5_IRQn          [#if enabledIT?contains("LPTIM5_IRQn")]<1=> Non-Secure state[#assign nonSecureIT4 = nonSecureIT4+", "+"1"/][#else]<0=> Secure state[/#if][#else]//   <o.4> I3C2_ER_IRQn          [#if enabledIT?contains("I3C2_ER_IRQn")]<1=> Non-Secure state[#assign nonSecureIT4 = nonSecureIT4+", "+"4"/][#else]<0=> Secure state[/#if][/#if]
+[#if McuName?starts_with("STM32H562") || McuName?starts_with("STM32H563") || McuName?starts_with("STM32H573")]//   <o.2>  LPTIM6_IRQn          [#if enabledIT?contains("LPTIM6_IRQn")]<1=> Non-Secure state[#assign nonSecureIT4 = nonSecureIT4+", "+"2"/][#else]<0=> Secure state[/#if][#else][/#if]
+*/
+[#assign decVal4 = 0/]
+[#if nonSecureIT4??]
+[#assign lll4 = nonSecureIT4?split(", ")/]
+[#list lll4 as it4]
+[#assign index4 = Integer.parseInt(it4)/]
+[#if index4!=100]
+[#assign decVal4 = decVal4 +  Math.pow(2, index4)]
+[/#if]
+[/#list]
+[/#if]
+[#assign res4 = String.format("0x%08X" , Math.round(decVal4)) /]
+#define NVIC_INIT_ITNS4_VAL      ${res4}
 
 /*
 //   </e>
@@ -641,7 +640,6 @@
 */
 
 /* USER CODE BEGIN 2 */
-
 /*
     max 8 SAU regions.
     SAU regions are defined in partition.h
@@ -743,6 +741,10 @@ __STATIC_INLINE void TZ_SAU_Setup (void)
 
   #if defined (NVIC_INIT_ITNS3) && (NVIC_INIT_ITNS3 == 1U)
     NVIC->ITNS[3] = NVIC_INIT_ITNS3_VAL;
+  #endif
+
+  #if defined (NVIC_INIT_ITNS4) && (NVIC_INIT_ITNS4 == 1U)
+    NVIC->ITNS[4] = NVIC_INIT_ITNS4_VAL;
   #endif
 
 }

@@ -21,16 +21,17 @@
 
     <RefParameter Visible="false" Comment="I2S_CKIN" Name="EXTERNAL_CLOCK_VALUE" DefaultValue="12288000" Type="double" Display="value/1000000" Unit="MHz"/>
     <!--divisor-->
-    <RefParameter Visible="false" Comment="SYSDIV"  DefaultValue="1" Name="SYSDIV" Type="list">
-        <PossibleValue Comment="1" Value="1"/>
-        <PossibleValue Comment="2" Value="2"/>
-        <PossibleValue Comment="3" Value="3"/>
-        <PossibleValue Comment="4" Value="4"/>
-        <PossibleValue Comment="5" Value="5"/>
-        <PossibleValue Comment="6" Value="6"/>
-        <PossibleValue Comment="7" Value="7"/>
-        <PossibleValue Comment="8" Value="8"/>
-    </RefParameter>	
+    <RefParameter Visible="false" Comment="SYSDIV"  DefaultValue="RCC_SYSCLK_DIV1" Name="SYSDIV" Type="list">
+        <PossibleValue Comment="1" Value="RCC_SYSCLK_DIV1"/>
+        <PossibleValue Comment="2" Value="RCC_SYSCLK_DIV2"/>
+        <PossibleValue Comment="3" Value="RCC_SYSCLK_DIV3"/>
+        <PossibleValue Comment="4" Value="RCC_SYSCLK_DIV4"/>
+        <PossibleValue Comment="5" Value="RCC_SYSCLK_DIV5"/>
+        <PossibleValue Comment="6" Value="RCC_SYSCLK_DIV6"/>
+        <PossibleValue Comment="7" Value="RCC_SYSCLK_DIV7"/>
+        <PossibleValue Comment="8" Value="RCC_SYSCLK_DIV8"/>
+    </RefParameter>
+    <RefParameter Visible="false" Comment="SYSDIV" DefaultValue="+SYSDIV" Name="SYSDIVARG" Type="list"/>	
 
     <!--Cortex_Div-->
     <RefParameter Visible="false" Comment="Cortex Div" DefaultValue="SYSTICK_CLKSOURCE_HCLK" Name="Cortex_Div" Type="list">
@@ -933,7 +934,7 @@
     
     <RefMode Name="ClockTree">
 
-        <ConfigForMode>RCC_ConfigVoltageScaling</ConfigForMode> 
+        <ConfigForMode>RCC_SetFlashLatency</ConfigForMode> 
         <ConfigForMode>RCC_LSEDRIVE_CONFIG</ConfigForMode>
         <ConfigForMode>RCC_OSCConfig</ConfigForMode>            
         <ConfigForMode>RCC_ClockConfig</ConfigForMode>
@@ -955,6 +956,7 @@
         <Parameter Name="RCC_RTC_Clock_Source_FROM_HSE"/>
         
         <Parameter Name="AHBCLKDivider"/>
+        <Parameter Name="SYSDIV"/>
         <Parameter Name="RCC_MCODiv"/>
         <Parameter Name="APB1CLKDivider"/>
         <Parameter Name="HSISYSCLKDivider"/>
@@ -1038,7 +1040,7 @@
    
     <ModeLogicOperator Name="OR">
         <!-- Modes for Oscillators & Clocks -->
-        <Mode Name="OSC" UserName="High Speed Clock (HSE)">
+        <Mode Name="OSC" UserName="High Speed Clock (HSE)" RemoveCondition="UFQFPN32_N | UFQFPN32_GP | LQFP32_N | LQFP32_GP | UFQFPN28_GP | UFQFPN28_N | TSSOP20_N | TSSOP20_GP | WLCSP19_GP">
             <ModeLogicOperator Name="XOR">
                 <Mode Name="HSE-External-Clock-Source" UserName="BYPASS Clock Source">
                     <SignalLogicalOp Name="AND">
@@ -1050,6 +1052,24 @@
                     <SignalLogicalOp Name="AND">
                         <Signal Name="OSC_IN"/>
                         <Signal Name="OSC_OUT"/>
+                    </SignalLogicalOp>
+                    <Semaphore>HSEOscillator</Semaphore>
+					<Condition Diagnostic="OSC Enable must be disabled first!" Expression="(!OSC_Enabled)|(!LSEOscillator)"/>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
+         <Mode Name="OSC" UserName="High Speed Clock (HSE)" RemoveCondition="(!UFQFPN32_N &amp; !UFQFPN32_GP &amp; !LQFP32_N &amp; !LQFP32_GP &amp; !UFQFPN28_GP &amp; !UFQFPN28_N &amp; !TSSOP20_N &amp; !TSSOP20_GP &amp; !WLCSP19_GP)">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="HSE-External-Clock-Source" UserName="BYPASS Clock Source">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="OSCX_IN"/>
+                    </SignalLogicalOp>
+                    <Semaphore>HSEByPass</Semaphore>
+                </Mode>
+                <Mode Name="HSE-External-Oscillator" UserName="Crystal/Ceramic Resonator">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="OSCX_IN"/>
+                        <Signal Name="OSCX_OUT"/>
                     </SignalLogicalOp>
                     <Semaphore>HSEOscillator</Semaphore>
 					<Condition Diagnostic="OSC Enable must be disabled first!" Expression="(!OSC_Enabled)|(!LSEOscillator)"/>
@@ -1110,7 +1130,7 @@
             <ModeLogicOperator Name="OR">
                 <Mode Name="Clock-out2">
                     <SignalLogicalOp Name="AND">
-                        <Signal Name="MCO2"/>
+                        <Signal Name="MCO_2"/>
                     </SignalLogicalOp>
                     <Semaphore>MCO2Config</Semaphore>
                 </Mode>
@@ -1162,7 +1182,7 @@
         </Mode>
     </ModeLogicOperator>
     <RefSignal IOMode="AlternateFunctionPushPull" Name="MCO"/>
-    <RefSignal IOMode="AlternateFunctionPushPull" Name="MCO2"/>
+    <RefSignal IOMode="AlternateFunctionPushPull" Name="MCO_2"/>
     <RefSignal IOMode="Analog" Name="LSCO"/>
     <RefSignal IOMode="System" Name="OSCX_IN"/>
     <RefSignal IOMode="System" Name="OSCX_OUT"/>

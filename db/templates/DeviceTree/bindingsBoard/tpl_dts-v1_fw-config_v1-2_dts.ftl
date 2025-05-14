@@ -151,7 +151,7 @@ ${TABnode}st-mem-firewall {
 [#list RegionNameList as RegionNameElmt]
 ${TABprop}${RegionNameElmt?replace("-","_")?lower_case}: ${RegionNameElmt?lower_case}@${StartAddressList[RegionNameElmt?index]?keep_after("0x")} {
 ${TABprop}${TABnode}reg = <0x0 ${StartAddressList[RegionNameElmt?index]} 0x0 ${RegionSizeList[RegionNameElmt?index]}>;
-${TABprop}${TABnode}st,protreg = <RISAFPROT(RISAF_REG_ID(${RegionIDList[RegionNameElmt?index]}), ${((MasterCIDRList[RegionNameElmt?index]?length)>0)?then(MasterCIDRList[RegionNameElmt?index],"0")}, ${((MasterCIDWList[RegionNameElmt?index]?length)>0)?then(MasterCIDWList[RegionNameElmt?index],"0")}, ${((MasterCIDPList[RegionNameElmt?index]?length)>0)?then(MasterCIDPList[RegionNameElmt?index],"0")}, ${SecureList[RegionNameElmt?index]}, ${EncryptList[RegionNameElmt?index]}, RIF_BREN_EN)>;
+${TABprop}${TABnode}st,protreg = <RISAFPROT(RISAF_REG_ID(${RegionIDList[RegionNameElmt?index]}), ${((MasterCIDRList[RegionNameElmt?index]?length)>0)?then(MasterCIDRList[RegionNameElmt?index],"0")}, ${((MasterCIDWList[RegionNameElmt?index]?length)>0)?then(MasterCIDWList[RegionNameElmt?index],"RIF_UNUSED")}, ${((MasterCIDPList[RegionNameElmt?index]?length)>0)?then(MasterCIDPList[RegionNameElmt?index],"RIF_UNUSED")}, ${SecureList[RegionNameElmt?index]}, ${EncryptList[RegionNameElmt?index]}, RIF_BREN_EN)>;
 ${TABprop}};
 [/#list]
 ${TABnode}};

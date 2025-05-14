@@ -5,14 +5,140 @@
   xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
   <About>MCE</About>
 
+  <RefParameter Comment="Index" DefaultValue="1" Name="Index" Type="String" Visible="false"/>
+  <RefParameter Comment="Instance" DefaultValue="MCE$Index" Name="Instance" Type="String" Visible="false"/>
+
+    <RefParameter Name="Algorithm" Group="Settings" Comment="Cipher Selection" DefaultValue="AES_128" Type="list">
+        <PossibleValue Value="MCE_AES_128" Comment="AES_128"/>
+        <PossibleValue Value="MCE_AES_256" Comment="AES_256"/>
+        <PossibleValue Value="MCE_NOEKEON" Comment="NOEKEON"/>
+    </RefParameter>
+
+    <RefParameter Name="Mode" Group="Settings" Comment="Context Mode" DefaultValue="MCE_NO_CIPHER" Type="list">
+        <PossibleValue Value="MCE_NO_CIPHER" Comment="MCE no cipher"/>
+        <PossibleValue Value="MCE_STREAM_CIPHER" Comment="MCE stream cipher "/>
+        <PossibleValue Value="MCE_BLOCK_CIPHER" Comment="MCE block cipher"/>
+        <PossibleValue Value="MCE_FASTBLOCK_CIPHER" Comment="MCE fast block cipher"/>
+    </RefParameter>
+
+    <RefParameter Name="ContextID" Group="Settings" Comment="Context Index" DefaultValue="MCE_NO_CONTEXT" Type="list">
+        <Condition Expression="Algorithm= MCE_AES_128 | Algorithm= MCE_AES_256" Diagnostic=""/>
+        <PossibleValue Value="MCE_NO_CONTEXT" Comment="No Context"/>
+        <PossibleValue Value="MCE_CONTEXT1" Comment="Context 1"/>
+        <PossibleValue Value="MCE_CONTEXT2" Comment="Context 2"/>
+    </RefParameter>
+
+    <RefParameter Name="ContextID_Neo" Group="Settings" Comment="Context Index" DefaultValue="MCE_NO_CONTEXT" Type="String">
+        <Condition Expression="Algorithm = MCE_NOEKEON" Diagnostic=""/>
+    </RefParameter>
+
+    <RefParameter Name="KeyType" Group="Settings" Comment="Key Type" DefaultValue="MCE_USE_MASTERKEYS" Type="list">
+        <Condition Expression="Algorithm = MCE_NOEKEON" Diagnostic=""/>
+        <Description>MCE_KeyType key type used for encryption, Master key or Fast Master key</Description>
+        <PossibleValue Value="MCE_USE_MASTERKEYS" Comment="Master keys"/>
+        <PossibleValue Value="MCE_USE_FASTMASTERKEYS" Comment="Fast Master keys"/>
+    </RefParameter>
+
+    <RefParameter Name="KeyType" Group="Settings" Comment="Key Type" DefaultValue="null" Type="" Visible="false"/>
+
+    <RefParameter Name="pKey" Group="Settings" Comment="Key" ArraySize="4" ArrayTypeElement="uint32_t;16" Type="Array" Separator=" " DefaultValue="00000000 00000000 00000000 00000000"/>
+    <RefParameter Name="Nonce" Group="Settings" Comment="Nonce" ArraySize="2" ArrayTypeElement="uint32_t;16" Type="Array" Separator=" " DefaultValue="00000000 00000000">
+        <Condition Expression="Algorithm= MCE_AES_128 | Algorithm= MCE_AES_256" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Name="Nonce" Comment="Nonce" ArraySize="2" ArrayTypeElement="uint32_t;16" Type="Array" Separator=" " DefaultValue="00000000 00000000" Visible="false"/>
+
+    <RefParameter Name="Version" Group="Settings" Comment="Version" Type="hex" DefaultValue="0x0000" Min="0x0000" Max="0xFFFF">
+        <Condition Expression="Algorithm= MCE_AES_128 | Algorithm= MCE_AES_256" Diagnostic=""/>
+    </RefParameter>
+    <RefParameter Name="Version" Comment="Version" Type="hex" DefaultValue="0x0000" Min="0x0000" Max="0xFFFF" Visible="false"/>
+
+    <RefParameter Name="PrivilegedAccess" Group="Settings" Comment="Privileged Access" DefaultValue="MCE_REGION_NPRIV" Type="list">
+        <Condition Expression="DIE485" Diagnostic=""/>
+        <Description></Description>
+        <PossibleValue Value="MCE_REGION_NPRIV" Comment="Region non-privileged"/>
+        <PossibleValue Value="MCE_REGION_PRIV" Comment="Region privileged access"/>
+    </RefParameter>
+
+    <RefParameter Name="AccessMode" Group="Settings" Comment="Access Mode" DefaultValue="MCE_REGION_READWRITE" Type="list">
+        <Condition Expression="DIE485" Diagnostic=""/>
+        <Description></Description>
+        <PossibleValue Value="MCE_REGION_READONLY" Comment="Read only"/>
+        <PossibleValue Value="MCE_REGION_READWRITE" Comment="Region can be read and written "/>
+    </RefParameter>
+    <RefParameter Name="AccessMode" Comment="Access Mode" DefaultValue="null" Type="list" Visible="false" >
+    </RefParameter>
+
+    <RefParameter Name="StartAddress" Group="XSPI Adress" Comment="Start Adress" DefaultValue="0x90000000" Min="0x90000000" Max="0x9FFFFFFF"  Type="hex" NoCheckOpt="false">
+        <Condition Expression="XSPI1_Used &amp; $Index=1" Diagnostic=""/>
+    </RefParameter>
+
+    <RefParameter Name="EndAddress" Group="XSPI Adress" Comment="End Adress" DefaultValue="0x9FFFFFFF" Min="0x90000FFF" Max="0x9FFFFFFF"  Type="hex" NoCheckOpt="false">
+        <Condition Expression="XSPI1_Used &amp; $Index=1" Diagnostic=""/>
+    </RefParameter>
+
+     <RefParameter Name="StartAddress" Group="XSPI Adress" Comment="Start Adress" DefaultValue="0x70000000" Min="0x70000000" Max="0x7FFFFFFF" Type="hex" >
+        <Condition Expression="XSPI2_Used &amp; $Index=2" Diagnostic=""/>
+    </RefParameter>
+
+    <RefParameter Name="EndAddress" Group="XSPI Adress" Comment="End Adress" DefaultValue="0x7FFFFFFF" Min="0x70000FFF" Max="0x7FFFFFFF" Type="hex" >
+        <Condition Expression="XSPI2_Used &amp; $Index=2" Diagnostic=""/>
+    </RefParameter>
+
+     <RefParameter Name="StartAddress" Group="XSPI Adress" Comment="Start Adress" DefaultValue="0x80000000" Min="0x80000000" Max="0x8FFFFFFF" Type="hex" >
+            <Condition Expression="XSPI3_Used &amp; $Index=3" Diagnostic=""/>
+     </RefParameter>
+
+     <RefParameter Name="EndAddress" Group="XSPI Adress" Comment="End Adress" DefaultValue="0x8FFFFFFF" Min="0x80000FFF" Max="0x8FFFFFFF" Type="hex" >
+            <Condition Expression="XSPI3_Used &amp; $Index=3" Diagnostic=""/>
+     </RefParameter>
+
+      <RefParameter Name="FMC_Memory" Group="FMC Adress" Comment="FMC Memory Banks" Type="list" >
+            <Condition Expression="FMC_Used &amp; $Index=4" Diagnostic=""/>
+        <PossibleValue Value="NOR_PSRAM_SRAM" Comment="NOR/PSRAM/SRAM Memory" Semaphore="Sem_NOR"/>
+        <PossibleValue Value="SDRAM" Comment="SDRAM" Semaphore="Sem_SDRAM"/>
+      </RefParameter>
+
+        <RefParameter Name="StartAddress" Group="FMC Adress" Comment="Start Adress" DefaultValue="0x60000000" Min="0x60000000" Max="0x6FFFFFFF" Type="hex" >
+            <Condition Expression="Sem_NOR &amp;  FMC_Used &amp; $Index=4" Diagnostic=""/>
+        </RefParameter>
+
+        <RefParameter Name="EndAddress" Group="FMC Adress" Comment="NOR/PSRAM/SRAM End Memory Adress" DefaultValue="0x6FFFFFFF" Min="0x60000FFF" Max="0x6FFFFFFF" Type="hex" >
+            <Condition Expression="Sem_NOR &amp;  FMC_Used &amp; $Index=4" Diagnostic=""/>
+        </RefParameter>
+
+        <RefParameter Name="StartAddress" Group="FMC Adress" Comment="Start Adress" DefaultValue="0xC0000000" Min="0xC0000000" Max="0xDFFFFFFF" Type="hex">
+            <Condition Expression="Sem_SDRAM &amp;  FMC_Used &amp; $Index=4" Diagnostic=""/>
+        </RefParameter>
+
+      <RefParameter Name="EndAddress" Group="FMC Adress" Comment="End Adress" DefaultValue="0xDFFFFFFF" Min="0xC0000FFF" Max="0xDFFFFFFF"  Type="hex">
+            <Condition Expression="Sem_SDRAM &amp;  FMC_Used &amp; $Index=4" Diagnostic=""/>
+        </RefParameter>
+
+    <RefParameter Name="StartAddress" Comment="Start Adress" DefaultValue="null" Type="hex" Visible="false"/>
+    <RefParameter Name="EndAddress" Comment="End Adress" DefaultValue="null" Type="hex" Visible="false"/>
+  
   <!-- Generic RefParameters for MCE -->
 
   <RefMode Name="MCE_Activate" HalMode ="MCE">
     <ConfigForMode>MCE_Init</ConfigForMode>
+    <Parameter Name="Algorithm"/>
+    <Parameter Name="Mode"/>
+    <Parameter Name="ContextID"/>
+    <Parameter Name="ContextID_Neo"/>
+    <Parameter Name="KeyType"/>
+    <Parameter Name="pKey"/>
+    <Parameter Name="Nonce"/>
+    <Parameter Name="Version"/>
+    <Parameter Name="PrivilegedAccess"/>
+    <Parameter Name="AccessMode"/>
+    <Parameter Name="FMC_Memory"/>
+    <Parameter Name="StartAddress"/>
+    <Parameter Name="EndAddress"/>
+    <Parameter Name="Instance"/>
   </RefMode>
 
   <ModeLogicOperator Name="OR">
-    <Mode Name="MCE_State" UserName="Activated">
+   <Mode Name="MCE_State" UserName="Activated">
       <ModeLogicOperator Name="XOR">
         <Mode Name="MCE_Activate" UserName="Activated">
           <SignalLogicalOp Name="AND">

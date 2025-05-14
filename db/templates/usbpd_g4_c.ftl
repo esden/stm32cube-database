@@ -2,7 +2,7 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file    ${name?lower_case}.c
+  * @file    ${name?lower_case}
   * @author  MCD Application Team
   * @brief   This file contains the device define.
   ******************************************************************************

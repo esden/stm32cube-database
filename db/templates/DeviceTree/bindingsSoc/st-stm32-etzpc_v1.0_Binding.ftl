@@ -80,7 +80,11 @@ ${res.errors} - deviceName=${deviceName}*/
 					[#elseif (deviceRtCtxtNber>1)]
 						[#--multi-assignments => "Non Secured" & only one time--]
 						[#if !srvc_map_isElmtInValuesAsList(periphIdsMap, newPeriphIdsList[0])][#--1st Id is enough--]
-							[#local periphIdsMap = bind_etzpc_updateSecurityAreasMap(periphIdsMap, newPeriphIdsList, "Non Secured", deviceSecurityAreasControlsList).periphIdsMap]
+							[#if newPeriphIdsList[0]?contains("LTDC")]
+								[#local periphIdsMap = bind_etzpc_updateSecurityAreasMap(periphIdsMap, newPeriphIdsList, "Secured", deviceSecurityAreasControlsList).periphIdsMap]
+							[#else]
+								[#local periphIdsMap = bind_etzpc_updateSecurityAreasMap(periphIdsMap, newPeriphIdsList, "Non Secured", deviceSecurityAreasControlsList).periphIdsMap]
+							[/#if]
 						[/#if]
 					[#else]
 	/*ERR : bind_etzpc() returns errors. The DTS may be incomplete. Reason:

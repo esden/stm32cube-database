@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" DBVersion="V3.0" IPType="peripheral" Name="MRSUBG" Version="mrsubg_1_v1_0" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db//IP_Modes.xsd">
+
+ <!-- Configures the radio parameters -->
+   <RefParameter Name="lFrequencyBase" Comment="lFrequencyBase" DefaultValue="0" Type="integer" Min="0" Group="Radio"  TabName="Configuration">
+        <Description>the base carrier frequency.</Description>
+    </RefParameter>
+
+    <RefParameter Name="xModulationSelect" Comment="xModulationSelect" DefaultValue="MOD_2FSK" Type="list" Group="Radio" TabName="Configuration">
+        <Description>Specifies the modulation.</Description>
+        <PossibleValue Value="MOD_2FSK"     Comment="MOD_2FSK" />
+        <PossibleValue Value="MOD_4FSK"     Comment="MOD_4FSK"/>
+        <PossibleValue Value="MOD_2GFSK05"  Comment="MOD_2GFSK05"/>
+        <PossibleValue Value="MOD_2GFSK1"   Comment="MOD_2GFSK1"/>
+        <PossibleValue Value="MOD_4GFSK05"  Comment="MOD_4GFSK05"/>
+        <PossibleValue Value="MOD_4GFSK1"   Comment="MOD_4GFSK1"/>
+        <PossibleValue Value="MOD_ASK"      Comment="MOD_ASK"/>
+        <PossibleValue Value="MOD_OOK"      Comment="MOD_OOK"/>
+        <PossibleValue Value="MOD_POLAR"    Comment="MOD_POLAR"/>
+        <PossibleValue Value="MOD_CW"       Comment="MOD_CW"/>
+    </RefParameter>
+
+    <RefParameter Name="lDatarate" Comment="lDatarate" DefaultValue="0" Type="integer" Min="0" Group="Radio" TabName="Configuration">
+        <Description>the datarate expressed in sps.</Description>
+    </RefParameter>
+
+    <RefParameter Name="lFreqDev" Comment="lFreqDev" DefaultValue="0" Type="integer" Min="0" Group="Radio" TabName="Configuration">
+        <Description>the frequency deviation.</Description>
+    </RefParameter>
+
+    <RefParameter Name="lBandwidth" Comment="lBandwidth" DefaultValue="0" Type="integer" Min="0" Group="Radio" TabName="Configuration">
+        <Description>the channel filter bandwidth.</Description>
+    </RefParameter>
+
+    <RefParameter Name="dsssExp" Comment="dsssExp" DefaultValue="0" Type="integer" Min="0"  Max="255" Group="Radio" TabName="Configuration">
+        <Description>the DSSS spreading exponent.</Description>
+    </RefParameter>
+
+    <RefParameter Name="outputPower" Comment="outputPower" DefaultValue="0x0" Type="hex" Group="Radio"  Min="0x0" Max="0xFF" TabName="Configuration">
+        <Description></Description>
+    </RefParameter>
+
+    <RefParameter Name="PADrvMode" Comment="PADrvMode" DefaultValue="PA_DRV_TX" Type="list" Group="Radio" TabName="Configuration">
+        <Description>drive modes.In case Sigfox is activated, then PA_DRV_TX is forbidden</Description>
+        <PossibleValue Value="PA_DRV_TX"           Comment="PA_DRV_TX"          Semaphore="Sem_PA_DRV_TX" Condition="S_SigfoxWL3" Action="Remove"/>
+        <PossibleValue Value="PA_DRV_TX_HP"        Comment="PA_DRV_TX_HP"       Semaphore="Sem_PA_DRV_TX_HP"/>
+        <PossibleValue Value="PA_DRV_TX_TX_HP"     Comment="PA_DRV_TX_TX_HP"    Semaphore="Sem_PA_DRV_TX_TX_HP"/>
+    </RefParameter>
+ <!-- Configures the packet parameters -->
+   <RefParameter Name="PacketFormat" Comment="Packet Format" DefaultValue="BasicPacket" Type="list" Group="Packet" TabName="Configuration">
+        <PossibleValue Value="BasicPacket" Comment="Basic Packet"        Semaphore="Sem_BasicPacket"/>
+        <PossibleValue Value="WmBusPacket" Comment="Wm-Bus Packet"       Semaphore="Sem_WmBusPacket"/>
+        <PossibleValue Value="802154Packet" Comment="802.15.4 Packet"    Semaphore="Sem_802Packet"/>
+        <Description>
+            Packet Format.
+        </Description>
+   </RefParameter>
+
+   <RefParameter Name="xWMbusSubmode" Comment="   xWMbusSubmode" DefaultValue="WMBUS_SUBMODE_NOT_CONFIGURED" Type="list" Group="Packet"  TabName="Configuration">
+        <Condition   Diagnostic="" Expression="Sem_WmBusPacket"/>
+        <Description>WMBUS submode</Description>
+        <PossibleValue Value="WMBUS_SUBMODE_NOT_CONFIGURED"            Comment="WMBUS_SUBMODE_NOT_CONFIGURED" />
+        <PossibleValue Value="WMBUS_SUBMODE_S1_S2_LONG_HEADER"         Comment="WMBUS_SUBMODE_S1_S2_LONG_HEADER"/>
+        <PossibleValue Value="WMBUS_SUBMODE_S1_M_S2_T2_OTHER_TO_METER" Comment="WMBUS_SUBMODE_S1_M_S2_T2_OTHER_TO_METER"/>
+        <PossibleValue Value="WMBUS_SUBMODE_T1_T2_METER_TO_OTHER"      Comment="WMBUS_SUBMODE_T1_T2_METER_TO_OTHER"/>
+        <PossibleValue Value="WMBUS_SUBMODE_R2_SHORT_HEADER"           Comment="WMBUS_SUBMODE_R2_SHORT_HEADER"/>
+    </RefParameter>
+
+    <RefParameter Name="xWMbusSubmode" Comment="   xWMbusSubmode" DefaultValue="" Type="string" Group="Packet"  TabName="Configuration" Visible="false">
+        <Description>WMBUS submode</Description>
+    </RefParameter>
+
+    <RefParameter Name="PreambleLength" Comment="   PreambleLength" DefaultValue="0" Type="integer" Min="0" Max="2046" Group="Packet" TabName="Configuration">
+        <Condition   Diagnostic="" Expression="Sem_WmBusPacket|Sem_BasicPacket|Sem_802Packet"/>
+        <Description>the preamble length of packet. From 1 to 2046 bit.</Description>
+    </RefParameter>
+
+    <RefParameter Name="PreambleLength" Comment="   PreambleLength" DefaultValue="0" Type="integer" Min="0" Max="2046"  Group="Packet" TabName="Configuration" Visible="false">
+        <Description>the preamble length of packet. From 1 to 2046 bit.</Description>
+    </RefParameter>
+
+    <RefParameter Name="PostambleLength" Comment="   PostambleLength" DefaultValue="0" Type="integer" Min="0" Max="63"  Group="Packet" TabName="Configuration">
+        <Condition   Diagnostic="" Expression="Sem_WmBusPacket|Sem_BasicPacket"/>
+        <Description>the postable length of packet. From 1 to 63 bit.</Description>
+    </RefParameter>
+
+    <RefParameter Name="PostambleLength" Comment="   PostambleLength" DefaultValue="0" Type="integer" Min="0" Max="63"  Group="Packet" TabName="Configuration" Visible="false">
+        <Description>the postable length of packet. From 1 to 63 bit.</Description>
+    </RefParameter>
+
+     <RefParameter Name="SyncLength" Comment="   SyncLength" DefaultValue="0" Type="integer" Min="0" Max="64"  Group="Packet" TabName="Configuration">
+        <Condition   Diagnostic="" Expression="Sem_BasicPacket"/>
+        <Description>the sync word length of packet in bits. From 1 to 64 bits.</Description>
+    </RefParameter>
+
+    <RefParameter Name="SyncLength" Comment="   SyncLength" DefaultValue="0" Type="integer" Min="0" Max="64"  Group="Packet" TabName="Configuration" Visible="false">
+        <Description>the sync word length of packet in bits. From 1 to 64 bits.</Description>
+    </RefParameter>
+
+    <RefParameter Name="SyncWord" Comment="   SyncWord" DefaultValue="0x0" Type="hex" Group="Packet"  Min="0x0" Max="0xFFFFFFFF" TabName="Configuration">
+        <Condition   Diagnostic="" Expression="Sem_BasicPacket"/>
+        <Description>the sync words in MSB.</Description>
+    </RefParameter>
+
+    <RefParameter Name="SyncWord" Comment="   SyncWord" DefaultValue="0x0" Type="hex" Group="Packet"  Min="0x0" Max="0xFFFFFFFF" TabName="Configuration" Visible="false">
+        <Description>the sync words in MSB.</Description>
+    </RefParameter>
+
+    <RefParameter Name="FixVarLength" Comment="   FixVarLength" DefaultValue="FIXED" Type="list" Group="Packet" TabName="Configuration">
+        <Condition   Diagnostic="" Expression="Sem_BasicPacket"/>
+        <Description></Description>
+        <PossibleValue Value="FIXED" Comment="FIXED" />
+        <PossibleValue Value="VARIABLE" Comment="VARIABLE"/>
+    </RefParameter>
+
+    <RefParameter Name="FixVarLength" Comment="   FixVarLength" DefaultValue="" Type="string" Group="Packet"  TabName="Configuration" Visible="false">
+        <Description></Description>
+    </RefParameter>
+
+    <RefParameter Name="PreambleSequence" Comment="   PreambleSequence" DefaultValue="PRE_SEQ_0101" Type="list" Group="Packet"  TabName="Configuration">
+        <Condition   Diagnostic="" Expression="Sem_BasicPacket"/>
+        <Description></Description>
+        <PossibleValue Value="PRE_SEQ_0101" Comment="PRE_SEQ_0101" />
+        <PossibleValue Value="PRE_SEQ_1010" Comment="PRE_SEQ_1010"/>
+        <PossibleValue Value="PRE_SEQ_0011" Comment="PRE_SEQ_0011"/>
+        <PossibleValue Value="PRE_SEQ_1100" Comment="PRE_SEQ_1100"/>
+        <PossibleValue Value="PRE_SEQ_0111" Comment="PRE_SEQ_0111"/>
+        <PossibleValue Value="PRE_SEQ_0010" Comment="PRE_SEQ_0010"/>
+        <PossibleValue Value="PRE_SEQ_1101" Comment="PRE_SEQ_1101"/>
+        <PossibleValue Value="PRE_SEQ_1000" Comment="PRE_SEQ_1000"/>
+    </RefParameter>
+
+    <RefParameter Name="PreambleSequence" Comment="   PreambleSequence" DefaultValue="" Type="string" Group="Packet"  TabName="Configuration" Visible="false">
+        <Description></Description>
+    </RefParameter>
+
+   <RefParameter Name="PostambleSequence" Comment="   PostambleSequence" DefaultValue="POST_SEQ_0101" Type="list" Group="Packet" TabName="Configuration">
+        <Condition   Diagnostic="" Expression="Sem_BasicPacket"/>
+        <Description>Packet postamble control: postamble bit sequence selection.</Description>
+        <PossibleValue Value="POST_SEQ_0101" Comment="POST_SEQ_0101" />
+        <PossibleValue Value="POST_SEQ_1010" Comment="POST_SEQ_1010"/>
+        <PossibleValue Value="POST_SEQ_OTHER" Comment="POST_SEQ_OTHER"/>
+    </RefParameter>
+
+    <RefParameter Name="PostambleSequence" Comment="   PostambleSequence" DefaultValue="" Type="string" Group="Packet"  TabName="Configuration" Visible="false">
+        <Description>Packet postamble control: postamble bit sequence selection.</Description>
+    </RefParameter>
+
+    <RefParameter Name="CrcMode" Comment="   CrcMode" DefaultValue="PKT_NO_CRC" Type="list" Group="Packet"  TabName="Configuration">
+        <Condition   Diagnostic="" Expression="Sem_BasicPacket"/>
+        <Description>the CRC type</Description>
+        <PossibleValue Value="PKT_NO_CRC"            Comment="PKT_NO_CRC" />
+        <PossibleValue Value="PKT_CRC_MODE_8BITS"    Comment="PKT_CRC_MODE_8BITS"/>
+        <PossibleValue Value="PKT_CRC_MODE_16BITS_1" Comment="PKT_CRC_MODE_16BITS_1"/>
+        <PossibleValue Value="PKT_CRC_MODE_16BITS_2" Comment="PKT_CRC_MODE_16BITS_2"/>
+        <PossibleValue Value="FCS_16BIT"             Comment="FCS_16BIT"/>
+        <PossibleValue Value="PKT_CRC_MODE_24BITS"   Comment="PKT_CRC_MODE_24BITS"/>
+        <PossibleValue Value="PKT_CRC_MODE_32BITS"   Comment="PKT_CRC_MODE_32BITS"/>
+        <PossibleValue Value="FCS_32BIT"             Comment="FCS_32BIT"/>
+    </RefParameter>
+
+    <RefParameter Name="CrcMode" Comment="   CrcMode" DefaultValue="" Type="string" Group="Packet"  TabName="Configuration" Visible="false">
+        <Description>the CRC type</Description>
+    </RefParameter>
+
+    <RefParameter Name="Coding" Comment="   Coding" DefaultValue="CODING_NONE" Type="list" Group="Packet" TabName="Configuration">
+        <Condition   Diagnostic="" Expression="Sem_BasicPacket"/>
+        <Description></Description>
+        <PossibleValue Value="CODING_NONE"       Comment="CODING_NONE" />
+        <PossibleValue Value="CODING_FEC"        Comment="CODING_FEC"/>
+        <PossibleValue Value="CODING_3o6"        Comment="CODING_3o6"/>
+        <PossibleValue Value="CODING_MANCHESTER" Comment="CODING_MANCHESTER"/>
+    </RefParameter>
+
+    <RefParameter Name="Coding" Comment="   Coding" DefaultValue="" Type="string" Group="Packet"  TabName="Configuration" Visible="false">
+        <Description></Description>
+    </RefParameter>
+
+    <RefParameter Name="DataWhitening" Comment="   DataWhitening" DefaultValue="ENABLE" Type="list" Group="Packet" TabName="Configuration">
+       <Condition   Diagnostic="" Expression="Sem_BasicPacket"/>
+       <Description>the data whitening.</Description>
+       <PossibleValue Comment="Enable" Value="ENABLE"/>
+       <PossibleValue Comment="Disable" Value="DISABLE"/>
+    </RefParameter>
+
+    <RefParameter Name="DataWhitening" Comment="   DataWhitening" DefaultValue="" Type="string" Group="Packet"  TabName="Configuration" Visible="false">
+        <Description>the data whitening.</Description>
+    </RefParameter>
+
+    <RefParameter Name="LengthWidth" Comment="   LengthWidth" DefaultValue="BYTE_LEN_1" Type="list" Group="Packet" TabName="Configuration">
+       <Condition   Diagnostic="" Expression="Sem_BasicPacket"/>
+       <Description></Description>
+       <PossibleValue Comment="BYTE_LEN_1" Value="BYTE_LEN_1"/>
+       <PossibleValue Comment="BYTES_LEN_2" Value="BYTES_LEN_2" />
+    </RefParameter>
+
+    <RefParameter Name="LengthWidth" Comment="   LengthWidth" DefaultValue="" Type="string" Group="Packet"  TabName="Configuration" Visible="false">
+        <Description></Description>
+    </RefParameter>
+
+    <RefParameter Name="SyncPresent" Comment="   SyncPresent" DefaultValue="ENABLE" Type="list" Group="Packet" TabName="Configuration">
+       <Condition   Diagnostic="" Expression="Sem_BasicPacket"/>
+       <Description></Description>
+       <PossibleValue Comment="Enable" Value="ENABLE"/>
+       <PossibleValue Comment="Disable" Value="DISABLE"/>
+    </RefParameter>
+
+    <RefParameter Name="SyncPresent" Comment="   SyncPresent" DefaultValue="" Type="string" Group="Packet"  TabName="Configuration" Visible="false">
+        <Description></Description>
+    </RefParameter>
+
+   <RefParameter Name="Modulation" Comment="   Modulation" DefaultValue="WMBUS_SUBMODE_NOT_CONFIGURED" Type="list" Group="Packet"  TabName="Configuration">
+        <Condition   Diagnostic="" Expression="Sem_802Packet"/>
+        <Description>Modulation</Description>
+        <PossibleValue Value="MOD_2FSK"               Comment="MOD_2FSK" />
+        <PossibleValue Value="MOD_4FSK"               Comment="MOD_4FSK"/>
+        <PossibleValue Value="MOD_2GFSK05"            Comment="MOD_2GFSK05"/>
+        <PossibleValue Value="MOD_2GFSK1"             Comment="MOD_2GFSK1"/>
+        <PossibleValue Value="MOD_4GFSK05"            Comment="MOD_4GFSK05"/>
+        <PossibleValue Value="MOD_4GFSK1"             Comment="MOD_4GFSK05"/>
+        <PossibleValue Value="MOD_ASK"                Comment="MOD_4GFSK05"/>
+        <PossibleValue Value="MOD_OOK"                Comment="MOD_4GFSK05"/>
+        <PossibleValue Value="MOD_POLAR"              Comment="MOD_4GFSK05"/>
+        <PossibleValue Value="MOD_CW"                 Comment="MOD_CW"/>
+    </RefParameter>
+
+    <RefParameter Name="Modulation" Comment="   Modulation" DefaultValue="" Type="string" Group="Packet"  TabName="Configuration" Visible="false">
+        <Description>Modulation</Description>
+    </RefParameter>
+
+   <RefParameter Name="FCSType" Comment="   FCSType" DefaultValue="PKT_NO_CRC" Type="list" Group="Packet"  TabName="Configuration">
+        <Condition   Diagnostic="" Expression="Sem_802Packet"/>
+        <Description>the FCS type</Description>
+        <PossibleValue Value="PKT_NO_CRC"            Comment="PKT_NO_CRC" />
+        <PossibleValue Value="PKT_CRC_MODE_8BITS"    Comment="PKT_CRC_MODE_8BITS"/>
+        <PossibleValue Value="PKT_CRC_MODE_16BITS_1" Comment="PKT_CRC_MODE_16BITS_1"/>
+        <PossibleValue Value="PKT_CRC_MODE_16BITS_2" Comment="PKT_CRC_MODE_16BITS_2"/>
+        <PossibleValue Value="FCS_16BIT"             Comment="FCS_16BIT"/>
+        <PossibleValue Value="PKT_CRC_MODE_24BITS"   Comment="PKT_CRC_MODE_24BITS"/>
+        <PossibleValue Value="PKT_CRC_MODE_32BITS"   Comment="PKT_CRC_MODE_32BITS"/>
+        <PossibleValue Value="FCS_32BIT"             Comment="FCS_32BIT"/>
+    </RefParameter>
+
+    <RefParameter Name="FCSType" Comment="   FCSType" DefaultValue="" Type="string" Group="Packet"  TabName="Configuration" Visible="false">
+        <Description>the FCS type</Description>
+    </RefParameter>
+
+    <RefParameter Name="Whitening" Comment="   Whitening" DefaultValue="ENABLE" Type="list" Group="Packet" TabName="Configuration">
+       <Condition   Diagnostic="" Expression="Sem_802Packet"/>
+       <Description>the data whitening.</Description>
+       <PossibleValue Comment="Enable" Value="ENABLE"/>
+       <PossibleValue Comment="Disable" Value="DISABLE"/>
+    </RefParameter>
+
+    <RefParameter Name="Whitening" Comment="   Whitening" DefaultValue="" Type="string" Group="Packet"  TabName="Configuration" Visible="false">
+        <Description>the data whitening.</Description>
+    </RefParameter>
+
+    <RefParameter Name="FecType" Comment="   FecType" DefaultValue="FEC_15_4_G_NONE" Type="list" Group="Packet"  TabName="Configuration">
+        <Condition   Diagnostic="" Expression="Sem_802Packet"/>
+        <Description>FEC type for 802.15.4g</Description>
+        <PossibleValue Value="FEC_15_4_G_NONE"             Comment="FEC_15_4_G_NONE" />
+        <PossibleValue Value="FEC_15_4_G_NRNSC"            Comment="FEC_15_4_G_NRNSC"/>
+        <PossibleValue Value="FEC_15_4_G_RSC"              Comment="FEC_15_4_G_RSC"/>
+        <PossibleValue Value="FEC_15_4_G_RSC_Interleaving" Comment="FEC_15_4_G_RSC_Interleaving"/>
+    </RefParameter>
+
+    <RefParameter Name="FecType" Comment="   FecType" DefaultValue="" Type="string" Group="Packet"  TabName="Configuration" Visible="false">
+        <Description>FEC type for 802.15.4g</Description>
+    </RefParameter>
+
+    <RefParameter Name="FrameLength" Comment="   FrameLength" DefaultValue="0" Type="integer" Min="0" Max="65535"  Group="Packet" TabName="Configuration">
+        <Condition   Diagnostic="" Expression="Sem_802Packet"/>
+        <Description>Frame Length</Description>
+    </RefParameter>
+
+    <RefParameter Name="FrameLength" Comment="   FrameLength" DefaultValue="0" Type="integer" Min="0" Max="65535" Group="Packet"  TabName="Configuration" Visible="false">
+        <Description>Frame Length</Description>
+    </RefParameter>
+
+    <RefMode Name="MRSUBG_Activate">
+        <ConfigForMode>MRSUBG_Init</ConfigForMode>
+        <ConfigForMode>BasicPacket_Init</ConfigForMode>
+        <ConfigForMode>WMBUSPacket_Init</ConfigForMode>
+        <ConfigForMode>802_15_4_PacketInit</ConfigForMode>
+        <Parameter Name="lFrequencyBase"/>
+        <Parameter Name="xModulationSelect"/>
+        <Parameter Name="lDatarate"/>
+        <Parameter Name="lFreqDev"/>
+        <Parameter Name="lBandwidth"/>
+        <Parameter Name="dsssExp"/>
+        <Parameter Name="outputPower"/>
+        <Parameter Name="PADrvMode"/>
+        <Parameter Name="PacketFormat"/>
+        <Parameter Name="xWMbusSubmode"/>
+        <Parameter Name="Modulation"/>
+        <Parameter Name="PreambleLength"/>
+        <Parameter Name="PostambleLength"/>
+        <Parameter Name="SyncLength"/>
+        <Parameter Name="SyncWord"/>
+        <Parameter Name="FixVarLength"/>
+        <Parameter Name="PreambleSequence"/>
+        <Parameter Name="PostambleSequence"/>
+        <Parameter Name="CrcMode"/>
+        <Parameter Name="Coding"/>
+        <Parameter Name="DataWhitening"/>
+        <Parameter Name="LengthWidth"/>
+        <Parameter Name="SyncPresent"/>
+        <Parameter Name="FCSType"/>
+        <Parameter Name="Whitening"/>
+        <Parameter Name="FecType"/>
+        <Parameter Name="FrameLength"/>
+    </RefMode>
+        <ModeLogicOperator Name="OR">
+        <Mode Name="MRSUBG" UserName="Activated">
+            <ModeLogicOperator Name="XOR">
+                 <Mode Name="MRSUBG_Activate" UserName="Activated">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_RF"/>
+                    </SignalLogicalOp>
+                    <Condition Diagnostic="Active only if: HSE and LSE  clock is activated in RCC" Expression="HSEOscillator &amp; (LSEByPass|LSEOscillator)"/>
+                    <Semaphore>S_MRSUBG</Semaphore>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
+        <Mode Name="RX_SEQUENCE" UserName="External LNA control">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="RX_SEQUENCE" UserName="RX_SEQUENCE">
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="System" Name="RX_SEQUENCE"/>
+                    </SignalLogicalOp>
+                    <Condition Diagnostic="Activate MRSUBG first" Expression="S_MRSUBG"/>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
+        <Mode Name="TX_SEQUENCE" UserName="External amplifier control">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="TX_SEQUENCE" UserName="TX_SEQUENCE">
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="System" Name="TX_SEQUENCE"/>
+                    </SignalLogicalOp>
+                    <Condition Diagnostic="Activate MRSUBG first" Expression="S_MRSUBG"/>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
+        <Mode Name="RX_CLOCK" UserName="Receive Clock control">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="RX_CLOCK" UserName="RX_CLOCK">
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="System" Name="RX_CLOCK"/>
+                    </SignalLogicalOp>
+                    <Condition Diagnostic="Activate MRSUBG first" Expression="S_MRSUBG"/>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
+        <Mode Name="TX_CLOCK" UserName="Transmit Clock control">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="TX_CLOCK" UserName="TX_CLOCK">
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="System" Name="TX_CLOCK"/>
+                    </SignalLogicalOp>
+                    <Condition Diagnostic="Activate MRSUBG first" Expression="S_MRSUBG"/>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
+        <Mode Name="RX_DATA" UserName="Receive Data control">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="RX_DATA" UserName="RX_DATA">
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="System" Name="RX_DATA"/>
+                    </SignalLogicalOp>
+                    <Condition Diagnostic="Activate MRSUBG first" Expression="S_MRSUBG"/>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
+        <Mode Name="TX_DATA" UserName="Transmit Data control">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="TX_DATA" UserName="TX_DATA">
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="System" Name="TX_DATA"/>
+                    </SignalLogicalOp>
+                    <Condition Diagnostic="Activate MRSUBG first" Expression="S_MRSUBG"/>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
+        <Mode Name="ANTENNA_SWITCH" UserName="ANTENNA SWITCH control">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="ANTENNA_SWITCH" UserName="ANTENNA_SWITCH">
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="System" Name="ANTENNA_SWITCH"/>
+                    </SignalLogicalOp>
+                    <Condition Diagnostic="Activate MRSUBG first" Expression="S_MRSUBG"/>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
+    </ModeLogicOperator>
+    <RefSignal Name="VS_RF" Virtual="true"/>
+    <RefSignal IOMode="System" Name="RX_SEQUENCE"/>
+    <RefSignal IOMode="System" Name="TX_SEQUENCE"/>
+    <RefSignal IOMode="System" Name="RX_DATA"/>
+    <RefSignal IOMode="System" Name="TX_DATA"/>
+    <RefSignal IOMode="System" Name="RX_CLOCK"/>
+    <RefSignal IOMode="System" Name="TX_CLOCK"/>
+    <RefSignal IOMode="System" Name="ANTENNA_SWITCH"/>
+    <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+</IP>

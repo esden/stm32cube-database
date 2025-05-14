@@ -1,0 +1,2595 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Clock xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" savedConfig="false" xsi:noNamespaceSchemaLocation="../../../../../../../doc/V4/Development/Specifications/db/MCU_Clock.xsd">
+
+    <Background  imageName="securableelem" name="LSI_SEC"  x="210" y="110">
+        <Condition Diagnostic="" Expression="S_SECURE"/>
+    </Background>
+    <Background  imageName="securableelem" name="MSI_SEC"  x="210" y="470">
+        <Condition Diagnostic="" Expression="S_SECURE"/>
+    </Background>
+    <Background  imageName="securableelem" name="HSI_SEC"  x="210" y="855">
+        <Condition Diagnostic="" Expression="S_SECURE"/>
+    </Background>
+    <Background  imageName="securableelem" name="PLL_SEC"  x="320" y="255">
+        <Condition Diagnostic="" Expression="S_SECURE"/>
+    </Background>
+    <Background  imageName="securableelem" name="PLL2_SEC" x="320" y="440">
+        <Condition Diagnostic="" Expression="S_SECURE"/>
+    </Background>
+    <Background  imageName="securableelem" name="PLL3_SEC" x="320" y="675">
+        <Condition Diagnostic="" Expression="S_SECURE"/>
+    </Background>
+    <Background  imageName="securableelem" name="PLL4_SEC" x="320" y="860">
+        <Condition Diagnostic="" Expression="S_SECURE"/>
+    </Background>
+    <Background  imageName="securableelem" name="HSE_SEC"  x="90" y="760">
+        <Condition Diagnostic="" Expression="S_SECURE"/>
+    </Background>
+    <Background  imageName="securableelem" name="SYSA_SEC"  x="1030" y="30">
+        <Condition Diagnostic="" Expression="S_SECURE"/>
+    </Background>
+    <Background  imageName="securableelem" name="SYSB_SEC"  x="1030" y="235">
+        <Condition Diagnostic="" Expression="S_SECURE"/>
+    </Background>
+    <Background  imageName="securableelem" name="SYSC_SEC"  x="1030" y="410">
+        <Condition Diagnostic="" Expression="S_SECURE"/>
+    </Background>
+    <Background  imageName="securableelem" name="SYSD_SEC"  x="1030" y="585">
+        <Condition Diagnostic="" Expression="S_SECURE"/>
+    </Background>
+    <Tree id="ClockTree">
+        <!--Divers source-->
+        <!--HSI RC-->
+        <Element id="HSIRC" type="fixedSource" isKey="true" refParameter="HSI_VALUE" x="294" y="792" isTZRes="true">
+            <Output signalId="HSI" to="SYSBClkSource"/>          
+            <Output signalId="HSI" to="PLL3Source"/>
+            <Output signalId="HSI" to="PLL4Source"/>
+            <Output signalId="HSI" to="PLL1Source"/>
+            <Output signalId="HSI" to="PLL2Source"/>
+        </Element>
+
+        <Element id="HSIDiv" type="devisor" refParameter="HSIDiv" x="411" y="965">
+            <Input signalId="HSI" from="HSIRC"/>
+            <Output  signalId="HSIDiv" to="HSIDivOutput"/>
+        </Element>
+		
+        <Element id="HSIDivOutput" type="output" refParameter="HSIDiv_VALUE" x="480" y="963">
+            <Input signalId="HSIDiv" from="HSIDiv"/>
+			<Output  signalId="HSIDivClk" to="MCO2Mult"/>
+        </Element>
+		
+        <Element id="HSIDiv4" type="devisor" refParameter="HSIDiv4" x="411" y="1008">
+            <Input signalId="HSI" from="HSIRC"/>
+            <Output  signalId="HSIDiv4" to="UCPDOutput"/>
+        </Element>
+		
+        <Element id="UCPDOutput" type="output" refParameter="UCPDFreq_Value" x="480" y="1006" refEnable="EnableUCPD1">
+            <Input signalId="HSIDiv4" from="HSIDiv4"/>
+        </Element>
+					
+        <!--HSE-->
+        <Element id="HSEOSC" type="variedSource" x="200" y="707" refParameter="HSE_VALUE" refEnable="EnableHSE" isTZRes="true">
+            <Output signalId="HSE" to="HSERTCDevisor"/>
+            <Output signalId="HSE" to="PLL3Source"/>
+            <Output signalId="HSE" to="PLL4Source"/>
+            <Output signalId="HSE" to="PLL1Source"/>
+            <Output signalId="HSE" to="PLL2Source"/>
+        </Element>
+		
+        <Element id="HSEOSCDIV" type="devisor" refParameter="HSE_Div" x="345" y="1944" refEnable="OTG1Enable,OTG2Enable,EnableHSE">
+            <Input signalId="HSE" from="HSEOSC"/>
+            <Output signalId="HSEOscDiv" to="OTGPHY1Mult"/>
+            <Output signalId="HSEOscDiv" to="OTGPHY2Mult"/>
+        </Element>
+		
+        <Element id="HSEDIV" type="devisor" refParameter="HSE_Div2" x="345" y="2015" refEnable="OTG1Enable,OTG2Enable,EnableHSE">
+            <Input signalId="HSE" from="HSEOSC"/>
+            <Output signalId="HSEDiv" to="OTGPHY1Mult"/>
+            <Output signalId="HSEDiv" to="OTGPHY2Mult"/>
+        </Element>
+		
+        <!-- LSI RC -->
+        <Element id="LSIRC" type="fixedSource" refParameter="LSI_VALUE" x="294" y="232" isTZRes="true">
+            <Output signalId="LSI" to="IWDGOutput"/>
+            <Output signalId="LSI" to="RTCClkSource"/>
+        </Element>
+		
+        <!--LSE-->
+        <Element id="LSEOSC" type="variedSource" refParameter="LSE_VALUE" x="200" y="195" refEnable="EnableLSE" isTZRes="true">
+            <Output signalId="LSE" to="RTCClkSource"/>
+            
+        </Element>
+		
+        <!--MSI-->
+        <Element id="MSIRC" type="distinctValsSource"  refParameter="MSIClockRange" x="294" y="505" isTZRes="true" isKey="true">
+            <Output signalId="MSI" to="PLL3Source"/>
+            <Output signalId="MSI" to="PLL4Source"/>
+        </Element>
+
+		
+	
+        <!-- ExtPin-->
+        <Element id="I2S_CKIN" type="variedSource" x="200" y="414" refParameter="EXTERNAL_CLOCK_VALUE" refEnable="ExtClockEnable">
+            <Output signalId="I2SCKIN" to="PLL1Source" />
+            <Output signalId="I2SCKIN" to="PLL2Source" />
+            <Output signalId="I2SCKIN" to="PLL3Source" />
+            <Output signalId="I2SCKIN" to="PLL4Source" />
+        </Element>
+        
+        <!-- IC clocks -->              
+        <Element id="IC1"  refParameter="IC1CLKSource" type="xbar" x="858" y="750">
+            <Input signalId="PLL1"     from="FOUTPOSTDIV1"    refValue="RCC_ICCLKSOURCE_PLL1"/> 
+            <Input signalId="PLL2"     from="FOUTPOSTDIV2"    refValue="RCC_ICCLKSOURCE_PLL2"/>
+            <Input signalId="PLL3"     from="FOUTPOSTDIV3"    refValue="RCC_ICCLKSOURCE_PLL3"/>
+            <Input signalId="PLL4"     from="FOUTPOSTDIV4"    refValue="RCC_ICCLKSOURCE_PLL4"/>            
+            <Output signalId="IC1Clk" to="IC1Div"/>
+        </Element>
+        
+        <Element id="IC1Div" type="devisor" refParameter="IC1Div" x="1040" y="752">
+            <Input signalId="IC1Clk" from="IC1"/>
+            <Output  signalId="IC1DivClk" to="IC1Output"/>
+        </Element>
+        
+        <Element id="IC1Output" type="output" refParameter="IC1Freq_VALUE" x="1140" y="750">
+            <Input signalId="IC1DivClk" from="IC1Div"/>
+            <Output signalId="IC1Out" to="SYSAClkSource"/>
+        </Element>
+
+        <Element id="IC2"  refParameter="IC2CLKSource" type="xbar" x="858" y="790">
+            <Input signalId="PLL1"     from="FOUTPOSTDIV1"    refValue="RCC_ICCLKSOURCE_PLL1"/> 
+            <Input signalId="PLL2"     from="FOUTPOSTDIV2"    refValue="RCC_ICCLKSOURCE_PLL2"/>
+            <Input signalId="PLL3"     from="FOUTPOSTDIV3"    refValue="RCC_ICCLKSOURCE_PLL3"/>
+            <Input signalId="PLL4"     from="FOUTPOSTDIV4"    refValue="RCC_ICCLKSOURCE_PLL4"/>            
+            <Output signalId="IC2Clk" to="IC2Div"/>
+        </Element>
+        
+        <Element id="IC2Div" type="devisor" refParameter="IC2Div" x="1040" y="792">
+            <Input signalId="IC2Clk" from="IC2"/>
+            <Output  signalId="IC2DivClk" to="IC2Output"/>
+        </Element>
+        
+        <Element id="IC2Output" type="output" refParameter="IC2Freq_VALUE" x="1140" y="790">
+            <Input signalId="IC2DivClk" from="IC2Div"/>
+            <Output signalId="IC2Out" to="SYSBClkSource"/>
+        </Element>
+		
+        <Element id="IC3"  refParameter="IC3CLKSource" type="xbar" x="858" y="828" refEnable="XSPI1Enable,XSPI2Enable,XSPI3Enable,FMCEnable">
+            <Input signalId="PLL1"     from="FOUTPOSTDIV1"    refValue="RCC_ICCLKSOURCE_PLL1"/> 
+            <Input signalId="PLL2"     from="FOUTPOSTDIV2"    refValue="RCC_ICCLKSOURCE_PLL2"/>
+            <Input signalId="PLL3"     from="FOUTPOSTDIV3"    refValue="RCC_ICCLKSOURCE_PLL3"/>
+            <Input signalId="PLL4"     from="FOUTPOSTDIV4"    refValue="RCC_ICCLKSOURCE_PLL4"/>            
+            <Output signalId="IC3Clk" to="IC3Div"/>
+        </Element>
+        
+        <Element id="IC3Div" type="devisor" refParameter="IC3Div" x="1040" y="832" refEnable="XSPI1Enable,XSPI2Enable,XSPI3Enable,FMCEnable">
+            <Input signalId="IC3Clk" from="IC3"/>
+            <Output  signalId="IC3DivClk" to="IC3Output"/>
+        </Element>
+        
+        <Element id="IC3Output" type="output" refParameter="IC3Freq_VALUE" x="1140" y="830" refEnable="XSPI1Enable,XSPI2Enable,XSPI3Enable,FMCEnable">
+            <Input signalId="IC3DivClk" from="IC3Div"/>
+            <Output signalId="IC3Out" to="FMCMult"/>
+            <Output signalId="IC3Out" to="XSPI1Mult"/>
+            <Output signalId="IC3Out" to="XSPI2Mult"/>
+            <Output signalId="IC3Out" to="XSPI3Mult"/>
+        </Element>
+		
+        <Element id="IC4"  refParameter="IC4CLKSource" type="xbar" x="858" y="868" refEnable="XSPI1Enable,XSPI2Enable,XSPI3Enable,FMCEnable,SDMMC1Enable,SDMMC2Enable">
+            <Input signalId="PLL1"     from="FOUTPOSTDIV1"    refValue="RCC_ICCLKSOURCE_PLL1"/> 
+            <Input signalId="PLL2"     from="FOUTPOSTDIV2"    refValue="RCC_ICCLKSOURCE_PLL2"/>
+            <Input signalId="PLL3"     from="FOUTPOSTDIV3"    refValue="RCC_ICCLKSOURCE_PLL3"/>
+            <Input signalId="PLL4"     from="FOUTPOSTDIV4"    refValue="RCC_ICCLKSOURCE_PLL4"/>            
+            <Output signalId="IC4Clk" to="IC4Div"/>
+        </Element>
+        
+        <Element id="IC4Div" type="devisor" refParameter="IC4Div" x="1040" y="870" refEnable="XSPI1Enable,XSPI2Enable,XSPI3Enable,FMCEnable,SDMMC1Enable,SDMMC2Enable">
+            <Input signalId="IC4Clk" from="IC4"/>
+            <Output  signalId="IC4DivClk" to="IC4Output"/>
+        </Element>
+        
+        <Element id="IC4Output" type="output" refParameter="IC4Freq_VALUE" x="1140" y="870" refEnable="XSPI1Enable,XSPI2Enable,XSPI3Enable,FMCEnable,SDMMC1Enable,SDMMC2Enable">
+            <Input signalId="IC4DivClk" from="IC4Div"/>
+            <Output signalId="IC4Out" to="FMCMult"/>
+            <Output signalId="IC4Out" to="SDMMC1Mult"/>
+            <Output signalId="IC4Out" to="SDMMC2Mult"/>
+            <Output signalId="IC4Out" to="XSPI1Mult"/>
+            <Output signalId="IC4Out" to="XSPI2Mult"/>
+            <Output signalId="IC4Out" to="XSPI3Mult"/>
+        </Element>
+ 		
+        <Element id="IC5"  refParameter="IC5CLKSource" type="xbar" x="858" y="908" refEnable="CKPEREnable,MCO1OutPutEnable,SDMMC1Enable,SDMMC2Enable">
+            <Input signalId="PLL1"     from="FOUTPOSTDIV1"    refValue="RCC_ICCLKSOURCE_PLL1"/> 
+            <Input signalId="PLL2"     from="FOUTPOSTDIV2"    refValue="RCC_ICCLKSOURCE_PLL2"/>
+            <Input signalId="PLL3"     from="FOUTPOSTDIV3"    refValue="RCC_ICCLKSOURCE_PLL3"/>
+            <Input signalId="PLL4"     from="FOUTPOSTDIV4"    refValue="RCC_ICCLKSOURCE_PLL4"/>            
+            <Output signalId="IC5Clk" to="IC5Div"/>
+        </Element>
+        
+        <Element id="IC5Div" type="devisor" refParameter="IC5Div" x="1040" y="910" refEnable="CKPEREnable,MCO1OutPutEnable,SDMMC1Enable,SDMMC2Enable">
+            <Input signalId="IC5Clk" from="IC5"/>
+            <Output  signalId="IC5DivClk" to="IC5Output"/>
+        </Element>
+        
+        <Element id="IC5Output" type="output" refParameter="IC5Freq_VALUE" x="1140" y="910" refEnable="CKPEREnable,MCO1OutPutEnable,SDMMC1Enable,SDMMC2Enable">
+            <Input signalId="IC5DivClk" from="IC5Div"/>
+            <Output signalId="IC5Out" to="CKPERSource"/>
+            <Output signalId="IC5Out" to="MCOMult"/>
+            <Output signalId="IC5Out" to="SDMMC1Mult"/>
+            <Output signalId="IC5Out" to="SDMMC2Mult"/>
+        </Element>
+ 		
+        <Element id="IC6"  refParameter="IC6CLKSource" type="xbar" x="858" y="948">
+            <Input signalId="PLL1"     from="FOUTPOSTDIV1"    refValue="RCC_ICCLKSOURCE_PLL1"/> 
+            <Input signalId="PLL2"     from="FOUTPOSTDIV2"    refValue="RCC_ICCLKSOURCE_PLL2"/>
+            <Input signalId="PLL3"     from="FOUTPOSTDIV3"    refValue="RCC_ICCLKSOURCE_PLL3"/>
+            <Input signalId="PLL4"     from="FOUTPOSTDIV4"    refValue="RCC_ICCLKSOURCE_PLL4"/>            
+            <Output signalId="IC6Clk" to="IC6Div"/>
+        </Element>
+        
+        <Element id="IC6Div" type="devisor" refParameter="IC6Div" x="1040" y="950">
+            <Input signalId="IC6Clk" from="IC6"/>
+            <Output  signalId="IC6DivClk" to="IC6Output"/>
+        </Element>
+        
+        <Element id="IC6Output" type="output" refParameter="IC6Freq_VALUE" x="1140" y="948">
+            <Input signalId="IC6DivClk" from="IC6Div"/>
+            <Output signalId="IC6Out" to="SYSCClkSource"/>
+        </Element>
+ 		
+        <Element id="IC7"  refParameter="IC7CLKSource" type="xbar" x="858" y="988" refEnable="ADCEnable,EnableADF1,EnableMDF1,EnableSAI1,EnableSAI2,EnableSPDIFRX">
+            <Input signalId="PLL1"     from="FOUTPOSTDIV1"    refValue="RCC_ICCLKSOURCE_PLL1"/> 
+            <Input signalId="PLL2"     from="FOUTPOSTDIV2"    refValue="RCC_ICCLKSOURCE_PLL2"/>
+            <Input signalId="PLL3"     from="FOUTPOSTDIV3"    refValue="RCC_ICCLKSOURCE_PLL3"/>
+            <Input signalId="PLL4"     from="FOUTPOSTDIV4"    refValue="RCC_ICCLKSOURCE_PLL4"/>            
+            <Output signalId="IC7Clk" to="IC7Div"/>
+        </Element>
+        
+        <Element id="IC7Div" type="devisor" refParameter="IC7Div" x="1040" y="990" refEnable="ADCEnable,EnableADF1,EnableMDF1,EnableSAI1,EnableSAI2,EnableSPDIFRX">
+            <Input signalId="IC7Clk" from="IC7"/>
+            <Output  signalId="IC7DivClk" to="IC7Output"/>
+        </Element>
+        
+        <Element id="IC7Output" type="output" refParameter="IC7Freq_VALUE" x="1140" y="988" refEnable="ADCEnable,EnableADF1,EnableMDF1,EnableSAI1,EnableSAI2,EnableSPDIFRX">
+            <Input signalId="IC7DivClk" from="IC7Div"/>
+            <Output signalId="IC7Out" to="ADCMult"/>
+            <Output signalId="IC7Out" to="ADFMult"/>
+            <Output signalId="IC7Out" to="MDF1Mult"/>
+            <Output signalId="IC7Out" to="SAI1Mult"/>
+            <Output signalId="IC7Out" to="SAI2Mult"/>
+            <Output signalId="IC7Out" to="SPDIFRX1Mult"/>
+        </Element>
+ 		
+        <Element id="IC8"  refParameter="IC8CLKSource" type="xbar" x="858" y="1026" refEnable="ADCEnable,EnableADF1,EnableMDF1,EnableSAI1,EnableSAI2,EnableSPDIFRX,EnableSPI1,EnableSPI2,EnableSPI3,EnableSPI6">
+            <Input signalId="PLL1"     from="FOUTPOSTDIV1"    refValue="RCC_ICCLKSOURCE_PLL1"/> 
+            <Input signalId="PLL2"     from="FOUTPOSTDIV2"    refValue="RCC_ICCLKSOURCE_PLL2"/>
+            <Input signalId="PLL3"     from="FOUTPOSTDIV3"    refValue="RCC_ICCLKSOURCE_PLL3"/>
+            <Input signalId="PLL4"     from="FOUTPOSTDIV4"    refValue="RCC_ICCLKSOURCE_PLL4"/>            
+            <Output signalId="IC8Clk" to="IC8Div"/>
+        </Element>
+        
+        <Element id="IC8Div" type="devisor" refParameter="IC8Div" x="1040" y="1028" refEnable="ADCEnable,EnableADF1,EnableMDF1,EnableSAI1,EnableSAI2,EnableSPDIFRX,EnableSPI1,EnableSPI2,EnableSPI3,EnableSPI6">
+            <Input signalId="IC8Clk" from="IC8"/>
+            <Output  signalId="IC8DivClk" to="IC8Output"/>
+        </Element>
+        
+        <Element id="IC8Output" type="output" refParameter="IC8Freq_VALUE" x="1140" y="1026" refEnable="ADCEnable,EnableADF1,EnableMDF1,EnableSAI1,EnableSAI2,EnableSPDIFRX,EnableSPI1,EnableSPI2,EnableSPI3,EnableSPI6">
+            <Input signalId="IC8DivClk" from="IC8Div"/>
+            <Output signalId="IC8Out" to="ADCMult"/>
+            <Output signalId="IC8Out" to="ADFMult"/>
+            <Output signalId="IC8Out" to="MDF1Mult"/>
+            <Output signalId="IC8Out" to="SAI1Mult"/>
+            <Output signalId="IC8Out" to="SAI2Mult"/>
+            <Output signalId="IC8Out" to="SPDIFRX1Mult"/>
+            <Output signalId="IC8Out" to="SPI1Mult"/>
+            <Output signalId="IC8Out" to="SPI2Mult"/>
+            <Output signalId="IC8Out" to="SPI3Mult"/>
+            <Output signalId="IC8Out" to="SPI6Mult"/>
+        </Element>
+ 		
+        <Element id="IC9"  refParameter="IC9CLKSource" type="xbar" x="858" y="1064" refEnable="EnableSPI1,EnableSPI2,EnableSPI3,EnableSPI4,EnableSPI5,EnableSPI6,EnableLPUART1,EnableUSART1,EnableUSART2,EnableUSART3,EnableUSART6,EnableUSART10,EnableUART4,EnableUART5,EnableUART7,EnableUART8,EnableUART9">
+            <Input signalId="PLL1"     from="FOUTPOSTDIV1"    refValue="RCC_ICCLKSOURCE_PLL1"/> 
+            <Input signalId="PLL2"     from="FOUTPOSTDIV2"    refValue="RCC_ICCLKSOURCE_PLL2"/>
+            <Input signalId="PLL3"     from="FOUTPOSTDIV3"    refValue="RCC_ICCLKSOURCE_PLL3"/>
+            <Input signalId="PLL4"     from="FOUTPOSTDIV4"    refValue="RCC_ICCLKSOURCE_PLL4"/>            
+            <Output signalId="IC9Clk" to="IC9Div"/>
+        </Element>
+        
+        <Element id="IC9Div" type="devisor" refParameter="IC9Div" x="1040" y="1068" refEnable="EnableSPI1,EnableSPI2,EnableSPI3,EnableSPI4,EnableSPI5,EnableSPI6,EnableLPUART1,EnableUSART1,EnableUSART2,EnableUSART3,EnableUSART6,EnableUSART10,EnableUART4,EnableUART5,EnableUART7,EnableUART8,EnableUART9">
+            <Input signalId="IC9Clk" from="IC9"/>
+            <Output  signalId="IC9DivClk" to="IC9Output"/>
+        </Element>
+        
+        <Element id="IC9Output" type="output" refParameter="IC9Freq_VALUE" x="1140" y="1067" refEnable="EnableSPI1,EnableSPI2,EnableSPI3,EnableSPI4,EnableSPI5,EnableSPI6,EnableLPUART1,EnableUSART1,EnableUSART2,EnableUSART3,EnableUSART6,EnableUSART10,EnableUART4,EnableUART5,EnableUART7,EnableUART8,EnableUART9">
+            <Input signalId="IC9DivClk" from="IC9Div"/>
+            <Output signalId="IC9Out" to="USART1Mult"/>
+            <Output signalId="IC9Out" to="USART2Mult"/>
+            <Output signalId="IC9Out" to="USART3Mult"/>
+            <Output signalId="IC9Out" to="UART4Mult"/>
+            <Output signalId="IC9Out" to="UART5Mult"/>
+            <Output signalId="IC9Out" to="USART6Mult"/>
+            <Output signalId="IC9Out" to="UART7Mult"/>
+            <Output signalId="IC9Out" to="UART8Mult"/>
+            <Output signalId="IC9Out" to="UART9Mult"/>
+            <Output signalId="IC9Out" to="USART10Mult"/>
+            <Output signalId="IC9Out" to="SPI1Mult"/>
+            <Output signalId="IC9Out" to="SPI2Mult"/>
+            <Output signalId="IC9Out" to="SPI3Mult"/>
+            <Output signalId="IC9Out" to="SPI4Mult"/>
+            <Output signalId="IC9Out" to="SPI5Mult"/>
+            <Output signalId="IC9Out" to="SPI6Mult"/>
+            <Output signalId="IC9Out" to="LPUART1Mult"/>
+        </Element>
+ 		
+        <Element id="IC10"  refParameter="IC10CLKSource" type="xbar" x="858" y="1105" refEnable="CKPEREnable,EnableLPUART1,MCO1OutPutEnable,EnableI2C1,EnableI2C2,EnableI2C3,EnableI2C4,EnableI3C1,EnableI3C2">
+            <Input signalId="PLL1"     from="FOUTPOSTDIV1"    refValue="RCC_ICCLKSOURCE_PLL1"/> 
+            <Input signalId="PLL2"     from="FOUTPOSTDIV2"    refValue="RCC_ICCLKSOURCE_PLL2"/>
+            <Input signalId="PLL3"     from="FOUTPOSTDIV3"    refValue="RCC_ICCLKSOURCE_PLL3"/>
+            <Input signalId="PLL4"     from="FOUTPOSTDIV4"    refValue="RCC_ICCLKSOURCE_PLL4"/>            
+            <Output signalId="IC10Clk" to="IC10Div"/>
+        </Element>
+        
+        <Element id="IC10Div" type="devisor" refParameter="IC10Div" x="1040" y="1107" refEnable="CKPEREnable,EnableLPUART1,MCO1OutPutEnable,EnableI2C1,EnableI2C2,EnableI2C3,EnableI2C4,EnableI3C1,EnableI3C2">
+            <Input signalId="IC10Clk" from="IC10"/>
+            <Output  signalId="IC10DivClk" to="IC10Output"/>
+        </Element>
+        
+        <Element id="IC10Output" type="output" refParameter="IC10Freq_VALUE" x="1140" y="1105" refEnable="CKPEREnable,EnableLPUART1,MCO1OutPutEnable,EnableI2C1,EnableI2C2,EnableI2C3,EnableI2C4,EnableI3C1,EnableI3C2">
+            <Input signalId="IC10DivClk" from="IC10Div"/>
+            <Output signalId="IC10Out" to="CKPERSource"/>
+            <Output signalId="IC10Out" to="MCOMult"/>
+            <Output signalId="IC10Out" to="I2C1Mult"/>
+            <Output signalId="IC10Out" to="I2C2Mult"/>
+            <Output signalId="IC10Out" to="I2C3Mult"/>
+            <Output signalId="IC10Out" to="I2C4Mult"/>
+            <Output signalId="IC10Out" to="I3C1Mult"/>
+            <Output signalId="IC10Out" to="I3C2Mult"/>
+        </Element>
+ 		
+        <Element id="IC11"  refParameter="IC11CLKSource" type="xbar" x="858" y="1144">
+            <Input signalId="PLL1"     from="FOUTPOSTDIV1"    refValue="RCC_ICCLKSOURCE_PLL1"/> 
+            <Input signalId="PLL2"     from="FOUTPOSTDIV2"    refValue="RCC_ICCLKSOURCE_PLL2"/>
+            <Input signalId="PLL3"     from="FOUTPOSTDIV3"    refValue="RCC_ICCLKSOURCE_PLL3"/>
+            <Input signalId="PLL4"     from="FOUTPOSTDIV4"    refValue="RCC_ICCLKSOURCE_PLL4"/>            
+            <Output signalId="IC11Clk" to="IC11Div"/>
+        </Element>
+        
+        <Element id="IC11Div" type="devisor" refParameter="IC11Div" x="1040" y="1146">
+            <Input signalId="IC11Clk" from="IC11"/>
+            <Output  signalId="IC11DivClk" to="IC11Output"/>
+        </Element>
+        
+        <Element id="IC11Output" type="output" refParameter="IC11Freq_VALUE" x="1140" y="1144">
+            <Input signalId="IC11DivClk" from="IC11Div"/>
+            <Output signalId="IC11Out" to="SYSDClkSource"/>
+        </Element>
+ 		
+        <Element id="IC12"  refParameter="IC12CLKSource" type="xbar" x="858" y="1183" refEnable="ETH1Enable">
+            <Input signalId="PLL1"     from="FOUTPOSTDIV1"    refValue="RCC_ICCLKSOURCE_PLL1"/> 
+            <Input signalId="PLL2"     from="FOUTPOSTDIV2"    refValue="RCC_ICCLKSOURCE_PLL2"/>
+            <Input signalId="PLL3"     from="FOUTPOSTDIV3"    refValue="RCC_ICCLKSOURCE_PLL3"/>
+            <Input signalId="PLL4"     from="FOUTPOSTDIV4"    refValue="RCC_ICCLKSOURCE_PLL4"/>            
+            <Output signalId="IC12Clk" to="IC12Div"/>
+        </Element>
+        
+        <Element id="IC12Div" type="devisor" refParameter="IC12Div" x="1040" y="1185" refEnable="ETH1Enable">
+            <Input signalId="IC12Clk" from="IC12"/>
+            <Output  signalId="IC12DivClk" to="IC12Output"/>
+        </Element>
+        
+        <Element id="IC12Output" type="output" refParameter="IC12Freq_VALUE" x="1140" y="1183" refEnable="ETH1Enable">
+            <Input signalId="IC12DivClk" from="IC12Div"/>
+            <Output signalId="IC12Out" to="ETH1Mult"/>
+        </Element>
+ 		
+        <Element id="IC13"  refParameter="IC13CLKSource" type="xbar" x="858" y="1223" refEnable="false">
+            <Input signalId="PLL1"     from="FOUTPOSTDIV1"    refValue="RCC_ICCLKSOURCE_PLL1"/> 
+            <Input signalId="PLL2"     from="FOUTPOSTDIV2"    refValue="RCC_ICCLKSOURCE_PLL2"/>
+            <Input signalId="PLL3"     from="FOUTPOSTDIV3"    refValue="RCC_ICCLKSOURCE_PLL3"/>
+            <Input signalId="PLL4"     from="FOUTPOSTDIV4"    refValue="RCC_ICCLKSOURCE_PLL4"/>            
+            <Output signalId="IC13Clk" to="IC13Div"/>
+        </Element>
+        
+        <Element id="IC13Div" type="devisor" refParameter="IC13Div" x="1040" y="1225" refEnable="false">
+            <Input signalId="IC13Clk" from="IC13"/>
+            <Output  signalId="IC13DivClk" to="IC13Output"/>
+        </Element>
+        
+        <Element id="IC13Output" type="output" refParameter="IC13Freq_VALUE" x="1140" y="1223" refEnable="false">
+            <Input signalId="IC13DivClk" from="IC13Div"/>
+        </Element>
+ 		
+        <Element id="IC14"  refParameter="IC14CLKSource" type="xbar" x="858" y="1262" refEnable="EnableLPUART1,EnableUSART1,EnableUSART2,EnableUSART3,EnableUSART6,EnableUSART10,EnableUART4,EnableUART5,EnableUART7,EnableUART8,EnableUART9,EnableSPI4,EnableSPI5">
+            <Input signalId="PLL1"     from="FOUTPOSTDIV1"    refValue="RCC_ICCLKSOURCE_PLL1"/> 
+            <Input signalId="PLL2"     from="FOUTPOSTDIV2"    refValue="RCC_ICCLKSOURCE_PLL2"/>
+            <Input signalId="PLL3"     from="FOUTPOSTDIV3"    refValue="RCC_ICCLKSOURCE_PLL3"/>
+            <Input signalId="PLL4"     from="FOUTPOSTDIV4"    refValue="RCC_ICCLKSOURCE_PLL4"/>            
+            <Output signalId="IC14Clk" to="IC14Div"/>
+        </Element>
+        
+        <Element id="IC14Div" type="devisor" refParameter="IC14Div" x="1040" y="1263" refEnable="EnableLPUART1,EnableUSART1,EnableUSART2,EnableUSART3,EnableUSART6,EnableUSART10,EnableUART4,EnableUART5,EnableUART7,EnableUART8,EnableUART9,EnableSPI4,EnableSPI5">
+            <Input signalId="IC14Clk" from="IC14"/>
+            <Output  signalId="IC14DivClk" to="IC14Output"/>
+        </Element>
+        
+        <Element id="IC14Output" type="output" refParameter="IC14Freq_VALUE" x="1140" y="1262" refEnable="EnableLPUART1,EnableUSART1,EnableUSART2,EnableUSART3,EnableUSART6,EnableUSART10,EnableUART4,EnableUART5,EnableUART7,EnableUART8,EnableUART9,EnableSPI4,EnableSPI5">
+            <Input signalId="IC14DivClk" from="IC14Div"/>
+            <Output signalId="IC14Out" to="USART1Mult"/>
+            <Output signalId="IC14Out" to="USART2Mult"/>
+            <Output signalId="IC14Out" to="USART3Mult"/>
+            <Output signalId="IC14Out" to="UART4Mult"/>
+            <Output signalId="IC14Out" to="UART5Mult"/>
+            <Output signalId="IC14Out" to="USART6Mult"/>
+            <Output signalId="IC14Out" to="UART7Mult"/>
+            <Output signalId="IC14Out" to="UART8Mult"/>
+            <Output signalId="IC14Out" to="UART9Mult"/>
+            <Output signalId="IC14Out" to="USART10Mult"/>
+            <Output signalId="IC14Out" to="LPUART1Mult"/>
+            <Output signalId="IC14Out" to="SPI4Mult"/>
+            <Output signalId="IC14Out" to="SPI5Mult"/>
+        </Element>
+ 		
+        <Element id="IC15"  refParameter="IC15CLKSource" type="xbar" x="858" y="1300" refEnable="CKPEREnable,OTG1Enable,OTG2Enable,EnableI2C1,EnableI2C2,EnableI2C3,EnableI2C4,EnableI3C1,EnableI3C2,MCO2OutPutEnable,EnableLPTIM1,EnableLPTIM2,EnableLPTIM3,EnableLPTIM4,EnableLPTIM5">
+            <Input signalId="PLL1"     from="FOUTPOSTDIV1"    refValue="RCC_ICCLKSOURCE_PLL1"/> 
+            <Input signalId="PLL2"     from="FOUTPOSTDIV2"    refValue="RCC_ICCLKSOURCE_PLL2"/>
+            <Input signalId="PLL3"     from="FOUTPOSTDIV3"    refValue="RCC_ICCLKSOURCE_PLL3"/>
+            <Input signalId="PLL4"     from="FOUTPOSTDIV4"    refValue="RCC_ICCLKSOURCE_PLL4"/>            
+            <Output signalId="IC15Clk" to="IC15Div"/>
+        </Element>
+        
+        <Element id="IC15Div" type="devisor" refParameter="IC15Div" x="1040" y="1302" refEnable="CKPEREnable,OTG1Enable,OTG2Enable,EnableI2C1,EnableI2C2,EnableI2C3,EnableI2C4,EnableI3C1,EnableI3C2,MCO2OutPutEnable,EnableLPTIM1,EnableLPTIM2,EnableLPTIM3,EnableLPTIM4,EnableLPTIM5">
+            <Input signalId="IC15Clk" from="IC15"/>
+            <Output  signalId="IC15DivClk" to="IC15Output"/>
+        </Element>
+        
+        <Element id="IC15Output" type="output" refParameter="IC15Freq_VALUE" x="1140" y="1300" refEnable="CKPEREnable,OTG1Enable,OTG2Enable,EnableI2C1,EnableI2C2,EnableI2C3,EnableI2C4,EnableI3C1,EnableI3C2,MCO2OutPutEnable,EnableLPTIM1,EnableLPTIM2,EnableLPTIM3,EnableLPTIM4,EnableLPTIM5">
+            <Input signalId="IC15DivClk" from="IC15Div"/>
+            <Output signalId="IC15Out" to="CKPERSource"/>
+            <Output signalId="IC15Out" to="MCO2Mult"/>
+            <Output signalId="IC15Out" to="I2C1Mult"/>
+            <Output signalId="IC15Out" to="I2C2Mult"/>
+            <Output signalId="IC15Out" to="I2C3Mult"/>
+            <Output signalId="IC15Out" to="I2C4Mult"/>
+            <Output signalId="IC15Out" to="I3C1Mult"/>
+            <Output signalId="IC15Out" to="I3C2Mult"/>
+            <Output signalId="IC15Out" to="LPTIM1Mult"/>
+            <Output signalId="IC15Out" to="LPTIM2Mult"/>
+            <Output signalId="IC15Out" to="LPTIM3Mult"/>
+            <Output signalId="IC15Out" to="LPTIM4Mult"/>
+            <Output signalId="IC15Out" to="LPTIM5Mult"/>
+            <Output signalId="IC15Out" to="OTGPHY1Mult"/>
+            <Output signalId="IC15Out" to="OTGPHY2Mult"/>
+        </Element>
+ 		
+        <Element id="IC16"  refParameter="IC16CLKSource" type="xbar" x="858" y="1338" refEnable="EnableLTDC">
+            <Input signalId="PLL1"     from="FOUTPOSTDIV1"    refValue="RCC_ICCLKSOURCE_PLL1"/> 
+            <Input signalId="PLL2"     from="FOUTPOSTDIV2"    refValue="RCC_ICCLKSOURCE_PLL2"/>
+            <Input signalId="PLL3"     from="FOUTPOSTDIV3"    refValue="RCC_ICCLKSOURCE_PLL3"/>
+            <Input signalId="PLL4"     from="FOUTPOSTDIV4"    refValue="RCC_ICCLKSOURCE_PLL4"/>            
+            <Output signalId="IC16Clk" to="IC16Div"/>
+        </Element>
+        
+        <Element id="IC16Div" type="devisor" refParameter="IC16Div" x="1040" y="1340" refEnable="EnableLTDC">
+            <Input signalId="IC16Clk" from="IC16"/>
+            <Output  signalId="IC16DivClk" to="IC16Output"/>
+        </Element>
+        
+        <Element id="IC16Output" type="output" refParameter="IC16Freq_VALUE" x="1140" y="1340" refEnable="EnableLTDC">
+            <Input signalId="IC16DivClk" from="IC16Div"/>
+            <Output signalId="IC16Out" to="LTDCMult"/>
+        </Element>
+ 		
+        <Element id="IC17"  refParameter="IC17CLKSource" type="xbar" x="858" y="1378" refEnable="EnableDCMI">
+            <Input signalId="PLL1"     from="FOUTPOSTDIV1"    refValue="RCC_ICCLKSOURCE_PLL1"/> 
+            <Input signalId="PLL2"     from="FOUTPOSTDIV2"    refValue="RCC_ICCLKSOURCE_PLL2"/>
+            <Input signalId="PLL3"     from="FOUTPOSTDIV3"    refValue="RCC_ICCLKSOURCE_PLL3"/>
+            <Input signalId="PLL4"     from="FOUTPOSTDIV4"    refValue="RCC_ICCLKSOURCE_PLL4"/>            
+            <Output signalId="IC17Clk" to="IC17Div"/>
+        </Element>
+        
+        <Element id="IC17Div" type="devisor" refParameter="IC17Div" x="1040" y="1380" refEnable="EnableDCMI">
+            <Input signalId="IC17Clk" from="IC17"/>
+            <Output  signalId="IC17DivClk" to="IC17Output"/>
+        </Element>
+        
+        <Element id="IC17Output" type="output" refParameter="IC17Freq_VALUE" x="1140" y="1378" refEnable="EnableDCMI">
+            <Input signalId="IC17DivClk" from="IC17Div"/>
+            <Output signalId="IC17Out" to="DCMIPPMult"/>
+        </Element>
+ 		
+        <Element id="IC18"  refParameter="IC18CLKSource" type="xbar" x="858" y="1415" refEnable="false">
+            <Input signalId="PLL1"     from="FOUTPOSTDIV1"    refValue="RCC_ICCLKSOURCE_PLL1"/> 
+            <Input signalId="PLL2"     from="FOUTPOSTDIV2"    refValue="RCC_ICCLKSOURCE_PLL2"/>
+            <Input signalId="PLL3"     from="FOUTPOSTDIV3"    refValue="RCC_ICCLKSOURCE_PLL3"/>
+            <Input signalId="PLL4"     from="FOUTPOSTDIV4"    refValue="RCC_ICCLKSOURCE_PLL4"/>            
+            <Output signalId="IC18Clk" to="IC18Div"/>
+        </Element>
+        
+        <Element id="IC18Div" type="devisor" refParameter="IC18Div" x="1040" y="1418" refEnable="false">
+            <Input signalId="IC18Clk" from="IC18"/>
+            <Output  signalId="IC18DivClk" to="IC18Output"/>
+        </Element>
+        
+        <Element id="IC18Output" type="output" refParameter="IC18Freq_VALUE" x="1140" y="1418" refEnable="false">
+            <Input signalId="IC18DivClk" from="IC18Div"/>
+        </Element>
+ 		
+        <Element id="IC19"  refParameter="IC19CLKSource" type="xbar" x="858" y="1456" refEnable="CKPEREnable,EnableFDCAN123">
+            <Input signalId="PLL1"     from="FOUTPOSTDIV1"    refValue="RCC_ICCLKSOURCE_PLL1"/> 
+            <Input signalId="PLL2"     from="FOUTPOSTDIV2"    refValue="RCC_ICCLKSOURCE_PLL2"/>
+            <Input signalId="PLL3"     from="FOUTPOSTDIV3"    refValue="RCC_ICCLKSOURCE_PLL3"/>
+            <Input signalId="PLL4"     from="FOUTPOSTDIV4"    refValue="RCC_ICCLKSOURCE_PLL4"/>            
+            <Output signalId="IC19Clk" to="IC19Div"/>
+        </Element>
+        
+        <Element id="IC19Div" type="devisor" refParameter="IC19Div" x="1040" y="1458" refEnable="CKPEREnable,EnableFDCAN123">
+            <Input signalId="IC19Clk" from="IC19"/>
+            <Output  signalId="IC19DivClk" to="IC19Output"/>
+        </Element>
+        
+        <Element id="IC19Output" type="output" refParameter="IC19Freq_VALUE" x="1140" y="1458" refEnable="CKPEREnable,EnableFDCAN123">
+            <Input signalId="IC19DivClk" from="IC19Div"/>
+            <Output signalId="IC19Out" to="CKPERSource"/>
+            <Output signalId="IC19Out" to="FDCANMult"/>
+        </Element>
+ 		
+        <Element id="IC20"  refParameter="IC20CLKSource" type="xbar" x="858" y="1494" refEnable="CKPEREnable,MCO2OutPutEnable,PSSIEnable">
+            <Input signalId="PLL1"     from="FOUTPOSTDIV1"    refValue="RCC_ICCLKSOURCE_PLL1"/> 
+            <Input signalId="PLL2"     from="FOUTPOSTDIV2"    refValue="RCC_ICCLKSOURCE_PLL2"/>
+            <Input signalId="PLL3"     from="FOUTPOSTDIV3"    refValue="RCC_ICCLKSOURCE_PLL3"/>
+            <Input signalId="PLL4"     from="FOUTPOSTDIV4"    refValue="RCC_ICCLKSOURCE_PLL4"/>            
+            <Output signalId="IC20Clk" to="IC20Div"/>
+        </Element>
+        
+        <Element id="IC20Div" type="devisor" refParameter="IC20Div" x="1040" y="1496" refEnable="CKPEREnable,MCO2OutPutEnable,PSSIEnable">
+            <Input signalId="IC20Clk" from="IC20"/>
+            <Output  signalId="IC20DivClk" to="IC20Output"/>
+        </Element>
+        
+        <Element id="IC20Output" type="output" refParameter="IC20Freq_VALUE" x="1140" y="1496" refEnable="CKPEREnable,MCO2OutPutEnable,PSSIEnable">
+            <Input signalId="IC20DivClk" from="IC20Div"/>
+            <Output signalId="IC20Out" to="CKPERSource"/>
+            <Output signalId="IC20Out" to="MCO2Mult"/>
+            <Output signalId="IC20Out" to="PSSIMult"/>
+        </Element>
+
+        <Element id="MCOMult" type="multiplexor" refParameter="RCC_MCO1Source" x="495" y="1073" refEnable="MCO1OutPutEnable" refSecure="MCO1TZEnable">
+            <Input signalId="HSIDivClk"    from="HSIDivOutput"        refValue="RCC_MCO1SOURCE_HSI"/>
+            <Input signalId="LSE"    from="LSEOSC"       refValue="RCC_MCO1SOURCE_LSE"/>
+            <Input signalId="MSI"    from="MSIRC"        refValue="RCC_MCO1SOURCE_MSI"   />
+            <Input signalId="LSI"    from="LSIRC"        refValue="RCC_MCO1SOURCE_LSI"/>
+            <Input signalId="HSE"    from="HSEOSC"       refValue="RCC_MCO1SOURCE_HSE"   />
+            <Input signalId="IC5Out" from="IC5Output"    refValue="RCC_MCO1SOURCE_IC5"/>
+            <Input signalId="IC10Out" from="IC10Output"   refValue="RCC_MCO1SOURCE_IC10"/>
+            <Input signalId="SYSACLKInput" from="SYSAClkSource" refValue="RCC_MCO1SOURCE_SYSA"/>
+            <Output signalId="MCO1DivInput" to="MCODiv"/>
+        </Element>
+
+        <Element id="MCODiv" type="devisor" refParameter="RCC_MCODiv1" x="390" y="1160" refEnable="MCO1OutPutEnable">
+            <Input signalId="MCO1DivInput" from="MCOMult"/>
+            <Output signalId="MCO1DivOuput" to="MCOPin"/>
+        </Element>
+        <Element id="MCOPin" type="output" refParameter="MCO1PinFreq_Value" x="310" y="1158" refEnable="MCO1OutPutEnable">
+            <Input signalId="MCO1DivOuput" from="MCODiv"/>
+        </Element>
+        
+        <Element id="MCO2Mult" type="multiplexor" refParameter="RCC_MCO2Source" x="495" y="1333" refEnable="MCO2OutPutEnable" refSecure="MCO2TZEnable">
+            <Input signalId="HSIDivClk"    from="HSIDivOutput"        refValue="RCC_MCO2SOURCE_HSI"/>
+            <Input signalId="LSE"    from="LSEOSC"       refValue="RCC_MCO2SOURCE_LSE"/>
+            <Input signalId="MSI"    from="MSIRC"        refValue="RCC_MCO2SOURCE_MSI"   />
+            <Input signalId="LSI"    from="LSIRC"        refValue="RCC_MCO2SOURCE_LSI"/>
+            <Input signalId="HSE"    from="HSEOSC"       refValue="RCC_MCO2SOURCE_HSE"   />
+            <Input signalId="IC15Out" from="IC5Output"    refValue="RCC_MCO2SOURCE_IC15"/>
+            <Input signalId="IC20Out" from="IC10Output"   refValue="RCC_MCO2SOURCE_IC20"/>
+            <Input signalId="SYSBCLKInput" from="SYSBClkSource" refValue="RCC_MCO2SOURCE_SYSB"/>
+            <Output signalId="MCO2DivInput" to="MCO2Div"/>
+        </Element>
+
+        <Element id="MCO2Div" type="devisor" refParameter="RCC_MCODiv2" x="390" y="1420" refEnable="MCO2OutPutEnable">
+            <Input signalId="MCO2DivInput" from="MCO2Mult"/>
+            <Output signalId="MCO2DivOuput" to="MCO2Pin"/>
+        </Element>
+        <Element id="MCO2Pin" type="output" refParameter="MCO2PinFreq_Value" x="310" y="1418" refEnable="MCO2OutPutEnable">
+            <Input signalId="MCO2DivOuput" from="MCO2Div"/>
+        </Element>
+
+        <!-- Peripherals -->
+        <Element id="CKPERSource" type="multiplexor" refParameter="CKPERSourceSelection" x="1535" y="900" refEnable="CKPEREnable">
+            <Input signalId="HSI"          from="HSIRC"  refValue="RCC_CLKPCLKSOURCE_HSI"   />
+            <Input signalId="MSI"          from="MSIRC"  refValue="RCC_CLKPCLKSOURCE_MSI"    />
+            <Input signalId="HSE"          from="HSEOSC" refValue="RCC_CLKPCLKSOURCE_HSE"/>
+            <Input signalId="IC5Out"  from="IC5Output"    refValue="RCC_CLKPCLKSOURCE_IC5"/>
+            <Input signalId="IC10Out" from="IC10Output"    refValue="RCC_CLKPCLKSOURCE_IC10"/>
+            <Input signalId="IC15Out" from="IC15Output"    refValue="RCC_CLKPCLKSOURCE_IC15"/>
+            <Input signalId="IC19Out" from="IC19Output"    refValue="RCC_CLKPCLKSOURCE_IC19"/>
+            <Input signalId="IC20Out" from="IC20Output"    refValue="RCC_CLKPCLKSOURCE_IC20"/>          
+            <Output signalId="CKPERClk" to="CKPERoutput"/>            
+        </Element>
+        <Element id="CKPERoutput" type="output" refParameter="CKPERFreq_Value" x="1600" y="982" refEnable="CKPEREnable">
+            <Input signalId="CKPERClk" from="CKPERSource"/>
+            <Output signalId="CKPERClk" to="ADCMult"/>            
+            <Output signalId="CKPERClk" to="ADFMult"/>            
+            <Output signalId="CKPERClk" to="DCMIPPMult"/>            
+            <Output signalId="CKPERClk" to="FDCANMult"/>            
+            <Output signalId="CKPERClk" to="FMCMult"/>            
+            <Output signalId="CKPERClk" to="I2C1Mult"/>            
+            <Output signalId="CKPERClk" to="I2C2Mult"/>            
+            <Output signalId="CKPERClk" to="I2C3Mult"/>            
+            <Output signalId="CKPERClk" to="I2C4Mult"/>            
+            <Output signalId="CKPERClk" to="I3C1Mult"/>            
+            <Output signalId="CKPERClk" to="I3C2Mult"/>            
+            <Output signalId="CKPERClk" to="LPTIM1Mult"/>            
+            <Output signalId="CKPERClk" to="LPTIM2Mult"/>            
+            <Output signalId="CKPERClk" to="LPTIM3Mult"/>            
+            <Output signalId="CKPERClk" to="LPTIM4Mult"/>            
+            <Output signalId="CKPERClk" to="LPTIM5Mult"/>            
+            <Output signalId="CKPERClk" to="LTDCMult"/>            
+            <Output signalId="CKPERClk" to="MDF1Mult"/>            
+            <Output signalId="CKPERClk" to="PSSIMult"/>            
+            <Output signalId="CKPERClk" to="SAI1Mult"/>            
+            <Output signalId="CKPERClk" to="SAI2Mult"/>            
+            <Output signalId="CKPERClk" to="SPDIRXMult"/>            
+            <Output signalId="CKPERClk" to="SPI1Mult"/>            
+            <Output signalId="CKPERClk" to="XSPI1Mult"/>            
+            <Output signalId="CKPERClk" to="SPI2Mult"/>            
+            <Output signalId="CKPERClk" to="XSPI2Mult"/>            
+            <Output signalId="CKPERClk" to="SPI3Mult"/>            
+            <Output signalId="CKPERClk" to="XSPI3Mult"/>            
+            <Output signalId="CKPERClk" to="SPI4Mult"/>            
+            <Output signalId="CKPERClk" to="SPI5Mult"/>            
+            <Output signalId="CKPERClk" to="SPI6Mult"/>            
+            <Output signalId="CKPERClk" to="USART1Mult"/>            
+            <Output signalId="CKPERClk" to="USART2Mult"/>            
+            <Output signalId="CKPERClk" to="USART3Mult"/>            
+            <Output signalId="CKPERClk" to="USART6Mult"/>            
+            <Output signalId="CKPERClk" to="USART10Mult"/>            
+            <Output signalId="CKPERClk" to="UART4Mult"/>            
+            <Output signalId="CKPERClk" to="UART5Mult"/>            
+            <Output signalId="CKPERClk" to="UART7Mult"/>            
+            <Output signalId="CKPERClk" to="UART8Mult"/>            
+            <Output signalId="CKPERClk" to="UART9Mult"/>            
+            <Output signalId="CKPERClk" to="SDMMC1Mult"/>            
+            <Output signalId="CKPERClk" to="SDMMC2Mult"/>            
+            <Output signalId="CKPERClk" to="LPUART1Mult"/>            
+            <Output signalId="CKPERClk" to="OTGPHY1Mult"/>            
+            <Output signalId="CKPERClk" to="OTGPHY2Mult"/>            
+            <Output signalId="CKPERClk" to="ETH1Mult"/>  
+        </Element>
+
+        <Element id="ADCMult" type="multiplexor" refParameter="ADCCLockSelection" orientation="LEFT" x="1355" y="750" refEnable="ADCEnable" refSecure="ADCTZEnable">
+            <Input signalId="HCLK"       from="AHBOutput"     refValue="RCC_ADCCLKSOURCE_HCLK"   />            
+            <Input signalId="CKPERClk"     from="CKPERoutput"  refValue="RCC_ADCCLKSOURCE_CLKP"/>
+            <Input signalId="IC7Out"      from="IC7Output"   refValue="RCC_ADCCLKSOURCE_IC7"/>
+            <Input signalId="IC8Out"      from="IC8Output"   refValue="RCC_ADCCLKSOURCE_IC8"/>
+            <Input signalId="MSI"      from="MSIRC"   refValue="RCC_ADCCLKSOURCE_MSI"/>
+            <Input signalId="HSIDivClk"   from="HSIDivOutput"   refValue="RCC_ADCCLKSOURCE_HSI"/>
+            <Input signalId="I2SCKIN"      from="I2S_CKIN"   refValue="RCC_ADCCLKSOURCE_PIN"/>
+            <Input signalId="TIMGClk"      from="TIMGOutput"   refValue="RCC_ADCCLKSOURCE_TIMG"/>
+            <Output signalId="ADCCLK" to="ADCDIV"/>
+        </Element>
+        <Element id="ADCDIV" type="devisor" refParameter="ADCDIV" x="1450" y="830" refEnable="ADCEnable">
+            <Input signalId="ADCCLK" from="ADCMult"/>
+            <Output signalId="ADCDivCLK" to="ADCoutput" />           
+        </Element>
+        <Element id="ADCoutput" type="activeOutput" refParameter="ADC12Freq_Value" x="1600" y="830"  refEnable="ADCEnable">
+            <Input signalId="ADCDivCLK" from="ADCDIV"/>
+        </Element>
+
+       <!--ADF-->		
+        <Element id="ADFMult" type="multiplexor" refParameter="ADF1ClockSelection" orientation="LEFT" x="1355" y="1032" refEnable="EnableADF1" refSecure="ADF1TZEnable">
+            <Input signalId="HCLK"       from="AHBOutput"     refValue="RCC_ADF1CLKSOURCE_HCLK"   />            
+            <Input signalId="CKPERClk"     from="CKPERoutput"  refValue="RCC_ADF1CLKSOURCE_CLKP"/>
+            <Input signalId="IC7Out"      from="IC7Output"   refValue="RCC_ADF1CLKSOURCE_IC7"/>
+            <Input signalId="IC8Out"      from="IC8Output"   refValue="RCC_ADF1CLKSOURCE_IC8"/>
+            <Input signalId="MSI"      from="MSIRC"   refValue="RCC_ADF1CLKSOURCE_MSI"/>
+            <Input signalId="HSIDivClk"   from="HSIDivOutput"   refValue="RCC_ADF1CLKSOURCE_HSI"/>
+            <Input signalId="I2SCKIN"      from="I2S_CKIN"   refValue="RCC_ADF1CLKSOURCE_PIN"/>
+            <Input signalId="TIMGClk"      from="TIMGOutput"   refValue="RCC_ADF1CLKSOURCE_TIMG"/>       
+            <Output signalId="ADFCLK" to="ADFoutput"/>
+        </Element>	
+        <Element id="ADFoutput" type="activeOutput" refParameter="ADFFreq_Value" x="1600" y="1115"  refEnable="EnableADF1">
+            <Input signalId="ADFCLK" from="ADFMult"/>
+        </Element>
+		
+       <!--MDF-->		
+        <Element id="MDF1Mult" type="multiplexor" refParameter="MDF1ClockSelection" orientation="LEFT" x="1357" y="2422" refEnable="EnableMDF1" refSecure="MDF1TZEnable">
+            <Input signalId="HCLK"       from="AHBOutput"     refValue="RCC_MDF1CLKSOURCE_HCLK"   />            
+            <Input signalId="CKPERClk"     from="CKPERoutput"  refValue="RCC_MDF1CLKSOURCE_CLKP"/>
+            <Input signalId="IC7Out"      from="IC7Output"   refValue="RCC_MDF1CLKSOURCE_IC7"/>
+            <Input signalId="IC8Out"      from="IC8Output"   refValue="RCC_MDF1CLKSOURCE_IC8"/>
+            <Input signalId="MSI"      from="MSIRC"   refValue="RCC_MDF1CLKSOURCE_MSI"/>
+            <Input signalId="HSIDivClk"  from="HSIDivOutput"   refValue="RCC_MDF1CLKSOURCE_HSI"/>
+            <Input signalId="I2SCKIN"      from="I2S_CKIN"   refValue="RCC_MDF1CLKSOURCE_PIN"/>
+            <Input signalId="TIMGClk"      from="TIMGOutput"   refValue="RCC_MDF1CLKSOURCE_TIMG"/>       
+            <Output signalId="MDFCLK" to="MDFoutput"/>
+        </Element>	
+        <Element id="MDFoutput" type="activeOutput" refParameter="MDFFreq_Value" x="1600" y="2506"  refEnable="EnableMDF1">
+            <Input signalId="MDFCLK" from="MDF1Mult"/>
+        </Element>
+
+       <!--PSSI-->		
+        <Element id="PSSIMult" type="multiplexor" refParameter="PSSIClockSelection" orientation="LEFT" x="1357" y="2678" refEnable="PSSIEnable" refSecure="PSSITZEnable">
+            <Input signalId="HCLK"       from="AHBOutput"     refValue="RCC_PSSICLKSOURCE_HCLK"   />            
+            <Input signalId="CKPERClk"   from="CKPERoutput"  refValue="RCC_PSSICLKSOURCE_CLKP"/>
+            <Input signalId="IC20Out"    from="IC20Output"   refValue="RCC_PSSICLKSOURCE_IC20"/>
+            <Input signalId="HSIDivClk"  from="HSIDivOutput"   refValue="RCC_PSSICLKSOURCE_HSI"/>
+            <Output signalId="PSSICLK" to="PSSIoutput"/>
+        </Element>	
+        <Element id="PSSIoutput" type="activeOutput" refParameter="PSSIFreq_Value" x="1600" y="2708"  refEnable="PSSIEnable">
+            <Input signalId="PSSICLK" from="PSSIMult"/>
+        </Element>
+		
+       <!--FDCAN-->		
+        <Element id="FDCANMult" type="multiplexor" refParameter="FDCANClockSelection" orientation="LEFT" x="1357" y="2847" refEnable="EnableFDCAN123" refSecure="FDCANTZEnable">
+            <Input signalId="PCLK1Clk"       from="APB1Output"     refValue="RCC_FDCANCLKSOURCE_PCLK1"   />            
+            <Input signalId="CKPERClk"     from="CKPERoutput"  refValue="RCC_FDCANCLKSOURCE_CLKP"/>
+            <Input signalId="IC19Out"      from="IC19Output"   refValue="RCC_FDCANCLKSOURCE_IC19"/>
+            <Input signalId="HSE"          from="HSEOSC"   refValue="RCC_FDCANCLKSOURCE_HSE"/>
+            <Output signalId="FDCANCLK" to="FDCANoutput"/>
+        </Element>	
+        <Element id="FDCANoutput" type="activeOutput" refParameter="FDCANFreq_Value" x="1600" y="2878"  refEnable="EnableFDCAN123">
+            <Input signalId="FDCANCLK" from="FDCANMult"/>
+        </Element>
+
+
+        <!--I2C1-->		
+        <Element id="I2C1Mult" type="multiplexor" refParameter="I2C1CLockSelection" orientation="LEFT" x="1357" y="1302" refEnable="EnableI2C1" refSecure="I2C1TZEnable">
+            <Input signalId="PCLK1Clk"     from="APB1Output"  refValue="RCC_I2C1CLKSOURCE_PCLK1"/>
+            <Input signalId="CKPERClk"   from="CKPERoutput"       refValue="RCC_I2C1CLKSOURCE_CLKP"/>
+            <Input signalId="IC10Out"    from="IC10Output"      refValue="RCC_I2C1CLKSOURCE_IC10"   />
+            <Input signalId="IC15Out"    from="IC15Output"       refValue="RCC_I2C1CLKSOURCE_IC15"/>
+            <Input signalId="MSI"        from="MSIRC"       refValue="RCC_I2C1CLKSOURCE_MSI"/>
+            <Input signalId="HSIDivClk"  from="HSIDivOutput"       refValue="RCC_I2C1CLKSOURCE_HSI"/>
+            <Output signalId="I2C1CLK" to="I2C1output"/>
+        </Element>	
+        <Element id="I2C1output" type="activeOutput" refParameter="I2C1Freq_Value" x="1600" y="1365"  refEnable="EnableI2C1">
+            <Input signalId="I2C1CLK" from="I2C1Mult"/>
+        </Element>
+		
+        <!--I2C2-->		
+        <Element id="I2C2Mult" type="multiplexor" refParameter="I2C2CLockSelection" orientation="LEFT" x="1537" y="1195" refEnable="EnableI2C2" refSecure="I2C2TZEnable">
+            <Input signalId="PCLK1Clk"     from="APB1Output"  refValue="RCC_I2C2CLKSOURCE_PCLK1"/>
+            <Input signalId="CKPERClk"   from="CKPERoutput"       refValue="RCC_I2C2CLKSOURCE_CLKP"/>
+            <Input signalId="IC10Out"    from="IC10Output"      refValue="RCC_I2C2CLKSOURCE_IC10"   />
+            <Input signalId="IC15Out"    from="IC15Output"       refValue="RCC_I2C2CLKSOURCE_IC15"/>
+            <Input signalId="MSI"        from="MSIRC"       refValue="RCC_I2C2CLKSOURCE_MSI"/>
+            <Input signalId="HSIDivClk"  from="HSIDivOutput"       refValue="RCC_I2C2CLKSOURCE_HSI"/>
+            <Output signalId="I2C2CLK" to="I2C2output"/>
+        </Element>	
+        <Element id="I2C2output" type="activeOutput" refParameter="I2C2Freq_Value" x="1600" y="1255"  refEnable="EnableI2C2">
+            <Input signalId="I2C2CLK" from="I2C2Mult"/>
+        </Element>
+		
+        <!--I2C3-->		
+        <Element id="I2C3Mult" type="multiplexor" refParameter="I2C3CLockSelection" orientation="LEFT" x="1357" y="1525" refEnable="EnableI2C3" refSecure="I2C3TZEnable">
+            <Input signalId="PCLK1Clk"     from="APB1Output"  refValue="RCC_I2C3CLKSOURCE_PCLK1"/>
+            <Input signalId="CKPERClk"   from="CKPERoutput"       refValue="RCC_I2C3CLKSOURCE_CLKP"/>
+            <Input signalId="IC10Out"    from="IC10Output"      refValue="RCC_I2C3CLKSOURCE_IC10"   />
+            <Input signalId="IC15Out"    from="IC15Output"       refValue="RCC_I2C3CLKSOURCE_IC15"/>
+            <Input signalId="MSI"        from="MSIRC"       refValue="RCC_I2C3CLKSOURCE_MSI"/>
+            <Input signalId="HSIDivClk"  from="HSIDivOutput"       refValue="RCC_I2C3CLKSOURCE_HSI"/>
+            <Output signalId="I2C3CLK" to="I2C3output"/>
+        </Element>	
+        <Element id="I2C3output" type="activeOutput" refParameter="I2C3Freq_Value" x="1600" y="1585"  refEnable="EnableI2C3">
+            <Input signalId="I2C3CLK" from="I2C3Mult"/>
+        </Element>
+		
+        <!--I2C4-->		
+        <Element id="I2C4Mult" type="multiplexor" refParameter="I2C4CLockSelection" orientation="LEFT" x="1537" y="1429" refEnable="EnableI2C4" refSecure="I2C4TZEnable">
+            <Input signalId="PCLK1Clk"     from="APB1Output"  refValue="RCC_I2C4CLKSOURCE_PCLK1"/>
+            <Input signalId="CKPERClk"   from="CKPERoutput"       refValue="RCC_I2C4CLKSOURCE_CLKP"/>
+            <Input signalId="IC10Out"    from="IC10Output"      refValue="RCC_I2C4CLKSOURCE_IC10"   />
+            <Input signalId="IC15Out"    from="IC15Output"       refValue="RCC_I2C4CLKSOURCE_IC15"/>
+            <Input signalId="MSI"        from="MSIRC"       refValue="RCC_I2C4CLKSOURCE_MSI"/>
+            <Input signalId="HSIDivClk"  from="HSIDivOutput"       refValue="RCC_I2C4CLKSOURCE_HSI"/>
+            <Output signalId="I2C4CLK" to="I2C4output"/>
+        </Element>	
+        <Element id="I2C4output" type="activeOutput" refParameter="I2C4Freq_Value" x="1600" y="1488"  refEnable="EnableI2C4">
+            <Input signalId="I2C4CLK" from="I2C4Mult"/>
+        </Element>
+		
+        <!--I3C1-->		
+        <Element id="I3C1Mult" type="multiplexor" refParameter="I3C1CLockSelection" orientation="LEFT" x="1357" y="1757" refEnable="EnableI3C1" refSecure="I3C1TZEnable">
+            <Input signalId="PCLK1Clk"     from="APB1Output"  refValue="RCC_I3C1CLKSOURCE_PCLK1"/>
+            <Input signalId="CKPERClk"   from="CKPERoutput"       refValue="RCC_I3C1CLKSOURCE_CLKP"/>
+            <Input signalId="IC10Out"    from="IC10Output"      refValue="RCC_I3C1CLKSOURCE_IC10"   />
+            <Input signalId="IC15Out"    from="IC15Output"       refValue="RCC_I3C1CLKSOURCE_IC15"/>
+            <Input signalId="MSI"        from="MSIRC"       refValue="RCC_I3C1CLKSOURCE_MSI"/>
+            <Input signalId="HSIDivClk"  from="HSIDivOutput"       refValue="RCC_I3C1CLKSOURCE_HSI"/>
+            <Output signalId="I3C1CLK" to="I3C1output"/>
+        </Element>	
+        <Element id="I3C1output" type="activeOutput" refParameter="I3C1Freq_Value" x="1600" y="1817"  refEnable="EnableI3C1">
+            <Input signalId="I3C1CLK" from="I3C1Mult"/>
+        </Element>
+		
+        <!--I3C2-->		
+        <Element id="I3C2Mult" type="multiplexor" refParameter="I3C2CLockSelection" orientation="LEFT" x="1537" y="1653" refEnable="EnableI3C2" refSecure="I3C2TZEnable">
+            <Input signalId="PCLK1Clk"     from="APB1Output"  refValue="RCC_I3C2CLKSOURCE_PCLK1"/>
+            <Input signalId="CKPERClk"   from="CKPERoutput"       refValue="RCC_I3C2CLKSOURCE_CLKP"/>
+            <Input signalId="IC10Out"    from="IC10Output"      refValue="RCC_I3C2CLKSOURCE_IC10"   />
+            <Input signalId="IC15Out"    from="IC15Output"       refValue="RCC_I3C2CLKSOURCE_IC15"/>
+            <Input signalId="MSI"        from="MSIRC"       refValue="RCC_I3C2CLKSOURCE_MSI"/>
+            <Input signalId="HSIDivClk"  from="HSIDivOutput"       refValue="RCC_I3C2CLKSOURCE_HSI"/>
+            <Output signalId="I3C2CLK" to="I3C2output"/>
+        </Element>	
+        <Element id="I3C2output" type="activeOutput" refParameter="I3C2Freq_Value" x="1600" y="1715"  refEnable="EnableI3C2">
+            <Input signalId="I3C2CLK" from="I3C2Mult"/>
+        </Element>
+		
+        <!--LPTIM1-->		
+        <Element id="LPTIM1Mult" type="multiplexor" refParameter="LPTIM1CLockSelection" orientation="LEFT" x="1357" y="1985" refEnable="EnableLPTIM1" refSecure="LPTIM1TZEnable">
+            <Input signalId="PCLK1Clk"     from="APB1Output"  refValue="RCC_LPTIM1CLKSOURCE_PCLK1"/>
+            <Input signalId="CKPERClk"   from="CKPERoutput"       refValue="RCC_LPTIM1CLKSOURCE_CLKP"/>
+            <Input signalId="IC15Out"    from="IC15Output"      refValue="RCC_LPTIM1CLKSOURCE_IC15"   />
+            <Input signalId="LSE"    from="LSEOSC"       refValue="RCC_LPTIM1CLKSOURCE_LSE"/>
+            <Input signalId="LSI"        from="LSIRC"       refValue="RCC_LPTIM1CLKSOURCE_LSI"/>
+            <Input signalId="TIMGClk"        from="TIMGOutput"       refValue="RCC_LPTIM1CLKSOURCE_TIMG"/>
+            <Output signalId="LPTIM1CLK" to="LPTIM1output"/>
+        </Element>	
+        <Element id="LPTIM1output" type="activeOutput" refParameter="LPTIM1Freq_Value" x="1600" y="2048"  refEnable="EnableLPTIM1">
+            <Input signalId="LPTIM1CLK" from="LPTIM1Mult"/>
+        </Element>
+		
+        <!--LPTIM3-->		
+        <Element id="LPTIM3Mult" type="multiplexor" refParameter="LPTIM3CLockSelection" orientation="LEFT" x="1357" y="2208" refEnable="EnableLPTIM3" refSecure="LPTIM3TZEnable">
+            <Input signalId="PCLK4Clk"     from="APB4Output"  refValue="RCC_LPTIM3CLKSOURCE_PCLK4"/>
+            <Input signalId="CKPERClk"   from="CKPERoutput"       refValue="RCC_LPTIM3CLKSOURCE_CLKP"/>
+            <Input signalId="IC15Out"    from="IC15Output"      refValue="RCC_LPTIM3CLKSOURCE_IC15"   />
+            <Input signalId="LSE"    from="LSEOSC"       refValue="RCC_LPTIM3CLKSOURCE_LSE"/>
+            <Input signalId="LSI"        from="LSIRC"       refValue="RCC_LPTIM3CLKSOURCE_LSI"/>
+            <Input signalId="TIMGClk"        from="TIMGOutput"       refValue="RCC_LPTIM3CLKSOURCE_TIMG"/>
+            <Output signalId="LPTIM3CLK" to="LPTIM3output"/>
+        </Element>	
+        <Element id="LPTIM3output" type="activeOutput" refParameter="LPTIM3Freq_Value" x="1600" y="2270"  refEnable="EnableLPTIM3">
+            <Input signalId="LPTIM3CLK" from="LPTIM3Mult"/>
+        </Element>
+		
+        <!--LPTIM2-->		
+        <Element id="LPTIM2Mult" type="multiplexor" refParameter="LPTIM2CLockSelection" orientation="LEFT" x="1540" y="1884" refEnable="EnableLPTIM2" refSecure="LPTIM2TZEnable">
+            <Input signalId="PCLK4Clk"     from="APB4Output"  refValue="RCC_LPTIM2CLKSOURCE_PCLK4"/>
+            <Input signalId="CKPERClk"   from="CKPERoutput"       refValue="RCC_LPTIM2CLKSOURCE_CLKP"/>
+            <Input signalId="IC15Out"    from="IC15Output"      refValue="RCC_LPTIM2CLKSOURCE_IC15"   />
+            <Input signalId="LSE"    from="LSEOSC"       refValue="RCC_LPTIM2CLKSOURCE_LSE"/>
+            <Input signalId="LSI"        from="LSIRC"       refValue="RCC_LPTIM2CLKSOURCE_LSI"/>
+            <Input signalId="TIMGClk"        from="TIMGOutput"       refValue="RCC_LPTIM2CLKSOURCE_TIMG"/>
+            <Output signalId="LPTIM2CLK" to="LPTIM2output"/>
+        </Element>	
+        <Element id="LPTIM2output" type="activeOutput" refParameter="LPTIM2Freq_Value" x="1600" y="1947"  refEnable="EnableLPTIM2">
+            <Input signalId="LPTIM2CLK" from="LPTIM2Mult"/>
+        </Element>
+		
+        <!--LPTIM4-->		
+        <Element id="LPTIM4Mult" type="multiplexor" refParameter="LPTIM4CLockSelection" orientation="LEFT" x="1540" y="2105" refEnable="EnableLPTIM4" refSecure="LPTIM4TZEnable">
+            <Input signalId="PCLK4Clk"     from="APB4Output"  refValue="RCC_LPTIM4CLKSOURCE_PCLK4"/>
+            <Input signalId="CKPERClk"   from="CKPERoutput"       refValue="RCC_LPTIM4CLKSOURCE_CLKP"/>
+            <Input signalId="IC15Out"    from="IC15Output"      refValue="RCC_LPTIM4CLKSOURCE_IC15"   />
+            <Input signalId="LSE"    from="LSEOSC"       refValue="RCC_LPTIM4CLKSOURCE_LSE"/>
+            <Input signalId="LSI"        from="LSIRC"       refValue="RCC_LPTIM4CLKSOURCE_LSI"/>
+            <Input signalId="TIMGClk"        from="TIMGOutput"       refValue="RCC_LPTIM4CLKSOURCE_TIMG"/>
+            <Output signalId="LPTIM4CLK" to="LPTIM4output"/>
+        </Element>	
+        <Element id="LPTIM4output" type="activeOutput" refParameter="LPTIM4Freq_Value" x="1600" y="2165"  refEnable="EnableLPTIM4">
+            <Input signalId="LPTIM4CLK" from="LPTIM4Mult"/>
+        </Element>
+		
+        <!--LPTIM5-->		
+        <Element id="LPTIM5Mult" type="multiplexor" refParameter="LPTIM5CLockSelection" orientation="LEFT" x="1542" y="2327" refEnable="EnableLPTIM5" refSecure="LPTIM5TZEnable">
+            <Input signalId="PCLK4Clk"     from="APB4Output"  refValue="RCC_LPTIM5CLKSOURCE_PCLK4"/>
+            <Input signalId="CKPERClk"   from="CKPERoutput"       refValue="RCC_LPTIM5CLKSOURCE_CLKP"/>
+            <Input signalId="IC15Out"    from="IC15Output"      refValue="RCC_LPTIM5CLKSOURCE_IC15"   />
+            <Input signalId="LSE"    from="LSEOSC"       refValue="RCC_LPTIM5CLKSOURCE_LSE"/>
+            <Input signalId="LSI"        from="LSIRC"       refValue="RCC_LPTIM5CLKSOURCE_LSI"/>
+            <Input signalId="TIMGClk"        from="TIMGOutput"       refValue="RCC_LPTIM5CLKSOURCE_TIMG"/>
+            <Output signalId="LPTIM5CLK" to="LPTIM5output"/>
+        </Element>	
+        <Element id="LPTIM5output" type="activeOutput" refParameter="LPTIM5Freq_Value" x="1600" y="2387"  refEnable="EnableLPTIM5">
+            <Input signalId="LPTIM5CLK" from="LPTIM5Mult"/>
+        </Element>
+
+        <!--LTDC-->		
+        <Element id="LTDCMult" type="multiplexor" refParameter="LTDCClockSelection" orientation="LEFT" x="1542" y="2565" refEnable="EnableLTDC" refSecure="LTDCTZEnable">
+            <Input signalId="PCLK5Clk"   from="APB5Output"  refValue="RCC_LTDCCLKSOURCE_PCLK5"/>
+            <Input signalId="CKPERClk"   from="CKPERoutput"       refValue="RCC_LTDCCLKSOURCE_CLKP"/>
+            <Input signalId="IC16Out"    from="IC16Output"      refValue="RCC_LTDCCLKSOURCE_IC16"   />
+            <Input signalId="HSIDivClk"  from="HSIDivOutput"       refValue="RCC_LTDCCLKSOURCE_HSI"/>
+            <Output signalId="LTDCCLK" to="LTDCoutput"/>
+        </Element>	
+        <Element id="LTDCoutput" type="activeOutput" refParameter="LTDCFreq_Value" x="1600" y="2592"  refEnable="EnableLTDC">
+            <Input signalId="LTDCCLK" from="LTDCMult"/>
+        </Element>
+		
+        <!--DCMIPP-->		
+        <Element id="DCMIPPMult" type="multiplexor" refParameter="DCMIPPClockSelection" orientation="LEFT" x="1544" y="2772" refEnable="EnableDCMI" refSecure="DCMIPPTZEnable">
+            <Input signalId="PCLK5Clk"     from="APB5Output"  refValue="RCC_DCMIPPCLKSOURCE_PCLK5"/>
+            <Input signalId="CKPERClk"   from="CKPERoutput"       refValue="RCC_DCMIPPCLKSOURCE_CLKP"/>
+            <Input signalId="IC17Out"    from="IC17Output"      refValue="RCC_DCMIPPCLKSOURCE_IC17"   />
+            <Input signalId="HSIDivClk"  from="HSIDivOutput"       refValue="RCC_DCMIPPCLKSOURCE_HSI"/>
+            <Output signalId="DCMIPPCLK" to="DCMIPPoutput"/>
+        </Element>	
+        <Element id="DCMIPPoutput" type="activeOutput" refParameter="DCMIPPFreq_Value" x="1600" y="2799"  refEnable="EnableDCMI">
+            <Input signalId="DCMIPPCLK" from="DCMIPPMult"/>
+        </Element>
+		
+        <!--FMC-->		
+        <Element id="FMCMult" type="multiplexor" refParameter="FMCClockSelection" orientation="LEFT" x="1544" y="2942" refEnable="FMCEnable" refSecure="FMCTZEnable">
+            <Input signalId="HCLK"     from="AHBOutput"  refValue="RCC_FMCCLKSOURCE_HCLK"/>
+            <Input signalId="CKPERClk"   from="CKPERoutput"       refValue="RCC_FMCCLKSOURCE_CLKP"/>
+            <Input signalId="IC3Out"    from="IC3Output"      refValue="RCC_FMCCLKSOURCE_IC3"   />
+            <Input signalId="IC4Out"    from="IC4Output"       refValue="RCC_FMCCLKSOURCE_IC4"/>
+            <Output signalId="FMCCLK" to="FMCoutput"/>
+        </Element>	
+        <Element id="FMCoutput" type="activeOutput" refParameter="FMCFreq_Value" x="1600" y="2972"  refEnable="FMCEnable">
+            <Input signalId="FMCCLK" from="FMCMult"/>
+        </Element>
+
+
+       <!--SAI1-->		
+        <Element id="SAI1Mult" type="multiplexor" refParameter="SAI1ClockSelection" orientation="LEFT" x="1359" y="3002" refEnable="EnableSAI1" refSecure="SAI1TZEnable">
+            <Input signalId="PCLK2Clk"       from="APB2Output"     refValue="RCC_SAI1CLKSOURCE_PCLK2"   />            
+            <Input signalId="CKPERClk"     from="CKPERoutput"  refValue="RCC_SAI1CLKSOURCE_CLKP"/>
+            <Input signalId="IC7Out"      from="IC7Output"   refValue="RCC_SAI1CLKSOURCE_IC7"/>
+            <Input signalId="IC8Out"      from="IC8Output"   refValue="RCC_SAI1CLKSOURCE_IC8"/>
+            <Input signalId="MSI"      from="MSIRC"   refValue="RCC_SAI1CLKSOURCE_MSI"/>
+            <Input signalId="HSIDivClk"  from="HSIDivOutput"   refValue="RCC_SAI1CLKSOURCE_HSI"/>
+            <Input signalId="I2SCKIN"      from="I2S_CKIN"   refValue="RCC_SAI1CLKSOURCE_PIN"/>
+            <Input signalId="SPDIFRX1CLK"      from="SPDIFRX1Mult"   refValue="RCC_SAI1CLKSOURCE_SPDIFRX1"/>       
+            <Output signalId="SAI1CLK" to="SAI1output"/>
+        </Element>	
+        <Element id="SAI1output" type="activeOutput" refParameter="SAI1Freq_Value" x="1600" y="3083"  refEnable="EnableSAI1">
+            <Input signalId="SAI1CLK" from="SAI1Mult"/>
+        </Element>
+		
+       <!--SAI2-->		
+        <Element id="SAI2Mult" type="multiplexor" refParameter="SAI2ClockSelection" orientation="LEFT" x="1544" y="3139" refEnable="EnableSAI2" refSecure="SAI2TZEnable">
+            <Input signalId="PCLK2Clk"       from="APB2Output"     refValue="RCC_SAI2CLKSOURCE_PCLK2"   />            
+            <Input signalId="CKPERClk"     from="CKPERoutput"  refValue="RCC_SAI2CLKSOURCE_CLKP"/>
+            <Input signalId="IC7Out"      from="IC7Output"   refValue="RCC_SAI2CLKSOURCE_IC7"/>
+            <Input signalId="IC8Out"      from="IC8Output"   refValue="RCC_SAI2CLKSOURCE_IC8"/>
+            <Input signalId="MSI"      from="MSIRC"   refValue="RCC_SAI2CLKSOURCE_MSI"/>
+            <Input signalId="HSIDivClk"  from="HSIDivOutput"   refValue="RCC_SAI2CLKSOURCE_HSI"/>
+            <Input signalId="I2SCKIN"      from="I2S_CKIN"   refValue="RCC_SAI2CLKSOURCE_PIN"/>
+            <Input signalId="SPDIFRX1CLK"      from="SPDIFRX1Mult"   refValue="RCC_SAI2CLKSOURCE_SPDIFRX1"/>       
+            <Output signalId="SAI2CLK" to="SAI2output"/>
+        </Element>	
+        <Element id="SAI2output" type="activeOutput" refParameter="SAI2Freq_Value" x="1600" y="3223"  refEnable="EnableSAI2">
+            <Input signalId="SAI2CLK" from="SAI2Mult"/>
+        </Element>
+
+       <!--USART1-->		
+        <Element id="USART1Mult" type="multiplexor" refParameter="USART1ClockSelection" orientation="LEFT" x="953" y="1595" refEnable="EnableUSART1" refSecure="USART1TZEnable">
+            <Input signalId="PCLK2Clk"       from="APB2Output"     refValue="RCC_USART1CLKSOURCE_PCLK2"   />            
+            <Input signalId="CKPERClk"     from="CKPERoutput"  refValue="RCC_USART1CLKSOURCE_CLKP"/>
+            <Input signalId="IC9Out"      from="IC9Output"   refValue="RCC_USART1CLKSOURCE_IC9"/>
+            <Input signalId="IC14Out"      from="IC14Output"   refValue="RCC_USART1CLKSOURCE_IC14"/>
+            <Input signalId="LSE"      from="LSEOSC"   refValue="RCC_USART1CLKSOURCE_LSE"/>
+            <Input signalId="MSI"      from="MSIRC"   refValue="RCC_USART1CLKSOURCE_MSI"/>
+            <Input signalId="HSIDivClk"      from="HSIDivOutput"   refValue="RCC_USART1CLKSOURCE_HSI"/>
+            <Output signalId="USART1CLK" to="USART1output"/>
+        </Element>	
+        <Element id="USART1output" type="activeOutput" refParameter="USART1Freq_Value" x="1140" y="1668"  refEnable="EnableUSART1">
+            <Input signalId="USART1CLK" from="USART1Mult"/>
+        </Element>
+		
+       <!--USART2-->		
+        <Element id="USART2Mult" type="multiplexor" refParameter="USART2ClockSelection" orientation="LEFT" x="1060" y="1723" refEnable="EnableUSART2" refSecure="USART2TZEnable">
+            <Input signalId="PCLK1Clk"       from="APB1Output"     refValue="RCC_USART2CLKSOURCE_PCLK1"   />            
+            <Input signalId="CKPERClk"     from="CKPERoutput"  refValue="RCC_USART2CLKSOURCE_CLKP"/>
+            <Input signalId="IC9Out"      from="IC9Output"   refValue="RCC_USART2CLKSOURCE_IC9"/>
+            <Input signalId="IC14Out"      from="IC14Output"   refValue="RCC_USART2CLKSOURCE_IC14"/>
+            <Input signalId="LSE"      from="LSEOSC"   refValue="RCC_USART2CLKSOURCE_LSE"/>
+            <Input signalId="MSI"      from="MSIRC"   refValue="RCC_USART2CLKSOURCE_MSI"/>
+            <Input signalId="HSIDivClk"      from="HSIDivOutput"   refValue="RCC_USART2CLKSOURCE_HSI"/>
+            <Output signalId="USART2CLK" to="USART2output"/>
+        </Element>	
+        <Element id="USART2output" type="activeOutput" refParameter="USART2Freq_Value" x="1140" y="1793"  refEnable="EnableUSART2">
+            <Input signalId="USART2CLK" from="USART2Mult"/>
+        </Element>
+		
+       <!--USART3-->		
+        <Element id="USART3Mult" type="multiplexor" refParameter="USART3ClockSelection" orientation="LEFT" x="953" y="1829" refEnable="EnableUSART3" refSecure="USART3TZEnable">
+            <Input signalId="PCLK1Clk"       from="APB1Output"     refValue="RCC_USART3CLKSOURCE_PCLK1"   />            
+            <Input signalId="CKPERClk"     from="CKPERoutput"  refValue="RCC_USART3CLKSOURCE_CLKP"/>
+            <Input signalId="IC9Out"      from="IC9Output"   refValue="RCC_USART3CLKSOURCE_IC9"/>
+            <Input signalId="IC14Out"      from="IC14Output"   refValue="RCC_USART3CLKSOURCE_IC14"/>
+            <Input signalId="LSE"      from="LSEOSC"   refValue="RCC_USART3CLKSOURCE_LSE"/>
+            <Input signalId="MSI"      from="MSIRC"   refValue="RCC_USART3CLKSOURCE_MSI"/>
+            <Input signalId="HSIDivClk"      from="HSIDivOutput"   refValue="RCC_USART3CLKSOURCE_HSI"/>
+            <Output signalId="USART3CLK" to="USART3output"/>
+        </Element>	
+        <Element id="USART3output" type="activeOutput" refParameter="USART3Freq_Value" x="1140" y="1902"  refEnable="EnableUSART3">
+            <Input signalId="USART3CLK" from="USART3Mult"/>
+        </Element>
+		
+       <!--UART4-->		
+        <Element id="UART4Mult" type="multiplexor" refParameter="UART4ClockSelection" orientation="LEFT" x="1060" y="1955" refEnable="EnableUART4" refSecure="UART4TZEnable">
+            <Input signalId="PCLK1Clk"       from="APB1Output"     refValue="RCC_UART4CLKSOURCE_PCLK1"   />            
+            <Input signalId="CKPERClk"     from="CKPERoutput"  refValue="RCC_UART4CLKSOURCE_CLKP"/>
+            <Input signalId="IC9Out"      from="IC9Output"   refValue="RCC_UART4CLKSOURCE_IC9"/>
+            <Input signalId="IC14Out"      from="IC14Output"   refValue="RCC_UART4CLKSOURCE_IC14"/>
+            <Input signalId="LSE"      from="LSEOSC"   refValue="RCC_UART4CLKSOURCE_LSE"/>
+            <Input signalId="MSI"      from="MSIRC"   refValue="RCC_UART4CLKSOURCE_MSI"/>
+            <Input signalId="HSIDivClk"      from="HSIDivOutput"   refValue="RCC_UART4CLKSOURCE_HSI"/>
+            <Output signalId="UART4CLK" to="UART4output"/>
+        </Element>	
+        <Element id="UART4output" type="activeOutput" refParameter="UART4Freq_Value" x="1140" y="2025"  refEnable="EnableUART4">
+            <Input signalId="UART4CLK" from="UART4Mult"/>
+        </Element>
+		
+       <!--UART5-->		
+        <Element id="UART5Mult" type="multiplexor" refParameter="UART5ClockSelection" orientation="LEFT" x="953" y="2065" refEnable="EnableUART5" refSecure="UART5TZEnable">
+            <Input signalId="PCLK1Clk"       from="APB1Output"     refValue="RCC_UART5CLKSOURCE_PCLK1"   />            
+            <Input signalId="CKPERClk"     from="CKPERoutput"  refValue="RCC_UART5CLKSOURCE_CLKP"/>
+            <Input signalId="IC9Out"      from="IC9Output"   refValue="RCC_UART5CLKSOURCE_IC9"/>
+            <Input signalId="IC14Out"      from="IC14Output"   refValue="RCC_UART5CLKSOURCE_IC14"/>
+            <Input signalId="LSE"      from="LSEOSC"   refValue="RCC_UART5CLKSOURCE_LSE"/>
+            <Input signalId="MSI"      from="MSIRC"   refValue="RCC_UART5CLKSOURCE_MSI"/>
+            <Input signalId="HSIDivClk"      from="HSIDivOutput"   refValue="RCC_UART5CLKSOURCE_HSI"/>
+            <Output signalId="UART5CLK" to="UART5output"/>
+        </Element>	
+        <Element id="UART5output" type="activeOutput" refParameter="UART5Freq_Value" x="1140" y="2140"  refEnable="EnableUART5">
+            <Input signalId="UART5CLK" from="UART5Mult"/>
+        </Element>
+		
+       <!--USART6-->		
+        <Element id="USART6Mult" type="multiplexor" refParameter="USART6ClockSelection" orientation="LEFT" x="1060" y="2194" refEnable="EnableUSART6" refSecure="USART6TZEnable">
+            <Input signalId="PCLK2Clk"       from="APB2Output"     refValue="RCC_USART6CLKSOURCE_PCLK2"   />            
+            <Input signalId="CKPERClk"     from="CKPERoutput"  refValue="RCC_USART6CLKSOURCE_CLKP"/>
+            <Input signalId="IC9Out"      from="IC9Output"   refValue="RCC_USART6CLKSOURCE_IC9"/>
+            <Input signalId="IC14Out"      from="IC14Output"   refValue="RCC_USART6CLKSOURCE_IC14"/>
+            <Input signalId="LSE"      from="LSEOSC"   refValue="RCC_USART6CLKSOURCE_LSE"/>
+            <Input signalId="MSI"      from="MSIRC"   refValue="RCC_USART6CLKSOURCE_MSI"/>
+            <Input signalId="HSIDivClk"      from="HSIDivOutput"   refValue="RCC_USART6CLKSOURCE_HSI"/>
+            <Output signalId="USART6CLK" to="USART6output"/>
+        </Element>	
+        <Element id="USART6output" type="activeOutput" refParameter="USART6Freq_Value" x="1140" y="2267"  refEnable="EnableUSART6">
+            <Input signalId="USART6CLK" from="USART6Mult"/>
+        </Element>
+
+       <!-- UART7-->
+        <Element id="UART7Mult" type="multiplexor" refParameter="UART7ClockSelection" orientation="LEFT" x="953" y="2300" refEnable="EnableUART7" refSecure="UART7TZEnable">
+            <Input signalId="PCLK1Clk"       from="APB1Output"     refValue="RCC_UART7CLKSOURCE_PCLK1"   />            
+            <Input signalId="CKPERClk"     from="CKPERoutput"  refValue="RCC_UART7CLKSOURCE_CLKP"/>
+            <Input signalId="IC9Out"      from="IC9Output"   refValue="RCC_UART7CLKSOURCE_IC9"/>
+            <Input signalId="IC14Out"      from="IC14Output"   refValue="RCC_UART7CLKSOURCE_IC14"/>
+            <Input signalId="LSE"      from="LSEOSC"   refValue="RCC_UART7CLKSOURCE_LSE"/>
+            <Input signalId="MSI"      from="MSIRC"   refValue="RCC_UART7CLKSOURCE_MSI"/>
+            <Input signalId="HSIDivClk"      from="HSIDivOutput"   refValue="RCC_UART7CLKSOURCE_HSI"/>
+            <Output signalId="UART7CLK" to="UART7output"/>
+        </Element>	
+        <Element id="UART7output" type="activeOutput" refParameter="UART7Freq_Value" x="1140" y="2374"  refEnable="EnableUART7">
+            <Input signalId="UART7CLK" from="UART7Mult"/>
+        </Element>
+		
+       <!--UART8-->		
+        <Element id="UART8Mult" type="multiplexor" refParameter="UART8ClockSelection" orientation="LEFT" x="1060" y="2437" refEnable="EnableUART8" refSecure="UART8TZEnable">
+            <Input signalId="PCLK1Clk"       from="APB1Output"     refValue="RCC_UART8CLKSOURCE_PCLK1"   />            
+            <Input signalId="CKPERClk"     from="CKPERoutput"  refValue="RCC_UART8CLKSOURCE_CLKP"/>
+            <Input signalId="IC9Out"      from="IC9Output"   refValue="RCC_UART8CLKSOURCE_IC9"/>
+            <Input signalId="IC14Out"      from="IC14Output"   refValue="RCC_UART8CLKSOURCE_IC14"/>
+            <Input signalId="LSE"      from="LSEOSC"   refValue="RCC_UART8CLKSOURCE_LSE"/>
+            <Input signalId="MSI"      from="MSIRC"   refValue="RCC_UART8CLKSOURCE_MSI"/>
+            <Input signalId="HSIDivClk"      from="HSIDivOutput"   refValue="RCC_UART8CLKSOURCE_HSI"/>
+            <Output signalId="UART8CLK" to="UART8output"/>
+        </Element>	
+        <Element id="UART8output" type="activeOutput" refParameter="UART8Freq_Value" x="1140" y="2508"  refEnable="EnableUART8">
+            <Input signalId="UART8CLK" from="UART8Mult"/>
+        </Element>
+		
+       <!--UART9-->		
+        <Element id="UART9Mult" type="multiplexor" refParameter="UART9ClockSelection" orientation="LEFT" x="953" y="2551" refEnable="EnableUART9" refSecure="UART9TZEnable">
+            <Input signalId="PCLK2Clk"       from="APB2Output"     refValue="RCC_UART9CLKSOURCE_PCLK2"   />            
+            <Input signalId="CKPERClk"     from="CKPERoutput"  refValue="RCC_UART9CLKSOURCE_CLKP"/>
+            <Input signalId="IC9Out"      from="IC9Output"   refValue="RCC_UART9CLKSOURCE_IC9"/>
+            <Input signalId="IC14Out"      from="IC14Output"   refValue="RCC_UART9CLKSOURCE_IC14"/>
+            <Input signalId="LSE"      from="LSEOSC"   refValue="RCC_UART9CLKSOURCE_LSE"/>
+            <Input signalId="MSI"      from="MSIRC"   refValue="RCC_UART9CLKSOURCE_MSI"/>
+            <Input signalId="HSIDivClk"      from="HSIDivOutput"   refValue="RCC_UART9CLKSOURCE_HSI"/>
+            <Output signalId="UART9CLK" to="UART9output"/>
+        </Element>	
+        <Element id="UART9output" type="activeOutput" refParameter="UART9Freq_Value" x="1140" y="2625"  refEnable="EnableUART9">
+            <Input signalId="UART9CLK" from="UART9Mult"/>
+        </Element>
+		
+       <!--LPUART1-->		
+        <Element id="LPUART1Mult" type="multiplexor" refParameter="LPUART1ClockSelection" orientation="LEFT" x="554" y="2551" refEnable="EnableLPUART1" refSecure="LPUART1TZEnable">
+            <Input signalId="PCLK4Clk"       from="APB4Output"     refValue="RCC_LPUART1CLKSOURCE_PCLK4"   />            
+            <Input signalId="CKPERClk"     from="CKPERoutput"  refValue="RCC_LPUART1CLKSOURCE_CLKP"/>
+            <Input signalId="IC9Out"      from="IC9Output"   refValue="RCC_LPUART1CLKSOURCE_IC9"/>
+            <Input signalId="IC14Out"      from="IC14Output"   refValue="RCC_LPUART1CLKSOURCE_IC14"/>
+            <Input signalId="LSE"      from="LSEOSC"   refValue="RCC_LPUART1CLKSOURCE_LSE"/>
+            <Input signalId="MSI"      from="MSIRC"   refValue="RCC_LPUART1CLKSOURCE_MSI"/>
+            <Input signalId="HSIDivClk"      from="HSIDivOutput"   refValue="RCC_LPUART1CLKSOURCE_HSI"/>
+            <Output signalId="LPUART1CLK" to="LPUART1output"/>
+        </Element>	
+        <Element id="LPUART1output" type="activeOutput" refParameter="LPUART1Freq_Value" x="712" y="2625"  refEnable="EnableLPUART1">
+            <Input signalId="LPUART1CLK" from="LPUART1Mult"/>
+        </Element>
+		
+       <!--USART10-->		
+        <Element id="USART10Mult" type="multiplexor" refParameter="USART10ClockSelection" orientation="LEFT" x="1060" y="2679" refEnable="EnableUSART10" refSecure="USART10TZEnable">
+            <Input signalId="PCLK2Clk"       from="APB2Output"     refValue="RCC_USART10CLKSOURCE_PCLK2"   />            
+            <Input signalId="CKPERClk"     from="CKPERoutput"  refValue="RCC_USART10CLKSOURCE_CLKP"/>
+            <Input signalId="IC9Out"      from="IC9Output"   refValue="RCC_USART10CLKSOURCE_IC9"/>
+            <Input signalId="IC14Out"      from="IC14Output"   refValue="RCC_USART10CLKSOURCE_IC14"/>
+            <Input signalId="LSE"      from="LSEOSC"   refValue="RCC_USART10CLKSOURCE_LSE"/>
+            <Input signalId="MSI"      from="MSIRC"   refValue="RCC_USART10CLKSOURCE_MSI"/>
+            <Input signalId="HSIDivClk"      from="HSIDivOutput"   refValue="RCC_USART10CLKSOURCE_HSI"/>
+            <Output signalId="USART10CLK" to="USART10output"/>
+        </Element>	
+        <Element id="USART10output" type="activeOutput" refParameter="USART10Freq_Value" x="1140" y="2751"  refEnable="EnableUSART10">
+            <Input signalId="USART10CLK" from="USART10Mult"/>
+        </Element>
+		
+       <!--SPI1-->		
+        <Element id="SPI1Mult" type="multiplexor" refParameter="SPI1ClockSelection" orientation="LEFT" x="953" y="2785" refEnable="EnableSPI1" refSecure="SPI1TZEnable">
+            <Input signalId="PCLK2Clk"       from="APB2Output"     refValue="RCC_SPI1CLKSOURCE_PCLK2"   />            
+            <Input signalId="CKPERClk"     from="CKPERoutput"  refValue="RCC_SPI1CLKSOURCE_CLKP"/>
+            <Input signalId="IC8Out"      from="IC8Output"   refValue="RCC_SPI1CLKSOURCE_IC8"/>
+            <Input signalId="IC9Out"      from="IC9Output"   refValue="RCC_SPI1CLKSOURCE_IC9"/>
+            <Input signalId="MSI"      from="MSIRC"   refValue="RCC_SPI1CLKSOURCE_MSI"/>
+            <Input signalId="HSIDivClk"      from="HSIDivOutput"   refValue="RCC_SPI1CLKSOURCE_HSI"/>
+            <Input signalId="I2SCKIN"      from="I2S_CKIN"   refValue="RCC_SPI1CLKSOURCE_PIN"/>
+            <Output signalId="SPI1CLK" to="SPI1output"/>
+        </Element>	
+        <Element id="SPI1output" type="activeOutput" refParameter="SPI1Freq_Value" x="1140" y="2860"  refEnable="EnableSPI1">
+            <Input signalId="SPI1CLK" from="SPI1Mult"/>
+        </Element>
+		
+       <!--SPI2-->		
+        <Element id="SPI2Mult" type="multiplexor" refParameter="SPI2ClockSelection" orientation="LEFT" x="1060" y="2915" refEnable="EnableSPI2" refSecure="SPI2TZEnable">
+            <Input signalId="PCLK1Clk"       from="APB1Output"     refValue="RCC_SPI2CLKSOURCE_PCLK1"   />            
+            <Input signalId="CKPERClk"     from="CKPERoutput"  refValue="RCC_SPI2CLKSOURCE_CLKP"/>
+            <Input signalId="IC8Out"      from="IC8Output"   refValue="RCC_SPI2CLKSOURCE_IC8"/>
+            <Input signalId="IC9Out"      from="IC9Output"   refValue="RCC_SPI2CLKSOURCE_IC9"/>
+            <Input signalId="MSI"      from="MSIRC"   refValue="RCC_SPI2CLKSOURCE_MSI"/>
+            <Input signalId="HSIDivClk"      from="HSIDivOutput"   refValue="RCC_SPI2CLKSOURCE_HSI"/>
+            <Input signalId="I2SCKIN"      from="I2S_CKIN"   refValue="RCC_SPI2CLKSOURCE_PIN"/>
+            <Output signalId="SPI2CLK" to="SPI2output"/>
+        </Element>	
+        <Element id="SPI2output" type="activeOutput" refParameter="SPI2Freq_Value" x="1140" y="2987"  refEnable="EnableSPI2">
+            <Input signalId="SPI2CLK" from="SPI2Mult"/>
+        </Element>
+		
+       <!--SPI3-->		
+        <Element id="SPI3Mult" type="multiplexor" refParameter="SPI3ClockSelection" orientation="LEFT" x="953" y="3021" refEnable="EnableSPI3" refSecure="SPI3TZEnable">
+            <Input signalId="PCLK1Clk"       from="APB1Output"     refValue="RCC_SPI3CLKSOURCE_PCLK1"   />            
+            <Input signalId="CKPERClk"     from="CKPERoutput"  refValue="RCC_SPI3CLKSOURCE_CLKP"/>
+            <Input signalId="IC8Out"      from="IC8Output"   refValue="RCC_SPI3CLKSOURCE_IC8"/>
+            <Input signalId="IC9Out"      from="IC9Output"   refValue="RCC_SPI3CLKSOURCE_IC9"/>
+            <Input signalId="MSI"      from="MSIRC"   refValue="RCC_SPI3CLKSOURCE_MSI"/>
+            <Input signalId="HSIDivClk"      from="HSIDivOutput"   refValue="RCC_SPI3CLKSOURCE_HSI"/>
+            <Input signalId="I2SCKIN"      from="I2S_CKIN"   refValue="RCC_SPI3CLKSOURCE_PIN"/>
+            <Output signalId="SPI3CLK" to="SPI3output"/>
+        </Element>	
+        <Element id="SPI3output" type="activeOutput" refParameter="SPI3Freq_Value" x="1140" y="3093"  refEnable="EnableSPI3">
+            <Input signalId="SPI3CLK" from="SPI3Mult"/>
+        </Element>
+		
+       <!--SPI4-->		
+        <Element id="SPI4Mult" type="multiplexor" refParameter="SPI4ClockSelection" orientation="LEFT" x="1060" y="3148" refEnable="EnableSPI4" refSecure="SPI4TZEnable">
+            <Input signalId="PCLK2Clk"       from="APB2Output"     refValue="RCC_SPI4CLKSOURCE_PCLK2"   />            
+            <Input signalId="CKPERClk"     from="CKPERoutput"  refValue="RCC_SPI4CLKSOURCE_CLKP"/>
+            <Input signalId="IC9Out"      from="IC9Output"   refValue="RCC_SPI4CLKSOURCE_IC9"/>
+            <Input signalId="IC14Out"      from="IC14Output"   refValue="RCC_SPI4CLKSOURCE_IC14"/>
+            <Input signalId="MSI"      from="MSIRC"   refValue="RCC_SPI4CLKSOURCE_MSI"/>
+            <Input signalId="HSIDivClk"      from="HSIDivOutput"   refValue="RCC_SPI4CLKSOURCE_HSI"/>
+            <Input signalId="HSE"      from="HSEOSC"   refValue="RCC_SPI4CLKSOURCE_HSE"/>
+            <Output signalId="SPI4CLK" to="SPI4output"/>
+        </Element>	
+        <Element id="SPI4output" type="activeOutput" refParameter="SPI4Freq_Value" x="1140" y="3220"  refEnable="EnableSPI4">
+            <Input signalId="SPI4CLK" from="SPI4Mult"/>
+        </Element>
+		
+       <!--SPI5-->		
+        <Element id="SPI5Mult" type="multiplexor" refParameter="SPI5ClockSelection" orientation="LEFT" x="953" y="3259" refEnable="EnableSPI5" refSecure="SPI5TZEnable">
+            <Input signalId="PCLK2Clk"       from="APB2Output"     refValue="RCC_SPI5CLKSOURCE_PCLK2"   />            
+            <Input signalId="CKPERClk"     from="CKPERoutput"  refValue="RCC_SPI5CLKSOURCE_CLKP"/>
+            <Input signalId="IC9Out"      from="IC9Output"   refValue="RCC_SPI5CLKSOURCE_IC9"/>
+            <Input signalId="IC14Out"      from="IC14Output"   refValue="RCC_SPI5CLKSOURCE_IC14"/>
+            <Input signalId="MSI"      from="MSIRC"   refValue="RCC_SPI5CLKSOURCE_MSI"/>
+            <Input signalId="HSIDivClk"      from="HSIDivOutput"   refValue="RCC_SPI5CLKSOURCE_HSI"/>
+            <Input signalId="HSE"      from="HSEOSC"   refValue="RCC_SPI5CLKSOURCE_HSE"/>
+            <Output signalId="SPI5CLK" to="SPI5output"/>
+        </Element>	
+        <Element id="SPI5output" type="activeOutput" refParameter="SPI5Freq_Value" x="1140" y="3333"  refEnable="EnableSPI5">
+            <Input signalId="SPI5CLK" from="SPI5Mult"/>
+        </Element>
+		
+       <!--SPI6-->		
+        <Element id="SPI6Mult" type="multiplexor" refParameter="SPI6ClockSelection" orientation="LEFT" x="1060" y="3387" refEnable="EnableSPI6" refSecure="SPI6TZEnable">
+            <Input signalId="PCLK4Clk"       from="APB4Output"     refValue="RCC_SPI6CLKSOURCE_PCLK4"   />            
+            <Input signalId="CKPERClk"     from="CKPERoutput"  refValue="RCC_SPI6CLKSOURCE_CLKP"/>
+            <Input signalId="IC8Out"      from="IC8Output"   refValue="RCC_SPI6CLKSOURCE_IC8"/>
+            <Input signalId="IC9Out"      from="IC9Output"   refValue="RCC_SPI6CLKSOURCE_IC9"/>
+            <Input signalId="MSI"      from="MSIRC"   refValue="RCC_SPI6CLKSOURCE_MSI"/>
+            <Input signalId="HSIDivClk"      from="HSIDivOutput"   refValue="RCC_SPI6CLKSOURCE_HSI"/>
+            <Input signalId="I2SCKIN"      from="I2S_CKIN"   refValue="RCC_SPI6CLKSOURCE_PIN"/>
+            <Output signalId="SPI6CLK" to="SPI6output"/>
+        </Element>	
+        <Element id="SPI6output" type="activeOutput" refParameter="SPI6Freq_Value" x="1140" y="3459"  refEnable="EnableSPI6">
+            <Input signalId="SPI6CLK" from="SPI6Mult"/>
+        </Element>
+		
+       <!--XSPI1-->		
+        <Element id="XSPI1Mult" type="multiplexor" refParameter="XSPI1ClockSelection" orientation="LEFT" x="552" y="1622" refEnable="XSPI1Enable" refSecure="XSPI1TZEnable">
+            <Input signalId="HCLK"       from="AHBOutput"     refValue="RCC_XSPI1CLKSOURCE_HCLK"   />            
+            <Input signalId="CKPERClk"     from="CKPERoutput"  refValue="RCC_XSPI1CLKSOURCE_CLKP"/>
+            <Input signalId="IC3Out"      from="IC3Output"   refValue="RCC_XSPI1CLKSOURCE_IC3"/>
+            <Input signalId="IC4Out"      from="IC4Output"   refValue="RCC_XSPI1CLKSOURCE_IC4"/>
+            <Output signalId="XSPI1CLK" to="XSPI1output"/>
+        </Element>	
+        <Element id="XSPI1output" type="activeOutput" refParameter="XSPI1Freq_Value" x="710" y="1653"  refEnable="XSPI1Enable">
+            <Input signalId="XSPI1CLK" from="XSPI1Mult"/>
+        </Element>
+		
+       <!--XSPI2-->		
+        <Element id="XSPI2Mult" type="multiplexor" refParameter="XSPI2ClockSelection" orientation="LEFT" x="662" y="1710" refEnable="XSPI2Enable" refSecure="XSPI2TZEnable">
+            <Input signalId="HCLK"       from="AHBOutput"     refValue="RCC_XSPI2CLKSOURCE_HCLK"   />            
+            <Input signalId="CKPERClk"     from="CKPERoutput"  refValue="RCC_XSPI2CLKSOURCE_CLKP"/>
+            <Input signalId="IC3Out"      from="IC3Output"   refValue="RCC_XSPI2CLKSOURCE_IC3"/>
+            <Input signalId="IC4Out"      from="IC4Output"   refValue="RCC_XSPI2CLKSOURCE_IC4"/>
+            <Output signalId="XSPI2CLK" to="XSPI2output"/>
+        </Element>	
+        <Element id="XSPI2output" type="activeOutput" refParameter="XSPI2Freq_Value" x="710" y="1742"  refEnable="XSPI2Enable">
+            <Input signalId="XSPI2CLK" from="XSPI2Mult"/>
+        </Element>
+		
+       <!--OTGHS1-->		
+        <Element id="OTGHS1Mult" type="multiplexor" refParameter="OTGHS1ClockSelection" orientation="LEFT" x="715" y="1983" refEnable="OTG1Enable" refSecure="OTGHS1TZEnable">
+            <Input signalId="OTGHS1"       from="OTGPHY1output"     refValue="RCC_USBPHY1REFCLKSOURCE_OTGPHY1"   />            
+            <Input signalId="HSEOscDiv"     from="HSEOSCDIV"  refValue="RCC_USBPHY1REFCLKSOURCE_HSE_DIRECT"/>
+            <Output signalId="OTGHS1CLK" to="OTGHS1output"/>
+        </Element>	
+        <Element id="OTGHS1output" type="activeOutput" refParameter="OTGHS1Freq_Value" x="753" y="1997"  refEnable="OTG1Enable">
+            <Input signalId="OTGHS1CLK" from="OTGHS1Mult"/>
+        </Element>
+		
+       <!--OTGHS2-->		
+        <Element id="OTGHS2Mult" type="multiplexor" refParameter="OTGHS2ClockSelection" orientation="LEFT" x="715" y="2150" refEnable="OTG2Enable" refSecure="OTGHS2TZEnable">
+            <Input signalId="OTGHS2"       from="OTGPHY2output"     refValue="RCC_USBPHY2REFCLKSOURCE_OTGPHY2"   />            
+            <Input signalId="HSEOscDiv"     from="HSEOSCDIV"  refValue="RCC_USBPHY2REFCLKSOURCE_HSE_DIRECT"/>
+            <Output signalId="OTGHS2CLK" to="OTGHS2output"/>
+        </Element>	
+        <Element id="OTGHS2output" type="activeOutput" refParameter="OTGHS2Freq_Value" x="753" y="2164"  refEnable="OTG2Enable">
+            <Input signalId="OTGHS2CLK" from="OTGHS2Mult"/>
+        </Element>
+		
+       <!--XSPI3-->		
+        <Element id="XSPI3Mult" type="multiplexor" refParameter="XSPI3ClockSelection" orientation="LEFT" x="552" y="1784" refEnable="XSPI3Enable" refSecure="XSPI3TZEnable">
+            <Input signalId="HCLK"       from="AHBOutput"     refValue="RCC_XSPI3CLKSOURCE_HCLK"   />            
+            <Input signalId="CKPERClk"     from="CKPERoutput"  refValue="RCC_XSPI3CLKSOURCE_CLKP"/>
+            <Input signalId="IC3Out"      from="IC3Output"   refValue="RCC_XSPI3CLKSOURCE_IC3"/>
+            <Input signalId="IC4Out"      from="IC4Output"   refValue="RCC_XSPI3CLKSOURCE_IC4"/>
+            <Output signalId="XSPI3CLK" to="XSPI3output"/>
+        </Element>	
+        <Element id="XSPI3output" type="activeOutput" refParameter="XSPI3Freq_Value" x="710" y="1815"  refEnable="XSPI3Enable">
+            <Input signalId="XSPI3CLK" from="XSPI3Mult"/>
+        </Element>
+
+       <!--OTGPHY1-->		
+        <Element id="OTGPHY1Mult" type="multiplexor" refParameter="OTGPHY1ClockSelection" orientation="LEFT" x="477" y="1946" refEnable="OTG1Enable">
+            <Input signalId="HSEOscDiv"       from="HSEOSCDIV"     refValue="RCC_USBOTGHS1CLKSOURCE_HSE_DIRECT"/>           
+            <Input signalId="CKPERClk"     from="CKPERoutput"  refValue="RCC_USBOTGHS1CLKSOURCE_CLKP"/>
+            <Input signalId="IC15Out"      from="IC15Output"   refValue="RCC_USBOTGHS1CLKSOURCE_IC15"/>
+            <Input signalId="HSEDiv"      from="HSEDIV"   refValue="RCC_USBOTGHS1CLKSOURCE_HSE_DIV2"/>
+            <Output signalId="OTGPHY1CLK" to="OTGPHY1output"/>
+        </Element>
+        <Element id="OTGPHY1output" type="activeOutput" refParameter="OTGPHY1Freq_Value" x="523" y="1977"  refEnable="OTG1Enable">
+            <Input signalId="OTGPHY1CLK" from="OTGPHY1Mult"/>
+            <Output signalId="OTGHS1" to="OTGHS1Mult"/>
+        </Element>
+		
+       <!-- OTGPHY2		 -->
+        <Element id="OTGPHY2Mult" type="multiplexor" refParameter="OTGPHY2ClockSelection" orientation="LEFT" x="477" y="2112" refEnable="OTG2Enable">
+            <Input signalId="HSEOscDiv"       from="HSEOSCDIV"     refValue="RCC_USBOTGHS2CLKSOURCE_HSE_DIRECT"/>
+            <Input signalId="CKPERClk"     from="CKPERoutput"  refValue="RCC_USBOTGHS2CLKSOURCE_CLKP"/>
+            <Input signalId="IC15Out"      from="IC15Output"   refValue="RCC_USBOTGHS2CLKSOURCE_IC15"/>
+            <Input signalId="HSEDiv"      from="HSEDIV"   refValue="RCC_USBOTGHS2CLKSOURCE_HSE_DIV2"/>
+            <Output signalId="OTGPHY2CLK" to="OTGPHY2output"/>
+        </Element>
+        <Element id="OTGPHY2output" type="activeOutput" refParameter="OTGPHY2Freq_Value" x="523" y="2144"  refEnable="OTG2Enable">
+            <Input signalId="OTGPHY2CLK" from="OTGPHY2Mult"/>
+            <Output signalId="OTGHS2" to="OTGHS2Mult"/>
+        </Element>
+		
+       <!--SDMMC1-->		
+        <Element id="SDMMC1Mult" type="multiplexor" refParameter="SDMMC1ClockSelection" orientation="LEFT" x="554" y="2280" refEnable="SDMMC1Enable" refSecure="SDMMC1TZEnable">
+            <Input signalId="HCLK"       from="AHBOutput"     refValue="RCC_SDMMC1CLKSOURCE_HCLK"   />            
+            <Input signalId="CKPERClk"     from="CKPERoutput"  refValue="RCC_SDMMC1CLKSOURCE_CLKP"/>
+            <Input signalId="IC4Out"      from="IC4Output"   refValue="RCC_SDMMC1CLKSOURCE_IC4"/>
+            <Input signalId="IC5Out"      from="IC5Output"   refValue="RCC_SDMMC1CLKSOURCE_IC5"/>
+            <Output signalId="SDMMC1CLK" to="SDMMC1output"/>
+        </Element>	
+        <Element id="SDMMC1output" type="activeOutput" refParameter="SDMMC1Freq_Value" x="712" y="2312"  refEnable="SDMMC1Enable">
+            <Input signalId="SDMMC1CLK" from="SDMMC1Mult"/>
+        </Element>
+		
+       <!--SDMMC2-->		
+        <Element id="SDMMC2Mult" type="multiplexor" refParameter="SDMMC2ClockSelection" orientation="LEFT" x="665" y="2370" refEnable="SDMMC2Enable" refSecure="SDMMC2TZEnable">
+            <Input signalId="HCLK"       from="AHBOutput"     refValue="RCC_SDMMC2CLKSOURCE_HCLK"   />            
+            <Input signalId="CKPERClk"     from="CKPERoutput"  refValue="RCC_SDMMC2CLKSOURCE_CLKP"/>
+            <Input signalId="IC4Out"      from="IC4Output"   refValue="RCC_SDMMC2CLKSOURCE_IC4"/>
+            <Input signalId="IC5Out"      from="IC5Output"   refValue="RCC_SDMMC2CLKSOURCE_IC5"/>
+            <Output signalId="SDMMC2CLK" to="SDMMC2output"/>
+        </Element>	
+        <Element id="SDMMC2output" type="activeOutput" refParameter="SDMMC2Freq_Value" x="712" y="2400"  refEnable="SDMMC2Enable">
+            <Input signalId="SDMMC2CLK" from="SDMMC2Mult"/>
+        </Element>
+		
+       <!--ETH1-->		
+        <Element id="ETH1Mult" type="multiplexor" refParameter="ETH1ClockSelection" orientation="LEFT" x="665" y="2708" refEnable="ETH1Enable" refSecure="ETH1TZEnable">
+            <Input signalId="HCLK"       from="AHBOutput"     refValue="RCC_ETH1CLKSOURCE_HCLK"   />            
+            <Input signalId="CKPERClk"     from="CKPERoutput"  refValue="RCC_ETH1CLKSOURCE_CLKP"/>
+            <Input signalId="IC12Out"      from="IC12Output"   refValue="RCC_ETH1CLKSOURCE_IC12"/>
+            <Input signalId="HSE"      from="HSEOSC"   refValue="RCC_ETH1CLKSOURCE_HSE"/>
+            <Output signalId="ETH1CLK" to="ETH1output"/>
+        </Element>	
+        <Element id="ETH1output" type="activeOutput" refParameter="ETH1Freq_Value" x="712" y="2740"  refEnable="ETH1Enable">
+            <Input signalId="ETH1CLK" from="ETH1Mult"/>
+        </Element>
+		
+      <!-- SPDIFRX1	 -->
+        <Element id="SPDIFRX1Mult" type="multiplexor" refParameter="SPDIFRX1ClockSelection" orientation="LEFT" x="1359" y="3295" refEnable="EnableSPDIFRX" refSecure="SPDIFTZEnable">
+            <Input signalId="PCLK1Clk"       from="APB1Output"     refValue="RCC_SPDIFRX1CLKSOURCE_PCLK1"   />            
+            <Input signalId="CKPERClk"     from="CKPERoutput"  refValue="RCC_SPDIFRX1CLKSOURCE_CLKP"/>
+            <Input signalId="IC7Out"      from="IC7Output"   refValue="RCC_SPDIFRX1CLKSOURCE_IC7"/>
+            <Input signalId="IC8Out"      from="IC8Output"   refValue="RCC_SPDIFRX1CLKSOURCE_IC8"/>
+            <Input signalId="MSI"      from="MSIRC"   refValue="RCC_SPDIFRX1CLKSOURCE_MSI"/>
+            <Input signalId="HSIDivClk"      from="HSIDivOutput"   refValue="RCC_SPDIFRX1CLKSOURCE_HSI"/>
+            <Input signalId="I2SCKIN"      from="I2S_CKIN"   refValue="RCC_SPDIFRX1CLKSOURCE_PIN"/>
+            <Output signalId="SPDIFRX1CLK" to="SPDIFRX1output"/>
+        </Element>	
+        <Element id="SPDIFRX1output" type="activeOutput" refParameter="SPDIFRX1Freq_Value" x="1600" y="3367"  refEnable="EnableSPDIFRX">
+            <Input signalId="SPDIFRX1CLK" from="SPDIFRX1Mult"/>
+        </Element>
+
+        <!-- System clock -->
+        <Element id="SYSBClkSource" type="multiplexor" refParameter="SYSBCLKSource" x="952" y="332" isTZRes="true">
+            <Input signalId="HSI"           from="HSIRC"  refValue="RCC_SYSCLKSOURCE_HSI"/>       
+            <Input signalId="MSI"           from="MSIRC"  refValue="RCC_SYSCLKSOURCE_MSI"/>       
+            <Input signalId="HSE"           from="HSEOSC" refValue="RCC_SYSCLKSOURCE_HSE"/>       
+            <Input signalId="IC2Out"        from="IC2Output"  refValue="RCC_SYSCLKSOURCE_IC2_IC6_IC11"/>                  
+            <Output signalId="SYSBCLKInput" to="SYSBCLKOutput"/>            
+            <Output signalId="SYSBCLKInput" to="MCO2Mult"/>            
+        </Element>
+        <Element id="SYSCClkSource" type="multiplexor" refParameter="SYSCCLKSourceVirtual" x="952" y="463" isTZRes="true">
+            <Input signalId="HSI"           from="HSIRC"  refValue="RCC_SYSCLKSOURCE_HSI"/>       
+            <Input signalId="MSI"           from="MSIRC"  refValue="RCC_SYSCLKSOURCE_MSI"/>       
+            <Input signalId="HSE"           from="HSEOSC" refValue="RCC_SYSCLKSOURCE_HSE"/>       
+            <Input signalId="IC6Out"        from="IC6Output"  refValue="RCC_SYSCLKSOURCE_IC2_IC6_IC11"/> 
+            <Output signalId="SYSCCLKInput" to="SYSCCLKOutput"/>            			
+        </Element>
+		
+        <Element id="SYSDClkSource" type="multiplexor" refParameter="SYSDCLKSourceVirtual" x="952" y="593" isTZRes="true">
+            <Input signalId="HSI"           from="HSIRC"  refValue="RCC_SYSCLKSOURCE_HSI"/>       
+            <Input signalId="MSI"           from="MSIRC"  refValue="RCC_SYSCLKSOURCE_MSI"/>       
+            <Input signalId="HSE"           from="HSEOSC" refValue="RCC_SYSCLKSOURCE_HSE"/>       
+            <Input signalId="IC11Out"        from="IC11Output"  refValue="RCC_SYSCLKSOURCE_IC2_IC6_IC11"/>
+            <Output signalId="SYSDCLKInput" to="SYSDCLKOutput"/>            			
+        </Element>
+        <Element id="SYSBCLKOutput" type="activeOutput" refParameter="SYSBCLKFreq_VALUE" x="980" y="363">
+            <Input signalId="SYSBCLKInput" from="SYSBClkSource"/>
+            <Output signalId="HPRECLK" to="HPREDiv"/>
+        </Element>
+		
+        <Element id="SYSCCLKOutput" type="activeOutput" refParameter="SYSCCLKFreq_VALUE" x="1600" y="630">
+            <Input signalId="SYSCCLKInput" from="SYSCClkSource"/>
+        </Element>
+		
+        <Element id="SYSDCLKOutput" type="activeOutput" refParameter="SYSDCLKFreq_VALUE" x="1600" y="665">
+            <Input signalId="SYSDCLKInput" from="SYSDClkSource"/>
+        </Element>
+		
+        <!-- CPU clock -->
+        <Element id="SYSAClkSource" type="multiplexor" refParameter="CPUCLKSource" x="952" y="177" isTZRes="true">
+            <Input signalId="HSI"           from="HSIRC"  refValue="RCC_CPUCLKSOURCE_HSI"/>       
+            <Input signalId="MSI"           from="MSIRC"  refValue="RCC_CPUCLKSOURCE_MSI"/>       
+            <Input signalId="HSE"           from="HSEOSC" refValue="RCC_CPUCLKSOURCE_HSE"/>       
+            <Input signalId="IC1Out"        from="IC1Output"  refValue="RCC_CPUCLKSOURCE_IC1"/>                  
+            <Output signalId="SYSACLKInput" to="CortexSysOutput"/>
+            <Output signalId="SYSACLKInput" to="TPIUPrescaler"/>        
+            <Output signalId="SYSACLKInput" to="CpuClockOutput"/>			
+        </Element>
+
+        <Element id="TPIUPrescaler" type="devisor" refParameter="TPIUPrescaler" x="1115" y="150">
+            <Input signalId="SYSACLKInput" from="SYSAClkSource"/>
+            <Output signalId="TPIUCLK" to="TPIUOutput" />
+        </Element>		
+        <Element id="TPIUOutput" type="activeOutput" refParameter="AHBFreq_Value" x="1600" y="150">
+            <Input signalId="TPIUCLK" from="TPIUPrescaler"/>
+        </Element>
+		
+        <Element id="CortexPrescaler" type="devisor" refParameter="Cortex_Div" x="1115" y="180">
+            <Input signalId="SYSACLKInput" from="SYSAClkSource"/>
+            <Output signalId="CortexCLK" to="CortexSysOutput" />
+        </Element>		
+        <Element id="CortexSysOutput" type="activeOutput" refParameter="CortexFreq_Value" x="1600" y="178">
+            <Input signalId="CortexCLK" from="CortexPrescaler"/>
+        </Element>
+
+        <Element id="CpuClockOutput" type="activeOutput" isKey="true" refParameter="CpuClockFreq_Value" x="1600" y="207">
+            <Input signalId="SYSACLKInput" from="SYSAClkSource"/>
+        </Element>
+		
+        <Element id="AXIClockOutput" type="activeOutput" isKey="true" refParameter="AXIClockFreq_Value" x="1600" y="243">
+            <Input signalId="SYSBCLKInput" from="SYSBClkSource"/>
+        </Element>
+		
+        <!--system main block-->
+        <Element id="HPREDiv" type="devisor" refParameter="HPRE_Div" x="1115" y="364" isTZRes="true">
+            <Input signalId="HPRECLK" from="SYSBCLKOutput"/>
+            <Output signalId="HPREDIVCLK" to="APB4DIV" />
+            <Output signalId="HPREDIVCLK" to="APB1DIV" />
+            <Output signalId="HPREDIVCLK" to="APB2DIV" />
+            <Output signalId="HPREDIVCLK" to="APB5DIV" />
+            <Output signalId="HPREDIVCLK" to="AHBOutput" />
+        </Element>
+		
+        <Element id="APB4DIV" type="devisor" refParameter="APB4DIV" x="1250" y="475" refLock="APBTrustZoneEnable">
+            <Input signalId="HPREDIVCLK" from="HPREDiv"/>
+            <Output signalId="PCLK4" to="APB4Output" />           
+        </Element>
+		
+        <Element id="APB4Output" type="activeOutput" refParameter="APB4Freq_Value" x="1600" y="470">
+            <Input signalId="PCLK4" from="APB4DIV"/>            
+            <Output signalId="PCLK4Clk" to="LPTIM2Mult"/>            
+            <Output signalId="PCLK4Clk" to="LPTIM3Mult"/>            
+            <Output signalId="PCLK4Clk" to="LPTIM4Mult"/>            
+            <Output signalId="PCLK4Clk" to="LPTIM5Mult"/>            
+            <Output signalId="PCLK4Clk" to="SPI6Mult"/>            
+            <Output signalId="PCLK4Clk" to="LPUART1Mult"/>            
+        </Element>
+        
+        <Element id="APB5DIV" type="devisor" refParameter="APB5DIV" x="1250" y="535" refLock="APBTrustZoneEnable">
+            <Input signalId="HPREDIVCLK" from="HPREDiv"/>
+            <Output signalId="PCLK5" to="APB5Output" />           
+        </Element>
+        <Element id="APB5Output" type="activeOutput" refParameter="APB5Freq_Value" x="1600" y="535">
+            <Input signalId="PCLK5" from="APB5DIV"/>            
+            <Input signalId="PCLK5Clk" from="LTDCMult"/>            
+            <Input signalId="PCLK5Clk" from="DCMIPPMult"/>            
+        </Element>
+		
+        <Element id="TIMGDIV" type="devisor" refParameter="TIMGDIV" x="1115" y="595">
+            <Input signalId="HPRECLK" from="SYSBCLKOutput"/>
+            <Output signalId="TIMG" to="TIMGOutput" />           
+        </Element>		
+		
+        <Element id="TIMGOutput" type="activeOutput" refParameter="TIMGFreq_Value" x="1600" y="595">
+            <Input signalId="TIMG" from="TIMGDIV"/>            
+            <Output signalId="TIMGClk" to="ADCMult"/>            
+            <Output signalId="TIMGClk" to="ADFMult"/>            
+            <Output signalId="TIMGClk" to="LPTIM1Mult"/>            
+            <Output signalId="TIMGClk" to="LPTIM2Mult"/>            
+            <Output signalId="TIMGClk" to="LPTIM3Mult"/>            
+            <Output signalId="TIMGClk" to="LPTIM4Mult"/>            
+            <Output signalId="TIMGClk" to="LPTIM5Mult"/>            
+            <Output signalId="TIMGClk" to="MDF1Mult"/>            
+        </Element>
+		
+        <Element id="APB1DIV" type="devisor" refParameter="APB1DIV" x="1250" y="335" refLock="APBTrustZoneEnable">
+            <Input signalId="HPREDIVCLK" from="HPREDiv"/>
+            <Output signalId="PCLK1" to="APB1Output" />
+        </Element>
+        <Element id="AHBOutput" type="activeOutput" refParameter="AHB1234Freq_Value" x="1600" y="300">
+            <Input signalId="HPREDIVCLK" from="HPREDiv"/>            
+            <Output signalId="HCLK" to="ADCMult"/>            
+            <Output signalId="HCLK" to="ADFMult"/>            
+            <Output signalId="HCLK" to="MDF1Mult"/>            
+            <Output signalId="HCLK" to="PSSIMult"/>            
+            <Output signalId="HCLK" to="FMCMult"/>            
+            <Output signalId="HCLK" to="XSPI1Mult"/>            
+            <Output signalId="HCLK" to="XSPI2Mult"/>            
+            <Output signalId="HCLK" to="XSPI3Mult"/>            
+            <Output signalId="HCLK" to="SDMMC1Mult"/>            
+            <Output signalId="HCLK" to="SDMMC2Mult"/>            
+            <Output signalId="HCLK" to="ETH1Mult"/>            
+        </Element>
+        <Element id="APB1Output" type="activeOutput" refParameter="APB1Freq_Value" x="1600" y="335">
+            <Input signalId="PCLK1" from="APB1DIV"/>        
+            <Output signalId="PCLK1Clk" to="I2C1Mult"/>        
+            <Output signalId="PCLK1Clk" to="I2C2Mult"/>        
+            <Output signalId="PCLK1Clk" to="I2C3Mult"/>        
+            <Output signalId="PCLK1Clk" to="I2C4Mult"/>        
+            <Output signalId="PCLK1Clk" to="I3C1Mult"/>        
+            <Output signalId="PCLK1Clk" to="I3C2Mult"/>        
+            <Output signalId="PCLK1Clk" to="LPTIM1Mult"/>        
+            <Output signalId="PCLK1Clk" to="FDCANMult"/>        
+            <Output signalId="PCLK1Clk" to="SPDIFRX1Mult"/>        
+            <Output signalId="PCLK1Clk" to="USART2Mult"/>        
+            <Output signalId="PCLK1Clk" to="USART3Mult"/>        
+            <Output signalId="PCLK1Clk" to="UART4Mult"/>        
+            <Output signalId="PCLK1Clk" to="UART5Mult"/>        
+            <Output signalId="PCLK1Clk" to="UART7Mult"/>        
+            <Output signalId="PCLK1Clk" to="UART8Mult"/>        
+            <Output signalId="PCLK1Clk" to="SPI2Mult"/>        
+            <Output signalId="PCLK1Clk" to="SPI3Mult"/>        
+        </Element>		
+		
+        <Element id="APB2DIV" type="devisor" refParameter="APB2DIV" x="1250" y="400" refLock="APBTrustZoneEnable">
+            <Input signalId="HPREDIVCLK" from="HPREDiv"/>
+            <Output signalId="PCLK2" to="APB2Output" />
+            <Output signalId="PCLK2" to="Tim2Mul" />
+        </Element>
+        <Element id="APB2Output" type="activeOutput" refParameter="APB2Freq_Value" x="1600" y="400">
+            <Input signalId="PCLK2" from="APB2DIV"/>            
+            <Output signalId="PCLK2Clk" to="SAI1Mult"/>            
+            <Output signalId="PCLK2Clk" to="SAI2Mult"/>            
+            <Output signalId="PCLK2Clk" to="USART1Mult"/>            
+            <Output signalId="PCLK2Clk" to="USART6Mult"/>            
+            <Output signalId="PCLK2Clk" to="UART9Mult"/>            
+            <Output signalId="PCLK2Clk" to="USART10Mult"/>            
+            <Output signalId="PCLK2Clk" to="SPI1Mult"/>            
+            <Output signalId="PCLK2Clk" to="SPI4Mult"/>            
+            <Output signalId="PCLK2Clk" to="SPI5Mult"/>            
+        </Element>
+		
+        <!--Main PLL3 source-->
+        <Element id="PLL1Source" type="multiplexor" refParameter="PLL1Source" orientation="LEFT" x="415" y="347" isTZRes="true">
+            <Input signalId="HSI"  from="HSIRC"  refValue="RCC_PLLSOURCE_HSI"/>
+            <Input signalId="MSI"        from="MSIRC"  refValue="RCC_PLLSOURCE_MSI"/>
+            <Input signalId="HSE"        from="HSEOSC"  refValue="RCC_PLLSOURCE_HSE"/>
+            <Input signalId="I2SCKIN"    from="I2S_CKIN"  refValue="RCC_PLLSOURCE_PIN"/>
+            <Output signalId="PLL1SRC" to="FREFDIV1"/>            
+        </Element>
+		
+		
+        <Element id="FREFDIV1" type="devisor" refParameter="FREFDIV1" x="497" y="380" refLock="PLLIsSecureLocked">
+            <Input signalId="PLL1SRC" from="PLL1Source"/>
+            <Output signalId="VCOInput" to="FBDIV1"/>
+        </Element>
+        
+        
+        <Element id="PLL2Source" type="multiplexor" refParameter="PLL2Source" orientation="LEFT" x="415" y="489" isTZRes="true">
+            <Input signalId="HSI"  from="HSIRC"  refValue="RCC_PLLSOURCE_HSI"/>
+            <Input signalId="MSI"        from="MSIRC"  refValue="RCC_PLLSOURCE_MSI"/>
+            <Input signalId="HSE"        from="HSEOSC"  refValue="RCC_PLLSOURCE_HSE"/>
+            <Input signalId="I2SCKIN"    from="I2S_CKIN"  refValue="RCC_PLLSOURCE_PIN"/>
+            <Output signalId="PLL2SRC" to="FREFDIV2"/>            
+        </Element>
+
+        <Element id="FREFDIV2" type="devisor" refParameter="FREFDIV2" x="497" y="522" refLock="PLL2IsSecureLocked">
+            <Input signalId="PLL2SRC" from="PLL2Source"/>
+            <Output signalId="VCO2Input" to="FBDIV2"/>
+        </Element> 
+        
+        <!--Main PLL3 source-->
+        <Element id="PLL3Source" type="multiplexor" refParameter="PLL3Source" orientation="LEFT" x="415" y="664" isTZRes="true">
+            <Input signalId="HSI"  from="HSIRC"  refValue="RCC_PLLSOURCE_HSI"/>            
+            <Input signalId="MSI"        from="MSIRC"   refValue="RCC_PLLSOURCE_MSI"/>
+            <Input signalId="HSE"        from="HSEOSC"  refValue="RCC_PLLSOURCE_HSE"/>
+			<Input signalId="I2SCKIN"    from="I2S_CKIN"  refValue="RCC_PLLSOURCE_PIN"/>
+            <Output signalId="PLL3SRC" to="FREFDIV3"/>
+        </Element> 
+
+        <Element id="FREFDIV3" type="devisor" refParameter="FREFDIV3" x="497" y="695" refLock="PLL3IsSecureLocked">
+            <Input signalId="PLL3SRC" from="PLL3Source"/>
+            <Output signalId="VCO3Input" to="FBDIV3"/>
+        </Element>
+        <!--Main PLL4 source-->
+        <Element id="PLL4Source" type="multiplexor" refParameter="PLL4Source" orientation="LEFT" x="415" y="800" isTZRes="true">
+            <Input signalId="HSI"  from="HSIRC"    refValue="RCC_PLLSOURCE_HSI"/>            
+            <Input signalId="MSI"        from="MSIRC"     refValue="RCC_PLLSOURCE_MSI"/>
+            <Input signalId="HSE"        from="HSEOSC"    refValue="RCC_PLLSOURCE_HSE"/>
+			<Input signalId="I2SCKIN"    from="I2S_CKIN"  refValue="RCC_PLLSOURCE_PIN"/>
+            <Output signalId="PLL4SRC" to="FREFDIV4"/>
+        </Element>   
+        
+        <Element id="FREFDIV4" type="devisor" refParameter="FREFDIV4" x="497" y="830" refLock="PLL4IsSecureLocked">
+            <Input signalId="PLL4SRC" from="PLL4Source"/>
+            <Output signalId="VCO4Input" to="FBDIV4"/>
+        </Element>
+
+		
+        <Tree id="PLL1">
+            <Element id="FBDIV1" type="multiplicator" refParameter="FBDIV1" x="562" y="380" refLock="PLLIsSecureLocked">
+                <Input signalId="VCOInput" from="FREFDIV1"/> 
+                <Input signalId="PLL1FRACVClk" from="PLL1FRACV"/>
+                <Output signalId="VCO1Output" to="POSTDIV1_1"/>
+            </Element>      
+            
+            <Element id="PLL1FRACV" type="fractional" refParameter="PLL1FRACV" x="557" y="440">
+                <Output signalId="PLL1FRACVClk" to="FBDIV1"/>
+            </Element>      
+							
+            <Element id="POSTDIV1_1" type="devisor" refParameter="POSTDIV1_1" x="627" y="380" refLock="PLLIsSecureLocked">
+                <Input signalId="VCO1Output" from="FBDIV1"/>
+                <Output signalId="postdiv1_1_clk" to="POSTDIV2_1"/>
+            </Element>
+            <Element id="POSTDIV2_1" type="devisor" refParameter="POSTDIV2_1" x="697" y="380" refLock="PLLIsSecureLocked">
+                <Input signalId="postdiv1_1_clk" from="POSTDIV1_1"/>
+                <Output signalId="postdiv2_1_clk" to="FOUTPOSTDIV1"/>
+            </Element>
+            <Element id="FOUTPOSTDIV1" type="output" refParameter="FOUTPOSTDIV1Freq_Value" x="767" y="380">
+                <Input signalId="postdiv2_1_clk" from="POSTDIV2_1"/>               
+                <Output signalId="PLL1" to="IC1Div"/>         
+            </Element>
+        </Tree>
+		
+        <Tree id="PLL2">
+            <Element id="FBDIV2" type="multiplicatorFrac" refParameter="FBDIV2" x="562" y="522" refLock="PLL2IsSecureLocked">
+                <Input signalId="VCO2Input" from="FREFDIV2"/>
+                <Input signalId="PLL2FRACVClk" from="PLL2FRACV"/>
+                <Output signalId="VCO2Output" to="POSTDIV1_2"/>
+            </Element>
+            
+            <Element id="PLL2FRACV" type="fractional" refParameter="PLL2FRACV/16777216" x="557" y="580" refLock="PLL2IsSecureLocked">
+                <Output signalId="PLL2FRACVClk" to="FBDIV2"/>
+            </Element>
+				
+            <Element id="POSTDIV1_2" type="devisor" refParameter="POSTDIV1_2" x="627" y="522" refLock="PLL2IsSecureLocked">
+                <Input signalId="VCO2Output" from="FBDIV2"/>
+                <Output signalId="postdiv1_2_clk" to="POSTDIV2_2"/>
+            </Element>
+            
+            <Element id="POSTDIV2_2" type="devisor" refParameter="POSTDIV2_2" x="697" y="522" refLock="PLL2IsSecureLocked">
+                <Input signalId="postdiv1_2_clk" from="POSTDIV1_2"/>
+                <Output signalId="postdiv2_2_clk" to="FOUTPOSTDIV2"/>
+            </Element>			
+            <Element id="FOUTPOSTDIV2" type="output" refParameter="FOUTPOSTDIV2Freq_Value" x="767" y="522">
+                <Input signalId="postdiv2_2_clk" from="POSTDIV2_2"/>
+                <Output signalId="PLL2" to="IC1Div"/>
+            </Element>
+
+        </Tree>
+		
+        <Tree id="PLL3">
+            <Element id="FBDIV3" type="multiplicatorFrac" refParameter="FBDIV3" x="562" y="695" refLock="PLL3IsSecureLocked">
+                <Input signalId="VCO3Input" from="FREFDIV3"/>
+                <Input signalId="PLL3FRACVClk" from="PLL3FRACV"/>
+                <Output signalId="VCO3Output" to="POSTDIV1_3"/>
+            </Element>
+            
+            <Element id="PLL3FRACV" type="fractional" refParameter="PLL3FRACV/16777216" x="557" y="760" refLock="PLL3IsSecureLocked">
+                <Output signalId="PLL3FRACVClk" to="FBDIV3"/>
+            </Element> 
+			
+            <Element id="POSTDIV1_3" type="devisor" refParameter="POSTDIV1_3" x="627" y="695" refLock="PLL3IsSecureLocked">
+                <Input signalId="VCO3Output" from="FBDIV3"/>
+                <Output signalId="postdiv1_3_clk" to="POSTDIV2_3"/>
+            </Element>
+			
+            <Element id="POSTDIV2_3" type="devisor" refParameter="POSTDIV2_3" x="697" y="695" refLock="PLL3IsSecureLocked">
+                <Input signalId="postdiv1_3_clk" from="POSTDIV1_3"/>
+                <Output signalId="postdiv2_3_clk" to="FOUTPOSTDIV3"/>            
+            </Element>			
+            <Element id="FOUTPOSTDIV3" type="output" refParameter="FOUTPOSTDIV3Freq_Value" x="767" y="695">
+                <Input signalId="postdiv2_3_clk" from="POSTDIV2_3"/>
+                <Output signalId="PLL3" to="IC1Div"/>
+            </Element>
+        </Tree>
+      
+        <Tree id="PLL4">
+            <Element id="FBDIV4" type="multiplicatorFrac" refParameter="FBDIV4" x="562" y="830" refLock="PLL4IsSecureLocked">
+                <Input signalId="VCO4Input" from="FREFDIV4"/>
+                <Input signalId="PLL4FRACVClk" from="PLL4FRACV"/>
+                <Output signalId="VCO4Output" to="POSTDIV1_4"/>
+            </Element>
+            <Element id="PLL4FRACV" type="fractional" refParameter="PLL4FRACV/16777216" x="557" y="890" refLock="PLL4IsSecureLocked">
+                <Output signalId="PLL4FRACVClk" to="FBDIV4"/>
+            </Element>
+
+            <Element id="POSTDIV1_4" type="devisor" refParameter="POSTDIV1_4" x="627" y="830" refLock="PLL4IsSecureLocked">
+                <Input signalId="VCO4Output" from="FBDIV4"/>
+                <Output signalId="postdiv1_4_clk" to="POSTDIV2_4"/>
+            </Element>
+            <Element id="POSTDIV2_4" type="devisor" refParameter="POSTDIV2_4" x="697" y="830" refLock="PLL4IsSecureLocked">
+                <Input signalId="postdiv1_4_clk" from="POSTDIV1_4"/>
+                <Output signalId="postdiv2_4_clk" to="FOUTPOSTDIV4"/>             
+            </Element>	
+			
+            <Element id="FOUTPOSTDIV4" type="output" refParameter="FOUTPOSTDIV4Freq_Value" x="767" y="830">
+                <Input signalId="postdiv2_4_clk" from="POSTDIV2_4"/>
+                <Output to="IC1Div" signalId="PLL4" />
+            </Element>        
+        </Tree>
+   
+        <!--IP clock-->
+        <!--RTC-->
+        <Element id="HSERTCDevisor" type="devisor" refParameter="RCC_RTC_Clock_Source_FROM_HSE" x="414" y="166" refEnable="EnableHSERTCDevisor">
+            <Input signalId="HSE" from="HSEOSC"/>
+            <Output signalId="HSE_RTC"  to="RTCClkSource"/>
+        </Element>	
+		
+        <Element id="RTCClkSource" type="multiplexor" refParameter="RTCClockSelection" x="540" y="166" refEnable="RTCEnable">
+            <Input signalId="HSE_RTC" from="HSERTCDevisor"  refValue="RCC_RTCCLKSOURCE_HSE_DIV"/>                     
+            <Input signalId="LSE"     from="LSEOSC"         refValue="RCC_RTCCLKSOURCE_LSE"/>
+            <Input signalId="LSI"     from="LSIRC"          refValue="RCC_RTCCLKSOURCE_LSI"/>
+            <Output signalId="RTCCLK" to="RTCOutput"/>
+        </Element>
+		
+        <Element id="RTCOutput" type="output" refParameter="RTCFreq_Value" x="615" y="198" refEnable="RTCEnable">
+            <Input signalId="RTCCLK" from="RTCClkSource"/>
+        </Element>
+		
+        <!--IWDG-->
+        <Element id="IWDGOutput" type="output" refParameter="WatchDogFreq_Value" x="615" y="280"  refEnable="IWDGEnable">
+            <Input signalId="LSI" from="LSIRC"/>
+        </Element>	
+    </Tree>
+    <Signals>
+        <Signal id="HSE"   refParameter="HSE_VALUE"/>
+        <Signal id="HSEOscDiv"/>
+        <Signal id="HSEDiv"/>
+        <Signal id="LSI"   refParameter="LSI_VALUE"/>
+        <Signal id="LSE"   refParameter="LSE_VALUE"/>
+        <Signal id="MSI_clk"   refParameter="MSI_VALUE"/>
+        <Signal id="HSI"   refParameter="HSI_VALUE"/>
+        <Signal id="MSI"   refParameter="MSI_VALUE"/>
+        <Signal id="SYSCLK"/>
+        <Signal id="HSIDiv"/>
+        <Signal id="HSIDiv4"/>
+        <Signal id="HSIDivClk"/>
+        <Signal id="ADCCLK"/>
+        <Signal id="ADCDivCLK"/>
+        <Signal id="ADFCLK"/>
+        <Signal id="MDFCLK"/>
+        <Signal id="SAI1CLK"/>
+        <Signal id="SAI2CLK"/>
+        <Signal id="SPDIFRX1CLK"/>
+        <Signal id="I2C1CLK"/>
+        <Signal id="I2C2CLK"/>
+        <Signal id="I2C3CLK"/>
+        <Signal id="I2C4CLK"/>
+        <Signal id="I3C1CLK"/>
+        <Signal id="I3C2CLK"/>
+        <Signal id="LPTIM1CLK"/>
+        <Signal id="LPTIM2CLK"/>
+        <Signal id="LPTIM3CLK"/>
+        <Signal id="LPTIM4CLK"/>
+        <Signal id="LPTIM5CLK"/>
+        <Signal id="PSSICLK"/>
+        <Signal id="LTDCCLK"/>
+        <Signal id="FDCANCLK"/>
+        <Signal id="DCMIPPCLK"/>
+        <Signal id="FMCCLK"/>
+        <Signal id="IC1Out"/>
+        <Signal id="IC2Out"/>
+        <Signal id="IC3Out"/>
+        <Signal id="IC4Out"/>
+        <Signal id="IC5Out"/>
+        <Signal id="IC6Out"/>
+        <Signal id="IC7Out"/>
+        <Signal id="IC6Out"/>
+        <Signal id="IC7Out"/>
+        <Signal id="IC8Out"/>
+        <Signal id="IC9Out"/>
+        <Signal id="IC10Out"/>
+        <Signal id="IC11Out"/>
+        <Signal id="IC12Out"/>
+        <Signal id="IC13Out"/>
+        <Signal id="IC14Out"/>
+        <Signal id="IC15Out"/>
+        <Signal id="IC16Out"/>
+        <Signal id="IC17Out"/>
+        <Signal id="IC18Out"/>
+        <Signal id="IC19Out"/>
+        <Signal id="IC20Out"/>
+        <Signal id="ETH1CLK"/>
+        <Signal id="USART1CLK"/>
+        <Signal id="USART2CLK"/>
+        <Signal id="USART3CLK"/>
+        <Signal id="UART4CLK"/>
+        <Signal id="UART5CLK"/>
+        <Signal id="USART6CLK"/>
+        <Signal id="UART7CLK"/>
+        <Signal id="UART8CLK"/>
+        <Signal id="UART9CLK"/>
+        <Signal id="LPUART1CLK"/>
+        <Signal id="USART10CLK"/>
+        <Signal id="SPI1CLK"/>
+        <Signal id="SPI2CLK"/>
+        <Signal id="SPI3CLK"/>
+        <Signal id="SPI4CLK"/>
+        <Signal id="SPI5CLK"/>
+        <Signal id="SPI6CLK"/>
+        <Signal id="XSPI1CLK"/>
+        <Signal id="XSPI2CLK"/>
+        <Signal id="XSPI3CLK"/>
+        <Signal id="OTGPHY1CLK"/>
+        <Signal id="OTGPHY2CLK"/>
+        <Signal id="OTGHS1CLK"/>
+        <Signal id="OTGHS1"/>
+        <Signal id="OTGHS2CLK"/>
+        <Signal id="OTGHS2"/>
+        <Signal id="SDMMC1CLK"/>
+        <Signal id="SDMMC2CLK"/>
+        <Signal id="CKPERClk"/>
+        <Signal id="SYSBCLKInput"/>
+        <Signal id="SYSCCLKInput"/>
+        <Signal id="SYSDCLKInput"/>
+        <Signal id="SYSACLKInput"/>
+        <Signal id="TPIUCLK"/>
+        <Signal id="CortexCLK"/>
+        <Signal id="I2SCKIN"/>
+        <Signal id="HPRECLK"/>
+        <Signal id="HCLK"/>
+        <Signal id="PCLK4"/>
+        <Signal id="PCLK4Clk"/>
+        <Signal id="PCLK5"/>
+        <Signal id="PCLK5Clk"/>
+        <Signal id="TIMG"/>
+        <Signal id="TIMGClk"/>
+        <Signal id="PCLK1"/>
+        <Signal id="PCLK1Clk"/>
+        <Signal id="PCLK2"/>
+        <Signal id="PCLK2Clk"/>
+        <Signal id="PLL3SRC"/>
+        <Signal id="PLL1SRC"/>
+        <Signal id="PLL2SRC"/>
+        <Signal id="PLL4SRC"/>
+        <Signal id="VCOInput" refParameter="VCOInput1Freq_Value"/>
+        <Signal id="VCO2Input" refParameter="VCOInput2Freq_Value"/>
+        <Signal id="VCO3Input" refParameter="VCOInput3Freq_Value"/>
+        <Signal id="VCO4Input" refParameter="VCOInput4Freq_Value"/>
+        <Signal id="VCO1Output" refParameter="VCO1OutputFreq_Value"/>
+        <Signal id="PLL1" refParameter="FOUTPOSTDIV1Freq_Value"/>
+        <Signal id="VCO2Output" refParameter="VCO2OutputFreq_Value"/>
+        <Signal id="PLL2" refParameter="FOUTPOSTDIV2Freq_Value"/>
+        <Signal id="VCO3Output" refParameter="VCO3OutputFreq_Value"/>
+        <Signal id="VCO4Output" refParameter="VCO4OutputFreq_Value"/>
+        <Signal id="PLL3" refParameter="FOUTPOSTDIV3Freq_Value"/>
+        <Signal id="PLL4" refParameter="FOUTPOSTDIV4Freq_Value"/>
+        <Signal id="HSE_RTC"/>
+        <Signal id="RTCCLK"/>
+        <Signal id="HPREDIVCLK"/>
+        <Signal id="MCO1DivInput"/>
+        <Signal id="MCO1DivOuput"/>
+        <Signal id="MCO2DivInput"/>
+        <Signal id="MCO2DivOuput"/>
+        <Signal id="postdiv1_1_clk"/>
+        <Signal id="postdiv1_2_clk"/>
+        <Signal id="postdiv1_3_clk"/>
+        <Signal id="postdiv1_4_clk"/>
+        <Signal id="postdiv2_1_clk"/>
+        <Signal id="postdiv2_2_clk"/>
+        <Signal id="postdiv2_3_clk"/>
+        <Signal id="postdiv2_4_clk"/>
+       
+        <Signal id="PLL1FRACVClk"/>
+        <Signal id="PLL3FRACVClk"/>
+        <Signal id="PLL4FRACVClk"/>
+        <Signal id="PLL2FRACVClk"/>
+        <Signal id="IC1Clk"/>
+        <Signal id="IC2Clk"/>
+        <Signal id="IC3Clk"/>
+        <Signal id="IC4Clk"/>
+        <Signal id="IC5Clk"/>
+        <Signal id="IC6Clk"/>
+        <Signal id="IC7Clk"/>
+        <Signal id="IC8Clk"/>
+        <Signal id="IC9Clk"/>
+        <Signal id="IC10Clk"/>
+        <Signal id="IC11Clk"/>
+        <Signal id="IC12Clk"/>
+        <Signal id="IC13Clk"/>
+        <Signal id="IC14Clk"/>
+        <Signal id="IC15Clk"/>
+        <Signal id="IC16Clk"/>
+        <Signal id="IC17Clk"/>
+        <Signal id="IC18Clk"/>
+        <Signal id="IC19Clk"/>
+        <Signal id="IC20Clk"/>
+        <Signal id="IC1DivClk"/>
+        <Signal id="IC2DivClk"/>
+        <Signal id="IC3DivClk"/>
+        <Signal id="IC4DivClk"/>
+        <Signal id="IC5DivClk"/>
+        <Signal id="IC6DivClk"/>
+        <Signal id="IC7DivClk"/>
+        <Signal id="IC8DivClk"/>
+        <Signal id="IC9DivClk"/>
+        <Signal id="IC10DivClk"/>
+        <Signal id="IC11DivClk"/>
+        <Signal id="IC12DivClk"/>
+        <Signal id="IC13DivClk"/>
+        <Signal id="IC14DivClk"/>
+        <Signal id="IC15DivClk"/>
+        <Signal id="IC16DivClk"/>
+        <Signal id="IC17DivClk"/>
+        <Signal id="IC18DivClk"/>
+        <Signal id="IC19DivClk"/>
+        <Signal id="IC20DivClk"/>
+		
+    </Signals>
+    <!--RTC labels-->
+
+	
+    <Label id="RTCMuxLabel"       type="muxLabel"    text="RTC Clock Mux" posX="511" posY="144" refEnable="RTCEnable"/>
+    <Label id="RTCOutputLabel"    type="SpecialInfo" text="To RTC (MHz)"  posX="672" posY="204" refEnable="RTCEnable"/>
+    <Label id="LSEForRTCLabel"    type="signal"      text="LSE"           posX="503" posY="195" refEnable="EnableLSERTC"/>
+    <Label id="LSIForRTCLabel"    type="signal"      text="LSI"           posX="503" posY="226" refEnable="RTCEnable"/>
+    <Label id="HSEForRTCLabel"    type="signal"      text="HSE"           posX="385" posY="160" refEnable="EnableHSERTCDevisor"/>
+    <Label id="HSERTCForRTCLabel" type="signal"      text="HSE_RTC"       posX="479" posY="160" refEnable="EnableHSERTCDevisor"/>
+
+    <!--CPU labels-->
+    <Label id="CPULabel" type="muxLabel" posX="899" posY="145" text="CPU Clock Mux"/>
+    <Label id="CPULabel"    type="signal"   posX="899" posY="170" text="HSI"/>
+    <Label id="CPULabel"    type="signal"   posX="899" posY="195" text="MSI"/>
+    <Label id="CPULabel"    type="signal"   posX="995" posY="205" text="SYSA"/>
+    <Label id="CPULabel"    type="signal"   posX="899" posY="220" text="HSE"/>
+    <Label id="CPULabel"    type="signal"   posX="899" posY="245" text="IC1"/>
+
+    <!--sysclock labels-->
+    <Label id="SystemCLKMuxLabel" type="muxLabel" posX="899" posY="300" text="System Clock Mux"/>
+    <Label id="SystemHSILabel"    type="signal"   posX="899" posY="327" text="HSI"/>
+    <Label id="SystemHSILabel"    type="signal"   posX="899" posY="352" text="MSI"/>
+    <Label id="SystemHSILabel"    type="signal"   posX="899" posY="377" text="HSE"/>
+    <Label id="SystemHSILabel"    type="signal"   posX="899" posY="402" text="IC2"/>
+    <Label id="SystemHSILabel"    type="signal"   posX="899" posY="457" text="HSI"/>
+    <Label id="SystemHSILabel"    type="signal"   posX="899" posY="482" text="MSI"/>
+    <Label id="SystemHSILabel"    type="signal"   posX="899" posY="507" text="HSE"/>
+    <Label id="SystemHSILabel"    type="signal"   posX="899" posY="532" text="IC6"/>
+    <Label id="SystemHSILabel"    type="signal"   posX="899" posY="587" text="HSI"/>
+    <Label id="SystemHSILabel"    type="signal"   posX="899" posY="612" text="MSI"/>
+    <Label id="SystemHSILabel"    type="signal"   posX="899" posY="637" text="HSE"/>
+    <Label id="SystemHSILabel"    type="signal"   posX="899" posY="662" text="IC11"/>
+    <Label id="AHBLabel" type="info" posX="995" posY="350" text="SYSB"/>
+    <Label id="AHBLabel" type="info" posX="995" posY="492" text="SYSC"/>
+    <Label id="AHBLabel" type="info" posX="995" posY="622" text="SYSD"/>
+    <Label id="AHBPrescalerLabel" type="info" posX="1115" posY="350" text="HPRE"/>
+    <Label id="TIMGPrescalerLabel" type="info" posX="1115" posY="580" text="TIMPRE"/>
+    <Label id="MCULimitConstraint"  type="dynamiConstraint" posX="982"  posY="390" text="800 MHz max"/>
+    
+    <Label id="APB2MaxLimitConstraint"  type="dynamiConstraint" posX="1240"  posY="358" text="400 MHz max"/>
+    <Label id="APB1MaxLimitConstraint"  type="dynamiConstraint" posX="1240"  posY="423" text="400 MHz max"/>
+    <Label id="APB5MaxLimitConstraint"  type="dynamiConstraint" posX="1240"  posY="498" text="400 MHz max"/>
+    <Label id="APB4MaxLimitConstraint"  type="dynamiConstraint" posX="1240"  posY="558" text="400 MHz max"/>
+
+    <!--- MCU Labels-->
+    <Label id="TPIU" type="SpecialInfo" posX="1660" posY="158" text="To TPIU Clock (MHz) "/>
+    <Label id="SYSTICK" type="SpecialInfo" posX="1660" posY="185" text="To Systick Clock (MHz) "/>
+    <Label id="CPU" type="SpecialInfo" posX="1660" posY="212" text="To CPU Clock (MHz) "/>
+    <Label id="AXI" type="SpecialInfo" posX="1660" posY="250" text="To AXI Clocks (MHz) "/>
+    <Label id="APB3" type="SpecialInfo" posX="1660" posY="475" text="To APB4 Peripheral Clocks (MHz)"/>
+    <Label id="APB4" type="SpecialInfo" posX="1660" posY="537" text="To APB5 Peripheral Clocks (MHz)"/>
+    <Label id="APBDBG" type="SpecialInfo" posX="1660" posY="597" text="To Timer Group Clocks (MHz)"/>
+    <Label id="APBDBG" type="SpecialInfo" posX="1660" posY="632" text="To NPU Clock (MHz)"/>
+    <Label id="APBDBG" type="SpecialInfo" posX="1660" posY="667" text="To AXISRAM3/4/5/6 Clocks (MHz)"/>
+    <Label id="AHB2MaxLimitConstraint"  type="info" posX="150"  posY="592" text="HCLK"/>
+    <Label id="Power" type="SpecialInfo" posX="1660" posY="305" text="To AHB Peripheral Clocks (MHz)"/>
+    <Label id="Power" type="SpecialInfo" posX="1660" posY="340" text="To APB1 Peripheral Clocks (MHz)"/>
+    <Label id="Power" type="SpecialInfo" posX="1660" posY="404" text="To APB2 Peripheral Clocks (MHz)"/>
+    
+    <!--PLL1 Source labels-->
+    <Label id="PLLSourcMuxLabel"    type="muxLabel" text="PLL1 Source Mux" posX="370" posY="315"/>
+    <Label id="PLLSourcMuxHSILabel" type="signal"   text="HSI"            posX="365" posY="342"/>
+    <Label id="PLLSourcMuxHSELabel" type="signal"   text="MSI"  	  posX="365" posY="367"/>
+    <Label id="PLLSourcMuxHSELabel" type="signal"   text="HSE"  	  posX="365" posY="392" refEnable="EnableHSE"/>
+    <Label id="PLLSourcMuxHSELabel" type="signal"   text="I2S_CKIN"  	  posX="365" posY="417" refEnable="ExtClockEnable"/>
+    
+    <!--PLL2 Source labels-->
+    <Label id="PLLSourcMuxLabel"    type="muxLabel" text="PLL2 Source Mux" posX="370" posY="455"/>
+    <Label id="PLLSourcMuxHSILabel" type="signal"   text="HSI"            posX="365" posY="482"/>
+    <Label id="PLLSourcMuxHSELabel" type="signal"   text="MSI"  	  posX="365" posY="507"/>
+    <Label id="PLLSourcMuxHSELabel" type="signal"   text="HSE"  	  posX="365" posY="532" refEnable="EnableHSE"/>
+    <Label id="PLLSourcMuxHSELabel" type="signal"   text="I2S_CKIN"  	  posX="365" posY="557" refEnable="ExtClockEnable"/>
+    
+    <!--PLL3 Source labels-->
+    <Label id="PLL3SourcMuxLabel"    type="muxLabel" text="PLL3 Source Mux" posX="370" posY="630"/>
+    <Label id="PLL3SourcMuxHSILabel" type="signal"   text="HSI"            posX="365" posY="658"/>
+    <Label id="PLL3SourcMuxHSILabel" type="signal"   text="MSI"            posX="365" posY="683"/>
+    <Label id="PLL3SourcMuxHSELabel" type="signal"   text="HSE"  	  posX="365" posY="708" refEnable="EnableHSE"/>
+    <Label id="PLL3SourcMuxHSELabel" type="signal"   text="I2S_CKIN"  	  posX="365" posY="733" refEnable="ExtClockEnable"/>
+    
+    
+    <!--PLL4 Source labels-->
+    <Label id="PLL4SourcMuxLabel"    type="muxLabel" text="PLL4 Source Mux" posX="370" posY="770"/>
+    <Label id="PLL4SourcMuxHSILabel" type="signal"   text="HSI"            posX="365" posY="793"/>
+    <Label id="PLL4SourcMuxHSILabel" type="signal"   text="MSI"            posX="365" posY="817"/>
+    <Label id="PLL4SourcMuxHSELabel" type="signal"   text="HSE"  	  posX="365" posY="842" refEnable="EnableHSE"/>
+    <Label id="PLL4SourcMuxHSELabel" type="signal"   text="I2S_CKIN"  	  posX="365" posY="867" refEnable="ExtClockEnable"/>
+
+    <!--Main PLL labels-->
+    <Label id="PLLMLabel"       type="signal" text="PLL1_CK"     posX="440" posY="375"/>
+    <Label id="PLLMLabel"       type="info" text="DIVM1"     posX="500" posY="405"/>
+    <Label id="PLLNLabel"       type="info" text="DIVN1"       posX="570" posY="400"/>
+    <Label id="PLLPLabel"       type="info" text="PLL1_1"       posX="625" posY="400"/>
+    <Label id="PLLPLabel"       type="info" text="PLL2_1"       posX="695" posY="400"/>
+    <Label id="FOUTPOSTDIV1Label"       type="info" text="PLL1"       posX="775" posY="360"/>
+    <Label id="PLLLabel"        type="info" text="PLL1"      posX="560" posY="470"/>
+    <Label id="PLL1fracvLabel"       type="info" text="fracn1"          posX="615" posY="447"/>
+    <!--Main PLL2 labels-->
+    <Label id="PLL2MLabel"       type="signal" text="PLL2_CK"     posX="440" posY="515"/>
+    <Label id="PLLMLabel"       type="info" text="DIVM2"     posX="500" posY="550"/>
+    <Label id="PLL2Label"       type="info" text="DIVN2"          posX="570" posY="545"/>
+    <Label id="PLL2PLabel"       type="info" text="PLL1_2"          posX="625" posY="545"/>
+    <Label id="PLL2_2PLabel"       type="info" text="PLL2_2"       posX="695" posY="545"/>
+    <Label id="FOUTPOSTDIV2Label"       type="info" text="PLL2"       posX="775" posY="505"/>
+    <Label id="PLL2Label"        type="info" text="PLL2"     posX="560" posY="610"/>
+    <Label id="PLLfracvLabel"       type="info" text="fracn2"          posX="615" posY="590"/>
+    <!--Main PLL3 labels-->
+    <Label id="PLL3MLabel"       type="signal" text="PLL3_CK"     posX="440" posY="690"/>
+    <Label id="PLLMLabel"       type="info" text="DIVM3"     posX="500" posY="720"/>
+    <Label id="PLL3NLabel"       type="info" text="DIVN3"          posX="570" posY="715"/>
+    <Label id="PLL3PLabel"       type="info" text="PLL1_3"          posX="625" posY="715"/>
+    <Label id="PLL3_2PLabel"       type="info" text="PLL2_3"       posX="695" posY="715"/>
+    <Label id="FOUTPOSTDIV3Label"       type="info" text="PLL3"       posX="775" posY="675"/>    
+    <Label id="PLL3Label"        type="info" text="PLL3"     posX="560" posY="795"/>
+    <Label id="PLL3fracvLabel"       type="info" text="fracn3"          posX="615" posY="772"/>
+    
+    
+    <!--Main PLL4 labels-->
+    <Label id="PLL4MLabel"       type="signal" text="PLL4_CK"     posX="440" posY="825"/>
+    <Label id="PLLMLabel"       type="info" text="DIVM4"     posX="500" posY="855"/>
+    <Label id="PLL4NLabel"       type="info" text="DIVN4"          posX="570" posY="850"/>
+    <Label id="PLL4PLabel"       type="info" text="PLL1_4"          posX="625" posY="850"/>
+    <Label id="PLL4_2PLabel"       type="info" text="PLL2_4"       posX="695" posY="850"/>
+    <Label id="FOUTPOSTDIV4Label"       type="info" text="PLL4"       posX="775" posY="810"/>
+    <Label id="PLL4Label"        type="info" text="PLL4"     posX="560" posY="925"/>
+    <Label id="PLL4fracvLabel"       type="info" text="fracn4"          posX="615" posY="900"/>
+     
+    <!-- source constraint label -->
+
+    <Label id="HSIRCLabel"    type="info"       posX="302" posY="779" text="HSI RC"/>
+    <Label id="HSIDIVLabel"   type="info"       posX="420" posY="953" text="HSI_DIV"/>
+    <Label id="HSIDIVLabel"   type="info"       posX="540" posY="968" text="To HSIDIV (MHz)"/>
+    <Label id="UCPDLabel"   type="info"       posX="540" posY="1011" text="To UCPD1 (MHz)" refEnable="EnableUCPD1"/>
+    <Label id="HSIRCCstLabel" type="constraint" posX="302" posY="821" text="64 MHz"/>
+    <Label id="HSIRCLabel"    type="info"       posX="302" posY="492" text="MSI RC"/>
+    <Label id="HSIRCCstLabel" type="constraint" posX="302" posY="531" text="4/16 MHz"/>
+    <Label id="LSI_RCLabel"   type="Info"       posX="302" posY="220" text="LSI RC"/>
+    <Label id="LSI_RCcST"     type="constraint" posX="302" posY="260" text="32 KHz"/>
+	
+    <!-- IWDG -->
+    <Label id="ToIWDGLabel" type="SpecialInfo" text="To IWDG (KHz)" posX="672" posY="285" refEnable="IWDGEnable"/>
+    <!-- APB label -->
+    
+    <Label id="ABP1labelPCLK2" type="info" text="PPRE1" posX="1250" posY="322" />
+    <Label id="ABP2labelPCLK2" type="info" text="PPRE2" posX="1250" posY="387" />
+    <Label id="ABP4labelPCLK1" type="info" text="PPRE4" posX="1250" posY="462" />
+    <Label id="ABP5labelPCLK1" type="info" text="PPRE5" posX="1250" posY="522" />
+
+    <!--ADC label-->
+    <Label id="ADCLabel" type="muxLabel"    text="ADC Source Mux"  posX="1305" posY="710" refEnable="ADCEnable"/>
+    <Label id="ADCLabel" type="SpecialInfo" text="To ADC1,2 (MHz)" posX="1660" posY="835" refEnable="ADCEnable"/>
+    <Label id="ADCLabel" type="signal"      text="HCLK"            posX="1305" posY="743" refEnable="ADCEnable"/>
+    <Label id="ADCLabel" type="signal"      text="PER"             posX="1305" posY="768" refEnable="ADCEnable"/>
+    <Label id="ADCLabel" type="signal"      text="IC7"             posX="1305" posY="793" refEnable="ADCEnable"/>
+    <Label id="ADCLabel" type="signal"      text="IC8"             posX="1305" posY="818" refEnable="ADCEnable"/>
+    <Label id="ADCLabel" type="signal"      text="MSI"             posX="1305" posY="843" refEnable="ADCEnable"/>
+    <Label id="ADCLabel" type="signal"      text="HSIDIV"             posX="1305" posY="868" refEnable="ADCEnable"/>
+    <Label id="ADCLabel" type="signal"      text="I2S_CKIN"        posX="1305" posY="893" refEnable="ADCEnable,ExtClockEnable"/>
+    <Label id="ADCLabel" type="signal"      text="TIMG"            posX="1305" posY="918" refEnable="ADCEnable"/>
+	
+    <!--CKPER label-->
+    <Label id="CKPERLabel" type="muxLabel"    text="CKPER Source Mux"  posX="1490" posY="860" refEnable="OTG1Enable,OTG2Enable,EnableLPUART1,SDMMC1Enable,SDMMC2Enable,EnableLPUART1,ADCEnable,EnableADF1,EnableDCMI,EnableFDCAN123,FMCEnable,EnableI2C1,EnableI2C2,EnableI2C3,EnableI2C4,EnableI3C1,EnableI3C2,EnableMDF1,EnableLPTIM1,EnableLPTIM2,EnableLPTIM3,EnableLPTIM4,EnableLPTIM5,EnableLTDC,PSSIEnable,EnableSAI1,EnableSAI2,EnableSPDIFRX,XSPI1Enable,XSPI2Enable,XSPI3Enable,EnableUSART1,EnableUSART2,EnableUSART3,EnableUART4,EnableUART5,EnableUART7,EnableUART8,EnableUART9,EnableUSART6,EnableUSART10,EnableSPI1,EnableSPI2,EnableSPI3,EnableSPI4,EnableSPI5,EnableSPI6"/>
+    <Label id="CKPERLabel" type="SpecialInfo" text="To PER (MHz)"      posX="1660" posY="987" refEnable="OTG1Enable,OTG2Enable,EnableLPUART1,SDMMC1Enable,SDMMC2Enable,EnableLPUART1,ADCEnable,EnableADF1,EnableDCMI,EnableFDCAN123,FMCEnable,EnableI2C1,EnableI2C2,EnableI2C3,EnableI2C4,EnableI3C1,EnableI3C2,EnableMDF1,EnableLPTIM1,EnableLPTIM2,EnableLPTIM3,EnableLPTIM4,EnableLPTIM5,EnableLTDC,PSSIEnable,EnableSAI1,EnableSAI2,EnableSPDIFRX,XSPI1Enable,XSPI2Enable,XSPI3Enable,EnableUSART1,EnableUSART2,EnableUSART3,EnableUART4,EnableUART5,EnableUART7,EnableUART8,EnableUART9,EnableUSART6,EnableUSART10,EnableSPI1,EnableSPI2,EnableSPI3,EnableSPI4,EnableSPI5,EnableSPI6"/>
+    <Label id="CKPERLabel" type="signal"      text="HSI"               posX="1485" posY="896" refEnable="OTG1Enable,OTG2Enable,EnableLPUART1,SDMMC1Enable,SDMMC2Enable,EnableLPUART1,ADCEnable,EnableADF1,EnableDCMI,EnableFDCAN123,FMCEnable,EnableI2C1,EnableI2C2,EnableI2C3,EnableI2C4,EnableI3C1,EnableI3C2,EnableMDF1,EnableLPTIM1,EnableLPTIM2,EnableLPTIM3,EnableLPTIM4,EnableLPTIM5,EnableLTDC,PSSIEnable,EnableSAI1,EnableSAI2,EnableSPDIFRX,XSPI1Enable,XSPI2Enable,XSPI3Enable,EnableUSART1,EnableUSART2,EnableUSART3,EnableUART4,EnableUART5,EnableUART7,EnableUART8,EnableUART9,EnableUSART6,EnableUSART10,EnableSPI1,EnableSPI2,EnableSPI3,EnableSPI4,EnableSPI5,EnableSPI6"/>
+    <Label id="CKPERLabel" type="signal"      text="MSI"               posX="1485" posY="921" refEnable="OTG1Enable,OTG2Enable,EnableLPUART1,SDMMC1Enable,SDMMC2Enable,EnableLPUART1,ADCEnable,EnableADF1,EnableDCMI,EnableFDCAN123,FMCEnable,EnableI2C1,EnableI2C2,EnableI2C3,EnableI2C4,EnableI3C1,EnableI3C2,EnableMDF1,EnableLPTIM1,EnableLPTIM2,EnableLPTIM3,EnableLPTIM4,EnableLPTIM5,EnableLTDC,PSSIEnable,EnableSAI1,EnableSAI2,EnableSPDIFRX,XSPI1Enable,XSPI2Enable,XSPI3Enable,EnableUSART1,EnableUSART2,EnableUSART3,EnableUART4,EnableUART5,EnableUART7,EnableUART8,EnableUART9,EnableUSART6,EnableUSART10,EnableSPI1,EnableSPI2,EnableSPI3,EnableSPI4,EnableSPI5,EnableSPI6"/>
+    <Label id="CKPERLabel" type="signal"      text="HSE"               posX="1485" posY="946" refEnable="OTG1Enable,OTG2Enable,EnableLPUART1,SDMMC1Enable,SDMMC2Enable,EnableLPUART1,ADCEnable,EnableADF1,EnableDCMI,EnableFDCAN123,FMCEnable,EnableI2C1,EnableI2C2,EnableI2C3,EnableI2C4,EnableI3C1,EnableI3C2,EnableMDF1,EnableLPTIM1,EnableLPTIM2,EnableLPTIM3,EnableLPTIM4,EnableLPTIM5,EnableLTDC,PSSIEnable,EnableSAI1,EnableSAI2,EnableSPDIFRX,XSPI1Enable,XSPI2Enable,XSPI3Enable,EnableUSART1,EnableUSART2,EnableUSART3,EnableUART4,EnableUART5,EnableUART7,EnableUART8,EnableUART9,EnableUSART6,EnableUSART10,EnableSPI1,EnableSPI2,EnableSPI3,EnableSPI4,EnableSPI5,EnableSPI6"/>
+    <Label id="CKPERLabel" type="signal"      text="IC5"               posX="1485" posY="972" refEnable="OTG1Enable,OTG2Enable,EnableLPUART1,SDMMC1Enable,SDMMC2Enable,EnableLPUART1,ADCEnable,EnableADF1,EnableDCMI,EnableFDCAN123,FMCEnable,EnableI2C1,EnableI2C2,EnableI2C3,EnableI2C4,EnableI3C1,EnableI3C2,EnableMDF1,EnableLPTIM1,EnableLPTIM2,EnableLPTIM3,EnableLPTIM4,EnableLPTIM5,EnableLTDC,PSSIEnable,EnableSAI1,EnableSAI2,EnableSPDIFRX,XSPI1Enable,XSPI2Enable,XSPI3Enable,EnableUSART1,EnableUSART2,EnableUSART3,EnableUART4,EnableUART5,EnableUART7,EnableUART8,EnableUART9,EnableUSART6,EnableUSART10,EnableSPI1,EnableSPI2,EnableSPI3,EnableSPI4,EnableSPI5,EnableSPI6"/>
+    <Label id="CKPERLabel" type="signal"      text="IC10"              posX="1485" posY="997" refEnable="OTG1Enable,OTG2Enable,EnableLPUART1,SDMMC1Enable,SDMMC2Enable,EnableLPUART1,ADCEnable,EnableADF1,EnableDCMI,EnableFDCAN123,FMCEnable,EnableI2C1,EnableI2C2,EnableI2C3,EnableI2C4,EnableI3C1,EnableI3C2,EnableMDF1,EnableLPTIM1,EnableLPTIM2,EnableLPTIM3,EnableLPTIM4,EnableLPTIM5,EnableLTDC,PSSIEnable,EnableSAI1,EnableSAI2,EnableSPDIFRX,XSPI1Enable,XSPI2Enable,XSPI3Enable,EnableUSART1,EnableUSART2,EnableUSART3,EnableUART4,EnableUART5,EnableUART7,EnableUART8,EnableUART9,EnableUSART6,EnableUSART10,EnableSPI1,EnableSPI2,EnableSPI3,EnableSPI4,EnableSPI5,EnableSPI6"/>
+    <Label id="CKPERLabel" type="signal"      text="IC15"              posX="1485" posY="1022" refEnable="OTG1Enable,OTG2Enable,EnableLPUART1,SDMMC1Enable,SDMMC2Enable,EnableLPUART1,ADCEnable,EnableADF1,EnableDCMI,EnableFDCAN123,FMCEnable,EnableI2C1,EnableI2C2,EnableI2C3,EnableI2C4,EnableI3C1,EnableI3C2,EnableMDF1,EnableLPTIM1,EnableLPTIM2,EnableLPTIM3,EnableLPTIM4,EnableLPTIM5,EnableLTDC,PSSIEnable,EnableSAI1,EnableSAI2,EnableSPDIFRX,XSPI1Enable,XSPI2Enable,XSPI3Enable,EnableUSART1,EnableUSART2,EnableUSART3,EnableUART4,EnableUART5,EnableUART7,EnableUART8,EnableUART9,EnableUSART6,EnableUSART10,EnableSPI1,EnableSPI2,EnableSPI3,EnableSPI4,EnableSPI5,EnableSPI6"/>
+    <Label id="CKPERLabel" type="signal"      text="IC19"              posX="1485" posY="1047" refEnable="OTG1Enable,OTG2Enable,EnableLPUART1,SDMMC1Enable,SDMMC2Enable,EnableLPUART1,ADCEnable,EnableADF1,EnableDCMI,EnableFDCAN123,FMCEnable,EnableI2C1,EnableI2C2,EnableI2C3,EnableI2C4,EnableI3C1,EnableI3C2,EnableMDF1,EnableLPTIM1,EnableLPTIM2,EnableLPTIM3,EnableLPTIM4,EnableLPTIM5,EnableLTDC,PSSIEnable,EnableSAI1,EnableSAI2,EnableSPDIFRX,XSPI1Enable,XSPI2Enable,XSPI3Enable,EnableUSART1,EnableUSART2,EnableUSART3,EnableUART4,EnableUART5,EnableUART7,EnableUART8,EnableUART9,EnableUSART6,EnableUSART10,EnableSPI1,EnableSPI2,EnableSPI3,EnableSPI4,EnableSPI5,EnableSPI6"/>
+    <Label id="CKPERLabel" type="signal"      text="IC20"              posX="1485" posY="1072" refEnable="OTG1Enable,OTG2Enable,EnableLPUART1,SDMMC1Enable,SDMMC2Enable,EnableLPUART1,ADCEnable,EnableADF1,EnableDCMI,EnableFDCAN123,FMCEnable,EnableI2C1,EnableI2C2,EnableI2C3,EnableI2C4,EnableI3C1,EnableI3C2,EnableMDF1,EnableLPTIM1,EnableLPTIM2,EnableLPTIM3,EnableLPTIM4,EnableLPTIM5,EnableLTDC,PSSIEnable,EnableSAI1,EnableSAI2,EnableSPDIFRX,XSPI1Enable,XSPI2Enable,XSPI3Enable,EnableUSART1,EnableUSART2,EnableUSART3,EnableUART4,EnableUART5,EnableUART7,EnableUART8,EnableUART9,EnableUSART6,EnableUSART10,EnableSPI1,EnableSPI2,EnableSPI3,EnableSPI4,EnableSPI5,EnableSPI6"/>
+	
+    <!--I2C2 label-->
+    <Label id="I2C2Label" type="muxLabel"    text="I2C2 Source Mux"  posX="1490" posY="1150" refEnable="EnableI2C2"/>
+    <Label id="I2C2Label" type="SpecialInfo" text="To I2C2 (MHz)" posX="1660" posY="1258" refEnable="EnableI2C2"/>
+    <Label id="I2C2Label" type="signal"      text="PCLK1"        posX="1485" posY="1186" refEnable="EnableI2C2"/>
+    <Label id="I2C2Label" type="signal"      text="PER"          posX="1485" posY="1211" refEnable="EnableI2C2"/>
+    <Label id="I2C2Label" type="signal"      text="IC10"         posX="1485" posY="1238" refEnable="EnableI2C2"/>
+    <Label id="I2C2Label" type="signal"      text="IC15"         posX="1485" posY="1265" refEnable="EnableI2C2"/>
+    <Label id="I2C2Label" type="signal"      text="MSI"          posX="1485" posY="1290" refEnable="EnableI2C2"/>
+    <Label id="I2C2Label" type="signal"      text="HSIDIV"          posX="1485" posY="1315" refEnable="EnableI2C2"/>
+	
+    <!--I2C4 label-->
+    <Label id="I2C4Label" type="muxLabel"    text="I2C4 Source Mux"  posX="1490" posY="1390" refEnable="EnableI2C4"/>
+    <Label id="I2C4Label" type="SpecialInfo" text="To I2C4 (MHz)" posX="1660" posY="1490" refEnable="EnableI2C4"/>
+    <Label id="I2C4Label" type="signal"      text="PCLK1"        posX="1485" posY="1418" refEnable="EnableI2C4"/>
+    <Label id="I2C4Label" type="signal"      text="PER"          posX="1485" posY="1443" refEnable="EnableI2C4"/>
+    <Label id="I2C4Label" type="signal"      text="IC10"         posX="1485" posY="1468" refEnable="EnableI2C4"/>
+    <Label id="I2C4Label" type="signal"      text="IC15"         posX="1485" posY="1497" refEnable="EnableI2C4"/>
+    <Label id="I2C4Label" type="signal"      text="MSI"          posX="1485" posY="1522" refEnable="EnableI2C4"/>
+    <Label id="I2C4Label" type="signal"      text="HSIDIV"          posX="1485" posY="1547" refEnable="EnableI2C4"/>
+	
+    <!--I3C2 label-->
+    <Label id="I3C2Label" type="muxLabel"    text="I3C2 Source Mux"  posX="1490" posY="1620" refEnable="EnableI3C2"/>
+    <Label id="I3C2Label" type="SpecialInfo" text="To I3C2 (MHz)" posX="1660" posY="1718" refEnable="EnableI3C2"/>
+    <Label id="I3C2Label" type="signal"      text="PCLK1"        posX="1485" posY="1646" refEnable="EnableI3C2"/>
+    <Label id="I3C2Label" type="signal"      text="PER"          posX="1485" posY="1673" refEnable="EnableI3C2"/>
+    <Label id="I3C2Label" type="signal"      text="IC10"         posX="1485" posY="1698" refEnable="EnableI3C2"/>
+    <Label id="I3C2Label" type="signal"      text="IC15"         posX="1485" posY="1723" refEnable="EnableI3C2"/>
+    <Label id="I3C2Label" type="signal"      text="MSI"          posX="1485" posY="1750" refEnable="EnableI3C2"/>
+    <Label id="I3C2Label" type="signal"      text="HSIDIV"          posX="1485" posY="1776" refEnable="EnableI3C2"/>
+	
+    <!--LPTIM2 label-->
+    <Label id="LPTIM2Label" type="muxLabel"    text="LPTIM2 Source Mux"  posX="1490" posY="1850" refEnable="EnableLPTIM2"/>
+    <Label id="LPTIM2Label" type="SpecialInfo" text="To LPTIM2 (MHz)" posX="1660" posY="1950" refEnable="EnableLPTIM2"/>
+    <Label id="LPTIM2Label" type="signal"      text="PCLK4"        posX="1487" posY="1876" refEnable="EnableLPTIM2"/>
+    <Label id="LPTIM2Label" type="signal"      text="PER"          posX="1487" posY="1901" refEnable="EnableLPTIM2"/>
+    <Label id="LPTIM2Label" type="signal"      text="IC15"         posX="1487" posY="1928" refEnable="EnableLPTIM2"/>
+    <Label id="LPTIM2Label" type="signal"      text="LSE"         posX="1487" posY="1955" refEnable="EnableLPTIM2"/>
+    <Label id="LPTIM2Label" type="signal"      text="LSI"          posX="1487" posY="1982" refEnable="EnableLPTIM2"/>
+    <Label id="LPTIM2Label" type="signal"      text="TIMG"          posX="1487" posY="2007" refEnable="EnableLPTIM2"/>
+	
+    <!--LPTIM4 label-->
+    <Label id="LPTIM4Label" type="muxLabel"    text="LPTIM4 Source Mux"  posX="1490" posY="2070" refEnable="EnableLPTIM4"/>
+    <Label id="LPTIM4Label" type="SpecialInfo" text="To LPTIM4 (MHz)" posX="1660" posY="2170" refEnable="EnableLPTIM4"/>
+    <Label id="LPTIM4Label" type="signal"      text="PCLK4"        posX="1487" posY="2097" refEnable="EnableLPTIM4"/>
+    <Label id="LPTIM4Label" type="signal"      text="PER"          posX="1487" posY="2122" refEnable="EnableLPTIM4"/>
+    <Label id="LPTIM4Label" type="signal"      text="IC15"         posX="1487" posY="2149" refEnable="EnableLPTIM4"/>
+    <Label id="LPTIM4Label" type="signal"      text="LSE"         posX="1487" posY="2176" refEnable="EnableLPTIM4"/>
+    <Label id="LPTIM4Label" type="signal"      text="LSI"          posX="1487" posY="2203" refEnable="EnableLPTIM4"/>
+    <Label id="LPTIM4Label" type="signal"      text="TIMG"          posX="1487" posY="2228" refEnable="EnableLPTIM4"/>
+	
+    <!--LPTIM5 label-->
+    <Label id="LPTIM5Label" type="muxLabel"    text="LPTIM5 Source Mux"  posX="1490" posY="2290" refEnable="EnableLPTIM5"/>
+    <Label id="LPTIM5Label" type="SpecialInfo" text="To LPTIM5 (MHz)" posX="1660" posY="2390" refEnable="EnableLPTIM5"/>
+    <Label id="LPTIM5Label" type="signal"      text="PCLK4"        posX="1488" posY="2317" refEnable="EnableLPTIM5"/>
+    <Label id="LPTIM5Label" type="signal"      text="PER"          posX="1488" posY="2342" refEnable="EnableLPTIM5"/>
+    <Label id="LPTIM5Label" type="signal"      text="IC15"         posX="1488" posY="2369" refEnable="EnableLPTIM5"/>
+    <Label id="LPTIM5Label" type="signal"      text="LSE"         posX="1488" posY="2396" refEnable="EnableLPTIM5"/>
+    <Label id="LPTIM5Label" type="signal"      text="LSI"          posX="1488" posY="2423" refEnable="EnableLPTIM5"/>
+    <Label id="LPTIM5Label" type="signal"      text="TIMG"          posX="1488" posY="2448" refEnable="EnableLPTIM5"/>
+
+    <!--LTDC label-->
+    <Label id="LTDCLabel" type="muxLabel"    text="LTDC Source Mux"  posX="1490" posY="2530" refEnable="EnableLTDC"/>
+    <Label id="LTDCLabel" type="SpecialInfo" text="To LTDC (MHz)" posX="1660" posY="2595" refEnable="EnableLTDC"/>
+    <Label id="LTDCLabel" type="signal"      text="PCLK5"        posX="1488" posY="2557" refEnable="EnableLTDC"/>
+    <Label id="LTDCLabel" type="signal"      text="PER"          posX="1488" posY="2582" refEnable="EnableLTDC"/>
+    <Label id="LTDCLabel" type="signal"      text="IC16"         posX="1488" posY="2607" refEnable="EnableLTDC"/>
+    <Label id="LTDCLabel" type="signal"      text="HSIDIV"         posX="1488" posY="2632" refEnable="EnableLTDC"/>
+	
+    <!--DCMI label-->
+    <Label id="DCMILabel" type="muxLabel"    text="DCMIPP Source Mux"  posX="1490" posY="2735" refEnable="EnableDCMI"/>
+    <Label id="DCMILabel" type="SpecialInfo" text="To DCMIPP (MHz)" posX="1660" posY="2805" refEnable="EnableDCMI"/>
+    <Label id="DCMILabel" type="signal"      text="PCLK5"        posX="1490" posY="2764" refEnable="EnableDCMI"/>
+    <Label id="DCMILabel" type="signal"      text="PER"          posX="1490" posY="2789" refEnable="EnableDCMI"/>
+    <Label id="DCMILabel" type="signal"      text="IC17"         posX="1490" posY="2814" refEnable="EnableDCMI"/>
+    <Label id="DCMILabel" type="signal"      text="HSIDIV"         posX="1490" posY="2839" refEnable="EnableDCMI"/>
+	
+    <!--FMC label-->
+    <Label id="FMCLabel" type="muxLabel"    text="FMC Source Mux"  posX="1490" posY="2905" refEnable="FMCEnable"/>
+    <Label id="FMCLabel" type="SpecialInfo" text="To FMC (MHz)" posX="1660" posY="2980" refEnable="FMCEnable"/>
+    <Label id="FMCLabel" type="signal"      text="HCLK"        posX="1490" posY="2935" refEnable="FMCEnable"/>
+    <Label id="FMCLabel" type="signal"      text="PER"          posX="1490" posY="2960" refEnable="FMCEnable"/>
+    <Label id="FMCLabel" type="signal"      text="IC3"         posX="1490" posY="2985" refEnable="FMCEnable"/>
+    <Label id="FMCLabel" type="signal"      text="IC4"         posX="1490" posY="3010" refEnable="FMCEnable"/>
+	
+    <!--SAI2 label-->
+    <Label id="SAI2Label" type="muxLabel"    text="SAI2 Source Mux"  posX="1490" posY="3105" refEnable="EnableSAI2"/>
+    <Label id="SAI2Label" type="SpecialInfo" text="To SAI2 (MHz)" posX="1660" posY="3225" refEnable="EnableSAI2"/>
+    <Label id="SAI2Label" type="signal"      text="PCLK2"          posX="1492" posY="3136" refEnable="EnableSAI2"/>
+    <Label id="SAI2Label" type="signal"      text="PER"           posX="1492" posY="3161" refEnable="EnableSAI2"/>
+    <Label id="SAI2Label" type="signal"      text="IC7"           posX="1492" posY="3186" refEnable="EnableSAI2"/>
+    <Label id="SAI2Label" type="signal"      text="IC8"           posX="1492" posY="3211" refEnable="EnableSAI2"/>
+    <Label id="SAI2Label" type="signal"      text="MSI"           posX="1492" posY="3236" refEnable="EnableSAI2"/>
+    <Label id="SAI2Label" type="signal"      text="HSIDIV"           posX="1492" posY="3262" refEnable="EnableSAI2"/>
+    <Label id="SAI2Label" type="signal"      text="I2S_CKIN"           posX="1492" posY="3287" refEnable="EnableSAI2,ExtClockEnable"/>
+    <Label id="SAI2Label" type="signal"      text="SPDIF"           posX="1492" posY="3312" refEnable="EnableSAI2"/>
+	
+    <!--ADF1 label-->
+    <Label id="ADF1Label" type="muxLabel"    text="ADF1 Source Mux" posX="1305" posY="990" refEnable="EnableADF1"/>
+    <Label id="ADF1Label" type="SpecialInfo" text="To ADF1 (MHz)"   posX="1660" posY="1120" refEnable="EnableADF1"/>
+    <Label id="ADF1Label" type="signal"      text="HCLK"            posX="1305" posY="1028" refEnable="EnableADF1"/>
+    <Label id="ADF1Label" type="signal"      text="PER"             posX="1305" posY="1053" refEnable="EnableADF1"/>
+    <Label id="ADF1Label" type="signal"      text="IC7"             posX="1305" posY="1078" refEnable="EnableADF1"/>
+    <Label id="ADF1Label" type="signal"      text="IC8"             posX="1305" posY="1103" refEnable="EnableADF1"/>
+    <Label id="ADF1Label" type="signal"      text="MSI"             posX="1305" posY="1128" refEnable="EnableADF1"/>
+    <Label id="ADF1Label" type="signal"      text="HSIDIV"             posX="1305" posY="1153" refEnable="EnableADF1"/>
+    <Label id="ADF1Label" type="signal"      text="I2S_CKIN"        posX="1305" posY="1178" refEnable="EnableADF1,ExtClockEnable"/>
+    <Label id="ADF1Label" type="signal"      text="TIMG"            posX="1305" posY="1203" refEnable="EnableADF1"/>
+	
+    <!--I2C1 label-->
+    <Label id="I2C1Label" type="muxLabel"    text="I2C1 Source Mux"  posX="1305" posY="1260" refEnable="EnableI2C1"/>
+    <Label id="I2C1Label" type="SpecialInfo" text="To I2C1 (MHz)" posX="1660" posY="1370" refEnable="EnableI2C1"/>
+    <Label id="I2C1Label" type="signal"      text="PCLK1"        posX="1305" posY="1296" refEnable="EnableI2C1"/>
+    <Label id="I2C1Label" type="signal"      text="PER"          posX="1305" posY="1323" refEnable="EnableI2C1"/>
+    <Label id="I2C1Label" type="signal"      text="IC10"         posX="1305" posY="1348" refEnable="EnableI2C1"/>
+    <Label id="I2C1Label" type="signal"      text="IC15"         posX="1305" posY="1375" refEnable="EnableI2C1"/>
+    <Label id="I2C1Label" type="signal"      text="MSI"          posX="1305" posY="1403" refEnable="EnableI2C1"/>
+    <Label id="I2C1Label" type="signal"      text="HSIDIV"          posX="1305" posY="1428" refEnable="EnableI2C1"/>
+	
+    <!--I2C3 label-->
+    <Label id="I2C3Label" type="muxLabel"    text="I2C3 Source Mux"  posX="1305" posY="1480" refEnable="EnableI2C3"/>
+    <Label id="I2C3Label" type="SpecialInfo" text="To I2C3 (MHz)" posX="1660" posY="1590" refEnable="EnableI2C3"/>
+    <Label id="I2C3Label" type="signal"      text="PCLK1"        posX="1305" posY="1516" refEnable="EnableI2C3"/>
+    <Label id="I2C3Label" type="signal"      text="PER"          posX="1305" posY="1543" refEnable="EnableI2C3"/>
+    <Label id="I2C3Label" type="signal"      text="IC10"         posX="1305" posY="1566" refEnable="EnableI2C3"/>
+    <Label id="I2C3Label" type="signal"      text="IC15"         posX="1305" posY="1595" refEnable="EnableI2C3"/>
+    <Label id="I2C3Label" type="signal"      text="MSI"          posX="1305" posY="1621" refEnable="EnableI2C3"/>
+    <Label id="I2C3Label" type="signal"      text="HSIDIV"          posX="1305" posY="1647" refEnable="EnableI2C3"/>
+	
+    <!--I3C1 label-->
+    <Label id="I3C1Label" type="muxLabel"    text="I3C1 Source Mux"  posX="1305" posY="1710" refEnable="EnableI3C1"/>
+    <Label id="I3C1Label" type="SpecialInfo" text="To I3C1 (MHz)" posX="1660" posY="1820" refEnable="EnableI3C1"/>
+    <Label id="I3C1Label" type="signal"      text="PCLK1"        posX="1305" posY="1750" refEnable="EnableI3C1"/>
+    <Label id="I3C1Label" type="signal"      text="PER"          posX="1305" posY="1777" refEnable="EnableI3C1"/>
+    <Label id="I3C1Label" type="signal"      text="IC10"         posX="1305" posY="1800" refEnable="EnableI3C1"/>
+    <Label id="I3C1Label" type="signal"      text="IC15"         posX="1305" posY="1829" refEnable="EnableI3C1"/>
+    <Label id="I3C1Label" type="signal"      text="MSI"          posX="1305" posY="1855" refEnable="EnableI3C1"/>
+    <Label id="I3C1Label" type="signal"      text="HSIDIV"          posX="1305" posY="1881" refEnable="EnableI3C1"/>
+	
+    <!--LPTIM1 label-->
+    <Label id="LPTIM1Label" type="muxLabel"    text="LPTIM1 Source Mux"  posX="1305" posY="1940" refEnable="EnableLPTIM1"/>
+    <Label id="LPTIM1Label" type="SpecialInfo" text="To LPTIM1 (MHz)" posX="1660" posY="2052" refEnable="EnableLPTIM1"/>
+    <Label id="LPTIM1Label" type="signal"      text="PCLK1"        posX="1305" posY="1980" refEnable="EnableLPTIM1"/>
+    <Label id="LPTIM1Label" type="signal"      text="PER"          posX="1305" posY="2005" refEnable="EnableLPTIM1"/>
+    <Label id="LPTIM1Label" type="signal"      text="IC15"         posX="1305" posY="2030" refEnable="EnableLPTIM1"/>
+    <Label id="LPTIM1Label" type="signal"      text="LSE"          posX="1305" posY="2058" refEnable="EnableLPTIM1"/>
+    <Label id="LPTIM1Label" type="signal"      text="LSI"          posX="1305" posY="2083" refEnable="EnableLPTIM1"/>
+    <Label id="LPTIM1Label" type="signal"      text="TIMG"         posX="1305" posY="2110" refEnable="EnableLPTIM1"/>
+	
+    <!--LPTIM3 label-->
+    <Label id="LPTIM3Label" type="muxLabel"    text="LPTIM3 Source Mux"  posX="1305" posY="2170" refEnable="EnableLPTIM3"/>
+    <Label id="LPTIM3Label" type="SpecialInfo" text="To LPTIM3 (MHz)" posX="1660" posY="2275" refEnable="EnableLPTIM3"/>
+    <Label id="LPTIM3Label" type="signal"      text="PCLK4"        posX="1305" posY="2202" refEnable="EnableLPTIM3"/>
+    <Label id="LPTIM3Label" type="signal"      text="PER"          posX="1305" posY="2228" refEnable="EnableLPTIM3"/>
+    <Label id="LPTIM3Label" type="signal"      text="IC15"         posX="1305" posY="2253" refEnable="EnableLPTIM3"/>
+    <Label id="LPTIM3Label" type="signal"      text="LSE"          posX="1305" posY="2281" refEnable="EnableLPTIM3"/>
+    <Label id="LPTIM3Label" type="signal"      text="LSI"          posX="1305" posY="2306" refEnable="EnableLPTIM3"/>
+    <Label id="LPTIM3Label" type="signal"      text="TIMG"         posX="1305" posY="2333" refEnable="EnableLPTIM3"/>
+	
+    <!--MDF1 label-->
+    <Label id="MDF1Label" type="muxLabel"    text="MDF1 Source Mux"  posX="1305" posY="2380" refEnable="EnableMDF1"/>
+    <Label id="MDF1Label" type="SpecialInfo" text="To MDF1 (MHz)" posX="1660" posY="2510" refEnable="EnableMDF1"/>
+    <Label id="MDF1Label" type="signal"      text="HCLK"          posX="1305" posY="2415" refEnable="EnableMDF1"/>
+    <Label id="MDF1Label" type="signal"      text="PER"           posX="1305" posY="2441" refEnable="EnableMDF1"/>
+    <Label id="MDF1Label" type="signal"      text="IC7"           posX="1305" posY="2466" refEnable="EnableMDF1"/>
+    <Label id="MDF1Label" type="signal"      text="IC8"           posX="1305" posY="2493" refEnable="EnableMDF1"/>
+    <Label id="MDF1Label" type="signal"      text="MSI"           posX="1305" posY="2518" refEnable="EnableMDF1"/>
+    <Label id="MDF1Label" type="signal"      text="HSIDIV"           posX="1305" posY="2543" refEnable="EnableMDF1"/>
+    <Label id="MDF1Label" type="signal"      text="I2S_CKIN"      posX="1305" posY="2568" refEnable="EnableMDF1,ExtClockEnable"/>
+    <Label id="MDF1Label" type="signal"      text="TIMG"          posX="1305" posY="2593" refEnable="EnableMDF1"/>
+	
+    <!--PSSI label-->
+    <Label id="PSSILabel" type="muxLabel"    text="PSSI Source Mux"  posX="1305" posY="2640" refEnable="PSSIEnable"/>
+    <Label id="PSSILabel" type="SpecialInfo" text="To PSSI (MHz)" posX="1660" posY="2712" refEnable="PSSIEnable"/>
+    <Label id="PSSILabel" type="signal"      text="HCLK"          posX="1305" posY="2670" refEnable="PSSIEnable"/>
+    <Label id="PSSILabel" type="signal"      text="PER"           posX="1305" posY="2695" refEnable="PSSIEnable"/>
+    <Label id="PSSILabel" type="signal"      text="IC20"           posX="1305" posY="2720" refEnable="PSSIEnable"/>
+    <Label id="PSSILabel" type="signal"      text="HSIDIV"           posX="1305" posY="2745" refEnable="PSSIEnable"/>
+	
+    <!--FDCAN label-->
+    <Label id="FDCANLabel" type="muxLabel"    text="FDCAN1,2,3 Source Mux"  posX="1305" posY="2810" refEnable="EnableFDCAN123"/>
+    <Label id="FDCANLabel" type="SpecialInfo" text="To FDCAN1,2,3 (MHz)" posX="1660" posY="2882" refEnable="EnableFDCAN123"/>
+    <Label id="FDCANLabel" type="signal"      text="PCLK1"          posX="1305" posY="2840" refEnable="EnableFDCAN123"/>
+    <Label id="FDCANLabel" type="signal"      text="PER"           posX="1305" posY="2865" refEnable="EnableFDCAN123"/>
+    <Label id="FDCANLabel" type="signal"      text="IC19"           posX="1305" posY="2890" refEnable="EnableFDCAN123"/>
+    <Label id="FDCANLabel" type="signal"      text="HSE"           posX="1305" posY="2915" refEnable="EnableFDCAN123"/>
+	
+    <!--SAI1 label-->
+    <Label id="SAI1Label" type="muxLabel"    text="SAI1 Source Mux"  posX="1305" posY="2960" refEnable="EnableSAI1"/>
+    <Label id="SAI1Label" type="SpecialInfo" text="To SAI1 (MHz)" posX="1660" posY="3087" refEnable="EnableSAI1"/>
+    <Label id="SAI1Label" type="signal"      text="PCLK2"          posX="1307" posY="2995" refEnable="EnableSAI1"/>
+    <Label id="SAI1Label" type="signal"      text="PER"           posX="1307" posY="3020" refEnable="EnableSAI1"/>
+    <Label id="SAI1Label" type="signal"      text="IC7"           posX="1307" posY="3045" refEnable="EnableSAI1"/>
+    <Label id="SAI1Label" type="signal"      text="IC8"           posX="1307" posY="3070" refEnable="EnableSAI1"/>
+    <Label id="SAI1Label" type="signal"      text="MSI"           posX="1307" posY="3095" refEnable="EnableSAI1"/>
+    <Label id="SAI1Label" type="signal"      text="HSIDIV"           posX="1307" posY="3120" refEnable="EnableSAI1"/>
+    <Label id="SAI1Label" type="signal"      text="I2S_CKIN"           posX="1307" posY="3145" refEnable="EnableSAI1,ExtClockEnable"/>
+    <Label id="SAI1Label" type="signal"      text="SPDIF"           posX="1307" posY="3173" refEnable="EnableSAI1"/>
+	
+    <!--SPDIFRX1 label-->
+    <Label id="SPDIFRX1Label" type="muxLabel"    text="SPDIFRX Source Mux"  posX="1305" posY="3250" refEnable="EnableSPDIFRX"/>
+    <Label id="SPDIFRX1Label" type="SpecialInfo" text="To SPDIFRX (MHz)" posX="1660" posY="3370" refEnable="EnableSPDIFRX"/>
+    <Label id="SPDIFRX1Label" type="signal"      text="PCLK1"          posX="1309" posY="3290" refEnable="EnableSPDIFRX"/>
+    <Label id="SPDIFRX1Label" type="signal"      text="PER"           posX="1309" posY="3315" refEnable="EnableSPDIFRX"/>
+    <Label id="SPDIFRX1Label" type="signal"      text="IC7"           posX="1309" posY="3340" refEnable="EnableSPDIFRX"/>
+    <Label id="SPDIFRX1Label" type="signal"      text="IC8"           posX="1309" posY="3365" refEnable="EnableSPDIFRX"/>
+    <Label id="SPDIFRX1Label" type="signal"      text="MSI"           posX="1309" posY="3390" refEnable="EnableSPDIFRX"/>
+    <Label id="SPDIFRX1Label" type="signal"      text="HSIDIV"           posX="1309" posY="3415" refEnable="EnableSPDIFRX"/>
+    <Label id="SPDIFRX1Label" type="signal"      text="I2S_CKIN"           posX="1309" posY="3440" refEnable="EnableSPDIFRX,ExtClockEnable"/>
+	
+    <!--USART1 label-->
+    <Label id="USART1Label" type="muxLabel"    text="USART1 Source Mux"  posX="902" posY="1555" refEnable="EnableUSART1"/>
+    <Label id="USART1Label" type="SpecialInfo" text="To USART1 (MHz)" posX="1200" posY="1670" refEnable="EnableUSART1"/>
+    <Label id="USART1Label" type="signal"      text="PCLK2"        posX="902" posY="1592" refEnable="EnableUSART1"/>
+    <Label id="USART1Label" type="signal"      text="PER"          posX="902" posY="1617" refEnable="EnableUSART1"/>
+    <Label id="USART1Label" type="signal"      text="IC9"          posX="902" posY="1642" refEnable="EnableUSART1"/>
+    <Label id="USART1Label" type="signal"      text="IC14"         posX="902" posY="1667" refEnable="EnableUSART1"/>
+    <Label id="USART1Label" type="signal"      text="LSE"          posX="902" posY="1692" refEnable="EnableUSART1"/>
+    <Label id="USART1Label" type="signal"      text="MSI"          posX="902" posY="1717" refEnable="EnableUSART1"/>
+    <Label id="USART1Label" type="signal"      text="HSIDIV"          posX="902" posY="1742" refEnable="EnableUSART1"/>
+
+    <!--XSPI1 label-->
+    <Label id="XSPI1Label" type="muxLabel"    text="XSPI1 Source Mux"  posX="500" posY="1585" refEnable="XSPI1Enable"/>
+    <Label id="XSPI1Label" type="SpecialInfo" text="To XSPI1 (MHz)" posX="770" posY="1660" refEnable="XSPI1Enable"/>
+    <Label id="XSPI1Label" type="signal"      text="HCLK"        posX="500" posY="1616" refEnable="XSPI1Enable"/>
+    <Label id="XSPI1Label" type="signal"      text="PER"          posX="500" posY="1641" refEnable="XSPI1Enable"/>
+    <Label id="XSPI1Label" type="signal"      text="IC3"          posX="500" posY="1666" refEnable="XSPI1Enable"/>
+    <Label id="XSPI1Label" type="signal"      text="IC4"         posX="500" posY="1691" refEnable="XSPI1Enable"/>
+	
+    <!--XSPI2 label-->
+    <Label id="XSPI2Label" type="muxLabel"    text="XSPI2 Source Mux"  posX="610" posY="1673" refEnable="XSPI2Enable"/>
+    <Label id="XSPI2Label" type="SpecialInfo" text="To XSPI2 (MHz)" posX="770" posY="1743" refEnable="XSPI2Enable"/>
+    <Label id="XSPI2Label" type="signal"      text="HCLK"        posX="610" posY="1705" refEnable="XSPI2Enable"/>
+    <Label id="XSPI2Label" type="signal"      text="PER"         posX="610" posY="1730" refEnable="XSPI2Enable"/>
+    <Label id="XSPI2Label" type="signal"      text="IC3"         posX="610" posY="1755" refEnable="XSPI2Enable"/>
+    <Label id="XSPI2Label" type="signal"      text="IC4"         posX="610" posY="1780" refEnable="XSPI2Enable"/>
+	
+    <!--OTGHS1 label-->
+    <Label id="OTGHS1Label" type="muxLabel"    text="OTGHS1 Source Mux"  posX="663" posY="1946" refEnable="OTG1Enable"/>
+    <Label id="OTGHS1Label" type="SpecialInfo" text="To OTGHS1 (MHz)" posX="813" posY="2002" refEnable="OTG1Enable"/>
+    <Label id="OTGHS1Label" type="signal"      text="OTGPHY1"        posX="663" posY="1975" refEnable="OTG1Enable"/>
+    <Label id="OTGHS1Label" type="signal"      text="HSEDIV"         posX="663" posY="2016" refEnable="OTG1Enable"/>
+	
+    <!--OTGHS2 label-->
+    <Label id="OTGHS2Label" type="muxLabel"    text="OTGHS2 Source Mux"  posX="663" posY="2115" refEnable="OTG2Enable"/>
+    <Label id="OTGHS2Label" type="SpecialInfo" text="To OTGHS2 (MHz)" posX="813" posY="2171" refEnable="OTG2Enable"/>
+    <Label id="OTGHS2Label" type="signal"      text="OTGPHY2"        posX="663" posY="2144" refEnable="OTG2Enable"/>
+    <Label id="OTGHS2Label" type="signal"      text="HSEDIV"         posX="663" posY="2185" refEnable="OTG2Enable"/>
+	
+    <!--XSPI3 label-->
+    <Label id="XSPI3Label" type="muxLabel"    text="XSPI3 Source Mux"  posX="500" posY="1750" refEnable="XSPI3Enable"/>
+    <Label id="XSPI3Label" type="SpecialInfo" text="To XSPI3 (MHz)" posX="770" posY="1815" refEnable="XSPI3Enable"/>
+    <Label id="XSPI3Label" type="signal"      text="HCLK"        posX="500" posY="1779" refEnable="XSPI3Enable"/>
+    <Label id="XSPI3Label" type="signal"      text="PER"          posX="500" posY="1804" refEnable="XSPI3Enable"/>
+    <Label id="XSPI3Label" type="signal"      text="IC3"          posX="500" posY="1829" refEnable="XSPI3Enable"/>
+    <Label id="XSPI3Label" type="signal"      text="IC4"         posX="500" posY="1854" refEnable="XSPI3Enable"/>
+	
+    <!--OTGPHY1 label-->
+    <Label id="OTGPHY1Label" type="muxLabel"    text="OTGPHY1 Source Mux"  posX="425" posY="1905" refEnable="OTG1Enable"/>
+    <Label id="OTGPHY1Label" type="signal"      text="HSEDIV"        posX="425" posY="1940" refEnable="OTG1Enable,EnableHSE"/>
+    <Label id="OTGPHY1Label" type="signal"      text="HSE"        posX="315" posY="1940" refEnable="OTG1Enable,EnableHSE"/>
+    <Label id="OTGPHY1Label" type="signal"      text="PER"          posX="425" posY="1965" refEnable="OTG1Enable"/>
+    <Label id="OTGPHY1Label" type="signal"      text="IC15"          posX="425" posY="1990" refEnable="OTG1Enable"/>
+    <Label id="OTGPHY1Label" type="signal"      text="HSEDIV2"         posX="425" posY="2014" refEnable="OTG1Enable,EnableHSE"/>
+    <Label id="OTGPHY1Label" type="constraint"  text="19.2, 20, 24 MHz" posX="515" posY="2020" refEnable="OTG1Enable"/>
+    <Label id="OTGPHY1Label" type="info"  text="PLL" posX="606" posY="2014" refEnable="OTG1Enable"/>
+    <Label id="OTGPHY1Label" type="info"  text="OTGPHY1" posX="606" posY="2025" refEnable="OTG1Enable"/>
+	
+    <!--OTGPHY2 label-->
+    <Label id="OTGPHY2Label" type="muxLabel"    text="OTGPHY2 Source Mux"  posX="425" posY="2075" refEnable="OTG2Enable"/>
+    <Label id="OTGPHY2Label" type="signal"      text="HSEDIV"        posX="425" posY="2109" refEnable="OTG2Enable,EnableHSE"/>
+    <Label id="OTGPHY2Label" type="signal"      text="PER"          posX="425" posY="2134" refEnable="OTG2Enable"/>
+    <Label id="OTGPHY2Label" type="signal"      text="IC15"          posX="425" posY="2159" refEnable="OTG2Enable"/>
+    <Label id="OTGPHY2Label" type="signal"      text="HSEDIV2"         posX="425" posY="2182" refEnable="OTG2Enable,EnableHSE"/>
+    <Label id="OTGPHY2Label" type="constraint"  text="19.2, 20, 24 MHz" posX="515" posY="2188" refEnable="OTG2Enable"/>
+    <Label id="OTGPHY2Label" type="info"  text="PLL" posX="606" posY="2183" refEnable="OTG2Enable"/>
+    <Label id="OTGPHY2Label" type="info"  text="OTGPHY2" posX="606" posY="2194" refEnable="OTG2Enable"/>
+
+    <!--SDMMC1 label-->
+    <Label id="SDMMC1Label" type="muxLabel"    text="SDMMC1 Source Mux"  posX="500" posY="2245" refEnable="SDMMC1Enable"/>
+    <Label id="SDMMC1Label" type="SpecialInfo" text="To SDMMC1 (MHz)" posX="770" posY="2315" refEnable="SDMMC1Enable"/>
+    <Label id="SDMMC1Label" type="signal"      text="HCLK"        posX="500" posY="2274" refEnable="SDMMC1Enable"/>
+    <Label id="SDMMC1Label" type="signal"      text="PER"          posX="500" posY="2299" refEnable="SDMMC1Enable"/>
+    <Label id="SDMMC1Label" type="signal"      text="IC4"          posX="500" posY="2324" refEnable="SDMMC1Enable"/>
+    <Label id="SDMMC1Label" type="signal"      text="IC5"         posX="500" posY="2349" refEnable="SDMMC1Enable"/>
+
+    <!--SDMMC2 label-->
+    <Label id="SDMMC2Label" type="muxLabel"    text="SDMMC2 Source Mux"  posX="610" posY="2333" refEnable="SDMMC2Enable"/>
+    <Label id="SDMMC2Label" type="SpecialInfo" text="To SDMMC2 (MHz)" posX="770" posY="2403" refEnable="SDMMC2Enable"/>
+    <Label id="SDMMC2Label" type="signal"      text="HCLK"        posX="612" posY="2362" refEnable="SDMMC2Enable"/>
+    <Label id="SDMMC2Label" type="signal"      text="PER"         posX="612" posY="2387" refEnable="SDMMC2Enable"/>
+    <Label id="SDMMC2Label" type="signal"      text="IC4"         posX="612" posY="2412" refEnable="SDMMC2Enable"/>
+    <Label id="SDMMC2Label" type="signal"      text="IC5"         posX="612" posY="2437" refEnable="SDMMC2Enable"/>
+	
+    <!--ETH1 label-->
+    <Label id="ETH1Label" type="muxLabel"    text="ETH1 Source Mux"  posX="610" posY="2673" refEnable="ETH1Enable"/>
+    <Label id="ETH1Label" type="SpecialInfo" text="To ETH1 (MHz)" posX="770" posY="2745" refEnable="ETH1Enable"/>
+    <Label id="ETH1Label" type="signal"      text="HCLK"        posX="612" posY="2702" refEnable="ETH1Enable"/>
+    <Label id="ETH1Label" type="signal"      text="PER"         posX="612" posY="2727" refEnable="ETH1Enable"/>
+    <Label id="ETH1Label" type="signal"      text="IC12"         posX="612" posY="2752" refEnable="ETH1Enable"/>
+    <Label id="ETH1Label" type="signal"      text="HSE"         posX="612" posY="2777" refEnable="ETH1Enable"/>
+	
+    <!--USART2 label-->
+    <Label id="USART2Label" type="muxLabel"    text="USART2 Source Mux"  posX="1010" posY="1685" refEnable="EnableUSART2"/>
+    <Label id="USART2Label" type="SpecialInfo" text="To USART2 (MHz)" posX="1200" posY="1800" refEnable="EnableUSART2"/>
+    <Label id="USART2Label" type="signal"      text="PCLK1"        posX="1008" posY="1719" refEnable="EnableUSART2"/>
+    <Label id="USART2Label" type="signal"      text="PER"          posX="1008" posY="1744" refEnable="EnableUSART2"/>
+    <Label id="USART2Label" type="signal"      text="IC9"          posX="1008" posY="1769" refEnable="EnableUSART2"/>
+    <Label id="USART2Label" type="signal"      text="IC14"         posX="1008" posY="1794" refEnable="EnableUSART2"/>
+    <Label id="USART2Label" type="signal"      text="LSE"          posX="1008" posY="1819" refEnable="EnableUSART2"/>
+    <Label id="USART2Label" type="signal"      text="MSI"          posX="1008" posY="1844" refEnable="EnableUSART2"/>
+    <Label id="USART2Label" type="signal"      text="HSIDIV"          posX="1008" posY="1869" refEnable="EnableUSART2"/>
+
+    <!--UART4 label-->
+    <Label id="UART4Label" type="muxLabel"    text="UART4 Source Mux"  posX="1010" posY="1920" refEnable="EnableUART4"/>
+    <Label id="UART4Label" type="SpecialInfo" text="To UART4 (MHz)" posX="1200" posY="2033" refEnable="EnableUART4"/>
+    <Label id="UART4Label" type="signal"      text="PCLK1"        posX="1008" posY="1951" refEnable="EnableUART4"/>
+    <Label id="UART4Label" type="signal"      text="PER"          posX="1008" posY="1976" refEnable="EnableUART4"/>
+    <Label id="UART4Label" type="signal"      text="IC9"          posX="1008" posY="2001" refEnable="EnableUART4"/>
+    <Label id="UART4Label" type="signal"      text="IC14"         posX="1008" posY="2026" refEnable="EnableUART4"/>
+    <Label id="UART4Label" type="signal"      text="LSE"          posX="1008" posY="2051" refEnable="EnableUART4"/>
+    <Label id="UART4Label" type="signal"      text="MSI"          posX="1008" posY="2076" refEnable="EnableUART4"/>
+    <Label id="UART4Label" type="signal"      text="HSIDIV"          posX="1008" posY="2101" refEnable="EnableUART4"/>
+	
+    <!--USART6 label-->
+    <Label id="USART6Label" type="muxLabel"    text="USART6 Source Mux"  posX="1010" posY="2157" refEnable="EnableUSART6"/>
+    <Label id="USART6Label" type="SpecialInfo" text="To USART6 (MHz)" posX="1200" posY="2270" refEnable="EnableUSART6"/>
+    <Label id="USART6Label" type="signal"      text="PCLK2"        posX="1008" posY="2192" refEnable="EnableUSART6"/>
+    <Label id="USART6Label" type="signal"      text="PER"          posX="1008" posY="2217" refEnable="EnableUSART6"/>
+    <Label id="USART6Label" type="signal"      text="IC9"          posX="1008" posY="2242" refEnable="EnableUSART6"/>
+    <Label id="USART6Label" type="signal"      text="IC14"         posX="1008" posY="2267" refEnable="EnableUSART6"/>
+    <Label id="USART6Label" type="signal"      text="LSE"          posX="1008" posY="2292" refEnable="EnableUSART6"/>
+    <Label id="USART6Label" type="signal"      text="MSI"          posX="1008" posY="2317" refEnable="EnableUSART6"/>
+    <Label id="USART6Label" type="signal"      text="HSIDIV"          posX="1008" posY="2342" refEnable="EnableUSART6"/>
+	
+    <!--UART8 label-->
+    <Label id="UART8Label" type="muxLabel"    text="UART8 Source Mux"  posX="1010" posY="2397" refEnable="EnableUART8"/>
+    <Label id="UART8Label" type="SpecialInfo" text="To UART8 (MHz)" posX="1200" posY="2512" refEnable="EnableUART8"/>
+    <Label id="UART8Label" type="signal"      text="PCLK1"        posX="1008" posY="2435" refEnable="EnableUART8"/>
+    <Label id="UART8Label" type="signal"      text="PER"          posX="1008" posY="2460" refEnable="EnableUART8"/>
+    <Label id="UART8Label" type="signal"      text="IC9"          posX="1008" posY="2485" refEnable="EnableUART8"/>
+    <Label id="UART8Label" type="signal"      text="IC14"         posX="1008" posY="2510" refEnable="EnableUART8"/>
+    <Label id="UART8Label" type="signal"      text="LSE"          posX="1008" posY="2535" refEnable="EnableUART8"/>
+    <Label id="UART8Label" type="signal"      text="MSI"          posX="1008" posY="2560" refEnable="EnableUART8"/>
+    <Label id="UART8Label" type="signal"      text="HSIDIV"          posX="1008" posY="2585" refEnable="EnableUART8"/>
+	
+    <!--USART10 label-->
+    <Label id="USART10Label" type="muxLabel"    text="USART10 Source Mux"  posX="1010" posY="2642" refEnable="EnableUSART10"/>
+    <Label id="USART10Label" type="SpecialInfo" text="To USART10 (MHz)" posX="1200" posY="2755" refEnable="EnableUSART10"/>
+    <Label id="USART10Label" type="signal"      text="PCLK2"        posX="1008" posY="2675" refEnable="EnableUSART10"/>
+    <Label id="USART10Label" type="signal"      text="PER"          posX="1008" posY="2700" refEnable="EnableUSART10"/>
+    <Label id="USART10Label" type="signal"      text="IC9"          posX="1008" posY="2725" refEnable="EnableUSART10"/>
+    <Label id="USART10Label" type="signal"      text="IC14"         posX="1008" posY="2750" refEnable="EnableUSART10"/>
+    <Label id="USART10Label" type="signal"      text="LSE"          posX="1008" posY="2775" refEnable="EnableUSART10"/>
+    <Label id="USART10Label" type="signal"      text="MSI"          posX="1008" posY="2800" refEnable="EnableUSART10"/>
+    <Label id="USART10Label" type="signal"      text="HSIDIV"          posX="1008" posY="2825" refEnable="EnableUSART10"/>
+	
+    <!--SPI2 label-->
+    <Label id="SPI2Label" type="muxLabel"    text="SPI2/I2S2 Source Mux"  posX="1010" posY="2882" refEnable="EnableSPI2"/>
+    <Label id="SPI2Label" type="SpecialInfo" text="To SPI2/I2S2 (MHz)" posX="1200" posY="2992" refEnable="EnableSPI2"/>
+    <Label id="SPI2Label" type="signal"      text="PCLK1"        posX="1008" posY="2910" refEnable="EnableSPI2"/>
+    <Label id="SPI2Label" type="signal"      text="PER"          posX="1008" posY="2935" refEnable="EnableSPI2"/>
+    <Label id="SPI2Label" type="signal"      text="IC8"          posX="1008" posY="2960" refEnable="EnableSPI2"/>
+    <Label id="SPI2Label" type="signal"      text="IC9"         posX="1008" posY="2985" refEnable="EnableSPI2"/>
+    <Label id="SPI2Label" type="signal"      text="MSI"          posX="1008" posY="3010" refEnable="EnableSPI2"/>
+    <Label id="SPI2Label" type="signal"      text="HSIDIV"          posX="1008" posY="3035" refEnable="EnableSPI2"/>
+    <Label id="SPI2Label" type="signal"      text="I2S_CKIN"          posX="1008" posY="3060" refEnable="EnableSPI2,ExtClockEnable"/>
+	
+    <!--SPI4 label-->
+    <Label id="SPI4Label" type="muxLabel"    text="SPI4 Source Mux"  posX="1010" posY="3110" refEnable="EnableSPI4"/>
+    <Label id="SPI4Label" type="SpecialInfo" text="To SPI4 (MHz)" posX="1200" posY="3225" refEnable="EnableSPI4"/>
+    <Label id="SPI4Label" type="signal"      text="PCLK2"        posX="1008" posY="3141" refEnable="EnableSPI4"/>
+    <Label id="SPI4Label" type="signal"      text="PER"          posX="1008" posY="3166" refEnable="EnableSPI4"/>
+    <Label id="SPI4Label" type="signal"      text="IC9"          posX="1008" posY="3191" refEnable="EnableSPI4"/>
+    <Label id="SPI4Label" type="signal"      text="IC14"         posX="1008" posY="3216" refEnable="EnableSPI4"/>
+    <Label id="SPI4Label" type="signal"      text="MSI"          posX="1008" posY="3241" refEnable="EnableSPI4"/>
+    <Label id="SPI4Label" type="signal"      text="HSIDIV"          posX="1008" posY="3266" refEnable="EnableSPI4"/>
+    <Label id="SPI4Label" type="signal"      text="HSE"          posX="1008" posY="3291" refEnable="EnableSPI4"/>
+	
+    <!--SPI6 label-->
+    <Label id="SPI6Label" type="muxLabel"    text="SPI6/I2S6 Source Mux"  posX="1010" posY="3350" refEnable="EnableSPI6"/>
+    <Label id="SPI6Label" type="SpecialInfo" text="To SPI6/I2S6 (MHz)" posX="1200" posY="3462" refEnable="EnableSPI6"/>
+    <Label id="SPI6Label" type="signal"      text="PCLK4"        posX="1008" posY="3382" refEnable="EnableSPI6"/>
+    <Label id="SPI6Label" type="signal"      text="PER"          posX="1008" posY="3407" refEnable="EnableSPI6"/>
+    <Label id="SPI6Label" type="signal"      text="IC8"          posX="1008" posY="3432" refEnable="EnableSPI6"/>
+    <Label id="SPI6Label" type="signal"      text="IC9"         posX="1008" posY="3457" refEnable="EnableSPI6"/>
+    <Label id="SPI6Label" type="signal"      text="MSI"          posX="1008" posY="3482" refEnable="EnableSPI6"/>
+    <Label id="SPI6Label" type="signal"      text="HSIDIV"          posX="1008" posY="3507" refEnable="EnableSPI6"/>
+    <Label id="SPI6Label" type="signal"      text="I2S_CKIN"          posX="1008" posY="3532" refEnable="EnableSPI6,ExtClockEnable"/>
+	
+    <!--USART3 label-->
+    <Label id="USART3Label" type="muxLabel"    text="USART3 Source Mux"  posX="902" posY="1790" refEnable="EnableUSART3"/>
+    <Label id="USART3Label" type="SpecialInfo" text="To USART3 (MHz)" posX="1200" posY="1905" refEnable="EnableUSART3"/>
+    <Label id="USART3Label" type="signal"      text="PCLK1"        posX="902" posY="1827" refEnable="EnableUSART3"/>
+    <Label id="USART3Label" type="signal"      text="PER"          posX="902" posY="1852" refEnable="EnableUSART3"/>
+    <Label id="USART3Label" type="signal"      text="IC9"          posX="902" posY="1877" refEnable="EnableUSART3"/>
+    <Label id="USART3Label" type="signal"      text="IC14"         posX="902" posY="1902" refEnable="EnableUSART3"/>
+    <Label id="USART3Label" type="signal"      text="LSE"          posX="902" posY="1927" refEnable="EnableUSART3"/>
+    <Label id="USART3Label" type="signal"      text="MSI"          posX="902" posY="1952" refEnable="EnableUSART3"/>
+    <Label id="USART3Label" type="signal"      text="HSIDIV"          posX="902" posY="1977" refEnable="EnableUSART3"/>
+	
+    <!--UART5 label-->
+    <Label id="UART5Label" type="muxLabel"    text="UART5 Source Mux"  posX="902" posY="2025" refEnable="EnableUART5"/>
+    <Label id="UART5Label" type="SpecialInfo" text="To UART5 (MHz)" posX="1200" posY="2142" refEnable="EnableUART5"/>
+    <Label id="UART5Label" type="signal"      text="PCLK1"        posX="902" posY="2065" refEnable="EnableUART5"/>
+    <Label id="UART5Label" type="signal"      text="PER"          posX="902" posY="2090" refEnable="EnableUART5"/>
+    <Label id="UART5Label" type="signal"      text="IC9"          posX="902" posY="2115" refEnable="EnableUART5"/>
+    <Label id="UART5Label" type="signal"      text="IC14"         posX="902" posY="2140" refEnable="EnableUART5"/>
+    <Label id="UART5Label" type="signal"      text="LSE"          posX="902" posY="2165" refEnable="EnableUART5"/>
+    <Label id="UART5Label" type="signal"      text="MSI"          posX="902" posY="2190" refEnable="EnableUART5"/>
+    <Label id="UART5Label" type="signal"      text="HSIDIV"          posX="902" posY="2215" refEnable="EnableUART5"/>
+	
+    <!--UART7 label-->
+    <Label id="UART7Label" type="muxLabel"    text="UART7 Source Mux"  posX="902" posY="2260" refEnable="EnableUART7"/>
+    <Label id="UART7Label" type="SpecialInfo" text="To UART7 (MHz)" posX="1200" posY="2377" refEnable="EnableUART7"/>
+    <Label id="UART7Label" type="signal"      text="PCLK1"        posX="902" posY="2300" refEnable="EnableUART7"/>
+    <Label id="UART7Label" type="signal"      text="PER"          posX="902" posY="2325" refEnable="EnableUART7"/>
+    <Label id="UART7Label" type="signal"      text="IC9"          posX="902" posY="2350" refEnable="EnableUART7"/>
+    <Label id="UART7Label" type="signal"      text="IC14"         posX="902" posY="2375" refEnable="EnableUART7"/>
+    <Label id="UART7Label" type="signal"      text="LSE"          posX="902" posY="2400" refEnable="EnableUART7"/>
+    <Label id="UART7Label" type="signal"      text="MSI"          posX="902" posY="2425" refEnable="EnableUART7"/>
+    <Label id="UART7Label" type="signal"      text="HSIDIV"          posX="902" posY="2450" refEnable="EnableUART7"/>
+	
+    <!--UART9 label-->
+    <Label id="UART9Label" type="muxLabel"    text="UART9 Source Mux"  posX="902" posY="2510" refEnable="EnableUART9"/>
+    <Label id="UART9Label" type="SpecialInfo" text="To UART9 (MHz)" posX="1200" posY="2627" refEnable="EnableUART9"/>
+    <Label id="UART9Label" type="signal"      text="PCLK2"        posX="902" posY="2549" refEnable="EnableUART9"/>
+    <Label id="UART9Label" type="signal"      text="PER"          posX="902" posY="2574" refEnable="EnableUART9"/>
+    <Label id="UART9Label" type="signal"      text="IC9"          posX="902" posY="2599" refEnable="EnableUART9"/>
+    <Label id="UART9Label" type="signal"      text="IC14"         posX="902" posY="2624" refEnable="EnableUART9"/>
+    <Label id="UART9Label" type="signal"      text="LSE"          posX="902" posY="2649" refEnable="EnableUART9"/>
+    <Label id="UART9Label" type="signal"      text="MSI"          posX="902" posY="2674" refEnable="EnableUART9"/>
+    <Label id="UART9Label" type="signal"      text="HSIDIV"          posX="902" posY="2699" refEnable="EnableUART9"/>
+	
+    <!--LPUART1 label-->
+    <Label id="LPUART1Label" type="muxLabel"    text="LPUART1 Source Mux"  posX="500" posY="2510" refEnable="EnableLPUART1"/>
+    <Label id="LPUART1Label" type="SpecialInfo" text="To LPUART1 (MHz)" posX="770" posY="2627" refEnable="EnableLPUART1"/>
+    <Label id="LPUART1Label" type="signal"      text="PCLK4"        posX="502" posY="2549" refEnable="EnableLPUART1"/>
+    <Label id="LPUART1Label" type="signal"      text="PER"          posX="502" posY="2574" refEnable="EnableLPUART1"/>
+    <Label id="LPUART1Label" type="signal"      text="IC9"          posX="502" posY="2599" refEnable="EnableLPUART1"/>
+    <Label id="LPUART1Label" type="signal"      text="IC14"         posX="502" posY="2624" refEnable="EnableLPUART1"/>
+    <Label id="LPUART1Label" type="signal"      text="LSE"          posX="502" posY="2649" refEnable="EnableLPUART1"/>
+    <Label id="LPUART1Label" type="signal"      text="MSI"          posX="502" posY="2674" refEnable="EnableLPUART1"/>
+    <Label id="LPUART1Label" type="signal"      text="HSIDIV"          posX="502" posY="2699" refEnable="EnableLPUART1"/>
+	
+    <!--SPI1 label-->
+    <Label id="SPI1Label" type="muxLabel"    text="SPI1/I2S1 Source Mux"  posX="902" posY="2750" refEnable="EnableSPI1"/>
+    <Label id="SPI1Label" type="SpecialInfo" text="To SPI1/I2S1 (MHz)" posX="1200" posY="2865" refEnable="EnableSPI1"/>
+    <Label id="SPI1Label" type="signal"      text="PCLK2"        posX="902" posY="2782" refEnable="EnableSPI1"/>
+    <Label id="SPI1Label" type="signal"      text="PER"          posX="902" posY="2807" refEnable="EnableSPI1"/>
+    <Label id="SPI1Label" type="signal"      text="IC8"          posX="902" posY="2832" refEnable="EnableSPI1"/>
+    <Label id="SPI1Label" type="signal"      text="IC9"         posX="902" posY="2857" refEnable="EnableSPI1"/>
+    <Label id="SPI1Label" type="signal"      text="MSI"          posX="902" posY="2882" refEnable="EnableSPI1"/>
+    <Label id="SPI1Label" type="signal"      text="HSIDIV"          posX="902" posY="2907" refEnable="EnableSPI1"/>
+    <Label id="SPI1Label" type="signal"      text="I2S_CKIN"          posX="902" posY="2932" refEnable="EnableSPI1,ExtClockEnable"/>
+	
+    <!--SPI3 label-->
+    <Label id="SPI3Label" type="muxLabel"    text="SPI3/I2S3 Source Mux"  posX="902" posY="2985" refEnable="EnableSPI3"/>
+    <Label id="SPI3Label" type="SpecialInfo" text="To SPI3/I2S3 (MHz)" posX="1200" posY="3100" refEnable="EnableSPI3"/>
+    <Label id="SPI3Label" type="signal"      text="PCLK1"        posX="902" posY="3017" refEnable="EnableSPI3"/>
+    <Label id="SPI3Label" type="signal"      text="PER"          posX="902" posY="3042" refEnable="EnableSPI3"/>
+    <Label id="SPI3Label" type="signal"      text="IC8"          posX="902" posY="3067" refEnable="EnableSPI3"/>
+    <Label id="SPI3Label" type="signal"      text="IC9"         posX="902" posY="3092" refEnable="EnableSPI3"/>
+    <Label id="SPI3Label" type="signal"      text="MSI"          posX="902" posY="3117" refEnable="EnableSPI3"/>
+    <Label id="SPI3Label" type="signal"      text="HSIDIV"          posX="902" posY="3142" refEnable="EnableSPI3"/>
+    <Label id="SPI3Label" type="signal"      text="I2S_CKIN"          posX="902" posY="3167" refEnable="EnableSPI3,ExtClockEnable"/>
+	
+    <!--SPI5 label-->
+    <Label id="SPI5Label" type="muxLabel"    text="SPI5 Source Mux"  posX="902" posY="3220" refEnable="EnableSPI5"/>
+    <Label id="SPI5Label" type="SpecialInfo" text="To SPI5 (MHz)" posX="1200" posY="3335" refEnable="EnableSPI5"/>
+    <Label id="SPI5Label" type="signal"      text="PCLK2"        posX="902" posY="3255" refEnable="EnableSPI5"/>
+    <Label id="SPI5Label" type="signal"      text="PER"          posX="902" posY="3280" refEnable="EnableSPI5"/>
+    <Label id="SPI5Label" type="signal"      text="IC9"          posX="902" posY="3305" refEnable="EnableSPI5"/>
+    <Label id="SPI5Label" type="signal"      text="IC14"         posX="902" posY="3330" refEnable="EnableSPI5"/>
+    <Label id="SPI5Label" type="signal"      text="MSI"          posX="902" posY="3355" refEnable="EnableSPI5"/>
+    <Label id="SPI5Label" type="signal"      text="HSIDIV"          posX="902" posY="3380" refEnable="EnableSPI5"/>
+    <Label id="SPI5Label" type="signal"      text="HSE"          posX="902" posY="3405" refEnable="EnableSPI5"/>
+
+    <!--MCO label-->
+    <Label id="MCOLabel"       type="info"     text="(MHz) MCO1"      posX="225" posY="1163" refEnable="MCO1OutPutEnable"/>
+    <Label id="MCOMuxLabel"    type="muxLabel" text="MCO1 Source Mux" posX="465" posY="1040"  refEnable="MCO1OutPutEnable"/>
+    <Label id="MCOLSELabel"    type="signal"   text="HSIDIV"            posX="524" posY="1061"  refEnable="MCO1OutPutEnable"/>
+    <Label id="MCOLSILabel"    type="signal"   text="LSE"            posX="529" posY="1087"  refEnable="MCO1OutPutEnable"/>
+    <Label id="MCOHSELabel"    type="signal"   text="MSI"            posX="529" posY="1113"  refEnable="MCO1OutPutEnable"/>
+    <Label id="MCOHSILabel"    type="signal"   text="LSI"         posX="529" posY="1139" refEnable="MCO1OutPutEnable"/>
+    <Label id="MCOPLLCLKLabel" type="signal"   text="HSE"         posX="529" posY="1165" refEnable="MCO1OutPutEnable"/>
+    <Label id="MCOSYSCLKLabel" type="signal"   text="IC5"         posX="529" posY="1191" refEnable="MCO1OutPutEnable"/>
+    <Label id="MCOSYSCLKLabel" type="signal"   text="IC10"         posX="529" posY="1217" refEnable="MCO1OutPutEnable"/>
+    <Label id="MCOSYSCLKLabel" type="signal"   text="SYSA"         posX="529" posY="1243" refEnable="MCO1OutPutEnable"/>
+   
+    <!--MCO2 label-->
+    <Label id="MCOLabel"       type="info"     text="(MHz) MCO2"      posX="225" posY="1423" refEnable="MCO2OutPutEnable"/>
+    <Label id="MCOMuxLabel"    type="muxLabel" text="MCO2 Source Mux" posX="465" posY="1300"  refEnable="MCO2OutPutEnable"/>
+    <Label id="MCOLSELabel"    type="signal"   text="HSIDIV"            posX="524" posY="1322"  refEnable="MCO2OutPutEnable"/>
+    <Label id="MCOLSILabel"    type="signal"   text="LSE"            posX="529" posY="1348"  refEnable="MCO2OutPutEnable"/>
+    <Label id="MCOHSELabel"    type="signal"   text="MSI"            posX="529" posY="1374"  refEnable="MCO2OutPutEnable"/>
+    <Label id="MCOHSILabel"    type="signal"   text="LSI"         posX="529" posY="1400" refEnable="MCO2OutPutEnable"/>
+    <Label id="MCOPLLCLKLabel" type="signal"   text="HSE"         posX="529" posY="1426" refEnable="MCO2OutPutEnable"/>
+    <Label id="MCOSYSCLKLabel" type="signal"   text="IC15"         posX="529" posY="1452" refEnable="MCO2OutPutEnable"/>
+    <Label id="MCOSYSCLKLabel" type="signal"   text="IC20"         posX="529" posY="1478" refEnable="MCO2OutPutEnable"/>
+    <Label id="MCOSYSCLKLabel" type="signal"   text="SYSB"         posX="529" posY="1504" refEnable="MCO2OutPutEnable"/>
+
+    <!-- IC labels -->
+    <Label id="IC1"     type="SpecialInfo"  text="To IC1 (MHz)"  posX="1200" posY="755"/>	
+    <Label id="IC2"     type="SpecialInfo"  text="To IC2 (MHz)"  posX="1200" posY="795"/>	
+    <Label id="IC3"     type="SpecialInfo"  text="To IC3 (MHz)"  posX="1200" posY="835" refEnable="XSPI1Enable,XSPI2Enable,XSPI3Enable,FMCEnable"/>	
+    <Label id="IC4"     type="SpecialInfo"  text="To IC4 (MHz)"  posX="1200" posY="875" refEnable="XSPI1Enable,XSPI2Enable,XSPI3Enable,FMCEnable,SDMMC1Enable,SDMMC2Enable"/>	
+    <Label id="IC5"     type="SpecialInfo"  text="To IC5 (MHz)"  posX="1200" posY="912" refEnable="CKPEREnable,MCO1OutPutEnable,SDMMC1Enable,SDMMC2Enable"/>	
+    <Label id="IC6"     type="SpecialInfo"  text="To IC6 (MHz)"  posX="1200" posY="952"/>	
+    <Label id="IC7"     type="SpecialInfo"  text="To IC7 (MHz)"  posX="1200" posY="992" refEnable="ADCEnable,EnableADF1,EnableMDF1,EnableSAI1,EnableSAI2,EnableSPDIFRX"/>	
+    <Label id="IC8"     type="SpecialInfo"  text="To IC8 (MHz)"  posX="1200" posY="1032" refEnable="ADCEnable,EnableADF1,EnableMDF1,EnableSAI1,EnableSAI2,EnableSPDIFRX,EnableSPI1,EnableSPI2,EnableSPI3,EnableSPI6"/>	
+    <Label id="IC9"     type="SpecialInfo"  text="To IC9 (MHz)"  posX="1200" posY="1072" refEnable="EnableSPI1,EnableSPI2,EnableSPI3,EnableSPI4,EnableSPI5,EnableSPI6,EnableLPUART1,EnableUSART1,EnableUSART2,EnableUSART3,EnableUSART6,EnableUSART10,EnableUART4,EnableUART5,EnableUART7,EnableUART8,EnableUART9"/>	
+    <Label id="IC10"     type="SpecialInfo"  text="To IC10 (MHz)"  posX="1200" posY="1110" refEnable="CKPEREnable,MCO1OutPutEnable,EnableI2C1,EnableI2C2,EnableI2C3,EnableI2C4,EnableI3C1,EnableI3C2"/>	
+    <Label id="IC11"     type="SpecialInfo"  text="To IC11 (MHz)"  posX="1200" posY="1150"/>	
+    <Label id="IC12"     type="SpecialInfo"  text="To IC12 (MHz)"  posX="1200" posY="1188" refEnable="ETH1Enable"/>	
+    <Label id="IC13"     type="SpecialInfo"  text="To IC13 (MHz)"  posX="1200" posY="1227" refEnable="false"/>	
+    <Label id="IC14"     type="SpecialInfo"  text="To IC14 (MHz)"  posX="1200" posY="1265" refEnable="EnableLPUART1,EnableUSART1,EnableUSART2,EnableUSART3,EnableUSART6,EnableUSART10,EnableUART4,EnableUART5,EnableUART7,EnableUART8,EnableUART9,EnableSPI4,EnableSPI5"/>	
+    <Label id="IC15"     type="SpecialInfo"  text="To IC15 (MHz)"  posX="1200" posY="1305" refEnable="CKPEREnable,OTG1Enable,OTG2Enable,EnableI2C1,EnableI2C2,EnableI2C3,EnableI2C4,EnableI3C1,EnableI3C2,MCO2OutPutEnable,EnableLPTIM1,EnableLPTIM2,EnableLPTIM3,EnableLPTIM4,EnableLPTIM5"/>	
+    <Label id="IC16"     type="SpecialInfo"  text="To IC16 (MHz)"  posX="1200" posY="1345" refEnable="EnableLTDC"/>	
+    <Label id="IC17"     type="SpecialInfo"  text="To IC17 (MHz)"  posX="1200" posY="1382" refEnable="EnableDCMI"/>	
+    <Label id="IC18"     type="SpecialInfo"  text="To IC18 (MHz)"  posX="1200" posY="1423" refEnable="false"/>	
+    <Label id="IC19"     type="SpecialInfo"  text="To IC19 (MHz)"  posX="1200" posY="1460" refEnable="CKPEREnable,EnableFDCAN123"/>	
+    <Label id="IC20"     type="SpecialInfo"  text="To IC20 (MHz)"  posX="1200" posY="1500" refEnable="CKPEREnable,MCO2OutPutEnable,PSSIEnable"/>	
+
+    <BButton id="CSSLSEEnable" text="CSS" refParameter="EnableCSSLSE" x="525" y="273">
+
+    </BButton>
+
+</Clock>
+
+

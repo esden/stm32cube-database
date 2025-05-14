@@ -59,6 +59,7 @@
 [#if (LCD_TC_ON?? && LCD_TC_ON == "true")]
 #include "stm32h573i_discovery_lcd.h"
 #include "stm32h573i_discovery_ts.h"
+#include "stm32_lcd.h"
 [/#if]
 [#if (AUDIO_IN == "true") || (AUDIO_OUT == "true") || (AUDIO_IN == "true" && AUDIO_OUT == "true")]
 #include "stm32h573i_discovery_audio.h"

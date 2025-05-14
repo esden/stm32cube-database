@@ -334,6 +334,10 @@
 #endif
 [/#compress]
 
+#ifndef CMSIS_device_header
+#define CMSIS_device_header "${familyName}xx.h"
+#endif /* CMSIS_device_header */
+
 #define configUSE_PREEMPTION                     ${valueUsePreemption}
 [#if valueMemoryAllocation == "0"]
 #define configSUPPORT_STATIC_ALLOCATION          0
@@ -525,39 +529,37 @@ standard names. */
 #define vPortSVCHandler    SVC_Handler
 #define xPortPendSVHandler PendSV_Handler
 
-/* IMPORTANT: This define is commented when used with STM32Cube firmware, when the timebase source is SysTick,
-              to prevent overwriting SysTick_Handler defined within STM32Cube HAL */
-[#-- for dual core, need to check the right timebase (for others, keep previous check --]
-[#if (familyName=="stm32h7")] 
+/* IMPORTANT: After 10.3.1 update, Systick_Handler comes from NVIC (if SYS timebase = systick), otherwise from cmsis_os2.c */
+[#if (familyName=="stm32h7")] [#-- for dual core, need to check the right timebase (for others, keep previous check --]
  [#assign timeBaseTreated = "0"]
  [#if cpucore!="" && cpucore?replace("ARM_CORTEX_","")=="M4"]
   [#if timeBaseSource_M4?? && timeBaseSource_M4!="SysTick"]
-#define xPortSysTickHandler SysTick_Handler
+#define USE_CUSTOM_SYSTICK_HANDLER_IMPLEMENTATION 0
   [#else]
-/* #define xPortSysTickHandler SysTick_Handler */
+#define USE_CUSTOM_SYSTICK_HANDLER_IMPLEMENTATION 1
   [/#if]
   [#assign timeBaseTreated = "1"]
  [/#if]
  [#if cpucore!="" &&cpucore?replace("ARM_CORTEX_","")=="M7"]
   [#if timeBaseSource_M7?? && timeBaseSource_M7!="SysTick"]
-#define xPortSysTickHandler SysTick_Handler
+#define USE_CUSTOM_SYSTICK_HANDLER_IMPLEMENTATION 0
   [#else]
-/* #define xPortSysTickHandler SysTick_Handler */
+#define USE_CUSTOM_SYSTICK_HANDLER_IMPLEMENTATION 1
   [/#if]
   [#assign timeBaseTreated = "1"]
  [/#if]
  [#if timeBaseTreated = "0"] [#-- not yet treated (on h7 single-core mcus) --]
   [#if timeBaseSource?? && timeBaseSource!="SysTick"]
-#define xPortSysTickHandler SysTick_Handler
+#define USE_CUSTOM_SYSTICK_HANDLER_IMPLEMENTATION 0
   [#else]
-/* #define xPortSysTickHandler SysTick_Handler */
+#define USE_CUSTOM_SYSTICK_HANDLER_IMPLEMENTATION 1
   [/#if]
  [/#if]
 [#else] [#-- not a h7 (test for mcu with no context: to be checkedand confirmed on L5!) --]
  [#if timeBaseSource?? && timeBaseSource!="SysTick"]
-#define xPortSysTickHandler SysTick_Handler
+#define USE_CUSTOM_SYSTICK_HANDLER_IMPLEMENTATION 0
  [#else]
-/* #define xPortSysTickHandler SysTick_Handler */
+#define USE_CUSTOM_SYSTICK_HANDLER_IMPLEMENTATION 1
  [/#if]
 [/#if]
 

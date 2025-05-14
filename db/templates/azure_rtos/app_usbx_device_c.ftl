@@ -13,10 +13,10 @@
 
 [#assign AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE_VAL = "1" ]
 [#assign USBX_DEVICE_CLASS_NB = 0]
-        [#assign UX_STANDALONE_ENABLED_Value = ""]
-        [#assign REG_UX_DEVICE_CCID_value = ""]
-        [#assign REG_UX_DEVICE_PRINTER_value = ""]
-        [#assign REG_UX_DEVICE_VIDEO_value = ""]
+[#assign UX_STANDALONE_ENABLED_Value = ""]
+[#assign REG_UX_DEVICE_CCID_value = ""]
+[#assign REG_UX_DEVICE_PRINTER_value = ""]
+[#assign REG_UX_DEVICE_VIDEO_value = ""]
 [#compress]
 [#list SWIPdatas as SWIP]
 [#if SWIP.defines??]
@@ -41,7 +41,46 @@
     [#if name == "REG_UX_DEVICE_CORE"]
       [#assign REG_UX_DEVICE_CORE_value = value]
     [/#if]
-    [#if name == "REG_UX_DEVICE_HID_MOUSE"]
+    [#if name == "UX_DEVICE_HID_MOUSE"]
+      [#assign UX_DEVICE_HID_MOUSE_value = value]
+    [/#if]
+    [#if name == "UX_DEVICE_HID_KEYBOARD"]
+      [#assign UX_DEVICE_HID_KEYBOARD_value = value]
+    [/#if]
+    [#if name == "UX_DEVICE_HID_CUSTOM"]
+      [#assign UX_DEVICE_HID_CUSTOM_value = value]
+    [/#if]
+    [#if name == "UX_DEVICE_STORAGE"]
+      [#assign UX_DEVICE_STORAGE_value = value]
+    [/#if]
+    [#if name == "UX_DEVICE_CDC_ACM"]
+      [#assign UX_DEVICE_CDC_ACM_value = value]
+    [/#if]
+    [#if name == "UX_DEVICE_CDC_ECM"]
+      [#assign UX_DEVICE_CDC_ECM_value = value]
+    [/#if]
+    [#if name == "UX_DEVICE_DFU"]
+      [#assign UX_DEVICE_DFU_value = value]
+    [/#if]
+    [#if name == "UX_DEVICE_PIMA_MTP"]
+      [#assign UX_DEVICE_PIMA_MTP_value = value]
+    [/#if]
+    [#if name == "UX_DEVICE_RNDIS"]
+      [#assign UX_DEVICE_RNDIS_value = value]
+    [/#if]
+    [#if name == "UX_DEVICE_VIDEO"]
+      [#assign UX_DEVICE_VIDEO_value = value]
+    [/#if]
+    [#if name == "UX_DEVICE_CCID"]
+      [#assign UX_DEVICE_CCID_value = value]
+    [/#if]
+    [#if name == "UX_DEVICE_PRINTER"]
+      [#assign UX_DEVICE_PRINTER_value = value]
+    [/#if]
+    [#if name == "UX_STANDALONE"]
+      [#assign UX_STANDALONE_ENABLED_Value = value]
+    [/#if]
+	[#if name == "REG_UX_DEVICE_HID_MOUSE"]
       [#assign REG_UX_DEVICE_HID_MOUSE_value = value]
     [/#if]
     [#if name == "REG_UX_DEVICE_HID_KEYBOARD"]
@@ -68,9 +107,6 @@
     [#if name == "REG_UX_DEVICE_RNDIS"]
       [#assign REG_UX_DEVICE_RNDIS_value = value]
     [/#if]
-    [#if name == "REG_UX_DEVICE_THREAD"]
-      [#assign REG_UX_DEVICE_THREAD_value = value]
-    [/#if]
     [#if name == "REG_UX_DEVICE_VIDEO"]
       [#assign REG_UX_DEVICE_VIDEO_value = value]
     [/#if]
@@ -80,48 +116,44 @@
     [#if name == "REG_UX_DEVICE_PRINTER"]
       [#assign REG_UX_DEVICE_PRINTER_value = value]
     [/#if]
-    [#if name == "UX_STANDALONE"]
-      [#assign UX_STANDALONE_ENABLED_Value = value]
-    [/#if]
-
    [/#list]
 [/#if]
 [/#list]
 [/#compress]
-[#if REG_UX_DEVICE_HID_MOUSE_value == "1"]
+	[#if UX_DEVICE_HID_MOUSE_value == "1"]
       [#assign USBX_DEVICE_CLASS_NB = USBX_DEVICE_CLASS_NB+1]
     [/#if]
-    [#if REG_UX_DEVICE_HID_KEYBOARD_value == "1"]
+    [#if UX_DEVICE_HID_KEYBOARD_value == "1"]
       [#assign USBX_DEVICE_CLASS_NB = USBX_DEVICE_CLASS_NB+1]
     [/#if]
-    [#if REG_UX_DEVICE_HID_CUSTOM_value == "1"]
+    [#if UX_DEVICE_HID_CUSTOM_value == "1"]
       [#assign USBX_DEVICE_CLASS_NB = USBX_DEVICE_CLASS_NB+1]
     [/#if]
-    [#if REG_UX_DEVICE_STORAGE_value == "1"]
+    [#if UX_DEVICE_STORAGE_value == "1"]
       [#assign USBX_DEVICE_CLASS_NB = USBX_DEVICE_CLASS_NB+1]
     [/#if]
-    [#if REG_UX_DEVICE_CDC_ACM_value == "1"]
+    [#if UX_DEVICE_CDC_ACM_value == "1"]
       [#assign USBX_DEVICE_CLASS_NB = USBX_DEVICE_CLASS_NB+1]
     [/#if]
-    [#if REG_UX_DEVICE_CDC_ECM_value == "1"]
+    [#if UX_DEVICE_CDC_ECM_value == "1"]
       [#assign USBX_DEVICE_CLASS_NB = USBX_DEVICE_CLASS_NB+1]
     [/#if]
-    [#if REG_UX_DEVICE_DFU_value == "1"]
+    [#if UX_DEVICE_DFU_value == "1"]
       [#assign USBX_DEVICE_CLASS_NB = USBX_DEVICE_CLASS_NB+1]
     [/#if]
-    [#if REG_UX_DEVICE_PIMA_MTP_value == "1"]
+    [#if UX_DEVICE_PIMA_MTP_value == "1"]
       [#assign USBX_DEVICE_CLASS_NB = USBX_DEVICE_CLASS_NB+1]
     [/#if]
-    [#if REG_UX_DEVICE_RNDIS_value == "1"]
+    [#if UX_DEVICE_RNDIS_value == "1"]
       [#assign USBX_DEVICE_CLASS_NB = USBX_DEVICE_CLASS_NB+1]
     [/#if]
-    [#if REG_UX_DEVICE_VIDEO_value == "1"]
+    [#if UX_DEVICE_VIDEO_value == "1"]
       [#assign USBX_DEVICE_CLASS_NB = USBX_DEVICE_CLASS_NB+1]
     [/#if]
-    [#if REG_UX_DEVICE_CCID_value == "1"]
+    [#if UX_DEVICE_CCID_value == "1"]
       [#assign USBX_DEVICE_CLASS_NB = USBX_DEVICE_CLASS_NB+1]
     [/#if]
-    [#if REG_UX_DEVICE_PRINTER_value == "1"]
+    [#if UX_DEVICE_PRINTER_value == "1"]
       [#assign USBX_DEVICE_CLASS_NB = USBX_DEVICE_CLASS_NB+1]
     [/#if]
 /* Includes ------------------------------------------------------------------*/
@@ -148,6 +180,7 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+[#if !FamilyName?lower_case?starts_with("stm32n6")]
 [#if UX_STANDALONE_ENABLED_Value == "1" && AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE_VAL  != "0" ]
 
 /* USER CODE BEGIN UX_Device_Memory_Buffer */
@@ -158,6 +191,8 @@
 #endif
 __ALIGN_BEGIN static UCHAR ux_device_byte_pool_buffer[UX_DEVICE_APP_MEM_POOL_SIZE] __ALIGN_END;
 [/#if]
+[/#if]
+
 [#if REG_UX_DEVICE_HID_MOUSE_value == "1"]
 static ULONG hid_mouse_interface_number;
 static ULONG hid_mouse_configuration_number;
@@ -303,6 +338,7 @@ UINT MX_USBX_Device_Init(VOID *memory_ptr)
   UCHAR *string_framework;
   UCHAR *language_id_framework;
 [/#if]
+
 [#if ((REG_UX_DEVICE_CORE_value  == "true") && (USBX_DEVICE_CLASS_NB != 0) && (UX_STANDALONE_ENABLED_Value == "1") && (AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE_VAL  != "0"))]
   UCHAR *pointer;
 [/#if]
@@ -312,13 +348,17 @@ UINT MX_USBX_Device_Init(VOID *memory_ptr)
 [/#if]
 
   /* USER CODE BEGIN MX_USBX_Device_Init0 */
+[#if !FamilyName?lower_case?starts_with("stm32n6")]
 [#if (REG_UX_DEVICE_CORE_value  == "false" && UX_STANDALONE_ENABLED_Value == "1")  ||  (USBX_DEVICE_CLASS_NB == 0 && UX_STANDALONE_ENABLED_Value == "1")]
   UX_PARAMETER_NOT_USED(ux_device_byte_pool_buffer);
 [#else]
 
 [/#if]
+[/#if]
+
   /* USER CODE END MX_USBX_Device_Init0 */
 [#if (REG_UX_DEVICE_CORE_value  == "true") && (USBX_DEVICE_CLASS_NB != 0)]
+[#if !FamilyName?lower_case?starts_with("stm32n6")]
 [#if UX_STANDALONE_ENABLED_Value == "0"]
   /* Allocate the stack for USBX Memory */
   if (tx_byte_allocate(byte_pool, (VOID **) &pointer,
@@ -339,6 +379,7 @@ UINT MX_USBX_Device_Init(VOID *memory_ptr)
     return UX_ERROR;
     /* USER CODE END USBX_SYSTEM_INITIALIZE_ERROR */
   }
+[/#if]
 
   /* Get Device Framework High Speed and get the length */
   device_framework_high_speed = USBD_Get_Device_Framework_Speed(USBD_HIGH_SPEED,
@@ -381,7 +422,7 @@ UINT MX_USBX_Device_Init(VOID *memory_ptr)
   hid_mouse_parameter.ux_slave_class_hid_instance_deactivate       = USBD_HID_Mouse_Deactivate;
   hid_mouse_parameter.ux_device_class_hid_parameter_report_address = USBD_HID_ReportDesc(INTERFACE_HID_MOUSE);
   hid_mouse_parameter.ux_device_class_hid_parameter_report_length  = USBD_HID_ReportDesc_length(INTERFACE_HID_MOUSE);
-  [#if FamilyName?lower_case?starts_with("stm32c0")]
+  [#if FamilyName?lower_case?starts_with("stm32c0") || FamilyName?lower_case?starts_with("stm32u5") || FamilyName?lower_case?starts_with("stm32h5")]
   hid_mouse_parameter.ux_device_class_hid_parameter_report_id      = UX_FALSE;
   [#else]
   hid_mouse_parameter.ux_device_class_hid_parameter_report_id      = UX_TRUE;
@@ -982,9 +1023,10 @@ static VOID ${USBX_DEVICE_APP_THREAD_NAME_value}(ULONG thread_input)
 ALIGN_TYPE _ux_utility_interrupt_disable(VOID)
 {
   UINT interrupt_save;
-
   /* USER CODE BEGIN _ux_utility_interrupt_disable */
+  [#if !FamilyName?lower_case?starts_with("stm32mp13")]
   interrupt_save = __get_PRIMASK();
+   [/#if]
   __disable_irq();
   /* USER CODE END _ux_utility_interrupt_disable */
 
@@ -999,8 +1041,11 @@ ALIGN_TYPE _ux_utility_interrupt_disable(VOID)
   */
 VOID _ux_utility_interrupt_restore(ALIGN_TYPE flags)
 {
+
   /* USER CODE BEGIN _ux_utility_interrupt_restore */
+  [#if !FamilyName?lower_case?starts_with("stm32mp13")]
   __set_PRIMASK(flags);
+   [/#if]
   /* USER CODE END _ux_utility_interrupt_restore */
 }
 

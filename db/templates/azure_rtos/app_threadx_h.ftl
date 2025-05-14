@@ -76,11 +76,16 @@
 [/#compress]
 
 /* Define to prevent recursive inclusion -------------------------------------*/
+[#assign familyName=FamilyName?lower_case]
 #ifndef __APP_THREADX_H
 #define __APP_THREADX_H
 
 #ifdef __cplusplus
+[#if (familyName?starts_with("stm32u3")||familyName?starts_with("stm32u5")||familyName?starts_with("stm32h5")||familyName?starts_with("stm32c0")||familyName?starts_with("stm32wba"))]
+extern "C" {
+[#else]
  extern "C" {
+[/#if]
 #endif
 
 /* Includes ------------------------------------------------------------------*/
@@ -106,13 +111,13 @@
 [#if AZRTOS_APP_MEM_ALLOCATION_METHOD_value != "0"]
 [#if TX_APP_GENERATE_INIT_CODE_value != "false"]
 [#if TX_APP_CREATION_value != "0"]
-#define TX_APP_STACK_SIZE                                          ${TX_APP_STACK_SIZE_value}
-#define TX_APP_THREAD_PRIO                                         ${TX_APP_THREAD_PRIO_value}
+#define TX_APP_STACK_SIZE                       ${TX_APP_STACK_SIZE_value}
+#define TX_APP_THREAD_PRIO                      ${TX_APP_THREAD_PRIO_value}
 [/#if]
 [#if TX_APP_MSG_QUEUE_CREATION_value != "0"]
-#define TX_APP_SINGLE_MSG_SIZE                                     ${TX_MSG_SIZE_WORDS_value}
-#define TX_APP_MSG_QUEUE_NB_MSG                                    ${TX_NB_MSG_value}
-#define TX_APP_MSG_QUEUE_FULL_SIZE                                 TX_APP_SINGLE_MSG_SIZE * TX_APP_MSG_QUEUE_NB_MSG
+#define TX_APP_SINGLE_MSG_SIZE                  ${TX_MSG_SIZE_WORDS_value}
+#define TX_APP_MSG_QUEUE_NB_MSG                 ${TX_NB_MSG_value}
+#define TX_APP_MSG_QUEUE_FULL_SIZE              TX_APP_SINGLE_MSG_SIZE * TX_APP_MSG_QUEUE_NB_MSG
 [/#if]
 [/#if]
 
@@ -168,4 +173,8 @@ void ${TX_APP_THREAD_ENTRY_value}(ULONG thread_input);
 #ifdef __cplusplus
 }
 #endif
+[#if (!familyName?starts_with("stm32wba"))]
+#endif /* __APP_THREADX_H */
+[#else]
 #endif /* __APP_THREADX_H__ */
+[/#if]

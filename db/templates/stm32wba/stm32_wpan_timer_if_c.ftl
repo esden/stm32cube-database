@@ -13,14 +13,10 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include <math.h>
-[#if HALCompliant??]
-#include "main.h" /*for Mx generated RTC_N_PREDIV_S and RTC_N_PREDIV_A*/
-[#else]
-#include "rtc.h"
-[/#if]
-#include "timer_if.h"
+#include "stm32wbaxx_hal.h"
 #include "stm32wbaxx_hal_conf.h"
 #include "stm32wbaxx_ll_rtc.h"
+#include "timer_if.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -189,9 +185,6 @@ UTIL_TIMER_Status_t TIMER_IF_Init(void)
 
   if (RTC_Initialized == false)
   {
-    /* Init RTC */
-    MX_RTC_Init();
-
     /* Stop Timer */
     TIMER_IF_StopTimer();
 
@@ -246,7 +239,7 @@ UTIL_TIMER_Status_t TIMER_IF_StartTimer(uint32_t timeout)
   if (HAL_RTC_SetAlarm_IT(&hrtc, &sAlarm, RTC_FORMAT_BCD) != HAL_OK)
   {
     /* Initialization Error */
-    Error_Handler();
+    while(1);
   }
 
   /* USER CODE BEGIN TIMER_IF_StartTimer_2 */

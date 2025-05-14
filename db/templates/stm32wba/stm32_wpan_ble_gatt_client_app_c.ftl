@@ -556,8 +556,15 @@ uint8_t GATT_CLIENT_APP_Procedure_Gatt(uint8_t index, ProcGattId_t GattProcId)
                                             a_ClientContext[index].ServiceChangedCharDescHdl,
                                             2,
                                             (uint8_t *) &charPropVal);
-          gatt_cmd_resp_wait();
-          LOG_INFO_APP(" ServiceChangedCharDescHdl =0x%04X\n",a_ClientContext[index].ServiceChangedCharDescHdl);
+          if (result == BLE_STATUS_SUCCESS)
+          {
+            gatt_cmd_resp_wait();
+            LOG_INFO_APP(" ServiceChangedCharDescHdl =0x%04X\n",a_ClientContext[index].ServiceChangedCharDescHdl);
+          }
+          else
+          {
+            LOG_INFO_APP(" ServiceChangedCharDescHdl write Failed, status =0x%02X\n\n", result);
+          }
         }
         /* USER CODE BEGIN PROC_GATT_PROPERTIES_ENABLE_ALL */
 [#if PG_FILL_UCS == "True"]
@@ -568,8 +575,15 @@ uint8_t GATT_CLIENT_APP_Procedure_Gatt(uint8_t index, ProcGattId_t GattProcId)
                                             a_ClientContext[index].P2PNotificationDescHdl,
                                             2,
                                             (uint8_t *) &enable);
-          gatt_cmd_resp_wait();
-          LOG_INFO_APP(" P2PNotificationDescHdl =0x%04X\n",a_ClientContext[index].P2PNotificationDescHdl);
+          if (result == BLE_STATUS_SUCCESS)
+          {
+            gatt_cmd_resp_wait();
+            LOG_INFO_APP(" P2PNotificationDescHdl =0x%04X\n",a_ClientContext[index].P2PNotificationDescHdl);
+          }
+          else
+          {
+            LOG_INFO_APP(" P2PNotificationDescHdl write Failed, status =0x%02X\n\n", result);
+          }
         }
 [/#if]
 [/#if]
@@ -586,9 +600,9 @@ uint8_t GATT_CLIENT_APP_Procedure_Gatt(uint8_t index, ProcGattId_t GattProcId)
         }
       }
       break; /* PROC_GATT_PROPERTIES_ENABLE_ALL */
-	  
+
 [#if (myHash["BLE_OPTIONS_GATT_CACHING"] == "BLE_OPTIONS_GATT_CACHING")]
-	  case PROC_GATT_READ_USING_CHAR_UUID:
+      case PROC_GATT_READ_USING_CHAR_UUID:
       {
         a_ClientContext[index].state = GATT_CLIENT_READ_USING_CHAR_UUID;
         UTIL_SEQ_SetTask(1U << CFG_TASK_READ_CHAR_UUID_ID, CFG_SEQ_PRIO_0);        
@@ -607,8 +621,15 @@ uint8_t GATT_CLIENT_APP_Procedure_Gatt(uint8_t index, ProcGattId_t GattProcId)
                                             a_ClientContext[index].ClientSupportedFeatureCharValueHdl,
                                             1,
                                             (uint8_t *) &enable_robust_caching);
-          gatt_cmd_resp_wait();
-          APP_DBG_MSG(" ClientSupportedFeatureCharValueHdl =0x%04X\n",a_ClientContext[index].ClientSupportedFeatureCharValueHdl);
+          if (result == BLE_STATUS_SUCCESS)
+          {
+            gatt_cmd_resp_wait();
+            APP_DBG_MSG(" ClientSupportedFeatureCharValueHdl =0x%04X\n",a_ClientContext[index].ClientSupportedFeatureCharValueHdl);
+          }
+          else
+          {
+            APP_DBG_MSG(" ClientSupportedFeatureCharValueHdl write Failed, status =0x%02X\n\n", result);
+          }
         }
 
         if (result == BLE_STATUS_SUCCESS)
@@ -711,7 +732,7 @@ static SVCCTL_EvtAckStatus_t Event_Handler(void *Event)
             }
           }
 [#if (myHash["BLE_OPTIONS_GATT_CACHING"] == "BLE_OPTIONS_GATT_CACHING")]
-		/* if GATT DB has changed */
+          /* if GATT DB has changed */
           if (DBHashModified == 1) 
           {
             LOG_INFO_APP("  GATT Database has changed, need to restart discovery of service/charac \r\n");
@@ -742,9 +763,9 @@ static SVCCTL_EvtAckStatus_t Event_Handler(void *Event)
           /* USER CODE END ACI_ATT_EXCHANGE_MTU_RESP_VSEVT_CODE */
         }
         break;
-		
+
 [#if (myHash["BLE_OPTIONS_GATT_CACHING"] == "BLE_OPTIONS_GATT_CACHING")]
-		case ACI_ATT_READ_RESP_VSEVT_CODE:
+        case ACI_ATT_READ_RESP_VSEVT_CODE:
         {
           aci_att_read_resp_event_rp0 *aci_att_read_resp;
           aci_att_read_resp = (aci_att_read_resp_event_rp0 *)p_blecore_evt->data;
@@ -820,7 +841,7 @@ static SVCCTL_EvtAckStatus_t Event_Handler(void *Event)
         case (ACI_GATT_EATT_BEARER_VSEVT_CODE):
         {
           aci_gatt_eatt_bearer_event_rp0 *eatt_bearer_event;
-		  uint8_t index;
+          uint8_t index;
 
           eatt_bearer_event = (aci_gatt_eatt_bearer_event_rp0*)p_blecore_evt->data;
           APP_DBG_MSG(">>== ACI_GATT_EATT_BEARER_VSEVT_CODE\n");
@@ -829,17 +850,17 @@ static SVCCTL_EvtAckStatus_t Event_Handler(void *Event)
           /* USER CODE BEGIN ACI_GATT_EATT_BEARER_VSEVT_CODE_1 */
 
           /* USER CODE END ACI_GATT_EATT_BEARER_VSEVT_CODE_1 */
-		  for(index = 0; index < BLE_CFG_CLT_MAX_NBR_CB; index++)
+          for(index = 0; index < BLE_CFG_CLT_MAX_NBR_CB; index++)
           {
             a_ClientContext[index].EATT_Bearer_connHdl[eatt_bearer_event->Channel_Index] = (GATT_EAB_PREFIX << 8) | eatt_bearer_event->Channel_Index;
           }
-		  
-		  /* USER CODE BEGIN ACI_GATT_EATT_BEARER_VSEVT_CODE_2 */
+
+          /* USER CODE BEGIN ACI_GATT_EATT_BEARER_VSEVT_CODE_2 */
 
           /* USER CODE END ACI_GATT_EATT_BEARER_VSEVT_CODE_2 */
         } 
         break;
-		
+
 [/#if]
         default:
           break;
@@ -855,7 +876,7 @@ static SVCCTL_EvtAckStatus_t Event_Handler(void *Event)
 
 __USED static void gatt_Notification(GATT_CLIENT_APP_Notification_evt_t *p_Notif)
 {
-  /* USER CODE BEGIN gatt_Notification_1*/
+  /* USER CODE BEGIN gatt_Notification_1 */
 
   /* USER CODE END gatt_Notification_1 */
   switch (p_Notif->Client_Evt_Opcode)
@@ -898,7 +919,7 @@ __USED static void gatt_Notification(GATT_CLIENT_APP_Notification_evt_t *p_Notif
       /* USER CODE END Client_Evt_Opcode_Default */
       break;
   }
-  /* USER CODE BEGIN gatt_Notification_2*/
+  /* USER CODE BEGIN gatt_Notification_2 */
 
   /* USER CODE END gatt_Notification_2 */
   return;
@@ -1398,9 +1419,9 @@ void client_discover_all_Entry(unsigned long thread_input)
     /* USER CODE BEGIN client_discover_1 */
 
     /* USER CODE END client_discover_1 */
-	
+
     GATT_CLIENT_APP_Discover_services(index);
-	
+
     /* USER CODE BEGIN client_discover_2 */
 
     /* USER CODE END client_discover_2 */
@@ -1419,13 +1440,13 @@ static void ClientDiscover_Task_Entry(void* argument)
     /* USER CODE BEGIN client_discover_1 */
 
     /* USER CODE END client_discover_1 */
-	
+
     GATT_CLIENT_APP_Discover_services(index);
 
     /* USER CODE BEGIN client_discover_2 */
 
     /* USER CODE END client_discover_2 */
-	osThreadYield();
+    osThreadYield();
   }
 }
 [/#if]

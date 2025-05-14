@@ -85,6 +85,7 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+[#if !FamilyName?lower_case?starts_with("stm32n6")]
 [#if UX_STANDALONE_ENABLED_Value == "1" && AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE_VAL  != "0" ]
 
 /* USER CODE BEGIN UX_Host_Memory_Buffer */
@@ -94,6 +95,7 @@
 #pragma data_alignment=4
 #endif
 __ALIGN_BEGIN static UCHAR ux_host_byte_pool_buffer[UX_HOST_APP_MEM_POOL_SIZE] __ALIGN_END;
+[/#if]
 [/#if]
 [#if REG_UX_HOST_THREAD_value == "1" && UX_STANDALONE_ENABLED_Value == "0"]
 static TX_THREAD ux_host_app_thread;
@@ -133,20 +135,24 @@ UINT MX_USBX_Host_Init(VOID *memory_ptr)
 [#if REG_UX_HOST_CORE_value  == "true" && UX_STANDALONE_ENABLED_Value == "1" && AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE_VAL  != "0" ]
   UCHAR *pointer;
 [/#if]
+
 [#if (REG_UX_HOST_CORE_value  == "true" || REG_UX_HOST_THREAD_value == "1") && UX_STANDALONE_ENABLED_Value == "0" && AZRTOS_APP_MEM_ALLOCATION_METHOD_VAL  != "0" ]
   UCHAR *pointer;
   TX_BYTE_POOL *byte_pool = (TX_BYTE_POOL*)memory_ptr;
 [/#if]
 
   /* USER CODE BEGIN MX_USBX_Host_Init0 */
+[#if !FamilyName?lower_case?starts_with("stm32n6")]
 [#if REG_UX_HOST_CORE_value  == "false" && UX_STANDALONE_ENABLED_Value == "1"]
   UX_PARAMETER_NOT_USED(ux_host_byte_pool_buffer);
 [#else]
 
 [/#if]
+[/#if]
   /* USER CODE END MX_USBX_Host_Init0 */
 
 [#if REG_UX_HOST_CORE_value  == "true"]
+[#if !FamilyName?lower_case?starts_with("stm32n6")]
 [#if UX_STANDALONE_ENABLED_Value == "0"]
   /* Allocate the stack for USBX Memory */
   if (tx_byte_allocate(byte_pool, (VOID **) &pointer,
@@ -168,6 +174,7 @@ UINT MX_USBX_Host_Init(VOID *memory_ptr)
     /* USER CODE END USBX_SYSTEM_INITIALIZE_ERROR */
   }
 
+[/#if]
   /* Install the host portion of USBX */
   if (ux_host_stack_initialize(ux_host_event_callback) != UX_SUCCESS)
   {
@@ -258,6 +265,7 @@ UINT MX_USBX_Host_Init(VOID *memory_ptr)
 [/#if]
 
 [/#if]
+
 [#if REG_UX_HOST_THREAD_value == "1" && UX_STANDALONE_ENABLED_Value == "0"]
   /* Allocate the stack for host application main thread */
   if (tx_byte_allocate(byte_pool, (VOID **) &pointer, UX_HOST_APP_THREAD_STACK_SIZE,

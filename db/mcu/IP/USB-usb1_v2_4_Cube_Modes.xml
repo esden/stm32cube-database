@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP DBVersion="V4.0" 
+  IPType="peripheral" 
+  Name="USB" 
+  Version="usb1_v2_4_Cube" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" 
+  ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd" 
+  xmlns="http://mcd.rou.st.com/modules.php?name=mcu">
+	
+	<About>USB: Universal Serial Bus</About>
+	
+	<!-- Generic RefParameters for USB Full Speed Device Mode -->
+	<RefParameter Name="Instance" DefaultValue="USB" Comment="Instance" Type="" Visible="false"/>
+			
+	<RefParameter Comment="Speed" DefaultValue="PCD_SPEED_FULL" Name="DeviceSpeed" Type="List" Group="Basic Parameters">			
+		<PossibleValue Comment="Full Speed 12MBit/s" Value="PCD_SPEED_FULL"/>		
+	</RefParameter>
+	
+	<RefParameter Comment="Device endpoints number" DefaultValue="8" Name="dev_endpoints" Min="1" Max="8" Type="integer" Group="" Visible="false">				
+	</RefParameter>				
+	
+	<!-- Tracker 54428
+	<RefParameter Comment="Endpoint 0 Max Packet size" DefaultValue="DEP0CTL_MPS_64" Name="ep0_mps" Type="List" Group="Basic Parameters" Visible="true">		
+		<PossibleValue Value="DEP0CTL_MPS_64" Comment="64 Bytes"/>		
+		<PossibleValue Value="DEP0CTL_MPS_32" Comment="32 Bytes"/>
+		<PossibleValue Value="DEP0CTL_MPS_16" Comment="16 Bytes"/>
+		<PossibleValue Value="DEP0CTL_MPS_8"  Comment="8 Bytes"/>
+	</RefParameter>
+	-->
+	
+	<RefParameter Comment="Physical interface" DefaultValue="PCD_PHY_EMBEDDED" Name="phy_itface" Type="List" Group="Basic Parameters" Visible="true">
+		<PossibleValue Value="PCD_PHY_EMBEDDED" Comment="Internal Phy"/>
+	</RefParameter>
+
+	<RefParameter Comment="Sof Enable" DefaultValue="DISABLE" Name="Sof_enable" Type="List" Group="Basic Parameters" Visible="true">			
+		<PossibleValue Value="ENABLE" Comment="Enabled"/>
+		<PossibleValue Value="DISABLE" Comment="Disabled"/>
+	</RefParameter>
+	<RefParameter Comment="Sof Enable" DefaultValue="null" Name="Sof_enable" Type="List" Group="Basic Parameters" Visible="false"/>		
+	
+	<RefParameter Comment="Low Power" DefaultValue="DISABLE" Name="low_power_enable" Type="List" Group="Power Parameters" Visible="true">
+		<PossibleValue Value="ENABLE" Comment="Enabled" Semaphore="$IpInstance_INTERRUPT_WAKEUP_ON"/>
+		<PossibleValue Value="DISABLE" Comment="Disabled"/>	
+		<!--<Description>This mode is not supproted on CubeMx V4.2</Description>-->
+	</RefParameter>
+	
+    <RefParameter Comment="Link Power Management" DefaultValue="DISABLE" Name="lpm_enable" Type="List" Group="Power Parameters" Visible="true">
+    	<Condition Expression="MW_USB_MW_DEVICE" Diagnostic=""/>
+    	<PossibleValue Value="ENABLE" Comment="Enabled"/>
+		<PossibleValue Value="DISABLE" Comment="Disabled"/>	
+	</RefParameter>	
+	<!-- Bug 346296 the BCD is implemented on PHY for the STM32L4x2,x3 lines --> 
+	<RefParameter Comment="Battery Charging" DefaultValue="DISABLE" Name="battery_charging_enable" Type="List" Group="Power Parameters" Visible="true">
+    	<Condition Expression="(STM32L4x2 | STM32L4x3 | DIE462 | DIE495 | DIE496)" Diagnostic=""/>
+		<PossibleValue Value="ENABLE" Comment="Enabled" Semaphore="SEM_BCD_ENABLED"/>
+		<PossibleValue Value="DISABLE" Comment="Disabled"/>	
+	</RefParameter>
+	
+	<RefParameter Comment="Battery charging" DefaultValue="DISABLE" Name="battery_charging_enable" Visible="false" Type="List">			
+		<PossibleValue Value="ENABLE" Comment="Enabled"/>
+		<PossibleValue Value="DISABLE" Comment="Disabled"/>	
+	</RefParameter>
+  
+	<RefMode Name="Device" HalMode="PCD">
+		<ConfigForMode>PCD_Init_FS</ConfigForMode>	
+		<Parameter Name="DeviceSpeed"/>
+		<Parameter Name="dev_endpoints"/>		
+		<!--<Parameter Name="ep0_mps"/>-->								
+		<Parameter Name="phy_itface">			
+			<PossibleValue>PCD_PHY_EMBEDDED</PossibleValue>
+		</Parameter>
+		<Parameter Name="Sof_enable"/>	
+		<Parameter Name="low_power_enable"/>
+		<Parameter Name="lpm_enable"/>
+		<Parameter Name="battery_charging_enable"/>
+	
+	</RefMode>
+	
+	<ModeLogicOperator Name="OR">
+		<Mode Name="Device" UserName="Device (FS)">
+			<ModeLogicOperator Name="OR">
+				<Mode Name="Device" UserName="Device (FS)">
+					<SignalLogicalOp Name="AND">
+						<Signal Name="DM"/>
+						<Signal Name="DP"/>						
+					</SignalLogicalOp>
+					<Semaphore>MW_USB_MW_DEVICE</Semaphore>
+				</Mode>
+			</ModeLogicOperator>
+		</Mode>
+		
+		<Mode Name="Activate_SOF" UserName="Activate SOF">
+			<ModeLogicOperator Name="XOR">
+				<Mode Name="Activate_SOF">					
+					<SignalLogicalOp Name="AND">				
+						<Signal Name="SOF"/>				
+					</SignalLogicalOp>	
+					<Condition Expression="MW_USB_MW_DEVICE" Diagnostic="USB IP must be selected"/>					
+				</Mode>				
+			</ModeLogicOperator>			
+		</Mode>		
+		
+		<Mode Name="Activate_NOE" UserName="Activate NOE">
+			<ModeLogicOperator Name="OR">
+				<Mode Name="Activate_OE">					
+					<SignalLogicalOp Name="AND">				
+						<Signal Name="NOE"/>				
+					</SignalLogicalOp>	
+					<Condition Expression="MW_USB_MW_DEVICE" Diagnostic="USB IP must be selected"/>					
+				</Mode>				
+			</ModeLogicOperator>			
+		</Mode>		
+	</ModeLogicOperator>
+	
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="DM"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="DP"/>	
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="NOE"/>
+	<RefSignal IOMode="AlternateFunctionPushPull" Name="SOF"/>
+	
+	<!-- Clock Semaphore for this IP. -->
+	<Semaphore>USBUsed_ForRCC</Semaphore>
+</IP>

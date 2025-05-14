@@ -111,7 +111,7 @@ pElmt is viewed as of DTDtsElmtDM type.--]
 				[#local inspectAndPrint = true]
 
 				[#if isNodeOverloading]
-${dtsTAB}&${name}{
+${dtsTAB}&${name} {
 				[#else]
 ${dtsTAB}[#if label?has_content]${label}:[/#if]${name}[#if nodeUnitAddress?has_content]@${nodeUnitAddress}[/#if]{
 				[/#if]
@@ -272,7 +272,8 @@ ${dtsTAB}/*ERR : Cannot generate User-Section (existing name: ${usName}).*/
 				[#else]
 					[#assign global_userSectionsNamesList = global_userSectionsNamesList + [usName]]
 					[#local inspectAndPrint = true]
-${dtsTAB}/* USER CODE BEGIN ${usName} */
+[#if !((usName?starts_with("rcc")) && mx_socDtRPN?? && mx_socDtRPN?starts_with("stm32mp15") && srvcmx_isTargetedFw_inDTS("OP-TEE"))]
+${dtsTAB}/* USER CODE BEGIN ${usName} */[/#if]
 				[/#if]
 			[#break]
 [#t]
@@ -388,7 +389,8 @@ ${propValueItemEnd}[#t]
 [#t]
 				[#case "UserSection"]
 					[#if usName?has_content]
-${dtsTAB}/* USER CODE END ${usName} */
+[#if !((usName?starts_with("rcc")) && mx_socDtRPN?? && mx_socDtRPN?starts_with("stm32mp15") && srvcmx_isTargetedFw_inDTS("OP-TEE"))]
+${dtsTAB}/* USER CODE END ${usName} */[/#if]
 					[/#if]
 				[#break]
 [#t]

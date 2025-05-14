@@ -30,6 +30,7 @@ extern "C" {
 [#assign TX_APP_MEM_POOL_SIZE_VAL = "0"]
 [#assign FX_APP_MEM_POOL_SIZE_VAL = "0"]
 [#assign NX_APP_MEM_POOL_SIZE_VAL = "0"]
+[#assign UX_APP_MEM_POOL_SIZE_VAL = "0"]
 [#assign UX_HOST_APP_MEM_POOL_SIZE_VAL = "0"]
 [#assign UX_DEVICE_APP_MEM_POOL_SIZE_VAL = "0"]
 [#assign USBPD_DEVICE_APP_MEM_POOL_SIZE_VAL = "0"]
@@ -41,6 +42,7 @@ extern "C" {
 [#assign TX_ENABLED = "true"]
 [#assign FX_ENABLED = "false"]
 [#assign NX_ENABLED = "false"]
+[#assign UX_ENABLED = "false"]
 [#assign UX_HOST_ENABLED = "false"]
 [#assign UX_DEVICE_ENABLED = "false"]
 [#assign USBPD_DEVICE_ENABLED = "false"]
@@ -61,11 +63,14 @@ extern "C" {
 	[#if name == "NETXDUO_ENABLED" && value == "true"]
       [#assign NX_ENABLED = value]
     [/#if]
+	[#if name == "USBX_ENABLED" && value == "true"]
+      [#assign UX_ENABLED = value]
+	[/#if]
 	[#if name == "USBXDEVICE_ENABLED" && value == "true"]
-      [#assign UX_DEVICE_ENABLED = value]
-    [/#if]
+	  [#assign UX_DEVICE_ENABLED = value]
+	[/#if]
 	[#if name == "USBXHOST_ENABLED" && value == "true"]
-      [#assign UX_HOST_ENABLED = value]
+	  [#assign UX_HOST_ENABLED = value]
     [/#if]
 	[#if name == "USBPD_ENABLED" && value == "true"]
       [#assign USBPD_DEVICE_ENABLED = value]
@@ -96,11 +101,14 @@ extern "C" {
     [#if name.contains("NX_APP_MEM_POOL_SIZE")]
       [#assign NX_APP_MEM_POOL_SIZE_VAL = value]
     [/#if]
-    [#if name.contains("UX_HOST_APP_MEM_POOL_SIZE")]
-      [#assign UX_HOST_APP_MEM_POOL_SIZE_VAL = value]
-    [/#if]
+	[#if name.contains("UX_HOST_APP_MEM_POOL_SIZE")]
+	  [#assign UX_HOST_APP_MEM_POOL_SIZE_VAL = value]
+	[/#if]
 	[#if name.contains("UX_DEVICE_APP_MEM_POOL_SIZE")]
 	  [#assign UX_DEVICE_APP_MEM_POOL_SIZE_VAL = value]
+	[/#if]
+	[#if name.contains("UX_APP_MEM_POOL_SIZE")]
+	  [#assign UX_APP_MEM_POOL_SIZE_VAL = value]
 	[/#if]
 	[#if name.contains("USBPD_DEVICE_APP_MEM_POOL_SIZE")]
 	  [#assign USBPD_DEVICE_APP_MEM_POOL_SIZE_VAL = value]
@@ -149,13 +157,18 @@ extern "C" {
 [#if NX_ENABLED == "true" && NX_APP_MEM_POOL_SIZE_VAL != "valueNotSetted"]
 #define NX_APP_MEM_POOL_SIZE                     ${NX_APP_MEM_POOL_SIZE_VAL}
 [/#if]
-
+[#if FamilyName?lower_case?starts_with("stm32n6")]
+[#if UX_ENABLED == "true" && UX_APP_MEM_POOL_SIZE_VAL != "valueNotSetted"]
+#define UX_APP_MEM_POOL_SIZE                     ${UX_APP_MEM_POOL_SIZE_VAL}
+[/#if]
+[#else]
 [#if UX_HOST_ENABLED == "true" && UX_HOST_APP_MEM_POOL_SIZE_VAL != "valueNotSetted"]
 #define UX_HOST_APP_MEM_POOL_SIZE                ${UX_HOST_APP_MEM_POOL_SIZE_VAL}
 [/#if]
 
 [#if UX_DEVICE_ENABLED == "true" && UX_DEVICE_APP_MEM_POOL_SIZE_VAL != "valueNotSetted"]
 #define UX_DEVICE_APP_MEM_POOL_SIZE              ${UX_DEVICE_APP_MEM_POOL_SIZE_VAL}
+[/#if]
 [/#if]
 
 [#if USBPD_DEVICE_ENABLED == "true" && USBPD_DEVICE_APP_MEM_POOL_SIZE_VAL != "valueNotSetted"]
@@ -177,7 +190,11 @@ extern "C" {
 
 [#if packs??]
 [#list packs as variables]
+[#if FamilyName?lower_case?starts_with("stm32n6")]
+[@common.optinclude name=mxTmpFolder+"/RTOS_defines_${variables.name}.tmp"/]
+[#else]
 [@common.optinclude name=contextFolder + mxTmpFolder+"/RTOS_defines_${variables.name}.tmp"/]
+[/#if]
 [/#list]
 [/#if]
 
@@ -197,12 +214,17 @@ extern "C" {
 /* #define NX_APP_MEM_POOL_SIZE                    <Add the NX memory pool Size> */
 [/#if]
 
+[#if !FamilyName?lower_case?starts_with("stm32n6")]
 [#if UX_HOST_ENABLED == "true"]
 /* #define UX_HOST_APP_MEM_POOL_SIZE                <Add the UXHost memory pool Size> */
 [/#if]
-
 [#if UX_DEVICE_ENABLED == "true"]
 /* #define UX_DEVICE_APP_MEM_POOL_SIZE               <Add the UXDevice memory pool Size> */
+[/#if]
+[#else]
+[#if UX_ENABLED == "true"]
+/* #define UX_APP_MEM_POOL_SIZE                    <Add the UX memory pool Size> */
+[/#if]
 [/#if]
 
 [#if USBPD_DEVICE_ENABLED == "true"]

@@ -70,7 +70,6 @@ extern "C" {
 
 /* Exported constants --------------------------------------------------------*/
 
-[#if FamilyName?lower_case == "stm32u0" || FamilyName?lower_case == "stm32c0"]
 /* Number of blocks of the simulated NAND memory */
 #define TOTAL_BLOCKS                        ${nand_sim_total_blocks}
 /* Number of pages in each block */
@@ -86,17 +85,6 @@ extern "C" {
 /* Start position for the extra bytes within the spare bytes */
 #define EXTRA_BYTE_POSITION                 ${nand_sim_extra_bytes_position}
 
-[#else] 
-#define TOTAL_BLOCKS                        8
-
-#define PHYSICAL_PAGES_PER_BLOCK            16        /* Min value of 2            */
-#define BYTES_PER_PHYSICAL_PAGE             2048      /* 2048 bytes per page       */
-
-#define WORDS_PER_PHYSICAL_PAGE             2048/4    /* Words per page            */
-#define SPARE_BYTES_PER_PAGE                64        /* 64 "spare" bytes per page */
-#define BAD_BLOCK_POSITION                  0         /* 0 is the bad block byte position*/
-#define EXTRA_BYTE_POSITION                 2         /* 2 is the extra bytes starting byte position*/
-[/#if]
 /* USER CODE BEGIN EC */
 
 /* USER CODE END EC */

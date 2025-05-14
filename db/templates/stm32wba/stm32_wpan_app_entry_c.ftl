@@ -71,6 +71,8 @@ Key: ${key}; Value: ${myHash[key]}
 [/#if]
 [#if (myHash["BLE_MODE_TRANSPARENT_UART"] == "Enabled")]
 #include "stm_list.h"
+#include "rf_external_pa.h"
+#include "rf_antenna_switch.h"
 [/#if]
 #if (CFG_LPM_LEVEL != 0)
 [#if myHash["ZIGBEE"] == "Enabled" || (myHash["ZIGBEE_SKELETON"] == "Enabled") || (myHash["mac_802_15_4_SKELETON"] == "Enabled") || (myHash["THREAD"] == "Enabled") || (myHash["THREAD_SKELETON"] == "Enabled")]
@@ -121,6 +123,9 @@ Key: ${key}; Value: ${myHash[key]}
 [#if (myHash["BLE"] == "Enabled")]
 #include "app_debug.h"
 [/#if]
+[#if (myHash["ZIGBEE"] == "Disabled")  && ( (myHash["FREERTOS_STATUS"]?number == 1) || (myHash["THREADX_STATUS"]?number == 1) ) ]
+#include "crc_ctrl.h"
+[/#if]
 [#if (myHash["USE_TEMPERATURE_BASED_RADIO_CALIBRATION"]?number == 1)]
 #if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)
 #include "adc_ctrl.h"
@@ -143,6 +148,9 @@ Key: ${key}; Value: ${myHash[key]}
 #include "timer_if.h"
 extern void xPortSysTickHandler (void);
 extern void vPortSetupTimerInterrupt(void);
+[/#if]
+[#if (myHash["ZIGBEE"] == "Enabled") || (myHash["ZIGBEE_SKELETON"] == "Enabled") || (myHash["THREAD"] == "Enabled") || (myHash["THREAD_SKELETON"] == "Enabled")]
+#include "assert.h"
 [/#if]
 
 /* Private includes -----------------------------------------------------------*/
@@ -220,7 +228,7 @@ static uint32_t maximumPossibleSuppressedTicks = 0;
 
 #if (CFG_LOG_SUPPORTED != 0)
 /* Log configuration */
-static Log_Module_t Log_Module_Config = { .verbose_level = APPLI_CONFIG_LOG_LEVEL, .region = LOG_REGION_ALL_REGIONS };
+static Log_Module_t Log_Module_Config = { .verbose_level = APPLI_CONFIG_LOG_LEVEL, .region_mask = APPLI_CONFIG_LOG_REGION };
 #endif /* (CFG_LOG_SUPPORTED != 0) */
 
 [#if (myHash["CFG_MM_TYPE"]?number == 2)]
@@ -272,7 +280,7 @@ static UTIL_TIMER_Object_t  TimerOSwakeup_Id;
 static osThreadId_t     AmmTaskHandle;
 static osSemaphoreId_t  AmmSemaphore;
 
-const osThreadAttr_t AmmTask_attributes = {
+static const osThreadAttr_t AmmTask_attributes = {
   .name         = "AMM Task",
   .priority     = TASK_PRIO_AMM,
   .stack_size   = TASK_STACK_SIZE_AMM,
@@ -282,7 +290,7 @@ const osThreadAttr_t AmmTask_attributes = {
   .stack_mem    = TASK_DEFAULT_STACK_MEM
 };
 
-const osSemaphoreAttr_t AmmSemaphore_attributes = {
+static const osSemaphoreAttr_t AmmSemaphore_attributes = {
   .name         = "AMM Semaphore",
   .attr_bits    = TASK_DEFAULT_ATTR_BITS,
   .cb_mem       = TASK_DEFAULT_CB_MEM,
@@ -293,7 +301,7 @@ const osSemaphoreAttr_t AmmSemaphore_attributes = {
 static osThreadId_t     RngTaskHandle;
 static osSemaphoreId_t  RngSemaphore;
 
-const osThreadAttr_t RngTask_attributes = {
+static const osThreadAttr_t RngTask_attributes = {
   .name         = "Random Number Generator Task",
   .priority     = TASK_PRIO_RNG,
   .stack_size   = TASK_STACK_SIZE_RNG,
@@ -303,7 +311,7 @@ const osThreadAttr_t RngTask_attributes = {
   .stack_mem    = TASK_DEFAULT_STACK_MEM
 };
 
-const osSemaphoreAttr_t RngSemaphore_attributes = {
+static const osSemaphoreAttr_t RngSemaphore_attributes = {
   .name         = "Random Number Generator Semaphore",
   .attr_bits    = TASK_DEFAULT_ATTR_BITS,
   .cb_mem       = TASK_DEFAULT_CB_MEM,
@@ -314,7 +322,7 @@ const osSemaphoreAttr_t RngSemaphore_attributes = {
 static osThreadId_t     FlashManagerTaskHandle;
 static osSemaphoreId_t  FlashManagerSemaphore;
 
-const osThreadAttr_t FlashManagerTask_attributes = {
+static const osThreadAttr_t FlashManagerTask_attributes = {
   .name         = "FLASH Manager Task",
   .priority     = TASK_PRIO_FLASH_MANAGER,
   .stack_size   = TASK_STACK_SIZE_FLASH_MANAGER,
@@ -324,7 +332,7 @@ const osThreadAttr_t FlashManagerTask_attributes = {
   .stack_mem    = TASK_DEFAULT_STACK_MEM
 };
 
-const osSemaphoreAttr_t FlashManagerSemaphore_attributes = {
+static const osSemaphoreAttr_t FlashManagerSemaphore_attributes = {
   .name         = "FLASH Manager Semaphore",
   .attr_bits    = TASK_DEFAULT_ATTR_BITS,
   .cb_mem       = TASK_DEFAULT_CB_MEM,
@@ -336,7 +344,7 @@ const osSemaphoreAttr_t FlashManagerSemaphore_attributes = {
 static osThreadId_t     BpkaTaskHandle;
 static osSemaphoreId_t  BpkaSemaphore;
 
-const osThreadAttr_t BpkaTask_attributes = {
+static const osThreadAttr_t BpkaTask_attributes = {
   .name         = "BPKA Task",
   .priority     = TASK_PRIO_RNG,
   .stack_size   = TASK_STACK_SIZE_RNG,
@@ -346,7 +354,7 @@ const osThreadAttr_t BpkaTask_attributes = {
   .stack_mem    = TASK_DEFAULT_STACK_MEM
 };
 
-const osSemaphoreAttr_t BpkaSemaphore_attributes = {
+static const osSemaphoreAttr_t BpkaSemaphore_attributes = {
   .name         = "BPKA Semaphore",
   .attr_bits    = TASK_DEFAULT_ATTR_BITS,
   .cb_mem       = TASK_DEFAULT_CB_MEM,
@@ -354,6 +362,27 @@ const osSemaphoreAttr_t BpkaSemaphore_attributes = {
 };
 
 [/#if]
+[#if (myHash["ZIGBEE"] == "Disabled") ]
+static osMutexId_t      crcCtrlMutex;
+
+static const osMutexAttr_t crcCtrlMutex_attributes = {
+  .name         = "CRC CTRL Mutex",
+  .attr_bits    = TASK_DEFAULT_ATTR_BITS,
+  .cb_mem       = TASK_DEFAULT_CB_MEM,
+  .cb_size      = TASK_DEFAULT_CB_SIZE
+};
+
+[/#if]
+#if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)
+static osMutexId_t      adcCtrlMutex;
+
+static const osMutexAttr_t adcCtrlMutex_attributes = {
+  .name         = "ADC CTRL Mutex",
+  .attr_bits    = TASK_DEFAULT_ATTR_BITS,
+  .cb_mem       = TASK_DEFAULT_CB_MEM,
+  .cb_size      = TASK_DEFAULT_CB_SIZE
+};
+#endif /* USE_TEMPERATURE_BASED_RADIO_CALIBRATION */
 [/#if]
 [#if myHash["THREADX_STATUS"]?number == 1 ]
 /* ThreadX objects declaration */
@@ -381,7 +410,14 @@ static TX_THREAD      BpkaTaskHandle;
 static TX_SEMAPHORE   BpkaSemaphore;
 
 [/#if]
-
+[#if (myHash["ZIGBEE"] == "Disabled") ]
+static TX_MUTEX       crcCtrlMutex;
+[/#if]
+[#if (myHash["USE_TEMPERATURE_BASED_RADIO_CALIBRATION"]?number == 1)]
+#if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)
+static TX_MUTEX       adcCtrlMutex;
+#endif /* USE_TEMPERATURE_BASED_RADIO_CALIBRATION */
+[/#if]
 [/#if]
 
 /* USER CODE BEGIN PV */
@@ -427,6 +463,14 @@ static void AMM_WrapperInit(uint32_t * const p_PoolAddr, const uint32_t PoolSize
 static uint32_t * AMM_WrapperAllocate(const uint32_t BufferSize);
 static void AMM_WrapperFree(uint32_t * const p_BufferAddr);
 
+[/#if]
+[#if myHash["ZIGBEE"] == "Enabled" || (myHash["ZIGBEE_SKELETON"] == "Enabled") || (myHash["mac_802_15_4_SKELETON"] == "Enabled")]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+void MX_APPE_InitTask(void* argument);
+[/#if]
+[#if myHash["THREADX_STATUS"]?number == 1 ]
+void MX_APPE_InitTask(ULONG lArgument);
+[/#if]
 [/#if]
 [#if myHash["FREERTOS_STATUS"]?number == 1 ]
 static void RNG_Task_Entry(void* argument);
@@ -524,7 +568,8 @@ void MX_APPE_LinkLayerInit(void)
  */
 void MX_APPE_InitTask( ULONG lArgument )
 {
-  /* USER CODE START APPE_Init_Task_1 */
+  /* USER CODE BEGIN APPE_Init_Task_1 */
+[#if PG_FILL_UCS == "True"]  
   /* Initialize Peripherals */
 #if (CFG_LED_SUPPORTED == 1)
   Led_Init();
@@ -532,6 +577,7 @@ void MX_APPE_InitTask( ULONG lArgument )
 #if (CFG_BUTTON_SUPPORTED == 1)
   Button_Init();
 #endif // (CFG_BUTTON_SUPPORTED == 1)
+[/#if]
 
   /* USER CODE END APPE_Init_Task_1 */
 
@@ -562,9 +608,9 @@ uint32_t MX_APPE_Init(void *p_param)
 
   BLE_Init();
 [#else]
-[#if (myHash["ZIGBEE"] == "Enabled")]
 [#if (myHash["THREADX_STATUS"]?number == 1)]
   UINT TXstatus;
+[#if (myHash["ZIGBEE"] == "Enabled")]
   CHAR *pStack;
 
 [/#if]
@@ -625,6 +671,45 @@ uint32_t MX_APPE_Init(void *p_param)
 
   /* USER CODE END APPE_Init_1 */
 
+[#if (myHash["ZIGBEE"] == "Disabled") ]
+[#if myHash["FREERTOS_STATUS"]?number == 1]
+  crcCtrlMutex = osMutexNew(&crcCtrlMutex_attributes);  
+  if (crcCtrlMutex == NULL)
+  {
+    LOG_ERROR_APP( "CRC CTRL FreeRTOS objects creation FAILED");
+    Error_Handler();
+  }
+  
+#if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)
+  adcCtrlMutex = osMutexNew(&adcCtrlMutex_attributes);
+  if (adcCtrlMutex == NULL)
+  {
+    LOG_ERROR_APP( "ADC CTRL FreeRTOS objects creation FAILED");
+    Error_Handler();
+  }
+#endif /* USE_TEMPERATURE_BASED_RADIO_CALIBRATION */
+
+[/#if]
+[#if myHash["THREADX_STATUS"]?number == 1]
+  TXstatus = tx_mutex_create(&crcCtrlMutex, "CRC CTRL Mutex", 0 );
+  
+  if( TXstatus != TX_SUCCESS )
+  {
+    LOG_ERROR_APP( "CRC CTRL ThreadX objects creation FAILED, status: %d", TXstatus);
+    Error_Handler();
+  }
+#if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)
+  TXstatus = tx_mutex_create(&adcCtrlMutex, "ADC CTRL Mutex", 0 );
+  
+  if( TXstatus != TX_SUCCESS )
+  {
+    LOG_ERROR_APP( "ADC CTRL ThreadX objects creation FAILED, status: %d", TXstatus);
+    Error_Handler();
+  }
+#endif /* USE_TEMPERATURE_BASED_RADIO_CALIBRATION */
+
+[/#if]
+[/#if]
 [#if (myHash["BLE"] == "Enabled")]
   /* Initialize the Ble Public Key Accelerator module */
   APPE_BPKA_Init();
@@ -687,8 +772,16 @@ uint32_t MX_APPE_Init(void *p_param)
   }
 [/#if]
 [/#if]
+[#if (myHash["BLE_MODE_TRANSPARENT_UART"] == "Enabled")]
+#if (CFG_EXTERNAL_PA_ENABLE == 1)
+  RF_CONTROL_ExternalPA(RF_EPA_ENABLE);
+#endif /* CFG_EXTERNAL_PA_ENABLE */
 
+#if (CFG_BLE_AOA_AOD_ENABLE == 1)
+  RF_CONTROL_AntennaSwitch(RF_ANTSW_ENABLE);
+#endif /* CFG_BLE_AOA_AOD_ENABLE */
 
+[/#if]
   /* USER CODE BEGIN APPE_Init_2 */
 
   /* USER CODE END APPE_Init_2 */
@@ -815,6 +908,19 @@ static void System_Init( void )
   HAL_PWR_EnableWakeUpPin(PWR_WAKEUP_PIN7_HIGH_3);
 
 #if (CFG_LOG_SUPPORTED != 0)
+[#if voidsList??]
+  [#list voidsList as void]
+  [#if void.functionName?? && void.genCode && !void.isStatic]
+    [#if (void.functionName == "MX_USART1_UART_Init")
+      || (void.functionName == "MX_USART2_UART_Init")
+      || (void.functionName == "MX_LPUART1_UART_Init")
+    ]
+${""?right_pad(2)}${void.functionName}();
+    [/#if]
+  [/#if]
+  [/#list]
+[/#if]
+
   /* Initialize the logs ( using the USART ) */
   Log_Module_Init( Log_Module_Config );
 [#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled")]
@@ -847,7 +953,6 @@ static void System_Init( void )
 #endif /* CFG_RT_DEBUG_DTB */
 
 [#if ( (myHash["SEQUENCER_STATUS"]?number == 1) || (myHash["FREERTOS_STATUS"]?number == 1) )]
-
 #if ( CFG_LPM_LEVEL != 0)
   system_startup_done = TRUE;
 #endif /* ( CFG_LPM_LEVEL != 0) */
@@ -1173,21 +1278,6 @@ static void APPE_AMM_Init(void)
 [/#if]
 }
 
-static void AMM_WrapperInit(uint32_t * const p_PoolAddr, const uint32_t PoolSize)
-{
-  UTIL_MM_Init ((uint8_t *)p_PoolAddr, ((size_t)PoolSize * sizeof(uint32_t)));
-}
-
-static uint32_t * AMM_WrapperAllocate(const uint32_t BufferSize)
-{
-  return (uint32_t *)UTIL_MM_GetBuffer (((size_t)BufferSize * sizeof(uint32_t)));
-}
-
-static void AMM_WrapperFree (uint32_t * const p_BufferAddr)
-{
-  UTIL_MM_ReleaseBuffer ((void *)p_BufferAddr);
-}
-
 [#if myHash["FREERTOS_STATUS"]?number == 1 ]
 static void AMM_Task_Entry(void* argument)
 {
@@ -1475,6 +1565,11 @@ void UTIL_SEQ_Idle( void )
 {
 #if ( CFG_LPM_LEVEL != 0)
   HAL_SuspendTick();
+#if (CFG_SCM_SUPPORTED == 1)
+  /* SCM HSE BEGIN */
+  SCM_HSE_StopStabilizationTimer();
+  /* SCM HSE END */
+#endif /* CFG_SCM_SUPPORTED */
   UTIL_LPM_EnterLowPower();
   HAL_ResumeTick();
 #endif /* CFG_LPM_LEVEL */
@@ -1500,14 +1595,15 @@ void UTIL_SEQ_PreIdle( void )
 
   LL_RCC_ClearResetFlags();
 
-[#if (myHash["ZIGBEE"] == "Enabled") || (myHash["ZIGBEE_SKELETON"] == "Enabled")]
-  /* Wait until System clock is not on HSI */
-  while (LL_RCC_GetSysClkSource() == LL_RCC_SYS_CLKSOURCE_STATUS_HSI);
-
-[/#if]
 #if defined(STM32WBAXX_SI_CUT1_0)
   /* Wait until HSE is ready */
+#if (CFG_SCM_SUPPORTED == 1)
+  /* SCM HSE BEGIN */
+  SCM_HSE_WaitUntilReady();
+  /* SCM HSE END */
+#else
   while (LL_RCC_HSE_IsReady() == 0);
+#endif /* CFG_SCM_SUPPORTED */
 
   UTILS_ENTER_LIMITED_CRITICAL_SECTION(RCC_INTR_PRIO << 4U);
   scm_hserdy_isr();
@@ -1601,6 +1697,21 @@ void AMM_ProcessRequest(void)
 [/#if]
 }
 
+static void AMM_WrapperInit(uint32_t * const p_PoolAddr, const uint32_t PoolSize)
+{
+  UTIL_MM_Init ((uint8_t *)p_PoolAddr, ((size_t)PoolSize * sizeof(uint32_t)));
+}
+
+static uint32_t * AMM_WrapperAllocate(const uint32_t BufferSize)
+{
+  return (uint32_t *)UTIL_MM_GetBuffer (((size_t)BufferSize * sizeof(uint32_t)));
+}
+
+static void AMM_WrapperFree (uint32_t * const p_BufferAddr)
+{
+  UTIL_MM_ReleaseBuffer ((void *)p_BufferAddr);
+}
+
 [/#if]
 [#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || ((myHash["ZIGBEE"] == "Enabled") && (myHash["USE_SNVMA_NVM"]?number != 0))]
 void FM_ProcessRequest(void)
@@ -1633,6 +1744,7 @@ void RNG_KERNEL_CLK_OFF(void)
   /* USER CODE END RNG_KERNEL_CLK_OFF_2 */
 }
 
+#if (CFG_SCM_SUPPORTED == 1)
 /* SCM module turn off HSI clock when traces are not used and low power used */
 void SCM_HSI_CLK_OFF(void)
 {
@@ -1644,6 +1756,7 @@ void SCM_HSI_CLK_OFF(void)
 
   /* USER CODE END SCM_HSI_CLK_OFF_2 */
 }
+#endif /* CFG_SCM_SUPPORTED */
 #endif /* ((CFG_LOG_SUPPORTED == 0) && (CFG_LPM_LEVEL != 0)) */
 
 #if (CFG_LOG_SUPPORTED != 0)
@@ -1667,6 +1780,20 @@ void UTIL_ADV_TRACE_PostSendHook(void)
   /* USER CODE BEGIN UTIL_ADV_TRACE_PostSendHook */
 
   /* USER CODE END UTIL_ADV_TRACE_PostSendHook */
+}
+
+/**
+ * @brief  Treat Serial commands.
+ *
+ * @param  pRxBuffer      Pointer on received data from USART.
+ * @param  iRxBufferSize  Number of received data.
+ * @retval None
+ */
+void Serial_CMD_Interpreter_CmdExecute( uint8_t * pRxBuffer, uint16_t iRxBufferSize )
+{
+  /* USER CODE BEGIN Serial_CMD_Interpreter_CmdExecute_1 */
+
+  /* USER CODE END Serial_CMD_Interpreter_CmdExecute_1 */
 }
 
 #endif /* (CFG_LOG_SUPPORTED != 0) */
@@ -1862,8 +1989,237 @@ void vPortSuppressTicksAndSleep( uint32_t xExpectedIdleTime )
 __WEAK void __aeabi_assert(const char * szExpression, const char * szFile, int iLine)
 {
   Error_Handler();
+  __builtin_unreachable();
 }
 
+[/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+[#if (myHash["ZIGBEE"] == "Disabled") ]
+CRCCTRL_Cmd_Status_t CRCCTRL_MutexTake(void)
+{
+  osStatus_t os_status;
+  CRCCTRL_Cmd_Status_t crc_status;  
+  /* USER CODE BEGIN CRCCTRL_MutexTake_0 */
+
+  /* USER CODE END CRCCTRL_MutexTake_0 */  
+  os_status = osMutexAcquire(crcCtrlMutex, osWaitForever);
+  
+  if(os_status != osOK)
+  {
+    crc_status = CRCCTRL_NOK;
+  }
+  else
+  {
+    crc_status = CRCCTRL_OK;
+  }
+  /* USER CODE BEGIN CRCCTRL_MutexTake_1 */
+
+  /* USER CODE END CRCCTRL_MutexTake_1 */
+  return crc_status;
+}
+
+CRCCTRL_Cmd_Status_t CRCCTRL_MutexRelease(void)
+{
+  osStatus_t os_status;
+  CRCCTRL_Cmd_Status_t crc_status;
+  /* USER CODE BEGIN CRCCTRL_MutexRelease_0 */
+
+  /* USER CODE END CRCCTRL_MutexRelease_0 */  
+  os_status = osMutexRelease(crcCtrlMutex);
+  
+  if(os_status != osOK)
+  {
+    crc_status = CRCCTRL_NOK;
+  }
+  else
+  {
+    crc_status = CRCCTRL_OK;
+  }
+  /* USER CODE BEGIN CRCCTRL_MutexRelease_1 */
+
+  /* USER CODE END CRCCTRL_MutexRelease_1 */  
+  return crc_status;  
+}
+
+[/#if]
+[#if (myHash["USE_TEMPERATURE_BASED_RADIO_CALIBRATION"]?number == 1)]
+#if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)
+ADCCTRL_Cmd_Status_t ADCCTRL_MutexTake(void)
+{
+  osStatus_t os_status;
+  ADCCTRL_Cmd_Status_t adc_status;
+  /* USER CODE BEGIN ADCCTRL_MutexTake_0 */
+
+  /* USER CODE END ADCCTRL_MutexTake_0 */  
+  os_status = osMutexAcquire(adcCtrlMutex, osWaitForever);
+  
+  if(os_status != osOK)
+  {
+    adc_status = ADCCTRL_NOK;
+  }
+  else
+  {
+    adc_status = ADCCTRL_OK;
+  }
+  /* USER CODE BEGIN ADCCTRL_MutexTake_1 */
+
+  /* USER CODE END ADCCTRL_MutexTake_1 */  
+  return adc_status;
+}
+
+ADCCTRL_Cmd_Status_t ADCCTRL_MutexRelease(void)
+{
+  osStatus_t os_status;
+  ADCCTRL_Cmd_Status_t adc_status;
+  /* USER CODE BEGIN ADCCTRL_MutexRelease_0 */
+
+  /* USER CODE END ADCCTRL_MutexRelease_0 */  
+  os_status = osMutexRelease(adcCtrlMutex);
+  
+  if(os_status != osOK)
+  {
+    adc_status = ADCCTRL_NOK;
+  }
+  else
+  {
+    adc_status = ADCCTRL_OK;
+  }
+  /* USER CODE BEGIN ADCCTRL_MutexRelease_1 */
+
+  /* USER CODE END ADCCTRL_MutexRelease_1 */  
+  return adc_status;
+}
+#endif /* USE_TEMPERATURE_BASED_RADIO_CALIBRATION */
+
+[/#if]
+[/#if]
+[#if myHash["THREADX_STATUS"]?number == 1 ]
+[#if (myHash["ZIGBEE"] == "Disabled") ]
+CRCCTRL_Cmd_Status_t CRCCTRL_MutexTake(void)
+{
+  UINT TXstatus;
+  CRCCTRL_Cmd_Status_t crc_status;
+  /* USER CODE BEGIN CRCCTRL_MutexTake_0 */
+
+  /* USER CODE END CRCCTRL_MutexTake_0 */
+  if(TX_THREAD_GET_SYSTEM_STATE() == TX_INITIALIZE_IS_FINISHED)
+  {
+    TXstatus = tx_mutex_get(&crcCtrlMutex, TX_WAIT_FOREVER);
+  }
+  else
+  {
+    TXstatus = TX_SUCCESS;
+  }
+
+  if(TXstatus != TX_SUCCESS)
+  {
+    crc_status = CRCCTRL_NOK;
+  }
+  else
+  {
+    crc_status = CRCCTRL_OK;
+  }
+  /* USER CODE BEGIN CRCCTRL_MutexTake_1 */
+
+  /* USER CODE END CRCCTRL_MutexTake_1 */
+  return crc_status;
+}
+
+CRCCTRL_Cmd_Status_t CRCCTRL_MutexRelease(void)
+{
+  UINT TXstatus;
+  CRCCTRL_Cmd_Status_t crc_status;
+  /* USER CODE BEGIN CRCCTRL_MutexRelease_0 */
+
+  /* USER CODE END CRCCTRL_MutexRelease_0 */
+  if(TX_THREAD_GET_SYSTEM_STATE() == TX_INITIALIZE_IS_FINISHED)
+  {
+    TXstatus = tx_mutex_put(&crcCtrlMutex);
+  }
+  else
+  {
+    TXstatus = TX_SUCCESS;
+  }  
+
+  if(TXstatus != TX_SUCCESS)
+  {
+    crc_status = CRCCTRL_NOK;
+  }
+  else
+  {
+    crc_status = CRCCTRL_OK;
+  }
+  /* USER CODE BEGIN CRCCTRL_MutexRelease_1 */
+
+  /* USER CODE END CRCCTRL_MutexRelease_1 */
+  return crc_status;
+}
+
+[/#if]
+[#if (myHash["USE_TEMPERATURE_BASED_RADIO_CALIBRATION"]?number == 1)]
+#if (USE_TEMPERATURE_BASED_RADIO_CALIBRATION == 1)
+ADCCTRL_Cmd_Status_t ADCCTRL_MutexTake(void)
+{
+  UINT TXstatus;
+  ADCCTRL_Cmd_Status_t adc_status;
+  /* USER CODE BEGIN ADCCTRL_MutexTake_0 */
+
+  /* USER CODE END ADCCTRL_MutexTake_0 */
+  if(TX_THREAD_GET_SYSTEM_STATE() == TX_INITIALIZE_IS_FINISHED)
+  {
+    TXstatus = tx_mutex_get(&adcCtrlMutex, TX_WAIT_FOREVER);
+  }
+  else
+  {
+    TXstatus = TX_SUCCESS;
+  }
+
+  if(TXstatus != TX_SUCCESS)
+  {
+    adc_status = ADCCTRL_NOK;
+  }
+  else
+  {
+    adc_status = ADCCTRL_OK;
+  }
+  /* USER CODE BEGIN ADCCTRL_MutexTake_1 */
+
+  /* USER CODE END ADCCTRL_MutexTake_1 */
+  return adc_status;
+}
+
+ADCCTRL_Cmd_Status_t ADCCTRL_MutexRelease(void)
+{
+  UINT TXstatus;
+  ADCCTRL_Cmd_Status_t adc_status;
+  /* USER CODE BEGIN ADCCTRL_MutexRelease_0 */
+
+  /* USER CODE END ADCCTRL_MutexRelease_0 */
+  if(TX_THREAD_GET_SYSTEM_STATE() == TX_INITIALIZE_IS_FINISHED)
+  {
+    TXstatus = tx_mutex_put(&adcCtrlMutex);
+  }
+  else
+  {
+    TXstatus = TX_SUCCESS;
+  }
+
+  if(TXstatus != TX_SUCCESS)
+  {
+    adc_status = ADCCTRL_NOK;
+  }
+  else
+  {
+    adc_status = ADCCTRL_OK;
+  }
+  /* USER CODE BEGIN ADCCTRL_MutexRelease_1 */
+
+  /* USER CODE END ADCCTRL_MutexRelease_1 */
+  return adc_status;
+}
+#endif /* USE_TEMPERATURE_BASED_RADIO_CALIBRATION */
+
+[/#if]
 [/#if]
 /* USER CODE BEGIN FD_WRAP_FUNCTIONS */
 [#if PG_FILL_UCS == "True"]

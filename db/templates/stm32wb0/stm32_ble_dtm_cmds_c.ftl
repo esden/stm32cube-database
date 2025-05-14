@@ -59,6 +59,7 @@
 */
 #define CONNECTION_BIT                         ((uint32_t)0x00000800)  /*!< Bit 11 selected */
 #define CONTROLLER_ONLY_BIT                    ((uint32_t)0x00001000)  /*!< Bit 12 selected */
+#define DTM_DEBUG_BIT                          ((uint32_t)0x00002000)  /*!< Bit 13 selected */
 #define CONTROLLER_CHAN_CLASS_BIT              ((uint32_t)0x00010000)  /*!< Bit 16 selected */
 #define CONTROLLER_BIS_BIT                     ((uint32_t)0x00020000)  /*!< Bit 17 selected */
 #define CONNECTION_SUBRATING_BIT               ((uint32_t)0x00080000)  /*!< Bit 19 selected */
@@ -93,6 +94,7 @@
     ((uint32_t)(CONTROLLER_POWER_CONTROL_ENABLED * CONTROLLER_POWER_CONTROL_BIT))                 | \
     ((uint32_t)(CONNECTION_ENABLED * CONNECTION_BIT))                                             | \
     ((uint32_t)(BLESTACK_CONTROLLER_ONLY * CONTROLLER_ONLY_BIT))                                  | \
+    ((uint32_t)(DTM_DEBUG_ENABLED * DTM_DEBUG_BIT))                                               | \
     ((uint32_t)(CONTROLLER_CHAN_CLASS_ENABLED * CONTROLLER_CHAN_CLASS_BIT))                       | \
     ((uint32_t)(CONTROLLER_BIS_ENABLED * CONTROLLER_BIS_BIT))                                     | \
     ((uint32_t)(CONNECTION_SUBRATING_ENABLED * CONNECTION_SUBRATING_BIT))                         | \
@@ -114,15 +116,15 @@ tBleStatus aci_hal_get_firmware_details(uint8_t *DTM_version_major,
 {
   tBleStatus ret;
   uint32_t BTLE_Stack_variant_ext;
-  
+
   ret = aci_hal_get_firmware_details_v2(DTM_version_major,DTM_version_minor,DTM_version_patch,
                                          DTM_variant,DTM_Build_Number,BTLE_Stack_version_major,
                                          BTLE_Stack_version_minor,BTLE_Stack_version_patch,
                                          BTLE_Stack_development,&BTLE_Stack_variant_ext,
                                          BTLE_Stack_Build_Number);
   *BTLE_Stack_variant = BTLE_Stack_variant_ext;
-  
-  return ret;  
+
+  return ret;
 }
 
 tBleStatus aci_hal_get_firmware_details_v2(uint8_t *DTM_version_major,
@@ -144,10 +146,10 @@ tBleStatus aci_hal_get_firmware_details_v2(uint8_t *DTM_version_major,
     uint8_t LMP_PAL_Version = 0;
     uint16_t Manufacturer_Name = 0;
     uint16_t LMP_PAL_Subversion = 0;
-    
+
     hci_read_local_version_information(&HCI_Version, &HCI_Revision, &LMP_PAL_Version,
                                        &Manufacturer_Name, &LMP_PAL_Subversion);
-        
+
     *DTM_version_major  = DTM_FW_VERSION_MAJOR;
     *DTM_version_minor  = DTM_FW_VERSION_MINOR;
     *DTM_version_patch  = DTM_FW_VERSION_PATCH;
@@ -157,21 +159,21 @@ tBleStatus aci_hal_get_firmware_details_v2(uint8_t *DTM_version_major,
     *BTLE_Stack_version_minor = (LMP_PAL_Subversion>>4)&0x0F;
     *BTLE_Stack_version_patch = LMP_PAL_Subversion&0x0F;
     *BTLE_Stack_development = (LMP_PAL_Subversion>>15)&0x01;
-     
+
     /* Set the stack configurations variant bitmap value:
        first LSB 7 bits are reserved for BLE stack modular options + Link Layer only*/
     *BTLE_Stack_variant = BLE_STACK_CONFIGURATIONS_VARIANT;
-    
+
     return (BLE_STATUS_SUCCESS);
-    
+
 }
 
 /**
- * @brief  This API implements the hci le transmitter test with 
- *         the capability to set the number of packets to be sent. 
- * @param  TX_Frequency: TX frequency 
+ * @brief  This API implements the hci le transmitter test with
+ *         the capability to set the number of packets to be sent.
+ * @param  TX_Frequency: TX frequency
  * @param  Length_Of_Test_Data: length of test data
- * @param  Packet_Payload: packet payload 
+ * @param  Packet_Payload: packet payload
  * @param  Number_Of_Packets: number pf packets to be sent on test
  * @param  PHY: PHY to be used by the transmitter
  * @retval status
@@ -183,42 +185,42 @@ tBleStatus aci_hal_transmitter_test_packets(uint8_t TX_Frequency,
                                             uint8_t PHY)
 {
   extern uint16_t num_packets;
-  tBleStatus status; 
-  
+  tBleStatus status;
+
   if(Number_Of_Packets == 0)
   {
     return BLE_ERROR_INVALID_HCI_CMD_PARAMS;
   }
 
 #if CONTROLLER_2M_CODED_PHY_ENABLED
-  
+
   status =  hci_le_transmitter_test_v2(TX_Frequency,
                                        Length_Of_Test_Data,
                                        Packet_Payload,
                                        PHY);
-  
+
 #else
-    
+
   status = hci_le_transmitter_test(TX_Frequency /* 1 */,
                                    Length_Of_Test_Data /* 1 */,
                                    Packet_Payload /* 1 */);
-#endif 
-  
+#endif
+
   if(status == 0x00)
-  {    
+  {
     num_packets = Number_Of_Packets;
   }
-  
+
   return status;
 }
 
 #if CONTROLLER_CTE_ENABLED
 /**
- * @brief  This API implements the hci le transmitter test v2 with 
- *         the capability to set the number of packets to be sent. 
- * @param  TX_Channel: TX channel 
+ * @brief  This API implements the hci le transmitter test v2 with
+ *         the capability to set the number of packets to be sent.
+ * @param  TX_Channel: TX channel
  * @param  Test_Data_Length: length of test data
- * @param  Packet_Payload: packet payload 
+ * @param  Packet_Payload: packet payload
  * @param  Number_Of_Packets: number of packets to be sent on test
  * @param  PHY: PHY to be used by the transmitter
  * @param  CTE_Length: CTE length
@@ -239,8 +241,8 @@ tBleStatus aci_hal_transmitter_test_packets_v2(uint8_t TX_Channel,
                                                uint8_t Antenna_IDs[])
 {
   extern uint16_t num_packets;
-  tBleStatus status; 
-  
+  tBleStatus status;
+
   if(Number_Of_Packets == 0)
   {
     return BLE_ERROR_INVALID_HCI_CMD_PARAMS;
@@ -254,12 +256,12 @@ tBleStatus aci_hal_transmitter_test_packets_v2(uint8_t TX_Channel,
                                        CTE_Type,
                                        Switching_Pattern_Length,
                                        Antenna_IDs);
-  
+
   if(status == 0x00)
-  {    
+  {
     num_packets = Number_Of_Packets;
   }
-  
+
   return status;
 }
 #endif
@@ -277,7 +279,7 @@ tBleStatus aci_test_tx_write_command_start(uint16_t Connection_Handle, uint16_t 
 }
 
 tBleStatus aci_test_rx_start(uint16_t Connection_Handle, uint16_t Attribute_Handle, uint8_t Notifications_WriteCmds)
-{   
+{
   return BURST_RXStart(Connection_Handle, Attribute_Handle, Notifications_WriteCmds);
 }
 
@@ -293,7 +295,7 @@ tBleStatus aci_test_stop(uint8_t TX_RX)
   default:
     return BLE_ERROR_INVALID_HCI_CMD_PARAMS;
   }
-  
+
   return BLE_STATUS_SUCCESS;
 }
 
@@ -301,7 +303,7 @@ tBleStatus aci_test_report(uint32_t *TX_Packets, uint32_t *RX_Packets, uint16_t 
 {
   *TX_Packets = BURST_TXReport();
   *RX_Packets = BURST_RXReport(RX_Data_Length, RX_Sequence_Errors);
-  
+
   return BLE_STATUS_SUCCESS;
 }
 

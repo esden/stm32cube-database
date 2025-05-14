@@ -72,6 +72,13 @@
         [#if (definition.name == "ETH_RX_BUFFER_CNT") && (definition.value != "valueNotSetted")]
             [#assign eth_rx_buff_cnt = definition.value]
         [/#if]
+        [#if definition.name == "LWIP_IGMP"]
+            [#if definition.value == "1"]
+                [#assign lwip_igmp = definition.value]
+            [#else]
+                [#assign lwip_igmp = "0"]
+            [/#if]
+        [/#if]
 	[/#list]
 [/#if][#-- SWIP.defines --]
 [/#list][/#compress]
@@ -132,6 +139,8 @@
 
 /* The time to block waiting for input. */
 #define TIME_WAITING_FOR_INPUT                 ( portMAX_DELAY )
+/* Time to block waiting for transmissions to finish */
+#define ETHIF_TX_TIMEOUT                       (2000U)
 /* USER CODE BEGIN OS_THREAD_STACK_SIZE_WITH_RTOS */
 /* Stack size of the interface thread */
 #define INTERFACE_THREAD_STACK_SIZE            ( 350 )
@@ -343,9 +352,17 @@ static void low_level_init(struct netif *netif)
   /* Accept broadcast address and ARP traffic */
   /* don't set NETIF_FLAG_ETHARP if this device is not an ethernet one */
   #if LWIP_ARP
+[#if lwip_igmp == "1"]
+    netif->flags |= NETIF_FLAG_BROADCAST | NETIF_FLAG_ETHARP | NETIF_FLAG_IGMP;
+[#else]
     netif->flags |= NETIF_FLAG_BROADCAST | NETIF_FLAG_ETHARP;
+[/#if]
   #else 
+[#if lwip_igmp == "1"]
+    netif->flags |= NETIF_FLAG_BROADCAST | NETIF_FLAG_IGMP;
+[#else]
     netif->flags |= NETIF_FLAG_BROADCAST;
+[/#if]
   #endif /* LWIP_ARP */
       
 [#if with_rtos == 1]
@@ -533,20 +550,34 @@ static err_t low_level_output(struct netif *netif, struct pbuf *p)
 [#if with_rtos == 1]
   pbuf_ref(p);
   
-  if (HAL_ETH_Transmit_IT(&heth, &TxConfig) == HAL_OK) {
-[#if cmsis_version = "v1"]
-    while(osSemaphoreWait(TxPktSemaphore, TIME_WAITING_FOR_INPUT)!=osOK)
-[#else]
-    while(osSemaphoreAcquire(TxPktSemaphore, TIME_WAITING_FOR_INPUT)!=osOK)
-[/#if][#-- endif cmsis_version --]
-
+  do
+  {
+    if(HAL_ETH_Transmit_IT(&heth, &TxConfig) == HAL_OK)
     {
+      errval = ERR_OK;
     }
+    else
+    {
 
-    HAL_ETH_ReleaseTxPacket(&heth);
-  } else {
-    pbuf_free(p);
-  }
+      if(HAL_ETH_GetError(&heth) & HAL_ETH_ERROR_BUSY)
+      {
+        /* Wait for descriptors to become available */
+[#if cmsis_version = "v1"]
+        osSemaphoreWait(TxPktSemaphore, ETHIF_TX_TIMEOUT);
+[#else]
+        osSemaphoreAcquire(TxPktSemaphore, ETHIF_TX_TIMEOUT);
+[/#if][#-- endif cmsis_version --]
+        HAL_ETH_ReleaseTxPacket(&heth);
+        errval = ERR_BUF;
+      }
+      else
+      {
+        /* Other error */
+        pbuf_free(p);
+        errval =  ERR_IF;
+      }
+    }
+  }while(errval == ERR_BUF);
 [#else][#-- endif with_rtos --]
   HAL_ETH_Transmit(&heth, &TxConfig, ETH_DMA_TRANSMIT_TIMEOUT);
 [/#if][#-- endelse with_rtos --]

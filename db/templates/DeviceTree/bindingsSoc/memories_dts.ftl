@@ -17,6 +17,8 @@ ${TABnode}memory@${mx_ddrConfigs["general"]["ddrBaseAddress"]?replace("0x", "")}
 ${TABprop}device_type = "memory";
 [#if mx_socDtRPN?starts_with("stm32mp1")]
 ${TABprop}reg = <${mx_ddrConfigs["general"]["ddrBaseAddress"]} ${mx_ddrConfigs["general"]["ddrSize"]}>;
+[#elseif srvcmx_isTargetedFw_inDTS("TF-M")]
+${TABprop}reg = <${mx_ddrConfigs["general"]["ddrBaseAddress"]} 0x80000000>;
 [#else]
 [#local ddrBaseAddress64bit=((mx_ddrConfigs["general"]["ddrBaseAddress"])?keep_after_last("0x")?length<=8)?then("0x0 "+mx_ddrConfigs["general"]["ddrBaseAddress"], "0x"+((mx_ddrConfigs["general"]["ddrBaseAddress"]?keep_after_last("0x"))?left_pad(16,"0"))?substring(0,8)+ " 0x"+((mmx_ddrConfigs["general"]["ddrBaseAddress"]?keep_after_last("0x"))?left_pad(16,"0"))?substring(8))]
 [#local ddrSize64bit=((mx_ddrConfigs["general"]["ddrSize"])?keep_after_last("0x")?length<=8)?then("0x0 "+mx_ddrConfigs["general"]["ddrSize"], "0x"+((mx_ddrConfigs["general"]["ddrSize"]?keep_after_last("0x"))?left_pad(16,"0"))?substring(0,8)+ " 0x"+((mx_ddrConfigs["general"]["ddrSize"]?keep_after_last("0x"))?left_pad(16,"0"))?substring(8))]

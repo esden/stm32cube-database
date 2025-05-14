@@ -224,18 +224,16 @@
 /* Override various options with default values already assigned in fx_api.h or fx_port.h.
   Please also refer to fx_port.h for descriptions on each of these options.  */
 
+[#if familyName?starts_with("stm32wba")]
 [#if ULONG_64_DEFINED_value == "true"]
 /* Avoid doule definition warning, as ULONG64 typedef is already defined by ThreadX */
 #define ULONG64_DEFINED
 [#else]
 /* #define ULONG64_DEFINED */
 [/#if]
-
-[#if familyName?starts_with("stm32c0")]
-/* Defined, the direct read sector update of cache is disabled.  */
-[#else]
-/* Direct read sector cache will be disabled if cache is disabled.  */
 [/#if]
+
+/* Defined, the direct read sector update of cache is disabled.  */
 
 [#if FX_DISABLE_DIRECT_DATA_READ_CACHE_FILL_value == "1"]
 #define FX_DISABLE_DIRECT_DATA_READ_CACHE_FILL
@@ -356,10 +354,6 @@
 #define FX_MAX_LAST_NAME_LEN      ${FX_MAX_LAST_NAME_LEN_value}
 [/#if]
 
-[#if familyName?starts_with("stm32c0")]
-#define FX_MAX_SHORT_NAME_LEN                  13       /* Only allowed value is 13.  */
-[/#if]
-
 
 [#if FX_MAX_LONG_NAME_LEN_value == "256"]
 /* #define FX_MAX_LONG_NAME_LEN         256 */
@@ -443,9 +437,7 @@
 /* #define FX_SINGLE_THREAD */
 [/#if]
 
-[#if !familyName?starts_with("stm32c0")]
-/* Configure the FileX in Standalone mode */
-[/#if]
+/* Defined, FileX will be used in standalone mode (without ThreadX) */
 
 [#if FX_STANDALONE_ENABLE_value == "1"]
 #define FX_STANDALONE_ENABLE
@@ -472,11 +464,7 @@
 #define FX_UPDATE_RATE_IN_TICKS     ${FX_UPDATE_RATE_IN_TICKS_value}
 [/#if]
 
-[#if familyName?starts_with("stm32c0")]
 /* If defined, cache is disabled.  */
-[#else]
-/* Determine if cache is disabled.  */
-[/#if]
 
 [#if FX_DISABLE_CACHE_value == "1"]
 #define FX_DISABLE_CACHE
@@ -548,13 +536,12 @@
 [/#if]
 
 [#if FX_EXFAT_MAX_CACHE_SIZE_value??]
-/* Define bitmap cache size for exFAT. Size should be minimum one sector size and maximum 4096. For applications using multiple media devices with varying sector size, the value should be set to the size of largest sector size.
-The FX_EXFAT_MAX_CACHE_SIZE is 2 power of FX_EXFAT_MAX_CACHE_SIZE_NB_BIT.  */
+/* Define bitmap cache size for exFAT. Size should be minimum one sector size and maximum 4096.
+   For applications using multiple media devices with varying sector size, the value should be set to the
+   size of largest sector size. */
 
 [#if FX_EXFAT_MAX_CACHE_SIZE_value == "512"]
-/*
-#define FX_EXFAT_MAX_CACHE_SIZE            512
-*/
+/* #define FX_EXFAT_MAX_CACHE_SIZE            512 */
 [#else]
 #define FX_EXFAT_MAX_CACHE_SIZE            ${FX_EXFAT_MAX_CACHE_SIZE_value}
 [/#if]
@@ -565,9 +552,7 @@ The FX_EXFAT_MAX_CACHE_SIZE is 2 power of FX_EXFAT_MAX_CACHE_SIZE_NB_BIT.  */
 	The FX_FAULT_TOLERANT_CACHE_SIZE is 2 power of FX_FAULT_TOLERANT_CACHE_SIZE_NB_SIZE.  */
 
 [#if FX_FAULT_TOLERANT_CACHE_SIZE_value == "1024"]
-/*
-#define FX_FAULT_TOLERANT_CACHE_SIZE            1024
-*/
+/* #define FX_FAULT_TOLERANT_CACHE_SIZE            1024 */
 [#else]
 #define FX_FAULT_TOLERANT_CACHE_SIZE            ${FX_FAULT_TOLERANT_CACHE_SIZE_value}
 [/#if]

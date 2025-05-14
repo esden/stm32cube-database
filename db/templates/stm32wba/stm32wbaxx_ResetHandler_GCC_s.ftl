@@ -24,9 +24,9 @@
   */
 
   .syntax unified
-	.cpu cortex-m33
-	.fpu softvfp
-	.thumb
+  .cpu cortex-m33
+  .fpu softvfp
+  .thumb
 
   .extern  SystemInit
   .extern  is_boot_from_standby
@@ -98,7 +98,7 @@ Reset_Handler:
 /* Call static constructors */
   bl __libc_init_array
 /* Call the application s entry point.*/
-  bl	main
+  bl main
 
 LoopForever:
   b LoopForever
@@ -107,13 +107,7 @@ LoopForever:
   .global CPUcontextSave
   .type CPUcontextSave, %function
 CPUcontextSave:
-        PUSH   { r4 - r7, lr }       /* store R4-R7 and LR (5 words) onto the stack */
-        MOV    R3, R8                /* mov thread {r8 - r12} to {r3 - r7} */
-        MOV    R4, R9
-        MOV    R5, R10
-        MOV    R6, R11
-        MOV    R7, R12
-        PUSH   {R3-R7}                 /* store R8-R12 (5 words) onto the stack */
+        PUSH   { R4 - R12, LR }        /* store R4 to R12 and LR (10 words) onto C stack */
         LDR    R4, =backup_MSP         /* load address of backup_MSP into R4 */
         MOV    R3, SP                  /* load the stack pointer into R3 */
         STR    R3, [R4]                /* store the MSP into backup_MSP */
@@ -125,16 +119,10 @@ CPUcontextRestore:
    * execute a context restore and end up where we left off with no
    * ill effects.  Normally at this point the core will either be
    * powered off or reset (depending on the deep sleep level). */
-        LDR    R4, =backup_MSP       /* load address of backup_MSP into R4 */
-        LDR    R4, [R4]              /* load the SP from backup_MSP */
-        MOV    SP, R4                /* restore the SP from R4 */
-        POP   {R3-R7}                /* load R8-R12 (5 words) from the stack */
-        MOV    R8, R3                /* mov {r3 - r7} to {r8 - r12} */
-        MOV    R9, R4
-        MOV    R10, R5
-        MOV    R11, R6
-        MOV    R12, R7
-        POP   { R4 - R7, PC }        /*load R4-R7 and PC (5 words) from the stack */
+        LDR    R4, =backup_MSP         /* load address of backup_MSP into R4 */
+        LDR    R4, [R4]                /* load the SP from backup_MSP */
+        MOV    SP, R4                  /* restore the SP from R4 */
+        POP    { R4 - R12, PC }        /* load R4 to R12 and PC (10 words) from C stack */ 
 
 backup_system_register:
 /* R0 -> register_backup_table array current item address */

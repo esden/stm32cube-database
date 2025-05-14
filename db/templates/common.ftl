@@ -84,7 +84,7 @@
                                         [#assign argValue=argument.value]
                                     [/#if][#-- if global --]
                                     [#if argument.genericType=="Array" && argument.context!="globalConst" && argument.context!="globalInit"][#-- if genericType=Array --]
-                                    [#assign valList = argument.value?split(argument.arraySeparator)]     
+                                    [#assign valList = argument.value?split(argument.arraySeparator)]
                                             [#assign i = 0]                                  
                                         [#list valList as val] 
                                             #t${argument.name}[${i}] = ${val};
@@ -483,7 +483,7 @@
 [#else] [#assign methodList = config.libMethod]
 [/#if]
 
-[#if (config.ipName?contains("flash") || config.ipName?contains("Flash")) && isHALUsed?? && UserConfigCondition?? ]
+[#if (config.ipName?contains("flash") || config.ipName?contains("Flash") || config.ipName?contains("FLASH")) && isHALUsed?? && UserConfigCondition?? ]
     [#list UserConfigCondition as ARG]
         #tHAL_FLASHEx_OBGetConfig(&pOBInit);
         #tif (${ARG}) #n#t{
@@ -585,7 +585,7 @@
                                     [/#if]                                   
                                     [#-- Bz40086 End tweak of the value in case of ADC --]
                                     [#if argument.genericType=="Array" && argument.context!="globalConst" && argument.context!="globalInit"][#-- if genericType=Array --]
-                                    [#assign valList = argument.value?split(argument.arraySeparator)]     
+                                    [#assign valList = argument.value?split(argument.arraySeparator)]
                                             [#assign i = 0]                                  
                                         [#list valList as val]
                                             [#if argument.base == "10"]
@@ -595,17 +595,24 @@
                                             [/#if]
                                             [#assign i = i+1]
                                         [/#list]
-                                        [#assign argValue="&"+argument.name]                                    
+                                        [#assign argValue="&"+argument.name]
                                     [/#if] [#-- if genericType=Array --]
                                     [#if argument.genericType=="Array" && (argument.context=="globalConst" || argument.context=="globalInit")][#-- if genericType=Array and gloabl--]                                        
-                                        [#assign argValue="("+argument.typeName +" *)"+argument.name]
+                                       [#if (argument.variableName)?contains("MCE") && !(argument.variableName)?contains("Nonce")]
+                                           [#assign argValue="("+argument.typeName +" *)"+argument.variableName]
+                                       [#elseif (argument.variableName)?contains("MCE") && (argument.variableName)?contains("Nonce")]
+                                            #t${fargument.name}.${argument.name}[0]= ${argument.variableName}[0];
+                                            #t${fargument.name}.${argument.name}[1]= ${argument.variableName}[1];
+                                       [#else]
+                                           [#assign argValue="("+argument.typeName +" *)"+argument.name]
+                                       [/#if]
                                     [/#if]
                                     [#if argument.value!="" && argument.value!="N/A"]
                                     [#if instanceIndex??&&fargument.context=="global" && fargument.optional!="output"][#assign varName=fargument.name + link +instanceIndex][#else][#assign varName=fargument.name][/#if]
                                         [#assign indicator = varName+link+argument.name+" = "+argValue+" "]
                                         [#assign indicatorName = varName+link+argument.name]
                                         [#if !listofDeclaration?contains(indicator)][#-- if not repeted --]
-                                            [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global" && fargument.optional!="output"][#assign varName=fargument.name +link +instanceIndex]${fargument.name}${instanceIndex}[#else][#assign varName=fargument.name]${fargument.name}[/#if]${link}${argument.name} = ${argValue};
+                                           [#if !(argument.variableName)?contains("Nonce") && ( FamilyName !="STM32N6" || (FamilyName=="STM32N6" &&  (Secure=="true" || (Secure=="false" && argument.name != "SrcSecure"&& argument.name != "DestSecure"))))] [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global" && fargument.optional!="output"][#assign varName=fargument.name +link +instanceIndex]${fargument.name}${instanceIndex}[#else][#assign varName=fargument.name]${fargument.name}[/#if]${link}${argument.name} = ${argValue};[/#if]
                                             [#assign listofDeclaration = listofDeclaration?replace(indicatorName+" =","")]
                                             [#assign listofDeclaration = listofDeclaration +", "+ varName+link+argument.name+" = "+argValue+" "]                                                                                 
                                         [/#if]
@@ -692,10 +699,10 @@
                                 [#if argument2.mandatory]
                                     [#if argument2.value??]
                                     [#if instanceIndex??&&fargument.context=="global"][#assign argValue=argument2.value?replace("$Index",instanceIndex)][#else][#assign argValue=argument2.value][/#if]
-                                    [#if argument2.genericType=="Array"][#-- if genericType=Array --] 
-                                        [#assign valList = argument2.value?split(":")]     
-                                            [#assign i = 0]                                  
-                                        [#list valList as val] 
+                                    [#if argument2.genericType=="Array"][#-- if genericType=Array --]
+                                        [#assign valList = argument2.value?split(":")]
+                                            [#assign i = 0]
+                                        [#list valList as val]
                                             [#if argument2.typeName == "10"]
                                                 #t${argument2.name}[${i}] = ${val};
                                             [#else]
@@ -704,7 +711,18 @@
                                         [/#list]
                                         [#assign argValue="&"+argument2.name+"[0]"]
                                     [/#if] [#-- if genericType=Array --]
-                                    [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if]${link}${argument.name}.${argument2.name} = ${argValue};
+                                    [#if FamilyName == "STM32N6" && (argument2.name == "TxDesc[ch]" || argument2.name == "RxDesc[ch]")]
+                                        [#if argument2.name == "TxDesc[ch]"]
+                                            [#if nTab==2]#t#t[#else]#t[/#if]for (int ch = 0; ch < ETH_DMA_CH_CNT; ch++)
+                                            [#if nTab==2]#t#t[#else]#t[/#if]{
+                                        [/#if]
+                                        [#if nTab==2]#t#t#t#t[#else]#t#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if]${link}${argument.name}.${argument2.name} = ${argValue};
+                                        [#if argument2.name == "RxDesc[ch]" && FamilyName == "STM32N6"]
+                                            [#if nTab==2]#t#t[#else]#t[/#if]}
+                                        [/#if]
+                                    [#else]
+                                        [#if nTab==2]#t#t[#else]#t[/#if][#if instanceIndex??&&fargument.context=="global"]${fargument.name}${instanceIndex}[#else]${fargument.name}[/#if]${link}${argument.name}.${argument2.name} = ${argValue};
+                                    [/#if]
                                     [/#if]
                                [#else] [#-- !argument.mandatory --]
                                     [#if argument2.status=="KO"]
@@ -987,7 +1005,6 @@
                 [#assign listofCalledMethod = listofCalledMethod + ", "+ methodName]
                 [/#if]
             [#if bz36245]
-
              }
 
                [/#if]

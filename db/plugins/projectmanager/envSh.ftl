@@ -26,6 +26,10 @@ else
     stm32programmercli="${STM32CubeProgrammerPath}"
     stm32tpccli="${tpcPath}"
 fi
+[#if isAppliOnly??]
+# Select device type (H7S or H7R)
+device_type="${H7S_H7R}"
+[/#if]
 # ==============================================================================
 #               !!!! DOT NOT EDIT --- UPDATED AUTOMATICALLY !!!!
 # ==============================================================================
@@ -101,7 +105,8 @@ stirot_iloader_boot_path_project=${CubeFwPath}\Projects\STM32H7S78-DK\Applicatio
 oemirot_appli_assembly_sign=${appli_assembly_sign}
 	[/#if]
 [/#if]
-oemirot_boot_path_project=$projectdir"/../"
+set oemirot_boot_path_project="${oemirot_boot_path_project}"
+set oemirot_boot=${oemirot_boot}
 rot_provisioning_path=$projectdir"/../"
 	[#if appli_assembly??]
 # ==============================================================================

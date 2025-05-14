@@ -6,7 +6,7 @@
   * @author  MCD Application Team
   * @brief   Configuration Header for crc_ctrl.c module
   ******************************************************************************
- [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
+[@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
   */
 /* USER CODE END Header */

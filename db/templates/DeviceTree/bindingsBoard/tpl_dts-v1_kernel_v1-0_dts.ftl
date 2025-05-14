@@ -48,7 +48,11 @@
 [/#if]
 [#if (mx_socDtRPN == "stm32mp15")||mx_socDtRPN?starts_with("stm32mp2")]
 	[#if mx_socPtCPN?has_content]
+		[#if mx_socPtCPN?starts_with("stm32mp23")]
+#include "${"stm32mp25" + "xx" + mx_socPtCPN?substring(11)}-pinctrl.dtsi"
+		[#else]
 #include "${mx_socPtCPN?substring(0,9) + "xx" + mx_socPtCPN?substring(11)}-pinctrl.dtsi"
+		[/#if]
 	[#else]
 		[@mlog  logMod=module logType="ERR" logMsg="unknown SOC pinCtrl package dtsi" varsMap={} /]
 /*#include "???-pinctrl.dtsi"*/

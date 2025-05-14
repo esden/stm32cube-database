@@ -228,11 +228,11 @@
         <Condition Diagnostic="" Expression="Sequencer=FULLY_CONFIGURABLE"/>
         <Description>Number of regular channels to be converted</Description>
     </RefParameter>
-    <RefParameter Comment="Number Of Conversion" DefaultValue="0" Group="ADCgroup"  Name="NbrOfConversion" Type="list" Visible="false">
-        <!--Condition Diagnostic="" Expression="Sequencer=NOT_FULLY_CONFIGURABLE"/-->
+    <RefParameter Comment="Number Of Conversion" DefaultValue="1" Group="ADCgroup"  Name="NbrOfConversion" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="Sequencer=NOT_FULLY_CONFIGURABLE"/>
         <Description>Number of regular channels to be converted</Description>
     </RefParameter>
-    
+
         
     <!-- AutoOff -->
     <RefParameter Comment="Auto Off" DefaultValue="DISABLE" Name="LowPowerAutoPowerOff" Type="list"><!-- aligned with HAL v1.2.0-->
@@ -290,6 +290,7 @@
         <PossibleValue Comment="Sequencer set to not fully configurable" Value="NOT_FULLY_CONFIGURABLE" Semaphore="$IpInstance_NOTCONFIGURABLE"/>
         <Description></Description> 
     </RefParameter>
+
     <!-- RefMode of ADC_Regular_ConversionMode -->
     <RefMode Abstract="true" Comment="Regular Conversion Settings" Group="ADC_Regular_ConversionMode" Name="ADC_Regular_ConversionMode">
         <!--  <Parameter Name="SamplingTime"/> -->
@@ -1948,7 +1949,20 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
     </RefParameter>
      <RefParameter Comment="" DefaultValue="null" Group="Analog WatchDog 3" Name="WDG3CONV1Channel21" Type="list" Visible="false">
       </RefParameter>    
-    
+        <RefParameter Comment="Offset Number" DefaultValue="ADC_OFFSET_NONE" Group="ADCgroup" Name="OffsetNumber" Type="list">
+        <Condition Diagnostic="" Expression="Regular_OversamplingMode_Enabled_$IpInstance | Injected_OversamplingMode_Enabled_$IpInstance"/>
+        <PossibleValue Comment="No offset" Value="ADC_OFFSET_NONE"/>
+     
+        <Description>Regular Channel x offset number selection</Description>
+    </RefParameter>
+    <RefParameter Comment="Offset Number" DefaultValue="ADC_OFFSET_NONE" Group="ADCgroup" Name="OffsetNumber" Type="list">
+        <PossibleValue Comment="No offset" Value="ADC_OFFSET_NONE"/>
+        <PossibleValue Comment="1 offset" Value="ADC_OFFSET_1"/>
+        <PossibleValue Comment="2 offsets" Value="ADC_OFFSET_2"/>
+        <PossibleValue Comment="3 offsets" Value="ADC_OFFSET_3"/>
+        <PossibleValue Comment="4 offsets" Value="ADC_OFFSET_4"/>
+        <Description>Regular Channel x offset number selection</Description>
+    </RefParameter>
     
     <RefMode BaseMode="ADC_Regular_ConversionMode" Comment="Regular Channel Settings" Group="ADC_Regular_ConversionMode" Name="ChannelRegularConversion">
         <ConfigForMode>ADC_RegularChannelRankConfig</ConfigForMode>
@@ -1956,6 +1970,9 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         <Parameter Name="Rank"/>
         <Parameter Name="Channel"/>
         <Parameter Name="SamplingTime"/>
+		<Parameter Name="SamplingTime"/>
+        <Parameter Name="OffsetNumber"/>
+        <Parameter Name="MonitoredBy"/>
         <Parameter Name="RegHighThreshold"/>
         <Parameter Name="RegLowThreshold"/>	
         <Parameter Name="RegITMode"/>
@@ -1990,7 +2007,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         <Parameter Name="EnableAnalogWatchDog1"/>
         <Parameter Name="AWD1WatchdogNumber"/>
         <Parameter Name="WatchdogMode"/>
-        <Parameter Name="WatchdogChannel"/>
+        <Parameter Name="AWatchdogChannel"/>
         <Parameter Name="AWD1HighThreshold"/>
         <Parameter Name="AWD1LowThreshold"/>
         <Parameter Name="AWD1ITMode"/>
@@ -2100,13 +2117,13 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
     </RefParameter>
 
     <!-- Possible value of WatchdogChannel parameter -->
-    <RefParameter Comment="Analog WatchDog Channel" DefaultValue="null" Group="ADCChannel" Name="WatchdogChannel" Type="list" Visible="false">
+    <RefParameter Comment="Analog WatchDog Channel" DefaultValue="null" Group="ADCChannel" Name="AWatchdogChannel" Type="list" Visible="false">
         <Condition Diagnostic="" Expression="EnableAnalogWatchDog1=false"/>
     </RefParameter>
-    <RefParameter Comment="Analog WatchDog Channel" DefaultValue="null" Group="ADCChannel" Name="WatchdogChannel" Type="list" Visible="false">
+    <RefParameter Comment="Analog WatchDog Channel" DefaultValue="null" Group="ADCChannel" Name="AWatchdogChannel" Type="list" Visible="false">
         <Condition Diagnostic="" Expression="AllRegular"/>
     </RefParameter>
-    <RefParameter Comment="Analog WatchDog Channel" DefaultValue="" Group="ADCChannel" Name="WatchdogChannel" Type="list">
+    <RefParameter Comment="Analog WatchDog Channel" DefaultValue="" Group="ADCChannel" Name="AWatchdogChannel" Type="list">
         <PossibleValue Comment="Channel 0" Value="ADC_CHANNEL_0"  Condition="!SHANNEL0ISSELECTED" Diagnostic=" " Action="Disable" />
         <PossibleValue Comment="Channel 1" Value="ADC_CHANNEL_1"  Condition="!SHANNEL1ISSELECTED" Diagnostic="" Action="Disable"  />
         <PossibleValue Comment="Channel 2" Value="ADC_CHANNEL_2" Condition="!SHANNEL2ISSELECTED" Diagnostic="" Action="Disable" />
@@ -2126,15 +2143,15 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         <PossibleValue Comment="Channel 16" Value="ADC_CHANNEL_16" Condition="!SHANNEL16ISSELECTED" Diagnostic="" Action="Disable" />
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="" Action="Disable" />
-        <PossibleValue Comment="Channel 19" Value="ADC_CHANNEL_19"/>
-        <PossibleValue Comment="Channel 20" Value="ADC_CHANNEL_20"/>
-        <PossibleValue Comment="Channel 21" Value="ADC_CHANNEL_21"/>
-        <PossibleValue Comment="Channel 22" Value="ADC_CHANNEL_22"/>
-        <PossibleValue Comment="Channel Temperature sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
-        <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT"/>
+        <PossibleValue Comment="Channel 19" Value="ADC_CHANNEL_19" Condition="!SHANNEL19ISSELECTED" Diagnostic="" Action="Disable" />
+        <PossibleValue Comment="Channel 20" Value="ADC_CHANNEL_20"  Condition="!SHANNEL20ISSELECTED" Diagnostic="" Action="Disable" />
+        <PossibleValue Comment="Channel 21" Value="ADC_CHANNEL_21"  Condition="!SHANNEL21ISSELECTED" Diagnostic="" Action="Disable" />
+        <PossibleValue Comment="Channel 22" Value="ADC_CHANNEL_22"  Condition="!SHANNEL22ISSELECTED" Diagnostic="" Action="Disable" />
+        <PossibleValue Comment="Channel Temperature sensor" Value="ADC_CHANNEL_TEMPSENSOR"  Condition="!SHANNEL18ISSELECTED" Diagnostic="" Action="Disable" />
+        <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNEL18ISSELECTED" Diagnostic="" Action="Disable" />
 
-        <PossibleValue Comment="Channel Vdda" Value="ADC_CHANNEL_VDDA"/>
-        <PossibleValue Comment="Channel Vssa" Value="ADC_CHANNEL_VSSA"/>
+        <PossibleValue Comment="Channel Vdda" Value="ADC_CHANNEL_VDDA"  Condition="!SHANNEL18ISSELECTED" Diagnostic="" Action="Disable" />
+        <PossibleValue Comment="Channel Vssa" Value="ADC_CHANNEL_VSSA"  Condition="!SHANNEL18ISSELECTED" Diagnostic="" Action="Disable" />
      
         <Description>ADC channel for the analog watchdog</Description> 
     </RefParameter>
@@ -2589,17 +2606,16 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         <PossibleValue Comment="Channel 16" Value="ADC_CHANNEL_16" Condition="!SHANNEL16ISSELECTED" Diagnostic="" Action="Disable" />
         <PossibleValue Comment="Channel 17" Value="ADC_CHANNEL_17" Condition="!SHANNEL17ISSELECTED" Diagnostic="" Action="Disable" />
         <PossibleValue Comment="Channel 18" Value="ADC_CHANNEL_18" Condition="!SHANNEL18ISSELECTED" Diagnostic="" Action="Disable" />
-        <PossibleValue Comment="Channel Temperature sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNEL19ISSELECTED" Diagnostic="" Action="Disable" />
+        <PossibleValue Comment="Channel Temperature sensor" Value="ADC_CHANNEL_TEMPSENSOR" Condition="!SHANNELTSISSELECTED" Diagnostic="" Action="Disable" />
         <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNEL20ISSELECTED" Diagnostic="" Action="Disable" />
-        <PossibleValue Comment="Channel 19" Value="ADC_CHANNEL_19"/>
-        <PossibleValue Comment="Channel 20" Value="ADC_CHANNEL_20"/>
-        <PossibleValue Comment="Channel 21" Value="ADC_CHANNEL_21"/>
-        <PossibleValue Comment="Channel 22" Value="ADC_CHANNEL_22"/>
-        <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT"/>
-        <PossibleValue Comment="Channel Vdda" Value="ADC_CHANNEL_VDDA"/>
-        <PossibleValue Comment="Channel Vssa" Value="ADC_CHANNEL_VSSA"/>
-        <PossibleValue Comment="Channel Temperature Sensor" Value="ADC_CHANNEL_TEMPSENSOR"/>
-        <Description>ADC channel for the analog watchdog</Description> 
+        <PossibleValue Comment="Channel 19" Value="ADC_CHANNEL_19" Condition="!SHANNEL19ISSELECTED" Diagnostic="" Action="Disable" />
+        <PossibleValue Comment="Channel 20" Value="ADC_CHANNEL_20" Condition="!SHANNEL20ISSELECTED" Diagnostic="" Action="Disable" />
+        <PossibleValue Comment="Channel 21" Value="ADC_CHANNEL_21" Condition="!SHANNEL21ISSELECTED" Diagnostic="" Action="Disable" />
+        <PossibleValue Comment="Channel 22" Value="ADC_CHANNEL_22" Condition="!SHANNEL22ISSELECTED" Diagnostic="" Action="Disable" />
+        <PossibleValue Comment="Channel Vrefint" Value="ADC_CHANNEL_VREFINT" Condition="!SHANNELVREFISSELECTED" Diagnostic="" Action="Disable" />
+        <PossibleValue Comment="Channel Vdda" Value="ADC_CHANNEL_VDDA" Condition="!SHANNELVDDAISSELECTED" Diagnostic="" Action="Disable" />
+        <PossibleValue Comment="Channel Vssa" Value="ADC_CHANNEL_VSSA" Condition="!SHANNELVSSAISSELECTED" Diagnostic="" Action="Disable" />
+        <Description>ADC channel for the analog watchdog</Description>
     </RefParameter>
     
     <!-- ChannelForWatchDog used to specify witch channel list to be available for analog watch dog mode-->
@@ -2806,7 +2822,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
                     <SignalLogicalOp Name="AND">
                         <Signal Name="IN0"/>
                     </SignalLogicalOp>
-
+                    <Condition Diagnostic="Channel0 is already used" Expression="!IN0Used_$IpInstance"/>
                 </Mode>
 
             </ModeLogicOperator>
@@ -2820,7 +2836,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
                     <SignalLogicalOp Name="AND">
                         <Signal Name="IN1"/>
                     </SignalLogicalOp>
-
+                    <Condition Diagnostic="Channel1 is already used" Expression="!IN1Used_$IpInstance"/>
                 </Mode>
             </ModeLogicOperator>
             <Semaphore>channelSelected</Semaphore>
@@ -2837,7 +2853,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
             </ModeLogicOperator>
             <Semaphore>channelSelected</Semaphore>
             <Semaphore>SHANNEL2ISSELECTED</Semaphore>
-
+            <Condition Diagnostic="Channel2 is already used" Expression="!IN2Used_$IpInstance"/>
         </Mode>
         <Mode Name="IN3">
             <ModeLogicOperator Name="OR">
@@ -2849,7 +2865,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
             </ModeLogicOperator>
             <Semaphore>channelSelected</Semaphore>
             <Semaphore>SHANNEL3ISSELECTED</Semaphore>
-
+            <Condition Diagnostic="Channel3 is already used" Expression="!IN3Used_$IpInstance"/>
         </Mode>
         <Mode Name="IN4">
             <ModeLogicOperator Name="OR">
@@ -2861,7 +2877,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
             </ModeLogicOperator>
             <Semaphore>channelSelected</Semaphore>
             <Semaphore>SHANNEL4ISSELECTED</Semaphore>
-
+            <Condition Diagnostic="Channel4 is already used" Expression="!IN4Used_$IpInstance"/>
         </Mode>
         <Mode Name="IN5">
             <ModeLogicOperator Name="OR">
@@ -2873,7 +2889,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
             </ModeLogicOperator>
             <Semaphore>channelSelected</Semaphore>
             <Semaphore>SHANNEL5ISSELECTED</Semaphore>
-
+            <Condition Diagnostic="Channel5 is already used" Expression="!IN5Used_$IpInstance"/>
         </Mode>
         <Mode Name="IN6">
             <ModeLogicOperator Name="OR">
@@ -2885,7 +2901,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
             </ModeLogicOperator>
             <Semaphore>channelSelected</Semaphore>
             <Semaphore>SHANNEL6ISSELECTED</Semaphore>
-
+            <Condition Diagnostic="Channel6 is already used" Expression="!IN6Used_$IpInstance"/>
         </Mode>
         <Mode Name="IN7">
             <ModeLogicOperator Name="OR">
@@ -2897,7 +2913,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
             </ModeLogicOperator>
             <Semaphore>channelSelected</Semaphore>
             <Semaphore>SHANNEL7ISSELECTED</Semaphore>
-
+            <Condition Diagnostic="Channel7 is already used" Expression="!IN7Used_$IpInstance"/>
         </Mode>
         <Mode Name="IN-TempSens" UserName="Temperature Sensor Channel">
             <ModeLogicOperator Name="XOR">
@@ -2910,7 +2926,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
             </ModeLogicOperator>
             <Semaphore>channelSelected</Semaphore>
             <Semaphore>SHANNELTSISSELECTED</Semaphore>
-
+            <Condition Diagnostic="Channeltemp is already used" Expression="!INtempUsed_$IpInstance"/>
         </Mode>
         <Mode Name="IN-Vrefint" UserName="Vrefint Channel">
             <ModeLogicOperator Name="XOR">
@@ -2918,7 +2934,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
                     <SignalLogicalOp Name="AND">
                         <Signal Name="Vref_Input"/>
                     </SignalLogicalOp>
-                    
+
                     <Semaphore>VrefTSelected$IpInstance</Semaphore>
                     <Semaphore>SHANNELVREFISSELECTED</Semaphore>
 
@@ -2937,7 +2953,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
             </ModeLogicOperator>
             <Semaphore>channelSelected</Semaphore>
             <Semaphore>SHANNEL8ISSELECTED</Semaphore>
-
+            <Condition Diagnostic="Channel8 is already used" Expression="!IN8Used_$IpInstance"/>
         </Mode>
         <Mode Name="IN9">
             <ModeLogicOperator Name="OR">
@@ -2949,7 +2965,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
             </ModeLogicOperator>
             <Semaphore>channelSelected</Semaphore>
             <Semaphore>SHANNEL9ISSELECTED</Semaphore>
-
+            <Condition Diagnostic="Channel9 is already used" Expression="!IN9Used_$IpInstance"/>
         </Mode>
         <Mode Name="IN10">
             <ModeLogicOperator Name="OR">
@@ -2961,7 +2977,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
             </ModeLogicOperator>
             <Semaphore>channelSelected</Semaphore>
             <Semaphore>SHANNEL10ISSELECTED</Semaphore>
-
+            <Condition Diagnostic="Channel10 is already used" Expression="!IN10Used_$IpInstance"/>
         </Mode>
         <Mode Name="IN11">
             <ModeLogicOperator Name="OR">
@@ -2973,7 +2989,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
             </ModeLogicOperator>
             <Semaphore>channelSelected</Semaphore>
             <Semaphore>SHANNEL11ISSELECTED</Semaphore>
-
+            <Condition Diagnostic="Channel11 is already used" Expression="!IN11Used_$IpInstance"/>
         </Mode>
         <Mode Name="IN12">
             <ModeLogicOperator Name="OR">
@@ -2985,7 +3001,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
             </ModeLogicOperator>
             <Semaphore>channelSelected</Semaphore>
             <Semaphore>SHANNEL12ISSELECTED</Semaphore>
-
+            <Condition Diagnostic="Channel12 is already used" Expression="!IN12Used_$IpInstance"/>
         </Mode>
         <Mode Name="IN13">
             <ModeLogicOperator Name="OR">
@@ -2997,7 +3013,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
             </ModeLogicOperator>
             <Semaphore>channelSelected</Semaphore>
             <Semaphore>SHANNEL13ISSELECTED</Semaphore>
-
+            <Condition Diagnostic="Channel13 is already used" Expression="!IN13Used_$IpInstance"/>
         </Mode>
         <Mode Name="IN14"> 
             <ModeLogicOperator Name="OR">
@@ -3009,7 +3025,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
             </ModeLogicOperator>
             <Semaphore>channelSelected</Semaphore>
              <Semaphore>SHANNEL14ISSELECTED</Semaphore>
-
+            <Condition Diagnostic="Channel14 is already used" Expression="!IN14Used_$IpInstance"/>
         </Mode>
         <Mode Name="IN-VDDA" UserName="VDDA Channel" RemoveCondition="(!STM32C0)">
             <ModeLogicOperator Name="XOR">
@@ -3019,10 +3035,11 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
                     </SignalLogicalOp>
                     
                     <Semaphore></Semaphore>
-
+                    <Condition Diagnostic="Channelvdda is already used" Expression="!INVddaUsed_$IpInstance"/>
                 </Mode>
             </ModeLogicOperator>
             <Semaphore>channelSelected</Semaphore>
+            <Semaphore>SHANNELVDDAISSELECTED</Semaphore>
         </Mode>
         <Mode Name="IN-VSSA" UserName="VSSA Channel" RemoveCondition="(!STM32C0)">
             <ModeLogicOperator Name="XOR">
@@ -3032,10 +3049,11 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
                     </SignalLogicalOp>
                     
                     <Semaphore></Semaphore>
-
+                    <Condition Diagnostic="Channelvssa is already used" Expression="!INVssaUsed_$IpInstance"/>
                 </Mode>
             </ModeLogicOperator>
             <Semaphore>channelSelected</Semaphore>
+            <Semaphore>SHANNELVSSAISSELECTED</Semaphore>
         </Mode>
         <Mode Name="IN15" >
             <ModeLogicOperator Name="OR">
@@ -3048,7 +3066,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
             <Condition Diagnostic="Available if sequencer set to not fully configurable in parameter settings tabs" Expression="$IpInstance_NOTCONFIGURABLE"/>
             <Semaphore>channelSelected</Semaphore>
           <Semaphore>SHANNEL15ISSELECTED</Semaphore>
-
+            <Condition Diagnostic="Channel15 is already used" Expression="!IN15Used_$IpInstance"/>
 
         </Mode>
         <Mode Name="IN16">
@@ -3063,7 +3081,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
 
             <Semaphore>channelSelected</Semaphore>
             <Semaphore>SHANNEL16ISSELECTED</Semaphore>
-
+            <Condition Diagnostic="Channel16 is already used" Expression="!IN16Used_$IpInstance"/>
         </Mode>
         <Mode Name="IN17">
             <ModeLogicOperator Name="OR">
@@ -3077,7 +3095,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
 
             <Semaphore>channelSelected</Semaphore>
             <Semaphore>SHANNEL17ISSELECTED</Semaphore>
-
+            <Condition Diagnostic="Channel17 is already used" Expression="!IN17Used_$IpInstance"/>
         </Mode>
         <Mode Name="IN18">
             <ModeLogicOperator Name="OR">
@@ -3090,7 +3108,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
              <Condition Diagnostic="Available if sequencer set to not fully configurable in parameter settings tabs" Expression="$IpInstance_NOTCONFIGURABLE"/>
             <Semaphore>channelSelected</Semaphore>
             <Semaphore>SHANNEL18ISSELECTED</Semaphore>
-
+            <Condition Diagnostic="Channel18 is already used" Expression="!IN18Used_$IpInstance"/>
         </Mode>
         <Mode Name="IN19">
             <ModeLogicOperator Name="OR">
@@ -3115,8 +3133,9 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
                 </Mode>
             </ModeLogicOperator>
             <Condition Diagnostic="Available if sequencer set to not fully configurable in parameter settings tabs" Expression="$IpInstance_NOTCONFIGURABLE"/>
-
+            <Condition Diagnostic="Channel20 is already used" Expression="!IN20Used_$IpInstance"/>
             <Semaphore>channelSelected</Semaphore>
+            <Semaphore>SHANNEL20ISSELECTED</Semaphore>
         </Mode>
         <Mode Name="IN21">
             <ModeLogicOperator Name="OR">
@@ -3127,9 +3146,9 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
                 </Mode>
             </ModeLogicOperator>
             <Condition Diagnostic="Available if sequencer set to not fully configurable in parameter settings tabs" Expression="$IpInstance_NOTCONFIGURABLE"/>
-
+            <Condition Diagnostic="Channel21 is already used" Expression="!IN21Used_$IpInstance"/>
             <Semaphore>channelSelected</Semaphore>
-             <Semaphore>SHANNEL20ISSELECTED</Semaphore>
+             <Semaphore>SHANNEL21ISSELECTED</Semaphore>
 
         </Mode>
         <Mode Name="IN22">
@@ -3141,8 +3160,9 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
                 </Mode>
             </ModeLogicOperator>
             <Condition Diagnostic="Available if sequencer set to not fully configurable in parameter settings tabs" Expression="$IpInstance_NOTCONFIGURABLE"/>
-
+            <Condition Diagnostic="Channel22 is already used" Expression="!IN22Used_$IpInstance"/>
             <Semaphore>channelSelected</Semaphore>
+            <Semaphore>SHANNEL22ISSELECTED</Semaphore>
         </Mode>
         
         <!-- Internal channels -->
@@ -3152,7 +3172,7 @@ Sem_WDG3_22channel|Sem_WDG3_23channel|Sem_WDG3_24channel|Sem_WDG3_25channel|Sem_
         
         
         <!-- Trigger -->
-        <Mode Name="External-Trigger-for-Regular-conversion" UserName="Regular EXTI Conversion Trigger" RemoveCondition="(STM32C0)">
+        <Mode Name="External-Trigger-for-Regular-conversion" UserName="Regular EXTI Conversion Trigger">
             <ModeLogicOperator Name="OR">
                 <Mode Name="External-Trigger-for-Regular-conversion" UserName="Regular Conversion Trigger">
                     <SignalLogicalOp Name="AND">

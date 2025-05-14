@@ -1,0 +1,567 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" DBVersion="V4.0" Name="RCC" Version="STM32Cube_FW_N6_V0.1.0" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu file:///C:/Dev_Build8/MicroXplorer/doc/V4/Development/Specifications/db/IP_Configs.xsd">
+              
+    <RefConfig Comment="Configure LSE Drive Capability" Name="RCC_LSEDRIVE_CONFIG">  
+        <IFCondition Expression="LSEOscillator &amp; (LSEUsed=1)">
+            <CallLibMethod Name="HAL_PWR_EnableBkUpAccess" ReturnHAL="false"/>                  
+        </IFCondition>     
+        <IFCondition Expression="1=1">
+            <CallLibMethod Name="__HAL_RCC_LSEDRIVE_CONFIG" ReturnHAL="false">
+				<MethodArg Name="__RCC_LSEDRIVE__" ParameterName="LSE_Drive_Capability"/>
+            </CallLibMethod>
+		</IFCondition>			
+    </RefConfig>
+
+    <RefConfig Name="RCC_MCO1Config">
+        <CallLibMethod Name="HAL_RCC_MCOConfig" ReturnHAL="false">
+            <MethodArg Name="RCC_MCOx" ParameterName="RCC_MCO1"/>
+            <MethodArg Name="RCC_MCOSource" ParameterName="RCC_MCO1Source"/>
+            <MethodArg Name="RCC_MCODiv" ParameterName="RCC_MCODiv1"/>
+        </CallLibMethod>
+    </RefConfig>
+    <RefConfig Name="RCC_MCO2Config">
+        <CallLibMethod Name="HAL_RCC_MCOConfig" ReturnHAL="false">
+            <MethodArg Name="RCC_MCOSource" ParameterName="RCC_MCO2Source"/>
+            <MethodArg Name="RCC_MCOx" ParameterName="RCC_MCO2"/>
+            <MethodArg Name="RCC_MCODiv" ParameterName="RCC_MCODiv2"/>
+        </CallLibMethod>
+    </RefConfig>
+
+    <RefConfig Comment="" Name="RCC_HSIEnable">
+		<CallLibMethod Name="" Type="HardCode">
+            <HardCode Text="#n#t/* Enable HSI */"/>
+        </CallLibMethod>
+		<CallLibMethod Name="" Type="HardCode">
+            <HardCode Text="#tRCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;#n#tRCC_OscInitStruct.HSIState = RCC_HSI_ON;#n#tRCC_OscInitStruct.HSIDiv = RCC_HSI_DIV1;#n#tRCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;#n#tRCC_OscInitStruct.PLL1.PLLState = RCC_PLL_NONE;#n#tRCC_OscInitStruct.PLL2.PLLState = RCC_PLL_NONE;#n#tRCC_OscInitStruct.PLL3.PLLState = RCC_PLL_NONE;#n#tRCC_OscInitStruct.PLL4.PLLState = RCC_PLL_NONE;"/>
+        </CallLibMethod>
+		<CallLibMethod Name="" Type="HardCode">
+            <HardCode Text="#tif (HAL_RCC_OscConfig(&amp;RCC_OscInitStruct) != HAL_OK)#n#t{#n#t#tError_Handler();#n#t}"/>
+        </CallLibMethod>
+    </RefConfig>
+	
+    <RefConfig Comment="Get current CPU/System buses clocks configuration and if necessary switch #n to intermediate HSI clock to ensure target clock can be set" Name="RCC_GetClockConfig">
+		<CallLibMethod Name="" Type="HardCode">
+            <HardCode Text="#tHAL_RCC_GetClockConfig(&amp;RCC_ClkInitStruct);"/>
+        </CallLibMethod>
+		<CallLibMethod Name="" Type="HardCode">
+            <HardCode Text="#tif ((RCC_ClkInitStruct.CPUCLKSource == RCC_CPUCLKSOURCE_IC1) ||#n#t#t (RCC_ClkInitStruct.SYSCLKSource == RCC_SYSCLKSOURCE_IC2_IC6_IC11))#n#t{#n#t#tRCC_ClkInitStruct.ClockType = (RCC_CLOCKTYPE_CPUCLK | RCC_CLOCKTYPE_SYSCLK);#n#t#tRCC_ClkInitStruct.CPUCLKSource = RCC_CPUCLKSOURCE_HSI;#n#t#tRCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;"/>
+        </CallLibMethod>
+		<CallLibMethod Name="" Type="HardCode">
+            <HardCode Text="#t#tif (HAL_RCC_ClockConfig(&amp;RCC_ClkInitStruct) != HAL_OK)#n#t#t{#n#t#t#t/* Initialization Error */#n#t#t#tError_Handler();#n#t#t}"/>
+        </CallLibMethod>
+		<CallLibMethod Name="" Type="HardCode">
+            <HardCode Text="#t}"/>
+        </CallLibMethod>
+    </RefConfig>
+
+	<RefConfig Comment="Configure the System Power Supply" Name="RCC_MODIFY_REG">
+        <CallLibMethod Name="HAL_PWREx_ConfigSupply">
+            <MethodArg Name="SupplySource" ParameterName="SupplySource"/>
+        </CallLibMethod>
+    </RefConfig>
+
+    <RefConfig Comment="Enables the Clock Security System" Name="RCC_CSS_Enable">
+        <CallLibMethod Name="HAL_RCC_EnableCSS" ReturnHAL="false"/>
+    </RefConfig>
+    <RefConfig Comment="Enables the Clock Security System" Name="RCC_CSS_EnableLSE">
+        <CallLibMethod Name="HAL_RCCEx_EnableLSECSS" ReturnHAL="false"/>
+    </RefConfig>
+    <RefConfig Comment="Initializes the RCC Oscillators according to the specified parameters#n#t*  in the RCC_OscInitTypeDef structure." Name="RCC_OSCConfig">
+        <CallLibMethod Name="HAL_RCC_OscConfig">
+            <MethodArg Name="HSEState" ParameterName="HSEStateARG"/>
+            <MethodArg Name="LSEState" ParameterName="LSEStateARG"/>
+            <MethodArg Name="HSIState" ParameterName="HSIStateARG"/>
+            <MethodArg Name="HSIDiv" ParameterName="HSIDivARG"/>
+            <MethodArg Name="HSICalibrationValue" ParameterName="HSICalibrationValueARG"/>
+            <MethodArg Name="LSIState" ParameterName="LSIStateARG"/>
+            <MethodArg Name="MSIState" ParameterName="MSIStateARG"/>
+            <MethodArg Name="MSIFrequency" ParameterName="MSIClockRangeARG"/>
+            <MethodArg Name="MSICalibrationValue" ParameterName="MSICalibrationValueARG"/>
+            <MethodArg Name="PLL1.PLLState" ParameterName="PLLStateARG"/>
+            <MethodArg Name="PLL1.PLLSource" ParameterName="PLLSourceARG"/>
+            <MethodArg Name="PLL1.PLLM" ParameterName="PLLMARG"/>
+            <MethodArg Name="PLL1.PLLN" ParameterName="PLLNARG"/>
+            <MethodArg Name="PLL1.PLLFractional" ParameterName="PLLFRACVARG"/>
+            <MethodArg Name="PLL1.PLLP1" ParameterName="PLLP1ARG"/>
+            <MethodArg Name="PLL1.PLLP2" ParameterName="PLLP2ARG"/>
+			<MethodArg Name="PLL2.PLLState" ParameterName="PLL2StateARG"/>
+            <MethodArg Name="PLL2.PLLSource" ParameterName="PLL2SourceARG"/>
+            <MethodArg Name="PLL2.PLLM" ParameterName="PLL2MARG"/>
+            <MethodArg Name="PLL2.PLLN" ParameterName="PLL2NARG"/>
+            <MethodArg Name="PLL2.PLLFractional" ParameterName="PLL2FRACVARG"/>
+            <MethodArg Name="PLL2.PLLP1" ParameterName="PLL2P1ARG"/>
+            <MethodArg Name="PLL2.PLLP2" ParameterName="PLL2P2ARG"/>
+			<MethodArg Name="PLL3.PLLState" ParameterName="PLL3StateARG"/>
+            <MethodArg Name="PLL3.PLLSource" ParameterName="PLL3SourceARG"/>
+            <MethodArg Name="PLL3.PLLM" ParameterName="PLL3MARG"/>
+            <MethodArg Name="PLL3.PLLN" ParameterName="PLL3NARG"/>
+            <MethodArg Name="PLL3.PLLFractional" ParameterName="PLL3FRACVARG"/>
+            <MethodArg Name="PLL3.PLLP1" ParameterName="PLL3P1ARG"/>
+            <MethodArg Name="PLL3.PLLP2" ParameterName="PLL3P2ARG"/>
+			<MethodArg Name="PLL4.PLLState" ParameterName="PLL4StateARG"/>
+            <MethodArg Name="PLL4.PLLSource" ParameterName="PLL4SourceARG"/>
+            <MethodArg Name="PLL4.PLLM" ParameterName="PLL4MARG"/>
+            <MethodArg Name="PLL4.PLLN" ParameterName="PLL4NARG"/>
+            <MethodArg Name="PLL4.PLLFractional" ParameterName="PLL4FRACVARG"/>
+            <MethodArg Name="PLL4.PLLP1" ParameterName="PLL4P1ARG"/>
+            <MethodArg Name="PLL4.PLLP2" ParameterName="PLL4P2ARG"/>
+        </CallLibMethod>
+    </RefConfig>
+    <RefConfig Comment="Initializes the CPU, AHB and APB buses clocks" Name="RCC_ClockConfig">
+        <CallLibMethod Name="HAL_RCC_ClockConfig">
+            <MethodArg Name="ClockType" ParameterName="ClockTypeARG"/>
+            <MethodArg Name="CPUCLKSource" ParameterName="CPUCLKSourceARG"/>
+            <MethodArg Name="SYSCLKSource" ParameterName="SYSCLKSourceARG"/>
+            <MethodArg Name="AHBCLKDivider" ParameterName="AHBCLKDividerARG"/>
+            <MethodArg Name="APB1CLKDivider" ParameterName="APB1CLKDividerARG"/>
+            <MethodArg Name="APB2CLKDivider" ParameterName="APB2CLKDividerARG"/>
+            <MethodArg Name="APB4CLKDivider" ParameterName="APB4CLKDividerARG"/>
+            <MethodArg Name="APB5CLKDivider" ParameterName="APB5CLKDividerARG"/>
+            <MethodArg Name="IC1Selection.ClockSelection" ParameterName="IC1ClockSelection"/>
+            <MethodArg Name="IC1Selection.ClockDivider" ParameterName="IC1ClockDivider"/>
+            <MethodArg Name="IC2Selection.ClockSelection" ParameterName="IC2ClockSelection"/>
+            <MethodArg Name="IC2Selection.ClockDivider" ParameterName="IC2ClockDivider"/>
+            <MethodArg Name="IC6Selection.ClockSelection" ParameterName="IC6ClockSelection"/>
+            <MethodArg Name="IC6Selection.ClockDivider" ParameterName="IC6ClockDivider"/>
+            <MethodArg Name="IC11Selection.ClockSelection" ParameterName="IC11ClockSelection"/>
+            <MethodArg Name="IC11Selection.ClockDivider" ParameterName="IC11ClockDivider"/>
+        </CallLibMethod>
+    </RefConfig>
+    <RefConfig Comment="Initializes the peripherals clock" Name="RCC_PeriphClockConfig">
+        <CallLibMethod Name="HAL_RCCEx_PeriphCLKConfig">
+            <MethodArg Name="PeriphClockSelection" ParameterName="PeriphClockSelectionARG"/>
+            <MethodArg Name="FmcClockSelection" ParameterName="FmcClockSelectionARG"/>
+            <MethodArg Name="Xspi1ClockSelection" ParameterName="Xspi1ClockSelectionARG"/>
+            <MethodArg Name="Xspi2ClockSelection" ParameterName="Xspi2ClockSelectionARG"/>
+            <MethodArg Name="Xspi3ClockSelection" ParameterName="Xspi3ClockSelectionARG"/>
+            <MethodArg Name="CkperClockSelection" ParameterName="CkperClockSelectionARG"/>
+            <MethodArg Name="AdcClockSelection" ParameterName="AdcClockSelectionARG"/>
+            <MethodArg Name="AdcDivider" ParameterName="AdcDividerARG"/>
+            <MethodArg Name="Adf1ClockSelection" ParameterName="Adf1ClockSelectionARG"/>
+            <MethodArg Name="DcmippClockSelection" ParameterName="DcmippClockSelectionARG"/>
+            <MethodArg Name="Eth1ClockSelection" ParameterName="Eth1ClockSelectionARG"/>
+            <MethodArg Name="FdcanClockSelection" ParameterName="FdcanClockSelectionARG"/>
+            <MethodArg Name="I2c1ClockSelection" ParameterName="I2c1ClockSelectionARG"/>
+            <MethodArg Name="I2c2ClockSelection" ParameterName="I2c2ClockSelectionARG"/>
+            <MethodArg Name="I2c3ClockSelection" ParameterName="I2c3ClockSelectionARG"/>
+            <MethodArg Name="I2c4ClockSelection" ParameterName="I2c4ClockSelectionARG"/>
+            <MethodArg Name="I3c1ClockSelection" ParameterName="I3c1ClockSelectionARG"/>
+            <MethodArg Name="I3c2ClockSelection" ParameterName="I3c2ClockSelectionARG"/>
+            <MethodArg Name="Lptim1ClockSelection" ParameterName="Lptim1ClockSelectionARG"/>
+            <MethodArg Name="Lptim2ClockSelection" ParameterName="Lptim2ClockSelectionARG"/>
+            <MethodArg Name="Lptim3ClockSelection" ParameterName="Lptim3ClockSelectionARG"/>
+            <MethodArg Name="Lptim4ClockSelection" ParameterName="Lptim4ClockSelectionARG"/>
+            <MethodArg Name="Lptim5ClockSelection" ParameterName="Lptim5ClockSelectionARG"/>
+            <MethodArg Name="Lpuart1ClockSelection" ParameterName="Lpuart1ClockSelectionARG"/>
+            <MethodArg Name="LtdcClockSelection" ParameterName="LtdcClockSelectionARG"/>
+            <MethodArg Name="Mdf1ClockSelection" ParameterName="Mdf1ClockSelectionARG"/>
+            <MethodArg Name="PssiClockSelection" ParameterName="PssiClockSelectionARG"/>
+            <MethodArg Name="Sai1ClockSelection" ParameterName="Sai1ClockSelectionARG"/>
+            <MethodArg Name="Sai2ClockSelection" ParameterName="Sai2ClockSelectionARG"/>
+            <MethodArg Name="Sdmmc1ClockSelection" ParameterName="Sdmmc1ClockSelectionARG"/>
+            <MethodArg Name="Sdmmc2ClockSelection" ParameterName="Sdmmc2ClockSelectionARG"/>
+            <MethodArg Name="Spi1ClockSelection" ParameterName="Spi1ClockSelectionARG"/>         
+            <MethodArg Name="Spi2ClockSelection" ParameterName="Spi2ClockSelectionARG"/>
+            <MethodArg Name="Spi3ClockSelection" ParameterName="Spi3ClockSelectionARG"/>
+            <MethodArg Name="Spi4ClockSelection" ParameterName="Spi4ClockSelectionARG"/>
+            <MethodArg Name="Spi5ClockSelection" ParameterName="Spi5ClockSelectionARG"/>
+            <MethodArg Name="Spi6ClockSelection" ParameterName="Spi6ClockSelectionARG"/>
+            <MethodArg Name="Spdifrx1ClockSelection" ParameterName="Spdifrx1ClockSelectionARG"/>   
+            <MethodArg Name="Usart1ClockSelection" ParameterName="Usart1ClockSelectionARG"/>   
+            <MethodArg Name="Usart2ClockSelection" ParameterName="Usart2ClockSelectionARG"/>   
+            <MethodArg Name="Usart3ClockSelection" ParameterName="Usart3ClockSelectionARG"/>   
+            <MethodArg Name="Uart4ClockSelection" ParameterName="Uart4ClockSelectionARG"/>   
+            <MethodArg Name="Uart5ClockSelection" ParameterName="Uart5ClockSelectionARG"/>   
+            <MethodArg Name="Usart6ClockSelection" ParameterName="Usart6ClockSelectionARG"/>   
+            <MethodArg Name="Uart7ClockSelection" ParameterName="Uart7ClockSelectionARG"/>   
+            <MethodArg Name="Uart8ClockSelection" ParameterName="Uart8ClockSelectionARG"/>   
+            <MethodArg Name="Uart9ClockSelection" ParameterName="Uart9ClockSelectionARG"/>   
+            <MethodArg Name="Usart10ClockSelection" ParameterName="Usart10ClockSelectionARG"/>   
+            <MethodArg Name="UsbPhy1ClockSelection" ParameterName="UsbPhy1ClockSelectionARG"/>   
+            <MethodArg Name="UsbOtgHs1ClockSelection" ParameterName="UsbOtgHs1ClockSelectionARG"/>
+            <MethodArg Name="UsbPhy2ClockSelection" ParameterName="UsbPhy2ClockSelectionARG"/>   
+            <MethodArg Name="UsbOtgHs2ClockSelection" ParameterName="UsbOtgHs2ClockSelectionARG"/> 			
+            <MethodArg Name="RTCClockSelection" ParameterName="RTCClockSelectionARG"/> 			
+            <MethodArg Name="TIMPresSelection" ParameterName=""/>
+            <MethodArg Name="ICSelection[RCC_IC3].ClockSelection" ParameterName="IC3ClockSelection"/>
+            <MethodArg Name="ICSelection[RCC_IC3].ClockDivider" ParameterName="IC3ClockDivider"/>
+            <MethodArg Name="ICSelection[RCC_IC4].ClockSelection" ParameterName="IC4ClockSelection"/>
+            <MethodArg Name="ICSelection[RCC_IC4].ClockDivider" ParameterName="IC4ClockDivider"/>
+            <MethodArg Name="ICSelection[RCC_IC5].ClockSelection" ParameterName="IC5ClockSelection"/>
+            <MethodArg Name="ICSelection[RCC_IC5].ClockDivider" ParameterName="IC5ClockDivider"/>
+            <MethodArg Name="ICSelection[RCC_IC7].ClockSelection" ParameterName="IC7ClockSelection"/>
+            <MethodArg Name="ICSelection[RCC_IC7].ClockDivider" ParameterName="IC7ClockDivider"/>
+            <MethodArg Name="ICSelection[RCC_IC8].ClockSelection" ParameterName="IC8ClockSelection"/>
+            <MethodArg Name="ICSelection[RCC_IC8].ClockDivider" ParameterName="IC8ClockDivider"/>
+            <MethodArg Name="ICSelection[RCC_IC9].ClockSelection" ParameterName="IC9ClockSelection"/>
+            <MethodArg Name="ICSelection[RCC_IC9].ClockDivider" ParameterName="IC9ClockDivider"/>
+            <MethodArg Name="ICSelection[RCC_IC10].ClockSelection" ParameterName="IC10ClockSelection"/>
+            <MethodArg Name="ICSelection[RCC_IC10].ClockDivider" ParameterName="IC10ClockDivider"/>
+            <MethodArg Name="ICSelection[RCC_IC12].ClockSelection" ParameterName="IC12ClockSelection"/>
+            <MethodArg Name="ICSelection[RCC_IC12].ClockDivider" ParameterName="IC12ClockDivider"/>
+            <MethodArg Name="ICSelection[RCC_IC14].ClockSelection" ParameterName="IC14ClockSelection"/>
+            <MethodArg Name="ICSelection[RCC_IC14].ClockDivider" ParameterName="IC14ClockDivider"/>
+            <MethodArg Name="ICSelection[RCC_IC15].ClockSelection" ParameterName="IC15ClockSelection"/>
+            <MethodArg Name="ICSelection[RCC_IC15].ClockDivider" ParameterName="IC15ClockDivider"/>
+            <MethodArg Name="ICSelection[RCC_IC16].ClockSelection" ParameterName="IC16ClockSelection"/>
+            <MethodArg Name="ICSelection[RCC_IC16].ClockDivider" ParameterName="IC16ClockDivider"/>
+            <MethodArg Name="ICSelection[RCC_IC17].ClockSelection" ParameterName="IC17ClockSelection"/>
+            <MethodArg Name="ICSelection[RCC_IC17].ClockDivider" ParameterName="IC17ClockDivider"/>
+            <MethodArg Name="ICSelection[RCC_IC19].ClockSelection" ParameterName="IC19ClockSelection"/>
+            <MethodArg Name="ICSelection[RCC_IC19].ClockDivider" ParameterName="IC19ClockDivider"/>
+            <MethodArg Name="ICSelection[RCC_IC20].ClockSelection" ParameterName="IC20ClockSelection"/>
+            <MethodArg Name="ICSelection[RCC_IC20].ClockDivider" ParameterName="IC20ClockDivider"/>
+        </CallLibMethod>
+    </RefConfig>
+    <RefConfig Comment="Initializes the peripherals clock" Name="RCC_CommonPeriphClockConfig">
+        <CallLibMethod Name="HAL_RCCEx_PeriphCLKConfig">
+            <MethodArg Name="PeriphClockSelection" ParameterName="C_PeriphClockSelectionARG"/>
+            <MethodArg Name="FmcClockSelection" ParameterName=""/>
+            <MethodArg Name="Xspi1ClockSelection" ParameterName=""/>
+            <MethodArg Name="Xspi2ClockSelection" ParameterName=""/>
+            <MethodArg Name="Xspi3ClockSelection" ParameterName=""/>
+            <MethodArg Name="CkperClockSelection" ParameterName=""/>
+            <MethodArg Name="AdcClockSelection" ParameterName=""/>
+            <MethodArg Name="Adf1ClockSelection" ParameterName=""/>
+            <MethodArg Name="DcmippClockSelection" ParameterName=""/>
+            <MethodArg Name="Eth1ClockSelection" ParameterName=""/>
+            <MethodArg Name="FdcanClockSelection" ParameterName=""/>
+            <MethodArg Name="I2c1ClockSelection" ParameterName=""/>
+            <MethodArg Name="I2c2ClockSelection" ParameterName=""/>
+            <MethodArg Name="I2c3ClockSelection" ParameterName=""/>
+            <MethodArg Name="I2c4ClockSelection" ParameterName=""/>
+            <MethodArg Name="I3c1ClockSelection" ParameterName=""/>
+            <MethodArg Name="I3c2ClockSelection" ParameterName=""/>
+            <MethodArg Name="Lptim1ClockSelection" ParameterName=""/>
+            <MethodArg Name="Lptim2ClockSelection" ParameterName=""/>
+            <MethodArg Name="Lptim3ClockSelection" ParameterName=""/>
+            <MethodArg Name="Lptim4ClockSelection" ParameterName=""/>
+            <MethodArg Name="Lptim5ClockSelection" ParameterName=""/>
+            <MethodArg Name="Lpuart1ClockSelection" ParameterName=""/>
+            <MethodArg Name="LtdcClockSelection" ParameterName=""/>
+            <MethodArg Name="Mdf1ClockSelection" ParameterName=""/>
+            <MethodArg Name="PssiClockSelection" ParameterName=""/>
+            <MethodArg Name="Sai1ClockSelection" ParameterName=""/>
+            <MethodArg Name="Sai2ClockSelection" ParameterName=""/>
+            <MethodArg Name="Sdmmc1ClockSelection" ParameterName=""/>
+            <MethodArg Name="Sdmmc2ClockSelection" ParameterName=""/>
+            <MethodArg Name="Spi1ClockSelection" ParameterName=""/>         
+            <MethodArg Name="Spi2ClockSelection" ParameterName=""/>
+            <MethodArg Name="Spi3ClockSelection" ParameterName=""/>
+            <MethodArg Name="Spi4ClockSelection" ParameterName=""/>
+            <MethodArg Name="Spi5ClockSelection" ParameterName=""/>
+            <MethodArg Name="Spi6ClockSelection" ParameterName=""/>
+            <MethodArg Name="Spdifrx1ClockSelection" ParameterName=""/>   
+            <MethodArg Name="Usart1ClockSelection" ParameterName=""/>   
+            <MethodArg Name="Usart2ClockSelection" ParameterName=""/>   
+            <MethodArg Name="Usart3ClockSelection" ParameterName=""/>   
+            <MethodArg Name="Uart4ClockSelection" ParameterName=""/>   
+            <MethodArg Name="Uart5ClockSelection" ParameterName=""/>   
+            <MethodArg Name="Usart6ClockSelection" ParameterName=""/>   
+            <MethodArg Name="Uart7ClockSelection" ParameterName=""/>   
+            <MethodArg Name="Uart8ClockSelection" ParameterName=""/>   
+            <MethodArg Name="Uart9ClockSelection" ParameterName=""/>   
+            <MethodArg Name="Usart10ClockSelection" ParameterName=""/>   
+            <MethodArg Name="UsbPhy1ClockSelection" ParameterName=""/>   
+            <MethodArg Name="UsbOtgHs1ClockSelection" ParameterName=""/>
+            <MethodArg Name="UsbPhy2ClockSelection" ParameterName=""/>   
+            <MethodArg Name="UsbOtgHs2ClockSelection" ParameterName=""/> 			
+            <MethodArg Name="RTCClockSelection" ParameterName=""/> 			
+            <MethodArg Name="TIMPresSelection" ParameterName="TIMPresSelectionARG"/>
+            <MethodArg Name="ICSelection[RCC_IC3].ClockSelection" ParameterName=""/>
+            <MethodArg Name="ICSelection[RCC_IC3].ClockDivider" ParameterName=""/>
+            <MethodArg Name="ICSelection[RCC_IC4].ClockSelection" ParameterName=""/>
+            <MethodArg Name="ICSelection[RCC_IC4].ClockDivider" ParameterName=""/>
+            <MethodArg Name="ICSelection[RCC_IC5].ClockSelection" ParameterName=""/>
+            <MethodArg Name="ICSelection[RCC_IC5].ClockDivider" ParameterName=""/>
+            <MethodArg Name="ICSelection[RCC_IC7].ClockSelection" ParameterName=""/>
+            <MethodArg Name="ICSelection[RCC_IC7].ClockDivider" ParameterName=""/>
+            <MethodArg Name="ICSelection[RCC_IC8].ClockSelection" ParameterName=""/>
+            <MethodArg Name="ICSelection[RCC_IC8].ClockDivider" ParameterName=""/>
+            <MethodArg Name="ICSelection[RCC_IC9].ClockSelection" ParameterName=""/>
+            <MethodArg Name="ICSelection[RCC_IC9].ClockDivider" ParameterName=""/>
+            <MethodArg Name="ICSelection[RCC_IC10].ClockSelection" ParameterName=""/>
+            <MethodArg Name="ICSelection[RCC_IC10].ClockDivider" ParameterName=""/>
+            <MethodArg Name="ICSelection[RCC_IC12].ClockSelection" ParameterName=""/>
+            <MethodArg Name="ICSelection[RCC_IC12].ClockDivider" ParameterName=""/>
+            <MethodArg Name="ICSelection[RCC_IC14].ClockSelection" ParameterName=""/>
+            <MethodArg Name="ICSelection[RCC_IC14].ClockDivider" ParameterName=""/>
+            <MethodArg Name="ICSelection[RCC_IC15].ClockSelection" ParameterName=""/>
+            <MethodArg Name="ICSelection[RCC_IC15].ClockDivider" ParameterName=""/>
+            <MethodArg Name="ICSelection[RCC_IC16].ClockSelection" ParameterName=""/>
+            <MethodArg Name="ICSelection[RCC_IC16].ClockDivider" ParameterName=""/>
+            <MethodArg Name="ICSelection[RCC_IC17].ClockSelection" ParameterName=""/>
+            <MethodArg Name="ICSelection[RCC_IC17].ClockDivider" ParameterName=""/>
+            <MethodArg Name="ICSelection[RCC_IC19].ClockSelection" ParameterName=""/>
+            <MethodArg Name="ICSelection[RCC_IC19].ClockDivider" ParameterName=""/>
+            <MethodArg Name="ICSelection[RCC_IC20].ClockSelection" ParameterName=""/>
+            <MethodArg Name="ICSelection[RCC_IC20].ClockDivider" ParameterName=""/>
+        </CallLibMethod>
+    </RefConfig>
+    <RefConfig Comment=" Enables PLL2P clock output" Name="PLL2P_FOR_MCO">
+        <IFCondition Expression="PLL2Used=1 &amp; ((pll2usage=1) &amp; ((MCO2SOURCE_PLL2PCLK)&amp; (MCO2Config)))" >
+            <CallLibMethod Name="__HAL_RCC_PLL2_CONFIG" ReturnHAL="false">
+                <MethodArg Name="__PLL2M__" ParameterName="PLL2MMCO"/>
+                <MethodArg Name="__PLL2N__" ParameterName="PLL2NMCO"/>
+                <MethodArg Name="__PLL2P__" ParameterName="PLL2PMCO"/>
+                <MethodArg Name="__PLL2Q__" ParameterName="PLL2QMCO"/>
+                <MethodArg Name="__PLL2R__" ParameterName="PLL2RMCO"/>
+            </CallLibMethod>
+            <CallLibMethod Name="__HAL_RCC_PLL2_VCIRANGE" ReturnHAL="false">
+                <MethodArg Name="__RCC_PLL2VCIRange__" ParameterName="PLL2RGEMCO"/>
+            </CallLibMethod>
+            <CallLibMethod Name="__HAL_RCC_PLL2_VCORANGE" ReturnHAL="false">
+                <MethodArg Name="__RCC_PLL2VCORange__" ParameterName="PLL2VCOSELargMCO"/>
+            </CallLibMethod>
+            <CallLibMethod Name="__HAL_RCC_PLL2CLKOUT_ENABLE" ReturnHAL="false">
+                <MethodArg Name="PLL2CLKOUT"/>
+            </CallLibMethod>
+            <CallLibMethod Name="__HAL_RCC_PLL2_ENABLE" ReturnHAL="false">
+                <MethodArg Name="PLL2CLKOUT"/>
+            </CallLibMethod>
+        </IFCondition>
+    </RefConfig>
+	    <LibMethod Comment="Enable the CRS" Name="__HAL_RCC_CRS_CLK_ENABLE">  
+		</LibMethod>
+
+    <LibMethod Comment="" Name="__HAL_RCC_PLL2CLKOUT_ENABLE">
+        <Argument AddressOf="false" GenericType="simple" Name="PLL2CLKOUT" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="__HAL_RCC_PLL2_CONFIG">
+        <Argument AddressOf="false" GenericType="simple" Name="__PLL2M__" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="__PLL2N__" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="__PLL2P__" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="__PLL2Q__" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="__PLL2R__" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="__HAL_RCC_PLL2_VCIRANGE">
+        <Argument AddressOf="false" GenericType="simple" Name="__RCC_PLL2VCIRange__" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="__HAL_RCC_PLL2_VCORANGE">
+        <Argument AddressOf="false" GenericType="simple" Name="__RCC_PLL2VCORange__" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="__HAL_RCC_PLL2_ENABLE"/>
+	
+    <LibMethod Comment="" Name="HAL_PWREx_ConfigSupply">
+        <Argument AddressOf="false" GenericType="simple" Name="SupplySource" OptimizationCondition="equal"/>
+    </LibMethod>
+    
+    <LibMethod Comment="" Name="HAL_RCC_EnableCSS">
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RCCEx_EnableLSECSS"/>
+    <LibMethod Comment="" Name="__HAL_RCC_PWR_CLK_ENABLE">
+    </LibMethod>
+
+	<LibMethod Comment="" Name="__HAL_RCC_LSEDRIVE_CONFIG">
+		<Argument AddressOf="false" GenericType="simple" Name="__RCC_LSEDRIVE__" OptimizationCondition="equal"/>
+	</LibMethod>
+	<LibMethod Comment="" Name="HAL_PWR_EnableBkUpAccess"/>
+	
+    <LibMethod Comment="" Name="HAL_RCC_OscConfig">
+        <Argument AddressOf="true" GenericType="struct" Name="RCC_OscInitStruct" TypeName="RCC_OscInitTypeDef">
+            <Argument AddressOf="false" GenericType="simple" Name="OscillatorType" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="HSEState" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="LSEState" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="HSIState" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="HSIDiv" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="HSICalibrationValue" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="LSIState" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="MSIState" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="MSIFrequency" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="MSICalibrationValue" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PLL1.PLLState" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PLL1.PLLSource" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PLL1.PLLM" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PLL1.PLLN" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PLL1.PLLFractional" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PLL1.PLLP1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PLL1.PLLP2" OptimizationCondition="equal"/>
+			
+                <Argument AddressOf="false" GenericType="simple" Name="PLL2.PLLState" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PLL2.PLLSource" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PLL2.PLLM" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PLL2.PLLN" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PLL2.PLLFractional" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PLL2.PLLP1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PLL2.PLLP2" OptimizationCondition="equal"/>
+			
+                <Argument AddressOf="false" GenericType="simple" Name="PLL3.PLLState" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PLL3.PLLSource" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PLL3.PLLM" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PLL3.PLLN" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PLL3.PLLFractional" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PLL3.PLLP1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PLL3.PLLP2" OptimizationCondition="equal"/>
+				
+                <Argument AddressOf="false" GenericType="simple" Name="PLL4.PLLState" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PLL4.PLLSource" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PLL4.PLLM" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PLL4.PLLN" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PLL4.PLLFractional" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PLL4.PLLP1" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="PLL4.PLLP2" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RCC_ClockConfig">
+        <Argument AddressOf="true" GenericType="struct" Name="RCC_ClkInitStruct" TypeName="RCC_ClkInitTypeDef">
+            <Argument AddressOf="false" GenericType="simple" Name="ClockType" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="CPUCLKSource" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="SYSCLKSource" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AHBCLKDivider" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="APB1CLKDivider" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="APB2CLKDivider" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="APB4CLKDivider" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="APB5CLKDivider" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="IC1Selection.ClockSelection" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="IC1Selection.ClockDivider" OptimizationCondition="equal"/>
+				
+                <Argument AddressOf="false" GenericType="simple" Name="IC2Selection.ClockSelection" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="IC2Selection.ClockDivider" OptimizationCondition="equal"/>
+				
+                <Argument AddressOf="false" GenericType="simple" Name="IC6Selection.ClockSelection" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="IC6Selection.ClockDivider" OptimizationCondition="equal"/>
+				
+                <Argument AddressOf="false" GenericType="simple" Name="IC11Selection.ClockSelection" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="IC11Selection.ClockDivider" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+	
+    <LibMethod Comment="" Name="HAL_RCC_MCOConfig">
+        <Argument AddressOf="false" GenericType="simple" Name="RCC_MCOx" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="RCC_MCOSource" OptimizationCondition="equal"/>
+        <Argument AddressOf="false" GenericType="simple" Name="RCC_MCODiv" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_RCCEx_PeriphCLKConfig">
+        <Argument AddressOf="true" GenericType="struct" Name="PeriphClkInitStruct" TypeName="RCC_PeriphCLKInitTypeDef">
+            <Argument AddressOf="false" GenericType="simple" Name="PeriphClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FmcClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Xspi1ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Xspi2ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Xspi3ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="CkperClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AdcClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="AdcDivider" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Adf1ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="DcmippClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Eth1ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="FdcanClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="I2c1ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="I2c2ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="I2c3ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="I2c4ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="I3c1ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="I3c2ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lptim1ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lptim2ClockSelection" OptimizationCondition="equal"/>          
+            <Argument AddressOf="false" GenericType="simple" Name="Lptim3ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lptim4ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lptim5ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Lpuart1ClockSelection" OptimizationCondition="equal"/>            
+            <Argument AddressOf="false" GenericType="simple" Name="LtdcClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Mdf1ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="PssiClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Sai1ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Sai2ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Sdmmc1ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Sdmmc2ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Spi1ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Spi2ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Spi3ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Spi4ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Spi5ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Spi6ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Usart1ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Usart2ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Usart3ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Uart4ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Uart5ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Usart6ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Uart7ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Uart8ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Uart9ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Usart10ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="UsbPhy1ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="UsbOtgHs1ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="UsbPhy2ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="UsbOtgHs2ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="RTCClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="TIMPresSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ICSelection[RCC_IC3].ClockSelection"  OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ICSelection[RCC_IC3].ClockDivider"    OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ICSelection[RCC_IC4].ClockSelection"  OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ICSelection[RCC_IC4].ClockDivider"    OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ICSelection[RCC_IC5].ClockSelection"  OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ICSelection[RCC_IC5].ClockDivider"    OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ICSelection[RCC_IC7].ClockSelection"  OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ICSelection[RCC_IC7].ClockDivider"    OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ICSelection[RCC_IC8].ClockSelection"  OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ICSelection[RCC_IC8].ClockDivider"    OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ICSelection[RCC_IC9].ClockSelection"  OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ICSelection[RCC_IC9].ClockDivider"    OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ICSelection[RCC_IC10].ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ICSelection[RCC_IC10].ClockDivider"   OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ICSelection[RCC_IC12].ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ICSelection[RCC_IC12].ClockDivider"   OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ICSelection[RCC_IC14].ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ICSelection[RCC_IC14].ClockDivider"   OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ICSelection[RCC_IC15].ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ICSelection[RCC_IC15].ClockDivider"   OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ICSelection[RCC_IC16].ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ICSelection[RCC_IC16].ClockDivider"   OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ICSelection[RCC_IC17].ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ICSelection[RCC_IC17].ClockDivider"   OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ICSelection[RCC_IC19].ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ICSelection[RCC_IC19].ClockDivider"   OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ICSelection[RCC_IC20].ClockSelection" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ICSelection[RCC_IC20].ClockDivider"   OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    
+    <RefComponent Cclass="HAL" Cgroup="RCC" Cversion="0.1.0">        
+        <File Category="header" Name="Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_hal_rcc.h"/>
+        <File Category="header" Name="Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_hal_rcc_ex.h"/>
+        <File Category="source" Name="Drivers/STM32N6xx_HAL_Driver/Src/stm32n6xx_hal_rcc.c"/>
+        <File Category="source" Name="Drivers/STM32N6xx_HAL_Driver/Src/stm32n6xx_hal_rcc_ex.c"/>
+        <File Category="header" Name="Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_ll_bus.h"/>
+        <File Category="header" Name="Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_ll_rcc.h"/>
+        <File Category="header" Name="Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_ll_system.h"/>
+        <File Category="header" Name="Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_ll_utils.h"/>
+    </RefComponent>
+    <RefComponent Cclass="HAL" Cgroup="GPIO" Cversion="0.1.0">
+        <File Category="header" Name="Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_hal_gpio.h"/>
+        <File Category="source" Name="Drivers/STM32N6xx_HAL_Driver/Src/stm32n6xx_hal_gpio.c"/>
+        <File Category="header" Name="Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_hal_gpio_ex.h"/>          
+        <File Category="header" Name="Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_ll_gpio.h"/>
+    </RefComponent>
+    <RefComponent Cclass="HAL" Cgroup="DMA" Cversion="0.1.0">       
+        <File Category="header" Name="Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_hal_dma.h"/>
+        <File Category="header" Name="Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_hal_dma_ex.h"/>
+        <File Category="source" Name="Drivers/STM32N6xx_HAL_Driver/Src/stm32n6xx_hal_dma.c"/>
+        <File Category="source" Name="Drivers/STM32N6xx_HAL_Driver/Src/stm32n6xx_hal_dma_ex.c"/>  
+        <File Category="header" Name="Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_ll_dma.h"/>
+    </RefComponent>
+    <RefComponent Cclass="HAL" Cgroup="PWR" Cversion="0.1.0">  
+        <File Category="header" Name="Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_hal_pwr.h"/>
+        <File Category="header" Name="Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_hal_pwr_ex.h"/>
+        <File Category="source" Name="Drivers/STM32N6xx_HAL_Driver/Src/stm32n6xx_hal_pwr.c"/>
+        <File Category="source" Name="Drivers/STM32N6xx_HAL_Driver/Src/stm32n6xx_hal_pwr_ex.c"/>
+        <File Category="header" Name="Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_ll_pwr.h"/>
+    </RefComponent>
+    <RefComponent Cclass="HAL" Cgroup="CORTEX" Cversion="0.1.0">
+        <File Category="header" Name="Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_hal_cortex.h"/> 
+        <File Category="source" Name="Drivers/STM32N6xx_HAL_Driver/Src/stm32n6xx_hal_cortex.c"/>       
+        <File Category="header" Name="Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_ll_cortex.h"/>
+    </RefComponent>
+    <RefComponent Cclass="HAL" Cgroup="COMMON" Cversion="0.1.0">
+        <File Category="header" Name="Drivers/CMSIS/Device/ST/STM32N6xx/Include/partition_stm32n6xx.h"/>
+        <File Category="header" Name="Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_hal.h"/>
+        <File Category="header" Name="Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_hal_def.h"/>  
+        <File Category="source" Name="Drivers/STM32N6xx_HAL_Driver/Src/stm32n6xx_hal.c"/>
+        <File Category="header" Name="Drivers/STM32N6xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h"/>
+    </RefComponent>
+    	<RefComponent Cclass="HAL" Cgroup="EXTI" Cversion="0.1.0">
+        <File Category="header" Name="Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_hal_exti.h"/>
+        <File Category="source" Name="Drivers/STM32N6xx_HAL_Driver/Src/stm32n6xx_hal_exti.c"/>
+        <File Category="header" Name="Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_ll_exti.h"/>
+    </RefComponent>
+</IP>

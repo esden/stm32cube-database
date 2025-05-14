@@ -423,7 +423,7 @@ Key: ${key}; Value: ${myHash[key]}
 #include "nvm_db.h"
 #include "blenvm.h"
 #include "pka_manager.h"
-[#if myHash["SEQUENCER_STATUS"]?number == 1 ]
+[#if myHash["SEQUENCER_STATUS"]?number == 1 ] 
 #include "stm32_seq.h"
 [#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
 
@@ -477,7 +477,7 @@ uint16_t num_packets = 0;
 /* USER CODE BEGIN PTD */
 
 /* USER CODE END PTD */
-[#if  ((myHash["BLE_MODE_PERIPHERAL"] == "Enabled") || (myHash["BLE_MODE_CENTRAL"] == "Enabled"))]
+[#if  (((myHash["BLE_MODE_PERIPHERAL"] == "Enabled") || (myHash["BLE_MODE_CENTRAL"] == "Enabled")) && ( myHash["LITE_SERVER_STATUS"]?number == 0))]
 
 /**
  * Security parameters structure
@@ -595,8 +595,11 @@ NO_INIT(uint32_t aci_gatt_adv_nwk_buffer[CFG_BLE_GATT_ADV_NWK_BUFFER_SIZE>>2]);
 
 [/#if]
 [#if  ((myHash["BLE_MODE_CENTRAL"] == "Enabled")|| (myHash["BLE_MODE_PERIPHERAL"] == "Enabled"))]
+[#if myHash["LITE_SERVER_STATUS"]?number == 0 ]
 static BleApplicationContext_t bleAppContext;
-
+[#else]
+BleApplicationContext_t bleAppContext;
+[/#if]
 [/#if]
 [#if (myHash["BLE_MODE_PERIPHERAL"] == "Enabled")]
 
@@ -705,8 +708,11 @@ static void connection_complete_event(uint8_t Status,
                                       uint16_t Connection_Interval,
                                       uint16_t Peripheral_Latency,
                                       uint16_t Supervision_Timeout);
+
+[#if myHash["LITE_SERVER_STATUS"]?number == 0 ] 
 static void gap_cmd_resp_wait(void);
 static void gap_cmd_resp_release(void);
+[/#if]
 
 [/#if]
 [#if  (myHash["BLE_MODE_CENTRAL"] == "Enabled")]
@@ -954,6 +960,7 @@ void BLE_Init(void)
 [/#if]
 [/#if]
 [#if (myHash["BLE_MODE_BROADCASTER"] != "Enabled")]
+  [#if myHash["LITE_SERVER_STATUS"]?number == 0 ]
   /**
    * Initialize IO capability
    */
@@ -975,10 +982,11 @@ void BLE_Init(void)
   bleAppContext.BleApplicationContext_legacy.bleSecurityParam.encryptionKeySizeMin  = CFG_ENCRYPTION_KEY_SIZE_MIN;
   bleAppContext.BleApplicationContext_legacy.bleSecurityParam.encryptionKeySizeMax  = CFG_ENCRYPTION_KEY_SIZE_MAX;
   bleAppContext.BleApplicationContext_legacy.bleSecurityParam.bonding_mode          = CFG_BONDING_MODE;
+  [/#if]
   /* USER CODE BEGIN Ble_Hci_Gap_Gatt_Init_1*/
 
   /* USER CODE END Ble_Hci_Gap_Gatt_Init_1*/
-
+  [#if myHash["LITE_SERVER_STATUS"]?number == 0 ]
   ret = aci_gap_set_security_requirements(bleAppContext.BleApplicationContext_legacy.bleSecurityParam.bonding_mode,
                                                bleAppContext.BleApplicationContext_legacy.bleSecurityParam.mitm_mode,
                                                CFG_SC_SUPPORT,
@@ -1011,30 +1019,35 @@ void BLE_Init(void)
       APP_DBG_MSG("  Success: aci_gap_configure_filter_accept_and_resolving_list command\n");
     }
   }
-
+  [/#if]
   APP_DBG_MSG("==>> End BLE_Init function\n");
   
 [/#if]
 [/#if]
 }
 
+[#if myHash["LITE_SERVER_STATUS"]?number == 0 ]
 void BLEStack_Process_Schedule(void)
 {
   /* Keep BLE Stack Process priority low, since there are limited cases
      where stack wants to be rescheduled for busy waiting.  */
   UTIL_SEQ_SetTask( 1U << CFG_TASK_BLE_STACK, CFG_SEQ_PRIO_1);
 }
-
+[/#if]
+[#if myHash["LITE_SERVER_STATUS"]?number == 0 ]
 static void BLEStack_Process(void)
 {
   APP_DEBUG_SIGNAL_SET(APP_STACK_PROCESS);
+[#else]
+void BLEStack_Process(void)
+{
+[/#if]
   BLE_STACK_Tick();
-  
-  if(BLE_STACK_SleepCheck() == 0)
-  {
-    BLEStack_Process_Schedule();
-  }
+
+  [#if myHash["LITE_SERVER_STATUS"]?number == 0 ]
+ 
   APP_DEBUG_SIGNAL_RESET(APP_STACK_PROCESS);
+  [/#if]
 }
 
 void VTimer_Process(void)
@@ -1042,72 +1055,93 @@ void VTimer_Process(void)
   HAL_RADIO_TIMER_Tick();
 }
 
+[#if myHash["LITE_SERVER_STATUS"]?number == 0 ]
 void VTimer_Process_Schedule(void)
 {
   UTIL_SEQ_SetTask( 1U << CFG_TASK_VTIMER, CFG_SEQ_PRIO_0);
 }
-
+[/#if]
 void NVM_Process(void)
 {
   NVMDB_Tick();
 }
 
+[#if myHash["LITE_SERVER_STATUS"]?number == 0 ]
 void NVM_Process_Schedule(void)
 {
   UTIL_SEQ_SetTask( 1U << CFG_TASK_NVM, CFG_SEQ_PRIO_1);
 }
+[/#if]
+
+[#if myHash["LITE_SERVER_STATUS"]?number == 1 ]
+void SERVICE_APP_Process(void)
+{
+   [#if myHash["NUMBER_OF_SERVICES"] != "0"]
+      [#list 1..myHash["NUMBER_OF_SERVICES"]?number as service]
+  ${SERVICES_NAMES[service?string][item_SHORT_NAME]?upper_case}_APP_Process();
+      [/#list]
+    [/#if]
+}
+[/#if]
 
 [#if (myHash["BLE_MODE_TRANSPARENT_UART"] == "Enabled")]
+[#if myHash["LITE_SERVER_STATUS"]?number == 0 ]
 void TM_Process_Schedule(void)
 {
   UTIL_SEQ_SetTask( 1U << CFG_TASK_TM, CFG_SEQ_PRIO_1);
 }
+[/#if]
 
 void TM_Process(void)
 {
   transport_layer_tick();
 }
 
+[#if myHash["LITE_SERVER_STATUS"]?number == 0 ]
 void BURST_Process_Schedule(void)
 {
   UTIL_SEQ_SetTask( 1U << CFG_TASK_BURST, CFG_SEQ_PRIO_1);
 }
-
+[/#if]
 void BURST_Process(void)
 {
   BURST_Tick();
 }
 [/#if]
 
-/* Function called from PKA_IRQHandler() context. */
-void PKAMGR_IRQCallback(void)
-{
-  BLEStack_Process_Schedule();
-}
-
+[#if myHash["LITE_SERVER_STATUS"]?number == 0 ]
 /* Function called from RADIO_TIMER_TXRX_WKUP_IRQHandler() context. */
 void HAL_RADIO_TIMER_TxRxWakeUpCallback(void)
 {
-  VTimer_Process_Schedule();  
-  BLEStack_Process_Schedule();
+  VTimer_Process_Schedule();
 }
 
 /* Function called from RADIO_TIMER_CPU_WKUP_IRQHandler() context. */
 void HAL_RADIO_TIMER_CpuWakeUpCallback(void)
 {
-  VTimer_Process_Schedule();  
-  BLEStack_Process_Schedule();
+  VTimer_Process_Schedule();
 }
 
 /* Function called from RADIO_TXRX_IRQHandler() context. */
 void HAL_RADIO_TxRxCallback(uint32_t flags)
 {
   BLE_STACK_RadioHandler(flags);
-  
-  BLEStack_Process_Schedule();
+
   VTimer_Process_Schedule();
-  NVM_Process_Schedule();  
+  NVM_Process_Schedule();
 }
+
+void BLE_STACK_ProcessRequest(void)
+{
+  BLEStack_Process_Schedule();
+}
+[#else]
+/* Function called from RADIO_TXRX_IRQHandler() context. */
+void HAL_RADIO_TxRxCallback(uint32_t flags)
+{
+  BLE_STACK_RadioHandler(flags);
+}
+[/#if]
 
 /* Functions Definition ------------------------------------------------------*/
 void APP_BLE_Init(void)
@@ -1118,7 +1152,7 @@ void APP_BLE_Init(void)
   /* USER CODE BEGIN APP_BLE_Init_1 */
 
   /* USER CODE END APP_BLE_Init_1 */
-
+[#if myHash["LITE_SERVER_STATUS"]?number == 0 ]
   UTIL_SEQ_RegTask(1U << CFG_TASK_BLE_STACK, UTIL_SEQ_RFU, BLEStack_Process);
   UTIL_SEQ_RegTask(1U << CFG_TASK_VTIMER, UTIL_SEQ_RFU, VTimer_Process);
   UTIL_SEQ_RegTask(1U << CFG_TASK_NVM, UTIL_SEQ_RFU, NVM_Process);
@@ -1126,14 +1160,12 @@ void APP_BLE_Init(void)
   UTIL_SEQ_RegTask(1U << CFG_TASK_TM, UTIL_SEQ_RFU, TM_Process);
   UTIL_SEQ_RegTask(1U << CFG_TASK_BURST, UTIL_SEQ_RFU, BURST_Process);
 [/#if]
-
+[/#if]
   ModulesInit();
-  
+
   /* Initialization of HCI & GATT & GAP layer */
   BLE_Init();
-  
-  /* Need to call stack process at least once. */
-  BLEStack_Process_Schedule();
+
 [#if (myHash["BLE_MODE_BROADCASTER"] == "Enabled")]
 
 /* USER CODE BEGIN APP_BLE_Init_2 */
@@ -1257,9 +1289,9 @@ void BLEEVT_App_Notification(const hci_pckt *hci_pckt)
 
         /* USER CODE END EVT_DISCONN_COMPLETE_2 */
       }
-
+[#if myHash["LITE_SERVER_STATUS"]?number == 0 ]
       gap_cmd_resp_release();
-
+[/#if]
       /* USER CODE BEGIN EVT_DISCONN_COMPLETE_1 */
 
       /* USER CODE END EVT_DISCONN_COMPLETE_1 */
@@ -1308,7 +1340,9 @@ void BLEEVT_App_Notification(const hci_pckt *hci_pckt)
           p_le_phy_update_complete = (hci_le_phy_update_complete_event_rp0*)p_meta_evt->data;
           UNUSED(p_le_phy_update_complete);
 
+[#if myHash["LITE_SERVER_STATUS"]?number == 0 ]
           gap_cmd_resp_release();
+[/#if]
 
           /* USER CODE BEGIN EVT_LE_PHY_UPDATE_COMPLETE */
 
@@ -1485,7 +1519,7 @@ void BLEEVT_App_Notification(const hci_pckt *hci_pckt)
 
         /* USER CODE END RADIO_ACTIVITY_EVENT*/
         break;
-[#if (myHash["BLE_MODE_PERIPHERAL"] == "Enabled") || (myHash["BLE_MODE_CENTRAL"] == "Enabled") || (myHash["BLE_MODE_PERIPHERAL_CENTRAL"] == "Enabled")]
+[#if ((myHash["BLE_MODE_PERIPHERAL"] == "Enabled") || (myHash["BLE_MODE_CENTRAL"] == "Enabled") || (myHash["BLE_MODE_PERIPHERAL_CENTRAL"] == "Enabled")) && (myHash["LITE_SERVER_STATUS"]?number == 0)]
       case ACI_GAP_KEYPRESS_NOTIFICATION_VSEVT_CODE:
         {
           APP_DBG_MSG(">>== ACI_GAP_KEYPRESS_NOTIFICATION_VSEVT_CODE\n");
@@ -1565,6 +1599,32 @@ void BLEEVT_App_Notification(const hci_pckt *hci_pckt)
           /* USER CODE END ACI_GAP_PAIRING_COMPLETE_VSEVT_CODE*/
         }
         break;
+      case ACI_GATT_SRV_READ_VSEVT_CODE :
+        {
+          APP_DBG_MSG(">>== ACI_GATT_SRV_READ_VSEVT_CODE\n");
+
+          aci_gatt_srv_read_event_rp0    *p_read;
+          p_read = (aci_gatt_srv_read_event_rp0*)p_blecore_evt->data;
+          uint8_t error_code = BLE_ATT_ERR_INSUFF_AUTHORIZATION;
+          
+          APP_DBG_MSG("Handle 0x%04X\n",  p_read->Attribute_Handle);
+          
+          /* USER CODE BEGIN ACI_GATT_SRV_READ_VSEVT_CODE_1*/
+          
+          /* USER CODE END ACI_GATT_SRV_READ_VSEVT_CODE_1*/
+          
+          aci_gatt_srv_resp(p_read->Connection_Handle,
+                            p_read->CID,
+                            p_read->Attribute_Handle,
+                            error_code,
+                            0,
+                            NULL);
+          
+          /* USER CODE BEGIN ACI_GATT_SRV_READ_VSEVT_CODE_2*/
+          
+          /* USER CODE END ACI_GATT_SRV_READ_VSEVT_CODE_2*/
+          break;
+        }	
 [/#if]
         /* USER CODE BEGIN EVT_VENDOR_1 */
 
@@ -1812,7 +1872,9 @@ void APP_BLE_Procedure_Gap_General(ProcGapGeneralId_t ProcGapGeneralId)
           else
           {
             APP_DBG_MSG("Success\n");
+            [#if myHash["LITE_SERVER_STATUS"]?number == 0 ]
             gap_cmd_resp_wait();/* waiting for HCI_LE_PHY_UPDATE_COMPLETE_SUBEVT_CODE */
+            [/#if]
           }
         }
         else
@@ -1826,7 +1888,9 @@ void APP_BLE_Procedure_Gap_General(ProcGapGeneralId_t ProcGapGeneralId)
           else
           {
             APP_DBG_MSG("Success\n");
+            [#if myHash["LITE_SERVER_STATUS"]?number == 0 ]
             gap_cmd_resp_wait();/* waiting for HCI_LE_PHY_UPDATE_COMPLETE_SUBEVT_CODE */
+            [/#if]
           }
         }
       }
@@ -1848,7 +1912,9 @@ void APP_BLE_Procedure_Gap_General(ProcGapGeneralId_t ProcGapGeneralId)
       else
       {
         APP_DBG_MSG("==>> aci_gap_terminate : Success\n");
+        [#if myHash["LITE_SERVER_STATUS"]?number == 0 ]
         gap_cmd_resp_wait();/* waiting for HCI_DISCONNECTION_COMPLETE_EVT_CODE */
+        [/#if]
       }
       break;
     }/* PROC_GAP_GEN_CONN_TERMINATE */
@@ -1928,6 +1994,7 @@ void APP_BLE_Procedure_Gap_Peripheral(ProcGapPeripheralId_t ProcGapPeripheralId)
       /* USER CODE END CONN_PARAM_UPDATE */
       break;
     }/* PROC_GAP_PERIPH_CONN_PARAM_UPDATE */
+    [#if myHash["LITE_SERVER_STATUS"]?number == 0 ]
     case PROC_GAP_PERIPH_CONN_TERMINATE:
     {
       status = aci_gap_terminate(bleAppContext.BleApplicationContext_legacy.connectionHandle, 0x13);
@@ -1943,6 +2010,7 @@ void APP_BLE_Procedure_Gap_Peripheral(ProcGapPeripheralId_t ProcGapPeripheralId)
       break;
     }
     /* PROC_GAP_PERIPH_CONN_TERMINATE */
+    [/#if]
     default:
       break;
   }
@@ -2067,43 +2135,6 @@ void APP_BLE_Procedure_Gap_Central(ProcGapCentralId_t ProcGapCentralId)
       }
       break;
     }/* PROC_GAP_PERIPH_ADVERTISE_STOP */
-    case PROC_GAP_PERIPH_ADVERTISE_DATA_UPDATE:
-    {
-      Advertising_Set_Parameters_t Advertising_Set_Parameters = {0};
-
-      /* Disable advertising */ //TBR??? Do we need to disable advertising, set advertising data and then enable advertising?
-      status = aci_gap_set_advertising_enable(DISABLE, 0, NULL);
-      if (status != BLE_STATUS_SUCCESS)
-      {
-        bleAppContext.Device_Connection_Status = (APP_BLE_ConnStatus_t)paramC;
-        APP_DBG_MSG("Disable advertising - fail, result: 0x%02X\n",status);
-      }
-      else
-      {
-        APP_DBG_MSG("==>> Disable advertising - Success\n");
-      }
-      /* Set advertising data */
-      status = aci_gap_set_advertising_data(0, ADV_COMPLETE_DATA, sizeof(a_AdvData), (uint8_t*) a_AdvData);
-      if (status != BLE_STATUS_SUCCESS)
-      {
-        APP_DBG_MSG("==>> aci_gap_set_advertising_data Failed, result: 0x%02X\n", status);
-      }
-      else
-      {
-        APP_DBG_MSG("==>> Success: aci_gap_set_advertising_data\n");
-      }
-      /* Enable advertising */
-      status = aci_gap_set_advertising_enable(ENABLE, 1, &Advertising_Set_Parameters);
-      if (status != BLE_STATUS_SUCCESS)
-      {
-        APP_DBG_MSG("==>> aci_gap_set_advertising_enable Failed, result: 0x%02X\n", status);
-      }
-      else
-      {
-        APP_DBG_MSG("==>> Success: aci_gap_set_advertising_enable\n");
-      }
-      break;
-    }/* PROC_GAP_PERIPH_ADVERTISE_DATA_UPDATE */
     case PROC_GAP_PERIPH_CONN_PARAM_UPDATE:
     {
        status = aci_l2cap_connection_parameter_update_req(
@@ -2288,6 +2319,8 @@ void APP_BLE_Procedure_Gap_Central(ProcGapCentralId_t ProcGapCentralId)
   return;
 }
 
+#if (BLESTACK_CONTROLLER_ONLY == 0)
+
 /* Implementation of event hooks. */
 
 int aci_l2cap_cos_disconnection_complete_event_preprocess(uint16_t Connection_Handle,
@@ -2334,6 +2367,7 @@ void BURST_StartCallback(void)
 {
   BURST_Process_Schedule();
 }
+#endif
 
 void TL_ProcessReqCallback(void)
 {
@@ -2354,6 +2388,7 @@ void TL_ResetReqCallback(void)
 [/#if]
 
 [#if ((myHash["BLE_MODE_PERIPHERAL"] == "Enabled") || (myHash["BLE_MODE_CENTRAL"] == "Enabled"))]
+[#if myHash["LITE_SERVER_STATUS"]?number == 0]
 static void gap_cmd_resp_release(void)
 {
   UTIL_SEQ_SetEvt(1 << CFG_IDLEEVT_PROC_GAP_COMPLETE);
@@ -2365,7 +2400,7 @@ static void gap_cmd_resp_wait(void)
   UTIL_SEQ_WaitEvt(1 << CFG_IDLEEVT_PROC_GAP_COMPLETE);
   return;
 }
-
+[/#if]
 /* USER CODE BEGIN FD_LOCAL_FUNCTION */
 
 /* USER CODE END FD_LOCAL_FUNCTION */

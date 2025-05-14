@@ -28,6 +28,9 @@
       [#if definition.name=="Bsp_Common_DEMO"]
           [#assign Bsp_Common_DEMO = definition.value]
       [/#if]
+      [#if definition.name=="LCD_TC_ON"]
+      [#assign LCD_TC_ON = definition.value]
+      [/#if]
     [/#list]
   [/#if]
 [/#list]
@@ -53,6 +56,17 @@
   [#if LED3?? && LED3 == "true"]
   BSP_LED_On(LED_BLUE);
   [/#if]
+
+  [#if LCD_TC_ON == "true"]
+  /* Demo code for LCD utilities functions */
+  UTIL_LCD_SetFuncDriver(&LCD_Driver);
+  UTIL_LCD_SetFont(&Font16);
+  UTIL_LCD_Clear(UTIL_LCD_COLOR_ST_BLUE_DARK);
+  UTIL_LCD_SetBackColor(UTIL_LCD_COLOR_ST_BLUE_DARK);
+  UTIL_LCD_SetTextColor(UTIL_LCD_COLOR_WHITE);
+  UTIL_LCD_DisplayStringAt(0, 25, (uint8_t *)"Welcome to", CENTER_MODE);
+  UTIL_LCD_DisplayStringAt(0, 50, (uint8_t *)"STM32 world !", CENTER_MODE);
+  [/#if]
+
   /* USER CODE END BSP */
-  
 [/#if]

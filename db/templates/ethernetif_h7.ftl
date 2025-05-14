@@ -72,6 +72,13 @@
         [#if (definition.name == "ETH_RX_BUFFER_CNT") && (definition.value != "valueNotSetted")]
             [#assign eth_rx_buff_cnt = definition.value]
         [/#if]
+        [#if definition.name == "LWIP_IGMP"]
+            [#if definition.value == "1"]
+                [#assign lwip_igmp = definition.value]
+            [#else]
+                [#assign lwip_igmp = "0"]
+            [/#if]
+        [/#if]
 	[/#list]
 [/#if][#-- SWIP.defines --]
 [/#list][/#compress]
@@ -405,9 +412,17 @@ static void low_level_init(struct netif *netif)
   /* Accept broadcast address and ARP traffic */
   /* don't set NETIF_FLAG_ETHARP if this device is not an ethernet one */
   #if LWIP_ARP
+[#if lwip_igmp == "1"]
+    netif->flags |= NETIF_FLAG_BROADCAST | NETIF_FLAG_ETHARP | NETIF_FLAG_IGMP;
+[#else]
     netif->flags |= NETIF_FLAG_BROADCAST | NETIF_FLAG_ETHARP;
-  #else 
+[/#if]
+  #else
+[#if lwip_igmp == "1"]
+    netif->flags |= NETIF_FLAG_BROADCAST | NETIF_FLAG_IGMP;
+[#else]
     netif->flags |= NETIF_FLAG_BROADCAST;
+[/#if]
   #endif /* LWIP_ARP */
       
 [#if with_rtos == 1]

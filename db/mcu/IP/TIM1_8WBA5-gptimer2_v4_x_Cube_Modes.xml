@@ -20,14 +20,22 @@
             <PossibleValue Value="TIM_COUNTERMODE_CENTERALIGNED2" Comment="Center Aligned mode2"/>
             <PossibleValue Value="TIM_COUNTERMODE_CENTERALIGNED3" Comment="Center Aligned mode3"/>
     </RefParameter>
+    <RefParameter Name="CounterMode" Comment="Counter Mode" DefaultValue="TIM_COUNTERMODE_DOWN" Type="list" Group="Counter Settings">
+        <Condition Diagnostic="" Expression="S_STM32_WPAN"/>
+        <PossibleValue Value="TIM_COUNTERMODE_UP" Comment="Up" />
+        <PossibleValue Value="TIM_COUNTERMODE_DOWN" Comment="Down" />
+    </RefParameter>
     <RefParameter Name="CounterMode" Comment="Counter Mode" DefaultValue="TIM_COUNTERMODE_UP" Type="list" Group="Counter Settings">
-        <Condition Diagnostic="" Expression="(($IpNumber=6)|($IpNumber=7)|($IpNumber=18)|($IpNumber=9)|($IpNumber=10)|($IpNumber=11)|($IpNumber=12)|($IpNumber=13)|($IpNumber=14)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17))"/>
+        <Condition Diagnostic="" Expression="(($IpNumber=6)|($IpNumber=7)|($IpNumber=18)|($IpNumber=9)|($IpNumber=10)|($IpNumber=11)|($IpNumber=12)|($IpNumber=13)|($IpNumber=14)|($IpNumber=15)|($IpNumber=16)|($IpNumber=17) &amp; !(S_STM32_WPAN))"/>
             <PossibleValue Value="TIM_COUNTERMODE_UP" Comment="Up" />
     </RefParameter>
 <!-- Period (ARR) TIMER INSTANCE DEPENDENT-->
 <!-- TIM2 and TIM5 are 32bits wide -->
     <RefParameter Name="PeriodNoDither" Comment="Counter Period (AutoReload Register - 16 bits value )" DefaultValue="65535" Max="65535" Min="0" Type="integer" Group="Counter Settings">
-        <Condition Diagnostic="" Expression="!(($IpNumber=2)|($IpNumber=5)) &amp; Semaphore_DitheringDisable_$IpInstance"/>
+        <Condition Diagnostic="" Expression="!(($IpNumber=2)|($IpNumber=5)) &amp; Semaphore_DitheringDisable_$IpInstance &amp; !(S_STM32_WPAN)"/>
+    </RefParameter>
+    <RefParameter Name="PeriodNoDither" Comment="Counter Period (AutoReload Register - 16 bits value )" DefaultValue="3200" Max="65535" Min="0" Type="integer" Group="Counter Settings">
+        <Condition Diagnostic="" Expression=" Semaphore_DitheringDisable_$IpInstance &amp; (S_STM32_WPAN)"/>
     </RefParameter>
     <RefParameter Name="PeriodNoDither" Comment="Counter Period (AutoReload Register - 32 bits value )" DefaultValue="4294967295" Max="4294967295" Min="0" Type="integer" Group="Counter Settings">
         <Condition Diagnostic="" Expression="(($IpNumber=2)|($IpNumber=5)) &amp; Semaphore_DitheringDisable_$IpInstance"/>
@@ -2380,7 +2388,7 @@
     </RefMode>
 <!-- ***********************************************************************************-->
     <RefMode Name="Counter_init" HalMode ="TIM" Abstract="true">
-        <Condition Diagnostic="" Expression="!(Semaphore_clearable$IpInstance &amp;!(($IpNumber=15)|($IpNumber=16)|($IpNumber=17)))"/>
+        <Condition Diagnostic="" Expression="!(Semaphore_clearable$IpInstance &amp;!($IpNumber=15))"/>
             <Parameter Name="Prescaler" />
             <Parameter Name="CounterMode" />
             <Parameter Name="Dithering" />
@@ -2468,7 +2476,7 @@
             <Parameter Name="PulseWidth" />
     </RefMode>
     <RefMode Name="Counter_init" HalMode ="TIM" Abstract="true">
-        <Condition Diagnostic="" Expression="Semaphore_clearable$IpInstance &amp;!(($IpNumber=15)|($IpNumber=16)|($IpNumber=17))"/>
+        <Condition Diagnostic="" Expression="Semaphore_clearable$IpInstance &amp;!($IpNumber=15)"/>
             <Parameter Name="Prescaler" />
             <Parameter Name="CounterMode" />
             <Parameter Name="Dithering" />

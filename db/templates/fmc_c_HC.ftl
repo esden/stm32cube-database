@@ -269,6 +269,7 @@
           [/#if]
         [/#list][#--list method.arguments as fargument--]
         #n[#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});#n[#--add blank line before function call--]
+				[#if method.type != ("HardCode")] [#-- Hard code --]  
                     [#if method.returnHAL=="false"]
                         [#if nTab==2]#t#t[#else]#t[/#if]${method.name}(${args});
                     [#else]
@@ -278,8 +279,10 @@
                         [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler( );
                         [#if nTab==2]#t#t[#else]#t[/#if]}
                     [/#if]#n
+                [/#if]
 		  [#else][#--if method.arguments??--]
         #n[#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n[#--add blank line before function call--]
+					[#if method.type != ("HardCode")] [#-- Hard code --]
                         [#if method.returnHAL=="false"]
                             [#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
                         [#else]
@@ -289,6 +292,7 @@
                             [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler( );
                             [#if nTab==2]#t#t[#else]#t[/#if]}
                         [/#if]#n
+                    [/#if]
       [/#if][#--if method.arguments??--]
     [/#if][#--if method.status=="OK"--]
     [#if method.status=="KO"]
@@ -362,6 +366,7 @@
         #n[#if nTab==2]#t#t[#else]#t[/#if]//${method.name}(${args});#n[#--add blank line before function call--]
       [#else]
         #n[#--[#if nTab==2]#t#t[#else]#t[/#if]${method.name}();#n[#--add blank line before function call--]
+		[#if method.type != ("HardCode")] [#-- Hard code --]
             [#if method.returnHAL=="false"]
                 [#if nTab==2]#t#t[#else]#t[/#if]${method.name}();
             [#else]
@@ -371,8 +376,12 @@
                 [#if nTab==2]#t#t[#else]#t[/#if]#tError_Handler( );
                 [#if nTab==2]#t#t[#else]#t[/#if]}
             [/#if]#n
+        [/#if]
       [/#if]
     [/#if][#--if method.status=="KO"--]
+	[#if method.type.contains("HardCode")] [#-- Hard code --]
+       ${method.hardCode.text}
+	[/#if]
   [/#list][#--list methodList as method--]
 
   [#assign instanceIndex = ""]
@@ -543,8 +552,14 @@
         [#if instanceData.core!=instanceData.ipInitializerCore]
             [#assign static = false]
         [/#if]
+    [#else]
+      [#list voids as void]
+        [#if void.ipName?? && void.ipName=="FMC" && !void.isStatic]
+          [#assign static = false]
+        [/#if]
+      [/#list]
     [/#if]
-        
+
   [#assign instName = instanceData.instanceName]
   [#assign halMode= instanceData.halMode]
 /* ${instName} initialization function */

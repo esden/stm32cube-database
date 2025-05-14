@@ -49,7 +49,11 @@ Key: ${key}; Value: ${myHash[key]}
 [/#if]
 #include "ble_stack.h"
 #if (CFG_LPM_SUPPORTED == 1)
+[#if myHash["LITE_SERVER_STATUS"]?number == 0 ] 
 #include "stm32_lpm.h"
+[#else]
+#include "stm32_lpm_if.h"
+[/#if]
 #endif /* CFG_LPM_SUPPORTED */
 #include "app_debug.h"
 
@@ -65,6 +69,15 @@ Key: ${key}; Value: ${myHash[key]}
 /* USER CODE END PTD */
 
 /* Private defines -----------------------------------------------------------*/
+
+[#if myHash["LITE_SERVER_STATUS"]?number == 1 ] 
+#if (CFG_LPM_SUPPORTED == 1)
+#define ATOMIC_SECTION_BEGIN() uint32_t uwPRIMASK_Bit = __get_PRIMASK(); \
+                                __disable_irq(); \
+/* Must be called in the same or in a lower scope of ATOMIC_SECTION_BEGIN */
+#define ATOMIC_SECTION_END() __set_PRIMASK(uwPRIMASK_Bit)
+#endif /* CFG_LPM_SUPPORTED */
+[/#if]
 
 /* USER CODE BEGIN PD */
 
@@ -88,6 +101,11 @@ Key: ${key}; Value: ${myHash[key]}
 /* USER CODE END GV */
 
 /* Private functions prototypes-----------------------------------------------*/
+[#if myHash["LITE_SERVER_STATUS"]?number == 1 ] 
+#if (CFG_LPM_SUPPORTED == 1)
+static void Enter_LowPowerMode(void); 
+#endif /* CFG_LPM_SUPPORTED */
+[/#if]
 
 /* USER CODE BEGIN PFP */
 
@@ -130,10 +148,12 @@ uint32_t MX_APPE_Init(void *p_param)
   APP_BLE_Init();
 [/#if]
 
+[#if myHash["LITE_SERVER_STATUS"]?number == 0 ]
 #if (CFG_LPM_SUPPORTED == 1)
   /* Low Power Manager Init */
   UTIL_LPM_Init();
 #endif /* CFG_LPM_SUPPORTED */
+[/#if]
 /* USER CODE BEGIN APPE_Init_2 */
   
 /* USER CODE END APPE_Init_2 */
@@ -176,12 +196,28 @@ void MX_APPE_Process(void)
   /* USER CODE BEGIN MX_APPE_Process_1 */
 
   /* USER CODE END MX_APPE_Process_1 */
+[#if myHash["SEQUENCER_STATUS"]?number == 1 ]
   UTIL_SEQ_Run(UTIL_SEQ_DEFAULT);
+[#else]
+  VTimer_Process();
+
+  BLEStack_Process();
+
+  NVM_Process();
+
+  [#if myHash["LITE_SERVER_STATUS"]?number == 1 ] 
+  SERVICE_APP_Process();
+  [/#if]
+#if (CFG_LPM_SUPPORTED == 1)
+  Enter_LowPowerMode();
+#endif /* CFG_LPM_SUPPORTED */
+
+[/#if]
   /* USER CODE BEGIN MX_APPE_Process_2 */
 
   /* USER CODE END MX_APPE_Process_2 */
 }
-
+[#if myHash["SEQUENCER_STATUS"]?number == 1 ]
 void UTIL_SEQ_PreIdle( void )
 {
 #if (CFG_LPM_SUPPORTED == 1)
@@ -214,7 +250,7 @@ void UTIL_SEQ_Idle( void )
     pka_level = (PowerSaveLevels) HW_PKA_PowerSaveLevelCheck();
     final_level = (PowerSaveLevels)MIN(vtimer_powerSave_level, app_powerSave_level);
     final_level = (PowerSaveLevels)MIN(pka_level, final_level);
-     
+
     switch(final_level)
     {
     case POWER_SAVE_LEVEL_RUNNING:
@@ -247,6 +283,114 @@ void UTIL_SEQ_Idle( void )
   }
 #endif /* CFG_LPM_SUPPORTED */
 }
+[/#if]
+
+
+[#if myHash["LITE_SERVER_STATUS"]?number == 1 ]
+#if (CFG_LPM_SUPPORTED == 1)
+/**
+  * @brief  This function configures the device in SLEEP (WFI).
+  * @param  None
+  * @retval None
+  */
+static void sleep(void)
+{
+   /* Disable the SysTick */
+   HAL_SuspendTick();
+
+   /* Device in SLEEP mode (WFI) */
+   HAL_PWR_EnterSLEEPMode();
+
+    /* Enable the SysTick */
+   HAL_ResumeTick();
+}
+
+/**
+  * @brief  This function configures the device in DEEPSTOP mode with the low
+  *         speed oscillator enabled.
+  * @note   At waekup the hardware resources located in the VDD12i power domain 
+  *         are reset and the CPU reboots.
+  * @param  None
+  * @retval None
+  */
+static void deepstopTimer(void)
+{
+   /* To consume additional CSTACK location */
+   volatile uint32_t dummy[15];
+   uint8_t i;
+  
+   for (i=0; i<10; i++)
+   {
+     dummy[i] = 0;
+     __NOP();
+   }
+
+   /* Low Power sequence */
+   ATOMIC_SECTION_BEGIN();
+   PWR_EnterStopMode();
+   PWR_ExitStopMode();
+   ATOMIC_SECTION_END();
+}
+
+/**
+  * @brief  This function configures the device in DEEPSTOP mode with the low
+  *         speed oscillator disabled.
+  * @note   At waekup the hardware resources located in the VDD12i power domain 
+  *         are reset and the CPU reboots.
+  * @param  None
+  * @retval None
+  */
+static void deepstop(void)
+{
+   /* To consume additional CSTACK location */
+   volatile uint32_t dummy[15];
+   uint8_t i;
+  
+   for (i=0; i<10; i++)
+   {
+     dummy[i] = 0;
+     __NOP();
+   }
+
+  /* Low Power sequence */
+   ATOMIC_SECTION_BEGIN();
+   PWR_EnterOffMode();
+   PWR_ExitOffMode();
+   ATOMIC_SECTION_END();
+}
+
+static void Enter_LowPowerMode(void)
+{
+  PowerSaveLevels app_powerSave_level, vtimer_powerSave_level, final_level, pka_level;
+  
+  if ((BLE_STACK_SleepCheck() != POWER_SAVE_LEVEL_RUNNING) &&
+      ((app_powerSave_level = App_PowerSaveLevel_Check()) != POWER_SAVE_LEVEL_RUNNING)) 
+  {  
+    vtimer_powerSave_level = HAL_RADIO_TIMER_PowerSaveLevelCheck();
+    pka_level = (PowerSaveLevels) HW_PKA_PowerSaveLevelCheck();
+    final_level = (PowerSaveLevels)MIN(vtimer_powerSave_level, app_powerSave_level);
+    final_level = (PowerSaveLevels)MIN(pka_level, final_level);
+     
+    switch(final_level)
+    {
+    case POWER_SAVE_LEVEL_RUNNING:
+      /* Not Power Save device is busy */
+      return;
+      break;
+    case POWER_SAVE_LEVEL_CPU_HALT:
+      sleep();
+      break;
+    case POWER_SAVE_LEVEL_STOP_LS_CLOCK_ON:
+      deepstopTimer();
+      break;
+    case POWER_SAVE_LEVEL_STOP:
+      deepstop();
+      break;
+    }
+  }
+}
+#endif /* CFG_LPM_SUPPORTED */
+[/#if]
 
 /* USER CODE BEGIN FD_WRAP_FUNCTIONS */
 

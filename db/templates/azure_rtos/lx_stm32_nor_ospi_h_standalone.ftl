@@ -47,6 +47,9 @@
       [#assign LX_USE_OSPI_OCTOSPI_value = value]
     [/#if]
 	
+		[#if name == "LX_STM32_OSPI_BASE_ADDRESS"]
+      [#assign LX_STM32_OSPI_BASE_ADDRESS_value = value]
+    [/#if]
   [/#list]
 [/#if]
 [/#list]
@@ -100,6 +103,17 @@ extern __IO UINT ospi_tx_cplt;
 /* the OctoSPI instance, default value set to 0 */
 #define LX_STM32_OSPI_INSTANCE                           ${ospi_instance}
 
+[#if LX_STM32_OSPI_BASE_ADDRESS_value??]
+/* define an offset from which to start accessing the NOR Flash memory.
+ * It must be a multiple of LX_STM32_OSPI_SECTOR_SIZE, default value set to 0.
+ */
+[#if LX_STM32_OSPI_BASE_ADDRESS_value == "0"]
+#define LX_STM32_OSPI_BASE_ADDRESS                       0
+[#else]
+#define LX_STM32_OSPI_BASE_ADDRESS                       ${LX_STM32_OSPI_BASE_ADDRESS_value}
+[/#if]
+[/#if]
+
 #define LX_STM32_OSPI_DEFAULT_TIMEOUT                    (10 * 1000)
 
 #define LX_STM32_DEFAULT_SECTOR_SIZE                     LX_STM32_OSPI_SECTOR_SIZE
@@ -149,16 +163,7 @@ extern __IO UINT ospi_tx_cplt;
 [#if glue_api == "DMA_API" && TRANSFER_NOTIFICATION != "Custom"]
 /* USER CODE BEGIN LX_STM32_OSPI_READ_CPLT_NOTIFY */
 
-#define LX_STM32_OSPI_READ_CPLT_NOTIFY(__status__)          do { \
-                                                               UINT start = HAL_GetTick(); \
-                                                               while (HAL_GetTick() - start < LX_STM32_OSPI_DEFAULT_TIMEOUT) \
-                                                                {\
-                                                                  if (ospi_rx_cplt == 1) \
-                                                                    break;\
-                                                                }\
-                                                                if (ospi_rx_cplt == 0) \
-                                                                  return LX_ERROR; \
-                                                            } while(0)
+#define LX_STM32_OSPI_READ_CPLT_NOTIFY(__status__)
 
 /* USER CODE END LX_STM32_OSPI_READ_CPLT_NOTIFY */
 
@@ -202,16 +207,8 @@ extern __IO UINT ospi_tx_cplt;
 [#if glue_api == "DMA_API" && TRANSFER_NOTIFICATION != "Custom"]
 /* USER CODE BEGIN LX_STM32_OSPI_WRITE_CPLT_NOTIFY */
 
-#define LX_STM32_OSPI_WRITE_CPLT_NOTIFY(__status__)            do { \
-                                                                  UINT start = HAL_GetTick(); \
-                                                                  while (HAL_GetTick() - start < LX_STM32_OSPI_DEFAULT_TIMEOUT) \
-                                                                  {\
-                                                                    if (ospi_tx_cplt == 1) \
-                                                                      break;\
-                                                                  }\
-                                                                  if (ospi_tx_cplt == 0) \
-                                                                    return LX_ERROR;\
-                                                               } while(0)
+#define LX_STM32_OSPI_WRITE_CPLT_NOTIFY(__status__) 
+
 /* USER CODE END LX_STM32_OSPI_WRITE_CPLT_NOTIFY */
 [#else]
 /* USER CODE BEGIN LX_STM32_OSPI_WRITE_CPLT_NOTIFY */

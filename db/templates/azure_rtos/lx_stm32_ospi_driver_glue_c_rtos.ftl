@@ -48,11 +48,11 @@
       [#assign LX_USE_OCTOSPI_value = value]
     [/#if]
 	
-    [#if "${FamilyName?lower_case}" == "stm32u5" || "${FamilyName?lower_case}" == "stm32mp2" ]
+    [#if "${FamilyName?lower_case}" == "stm32u5" || "${FamilyName?lower_case}" == "stm32mp2"]
       [#assign  used_api= "OSPI"]
     [/#if]
     
-    [#if "${FamilyName?lower_case}" == "stm32h5"]
+    [#if "${FamilyName?lower_case}" == "stm32h5" || "${FamilyName?lower_case}" == "stm32u3"]
       [#assign used_api = "XSPI"]
     [/#if]
 	
@@ -95,7 +95,7 @@
  [/#if]
 [/#if]
 [#elseif LX_USE_OCTOSPI_value == "Octo SPI with Data Strobe"]
-[#if "${FamilyName?lower_case}" == "stm32h5"]
+[#if "${FamilyName?lower_case}" == "stm32h5" || "${FamilyName?lower_case}" == "stm32u3"]
 [#if ospi_comp == "MX25LM51245G"]
 
 /* HAL DMA API implementation for OctoSPI component MX25LM51245G
@@ -267,7 +267,7 @@ INT lx_stm32_ospi_get_status(UINT instance)
   s_command.DataDtrMode           = HAL_OSPI_DATA_DTR_ENABLE;
   s_command.DQSMode               = HAL_OSPI_DQS_ENABLE;
   [/#if]
-  [#if "${FamilyName?lower_case}" == "stm32h5"]
+  [#if "${FamilyName?lower_case}" == "stm32h5" || "${FamilyName?lower_case}" == "stm32u3"]
   s_command.OperationType         = HAL_XSPI_OPTYPE_COMMON_CFG;
   s_command.IOSelect              = HAL_XSPI_SELECT_IO_7_0;
   s_command.Instruction           = LX_STM32_OSPI_OCTAL_READ_STATUS_REG_CMD;
@@ -337,9 +337,11 @@ INT lx_stm32_ospi_get_info(UINT instance, ULONG *block_size, ULONG *total_blocks
 
 [#if glue_api == "DMA_API"]
   *block_size = LX_STM32_OSPI_SECTOR_SIZE;
-
+  [#if !FamilyName?lower_case?starts_with("stm32u5") && !FamilyName?lower_case?starts_with("stm32h5") ]
   *total_blocks = (LX_STM32_OSPI_FLASH_SIZE / LX_STM32_OSPI_SECTOR_SIZE);
-
+  [#else]
+  *total_blocks = ((LX_STM32_OSPI_FLASH_SIZE - LX_STM32_OSPI_BASE_ADDRESS) / LX_STM32_OSPI_SECTOR_SIZE);
+  [/#if]
   /* USER CODE BEGIN POST_OSPI_GET_INFO */
 
   /* USER CODE END POST_OSPI_GET_INFO */
@@ -391,7 +393,7 @@ INT lx_stm32_ospi_read(UINT instance, ULONG *address, ULONG *buffer, ULONG words
   s_command.DataDtrMode           = HAL_OSPI_DATA_DTR_ENABLE;
   s_command.DQSMode               = HAL_OSPI_DQS_ENABLE;
   [/#if]
-  [#if "${FamilyName?lower_case}" == "stm32h5"]
+  [#if "${FamilyName?lower_case}" == "stm32h5" || "${FamilyName?lower_case}" == "stm32u3"]
   s_command.OperationType      = HAL_XSPI_OPTYPE_COMMON_CFG;
   s_command.IOSelect           = HAL_XSPI_SELECT_IO_7_0;
   s_command.InstructionMode    = HAL_XSPI_INSTRUCTION_8_LINES;
@@ -510,7 +512,7 @@ INT lx_stm32_ospi_write(UINT instance, ULONG *address, ULONG *buffer, ULONG word
     s_command.Address = current_addr;
     s_command.NbData  = current_size;
 [/#if]
-[#if "${FamilyName?lower_case}" == "stm32h5"]
+[#if "${FamilyName?lower_case}" == "stm32h5" || "${FamilyName?lower_case}" == "stm32u3"]
   s_command.OperationType         = HAL_XSPI_OPTYPE_COMMON_CFG;
   s_command.IOSelect              = HAL_XSPI_SELECT_IO_7_0;
   s_command.Instruction           = LX_STM32_OSPI_OCTAL_PAGE_PROG_CMD;
@@ -617,7 +619,7 @@ INT lx_stm32_ospi_write(UINT instance, ULONG *address, ULONG *buffer, ULONG word
   s_command.DataDtrMode           = HAL_OSPI_DATA_DTR_ENABLE;
   s_command.DQSMode               = HAL_OSPI_DQS_DISABLE;
 [/#if]
-[#if "${FamilyName?lower_case}" == "stm32h5"]
+[#if "${FamilyName?lower_case}" == "stm32h5" || "${FamilyName?lower_case}" == "stm32u3"]
   s_command.OperationType         = HAL_XSPI_OPTYPE_COMMON_CFG;
   s_command.IOSelect              = HAL_XSPI_SELECT_IO_7_0;
   s_command.Instruction           = LX_STM32_OSPI_OCTAL_PAGE_PROG_CMD;
@@ -648,7 +650,7 @@ INT lx_stm32_ospi_write(UINT instance, ULONG *address, ULONG *buffer, ULONG word
     s_command.Address = current_addr;
     s_command.NbData  = current_size;
 [/#if]
-[#if "${FamilyName?lower_case}" == "stm32h5"]
+[#if "${FamilyName?lower_case}" == "stm32h5" || "${FamilyName?lower_case}" == "stm32u3"]
   do
   {
     s_command.Address = current_addr;
@@ -752,7 +754,7 @@ INT lx_stm32_ospi_erase(UINT instance, ULONG block, ULONG erase_count, UINT full
     s_command.AddressDtrMode      = HAL_OSPI_ADDRESS_DTR_ENABLE; /* DTR mode is enabled */
   }
   [/#if]
-  [#if "${FamilyName?lower_case}" == "stm32h5"]
+  [#if "${FamilyName?lower_case}" == "stm32h5" || "${FamilyName?lower_case}" == "stm32u3"]
   s_command.OperationType         = HAL_XSPI_OPTYPE_COMMON_CFG;
   s_command.IOSelect              = HAL_XSPI_SELECT_IO_7_0;;
   s_command.InstructionMode       = HAL_XSPI_INSTRUCTION_8_LINES;
@@ -874,7 +876,7 @@ static uint8_t ospi_memory_reset(${used_api}_HandleTypeDef *h${used_api?lower_ca
   s_command.DQSMode               = HAL_OSPI_DQS_DISABLE;
   s_command.SIOOMode              = HAL_OSPI_SIOO_INST_EVERY_CMD;
   [/#if]
-  [#if "${FamilyName?lower_case}" == "stm32h5"]
+  [#if "${FamilyName?lower_case}" == "stm32h5" || "${FamilyName?lower_case}" == "stm32u3"]
   s_command.OperationType         = HAL_XSPI_OPTYPE_COMMON_CFG;
   s_command.IOSelect              = HAL_XSPI_SELECT_IO_7_0;
   s_command.Instruction           = LX_STM32_OSPI_RESET_ENABLE_CMD;
@@ -916,7 +918,7 @@ static uint8_t ospi_memory_reset(${used_api}_HandleTypeDef *h${used_api?lower_ca
   s_config.Interval      = 0x10;
   s_config.AutomaticStop = HAL_OSPI_AUTOMATIC_STOP_ENABLE;
   [/#if]
-  [#if "${FamilyName?lower_case}" == "stm32h5"]
+  [#if "${FamilyName?lower_case}" == "stm32h5" || "${FamilyName?lower_case}" == "stm32u3"]
   s_command.Instruction  = LX_STM32_OSPI_READ_STATUS_REG_CMD;
   s_command.DataMode     = HAL_XSPI_DATA_1_LINE;
   s_command.DataLength   = 1;
@@ -974,7 +976,7 @@ static uint8_t ospi_set_write_enable(${used_api}_HandleTypeDef *h${used_api?lowe
   /* DTR mode is enabled */
   s_command.InstructionDtrMode    = HAL_OSPI_INSTRUCTION_DTR_ENABLE;
   [/#if]
-  [#if "${FamilyName?lower_case}" == "stm32h5"]
+  [#if "${FamilyName?lower_case}" == "stm32h5" || "${FamilyName?lower_case}" == "stm32u3"]
   s_command.OperationType         = HAL_XSPI_OPTYPE_COMMON_CFG;
   s_command.IOSelect              = HAL_XSPI_SELECT_IO_7_0;
   s_command.Instruction           = LX_STM32_OSPI_OCTAL_WRITE_ENABLE_CMD;
@@ -1048,7 +1050,7 @@ static uint8_t ospi_auto_polling_ready(${used_api}_HandleTypeDef *h${used_api?lo
   s_config.Match           = 0;
   s_config.Mask            = LX_STM32_OSPI_SR_WIP;
   [/#if]
-  [#if "${FamilyName?lower_case}" == "stm32h5"]
+  [#if "${FamilyName?lower_case}" == "stm32h5" || "${FamilyName?lower_case}" == "stm32u3"]
   s_command.OperationType         = HAL_XSPI_OPTYPE_COMMON_CFG;
   s_command.IOSelect              = HAL_XSPI_SELECT_IO_7_0;
   s_command.Instruction           = LX_STM32_OSPI_OCTAL_READ_STATUS_REG_CMD;
@@ -1121,7 +1123,7 @@ static uint8_t ospi_set_octal_mode(${used_api}_HandleTypeDef *h${used_api?lower_
   ${used_api}_AutoPollingTypeDef s_config;
   uint8_t reg[2];
 
-    [#if "${FamilyName?lower_case}" == "stm32u5" || "${FamilyName?lower_case}" == "stm32mp2"]
+    [#if "${FamilyName?lower_case}" == "stm32u5"]
   s_command.OperationType      = HAL_OSPI_OPTYPE_COMMON_CFG;
   s_command.FlashId            = HAL_OSPI_FLASH_ID_1;
   s_command.InstructionDtrMode = HAL_OSPI_INSTRUCTION_DTR_DISABLE;
@@ -1145,7 +1147,7 @@ static uint8_t ospi_set_octal_mode(${used_api}_HandleTypeDef *h${used_api?lower_
   s_command.DataMode        = HAL_OSPI_DATA_NONE;
   s_command.DummyCycles     = 0;
   [/#if]
-  [#if "${FamilyName?lower_case}" == "stm32h5"]
+  [#if "${FamilyName?lower_case}" == "stm32h5" || "${FamilyName?lower_case}" == "stm32u3"]
   s_command.OperationType      = HAL_XSPI_OPTYPE_COMMON_CFG;
   s_command.IOSelect           = HAL_XSPI_SELECT_IO_7_0;
   s_command.InstructionDTRMode = HAL_XSPI_INSTRUCTION_DTR_DISABLE;
@@ -1186,7 +1188,7 @@ static uint8_t ospi_set_octal_mode(${used_api}_HandleTypeDef *h${used_api?lower_
   s_command.DataMode    = HAL_OSPI_DATA_1_LINE;
   s_command.NbData      = 1;
   [/#if]
-  [#if "${FamilyName?lower_case}" == "stm32h5"]
+  [#if "${FamilyName?lower_case}" == "stm32h5" || "${FamilyName?lower_case}" == "stm32u3"]
   s_config.MatchValue = LX_STM32_OSPI_SR_WEL;
   s_config.MatchMask  = LX_STM32_OSPI_SR_WEL;
 
@@ -1290,7 +1292,7 @@ static uint8_t ospi_set_octal_mode(${used_api}_HandleTypeDef *h${used_api?lower_
   s_command.DataDtrMode        = HAL_OSPI_DATA_DTR_ENABLE;
   s_command.DQSMode            = HAL_OSPI_DQS_ENABLE;
   [/#if]
-  [#if "${FamilyName?lower_case}" == "stm32h5"]
+  [#if "${FamilyName?lower_case}" == "stm32h5" || "${FamilyName?lower_case}" == "stm32u3"]
   s_command.Instruction      = LX_STM32_OSPI_OCTAL_READ_CFG_REG2_CMD;
   s_command.InstructionMode  = HAL_XSPI_INSTRUCTION_8_LINES;
   s_command.InstructionWidth = HAL_XSPI_INSTRUCTION_16_BITS;
@@ -1411,7 +1413,7 @@ void HAL_${used_api}_TxCpltCallback(${used_api}_HandleTypeDef *h${used_api?lower
  */
 [/#if]
 [/#if]
-[#if "${FamilyName?lower_case}" == "stm32h5"]
+[#if "${FamilyName?lower_case}" == "stm32h5" || "${FamilyName?lower_case}" == "stm32u3"]
 [#if ospi_comp == "MX25LM51245G"]
 
 /* HAL DMA API implementation for OctoSPI component MX25LM51245G

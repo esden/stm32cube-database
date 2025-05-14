@@ -13,47 +13,47 @@
 [#if !BspIpDatas??]
 
 /*
- *	(!) No platform settings set in Cube MX for the MW STM32_WPAN. The Logs will not be used (!)
+ *  (!) No platform settings set in Cube MX for the MW STM32_WPAN. The Logs will not be used (!)
  *
- *	--------------------------------------------------------------------
- *	If you intend to use the Logs, please follow the procedure below :
- *	--------------------------------------------------------------------
+ *  --------------------------------------------------------------------
+ *  If you intend to use the Logs, please follow the procedure below :
+ *  --------------------------------------------------------------------
  *
- *	1.	Open your project on Cube MX.
+ * 1. Open your project on Cube MX.
  *
- *	2.	Click on the MW "STM32_WPAN".
+ * 2. Click on the MW "STM32_WPAN".
  *
- *	3.	Click on the "Configuration" panel.
+ * 3. Click on the "Configuration" panel.
  *
- *	4.	Open the sub-section "Application configuration - Logs".
+ * 4. Open the sub-section "Application configuration - Logs".
  *
- *	5.	Enable one of the following according to your needs :
- *		. CFG_LOG_INSERT_TIME_STAMP_INSIDE_THE_TRACE
- *		. CFG_LOG_SUPPORTED
+ * 5. Enable one of the following according to your needs :
+ *      . CFG_LOG_INSERT_TIME_STAMP_INSIDE_THE_TRACE
+ *      . CFG_LOG_SUPPORTED
  *
- *	6.	Click on the "Platform Settings" panel.
+ * 6. Click on the "Platform Settings" panel.
  *
- *	7.	Select the BSP you'll use for the Logs. It can be one of the following :
- *		In order to select them, you need to activate the corresponding IP beforehand in Cube MX.
- *		. USART1
- *		. USART2
- *		. LPUART1
+ * 7. Select the BSP you'll use for the Logs. It can be one of the following :
+ *    In order to select them, you need to activate the corresponding IP beforehand in Cube MX.
+ *    . USART1
+ *    . USART2
+ *    . LPUART1
  *
  */
 [/#if]
 [#assign nbInstance = 0]
 [#assign myHash = {}]
 [#if BspIpDatas??]
-	[#list BspIpDatas as SWIP]
-		[#if SWIP.variables??]
-			[#list SWIP.variables as variables]
-				[#assign myHash = {variables.name + nbInstance:variables.value} + myHash]
-				[#if variables.name?contains("BoardName")]
-					[#assign nbInstance=nbInstance+1]
-				[/#if]
-			[/#list]
-		[/#if]
-	[/#list]
+  [#list BspIpDatas as SWIP]
+    [#if SWIP.variables??]
+      [#list SWIP.variables as variables]
+        [#assign myHash = {variables.name + nbInstance:variables.value} + myHash]
+        [#if variables.name?contains("BoardName")]
+          [#assign nbInstance=nbInstance+1]
+        [/#if]
+      [/#list]
+    [/#if]
+  [/#list]
 [/#if]
 [#--
 
@@ -66,21 +66,21 @@ nbInstance : ${nbInstance}
 --]
 [#assign is_for_BLE_TM_and_BLE_Skeleton_only = 0]
 [#if nbInstance == 1]
-	[#if myHash["bspName0"]?contains("Serial Link for CubeMonitor RF") && !myHash["bspName0"]?contains("Serial Link for Logs")]
-		[#assign is_for_BLE_TM_and_BLE_Skeleton_only=is_for_BLE_TM_and_BLE_Skeleton_only+1]
-	[/#if]
+  [#if myHash["bspName0"]?contains("Serial Link for CubeMonitor RF") && !myHash["bspName0"]?contains("Serial Link for Logs")]
+    [#assign is_for_BLE_TM_and_BLE_Skeleton_only=is_for_BLE_TM_and_BLE_Skeleton_only+1]
+  [/#if]
 [/#if]
 [#if nbInstance == 2]
-	[#if myHash["bspName0"]?contains("Serial Link for CubeMonitor RF") || myHash["bspName1"]?contains("Serial Link for CubeMonitor RF")
-	&& !myHash["bspName0"]?contains("Serial Link for Logs") && !myHash["bspName1"]?contains("Serial Link for Logs")]
-		[#assign is_for_BLE_TM_and_BLE_Skeleton_only=is_for_BLE_TM_and_BLE_Skeleton_only+1]
-	[/#if]
+  [#if myHash["bspName0"]?contains("Serial Link for CubeMonitor RF") || myHash["bspName1"]?contains("Serial Link for CubeMonitor RF")
+   && !myHash["bspName0"]?contains("Serial Link for Logs") && !myHash["bspName1"]?contains("Serial Link for Logs")]
+    [#assign is_for_BLE_TM_and_BLE_Skeleton_only=is_for_BLE_TM_and_BLE_Skeleton_only+1]
+  [/#if]
 [/#if]
 [#if is_for_BLE_TM_and_BLE_Skeleton_only != 0]
 
 /**
- *	THIS FILE IS NOT USED FOR BLE TM.
- *	THE SERIAL LINK IS DIRECTLY USED ON app_ble.c side.
+ * THIS FILE IS NOT USED FOR BLE TM.
+ * THE SERIAL LINK IS DIRECTLY USED ON app_ble.c side.
  */
 [/#if]
 
@@ -111,14 +111,14 @@ nbInstance : ${nbInstance}
 
 /* External variables --------------------------------------------------------*/
 [#if BspIpDatas??]
-	[#list 0..(nbInstance-1) as i]
-		[#if myHash["bspName"+i] == "Serial Link for Logs"]
+  [#list 0..(nbInstance-1) as i]
+    [#if myHash["bspName"+i] == "Serial Link for Logs"]
 /**
   * @brief ${myHash["IpInstance"+i]} handle
   */
 extern UART_HandleTypeDef h${myHash["IpInstance"+i]?lower_case?replace("s","")};
-		[/#if]
-	[/#list]
+    [/#if]
+  [/#list]
 [/#if]
 
 /* USER CODE BEGIN EV */
@@ -151,8 +151,8 @@ const UTIL_ADV_TRACE_Driver_s UTIL_TraceDriver =
 
 /* Private variables ---------------------------------------------------------*/
 [#if BspIpDatas??]
-	[#list 0..(nbInstance-1) as i]
-		[#if myHash["bspName"+i] == "Serial Link for Logs"]
+  [#list 0..(nbInstance-1) as i]
+    [#if myHash["bspName"+i] == "Serial Link for Logs"]
 uint8_t receive_after_transmit = 0; /* Whether the UART should be in RX after a Transmit */
 
 /**
@@ -160,8 +160,8 @@ uint8_t receive_after_transmit = 0; /* Whether the UART should be in RX after a 
   */
 uint8_t charRx;
 
-		[/#if]
-	[/#list]
+    [/#if]
+  [/#list]
 [/#if]
 /* USER CODE BEGIN PV */
 
@@ -174,8 +174,8 @@ uint8_t charRx;
 
 /* Private function prototypes -----------------------------------------------*/
 [#if BspIpDatas??]
-	[#list 0..(nbInstance-1) as i]
-		[#if myHash["bspName"+i] == "Serial Link for Logs"]
+  [#list 0..(nbInstance-1) as i]
+    [#if myHash["bspName"+i] == "Serial Link for Logs"]
 /**
   * @brief  TX complete callback
   * @return none
@@ -183,25 +183,25 @@ uint8_t charRx;
 static void (*TxCpltCallback)(void *);
 static void (*RxCpltCallback)(uint8_t *pdata, uint16_t size, uint8_t error);
 
-		[/#if]
-	[/#list]
+    [/#if]
+  [/#list]
 [/#if]
 [#if BspIpDatas??]
-	[#list 0..(nbInstance-1) as i]
-		[#if myHash["bspName"+i] == "Serial Link for Logs"]
+  [#list 0..(nbInstance-1) as i]
+    [#if myHash["bspName"+i] == "Serial Link for Logs"]
 static void ${myHash["IpInstance"+i]}_DMA_MspDeInit(void);
-		[/#if]
-	[/#list]
+    [/#if]
+  [/#list]
 [/#if]
 
 [#if BspIpDatas??]
-	[#list 0..(nbInstance-1) as i]
-		[#if myHash["bspName"+i] == "Serial Link for Logs"]
+  [#list 0..(nbInstance-1) as i]
+    [#if myHash["bspName"+i] == "Serial Link for Logs"]
 static void UsartIf_TxCpltCallback(UART_HandleTypeDef *huart);
 static void UsartIf_RxCpltCallback(UART_HandleTypeDef *huart);
 static IRQn_Type get_IRQn_Type_from_DMA_HandleTypeDef(DMA_HandleTypeDef * dma_handler);
-		[/#if]
-	[/#list]
+    [/#if]
+  [/#list]
 [/#if]
 
 /* USER CODE BEGIN PFP */
@@ -227,7 +227,7 @@ UTIL_ADV_TRACE_Status_t UART_Init(  void (*cb)(void *))
   /* USER CODE END UART_Init 2 */
 }
 [#else]
-	[#if is_for_BLE_TM_and_BLE_Skeleton_only != 0]
+  [#if is_for_BLE_TM_and_BLE_Skeleton_only != 0]
 
   return UTIL_ADV_TRACE_UNKNOWN_ERROR;
 
@@ -235,27 +235,26 @@ UTIL_ADV_TRACE_Status_t UART_Init(  void (*cb)(void *))
 
   /* USER CODE END UART_Init 2 */
 }
-	[#else]
+  [#else]
 
-		[#list 0..(nbInstance-1) as i]
-			[#if myHash["bspName"+i] == "Serial Link for Logs"]
+    [#list 0..(nbInstance-1) as i]
+      [#if myHash["bspName"+i] == "Serial Link for Logs"]
   MX_${myHash["IpInstance"+i]}_UART_Init();
 
-			[/#if]
-		[/#list]
+      [/#if]
+    [/#list]
   /* USER CODE BEGIN UART_Init 2 */
 
   /* USER CODE END UART_Init 2 */
 
-  /* Two layer callbacks: perhaps smarter way to do it? */
   TxCpltCallback = cb;
 
-		[#list 0..(nbInstance-1) as i]
-			[#if myHash["bspName"+i] == "Serial Link for Logs"]
+    [#list 0..(nbInstance-1) as i]
+      [#if myHash["bspName"+i] == "Serial Link for Logs"]
   h${myHash["IpInstance"+i]?lower_case?replace("s","")}.TxCpltCallback = UsartIf_TxCpltCallback;
 
-			[/#if]
-		[/#list]
+      [/#if]
+    [/#list]
 
   /* USER CODE BEGIN UART_Init 3 */
 
@@ -267,7 +266,7 @@ UTIL_ADV_TRACE_Status_t UART_Init(  void (*cb)(void *))
 
   return UTIL_ADV_TRACE_OK;
 }
-	[/#if]
+  [/#if]
 [/#if]
 
 UTIL_ADV_TRACE_Status_t UART_DeInit( void )
@@ -284,7 +283,7 @@ UTIL_ADV_TRACE_Status_t UART_DeInit( void )
   return UTIL_ADV_TRACE_UNKNOWN_ERROR;
 }
 [#else]
-	[#if is_for_BLE_TM_and_BLE_Skeleton_only != 0]
+  [#if is_for_BLE_TM_and_BLE_Skeleton_only != 0]
   /* USER CODE BEGIN UART_DeInit 1 */
 
   /* USER CODE END UART_DeInit 1 */
@@ -295,7 +294,7 @@ UTIL_ADV_TRACE_Status_t UART_DeInit( void )
 
   return UTIL_ADV_TRACE_UNKNOWN_ERROR;
 }
-	[#else]	
+  [#else]
   IRQn_Type use_dma;
   HAL_StatusTypeDef result;
 
@@ -303,18 +302,18 @@ UTIL_ADV_TRACE_Status_t UART_DeInit( void )
 
   /* USER CODE END UART_DeInit 1 */
 
-		[#list 0..(nbInstance-1) as i]
-			[#if myHash["bspName"+i] == "Serial Link for Logs"]
+    [#list 0..(nbInstance-1) as i]
+      [#if myHash["bspName"+i] == "Serial Link for Logs"]
   ${myHash["IpInstance"+i]}_DMA_MspDeInit();
-			[/#if]
-		[/#list]
+      [/#if]
+    [/#list]
 
   /* USER CODE BEGIN UART_DeInit 2 */
 
   /* USER CODE END UART_DeInit 2 */
 
-		[#list 0..(nbInstance-1) as i]
-			[#if myHash["bspName"+i] == "Serial Link for Logs"]
+    [#list 0..(nbInstance-1) as i]
+      [#if myHash["bspName"+i] == "Serial Link for Logs"]
   result = HAL_UART_DeInit(&h${myHash["IpInstance"+i]?lower_case?replace("s","")});
   if (result != HAL_OK)
   {
@@ -322,15 +321,15 @@ UTIL_ADV_TRACE_Status_t UART_DeInit( void )
     return UTIL_ADV_TRACE_UNKNOWN_ERROR;
   }
 
-			[/#if]
-		[/#list]
+      [/#if]
+    [/#list]
 
   /* USER CODE BEGIN UART_DeInit 3 */
 
   /* USER CODE END UART_DeInit 3 */
 
-		[#list 0..(nbInstance-1) as i]
-			[#if myHash["bspName"+i] == "Serial Link for Logs"]
+    [#list 0..(nbInstance-1) as i]
+      [#if myHash["bspName"+i] == "Serial Link for Logs"]
   use_dma = get_IRQn_Type_from_DMA_HandleTypeDef(h${myHash["IpInstance"+i]?lower_case?replace("s","")}.hdmatx);
 
   if (use_dma == GPDMA1_Channel0_IRQn || use_dma == GPDMA1_Channel1_IRQn
@@ -345,15 +344,15 @@ UTIL_ADV_TRACE_Status_t UART_DeInit( void )
     }
   }
 
-			[/#if]
-		[/#list]
+      [/#if]
+    [/#list]
 
   /* USER CODE BEGIN UART_DeInit 4 */
 
   /* USER CODE END UART_DeInit 4 */
 
-		[#list 0..(nbInstance-1) as i]
-			[#if myHash["bspName"+i] == "Serial Link for Logs"]
+    [#list 0..(nbInstance-1) as i]
+      [#if myHash["bspName"+i] == "Serial Link for Logs"]
   use_dma = get_IRQn_Type_from_DMA_HandleTypeDef(h${myHash["IpInstance"+i]?lower_case?replace("s","")}.hdmarx);
 
   if (use_dma == GPDMA1_Channel0_IRQn || use_dma == GPDMA1_Channel1_IRQn
@@ -368,8 +367,8 @@ UTIL_ADV_TRACE_Status_t UART_DeInit( void )
     }
   }
 
-			[/#if]
-		[/#list]
+      [/#if]
+    [/#list]
 
   /* USER CODE BEGIN UART_DeInit 5 */
 
@@ -381,7 +380,7 @@ UTIL_ADV_TRACE_Status_t UART_DeInit( void )
 
   return UTIL_ADV_TRACE_OK;
 }
-	[/#if]
+  [/#if]
 [/#if]
 
 UTIL_ADV_TRACE_Status_t UART_StartRx(void (*cb)(uint8_t *pdata, uint16_t size, uint8_t error))
@@ -398,7 +397,7 @@ UTIL_ADV_TRACE_Status_t UART_StartRx(void (*cb)(uint8_t *pdata, uint16_t size, u
   return UTIL_ADV_TRACE_UNKNOWN_ERROR;
 }
 [#else]
-	[#if is_for_BLE_TM_and_BLE_Skeleton_only != 0]
+  [#if is_for_BLE_TM_and_BLE_Skeleton_only != 0]
   /* USER CODE BEGIN UART_StartRx 1 */
 
   /* USER CODE END UART_StartRx 1 */
@@ -409,19 +408,19 @@ UTIL_ADV_TRACE_Status_t UART_StartRx(void (*cb)(uint8_t *pdata, uint16_t size, u
 
   return UTIL_ADV_TRACE_UNKNOWN_ERROR;
 }
-	[#else]
+  [#else]
   /* USER CODE BEGIN UART_StartRx 1 */
 
   /* USER CODE END UART_StartRx 1 */
 
-		[#list 0..(nbInstance-1) as i]
-			[#if myHash["bspName"+i] == "Serial Link for Logs"]
+    [#list 0..(nbInstance-1) as i]
+      [#if myHash["bspName"+i] == "Serial Link for Logs"]
   /* Configure UART1 in Receive mode */
   HAL_UART_Receive_IT(&h${myHash["IpInstance"+i]?lower_case?replace("s","")}, &charRx, 1);
   h${myHash["IpInstance"+i]?lower_case?replace("s","")}.RxCpltCallback = &UsartIf_RxCpltCallback;
 
-			[/#if]
-		[/#list]
+      [/#if]
+    [/#list]
   if (cb != NULL)
   {
     RxCpltCallback = cb;
@@ -437,7 +436,7 @@ UTIL_ADV_TRACE_Status_t UART_StartRx(void (*cb)(uint8_t *pdata, uint16_t size, u
 
   return UTIL_ADV_TRACE_OK;
 }
-	[/#if]
+  [/#if]
 [/#if]
 
 UTIL_ADV_TRACE_Status_t UART_TransmitDMA ( uint8_t *pdata, uint16_t size )
@@ -454,7 +453,7 @@ UTIL_ADV_TRACE_Status_t UART_TransmitDMA ( uint8_t *pdata, uint16_t size )
   return UTIL_ADV_TRACE_UNKNOWN_ERROR;
 }
 [#else]
-	[#if is_for_BLE_TM_and_BLE_Skeleton_only != 0]
+  [#if is_for_BLE_TM_and_BLE_Skeleton_only != 0]
   /* USER CODE BEGIN UART_TransmitDMA 1 */
 
   /* USER CODE END UART_TransmitDMA 1 */
@@ -465,7 +464,7 @@ UTIL_ADV_TRACE_Status_t UART_TransmitDMA ( uint8_t *pdata, uint16_t size )
 
   return UTIL_ADV_TRACE_UNKNOWN_ERROR;
 }
-	[#else]
+  [#else]
   HAL_StatusTypeDef result;
   IRQn_Type use_dma_tx;
   UTIL_ADV_TRACE_Status_t status = UTIL_ADV_TRACE_OK;
@@ -478,8 +477,8 @@ UTIL_ADV_TRACE_Status_t UART_TransmitDMA ( uint8_t *pdata, uint16_t size )
 
   /* USER CODE END UART_TransmitDMA 2 */
 
-		[#list 0..(nbInstance-1) as i]
-			[#if myHash["bspName"+i] == "Serial Link for Logs"]
+    [#list 0..(nbInstance-1) as i]
+      [#if myHash["bspName"+i] == "Serial Link for Logs"]
   use_dma_tx = get_IRQn_Type_from_DMA_HandleTypeDef(h${myHash["IpInstance"+i]?lower_case?replace("s","")}.hdmatx);
 
   if ( (use_dma_tx == GPDMA1_Channel0_IRQn ) || ( use_dma_tx == GPDMA1_Channel1_IRQn )
@@ -505,8 +504,8 @@ UTIL_ADV_TRACE_Status_t UART_TransmitDMA ( uint8_t *pdata, uint16_t size )
     HAL_UART_Receive_IT(&h${myHash["IpInstance"+i]?lower_case?replace("s","")}, &charRx, 1);
   }
 
-			[/#if]
-		[/#list]
+      [/#if]
+    [/#list]
   /* USER CODE BEGIN UART_TransmitDMA 3 */
 
   /* USER CODE END UART_TransmitDMA 3 */
@@ -517,14 +516,14 @@ UTIL_ADV_TRACE_Status_t UART_TransmitDMA ( uint8_t *pdata, uint16_t size )
 
   return status;
 }
-	[/#if]
+  [/#if]
 [/#if]
 
 [#if !BspIpDatas??]
 [#else]
-	[#if is_for_BLE_TM_and_BLE_Skeleton_only == 0]
-		[#list 0..(nbInstance-1) as i]
-			[#if myHash["bspName"+i] == "Serial Link for Logs"]
+  [#if is_for_BLE_TM_and_BLE_Skeleton_only == 0]
+    [#list 0..(nbInstance-1) as i]
+      [#if myHash["bspName"+i] == "Serial Link for Logs"]
 static void ${myHash["IpInstance"+i]}_DMA_MspDeInit(void)
 {
   IRQn_Type use_dma_tx;
@@ -554,14 +553,14 @@ static void ${myHash["IpInstance"+i]}_DMA_MspDeInit(void)
 
   /* USER CODE END ${myHash["IpInstance"+i]}_DMA_MspDeInit 2 */
 }
-			[/#if]
-		[/#list]
-	[/#if]
+      [/#if]
+    [/#list]
+  [/#if]
 [/#if]
 
 [#if !BspIpDatas??]
 [#else]
-	[#if is_for_BLE_TM_and_BLE_Skeleton_only == 0]
+  [#if is_for_BLE_TM_and_BLE_Skeleton_only == 0]
 static void UsartIf_TxCpltCallback(UART_HandleTypeDef *huart)
 {
   /* USER CODE BEGIN UsartIf_TxCpltCallback 1 */
@@ -583,11 +582,11 @@ static void UsartIf_RxCpltCallback(UART_HandleTypeDef *huart)
   /* USER CODE END UsartIf_RxCpltCallback 1 */
 
   RxCpltCallback(&charRx, 1, 0);
-		[#list 0..(nbInstance-1) as i]
-			[#if myHash["bspName"+i] == "Serial Link for Logs"]
+    [#list 0..(nbInstance-1) as i]
+      [#if myHash["bspName"+i] == "Serial Link for Logs"]
   HAL_UART_Receive_IT(&h${myHash["IpInstance"+i]?lower_case?replace("s","")}, &charRx, 1);
-			[/#if]
-		[/#list]
+      [/#if]
+    [/#list]
 
   /* USER CODE BEGIN UsartIf_RxCpltCallback 2 */
 
@@ -615,7 +614,7 @@ static IRQn_Type get_IRQn_Type_from_DMA_HandleTypeDef(DMA_HandleTypeDef * dma_ha
      So, if you see this value, it means you used an invalid DMA handler as input. */
   return IRQ_BADIRQ;
 }
-	[/#if]
+  [/#if]
 [/#if]
 
 /* Private user code ---------------------------------------------------------*/

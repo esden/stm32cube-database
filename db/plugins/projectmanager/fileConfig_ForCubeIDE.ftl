@@ -89,7 +89,9 @@
 
     <Toolchain>${ide}</Toolchain>
 [#if ide=="EWARM" || ide=="MDK-ARM"]
+   [#if Toolversion??]
     <Toolversion>${Toolversion}</Toolversion>
+   [/#if]
 [/#if]
 [#if staticLibraryProject??]<StaticLibraryProject>true</StaticLibraryProject> [#-- Static Library Project --][/#if]
 
@@ -205,8 +207,8 @@
     [/#if]
 [/#if]
 <config>
-[#if family!="STM32H7RSxx"]
-<name>${Configuration}[#if (multiConfig == "true")][#if Secure!="-1"][#if family=="STM32MP2xx"]_${cpuCore?replace("ARM Cortex-", "C")}[/#if][#if Secure=="1" && family!="STM32WLxx"]_S[/#if][#if Secure=="0" && family!="STM32WLxx"]_NS[/#if][#if Secure=="1" && family=="STM32WLxx"]_${cpuCore?replace("ARM Cortex-", "C")?replace("+", "PLUS")}[#else][#if family !="STM32MP2xx"]_${cpuCore?replace("ARM Cortex-", "C")?replace("+", "PLUS")}[/#if][/#if][/#if][/#if]</name>	 [#-- project configuration name. Ex: STM32F407_EVAL --]
+[#if family!="STM32H7RSxx" && family!="STM32N6xx" && Configuration?contains("FSBL") == false]
+<name>${Configuration}[#if (multiConfig == "true")][#if Secure!="-1" && cpuCore?has_content][#if family=="STM32MP2xx"]_${cpuCore?replace("ARM Cortex-", "C")}[/#if][#if Secure=="1" && family!="STM32WLxx"]_S[/#if][#if Secure=="0" && family!="STM32WLxx"]_NS[/#if][#if Secure=="1" && family=="STM32WLxx"]_${cpuCore?replace("ARM Cortex-", "C")?replace("+", "PLUS")}[#else][#if family !="STM32MP2xx"]_${cpuCore?replace("ARM Cortex-", "C")?replace("+", "PLUS")}[/#if][/#if][/#if][/#if]</name>	 [#-- project configuration name. Ex: STM32F407_EVAL --]
 [#else] 
 <name>${Configuration}</name>
 [/#if]
@@ -272,6 +274,9 @@
 [/#if]
 [#if ota?? && ota=="true"]
 <ota>true</ota>
+[/#if]
+[#if OpenAMPActivated?? && OpenAMPActivated=="true"]
+<OpenAMPActivated>true</OpenAMPActivated>
 [/#if]
 [#if bootinfo?? && bootinfo=="true"]
 <bootinfo>true</bootinfo>
@@ -524,6 +529,9 @@
             [#if dataKey=="UtilitiesGroup"]
                [#assign UtilitiesGroup =  elem[dataKey]]
             [/#if]
+             [#if dataKey=="CommonGroup"]            
+               [#assign CommonGroup =  elem[dataKey]]
+            [/#if]
             [#if dataKey=="cmsisSourceFileNameList"]
                [#assign cmsisSourceFileNameList =  elem[dataKey]]               
             [/#if]
@@ -570,8 +578,8 @@
 [#--if ide!="STM32CubeIDE" --]
 <Project>    
 [#-- <ProjectPath>${ProjectPath}</ProjectPath>  --][#-- added to give project path --]
-[#if family!="STM32H7RSxx"]
-    <ProjectName>${Configuration}[#if TrustZone=="1"][#if family=="STM32MP2xx"]_${cpuCore?replace("ARM Cortex-", "C")}[/#if][#if ConfigSecure=="1"]_S[#else]_NS[/#if][/#if][#if (MultiProject == "1") && family !="STM32MP2xx"][#if MultiProject=="1" && cpuCore??]_${cpuCore?replace("ARM Cortex-", "C")?replace("+", "PLUS")}[#else]_CM4[/#if][/#if]</ProjectName> [#-- modified to give only the project name without path --]
+[#if family!="STM32H7RSxx" && family!="STM32N6xx" && Configuration?contains("FSBL") == false]
+    <ProjectName>${Configuration}[#if TrustZone=="1"][#if family=="STM32MP2xx"]_${cpuCore?replace("ARM Cortex-", "C")}[/#if][#if ConfigSecure=="1"]_S[#else]_NS[/#if][/#if][#if (MultiProject == "1" && cpuCore?has_content) && family !="STM32MP2xx"][#if MultiProject=="1" && cpuCore??]_${cpuCore?replace("ARM Cortex-", "C")?replace("+", "PLUS")}[#else]_CM4[/#if][/#if]</ProjectName> [#-- modified to give only the project name without path --]
 [#else]
     <ProjectName>${Configuration}</ProjectName>
 [/#if]
@@ -971,6 +979,78 @@
             </group>
             [#-- /#if --]
         [/#if] [#-- End Utilities Group --]
+ [#-- CommonGroup Start --]  
+      [#if CommonGroup??]                 
+    <group>     
+    <name>Common</name>
+        <group>
+        <name>${CommonGroup.name?replace("COMMON_","")}</name>
+        [#list CommonGroup.subGroups as groupList]
+            <group>
+            <name>${groupList.name!''}</name>
+            [#-- First level of subGroup --]
+            [#if groupList.sourceFilesNameList??] 
+                [#list groupList.sourceFilesNameList as filesName]
+                    [#assign removeFromConfig = "0"]
+                        [#if multiConfigurationProject?? && ConfigsAndFiles?? && TrustZone=="1"]
+                            [#if !ConfigsAndFiles[selectedConfig]?seq_contains(filesName?replace("/","\\"))]
+                            [#assign removeFromConfig = "1"]
+                            [/#if]
+                        [/#if]
+                        [#if removeFromConfig == "0"]
+                    <file>
+                    <name>${filesName!''}</name>
+                    [#if ConfigsAndFiles??]
+                        [#list ConfigsAndFiles?keys as configKey]
+                            [#if  multiConfigurationProject?? && !ConfigsAndFiles[configKey]?seq_contains(filesName?replace("/","\\")) && TrustZone=="0"]
+            <excluded>
+                <configuration>${Configuration}_${configKey?replace("CortexM", "CM")}</configuration>
+                </excluded>
+                            [/#if]
+                        [/#list]
+                    [/#if]
+                </file>
+                    [/#if]
+                [/#list] 
+            [/#if] 
+            [#-- Second level of subGroup --]
+            [#if groupList.subGroups??]
+                [#list groupList.subGroups as subGroupList]
+                 <group>
+                    <name>${subGroupList.name!''}</name>
+                    [#if subGroupList.sourceFilesNameList??] 
+                        [#list subGroupList.sourceFilesNameList as filesName]
+                        [#assign removeFromConfig = "0"]
+                        [#if multiConfigurationProject?? && ConfigsAndFiles?? && TrustZone=="1"]
+                            [#if !ConfigsAndFiles[selectedConfig]?seq_contains(filesName?replace("/","\\"))]
+                            [#assign removeFromConfig = "1"]
+                            [/#if]
+                        [/#if]
+                        [#if removeFromConfig == "0"]
+                    <file>
+                    <name>${filesName!''}</name>
+                        [#if ConfigsAndFiles??]
+                            [#list ConfigsAndFiles?keys as configKey]
+                                [#if  multiConfigurationProject?? && !ConfigsAndFiles[configKey]?seq_contains(filesName?replace("/","\\")) && TrustZone=="0"]
+            <excluded>
+                <configuration>${Configuration}_${configKey?replace("CortexM", "CM")}</configuration>
+                </excluded>
+                                [/#if]
+                            [/#list]
+                        [/#if]
+                </file>
+                        [/#if]
+                        [/#list] 
+                    [/#if] 
+                 </group>  
+                [/#list]
+            [/#if]
+            </group>
+        [/#list]
+        </group>       
+     </group>
+    [/#if]
+    [#-- CommonGroup End --]  
     </Groups>
 
     [#else] [#-- Copy All/Needed option --]
@@ -1073,9 +1153,14 @@
                 [#list MiddlewareList as Middleware] 
                     [#if !Middleware?ends_with("FREERTOS") && !Middleware?ends_with("ThreadX") && !AppSourceEntries?seq_contains(Middleware?replace("/","\\")?replace("CM0Plus","CM0PLUS"))]
                         [#if TrustZone == "0"]
+                         [#if Context??]
+                           [#assign exist = fileExist(WorkspacePath+mainSourceRepo+"/"+Middleware)]
+                            [#if exist?contains("true")]
                             <sourceEntry>
                             <name>${Middleware}</name>
                             </sourceEntry>
+                        [/#if]
+                    [/#if]
                         [#else] [#-- trustzone == 1 --]
                             [#if Middleware?starts_with("Secure") && ConfigSecure=="1"]
                                 <sourceEntry>
@@ -1093,11 +1178,21 @@
             [/#if]
         [#-- ************************* --]
 	[/#if] [#-- End of at least one mw--]
-        [#if ResMgr_Utility?? || (UtilitiesGroup?? && UtilitiesGroup.sourceFilesNameList?size>0)]
-            <sourceEntry>
-                <name>Utilities</name>
-            </sourceEntry>
-        [/#if]
+    [#-- workaround for Ticket 195742 begin--]
+          	    [#assign found ="false"]
+          	    [#if UtilitiesGroup??]
+                [#list UtilitiesGroup.sourceFilesNameList as pack]
+                    [#if pack?contains("stm32_lcd.c")]
+                    [#assign found ="true"]
+                    [/#if]
+                [/#list]
+                [/#if]
+              [#if ResMgr_Utility?? || (UtilitiesGroup?? && UtilitiesGroup.sourceFilesNameList?size>0 && !(found=="true" && TrustZone=="1" && !atLeastOneBspComponentIsUsed) )]
+                    <sourceEntry>
+                    <name>Utilities</name>
+                    </sourceEntry>
+              [/#if]
+    [#-- workaround for Ticket 195742 ends--]
         [#if ThirdPartyPackList??]
             [#list ThirdPartyPackList as pack]
                 [#if pack !=  ""]
@@ -1356,6 +1451,79 @@
             </group>
             [/#if]
         [/#if] [#-- End Utilities Group --]
+        
+ [#-- CommonGroup Start --]  
+      [#if CommonGroup??]                 
+    <group>     
+    <name>Common</name>
+        <group>
+        <name>${CommonGroup.name?replace("COMMON_","")}</name>
+        [#list CommonGroup.subGroups as groupList]
+            <group>
+            <name>${groupList.name!''}</name>
+            [#-- First level of subGroup --]
+            [#if groupList.sourceFilesNameList??] 
+                [#list groupList.sourceFilesNameList as filesName]
+                    [#assign removeFromConfig = "0"]
+                        [#if multiConfigurationProject?? && ConfigsAndFiles?? && TrustZone=="1"]
+                            [#if !ConfigsAndFiles[selectedConfig]?seq_contains(filesName?replace("/","\\"))]
+                            [#assign removeFromConfig = "1"]
+                            [/#if]
+                        [/#if]
+                        [#if removeFromConfig == "0"]
+                    <file>
+                    <name>${filesName!''}</name>
+                    [#if ConfigsAndFiles??]
+                        [#list ConfigsAndFiles?keys as configKey]
+                            [#if  multiConfigurationProject?? && !ConfigsAndFiles[configKey]?seq_contains(filesName?replace("/","\\")) && TrustZone=="0"]
+            <excluded>
+                <configuration>${Configuration}_${configKey?replace("CortexM", "CM")}</configuration>
+                </excluded>
+                            [/#if]
+                        [/#list]
+                    [/#if]
+                </file>
+                    [/#if]
+                [/#list] 
+            [/#if] 
+            [#-- Second level of subGroup --]
+            [#if groupList.subGroups??]
+                [#list groupList.subGroups as subGroupList]
+                 <group>
+                    <name>${subGroupList.name!''}</name>
+                    [#if subGroupList.sourceFilesNameList??] 
+                        [#list subGroupList.sourceFilesNameList as filesName]
+                        [#assign removeFromConfig = "0"]
+                        [#if multiConfigurationProject?? && ConfigsAndFiles?? && TrustZone=="1"]
+                            [#if !ConfigsAndFiles[selectedConfig]?seq_contains(filesName?replace("/","\\"))]
+                            [#assign removeFromConfig = "1"]
+                            [/#if]
+                        [/#if]
+                        [#if removeFromConfig == "0"]
+                    <file>
+                    <name>${filesName!''}</name>
+                        [#if ConfigsAndFiles??]
+                            [#list ConfigsAndFiles?keys as configKey]
+                                [#if  multiConfigurationProject?? && !ConfigsAndFiles[configKey]?seq_contains(filesName?replace("/","\\")) && TrustZone=="0"]
+            <excluded>
+                <configuration>${Configuration}_${configKey?replace("CortexM", "CM")}</configuration>
+                </excluded>
+                                [/#if]
+                            [/#list]
+                        [/#if]
+                </file>
+                        [/#if]
+                        [/#list] 
+                    [/#if] 
+                 </group>  
+                [/#list]
+            [/#if]
+            </group>
+        [/#list]
+        </group>       
+     </group>
+    [/#if]
+    [#-- CommonGroup End --]  
     </Groups>
     [/#if]
 
@@ -1607,6 +1775,78 @@
             </group>
             [#-- /#if --]
         [/#if] [#-- End Utilities Group --]
+[#-- CommonGroup Start --]
+      [#if CommonGroup??]
+    <group>
+    <name>Common</name>
+        <group>
+        <name>${CommonGroup.name?replace("COMMON_","")}</name>
+        [#list CommonGroup.subGroups as groupList]
+            <group>
+            <name>${groupList.name!''}</name>
+            [#-- First level of subGroup --]
+            [#if groupList.sourceFilesNameList??]
+                [#list groupList.sourceFilesNameList as filesName]
+                    [#assign removeFromConfig = "0"]
+                        [#if multiConfigurationProject?? && ConfigsAndFiles?? && TrustZone=="1"]
+                            [#if !ConfigsAndFiles[selectedConfig]?seq_contains(filesName?replace("/","\\"))]
+                            [#assign removeFromConfig = "1"]
+                            [/#if]
+                        [/#if]
+                        [#if removeFromConfig == "0"]
+                    <file>
+                    <name>${filesName!''}</name>
+                    [#if ConfigsAndFiles??]
+                        [#list ConfigsAndFiles?keys as configKey]
+                            [#if  multiConfigurationProject?? && !ConfigsAndFiles[configKey]?seq_contains(filesName?replace("/","\\")) && TrustZone=="0"]
+            <excluded>
+                <configuration>${Configuration}_${configKey?replace("CortexM", "CM")}</configuration>
+                </excluded>
+                            [/#if]
+                        [/#list]
+                    [/#if]
+                </file>
+                    [/#if]
+                [/#list]
+            [/#if]
+            [#-- Second level of subGroup --]
+            [#if groupList.subGroups??]
+                [#list groupList.subGroups as subGroupList]
+                 <group>
+                    <name>${subGroupList.name!''}</name>
+                    [#if subGroupList.sourceFilesNameList??]
+                        [#list subGroupList.sourceFilesNameList as filesName]
+                        [#assign removeFromConfig = "0"]
+                        [#if multiConfigurationProject?? && ConfigsAndFiles?? && TrustZone=="1"]
+                            [#if !ConfigsAndFiles[selectedConfig]?seq_contains(filesName?replace("/","\\"))]
+                            [#assign removeFromConfig = "1"]
+                            [/#if]
+                        [/#if]
+                        [#if removeFromConfig == "0"]
+                    <file>
+                    <name>${filesName!''}</name>
+                        [#if ConfigsAndFiles??]
+                            [#list ConfigsAndFiles?keys as configKey]
+                                [#if  multiConfigurationProject?? && !ConfigsAndFiles[configKey]?seq_contains(filesName?replace("/","\\")) && TrustZone=="0"]
+            <excluded>
+                <configuration>${Configuration}_${configKey?replace("CortexM", "CM")}</configuration>
+                </excluded>
+                                [/#if]
+                            [/#list]
+                        [/#if]
+                </file>
+                        [/#if]
+                        [/#list]
+                    [/#if]
+                 </group>
+                [/#list]
+            [/#if]
+            </group>
+        [/#list]
+        </group>
+     </group>
+    [/#if]
+    [#-- CommonGroup End --]
 <group>
         <name>Application</name>
         <group>

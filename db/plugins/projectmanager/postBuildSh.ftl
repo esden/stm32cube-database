@@ -79,7 +79,7 @@ ns_code_xml="$provisioningdir/${ProvisioningFolderName}/Images/${NonSecure_Code_
 	[#if NonSecure_Bin_Code_Image??]
 ns_code_bin_xml="$provisioningdir/${ProvisioningFolderName}/Images/${NonSecure_Bin_Code_Image}"
 	[/#if]
-updateXmlImage="$provisioningdir\${ProvisioningFolderName}\PyHelper\update_xml_image.py"
+updateXmlImage="$provisioningdir/${ProvisioningFolderName}/PyHelper/update_xml_image.py"
 imageXml=" --image-xml"
 [/#if]
 

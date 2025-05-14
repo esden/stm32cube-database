@@ -19,7 +19,11 @@
 #endif
 /* Includes ------------------------------------------------------------------*/
 [#if isHalSupported?? && isHALUsed?? ]
+    [#if FamilyName?matches("STM32W(B0|L3)*")]
+#include "${FamilyName?lower_case}x_hal.h"
+    [#else]
 #include "${FamilyName?lower_case}xx_hal.h"
+    [/#if]
 [/#if]
 [#assign STM32WL=false]
 [#if FamilyName?lower_case?contains("wl")]

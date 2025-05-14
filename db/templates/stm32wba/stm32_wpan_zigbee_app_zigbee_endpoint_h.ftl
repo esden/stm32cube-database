@@ -2,8 +2,8 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * File Name          : app_zigbee_cluster.h
-  * Description        : Header for Zigbee Application and it cluster.
+  * File Name          : app_zigbee_endpoint.h
+  * Description        : Header for Zigbee Application and it endpoint.
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
   ******************************************************************************
@@ -24,6 +24,23 @@ Key & Value:
 Key: ${key}; Value: ${myHash[key]}
 [/#list]
 --]
+[#assign EndNbr = myHash["ZGB_NB_ENDPOINTS"]]
+[#assign item = 0]
+[#assign otaUpgrade = 0]
+[#list SWIPdatas as SWIP]
+    [#if SWIP.defines??]
+        [#list SWIP.defines as configParameter]
+          [#if EndNbr?number!=0]
+            [#if configParameter.name?starts_with("ZCL_") && configParameter.value != "NONE" && !configParameter.name?contains("BASIC")]
+               [#assign item = item + 1]
+            [/#if]
+            [#if configParameter.name?contains("ZCL_OTA") && configParameter.value != "NONE"]
+               [#assign otaUpgrade = otaUpgrade + 1]
+            [/#if]
+          [/#if]
+        [/#list]
+    [/#if]
+[/#list]
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef APP_ZIGBEE_ENDPOINT_H
 #define APP_ZIGBEE_ENDPOINT_H
@@ -40,7 +57,7 @@ extern "C" {
 /* USER CODE END Includes */
 
 /* Exported defines ------------------------------------------------------------*/
-[#if myHash["ZCL_OTA_UPGRADE_ENDPOINT0"] != "NONE"]
+[#if otaUpgrade?number!=0]
 
 /* ZCL OTA FUOTA specific defines ----------------------------------------------------*/
 #define FUOTA_MAGIC_KEYWORD_M4_APP              0x94448A29u       /* Keyword found at the end of Zigbee Ota file for M4 Application Processor binary */
@@ -79,14 +96,18 @@ extern "C" {
 #define CFG_REBOOT_ON_CPU2_UPGRADE              0x02u       /* Reboot on OTA FW to download CPU2. For WB Compatibility */
 
 [/#if]
-#define	CLUSTER_NB_MAX                          6u          /* Maximum number of Clusters in this application */
+[#if item?number > 6]
+#define CLUSTER_NB_MAX                          ${item}u          /* Maximum number of Clusters in this application */
+[#else]
+#define CLUSTER_NB_MAX                          6u          /* Maximum number of Clusters in this application */
+[/#if]
 
 /* USER CODE BEGIN ED */
 
 /* USER CODE END ED */ 
 
 /* Exported types ------------------------------------------------------------*/  
-[#if myHash["ZCL_OTA_UPGRADE_ENDPOINT0"] != "NONE"]  
+[#if otaUpgrade?number!=0]
 /* OTA Structure Definition ------------------------------------------------------*/
 enum APP_ZIGBEE_OtaFileTypeDef_t
 {
@@ -129,7 +150,7 @@ struct APP_ZIGBEE_OtaContext_t
 /* Exported functions prototypes -------------------------------- */
 extern void       APP_ZIGBEE_ApplicationInit              ( void );
 extern void       APP_ZIGBEE_ApplicationStart             ( void );
-extern void	      APP_ZIGBEE_PersistenceStartup           ( void );
+extern void       APP_ZIGBEE_PersistenceStartup           ( void );
 extern void       APP_ZIGBEE_ConfigEndpoints              ( void );
 extern bool       APP_ZIGBEE_ConfigGroupAddr              ( void );
 

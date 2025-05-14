@@ -71,7 +71,7 @@
 extern uint32_t HAL_GetTick(void);
 
 /* Private function prototypes -----------------------------------------------*/
-[#if (FREERTOS?? || THREADX??) && Secure!="true"]
+[#if (FREERTOS??||XCUBEFREERTOS?? || THREADX??) && Secure!="true"]
 DEF_TASK_FUNCTION(USBPD_TaskUser);
 DEF_TASK_FUNCTION(USBPD_CAD_Task);
 DEF_TASK_FUNCTION(USBPD_PE_CableTask);
@@ -139,7 +139,7 @@ UTIL_TIMER_Object_t TimerPE0, TimerPE1;
 #endif /* _DEBUG_TRACE */
 
 /* Private variables ---------------------------------------------------------*/
-[#if (FREERTOS?? || THREADX??) && Secure!="true"]
+[#if (FREERTOS??||XCUBEFREERTOS?? || THREADX??) && Secure!="true"]
 [#if !USBPDCORE_LIB_NO_PD]
 static OS_TASK_ID DPM_PEThreadId_Table[USBPD_PORT_COUNT];
 static OS_QUEUE_ID CADQueueId;
@@ -358,7 +358,7 @@ USBPD_StatusTypeDef USBPD_DPM_InitOS(void)
 [/#if]
 {
   OS_INIT();
-[#if (FREERTOS?? || THREADX??) && Secure!="true"]
+[#if (FREERTOS??||XCUBEFREERTOS?? || THREADX??) && Secure!="true"]
   {
     OS_CREATE_QUEUE(CADQueueId, "QCAD", USBPD_PORT_COUNT, OS_ELEMENT_SIZE);
     OS_DEFINE_TASK(CAD, USBPD_CAD_Task, OS_CAD_PRIORITY, OS_CAD_STACK_SIZE, NULL);
@@ -594,7 +594,7 @@ void USBPD_DPM_TimerCounter(void)
 
 [#if !CUBEMX_GENERATED]
 [#-- does not provide this piece of code because already done by CubeMX in main.c --]
-[#if FREERTOS?? && Secure!="true"]
+[#if (FREERTOS??  ||XCUBEFREERTOS??) && Secure!="true"]
 #if (osCMSIS >= 0x20000U)
   /* SysTick Handler now fully handled on CMSIS OS V2 side */
 #else
@@ -615,7 +615,7 @@ void USBPD_DPM_TimerCounter(void)
   */
 static void USBPD_PE_TaskWakeUp(uint8_t PortNum)
 {
-[#if (FREERTOS?? || THREADX??) && Secure!="true"]
+[#if (FREERTOS??|| XCUBEFREERTOS?? ||THREADX??) && Secure!="true"]
   OS_PUT_MESSAGE_QUEUE(PEQueueId[PortNum], 0xFFFFU, 0U);
 [#else]
 #if defined(USE_STM32_UTILITY_OS)
@@ -634,7 +634,7 @@ static void USBPD_PE_TaskWakeUp(uint8_t PortNum)
   */
 static void USBPD_DPM_CADTaskWakeUp(void)
 {
-[#if (FREERTOS?? || THREADX??) && Secure!="true"]
+[#if (FREERTOS??||XCUBEFREERTOS?? || THREADX??) && Secure!="true"]
   OS_PUT_MESSAGE_QUEUE(CADQueueId, 0xFFFF, 0);
 [#else]
 #if defined(USE_STM32_UTILITY_OS)
@@ -645,7 +645,7 @@ static void USBPD_DPM_CADTaskWakeUp(void)
 [/#if][#-- _RTOS --]
 }
 
-[#if (FREERTOS?? || THREADX??) && Secure!="true"]
+[#if (FREERTOS??|| XCUBEFREERTOS?? ||THREADX??) && Secure!="true"]
 [#if !USBPDCORE_LIB_NO_PD]
 /**
   * @brief  Main task for PE layer
@@ -769,7 +769,7 @@ void USBPD_DPM_CADCallback(uint8_t PortNum, USBPD_CAD_EVENT State, CCxPin_TypeDe
     case USBPD_CAD_EVENT_EMC :
     {
       /* Terminate PE task */
-[#if (FREERTOS?? || THREADX??) && Secure!="true"]
+[#if (FREERTOS??|| XCUBEFREERTOS??||THREADX??) && Secure!="true"]
       uint8_t _timeout = 0;
 #ifdef _LOW_POWER
       UTIL_LPM_SetStopMode(0 == PortNum ? LPM_PE_0 : LPM_PE_1, UTIL_LPM_ENABLE);
@@ -820,7 +820,7 @@ void USBPD_DPM_CADCallback(uint8_t PortNum, USBPD_CAD_EVENT State, CCxPin_TypeDe
 static void DPM_StartPETask(uint8_t PortNum)
 {
   USBPD_PE_StateMachine_Reset(PortNum);
-[#if (FREERTOS?? || THREADX??) && Secure!="true"]
+[#if (FREERTOS??||XCUBEFREERTOS?? ||THREADX??) && Secure!="true"]
   /* Resume the PE task */
   switch (PortNum)
   {

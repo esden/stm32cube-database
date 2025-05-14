@@ -39,7 +39,7 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
 #ifdef  USE_FULL_ASSERT
-[#if familyName="stm32g4" || familyName="stm32g0" || familyName="stm32wl"|| familyName="stm32l5" || familyName="stm32wba"]
+[#if familyName="stm32g4" || familyName="stm32g0" || familyName="stm32wl"|| familyName="stm32l5" || familyName="stm32wba" || familyName="stm32wl3"]
 /**
   * @brief  The assert_param macro is used for function's parameters check.
   * @param  expr: If expr is false, it calls assert_failed function

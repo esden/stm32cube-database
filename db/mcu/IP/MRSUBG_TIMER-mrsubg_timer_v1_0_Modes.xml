@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" DBVersion="V3.0" IPType="peripheral" Name="MRSUBG_TIMER" Version="mrsubg_timer_v1_0" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db//IP_Modes.xsd">
+
+     <RefParameter Name="HSE_XTAL_freq" Comment="HSE_XTAL_freq" DefaultValue="48"  Type="string" TabName="Configuration" Group="Application configuration">
+        <Description>HSE XTAL frequency</Description>
+    </RefParameter>
+
+     <RefParameter Name="XTAL_StartupTime" Comment="XTAL_StartupTime" DefaultValue="320" Min="1" Type="integer" TabName="Configuration" Group="Application configuration">
+        <Description>XTAL startup time</Description>
+    </RefParameter>
+
+    <RefParameter Name="enableInitialCalibration" Comment="enableInitialCalibration" DefaultValue="TRUE" Type="list" Group="Application configuration" TabName="Configuration">
+        <PossibleValue Value="TRUE" Comment="Yes"/>
+        <PossibleValue Value="FALSE" Comment="No"/>
+        <Description>Enable initial estimation of the frequency of the Low Speed Oscillator
+         &lt;br&gt; otherwise it is assumed fixed at 32.768 kHz.</Description>
+        <Condition Diagnostic="" Expression="!(LSEByPass|LSEOscillator)"/>
+    </RefParameter>
+    <RefParameter Name="enableInitialCalibration" Comment="enableInitialCalibration" DefaultValue="FALSE" Type="list" Group="Application configuration" TabName="Configuration">
+        <PossibleValue Value="TRUE" Comment="Yes"/>
+        <PossibleValue Value="FALSE" Comment="No"/>
+        <Description>Enable initial estimation of the frequency of the Low Speed Oscillator
+         &lt;br&gt; otherwise it is assumed fixed at 32.768 kHz.</Description>
+    </RefParameter>
+
+    <RefParameter Name="periodicCalibrationInterval" Comment="periodicCalibrationInterval" DefaultValue="10000" Type="integer" Min="0" Max="10000" Group="Application configuration" TabName="Configuration">
+        <Description>Periodic calibration interval in ms (if 0 no calibration is done)
+        &lt;br&gt;Default value:
+        &lt;br&gt;0 if RCC LSE clock is enabled;
+        &lt;br&gt;10000 if RCC LSE clock is not enabled;
+       </Description>
+        <Condition Diagnostic="" Expression="!(LSEByPass|LSEOscillator)"/>
+    </RefParameter>
+    <RefParameter Name="periodicCalibrationInterval" Comment="periodicCalibrationInterval" DefaultValue="0" Type="integer" Min="0" Max="10000" Group="Application configuration" TabName="Configuration">
+        <Description>Periodic calibration interval in ms (if 0 no calibration is done)
+        &lt;br&gt;Default value:
+        &lt;br&gt;0 if RCC LSE clock is enabled;
+        &lt;br&gt;10000 if RCC LSE clock is not enabled;
+        </Description>
+    </RefParameter>
+
+    <RefMode Name="MRSUBG_TIMER_Activate">
+        <ConfigForMode>Mrsubg_Timer_Init</ConfigForMode>
+           <Parameter Name="HSE_XTAL_freq"/>
+           <Parameter Name="XTAL_StartupTime"/>
+           <Parameter Name="enableInitialCalibration"/>
+           <Parameter Name="periodicCalibrationInterval"/>
+    </RefMode>
+
+    <ModeLogicOperator Name="OR">
+        <Mode Name="MRSUBG_TIMER_Activate" UserName="Activated">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="MRSUBG_TIMER_Activate" UserName="Activated">
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_MRSUBG_TIMER"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+            <Condition Diagnostic="Active only if: HSE and LSE  clock is activated in RCC" Expression="(HSEByPass|HSEOscillator) &amp; (LSEByPass|LSEOscillator)"/>
+            <Semaphore>MW_MRSUBG_TIMER</Semaphore>
+        </Mode>
+    </ModeLogicOperator>
+
+    <RefSignal Name="VS_MRSUBG_TIMER" Virtual="true"/>
+</IP>

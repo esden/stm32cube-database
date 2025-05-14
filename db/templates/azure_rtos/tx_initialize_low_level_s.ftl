@@ -76,10 +76,12 @@
 /**************************************************************************/
 /**************************************************************************/
 
-[#if FamilyName == "STM32WBA"]
+[#if FamilyName == "STM32WBA" || FamilyName == "STM32N6"]
 SYSTEM_CLOCK      =   ${CORTEX_CLOCK_FREQ_value}
 [#else]
+[#if HCLKFreq_Value??]
 SYSTEM_CLOCK      =   ${HCLKFreq_Value}
+[/#if]
 [/#if]
 SYSTICK_CYCLES    =   ((SYSTEM_CLOCK / ${TX_TIMER_TICKS_PER_SECOND_value}) -1)
 
@@ -306,10 +308,12 @@ __tx_DBGHandler:
     EXTERN  __vector_table
 ;
 ;
-[#if FamilyName == "STM32WBA"]
+[#if FamilyName == "STM32WBA" || FamilyName == "STM32N6"]
 SYSTEM_CLOCK      EQU   ${CORTEX_CLOCK_FREQ_value}
 [#else]
+[#if HCLKFreq_Value??]
 SYSTEM_CLOCK      EQU   ${HCLKFreq_Value}
+[/#if]
 [/#if]
 SYSTICK_CYCLES    EQU   ((SYSTEM_CLOCK / ${TX_TIMER_TICKS_PER_SECOND_value}) -1)
 ;
@@ -513,10 +517,12 @@ __tx_DBGHandler:
 /**************************************************************************/
 /**************************************************************************/
 
-[#if FamilyName == "STM32WBA"]
+[#if FamilyName == "STM32WBA" || FamilyName == "STM32WBA"]
 SYSTEM_CLOCK      =   ${CORTEX_CLOCK_FREQ_value}
 [#else]
+[#if HCLKFreq_Value??]
 SYSTEM_CLOCK      =   ${HCLKFreq_Value}
+[/#if]
 [/#if]
 SYSTICK_CYCLES    =   ((SYSTEM_CLOCK / ${TX_TIMER_TICKS_PER_SECOND_value}) -1)
 

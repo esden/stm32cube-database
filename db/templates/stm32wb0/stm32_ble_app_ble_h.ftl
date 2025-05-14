@@ -105,6 +105,50 @@ typedef enum
 }ProcGapCentralId_t;
 
 [/#if]
+
+[#if myHash["LITE_SERVER_STATUS"]?number == 1 ]
+
+/**
+ * Global context contains all BLE common variables.
+ */
+typedef struct
+{
+  /**
+   * gap service handle
+   */
+  uint16_t gapServiceHandle;
+
+  /**
+   * device name characteristic handle
+   */
+  uint16_t devNameCharHandle;
+
+  /**
+   * appearance characteristic handle
+   */
+  uint16_t appearanceCharHandle;
+
+  /**
+   * connection handle of the current active connection
+   * When not iFn connection, the handle is set to 0xFFFF
+   */
+  uint16_t connectionHandle;
+  /* USER CODE BEGIN BleGlobalContext_t*/
+
+  /* USER CODE END BleGlobalContext_t */
+}BleGlobalContext_t;
+
+typedef struct
+{
+  BleGlobalContext_t BleApplicationContext_legacy;
+  APP_BLE_ConnStatus_t Device_Connection_Status;
+  /* USER CODE BEGIN PTD_1*/
+
+  /* USER CODE END PTD_1 */
+}BleApplicationContext_t;
+
+[/#if]
+
 /* USER CODE BEGIN ET */
 
 /* USER CODE END ET */
@@ -130,9 +174,9 @@ typedef enum
 [/#if]
 [#if  (myHash["BLE_MODE_TRANSPARENT_UART"] == "Enabled")]
 
-/* STM32WB09 Transparent Mode/DTM version (Bluetooth LE stack v4.0) */   
+/* Transparent Mode/DTM version (Bluetooth LE stack v4.x) */   
 #define DTM_FW_VERSION_MAJOR    1
-#define DTM_FW_VERSION_MINOR    0
+#define DTM_FW_VERSION_MINOR    1
 #define DTM_FW_VERSION_PATCH    0
 
 #define UART_INTERFACE
@@ -167,6 +211,15 @@ void APP_BLE_Procedure_Gap_Peripheral(ProcGapPeripheralId_t ProcGapPeripheralId)
 [/#if]
 void APP_BLE_Procedure_Gap_Central(ProcGapCentralId_t ProcGapCentralId);
 [/#if]
+
+[#if myHash["LITE_SERVER_STATUS"]?number == 1 ]
+void BLEEVT_App_Notification(const hci_pckt *hci_pckt);
+void VTimer_Process(void); 
+void BLEStack_Process(void);
+void NVM_Process(void ); 
+void SERVICE_APP_Process(void);
+[/#if]
+
 /* USER CODE BEGIN EF */
 
 /* USER CODE END EF */

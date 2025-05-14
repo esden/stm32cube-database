@@ -407,7 +407,7 @@ extern uint32_t ${valueCpuClock};
 [/#compress]
 
 #ifndef CMSIS_device_header
-[#if ((familyName=="stm32wb0") || (familyName=="stm32wl33")) ]
+[#if ((familyName=="stm32wb0") || (familyName=="stm32wl3")) ]
 #define CMSIS_device_header "${familyName}x.h"
 [#else]
 #define CMSIS_device_header "${familyName}xx.h"
@@ -620,7 +620,12 @@ to exclude the API function. */
 
 /* The lowest interrupt priority that can be used in a call to a "set priority"
 function. */
+
+[#if (familyName=="stm32wl3") ]
+#define configLIBRARY_LOWEST_INTERRUPT_PRIORITY   ((1 << configPRIO_BITS) - 1)
+[#else]
 #define configLIBRARY_LOWEST_INTERRUPT_PRIORITY   ${valueLibraryLowestInterruptPriority}
+[/#if]
 
 /* The highest interrupt priority that can be used by any interrupt service
 routine that makes calls to interrupt safe FreeRTOS API functions.  DO NOT CALL

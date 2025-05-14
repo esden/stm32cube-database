@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-  <IP xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+<IP xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
     ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
     xmlns="http://mcd.rou.st.com/modules.php?name=mcu"
     DBVersion="V4.0"
@@ -51,11 +51,11 @@
     <Condition Expression="S_All_IP_Secured" Diagnostic="pre-selected all Peripheral Secured"/>
     <PossibleValue Value="GTZC_TZSC_PERIPH_SEC" Comment="secured" Semaphore="CRS_GTZC_SECURE"/>
     <PossibleValue Value="GTZC_TZSC_PERIPH_NSEC" Comment="not secured"/>
-   </RefParameter>
+  </RefParameter>
   <RefParameter Name="CRS_Secure" Comment="CRS" DefaultValue="GTZC_TZSC_PERIPH_NSEC" Type="list" Group="Secureable Peripherals" TabName="TrustZone Security Controller - Securable Peripherals">
     <PossibleValue Value="GTZC_TZSC_PERIPH_NSEC" Comment="not secured"/>
     <PossibleValue Value="GTZC_TZSC_PERIPH_SEC" Comment="secured" Semaphore="CRS_GTZC_SECURE"/>
-   </RefParameter>
+  </RefParameter>
   <!-- ICACHE synchronize with ICACHE Secure mode -->
   <RefParameter Name="ICACHE_Secure" Comment="ICACHE" DefaultValue="GTZC_TZSC_PERIPH_SEC" Type="list" Group="Secureable Peripherals" TabName="TrustZone Security Controller - Securable Peripherals">
     <Condition Expression="S_ICACHE_REG_Secure" Diagnostic="pre-selected all Peripheral Secured"/>
@@ -457,7 +457,7 @@
   <!-- RefParameters for GTZC - MPCWM1 Secured -->
   <RefParameter Name="MPCWM1_Area_Choice" Comment="Configure Memory" DefaultValue="from full Secured Privileged" Type="String">
     <PossibleValue Value="from full Secured Privileged" Comment="from full Secured Privileged" Semaphore="S_All_MPCWM1_Secured"/>
-   <Description>Secure all the memory range in one time until sizes are modified.</Description>
+    <Description>Secure all the memory range in one time until sizes are modified.</Description>
   </RefParameter>
 
   <RefParameter Name="MPCWM1_Area_OCTOSPI1_BASE" Comment="Area Start OCTOSPI1_BASE" DefaultValue="0x90000000" Type="hex" Min="0x90000000" Max="0x90000000" Visible="false"/>
@@ -758,6 +758,8 @@
 
   <!-- RefParameters for GTZC - MPCBB1 Secured -->
 
+  <RefParameter Name="MPCBB1_NbArea" Comment="Nb Area" DefaultValue="2" Type="int" Min="2" Max="2" NoCheckOpt="false" Visible="false"/>
+  
   <RefParameter Name="MPCBB1_Area_SRAM1_BASE_NS" Comment="Area Start SRAM1_BASE_NS" DefaultValue="0x20000000" Type="hex" Min="0x20000000" Max="0x20000000" Visible="false"/>
   <RefParameter Name="MPCBB1_Area_Max" Comment="Area Max" DefaultValue="0x20000" Type="hex" Min="0x20000" Max="0x20000" Visible="false"/>
   <RefParameter Name="MPCBB1_Area_BlockSize" Comment="Area Block Size" DefaultValue="0x200" Type="hex" Min="0x200" Max="0x200" Visible="false"/>
@@ -842,33 +844,59 @@
     MPCBB*_nbArea=MPCBB*_Area_NbBlock/2 : is the very maximum of areas (each block alternate state from predecessor)
   -->
   <!-- increment NbArea & define Start_Address, Start & Size for each new area/attribute -->
-  <RefParameter Name="MPCBB1_NbArea" Comment="Nb Area" DefaultValue="2" Type="int" Min="2" Max="2" NoCheckOpt="false" Visible="false"/>
-  <RefParameter Name="MPCBB1_Area2_Secure_Start_Address" Comment="    Area 2 Start Address" DefaultValue="=MPCBB1_Area_Start_Address" Type="hex" Min="=(MPCBB1_Area_SRAM1_BASE_NS)" Max="=(MPCBB1_Area_Max + MPCBB1_Area_SRAM1_BASE_NS - MPCBB1_Area_BlockSize)" NoCheckOpt="false">
+
+  <RefParameter Name="MPCBB1_Area2_Start_Address" Comment="Area 2 Start Address" DefaultValue="=MPCBB1_Area_SRAM1_BASE_NS" Type="hex" Min="=(MPCBB1_Area_SRAM1_BASE_NS)" Max="=(MPCBB1_Area_Max + MPCBB1_Area_SRAM1_BASE_NS - MPCBB1_Area_BlockSize)" NoCheckOpt="false" Visible="false">
+    <Condition Expression="($IpInstance=GTZC)" Diagnostic="GTZC"/>
+  </RefParameter>
+  <RefParameter Name="MPCBB1_Area2_Start_Address" Comment="Area 2 Start Address" DefaultValue="=GTZC_S:MPCBB1_Area2_Start_Address" Type="StringHex" Min="=(MPCBB1_Area_SRAM1_BASE_NS)" Max="=(MPCBB1_Area_Max + MPCBB1_Area_SRAM1_BASE_NS - MPCBB1_Area_BlockSize)" NoCheckOpt="false" Visible="false">
+    <Condition Expression="!($IpInstance=GTZC_S)" Diagnostic="only modifiable from GTZC_S Peripheral"/>
+  </RefParameter>
+  <RefParameter Name="MPCBB1_Area2_Start_Address" Comment="Area 2 Start Address" DefaultValue="=MPCBB1_Area_SRAM1_BASE_NS" Type="hex" Min="=MPCBB1_Area_SRAM1_BASE_NS" Max="=MPCBB1_Area_SRAM1_BASE_NS" NoCheckOpt="false" Visible="false">
     <Condition Expression="S_Default_MPCBB1_template_$IpInstance" Diagnostic="ST default Template configuration Linker file"/>
   </RefParameter>
-  
-  <RefParameter Name="MPCBB1_Area2_Secure_Start_Address" Comment="    Area 2 Start Address" DefaultValue="=MPCBB1_Area_Start_Address" Type="hex" Min="=(MPCBB1_Area_SRAM1_BASE_NS)" Max="=(MPCBB1_Area_Max + MPCBB1_Area_SRAM1_BASE_NS - MPCBB1_Area_BlockSize)" NoCheckOpt="false"/>
+  <RefParameter Name="MPCBB1_Area2_Start_Address" Comment="Area 2 Start Address" DefaultValue="=MPCBB1_Area_SRAM1_BASE_NS" Type="hex" Min="=(MPCBB1_Area_SRAM1_BASE_NS)" Max="=(MPCBB1_Area_Max + MPCBB1_Area_SRAM1_BASE_NS - MPCBB1_Area_BlockSize)" NoCheckOpt="false" Visible="false"/>
+  <RefParameter Name="MPCBB1_Area2_Start" Comment="Area 2 Start Offset" DefaultValue="=(MPCBB1_Area2_Start_Address - MPCBB1_Area_SRAM1_BASE_NS)" Type="StringHex" Min="=(MPCBB1_Area2_Start_Address - MPCBB1_Area_SRAM1_BASE_NS)" Max="=(MPCBB1_Area2_Start_Address - MPCBB1_Area_SRAM1_BASE_NS)" NoCheckOpt="false" Visible="false"/>
+  <RefParameter Name="MPCBB1_Area2_Size" Comment="Area 2 Size" DefaultValue="0x0" Type="hex" Min="0x0" Max="=(MPCBB1_Area_Max - MPCBB1_Area2_Start)" NoCheckOpt="false" Visible="false">
+    <Condition Expression="($IpInstance=GTZC)" Diagnostic="GTZC"/>
+  </RefParameter>
+  <RefParameter Name="MPCBB1_Area2_Size" Comment="Area 2 Size" DefaultValue="=GTZC_S:MPCBB1_Area2_Size" Type="StringHex" Min="0x0" Max="=(MPCBB1_Area_Max - MPCBB1_Area2_Start)" NoCheckOpt="false" Visible="false">
+    <Condition Expression="!($IpInstance=GTZC_S)" Diagnostic="only modifiable from GTZC_S Peripheral"/>
+  </RefParameter>
+  <RefParameter Name="MPCBB1_Area2_Size" Comment="Area 2 Size" DefaultValue="0x0" Type="hex" Min="0x0" Max="0x0" NoCheckOpt="false" Visible="false">
+    <Condition Expression="!S_SECURE" Diagnostic="pre-selected no MPCBB1 Secured"/>
+  </RefParameter>
+  <RefParameter Name="MPCBB1_Area2_Size" Comment="Area 2 Size" DefaultValue="0x0" Type="hex" Min="0x0" Max="0x0" NoCheckOpt="false" Visible="false">
+    <Condition Expression="S_Default_MPCBB1_template_$IpInstance" Diagnostic="ST default Template configuration Linker file"/>
+  </RefParameter>
+  <RefParameter Name="MPCBB1_Area2_Size" Comment="Area 2 Size" DefaultValue="0x0" Type="hex" Min="0x0" Max="=(MPCBB1_Area_Max - MPCBB1_Area2_Start)" NoCheckOpt="false" Visible="false"/>
+
+  <RefParameter Name="MPCBB1_Area2_SuperBlockSize" Comment="Area 2 Super-Block Size" DefaultValue="0x20000" Type="hex" Min="0x20000" Max="0x20000" Visible="false"/>
+  <RefParameter Name="MPCBB1_Area2_NbSuperBlock" Comment="Area 2 Nb Super-Block" DefaultValue="=(MPCBB1_Area_Max / MPCBB1_Area2_SuperBlockSize)" Type="integer" Min="=(MPCBB1_Area_Max / MPCBB1_Area2_SuperBlockSize)" Max="=(MPCBB1_Area_Max / MPCBB1_Area2_SuperBlockSize)" Visible="false"/>
+
+  <RefParameter Name="MPCBB1_Area2_Secure_Start_Address" Comment="    Area 2 Start Address" DefaultValue="=MPCBB1_Area_SRAM1_BASE_NS" Type="hex" Min="=MPCBB1_Area_SRAM1_BASE_NS" Max="=MPCBB1_Area_SRAM1_BASE_NS" NoCheckOpt="false">
+    <Condition Expression="S_Default_MPCBB1_template_$IpInstance" Diagnostic="ST default Template configuration Linker file"/>
+  </RefParameter>
+  <RefParameter Name="MPCBB1_Area2_Secure_Start_Address" Comment="    Area 2 Start Address" DefaultValue="=MPCBB1_Area2_Start_Address" Type="hex" Min="=(MPCBB1_Area_SRAM1_BASE_NS)" Max="=(MPCBB1_Area_Max + MPCBB1_Area_SRAM1_BASE_NS - MPCBB1_Area_BlockSize)" NoCheckOpt="false"/>
   <RefParameter Name="MPCBB1_Area2_Secure_Start" Comment="    Area 2 Start Offset" DefaultValue="=(MPCBB1_Area2_Secure_Start_Address - MPCBB1_Area_SRAM1_BASE_NS)" Type="StringHex" Min="=(MPCBB1_Area2_Secure_Start_Address - MPCBB1_Area_SRAM1_BASE_NS)" Max="=(MPCBB1_Area2_Secure_Start_Address - MPCBB1_Area_SRAM1_BASE_NS)" NoCheckOpt="false" Visible="false"/>
   <RefParameter Name="MPCBB1_Area2_Secure_Size" Comment="    Area 2 Size" DefaultValue="0x0" Type="hex" Min="0x0" Max="0x0" NoCheckOpt="false">
     <Condition Expression="S_Default_MPCBB1_template_$IpInstance" Diagnostic="ST default Template configuration Linker file"/>
-    <Description>0x0 : use the default HW configuration (not secured memory)</Description>
+    <Description>0x0 : use the default HW configuration (secured memory)</Description>
   </RefParameter>
-  <RefParameter Name="MPCBB1_Area2_Secure_Size" Comment="    Area 2 Size" DefaultValue="0x0" Type="hex" Min="0x0" Max="=(MPCBB1_Area_Max - MPCBB1_Area2_Secure_Start)" NoCheckOpt="false">
-    <Description>0x0 : use the default HW configuration (not secured memory)</Description>
+  <RefParameter Name="MPCBB1_Area2_Secure_Size" Comment="    Area 2 Size" DefaultValue="=MPCBB1_Area_Size" Type="hex" Min="0x0" Max="=(MPCBB1_Area_Max - MPCBB1_Area_Secure_Start)" NoCheckOpt="false">
+    <Description>0x0 : use the default HW configuration (secured memory)</Description>
   </RefParameter>
-  <RefParameter Name="MPCBB1_Area2_Secure_SuperBlockSize" Comment="    Area 2 Super-Block Size" DefaultValue="=(MPCBB1_Area_SuperBlockSize)" Type="hex" Min="=(MPCBB1_Area_SuperBlockSize)" Max="=(MPCBB1_Area_SuperBlockSize)" Visible="false"/>
+  <RefParameter Name="MPCBB1_Area2_Secure_BlockSize" Comment="    Area 2 Block Size" DefaultValue="=(MPCBB1_Area_BlockSize)" Type="hex" Min="=(MPCBB1_Area_BlockSize)" Max="=(MPCBB1_Area_BlockSize)" Visible="false"/>
+  <RefParameter Name="MPCBB1_Area2_Secure_SuperBlockSize" Comment="    Area 2 Super-Block Size" DefaultValue="=(MPCBB1_Area2_SuperBlockSize)" Type="hex" Min="=(MPCBB1_Area2_SuperBlockSize)" Max="=(MPCBB1_Area2_SuperBlockSize)" Visible="false"/>
   <RefParameter Name="MPCBB1_Area2_Secure_NbSuperBlock" Comment="    Area 2 Nb Super-Block" DefaultValue="=(MPCBB1_Area_Max / MPCBB1_Area2_Secure_SuperBlockSize)" Type="integer" Min="=(MPCBB1_Area_Max / MPCBB1_Area2_Secure_SuperBlockSize)" Max="=(MPCBB1_Area_Max / MPCBB1_Area2_Secure_SuperBlockSize)" Visible="false"/>
 
-  <RefParameter Name="MPCBB1_Area2_Privilege_Start_Address" Comment="    Area 2 Start Address" DefaultValue="=MPCBB1_Area_Start_Address" Type="hex" Min="=(MPCBB1_Area_SRAM1_BASE_NS)" Max="=(MPCBB1_Area_Max + MPCBB1_Area_SRAM1_BASE_NS - MPCBB1_Area_BlockSize)" NoCheckOpt="false"/>
+  <RefParameter Name="MPCBB1_Area2_Privilege_Start_Address" Comment="    Area 2 Start Address" DefaultValue="=MPCBB1_Area2_Start_Address" Type="hex" Min="=(MPCBB1_Area_SRAM1_BASE_NS)" Max="=(MPCBB1_Area_Max + MPCBB1_Area_SRAM1_BASE_NS - MPCBB1_Area_BlockSize)" NoCheckOpt="false"/>
   <RefParameter Name="MPCBB1_Area2_Privilege_Start" Comment="    Area 2 Start Offset" DefaultValue="=(MPCBB1_Area2_Privilege_Start_Address - MPCBB1_Area_SRAM1_BASE_NS)" Type="StringHex" Min="=(MPCBB1_Area2_Privilege_Start_Address - MPCBB1_Area_SRAM1_BASE_NS)" Max="=(MPCBB1_Area2_Privilege_Start_Address - MPCBB1_Area_SRAM1_BASE_NS)" NoCheckOpt="false" Visible="false"/>
   <RefParameter Name="MPCBB1_Area2_Privilege_Size" Comment="    Area 2 Size" DefaultValue="0x0" Type="hex" Min="0x0" Max="=(MPCBB1_Area_Max - MPCBB1_Area2_Privilege_Start)" NoCheckOpt="false">
-    <Description>0x0 : use the default HW configuration (not privileged memory)</Description>
-  </RefParameter>  
+    <Description>0x0 : use the default HW configuration (privileged memory)</Description>
+  </RefParameter>
   <RefParameter Name="MPCBB1_Area2_Privilege_BlockSize" Comment="    Area 2 Block Size" DefaultValue="=(MPCBB1_Area_BlockSize)" Type="hex" Min="=(MPCBB1_Area_BlockSize)" Max="=(MPCBB1_Area_BlockSize)" Visible="false"/>
-  <RefParameter Name="MPCBB1_Area2_Privilege_SuperBlockSize" Comment="    Area 2 Super-Block Size" DefaultValue="=(MPCBB1_Area_SuperBlockSize)" Type="hex" Min="=(MPCBB1_Area_SuperBlockSize)" Max="=(MPCBB1_Area_SuperBlockSize)" Visible="false"/>
+  <RefParameter Name="MPCBB1_Area2_Privilege_SuperBlockSize" Comment="    Area 2 Super-Block Size" DefaultValue="=(MPCBB1_Area2_SuperBlockSize)" Type="hex" Min="=(MPCBB1_Area2_SuperBlockSize)" Max="=(MPCBB1_Area2_SuperBlockSize)" Visible="false"/>
   <RefParameter Name="MPCBB1_Area2_Privilege_NbSuperBlock" Comment="    Area 2 Nb Super-Block" DefaultValue="=(MPCBB1_Area_Max / MPCBB1_Area2_Privilege_SuperBlockSize)" Type="integer" Min="=(MPCBB1_Area_Max / MPCBB1_Area2_Privilege_SuperBlockSize)" Max="=(MPCBB1_Area_Max / MPCBB1_Area2_Privilege_SuperBlockSize)" Visible="false"/>
-
-  <!--  -->
 
   <RefParameter Name="MPCBB1_SecConfig_array" Comment="Secure configuration array" DefaultValue="00000000:00000000:00000000:00000000:00000000:00000000:00000000:00000000:00000000:00000000:00000000:00000000" Type="Array" ArraySize="12" ArrayTypeElement="uint32_t;16" Separator=":" Visible="false">
     <Condition Expression="S_No_MPCBB1_Secured" Diagnostic="memory not secured"/>
@@ -892,6 +920,7 @@
 
   <!-- RefParameters for GTZC - MPCBB2 Secured -->
 
+  <RefParameter Name="MPCBB2_NbArea" Comment="Nb Area" DefaultValue="2" Type="int" Min="2" Max="2" NoCheckOpt="false" Visible="false"/>
   <RefParameter Name="MPCBB2_Area_SRAM2_BASE_NS" Comment="Area Start SRAM2_BASE_NS" DefaultValue="0x20020000" Type="hex" Min="0x20020000" Max="0x20020000" Visible="false"/>
   <RefParameter Name="MPCBB2_Area_Max" Comment="Area Max" DefaultValue="0x14000" Type="hex" Min="0x14000" Max="0x14000" Visible="false"/>
   <RefParameter Name="MPCBB2_Area_BlockSize" Comment="Area Block Size" DefaultValue="0x200" Type="hex" Min="0x200" Max="0x200" Visible="false"/>
@@ -1017,6 +1046,7 @@
 
   <!-- RefParameters for GTZC - MPCBB3 Secured -->
 
+  <RefParameter Name="MPCBB3_NbArea" Comment="Nb Area" DefaultValue="2" Type="int" Min="2" Max="2" NoCheckOpt="false" Visible="false"/>
   <RefParameter Name="MPCBB3_Area_SRAM3_BASE_NS" Comment="Area Start SRAM3_BASE_NS" DefaultValue="0x20034000" Type="hex" Min="0x20034000" Max="0x20034000" Visible="false"/>
   <RefParameter Name="MPCBB3_Area_Desc" Comment="Area Descriptor" DefaultValue="MPCBB3_Area_Desc" Type="string" Visible="false"/>
   <RefParameter Name="MPCBB3_Area_Max" Comment="Area Max" DefaultValue="0x10000" Type="hex" Min="0x10000" Max="0x10000" Visible="false"/>
@@ -1425,7 +1455,7 @@
       <PossibleValue Comment="secured" Semaphore="S_IP_SECURED">GTZC_TZSC_PERIPH_SEC</PossibleValue>
       <PossibleValue Comment="not secured" Semaphore="S_IP_NOT_SECURED">GTZC_TZSC_PERIPH_NSEC</PossibleValue>
     </Parameter>
-<!--     ICACHE do not synchronize with context -->
+    <!--     ICACHE do not synchronize with context -->
     <Parameter Name="ICACHE_Secure" RefParameter="ICACHE_Secure" Comment="ICACHE">
       <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
       <PossibleValue Comment="secured" Semaphore="S_IP_SECURED">GTZC_TZSC_PERIPH_SEC</PossibleValue>
@@ -2228,7 +2258,7 @@
     <Parameter Name="MPCWM3_Area_Privilege" Group="MPCWM3 (FMC_NAND)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
     <Parameter Name="MPCWM3_Area_Attribute" Group="MPCWM3 (FMC_NAND)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
     <Parameter Name="MPCWM3_Area_Lock" Group="MPCWM3 (FMC_NAND)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
-    <Parameter Name="MPCWM3_Area_Status" Group="MPCWM3 (FMC_NAND)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>    
+    <Parameter Name="MPCWM3_Area_Status" Group="MPCWM3 (FMC_NAND)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
 
     <!-- Parameters for GTZC - MPCWM4 Secured -->
     <Parameter Name="MPCWM4_Area_Choice" Group="MPCWM4 (BKPSRAM)" TabName="TrustZone Security Controller - Memory Protection Controller WaterMark"><Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/></Parameter>
@@ -2604,7 +2634,7 @@
       <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
     </Parameter>
     <Parameter Name="TIM5_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="TIM5">
-     <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
+      <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>
     </Parameter>
     <Parameter Name="TIM6_Illegal_Access_Interrupt" RefParameter="Illegal_Access_Interrupt" Comment="TIM6">
       <Condition Diagnostic="only Active with TZEN enabled" Expression="$IpInstance=GTZC_S"/>

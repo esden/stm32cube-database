@@ -224,7 +224,7 @@
     <RefParameter Name="MDF_DFLT0_StructureName" DefaultValue="MdfFilterConfig0" Comment="Structure" Type="string" Visible="false"/>
     
     <RefParameter Name="MDF_DFLT0_Data_Source" DefaultValue="" Comment="Data Source" Type="list">
-        <Condition Expression="!($IpInstance=ADF1)&amp;(ADC2_Exist)" Diagnostic=""/>
+        <Condition Expression="!($IpInstance=ADF1)&amp;(ADC2_Exist)&amp; !DIE486" Diagnostic=""/>
         <PossibleValue Value="MDF_DATA_SOURCE_BSMX"     Comment="Data from bitstream matrix" Semaphore="S_MDF_$IpInstance_DFLT0_BSMX_DataSource"
                        Condition="!(S_MDF_$IpInstance_SITF0)&amp;!(S_MDF_$IpInstance_SITF1)&amp;!(S_MDF_$IpInstance_SITF2)&amp;!(S_MDF_$IpInstance_SITF3)&amp;!(S_MDF_$IpInstance_SITF4)&amp;!(S_MDF_$IpInstance_SITF5)" 
                        Diagnostic="Activate at least one Serial Interface in one instance"/>
@@ -244,7 +244,27 @@
         </Description>
     </RefParameter>
     <RefParameter Name="MDF_DFLT0_Data_Source" DefaultValue="" Comment="Data Source" Type="list">
-        <Condition Expression="!($IpInstance=ADF1)" Diagnostic=""/>
+        <Condition Expression="!($IpInstance=ADF1)&amp;DIE486" Diagnostic=""/>
+        <PossibleValue Value="MDF_DATA_SOURCE_BSMX"     Comment="Data from bitstream matrix" Semaphore="S_MDF_$IpInstance_DFLT0_BSMX_DataSource"
+                       Condition="!(S_MDF_$IpInstance_SITF0)&amp;!(S_MDF_$IpInstance_SITF1)&amp;!(S_MDF_$IpInstance_SITF2)&amp;!(S_MDF_$IpInstance_SITF3)&amp;!(S_MDF_$IpInstance_SITF4)&amp;!(S_MDF_$IpInstance_SITF5)" 
+                       Diagnostic="Activate at least one Serial Interface in one instance"/>
+        <PossibleValue Value="MDF_DATA_SOURCE_ADCITF1"  Comment="Data from ADC interface 1"
+                       Condition="!(S_ADC1_MDF1_ConversionDataManagement)"
+                       Diagnostic="Activate MDF mode value in Conversion Data Management Parameter of ADC1 + Desactivate SCD0"/>
+        <PossibleValue Value="MDF_DATA_SOURCE_ADCITF2"  Comment="Data from ADC interface 2"
+                       Condition="!(S_ADC2_MDF1_ConversionDataManagement)"
+                       Diagnostic="Activate MDF mode value in Conversion Data Management Parameter of ADC2 + Desactivate SCD0"/>
+        <Description>
+            The source of the digital filter (DFLT) can be selected between the two following:&lt;br&gt;
+            • data coming from the Bitstream matrix (then select which SITF and the front used in the additionnal parameters)&lt;br&gt;
+            • data coming from the ADC interface 1 or 2&lt;br&gt;&lt;br&gt;
+            To use the data source coming from ADC interface 1 or 2, these 3 conditions have to be checked :&lt;br&gt;
+            - 1 : ADC1 (or ADC2) has to be activated with the Conversion Data Management Parameter set to "MDF mode" value  &lt;br&gt;
+            - 2 : the SCD (Short Circuit Detector) mode has to be desactivated &lt;br&gt;
+        </Description>
+    </RefParameter>
+    <RefParameter Name="MDF_DFLT0_Data_Source" DefaultValue="" Comment="Data Source" Type="list">
+        <Condition Expression="!($IpInstance=ADF1)&amp;!DIE486" Diagnostic=""/>
         <PossibleValue Value="MDF_DATA_SOURCE_BSMX"     Comment="Data from bitstream matrix" Semaphore="S_MDF_$IpInstance_DFLT0_BSMX_DataSource"
                        Condition="!(S_MDF_$IpInstance_SITF0)&amp;!(S_MDF_$IpInstance_SITF1)&amp;!(S_MDF_$IpInstance_SITF2)&amp;!(S_MDF_$IpInstance_SITF3)&amp;!(S_MDF_$IpInstance_SITF4)&amp;!(S_MDF_$IpInstance_SITF5)" 
                        Diagnostic="Activate at least one Serial Interface in one instance"/>
@@ -509,6 +529,29 @@
         </Description>
     </RefParameter> 
     <RefParameter Name="MDF_DFLT0_TriggerSource" DefaultValue="MDF_CLOCK_TRIG_TRGO" Comment="Trigger Source" Type="list" >
+        <Condition Expression="!(MDF_DFLT0_AcquisitionMode=MDF_MODE_ASYNC_CONT)&amp;!(MDF_DFLT0_AcquisitionMode=MDF_MODE_ASYNC_SINGLE) &amp; DIE486 " Diagnostic=""/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TRGO"       Comment="TRGO"/>
+        <PossibleValue Value="MDF_FILTER_TRIG_OLD_EVENT" Comment="Out-off limit detector event"        Condition="!S_MDF_$IpInstance_OLD0" Diagnostic="Instance0 -> OLD0 has to be configured" Action="Disable"/>        
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM1_TRGO"  Comment="TIM1 TRGO"  Condition="!TIM1_Used"   Diagnostic="TIM1 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM1_TRGO2" Comment="TIM1 TRGO2" Condition="!TIM1_Used"   Diagnostic="TIM1 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM8_TRGO"  Comment="TIM8 TRGO"  Condition="!TIM8_Used"   Diagnostic="TIM8 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM8_TRGO2" Comment="TIM8 TRGO2" Condition="!TIM8_Used"   Diagnostic="TIM8 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM3_TRGO"  Comment="TIM3 TRGO"  Condition="!TIM3_Used"   Diagnostic="TIM3 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM4_TRGO"  Comment="TIM4 TRGO"  Condition="!TIM4_Used"   Diagnostic="TIM4 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM6_TRGO"  Comment="TIM6 TRGO"  Condition="!TIM6_Used"   Diagnostic="TIM6 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM7_TRGO"  Comment="TIM7 TRGO"  Condition="!TIM7_Used"   Diagnostic="TIM7 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_FILTER_TRIG_TIM15_TRGO"  Comment="TIM15 TRGO"  Condition="!TIM15_Used"  Diagnostic="TIM15 has to be configured" Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_SAD_DET"    Comment="SAD DET"    Condition="ADF1:MDF_DFLT0_SADActivation=DISABLE" Diagnostic="ADF1 Sound Activity Detection has to be configured" Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_EXTI11"     Comment="EXTI11" />
+        <PossibleValue Value="MDF_CLOCK_TRIG_EXTI15"     Comment="EXTI15"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_LPTIM1_OUT" Comment="LPTIM1 Out" Condition="!LPTIM1_Used" Diagnostic="LPTIM1 has to be configured" Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_SAD_TRGO"   Comment="SAD TRGO"   Condition="!ADF1_Used"   Diagnostic="ADF1 has to be configured"   Action="Disable"/>
+        <Description>
+            Digital filter trigger signal selection, select which external signals trigger for the corresponding filter&lt;br&gt;
+            When the trigger source is TRGO, the sensitivity is forced to falling edge.
+        </Description>
+    </RefParameter>
+    <RefParameter Name="MDF_DFLT0_TriggerSource" DefaultValue="MDF_CLOCK_TRIG_TRGO" Comment="Trigger Source" Type="list" >
         <Condition Expression="!(MDF_DFLT0_AcquisitionMode=MDF_MODE_ASYNC_CONT)&amp;!(MDF_DFLT0_AcquisitionMode=MDF_MODE_ASYNC_SINGLE)" Diagnostic=""/>
         <PossibleValue Value="MDF_CLOCK_TRIG_TRGO"       Comment="TRGO"/>
         <PossibleValue Value="MDF_FILTER_TRIG_OLD_EVENT" Comment="Out-off limit detector event"        Condition="!S_MDF_$IpInstance_OLD0" Diagnostic="Instance0 -> OLD0 has to be configured" Action="Disable"/>        
@@ -531,6 +574,7 @@
             When the trigger source is TRGO, the sensitivity is forced to falling edge.
         </Description>
     </RefParameter>
+
     <RefParameter Name="MDF_DFLT0_TriggerSource" DefaultValue="null" Comment="Trigger Source" Type="string" Visible="false"/>
 
     <RefParameter Name="MDF_DFLT0_TriggerEdge" DefaultValue="MDF_FILTER_TRIG_RISING_EDGE" Comment="Trigger edge" Type="list">
@@ -842,7 +886,7 @@
     <!--#############################################################################################################-->
     <!--################################## RefParameters for DFLT1 Begin    #########################################-->
     <RefParameter Name="MDF_DFLT1_Data_Source" DefaultValue="" Comment="Data Source" Type="list">
-        <Condition Expression="!(ADC2_Exist)" Diagnostic=""/>
+        <Condition Expression="!(ADC2_Exist)&amp;!DIE486" Diagnostic=""/>
         <PossibleValue Value="MDF_DATA_SOURCE_BSMX"     Comment="Data from bitstream matrix"  Semaphore="S_MDF_$IpInstance_DFLT1_BSMX_DataSource"  Condition="!(S_MDF_$IpInstance_SITF0)&amp;!(S_MDF_$IpInstance_SITF1)&amp;!(S_MDF_$IpInstance_SITF2)&amp;!(S_MDF_$IpInstance_SITF3)&amp;!(S_MDF_$IpInstance_SITF4)&amp;!(S_MDF_$IpInstance_SITF5)" 
                        Diagnostic="Activate at least one Serial Interface in one instance"/>
         <PossibleValue Value="MDF_DATA_SOURCE_ADCITF1"  Comment="Data from ADC interface 1"  
@@ -1108,6 +1152,29 @@
         </Description>
     </RefParameter>
     <RefParameter Name="MDF_DFLT1_TriggerSource" DefaultValue="MDF_CLOCK_TRIG_TRGO" Comment="Trigger Source" Type="list" >
+        <Condition Expression="!(MDF_DFLT1_AcquisitionMode=MDF_MODE_ASYNC_CONT)&amp;!(MDF_DFLT1_AcquisitionMode=MDF_MODE_ASYNC_SINGLE) &amp; DIE486" Diagnostic=""/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TRGO"       Comment="TRGO"/>
+        <PossibleValue Value="MDF_FILTER_TRIG_OLD_EVENT" Comment="Out-off limit detector event"        Condition="!S_MDF_$IpInstance_OLD1" Diagnostic="Instance1 -> OLD1 has to be configured" Action="Disable"/>        
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM1_TRGO"  Comment="TIM1 TRGO"  Condition="!TIM1_Used"   Diagnostic="TIM1 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM1_TRGO2" Comment="TIM1 TRGO2" Condition="!TIM1_Used"   Diagnostic="TIM1 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM8_TRGO"  Comment="TIM8 TRGO"  Condition="!TIM8_Used"   Diagnostic="TIM8 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM8_TRGO2" Comment="TIM8 TRGO2" Condition="!TIM8_Used"   Diagnostic="TIM8 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM3_TRGO"  Comment="TIM3 TRGO"  Condition="!TIM3_Used"   Diagnostic="TIM3 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM4_TRGO"  Comment="TIM4 TRGO"  Condition="!TIM4_Used"   Diagnostic="TIM4 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM6_TRGO"  Comment="TIM6 TRGO"  Condition="!TIM6_Used"   Diagnostic="TIM6 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM7_TRGO"  Comment="TIM7 TRGO"  Condition="!TIM7_Used"   Diagnostic="TIM7 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_FILTER_TRIG_TIM15_TRGO"  Comment="TIM15 TRGO"  Condition="!TIM15_Used"  Diagnostic="TIM15 has to be configured" Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_SAD_DET"    Comment="SAD DET"    Condition="ADF1:MDF_DFLT0_SADActivation=DISABLE" Diagnostic="ADF1 Sound Activity Detection has to be configured" Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_EXTI11"     Comment="EXTI11" />
+        <PossibleValue Value="MDF_CLOCK_TRIG_EXTI15"     Comment="EXTI15"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_LPTIM1_OUT" Comment="LPTIM1 Out" Condition="!LPTIM1_Used" Diagnostic="LPTIM1 has to be configured" Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_SAD_TRGO"   Comment="SAD TRGO"   Condition="!ADF1_Used"   Diagnostic="ADF1 has to be configured"   Action="Disable"/>
+        <Description>
+            Digital filter trigger signal selection, select which external signals trigger for the corresponding filter&lt;br&gt;
+            When the trigger source is TRGO, the sensitivity is forced to falling edge.
+        </Description>
+    </RefParameter>
+    <RefParameter Name="MDF_DFLT1_TriggerSource" DefaultValue="MDF_CLOCK_TRIG_TRGO" Comment="Trigger Source" Type="list" >
         <Condition Expression="!(MDF_DFLT1_AcquisitionMode=MDF_MODE_ASYNC_CONT)&amp;!(MDF_DFLT1_AcquisitionMode=MDF_MODE_ASYNC_SINGLE)" Diagnostic=""/>
         <PossibleValue Value="MDF_CLOCK_TRIG_TRGO"       Comment="TRGO"/>
         <PossibleValue Value="MDF_FILTER_TRIG_OLD_EVENT" Comment="Out-off limit detector event"        Condition="!S_MDF_$IpInstance_OLD1" Diagnostic="Instance1 -> OLD1 has to be configured" Action="Disable"/>        
@@ -1130,6 +1197,7 @@
             When the trigger source is TRGO, the sensitivity is forced to falling edge.
         </Description>
     </RefParameter>
+
     <RefParameter Name="MDF_DFLT1_TriggerSource" DefaultValue="null" Comment="Trigger Source" Type="string" Visible="false"/>
 
     <RefParameter Name="MDF_DFLT1_TriggerEdge" DefaultValue="MDF_FILTER_TRIG_RISING_EDGE" Comment="Trigger edge" Type="list">
@@ -1429,7 +1497,7 @@
     <!--#############################################################################################################-->
     <!--################################## RefParameters for DFLT2 Begin    #########################################-->
     <RefParameter Name="MDF_DFLT2_Data_Source" DefaultValue="" Comment="Data Source" Type="list">
-        <Condition Expression="!(ADC2_Exist)" Diagnostic=""/>
+        <Condition Expression="!(ADC2_Exist)&amp;!DIE486" Diagnostic=""/>
         <PossibleValue Value="MDF_DATA_SOURCE_BSMX"     Comment="Data from bitstream matrix" Semaphore="S_MDF_$IpInstance_DFLT2_BSMX_DataSource"   Condition="!(S_MDF_$IpInstance_SITF0)&amp;!(S_MDF_$IpInstance_SITF1)&amp;!(S_MDF_$IpInstance_SITF2)&amp;!(S_MDF_$IpInstance_SITF3)&amp;!(S_MDF_$IpInstance_SITF4)&amp;!(S_MDF_$IpInstance_SITF5)" 
                        Diagnostic="Activate at least one Serial Interface in one instance"/>
         <PossibleValue Value="MDF_DATA_SOURCE_ADCITF1"  Comment="Data from ADC interface 1"  
@@ -1692,7 +1760,30 @@
             Digital filter trigger signal selection, select which external signals trigger for the corresponding filter&lt;br&gt;
             When the trigger source is TRGO, the sensitivity is forced to falling edge.
         </Description>
-    </RefParameter> 
+    </RefParameter>
+    <RefParameter Name="MDF_DFLT2_TriggerSource" DefaultValue="MDF_CLOCK_TRIG_TRGO" Comment="Trigger Source" Type="list" >
+        <Condition Expression="!(MDF_DFLT2_AcquisitionMode=MDF_MODE_ASYNC_CONT)&amp;!(MDF_DFLT2_AcquisitionMode=MDF_MODE_ASYNC_SINGLE)&amp; DIE486" Diagnostic=""/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TRGO"       Comment="TRGO"/>
+        <PossibleValue Value="MDF_FILTER_TRIG_OLD_EVENT" Comment="Out-off limit detector event"        Condition="!S_MDF_$IpInstance_OLD2" Diagnostic="Instance2 -> OLD2 has to be configured" Action="Disable"/>        
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM1_TRGO"  Comment="TIM1 TRGO"  Condition="!TIM1_Used"   Diagnostic="TIM1 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM1_TRGO2" Comment="TIM1 TRGO2" Condition="!TIM1_Used"   Diagnostic="TIM1 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM8_TRGO"  Comment="TIM8 TRGO"  Condition="!TIM8_Used"   Diagnostic="TIM8 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM8_TRGO2" Comment="TIM8 TRGO2" Condition="!TIM8_Used"   Diagnostic="TIM8 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM3_TRGO"  Comment="TIM3 TRGO"  Condition="!TIM3_Used"   Diagnostic="TIM3 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM4_TRGO"  Comment="TIM4 TRGO"  Condition="!TIM4_Used"   Diagnostic="TIM4 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM6_TRGO"  Comment="TIM6 TRGO"  Condition="!TIM6_Used"   Diagnostic="TIM6 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM7_TRGO"  Comment="TIM7 TRGO"  Condition="!TIM7_Used"   Diagnostic="TIM7 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_FILTER_TRIG_TIM15_TRGO"  Comment="TIM15 TRGO"  Condition="!TIM15_Used"  Diagnostic="TIM15 has to be configured" Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_SAD_DET"    Comment="SAD DET"    Condition="ADF1:MDF_DFLT0_SADActivation=DISABLE" Diagnostic="ADF1 Sound Activity Detection has to be configured" Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_EXTI11"     Comment="EXTI11" />
+        <PossibleValue Value="MDF_CLOCK_TRIG_EXTI15"     Comment="EXTI15"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_LPTIM1_OUT" Comment="LPTIM1 Out" Condition="!LPTIM1_Used" Diagnostic="LPTIM1 has to be configured" Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_SAD_TRGO"   Comment="SAD TRGO"   Condition="!ADF1_Used"   Diagnostic="ADF1 has to be configured"   Action="Disable"/>
+        <Description>
+            Digital filter trigger signal selection, select which external signals trigger for the corresponding filter&lt;br&gt;
+            When the trigger source is TRGO, the sensitivity is forced to falling edge.
+        </Description>
+    </RefParameter>
     <RefParameter Name="MDF_DFLT2_TriggerSource" DefaultValue="MDF_CLOCK_TRIG_TRGO" Comment="Trigger Source" Type="list" >
         <Condition Expression="!(MDF_DFLT2_AcquisitionMode=MDF_MODE_ASYNC_CONT)&amp;!(MDF_DFLT2_AcquisitionMode=MDF_MODE_ASYNC_SINGLE)" Diagnostic=""/>
         <PossibleValue Value="MDF_CLOCK_TRIG_TRGO"       Comment="TRGO"/>
@@ -1716,6 +1807,7 @@
             When the trigger source is TRGO, the sensitivity is forced to falling edge.
         </Description>
     </RefParameter>
+
     <RefParameter Name="MDF_DFLT2_TriggerSource" DefaultValue="null" Comment="Trigger Source" Type="string" Visible="false"/>
 
     <RefParameter Name="MDF_DFLT2_TriggerEdge" DefaultValue="MDF_FILTER_TRIG_RISING_EDGE" Comment="Trigger edge" Type="list">
@@ -1997,7 +2089,7 @@
     <!--#############################################################################################################-->
     <!--################################## RefParameters for DFLT3 Begin    #########################################-->
     <RefParameter Name="MDF_DFLT3_Data_Source" DefaultValue="" Comment="Data Source" Type="list">
-        <Condition Expression="!(ADC2_Exist)" Diagnostic=""/>
+        <Condition Expression="!(ADC2_Exist)&amp;!DIE486" Diagnostic=""/>
         <PossibleValue Value="MDF_DATA_SOURCE_BSMX"     Comment="Data from bitstream matrix"  Semaphore="S_MDF_$IpInstance_DFLT3_BSMX_DataSource"  Condition="!(S_MDF_$IpInstance_SITF0)&amp;!(S_MDF_$IpInstance_SITF1)&amp;!(S_MDF_$IpInstance_SITF2)&amp;!(S_MDF_$IpInstance_SITF3)&amp;!(S_MDF_$IpInstance_SITF4)&amp;!(S_MDF_$IpInstance_SITF5)" 
                        Diagnostic="Activate at least one Serial Interface in one instance"/>
         <PossibleValue Value="MDF_DATA_SOURCE_ADCITF1"  Comment="Data from ADC interface 1"  
@@ -2256,6 +2348,29 @@
         <Condition Expression="($IpInstance=ADF1)&amp;!(MDF_DFLT3_AcquisitionMode=MDF_MODE_ASYNC_CONT)&amp;!(MDF_DFLT3_AcquisitionMode=MDF_MODE_ASYNC_SINGLE)" Diagnostic=""/>
         <PossibleValue Value="MDF_CLOCK_TRIG_TRGO" Comment="TRGO"/>
         <PossibleValue Value="MDF_CLOCK_TRIG_EXTI15" Comment="EXTI15"/>
+        <Description>
+            Digital filter trigger signal selection, select which external signals trigger for the corresponding filter&lt;br&gt;
+            When the trigger source is TRGO, the sensitivity is forced to falling edge.
+        </Description>
+    </RefParameter>
+    <RefParameter Name="MDF_DFLT3_TriggerSource" DefaultValue="MDF_CLOCK_TRIG_TRGO" Comment="Trigger Source" Type="list" >
+        <Condition Expression="!(MDF_DFLT3_AcquisitionMode=MDF_MODE_ASYNC_CONT)&amp;!(MDF_DFLT3_AcquisitionMode=MDF_MODE_ASYNC_SINGLE)&amp; DIE486" Diagnostic=""/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TRGO"       Comment="TRGO"/>
+        <PossibleValue Value="MDF_FILTER_TRIG_OLD_EVENT" Comment="Out-off limit detector event"        Condition="!S_MDF_$IpInstance_OLD3" Diagnostic="Instance3 -> OLD3 has to be configured" Action="Disable"/>        
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM1_TRGO"  Comment="TIM1 TRGO"  Condition="!TIM1_Used"   Diagnostic="TIM1 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM1_TRGO2" Comment="TIM1 TRGO2" Condition="!TIM1_Used"   Diagnostic="TIM1 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM8_TRGO"  Comment="TIM8 TRGO"  Condition="!TIM8_Used"   Diagnostic="TIM8 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM8_TRGO2" Comment="TIM8 TRGO2" Condition="!TIM8_Used"   Diagnostic="TIM8 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM3_TRGO"  Comment="TIM3 TRGO"  Condition="!TIM3_Used"   Diagnostic="TIM3 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM4_TRGO"  Comment="TIM4 TRGO"  Condition="!TIM4_Used"   Diagnostic="TIM4 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM6_TRGO"  Comment="TIM6 TRGO"  Condition="!TIM6_Used"   Diagnostic="TIM6 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM7_TRGO"  Comment="TIM7 TRGO"  Condition="!TIM7_Used"   Diagnostic="TIM7 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_FILTER_TRIG_TIM15_TRGO"  Comment="TIM15 TRGO"  Condition="!TIM15_Used"  Diagnostic="TIM15 has to be configured" Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_SAD_DET"    Comment="SAD DET"    Condition="ADF1:MDF_DFLT0_SADActivation=DISABLE" Diagnostic="ADF1 Sound Activity Detection has to be configured" Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_EXTI11"     Comment="EXTI11" />
+        <PossibleValue Value="MDF_CLOCK_TRIG_EXTI15"     Comment="EXTI15"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_LPTIM1_OUT" Comment="LPTIM1 Out" Condition="!LPTIM1_Used" Diagnostic="LPTIM1 has to be configured" Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_SAD_TRGO"   Comment="SAD TRGO"   Condition="!ADF1_Used"   Diagnostic="ADF1 has to be configured"   Action="Disable"/>
         <Description>
             Digital filter trigger signal selection, select which external signals trigger for the corresponding filter&lt;br&gt;
             When the trigger source is TRGO, the sensitivity is forced to falling edge.
@@ -2565,7 +2680,7 @@
     <!--#############################################################################################################-->
     <!--################################## RefParameters for DFLT4 Begin    #########################################-->
     <RefParameter Name="MDF_DFLT4_Data_Source" DefaultValue="" Comment="Data Source" Type="list">
-        <Condition Expression="!(ADC2_Exist)" Diagnostic=""/>
+        <Condition Expression="!(ADC2_Exist)&amp;!DIE486" Diagnostic=""/>
         <PossibleValue Value="MDF_DATA_SOURCE_BSMX"     Comment="Data from bitstream matrix"   Semaphore="S_MDF_$IpInstance_DFLT4_BSMX_DataSource"  Condition="!(S_MDF_$IpInstance_SITF0)&amp;!(S_MDF_$IpInstance_SITF1)&amp;!(S_MDF_$IpInstance_SITF2)&amp;!(S_MDF_$IpInstance_SITF3)&amp;!(S_MDF_$IpInstance_SITF4)&amp;!(S_MDF_$IpInstance_SITF5)" 
                        Diagnostic="Activate at least one Serial Interface in one instance"/>
         <PossibleValue Value="MDF_DATA_SOURCE_ADCITF1"  Comment="Data from ADC interface 1" 
@@ -2827,7 +2942,30 @@
             Digital filter trigger signal selection, select which external signals trigger for the corresponding filter&lt;br&gt;
             When the trigger source is TRGO, the sensitivity is forced to falling edge.
         </Description>
-    </RefParameter> 
+    </RefParameter>
+    <RefParameter Name="MDF_DFLT4_TriggerSource" DefaultValue="MDF_CLOCK_TRIG_TRGO" Comment="Trigger Source" Type="list" >
+        <Condition Expression="!(MDF_DFLT4_AcquisitionMode=MDF_MODE_ASYNC_CONT)&amp;!(MDF_DFLT4_AcquisitionMode=MDF_MODE_ASYNC_SINGLE)&amp; DIE486" Diagnostic=""/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TRGO"       Comment="TRGO"/>
+        <PossibleValue Value="MDF_FILTER_TRIG_OLD_EVENT" Comment="Out-off limit detector event"        Condition="!S_MDF_$IpInstance_OLD4" Diagnostic="Instance4 -> OLD4 has to be configured" Action="Disable"/>        
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM1_TRGO"  Comment="TIM1 TRGO"  Condition="!TIM1_Used"   Diagnostic="TIM1 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM1_TRGO2" Comment="TIM1 TRGO2" Condition="!TIM1_Used"   Diagnostic="TIM1 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM8_TRGO"  Comment="TIM8 TRGO"  Condition="!TIM8_Used"   Diagnostic="TIM8 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM8_TRGO2" Comment="TIM8 TRGO2" Condition="!TIM8_Used"   Diagnostic="TIM8 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM3_TRGO"  Comment="TIM3 TRGO"  Condition="!TIM3_Used"   Diagnostic="TIM3 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM4_TRGO"  Comment="TIM4 TRGO"  Condition="!TIM4_Used"   Diagnostic="TIM4 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM6_TRGO"  Comment="TIM6 TRGO"  Condition="!TIM6_Used"   Diagnostic="TIM6 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM7_TRGO"  Comment="TIM7 TRGO"  Condition="!TIM7_Used"   Diagnostic="TIM7 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_FILTER_TRIG_TIM15_TRGO"  Comment="TIM15 TRGO"  Condition="!TIM15_Used"  Diagnostic="TIM15 has to be configured" Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_SAD_DET"    Comment="SAD DET"    Condition="ADF1:MDF_DFLT0_SADActivation=DISABLE" Diagnostic="ADF1 Sound Activity Detection has to be configured" Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_EXTI11"     Comment="EXTI11" />
+        <PossibleValue Value="MDF_CLOCK_TRIG_EXTI15"     Comment="EXTI15"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_LPTIM1_OUT" Comment="LPTIM1 Out" Condition="!LPTIM1_Used" Diagnostic="LPTIM1 has to be configured" Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_SAD_TRGO"   Comment="SAD TRGO"   Condition="!ADF1_Used"   Diagnostic="ADF1 has to be configured"   Action="Disable"/>
+        <Description>
+            Digital filter trigger signal selection, select which external signals trigger for the corresponding filter&lt;br&gt;
+            When the trigger source is TRGO, the sensitivity is forced to falling edge.
+        </Description>
+    </RefParameter>
     <RefParameter Name="MDF_DFLT4_TriggerSource" DefaultValue="MDF_CLOCK_TRIG_TRGO" Comment="Trigger Source" Type="list" >
         <Condition Expression="!(MDF_DFLT4_AcquisitionMode=MDF_MODE_ASYNC_CONT)&amp;!(MDF_DFLT4_AcquisitionMode=MDF_MODE_ASYNC_SINGLE)" Diagnostic=""/>
         <PossibleValue Value="MDF_CLOCK_TRIG_TRGO"       Comment="TRGO"/>
@@ -3131,7 +3269,7 @@
     <!--#############################################################################################################-->
     <!--################################## RefParameters for DFLT5 Begin    #########################################-->
     <RefParameter Name="MDF_DFLT5_Data_Source" DefaultValue="" Comment="Data Source" Type="list">
-        <Condition Expression="!(ADC2_Exist)" Diagnostic=""/>
+        <Condition Expression="!(ADC2_Exist)&amp;!DIE486" Diagnostic=""/>
         <PossibleValue Value="MDF_DATA_SOURCE_BSMX"     Comment="Data from bitstream matrix"  Semaphore="S_MDF_$IpInstance_DFLT5_BSMX_DataSource"   Condition="!(S_MDF_$IpInstance_SITF0)&amp;!(S_MDF_$IpInstance_SITF1)&amp;!(S_MDF_$IpInstance_SITF2)&amp;!(S_MDF_$IpInstance_SITF3)&amp;!(S_MDF_$IpInstance_SITF4)&amp;!(S_MDF_$IpInstance_SITF5)" 
                        Diagnostic="Activate at least one Serial Interface in one instance"/>
         <PossibleValue Value="MDF_DATA_SOURCE_ADCITF1"  Comment="Data from ADC interface 1" 
@@ -3394,7 +3532,30 @@
             Digital filter trigger signal selection, select which external signals trigger for the corresponding filter&lt;br&gt;
             When the trigger source is TRGO, the sensitivity is forced to falling edge.
         </Description>
-    </RefParameter> 
+    </RefParameter>
+    <RefParameter Name="MDF_DFLT5_TriggerSource" DefaultValue="MDF_CLOCK_TRIG_TRGO" Comment="Trigger Source" Type="list" >
+        <Condition Expression="!(MDF_DFLT5_AcquisitionMode=MDF_MODE_ASYNC_CONT)&amp;!(MDF_DFLT5_AcquisitionMode=MDF_MODE_ASYNC_SINGLE)&amp; DIE486" Diagnostic=""/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TRGO"       Comment="TRGO"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM1_TRGO"  Comment="TIM1 TRGO"  Condition="!TIM1_Used"   Diagnostic="TIM1 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_FILTER_TRIG_OLD_EVENT" Comment="Out-off limit detector event"        Condition="!S_MDF_$IpInstance_OLD5" Diagnostic="Instance5 -> OLD5 has to be configured" Action="Disable"/>        
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM1_TRGO2" Comment="TIM1 TRGO2" Condition="!TIM1_Used"   Diagnostic="TIM1 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM8_TRGO"  Comment="TIM8 TRGO"  Condition="!TIM8_Used"   Diagnostic="TIM8 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM8_TRGO2" Comment="TIM8 TRGO2" Condition="!TIM8_Used"   Diagnostic="TIM8 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM3_TRGO"  Comment="TIM3 TRGO"  Condition="!TIM3_Used"   Diagnostic="TIM3 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM4_TRGO"  Comment="TIM4 TRGO"  Condition="!TIM4_Used"   Diagnostic="TIM4 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM6_TRGO"  Comment="TIM6 TRGO"  Condition="!TIM6_Used"   Diagnostic="TIM6 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM7_TRGO"  Comment="TIM7 TRGO"  Condition="!TIM7_Used"   Diagnostic="TIM7 has to be configured"  Action="Disable"/>
+        <PossibleValue Value="MDF_FILTER_TRIG_TIM15_TRGO"  Comment="TIM15 TRGO"  Condition="!TIM15_Used"  Diagnostic="TIM15 has to be configured" Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_SAD_DET"    Comment="SAD DET"    Condition="ADF1:MDF_DFLT0_SADActivation=DISABLE" Diagnostic="ADF1 Sound Activity Detection has to be configured" Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_EXTI11"     Comment="EXTI11" />
+        <PossibleValue Value="MDF_CLOCK_TRIG_EXTI15"     Comment="EXTI15"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_LPTIM1_OUT" Comment="LPTIM1 Out" Condition="!LPTIM1_Used" Diagnostic="LPTIM1 has to be configured" Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_SAD_TRGO"   Comment="SAD TRGO"   Condition="!ADF1_Used"   Diagnostic="ADF1 has to be configured"   Action="Disable"/>
+        <Description>
+            Digital filter trigger signal selection, select which external signals trigger for the corresponding filter&lt;br&gt;
+            When the trigger source is TRGO, the sensitivity is forced to falling edge.
+        </Description>
+    </RefParameter>
     <RefParameter Name="MDF_DFLT5_TriggerSource" DefaultValue="MDF_CLOCK_TRIG_TRGO" Comment="Trigger Source" Type="list" >
         <Condition Expression="!(MDF_DFLT5_AcquisitionMode=MDF_MODE_ASYNC_CONT)&amp;!(MDF_DFLT5_AcquisitionMode=MDF_MODE_ASYNC_SINGLE)" Diagnostic=""/>
         <PossibleValue Value="MDF_CLOCK_TRIG_TRGO"       Comment="TRGO"/>
@@ -3418,6 +3579,7 @@
             When the trigger source is TRGO, the sensitivity is forced to falling edge.
         </Description>
     </RefParameter>
+
     <RefParameter Name="MDF_DFLT5_TriggerSource" DefaultValue="null" Comment="Trigger Source" Type="string" Visible="false"/>
 
     <RefParameter Name="MDF_DFLT5_TriggerEdge" DefaultValue="MDF_FILTER_TRIG_RISING_EDGE" Comment="Trigger edge" Type="list">
@@ -3665,6 +3827,19 @@
     <RefParameter Name="MDF_COMPARAM_ActivationClockTrigger" DefaultValue="null" Comment="Output Clock Trigger Activation" Type="string" Visible="false"/>
 
     <RefParameter Name="MDF_COMPARAM_Clock_Source" DefaultValue="MDF_CLOCK_TRIG_TRGO" Comment="Trigger Source" Type="list" >
+        <Condition Expression="($IpInstance=ADF1)&amp;(MDF_COMPARAM_ActivationClockTrigger=ENABLE)&amp;(DIE454) " Diagnostic=""/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TRGO" Comment="TRGO"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_EXTI15" Comment="EXTI15"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM1_TRGO" Comment="TIM1 TRGO" Condition="!TIM1_Used" Diagnostic="TIM1 has to be configured" Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM3_TRGO" Comment="TIM3 TRGO" Condition="!TIM3_Used" Diagnostic="TIM3 has to be configured" Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM6_TRGO" Comment="TIM6 TRGO" Condition="!TIM6_Used" Diagnostic="TIM6 has to be configured" Action="Disable"/>
+        <Description>
+            Clock trigger signal choice selects which external signal has to used to trigger the common clock activation&lt;br&gt;
+            This allows to synchronize the common clocks of several MDF instances, or to synchronize the common clock generation to a timer event.&lt;br&gt;
+            When the trigger source is TRGO, the sensitivity is forced to falling edge.
+        </Description>
+    </RefParameter>
+    <RefParameter Name="MDF_COMPARAM_Clock_Source" DefaultValue="MDF_CLOCK_TRIG_TRGO" Comment="Trigger Source" Type="list" >
         <Condition Expression="($IpInstance=ADF1)&amp;(MDF_COMPARAM_ActivationClockTrigger=ENABLE)" Diagnostic=""/>
         <PossibleValue Value="MDF_CLOCK_TRIG_TRGO" Comment="TRGO"/>
         <PossibleValue Value="MDF_CLOCK_TRIG_EXTI15" Comment="EXTI15"/>
@@ -3675,7 +3850,7 @@
         </Description>
     </RefParameter> 
     <RefParameter Name="MDF_COMPARAM_Clock_Source" DefaultValue="MDF_CLOCK_TRIG_TRGO" Comment="Trigger Source" Type="list" >
-        <Condition Expression="MDF_COMPARAM_ActivationClockTrigger=ENABLE" Diagnostic=""/>
+        <Condition Expression="MDF_COMPARAM_ActivationClockTrigger=ENABLE &amp; !DIE486" Diagnostic=""/>
         <PossibleValue Value="MDF_CLOCK_TRIG_TRGO" Comment="TRGO"/>
         <PossibleValue Value="MDF_CLOCK_TRIG_TIM1_TRGO" Comment="TIM1 TRGO" Condition="!TIM1_Used" Diagnostic="TIM1 has to be configured" Action="Disable"/>
         <PossibleValue Value="MDF_CLOCK_TRIG_TIM1_TRGO2" Comment="TIM1 TRGO2" Condition="!TIM1_Used" Diagnostic="TIM1 has to be configured" Action="Disable"/>
@@ -3686,6 +3861,29 @@
         <PossibleValue Value="MDF_CLOCK_TRIG_TIM16_OC1" Comment="TIM16 OC1" Condition="!TIM16_Used" Diagnostic="TIM16 has to be configured" Action="Disable"/>
         <PossibleValue Value="MDF_CLOCK_TRIG_TIM6_TRGO" Comment="TIM6 TRGO" Condition="!TIM6_Used" Diagnostic="TIM6 has to be configured" Action="Disable"/>
         <PossibleValue Value="MDF_CLOCK_TRIG_TIM7_TRGO" Comment="TIM7 TRGO" Condition="!TIM7_Used" Diagnostic="TIM7 has to be configured" Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_SAD_DET" Comment="SAD DET" Condition="ADF1:MDF_DFLT0_SADActivation=DISABLE" Diagnostic="ADF1 Sound Activity Detection has to be configured" Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_EXTI11" Comment="EXTI11" />
+        <PossibleValue Value="MDF_CLOCK_TRIG_EXTI15" Comment="EXTI15"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_LPTIM1_OUT" Comment="LPTIM1 Out" Condition="!LPTIM1_Used" Diagnostic="LPTIM1 has to be configured" Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_SAD_TRGO" Comment="SAD TRGO" Condition="!ADF1_Used" Diagnostic="ADF1 has to be configured" Action="Disable"/>
+        <Description>
+            Clock trigger signal choice selects which external signal has to used to trigger the common clock activation&lt;br&gt;
+            This allows to synchronize the common clocks of several MDF instances, or to synchronize the common clock generation to a timer event.&lt;br&gt;
+            When the trigger source is TRGO, the sensitivity is forced to falling edge.
+        </Description>
+    </RefParameter>
+        <RefParameter Name="MDF_COMPARAM_Clock_Source" DefaultValue="MDF_CLOCK_TRIG_TRGO" Comment="Trigger Source" Type="list" >
+        <Condition Expression="MDF_COMPARAM_ActivationClockTrigger=ENABLE &amp; DIE486" Diagnostic=""/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TRGO" Comment="TRGO"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM1_TRGO" Comment="TIM1 TRGO" Condition="!TIM1_Used" Diagnostic="TIM1 has to be configured" Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM1_TRGO2" Comment="TIM1 TRGO2" Condition="!TIM1_Used" Diagnostic="TIM1 has to be configured" Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM8_TRGO" Comment="TIM8 TRGO" Condition="!TIM8_Used" Diagnostic="TIM8 has to be configured" Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM8_TRGO2" Comment="TIM8 TRGO2" Condition="!TIM8_Used" Diagnostic="TIM8 has to be configured" Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM3_TRGO" Comment="TIM3 TRGO" Condition="!TIM3_Used" Diagnostic="TIM3 has to be configured" Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM4_TRGO" Comment="TIM4 TRGO" Condition="!TIM4_Used" Diagnostic="TIM4 has to be configured" Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM6_TRGO" Comment="TIM6 TRGO" Condition="!TIM6_Used" Diagnostic="TIM6 has to be configured" Action="Disable"/>
+        <PossibleValue Value="MDF_CLOCK_TRIG_TIM7_TRGO" Comment="TIM7 TRGO" Condition="!TIM7_Used" Diagnostic="TIM7 has to be configured" Action="Disable"/>
+        <PossibleValue Value="MDF_FILTER_TRIG_TIM15_TRGO"  Comment="TIM15 TRGO"  Condition="!TIM15_Used"  Diagnostic="TIM15 has to be configured" Action="Disable"/>
         <PossibleValue Value="MDF_CLOCK_TRIG_SAD_DET" Comment="SAD DET" Condition="ADF1:MDF_DFLT0_SADActivation=DISABLE" Diagnostic="ADF1 Sound Activity Detection has to be configured" Action="Disable"/>
         <PossibleValue Value="MDF_CLOCK_TRIG_EXTI11" Comment="EXTI11" />
         <PossibleValue Value="MDF_CLOCK_TRIG_EXTI15" Comment="EXTI15"/>

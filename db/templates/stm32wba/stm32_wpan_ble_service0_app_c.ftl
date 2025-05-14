@@ -124,12 +124,7 @@ ${definition.name}: "${definition.value}"
 #include "${SERVICE_SHORT_NAME_LowerCase}_app.h"
 #include "${SERVICE_SHORT_NAME_LowerCase}.h"
 [/#if]
-[#if myHash["SEQUENCER_STATUS"]?number == 1 ]
-#include "stm32_seq.h"
-[#elseif myHash["THREADX_STATUS"]?number == 1 ]
-#include "app_threadx.h"
-[#elseif myHash["FREERTOS_STATUS"]?number == 1 ]
-[/#if]
+#include "stm32_rtos.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -329,18 +324,18 @@ __USED void ${SERVICE_SHORT_NAME_UpperCase}_[@capitalizeServChar characteristic/
   ${SERVICE_SHORT_NAME_LowerCase}_notification_data.p_Payload = (uint8_t*)a_${SERVICE_SHORT_NAME_UpperCase}_UpdateCharData;
   ${SERVICE_SHORT_NAME_LowerCase}_notification_data.Length = 0;
 
-  /* USER CODE BEGIN Service${SvcNbr}Char${characteristic}_NS_1*/
+  /* USER CODE BEGIN Service${SvcNbr}Char${characteristic}_NS_1 */
 
-  /* USER CODE END Service${SvcNbr}Char${characteristic}_NS_1*/
+  /* USER CODE END Service${SvcNbr}Char${characteristic}_NS_1 */
 
   if (notification_on_off != [@capitalizeServChar characteristic/]_NOTIFICATION_OFF)
   {
     ${SERVICE_SHORT_NAME_UpperCase}_UpdateValue([@customServChar characteristic/], &${SERVICE_SHORT_NAME_LowerCase}_notification_data);
   }
   
-  /* USER CODE BEGIN Service${SvcNbr}Char${characteristic}_NS_Last*/
+  /* USER CODE BEGIN Service${SvcNbr}Char${characteristic}_NS_Last */
 
-  /* USER CODE END Service${SvcNbr}Char${characteristic}_NS_Last*/
+  /* USER CODE END Service${SvcNbr}Char${characteristic}_NS_Last */
 
   return;
 }
@@ -356,18 +351,18 @@ __USED void ${SERVICE_SHORT_NAME_UpperCase}_[@capitalizeServChar characteristic/
   ${SERVICE_SHORT_NAME_LowerCase}_indication_data.p_Payload = (uint8_t*)a_${SERVICE_SHORT_NAME_UpperCase}_UpdateCharData;
   ${SERVICE_SHORT_NAME_LowerCase}_indication_data.Length = 0;
 
-  /* USER CODE BEGIN Service${SvcNbr}Char${characteristic}_IS_1*/
+  /* USER CODE BEGIN Service${SvcNbr}Char${characteristic}_IS_1 */
 
-  /* USER CODE END Service${SvcNbr}Char${characteristic}_IS_1*/
+  /* USER CODE END Service${SvcNbr}Char${characteristic}_IS_1 */
 
   if (indication_on_off != [@capitalizeServChar characteristic/]_INDICATION_OFF)
   {
     ${SERVICE_SHORT_NAME_UpperCase}_UpdateValue([@customServChar characteristic/], &${SERVICE_SHORT_NAME_LowerCase}_indication_data);
   }
   
-  /* USER CODE BEGIN Service${SvcNbr}Char${characteristic}_IS_Last*/
+  /* USER CODE BEGIN Service${SvcNbr}Char${characteristic}_IS_Last */
 
-  /* USER CODE END Service${SvcNbr}Char${characteristic}_IS_Last*/
+  /* USER CODE END Service${SvcNbr}Char${characteristic}_IS_Last */
 
   return;
 }
@@ -376,6 +371,6 @@ __USED void ${SERVICE_SHORT_NAME_UpperCase}_[@capitalizeServChar characteristic/
   [/#list]
 [/#if]
 
-/* USER CODE BEGIN FD_LOCAL_FUNCTIONS*/
+/* USER CODE BEGIN FD_LOCAL_FUNCTIONS */
 
-/* USER CODE END FD_LOCAL_FUNCTIONS*/
+/* USER CODE END FD_LOCAL_FUNCTIONS */

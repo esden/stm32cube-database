@@ -12,9 +12,9 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file    Loader_Src.c
+  * @file    extmemloader_init.c  
   * @author  MCD Application Team
-  * @brief   This file defines the operations of the external memory loader.
+  * @brief   This file defines the system initialisation of an external loader.
   *
   ******************************************************************************
 [@common.optinclude name=mxTmpFolder+"/license.tmp"/][#--include License text --]
@@ -215,6 +215,7 @@ uint32_t extmemloader_Init()
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
+[#if !STM32_EXTMEMLOADER_STM32CUBEOPENBLTARGET_Used??]
 
   /* Init system */
   SystemInit();
@@ -245,7 +246,19 @@ uint32_t extmemloader_Init()
 
   /* Configure the system clock  */
   SystemClock_Config();
+[#else]
 
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  HAL_MspInit();
+
+  /* MPU Configuration--------------------------------------------------------*/
+  HAL_MPU_Disable();
+
+  /* USER CODE BEGIN Init */
+
+  /* USER CODE END Init */
+
+[/#if]
   /* USER CODE BEGIN SysInit */
 
   /* USER CODE END SysInit */

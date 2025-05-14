@@ -25,6 +25,7 @@
 #include "app_common.h"
 #include "hw.h"
 #include "baes.h"
+#include "zigbee_plat.h"
 [#if (myHash["CFG_MM_TYPE"]?number == 2)]
 #include "advanced_memory_manager.h"
 [/#if]
@@ -189,7 +190,7 @@ void ZIGBEE_PLAT_AesCmacCompute( const uint8_t * pInput, uint32_t lInputLength, 
  *
  */
 bool ZIGBEE_PLAT_ZbHeapInit( void )
-{	
+{
 [#if (myHash["CFG_MM_TYPE"]?number == 1)]
   static bool  bHeapAlreadyDone = false;
   
@@ -359,7 +360,7 @@ unsigned long ZIGBEE_PLAT_HeapAvailable( void )
 /**
  * 
  */
-bool ZIGBEE_PLAT_HeapCheckAlloc( unsigned int iSize )
+bool ZIGBEE_PLAT_HeapCheckAlloc( uint32_t iSize )
 {
     /* Just assume we have enough memory in the system heap */
     return true;

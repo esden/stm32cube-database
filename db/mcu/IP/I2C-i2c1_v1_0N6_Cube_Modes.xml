@@ -1,0 +1,819 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance" DBVersion="V3.0" IPType="peripheral" Name="I2C" Version="i2c2_v1_1U5_Cube" ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../db/IP_Modes_V3_0.xsd">
+    <About>I2C: Inter Integrated Circuit interface</About>
+ 
+ 
+    <RefParameter Comment="Instance" DefaultValue="I2C$Index" Name="Instance" Type="" Visible="false"/>
+    
+    <!--Timing configuration-->
+    <!--Specifies the speed mode for SMBus-->
+    <RefParameter Comment="I2C Speed Mode " DefaultValue="I2C_Standard" Group="Timing configuration" Name="I2C_Speed_Mode" Type="list">
+        <Condition Diagnostic="" Expression="$IpInstance_SMBUS_Enable"/>
+        <PossibleValue Comment="Standard Mode" Value="I2C_Standard"/>
+        <PossibleValue Comment="Fast Mode" Value="I2C_Fast"/>
+        <PossibleValue Comment="Fast Mode Plus" Semaphore="$IpInstance_SMBusFastMP" Value="I2C_Fast_Plus"/>      
+    </RefParameter>  
+    <!--Specifies the speed mode for I2C-->
+    <RefParameter Comment="I2C Speed Mode " DefaultValue="I2C_Standard" Group="Timing configuration" Name="I2C_Speed_Mode" Type="list">
+        <Condition Diagnostic="" Expression="$IpInstance_I2C_Mode"/>
+        <PossibleValue Comment="Standard Mode" Value="I2C_Standard"/>
+        <PossibleValue Comment="Fast Mode" Value="I2C_Fast"/>
+        <PossibleValue Comment="Fast Mode Plus" Semaphore="$IpInstance_FastMP" Value="I2C_Fast_Plus"/> 
+    </RefParameter>
+    <!--Specifies if The analog noise filter is present on the SDA and SCL inputs-->
+    <RefParameter Comment="Analog Filter" DefaultValue="SMBUS_ANALOGFILTER_ENABLE" Group="Timing configuration" Name="SMBusAnalogFilter" Type="list">
+        <PossibleValue Comment="Enabled" Value="SMBUS_ANALOGFILTER_ENABLE"/>
+        <PossibleValue Comment="Disabled" Value="SMBUS_ANALOGFILTER_DISABLE"/>
+    </RefParameter>
+    <!--Specifies if The analog noise filter is present on the SDA and SCL inputs-->
+    <RefParameter Comment="Analog Filter" DefaultValue="I2C_ANALOGFILTER_ENABLE" Group="Timing configuration" Name="Analog_Filter" Type="list">
+        <PossibleValue Comment="Disabled" Value="I2C_ANALOGFILTER_DISABLE"/>
+        <PossibleValue Comment="Enabled" Value="I2C_ANALOGFILTER_ENABLE"/>
+    </RefParameter>
+      <!--Fast mode plus I2C/SMBus -->
+    <RefParameter Comment="FASTMODEPLUS" DefaultValue="I2C_FASTMODEPLUS_ENABLE" Name="FASTMODEPLUS" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="$IpInstance_FastMP &amp; $IpInstance_I2C_Mode"/>
+    </RefParameter>
+    <RefParameter Comment="FASTMODEPLUS" DefaultValue="SMBUS_FASTMODEPLUS_ENABLE" Name="FASTMODEPLUS" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="$IpInstance_FastMP &amp; $IpInstance_SMBus_Mode"/>
+    </RefParameter>
+    <RefParameter Comment="FASTMODEPLUS" DefaultValue="SMBUS_FASTMODEPLUS_ENABLE" Name="FASTMODEPLUS" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="$IpInstance_SMBusFastMP"/>
+    </RefParameter>  
+    <RefParameter Comment="FASTMODEPLUS" DefaultValue="null" Group="Timing configuration" Name="FASTMODEPLUS" Type="list"/>
+    
+    <!--Specifies the speed frequency-->																							 
+    <RefParameter Comment="I2C Speed Frequency (KHz) " DefaultValue="100" Group="Timing configuration" Max="100" Min="1" Name="Speed" Type="integer" Visible="true" NoCheckOpt="false" >													 
+        <Condition Diagnostic="" Expression="I2C_Speed_Mode=I2C_Standard"/>													 
+    </RefParameter>		
+																			 
+    <RefParameter Comment="I2C Speed Frequency (KHz) " DefaultValue="400" Group="Timing configuration" Max="400" Min="1" Name="Speed" Type="integer" Visible="true" NoCheckOpt="false" >													 
+        <Condition Diagnostic="" Expression="I2C_Speed_Mode=I2C_Fast"/>													 
+    </RefParameter>		
+				
+    <RefParameter Comment="I2C Speed Frequency (KHz) " DefaultValue="1000" Group="Timing configuration" Max="1000" Min="1" Name="Speed" Type="integer" Visible="true" NoCheckOpt="false" >													 
+																	 
+    </RefParameter>
+    
+							
+    <RefParameter Comment="Custom Timing" DefaultValue="Disabled" Group="Timing configuration" Name="CustomTiming" Type="list">
+        <Condition Diagnostic="" Expression="STM32G0 | STM32WB | STM32G4 | STM32L5| STM32L4"/>
+        <PossibleValue Comment="Disabled" Value="Disabled"/>        
+        <PossibleValue Comment="Enabled" Value="Enabled" Semaphore="S_$IpInstance_CustomTiming"/>
+    </RefParameter>			
+    <RefParameter Comment="Custom Timing" DefaultValue="Disabled" Group="Timing configuration" Name="CustomTiming" Type="list" Visible="false">        
+    </RefParameter>			
+
+
+    <!--Specifies the Rise Time-->				
+     <RefParameter Comment="Rise Time (ns)" DefaultValue="0" Group="Timing configuration" Name="I2C_Rise_Time" Type="integer" Visible="false">													 
+	<Condition Diagnostic="" Expression="(STM32G0| STM32WB | STM32G4 |STM32L5|STM32L4) &amp; S_$IpInstance_CustomTiming"/>											 
+    </RefParameter>
+    <RefParameter Comment="Rise Time (ns)" DefaultValue="0" Group="Timing configuration" Max="1000" Min="0" Name="I2C_Rise_Time" Type="integer" Visible="true" NoCheckOpt="false" >													 
+        <Condition Diagnostic="" Expression="I2C_Speed_Mode=I2C_Standard"/>													 
+    </RefParameter>	
+				
+    <RefParameter Comment="Rise Time (ns)" DefaultValue="0" Group="Timing configuration" Max="300" Min="0" Name="I2C_Rise_Time" Type="integer" Visible="true" NoCheckOpt="false"  >													 
+        <Condition Diagnostic="" Expression="I2C_Speed_Mode=I2C_Fast"/>													 
+    </RefParameter>	
+
+   	
+    <RefParameter Comment="Rise Time (ns)" DefaultValue="0" Group="Timing configuration" Max="120" Min="0" Name="I2C_Rise_Time" Type="integer" Visible="true" NoCheckOpt="false" >													 
+															 
+    </RefParameter>
+
+    <!--Specifies the Fall Time-->	
+    <RefParameter Comment="Fall Time (ns)" DefaultValue="0" Group="Timing configuration" Name="I2C_Fall_Time" Type="integer" Visible="false">													 
+	<Condition Diagnostic="" Expression="(STM32G0| STM32WB |STM32G4 | STM32L5 |STM32L4) &amp; S_$IpInstance_CustomTiming"/>											 
+    </RefParameter>					
+    <RefParameter Comment="Fall Time (ns)" DefaultValue="0" Group="Timing configuration" Max="120" Min="0" Name="I2C_Fall_Time" Type="integer" Visible="true" NoCheckOpt="false" >													 
+        <Condition Diagnostic="" Expression="I2C_Speed_Mode=I2C_Fast_Plus"/>													 
+    </RefParameter>	
+    <RefParameter Comment="Fall Time (ns)" DefaultValue="0" Group="Timing configuration" Max="300" Min="0" Name="I2C_Fall_Time" Type="integer" Visible="true" NoCheckOpt="false" >													 
+        <Condition Diagnostic="" Expression="I2C_Speed_Mode=I2C_Fast"/>													 
+    </RefParameter>	
+    
+    <RefParameter Comment="Fall Time (ns)" DefaultValue="0" Group="Timing configuration" Max="300" Min="0" Name="I2C_Fall_Time" Type="integer" Visible="true" NoCheckOpt="false" >													 
+																	 
+    </RefParameter>	
+    <RefParameter Comment="Coefficient of Digital Filter" DefaultValue="0" Group="Timing configuration" Name="I2C_Coeff_DF" Type="integer" Visible="false">													 
+	<Condition Diagnostic="" Expression="(STM32G0| STM32WB|STM32G4 | STM32L5 |STM32L4)&amp; S_$IpInstance_CustomTiming"/>											 
+    </RefParameter>					
+
+    <RefParameter Comment="Coefficient of Digital Filter" DefaultValue="0" Group="Timing configuration" Max="15" Min="0" Name="I2C_Coeff_DF" Type="integer" Visible="true" NoCheckOpt="false" >													 
+    </RefParameter>
+    <!-- LPBAM: if Digital filter > 0 then Wake up by match must not appear -->
+    <RefParameter Comment="Digital Filter" DefaultValue="Enable" Group="Timing configuration" Name="LPBAMDigitalFiltre" Type="list" Visible="false">										 
+        <Condition Diagnostic="" Expression="S_LPBAM_CONF &amp; (I2C_Coeff_DF &gt; 0)"/>
+        <PossibleValue Semaphore="$IpInstance_DF0" Comment="Enable" Value="Enable"/>
+    </RefParameter>
+    <RefParameter Comment="Digital Filter" DefaultValue="null" Group="Timing configuration" Name="LPBAMDigitalFiltre" Type="list" Visible="false">										 
+        <Condition Diagnostic="" Expression="!S_LPBAM_CONF | (S_LPBAM_CONF &amp; (I2C_Coeff_DF &lt; 1)) "/>
+    </RefParameter>
+				
+    <!--Specifies the I2C_TIMINGR_register value  -->
+    <RefParameter Comment="Timing" DefaultValue="0x00000708" Group="Timing configuration" Name="Timing" Type="string">
+        <Condition Diagnostic="" Expression="STM32L0"/>
+    </RefParameter>
+    <RefParameter Comment="Timing" DefaultValue="0x2000090E" Group="Timing configuration" Name="Timing" Type="string">
+        <Condition Diagnostic="" Expression="STM32F0|STM32F3"/>
+    </RefParameter>
+    <!--RefParameter Comment="Timing" DefaultValue="0x10909CEC" Group="Timing configuration" Name="Timing" Type="string">
+        <Condition Diagnostic="" Expression="STM32L4 &amp; !S_$IpInstance_CustomTiming"/>
+    </RefParameter-->
+     <RefParameter Comment="Timing" DefaultValue="0x00000E14" Group="Timing configuration" Name="Timing" Max="0xDFFFFFFF" Min="0x00000000" Type="hex">
+        <Condition Diagnostic="" Expression="STM32L4 &amp;S_$IpInstance_CustomTiming"/>
+    </RefParameter>
+    <RefParameter Comment="Timing" DefaultValue="0x00000E14" Group="Timing configuration" Name="Timing" Type="string">
+        <Condition Diagnostic="" Expression="STM32L4|STM32WB |STM32WL &amp;!S_$IpInstance_CustomTiming"/>
+    </RefParameter>
+    
+    <RefParameter Comment="Timing" DefaultValue="0x00303D5B" Group="Timing configuration" Name="Timing" Type="string">
+        <Condition Diagnostic="" Expression="STM32G0&amp;!S_$IpInstance_CustomTiming"/>
+    </RefParameter>
+    <RefParameter Comment="Timing" DefaultValue="0x00303D5B" Group="Timing configuration" Name="Timing" Max="0xDFFFFFFF" Min="0x00000000" Type="hex">
+        <Condition Diagnostic="" Expression="STM32G0&amp;S_$IpInstance_CustomTiming"/>
+    </RefParameter>
+     <RefParameter Comment="Timing" DefaultValue="0x00000E14" Group="Timing configuration" Name="Timing" Max="0xDFFFFFFF" Min="0x00000000" Type="hex">
+        <Condition Diagnostic="" Expression="STM32WB &amp;S_$IpInstance_CustomTiming"/>
+        </RefParameter>
+         <RefParameter Comment="Timing" DefaultValue="0x00000E14" Group="Timing configuration" Name="Timing" Type="string">
+        <Condition Diagnostic="" Expression="STM32L5 &amp;!S_$IpInstance_CustomTiming"/>
+    </RefParameter>
+    <RefParameter Comment="Timing" DefaultValue="0x00000E14" Group="Timing configuration" Name="Timing" Max="0xDFFFFFFF" Min="0x00000000" Type="hex">
+        <Condition Diagnostic="" Expression="STM32L5 &amp;S_$IpInstance_CustomTiming"/>
+        </RefParameter>
+    <RefParameter Comment="Timing" DefaultValue="0x00000E14" Group="Timing configuration" Name="Timing" Max="0xDFFFFFFF" Min="0x00000000" Type="hex">
+        <Condition Diagnostic="" Expression="STM32WL &amp;S_$IpInstance_CustomTiming"/>
+    </RefParameter>
+    <RefParameter Comment="Timing" DefaultValue="0x00303D5B" Group="Timing configuration" Name="Timing" Type="string">
+        <Condition Diagnostic="" Expression="STM32G4 &amp;!S_$IpInstance_CustomTiming"/>
+    </RefParameter>    
+    <RefParameter Comment="Timing" DefaultValue="0x00303D5B" Group="Timing configuration" Name="Timing" Max="0xDFFFFFFF" Min="0x00000000" Type="hex">
+        <Condition Diagnostic="" Expression="STM32G4 &amp;S_$IpInstance_CustomTiming"/>
+    </RefParameter>
+    <RefParameter Comment="Timing" DefaultValue="0x00000000" Group="Timing configuration" Name="Timing" Type="string"/>
+
+    <!--I2C Mode-->
+    <!--Slave features-->
+    <!--RefParameter Comment="Primary Address Length selection : 7 bit" DefaultValue="I2C_ADDRESSINGMODE_7BIT" Name="AddressingMode" Type="integer" Group="Slave Features"-->
+    <RefParameter Comment="Primary Address Length selection" DefaultValue="I2C_ADDRESSINGMODE_7BIT" Group="Slave Features" Name="AddressingMode" Type="list">
+        <Condition Diagnostic="When Dual address is enabled we can have a primary address only on 7 bits length" Expression="DualAddressMode=I2C_DUALADDRESS_ENABLE&amp;!STM32G0&amp;!STM32WB &amp;!STM32G4 &amp;!STM32L5 &amp;!STM32WL &amp;!STM32WBA"/>  
+        <PossibleValue Comment="7-bit" Value="I2C_ADDRESSINGMODE_7BIT"/>
+    </RefParameter>
+    
+    <RefParameter Comment="Primary Address Length selection" DefaultValue="I2C_ADDRESSINGMODE_7BIT" Group="Slave Features" Name="AddressingMode" Type="list">
+        <PossibleValue Comment="7-bit" Value="I2C_ADDRESSINGMODE_7BIT"/>
+        <PossibleValue Comment="10-bit" Value="I2C_ADDRESSINGMODE_10BIT"/>       
+    </RefParameter>
+
+
+    <!-- OwnAddress and OwnAddress1 parameters are both declared to handle the shit in case of 7-bits addressing and the no-Shift in case of 10-bits addressing-->
+    <RefParameter Comment="Primary slave address" DefaultValue="0" Group="Slave Features" Max="127" Min="0" Name="OwnAddress" Type="integer" >
+        <Condition Diagnostic="Address value from 0 to 127" Expression="AddressingMode=I2C_ADDRESSINGMODE_7BIT"/>
+        <Description>The generated value of the address is shifted left by 1 bit.</Description>       
+    </RefParameter> 
+    
+    <RefParameter Comment="Primary slave address" DefaultValue="0" Group="Slave Features" Max="127" Min="0" Name="OwnAddress" Type="integer" >
+        <Condition Diagnostic="Address value from 0 to 127" Expression="DualAddressMode=I2C_DUALADDRESS_ENABLE &amp; AddressingMode=I2C_ADDRESSINGMODE_7BIT &amp;(!STM32G0|!STM32WB | !STM32G4 | !STM32L5 | !STM32WL | !STM32WBA) "/>    
+        <Description>The generated value of the address is shifted left by 1 bit.</Description>    
+    </RefParameter>  
+     <RefParameter Comment="Primary slave address" DefaultValue="0" Group="Slave Features" Max="1023" Min="0" Name="OwnAddress" Type="integer" >
+        <Condition Diagnostic="Address value from 0 to 1023" Expression="DualAddressMode=I2C_DUALADDRESS_ENABLE &amp; AddressingMode=I2C_ADDRESSINGMODE_10BIT &amp;(!STM32G0 | !STM32G4 | !STM32L5 | !STM32WL | !STM32WBA) "/>    
+        <Description>The generated value of the address is shifted left by 1 bit.</Description>    
+    </RefParameter>  
+    
+    <RefParameter Comment="Primary slave address" DefaultValue="0"  Group="Slave Features" Max="1023" Min="0" Name="OwnAddress" Type="integer">
+    
+    </RefParameter>
+    
+    <RefParameter Comment="Primary slave address" DefaultValue="=(OwnAddress*2)" Group="Slave Features" Max="127" Min="0" Name="OwnAddress1" Type="integer">
+     <Condition Diagnostic="Address value from 0 to 127" Expression="AddressingMode=I2C_ADDRESSINGMODE_7BIT"/>
+        <Description>The generated value of the address is shifted left by 1 bit.</Description>        
+    </RefParameter>
+    
+    <RefParameter Comment="Primary slave address" DefaultValue="=OwnAddress" Group="Slave Features" Max="1023" Min="0" Name="OwnAddress1" Type="integer">
+        <Condition Diagnostic="Address value from 0 to 1023" Expression="AddressingMode=I2C_ADDRESSINGMODE_10BIT"/>
+        <Description>The generated value of the address is shifted left by 1 bit.</Description>        
+    </RefParameter>
+
+
+    <RefParameter Comment="Secondary slave address" DefaultValue="0" Group="Slave Features" Max="0" Min="0" Name="OwnAddress2" Type="integer" Visible="false">
+        <Condition Diagnostic="Address value from 0 to 127" Expression="DualAddressMode=I2C_DUALADDRESS_DISABLE"/>        
+        <Description>The generated value of the address is shifted left by 1 bit.</Description>       
+    </RefParameter>
+	   
+    
+    <RefParameter Comment="Secondary slave address" DefaultValue="0" Group="Slave Features" Max="127" Min="0" Name="OwnAddress2" Type="integer" Visible="true">
+        <Description>The generated value of the address is shifted left by 1 bit.</Description>       
+
+    </RefParameter>
+
+
+    <!--specifier seconde address pour slave avec 7 bit adressage et dual mode activer -->
+    <RefParameter Comment="Secondary slave address" DefaultValue="=(OwnAddress2*2)" Group="Slave Features" Max="127" Min="0" Name="OwnAddress22" Type="integer" Visible="false">
+        <Condition Diagnostic="Address value from 0 to 127" Expression="DualAddressMode=I2C_DUALADDRESS_DISABLE"/>    
+        <PossibleValue Comment=" 0" Value="0"/>			
+    </RefParameter>
+    
+    <RefParameter Comment="Secondary slave address" DefaultValue="=(OwnAddress2*2)" Group="Slave Features" Max="127" Min="0" Name="OwnAddress22" Type="integer" Visible="false">
+    
+    </RefParameter>
+    
+
+
+    <!--specifier if dual mode active -->
+    <RefParameter Comment="Dual Address Acknowledged" DefaultValue="I2C_DUALADDRESS_DISABLE" Group="Slave Features" Name="DualAddressMode" Type="list">
+        <Condition Diagnostic="When primary address is 7 bits length we can have a dual address" Expression="AddressingMode=I2C_ADDRESSINGMODE_7BIT | AddressingMode=I2C_ADDRESSINGMODE_10BIT " />  
+        <PossibleValue Comment="Disabled" Value="I2C_DUALADDRESS_DISABLE"/>
+        <PossibleValue Comment="Enabled" Value="I2C_DUALADDRESS_ENABLE"/>
+    </RefParameter>
+    
+    <RefParameter Comment="Dual Address Acknowledged" DefaultValue="I2C_DUALADDRESS_DISABLE" Group="Slave Features" Name="DualAddressMode" Type="list">         
+        <PossibleValue Comment="Disabled" Value="I2C_DUALADDRESS_DISABLE"/>       
+    </RefParameter>
+
+
+    <!-- Specifies the acknoledge mask address second slave own address if dual addressing mode is selected-->
+    <RefParameter Comment="Secondary Address Mask" DefaultValue="I2C_OA2_NOMASK" Group="Slave Features" Name="OwnAddress2Masks" Type="list" Visible="true">
+        <Condition Diagnostic="" Expression=" (DualAddressMode=I2C_DUALADDRESS_ENABLE) "/> 
+        <PossibleValue Comment="No mask" Value="I2C_OA2_NOMASK"/>
+        <PossibleValue Comment="OA2[1] masked" Value="I2C_OA2_MASK01"/>
+        <PossibleValue Comment="OA2[2:1] masked" Value="I2C_OA2_MASK02"/>
+        <PossibleValue Comment="OA2[3:1] masked" Value="I2C_OA2_MASK03"/>
+        <PossibleValue Comment="OA2[4:1] masked" Value="I2C_OA2_MASK04"/>
+        <PossibleValue Comment="OA2[5:1] masked" Value="I2C_OA2_MASK05"/>
+        <PossibleValue Comment="OA2[6:1] masked" Value="I2C_OA2_MASK06"/>
+        <PossibleValue Comment="OA2[7:1] masked" Value="I2C_OA2_MASK07"/>
+    </RefParameter>
+	
+    <RefParameter Comment="Secondary Address Mask" DefaultValue="I2C_OA2_NOMASK" Group="Slave Features" Name="OwnAddress2Masks" Type="list" Visible="false">
+          
+        <PossibleValue Comment="No mask" Value="I2C_OA2_NOMASK"/>
+    </RefParameter>	
+
+
+    <!-- Specifies if General Call address detection-->
+    <RefParameter Comment="General Call Address Detection" DefaultValue="I2C_GENERALCALL_DISABLE" Group="Slave Features" Name="GeneralCallMode" Type="list">
+        <PossibleValue Comment="Disabled" Value="I2C_GENERALCALL_DISABLE"/>
+        <PossibleValue Comment="Enabled" Value="I2C_GENERALCALL_ENABLE"/>
+    </RefParameter>
+	
+    <!-- Master Features-->  
+    <!-- Specifies if Clock No Stretch Mode enable-->   
+
+    <RefParameter Comment="Clock No Stretch Mode" DefaultValue="I2C_NOSTRETCH_DISABLE" Group="Slave Features" Name="NoStretchMode" Type="list">
+        <Condition Diagnostic="" Expression="!S_LPBAM_CONF"/>
+        <PossibleValue Comment="Disabled" Value="I2C_NOSTRETCH_DISABLE"/>
+        <PossibleValue Comment="Enabled" Value="I2C_NOSTRETCH_ENABLE"/>
+    </RefParameter> 
+    
+    <RefParameter Comment="Clock No Stretch Mode" DefaultValue="I2C_NOSTRETCH_DISABLE" Group="Slave Features" Name="NoStretchMode" Type="list">
+        <Condition Diagnostic="" Expression="S_LPBAM_CONF"/>
+        <PossibleValue Comment="Disabled" Value="I2C_NOSTRETCH_DISABLE"/>
+    </RefParameter> 
+
+    <!--SMBus Mode-->
+    <!--Timeout configuration-->
+    <!--Specifies if Extended clock timeout enable  -->					   
+    <RefParameter Comment="Extended Clock Timeout" DefaultValue="SMBUS_TEXTEN_DISABLED" Group="Timeout configuration" Name="TEXTEN" Type="list">
+        <PossibleValue Comment="Enabled" Value="SMBUS_TEXTEN_ENABLED"/>
+        <PossibleValue Comment="Disabled" Value="SMBUS_TEXTEN_DISABLED"/>
+    </RefParameter>
+				
+    <!--Specifies if Idle clock timeout detection enable  -->	
+    <RefParameter Comment="Idle Clock Timeout Detection" DefaultValue="SMBUS_TIDLE_DISABLED" Group="Timeout configuration" Name="TIDLE" Type="list">
+        <PossibleValue Comment="Enabled" Value="SMBUS_TIDLE_ENABLED"/>
+        <PossibleValue Comment="Disabled" Semaphore="$IpInstance_TIDLE_DISABLED" Value="SMBUS_TIDLE_DISABLED"/>
+    </RefParameter>
+				
+    <!--Specifies Low Extend Time when Extended time enable  -->
+    <RefParameter Comment="LOW:MEXT Time (ns)" DefaultValue="0" Group="Timeout configuration" Max="10000000" Min="0" Name="TIMEOUTB_Master" Type="integer" Visible="true" NoCheckOpt="false" >													 
+        <Condition Diagnostic="" Expression="(TEXTEN=SMBUS_TEXTEN_ENABLED)&amp;(SMBusPeripheralMode=SMBUS_PERIPHERAL_MODE_SMBUS_HOST) "/>  
+    </RefParameter>
+    <RefParameter Comment="LOW:MEXT Time (ns)" DefaultValue="0" Group="Timeout configuration" Max="10000000" Min="0" Name="TIMEOUTB_Master" Type="integer" Visible="false" NoCheckOpt="false" >													 
+        <Condition Diagnostic="" Expression="(TEXTEN=SMBUS_TEXTEN_DISABLED)|!(SMBusPeripheralMode=SMBUS_PERIPHERAL_MODE_SMBUS_HOST) "/>  
+    </RefParameter>
+    <RefParameter Comment="LOW:SEXT Time (ns)" DefaultValue="0" Group="Timeout configuration" Max="25000000" Min="0" Name="TIMEOUTB_Slave" Type="integer" Visible="true" NoCheckOpt="false" >													 
+        <Condition Diagnostic="" Expression="(TEXTEN=SMBUS_TEXTEN_ENABLED)&amp;((SMBusPeripheralMode=SMBUS_PERIPHERAL_MODE_SMBUS_SLAVE)|(SMBusPeripheralMode=SMBUS_PERIPHERAL_MODE_SMBUS_SLAVE_ARP)  )"/> 
+    </RefParameter>
+    <RefParameter Comment="LOW:SEXT Time (ns)" DefaultValue="0" Group="Timeout configuration" Max="25000000" Min="0" Name="TIMEOUTB_Slave" Type="integer" Visible="false" NoCheckOpt="false" >													 
+        <Condition Diagnostic="" Expression="(TEXTEN=SMBUS_TEXTEN_DISABLED)|!((SMBusPeripheralMode=SMBUS_PERIPHERAL_MODE_SMBUS_SLAVE)&amp;(SMBusPeripheralMode=SMBUS_PERIPHERAL_MODE_SMBUS_SLAVE_ARP)  )"/> 
+    </RefParameter>				
+ 
+    <!--Specifies IDLE Time when Idle clock timeout detection enable -->				
+    <RefParameter Comment="Idle Time (ns)" DefaultValue="4000" Group="Timeout configuration" Max="5000000" Min="4000" Name="TIMEOUTA_idle" Type="integer" Visible="false" NoCheckOpt="false" >
+        <Condition Diagnostic="" Expression="$IpInstance_TIDLE_DISABLED"/>
+    </RefParameter>
+    <RefParameter Comment="Idle Time (ns)" DefaultValue="4000" Group="Timeout configuration" Max="5000000" Min="4000" Name="TIMEOUTA_idle" Type="integer" NoCheckOpt="false" />
+   	
+	
+    <!--Specifies Timeout Time when Idle clock timeout detection Disable -->				   
+    <RefParameter Comment="Timeout Time (ns)" DefaultValue="25000000" Group="Timeout configuration" Max="35000000" Min="25000000" Name="TIMEOUT_time" Type="integer" Visible="true" NoCheckOpt="false" >													 
+        <Condition Diagnostic="" Expression="(TIDLE=SMBUS_TIDLE_DISABLED) "/>  
+    </RefParameter>	
+    <RefParameter Comment="Timeout Time (ns)" DefaultValue="25000000" Group="Timeout configuration" Max="35000000" Min="25000000" Name="TIMEOUT_time" Type="integer" Visible="false" NoCheckOpt="false" >													 
+             
+    </RefParameter>
+			
+    <!--Specifies the Timout Register value  -->
+    <RefParameter Comment="Timeout" DefaultValue="0x00008019" Group="Timeout configuration" Name="Timeout" Type="string">
+        <Condition Diagnostic="" Expression="STM32L0"/>
+    </RefParameter>
+    <RefParameter Comment="Timeout" DefaultValue="0x00008061" Group="Timeout configuration" Name="Timeout" Type="string">
+        <Condition Diagnostic="" Expression="STM32F0|STM32F1|STM32F3"/>
+    </RefParameter>
+    <RefParameter Comment="Timeout" DefaultValue="0x00008030" Group="Timeout configuration" Name="Timeout" Type="string">
+        <Condition Diagnostic="" Expression="STM32L4|STM32WB"/>
+    </RefParameter>
+      <RefParameter Comment="Timeout" DefaultValue="0x000080C3" Group="Timeout configuration" Name="Timeout" Type="string">
+        <Condition Diagnostic="" Expression="STM32G0|STM32G4"/>
+    </RefParameter>
+    <RefParameter Comment="Timeout" DefaultValue="0x00008019" Group="Timeout configuration" Name="Timeout" Type="string"/>
+				 
+    <!--SMBus Features -->
+    <!-- Specifies if Packet Error Check mode is selected-->	
+    <RefParameter Comment="Packet Error Check Mode" DefaultValue="SMBUS_PEC_DISABLE" Group="SMBus Features" Name="SMBusPacketErrorCheckMode" Type="list">
+        <Condition Diagnostic="" Expression="STM32L0|STM32L4"/>
+        <PossibleValue Comment="PEC Disabled" Value="SMBUS_PEC_DISABLE"/>
+        <PossibleValue Comment="PEC Enabled" Value="SMBUS_PEC_ENABLE"/>
+    </RefParameter>						
+    <RefParameter Comment="Packet Error Check Mode" DefaultValue="SMBUS_PEC_DISABLE" Group="SMBus Features" Name="SMBusPacketErrorCheckMode" Type="list">
+        <PossibleValue Comment="PEC Disabled" Value="SMBUS_PEC_DISABLE"/>
+        <PossibleValue Comment="PEC Enabled" Value="SMBUS_PEC_ENABLE"/>
+    </RefParameter>
+          
+    <!-- Specifies which mode of Periphal is selected-->
+    <RefParameter Comment="Peripheral Mode" DefaultValue="SMBUS_PERIPHERAL_MODE_SMBUS_SLAVE" Group="SMBus Features" Name="SMBusPeripheralMode" Type="list">
+        <PossibleValue Comment="Peripheral Mode Smbus Master " Value="SMBUS_PERIPHERAL_MODE_SMBUS_HOST"/>
+        <PossibleValue Comment="Peripheral Mode Smbus Slave" Value="SMBUS_PERIPHERAL_MODE_SMBUS_SLAVE"/>
+        <PossibleValue Comment="Peripheral Mode Smbus Slave ARP" Value="SMBUS_PERIPHERAL_MODE_SMBUS_SLAVE_ARP"/>
+        <Description>In case of switching your device form Slave ARP to Master (Peripheral mode SMBus Master) on your application, you need to set addressing mode parameters. And if you are using SMBUS device protocol and Host mode(Peripheral mode SMBus Master), please make sure that there may be at most one host in your system.</Description>
+    </RefParameter>
+    <!--SMBus Slave Features -->
+    <RefParameter Comment="Primary Address Length selection" DefaultValue="SMBUS_ADDRESSINGMODE_7BIT" Group="SMBus Slave Features" Name="SMBusAddressingMode" Type="list">
+        <PossibleValue Comment="7-bit" Value="SMBUS_ADDRESSINGMODE_7BIT"/>
+        <Description>The Parameter " SMBusAddressingMode " is not supported by LL Driver </Description>
+    </RefParameter>
+
+    <RefParameter Comment="Primary slave address" DefaultValue="1" Group="SMBus Slave Features" Max="127" Min="1" Name="SMBusOwnAddress" Type="integer" Visible="false">
+        <Description>The generated value of the address is shifted left by 1 bit.</Description>       
+        <Condition Diagnostic="" Expression="SMBusPeripheralMode=SMBUS_PERIPHERAL_MODE_SMBUS_SLAVE_ARP"/>   
+        <PossibleValue Comment="1" Value="1"/>	
+    </RefParameter>
+    <RefParameter Comment="Primary slave address" DefaultValue="1" Group="SMBus Slave Features" Max="127" Min="1" Name="SMBusOwnAddress" Type="integer">
+        <Description>The generated value of the address is shifted left by 1 bit.</Description>       
+        <Condition Diagnostic="Address value from 1 to 127" Expression="SMBusAddressingMode=SMBUS_ADDRESSINGMODE_7BIT"/>        
+    </RefParameter> 
+    
+    <RefParameter Comment="Primary slave address" DefaultValue="1" Group="SMBus Slave Features" Max="127" Min="1" Name="SMBusOwnAddress" Type="integer">
+        <Description>The generated value of the address is shifted left by 1 bit.</Description>       
+        <Condition Diagnostic="Address value from 1 to 127" Expression="SMBusDualAddressMode=SMBUS_DUALADDRESS_ENABLE"/>        
+    </RefParameter>  
+      
+    <RefParameter Comment="Primary slave address" DefaultValue="1" Group="SMBus Slave Features" Max="1023" Min="1" Name="SMBusOwnAddress" Type="integer">       
+    </RefParameter>
+
+    <RefParameter Comment="Primary slave address" DefaultValue="0" Group="SMBus Slave Features" Max="127" Min="0" Name="SMBusOwnAddress1" Type="integer" Visible="false">
+        <Condition Diagnostic="" Expression="SMBusPeripheralMode=SMBUS_PERIPHERAL_MODE_SMBUS_SLAVE_ARP"/>   
+        <PossibleValue Comment="0" Value="0"/>	
+    </RefParameter>
+    <RefParameter Comment="Primary slave address" DefaultValue="=SMBusOwnAddress*2" Group="SMBus Slave Features" Max="127" Min="1" Name="SMBusOwnAddress1" Type="integer" Visible="false">
+        <Condition Diagnostic="Address value from 1 to 127" Expression="SMBusAddressingMode=SMBUS_ADDRESSINGMODE_7BIT"/>        
+    </RefParameter> 
+    
+    <RefParameter Comment="Primary slave address" DefaultValue="=SMBusOwnAddress*2" Group="SMBus Slave Features" Max="127" Min="1" Name="SMBusOwnAddress1" Type="integer" Visible="false">
+        <Condition Diagnostic="Address value from 1 to 127" Expression="SMBusDualAddressMode=SMBUS_DUALADDRESS_ENABLE"/>        
+    </RefParameter>  
+    
+    <RefParameter Comment="Primary slave address" DefaultValue="=SMBusOwnAddress" Group="SMBus Slave Features" Max="1023" Min="1" Name="SMBusOwnAddress1" Type="integer" Visible="false">        
+    </RefParameter>
+    
+    <RefParameter Comment="Secondary slave address" DefaultValue="0" Group="SMBus Slave Features" Max="127" Min="0" Name="SMBusOwnAddress2" Type="integer" Visible="false">
+        <Description>The generated value of the address is shifted left by 1 bit.</Description>       
+        <Condition Diagnostic="Address value from 0 to 127" Expression="SMBusDualAddressMode=SMBUS_DUALADDRESS_DISABLE"/>  
+        <PossibleValue Comment=" 0" Value="0"/>			
+    </RefParameter>
+    
+    <RefParameter Comment="Secondary slave address" DefaultValue="0" Group="SMBus Slave Features" Max="127" Min="0" Name="SMBusOwnAddress2" Type="integer" Visible="true">
+        <Description>The generated value of the address is shifted left by 1 bit.</Description>       
+        <Condition Diagnostic="Address value from 0 to 127" Expression="SMBusDualAddressMode=SMBUS_DUALADDRESS_ENABLE"/>  
+    </RefParameter>
+    
+    <RefParameter Comment="Secondary slave address" DefaultValue="0" Group="SMBus Slave Features" Max="127" Min="0" Name="SMBusOwnAddress2" Type="integer" Visible="false">
+        <Description>The generated value of the address is shifted left by 1 bit.</Description>       
+        <!-- <Condition Diagnostic="Address value from 0 to 127" Expression="SMBusDualAddressMode=SMBUS_DUALADDRESS_ENABLED"/> -->  
+    </RefParameter>
+
+    <RefParameter Comment="Secondary slave address" DefaultValue="0" Group="SMBus Slave Features" Max="127" Min="0" Name="SMBusOwnAddress22" Type="integer" Visible="false">
+        <Condition Diagnostic="Address value from 0 to 127" Expression="SMBusDualAddressMode=SMBUS_DUALADDRESS_DISABLE"/>  
+        <PossibleValue Comment=" 0" Value="0"/>			
+    </RefParameter>
+    
+    <RefParameter Comment="Secondary slave address" DefaultValue="=SMBusOwnAddress2*2" Group="SMBus Slave Features" Max="127" Min="0" Name="SMBusOwnAddress22" Type="integer" Visible="false">
+        <Condition Diagnostic="Address value from 0 to 127" Expression="SMBusDualAddressMode=SMBUS_DUALADDRESS_ENABLE"/>  
+    </RefParameter>
+    
+    <RefParameter Comment="Secondary slave address" DefaultValue="0" Group="SMBus Slave Features" Max="127" Min="0" Name="SMBusOwnAddress22" Type="integer" Visible="false">
+        <!-- <Condition Diagnostic="Address value from 0 to 127" Expression="SMBusDualAddressMode=SMBUS_DUALADDRESS_ENABLED"/> -->  
+    </RefParameter>
+        
+    <RefParameter Comment="Dual Address Acknowledged" DefaultValue="SMBUS_DUALADDRESS_DISABLE" Group="SMBus Slave Features" Name="SMBusDualAddressMode" Type="list">
+        <Condition Diagnostic="" Expression="!(SMBusPeripheralMode=SMBUS_PERIPHERAL_MODE_SMBUS_SLAVE_ARP)"/>  
+        <PossibleValue Comment="Disabled" Value="SMBUS_DUALADDRESS_DISABLE"/>
+        <PossibleValue Comment="Enabled" Value="SMBUS_DUALADDRESS_ENABLE"/>
+        <Description>The Parameter " SMBusDualAddressMode " is not supported by LL Driver </Description>
+    </RefParameter>
+    
+    <RefParameter Comment="Dual Address Acknowledged" DefaultValue="SMBUS_DUALADDRESS_DISABLE" Group="SMBus Slave Features" Name="SMBusDualAddressMode" Type="list" Visible="false">         
+        <Condition Diagnostic="" Expression=" (SMBusPeripheralMode=SMBUS_PERIPHERAL_MODE_SMBUS_SLAVE_ARP)"/>  
+        <PossibleValue Comment="Disabled" Value="SMBUS_DUALADDRESS_DISABLE"/>       
+    </RefParameter>
+    <RefParameter Comment="Dual Address Acknowledged" DefaultValue="null" Group="SMBus Slave Features" Name="SMBusDualAddressMode" Type="list" Visible="false"/>         
+
+    <RefParameter Comment="General Call Address Detection" DefaultValue="SMBUS_GENERALCALL_DISABLE" Group="SMBus Slave Features" Name="SMBusGeneralCallMode" Type="list">
+        <PossibleValue Comment="Disabled" Value="SMBUS_GENERALCALL_DISABLE"/>
+        <PossibleValue Comment="Enabled" Value="SMBUS_GENERALCALL_ENABLE"/>
+    </RefParameter>
+    
+    <RefParameter Comment="Clock No Stretch Mode" DefaultValue="SMBUS_NOSTRETCH_DISABLE" Group="SMBus Slave Features" Name="SMBusNoStretchMode" Type="list">
+        <PossibleValue Comment="Disabled" Value="SMBUS_NOSTRETCH_DISABLE"/>
+        <PossibleValue Comment="Enabled" Value="SMBUS_NOSTRETCH_ENABLE"/>
+    </RefParameter>	       
+    <!-- Specifies the acknoledge mask address second slave own address if dual addressing mode is selected-->
+    <RefParameter Comment="Secondary Address Mask" DefaultValue="SMBUS_OA2_NOMASK" Group="SMBus Slave Features" Name="SMBusOwnAddress2Masks" Type="list" Visible="true">
+        <Condition Diagnostic="" Expression=" (SMBusDualAddressMode=SMBUS_DUALADDRESS_ENABLE) "/> 
+        <PossibleValue Comment="No mask" Value="SMBUS_OA2_NOMASK"/>
+        <PossibleValue Comment="OA2[1] masked" Value="SMBUS_OA2_MASK01"/>
+        <PossibleValue Comment="OA2[2:1] masked" Value="SMBUS_OA2_MASK02"/>
+        <PossibleValue Comment="OA2[3:1] masked" Value="SMBUS_OA2_MASK03"/>
+        <PossibleValue Comment="OA2[4:1] masked" Value="SMBUS_OA2_MASK04"/>
+        <PossibleValue Comment="OA2[5:1] masked" Value="SMBUS_OA2_MASK05"/>
+        <PossibleValue Comment="OA2[6:1] masked" Value="SMBUS_OA2_MASK06"/>
+        <PossibleValue Comment="OA2[7:1] masked" Value="SMBUS_OA2_MASK07"/>
+    </RefParameter>
+	
+    <RefParameter Comment="Secondary Address Mask" DefaultValue="SMBUS_OA2_NOMASK" Group="SMBus Slave Features" Name="SMBusOwnAddress2Masks" Type="list" Visible="false">
+        <PossibleValue Comment="No mask" Value="SMBUS_OA2_NOMASK"/>
+    </RefParameter>	    
+    
+    <!-- Autonomous Mode __begin -->
+    <RefParameter Comment="Autonomous Mode" DefaultValue="AUTONOMOUS_MODE_DISABLE" Group="Autonomous Mode" Name="AutonomousMode" Type="list">
+        <Condition Diagnostic="" Expression="STM32U5 | STM32WBA"/>
+        <PossibleValue Comment="Disable " Value="AUTONOMOUS_MODE_DISABLE"/>
+        <PossibleValue Comment="Enable " Value="AUTONOMOUS_MODE_ENABLE"/>
+    </RefParameter>
+    <RefParameter Comment="Autonomous Mode" DefaultValue="null" Group="Autonomous Mode" Name="AutonomousMode" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="!STM32U5 &amp; !STM32WBA"/>
+    </RefParameter>
+         
+    <RefParameter Comment="     Trigger State" DefaultValue="I2C_AUTO_MODE_ENABLE" Group="Autonomous Mode" Name="TriggerState" Type="list">
+        <Condition Diagnostic="" Expression="(AutonomousMode = AUTONOMOUS_MODE_ENABLE) &amp; $IpInstance_I2C_Mode"/>
+        <PossibleValue Comment="Enable " Value="I2C_AUTO_MODE_ENABLE"/>
+        <PossibleValue Comment="Disable " Value="I2C_AUTO_MODE_DISABLE"/>
+    </RefParameter>
+    
+    <RefParameter Comment="     Trigger State" DefaultValue="I2C_AUTO_MODE_ENABLE" Group="Autonomous Mode" Name="TriggerState" Type="list">
+        <Condition Diagnostic="" Expression="(AutonomousMode = AUTONOMOUS_MODE_ENABLE) &amp; $IpInstance_SMBus_Mode"/>
+        <PossibleValue Comment="Enable" Value="SMBUS_AUTO_MODE_ENABLE"/>
+        <PossibleValue Comment="Disable" Value="SMBUS_AUTO_MODE_DISABLE"/>
+    </RefParameter>
+    
+    <RefParameter Comment="     Trigger State" DefaultValue="null" Group="Autonomous Mode" Name="TriggerState" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="(AutonomousMode = AUTONOMOUS_MODE_DISABLE) | ( !STM32U5 &amp; !STM32WBA)"/>
+    </RefParameter>    
+    
+    <RefParameter Comment="     Trigger Polarity" DefaultValue="null" Group="Autonomous Mode" Name="TriggerPolarity" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="(AutonomousMode = AUTONOMOUS_MODE_DISABLE) | ( !STM32U5 &amp; !STM32WBA)"/>
+    </RefParameter>	    
+    <RefParameter Comment="     Trigger Polarity" DefaultValue="I2C_TRIG_POLARITY_RISING" Group="Autonomous Mode" Name="TriggerPolarity" Type="list">
+        <Condition Diagnostic="" Expression="(AutonomousMode = AUTONOMOUS_MODE_ENABLE) &amp; $IpInstance_I2C_Mode"/>
+        <PossibleValue Comment="RISING" Value="I2C_TRIG_POLARITY_RISING"/>
+        <PossibleValue Comment="FALLING" Value="I2C_TRIG_POLARITY_FALLING"/>
+    </RefParameter>
+    <RefParameter Comment="     Trigger Polarity" DefaultValue="I2C_TRIG_POLARITY_RISING" Group="Autonomous Mode" Name="TriggerPolarity" Type="list">
+        <Condition Diagnostic="" Expression="(AutonomousMode = AUTONOMOUS_MODE_ENABLE) &amp; $IpInstance_SMBus_Mode"/>
+        <PossibleValue Comment="RISING " Value="SMBUS_TRIG_POLARITY_RISING"/>
+        <PossibleValue Comment="FALLING " Value="SMBUS_TRIG_POLARITY_FALLING"/>
+    </RefParameter>
+    
+    <RefParameter Comment="     Trigger Selection" DefaultValue="null" Group="Autonomous Mode" Name="TriggerSelection" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="(AutonomousMode = AUTONOMOUS_MODE_DISABLE) | ( !STM32U5 &amp; !STM32WBA)"/>
+    </RefParameter>    
+
+	<!--Trigger Selection Without COMP2 out-->
+	<RefParameter Comment="Trigger Selection" DefaultValue="I2C_GRP2_GPDMA_CH0_TCF_TRG" Group="Autonomous Mode" Name="TriggerSelection" Type="list">
+        <Condition Diagnostic="" Expression="STM32U5 &amp; DIE455 &amp;  (AutonomousMode = AUTONOMOUS_MODE_ENABLE) &amp; $IpInstance_I2C_Mode" />
+        <PossibleValue Comment="GPDMA1 channel 0" Value="I2C_GRP2_LPDMA_CH0_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 1" Value="I2C_GRP2_LPDMA_CH1_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 2" Value="I2C_GRP2_LPDMA_CH2_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 3" Value="I2C_GRP2_LPDMA_CH3_TCF_TRG"/>
+        <PossibleValue Comment="EXTI line 5" Value="I2C_GRP2_EXTI5_TRG"/>
+        <PossibleValue Comment="EXTI line 8" Value="I2C_GRP2_EXTI8_TRG"/>
+        <PossibleValue Comment="LPTIM1 out" Value="I2C_GRP2_LPTIM1_CH1_TRG"/>
+        <PossibleValue Comment="LPTIM2 out" Value="I2C_GRP2_LPTIM3_CH1_TRG"/>
+        <PossibleValue Comment="COMP1 out" Value="I2C_GRP2_COMP1_TRG"/>
+        <PossibleValue Comment="RTC alarm" Value="I2C_GRP2_RTC_ALRA_TRG"/>
+        <PossibleValue Comment="RTC wakeup" Value="I2C_GRP2_RTC_WUT_TRG"/>
+    </RefParameter>
+    <RefParameter Comment="     Trigger Selection" DefaultValue="I2C_GRP1_GPDMA_CH0_TCF_TRG" Group="Autonomous Mode" Name="TriggerSelection" Type="list">
+        <Condition Diagnostic="" Expression="(AutonomousMode = AUTONOMOUS_MODE_ENABLE) &amp; !($Index=3) &amp; $IpInstance_I2C_Mode &amp; !(STM32WBAx0|STM32WBAx2)" />
+        <PossibleValue Comment="GPDMA1 channel 0" Value="I2C_GRP1_GPDMA_CH0_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 1" Value="I2C_GRP1_GPDMA_CH1_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 2" Value="I2C_GRP1_GPDMA_CH2_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 3" Value="I2C_GRP1_GPDMA_CH3_TCF_TRG"/>
+        <PossibleValue Comment="EXTI line 5" Value="I2C_GRP1_EXTI5_TRG"/>
+        <PossibleValue Comment="EXTI line 9" Value="I2C_GRP1_EXTI9_TRG"/>
+        <PossibleValue Comment="LPTIM1 out" Value="I2C_GRP1_LPTIM1_CH1_TRG"/>
+        <PossibleValue Comment="LPTIM2 out" Value="I2C_GRP1_LPTIM2_CH1_TRG"/>
+        <PossibleValue Comment="COMP1 out" Value="I2C_GRP1_COMP1_TRG"/>
+        <PossibleValue Comment="COMP2 out" Value="I2C_GRP1_COMP2_TRG"/>
+        <PossibleValue Comment="RTC alarm" Value="I2C_GRP1_RTC_ALRA_TRG"/>
+        <PossibleValue Comment="RTC wakeup" Value="I2C_GRP1_RTC_WUT_TRG"/>
+    </RefParameter>
+    <RefParameter Comment="     Trigger Selection" DefaultValue="I2C_GRP2_GPDMA_CH0_TCF_TRG" Group="Autonomous Mode" Name="TriggerSelection" Type="list">
+        <Condition Diagnostic="" Expression="STM32U5 &amp; (AutonomousMode = AUTONOMOUS_MODE_ENABLE) &amp; ($Index=3) &amp; $IpInstance_I2C_Mode" />
+        <PossibleValue Comment="GPDMA1 channel 0" Value="I2C_GRP2_LPDMA_CH0_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 1" Value="I2C_GRP2_LPDMA_CH1_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 2" Value="I2C_GRP2_LPDMA_CH2_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 3" Value="I2C_GRP2_LPDMA_CH3_TCF_TRG"/>
+        <PossibleValue Comment="EXTI line 5" Value="I2C_GRP2_EXTI5_TRG"/>
+        <PossibleValue Comment="EXTI line 8" Value="I2C_GRP2_EXTI8_TRG"/>
+        <PossibleValue Comment="LPTIM1 out" Value="I2C_GRP2_LPTIM1_CH1_TRG"/>
+        <PossibleValue Comment="LPTIM2 out" Value="I2C_GRP2_LPTIM3_CH1_TRG"/>
+        <PossibleValue Comment="COMP1 out" Value="I2C_GRP2_COMP1_TRG"/>
+        <PossibleValue Comment="COMP2 out" Value="I2C_GRP2_COMP2_TRG"/>
+        <PossibleValue Comment="RTC alarm" Value="I2C_GRP2_RTC_ALRA_TRG"/>
+        <PossibleValue Comment="RTC wakeup" Value="I2C_GRP2_RTC_WUT_TRG"/>
+    </RefParameter>
+    <RefParameter Comment="     Trigger Selection" DefaultValue="I2C_GRP2_GPDMA_CH0_TCF_TRG" Group="Autonomous Mode" Name="TriggerSelection" Type="list">
+        <Condition Diagnostic="" Expression="STM32WBA &amp; !(STM32WBAx0|STM32WBAx2) &amp; (AutonomousMode = AUTONOMOUS_MODE_ENABLE) &amp; ($Index=3) &amp; $IpInstance_I2C_Mode" />
+        <PossibleValue Comment="GPDMA1 channel 0" Value="I2C_GRP2_GPDMA_CH0_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 1" Value="I2C_GRP2_GPDMA_CH1_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 2" Value="I2C_GRP2_GPDMA_CH2_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 3" Value="I2C_GRP2_GPDMA_CH3_TCF_TRG"/>
+        <PossibleValue Comment="EXTI line 5" Value="I2C_GRP2_EXTI5_TRG"/>
+        <PossibleValue Comment="EXTI line 8" Value="I2C_GRP2_EXTI8_TRG"/>
+        <PossibleValue Comment="LPTIM1 out" Value="I2C_GRP2_LPTIM1_CH1_TRG"/>
+        <PossibleValue Comment="COMP1 out" Value="I2C_GRP2_COMP1_TRG"/>
+        <PossibleValue Comment="COMP2 out" Value="I2C_GRP2_COMP2_TRG"/>
+        <PossibleValue Comment="RTC alarm" Value="I2C_GRP2_RTC_ALRA_TRG"/>
+        <PossibleValue Comment="RTC wakeup" Value="I2C_GRP2_RTC_WUT_TRG"/>
+    </RefParameter>
+    <RefParameter Comment="     Trigger Selection" DefaultValue="I2C_GRP1_GPDMA_CH0_TCF_TRG" Group="Autonomous Mode" Name="TriggerSelection" Type="list">
+        <Condition Diagnostic="" Expression="(STM32WBAx0|STM32WBAx2) &amp; (AutonomousMode = AUTONOMOUS_MODE_ENABLE) &amp; !($Index=3) &amp; $IpInstance_I2C_Mode" />
+        <PossibleValue Comment="GPDMA1 channel 0" Value="I2C_GRP1_GPDMA_CH0_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 1" Value="I2C_GRP1_GPDMA_CH1_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 2" Value="I2C_GRP1_GPDMA_CH2_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 3" Value="I2C_GRP1_GPDMA_CH3_TCF_TRG"/>
+        <PossibleValue Comment="EXTI line 5" Value="I2C_GRP1_EXTI5_TRG"/>
+        <PossibleValue Comment="EXTI line 9" Value="I2C_GRP1_EXTI9_TRG"/>
+        <PossibleValue Comment="LPTIM1 out" Value="I2C_GRP1_LPTIM1_CH1_TRG"/>
+        <PossibleValue Comment="LPTIM2 out" Value="I2C_GRP1_LPTIM2_CH1_TRG"/>
+        <PossibleValue Comment="RTC alarm" Value="I2C_GRP1_RTC_ALRA_TRG"/>
+        <PossibleValue Comment="RTC wakeup" Value="I2C_GRP1_RTC_WUT_TRG"/>
+    </RefParameter>
+    <RefParameter Comment="     Trigger Selection" DefaultValue="I2C_GRP2_GPDMA_CH0_TCF_TRG" Group="Autonomous Mode" Name="TriggerSelection" Type="list">
+        <Condition Diagnostic="" Expression="(STM32WBAx0|STM32WBAx2) &amp; (AutonomousMode = AUTONOMOUS_MODE_ENABLE) &amp; ($Index=3) &amp; $IpInstance_I2C_Mode" />
+        <PossibleValue Comment="GPDMA1 channel 0" Value="I2C_GRP2_GPDMA_CH0_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 1" Value="I2C_GRP2_GPDMA_CH1_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 2" Value="I2C_GRP2_GPDMA_CH2_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 3" Value="I2C_GRP2_GPDMA_CH3_TCF_TRG"/>
+        <PossibleValue Comment="EXTI line 5" Value="I2C_GRP2_EXTI5_TRG"/>
+        <PossibleValue Comment="EXTI line 8" Value="I2C_GRP2_EXTI8_TRG"/>
+        <PossibleValue Comment="LPTIM1 out" Value="I2C_GRP2_LPTIM1_CH1_TRG"/>
+        <PossibleValue Comment="RTC alarm" Value="I2C_GRP2_RTC_ALRA_TRG"/>
+        <PossibleValue Comment="RTC wakeup" Value="I2C_GRP2_RTC_WUT_TRG"/>
+    </RefParameter>
+    <RefParameter Comment="     Trigger Selection" DefaultValue="SMBUS_GRP1_GPDMA_CH0_TCF_TRG" Group="Autonomous Mode" Name="TriggerSelection" Type="list">
+        <Condition Diagnostic="" Expression="(AutonomousMode = AUTONOMOUS_MODE_ENABLE) &amp; !($Index=3) &amp; $IpInstance_SMBus_Mode &amp; !(STM32WBAx0|STM32WBAx2)" />
+        <PossibleValue Comment="GPDMA1 channel 0" Value="SMBUS_GRP1_GPDMA_CH0_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 1" Value="SMBUS_GRP1_GPDMA_CH1_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 2" Value="SMBUS_GRP1_GPDMA_CH2_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 3" Value="SMBUS_GRP1_GPDMA_CH3_TCF_TRG"/>
+        <PossibleValue Comment="EXTI line 5" Value="SMBUS_GRP1_EXTI5_TRG"/>
+        <PossibleValue Comment="EXTI line 9" Value="SMBUS_GRP1_EXTI9_TRG"/>
+        <PossibleValue Comment="LPTIM1 out" Value="SMBUS_GRP1_LPTIM1_CH1_TRG"/>
+        <PossibleValue Comment="LPTIM2 out" Value="SMBUS_GRP1_LPTIM2_CH1_TRG"/>
+        <PossibleValue Comment="COMP1 out" Value="SMBUS_GRP1_COMP1_TRG"/>
+        <PossibleValue Comment="COMP2 out" Value="SMBUS_GRP1_COMP2_TRG" Condition="DIE455" Action="Remove"/>
+        <PossibleValue Comment="RTC alarm" Value="SMBUS_GRP1_RTC_ALRA_TRG"/>
+        <PossibleValue Comment="RTC wakeup" Value="SMBUS_GRP1_RTC_WUT_TRG"/>
+    </RefParameter>
+    <RefParameter Comment="     Trigger Selection" DefaultValue="SMBUS_GRP2_LPDMA_CH0_TCF_TRG" Group="Autonomous Mode" Name="TriggerSelection" Type="list">
+        <Condition Diagnostic="" Expression="STM32U5 &amp; (AutonomousMode = AUTONOMOUS_MODE_ENABLE) &amp; ($Index=3) &amp; $IpInstance_SMBus_Mode" />
+        <PossibleValue Comment="GPDMA1 channel 0" Value="SMBUS_GRP2_LPDMA_CH0_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 1" Value="SMBUS_GRP2_LPDMA_CH1_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 2" Value="SMBUS_GRP2_LPDMA_CH2_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 3" Value="SMBUS_GRP2_LPDMA_CH3_TCF_TRG"/>
+        <PossibleValue Comment="EXTI line 5" Value="SMBUS_GRP2_EXTI5_TRG"/>
+        <PossibleValue Comment="EXTI line 8" Value="SMBUS_GRP2_EXTI8_TRG"/>
+        <PossibleValue Comment="LPTIM1 out" Value="SMBUS_GRP2_LPTIM1_CH1_TRG"/>
+        <PossibleValue Comment="LPTIM2 out" Value="SMBUS_GRP2_LPTIM3_CH1_TRG"/>
+        <PossibleValue Comment="COMP1 out" Value="SMBUS_GRP2_COMP1_TRG"/>
+        <PossibleValue Comment="COMP2 out" Value="SMBUS_GRP2_COMP2_TRG" Condition="DIE455" Action="Remove"/>
+        <PossibleValue Comment="RTC alarm" Value="SMBUS_GRP2_RTC_ALRA_TRG"/>
+        <PossibleValue Comment="RTC wakeup" Value="SMBUS_GRP2_RTC_WUT_TRG"/>
+    </RefParameter>
+    <RefParameter Comment="     Trigger Selection" DefaultValue="SMBUS_GRP2_GPDMA_CH0_TCF_TRG" Group="Autonomous Mode" Name="TriggerSelection" Type="list">
+        <Condition Diagnostic="" Expression="STM32WBA &amp; !(STM32WBAx0|STM32WBAx2) &amp; (AutonomousMode = AUTONOMOUS_MODE_ENABLE) &amp; ($Index=3) &amp; $IpInstance_SMBus_Mode" />
+        <PossibleValue Comment="GPDMA1 channel 0" Value="SMBUS_GRP2_GPDMA_CH0_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 1" Value="SMBUS_GRP2_GPDMA_CH1_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 2" Value="SMBUS_GRP2_GPDMA_CH2_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 3" Value="SMBUS_GRP2_GPDMA_CH3_TCF_TRG"/>
+        <PossibleValue Comment="EXTI line 5" Value="SMBUS_GRP2_EXTI5_TRG"/>
+        <PossibleValue Comment="EXTI line 8" Value="SMBUS_GRP2_EXTI8_TRG"/>
+        <PossibleValue Comment="LPTIM1 out" Value="SMBUS_GRP2_LPTIM1_CH1_TRG"/>
+        <PossibleValue Comment="COMP1 out" Value="SMBUS_GRP2_COMP1_TRG"/>
+        <PossibleValue Comment="COMP2 out" Value="SMBUS_GRP2_COMP2_TRG"/>
+        <PossibleValue Comment="RTC alarm" Value="SMBUS_GRP2_RTC_ALRA_TRG"/>
+        <PossibleValue Comment="RTC wakeup" Value="SMBUS_GRP2_RTC_WUT_TRG"/>
+    </RefParameter>
+    <RefParameter Comment="     Trigger Selection" DefaultValue="SMBUS_GRP1_GPDMA_CH0_TCF_TRG" Group="Autonomous Mode" Name="TriggerSelection" Type="list">
+        <Condition Diagnostic="" Expression="(STM32WBAx0|STM32WBAx2) &amp; (AutonomousMode = AUTONOMOUS_MODE_ENABLE) &amp; !($Index=3) &amp; $IpInstance_SMBus_Mode" />
+        <PossibleValue Comment="GPDMA1 channel 0" Value="SMBUS_GRP1_GPDMA_CH0_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 1" Value="SMBUS_GRP1_GPDMA_CH1_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 2" Value="SMBUS_GRP1_GPDMA_CH2_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 3" Value="SMBUS_GRP1_GPDMA_CH3_TCF_TRG"/>
+        <PossibleValue Comment="EXTI line 5" Value="SMBUS_GRP1_EXTI5_TRG"/>
+        <PossibleValue Comment="EXTI line 9" Value="SMBUS_GRP1_EXTI9_TRG"/>
+        <PossibleValue Comment="LPTIM1 out" Value="SMBUS_GRP1_LPTIM1_CH1_TRG"/>
+        <PossibleValue Comment="LPTIM2 out" Value="SMBUS_GRP1_LPTIM2_CH1_TRG"/>
+        <PossibleValue Comment="RTC alarm" Value="SMBUS_GRP1_RTC_ALRA_TRG"/>
+        <PossibleValue Comment="RTC wakeup" Value="SMBUS_GRP1_RTC_WUT_TRG"/>
+    </RefParameter>
+    <RefParameter Comment="     Trigger Selection" DefaultValue="SMBUS_GRP2_GPDMA_CH0_TCF_TRG" Group="Autonomous Mode" Name="TriggerSelection" Type="list">
+        <Condition Diagnostic="" Expression="(STM32WBAx0|STM32WBAx2) &amp; (AutonomousMode = AUTONOMOUS_MODE_ENABLE) &amp; ($Index=3) &amp; $IpInstance_SMBus_Mode" />
+        <PossibleValue Comment="GPDMA1 channel 0" Value="SMBUS_GRP2_GPDMA_CH0_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 1" Value="SMBUS_GRP2_GPDMA_CH1_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 2" Value="SMBUS_GRP2_GPDMA_CH2_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 3" Value="SMBUS_GRP2_GPDMA_CH3_TCF_TRG"/>
+        <PossibleValue Comment="EXTI line 5" Value="SMBUS_GRP2_EXTI5_TRG"/>
+        <PossibleValue Comment="EXTI line 8" Value="SMBUS_GRP2_EXTI8_TRG"/>
+        <PossibleValue Comment="LPTIM1 out" Value="SMBUS_GRP2_LPTIM1_CH1_TRG"/>
+        <PossibleValue Comment="RTC alarm" Value="SMBUS_GRP2_RTC_ALRA_TRG"/>
+        <PossibleValue Comment="RTC wakeup" Value="SMBUS_GRP2_RTC_WUT_TRG"/>
+    </RefParameter>
+    <!-- Autonomous Mode  __end. -->
+
+
+<!-- LPBAM specific configuration -->
+<RefParameter Name="Interrupt1" Comment="Bus,Arbitration lost,Overrun,Underrun (slave mode) Errors"   DefaultValue="DISABLE"  Type="list" Group="IP Internal Interrupt" TabName="Advanced Settings for LPBAM">
+        <Description>description</Description>
+        <PossibleValue Comment="Enable" Value="I2C_IT_ERRI"/>
+        <PossibleValue Comment="Disable" Value="DISABLE"/>
+</RefParameter>
+
+
+<RefParameter Comment="Interrupt parameter for code generation __HAL_DAC_ENABLE_IT" DefaultValue="+Interrupt1"  Type="list"  Name="ORingInterrupt"  Visible="false">
+      <Condition Diagnostic="" Expression="!((Interrupt1=DISABLE))"/> 
+</RefParameter>
+<RefParameter  Comment="Interrupt parameter for code generation __HAL_DAC_ENABLE_IT" DefaultValue="__NULL" Name="ORingInterrupt" Type="String" >
+               <Condition Diagnostic="" Expression="(Interrupt1=DISABLE)"/> 
+ </RefParameter>
+
+
+<RefMode Name="LPBAMSPECIFIC">
+        <ConfigForMode>LPBAM_ADD_HALCONFIG</ConfigForMode>
+        <Parameter Name="Interrupt1"/>
+        
+ </RefMode>
+
+<!-- LPBAM specific configuration -->
+
+    <!-- RefMode for I2C -->
+    <RefMode HalMode="I2C" Name="I2C">
+        <ConfigForMode>I2C</ConfigForMode>   
+        <ConfigForMode>I2C_Analogue</ConfigForMode>  
+        <ConfigForMode>I2C_DigitalFolter</ConfigForMode>   		
+        <ConfigForMode>FASTMODE_Config</ConfigForMode>
+        <ConfigForMode>AutonomousMode_Config</ConfigForMode>
+        <Parameter Name="CustomTiming"/>
+        <Parameter Name="I2C_Speed_Mode"/>
+        <Parameter Name="Speed"/>      
+        <Parameter Name="I2C_Rise_Time"/>
+        <Parameter Name="I2C_Fall_Time"/>
+        <Parameter Name="I2C_Coeff_DF"/>
+        <Parameter Name="LPBAMDigitalFiltre"/>
+        <Parameter Name="Analog_Filter"/>
+        <Parameter Name="Timing"/>
+        <Parameter Name="NoStretchMode"/> 
+        <Parameter Name="GeneralCallMode"/>
+        <Parameter Name="AddressingMode"/>
+	<Parameter Name="DualAddressMode"/>  
+        <Parameter Name="OwnAddress"/>
+        <Parameter Name="OwnAddress2"/>  
+        <Parameter Name="OwnAddress2Masks"/>	
+        <Parameter Name="Instance"/>
+        <!-- Autonomous Mode -->
+        <Parameter Name="AutonomousMode"/>
+        <Parameter Name="TriggerState"/>
+        <Parameter Name="TriggerSelection"/>
+        <Parameter Name="TriggerPolarity"/>
+    </RefMode> 
+
+	
+    <!-- RefMode for SMBus -->
+    <RefMode Abstract="true" Name="SMBus_common">
+        <Parameter Name="I2C_Speed_Mode"/>
+        <Parameter Name="Speed"/>      
+        <Parameter Name="I2C_Rise_Time"/>
+        <Parameter Name="I2C_Fall_Time"/>
+        <Parameter Name="I2C_Coeff_DF"/>
+        <Parameter Name="SMBusAnalogFilter"/>
+        <Parameter Name="Timing"/>
+        <Parameter Name="SMBusPacketErrorCheckMode"/>
+        <Parameter Name="SMBusPeripheralMode"/>
+        <Parameter Name="SMBusNoStretchMode"/> 
+        <Parameter Name="SMBusGeneralCallMode"/>
+        <Parameter Name="SMBusAddressingMode"/>	
+        <Parameter Name="SMBusDualAddressMode"/>
+        <Parameter Name="SMBusOwnAddress"/>          
+        <Parameter Name="SMBusOwnAddress2"/>  
+        <Parameter Name="SMBusOwnAddress2Masks"/>	
+        <Parameter Name="TEXTEN"/>
+        <Parameter Name="TIMEOUTB_Master"/>
+        <Parameter Name="TIMEOUTB_Slave"/>
+        <Parameter Name="TIDLE"/>
+        <Parameter Name="TIMEOUTA_idle"/>
+        <Parameter Name="TIMEOUT_time"/>
+        <Parameter Name="Timeout"/>
+        <Parameter Name="Instance"/>
+        <!-- Autonomous Mode -->
+        <Parameter Name="AutonomousMode"/>
+        <Parameter Name="TriggerState"/>
+        <Parameter Name="TriggerSelection"/>
+        <Parameter Name="TriggerPolarity"/>
+    </RefMode>
+	
+    <RefMode BaseMode="SMBus_common" HalMode="SMBUS" Name="SMBus-two-wire-Interface">
+        <ConfigForMode>SMBus_init</ConfigForMode>   
+        <ConfigForMode>FASTMODE_Config</ConfigForMode>  
+        <ConfigForMode>I2C_DigitalFolter</ConfigForMode>
+        <ConfigForMode>AutonomousMode_Config_SMBus</ConfigForMode> 
+    </RefMode> 
+	
+	
+    <RefMode BaseMode="SMBus_common" HalMode="SMBUS" Name="SMBus-Alert-mode">
+        <ConfigForMode>SMBus_init</ConfigForMode>   
+        <ConfigForMode>SMBus_alert</ConfigForMode>   
+        <ConfigForMode>FASTMODE_Config</ConfigForMode>
+        <ConfigForMode>I2C_DigitalFolter</ConfigForMode>
+        <ConfigForMode>AutonomousMode_Config_SMBus</ConfigForMode>  
+    </RefMode> 
+
+    <!-- ModeLogicOperator for I2C -->
+    <ModeLogicOperator Name="OR">
+        <Mode Name="I2C">
+            <ModeLogicOperator Name="XOR">
+                <Mode Name="I2C">
+                    <Semaphore>$IpInstance_I2C_Mode</Semaphore>
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="SCL"/>
+                        <Signal Name="SDA"/>
+                    </SignalLogicalOp>
+                    <Semaphore>$IpInstance_Dma</Semaphore>
+                    <Semaphore>I2CMode_Enable</Semaphore>
+                </Mode>
+                <Mode Name="SMBus-Alert-mode">
+                    <Condition Diagnostic="Not available when configuring IP from LPBAM context" Expression="!S_LPBAM_CONF"/>
+                    <Semaphore>$IpInstance_SMBus_Mode</Semaphore>
+                    <Semaphore>$IpInstance_SMBUS_Enable</Semaphore>
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="SCL"/>
+                        <Signal Name="SDA"/>
+                        <Signal Name="SMBA"/>
+                    </SignalLogicalOp>
+                </Mode>
+                <Mode Name="SMBus-two-wire-Interface" RemoveCondition="(((STM32L0|STM32F0|STM32G0)) &amp; ($Index=2))">
+                    <Condition Diagnostic="Not available when configuring IP from LPBAM context" Expression="!S_LPBAM_CONF"/>
+                    <Semaphore>$IpInstance_SMBus_Mode</Semaphore>
+                    <Semaphore>$IpInstance_SMBUS_Enable</Semaphore>
+                    <SignalLogicalOp Name="AND">
+                        <Signal Name="SCL"/>
+                        <Signal Name="SDA"/>
+                    </SignalLogicalOp>
+                </Mode>
+            </ModeLogicOperator>
+        </Mode>
+      <!-- LPBAM specific configuration -->  
+         <Mode Name="LPBAMSPECIFICTOP" UserName="LPBAM Advanced Settings" RemoveDisable="true" RemoveCondition="!($Index=3)|!STM32U5"> <!-- only I2C3 is managed by LPBAM-->
+
+             <Condition Diagnostic="only available when configurring IP from LPBAM context" Expression="S_LPBAM_CONF &amp; ($IpInstance_I2C_Mode|$IpInstance_SMBus_Mode)"/>
+              <ModeLogicOperator Name="XOR">
+                 <Mode Name="LPBAMSPECIFIC" UserName="">
+            <SignalLogicalOp Name="AND">
+                        <Signal Name="VS_I2C_LPBAM"/>
+            </SignalLogicalOp>
+            </Mode>
+            </ModeLogicOperator>
+        </Mode>
+        <!-- LPBAM specific configuration -->
+    </ModeLogicOperator>
+
+    <!-- RefSignal for I2C -->
+    <RefSignal IOMode="AlternateFunctionOpenDrainNoPullOrPullUp" Name="SCL"/>        
+    <RefSignal IOMode="AlternateFunctionOpenDrainNoPullOrPullUp" Name="SDA"/>       
+    <RefSignal IOMode="AlternateFunctionOpenDrainNoPullOrPullUp" Name="SMBA"/>
+     <RefSignal Name="VS_I2C_LPBAM" Virtual="true"/><!-- LPBAM specific configuration -->
+    <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+</IP>

@@ -285,7 +285,7 @@ FX_MEDIA        nor_simulator_flash_disk;
 /* USER CODE END PFP */
 /**
   * @brief  Application FileX Initialization.
-  * @param memory_ptr: memory pointer
+  * @param  None
   * @retval int
   */
 UINT MX_FileX_Init(void)
@@ -295,7 +295,7 @@ UINT MX_FileX_Init(void)
 
   /* USER CODE END MX_FileX_Init */
 
-/* Initialize FileX.  */
+  /* Initialize FileX.  */
   fx_system_initialize();
 
   /* USER CODE BEGIN MX_FileX_Init 1*/
@@ -579,7 +579,7 @@ UINT MX_FileX_Init(VOID *memory_ptr)
                                      FX_NOR_OSPI_NUMBER_OF_FATS,                                                     // Number of FATs
                                      32,                                                                             // Directory Entries
                                      FX_NOR_OSPI_HIDDEN_SECTORS,                                                     // Hidden sectors
-                                     (LX_STM32_OSPI_FLASH_SIZE - LX_STM32_OSPI_SECTOR_SIZE)/ FX_NOR_OSPI_SECTOR_SIZE,// Total sectors
+                                     (LX_STM32_OSPI_FLASH_SIZE - LX_STM32_OSPI_SECTOR_SIZE)/ FX_NOR_OSPI_SECTOR_SIZE,// Total sectors minus one
                                      FX_NOR_OSPI_SECTOR_SIZE,                                                        // Sector size
                                      8,                                                                              // Sectors per cluster
                                      1,                                                                              // Heads

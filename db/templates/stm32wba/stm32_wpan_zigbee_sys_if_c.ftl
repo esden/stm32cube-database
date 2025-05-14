@@ -8,7 +8,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2023 STMicroelectronics.
+  * Copyright (c) 2024 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -39,6 +39,7 @@ Key: ${key}; Value: ${myHash[key]}
 #include "log_module.h"
 #include "app_zigbee.h"
 #include "stm32_rtos.h"
+#include "zigbee.stm32wba.sys.h"
 
 /* Private defines -----------------------------------------------------------*/
 /* USER CODE BEGIN PD */
@@ -83,7 +84,7 @@ void ZigbeeSys_Process(void)
  * @param  lArgument  Argument passed the first time.
  * @retval None
  */
-static void ZigbeeSys_Process( ULONG lArgument ) 
+static void ZigbeeSys_ProcessTask( ULONG lArgument ) 
 {
   UNUSED( lArgument );
 
@@ -123,7 +124,7 @@ void ZigbeeSys_Init(void)
   lThreadXStatus = tx_byte_allocate( pBytePool, (void **)&pStack, TASK_STACK_SIZE_ZIGBEE_LAYER, TX_NO_WAIT);
   if ( lThreadXStatus == TX_SUCCESS )
   {
-    lThreadXStatus = tx_thread_create( &stZigbeeLayerThread, "ZigbeeLayerTaskId", ZigbeeSys_Process, 0, pStack,
+    lThreadXStatus = tx_thread_create( &stZigbeeLayerThread, "ZigbeeLayerTaskId", ZigbeeSys_ProcessTask, 0, pStack,
                                         TASK_STACK_SIZE_ZIGBEE_LAYER, TASK_PRIO_ZIGBEE_LAYER, TASK_PREEMP_ZIGBEE_LAYER,
                                         TX_NO_TIME_SLICE, TX_AUTO_START);
   }

@@ -44,7 +44,13 @@
 
 [#if numButton > 0]
 	[#assign useBUTTON = true]		
-[/#if]  
+[/#if]
+
+[#if FamilyName?matches("STM32W(B0|L3)*")]
+    [#assign virtualEXTI=true]
+[#else]
+    [#assign virtualEXTI=false]
+[/#if]
 
 [#list BspIpDatas as SWIP] 
 	[#if SWIP.variables??]
@@ -101,7 +107,7 @@
 /* Includes ------------------------------------------------------------------*/ 
 [#--#include "${FamilyName?lower_case}${BoardName}.h"--]
 #include "${BoardName}.h"
-[#if useBUTTON]
+[#if useBUTTON && !virtualEXTI ]
 #include "${FamilyName?lower_case}xx_hal_exti.h"
 [/#if] 
 
@@ -225,6 +231,7 @@ static const uint16_t  BUTTON_PIN[BUTTONn]  = {${BUTTON_PIN}};
 static const IRQn_Type BUTTON_IRQn[BUTTONn] = {${BUTTON_IRQN}};
 			[/#if]
 	[/#if]
+[#if !virtualEXTI ]
 [#if useDefine]
 	[#if numButton = 1]
 EXTI_HandleTypeDef hpb_exti[BUTTONn] = {{.Line = EXTI_LINE_${BUTTON_EXTI}}};
@@ -233,6 +240,7 @@ EXTI_HandleTypeDef hpb_exti[BUTTONn] = {{${BUTTON_EXTI_LINE}}};
 	[/#if]
 [#else]
 EXTI_HandleTypeDef* hpb_exti[BUTTONn];
+[/#if]
 [/#if]
 [/#if]
 [#if useUSART]
@@ -276,7 +284,11 @@ EXTI_HandleTypeDef hpb_exti[BUTTONn] = {{${BUTTON_EXTI_LINE}}};
  */ 
 [#if useBUTTON]
 	[#if numButton = 1]
+        [#if virtualEXTI ]
+void HAL_GPIO_EXTI_Callback(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
+        [#else]
 static void BUTTON_USER_EXTI_Callback(void);
+        [/#if]
 static void BUTTON_USER_GPIO_Init(void);
 	[/#if]
 	[#if numButton > 1]
@@ -548,11 +560,13 @@ int32_t BSP_PB_Init(Button_TypeDef Button, ButtonMode_TypeDef ButtonMode)
 [/#if]
   
 [#if numButton = 1]
-  static const BSP_EXTI_LineCallback ButtonCallback[BUTTONn] ={BUTTON_USER_EXTI_Callback};                                                
-  static const uint32_t  BSP_BUTTON_PRIO [BUTTONn] ={BSP_BUTTON_USER_IT_PRIORITY};    											     
-  static const uint32_t BUTTON_EXTI_LINE[BUTTONn] ={USER_BUTTON_EXTI_LINE};  
+    [#if !virtualEXTI ]
+  static const BSP_EXTI_LineCallback ButtonCallback[BUTTONn] ={BUTTON_USER_EXTI_Callback};
+  static const uint32_t  BSP_BUTTON_PRIO [BUTTONn] ={BSP_BUTTON_USER_IT_PRIORITY};
+  static const uint32_t BUTTON_EXTI_LINE[BUTTONn] ={USER_BUTTON_EXTI_LINE};
+    [/#if]
   static const BSP_BUTTON_GPIO_Init ButtonGpioInit[BUTTONn] = {BUTTON_USER_GPIO_Init};
-[/#if]  
+[/#if]
 [#if numButton > 1]
 		[#assign BUTTON_USER_EXTI_CALLBACK=""]
 		[#assign BSP_BUTTON_USER_IT_PRIORITY=""]
@@ -617,6 +631,7 @@ int32_t BSP_PB_Init(Button_TypeDef Button, ButtonMode_TypeDef ButtonMode)
     
     HAL_GPIO_Init(BUTTON_PORT[Button], &gpio_init_structure);
     --]
+   [#if !virtualEXTI ]
     [#if useDefine]
     if(HAL_EXTI_GetHandle(&hpb_exti[Button], BUTTON_EXTI_LINE[Button]) != HAL_OK)
     {
@@ -635,7 +650,7 @@ int32_t BSP_PB_Init(Button_TypeDef Button, ButtonMode_TypeDef ButtonMode)
     {
       ret = BSP_ERROR_PERIPH_FAILURE;
     }
-    [/#if]  
+    [/#if]
 	else
     {
       /* Enable and set Button EXTI Interrupt to the lowest priority */     
@@ -643,6 +658,12 @@ int32_t BSP_PB_Init(Button_TypeDef Button, ButtonMode_TypeDef ButtonMode)
       HAL_NVIC_EnableIRQ((BUTTON_IRQn[Button]));      
     }
   }
+ [#elseif useDefine]
+      /* Enable and set Button EXTI Interrupt to the lowest priority */
+      HAL_NVIC_SetPriority((BUTTON_IRQn[Button]), NVIC_LOW_PRIORITY, 0x00);
+      HAL_NVIC_EnableIRQ((BUTTON_IRQn[Button]));
+  }
+ [/#if]
   
   return ret;
 }
@@ -682,14 +703,21 @@ int32_t BSP_PB_GetState(Button_TypeDef Button)
  * @brief  User EXTI line detection callbacks.
  * @retval None
  */
+[#if virtualEXTI ]
+void BSP_PB_IRQHandler(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
+{
+  HAL_GPIO_EXTI_IRQHandler( GPIOx, GPIO_Pin);
+}
+[#else]
 void BSP_PB_IRQHandler (Button_TypeDef Button)
 {
 [#if useDefine]
   HAL_EXTI_IRQHandler( &hpb_exti[Button] );
 [#else]
   HAL_EXTI_IRQHandler( hpb_exti[Button] );
-[/#if]     
+[/#if]
 }
+[/#if]
 
 /**
  * @brief  BSP Push Button callback
@@ -710,10 +738,20 @@ __weak void BSP_PB_Callback(Button_TypeDef Button)
   * @brief  User EXTI line detection callbacks.
   * @retval None
   */
+ [#if virtualEXTI ]
+void HAL_GPIO_EXTI_Callback(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
+{
+  if( (GPIOx == BUTTON_PORT[BUTTON_USER]) && (GPIO_Pin == BUTTON_PIN[BUTTON_USER]) )
+  {
+    BSP_PB_Callback(BUTTON_USER);
+  }
+}
+ [#else]
 static void BUTTON_USER_EXTI_Callback(void)
 {   
   BSP_PB_Callback(BUTTON_USER);
 }
+ [/#if]
 [/#if]
 [#if numButton > 1]
 	[#list BspIpDatas as SWIP] 
@@ -756,7 +794,21 @@ static void BUTTON_USER_${i}_EXTI_Callback(void)
   * @retval None
   */
 static void BUTTON_USER_GPIO_Init(void) {
-[@common.optinclude name=mxTmpFolder+"/bsp_button_GPIO.tmp"/]   
+[@common.optinclude name=mxTmpFolder+"/bsp_button_GPIO.tmp"/]
+[#if virtualEXTI]
+  __HAL_RCC_SYSCFG_CLK_ENABLE();
+  if( LL_PWR_IsEnabledPUPDCfg() != 0)
+  {
+    if (BUS_BSP_BUTTON_GPIO_PORT == GPIOA)
+    {
+      LL_PWR_EnableGPIOPullUp( LL_PWR_GPIO_A, GPIO_InitStruct.Pin);
+    }
+    if (BUS_BSP_BUTTON_GPIO_PORT== GPIOB)
+    {
+      LL_PWR_EnableGPIOPullUp( LL_PWR_GPIO_B, GPIO_InitStruct.Pin);
+    }
+  }
+[/#if]
 }
 [/#if]
 [#if numButton > 1]

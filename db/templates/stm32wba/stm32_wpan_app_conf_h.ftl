@@ -28,16 +28,16 @@
 [#assign nbInstanceCli = 0]
 [#assign myHashCli = {}]
 [#if BspIpDatas??]
-	[#list BspIpDatas as SWIP]
-		[#if SWIP.variables??]
-			[#list SWIP.variables as variables]
-				[#assign myHashCli = {variables.name + nbInstanceCli:variables.value} + myHashCli]
-				[#if variables.name?contains("BoardName")]
-					[#assign nbInstanceCli = nbInstanceCli + 1]
-				[/#if]
-			[/#list]
-		[/#if]
-	[/#list]
+    [#list BspIpDatas as SWIP]
+        [#if SWIP.variables??]
+            [#list SWIP.variables as variables]
+                [#assign myHashCli = {variables.name + nbInstanceCli:variables.value} + myHashCli]
+                [#if variables.name?contains("BoardName")]
+                    [#assign nbInstanceCli = nbInstanceCli + 1]
+                [/#if]
+            [/#list]
+        [/#if]
+    [/#list]
 [/#if]
 [#--
 Key & Value:
@@ -47,9 +47,9 @@ Key: ${key}; Value: ${myHash[key]}
 --]
 [#assign SNVMA_NUMBER_OF_SECTOR_NEEDED = 0]
 [#if myHash["SNVMA_NVM_NUMBER"]?number != 0]
-		[#list 1..myHash["SNVMA_NVM_NUMBER"]?number as nvm_number]
-		[#assign SNVMA_NUMBER_OF_SECTOR_NEEDED = SNVMA_NUMBER_OF_SECTOR_NEEDED + myHash["SNVMA_NVM_ID_" + nvm_number?string  + "_BANK_NUMBER"]?number * myHash["SNVMA_NVM_ID_" + nvm_number?string  + "_BANK_SIZE"]?number]
-		[/#list]
+    [#list 1..myHash["SNVMA_NVM_NUMBER"]?number as nvm_number]
+    [#assign SNVMA_NUMBER_OF_SECTOR_NEEDED = SNVMA_NUMBER_OF_SECTOR_NEEDED + myHash["SNVMA_NVM_ID_" + nvm_number?string  + "_BANK_NUMBER"]?number * myHash["SNVMA_NVM_ID_" + nvm_number?string  + "_BANK_SIZE"]?number]
+    [/#list]
 [/#if]
 
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -358,9 +358,6 @@ typedef enum
 /******************************************************************************
  * RTC
  ******************************************************************************/
-#define RTC_N_PREDIV_S (10)
-#define RTC_PREDIV_S ((1<<RTC_N_PREDIV_S)-1)
-#define RTC_PREDIV_A ((1<<(15-RTC_N_PREDIV_S))-1)
 
 /* USER CODE BEGIN RTC */
 
@@ -382,6 +379,16 @@ typedef enum
  * Standby low power mode(CFG_LPM_STDBY_SUPPORTED) will disable LOG.
  */
 #define CFG_LOG_SUPPORTED           (${myHash["CFG_LOG_SUPPORTED"]}U)
+
+/* Usart used by LOG */
+[#if nbInstanceCli != 0 ]
+    [#list 0..(nbInstanceCli-1) as i]
+        [#if myHashCli["bspName"+i] == "Serial Link for Logs"]
+extern UART_HandleTypeDef           h${myHashCli["IpInstance"+i]?lower_case?replace("s","")};
+#define LOG_UART_HANDLER            h${myHashCli["IpInstance"+i]?lower_case?replace("s","")}
+        [/#if]
+    [/#list]
+[/#if]
 
 /* Configure Log display settings */
 #define CFG_LOG_INSERT_COLOR_INSIDE_THE_TRACE       (${myHash["CFG_LOG_INSERT_COLOR_INSIDE_THE_TRACE"]}U)
@@ -417,7 +424,26 @@ typedef enum
  * Configure Log level for Application
  ******************************************************************************/
 #define APPLI_CONFIG_LOG_LEVEL      ${myHash["CFG_LOG_VERBOSE_LEVEL"]}
-
+[#assign listLog = ""]
+[#list SWIPdatas as SWIP]
+    [#if SWIP.defines??]
+        [#list SWIP.defines as configParameter]
+            [#if !configParameter.value?contains("NONE") && configParameter.name?starts_with("LOG_REGION") && !configParameter.name?contains("ALL_REGIONS") && configParameter.value != "valueNotSetted" ]
+			   [#if listLog != ""]
+                   [#assign listLog = listLog + " | " + "1U << " + configParameter.value]
+			   [/#if]
+               [#if listLog == ""]
+                   [#assign listLog = listLog + "1U << " + configParameter.value]
+               [/#if]
+			[/#if]
+        [/#list]
+    [/#if]
+[/#list]
+[#if listLog !=""]
+#define APPLI_CONFIG_LOG_REGION     (${listLog})
+[#else]
+#define APPLI_CONFIG_LOG_REGION     (LOG_REGION_ALL_REGIONS)
+[/#if]
 /* USER CODE BEGIN Log_level */
 
 /* USER CODE END Log_level */
@@ -499,6 +525,7 @@ typedef enum
   CFG_TASK_OT_ALARM,
   CFG_TASK_OT_US_ALARM,
   CFG_TASK_OT_TASKLETS,
+  CFG_TASK_OT_RCP_SPINEL_RX,
   CFG_TASK_SET_THREAD_MODE,
   CFG_TASK_PKA,
 [/#if]
@@ -669,7 +696,7 @@ typedef enum
  ******************************************************************************/
 
 
-#define CFG_SNVMA_START_SECTOR_ID     (FLASH_PAGE_NB - ${SNVMA_NUMBER_OF_SECTOR_NEEDED}u)
+#define CFG_SNVMA_START_SECTOR_ID     ((FLASH_SIZE / FLASH_PAGE_SIZE) - ${SNVMA_NUMBER_OF_SECTOR_NEEDED}u)
 
 #define CFG_SNVMA_START_ADDRESS       (FLASH_BASE + (FLASH_PAGE_SIZE * (CFG_SNVMA_START_SECTOR_ID)))
 
@@ -713,21 +740,21 @@ typedef enum
  *   - 2 : Debugger available in low power mode.
  *
  ******************************************************************************/
-#define CFG_DEBUGGER_LEVEL           (${myHash["CFG_DEBUGGER_LEVEL"]})
+#define CFG_DEBUGGER_LEVEL                  (${myHash["CFG_DEBUGGER_LEVEL"]})
 
 /******************************************************************************
  * RealTime GPIO debug module configuration
  ******************************************************************************/
 
-#define CFG_RT_DEBUG_GPIO_MODULE         (${myHash["CFG_RT_DEBUG_GPIO_MODULE"]})
-#define CFG_RT_DEBUG_DTB                 (0)
+#define CFG_RT_DEBUG_GPIO_MODULE            (${myHash["CFG_RT_DEBUG_GPIO_MODULE"]})
+#define CFG_RT_DEBUG_DTB                    (0)
 
 [#if (myHash["BLE_MODE_SIMPLEST_BLE"] != "Enabled")]
 /******************************************************************************
  * System Clock Manager module configuration
  ******************************************************************************/
 
-#define CFG_SCM_SUPPORTED            (1)
+#define CFG_SCM_SUPPORTED                   (${myHash["CFG_SCM_SUPPORTED"]})
 [/#if]
 
 /******************************************************************************
@@ -761,9 +788,18 @@ typedef enum
 /* RF TX power table ID selection:
  *   0 -> RF TX output level from -20 dBm to +10 dBm
  *   1 -> RF TX output level from -20 dBm to +3 dBm
+[#if (myHash["BLE_MODE_TRANSPARENT_UART"] == "Enabled")]
+ *   2 -> RF TX output level at +20 dBm with an external PA
+[/#if]
  */
 #define CFG_RF_TX_POWER_TABLE_ID            (${myHash["CFG_RF_TX_POWER_TABLE_ID"]})
 
+[#if (myHash["BLE_MODE_TRANSPARENT_UART"] == "Enabled")]
+#define CFG_EXTERNAL_PA_ENABLE              (${myHash["CFG_EXTERNAL_PA_ENABLE"]})
+
+#define CFG_BLE_AOA_AOD_ENABLE              (${myHash["CFG_AOA_AOD_ENABLE"]})
+
+[/#if]
 /* Custom LSE sleep clock accuracy to use if both conditions are met: 
  * - LSE is selected as Link Layer sleep clock source
  * - the LSE used is different from the default one.
@@ -805,8 +841,8 @@ typedef enum
 #define CFG_AMM_VIRTUAL_APP_BLE                           (2U)
 #define CFG_AMM_VIRTUAL_APP_BLE_BUFFER_SIZE               (200U)  /* words (32 bits) */
 [/#if]
-#define CFG_AMM_POOL_SIZE                                 DIVC(CFG_MM_POOL_SIZE, sizeof (uint32_t)) \
-                                                          + (AMM_VIRTUAL_INFO_ELEMENT_SIZE * CFG_AMM_VIRTUAL_MEMORY_NUMBER)
+#define CFG_AMM_POOL_SIZE                                 ( DIVC(CFG_MM_POOL_SIZE, sizeof (uint32_t)) \
+                                                          + (AMM_VIRTUAL_INFO_ELEMENT_SIZE * CFG_AMM_VIRTUAL_MEMORY_NUMBER) )
 [/#if]
 
 /* USER CODE BEGIN MEMORY_MANAGER_Configuration */

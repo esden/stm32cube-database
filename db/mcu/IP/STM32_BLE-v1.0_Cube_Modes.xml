@@ -4,52 +4,75 @@
  	xmlns="http://mcd.rou.st.com/modules.php?name=mcu"
  	DBVersion="V4.0"
 	IPType="middleware"
+	IpGroup="Middleware"
     Name="STM32_BLE"
  	Version="v1.0_Cube">
     <About>BLE : BlueTooth Low Energy, designed for very low power operation. It supports multiple network topologies, including a point-to-point option used for data transfer, a broadcast option used for location services and a mesh option used for creating large-scale device networks. </About>
 
+    <RefParameter Name="LITE_SERVER_STATUS" Comment="Lite mode " DefaultValue="0" Type="UniqueElementList" Group="Application configuration - Project IP's Configuration" TabName="Configuration" Visible="false">
+        <Description></Description>
+        <Condition Diagnostic="" Expression="S_BLE_LSP"/>
+            <PossibleValue Value="1" Comment="Enabled"/>
+    </RefParameter>
+    <RefParameter Name="LITE_SERVER_STATUS" Comment="Lite mode " DefaultValue="0" Type="UniqueElementList" Group="Application configuration - Project IP's Configuration" TabName="Configuration" Visible="false">
+        <Description></Description>
+        <Condition Diagnostic="" Expression="!S_BLE_LSP"/>
+            <PossibleValue Value="0" Comment="Disabled"/>
+    </RefParameter>
+
     <RefParameter Name="SEQUENCER_STATUS" Comment="Sequencer " DefaultValue="1" Type="UniqueElementList" Group="Application configuration - Project IP's Configuration" TabName="Configuration" Visible="false">
         <Description></Description>
         <Condition Diagnostic="" Expression="S_SEQUENCER"/>
-            <PossibleValue Value="1" Comment="Enabled"/>
+        <PossibleValue Value="1" Comment="Enabled"/>
     </RefParameter>
     <RefParameter Name="SEQUENCER_STATUS" Comment="Sequencer " DefaultValue="0" Type="UniqueElementList" Group="Application configuration - Project IP's Configuration" TabName="Configuration" Visible="false">
         <Description></Description>
         <Condition Diagnostic="" Expression="!S_SEQUENCER"/>
-            <PossibleValue Value="0" Comment="Disabled"/>
+        <PossibleValue Value="0" Comment="Disabled"/>
     </RefParameter>
 
     <RefParameter Name="FREERTOS_STATUS" Comment="FreeRTOS " DefaultValue="1" Type="UniqueElementList" Group="Application configuration - Project IP's Configuration" TabName="Configuration" Visible="false">
         <Description></Description>
         <Condition Diagnostic="" Expression="S_FREERTOS"/>
-            <PossibleValue Value="1" Comment="Enabled"/>
+        <PossibleValue Value="1" Comment="Enabled"/>
     </RefParameter>
     <RefParameter Name="FREERTOS_STATUS" Comment="FreeRTOS " DefaultValue="0" Type="UniqueElementList" Group="Application configuration - Project IP's Configuration" TabName="Configuration" Visible="false">
         <Description></Description>
         <Condition Diagnostic="" Expression="!S_FREERTOS"/>
-            <PossibleValue Value="0" Comment="Disabled"/>
+        <PossibleValue Value="0" Comment="Disabled"/>
+    </RefParameter>
+
+    <RefParameter Name="COMMON_BLE_STATUS" Comment="CommonBLE" DefaultValue="Enabled" Type="UniqueElementList" Group="Application configuration - Project IP's Configuration" TabName="Configuration" Visible="false">
+        <Description></Description>
+        <Condition Diagnostic="" Expression="S_COMMON_BLE"/>
+        <PossibleValue Value="Enabled" Comment="Enabled"/>
+    </RefParameter>
+    <RefParameter Name="COMMON_BLE_STATUS" Comment="CommonBLE " DefaultValue="Disabled" Type="UniqueElementList" Group="Application configuration - Project IP's Configuration" TabName="Configuration" Visible="false">
+        <Description></Description>
+        <Condition Diagnostic="" Expression="!S_COMMON_BLE"/>
+        <PossibleValue Value="Disabled" Comment="Disabled"/>
     </RefParameter>
 
     <RefParameter Name="BLE" Comment="BLE" DefaultValue="Enabled" Type="UniqueElementList" Group="Application configuration - Project IP's Configuration" TabName="Configuration" Visible="false">
         <Description></Description>
-        <Condition Diagnostic="" Expression="S_BLE_HOST"/>
-             <PossibleValue Value="Enabled" Comment="Enabled" Semaphore="Semaphore_BLE"/>
+        <Condition Diagnostic="" Expression="(S_BLE_HOST | S_BLE_HOST_LITE)"/>
+       <PossibleValue Value="Enabled" Comment="Enabled" Semaphore="Semaphore_BLE"/>
     </RefParameter>
     <RefParameter Name="BLE" Comment="BLE" DefaultValue="Disabled" Type="UniqueElementList" Group="Application configuration - Project IP's Configuration" TabName="Configuration" Visible="false">
         <Description></Description>
-        <Condition Diagnostic="" Expression="!S_BLE_HOST"/>
-            <PossibleValue Value="Disabled" Comment="Disabled"/>
+        <Condition Diagnostic="" Expression="!(S_BLE_HOST | S_BLE_HOST_LITE)"/>
+        <PossibleValue Value="Disabled" Comment="Disabled"/>
     </RefParameter>
 
     <RefParameter Name="BLE_MODE_SKELETON" Comment="BLE_MODE_SKELETON" DefaultValue="Enabled" Type="UniqueElementList" Group="Application configuration - Project IP's Configuration" TabName="Configuration" Visible="false">
         <Description></Description>
         <Condition Diagnostic="" Expression="S_BLE_SKELETON"/>
-              <PossibleValue Value="Enabled" Comment="Enabled" Semaphore="Semaphore_BLE_SKELETON"/>
+          <PossibleValue Value="Enabled" Comment="Enabled" Semaphore="Semaphore_BLE_SKELETON"/>
     </RefParameter>
     <RefParameter Name="BLE_MODE_SKELETON" Comment="S_BLE_HOST_SKELETON" DefaultValue="Disabled" Type="UniqueElementList" Group="Application configuration - Project IP's Configuration" TabName="Configuration" Visible="false">
         <Description></Description>
         <Condition Diagnostic="" Expression="!S_BLE_HOST_SKELETON"/>
-            <PossibleValue Value="Disabled" Comment="Disabled"/>
+        <PossibleValue Value="Disabled" Comment="Disabled"/>
     </RefParameter>
 
     <RefParameter Name="BLE_MODE_HOST_SKELETON" Comment="BLE_MODE_HOST_SKELETON" DefaultValue="Enabled" Type="UniqueElementList" Group="Application configuration - Project IP's Configuration" TabName="Configuration" Visible="false">
@@ -73,7 +96,7 @@
 
     <RefParameter Name="BLE_MODE_PERIPHERAL" Comment="Custom Server Router" DefaultValue="Enabled" Type="UniqueElementList" Group="BLE Services Configuration" TabName="BLE Applications and Services" Visible="false">
         <Description></Description>
-        <Condition Diagnostic="" Expression="(S_BLE_SP|S_BLE_RP)"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP|S_BLE_SP|S_BLE_RP)"/>
     </RefParameter>
     <RefParameter Name="BLE_MODE_PERIPHERAL" Comment="" DefaultValue="Disabled" Type="UniqueElementList" Group="BLE Services Configuration" TabName="BLE Applications and Services" Visible="false">
         <Description></Description>
@@ -87,7 +110,7 @@
     </RefParameter>
 
     <RefParameter Name="BLE_MODE_CLIENT" Comment="Custom Client" DefaultValue="Enabled" Type="string" Group="BLE Services Configuration" TabName="BLE Applications and Services" Visible="false">
-        <Condition Diagnostic="" Expression="(S_BLE_CP &amp; !S_BLE_RP &amp; !S_BLE_SP)"/>
+        <Condition Diagnostic="" Expression="(S_BLE_CP &amp; !S_BLE_RP &amp; !S_BLE_SP &amp; !S_BLE_LSP)"/>
     </RefParameter>
     <RefParameter Name="BLE_MODE_CLIENT" Comment="Custom Client" DefaultValue="Disabled" Type="string" Group="BLE Services Configuration" TabName="BLE Applications and Services" Visible="false">
     </RefParameter>
@@ -369,7 +392,7 @@
                     + IF(S_INC_ATU,AD_TYPE_URI_LENGTH + 1,0)
                     + IF(S_INC_ATMSD,AD_TYPE_MANUFACTURER_SPECIFIC_DATA_LENGTH + 1,0))" Type="integerReadOnly" Min="1" Max="31" TabName="BLE Advertising" Group="Advertising elements">
         <Description> </Description>
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP | S_BLE_BC)"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP | S_BLE_BC)"/>
     </RefParameter>
     <RefParameter Name="AD_DATA_LENGTH" Comment="ad_data[] length" DefaultValue="" Type="string" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
         <Description></Description>
@@ -378,7 +401,7 @@
     <RefParameter Name="INCLUDE_AD_TYPE_FLAGS" Comment="Include INCLUDE_AD_TYPE_FLAGS element" DefaultValue="1" Type="uniqueElementList" TabName="BLE Advertising" Group="Advertising elements">
         <Description></Description>
         <PossibleValue Value="1" Comment="Yes" Semaphore="S_INC_TF"/>
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP | S_BLE_BC)"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP | S_BLE_BC)"/>
     </RefParameter>
     <RefParameter Name="INCLUDE_AD_TYPE_FLAGS" Comment="Include INCLUDE_AD_TYPE_FLAGS element" DefaultValue="1" Type="string" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
         <Description></Description>
@@ -396,7 +419,7 @@
         <Description></Description>
         <PossibleValue Value="0" Comment="No"/>
         <PossibleValue Value="1" Comment="Yes" Semaphore="S_INC_TX"/>
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP | S_BLE_BC)"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP | S_BLE_BC)"/>
     </RefParameter>
     <RefParameter Name="INCLUDE_AD_TYPE_TX_POWER_LEVEL" Comment="Include AD_TYPE_TX_POWER_LEVEL element" DefaultValue="0" Type="string" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
         <Description></Description>
@@ -612,8 +635,8 @@
     <RefParameter Name="INCLUDE_AD_TYPE_COMPLETE_LOCAL_NAME" Comment="Include AD_TYPE_COMPLETE_LOCAL_NAME element" DefaultValue="0" Type="list" TabName="BLE Advertising" Group="Advertising elements">
         <Description></Description>
         <PossibleValue Value="0" Comment="No"/>
-		<PossibleValue Value="1" Comment="Yes" Semaphore="S_INC_CLN"/>
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP | S_BLE_BC)"/>
+        <PossibleValue Value="1" Comment="Yes" Semaphore="S_INC_CLN"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP | S_BLE_BC)"/>
     </RefParameter>
     <RefParameter Name="INCLUDE_AD_TYPE_COMPLETE_LOCAL_NAME" Comment="Include AD_TYPE_COMPLETE_LOCAL_NAME element" DefaultValue="0" Type="string" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
         <Description></Description>
@@ -638,8 +661,8 @@
     <RefParameter Name="INCLUDE_AD_TYPE_SHORTENED_LOCAL_NAME" Comment="Include AD_TYPE_SHORTENED_LOCAL_NAME  element" DefaultValue="0" Type="list" TabName="BLE Advertising" Group="Advertising elements">
         <Description></Description>
         <PossibleValue Value="0" Comment="No"/>
-		<PossibleValue Value="1" Comment="Yes" Semaphore="S_INC_SLN"/>
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP | S_BLE_BC)"/>
+        <PossibleValue Value="1" Comment="Yes" Semaphore="S_INC_SLN"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP | S_BLE_BC)"/>
     </RefParameter>
     <RefParameter Name="INCLUDE_AD_TYPE_SHORTENED_LOCAL_NAME" Comment="Include AD_TYPE_SHORTENED_LOCAL_NAME  element" DefaultValue="0" Type="string" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
         <Description></Description>
@@ -664,8 +687,8 @@
     <RefParameter Name="INCLUDE_AD_TYPE_APPEARANCE" Comment="Include AD_TYPE_APPEARANCE element" DefaultValue="0" Type="list" TabName="BLE Advertising" Group="Advertising elements">
         <Description></Description>
         <PossibleValue Value="0" Comment="No"/>
-		<PossibleValue Value="1" Comment="Yes" Semaphore="S_INC_ADTA"/>
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP | S_BLE_BC)"/>
+        <PossibleValue Value="1" Comment="Yes" Semaphore="S_INC_ADTA"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP | S_BLE_BC)"/>
     </RefParameter>
     <RefParameter Name="INCLUDE_AD_TYPE_APPEARANCE" Comment="Include AD_TYPE_APPEARANCE element" DefaultValue="0" Type="string" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
         <Description></Description>
@@ -707,8 +730,8 @@
     <RefParameter Name="INCLUDE_AD_TYPE_ADVERTISING_INTERVAL" Comment="Include AD_TYPE_ADVERTISING_INTERVAL element" DefaultValue="0" Type="list" TabName="BLE Advertising" Group="Advertising elements">
         <Description></Description>
         <PossibleValue Value="0" Comment="No"/>
-		<PossibleValue Value="1" Comment="Yes" Semaphore="S_INC_ADTAI"/>
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP | S_BLE_BC)"/>
+        <PossibleValue Value="1" Comment="Yes" Semaphore="S_INC_ADTAI"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP | S_BLE_BC)"/>
     </RefParameter>
     <RefParameter Name="INCLUDE_AD_TYPE_ADVERTISING_INTERVAL" Comment="Include AD_TYPE_ADVERTISING_INTERVAL element" DefaultValue="0" Type="string" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
         <Description></Description>
@@ -749,8 +772,8 @@
     <RefParameter Name="INCLUDE_AD_TYPE_LE_ROLE" Comment="Include AD_TYPE_LE_ROLE element" DefaultValue="0" Type="list" TabName="BLE Advertising" Group="Advertising elements">
         <Description></Description>
         <PossibleValue Value="0" Comment="No"/>
-		<PossibleValue Value="1" Comment="Yes" Semaphore="S_INC_ADTLR"/>
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP | S_BLE_BC)"/>
+        <PossibleValue Value="1" Comment="Yes" Semaphore="S_INC_ADTLR"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP | S_BLE_BC)"/>
     </RefParameter>
     <RefParameter Name="INCLUDE_AD_TYPE_LE_ROLE" Comment="Include INCLUDE_AD_TYPE_LE_ROLE element" DefaultValue="0" Type="string" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
         <Description></Description>
@@ -779,8 +802,8 @@
     <RefParameter Name="INCLUDE_AD_TYPE_16_BIT_SERV_UUID_CMPLT_LIST" Comment="Include AD_TYPE_16_BIT_SERV_UUID_CMPLT_LIST element" DefaultValue="0" Type="list" TabName="BLE Advertising" Group="Advertising elements">
         <Description></Description>
         <PossibleValue Value="0" Comment="No"/>
-		<PossibleValue Value="1" Comment="Yes" Semaphore="S_INC_ADTSBSUCL"/>
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP | S_BLE_BC)"/>
+        <PossibleValue Value="1" Comment="Yes" Semaphore="S_INC_ADTSBSUCL"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP | S_BLE_BC)"/>
     </RefParameter>
     <RefParameter Name="INCLUDE_AD_TYPE_16_BIT_SERV_UUID_CMPLT_LIST" Comment="Include AD_TYPE_16_BIT_SERV_UUID_CMPLT_LIST element" DefaultValue="0" Type="string" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
         <Description></Description>
@@ -937,8 +960,8 @@
     <RefParameter Name="INCLUDE_AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST" Comment="Include AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST element" DefaultValue="0" Type="list" TabName="BLE Advertising" Group="Advertising elements">
         <Description></Description>
         <PossibleValue Value="0" Comment="No"/>
-		<PossibleValue Value="1" Comment="Yes" Semaphore="S_INC_ADTHBSUCL"/>
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP | S_BLE_BC)"/>
+        <PossibleValue Value="1" Comment="Yes" Semaphore="S_INC_ADTHBSUCL"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP | S_BLE_BC)"/>
     </RefParameter>
     <RefParameter Name="INCLUDE_AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST" Comment="Include AD_TYPE_128_BIT_SERV_UUID_CMPLT_LIST element" DefaultValue="0" Type="string" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
         <Description></Description>
@@ -967,8 +990,8 @@
     <RefParameter Name="INCLUDE_AD_TYPE_SLAVE_CONN_INTERVAL" Comment="Include AD_TYPE_SLAVE_CONN_INTERVAL element" DefaultValue="0" Type="list" TabName="BLE Advertising" Group="Advertising elements">
         <Description></Description>
         <PossibleValue Value="0" Comment="No"/>
-		<PossibleValue Value="1" Comment="Yes" Semaphore="S_INC_ADTSCI"/>
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP | S_BLE_BC)"/>
+        <PossibleValue Value="1" Comment="Yes" Semaphore="S_INC_ADTSCI"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP | S_BLE_BC)"/>
     </RefParameter>
     <RefParameter Name="INCLUDE_AD_TYPE_SLAVE_CONN_INTERVAL" Comment="Include AD_TYPE_SLAVE_CONN_INTERVAL element" DefaultValue="0" Type="string" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
         <Description></Description>
@@ -1027,8 +1050,8 @@
     <RefParameter Name="INCLUDE_AD_TYPE_URI" Comment="Include AD_TYPE_URI element" DefaultValue="0" Type="list" TabName="BLE Advertising" Group="Advertising elements">
         <Description></Description>
         <PossibleValue Value="0" Comment="No"/>
-		<PossibleValue Value="1" Comment="Yes" Semaphore="S_INC_ATU"/>
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP | S_BLE_BC)"/>
+        <PossibleValue Value="1" Comment="Yes" Semaphore="S_INC_ATU"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP | S_BLE_BC)"/>
     </RefParameter>
     <RefParameter Name="INCLUDE_AD_TYPE_URI" Comment="Include AD_TYPE_URI element" DefaultValue="0" Type="string" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
         <Description></Description>
@@ -1069,8 +1092,8 @@
     <RefParameter Name="INCLUDE_AD_TYPE_MANUFACTURER_SPECIFIC_DATA" Comment="Include AD_TYPE_MANUFACTURER_SPECIFIC_DATA element" DefaultValue="0" Type="list" TabName="BLE Advertising" Group="Advertising elements">
         <Description></Description>
         <PossibleValue Value="0" Comment="No"/>
-		<PossibleValue Value="1" Comment="Yes" Semaphore="S_INC_ATMSD"/>
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP | S_BLE_BC)"/>
+        <PossibleValue Value="1" Comment="Yes" Semaphore="S_INC_ATMSD"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP | S_BLE_BC)"/>
     </RefParameter>
     <RefParameter Name="INCLUDE_AD_TYPE_MANUFACTURER_SPECIFIC_DATA" Comment="Include AD_TYPE_MANUFACTURER_SPECIFIC_DATA element" DefaultValue="0" Type="string" TabName="BLE Advertising" Group="Advertising elements" Visible="false">
         <Description></Description>
@@ -1608,7 +1631,7 @@
 
     <RefParameter Name="CFG_GAP_DEVICE_NAME" Comment="CFG_GAP_DEVICE_NAME" DefaultValue="STM32WB0" Type="stringRW" TabName="Configuration" Group="Application configuration - Application parameters">
         <Description>Device name; default value is TEMPLATE</Description>
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP | S_BLE_CP)"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP | S_BLE_CP)"/>
     </RefParameter>
     <RefParameter Name="CFG_GAP_DEVICE_NAME" Comment="CFG_GAP_DEVICE_NAME" DefaultValue="STM32WB0" Type="string" TabName="Configuration" Group="Application configuration - Application parameters" Visible="false">
         <Description></Description>
@@ -1616,7 +1639,7 @@
 
     <RefParameter Name="CFG_GAP_DEVICE_NAME_LENGTH" Comment="CFG_GAP_DEVICE_NAME_LENGTH" DefaultValue="8" Type="integerReadOnly" Min = "1" Max = "48" TabName="Configuration" Group="Application configuration - Application parameters">
         <Description>Device name lenght; max value is 48bytes, default value is 8 (TEMPLATE length)</Description>
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP |S_BLE_CP)"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP |S_BLE_CP)"/>
     </RefParameter>
     <RefParameter Name="CFG_GAP_DEVICE_NAME_LENGTH" Comment="CFG_GAP_DEVICE_NAME_LENGTH" DefaultValue="8" Type="integerReadOnly" Min = "8" Max = "8" TabName="Configuration" Group="Application configuration - Application parameters" Visible="false">
         <Description></Description>
@@ -1639,7 +1662,7 @@
     </RefParameter>
 
     <RefParameter Name="CFG_BLE_NUM_GATT_ATTRIBUTES" Comment="CFG_BLE_NUM_GATT_ATTRIBUTES" DefaultValue="20" Min="2" Type="integer" TabName="Configuration" Group="Application configuration - BLE stack">
-        <Condition Diagnostic="" Expression="(S_BLE_SP|S_BLE_RP)&amp; (NUMBER_OF_SERVICES &gt; 0) | S_BLE_TM"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP|S_BLE_SP|S_BLE_RP)&amp; (NUMBER_OF_SERVICES &gt; 0) | S_BLE_TM"/>
         <Description>Maximum number of Attributes that can be stored in the GATT database
 		&lt;br&gt;When a GATT characteristic is added to the database a minimum of 2 attribute records are needed: one for the characteristic declaration and one for the characteristic value. On top of this, additional records may be needed based on the characteristic properties, in particular:
 		&lt;br&gt; - If the characteristic has the notify or indicate property set, then one additional attribute record is needed.
@@ -1831,6 +1854,18 @@
         &lt;br&gt;controller and host events produced outside the ISR</Description>
     </RefParameter>
 
+    <RefParameter Name="CFG_BLE_GAP_PERIPH_PREF_CONN_PARAM_CHARACTERISTIC" Comment="CFG_BLE_GAP_PERIPH_PREF_CONN_PARAM_CHARACTERISTIC" DefaultValue="0" Type="list" Group="Application configuration - BLE stack" TabName="Configuration" Visible="true">
+        <PossibleValue Value="0" Comment="Disabled"/>
+         <PossibleValue Value="1" Comment="Enabled"/>
+        <Description>If 1, Peripheral Preferred Connection Parameters Characteristic is added in GAP service.</Description>
+    </RefParameter>
+
+    <RefParameter Name="CFG_BLE_GAP_ENCRYPTED_KEY_MATERIAL_CHARACTERISTIC" Comment="CFG_BLE_GAP_ENCRYPTED_KEY_MATERIAL_CHARACTERISTIC" DefaultValue="0" Type="list" Group="Application configuration - BLE stack" TabName="Configuration" Visible="true">
+        <PossibleValue Value="0" Comment="Disabled"/>
+         <PossibleValue Value="1" Comment="Enabled"/>
+        <Description>If 1, Encrypted Key Material Characteristic is added in GAP service.</Description>
+    </RefParameter>
+
     <RefParameter Name="CFG_BLE_ATT_QUEUED_WRITE_SIZE" Comment="CFG_BLE_ATT_QUEUED_WRITE_SIZE" DefaultValue="512" Min="0" Type="integer" TabName="Configuration" Group="Application configuration - BLE stack">
         <Condition Diagnostic="" Expression="(S_BLE_TM | S_BLE_TMCO)"/>
         <Description>Size of buffer used for ATT queued writes</Description>
@@ -1853,6 +1888,11 @@
     </RefParameter>
     <RefParameter Name="CFG_BLE_ADV_NWK_BUFFER_SIZE" Comment="CFG_BLE_ADV_NWK_BUFFER_SIZE" DefaultValue="1660" Min="40" Type="integer" TabName="Configuration" Group="Application configuration - BLE stack" Visible="false">
         <Description>Amount of RAM used to store advertising data (bytes)</Description>
+    </RefParameter>
+
+    <RefParameter Name="CFG_BLE_GATT_CLT_NUM_CHARAC_SUBSCRIPTIONS_MAX" Comment="CFG_BLE_GATT_CLT_NUM_CHARAC_SUBSCRIPTIONS_MAX" DefaultValue="5" Min="0" Type="integer" TabName="Configuration" Group="Application configuration - BLE stack">
+        <Condition Diagnostic="" Expression="(S_BLE_TM | S_BLE_TMCO)"/>
+        <Description>Maximum number of characteristics that can be subscribed to check for security level</Description>
     </RefParameter>
 
     <RefParameter Name="CFG_BLE_CONTROLLER_SCAN_ENABLED" Comment="CFG_BLE_CONTROLLER_SCAN_ENABLED" DefaultValue="1" Type="list" Group="Application configuration -  Modular Options" TabName="Configuration">
@@ -2003,7 +2043,7 @@
     </RefParameter>
 
     <RefParameter Name="CFG_BLE_CONNECTION_ENABLED" Comment="CFG_BLE_CONNECTION_ENABLED" DefaultValue="1" Type="list" Group="Application configuration -  Modular Options" TabName="Configuration">
-        <Condition Diagnostic="" Expression="(S_BLE_TM | S_BLE_TMCO | S_BLE_SP | S_BLE_CP | S_BLE_RP)"/>
+        <Condition Diagnostic="" Expression="(S_BLE_TM | S_BLE_TMCO | S_BLE_LSP | S_BLE_SP | S_BLE_CP | S_BLE_RP)"/>
         <PossibleValue Value="0" Comment="Disabled"/>
         <PossibleValue Value="1" Comment="Enabled"/>
         <Description>Enable/disable the Bluetooth LE Power Control and PATH Loss Monitoring support.</Description>
@@ -2122,7 +2162,7 @@
 <!-- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
 
     <RefParameter Name="NUMBER_OF_SERVICES" Comment="     Number of services" DefaultValue="0" Type="Integer" Min="0" Max="25" TabName="BLE Applications and Services" Group="Server Mode">
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP)"/>
         <Description> Number of services; maximum is 25</Description>
     </RefParameter>
     <RefParameter Name="NUMBER_OF_SERVICES" Comment="Number of services" DefaultValue="0" Type="Integer" Min="0" Max="25" TabName="BLE Applications and Services" Group="Server Mode" Visible="false">
@@ -2130,7 +2170,7 @@
     </RefParameter>
 
     <RefParameter Name="SERVICE_CHAR_GATT_DONT_NOTIFY_EVENTS" Comment="GATT_DONT_NOTIFY_EVENTS" DefaultValue="GATT_DONT_NOTIFY_EVENTS" Type="list" Visible="false" TabName="BLE Applications and Services" Group="Server Mode">
-         <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
+         <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP)"/>
         <Description>Do not notify events</Description>
         <PossibleValue Value="GATT_DONT_NOTIFY_EVENTS" Comment="Yes"/>
         <PossibleValue Value=" " Comment="No"/>
@@ -2142,7 +2182,7 @@
     </RefParameter>
 
     <RefParameter Name="SERVICE_CHAR_ATTR_PERMISSION_NONE" Comment="ATTR_PERMISSION_NONE" DefaultValue="BLE_GATT_SRV_PERM_NONE" Type="list" Visible="false" TabName="BLE Applications and Services" Group="Server Mode">
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP)"/>
         <Description>No security</Description>
         <PossibleValue Value="BLE_GATT_SRV_PERM_NONE" Comment="Yes"/>
         <PossibleValue Value=" " Comment="No"/>
@@ -2154,7 +2194,7 @@
     </RefParameter>
 
     <RefParameter Name="SERVICE_CHAR_PROP_NONE" Comment="CHAR_PROP_NONE" DefaultValue="BLE_GATT_SRV_CHAR_PROP_NONE" Type="list" Visible="false" TabName="BLE Applications and Services" Group="Server Mode">
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP)"/>
         <Description>No security</Description>
         <PossibleValue Value="BLE_GATT_SRV_CHAR_PROP_NONE" Comment="Yes"/>
         <PossibleValue Value=" " Comment="No"/>
@@ -2167,7 +2207,7 @@
 
     <RefParameter Name="SERVICE0" Comment="Service0" DefaultValue="1" Type="List" Visible="false">
         <PossibleValue Value="1" Comment="1" Semaphore="S_SERVICE0_OLD"/>
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP) &amp; (NUMBER_OF_SERVICES &gt; 0)"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP) &amp; (NUMBER_OF_SERVICES &gt; 0)"/>
         <Description> Number of services; maximum is 10</Description>
     </RefParameter>
     <RefParameter Name="SERVICE0" Comment="Service0" DefaultValue="0" Type="List" Visible="false">
@@ -2180,7 +2220,7 @@
 <!-- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
     
     <RefParameter Name="SERVICE0_ID_BLE" Comment="Service ID" DefaultValue="0" Min="0" Max="240" Type="Integer"  TabName="SERVICE0" Group="Service" Visible="false">
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP)"/>
         <Description>Service ID BLE </Description>
     </RefParameter>
     
@@ -2407,7 +2447,7 @@
         <PossibleValue Value="SECONDARY_SERVICE" Comment="Secondary Service(0x02)"/>
     </RefParameter>
 
-    <RefParameter Name="SERVICE0_MAX_ATTRIBUTES_RECORDS" Comment="Service max attributes record(s)" DefaultValue="=(1 + 2*SERVICE0_NUMBER_OF_CHARACTERISTICS + IF(((SERVICE0_CHAR1_PROP_NOTIFY=BLE_GATT_SRV_CHAR_PROP_NOTIFY) | (SERVICE0_CHAR1_PROP_INDICATE=BLE_GATT_SRV_CHAR_PROP_INDICATE)), 1 ,0) + IF((SERVICE0_CHAR1_PROP_BROADCAST=BLE_GATT_SRV_CHAR_PROP_BROADCAST), 1 ,0))" Type="integerReadOnly" TabName="SERVICE0" Group="Service">
+    <RefParameter Name="SERVICE0_MAX_ATTRIBUTES_RECORDS" Comment="Service max attributes record(s)" DefaultValue="=(1 + 2*SERVICE0_NUMBER_OF_CHARACTERISTICS + IF(((SERVICE0_CHAR1_PROP_NOTIFY=BLE_GATT_SRV_CHAR_PROP_NOTIFY) | (SERVICE0_CHAR1_PROP_INDICATE=BLE_GATT_SRV_CHAR_PROP_INDICATE)), 1 ,0) + IF((SERVICE0_CHAR1_PROP_BROADCAST=BLE_GATT_SRV_CHAR_PROP_BROADCAST), 1 ,0) + SERVICE0_CHAR0_NUMBER_OF_CHAR_DESCRIPTORS)  " Type="integerReadOnly" TabName="SERVICE0" Group="Service">
         <Condition Diagnostic="" Expression="S_SERVICE0"/>
         <Description>Value depends of the number of characteristics (nbOfChar) with the property Notify or Indicate(nbOfDescriptor)&lt;br&gt;
         Max_Attributes_Records = 1 + 2*nbOfChar + nbOfDescriptor</Description>
@@ -2441,7 +2481,7 @@
 
     <RefParameter Name="SERVICE0_CHAR0_UUID_TYPE" Comment="UUID type" DefaultValue="0x02" Type="list" TabName="SERVICE0" Group="Characteristic0">
         <Description>Type of characteristic UUID, 0x01 = 16 bits UUID, 0x02 = 128 bits UUID</Description>
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP)"/>
         <PossibleValue Value="0x01" Comment="16 bits UUID(0x01)" Semaphore="S_SERVICE0_CHAR0_UUID_TYPE_16"/>
 		<PossibleValue Value="0x02" Comment="128 bits UUID(0x02)" Semaphore="S_SERVICE0_CHAR0_UUID_TYPE_128"/>
     </RefParameter>
@@ -3150,7 +3190,7 @@
 
     <RefParameter Name="SERVICE0_CHAR0_CHARACTERISTIC_TYPE" Comment="Characteristic type" DefaultValue="Buffered" Type="list" TabName="SERVICE0" Group="Characteristic0">
         <Description>Type of characteristic Non-buffered or Buffered</Description>
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP)"/>
         <PossibleValue Value="Buffered" Comment="Buffered"/>
         <PossibleValue Value="Non-buffered" Comment="Non-buffered"/>
     </RefParameter>
@@ -3401,7 +3441,7 @@
 <!-- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
  
     <RefParameter Name="SERVICE0_CHAR0_LONG_NAME" Comment="Characteristic long name" DefaultValue="Please enter a Characteristic Long Name" Type="stringRW" TabName="SERVICE0" Group="Characteristic0">
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP)"/>
         <Description>Please enter a Service Characteristic Long Name&lt;br&gt;&lt;font color=&quot;E6007E&quot;&gt;&lt;b&gt;WARNING:&lt;/b&gt; this name must : &lt;br&gt;- not start with "Please"&lt;br&gt;- not be empty&lt;br&gt;- contain only "a to z", "A to Z", "0 to 9" and "_" characters</Description>
     </RefParameter>
     <RefParameter Name="SERVICE0_CHAR0_LONG_NAME" Comment="Characteristic long name" DefaultValue="Please enter a Characteristic Long Name" Type="stringRW" TabName="SERVICE0" Group="Characteristic0" Visible="false">
@@ -3652,7 +3692,7 @@
 <!-- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
 
     <RefParameter Name="SERVICE0_CHAR0_SHORT_NAME" Comment="Characteristic short name" DefaultValue="Please enter a Characteristic Short Name" Type="stringRW" TabName="SERVICE0" Group="Characteristic0">
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP)"/>
         <Description>Please enter a Service Characteristic Short Name&lt;br&gt;&lt;font color=&quot;E6007E&quot;&gt;&lt;b&gt;WARNING:&lt;/b&gt; this name must : &lt;br&gt;- not start with "Please"&lt;br&gt;- not be empty&lt;br&gt;- contain only "a to z", "A to Z", "0 to 9" and "_" characters</Description>
     </RefParameter>
     <RefParameter Name="SERVICE0_CHAR0_SHORT_NAME" Comment="Characteristic short name" DefaultValue="Please enter a Characteristic Short Name" Type="stringRW" TabName="SERVICE0" Group="Characteristic0" Visible="false">
@@ -3910,7 +3950,7 @@
 <!-- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
 
     <RefParameter Name="SERVICE0_CHAR0_VALUE_LENGTH" Comment="Value length" DefaultValue="1" Type="integer" Min = "1" Max = "1024" TabName="SERVICE0" Group="Characteristic0">
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP)"/>
         <Description>Number of bytes to be written or to notify (1 to 512)</Description>
     </RefParameter>
     <RefParameter Name="SERVICE0_CHAR0_VALUE_LENGTH" Comment="Value length" DefaultValue="1" Type="integer" Min = "1" Max = "1024" TabName="SERVICE0" Group="Characteristic0" Visible = "false">
@@ -3935,7 +3975,7 @@
 <!-- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
 
     <RefParameter Name="SERVICE0_CHAR0_LENGTH_CHARACTERISTIC" Comment="Length characteristic" DefaultValue="CHAR_VALUE_LEN_CONSTANT" Type="list" TabName="SERVICE0" Group="Characteristic0">
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP)"/>
         <Description>Type of characteristic length in ble_defs.h. can be either CHAR_VALUE_LEN_CONSTANT(0x00) or CHAR_VALUE_LEN_VARIABLE(0x01)</Description>
         <PossibleValue Value="CHAR_VALUE_LEN_CONSTANT" Comment="Constant"/>
         <PossibleValue Value="CHAR_VALUE_LEN_VARIABLE" Comment="Variable"/>
@@ -3949,7 +3989,7 @@
 <!-- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
 
     <RefParameter Name="SERVICE0_CHAR0_ENCRY_KEY_SIZE" Comment="Encryption Key Size" DefaultValue="0x10" Type="hex" Min="0x07" Max ="0x10" TabName="SERVICE0" Group="Characteristic0">
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP)"/>
         <Description></Description>
     </RefParameter>
     <RefParameter Name="SERVICE0_CHAR0_ENCRY_KEY_SIZE" Comment="Encryption Key Size" DefaultValue="0x10" Type="hex" Min="0x07" Max ="0x10" TabName="SERVICE0" Group="Characteristic0" Visible="false">
@@ -3961,7 +4001,7 @@
 
     <RefParameter Name="SERVICE0_CHAR0_PROP_BROADCAST" Comment="CHAR_PROP_BROADCAST" DefaultValue=" " Type="list" TabName="SERVICE0"  Group="Characteristic0">
         <Description>Broadcasting of the characteristic value using a characteristic configuration descriptor. Default value is No.</Description>
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP)"/>
         <PossibleValue Value="BLE_GATT_SRV_CHAR_PROP_BROADCAST" Comment="Yes"/>
         <PossibleValue Value=" " Comment="No"/>
     </RefParameter>
@@ -3980,7 +4020,7 @@
 
     <RefParameter Name="SERVICE0_CHAR0_PROP_READ" Comment="CHAR_PROP_READ" DefaultValue=" " Type="list" TabName="SERVICE0"  Group="Characteristic0">
         <Description>Broadcasting of the characteristic value using a characteristic configuration descriptor. Default value is No.</Description>
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP)"/>
         <PossibleValue Value="BLE_GATT_SRV_CHAR_PROP_READ" Comment="Yes"/>
         <PossibleValue Value=" " Comment="No"/>
     </RefParameter>
@@ -3999,7 +4039,7 @@
 
     <RefParameter Name="SERVICE0_CHAR0_PROP_WRITE_NO_RESP" Comment="CHAR_PROP_WRITE_NO_RESP" DefaultValue=" " Type="list" TabName="SERVICE0"  Group="Characteristic0">
         <Description>Broadcasting of the characteristic value using a characteristic configuration descriptor. Default value is No.</Description>
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP)"/>
         <PossibleValue Value="BLE_GATT_SRV_CHAR_PROP_WRITE_NO_RESP" Comment="Yes"/>
         <PossibleValue Value=" " Comment="No"/>
     </RefParameter>
@@ -4036,7 +4076,7 @@
 
     <RefParameter Name="SERVICE0_CHAR0_PROP_NOTIFY" Comment="CHAR_PROP_NOTIFY" DefaultValue=" " Type="list" TabName="SERVICE0"  Group="Characteristic0">
         <Description>Broadcasting of the characteristic value using a characteristic configuration descriptor. Default value is No.</Description>
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP)"/>
         <PossibleValue Value="BLE_GATT_SRV_CHAR_PROP_NOTIFY" Semaphore="S_SERVICE0_CHAR0_PROP_NOTIFY" Comment="Yes"/>
         <PossibleValue Value=" " Comment="No"/>
     </RefParameter>
@@ -4055,7 +4095,7 @@
 
     <RefParameter Name="SERVICE0_CHAR0_PROP_INDICATE" Comment="CHAR_PROP_INDICATE" DefaultValue=" " Type="list" TabName="SERVICE0"  Group="Characteristic0">
         <Description>Broadcasting of the characteristic value using a characteristic configuration descriptor. Default value is No.</Description>
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP)"/>
         <PossibleValue Value="BLE_GATT_SRV_CHAR_PROP_INDICATE" Semaphore="S_SERVICE0_CHAR0_PROP_INDICATE" Comment="Yes"/>
         <PossibleValue Value=" " Comment="No"/>
     </RefParameter>
@@ -4085,7 +4125,7 @@
     </RefParameter>
     <RefParameter Name="SERVICE0_CHAR0_ATTR_PERMISSION_AUTHEN_READ" Comment="ATTR_PERMISSION_AUTHEN_READ" DefaultValue=" " Type="list" TabName="SERVICE0"  Group="Characteristic0">
         <Description>Broadcasting of the characteristic value using a characteristic configuration descriptor.Default value is No.</Description>
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP)"/>
         <PossibleValue Value="BLE_GATT_SRV_PERM_AUTHEN_READ" Comment="Yes"/>
         <PossibleValue Value=" " Comment="No"/>
     </RefParameter>
@@ -4102,7 +4142,7 @@
     </RefParameter>
     <RefParameter Name="SERVICE0_CHAR0_ATTR_PERMISSION_AUTHOR_READ" Comment="ATTR_PERMISSION_AUTHOR_READ" DefaultValue=" " Type="list" TabName="SERVICE0"  Group="Characteristic0">
         <Description>Broadcasting of the characteristic value using a characteristic configuration descriptor.Default value is No.</Description>
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP)"/>
         <PossibleValue Value="BLE_GATT_SRV_PERM_AUTHOR_READ" Comment="Yes"/>
         <PossibleValue Value=" " Comment="No"/>
     </RefParameter>
@@ -4119,7 +4159,7 @@
     </RefParameter>
     <RefParameter Name="SERVICE0_CHAR0_ATTR_PERMISSION_ENCRY_READ" Comment="ATTR_PERMISSION_ENCRY_READ" DefaultValue=" " Type="list" TabName="SERVICE0"  Group="Characteristic0">
         <Description>Broadcasting of the characteristic value using a characteristic configuration descriptor.Default value is No.</Description>
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP)"/>
         <PossibleValue Value="BLE_GATT_SRV_PERM_ENCRY_READ" Comment="Yes"/>
         <PossibleValue Value=" " Comment="No"/>
     </RefParameter>
@@ -4136,7 +4176,7 @@
     </RefParameter>
     <RefParameter Name="SERVICE0_CHAR0_ATTR_PERMISSION_AUTHEN_WRITE" Comment="ATTR_PERMISSION_AUTHEN_WRITE" DefaultValue=" " Type="list" TabName="SERVICE0"  Group="Characteristic0">
         <Description>Broadcasting of the characteristic value using a characteristic configuration descriptor.Default value is No.</Description>
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP)"/>
         <PossibleValue Value="BLE_GATT_SRV_PERM_AUTHEN_WRITE" Comment="Yes"/>
         <PossibleValue Value=" " Comment="No"/>
     </RefParameter>
@@ -4153,7 +4193,7 @@
     </RefParameter>
     <RefParameter Name="SERVICE0_CHAR0_ATTR_PERMISSION_AUTHOR_WRITE" Comment="ATTR_PERMISSION_AUTHOR_WRITE" DefaultValue=" " Type="list" TabName="SERVICE0"  Group="Characteristic0">
         <Description>Broadcasting of the characteristic value using a characteristic configuration descriptor.Default value is No.</Description>
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP)"/>
         <PossibleValue Value="BLE_GATT_SRV_PERM_AUTHOR_WRITE" Comment="Yes"/>
         <PossibleValue Value=" " Comment="No"/>
     </RefParameter>
@@ -4170,7 +4210,7 @@
     </RefParameter>
     <RefParameter Name="SERVICE0_CHAR0_ATTR_PERMISSION_ENCRY_WRITE" Comment="ATTR_PERMISSION_ENCRY_WRITE" DefaultValue=" " Type="list" TabName="SERVICE0"  Group="Characteristic0">
         <Description>Broadcasting of the characteristic value using a characteristic configuration descriptor.Default value is No.</Description>
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP)"/>
         <PossibleValue Value="BLE_GATT_SRV_PERM_ENCRY_WRITE" Comment="Yes"/>
         <PossibleValue Value=" " Comment="No"/>
     </RefParameter>
@@ -4182,7 +4222,7 @@
 <!-- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
 
     <RefParameter Name="SERVICE0_CHAR0_GATT_NOTIFY_ATTRIBUTE_WRITE" Comment="GATT_NOTIFY_ATTRIBUTE_WRITE" DefaultValue="BLE_GATT_SRV_GATT_NOTIFY_ATTRIBUTE_WRITE" Type="list" TabName="SERVICE0"  Group="Characteristic0">
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP)"/>
         <Description>The application will be notified when a client writes to this attribute. An ACI_GATT_ATTRIBUTE_MODIFIED_EVENT will be issued.</Description>
         <PossibleValue Value="BLE_GATT_SRV_GATT_NOTIFY_ATTRIBUTE_WRITE" Comment="Yes"/>
         <PossibleValue Value=" " Comment="No"/>
@@ -4194,7 +4234,7 @@
     </RefParameter>
 
     <RefParameter Name="SERVICE0_CHAR0_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP" Comment="GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP" DefaultValue="BLE_GATT_SRV_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP" Type="list" TabName="SERVICE0"  Group="Characteristic0">
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP)"/>
         <Description>The application will be notified when a write request, a write cmd or a signed write cmd is received by the server for this attribute. An ACI_GATT_WRITE_PERMIT_REQ_EVENT will be issued.</Description>
         <PossibleValue Value="BLE_GATT_SRV_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP" Comment="Yes"/>
         <PossibleValue Value=" " Comment="No"/>
@@ -4206,7 +4246,7 @@
     </RefParameter>
 
     <RefParameter Name="SERVICE0_CHAR0_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP" Comment="GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP" DefaultValue="BLE_GATT_SRV_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP" Type="list" TabName="SERVICE0"  Group="Characteristic0">
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP)"/>
         <Description>The application will be notified when a read request of any type is received for this attribute. An ACI_GATT_READ_PERMIT_REQ_EVENT will be issued.</Description>
         <PossibleValue Value="BLE_GATT_SRV_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP" Comment="Yes"/>
         <PossibleValue Value=" " Comment="No"/>
@@ -4218,7 +4258,7 @@
     </RefParameter>
 	
     <RefParameter Name="SERVICE0_CHAR0_GATT_NOTIFY_NOTIFICATION_COMPLETION" Comment="GATT_NOTIFY_NOTIFICATION_COMPLETION" DefaultValue=" " Type="list" TabName="SERVICE0"  Group="Characteristic0">
-        <Condition Diagnostic="" Expression="(S_BLE_SP | S_BLE_RP)"/>
+        <Condition Diagnostic="" Expression="(S_BLE_LSP | S_BLE_SP | S_BLE_RP)"/>
         <Description>The application will be notified when notifications are transmitted. An ACI_GATT_NOTIFICATION_COMPLETE_EVENT will be issued.</Description>
         <PossibleValue Value="BLE_GATT_SRV_GATT_NOTIFY_NOTIFICATION_COMPLETION" Comment="Yes"/>
         <PossibleValue Value=" " Comment="No"/>
@@ -4229,7 +4269,9 @@
         <PossibleValue Value=" " Comment="No"/>
     </RefParameter>
 
-
+    <RefParameter Name="SERVICE0_CHAR0_NUMBER_OF_CHAR_DESCRIPTORS" Comment="Number of char descriptors" DefaultValue="0" Type="integer"  Min = "0" Max = "10" TabName="SERVICE0"  Group="Characteristic0" >
+        <Description>Number of char descriptors</Description>
+    </RefParameter>
 <!-- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
 <!-- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ SERVICE0 CHAR0 end @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
 <!-- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
@@ -4239,8 +4281,10 @@
 
     <RefMode Name="STM32_BLE_Configuration" Abstract = "true">
         <!-- <ConfigForMode>STM32_BLE_Init</ConfigForMode> -->
+        <Parameter Name="LITE_SERVER_STATUS"/>
         <Parameter Name="SEQUENCER_STATUS"/>
         <Parameter Name="FREERTOS_STATUS"/>
+		<Parameter Name="COMMON_BLE_STATUS"/>
         <Parameter Name="BLE"/>
         <Parameter Name="BLE_MODE_SKELETON"/>
         <Parameter Name="BLE_MODE_HOST_SKELETON"/>
@@ -4311,9 +4355,12 @@
         <Parameter Name="CFG_BLE_ISR0_FIFO_SIZE"/>
         <Parameter Name="CFG_BLE_ISR1_FIFO_SIZE"/>
         <Parameter Name="CFG_BLE_USER_FIFO_SIZE"/>
+        <Parameter Name="CFG_BLE_GAP_PERIPH_PREF_CONN_PARAM_CHARACTERISTIC"/>
+        <Parameter Name="CFG_BLE_GAP_ENCRYPTED_KEY_MATERIAL_CHARACTERISTIC"/>
         <Parameter Name="CFG_BLE_ATT_QUEUED_WRITE_SIZE"/>
         <Parameter Name="CFG_BLE_GATT_NWK_BUFFER_SIZE"/>
         <Parameter Name="CFG_BLE_ADV_NWK_BUFFER_SIZE"/>
+        <Parameter Name="CFG_BLE_GATT_CLT_NUM_CHARAC_SUBSCRIPTIONS_MAX"/>
         <Parameter Name="CFG_BLE_CONTROLLER_SCAN_ENABLED"/>
         <Parameter Name="CFG_BLE_CONTROLLER_PRIVACY_ENABLED"/>
         <Parameter Name="CFG_BLE_SECURE_CONNECTIONS_ENABLED"/>
@@ -4345,6 +4392,9 @@
         <ConfigForMode>STM32_BLE_Init</ConfigForMode>
     </RefMode>
     <RefMode Name="BLE_Router" BaseMode="BLE_Server">
+        <ConfigForMode>STM32_BLE_Init</ConfigForMode>
+    </RefMode>
+    <RefMode Name="BLE_Server_Lite" BaseMode="BLE_Server">
         <ConfigForMode>STM32_BLE_Init</ConfigForMode>
     </RefMode>
     <RefMode Name="BLE_Server" BaseMode="STM32_BLE_Bsp_Dependency">
@@ -4638,6 +4688,7 @@
         <Parameter Name="SERVICE0_CHAR0_GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP"/>
         <Parameter Name="SERVICE0_CHAR0_GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP"/>
         <Parameter Name="SERVICE0_CHAR0_GATT_NOTIFY_NOTIFICATION_COMPLETION"/>
+		<Parameter Name="SERVICE0_CHAR0_NUMBER_OF_CHAR_DESCRIPTORS"/>
     </RefMode>
     
     <RefMode Name="MOD_SERVICE_TO_DUPLICATE" Abstract="true">
@@ -4701,6 +4752,13 @@
                     <Semaphore>S_BLE_HOST</Semaphore>
                     <Semaphore>S_BLE_SP</Semaphore>
                 </Mode>
+                <Mode Name="BLE_Server_Lite" UserName="Create your Peripheral &amp; GATT Lite server application">
+                    <SignalLogicalOp Name="AND">
+                        <Signal IOMode="Basic" Name="VS_BLE_HOST_LSP"/>
+                    </SignalLogicalOp>
+                    <Semaphore>S_BLE_HOST_LITE</Semaphore>
+                    <Semaphore>S_BLE_LSP</Semaphore>
+                </Mode>
                 <Mode Name="BLE_Client" UserName="Create your Central &amp; GATT client application">
                      <SignalLogicalOp Name="AND">
                         <Signal IOMode="Basic" Name="VS_BLE_HOST_CP"/>
@@ -4741,6 +4799,7 @@
     <RefSignal Name="VS_BLE_HOST_CP" Virtual="true"/>
     <RefSignal Name="VS_BLE_HOST_RP" Virtual="true"/>
     <RefSignal Name="VS_BLE_HOST_SP" Virtual="true"/>
+    <RefSignal Name="VS_BLE_HOST_LSP" Virtual="true"/>
     <RefSignal Name="VS_BLE_HOST_TM" Virtual="true"/>
     <RefSignal Name="VS_BLE_HOST_TMCO" Virtual="true"/>
     <RefSignal Name="VS_BLE_HOST_BC" Virtual="true"/>

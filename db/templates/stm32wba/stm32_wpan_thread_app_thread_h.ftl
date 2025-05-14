@@ -17,6 +17,9 @@
     [#if SWIP.defines??]
         [#list SWIP.defines as definition]
             [#assign myHash = {definition.name:definition.value} + myHash]
+			[#if (definition.name == "THREAD_APPLICATION") ]
+                [#assign THREAD_APPLICATION = definition.value]
+            [/#if]
         [/#list]
     [/#if]
 [/#list]
@@ -76,13 +79,18 @@ typedef enum
 /* USER CODE END EC */
 
 /* Exported functions prototypes ---------------------------------------------*/
-[#if myHash["SEQUENCER_STATUS"]?number == 1 ]
 void Thread_Init(void);
+[#if myHash["SEQUENCER_STATUS"]?number == 1 ]
 void ProcessLinkLayer(void);
 void ProcessTasklets(void);
 void ProcessAlarm(void);
+[#if (THREAD_APPLICATION != "RCP")]
 void ProcessUsAlarm(void);
+[/#if]
 void ProcessOpenThreadTasklets(void);
+[#if (THREAD_APPLICATION == "RCP")]
+void ProcessRcpSpinel(void);
+[/#if]
 [/#if]
 
 void APP_THREAD_Init(void);

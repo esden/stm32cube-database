@@ -10,6 +10,10 @@ set stm32tpccli="${tpcPath}"
 [#else]
 set stm32tpccli=${tpcPath}
 [/#if]
+[#if isAppliOnly??]
+:: Select device type (H7S or H7R)
+set device_type="${H7S_H7R}"
+[/#if]
 ::~dp0 = represent the folder where the env.bat is started
 :: ==============================================================================
 ::               !!!! DOT NOT EDIT --- UPDATED AUTOMATICALLY !!!!
@@ -89,7 +93,8 @@ set stirot_iloader_boot_path_project=${CubeFwPath}\Projects\STM32H7S78-DK\Applic
 set oemirot_appli_assembly_sign=${appli_assembly_sign}
 	[/#if]
 [/#if]
-set oemirot_boot_path_project=%~dp0..\
+set oemirot_boot_path_project="${oemirot_boot_path_project}"
+set oemirot_boot=${oemirot_boot}
 set rot_provisioning_path=%~dp0
 	[#if appli_assembly??]
 :: ==============================================================================

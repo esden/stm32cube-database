@@ -67,7 +67,6 @@ static void MX_GPIO_Init(void)
   		[#if clock?size >0 ]#n#t/* GPIO Ports Clock Enable */[/#if]
   		 [#if RESMGR_UTILITY?? && FamilyName=="STM32MP2"]
   		  [@common.optinclude name=contextFolder+mxTmpFolder+"/ResMgr_Rifaware_EXTI.tmp"/][#-- ADD RESMGR_UTILITY Code--]
-         [@common.optinclude name=contextFolder+mxTmpFolder+"/ResMgr_Rifaware_RCC.tmp"/][#-- ADD RESMGR_UTILITY Code--]
           [/#if]
             [#list clock as clockMacro]
                 [#if clockMacro!=""] 
@@ -212,7 +211,8 @@ static void MX_${data.ipName}_GPIO_Init(void)
 [#list InitNvic as initVector]
 
     [#-- Request in Ticket 170461 Begin--]
-    [#if initVector.label?? && initVector.label != "" && DIE == "DIE485"]
+
+    [#if initVector.label?? && initVector.label != "" && (DIE == "DIE485" || FamilyName == ("STM32H7"))]
         [#assign vectorName = initVector.label]
     [#else]
         [#assign vectorName = initVector.vector]

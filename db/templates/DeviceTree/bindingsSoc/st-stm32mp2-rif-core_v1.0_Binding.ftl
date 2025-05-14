@@ -1,3 +1,4 @@
+
 [#ftl]
 [#assign Tabulation=dts_get_tabs(pDtLevel)]
 [#assign TABnode = Tabulation.TABN]
@@ -13,6 +14,7 @@
 [#assign RifAwareExtraTablePrefix = "RIFAwareExtraTable_"]
 [#assign RifAwareIPName=""]
 [#assign RifAwareIPsWithSpeceficProp=["TAMP","HSEM","EXTI1","EXTI2"]]
+[#assign RifAwareIPsWithNoAccess= ["FMC", "PWR", "RCC", "GPIO", "DSIHOST", "LTDC", "ETHSW", "HPDMA1", "HPDMA2", "HPDMA3","GPDMA1"]]
 [#list mx_RIF_Params.entrySet() as RIF_Params]
 	[#if (RIF_Params.key)?? && RIF_Params.key?matches("^"+RifAwarePrefix+".+")]
 		[#compress]
@@ -30,16 +32,24 @@
 			[#assign SystemModeList=[]]
 			[#list RifAwareIPFeatures.entrySet() as RifAwareIPFeatureList]
 				[#assign isCIDmatchesInt = RifAwareIPFeatureList.value[MasterCidUIIndex]?matches("[123456789]")]
-				[#assign isCIDZero = RifAwareIPFeatureList.value[MasterCidUIIndex]=="0"]
+				[#assign isCIDZero = RifAwareIPFeatureList.value[MasterCidUIIndex]=="-"]
 				[#-- Populate FeatureNamesList --]
 				[#assign FeatureNamesList+=[RifAwareIPFeatureList.key]]
 				[#-- Populate FeatureIDList --]
 				[#assign FeatureIDList+=[(RifAwareIPFeatureList.value[FeatureIDUIIndex])?matches("[0-9]\\d{0,9}")?then("("+RifAwareIPFeatureList.value[FeatureIDUIIndex]+")","_"+RifAwareIPFeatureList.value[FeatureIDUIIndex]?substring(0, 3)+"("+RifAwareIPFeatureList.value[FeatureIDUIIndex]?substring(3)+")")]]
 				[#-- Populate MasterCIDList with formatted Master CIDs --]
-				[#if RifAwareIPFeatureList.value[MasterCidUIIndex] == "-" || isCIDmatchesInt]
-					[#assign MasterCIDList+=["RIF_UNUSED"]]
-				[#elseif isCIDZero]
-					[#assign MasterCIDList+=["EMPTY_SEMWL"]]
+				[#if isCIDmatchesInt]
+					[#if RifAwareIPFeatureList.value[SystemModeUIIndex]?? && (RifAwareIPFeatureList.value[SystemModeUIIndex] == "true")]
+						[#assign MasterCIDList+=["RIF_CID"+RifAwareIPFeatureList.value[MasterCidUIIndex]+"_BF"]]
+					[#else]
+						[#assign MasterCIDList+=["RIF_UNUSED"]]
+					[/#if]
+				[#elseif isCIDZero ]
+					[#if RifAwareIPsWithNoAccess?seq_contains(RifAwareIPName)]
+						[#assign MasterCIDList+=["EMPTY_SEMWL"]]
+					[#else]
+						[#assign MasterCIDList+=["RIF_UNUSED"]]
+					[/#if]
 				[#elseif RifAwareIPFeatureList.value[MasterCidUIIndex]?contains("&")]
 					[#assign MasterCID = ""]
 					[#list RifAwareIPFeatureList.value[MasterCidUIIndex]?split("&") as CIDx]
@@ -58,13 +68,18 @@
 				[#-- Populate PrivilegeList --]
 				[#assign SCIDList+= [isCIDmatchesInt?then("RIF_CID"+RifAwareIPFeatureList.value[MasterCidUIIndex],"RIF_UNUSED")] ]
 				[#-- Populate SemList --]
-				[#if isCIDZero]
+				[#if isCIDZero && RifAwareIPsWithNoAccess?seq_contains(RifAwareIPName)]
 					[#assign SemList+= ["RIF_SEM_EN"]]
 				[#else]
 					[#assign SemList+= [(RifAwareIPFeatureList.value[MasterCidUIIndex]?contains("&"))?then("RIF_SEM_EN","RIF_SEM_DIS")] ]
 				[/#if]
 				[#-- Populate FilteringCIDList --]
-				[#assign FilteringCIDList+= [(RifAwareIPFeatureList.value[MasterCidUIIndex] == "-")?then("RIF_CFDIS","RIF_CFEN")] ]
+				[#if RifAwareIPsWithNoAccess?seq_contains(RifAwareIPName) && isCIDZero]
+					[#assign FilteringCIDList+=["RIF_CFEN"]]
+				[#else]
+					[#assign FilteringCIDList+= [(RifAwareIPFeatureList.value[MasterCidUIIndex] == "-")?then("RIF_CFDIS","RIF_CFEN")] ]
+				[/#if]
+
 				[#if RifAwareIPName=="RCC"]
 					[#assign LockList+= [(RifAwareIPFeatureList.value[LockUIIndex] == "true")?then("RIF_LOCK","RIF_UNLOCK")] ]
 					[#assign  SystemModeList+= [(RifAwareIPFeatureList.value[SystemModeUIIndex] == "true")?then("true","false")] ]
@@ -146,21 +161,27 @@ ${TABnode}>;
 		[/#list]
 ${TABnode}${(RifAwareIPName=="TAMP")?then("st,backup-zones = <"+RifAware_values?substring(0,RifAware_values?length-1)+">;","st,proccid = "+RifAware_values?substring(0,RifAware_values?length-2-" <3 RIF_CID3>,"?length)+";")}[#-- <3 RIF_CID3> not supported for Beta3 --]
 [/#if]
+[#if mx_isAhbErrata && supportAhbErrataList?seq_contains(RifAwareIPName)]
+${TABnode}st,errata-ahbrisab;
+[/#if]
 };
 		[/#if]
 	[/#if]
 [/#list]
 #n
-&ipcc2{
-${TABnode}st,protreg = <
-${TABprop}RIFPROT(RIF_IPCC_CPU1_CHANNEL(1), RIF_UNUSED, RIF_UNLOCK, RIF_NSEC, RIF_NPRIV, RIF_CID1, RIF_SEM_DIS, RIF_CFEN)
-${TABprop}RIFPROT(RIF_IPCC_CPU2_CHANNEL(1), RIF_UNUSED, RIF_UNLOCK, RIF_NSEC, RIF_NPRIV, RIF_CID3, RIF_SEM_DIS, RIF_CFEN)
-${TABprop}RIFPROT(RIF_IPCC_CPU1_CHANNEL(2), RIF_UNUSED, RIF_UNLOCK, RIF_NSEC, RIF_NPRIV, RIF_CID1, RIF_SEM_DIS, RIF_CFEN)
-${TABprop}RIFPROT(RIF_IPCC_CPU2_CHANNEL(2), RIF_UNUSED, RIF_UNLOCK, RIF_NSEC, RIF_NPRIV, RIF_CID3, RIF_SEM_DIS, RIF_CFEN)
-${TABprop}RIFPROT(RIF_IPCC_CPU1_CHANNEL(3), RIF_UNUSED, RIF_UNLOCK, RIF_NSEC, RIF_NPRIV, RIF_CID1, RIF_SEM_DIS, RIF_CFEN)
-${TABprop}RIFPROT(RIF_IPCC_CPU2_CHANNEL(3), RIF_UNUSED, RIF_UNLOCK, RIF_NSEC, RIF_NPRIV, RIF_CID3, RIF_SEM_DIS, RIF_CFEN)
-${TABprop}RIFPROT(RIF_IPCC_CPU1_CHANNEL(4), RIF_UNUSED, RIF_UNLOCK, RIF_NSEC, RIF_NPRIV, RIF_CID1, RIF_SEM_DIS, RIF_CFEN)
-${TABprop}RIFPROT(RIF_IPCC_CPU2_CHANNEL(4), RIF_UNUSED, RIF_UNLOCK, RIF_NSEC, RIF_NPRIV, RIF_CID3, RIF_SEM_DIS, RIF_CFEN)
-${TABnode}>;
+[#if !mx_socPtCPN?starts_with("stm32mp23")]
+&ipcc2 {
+	st,protreg = <
+		RIFPROT(RIF_IPCC_CPU1_CHANNEL(1), RIF_UNUSED, RIF_UNLOCK, RIF_NSEC, RIF_NPRIV, RIF_CID3, RIF_SEM_DIS, RIF_CFEN) /* Feature = CPU1 channel 1 */
+		RIFPROT(RIF_IPCC_CPU2_CHANNEL(1), RIF_UNUSED, RIF_UNLOCK, RIF_NSEC, RIF_NPRIV, RIF_CID1, RIF_SEM_DIS, RIF_CFEN) /* Feature = CPU2 channel 1 */
+		RIFPROT(RIF_IPCC_CPU1_CHANNEL(2), RIF_UNUSED, RIF_UNLOCK, RIF_NSEC, RIF_NPRIV, RIF_CID3, RIF_SEM_DIS, RIF_CFEN) /* Feature = CPU1 channel 2 */
+		RIFPROT(RIF_IPCC_CPU2_CHANNEL(2), RIF_UNUSED, RIF_UNLOCK, RIF_NSEC, RIF_NPRIV, RIF_CID1, RIF_SEM_DIS, RIF_CFEN) /* Feature = CPU2 channel 2 */
+		RIFPROT(RIF_IPCC_CPU1_CHANNEL(3), RIF_UNUSED, RIF_UNLOCK, RIF_NSEC, RIF_NPRIV, RIF_CID3, RIF_SEM_DIS, RIF_CFEN) /* Feature = CPU1 channel 3 */
+		RIFPROT(RIF_IPCC_CPU2_CHANNEL(3), RIF_UNUSED, RIF_UNLOCK, RIF_NSEC, RIF_NPRIV, RIF_CID1, RIF_SEM_DIS, RIF_CFEN) /* Feature = CPU2 channel 3 */
+		RIFPROT(RIF_IPCC_CPU1_CHANNEL(4), RIF_UNUSED, RIF_UNLOCK, RIF_NSEC, RIF_NPRIV, RIF_CID3, RIF_SEM_DIS, RIF_CFEN) /* Feature = CPU1 channel 4 */
+		RIFPROT(RIF_IPCC_CPU2_CHANNEL(4), RIF_UNUSED, RIF_UNLOCK, RIF_NSEC, RIF_NPRIV, RIF_CID1, RIF_SEM_DIS, RIF_CFEN) /* Feature = CPU2 channel 4 */
+	>;
 };
+[/#if]
+
 

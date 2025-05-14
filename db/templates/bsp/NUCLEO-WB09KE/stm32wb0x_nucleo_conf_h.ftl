@@ -14,7 +14,7 @@
 [/#list]
 /**
   ******************************************************************************
-  * @file    stm32wb0xx_nucleo_conf.h
+  * @file    stm32wb0x_nucleo_conf.h
   * @author  MCD Application Team
   * @brief   STM32WB0x_Nucleo board configuration file.
   *          This file should be copied to the application folder and renamed

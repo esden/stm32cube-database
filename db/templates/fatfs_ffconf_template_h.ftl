@@ -178,7 +178,7 @@
 / Additional user header to be used
 /-----------------------------------------------------------------------------*/
 #include "main.h"
-[#if familyName == "stm32wb0" ]
+[#if familyName == "stm32wb0" || familyName == "stm32wl3"]
 #include "${familyName}x_hal.h"
 [#else]
 #include "${familyName}xx_hal.h"

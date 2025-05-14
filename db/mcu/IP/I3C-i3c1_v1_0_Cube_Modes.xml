@@ -396,13 +396,54 @@
         <Condition Diagnostic="" Expression="$IpInstance_I3C_Target"/>
         <PossibleValue Comment="Disable " Value="HAL_I3C_STATUSFIFO_DISABLE"/>
     </RefParameter>
-    
+    <!-- Autonomous Mode __begin -->
+    <RefParameter Comment="Autonomous Mode" DefaultValue="AUTONOMOUS_MODE_DISABLE" Group="Autonomous Mode" Name="AutonomousMode" Type="list">
+        <Condition Diagnostic="" Expression="STM32U3"/>
+        <PossibleValue Comment="Disable " Value="AUTONOMOUS_MODE_DISABLE"/>
+        <PossibleValue Comment="Enable " Value="AUTONOMOUS_MODE_ENABLE"/>
+    </RefParameter>
+    <RefParameter Comment="     Trigger State" DefaultValue="I3C_AUTO_MODE_ENABLE" Group="Autonomous Mode" Name="TriggerState" Type="list">
+        <Condition Diagnostic="" Expression="(AutonomousMode = AUTONOMOUS_MODE_ENABLE)"/>
+        <PossibleValue Comment="Enable " Value="I3C_TRIGGER_ENABLE"/>
+        <PossibleValue Comment="Disable " Value="I3C_TRIGGER_DISABLE"/>
+    </RefParameter>
+    <RefParameter Comment="     Trigger Polarity" DefaultValue="null" Group="Autonomous Mode" Name="TriggerPolarity" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="(AutonomousMode = AUTONOMOUS_MODE_DISABLE) | (!STM32U3)"/>
+    </RefParameter>
+    <RefParameter Comment="     Trigger Polarity" DefaultValue="I3C_TRIG_POLARITY_LOW" Group="Autonomous Mode" Name="TriggerPolarity" Type="list">
+        <Condition Diagnostic="" Expression="(AutonomousMode = AUTONOMOUS_MODE_ENABLE)"/>
+        <PossibleValue Comment="LOW" Value="I3C_TRIG_POLARITY_LOW"/>
+        <PossibleValue Comment="HIGH" Value="I3C_TRIG_POLARITY_HIGH"/>
+    </RefParameter>
+    <RefParameter Comment="     Trigger Selection" DefaultValue="null" Group="Autonomous Mode" Name="TriggerSelection" Type="list" Visible="false">
+        <Condition Diagnostic="" Expression="(AutonomousMode = AUTONOMOUS_MODE_DISABLE) | ( !STM32U3)"/>
+    </RefParameter>
+<!--Trigger Selection GRP1 U3 I3C_Mode-->
+    <RefParameter Comment="     Trigger Selection" DefaultValue="I3C_GRP2_GPDMA_CH0_TCF_TRG" Group="Autonomous Mode" Name="TriggerSelection" Type="list">
+        <Condition Diagnostic="" Expression="STM32U3 &amp; (AutonomousMode = AUTONOMOUS_MODE_ENABLE)" />
+        <PossibleValue Comment="GPDMA1 channel 0" Value="I3C_GRP1_GPDMA_CH0_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 1" Value="I3C_GRP1_GPDMA_CH1_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 2" Value="I3C_GRP1_GPDMA_CH2_TCF_TRG"/>
+        <PossibleValue Comment="GPDMA1 channel 3" Value="I3C_GRP1_GPDMA_CH3_TCF_TRG"/>
+        <PossibleValue Comment="EXTI line 5" Value="I3C_GRP1_EXTI5_TRG"/>
+        <PossibleValue Comment="EXTI line 9" Value="I3C_GRP1_EXTI9_TRG"/>
+        <PossibleValue Comment="LPTIM1 out" Value="I3C_GRP1_LPTIM1_CH1_TRG"/>
+        <PossibleValue Comment="LPTIM2 out" Value="I3C_GRP1_LPTIM2_CH1_TRG"/>
+        <PossibleValue Comment="COMP1 out" Value="I3C_GRP1_COMP1_TRG"/>
+        <PossibleValue Comment="COMP2 out" Value="I3C_GRP1_COMP2_TRG"/>
+        <PossibleValue Comment="RTC alarm" Value="I3C_GRP1_RTC_ALRA_TRG"/>
+        <PossibleValue Comment="RTC wakeup" Value="I3C_GRP1_RTC_WUT_TRG"/>
+        <PossibleValue Comment="TIM15" Value="I3C_GRP1_TIM15_TGO_CKTIM_TRG"/>
+        <PossibleValue Comment="TIM16" Value="I3C_GRP1_TIM16_OC1_TRG"/>
+    </RefParameter>
+    <!-- Autonomous Mode  __end. -->
     <!-- RefMode for I3C Controller -->
     <RefMode BaseMode="I3C" Name="Controller">
         <ConfigForMode>I3C_Controller_Init</ConfigForMode>
         <ConfigForMode>Fifo_Config</ConfigForMode>
         <ConfigForMode>Contoller_Config</ConfigForMode>
         <ConfigForMode>Enable_I3C_LL</ConfigForMode>   
+        <ConfigForMode>AutonomousMode_Config</ConfigForMode>
         <!-- Controller parameters -->
         <Parameter Name="SDARiseTime"/>
         <Parameter Name="BusUsage"/>
@@ -448,6 +489,11 @@
         <Parameter Name="RXFIFOThreshold"/>
         <Parameter Name="FIFOControl"/>
         <Parameter Name="FIFOStatus"/>
+		<!-- Autonomous Mode -->
+        <Parameter Name="AutonomousMode"/>
+        <Parameter Name="TriggerState"/>
+        <Parameter Name="TriggerSelection"/>
+        <Parameter Name="TriggerPolarity"/>
         
     </RefMode>
     
@@ -457,6 +503,8 @@
         <ConfigForMode>Fifo_Config</ConfigForMode>
         <ConfigForMode>Target_Config</ConfigForMode>
         <ConfigForMode>Enable_I3C_LL</ConfigForMode>  
+        <ConfigForMode>AutonomousMode_Config</ConfigForMode>
+        
         <Parameter Name="T_BusAvailableDuration"/>
         <Parameter Name="hexBusAvailableDuration"/>
         <Parameter Name="Register1"/>
@@ -495,6 +543,11 @@
         <Parameter Name="FifoConf"/>
         <Parameter Name="TXFIFOThreshold"/>
         <Parameter Name="RXFIFOThreshold"/>
+        <!-- Autonomous Mode -->
+        <Parameter Name="AutonomousMode"/>
+        <Parameter Name="TriggerState"/>
+        <Parameter Name="TriggerSelection"/>
+        <Parameter Name="TriggerPolarity"/>
     </RefMode>
     
     <!-- ModeLogicOperator for I3C -->
@@ -504,26 +557,25 @@
                     <Mode Name="Controller" UserName="Controller">
                         <SignalLogicalOp Name="AND">
                             <Signal Name="SCL"/>
-                            <Signal Name="SDA"/>							
+                            <Signal Name="SDA"/>
                         </SignalLogicalOp>
                         <Semaphore>$IpInstance_I3C_Controller</Semaphore>
                         <Semaphore>$IpInstance_Dma_CTRL</Semaphore>
-                    </Mode>						
+                    </Mode>
                     <Mode Name="Target" UserName="Target">
                         <SignalLogicalOp Name="AND">
                             <Signal Name="SCL" IOMode="AlternateFunctionNoPushPullVeryHighTargetMode"/>
-                            <Signal Name="SDA" IOMode="AlternateFunctionNoPushPullVeryHighTargetMode"/>						
+                            <Signal Name="SDA" IOMode="AlternateFunctionNoPushPullVeryHighTargetMode"/>		
                         </SignalLogicalOp>
                         <Semaphore>$IpInstance_I3C_Target</Semaphore>
-                        <Semaphore>$IpInstance_Dma</Semaphore>	
-                    </Mode>							
+                        <Semaphore>$IpInstance_Dma</Semaphore>
+                    </Mode>
                 </ModeLogicOperator>
-        </Mode>                                                                                                							
+        </Mode>
     </ModeLogicOperator>
    
     <!-- RefSignal for I3C -->
-    <RefSignal IOMode="AlternateFunctionNoPushPullVeryHigh" Name="SCL"/>        
+    <RefSignal IOMode="AlternateFunctionNoPushPullVeryHigh" Name="SCL"/>
     <RefSignal IOMode="AlternateFunctionNoPushPullVeryHigh" Name="SDA"/>
-    
     <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
 </IP>

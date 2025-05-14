@@ -135,7 +135,7 @@
 	<RefConfig Name="UX_Device_class_AUDIO" Comment="UX_DEVICE_AUDIO">
         <Component Name="Middleware:USBX:UXOoDeviceOoClassOoAUDIO:AUDIO"/>
     </RefConfig>
-	<RefConfig Name="UX_Device_class_PIMA" Comment="UX_DEVICE_PIMA">
+	<RefConfig Name="UX_Device_class_PIMA" Comment="UX_DEVICE_PIMA_MTP">
         <Component Name="Middleware:USBX:UXOoDeviceOoClassOoPIMA:PIMA"/>
 		<ConfigFile Name="ux_device_pima_mtp_c"/>
         <ConfigFile Name="ux_device_pima_mtp_h"/>
@@ -252,11 +252,18 @@
 		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_Device_CoreStack" TypeName=""/>
 		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_Host_CoreStack" TypeName=""/>
 		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_HID_CUSTOM" TypeName=""/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_PIMA" TypeName=""/>
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_PIMA_MTP" TypeName=""/>
 		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_CDC_ACM" TypeName=""/>
 		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_DFU" TypeName=""/>
 		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_CDC_ECM" TypeName=""/>
 		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_PRINTER" TypeName=""/>
+		<Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_DEVICE_ENDPOINT_BUFFER_OWNER" OptimizationCondition="equal"/>
+		<Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_DEVICE_CLASS_CDC_ACM_ZERO_COPY" OptimizationCondition="equal"/>
+		<Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_DEVICE_CLASS_HID_ZERO_COPY" OptimizationCondition="equal"/>
+		<Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_DEVICE_CLASS_CDC_ECM_ZERO_COPY" OptimizationCondition="equal"/>
+		<Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_DEVICE_CLASS_RNDIS_ZERO_COPY" OptimizationCondition="equal"/>
+		<Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_DEVICE_CLASS_PRINTER_ZERO_COPY" OptimizationCondition="equal"/>
+		<Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_DEVICE_ENABLE_GET_STRING_WITH_ZERO_LANGUAGE_ID" OptimizationCondition="equal"/>
     </RefConfigFile>
 
 	<RefConfigFile Added="true" Description="ux_stm32_config.h template file" Name="ux_stm32_config_h" Template="azure_rtos/ux_stm32_config_h.ftl" destinationFolder="USBX/Target">
@@ -279,7 +286,7 @@
 		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_HID_MOUSE" TypeName=""/>
 		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_HID_KEYBOARD" TypeName=""/>
 		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_HID_CUSTOM" TypeName=""/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_PIMA" TypeName=""/>
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_PIMA_MTP" TypeName=""/>
 		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_RNDIS" TypeName=""/>
 		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_VIDEO" TypeName=""/>
 		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_CCID" TypeName=""/>
@@ -436,7 +443,7 @@
 		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_STORAGE" TypeName=""/>
 		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_CDC_ACM" TypeName=""/>
 		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_DFU" TypeName=""/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_PIMA" TypeName=""/>
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_PIMA_MTP" TypeName=""/>
 		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_RNDIS" TypeName=""/>
 		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_VIDEO" TypeName=""/>
 		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_CCID" TypeName=""/>
@@ -631,7 +638,7 @@
 		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_Host_class_SWAR" TypeName=""/>
 		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_DFU" TypeName=""/>
 		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_AUDIO" TypeName=""/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_PIMA" TypeName=""/>
+		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_PIMA_MTP" TypeName=""/>
 		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_RNDIS" TypeName=""/>
 		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_Device_CoreStack" TypeName=""/>
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_STANDALONE" OptimizationCondition="equal"/>
@@ -669,91 +676,67 @@
 
 	<RefConfigFile Added="true" Description="app_usbx_device.c file" Name="APP_USBXD_C" Template="azure_rtos/app_usbx_device_c.ftl" destinationFolder="USBX/App">
         <File Category="source" Condition="all" Name="app_usbx_device.c"/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="Core_System" TypeName=""/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_HID" TypeName=""/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_CDC_ACM" TypeName=""/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_MSC" TypeName=""/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_CDC_ECM" TypeName=""/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="TraceX_Support" TypeName=""/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="Network_Driver" TypeName=""/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_Host_CoreStack" TypeName=""/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_Host_Controller" TypeName=""/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_Host_class_HID_Core" TypeName=""/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_Host_class_HID_Keyboard" TypeName=""/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_Host_class_HID_Mouse" TypeName=""/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_Host_class_HID_RCU" TypeName=""/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_Host_MSC" TypeName=""/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_Host_class_CDC_ACM" TypeName=""/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_Host_class_CDC_ECM" TypeName=""/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_Host_class_HUB" TypeName=""/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_Host_class_AUDIO" TypeName=""/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_Host_class_VIDEO" TypeName=""/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_Host_class_PRINTER" TypeName=""/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_Host_class_GSER" TypeName=""/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_Host_class_ASIX" TypeName=""/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_Host_class_PIMA" TypeName=""/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_Host_class_PROLIFIC" TypeName=""/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_Host_class_SWAR" TypeName=""/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_DFU" TypeName=""/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_AUDIO" TypeName=""/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_PIMA" TypeName=""/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_DEVICE_RNDIS" TypeName=""/>
-		<Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_Device_CoreStack" TypeName=""/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_STANDALONE" OptimizationCondition="equal"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="USBX_DEVICE_APP_THREAD_NAME" OptimizationCondition="equal"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_DEVICE_HID_MOUSE" OptimizationCondition="equal"/>
-		<Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_CORE" OptimizationCondition="equal"/>
-		<Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_USBX_DEVICE_CON_CK" OptimizationCondition="equal"/>
-		<Argument Added="true" AddressOf="false" GenericType="simple" Name="AZRTOS_APP_MEM_ALLOCATION_METHOD" OptimizationCondition="equal"/>
-		<Argument Added="true" AddressOf="false" GenericType="simple" Name="AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE" OptimizationCondition="equal"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_THREAD" OptimizationCondition="equal"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_HID_MOUSE" OptimizationCondition="equal"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_HID_KEYBOARD" OptimizationCondition="equal"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_HID_CUSTOM" OptimizationCondition="equal"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_STORAGE" OptimizationCondition="equal"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_CDC_ACM" OptimizationCondition="equal"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_CDC_ECM" OptimizationCondition="equal"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_DFU" OptimizationCondition="equal"/>
-		<Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_Device_CoreStack_FS" OptimizationCondition="equal"/>
-		<Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_RNDIS" OptimizationCondition="equal"/>
-		<Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_PIMA_MTP" OptimizationCondition="equal"/>
-		<Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_VIDEO" OptimizationCondition="equal"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_CCID" OptimizationCondition="equal"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_PRINTER" OptimizationCondition="equal"/>
+		<Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_STANDALONE" OptimizationCondition="equal"/>
+          <Argument Added="true" AddressOf="false" GenericType="simple" Name="USBX_DEVICE_APP_THREAD_NAME" OptimizationCondition="equal"/>
+          <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_CORE" OptimizationCondition="equal"/>
+          <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_USBX_DEVICE_CON_CK" OptimizationCondition="equal"/>
+          <Argument Added="true" AddressOf="false" GenericType="simple" Name="AZRTOS_APP_MEM_ALLOCATION_METHOD" OptimizationCondition="equal"/>
+		  <Argument Added="true" AddressOf="false" GenericType="simple" Name="AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE" OptimizationCondition="equal"/>
+          <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_THREAD" OptimizationCondition="equal"/>
+          <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_HID_MOUSE" OptimizationCondition="equal"/>
+          <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_HID_KEYBOARD" OptimizationCondition="equal"/>
+          <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_HID_CUSTOM" OptimizationCondition="equal"/>
+          <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_STORAGE" OptimizationCondition="equal"/>
+          <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_CDC_ACM" OptimizationCondition="equal"/>
+          <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_CDC_ECM" OptimizationCondition="equal"/>
+          <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_DFU" OptimizationCondition="equal"/>
+          <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_RNDIS" OptimizationCondition="equal"/>
+          <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_PIMA_MTP" OptimizationCondition="equal"/>
+		  <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_VIDEO" OptimizationCondition="equal"/>
+		  <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_CCID" OptimizationCondition="equal"/>
+		  <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_PRINTER" OptimizationCondition="equal"/>
+		  <Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_DEVICE_HID_MOUSE" OptimizationCondition="equal"/>
+          <Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_DEVICE_HID_KEYBOARD" OptimizationCondition="equal"/>
+          <Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_DEVICE_HID_CUSTOM" OptimizationCondition="equal"/>
+          <Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_DEVICE_STORAGE" OptimizationCondition="equal"/>
+          <Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_DEVICE_CDC_ACM" OptimizationCondition="equal"/>
+          <Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_DEVICE_CDC_ECM" OptimizationCondition="equal"/>
+          <Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_DEVICE_DFU" OptimizationCondition="equal"/>
+          <Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_DEVICE_RNDIS" OptimizationCondition="equal"/>
+          <Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_DEVICE_PIMA_MTP" OptimizationCondition="equal"/>
+		  <Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_DEVICE_VIDEO" OptimizationCondition="equal"/>
+		  <Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_DEVICE_CCID" OptimizationCondition="equal"/>
+		  <Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_DEVICE_PRINTER" OptimizationCondition="equal"/>
     </RefConfigFile>
     <RefConfigFile Added="true" Description="app_usbx_device.h file" Name="APP_USBXD_H" Template="azure_rtos/app_usbx_device_h.ftl" destinationFolder="USBX/App">
         <File Category="header" Condition="all" Name="app_usbx_device.h"/>
         <Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_Device_CoreStack" TypeName=""/>
-        <Argument AddressOf="true" Context="global" GenericType="struct" Name="UX_Host_CoreStack" TypeName=""/>
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_CORE" OptimizationCondition="equal"/>
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_THREAD" OptimizationCondition="equal"/>
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="USBX_DEVICE_SYS_SIZE" OptimizationCondition="equal"/>
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="USBX_DEVICE_APP_THREAD_PRIO" OptimizationCondition="equal"/>
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="USBX_DEVICE_APP_THREAD_Size" OptimizationCondition="equal"/>
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_USBX_DEVICE_CON_CK" OptimizationCondition="equal"/>
+		<Argument Added="true" AddressOf="false" GenericType="simple" Name="AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE" OptimizationCondition="equal"/>
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_STANDALONE" OptimizationCondition="equal"/>
+		<Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_DEVICE_APP_MEM_POOL_SIZE_STANDALONE" OptimizationCondition="equal"/>
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_Device_CoreStack" OptimizationCondition="equal"/>
 		<Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_DEVICE_HID_CORE" OptimizationCondition="equal"/>
 		<Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_DEVICE_HID_MOUSE" OptimizationCondition="equal"/>
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_DEVICE_HID_KEYBOARD" OptimizationCondition="equal"/>
         <Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_DEVICE_HID_CUSTOM" OptimizationCondition="equal"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_Device_CoreStack" OptimizationCondition="equal"/>
-		<Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_CORE" OptimizationCondition="equal"/>
-		<Argument Added="true" AddressOf="false" GenericType="simple" Name="USBX_DEVICE_SYS_SIZE" OptimizationCondition="equal"/>
-		<Argument Added="true" AddressOf="false" GenericType="simple" Name="USBX_DEVICE_APP_THREAD_PRIO" OptimizationCondition="equal"/>
-		<Argument Added="true" AddressOf="false" GenericType="simple" Name="USBX_DEVICE_APP_THREAD_Size" OptimizationCondition="equal"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_HID_MOUSE" OptimizationCondition="equal"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_HID_KEYBOARD" OptimizationCondition="equal"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_HID_CUSTOM" OptimizationCondition="equal"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_STORAGE" OptimizationCondition="equal"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_CDC_ACM" OptimizationCondition="equal"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_CDC_ECM" OptimizationCondition="equal"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_DFU" OptimizationCondition="equal"/>
-		<Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_RNDIS" OptimizationCondition="equal"/>
-		<Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_PIMA_MTP" OptimizationCondition="equal"/>
-		<Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_USBX_DEVICE_CON_CK" OptimizationCondition="equal"/>
-		<Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_VIDEO" OptimizationCondition="equal"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_CCID" OptimizationCondition="equal"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_PRINTER" OptimizationCondition="equal"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_DEVICE_APP_MEM_POOL_SIZE_STANDALONE" OptimizationCondition="equal"/>
-		<Argument Added="true" AddressOf="false" GenericType="simple" Name="AZRTOS_APP_MEM_ALLOCATION_METHOD_STANDALONE" OptimizationCondition="equal"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="REG_UX_DEVICE_THREAD" OptimizationCondition="equal"/>
-        <Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_STANDALONE" OptimizationCondition="equal"/>
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_DEVICE_STORAGE" OptimizationCondition="equal"/>
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_DEVICE_CDC_ACM" OptimizationCondition="equal"/>
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_DEVICE_CDC_ECM" OptimizationCondition="equal"/>
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_DEVICE_DFU" OptimizationCondition="equal"/>
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_DEVICE_RNDIS" OptimizationCondition="equal"/>
+        <Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_DEVICE_PIMA_MTP" OptimizationCondition="equal"/>
+		<Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_DEVICE_VIDEO" OptimizationCondition="equal"/>
+		<Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_DEVICE_CCID" OptimizationCondition="equal"/>
+		<Argument Added="true" AddressOf="false" GenericType="simple" Name="UX_DEVICE_PRINTER" OptimizationCondition="equal"/>
     </RefConfigFile>
-	<RefComponent Cclass="Middleware" Cgroup="USBX" Cversion="6Gg2Gg0">
-		<SubComponent Csub="CoreOoSystem" Cvariant="true" Cversion="6Gg2Gg0">
+	<RefComponent Cclass="Middleware" Cgroup="USBX" Cversion="6Gg4Gg0">
+		<SubComponent Csub="CoreOoSystem" Cvariant="true" Cversion="6Gg4Gg0">
             <File Category="source" Condition="!SEMThreadXCcRTOSJjThreadXJjCore" Name="common/core/src/ux_system_tasks_run.c"/>
             <File Category="source" Condition="" Name="common/core/src/ux_utility_debug_callback_register.c"/>
             <File Category="source" Condition="" Name="common/core/src/ux_utility_debug_log.c"/>
@@ -776,7 +759,8 @@
             <File Category="source" Condition="" Name="common/core/src/ux_utility_memory_compare.c"/>
             <File Category="source" Condition="" Name="common/core/src/ux_utility_memory_copy.c"/>
             <File Category="source" Condition="" Name="common/core/src/ux_utility_memory_free.c"/>
-            <File Category="source" Condition="" Name="common/core/src/ux_utility_memory_free_block_best_get.c"/>
+            <File Category="source" Condition="" Name="common/core/src/ux_utility_memory_byte_pool_create.c"/>
+            <File Category="source" Condition="" Name="common/core/src/ux_utility_memory_byte_pool_search.c"/>
             <File Category="source" Condition="" Name="common/core/src/ux_utility_memory_set.c"/>
             <File Category="source" Condition="SEMThreadXCcRTOSJjThreadXJjCore" Name="common/core/src/ux_utility_mutex_create.c"/>
             <File Category="source" Condition="SEMThreadXCcRTOSJjThreadXJjCore" Name="common/core/src/ux_utility_mutex_delete.c"/>
@@ -816,11 +800,11 @@
             <File Category="source" Condition="" Name="common/core/src/ux_system_initialize.c"/>
             <File Category="source" Condition="" Name="common/core/src/ux_system_uninitialize.c"/>
         </SubComponent>
-        <SubComponent Csub="UXOoNetworkOoDriver" Cvariant="true" Cversion="6Gg2Gg0">
+        <SubComponent Csub="UXOoNetworkOoDriver" Cvariant="true" Cversion="6Gg4Gg0">
             <File Category="source" Condition="" Name="common/usbx_network/src/ux_network_driver.c"/>
             <File Category="header" Condition="" Name="common/usbx_network/inc/*"/>
         </SubComponent>
-        <SubComponent Csub="UXOoHostOoCoreStack" Cvariant="RTOSIiMODE" Cversion="6Gg2Gg0">
+        <SubComponent Csub="UXOoHostOoCoreStack" Cvariant="RTOSIiMODE" Cversion="6Gg4Gg0">
             <File Category="header" Condition="" Name="common/core/inc/*"/>
             <File Category="header" Condition="" Name="ports/generic/inc/*"/>
             <File Category="source" Condition="!SEMThreadXCcRTOSJjThreadXJjCore" Name="common/core/src/ux_host_stack_tasks_run.c"/>
@@ -887,7 +871,7 @@
             <File Category="source" Condition="" Name="common/core/src/ux_host_stack_transfer_request_abort.c"/>
             <File Category="source" Condition="" Name="common/core/src/ux_host_stack_uninitialize.c"/>
         </SubComponent>
-        <SubComponent Csub="UXOoHostOoControllers" Cvariant="true" Cversion="6Gg2Gg0">
+        <SubComponent Csub="UXOoHostOoControllers" Cvariant="true" Cversion="6Gg4Gg0">
             <File Category="source" Condition="" Name="common/usbx_stm32_host_controllers/ux_hcd_stm32_callback.c"/>
             <File Category="source" Condition="" Name="common/usbx_stm32_host_controllers/ux_hcd_stm32_controller_disable.c"/>
             <File Category="source" Condition="" Name="common/usbx_stm32_host_controllers/ux_hcd_stm32_ed_obtain.c"/>
@@ -917,7 +901,7 @@
             <File Category="header" Condition="" Name="common/usbx_stm32_host_controllers/*"/>
             <File Category="source" Condition="" Name="common/usbx_stm32_host_controllers/ux_hcd_stm32_request_periodic_transfer.c"/>
         </SubComponent>
-        <SubComponent Csub="UXOoHostOoClassOoHIDOoCore" Cvariant="HID_Core" Cversion="6Gg2Gg0">
+        <SubComponent Csub="UXOoHostOoClassOoHIDOoCore" Cvariant="HID_Core" Cversion="6Gg4Gg0">
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_hid_activate.c"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_hid_client_register.c"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_hid_client_search.c"/>
@@ -952,7 +936,7 @@
             <File Category="source" Condition="!SEMThreadXCcRTOSJjThreadXJjCore" Name="common/usbx_host_classes/src/ux_host_class_hid_idle_set_run.c"/>
             <File Category="header" Condition="" Name="common/usbx_host_classes/inc/*"/>
         </SubComponent>
-        <SubComponent Csub="UXOoHostOoClassOoHIDOoKeyboard" Cvariant="HID_Keyboard" Cversion="6Gg2Gg0">
+        <SubComponent Csub="UXOoHostOoClassOoHIDOoKeyboard" Cvariant="HID_Keyboard" Cversion="6Gg4Gg0">
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_hid_keyboard_activate.c"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_hid_keyboard_callback.c"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_hid_keyboard_deactivate.c"/>
@@ -963,7 +947,7 @@
             <File Category="source" Condition="!SEMThreadXCcRTOSJjThreadXJjCore" Name="common/usbx_host_classes/src/ux_host_class_hid_keyboard_tasks_run.c"/>
             <File Category="header" Condition="" Name="common/usbx_host_classes/inc/*"/>
         </SubComponent>
-        <SubComponent Csub="UXOoHostOoClassOoHIDOoMouse" Cvariant="HID_Mouse" Cversion="6Gg2Gg0">
+        <SubComponent Csub="UXOoHostOoClassOoHIDOoMouse" Cvariant="HID_Mouse" Cversion="6Gg4Gg0">
             <File Category="header" Condition="" Name="common/usbx_host_classes/inc/*"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_hid_mouse_activate.c"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_hid_mouse_buttons_get.c"/>
@@ -973,7 +957,7 @@
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_hid_mouse_position_get.c"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_hid_mouse_wheel_get.c"/>
         </SubComponent>
-        <SubComponent Csub="UXOoHostOoClassOoHIDOoRCU" Cvariant="HID_RCU" Cversion="6Gg2Gg0">
+        <SubComponent Csub="UXOoHostOoClassOoHIDOoRCU" Cvariant="HID_RCU" Cversion="6Gg4Gg0">
             <File Category="header" Condition="" Name="common/usbx_host_classes/inc/*"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_hid_remote_control_activate.c"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_hid_remote_control_callback.c"/>
@@ -981,7 +965,7 @@
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_hid_remote_control_entry.c"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_hid_remote_control_usage_get.c"/>
         </SubComponent>
-        <SubComponent Csub="UXOoHostOoClassOoMSC" Cvariant="MSC" Cversion="6Gg2Gg0">
+        <SubComponent Csub="UXOoHostOoClassOoMSC" Cvariant="MSC" Cversion="6Gg4Gg0">
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_storage_activate.c"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_storage_cbw_initialize.c"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_storage_configure.c"/>
@@ -1021,7 +1005,7 @@
             <File Category="source" Condition="!SEMThreadXCcRTOSJjThreadXJjCore" Name="common/usbx_host_classes/src/ux_host_class_storage_transport_run.c"/>
             <File Category="header" Condition="" Name="common/usbx_host_classes/inc/*"/>
         </SubComponent>
-        <SubComponent Csub="UXOoHostOoClassOoCDCOoACM" Cvariant="CDC_ACM" Cversion="6Gg2Gg0">
+        <SubComponent Csub="UXOoHostOoClassOoCDCOoACM" Cvariant="CDC_ACM" Cversion="6Gg4Gg0">
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_cdc_acm_activate.c"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_cdc_acm_capabilities_get.c"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_cdc_acm_command.c"/>
@@ -1040,7 +1024,7 @@
             <File Category="source" Condition="!SEMThreadXCcRTOSJjThreadXJjCore" Name="common/usbx_host_classes/src/ux_host_class_cdc_acm_write_with_callback.c"/>
             <File Category="header" Condition="" Name="common/usbx_host_classes/inc/*"/>
         </SubComponent>
-        <SubComponent Csub="UXOoHostOoClassOoCDCOoECM" Cvariant="CDC_ECM" Cversion="6Gg2Gg0">
+        <SubComponent Csub="UXOoHostOoClassOoCDCOoECM" Cvariant="CDC_ECM" Cversion="6Gg4Gg0">
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_cdc_ecm_activate.c"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_cdc_ecm_deactivate.c"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_cdc_ecm_endpoints_get.c"/>
@@ -1053,7 +1037,7 @@
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_cdc_ecm_write.c"/>
             <File Category="header" Condition="" Name="common/usbx_host_classes/inc/*"/>
         </SubComponent>
-        <SubComponent Csub="UXOoHostOoClassOoHUB" Cvariant="HUB" Cversion="6Gg2Gg0">
+        <SubComponent Csub="UXOoHostOoClassOoHUB" Cvariant="HUB" Cversion="6Gg4Gg0">
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_hub_activate.c"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_hub_change_detect.c"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_hub_change_process.c"/>
@@ -1077,7 +1061,7 @@
             <File Category="source" Condition="!SEMThreadXCcRTOSJjThreadXJjCore" Name="common/usbx_host_classes/src/ux_host_class_hub_tasks_run.c"/>
             <File Category="header" Condition="" Name="common/usbx_host_classes/inc/*"/>
         </SubComponent>
-        <SubComponent Csub="UXOoHostOoClassOoAUDIO" Cvariant="AUDIO" Cversion="6Gg2Gg0">
+        <SubComponent Csub="UXOoHostOoClassOoAUDIO" Cvariant="AUDIO" Cversion="6Gg4Gg0">
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_audio_activate.c"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_audio_alternate_setting_locate.c"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_audio_configure.c"/>
@@ -1111,7 +1095,7 @@
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_audio_stop.c"/>
             <File Category="header" Condition="" Name="common/usbx_host_classes/inc/*"/>
         </SubComponent>
-        <SubComponent Csub="UXOoHostOoClassOoVIDEO" Cvariant="VIDEO" Cversion="6Gg2Gg0">
+        <SubComponent Csub="UXOoHostOoClassOoVIDEO" Cvariant="VIDEO" Cversion="6Gg4Gg0">
             <File Category="header" Condition="" Name="common/usbx_host_classes/inc/*"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_video_activate.c"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_video_alternate_setting_locate.c"/>
@@ -1145,7 +1129,7 @@
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_video_transfer_request_callback.c"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_video_transfer_request_completed.c"/>
         </SubComponent>
-        <SubComponent Csub="UXOoHostOoClassOoPRINTER" Cvariant="PRINTER" Cversion="6Gg2Gg0">
+        <SubComponent Csub="UXOoHostOoClassOoPRINTER" Cvariant="PRINTER" Cversion="6Gg4Gg0">
             <File Category="header" Condition="" Name="common/usbx_host_classes/inc/*"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_printer_activate.c"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_printer_configure.c"/>
@@ -1159,7 +1143,7 @@
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_printer_status_get.c"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_printer_write.c"/>
         </SubComponent>
-        <SubComponent Csub="UXOoHostOoClassOoGSER" Cvariant="GSER" Cversion="6Gg2Gg0">
+        <SubComponent Csub="UXOoHostOoClassOoGSER" Cvariant="GSER" Cversion="6Gg4Gg0">
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_gser_activate.c"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_gser_command.c"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_gser_configure.c"/>
@@ -1174,7 +1158,7 @@
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_gser_write.c"/>
             <File Category="header" Condition="" Name="common/usbx_host_classes/inc/*"/>
         </SubComponent>
-        <SubComponent Csub="UXOoHostOoClassOoASIX" Cvariant="ASIX" Cversion="6Gg2Gg0">
+        <SubComponent Csub="UXOoHostOoClassOoASIX" Cvariant="ASIX" Cversion="6Gg4Gg0">
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_asix_activate.c"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_asix_configure.c"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_asix_deactivate.c"/>
@@ -1189,7 +1173,7 @@
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_asix_write.c"/>
             <File Category="header" Condition="" Name="common/usbx_host_classes/inc/*"/>
         </SubComponent>
-        <SubComponent Csub="UXOoHostOoClassOoPIMA" Cvariant="PIMA" Cversion="6Gg2Gg0">
+        <SubComponent Csub="UXOoHostOoClassOoPIMA" Cvariant="PIMA" Cversion="6Gg4Gg0">
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_pima_activate.c"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_pima_command.c"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_pima_configure.c"/>
@@ -1221,7 +1205,7 @@
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_pima_write.c"/>
             <File Category="header" Condition="" Name="common/usbx_host_classes/inc/*"/>
         </SubComponent>
-        <SubComponent Csub="UXOoHostOoClassOoPROLIFIC" Cvariant="PROLIFIC" Cversion="6Gg2Gg0">
+        <SubComponent Csub="UXOoHostOoClassOoPROLIFIC" Cvariant="PROLIFIC" Cversion="6Gg4Gg0">
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_prolific_activate.c"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_prolific_command.c"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_prolific_configure.c"/>
@@ -1238,7 +1222,7 @@
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_prolific_write.c"/>
             <File Category="header" Condition="" Name="common/usbx_host_classes/inc/*"/>
         </SubComponent>
-        <SubComponent Csub="UXOoHostOoClassOoSWAR" Cvariant="SWAR" Cversion="6Gg2Gg0">
+        <SubComponent Csub="UXOoHostOoClassOoSWAR" Cvariant="SWAR" Cversion="6Gg4Gg0">
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_swar_activate.c"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_swar_configure.c"/>
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_swar_deactivate.c"/>
@@ -1252,7 +1236,7 @@
             <File Category="source" Condition="" Name="common/usbx_host_classes/src/ux_host_class_swar_write.c"/>
             <File Category="header" Condition="" Name="common/usbx_host_classes/inc/*"/>
         </SubComponent>
-        <SubComponent Csub="UXOoDeviceOoCoreStack" Cvariant="RTOSIiMODE" Cversion="6Gg2Gg0">
+        <SubComponent Csub="UXOoDeviceOoCoreStack" Cvariant="RTOSIiMODE" Cversion="6Gg4Gg0">
             <File Category="source" Condition="" Name="common/core/src/ux_device_stack_alternate_setting_get.c"/>
             <File Category="source" Condition="" Name="common/core/src/ux_device_stack_alternate_setting_set.c"/>
             <File Category="source" Condition="" Name="common/core/src/ux_device_stack_class_register.c"/>
@@ -1283,7 +1267,7 @@
             <File Category="header" Condition="" Name="ports/generic/inc/*"/>
             <File Category="header" Condition="" Name="common/usbx_stm32_device_controllers/*"/>
         </SubComponent>
-        <SubComponent Csub="UXOoDeviceOoControllers" Cvariant="true" Cversion="6Gg2Gg0">
+        <SubComponent Csub="UXOoDeviceOoControllers" Cvariant="true" Cversion="6Gg4Gg0">
             <File Category="source" Condition="" Name="common/usbx_stm32_device_controllers/ux_dcd_stm32_callback.c"/>
             <File Category="source" Condition="" Name="common/usbx_stm32_device_controllers/ux_dcd_stm32_endpoint_create.c"/>
             <File Category="source" Condition="" Name="common/usbx_stm32_device_controllers/ux_dcd_stm32_endpoint_destroy.c"/>
@@ -1301,7 +1285,7 @@
             <File Category="source" Condition="" Name="common/usbx_stm32_device_controllers/ux_dcd_stm32_uninitialize.c"/>
             <File Category="header" Condition="" Name="common/usbx_stm32_device_controllers/*"/>
         </SubComponent>
-        <SubComponent Csub="UXOoDeviceOoClassOoHID" Cvariant="DEVICE_HID_CORE" Cversion="6Gg2Gg0">
+        <SubComponent Csub="UXOoDeviceOoClassOoHID" Cvariant="DEVICE_HID_CORE" Cversion="6Gg4Gg0">
             <File Category="source" Condition="" Name="common/usbx_device_classes/src/ux_device_class_hid_activate.c"/>
             <File Category="source" Condition="" Name="common/usbx_device_classes/src/ux_device_class_hid_control_request.c"/>
             <File Category="source" Condition="" Name="common/usbx_device_classes/src/ux_device_class_hid_deactivate.c"/>
@@ -1325,7 +1309,7 @@
             <File Category="source" Condition="!SEMThreadXCcRTOSJjThreadXJjCore" Name="common/usbx_device_classes/src/ux_device_class_hid_receiver_tasks_run.c"/>
             <File Category="header" Condition="" Name="common/usbx_device_classes/inc/*"/>
         </SubComponent>
-        <SubComponent Csub="UXOoDeviceOoClassOoMSC" Cvariant="MSC" Cversion="6Gg2Gg0">
+        <SubComponent Csub="UXOoDeviceOoClassOoMSC" Cvariant="MSC" Cversion="6Gg4Gg0">
             <File Category="source" Condition="" Name="common/usbx_device_classes/src/ux_device_class_storage_activate.c"/>
             <File Category="source" Condition="" Name="common/usbx_device_classes/src/ux_device_class_storage_control_request.c"/>
             <File Category="source" Condition="" Name="common/usbx_device_classes/src/ux_device_class_storage_csw_send.c"/>
@@ -1358,7 +1342,7 @@
             <File Category="source" Condition="!SEMThreadXCcRTOSJjThreadXJjCore" Name="common/usbx_device_classes/src/ux_device_class_storage_tasks_run.c"/>
             <File Category="header" Condition="" Name="common/usbx_device_classes/inc/*"/>
         </SubComponent>
-        <SubComponent Csub="UXOoDeviceOoClassOoCDCOoACM" Cvariant="CDC_ACM" Cversion="6Gg2Gg0">
+        <SubComponent Csub="UXOoDeviceOoClassOoCDCOoACM" Cvariant="CDC_ACM" Cversion="6Gg4Gg0">
             <File Category="source" Condition="" Name="common/usbx_device_classes/src/ux_device_class_cdc_acm_activate.c"/>
             <File Category="source" Condition="SEMThreadXCcRTOSJjThreadXJjCore" Name="common/usbx_device_classes/src/ux_device_class_cdc_acm_bulkin_thread.c"/>
             <File Category="source" Condition="SEMThreadXCcRTOSJjThreadXJjCore" Name="common/usbx_device_classes/src/ux_device_class_cdc_acm_bulkout_thread.c"/>
@@ -1376,7 +1360,7 @@
             <File Category="source" Condition="!SEMThreadXCcRTOSJjThreadXJjCore" Name="common/usbx_device_classes/src/ux_device_class_cdc_acm_write_run.c"/>
             <File Category="header" Condition="" Name="common/usbx_device_classes/inc/*"/>
         </SubComponent>
-        <SubComponent Csub="UXOoDeviceOoClassOoCDCOoECM" Cvariant="CDC_ECM" Cversion="6Gg2Gg0">
+        <SubComponent Csub="UXOoDeviceOoClassOoCDCOoECM" Cvariant="CDC_ECM" Cversion="6Gg4Gg0">
             <File Category="source" Condition="" Name="common/usbx_device_classes/src/ux_device_class_cdc_ecm_activate.c"/>
             <File Category="source" Condition="" Name="common/usbx_device_classes/src/ux_device_class_cdc_ecm_bulkin_thread.c"/>
             <File Category="source" Condition="" Name="common/usbx_device_classes/src/ux_device_class_cdc_ecm_bulkout_thread.c"/>
@@ -1390,7 +1374,7 @@
             <File Category="source" Condition="" Name="common/usbx_device_classes/src/ux_device_class_cdc_ecm_write.c"/>
             <File Category="header" Condition="" Name="common/usbx_device_classes/inc/*"/>
         </SubComponent>
-        <SubComponent Csub="UXOoDeviceOoClassOoDFU" Cvariant="DFU" Cversion="6Gg2Gg0">
+        <SubComponent Csub="UXOoDeviceOoClassOoDFU" Cvariant="DFU" Cversion="6Gg4Gg0">
             <File Category="header" Condition="" Name="common/usbx_device_classes/inc/*"/>
             <File Category="source" Condition="" Name="common/usbx_device_classes/src/ux_device_class_dfu_activate.c"/>
             <File Category="source" Condition="" Name="common/usbx_device_classes/src/ux_device_class_dfu_control_request.c"/>
@@ -1402,7 +1386,7 @@
             <File Category="source" Condition="SEMThreadXCcRTOSJjThreadXJjCore" Name="common/usbx_device_classes/src/ux_device_class_dfu_thread.c"/>
             <File Category="source" Condition="!SEMThreadXCcRTOSJjThreadXJjCore" Name="common/usbx_device_classes/src/ux_device_class_dfu_tasks_run.c"/>
         </SubComponent>
-        <SubComponent Csub="UXOoDeviceOoClassOoAUDIO" Cvariant="AUDIO" Cversion="6Gg2Gg0">
+        <SubComponent Csub="UXOoDeviceOoClassOoAUDIO" Cvariant="AUDIO" Cversion="6Gg4Gg0">
             <File Category="source" Condition="" Name="common/usbx_device_classes/src/ux_device_class_audio_activate.c"/>
             <File Category="source" Condition="" Name="common/usbx_device_classes/src/ux_device_class_audio_change.c"/>
             <File Category="source" Condition="" Name="common/usbx_device_classes/src/ux_device_class_audio_control_request.c"/>
@@ -1440,7 +1424,7 @@
             <File Category="source" Condition="!SEMThreadXCcRTOSJjThreadXJjCore" Name="common/usbx_device_classes/src/ux_device_class_audio_feedback_task_function.c"/>
             <File Category="header" Condition="" Name="common/usbx_device_classes/inc/*"/>
         </SubComponent>
-        <SubComponent Csub="UXOoDeviceOoClassOoPIMA" Cvariant="PIMA" Cversion="6Gg2Gg0">
+        <SubComponent Csub="UXOoDeviceOoClassOoPIMA" Cvariant="PIMA" Cversion="6Gg4Gg0">
             <File Category="source" Condition="" Name="common/usbx_device_classes/src/ux_device_class_pima_activate.c"/>
             <File Category="source" Condition="" Name="common/usbx_device_classes/src/ux_device_class_pima_control_request.c"/>
             <File Category="source" Condition="" Name="common/usbx_device_classes/src/ux_device_class_pima_data.c"/>
@@ -1477,7 +1461,7 @@
             <File Category="source" Condition="" Name="common/usbx_device_classes/src/ux_device_class_pima_thread.c"/>
             <File Category="header" Condition="" Name="common/usbx_device_classes/inc/*"/>
         </SubComponent>
-        <SubComponent Csub="UXOoDeviceOoClassOoRNDIS" Cvariant="RNDIS" Cversion="6Gg2Gg0">
+        <SubComponent Csub="UXOoDeviceOoClassOoRNDIS" Cvariant="RNDIS" Cversion="6Gg4Gg0">
             <File Category="source" Condition="" Name="common/usbx_device_classes/src/ux_device_class_rndis_activate.c"/>
             <File Category="source" Condition="" Name="common/usbx_device_classes/src/ux_device_class_rndis_bulkin_thread.c"/>
             <File Category="source" Condition="" Name="common/usbx_device_classes/src/ux_device_class_rndis_bulkout_thread.c"/>
@@ -1494,7 +1478,7 @@
             <File Category="source" Condition="" Name="common/usbx_device_classes/src/ux_device_class_rndis_write.c"/>
             <File Category="header" Condition="" Name="common/usbx_device_classes/inc/*"/>
         </SubComponent>
-        <SubComponent Csub="UXOoDeviceOoClassOoVIDEO" Cvariant="VIDEO" Cversion="6Gg2Gg0">
+        <SubComponent Csub="UXOoDeviceOoClassOoVIDEO" Cvariant="VIDEO" Cversion="6Gg4Gg0">
             <File Category="source" Condition="" Name="common/usbx_device_classes/src/ux_device_class_video_activate.c"/>
             <File Category="source" Condition="" Name="common/usbx_device_classes/src/ux_device_class_video_change.c"/>
             <File Category="source" Condition="" Name="common/usbx_device_classes/src/ux_device_class_video_control_request.c"/>
@@ -1518,7 +1502,7 @@
             <File Category="source" Condition="!SEMThreadXCcRTOSJjThreadXJjCore" Name="common/usbx_device_classes/src/ux_device_class_video_read_task_function.c"/>
             <File Category="header" Condition="" Name="common/usbx_device_classes/inc/*"/>
         </SubComponent>
-        <SubComponent Csub="UXOoDeviceOoClassOoCCID" Cvariant="CCID" Cversion="6Gg2Gg0">
+        <SubComponent Csub="UXOoDeviceOoClassOoCCID" Cvariant="CCID" Cversion="6Gg4Gg0">
             <File Category="source" Condition="" Name="common/usbx_device_classes/src/ux_device_class_ccid_activate.c"/>
             <File Category="source" Condition="" Name="common/usbx_device_classes/src/ux_device_class_ccid_auto_seq_done.c"/>
             <File Category="source" Condition="" Name="common/usbx_device_classes/src/ux_device_class_ccid_auto_seq_start.c"/>
@@ -1538,7 +1522,7 @@
             <File Category="source" Condition="" Name="common/usbx_device_classes/src/ux_device_class_ccid_uninitialize.c"/>
             <File Category="header" Condition="" Name="common/usbx_device_classes/inc/*"/>
         </SubComponent>
-        <SubComponent Csub="UXOoDeviceOoClassOoPRINTER" Cvariant="PRINTER" Cversion="6Gg2Gg0">
+        <SubComponent Csub="UXOoDeviceOoClassOoPRINTER" Cvariant="PRINTER" Cversion="6Gg4Gg0">
             <File Category="source" Condition="" Name="common/usbx_device_classes/src/ux_device_class_printer_activate.c"/>
             <File Category="source" Condition="" Name="common/usbx_device_classes/src/ux_device_class_printer_control_request.c"/>
             <File Category="source" Condition="" Name="common/usbx_device_classes/src/ux_device_class_printer_deactivate.c"/>

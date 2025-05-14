@@ -18,7 +18,23 @@
 #include "osal.h"
 #include "ble.h"
 
-#if (CFG_BLE_CONNECTION_ENABLED==1)
+#ifndef CFG_BLE_NETWORK_PROC_MODE
+#define CFG_BLE_NETWORK_PROC_MODE   0
+#endif
+
+#ifndef CFG_BLE_GAP_PERIPH_PREF_CONN_PARAM_CHARACTERISTIC
+#define CFG_BLE_GAP_PERIPH_PREF_CONN_PARAM_CHARACTERISTIC   0
+#endif
+
+#ifndef CFG_BLE_GAP_ENCRYPTED_KEY_MATERIAL_CHARACTERISTIC
+#define CFG_BLE_GAP_ENCRYPTED_KEY_MATERIAL_CHARACTERISTIC   0
+#endif
+
+#if (CFG_BLE_NETWORK_PROC_MODE == 1)
+#include "aci_gatt_nwk.h"
+#endif
+
+#if (CFG_BLE_CONNECTION_ENABLED==1) && (BLESTACK_CONTROLLER_ONLY == 0)
 
 /******************************************************************************
  * LOCAL VARIABLES
@@ -123,6 +139,12 @@ static ble_gatt_chr_def_t gap_chrs[] = {
         .min_key_size = 7U,
         .uuid = BLE_UUID_INIT_16(BLE_GATT_SRV_CENTRAL_ADDRESS_RESOLUTION_UUID),
         .val_buffer_p = (ble_gatt_val_buffer_def_t *)&gap_central_address_resolution_val_buff,
+    }, { /**< Encrypted Data Key Material Characteristic. */
+        .properties = BLE_GATT_SRV_CHAR_PROP_READ | BLE_GATT_SRV_CHAR_PROP_INDICATE,
+        .permissions = BLE_GATT_SRV_PERM_AUTHEN_READ|BLE_GATT_SRV_PERM_AUTHEN_WRITE, /* BLE_GATT_SRV_PERM_AUTHEN_WRITE needed for CCCD. */
+        .min_key_size = 7U,
+        .uuid = BLE_UUID_INIT_16(BLE_GATT_SRV_ENCRYPTED_DATA_KEY_MATERIAL_UUID),
+        .val_buffer_p = NULL,
     }
 };
 
@@ -141,65 +163,131 @@ tBleStatus aci_gap_profile_init(uint8_t Role,
                                 uint16_t *Appearance_Char_Handle,
                                 uint16_t *Periph_Pref_Conn_Param_Char_Handle)
 {
-    tBleStatus ret;
-    uint16_t gap_srvc_handle;
-    
+  tBleStatus ret;
+  uint16_t gap_srvc_handle;
+  
   *Dev_Name_Char_Handle = 0x0000;
   *Appearance_Char_Handle= 0x0000;
   *Periph_Pref_Conn_Param_Char_Handle = 0x0000;
   
   if ((Role & (GAP_PERIPHERAL_ROLE | GAP_CENTRAL_ROLE)) != 0x0U)
-    {      
+  {
+    /**
+    * Register GAP service.
+    * Device Name and Appearance Characteristics will be also registered.
+    */
+    ret = aci_gatt_srv_add_service(&gap_srvc);
+    if (ret != BLE_STATUS_SUCCESS)
+    {
+      return ret;
+    }
     
+    *Dev_Name_Char_Handle = aci_gatt_srv_get_char_decl_handle(&gap_chrs[0U]);
+    *Appearance_Char_Handle = aci_gatt_srv_get_char_decl_handle(&gap_chrs[1U]);
+    
+    gap_srvc_handle = aci_gatt_srv_get_service_handle(&gap_srvc);
+    
+#if (CFG_BLE_GAP_PERIPH_PREF_CONN_PARAM_CHARACTERISTIC == 1)
+    
+    if ((Role & GAP_PERIPHERAL_ROLE) != 0x0U)
+    {
       /**
-      * Register GAP service.
-      * Device Name and Appearance Characteristics will be also registered.
+      * Register Peripheral Preferred Connection Parameters Characteristic.
       */
-      ret = aci_gatt_srv_add_service(&gap_srvc);
+      ret = aci_gatt_srv_add_char(&gap_chrs[2U], gap_srvc_handle);
+      if (ret != BLE_STATUS_SUCCESS)
+      {
+        return ret;
+      }
+    }
+    
+    *Periph_Pref_Conn_Param_Char_Handle = aci_gatt_srv_get_char_decl_handle(&gap_chrs[2U]);
+#else
+    *Periph_Pref_Conn_Param_Char_Handle = 0;
+#endif    
+    
+    if (Privacy_Type == 2U)
+    {
+      /**
+      * Register Central Address Resolution Characteristic.
+      */
+      ret = aci_gatt_srv_add_char(&gap_chrs[3U], gap_srvc_handle);
+      if (ret != BLE_STATUS_SUCCESS)
+      {
+        return ret;
+      }
+    }
+    
+#if (CFG_BLE_GAP_ENCRYPTED_KEY_MATERIAL_CHARACTERISTIC == 1)
+    
+    if ((Role & (GAP_PERIPHERAL_ROLE)) != 0x0U)
+    {
+      /**
+      * Register Encrypted Data Key Material Characteristic.
+      */
+      
+#if (CFG_BLE_NETWORK_PROC_MODE == 0)
+      
+      ret = aci_gatt_srv_add_char(&gap_chrs[4U], gap_srvc_handle);
       if (ret != BLE_STATUS_SUCCESS)
       {
         return ret;
       }
       
-    *Dev_Name_Char_Handle = aci_gatt_srv_get_char_decl_handle(&gap_chrs[0U]);
-    *Appearance_Char_Handle = aci_gatt_srv_get_char_decl_handle(&gap_chrs[1U]);
-    
-      gap_srvc_handle = aci_gatt_srv_get_service_handle(&gap_srvc);
-    if ((Role & GAP_PERIPHERAL_ROLE) != 0x0U)
+#else
+      
+      Char_UUID_t Char_UUID;
+      Char_UUID.Char_UUID_16 = (uint16_t)BLE_GATT_SRV_ENCRYPTED_DATA_KEY_MATERIAL_UUID;
+      uint16_t Char_Desc_Handle;
+      uint8_t gap_edkm_value[GAP_CHR_ENCRYPTED_DATA_KEY_MATERIAL_LEN];
+      
+      ret = aci_gatt_srv_add_char_nwk(gap_srvc_handle,
+                                      0x01, // Char_UUID_Type = 0x01: 16-bit UUID
+                                      &Char_UUID, // Char_UUID value
+                                      GAP_CHR_ENCRYPTED_DATA_KEY_MATERIAL_LEN, // Char_Value_Length,
+                                      BLE_GATT_SRV_CHAR_PROP_READ | BLE_GATT_SRV_CHAR_PROP_INDICATE, // Char_Properties,
+                                      BLE_GATT_SRV_PERM_ALL, // Security_Permissions
+                                      GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP | GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP, // GATT_Evt_Mask
+                                      7U, // Enc_Key_Size Minimum
+                                      0x00U, // Is_Variable = 0x00: Fixed length
+                                      &Char_Desc_Handle);
+      if (ret != BLE_STATUS_SUCCESS)
       {
-        /**
-        * Register Peripheral Preferred Connection Parameters Characteristic.
-        */
-        ret = aci_gatt_srv_add_char(&gap_chrs[2U], gap_srvc_handle);
-        if (ret != BLE_STATUS_SUCCESS)
-        {
-          return ret;
-        }
+        return ret;
       }
       
-    *Periph_Pref_Conn_Param_Char_Handle = aci_gatt_srv_get_char_decl_handle(&gap_chrs[2U]);
-    
-    if (Privacy_Type == 2U)
+      /* Initialization of the 2 fields of the EDKM charachteristic 
+      * (i.e. 16-octets Session Key and 8-octets IV value) 
+      * in compliance with CSS v.11, Part A, Sec. 1.23.3 */
+      for (uint8_t idx = 0; idx < (GAP_CHR_ENCRYPTED_DATA_KEY_MATERIAL_LEN / 8); idx++)
       {
-        /**
-        * Register Central Address Resolution Characteristic.
-        */
-        ret = aci_gatt_srv_add_char(&gap_chrs[3U], gap_srvc_handle);
-        if (ret != BLE_STATUS_SUCCESS)
-        {
-          return ret;
-        }
+        hci_le_rand(&gap_edkm_value[idx * 8]);
       }
       
-      /**
-      * Set default device name.
-      */
-      Gap_profile_set_dev_name(0U, sizeof(default_dev_name),
-                               (uint8_t *)default_dev_name);
-    
+      ret = aci_gatt_srv_write_handle_value_nwk(Char_Desc_Handle+1,
+                                                0x00U,
+                                                GAP_CHR_ENCRYPTED_DATA_KEY_MATERIAL_LEN,
+                                                gap_edkm_value);
+      if (ret != BLE_STATUS_SUCCESS)
+      {
+        return ret;
+      }
+      
+#endif /* CFG_BLE_NETWORK_PROC_MODE */
+      
     }
-
-    return BLE_STATUS_SUCCESS;
+    
+#endif /* CFG_BLE_GAP_ENCRYPTED_KEY_MATERIAL_CHARACTERISTIC */
+    
+    /**
+    * Set default device name.
+    */
+    Gap_profile_set_dev_name(0U, sizeof(default_dev_name),
+                             (uint8_t *)default_dev_name);
+    
+  }
+  
+  return BLE_STATUS_SUCCESS;
 }
 
 tBleStatus Gap_profile_set_dev_name(uint16_t offset,

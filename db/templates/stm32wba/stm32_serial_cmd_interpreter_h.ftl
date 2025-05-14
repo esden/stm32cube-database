@@ -43,6 +43,7 @@ extern "C" {
 
 /* Exported functions prototypes ---------------------------------------------*/
 void Serial_CMD_Interpreter_Init(void);
+void Serial_CMD_Interpreter_CmdExecute( uint8_t * pRxBuffer, uint16_t iRxBufferSize );
 
 /* USER CODE BEGIN EFP */
 

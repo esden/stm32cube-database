@@ -110,6 +110,8 @@
 		<Parameter Added="true" Name="NX_MAX_MULTICAST_GROUPS" />
 		<Parameter Added="true" Name="NX_DISABLE_FRAGMENTATION" />
 		<Parameter Added="true" Name="NX_FRAGMENT_IMMEDIATE_ASSEMBLY" />
+		<Parameter Added="true" Name="NX_ENABLE_IP_ID_RANDOMIZATION" />
+		<Parameter Added="true" Name="NX_ENABLE_VLAN" />
 		<Parameter Added="true" Name="NX_DISABLE_PACKET_INFO" />
 		<Parameter Added="true" Name="NX_ENABLE_LOW_WATERMARK" />
 		<Parameter Added="true" Name="NX_MAX_LISTEN_REQUESTS" />
@@ -135,6 +137,7 @@
 		<Parameter Added="true" Name="NetXDuo_Static_IP_address" />
 		<Parameter Added="true" Name="NetXDuo_Application_NetMask" />
 		<Parameter Name="TX_TIMER_TICKS_PER_SECOND" />
+		<Parameter Name="NX_ENABLE_VLAN" />
 		<Parameter Added="true" Name="NX_APP_MEM_POOL_SIZE">
 			<Condition Diagnostic="" Expression="SEMThreadXCcRTOSJjThreadXJjCore" Name="NX_APP_MEM_POOL_CONDITION" />
 		</Parameter>
@@ -450,6 +453,9 @@
 		<Parameter Added="true" Name="NX_SECURE_TLS_MINIMUM_MESSAGE_BUFFER_SIZE" />
 		<Parameter Added="true" Name="NX_SECURE_TLS_PREMASTER_SIZE" />
 		<Parameter Added="true" Name="NX_SECURE_TLS_SNI_EXTENSION_DISABLED" />
+		<Parameter Added="true" Name="NX_SECURE_TLS_MASTER_SIZE" />
+		<Parameter Added="true" Name="NX_SECURE_TLS_KEY_MATERIAL_SIZE" />
+		<Parameter Added="true" Name="NX_SECURE_CUSTOM_SECRET_GENERATION" />
 		<Parameter Added="true" Name="NX_SECURE_TLS_USE_SCSV_CIPHPERSUITE" />
 		<Parameter Added="true" Name="NX_SECURE_X509_DISABLE_CRL" />
 		<Parameter Added="true" Name="NX_SECURE_DISABLE_ERROR_CHECKING" />
@@ -1928,6 +1934,14 @@ When a FileSystem is needed this option should be set to flase  FileX should be 
 	<RefParameter Added="true" Comment="NX_ND_MAX_QUEUE_DEPTH" DefaultValue="4" Group="Core" Max="65535" Min="0" Name="NX_ND_MAX_QUEUE_DEPTH" TabName="NetXDuo" Type="integer" Unit="">
 		<Description>Symbol that defines the maximum number of packets queued up for Neighbor Discovery cache to be resolved. By default this symbol is set to 4.</Description>
 	</RefParameter>
+	<RefParameter Added="true" Comment="NX_ENABLE_VLAN" DefaultValue="false" Group="Core" Name="NX_ENABLE_VLAN" TabName="NetXDuo" Type="list">
+		<Description>Defined, the VLAN feature is enabled.
+			Note: Require driver support to use APIs from this file.
+			A quick check in driver is to search for NX_LINK_RAW_PACKET_SEND. VLAN APIs are not supported if not found.
+		</Description>
+		<PossibleValue Comment="Enabled" Value="true" />
+		<PossibleValue Comment="Disabled" Value="false" />
+	</RefParameter>
 	<RefParameter Added="true" Comment="NX_IPV6_PREFIX_LIST_TABLE_SIZE" DefaultValue="8" Group="IP" Max="65535" Min="1" Name="NX_IPV6_PREFIX_LIST_TABLE_SIZE" TabName="NetXDuo" Type="integer" Unit="">
 		<Description>Specifies the size of the prefix table. Prefix information is obtained from router advertisements and is part of the IPv6 address configuration. Defined in nx_api.h, the default value is 8.</Description>
 	</RefParameter>
@@ -2069,7 +2083,7 @@ The default value is (5 *NX_DHCP_PACKET_PAYLOAD) which will provide four packets
 		<PossibleValue Comment="true" Value="true" />
 		<PossibleValue Comment="false" Value="false" />
 	</RefParameter>
-	<RefParameter Added="true" Comment="NetXDuo version" DefaultValue="6.2.0" Group="Version" Name="NetXDuo_Version" TabName="NetXDuo" Type="string">
+	<RefParameter Added="true" Comment="NetXDuo version" DefaultValue="6.4.0" Group="Version" Name="NetXDuo_Version" TabName="NetXDuo" Type="string">
 		<Description>NetXDuo version</Description>
 	</RefParameter>
 	<RefParameter Added="true" Comment="NetXDuo Generate Init Code" DefaultValue="false" Group="NetXDuo Core Init" Name="NetXDuo_Generate_Init_Code" TabName="NetXDuo" Type="list">
@@ -2190,6 +2204,11 @@ Approximately: 64(RSA) + 16(MD5) + 176(ASN.1 + text data, common name, etc)</Des
 		<PossibleValue Comment="true" Value="true" />
 		<PossibleValue Comment="false" Value="false" />
 	</RefParameter>
+	<RefParameter Added="true" Comment="NX_ENABLE_IP_ID_RANDOMIZATION" DefaultValue="false" Group="IP" Name="NX_ENABLE_IP_ID_RANDOMIZATION" TabName="NetXDuo" Type="list">
+		<Description>Defined, this option enables random IP id. By default, IP id is increased by one for each packet.</Description>
+		<PossibleValue Comment="Enabled" Value="true" />
+		<PossibleValue Comment="Disabled" Value="false" />
+	</RefParameter>
 	<RefParameter Added="true" Comment="NX_AUTO_IP_RATE_LIMIT_INTERVAL" DefaultValue="60" Group="AUTO_IP" Max="65535" Min="0" Name="NX_AUTO_IP_RATE_LIMIT_INTERVAL" TabName="NetXDuo" Type="integer" Unit="">
 		<Description>The number of seconds to extend the wait period when the total number of conflicts is exceeded. By default, this value is defined as 60.</Description>
 	</RefParameter>
@@ -2202,6 +2221,17 @@ Approximately: 64(RSA) + 16(MD5) + 176(ASN.1 + text data, common name, etc)</Des
 		<Description>This option disables Server Name Indication (SNI) extension.</Description>
 		<PossibleValue Comment="true" Value="true" />
 		<PossibleValue Comment="false" Value="false" />
+	</RefParameter>
+	<RefParameter Added="true" Comment="NX_SECURE_TLS_MASTER_SIZE" DefaultValue="48" Max="65534" Min="1" Group="TLS CORE" Name="NX_SECURE_TLS_MASTER_SIZE" TabName="NetXDuo" Type="integer">
+		<Description>Defines the size of master secret.</Description>
+	</RefParameter>
+	<RefParameter Added="true" Comment="NX_SECURE_TLS_KEY_MATERIAL_SIZE" DefaultValue="160" Max="65534" Min="1" Group="TLS CORE" Name="NX_SECURE_TLS_KEY_MATERIAL_SIZE" TabName="NetXDuo" Type="integer">
+		<Description>Defines the size of key material.</Description>
+	</RefParameter>
+	<RefParameter Added="true" Comment="NX_SECURE_CUSTOM_SECRET_GENERATION" DefaultValue="false" Group="TLS CORE" Name="NX_SECURE_CUSTOM_SECRET_GENERATION" TabName="NetXDuo" Type="list">
+		<Description>Enables the user to pass pointers of customized secret generation functions to TLS.</Description>
+		<PossibleValue Comment="Enabled" Value="true" />
+		<PossibleValue Comment="Disabled" Value="false" />
 	</RefParameter>
 	<RefParameter Added="true" Comment="NX_DISABLE_TCP_INFO" DefaultValue="false" Group="TCP" Name="NX_DISABLE_TCP_INFO" TabName="NetXDuo" Type="boolean">
 		<Description>Defined, disables TCP information gathering.</Description>

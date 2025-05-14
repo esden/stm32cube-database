@@ -190,6 +190,41 @@ void HW_AES_Disable( void )
   }
 }
 
+[#if (myHash["ZIGBEE"] == "Enabled") || (myHash["ZIGBEE_SKELETON"] == "Enabled") || (myHash["mac_802_15_4_SKELETON"] == "Enabled")]
+/*****************************************************************************/
+
+void HW_AES_Crypt8( const uint8_t * pInput, uint8_t * pOutput )
+{
+  uint32_t    pTemp[AES_BLOCK_SIZE_WORD];
+
+  // Transfer 8 -> 32  bits */
+  memcpy( pTemp, pInput, AES_BLOCK_SIZE_BYTE );
+
+  /*  Write the input block into the input FIFO */
+  HW_AESX->DINR = __REV( pTemp[0] );
+  HW_AESX->DINR = __REV( pTemp[1] );
+  HW_AESX->DINR = __REV( pTemp[2] );
+  HW_AESX->DINR = __REV( pTemp[3] );
+
+  // -- Wait for CCF flag to be raised /
+  while ( (HW_AESX->SR & AES_SR_CCF) == 0x00u )
+    { }
+
+  /* Read the output block from the output FIFO */
+  pTemp[0] = __REV( HW_AESX->DOUTR );
+  pTemp[1] = __REV( HW_AESX->DOUTR );
+  pTemp[2] = __REV( HW_AESX->DOUTR );
+  pTemp[3] = __REV( HW_AESX->DOUTR );
+
+  /* Transfer 32 -> 8  bits */
+  memcpy( pOutput, pTemp, AES_BLOCK_SIZE_BYTE );
+
+  /* Clear CCF Flag */
+  HW_AESX->ICR |= AES_ICR_CCF;
+}
+
+[/#if]
+
 /*****************************************************************************/
 
 void HW_AES_InitCcm( uint8_t decrypt,
@@ -279,38 +314,4 @@ void HW_AES_SetLast( uint8_t left_length )
   HW_AESX->CR |= (16UL - left_length) << AES_CR_NPBLB_Pos;
 }
 
-[#if (myHash["ZIGBEE"] == "Enabled") || (myHash["ZIGBEE_SKELETON"] == "Enabled") || (myHash["mac_802_15_4_SKELETON"] == "Enabled")]
-/*****************************************************************************/
-
-void HW_AES_Crypt8( const uint8_t * pInput, uint8_t * pOutput )
-{
-  uint32_t    pTemp[AES_BLOCK_SIZE_WORD];
-
-  // Transfer 8 -> 32  bits */
-  memcpy( pTemp, pInput, AES_BLOCK_SIZE_BYTE );
-
-  /*  Write the input block into the input FIFO */
-  HW_AESX->DINR = __REV( pTemp[0] );
-  HW_AESX->DINR = __REV( pTemp[1] );
-  HW_AESX->DINR = __REV( pTemp[2] );
-  HW_AESX->DINR = __REV( pTemp[3] );
-
-  // -- Wait for CCF flag to be raised /
-  while ( (HW_AESX->SR & AES_SR_CCF) == 0x00u )
-    { }
-
-  /* Read the output block from the output FIFO */
-  pTemp[0] = __REV( HW_AESX->DOUTR );
-  pTemp[1] = __REV( HW_AESX->DOUTR );
-  pTemp[2] = __REV( HW_AESX->DOUTR );
-  pTemp[3] = __REV( HW_AESX->DOUTR );
-
-  /* Transfer 32 -> 8  bits */
-  memcpy( pOutput, pTemp, AES_BLOCK_SIZE_BYTE );
-
-  /* Clear CCF Flag */
-  HW_AESX->ICR |= AES_ICR_CCF;
-}
-
-[/#if]
 /*****************************************************************************/

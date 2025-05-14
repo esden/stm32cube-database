@@ -761,17 +761,6 @@ void APP_ZIGBEE_GetStartupConfig( struct ZbStartupT * pstConfig )
 {
   /* Attempt to join a zigbee network */
   ZbStartupConfigGetProDefaults( pstConfig );
-
-[#if ZigBeeMode == "DISTRIBUTED"]
-  /* Set the TC address to be distributed. */
-  pstConfig->security.trustCenterAddress = ZB_DISTRIBUTED_TC_ADDR;
-
-  /* Using the Uncertified Distributed Global Key */
-  memcpy( pstConfig->security.distributedGlobalKey, sec_key_distrib_uncert, ZB_SEC_KEYSIZE );
-[#else]
-  /* Using the default HA preconfigured Link Key */
-  memcpy( pstConfig->security.preconfiguredLinkKey, sec_key_ha, ZB_SEC_KEYSIZE );
-[/#if]  
   
   /* Setting up additional startup configuration parameters */
   pstConfig->startupControl = stZigbeeAppInfo.eStartupControl;

@@ -58,11 +58,11 @@ static uint8_t RF_CONTROL_ExternalPA_Enable_cb(uint8_t epa_enable)
 {
   if(epa_enable == 1)
   {
-    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(rf_external_pa_gpio_table[RF_EPA_SIGNAL_CSD].GPIO_port, rf_external_pa_gpio_table[RF_EPA_SIGNAL_CSD].GPIO_pin, GPIO_PIN_SET);
   }
   else
   {
-    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(rf_external_pa_gpio_table[RF_EPA_SIGNAL_CSD].GPIO_port, rf_external_pa_gpio_table[RF_EPA_SIGNAL_CSD].GPIO_pin, GPIO_PIN_RESET);
   }
   
   return 0;

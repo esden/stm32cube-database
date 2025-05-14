@@ -22,6 +22,8 @@
 #include <dt-bindings/pinctrl/stm32-pinfunc.h>
 [#if (mx_socDtRPN == "stm32mp15")]
 #include <dt-bindings/clock/stm32mp1-clksrc.h>
+	[#elseif mx_socPtCPN?starts_with("stm32mp23")]
+#include <dt-bindings/clock/stm32mp25-clksrc.h>
 	[#else]
 #include <dt-bindings/clock/${mx_socDtRPN}-clksrc.h>
 [/#if]
@@ -66,7 +68,11 @@
 [/#if]
 [#if (mx_socDtRPN == "stm32mp15")||mx_socDtRPN?starts_with("stm32mp2")]
 	[#if mx_socPtCPN?has_content]
+		[#if mx_socPtCPN?starts_with("stm32mp23")]
+#include "${"stm32mp25" + "xx" + mx_socPtCPN?substring(11)}-pinctrl.dtsi"
+		[#else]
 #include "${mx_socPtCPN?substring(0,9) + "xx" + mx_socPtCPN?substring(11)}-pinctrl.dtsi"
+		[/#if]
 	[#else]
 	[@mlog  logMod=module logType="ERR" logMsg="unknown SOC pinCtrl package dtsi" varsMap={} /]
 /*#include "???-pinctrl.dtsi"*/
@@ -74,7 +80,11 @@
 [/#if]
 [#if mx_ddrConfigs["general"]?? && mx_ddrConfigs["general"]["isConfigured"]?? && mx_ddrConfigs["general"]["isConfigured"]=="true" ]
 	[#if mx_socDtRPN?has_content]
+		[#if mx_socPtCPN?starts_with("stm32mp23")]
+#include "stm32mp25-ddr.dtsi"
+		[#else]
 #include "${mx_socDtRPN}-ddr.dtsi"
+		[/#if]
 	[#else]
 	[@mlog  logMod=module logType="ERR" logMsg="unknown DDR dtsi" varsMap={} /]
 /*#include "???-ddr.dtsi"*/

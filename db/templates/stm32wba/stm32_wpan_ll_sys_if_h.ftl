@@ -31,6 +31,10 @@ Key: ${key}; Value: ${myHash[key]}
 #ifndef LL_SYS_IF_H
 #define LL_SYS_IF_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Includes ------------------------------------------------------------------*/
 [#if (myHash["BLE"] == "Enabled")]
 [#if myHash["THREADX_STATUS"]?number == 1 ]

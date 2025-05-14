@@ -325,6 +325,16 @@ void ${SERVICE_SHORT_NAME_UpperCase}_APP_Init(void)
   return;
 }
 
+[#if myHash["LITE_SERVER_STATUS"]?number == 1 ]
+void ${SERVICE_SHORT_NAME_UpperCase}_APP_Process(void)
+{
+  /* USER CODE BEGIN ${SERVICE_SHORT_NAME_UpperCase}_APP_Process_1 */
+
+  /* USER CODE END ${SERVICE_SHORT_NAME_UpperCase}_APP_Process_1 */
+  return;
+}
+[/#if]
+
 /* USER CODE BEGIN FD */
 
 /* USER CODE END FD */

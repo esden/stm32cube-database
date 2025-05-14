@@ -43,6 +43,12 @@ Key: ${key}; Value: ${myHash[key]}
 [#if myHash["BLE_MODE_SIMPLEST_BLE"] == "Enabled" ]
 #include "skel_ble.h"
 [/#if]
+
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+
+/* USER CODE END Includes */
+
 /* External variables --------------------------------------------------------*/
 [#if (myHash["BLE"] == "Enabled")]
 /**
@@ -59,8 +65,34 @@ extern uint8_t missed_hci_event_flag;
 
 /* USER CODE END EFP */
 
+[#if myHash["SEQUENCER_STATUS"]?number == 1 ]
+/* Trigger BLE Host stack process after calling any aci/hci functions */
+#define BLE_WRAP_POSTPROC BleStackCB_Process()
+[/#if]
+[#if myHash["THREADX_STATUS"]?number == 1 ]
+/* Release Link Layer Mutex before calling any aci/hci functions */
+#define BLE_WRAP_PREPROC tx_mutex_get(&LinkLayerMutex, TX_WAIT_FOREVER)
+
+/* Release Link Layer Mutex and Trigger BLE Host stack process after calling any aci/hci functions */
+#define BLE_WRAP_POSTPROC do{ \
+                              tx_mutex_put(&LinkLayerMutex);  \
+                              BleStackCB_Process(); \
+                            }while(0)
+[/#if]
+[#if myHash["FREERTOS_STATUS"]?number == 1 ]
+/* Release Link Layer Mutex before calling any aci/hci functions */
+#define BLE_WRAP_PREPROC osMutexAcquire(LinkLayerMutex, osWaitForever)
+
+/* Release Link Layer Mutex and Trigger BLE Host stack process after calling any aci/hci functions */
+#define BLE_WRAP_POSTPROC do{ \
+                              osMutexRelease(LinkLayerMutex);  \
+                              BleStackCB_Process(); \
+                            }while(0)
+[/#if]
+
+[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled") || (myHash["BLE_MODE_SIMPLEST_BLE"] == "Enabled")]
 /**
-  * @brief  BLE Host stack processing request.
+  * @brief  Host stack processing request from Link Layer.
   * @param  None
   * @retval None
   */
@@ -70,17 +102,14 @@ void HostStack_Process(void)
 
   /* USER CODE END HostStack_Process 0 */
 
-[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled") || (myHash["BLE_MODE_SIMPLEST_BLE"] == "Enabled")]
   /* Process BLE Host stack */
   BleStackCB_Process();
-[/#if]
 
   /* USER CODE BEGIN HostStack_Process 1 */
 
   /* USER CODE END HostStack_Process 1 */
 }
 
-[#if (myHash["BLE"] == "Enabled") || (myHash["BLE_MODE_SKELETON"] == "Enabled") || (myHash["BLE_MODE_HOST_SKELETON"] == "Enabled") || (myHash["BLE_MODE_SIMPLEST_BLE"] == "Enabled")]
 /**
   * @brief  BLE Host stack processing callback.
   * @param  None

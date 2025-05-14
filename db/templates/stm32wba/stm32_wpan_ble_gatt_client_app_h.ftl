@@ -58,7 +58,7 @@ typedef enum
   GATT_CLIENT_READ_USING_CHAR_UUID,
   GATT_CLIENT_ENABLE_ROBUST_CACHING,
 [/#if]
-  /* USER CODE BEGIN GATT_CLIENT_APP_State_t*/
+  /* USER CODE BEGIN GATT_CLIENT_APP_State_t */
 
   /* USER CODE END GATT_CLIENT_APP_State_t */
 }GATT_CLIENT_APP_State_t;
@@ -67,7 +67,7 @@ typedef enum
 {
   PEER_CONN_HANDLE_EVT,
   PEER_DISCON_HANDLE_EVT,
-  /* USER CODE BEGIN GATT_CLIENT_APP_Conn_Opcode_t*/
+  /* USER CODE BEGIN GATT_CLIENT_APP_Conn_Opcode_t */
 
   /* USER CODE END GATT_CLIENT_APP_Conn_Opcode_t */
 }GATT_CLIENT_APP_Conn_Opcode_t;
@@ -82,7 +82,7 @@ typedef enum
   PROC_GATT_READ_USING_CHAR_UUID,
   PROC_GATT_ENABLE_ROBUST_CACHING,
 [/#if] 
-  /* USER CODE BEGIN ProcGattId_t*/
+  /* USER CODE BEGIN ProcGattId_t */
 
   /* USER CODE END ProcGattId_t */
 }ProcGattId_t;

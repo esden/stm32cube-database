@@ -42,16 +42,45 @@
 
 /* USER CODE BEGIN addons */
 
-&uart4{
-	u-boot,dm-pre-reloc;
+&uart4 {
+	bootph-all;
 };
 
-&flash0{
+&flash0 {
+	bootph-pre-ram;
 
 	partitions{
 		compatible = "fixed-partitions";
 		#address-cells = <1>;
 		#size-cells = <1>;
+
+#if defined(CONFIG_STM32MP15X_STM32IMAGE) || defined(CONFIG_SPL)
+
+		partition@0{
+			label = "fsbl1";
+			reg = <0x00000000 0x00040000>;
+		};
+
+		partition@80000{
+			label = "fsbl2";
+			reg = <0x00040000 0x00040000>;
+		};
+
+		partition@100000{
+			label = "ssbl";
+			reg = <0x00080000 0x00200000>;
+		};
+
+		partition@280000{
+			label = "u-boot-env";
+			reg = <0x00280000 0x00080000>;
+		};
+
+		partition@300000{
+			label = "nor-user";
+			reg = <0x00300000 0x03d00000>;
+		};
+#else
 
 		partition@0{
 			label = "fsbl1";
@@ -92,10 +121,11 @@
 			label = "nor-user";
 			reg = <0x00980000 0x03680000>;
 		};
+#endif
 	};
 };
 
-&fmc{
+&fmc {
 
 	nand-controller@4,0{
 
@@ -105,6 +135,29 @@
 				compatible = "fixed-partitions";
 				#address-cells = <1>;
 				#size-cells = <1>;
+
+#if defined(CONFIG_STM32MP15X_STM32IMAGE) || defined(CONFIG_SPL)
+
+				partition@0{
+					label = "fsbl";
+					reg = <0x00000000 0x00200000>;
+				};
+
+				partition@200000{
+					label = "ssbl1";
+					reg = <0x00200000 0x00200000>;
+				};
+
+				partition@400000{
+					label = "ssbl2";
+					reg = <0x00400000 0x00200000>;
+				};
+
+				partition@600000{
+					label = "UBI";
+					reg = <0x00600000 0x3fa00000>;
+				};
+#else
 
 				partition@0{
 					label = "fsbl1";
@@ -150,8 +203,13 @@
 					label = "UBI";
 					reg = <0x01200000 0x3ee00000>;
 				};
+#endif
 			};
 		};
 	};
+};
+
+&qspi {
+	bootph-pre-ram;
 };
 /* USER CODE END addons */

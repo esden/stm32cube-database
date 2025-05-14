@@ -27,7 +27,11 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    lx_user.h                                           PORTABLE C      */
+[#if FamilyName?lower_case?starts_with("stm32mp") || FamilyName?lower_case?starts_with("stm32wb")]
 /*                                                           6.1.7        */
+[#else]
+/*                                                           6.3.0        */
+[/#if]
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -49,7 +53,7 @@
 /*  06-02-2021     Bhupendra Naphade        Modified comment(s), and      */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.7  */
-[#if FamilyName?lower_case?starts_with("stm32c0")]
+[#if !FamilyName?lower_case?starts_with("stm32mp") && !FamilyName?lower_case?starts_with("stm32wb")]
 /*  03-08-2023     Xiuwen Cai               Modified comment(s), and      */
 /*                                            added new NAND options,     */
 /*                                            resulting in version 6.2.1  */
@@ -152,29 +156,27 @@
 /* USER CODE END 1 */
 
 [#if LX_NOR_ENABLED_Value == "true"]
+/* Defined, this option bypasses the NOR flash driver read routine in favor or reading
+   the NOR memory directly, resulting in a significant performance increase.
+*/
+
 [#if LX_DIRECT_READ_value == "1"]
 #define LX_DIRECT_READ
 [#else]
 /* #define LX_DIRECT_READ */
 [/#if]
 
+/* Defined, this causes the LevelX NOR instance open logic to verify free NOR
+   sectors are all ones.
+*/
+
 [#if LX_FREE_SECTOR_DATA_VERIFY_value == "1"]
 #define LX_FREE_SECTOR_DATA_VERIFY
 [#else]
 /* #define LX_FREE_SECTOR_DATA_VERIFY */
 [/#if]
-[#if FamilyName?lower_case == "stm32u0"]
-[#if LX_NAND_FLASH_MAX_METADATA_BLOCKS_value??]
-/* By default this value is 4, which represents a maximum of 4 blocks that 
-   can be allocated for metadata.
-*/
-[#if LX_NAND_FLASH_MAX_METADATA_BLOCKS_value == "4"]
-/* #define LX_NAND_FLASH_MAX_METADATA_BLOCKS         4 */
-[#else]
-#define LX_NAND_FLASH_MAX_METADATA_BLOCKS         ${LX_NAND_FLASH_MAX_METADATA_BLOCKS_value}
-[/#if]
-[/#if]
-[/#if]
+
+/* Defined, this disabled the extended NOR cache.  */
 
 [#if LX_NOR_DISABLE_EXTENDED_CACHE_value == "1"]
 #define LX_NOR_DISABLE_EXTENDED_CACHE
@@ -182,11 +184,20 @@
 /* #define LX_NOR_DISABLE_EXTENDED_CACHE */
 [/#if]
 
+/* By default this value is 8, which represents a maximum of 8 sectors that
+   can be cached in a NOR instance.
+*/
+
 [#if LX_NOR_EXTENDED_CACHE_SIZE_value == "8"]
 /* #define LX_NOR_EXTENDED_CACHE_SIZE         8 */
 [#else]
 #define LX_NOR_EXTENDED_CACHE_SIZE         ${LX_NOR_EXTENDED_CACHE_SIZE_value}
 [/#if]
+
+/* By default this value is 16 and defines the logical sector mapping cache size.
+   Large values improve performance, but cost memory. The minimum size is 8 and all
+   values must be a power of 2.
+*/
 
 [#if LX_NOR_SECTOR_MAPPING_CACHE_SIZE_value == "16"]
 /* #define LX_NOR_SECTOR_MAPPING_CACHE_SIZE         16 */
@@ -195,25 +206,7 @@
 [/#if]
 [/#if]
 
-/* Configure the LevelX in Standalone mode. */
-
-
-[#if LX_STANDALONE_ENABLE_value??]
-[#if LX_STANDALONE_ENABLE_value == "1"]
-#define LX_STANDALONE_ENABLE
-[#else]
-/* #define LX_STANDALONE_ENABLE */
-[/#if]
-[/#if]
-
-
-[#if LX_THREAD_SAFE_ENABLE_value == "1"]
-#define LX_THREAD_SAFE_ENABLE
-[#else]
-/* #define LX_THREAD_SAFE_ENABLE */
-[/#if]
-
-[#if FamilyName?lower_case?starts_with("stm32c0")]
+[#if LX_NOR_ENABLE_MAPPING_BITMAP_value??]
 /* Determine if logical sector mapping bitmap should be enabled in extended cache.
    Cache memory will be allocated to sector mapping bitmap first. One bit can be allocated for each physical sector.
 */
@@ -223,7 +216,9 @@
 [#else]
 /* #define LX_NOR_ENABLE_MAPPING_BITMAP */
 [/#if]
+[/#if]
 
+[#if LX_NOR_ENABLE_OBSOLETE_COUNT_CACHE_value??]
 /* Determine if obsolete count cache should be enabled in extended cache.
    Cache memory will be allocated to obsolete count cache after the mapping bitmap if enabled,
    and the rest of the cache memory is allocated to sector cache.
@@ -234,7 +229,9 @@
 [#else]
 /* #define LX_NOR_ENABLE_OBSOLETE_COUNT_CACHE */
 [/#if]
+[/#if]
 
+[#if LX_NOR_OBSOLETE_COUNT_CACHE_TYPE_value??]
 /* Defines obsolete count cache element size. If number of sectors per block is greater than 256, use USHORT instead of UCHAR. */
 
 [#if LX_NOR_OBSOLETE_COUNT_CACHE_TYPE_value == "UCHAR"]
@@ -242,8 +239,9 @@
 [#else]
 #define LX_NOR_OBSOLETE_COUNT_CACHE_TYPE            USHORT
 [/#if]
+[/#if]
 
-
+[#if LX_NOR_SECTOR_SIZE_value??]
 /* Define the logical sector size for NOR flash. The sector size is in units of 32-bit words.
    This sector size should match the sector size used in file system.  */
 
@@ -251,10 +249,10 @@
 /* #define LX_NOR_SECTOR_SIZE         (512/sizeof(ULONG)) */
 [#else]
 #define LX_NOR_SECTOR_SIZE         (${LX_NOR_SECTOR_SIZE_value}/sizeof(ULONG))
+[/#if]
+[/#if]
 
-[/#if]
-[/#if]
-[#if FamilyName?lower_case == "stm32c0"]
+[#if LX_NAND_FLASH_MAX_METADATA_BLOCKS_value??]
 /* By default this value is 4, which represents a maximum of 4 blocks that 
    can be allocated for metadata.
 */
@@ -265,7 +263,31 @@
 [/#if]
 [/#if]
 
+/* Defined, this makes LevelX thread-safe by using a ThreadX mutex object
+   throughout the API.
+*/
+
+[#if LX_THREAD_SAFE_ENABLE_value == "1"]
+#define LX_THREAD_SAFE_ENABLE
+[#else]
+/* #define LX_THREAD_SAFE_ENABLE */
+[/#if]
+
+/* Defined, LevelX will be used in standalone mode (without Azure RTOS ThreadX) */
+
+[#if LX_STANDALONE_ENABLE_value??]
+[#if LX_STANDALONE_ENABLE_value == "1"]
+#define LX_STANDALONE_ENABLE
+[#else]
+/* #define LX_STANDALONE_ENABLE */
+[/#if]
+[/#if]
+
 /* USER CODE BEGIN 2 */
+
+/* Define user extension for NOR flash control block.  */
+
+/* #define LX_NOR_FLASH_USER_EXTENSION    ???? */
 
 /* USER CODE END 2 */
 

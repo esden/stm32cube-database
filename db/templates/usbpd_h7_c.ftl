@@ -16,6 +16,7 @@
 [#if GUI_INTERFACE??]
 #include "gui_api.h"
 [/#if]
+[@common.optinclude name=mxTmpFolder+"/usbpd_c_Include.tmp"/]
 
 /* USER CODE BEGIN 0 */
 /* USER CODE END 0 */
@@ -50,6 +51,7 @@ unsigned int USBPD_PreInitOs(void)
   GUI_Init(BSP_GetBoardName, BSP_GetBoardID, HW_IF_PWR_GetVoltage, HW_IF_PWR_GetCurrent);
 [/#if]
   
+[@common.optinclude name=mxTmpFolder+"/usbpd_c_PreInitOs.tmp"/]
   return USBPD_OK;
 }
 

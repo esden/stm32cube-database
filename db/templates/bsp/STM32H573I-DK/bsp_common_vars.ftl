@@ -49,6 +49,8 @@ COM_InitTypeDef BspCOMInit;
 [/#if]
 [#if Bsp_Common_DEMO?? && Bsp_Common_DEMO == "true"]
 __IO uint32_t BspButtonState = BUTTON_RELEASED;
+__IO uint32_t TouchPressed = 0;
+TS_State_t TS_State;
 [/#if]
 [#if (LCD_TC_ON?? && LCD_TC_ON == "true")]
 TS_Init_t   BspTSInit;

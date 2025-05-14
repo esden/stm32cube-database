@@ -483,7 +483,7 @@
 [#else]
     [#lt]#define CHANNEL                                     ${zigbeeGenericParamHash_GP["ZGB_CHANNEL"]}
 [/#if]
-[#if ZGB_DEVICE_ROLE == "END_DEVICE" || ZGB_APPLICATION == "RFD"]
+[#if ZGB_DEVICE_ROLE == "END_DEVICE" && ZGB_SLEEPY_MODE == "ON" || ZGB_APPLICATION == "RFD" && ZGB_SLEEPY_MODE == "ON"]
     [#lt]#define ZED_SLEEP_TIME_30S                           1 /* 30s sleep time unit */
 [/#if]
 
@@ -571,6 +571,7 @@ PLACE_IN_SECTION("MB_MEM1") ALIGN(4) static TL_ZIGBEE_Config_t ZigbeeConfigBuffe
 PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static TL_CmdPacket_t ZigbeeOtCmdBuffer;
 PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static uint8_t ZigbeeNotifRspEvtBuffer[sizeof(TL_PacketHeader_t) + TL_EVT_HDR_SIZE + 255U];
 PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static uint8_t ZigbeeNotifRequestBuffer[sizeof(TL_PacketHeader_t) + TL_EVT_HDR_SIZE + 255U];
+uint8_t g_ot_notification_allowed = 0U;
 
 struct zigbee_app_info
 {
@@ -894,7 +895,12 @@ static void APP_ZIGBEE_NwkForm(void)
     ZbStartupConfigGetProDefaults(&config);
 
     /* Set the ${ZigBeeMode?lower_case} network */
+	[#if ZGB_APPLICATION != "RFD" && ZGB_DEVICE_ROLE != "END_DEVICE" || ZGB_APPLICATION == "RFD" && ZGB_DEVICE_ROLE == "END_DEVICE" && ZGB_SLEEPY_MODE == "ON"]
     APP_DBG("Network config : APP_STARTUP_${ZigBeeMode}[#if ZigBeeMode == "CENTRALIZED"]_${ZGB_DEVICE_ROLE}[/#if]");
+	[/#if]
+	[#if ZGB_DEVICE_ROLE == "END_DEVICE" && ZGB_SLEEPY_MODE == "OFF"]
+	APP_DBG("Network config : APP_STARTUP_${ZigBeeMode}[#if ZigBeeMode == "CENTRALIZED"]_${ZGB_DEVICE_ROLE} - NONE SLEEPY[/#if]");
+	[/#if]
     [#if ZigBeeMode != "TOUCHLINK"]
     config.startupControl = zigbee_app_info.startupControl;
     [/#if]
@@ -953,8 +959,13 @@ static void APP_ZIGBEE_NwkForm(void)
     [/#if]
     [#if ZGB_DEVICE_ROLE == "END_DEVICE" || (ZGB_APPLICATION == "RFD")]
     [#if  ZGB_DEVICE_ROLE == "END_DEVICE"]/* Add End device configuration */[#else]/* For Distributed and Touchlink network in RFD application, End device configuration has to be set */[/#if]
+    [#if  ZGB_DEVICE_ROLE == "END_DEVICE" && ZGB_SLEEPY_MODE == "OFF"]
+	config.capability &= ~(MCP_ASSOC_CAP_DEV_TYPE | MCP_ASSOC_CAP_ALT_COORD);
+    config.endDeviceTimeout=0xFF;
+	[#else]
     config.capability &= ~(MCP_ASSOC_CAP_RXONIDLE | MCP_ASSOC_CAP_DEV_TYPE | MCP_ASSOC_CAP_ALT_COORD);
     config.endDeviceTimeout=ZED_SLEEP_TIME_30S;
+	[/#if]
 
     [/#if]
     /* Using ZbStartupWait (blocking) */
@@ -1233,6 +1244,18 @@ void ZIGBEE_CmdTransfer(void)
 
   /* Wait completion of cmd */
   Wait_Getting_Ack_From_M0();
+}
+
+/**
+ * @brief  This function is used to transfer the commands from the M4 to the M0 with notification
+ *
+ * @param   None
+ * @return  None
+ */
+void ZIGBEE_CmdTransferWithNotif(void)
+{
+        g_ot_notification_allowed = 1;
+        ZIGBEE_CmdTransfer();
 }
 
 /**

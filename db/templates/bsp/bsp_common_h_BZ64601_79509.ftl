@@ -49,7 +49,14 @@
 
 [#if numButton > 0]
 	[#assign useBUTTON = true]		
-[/#if]   
+[/#if]
+
+[#if FamilyName?matches("STM32W(B0|L3)*")]
+    [#assign virtualEXTI=true]
+[#else]
+    [#assign virtualEXTI=false]
+[/#if]
+
 
 [#list BspIpDatas as SWIP] 
     [#if SWIP.variables??]
@@ -239,12 +246,14 @@
 
 #define USER_BUTTON_PIN	                  ${BUTTON_PIN}
 #define USER_BUTTON_GPIO_PORT              ${BUTTON_PORT}
-[#-- BZ 94093 --]	
+[#-- BZ 94093 --]
 #define USER_BUTTON_EXTI_IRQn              ${BUTTON_IRQn}
-#define USER_BUTTON_EXTI_LINE              EXTI_LINE_${BUTTON_EXTI} 
+[#if !virtualEXTI ]
+#define USER_BUTTON_EXTI_LINE              EXTI_LINE_${BUTTON_EXTI}
 	[#if useDefine && useEXTI]
-#define H_EXTI_${BUTTON_EXTI}			  hpb_exti[BUTTON_USER]		
+#define H_EXTI_${BUTTON_EXTI}			  hpb_exti[BUTTON_USER]
 	[/#if]
+[/#if]
 [/#if]
 [#if numButton > 1]
 	[#list BspIpDatas as SWIP] 
@@ -485,7 +494,7 @@ extern UART_HandleTypeDef hcom_uart[COMn];
 /** @defgroup ${BoardName?upper_case}_LOW_LEVEL_Exported_Variables LOW LEVEL Exported Constants
   * @{
   */   
-[#if useBUTTON]
+[#if useBUTTON && !virtualEXTI ]
 [#if useDefine]
 extern EXTI_HandleTypeDef hpb_exti[BUTTONn];
 [#else]
@@ -514,7 +523,11 @@ int32_t  BSP_PB_Init(Button_TypeDef Button, ButtonMode_TypeDef ButtonMode);
 int32_t  BSP_PB_DeInit(Button_TypeDef Button);
 int32_t  BSP_PB_GetState(Button_TypeDef Button);
 void     BSP_PB_Callback(Button_TypeDef Button);
-void     BSP_PB_IRQHandler (Button_TypeDef Button);
+[#if virtualEXTI ]
+void     BSP_PB_IRQHandler(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
+[#else]
+void     BSP_PB_IRQHandler(Button_TypeDef Button);
+[/#if]
 [/#if]
 [#if useUSART]
 #if (USE_BSP_COM_FEATURE > 0)

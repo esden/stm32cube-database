@@ -35,9 +35,9 @@ Key: ${key}; Value: ${myHash[key]}
 
 /* Default software configuration */
 [#if myHash["OTHER_THAN_BLE"]?number == 1]
-#define     AES_BLOCK_SIZE_BIT      128u            // AES Size in Bits
-#define     AES_BLOCK_SIZE_BYTE     16u             // AES Size in Bytes.
-#define     AES_BLOCK_SIZE_WORD     4u              // AES Size in Words.
+#define     AES_BLOCK_SIZE_BIT      128u            /* AES Size in Bits */
+#define     AES_BLOCK_SIZE_BYTE     16u             /* AES Size in Bytes */
+#define     AES_BLOCK_SIZE_WORD     4u              /* AES Size in Words. */
 
 #define     AES_EXPANDED_KEY_SIZE   44u
 [/#if]

@@ -1715,6 +1715,7 @@ typedef enum
   /* USER CODE BEGIN CFG_SCH_Prio_Id_t */
 
   /* USER CODE END CFG_SCH_Prio_Id_t */
+  CFG_SCH_PRIO_NBR
 } CFG_SCH_Prio_Id_t;
 
 /**
@@ -1787,6 +1788,9 @@ typedef enum
   /* USER CODE END CFG_SCH_Prio_Id_t */
 [#if ZIGBEE == 1]
   CFG_SCH_PRIO_NBR  /**< Shall be last in the list */
+[/#if]
+[#if THREAD = 1]
+  CFG_SCH_PRIO_NBR
 [/#if]
 } CFG_SCH_Prio_Id_t;
 

@@ -35,17 +35,17 @@
   */
 #define HAL_MODULE_ENABLED 
   [#assign aes=0]
-  [#assign allModules = ["ADC","BSEC","CRC","AES","CRYP","DCMIPP","DDR", "DFSDM","DTS","ETH","FDCAN","HASH","HCD","I2C","I2S","IWDG","LPTIM","LTDC","MCE","MDMA","PCD","PKA","RNG","RTC","SAI","SPDIFRX","SD","MMC","SMARTCARD","SMBUS","SPI","SRAM","TIM","UART","USART","ETZPC"]]
+  [#assign allModules = ["ADC","BSEC","CRC","AES","CRYP","DCMIPP","DDR", "DFSDM","DTS","ETH","FDCAN","HASH","HCD","I2C","I2S","IWDG","LPTIM","LTDC","MCE","MDMA","PCD","PKA","QUADSPI","RNG","RTC","SAI","SPDIFRX","SD","MMC","SMARTCARD","SMBUS","SPI","SRAM","TIM","UART","USART","ETZPC"]]
   [#list allModules as module]
 	[#if isModuleUsed(module)]
 	  [#if module=="AES"]
 		[#assign aes=1]
 	  [/#if]
-[#compress]#define HAL_${module?replace("QUADSPI","QSPI")?replace("AES","CRYP")?replace("SCRYP","CRYP")?replace("OCTOSPI","OSPI")}_MODULE_ENABLED[/#compress]
+[#compress]#define HAL_${module?replace("QUADSPI","XSPI")?replace("AES","CRYP")?replace("SCRYP","CRYP")?replace("OCTOSPI","OSPI")}_MODULE_ENABLED[/#compress]
     [#else]
 	  [#if aes==1 && module=="CRYP"]
 	  [#else]
-/*#define HAL_${module?replace("QUADSPI","QSPI")?replace("AES","CRYP")?replace("SCRYP","CRYP")?replace("OCTOSPI","OSPI")}_MODULE_ENABLED */
+/*#define HAL_${module?replace("QUADSPI","XSPI")?replace("AES","CRYP")?replace("SCRYP","CRYP")?replace("OCTOSPI","OSPI")}_MODULE_ENABLED */
 	[/#if]
 	[/#if]	
   [/#list]
@@ -91,7 +91,7 @@
 #define USE_HAL_MMC_REGISTER_CALLBACKS         0U
 #define USE_HAL_PCD_REGISTER_CALLBACKS         0U
 #define USE_HAL_PKA_REGISTER_CALLBACKS         0U
-#define USE_HAL_QSPI_REGISTER_CALLBACKS        0U
+#define USE_HAL_XSPI_REGISTER_CALLBACKS        0U
 #define USE_HAL_RNG_REGISTER_CALLBACKS         0U
 #define USE_HAL_RTC_REGISTER_CALLBACKS         0U
 #define USE_HAL_SAI_REGISTER_CALLBACKS         0U
@@ -195,7 +195,7 @@ in voltage and temperature.  */
   * @brief This is the HAL system configuration section
   */     
 #define  VDD_VALUE                    [#if vdd_value??]${vdd_value}[#else]3300[/#if]U /*!< Value of VDD in mv */
-#define  TICK_INT_PRIORITY            [#if TICK_INT_PRIORITY??]${TICK_INT_PRIORITY}U[#else]((uint32_t)(1U<<4U) - 1U)[/#if] /*!< tick interrupt priority (lowest by default) */
+#define  TICK_INT_PRIORITY            [#if TICK_INT_PRIORITY??]${TICK_INT_PRIORITY}U[#else]((uint32_t)(1U<<4U) - 1U)[/#if] /*!< tick interrupt priority [#if !TICK_INT_PRIORITY?? || TICK_INT_PRIORITY == "15"](lowest by default) [/#if]*/
 /*  Warning: Must be set to higher priority for HAL_Delay()  */
 /*  and HAL_GetTick() usage under interrupt context          */
 #define  USE_RTOS                     [#if advancedSettings?? && advancedSettings.USE_RTOS??]${advancedSettings.USE_RTOS}[#else]0[/#if]U
@@ -323,9 +323,9 @@ in voltage and temperature.  */
 #include "stm32mp13xx_hal_pwr.h"
 #endif /* HAL_PWR_MODULE_ENABLED */
 
-#ifdef HAL_QSPI_MODULE_ENABLED
-#include "stm32mp13xx_hal_qspi.h"
-#endif /* HAL_QSPI_MODULE_ENABLED */
+#ifdef HAL_XSPI_MODULE_ENABLED
+#include "stm32mp13xx_hal_xspi.h"
+#endif /* HAL_XSPI_MODULE_ENABLED */
 
 #ifdef HAL_RNG_MODULE_ENABLED
 #include "stm32mp13xx_hal_rng.h"
@@ -360,7 +360,7 @@ in voltage and temperature.  */
 #endif /* HAL_SPI_MODULE_ENABLED */
 
 #ifdef HAL_SRAM_MODULE_ENABLED
- #include "stm32mp1xx_hal_sram.h"
+ #include "stm32mp13xx_hal_sram.h"
 #endif /* HAL_SRAM_MODULE_ENABLED */
 
 #ifdef HAL_TIM_MODULE_ENABLED

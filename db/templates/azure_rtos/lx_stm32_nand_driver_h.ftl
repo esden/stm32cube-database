@@ -31,7 +31,6 @@ extern "C" {
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
-[#if FamilyName?lower_case == "stm32u0" || FamilyName?lower_case == "stm32c0"]
 /* Define the flag for format and erase NAND flash memory */
 /* #define LX_DRIVER_ERASES_FLASH_AFTER_INIT */
 
@@ -47,7 +46,6 @@ extern "C" {
 #define SPARE_DATA1_LENGTH                  0             /* length of spare data 1 */
 #define SPARE_DATA2_OFFSET                  0             /* Offset of spare data 2 */
 #define SPARE_DATA2_LENGTH                  0             /* length of spare data 2 */
-[/#if]
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/

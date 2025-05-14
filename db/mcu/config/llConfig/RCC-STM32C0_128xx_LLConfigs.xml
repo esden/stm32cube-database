@@ -82,7 +82,13 @@
                 <MethodArg Name="HSIDiv" ParameterName="HSISYSCLKDivider"/>
             </CallLibMethod>
         </IFCondition>
-        
+        <IFCondition Expression="HSI48Used=1">
+            <CallLibMethod Name="LL_RCC_HSI48_Enable"/>
+
+            <CallLibMethod Name="" Type="HardCode">
+                <HardCode Text="#n#t /* Wait till HSI48 is ready */#n#twhile(LL_RCC_HSI48_IsReady() != 1)#n#t{#n#t}#n"/>
+            </CallLibMethod>
+        </IFCondition>
         <IFCondition Expression ="HSIKERUsed=1">
             <CallLibMethod Name="LL_RCC_SetHSIKERDiv">
                 <MethodArg Name="HSIDiv" ParameterName="HSIKERCLKDivider"/>
@@ -410,7 +416,11 @@
                 <MethodArg Name="ADCxSource" ParameterName="ADCCLockSelection"/>
             </CallLibMethod>
         </IFCondition>
-        
+        <IFCondition Expression ="USBUsed_ForRCC">
+            <CallLibMethod Name="LL_RCC_SetUSBClockSource">
+                <MethodArg Name="USBxSource" ParameterName="USBCLockSelection"/>
+            </CallLibMethod>
+        </IFCondition>  
         <IFCondition Expression ="I2S1Used_ForRCC|SPI1Used_ForRCC">
             <CallLibMethod Name="LL_RCC_SetI2SClockSource">
                 <MethodArg Name="I2SxSource" ParameterName="I2S1CLockSelection"/>
@@ -434,6 +444,7 @@
 
     <LibMethod Comment="" Name="LL_RCC_HSI_Enable"/>
     
+    <LibMethod Comment="" Name="LL_RCC_HSI48_Enable"/>
   
     <LibMethod Comment="" Name="LL_RCC_LSE_Enable"/>
 	
@@ -504,6 +515,9 @@
     </LibMethod>
     <LibMethod Comment="" Name="LL_RCC_SetADCClockSource">
         <Argument AddressOf="false" GenericType="simple" Name="ADCxSource" OptimizationCondition="equal"/>
+    </LibMethod>
+    <LibMethod Comment="" Name="LL_RCC_SetUSBClockSource">
+        <Argument AddressOf="false" GenericType="simple" Name="USBxSource" OptimizationCondition="equal"/>
     </LibMethod>
     <LibMethod Comment="" Name="LL_RCC_SetI2SClockSource">
         <Argument AddressOf="false" GenericType="simple" Name="I2SxSource" OptimizationCondition="equal"/>

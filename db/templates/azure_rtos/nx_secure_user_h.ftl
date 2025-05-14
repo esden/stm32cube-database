@@ -321,7 +321,19 @@
 	[#if name == "NX_SECURE_TLS_SERVER_DISABLED"]
       [#assign NX_SECURE_TLS_SERVER_DISABLED_value = value]
     [/#if]
-	
+
+    [#if name == "NX_SECURE_TLS_MASTER_SIZE"]
+          [#assign NX_SECURE_TLS_MASTER_SIZE_value = value]
+    [/#if]
+
+    [#if name == "NX_SECURE_TLS_KEY_MATERIAL_SIZE"]
+          [#assign NX_SECURE_TLS_KEY_MATERIAL_SIZE_value = value]
+    [/#if]
+
+	[#if name == "NX_SECURE_CUSTOM_SECRET_GENERATION"]
+      [#assign NX_SECURE_CUSTOM_SECRET_GENERATION_value = value]
+    [/#if]
+
 	[#if name == "NX_SECURE_TLS_REQUIRE_RENEGOTIATION_EXT"]
       [#assign NX_SECURE_TLS_REQUIRE_RENEGOTIATION_EXT_value = value]
     [/#if]
@@ -960,6 +972,39 @@
 /*
 #define NX_SECURE_TLS_SERVER_DISABLED   
 */                   
+[/#if]
+
+[#if FamilyName=="STM32H5" || FamilyName=="STM32U5" || FamilyName=="STM32N6"]
+/* NX_SECURE_TLS_MASTER_SIZE defines the size of master secret.
+   The default value is 48. */
+   [#if NX_SECURE_TLS_MASTER_SIZE_value == "48"]
+/*
+   #define NX_SECURE_TLS_MASTER_SIZE 48
+*/
+[#else]
+    #define NX_SECURE_TLS_MASTER_SIZE		 	     	${NX_SECURE_TLS_MASTER_SIZE_value}
+[/#if]
+
+/* NX_SECURE_TLS_KEY_MATERIAL_SIZE defines the size of key material.
+   The default value is (2 * (NX_SECURE_TLS_MAX_HASH_SIZE + NX_SECURE_TLS_MAX_KEY_SIZE + NX_SECURE_TLS_MAX_IV_SIZE)). */
+   [#if NX_SECURE_TLS_KEY_MATERIAL_SIZE_value == "160"]
+/*
+    #define NX_SECURE_TLS_KEY_MATERIAL_SIZE (2 * (NX_SECURE_TLS_MAX_HASH_SIZE + NX_SECURE_TLS_MAX_KEY_SIZE + NX_SECURE_TLS_MAX_IV_SIZE))
+*/
+[#else]
+    #define NX_SECURE_TLS_KEY_MATERIAL_SIZE		 	     	${NX_SECURE_TLS_KEY_MATERIAL_SIZE_value}
+[/#if]
+
+/* NX_SECURE_CUSTOM_SECRET_GENERATION enables the user to pass pointers of customized secret generation functions to
+   TLS in the user defined nx_secure_custom_secret_generation_init function. This will allow TLS to use customized
+   secret generation functions. */
+[#if NX_SECURE_CUSTOM_SECRET_GENERATION_value == "true"]
+#define NX_SECURE_CUSTOM_SECRET_GENERATION
+[#else]
+/*
+#define NX_SECURE_CUSTOM_SECRET_GENERATION
+*/
+[/#if]
 [/#if]
 
 /* When defined the AES Tabled are  moved to RAM. */

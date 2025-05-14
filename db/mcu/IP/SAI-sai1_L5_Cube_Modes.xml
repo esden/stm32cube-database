@@ -226,12 +226,18 @@
 	</RefParameter>	
 	
 	<!-- PDM Parameters for SAI  -->
-	<RefParameter Comment="Activation" DefaultValue="DISABLE"  Group="Pdm Parameters" Name="Activation" Type="list" Visible="false">
+	<RefParameter Comment="Activation SAI A" DefaultValue="DISABLE"  Group="Pdm Parameters" Name="Activation" Type="list" Visible="false">
 		<PossibleValue Value="DISABLE" Comment="DISABLE"/>
 		<PossibleValue Value="ENABLE" Comment="ENABLE"/>
 		<Description>Enable/Disable PDM interface.</Description>
-	</RefParameter>	
-	
+	</RefParameter>
+
+	<!-- FIX#189179:  Issue on PDM configuration if the two SAI sub-blocks are configurated -->
+	<RefParameter Comment="Activation SAI B" DefaultValue="DISABLE"  Group="Pdm Parameters" Name="ActivationB" Type="list" Visible="false">
+		<PossibleValue Value="DISABLE" Comment="DISABLE"/>
+		<Description>Enable/Disable PDM interface.</Description>
+	</RefParameter>
+
 	<RefParameter Comment="Mic Pairs Nbr" DefaultValue="1" Max="1" Min="1" Group="Pdm Parameters" Name="MicPairsNbr" Type="integer" Visible="true">
 		<Condition Expression="!(SEM_MIC_2 | SEM_MIC_3)" Diagnostic=""/>
 		<Description>Specifies the number of microphone pairs used.</Description>
@@ -482,18 +488,16 @@
 	<RefParameter Comment="    Clock Source" DefaultValue="null" Group="Clock Parameters" Name="ClockSource" Type="integer" Visible="false" NoCheckOpt="false"/>
 	
 	<RefParameter Comment="    Master Clock No Divider" DefaultValue="SAI_MASTERDIVIDER_ENABLE" Group="Clock Parameters" Name="NoDivider" Type="list">
-		<Condition Diagnostic="" Expression="((VirtualMode=VM_MASTER) &amp; !((Protocol=SAI_AC97_PROTOCOL)))"/>
+		<Condition Diagnostic="" Expression="(!((Protocol=SAI_AC97_PROTOCOL)))"/>
 		<PossibleValue Comment="Enabled" Value="SAI_MASTERDIVIDER_ENABLE"/>
 		<PossibleValue Comment="Disabled" Value="SAI_MASTERDIVIDER_DISABLE"/>
 	</RefParameter>
-	<RefParameter Comment="    Master Clock No Divider" DefaultValue="null" Group="Clock Parameters" Name="NoDivider" Type="integer" Visible="false" NoCheckOpt="false"/>
 	
-	<RefParameter Comment="    Master Clock Over Sampling" DefaultValue="SAI_MCK_OVERSAMPLING_DISABLE" Group="Clock Parameters" Name="MckOverSampling" Type="list">
-		<Condition Diagnostic="" Expression="((VirtualMode=VM_MASTER) &amp; !((Protocol=SAI_AC97_PROTOCOL)) &amp; (DIE470 | DIE495 | DIE468 | DIE469))"/>
+	<RefParameter Comment="    Master Clock Oversampling" DefaultValue="SAI_MCK_OVERSAMPLING_DISABLE" Group="Clock Parameters" Name="MckOverSampling" Type="list">
+		<Condition Diagnostic="" Expression="(!((Protocol=SAI_AC97_PROTOCOL)) &amp; (DIE470 | DIE495 | DIE468 | DIE469 | DIE481))"/>
 		<PossibleValue Comment="Enabled" Value="SAI_MCK_OVERSAMPLING_ENABLE"/>
 		<PossibleValue Comment="Disabled" Value="SAI_MCK_OVERSAMPLING_DISABLE"/>
 	</RefParameter>
-	<RefParameter Comment="    Master Clock Over Sampling" DefaultValue="null" Group="Clock Parameters" Name="MckOverSampling" Type="integer" Visible="false" NoCheckOpt="false"/>
 	
 	<RefParameter Comment="    Audio Frequency" DefaultValue="SAI_AUDIO_FREQUENCY_192K" Group="Clock Parameters" Name="AudioFrequency" Type="list">
 		<Condition Diagnostic="" Expression="((VirtualMode=VM_MASTER)  &amp; !((Protocol=SAI_AC97_PROTOCOL) | (Protocol=SAI_SPDIF_PROTOCOL)))"/>		
@@ -571,10 +575,10 @@
 	</RefParameter>
 
 	<RefParameter Comment="   Master Clock Divider" DefaultValue="0" Group="Clock Parameters" Max="63" Min="0" Name="Mckdiv" Type="integer" NoCheckOpt="false">
-		<Condition Diagnostic="Master Clock frequency is equal to SAI Clock frequency" Expression="(AudioFrequency=SAI_AUDIO_FREQUENCY_MCKDIV) &amp; (NoDivider=SAI_MASTERDIVIDER_ENABLE) &amp; ((DIE470) | (DIE495) | (DIE481) | (DIE484) | (DIE492) | (DIE455))"/>
+		<Condition Diagnostic="Master Clock frequency is equal to SAI Clock frequency" Expression="(AudioFrequency=SAI_AUDIO_FREQUENCY_MCKDIV) &amp; ((DIE470) | (DIE495) | (DIE481) | (DIE484) | (DIE492) | (DIE455) | (DIE454))"/>
 	</RefParameter>
 	<RefParameter Comment="   Master Clock Divider" DefaultValue="0" Group="Clock Parameters" Max="15" Min="0" Name="Mckdiv" Type="integer" NoCheckOpt="false">
-		<Condition Diagnostic="Master Clock frequency is equal to SAI Clock frequency" Expression="(AudioFrequency=SAI_AUDIO_FREQUENCY_MCKDIV) &amp; (NoDivider=SAI_MASTERDIVIDER_ENABLE)"/>
+		<Condition Diagnostic="Master Clock frequency is equal to SAI Clock frequency" Expression="(AudioFrequency=SAI_AUDIO_FREQUENCY_MCKDIV)"/>
 	</RefParameter>
 	<RefParameter Comment="   Master Clock Divider" DefaultValue="null" Group="Clock Parameters" Max="15" Min="0" Name="Mckdiv" Type="integer" Visible="false" NoCheckOpt="false">		
 	</RefParameter>
@@ -1178,6 +1182,9 @@
 		<!--<Parameter Name="SynchroExt" RefParameter="SynchroExt_B"/>-->
 		<!-- Bug35768 -->
 		<Parameter Name="MckOverSampling"/>
+		<Parameter Name="ActivationB">
+			<PossibleValue>DISABLE</PossibleValue>
+		</Parameter>
 		<Condition Diagnostic="" Expression="!$IpInstance_SAIB_INIT_PROTOCOL"/>
 	</RefMode>
 	<!-- RefModes 'Master Basic Mode' for SAI_B -->
@@ -1846,7 +1853,7 @@
 							</SignalLogicalOp>	
 							<Semaphore>SEM_MIC_2$noContext</Semaphore>
 						</Mode>						
-						<Mode Name="5_6_MicroPhones" UserName="Add MicroPhones paris (5-6)">
+						<Mode Name="5_6_MicroPhones" UserName="Add MicroPhones pairs (5-6)">
 							<SignalLogicalOp Name="AND">																
 								<Signal Name="D2"/>	
 								<Signal Name="D3"/>															

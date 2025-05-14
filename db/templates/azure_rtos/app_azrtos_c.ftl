@@ -22,12 +22,14 @@
 [#assign FILEX_MEM_POOL_VAR_NAME_value = "fx_app_byte_pool"]
 [#assign USBX_HOST_MEM_POOL_VAR_NAME_value = "ux_host_app_byte_pool"]
 [#assign USBX_DEVICE_MEM_POOL_VAR_NAME_value = "ux_device_app_byte_pool"]
+[#assign USBX_MEM_POOL_VAR_NAME_value = "ux_app_byte_pool"]
 [#assign NETXDUO_MEM_POOL_VAR_NAME_value = "nx_app_byte_pool"]
 [#assign TX_ENABLED = "true"]
 [#assign FX_ENABLED = "false"]
 [#assign NX_ENABLED = "false"]
 [#assign UX_HOST_ENABLED = "false"]
 [#assign UX_DEVICE_ENABLED = "false"]
+[#assign UX_ENABLED = "false"]
 [#assign USBPD_DEVICE_ENABLED = "false"]
 [#assign TOUCHSENSING_ENABLED = "false"]
 [#assign GUI_INTERFACE_ENABLED = "false"]
@@ -53,6 +55,9 @@
     [/#if]
 	[#if name == "USBXHOST_ENABLED" && value == "true"]
       [#assign UX_HOST_ENABLED = value]
+    [/#if]
+	[#if name == "USBX_ENABLED" && value == "true"]
+      [#assign UX_ENABLED = value]
     [/#if]
 	[#if name == "USBPD_ENABLED" && value == "true"]
       [#assign USBPD_DEVICE_ENABLED = value]
@@ -85,6 +90,9 @@
 	[#if name.contains("USBX_DEVICE_MEM_POOL_VAR_NAME")]
       [#assign USBX_DEVICE_MEM_POOL_VAR_NAME_value = value]
     [/#if]
+	[#if name.contains("USBX_MEM_POOL_VAR_NAME")]
+      [#assign USBX_MEM_POOL_VAR_NAME_value = value]
+    [/#if]
 	[#if name.contains("NETXDUO_MEM_POOL_VAR_NAME")]
       [#assign NETXDUO_MEM_POOL_VAR_NAME_value = value]
     [/#if]
@@ -100,7 +108,11 @@
 [#list packs as variables]
 [#if variables.value != "ThreadX" ]
 [#assign result = "false"]
+[#if FamilyName?lower_case?starts_with("stm32n6")]
+[#assign name=mxTmpFolder+"/RTOS_pool_create_${variables.name}.tmp"/]
+[#else]
 [#assign name=contextFolder + mxTmpFolder+"/RTOS_pool_create_${variables.name}.tmp"/]
+[/#if]
 [#assign exist = common.fileExist(name)]  
   [#if exist?contains("true")] 
 	[#assign result = "true"]
@@ -167,8 +179,7 @@ static TX_BYTE_POOL ${FILEX_MEM_POOL_VAR_NAME_value};
 __ALIGN_BEGIN static UCHAR  nx_byte_pool_buffer[NX_APP_MEM_POOL_SIZE] __ALIGN_END;
 static TX_BYTE_POOL ${NETXDUO_MEM_POOL_VAR_NAME_value};
 [/#if]
-
-[#if UX_HOST_ENABLED == "true"]
+[#if UX_HOST_ENABLED == "true" && !FamilyName?lower_case?starts_with("stm32n6")]
 /* USER CODE BEGIN UX_HOST_Pool_Buffer */
 /* USER CODE END UX_HOST_Pool_Buffer */
 #if defined ( __ICCARM__ ) 
@@ -178,7 +189,7 @@ __ALIGN_BEGIN static UCHAR  ux_host_byte_pool_buffer[UX_HOST_APP_MEM_POOL_SIZE] 
 static TX_BYTE_POOL ${USBX_HOST_MEM_POOL_VAR_NAME_value};
 [/#if]
 
-[#if UX_DEVICE_ENABLED == "true"]
+[#if UX_DEVICE_ENABLED == "true" && !FamilyName?lower_case?starts_with("stm32n6")]
 /* USER CODE BEGIN UX_Device_Pool_Buffer */
 /* USER CODE END UX_Device_Pool_Buffer */
 #if defined ( __ICCARM__ ) 
@@ -186,6 +197,16 @@ static TX_BYTE_POOL ${USBX_HOST_MEM_POOL_VAR_NAME_value};
 #endif
 __ALIGN_BEGIN static UCHAR  ux_device_byte_pool_buffer[UX_DEVICE_APP_MEM_POOL_SIZE] __ALIGN_END;
 static TX_BYTE_POOL ${USBX_DEVICE_MEM_POOL_VAR_NAME_value};
+[/#if]
+
+[#if UX_ENABLED == "true" && FamilyName?lower_case?starts_with("stm32n6")]
+/* USER CODE BEGIN UX_Pool_Buffer */
+/* USER CODE END UX_Pool_Buffer */
+#if defined ( __ICCARM__ ) 
+#pragma data_alignment=4
+#endif
+__ALIGN_BEGIN static UCHAR ux_byte_pool_buffer[UX_APP_MEM_POOL_SIZE] __ALIGN_END;
+static TX_BYTE_POOL ${USBX_MEM_POOL_VAR_NAME_value};
 [/#if]
 [#if USBPD_DEVICE_ENABLED == "true"]
 /* USER CODE BEGIN USBPD_Pool_Buffer */
@@ -235,7 +256,11 @@ static TX_BYTE_POOL secure_manager_api_app_byte_pool;
 
 [#if packs??]
 [#list packs as variables]
+[#if FamilyName?lower_case?starts_with("stm32n6")]
+[@common.optinclude name=mxTmpFolder+"/RTOS_variables_${variables.name}.tmp"/]
+[#else]
 [@common.optinclude name=contextFolder +mxTmpFolder+"/RTOS_variables_${variables.name}.tmp"/]
+[/#if]
 [/#list]
 [/#if]
 
@@ -347,13 +372,14 @@ VOID tx_application_define(VOID *first_unused_memory)
 
   }
 [/#if]
-[#if UX_HOST_ENABLED == "true"]
+
+[#if UX_HOST_ENABLED == "true" && !FamilyName?lower_case?starts_with("stm32n6")]
   if (tx_byte_pool_create(&${USBX_HOST_MEM_POOL_VAR_NAME_value}, "Ux App memory pool", ux_host_byte_pool_buffer, UX_HOST_APP_MEM_POOL_SIZE) != TX_SUCCESS)
   {
     /* USER CODE BEGIN UX_Byte_Pool_Error */
 
-    /* USER CODE END UX_Byte_Pool_Error */
-  }
+	/* USER CODE END UX_Byte_Pool_Error */
+   }
   else
   {
     /* USER CODE BEGIN UX_HOST_Byte_Pool_Success */
@@ -373,9 +399,10 @@ VOID tx_application_define(VOID *first_unused_memory)
     /* USER CODE BEGIN  MX_USBX_Host_Init_Success */
       
     /* USER CODE END  MX_USBX_Host_Init_Success */ 
+
   }
 [/#if]
-[#if UX_DEVICE_ENABLED == "true"]
+[#if UX_DEVICE_ENABLED == "true"  && !FamilyName?lower_case?starts_with("stm32n6")]
   if (tx_byte_pool_create(&${USBX_DEVICE_MEM_POOL_VAR_NAME_value}, "Ux App memory pool", ux_device_byte_pool_buffer, UX_DEVICE_APP_MEM_POOL_SIZE) != TX_SUCCESS)
   {
     /* USER CODE BEGIN UX_Device_Byte_Pool_Error */
@@ -401,6 +428,35 @@ VOID tx_application_define(VOID *first_unused_memory)
     /* USER CODE BEGIN  MX_USBX_Device_Init_Success */
       
     /* USER CODE END  MX_USBX_Device_Init_Success */
+  }
+[/#if]
+
+[#if UX_ENABLED == "true" && FamilyName?lower_case?starts_with("stm32n6")]
+  if (tx_byte_pool_create(&${USBX_MEM_POOL_VAR_NAME_value}, "Ux App memory pool", ux_byte_pool_buffer, UX_APP_MEM_POOL_SIZE) != TX_SUCCESS)
+  {
+    /* USER CODE BEGIN UX_Byte_Pool_Error */
+
+	/* USER CODE END UX_Byte_Pool_Error */
+  }
+  else
+  {
+    /* USER CODE BEGIN UX_Byte_Pool_Success */
+
+    /* USER CODE END UX_Byte_Pool_Success */
+
+    memory_ptr = (VOID *)&${USBX_MEM_POOL_VAR_NAME_value};
+    status = MX_USBX_Init(memory_ptr);
+    if (status != UX_SUCCESS)
+    {
+      /* USER CODE BEGIN  MX_USBX_Init_Error */
+#t#t#twhile(1)
+#t#t#t{
+#t#t#t}
+      /* USER CODE END  MX_USBX_Init_Error */
+    }
+    /* USER CODE BEGIN  MX_USBX_Init_Success */
+
+    /* USER CODE END  MX_USBX_Init_Success */ 
   }
 [/#if]
 [#if USBPD_DEVICE_ENABLED == "true"]
@@ -546,7 +602,11 @@ VOID tx_application_define(VOID *first_unused_memory)
 [#if packs??]
 [#list packs as variables]
 [#if variables.value != "ThreadX" ]
-[@common.optinclude name=contextFolder + mxTmpFolder+"/RTOS_pool_create_${variables.name}.tmp"/]
+[#if FamilyName?lower_case?starts_with("stm32n6")]
+[@common.optinclude name= mxTmpFolder+"/RTOS_pool_create_${variables.name}.tmp"/]
+[#else]
+[@common.optinclude name= contextFolder + mxTmpFolder+"/RTOS_pool_create_${variables.name}.tmp"/]
+[/#if]
   [#assign result = "false"]
   [#assign exist = common.fileExist(name)]  
   [#if exist?contains("true")] 

@@ -19,13 +19,7 @@
     [#if paramEntry.key == "I2S_CLK_STATUS"][#assign i2s_clk_status="${paramEntry.value}"][/#if]
 [/#list]
 
-[#assign clocks=""]
-[#assign clocksNames=""]
-[#if hse_status=="enabled"][#assign clocks +="<&clk_hse>, "] [/#if][#assign clocks +="<&clk_hsi>, "][#assign clocks +="<&clk_msi>, "][#if lse_status=="enabled"][#assign clocks +="<&clk_lse>, "][/#if][#assign clocks +="<&clk_lsi>, "][#if i2s_clk_status=="enabled"][#assign clocks +="<&clk_i2sin>, "][/#if]
-[#if hse_status=="enabled"][#assign clocksNames+="\"clk-hse\", "][/#if][#assign clocksNames+="\"clk-hsi\", "][#assign clocksNames+="\"clk-msi\", "][#if lse_status=="enabled"][#assign clocksNames+="\"clk-lse\", "][/#if][#assign clocksNames+="\"clk-lsi\", "][#if i2s_clk_status=="enabled"][#assign clocksNames+="\"clk-i2sin\", "][/#if]
 [#if !srvcmx_isTargetedFw_inDTS("TF-M")]
-[#lt]${T1}clocks = ${clocks?keep_before_last(",")};
-[#lt]${T1}clock-names = ${clocksNames?keep_before_last(",")};
 
 	[#lt]${T1}st,flexgen = <
 [#t]

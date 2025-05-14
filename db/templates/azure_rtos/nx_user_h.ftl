@@ -27,7 +27,11 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
 /*    nx_user.h                                           PORTABLE C      */
+[#if FamilyName=="STM32U5" || FamilyName=="STM32H5" || FamilyName=="STM32N6"]
+/*                                                           6.3.0        */
+[#else]
 /*                                                           6.1.11       */
+[/#if]
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -53,6 +57,11 @@
 /*                                            resulting in version 6.1.8  */
 /*  04-25-2022     Yuxin Zhou               Modified comment(s),          */
 /*                                            resulting in version 6.1.11 */
+[#if FamilyName=="STM32U5" || FamilyName=="STM32H5" || FamilyName=="STM32N6"]
+/*  10-31-2023      Tiejun Zhou              Modified comment(s),          */
+/*                                            supported random IP id,      */
+/*                                            resulting in version 6.3.0   */
+[/#if]
 /*                                                                        */
 /**************************************************************************/
 
@@ -188,6 +197,14 @@
 
 	[#if name == "NX_IP_ROUTING_TABLE_SIZE"]
       [#assign NX_IP_ROUTING_TABLE_SIZE_value = value]
+    [/#if]
+
+    [#if name == "NX_ENABLE_IP_ID_RANDOMIZATION"]
+      [#assign NX_ENABLE_IP_ID_RANDOMIZATION_value = value]
+    [/#if]
+
+    [#if name == "NX_ENABLE_VLAN"]
+      [#assign NX_ENABLE_VLAN_value = value]
     [/#if]
 
 	[#if name == "NX_IP_MAX_REASSEMBLY_TIME"]
@@ -1895,6 +1912,18 @@
 */
 [#else]
 #define NX_IP_ROUTING_TABLE_SIZE         		${NX_IP_ROUTING_TABLE_SIZE_value}
+[/#if]
+[/#if]
+
+[#if FamilyName=="STM32H5" || FamilyName=="STM32U5" || FamilyName=="STM32N6"]
+/* Defined, this option enables random IP id. By default IP id is increased by one for each packet.
+*/
+[#if NX_ENABLE_IP_ID_RANDOMIZATION_value == "true"]
+#define NX_ENABLE_IP_ID_RANDOMIZATION
+[#else]
+/*
+#define NX_ENABLE_IP_ID_RANDOMIZATION
+*/
 [/#if]
 [/#if]
 
@@ -5134,6 +5163,20 @@
 */
 [#else]
 #define NX_PPP_OPTION_MESSAGE_LENGTH            ${NX_PPP_OPTION_MESSAGE_LENGTH_value}
+[/#if]
+
+[#if FamilyName=="STM32H5" || FamilyName=="STM32U5" || FamilyName=="STM32N6"]
+/* Defined, the VLAN feature is enabled.
+   Note: Require driver support to use APIs from this file.
+         A quick check in driver is to search for
+         NX_LINK_RAW_PACKET_SEND. VLAN APIs are not supported if not found. */
+[#if NX_ENABLE_VLAN_value == "true"]
+#define NX_ENABLE_VLAN
+[#else]
+/*
+#define NX_ENABLE_VLAN
+*/
+[/#if]
 [/#if]
 
 #ifdef NX_DISABLE_IPV6

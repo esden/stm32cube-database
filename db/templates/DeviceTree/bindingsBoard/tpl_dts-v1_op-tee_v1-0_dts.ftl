@@ -23,15 +23,25 @@
 [#if (mx_socDtRPN == "stm32mp15")]
 #include <dt-bindings/clock/stm32mp1-clksrc.h>
 [#else]
+	[#if mx_socPtCPN?starts_with("stm32mp23")]
+#include <dt-bindings/clock/stm32mp25-clksrc.h>
+	[#else]
 #include <dt-bindings/clock/${mx_socDtRPN}-clksrc.h>
-
+	[/#if]
 [/#if]
 [#--MP25 specefic Bindings--]
 [#if mx_socDtRPN?starts_with("stm32mp2") ]
+	[#if mx_socPtCPN?starts_with("stm32mp23")]
+#include <dt-bindings/soc/stm32mp25-rif.h>
+#include <dt-bindings/soc/stm32mp25-risab.h>
+#include <dt-bindings/soc/stm32mp25-risaf.h>
+#include <dt-bindings/soc/stm32mp25-rifsc.h>
+	[#else]
 #include <dt-bindings/soc/${mx_socDtRPN}-rif.h>
 #include <dt-bindings/soc/${mx_socDtRPN}-risab.h>
 #include <dt-bindings/soc/${mx_socDtRPN}-risaf.h>
 #include <dt-bindings/soc/${mx_socDtRPN}-rifsc.h>
+	[/#if]
 [/#if]
 [#if srvcmx_isDeviceEnabled("etzpc") && srvcmx_getMatchingBindedHwName_inDTS("etzpc")?has_content]
 #include <dt-bindings/soc/${mx_socDtRPN}-etzpc.h>
@@ -67,7 +77,11 @@
 [/#if]
 [#if (mx_socDtRPN == "stm32mp15")||mx_socDtRPN?starts_with("stm32mp2") ]
 	[#if mx_socPtCPN?has_content]
+		[#if mx_socPtCPN?starts_with("stm32mp23")]
+#include "${"stm32mp25" + "xx" + mx_socPtCPN?substring(11)}-pinctrl.dtsi"
+		[#else]
 #include "${mx_socPtCPN?substring(0,9) + "xx" + mx_socPtCPN?substring(11)}-pinctrl.dtsi"
+		[/#if]
 	[#else]
 	[@mlog  logMod=module logType="ERR" logMsg="unknown SOC pinCtrl package dtsi" varsMap={} /]
 /*#include "???-pinctrl.dtsi"*/

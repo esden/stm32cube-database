@@ -262,7 +262,7 @@ void USBPD_DPM_UserExecute(void const *argument)
 /* USER CODE BEGIN USBPD_DPM_UserExecute */
 
 /* USER CODE END USBPD_DPM_UserExecute */
-[#if (FREERTOS?? || THREADX??) && Secure!="true"]
+[#if (FREERTOS??||XCUBEFREERTOS??||THREADX??) && Secure!="true"]
 [#else]
 [#if GUI_INTERFACE??]
   GUI_Execute();

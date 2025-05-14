@@ -2,7 +2,7 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file           : mx_extmem.h
+  * @file           : extmem_manager.h
   * @version        : ${version}
 [#--  * @packageVersion : ${fwVersion} --]
   * @brief          : Header for secure_manager_api.c file.

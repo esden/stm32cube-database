@@ -38,6 +38,8 @@ extern "C" {
 #define HAL_MODULE_ENABLED
 [#if DIE=="DIE493"]
 [#assign allModules = ["ADC", "CRC","AES","I2C","I2S","IWDG","IRDA","PCD","HCD","RNG","RTC","SMARTCARD","SMBUS","SPI","TIM","UART","USART","WWDG"]]
+[#elseif DIE=="DIE44D"]
+[#assign allModules = ["ADC", "CRC","AES","I2C","I2S","IWDG","IRDA","PCD","RNG","RTC","SMARTCARD","SMBUS","SPI","TIM","UART","USART","WWDG"]]
 [#else]
 [#assign allModules = ["ADC", "CRC","AES","I2C","I2S","IWDG","IRDA","PCD","RNG","RTC","SMARTCARD","SMBUS","SPI","TIM","UART","USART","WWDG"]]
 [/#if]
@@ -64,7 +66,13 @@ extern "C" {
 #define HAL_FLASH_MODULE_ENABLED
 #define HAL_PWR_MODULE_ENABLED
 #define HAL_CORTEX_MODULE_ENABLED
-
+[#if DIE=="DIE44D"]
+[#if isModuleUsed("FDCAN")]
+#define HAL_FDCAN_MODULE_ENABLED
+[#else]
+/* #define HAL_FDCAN_MODULE_ENABLED   */
+[/#if]
+[/#if]
 /* ########################## Register Callbacks selection ############################## */
 /**
   * @brief Set below the peripheral configuration  to "1U" to add the support
@@ -254,8 +262,14 @@ in voltage and temperature.*/
 #ifdef HAL_WWDG_MODULE_ENABLED
  #include "stm32c0xx_hal_wwdg.h"
 #endif /* HAL_WWDG_MODULE_ENABLED */
+[#if DIE=="DIE44D"]
 
+#ifdef HAL_FDCAN_MODULE_ENABLED
+#include "stm32c0xx_hal_fdcan.h"
+#endif /* HAL_FDCAN_MODULE_ENABLED */
+[/#if]
 [#if DIE=="DIE493"]
+
 #ifdef HAL_PCD_MODULE_ENABLED
  #include "stm32c0xx_hal_pcd.h"
 #endif /* HAL_PCD_MODULE_ENABLED */

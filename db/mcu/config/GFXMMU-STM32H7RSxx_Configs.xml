@@ -5,16 +5,31 @@
             <MethodArg Name="hgfxmmu.Init.Interrupts.Activation"    ParameterName="ITActivation"/>
             <MethodArg Name="UsedInterrupts" ParameterName="UsedInterruptsARG"/>
         </CallLibMethod>
-        <!-- <IFCondition Expression="Sem_GFXMMUIsConfigured" Diagnostic=""> -->
+       <IFCondition Expression="AddressTranslation = ENABLE" Diagnostic="">
        <CallLibMethod Name="HAL_GFXMMU_ConfigLut">
             <MethodArg Name="FirstLine" FValue="GFXMMU_LUT_FIRST"/>
             <MethodArg Name="LinesNumber" FValue="GFXMMU_LUT_SIZE"/>
             <MethodArg Name="Address" FValue="(uint32_t)gfxmmu_lut_config"/>
         </CallLibMethod>
-        <!-- </IFCondition> -->
+        </IFCondition>
         <ImplementCallBack Name="HAL_GFXMMU_MspInit"/>
         <ImplementCallBack Name="HAL_GFXMMU_MspDeInit"/>
     </RefConfig>
+     <RefConfig Name="GFXMMU_Packing">
+        <IFCondition Expression="BlockSize = GFXMMU_12BYTE_BLOCKS">
+        <CallLibMethod Name="HAL_GFXMMU_ConfigPacking">
+        <MethodArg Name="Buffer0Activation"                               ParameterName="Buffer0Activation"/>
+        <MethodArg Name="Buffer0Mode"                                     ParameterName="Buffer0Mode"/>
+        <MethodArg Name="Buffer1Activation"                               ParameterName="Buffer1Activation"/>
+        <MethodArg Name="Buffer1Mode"                                     ParameterName="Buffer1Mode"/>
+        <MethodArg Name="Buffer2Activation"                               ParameterName="Buffer2Activation"/>
+        <MethodArg Name="Buffer2Mode"                                     ParameterName="Buffer2Mode"/>
+        <MethodArg Name="Buffer3Activation"                               ParameterName="Buffer3Activation"/>
+        <MethodArg Name="Buffer3Mode"                                     ParameterName="Buffer3Mode"/>
+        <MethodArg Name="DefaultAlpha"                                    ParameterName="DefaultAlpha"/>
+        </CallLibMethod>
+       </IFCondition>
+       </RefConfig>
     <RefConfig Name="Gfxmmu_DeInit">
         <CallLibMethod Name="HAL_GFXMMU_DeInit"/>
     </RefConfig>
@@ -39,6 +54,39 @@
             </Argument> 
             <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
             <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+    </LibMethod>
+    <LibMethod Comment="" Name="HAL_GFXMMU_ConfigPacking">
+        <Argument AddressOf="true" Context="global" GenericType="struct" Name="hgfxmmu" TypeName="GFXMMU_HandleTypeDef">
+            <Argument AddressOf="false" GenericType="baseaddress" Name="Instance" TypeName="GFXMMU_TypeDef"/>
+            <Argument AddressOf="false" GenericType="struct" Name="Init" TypeName="GFXMMU_InitTypeDef">
+                <Argument AddressOf="false" GenericType="simple" Name="BlockSize" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="DefaultValue" OptimizationCondition="equal"/>
+                <Argument AddressOf="false" GenericType="simple" Name="AddressTranslation" OptimizationCondition="equal"/>
+                <Argument AddressOf="true" GenericType="struct" Name="Buffers" TypeName="GFXMMU_BuffersTypeDef">
+                    <Argument AddressOf="false" GenericType="simple" Name="Buf0Address" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="Buf1Address" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="Buf2Address" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="Buf3Address" OptimizationCondition="equal"/>
+                </Argument>	
+                <Argument AddressOf="true" GenericType="struct" Name="Interrupts" TypeName="GFXMMU_InterruptsTypeDef">
+                    <Argument AddressOf="false" GenericType="simple" Name="Activation" OptimizationCondition="equal"/>
+                    <Argument AddressOf="false" GenericType="simple" Name="UsedInterrupts" OptimizationCondition="equal"/>
+                </Argument>
+            </Argument> 
+            <Argument AddressOf="false" GenericType="simple" Name="State" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="ErrorCode" OptimizationCondition="equal"/>
+        </Argument>
+        <Argument AddressOf="true"  GenericType="struct" Name="pPacking" TypeName="GFXMMU_PackingTypeDef">
+            <Argument AddressOf="false" GenericType="simple" Name="Buffer0Activation" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Buffer0Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Buffer1Activation" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Buffer1Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Buffer2Activation" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Buffer2Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Buffer3Activation" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="Buffer3Mode" OptimizationCondition="equal"/>
+            <Argument AddressOf="false" GenericType="simple" Name="DefaultAlpha" OptimizationCondition="equal"/>
         </Argument>
     </LibMethod>
     <LibMethod Comment="" Name="HAL_GFXMMU_DeInit">

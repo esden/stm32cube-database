@@ -122,7 +122,7 @@ typedef enum
   APP_BLE_DISCOVERING_SERVICES,
   APP_BLE_DISCOVERING_CHARACS,
 [/#if]
-  /* USER CODE BEGIN APP_BLE_ConnStatus_t*/
+  /* USER CODE BEGIN APP_BLE_ConnStatus_t */
 
   /* USER CODE END APP_BLE_ConnStatus_t */
 } APP_BLE_ConnStatus_t;
@@ -162,7 +162,7 @@ typedef enum
   PROC_GAP_GEN_PHY_TOGGLE,
   PROC_GAP_GEN_CONN_TERMINATE,
   PROC_GATT_EXCHANGE_CONFIG,
-  /* USER CODE BEGIN ProcGapGeneralId_t*/
+  /* USER CODE BEGIN ProcGapGeneralId_t */
 
   /* USER CODE END ProcGapGeneralId_t */
 }ProcGapGeneralId_t;
@@ -367,7 +367,7 @@ void APP_BLE_Procedure_Gap_Peripheral(ProcGapPeripheralId_t ProcGapPeripheralId)
 [#if (myHash["BLE_MODE_CENTRAL"] == "Enabled")]
 void APP_BLE_Procedure_Gap_Central(ProcGapCentralId_t ProcGapCentralId);
 [/#if]
-[#if (myHash["BLE_OPTIONS_LL_ONLY"] == "BLE_OPTIONS_LL_ONLY")]
+[#if (myHash["BLE_MODE_TRANSPARENT_UART"] != "Enabled")]
 const uint8_t* BleGetBdAddress(void);
 [/#if]
 [#if ((myHash["BLE_OPTIONS_ENHANCED_ATT"] == "BLE_OPTIONS_ENHANCED_ATT") && (myHash["BLE_MODE_CENTRAL"] == "Enabled"))]

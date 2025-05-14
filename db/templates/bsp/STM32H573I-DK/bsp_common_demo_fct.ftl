@@ -28,6 +28,9 @@
       [#if definition.name=="Bsp_Common_DEMO"]
           [#assign Bsp_Common_DEMO = definition.value]
       [/#if]
+      [#if definition.name=="LCD_TC_ON"]
+          [#assign LCD_TC_ON = definition.value]
+      [/#if]
     [/#list]
   [/#if]
 [/#list]
@@ -48,4 +51,20 @@ void BSP_PB_Callback(Button_TypeDef Button)
   }
 }
   [/#if]
+
+[#if (LCD_TC_ON?? && LCD_TC_ON == "true")]
+/**
+  * @brief  BSP TS Callback.
+  * @param  Instance TS Instance.
+  * @retval None.
+  */
+void BSP_TS_Callback(uint32_t Instance)
+{
+  BSP_TS_GetState(0, &TS_State);
+  if(TS_State.TouchDetected == 1)
+  {
+    TouchPressed = 1;
+  }
+}
+[/#if]
 [/#if]

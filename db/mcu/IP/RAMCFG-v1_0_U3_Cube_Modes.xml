@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<IP xmlns="http://mcd.rou.st.com/modules.php?name=mcu" 
+    ns0:schemaLocation="http://mcd.rou.st.com/modules.php?name=mcu ../../../../../../../doc/V4/Development/Specifications/db/IP_Modes.xsd"
+    xmlns:ns0="http://www.w3.org/2001/XMLSchema-instance"
+    DBVersion="V4.0"
+    IPType="service"
+    IpGroup="System Core"
+    Name="RAMCFG"
+    Version="v1_0_U3_Cube">
+       
+    <About>RAMCFG: RAMs configuration controller</About>
+    
+    <RefParameter Comment="Instance" DefaultValue="RAMCFG" Name="Instance" Type="" Visible="false"/>
+   
+<RefParameter Comment="Parity error detection" DefaultValue="ECC_DISABLE" Name="ErrorCodeCorrectionSRAM2" Type="list">
+        <PossibleValue Comment="Disable" Value="ECC_DISABLE"/>
+        <PossibleValue Comment="StartParity" Value="START_ECC"/>
+        <PossibleValue Comment="StopParity" Value="STOP_ECC"/>
+</RefParameter>
+<RefParameter Comment="Parity error detection" DefaultValue="null" Name="ErrorCodeCorrectionSRAM2" Type="list" Visible="false">
+</RefParameter>   
+    <!-- Write Protection -->
+    <!-- I Removed the Write Protection parameter (according to Intropack Owner this parameter should not be initialized, let user define it.) -->
+    <!--
+    <RefParameter Comment="Write Protection" DefaultValue="WP_DISABLE" Name="WriteProtection" Type="list">
+        <PossibleValue Comment="Disable" Value="WP_DISABLE"/>
+        <PossibleValue Comment="Enable" Value="WP_ENABLE"/>
+    </RefParameter>
+    -->                         <!-- SRAM2 contains 64 pages (1 Kbyte page size). -->
+    <!--
+    <RefParameter Name="StartPage" Comment="    Start Page" DefaultValue="1U" Type="unsignedInt">
+        <Condition Diagnostic="" Expression="WriteProtection=WP_ENABLE"/>
+    </RefParameter>
+
+    <RefParameter Name="PageNb" Comment="    Page Number" DefaultValue="1U" Type="unsignedInt">
+        <Condition Diagnostic="" Expression="WriteProtection=WP_ENABLE"/>    
+    </RefParameter>
+    -->
+     
+    <!-- Software Erase -->
+    <RefParameter Comment="Hardware Erase" DefaultValue="HE_DISABLE" Name="HardwareErase" Type="list">
+        <PossibleValue Comment="Disable" Value="HE_DISABLE"/>
+        <PossibleValue Comment="Enable" Value="HE_ENABLE"/>
+    </RefParameter>
+      
+    <!-- RefMode RAMCFG SRAM1 -->
+    <RefMode BaseMode="RAMCFG SRAM1" Group="SRAM1" Name="RAMCFG1_Activate">
+        <ConfigForMode>Ramcfg1_Init</ConfigForMode>
+        <Parameter Name="Instance">
+            <PossibleValue>RAMCFG_SRAM1</PossibleValue>
+	</Parameter>
+		 <Parameter Name="HardwareErase"/>
+    </RefMode>
+    
+    <!-- RefMode RAMCFG SRAM2 -->
+    <RefMode BaseMode="RAMCFG SRAM2" Group="SRAM2" Name="RAMCFG2_Activate">
+        <ConfigForMode>Ramcfg2_Init</ConfigForMode>
+        <Parameter Name="Instance">
+            <PossibleValue>RAMCFG_SRAM2</PossibleValue>
+	</Parameter>
+        <Parameter Name="HardwareErase"/>
+		<Parameter Name="ErrorCodeCorrectionSRAM2"/>
+    </RefMode>
+    
+      
+    <!-- ModeLogicOperator for RAMCFG -->
+        <ModeLogicOperator Name="OR">
+		<Mode Name="RAMCFG1_Activate" UserName="RAMCFG SRAM1">
+                    <ModeLogicOperator Name="XOR">
+			<Mode Name="RAMCFG1_Activate" UserName="Activated">
+                            <SignalLogicalOp Name="AND">
+                                <Signal Name="VS_RAMCFG1"/>							
+                            </SignalLogicalOp>
+			</Mode>							
+                    </ModeLogicOperator>					
+		</Mode>						
+								
+		<Mode Name="RAMCFG2_Activate" UserName="RAMCFG SRAM2">
+                    <ModeLogicOperator Name="XOR">
+			<Mode Name="RAMCFG2_Activate" UserName="Activated">
+                            <SignalLogicalOp Name="AND">
+				<Signal Name="VS_RAMCFG2"/>							
+                            </SignalLogicalOp>	
+			</Mode>							
+                    </ModeLogicOperator>					
+		</Mode>                              							                            							
+	</ModeLogicOperator>
+	
+        <!-- RefSignal for RAMCFG -->
+        <RefSignal Name="VS_RAMCFG1" Virtual="true"/>
+        <RefSignal Name="VS_RAMCFG2" Virtual="true"/>      
+        <Semaphore>$IpInstanceUsed_ForRCC</Semaphore>
+</IP>

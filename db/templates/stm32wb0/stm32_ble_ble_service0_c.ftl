@@ -361,6 +361,10 @@ BLE_GATT_SRV_CCCD_DECLARE([@characteristicShortNameLow characteristic/], CFG_BLE
                           BLE_GATT_SRV_OP_MODIFIED_EVT_ENABLE_FLAG);
         [/#if]
     [/#list]
+	
+/* USER CODE BEGIN DESCRIPTORS DECLARATION */
+
+/* USER CODE END DESCRIPTORS DECLARATION */		
 [/#if]
 
 [#if SERVICE_NUMBER_OF_CHARACTERISTICS != "0"]
@@ -450,7 +454,12 @@ static const ble_gatt_chr_def_t ${SERVICE_SHORT_NAME?lower_case}_chars[] = {
 		[#if myHash["SERVICE"+SvcNbr+"_CHAR"+characteristic+"_UUID_TYPE"] == "0x02"]
         .uuid = ${UUID_TYPE}([@characteristicShortName characteristic/]_UUID),
 		[/#if]
-	        [#if ((myHash["SERVICE"+SvcNbr+"_CHAR"+characteristic+"_PROP_NOTIFY"] == "BLE_GATT_SRV_CHAR_PROP_NOTIFY") && (myHash["SERVICE"+SvcNbr+"_CHAR"+characteristic+"_PROP_INDICATE"] != "BLE_GATT_SRV_CHAR_PROP_INDICATE")) || ((myHash["SERVICE"+SvcNbr+"_CHAR"+characteristic+"_PROP_NOTIFY"] != "BLE_GATT_SRV_CHAR_PROP_NOTIFY") && (myHash["SERVICE"+SvcNbr+"_CHAR"+characteristic+"_PROP_INDICATE"] == "BLE_GATT_SRV_CHAR_PROP_INDICATE"))]
+			[#if (myHash["SERVICE"+SvcNbr+"_CHAR"+characteristic+"_NUMBER_OF_CHAR_DESCRIPTORS"]?number != 0)]
+/* USER CODE BEGIN Service${SvcNbr}_char${characteristic}_DESCRIPTORS_DEFINITION */
+/* Place holder for Characteristic Descriptors */
+
+/* USER CODE END Service${SvcNbr}_char${characteristic}_DESCRIPTORS_DEFINITION */			
+	        [#elseif ((myHash["SERVICE"+SvcNbr+"_CHAR"+characteristic+"_PROP_NOTIFY"] == "BLE_GATT_SRV_CHAR_PROP_NOTIFY") && (myHash["SERVICE"+SvcNbr+"_CHAR"+characteristic+"_PROP_INDICATE"] != "BLE_GATT_SRV_CHAR_PROP_INDICATE")) || ((myHash["SERVICE"+SvcNbr+"_CHAR"+characteristic+"_PROP_NOTIFY"] != "BLE_GATT_SRV_CHAR_PROP_NOTIFY") && (myHash["SERVICE"+SvcNbr+"_CHAR"+characteristic+"_PROP_INDICATE"] == "BLE_GATT_SRV_CHAR_PROP_INDICATE"))]
         .descrs = {
             .descrs_p = &BLE_GATT_SRV_CCCD_DEF_NAME([@characteristicShortNameLow characteristic/]),
             .descr_count = 1U,

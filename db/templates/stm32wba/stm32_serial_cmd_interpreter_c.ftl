@@ -62,7 +62,6 @@ static uint16_t indexRxBuffer = 0;
 
 /* Private functions prototypes ----------------------------------------------*/
 static void UART_Rx_Callback(uint8_t *PData, uint16_t Size, uint8_t Error);
-static void Uart_Cmd_Execute(void);
 
 /* USER CODE BEGIN PFP */
 
@@ -80,58 +79,15 @@ void Serial_CMD_Interpreter_Init(void)
   UTIL_ADV_TRACE_StartRxProcess(UART_Rx_Callback);
 }
 
-/* USER CODE BEGIN FD */
-
-/* USER CODE END FD */
-
-/* Private functions definition ----------------------------------------------*/
-static void UART_Rx_Callback(uint8_t *PData, uint16_t Size, uint8_t Error)
+__weak void Serial_CMD_Interpreter_CmdExecute( uint8_t * pRxBuffer, uint16_t iRxBufferSize )
 {
-  /* USER CODE BEGIN UART_Rx_Callback_0 */
-
-  /* USER CODE END UART_Rx_Callback_0 */
-
-  /* Filling buffer and wait for '\r' charactere to execute actions */
-  if (indexRxBuffer < RX_BUFF_SIZE)
-  {
-    if (*PData == '\r')
-    {
-      Uart_Cmd_Execute();
-
-      /* Clear receive buffer and character counter*/
-      indexRxBuffer = 0;
-      memset( &RxBuffer[0], 0, RX_BUFF_SIZE );
-    }
-    else
-    {
-      if ( ( *PData == '\n' ) && ( indexRxBuffer == 0 ) )
-      {
-        /* discard this first charactere if it's a delimiter  */
-      }
-      else
-      {
-        RxBuffer[indexRxBuffer++] = *PData;
-      }
-    }
-  }
-  else
-  {
-    indexRxBuffer = 0;
-    memset(&RxBuffer[0], 0, RX_BUFF_SIZE);
-  }
-  return;
-
-  /* USER CODE BEGIN UART_Rx_Callback_1 */
-
-  /* USER CODE END UART_Rx_Callback_1 */
-}
-
-static void Uart_Cmd_Execute(void)
-{
+  /* NOTE : This function should not be modified, when the callback is needed,
+            the enter_standby_notification could be implemented in the user file
+  */
+   
   /*
-    This function is in charge of interpreting the received data.
-    The data are located within the RxBuffer variable.
-
+    This user function is in charge of interpreting the received data.
+    
     Here is an example of how to use them.
     In this simple case, we'll generate a SW IT on GPIO14 if the received data is a string "TEST".
     Add the following code into the user code section :
@@ -140,48 +96,59 @@ static void Uart_Cmd_Execute(void)
     EXTI_HandleTypeDef exti_handle;
 
     // Check RxBuffer's content to know if we're matching our case
-    if(strcmp((char const*)RxBuffer, "TEST") == 0)
+    if( strcmp( (char const*)pRxBuffer, "TEST" ) == 0 )
     {
       LOG_INFO_APP("TEST has been received in Uart_Cmd_Execute.\n");
       exti_handle.Line = EXTI_LINE_14;
       HAL_EXTI_GenerateSWI(&exti_handle);
     }
   */
+}
 
-  /* USER CODE BEGIN Uart_Cmd_Execute */
-[#if PG_FILL_UCS == "True"]
-[#if PG_VALIDATION == 1]
-  Button_TypeDef      eButton;
+/* USER CODE BEGIN FD */
 
-  /* Parse received frame */
-  if ( strcmp((char const*)RxBuffer, "SW1") == 0 )
+/* USER CODE END FD */
+
+/* Private functions definition ----------------------------------------------*/
+static void UART_Rx_Callback(uint8_t *pData, uint16_t Size, uint8_t Error)
+{
+  /* USER CODE BEGIN UART_Rx_Callback_0 */
+
+  /* USER CODE END UART_Rx_Callback_0 */
+
+  /* Filling buffer and wait for '\r' charactere to execute actions */
+  if (indexRxBuffer < RX_BUFF_SIZE)
   {
-    eButton = B1;
-  }
-  else if ( strcmp( (char const*)RxBuffer, "SW2" ) == 0 )
-  {
-    eButton = B2;
-  }
-  else if ( strcmp( (char const*)RxBuffer, "SW3" ) == 0 )
-  {
-    eButton = B3;
+    if (*pData == '\r')
+    {
+      Serial_CMD_Interpreter_CmdExecute(RxBuffer, indexRxBuffer);
+
+      /* Clear receive buffer and character counter*/
+      indexRxBuffer = 0;
+      memset( &RxBuffer[0], 0, RX_BUFF_SIZE );
+    }
+    else
+    {
+      if ( ( *pData == '\n' ) && ( indexRxBuffer == 0 ) )
+      {
+        /* discard this first charactere if it's a delimiter  */
+      }
+      else
+      {
+        RxBuffer[indexRxBuffer++] = *pData;
+      }
+    }
   }
   else
   {
-    LOG_INFO_APP( "NOT RECOGNIZED COMMAND : %s\n", RxBuffer );
-    return;
+    indexRxBuffer = 0;
+    memset(&RxBuffer[0], 0, RX_BUFF_SIZE);
   }
 
-  /* Launch SW Command */
-  LOG_INFO_APP( "%s pressed by Command.\n", RxBuffer );
-  BSP_PB_Callback( eButton );
-[/#if]
-[/#if]
+  /* USER CODE BEGIN UART_Rx_Callback_1 */
 
-  /* USER CODE END Uart_Cmd_Execute */
+  /* USER CODE END UART_Rx_Callback_1 */
+  return;
 }
 
-/* USER CODE BEGIN PFD */
-
-/* USER CODE END PFD */
 

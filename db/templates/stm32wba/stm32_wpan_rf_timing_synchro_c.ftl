@@ -12,6 +12,20 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
+[#assign myHash = {}]
+[#list SWIPdatas as SWIP]
+    [#if SWIP.defines??]
+        [#list SWIP.defines as definition]
+            [#assign myHash = {definition.name:definition.value} + myHash]
+        [/#list]
+    [/#if]
+[/#list]
+[#--
+Key & Value:
+[#list myHash?keys as key]
+Key: ${key}; Value: ${myHash[key]}
+[/#list]
+--]
 
 /* Includes ------------------------------------------------------------------*/
 #include <stdbool.h>
@@ -25,6 +39,10 @@
 /* Global variables ----------------------------------------------------------*/
 /* Private typedef -----------------------------------------------------------*/
 /* Private defines -----------------------------------------------------------*/
+[#if myHash["ZIGBEE"] == "Enabled"]
+#define DISABLE_RFTS_EXT_EVNT_HNDLR     1u
+
+[/#if]
 /* Private macros ------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 

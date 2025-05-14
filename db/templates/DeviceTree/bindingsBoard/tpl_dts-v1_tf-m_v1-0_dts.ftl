@@ -16,10 +16,15 @@
 [#macro gen_tfm]
 [#local module = "gen_optee"]
 /dts-v1/;
-
+[#if mx_socPtCPN?starts_with("stm32mp23")]
+#include "dt-bindings/clock/stm32mp25-clksrc.h"
+#include "dt-bindings/reset/stm32mp25-resets.h"
+#include <dt-bindings/pinctrl/stm32-pinfunc.h>
+[#else]
 #include "dt-bindings/clock/${mx_socDtRPN}-clksrc.h"
 #include "dt-bindings/reset/${mx_socDtRPN}-resets.h"
 #include <dt-bindings/pinctrl/stm32-pinfunc.h>
+[/#if]
 [#if mx_socFtRPN?has_content]
 #include "${mx_socFtRPN}.dtsi"
 [#else]
@@ -36,7 +41,11 @@
 [/#if]
 [#if (mx_socDtRPN?starts_with("stm32mp2"))]
 	[#if mx_socPtCPN?has_content]
+		[#if mx_socPtCPN?starts_with("stm32mp23")]
+#include "${"stm32mp25" + "xx" + mx_socPtCPN?substring(11)}-pinctrl.dtsi"
+		[#else]
 #include "${mx_socPtCPN?substring(0,9) + "xx" + mx_socPtCPN?substring(11)}-pinctrl.dtsi"
+		[/#if]
 	[#else]
 		[@mlog  logMod=module logType="ERR" logMsg="unknown SOC pinCtrl package dtsi" varsMap={} /]
 /*#include "???-pinctrl.dtsi"*/
