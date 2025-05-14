@@ -80,13 +80,13 @@
 	[/#if]	
 [#if cpucore=="ARM_CORTEX_M4"]
     [#if definition.paramName == "DEVICE_SERIAL0"]
-#define DEVICE_SERIAL0 #t#t(*(uint32_t *) ${value})
+#define DEVICE_SERIAL0 #t#t(${value})
     [/#if]
     [#if definition.paramName == "DEVICE_SERIAL1"]	
-#define DEVICE_SERIAL1 #t#t(*(uint32_t *) ${value})
+#define DEVICE_SERIAL1 #t#t(${value})
     [/#if]
     [#if definition.paramName == "DEVICE_SERIAL2"]	
-#define DEVICE_SERIAL2 #t#t(*(uint32_t *) ${value})
+#define DEVICE_SERIAL2 #t#t(${value})
     [/#if]
 [/#if]
 [#if !definition.paramName.contains("DEVICE_SERIAL")]

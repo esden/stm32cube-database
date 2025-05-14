@@ -3,7 +3,6 @@
     [#assign instName = SWIP.ipName]
     [#assign fileName = SWIP.fileName]
     [#assign version = SWIP.version]
-
     [#if SWIP.defines??]
         [#list SWIP.defines as definition]
             [#if definition.name=="LD1"]
