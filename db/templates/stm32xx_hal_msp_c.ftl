@@ -146,12 +146,8 @@ void HAL_MspInit(void)
 [#if isSBS_XSPIM1_Used?? || isSBS_XSPIM2_Used?? || isSBS_IO_Used??]
 #t__HAL_RCC_SBS_CLK_ENABLE();
 [/#if]
-[#if FamilyName == "STM32U5"]
-[#list IPdatas as IP]
-    [#if IP.ipName?? && IP.ipName?starts_with("ADC") && VDDA_ISOLATION??]
-    #tHAL_PWREx_EnableVddA();  
-    [/#if]
-[/#list]
+[#if VDDA_ISOLATION??]
+#tHAL_PWREx_EnableVddA();
 [/#if]
 #n
 

@@ -733,7 +733,7 @@ static void Get_SerialNum(void)
   deviceserial2 = DEVICE_SERIAL2;
 
 /* USER CODE END SerialNum */
-[#elseif cpucore=="ARM_CORTEX_M7"]
+[#elseif cpucore=="ARM_CORTEX_M7" | CLASS_FS!="CDC" | CLASS_HS!="CDC"]
   deviceserial0 = *(uint32_t *) DEVICE_ID1;
   deviceserial1 = *(uint32_t *) DEVICE_ID2;
   deviceserial2 = *(uint32_t *) DEVICE_ID3;
